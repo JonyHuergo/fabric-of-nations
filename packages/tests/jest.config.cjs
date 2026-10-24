@@ -15,6 +15,7 @@ module.exports = {
     ]
   },
   moduleNameMapper: {
+    "^@century/data$": "<rootDir>/../data/src/index.ts",
     "^@century/sim$": "<rootDir>/../sim/src/index.ts",
     "^(\\.{1,2}/.*)\\.js$": "$1"
   }

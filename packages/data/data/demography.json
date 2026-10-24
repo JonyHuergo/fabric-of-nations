@@ -1,0 +1,39 @@
+{
+  "mortalityAnchors": [
+    {
+      "year": 1900,
+      "annualDeathsPer1000ByAgeBand": [60, 10, 5, 6, 8, 10, 12, 15, 20, 28, 40, 55, 75, 110, 160, 230, 350]
+    },
+    {
+      "year": 1949,
+      "annualDeathsPer1000ByAgeBand": [60, 10, 5, 6, 8, 10, 12, 15, 20, 28, 40, 55, 75, 110, 160, 230, 350]
+    },
+    {
+      "year": 1950,
+      "annualDeathsPer1000ByAgeBand": [38, 6, 3, 4, 5, 6, 8, 10, 13, 18, 26, 36, 50, 75, 110, 160, 260]
+    },
+    {
+      "year": 2000,
+      "annualDeathsPer1000ByAgeBand": [8, 1.2, 0.6, 0.8, 1, 1.5, 2, 3, 4, 6, 9, 14, 22, 38, 65, 110, 190]
+    }
+  ],
+  "fertilityAnchors": [
+    { "year": 1900, "annualBirthsPer1000": 31.9 },
+    { "year": 1949, "annualBirthsPer1000": 31.9 },
+    { "year": 1950, "annualBirthsPer1000": 36.1 },
+    { "year": 2000, "annualBirthsPer1000": 25.1 }
+  ],
+  "fertilityMultipliers": [
+    { "professionId": 0, "multiplier": 1 },
+    { "professionId": 1, "multiplier": 1 },
+    { "professionId": 2, "multiplier": 1 }
+  ],
+  "provenance": {
+    "status": "provisional",
+    "confidence": "low",
+    "sourceName": "Century GDD v2.0 §15.3 provisional world anchors plus a stylized transition",
+    "sourceUrl": "Century_GDD_v2.md#15.3",
+    "accessDate": "2026-10-23",
+    "notes": "Synthetic, not a source-backed historical demographic series. The 1900-1949 mortality schedule is held flat and steps down in 1950 to exercise a stylized transition. Age-specific rates are provisional reconstructions. The crude birth-rate anchors were adjusted by +0.3 per 1,000 from the earlier provisional values to reduce the error against the source-backed OWID world-population curve; this is a calibration adjustment to a total-population target, not evidence that the age-specific schedules are historical."
+  }
+}

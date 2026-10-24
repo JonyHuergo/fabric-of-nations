@@ -16,6 +16,9 @@ importers:
 
   packages/bench:
     dependencies:
+      '@century/data':
+        specifier: workspace:*
+        version: link:../data
       '@century/sim':
         specifier: workspace:*
         version: link:../sim
@@ -24,12 +27,23 @@ importers:
         specifier: 22.10.2
         version: 22.10.2
 
-  packages/data: {}
+  packages/data:
+    dependencies:
+      '@century/sim':
+        specifier: workspace:*
+        version: link:../sim
+    devDependencies:
+      '@types/node':
+        specifier: 22.10.2
+        version: 22.10.2
 
   packages/sim: {}
 
   packages/tests:
     dependencies:
+      '@century/data':
+        specifier: workspace:*
+        version: link:../data
       '@century/sim':
         specifier: workspace:*
         version: link:../sim

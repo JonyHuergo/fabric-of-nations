@@ -1,21 +1,17 @@
 /**
- * Explicit, versioned serialization for the M1 world.
+ * Explicit, versioned serialization for the M2 world.
  *
- * A save is a canonical JSON envelope with:
- * - save format version,
- * - world schema version,
- * - simulation version,
- * - content/data version,
- * - scenario, day index, and seed for quick inspection,
- * - a checksum of the canonical payload,
- * - the complete encoded payload.
+ * A save is a canonical JSON envelope with save format, schema, simulation, and
+ * content versions; scenario/day/seed metadata; a checksum; and the complete
+ * encoded payload. The payload includes the M1 diagnostics and the M2 region,
+ * pop-block, and minimal finance-account state.
  *
  * Typed arrays are never left to `JSON.parse`: each is encoded as a tagged
  * object with an explicit kind, length, and values, and reconstructed as the
- * corresponding typed-array class. The M1 world itself has no dense arrays yet;
- * this codec is the same one later dense state will use and is tested in
- * isolation. Version mismatches, malformed data, checksum failures, and invalid
- * state all produce a `SaveFormatError` instead of a partially restored world.
+ * corresponding typed-array class. M2 uses this codec for `Uint32Array` cohort
+ * counts and `Uint8Array` aging carries. Version mismatches, malformed data,
+ * checksum failures, and invalid state all produce a `SaveFormatError` instead
+ * of a partially restored world.
  *
  * The checksum is FNV-1a 32 over canonical JSON. It detects accidental
  * corruption and is not a security signature.
@@ -33,9 +29,17 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { checksumOfJson, stableStringify } from "./hash.js";
+import { AGE_COHORT_COUNT } from "./population/constants.js";
+import type {
+  FinanceState,
+  FinancialAccount,
+  PopBlock,
+  Region,
+} from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
 import {
   requireArray,
+  requireFiniteNumber,
   requireInteger,
   requireRecord,
   requireString,
@@ -109,6 +113,46 @@ export type SerializedDiagnostics = {
   readonly recentWarnings: readonly string[];
 };
 
+/** Encoded region. */
+export type SerializedRegion = {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+  readonly popBlockIds: readonly number[];
+};
+
+/** Encoded household financial account. */
+export type SerializedFinancialAccount = {
+  readonly id: number;
+  readonly ownerKind: "popBlock";
+  readonly ownerId: number;
+  readonly accountKind: "household";
+  readonly balanceSUSD: number;
+};
+
+/** Encoded minimal finance state. */
+export type SerializedFinanceState = {
+  readonly accounts: readonly SerializedFinancialAccount[];
+};
+
+/** Encoded population block with explicit typed-array tags. */
+export type SerializedPopBlock = {
+  readonly id: number;
+  readonly regionId: number;
+  readonly professionId: number;
+  readonly ageCohorts: EncodedTypedArray;
+  readonly agingCarry: EncodedTypedArray;
+  readonly literacy: number;
+  readonly wealthLevel: number;
+  readonly financialAccountId: number;
+  readonly militancy: number;
+  readonly unmetSubsistenceDays: number;
+  readonly unmetBasicDays: number;
+  readonly comfortFulfilledDays: number;
+  readonly fractionalBirthRemainder: number;
+  readonly fractionalDeathRemainder: number;
+};
+
 /** Complete encoded world payload. */
 export type SerializedWorld = {
   readonly schemaVersion: number;
@@ -117,6 +161,9 @@ export type SerializedWorld = {
   readonly scenarioId: string;
   readonly dayIndex: number;
   readonly seed: number;
+  readonly regions: readonly SerializedRegion[];
+  readonly popBlocks: readonly SerializedPopBlock[];
+  readonly finance: SerializedFinanceState;
   readonly diagnostics: SerializedDiagnostics;
 };
 
@@ -288,12 +335,144 @@ export function encodeWorld(world: World): SerializedWorld {
     scenarioId: world.scenarioId,
     dayIndex: world.dayIndex,
     seed: world.seed,
+    regions: world.regions.map((region) => ({
+      id: region.id,
+      key: region.key,
+      name: region.name,
+      popBlockIds: [...region.popBlockIds],
+    })),
+    popBlocks: world.popBlocks.map((block) => ({
+      id: block.id,
+      regionId: block.regionId,
+      professionId: block.professionId,
+      ageCohorts: encodeTypedArray(block.ageCohorts),
+      agingCarry: encodeTypedArray(block.agingCarry),
+      literacy: block.literacy,
+      wealthLevel: block.wealthLevel,
+      financialAccountId: block.financialAccountId,
+      militancy: block.militancy,
+      unmetSubsistenceDays: block.unmetSubsistenceDays,
+      unmetBasicDays: block.unmetBasicDays,
+      comfortFulfilledDays: block.comfortFulfilledDays,
+      fractionalBirthRemainder: block.fractionalBirthRemainder,
+      fractionalDeathRemainder: block.fractionalDeathRemainder,
+    })),
+    finance: {
+      accounts: world.finance.accounts.map((account) => ({
+        id: account.id,
+        ownerKind: account.ownerKind,
+        ownerId: account.ownerId,
+        accountKind: account.accountKind,
+        balanceSUSD: account.balanceSUSD,
+      })),
+    },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
       invalidActionCount: world.diagnostics.invalidActionCount,
       eventApplicationCount: world.diagnostics.eventApplicationCount,
       recentWarnings: [...world.diagnostics.recentWarnings],
     },
+  };
+}
+
+function decodeRegion(value: unknown, path: string): Region {
+  const record = requireRecord(value, path);
+  const popBlockIds = requireArray(record.popBlockIds, `${path}.popBlockIds`);
+  const ids: number[] = [];
+  for (let index = 0; index < popBlockIds.length; index += 1) {
+    ids.push(requireUint32(popBlockIds[index], `${path}.popBlockIds[${String(index)}]`));
+  }
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    key: requireString(record.key, `${path}.key`, { minLength: 1 }),
+    name: requireString(record.name, `${path}.name`, { minLength: 1 }),
+    popBlockIds: ids,
+  };
+}
+
+function decodeFinancialAccount(value: unknown, path: string): FinancialAccount {
+  const record = requireRecord(value, path);
+  if (record.ownerKind !== "popBlock") {
+    throw new SaveFormatError(`${path}.ownerKind must be "popBlock"`);
+  }
+  if (record.accountKind !== "household") {
+    throw new SaveFormatError(`${path}.accountKind must be "household"`);
+  }
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    ownerKind: "popBlock",
+    ownerId: requireUint32(record.ownerId, `${path}.ownerId`),
+    accountKind: "household",
+    balanceSUSD: requireFiniteNumber(record.balanceSUSD, `${path}.balanceSUSD`),
+  };
+}
+
+function decodeFinanceState(value: unknown): FinanceState {
+  const record = requireRecord(value, "save payload.finance");
+  const accounts = requireArray(record.accounts, "save payload.finance.accounts");
+  return {
+    accounts: accounts.map((account, index) =>
+      decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
+    ),
+  };
+}
+
+function decodePopBlock(value: unknown, path: string): PopBlock {
+  const record = requireRecord(value, path);
+  const ageCohorts = decodeTypedArray(record.ageCohorts);
+  if (!(ageCohorts instanceof Uint32Array)) {
+    throw new SaveFormatError(`${path}.ageCohorts must decode to Uint32Array`);
+  }
+  if (ageCohorts.length !== AGE_COHORT_COUNT) {
+    throw new SaveFormatError(`${path}.ageCohorts must have length ${String(AGE_COHORT_COUNT)}`);
+  }
+  const agingCarry = decodeTypedArray(record.agingCarry);
+  if (!(agingCarry instanceof Uint8Array) || agingCarry instanceof Uint8ClampedArray) {
+    throw new SaveFormatError(`${path}.agingCarry must decode to Uint8Array`);
+  }
+  if (agingCarry.length !== AGE_COHORT_COUNT) {
+    throw new SaveFormatError(`${path}.agingCarry must have length ${String(AGE_COHORT_COUNT)}`);
+  }
+
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    professionId: requireUint32(record.professionId, `${path}.professionId`),
+    ageCohorts,
+    agingCarry,
+    literacy: requireFiniteNumber(record.literacy, `${path}.literacy`),
+    wealthLevel: requireFiniteNumber(record.wealthLevel, `${path}.wealthLevel`),
+    financialAccountId: requireUint32(
+      record.financialAccountId,
+      `${path}.financialAccountId`,
+    ),
+    militancy: requireFiniteNumber(record.militancy, `${path}.militancy`),
+    unmetSubsistenceDays: requireInteger(
+      record.unmetSubsistenceDays,
+      `${path}.unmetSubsistenceDays`,
+      0,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    unmetBasicDays: requireInteger(
+      record.unmetBasicDays,
+      `${path}.unmetBasicDays`,
+      0,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    comfortFulfilledDays: requireInteger(
+      record.comfortFulfilledDays,
+      `${path}.comfortFulfilledDays`,
+      0,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    fractionalBirthRemainder: requireFiniteNumber(
+      record.fractionalBirthRemainder,
+      `${path}.fractionalBirthRemainder`,
+    ),
+    fractionalDeathRemainder: requireFiniteNumber(
+      record.fractionalDeathRemainder,
+      `${path}.fractionalDeathRemainder`,
+    ),
   };
 }
 
@@ -382,6 +561,16 @@ function decodeWorldPayload(value: unknown): World {
     );
   }
 
+  const rawRegions = requireArray(payload.regions, "save payload.regions");
+  const regions = rawRegions.map((region, index) =>
+    decodeRegion(region, `save payload.regions[${String(index)}]`),
+  );
+  const rawPopBlocks = requireArray(payload.popBlocks, "save payload.popBlocks");
+  const popBlocks = rawPopBlocks.map((block, index) =>
+    decodePopBlock(block, `save payload.popBlocks[${String(index)}]`),
+  );
+  const finance = decodeFinanceState(payload.finance);
+
   const world: World = {
     schemaVersion,
     simVersion,
@@ -389,6 +578,9 @@ function decodeWorldPayload(value: unknown): World {
     scenarioId,
     dayIndex,
     seed,
+    regions,
+    popBlocks,
+    finance,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

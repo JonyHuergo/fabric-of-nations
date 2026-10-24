@@ -1,9 +1,9 @@
 {
   "name": "@century/data",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Validated static definitions and data loaders for Century. Placeholder until M5.",
+  "description": "Validated JSON static definitions and loaders for Century.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -13,10 +13,17 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "data"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.typecheck.json"
+  },
+  "dependencies": {
+    "@century/sim": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2"
   }
 }

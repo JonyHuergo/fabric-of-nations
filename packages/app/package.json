@@ -1,6 +1,6 @@
 {
   "name": "@century/app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Century application shell. Placeholder until the M7 mobile worker proof of concept.",

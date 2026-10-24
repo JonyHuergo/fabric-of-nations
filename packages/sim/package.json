@@ -1,6 +1,6 @@
 {
   "name": "@century/sim",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Pure deterministic simulation core for Century. No platform, DOM, or UI dependencies.",

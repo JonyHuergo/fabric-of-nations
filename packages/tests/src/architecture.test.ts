@@ -210,4 +210,11 @@ describe("simulation isolation", () => {
       );
     }
   });
+
+  test("simulation code does not import calibration targets or the data package", () => {
+    for (const file of simSourceFiles) {
+      const source = readFileSync(file, "utf8");
+      expect(source).not.toMatch(/@century\/data|m2_population_targets|calibration\/m2/);
+    }
+  });
 });

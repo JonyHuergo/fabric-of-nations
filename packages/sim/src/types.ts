@@ -15,6 +15,15 @@ export type DayIndex = Day;
 /** Stable dense numeric identifier within one world. */
 export type Id = number;
 
+/** Nominal simulated USD accounting unit. */
+export type MoneySUSD = number;
+
+/** Normalized ratio, normally in 0..1. */
+export type Rate = number;
+
+/** Non-negative integer count of persons, jobs, or items. */
+export type Count = number;
+
 /** Deterministic world seed. Must be an unsigned 32-bit integer. */
 export type Seed = number;
 

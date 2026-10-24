@@ -1,0 +1,56 @@
+{
+  "scenarioId": "m2-multi-block",
+  "dataVersion": "m2-population-v2",
+  "status": "provisional",
+  "description": "Synthetic single-region multi-block fixture for needs, scarcity, and population-effect tests. Not a historical population distribution.",
+  "professions": [
+    { "id": 0, "key": "peasants", "name": "Peasants", "stratum": "lower" },
+    { "id": 1, "key": "laborers", "name": "Laborers", "stratum": "lower" },
+    { "id": 2, "key": "clerks", "name": "Clerks", "stratum": "middle" }
+  ],
+  "regions": [
+    {
+      "id": 0,
+      "key": "test-region",
+      "name": "Test region"
+    }
+  ],
+  "popBlocks": [
+    {
+      "id": 0,
+      "regionId": 0,
+      "professionId": 0,
+      "financialAccountId": 0,
+      "ageCohorts": [64000, 52000, 48000, 42000, 38000, 32000, 28000, 24000, 20000, 16000, 12000, 8800, 6400, 4400, 2400, 1200, 800],
+      "literacy": 0.35,
+      "wealthLevel": 30,
+      "initialSavingsSUSD": 1000,
+      "militancy": 0.1
+    },
+    {
+      "id": 1,
+      "regionId": 0,
+      "professionId": 1,
+      "financialAccountId": 1,
+      "ageCohorts": [56000, 45500, 42000, 36750, 33250, 28000, 24500, 21000, 17500, 14000, 10500, 7700, 5600, 3850, 2100, 1050, 700],
+      "literacy": 0.5,
+      "wealthLevel": 40,
+      "initialSavingsSUSD": 1000,
+      "militancy": 0.1
+    },
+    {
+      "id": 2,
+      "regionId": 0,
+      "professionId": 2,
+      "financialAccountId": 2,
+      "ageCohorts": [40000, 32500, 30000, 26250, 23750, 20000, 17500, 15000, 12500, 10000, 7500, 5500, 4000, 2750, 1500, 750, 500],
+      "literacy": 0.85,
+      "wealthLevel": 60,
+      "initialSavingsSUSD": 1000,
+      "militancy": 0.05
+    }
+  ],
+  "needsFile": "needs.json",
+  "demographyFile": "demography.json",
+  "notes": "Synthetic fixture. All population and wealth values are test inputs, not historical claims."
+}

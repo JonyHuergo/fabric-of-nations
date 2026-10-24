@@ -1,10 +1,11 @@
 /**
- * Stable digest of the complete authoritative M1 world.
+ * Stable digest of the complete authoritative world.
  *
  * The digest is a 64-bit value built from two FNV-1a lanes over canonical JSON
  * of the encoded world. It is used by determinism tests and diagnostics, not for
- * security. It intentionally includes diagnostics: an otherwise identical world
- * with a different processed-day ring is not bit-identical state.
+ * security. It intentionally includes diagnostics and all population/finance
+ * state: an otherwise identical world with different authoritative state is not
+ * bit-identical.
  */
 
 import { dualFnv1a32Hex, stableStringify } from "./hash.js";

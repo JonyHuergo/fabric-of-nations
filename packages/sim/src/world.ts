@@ -1,17 +1,10 @@
 /**
- * Minimal authoritative world state for M1.
+ * Authoritative world state for M2.
  *
- * M1 intentionally does not define countries, regions, population, markets,
- * buildings, or finance state. Those contracts are introduced with their
- * milestones so M1 cannot accidentally grow speculative economy behavior. The
- * fields below are the complete authoritative state needed to serialize, restore,
- * and continue the no-op tick driver deterministically.
- *
- * The M1 world contains no dense numeric arrays yet. The serializer nevertheless
- * keeps an explicit tagged typed-array codec, tested in isolation, because later
- * milestones will store dense population/market data as typed arrays. Diagnostics
- * here are scalar counters and a bounded warning list only; no per-day history is
- * stored.
+ * M1's minimal fields remain. M2 adds a single-region population collection and
+ * a minimal household-account subset of the future finance state. Countries,
+ * buildings, markets, debt, armies, event queues, and history remain future
+ * milestones and are not invented here.
  */
 
 import { assertValidDayIndex } from "./calendar.js";
@@ -25,6 +18,8 @@ import {
   SIM_VERSION,
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
+import { assertValidPopulationState } from "./population/state.js";
+import type { FinanceState, PopBlock, Region } from "./population/types.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
   requireArray,
@@ -46,31 +41,31 @@ export interface SimulationDiagnostics {
   recentWarnings: string[];
 }
 
-/** Authoritative M1 world state. */
+/** Authoritative world state. */
 export interface World {
-  /** Save/world schema version. */
   schemaVersion: number;
-  /** Simulation behavior version. */
   simVersion: string;
-  /** Static content/data version. */
   dataVersion: string;
-  /** Scenario identifier. */
   scenarioId: string;
   /** Next civil day to process; 36,524 is the terminal boundary. */
   dayIndex: Day;
   /** Unsigned 32-bit deterministic world seed. */
   seed: Seed;
-  /** Diagnostic state. */
+  /** M2 supports at most one region; the collection is future-compatible. */
+  regions: Region[];
+  popBlocks: PopBlock[];
+  /** Minimal M2 finance subset: household accounts only. */
+  finance: FinanceState;
   diagnostics: SimulationDiagnostics;
 }
 
-/** Options accepted by `createInitialWorld`. */
+/** Options accepted by `createInitialWorld` and `createPopulationWorld`. */
 export interface CreateWorldOptions {
   readonly seed?: Seed;
   readonly scenarioId?: string;
 }
 
-/** Create a new M1 world at 1900-01-01. */
+/** Create an empty M2-schema world at 1900-01-01. */
 export function createInitialWorld(options: CreateWorldOptions = {}): World {
   const seed = options.seed ?? 0;
   const scenarioId = options.scenarioId ?? DEFAULT_SCENARIO_ID;
@@ -88,6 +83,9 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     scenarioId,
     dayIndex: 0,
     seed,
+    regions: [],
+    popBlocks: [],
+    finance: { accounts: [] },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -104,8 +102,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
  * Validate all authoritative world fields and their relationships.
  *
  * This is intentionally strict: it is called before every tick and before save
- * encoding, so corrupt or impossible state cannot silently propagate. It never
- * clamps or repairs values.
+ * encoding. It never clamps or repairs values.
  */
 export function assertValidWorld(world: World): void {
   requireInteger(
@@ -124,11 +121,6 @@ export function assertValidWorld(world: World): void {
     minLength: 1,
     maxLength: MAX_SCENARIO_ID_LENGTH,
   });
-  if (world.dataVersion !== DEFAULT_DATA_VERSION) {
-    throw new RangeError(
-      `world.dataVersion ${JSON.stringify(world.dataVersion)} is incompatible with ${JSON.stringify(DEFAULT_DATA_VERSION)}`,
-    );
-  }
   requireString(world.scenarioId, "world.scenarioId", {
     minLength: 1,
     maxLength: MAX_SCENARIO_ID_LENGTH,
@@ -167,6 +159,8 @@ export function assertValidWorld(world: World): void {
       maxLength: MAX_WARNING_LENGTH,
     });
   }
+
+  assertValidPopulationState(world);
 }
 
 /** True when the world has reached the terminal boundary and no day remains. */
@@ -174,7 +168,7 @@ export function isCampaignComplete(world: World): boolean {
   return world.dayIndex === CAMPAIGN_TERMINAL_DAY_INDEX;
 }
 
-/** Numeric IDs are stable non-negative integers. Kept here for future subsystems. */
+/** Numeric IDs are stable non-negative integers. */
 export function isValidId(id: number): id is Id {
   return Number.isInteger(id) && id >= 0 && id <= 0xffff_ffff;
 }

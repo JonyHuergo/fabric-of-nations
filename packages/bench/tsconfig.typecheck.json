@@ -6,6 +6,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
+      "@century/data": ["../data/src/index.ts"],
       "@century/sim": ["../sim/src/index.ts"]
     }
   },
