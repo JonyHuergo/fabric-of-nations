@@ -8,9 +8,10 @@ The repository currently implements **M0 (project foundation)**, **M1
 (simulation core)**, and **M2.1 (corrected population core)** only. There is
 deliberately no production, general goods market, employment allocation,
 government finance, politics, technology, diplomacy, warfare, AI, worker, or
-React Native UI yet. The design authority is the Century GDD v2.0; persistent
-engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation
-decisions are in [`DECISIONS.md`](./DECISIONS.md).
+React Native UI yet. The design authority is the Century GDD v2.1
+(`Century_GDD_v2.1.md`); persistent engineering rules are in
+[`AGENTS.md`](./AGENTS.md), and implementation decisions are in
+[`DECISIONS.md`](./DECISIONS.md).
 
 ## Workspace
 
@@ -126,9 +127,10 @@ household-account subset of the future finance state.
 
 - Four tiers: subsistence, basic, comfort, luxury; wealth-dependent activation.
 - One physical supply pool per good is shared across all four tiers.
-- The daily budget is based only on annual disposable per-capita income divided
-  by the actual civil-year length and multiplied by block population. Savings
-  accounts are authoritative but are not added to the budget and are not spent.
+- The daily budget is based only on annual settled per-capita income net of
+  mandatory payments, divided by the actual civil-year length and multiplied by
+  block population. Savings accounts are authoritative but are not added to the
+  budget and are not spent.
 - `fundingRatio = clamp(tierCost > 0 ? budget / tierCost : 1, 0, 1)`.
 - Only fulfilled quantities spend budget and consume supply; higher tiers are
   not purchased when a lower tier is unmet.
@@ -270,7 +272,7 @@ diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
 - The sex ratio at birth and within-band age expansion are provisional.
 - Mortality is derived from WPP deaths/mid-year population rather than a
   published `mx` table.
-- M2.1 intentionally omits GDD §6.2 household-asset drawdown; only annual
+- M2.1 intentionally omits GDD §6.4 household-asset drawdown; only annual
   disposable income finances needs.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.

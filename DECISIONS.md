@@ -22,6 +22,8 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   outdated command example, not a package-manager requirement.
 - **Consequence:** Running plain `npm` commands is unsupported and may resolve a
   different dependency graph.
+- **GDD v2.1 status:** GDD v2.1 now documents the pnpm workflow, so this is no
+  longer a GDD/`AGENTS.md` conflict. The entry is retained as history.
 
 ### D-002 — Jest is the test runner
 
@@ -34,6 +36,8 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Consequence:** Node emits an experimental VM-modules warning. That warning
   does not affect results. If a future Node/Jest version removes support, the
   harness will need migration.
+- **GDD v2.1 status:** retained as the historical framework choice; GDD v2.1
+  does not require a different test runner.
 
 ### D-003 — `Day` and `DayIndex` are aliases
 
@@ -220,8 +224,10 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   M2 adds wealth, mortality-multiplier, needs-effect, and militancy coefficients
   in `packages/sim/src/population/constants.ts`. Each records units, cadence,
   justification, and status.
-- **Status:** All M2 behavioral coefficients are **provisional**. Structural
-  choices (17 cohorts, 1/5 annual transfer, working-age bands) are binding.
+- **Status:** All M2 behavioral coefficients are **provisional**. The original
+  structural choice of 17 cohorts with one-fifth annual transfer was superseded
+  by D-025 (single-year, sex-separated authoritative state); current structural
+  choices are recorded in D-025/D-026.
 - **Consequence:** Calibration may tune coefficients, but changing structural
   behavior requires a decision and regression tests.
 
@@ -241,9 +247,10 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 
 ### D-017 — M2 population state and cohort representation
 
-- **M2.1 status:** superseded by D-025. The 17-band/fifths representation and
-  repeated one-fifth transfer were removed because they cannot represent actual
-  single-year progression; this section is retained as history.
+- **M2.1 status:** **Superseded by D-025, which is authoritative.** The original
+  17-band/fifths representation and repeated one-fifth transfer were removed
+  because they cannot represent actual single-year progression; this section is
+  retained only as history.
 - **Resolution:** `World` adds `regions: Region[]`, `popBlocks: PopBlock[]`, and
   a minimal `finance.accounts` subset. M2 supports exactly one region.
 - **Cohorts:** 17 five-year bands. `ageCohorts` is `Uint32Array`; working age is
@@ -273,11 +280,12 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Accounting:** only fulfilled quantities spend budget and consume supply;
   desired/funded/fulfilled/unmet and supply identities are asserted with relative
   tolerances.
-- **GDD deviation:** GDD §6.2 describes the daily funded budget as household
-  financial assets plus income actually received, less mandatory payments. M2 is
-  explicitly scoped to annual disposable income only and does not draw down
-  savings. This is a deliberate, task-mandated M2 limitation, not a hidden
-  redefinition of the GDD; asset drawdown/settlement is deferred.
+- **GDD v2.1 status:** GDD §6.4 now preserves the intended long-term assets plus
+  settled-income model and explicitly records the M2 annual-disposable-income
+  fixture, no savings drawdown, and no account mutation. This is no longer an
+  undocumented deviation; it is a milestone limitation with the later model
+  retained. Asset drawdown/settlement still requires explicit counterpart
+  accounts in the relevant finance milestone.
 - **Consequence:** M2 tests needs allocation without inventing money or a market.
   A future asset drawdown must use explicit counterpart accounts.
 
@@ -317,6 +325,11 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   values 1899–2000. Published values are treated as mid-year; January 1 comparison
   values are the average of adjacent years. The initial scenario is the
   source-derived Jan 1, 1900 total, 1,621,287,278.
+- **Source conventions:** OWID annual values are treated as mid-year; OWID-derived
+  January 1 values are adjacent-year averages, not direct January 1
+  observations. The 1950 splice is disclosed rather than blended: OWID-derived
+  1950-01-01 is 2,480,507,938, while WPP 2024 1-January is 2,471,424,002. The
+  WPP validation uses the WPP value.
 - **Acceptance:** Historical validation uses the WPP 1950-initialized scenario
   and source-backed annual 1950–2000 ASFR/mortality. It currently reports
   +0.193% at 1975 and +1.227% at 2000, with maximum five-year share differences
@@ -383,10 +396,10 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 
 ### D-025 — M2.1 single-year, sex-separated age representation
 
-- **Issue:** GDD §6.2 specifies 17 five-year buckets and moving approximately
-  one fifth of each cohort annually. That approximation cannot represent a
-  person's actual single-year progression and produces artificial cohort leakage;
-  it also cannot identify women in reproductive age groups.
+- **Issue:** The original GDD §6.1 specified 17 five-year buckets and moving
+  approximately one fifth of each cohort annually. That approximation cannot
+  represent a person's actual single-year progression and produces artificial
+  cohort leakage; it also cannot identify women in reproductive age groups.
 - **Resolution:** Authoritative state is two `Uint32Array(81)` arrays per block:
   male and female single ages 0–79 plus open-ended 80+. The 17 five-year bands
   are derived for reporting. Scenario initial data remains 17 five-year groups,
@@ -394,9 +407,8 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Ageing:** every person advances exactly one year each January 1 (except the
   scenario start day), oldest-to-youngest; 79 enters 80+; 80+ never ages out;
   newborns enter age 0. No fifths carries or per-cohort fractional transfer.
-- **GDD deviation:** this intentionally supersedes the GDD §6.2 bucketed
-  approximation, authorized by the M2.1 task. Recorded rather than presented as
-  GDD-compliant.
+- **GDD alignment:** GDD v2.1 now specifies this model. The former bucketed
+  approximation is no longer a GDD deviation; D-017 records the superseded model.
 - **Consequence:** Schema 3; larger state and per-block demographic work; 5-year
   reporting totals remain available without duplicate authority.
 
@@ -405,8 +417,9 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Resolution:** Seven maternal five-year bands (15–19 through 45–49) carry
   ASFR per 1,000 women. Expected births use female single-age counts, actual
   civil-year length, fractional accumulation, and the generating block's
-  profession multiplier. Births enter age 0; a documented provisional
-  `sexRatioAtBirth` splits male/female births exactly.
+  documented provisional profession multiplier. Births enter age 0; a documented
+  provisional `sexRatioAtBirth` (currently 1.05 male/female) splits male/female
+  births exactly.
 - **Data:** WPP 2024 annual ASFR for every year 1950–2000; 1900/1949 schedules
   are provisional WPP-1950-shaped estimates. TFR is used only as a consistency
   check, never as a substitute for ASFR.
@@ -433,11 +446,12 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 
 ### D-028 — 1900 initial distribution and pre-1950 calibration
 
-- **Resolution:** The 1900 total is source-backed (OWID January 1 interpolation),
-  but the 1900 age/sex distribution is provisional: the prior stylized 17-band
-  shares split by WPP 1950 age-specific sex shares. 1900/1949 ASFR and mortality
-  are provisional; mortality is multiplied by a documented 1.45 total-population
-  calibration factor (capped at 1,000 per 1,000).
+- **Resolution:** The 1900 total is source-derived (OWID adjacent-mid-year
+  interpolation, not a direct January 1 observation), but the 1900 age/sex
+  distribution is provisional: the prior stylized 17-band shares split by WPP
+  1950 age-specific sex shares. 1900/1949 ASFR and mortality are provisional;
+  mortality is multiplied by a documented 1.45 total-population calibration
+  factor (capped at 1,000 per 1,000).
 - **Status:** These are calibrated/provisional inputs, not source-backed
   historical observations. Full demographic calibration remains incomplete.
 
@@ -475,6 +489,24 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   build a world and then substitute a structurally different definitions object
   are outside the supported `TickContext` contract; tests construct scenarios
   through `createPopulationWorld`.
+
+### D-032 — GDD v2.1 documentation alignment
+
+- **Resolution:** GDD v2.1 (revision 2026-10-24) is the authoritative
+  specification. It aligns calendar/randomness wording, single-year sex-separated
+  population state, annual ageing, ASFR fertility, sex-specific mortality,
+  annual WPP 1950–2000 data, historical-validation vs gameplay-baseline
+  scenarios, the M2 financial-budget fixture limitation, milestone commands, and
+  the mobile-performance caveat with the M2.1 implementation.
+- **Historical data:** post-1950 WPP validation is source-backed; 1900–1949 age
+  structure, fertility, and mortality remain provisional. The campaign's +9.553%
+  difference is documented as a no-shock baseline limitation, not historical
+  calibration and not evidence about omitted disasters.
+- **Supersession:** D-017 remains historical; D-025 is authoritative for the
+  population representation. D-021 and D-027 record the annual WPP schedules and
+  current validation results. D-028 remains the explicit pre-1950 provisional
+  decision.
+- **Scope:** documentation only; no simulation code or gameplay behavior changed.
 
 ## Assumptions recorded for future review
 
