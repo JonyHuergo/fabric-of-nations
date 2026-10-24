@@ -1,4 +1,6 @@
 /** @type {import('jest').Config} */
+const tsJestPath = require.resolve("ts-jest");
+
 module.exports = {
   testEnvironment: "node",
   roots: ["<rootDir>/src"],
@@ -6,7 +8,7 @@ module.exports = {
   extensionsToTreatAsEsm: [".ts"],
   transform: {
     "^.+\\.tsx?$": [
-      "ts-jest",
+      tsJestPath,
       {
         useESM: true,
         tsconfig: "<rootDir>/tsconfig.json",

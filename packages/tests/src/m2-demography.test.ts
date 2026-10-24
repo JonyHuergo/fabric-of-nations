@@ -5,6 +5,8 @@ import {
   populationTotal,
   runTicks,
   tick,
+  type FertilityAnchor,
+  type MortalityAnchor,
   type PopulationDefinitions,
 } from "@century/sim";
 import {
@@ -17,14 +19,66 @@ import {
   oneBlockScenario,
 } from "./fixtures/m2.js";
 
-function definitionsWith(
-  overrides: Partial<PopulationDefinitions>,
-): PopulationDefinitions {
+function zeroMortality(): MortalityAnchor[] {
+  return [
+    {
+      year: 1900,
+      maleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
+      femaleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
+    },
+    {
+      year: 2000,
+      maleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
+      femaleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
+    },
+  ];
+}
+
+function fertility(rates: number[]): FertilityAnchor[] {
+  return [
+    { year: 1900, ageSpecificBirthsPer1000Women: rates },
+    { year: 2000, ageSpecificBirthsPer1000Women: rates },
+  ];
+}
+
+function definitionsWith(overrides: Partial<PopulationDefinitions>): PopulationDefinitions {
   const base = aggregateScenario().definitions;
   return { ...base, ...overrides };
 }
 
-describe("M2 births, deaths, and fractional accumulation", () => {
+function scenarioWithGroups(
+  maleGroups: number[],
+  femaleGroups: number[],
+  definitions: PopulationDefinitions,
+) {
+  const base = aggregateScenario();
+  return {
+    ...customScenario(
+      [
+        {
+          id: 0,
+          regionId: 0,
+          professionId: 0,
+          financialAccountId: 0,
+          maleAgeGroups: maleGroups,
+          femaleAgeGroups: femaleGroups,
+          literacy: 0.5,
+          wealthLevel: 30,
+          initialSavingsSUSD: 1000,
+          militancy: 0.1,
+        },
+      ],
+      { ...base, definitions },
+    ),
+    definitions,
+  };
+}
+
+function groupsWith(index: number, value: number): number[] {
+  return cohorts({ [index]: value });
+}
+
+describe("M2.1 age-specific births, deaths, and fractional accumulation", () => {
   test("conserves population every day and over a multi-year run", () => {
     const { scenario, world } = aggregateWorld();
     const inputs = makeInputs([0]);
@@ -40,6 +94,7 @@ describe("M2 births, deaths, and fractional accumulation", () => {
       expect(blockResult.populationEnd).toBe(
         blockResult.populationStart + blockResult.births - blockResult.deaths,
       );
+      expect(blockResult.maleBirths + blockResult.femaleBirths).toBe(blockResult.births);
       births += blockResult.births;
       deaths += blockResult.deaths;
       const current = populationTotal(world.popBlocks[0]!);
@@ -53,86 +108,198 @@ describe("M2 births, deaths, and fractional accumulation", () => {
     const block = world.popBlocks[0]!;
     expect(block.fractionalBirthRemainder).toBeGreaterThanOrEqual(0);
     expect(block.fractionalBirthRemainder).toBeLessThan(1);
+    expect(block.fractionalMaleBirthRemainder).toBeGreaterThanOrEqual(0);
+    expect(block.fractionalMaleBirthRemainder).toBeLessThan(1);
     expect(block.fractionalDeathRemainder).toBeGreaterThanOrEqual(0);
     expect(block.fractionalDeathRemainder).toBeLessThan(1);
   });
 
-  test("allocates age-specific deaths only to the affected cohort", () => {
-    const rates = new Array<number>(17).fill(0);
-    rates[16] = 1000; // every 80+ person would die within a year
+  test("applies age-specific mortality to the affected age and sex", () => {
+    const male = new Array<number>(17).fill(0);
+    const female = new Array<number>(17).fill(0);
+    male[16] = 1000;
+    female[16] = 0;
     const definitions = definitionsWith({
       mortalityAnchors: [
-        { year: 1900, annualDeathsPer1000ByAgeBand: rates },
-        { year: 2000, annualDeathsPer1000ByAgeBand: rates },
+        { year: 1900, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
+        { year: 2000, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
       ],
-      fertilityAnchors: [
-        { year: 1900, annualBirthsPer1000: 0 },
-        { year: 2000, annualBirthsPer1000: 0 },
-      ],
+      fertilityAnchors: fertility(new Array<number>(7).fill(0)),
     });
-    const base = aggregateScenario();
-    const scenario = { ...customScenario(
-      [
-        {
-          id: 0,
-          regionId: 0,
-          professionId: 0,
-          financialAccountId: 0,
-          ageCohorts: cohorts({ 16: 365 }),
-          literacy: 0.5,
-          wealthLevel: 30,
-          initialSavingsSUSD: 1000,
-          militancy: 0.1,
-        },
-      ],
-      { ...base, definitions },
-    ), definitions };
+    const scenario = scenarioWithGroups(
+      groupsWith(16, 365),
+      groupsWith(16, 365),
+      definitions,
+    );
     const world = createPopulationWorld(scenario);
     const block = world.popBlocks[0]!;
     const result = applyDailyDemography(world, definitions, 0);
     expect(result.totalDeaths).toBe(1);
     expect(result.totalBirths).toBe(0);
-    expect(block.ageCohorts[16]).toBe(364);
+    expect(block.maleByAge[80]).toBe(364);
+    expect(block.femaleByAge[80]).toBe(365);
     expect(result.blocks[0]?.deaths).toBe(1);
   });
 
-  test("birth remainders eventually produce whole persons without systematic loss", () => {
+  test("prior-day unmet needs raise next-day mortality", () => {
+    const male = new Array<number>(17).fill(0);
+    const female = new Array<number>(17).fill(0);
+    male[16] = 100;
+    female[16] = 100;
     const definitions = definitionsWith({
       mortalityAnchors: [
-        { year: 1900, annualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0) },
-        { year: 2000, annualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0) },
+        { year: 1900, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
+        { year: 2000, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
       ],
-      fertilityAnchors: [
-        { year: 1900, annualBirthsPer1000: 1000 },
-        { year: 2000, annualBirthsPer1000: 1000 },
-      ],
+      fertilityAnchors: fertility(new Array<number>(7).fill(0)),
     });
-    const base = aggregateScenario();
-    const scenario = { ...customScenario(
-      [
-        {
-          id: 0,
-          regionId: 0,
-          professionId: 0,
-          financialAccountId: 0,
-          ageCohorts: cohorts({ 0: 1 }),
-          literacy: 0.5,
-          wealthLevel: 30,
-          initialSavingsSUSD: 1000,
-          militancy: 0.1,
-        },
-      ],
-      { ...base, definitions },
-    ), definitions };
+    const calm = createPopulationWorld(
+      scenarioWithGroups(groupsWith(16, 3650), new Array<number>(17).fill(0), definitions),
+    );
+    const pressured = createPopulationWorld(
+      scenarioWithGroups(groupsWith(16, 3650), new Array<number>(17).fill(0), definitions),
+    );
+    const pressuredBlock = pressured.popBlocks[0]!;
+    pressuredBlock.unmetSubsistenceDays = 90;
+    pressuredBlock.unmetBasicDays = 90;
+    const calmDeaths = applyDailyDemography(calm, definitions, 0).totalDeaths;
+    const pressuredDeaths = applyDailyDemography(pressured, definitions, 0).totalDeaths;
+    expect(calmDeaths).toBe(1);
+    expect(pressuredDeaths).toBeGreaterThan(calmDeaths);
+  });
+
+  test("different female age structures produce different births at equal total population", () => {
+    const asfr = new Array<number>(7).fill(0);
+    asfr[0] = 1000;
+    const definitions = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(asfr),
+    });
+    const young = createPopulationWorld(
+      scenarioWithGroups(
+        groupsWith(0, 5),
+        groupsWith(3, 5),
+        definitions,
+      ),
+    );
+    const old = createPopulationWorld(
+      scenarioWithGroups(
+        groupsWith(0, 5),
+        groupsWith(9, 5),
+        definitions,
+      ),
+    );
+    let youngBirths = 0;
+    let oldBirths = 0;
+    for (let day = 0; day < 365; day += 1) {
+      youngBirths += applyDailyDemography(young, definitions, day).totalBirths;
+      oldBirths += applyDailyDemography(old, definitions, day).totalBirths;
+    }
+    expect(youngBirths).toBeGreaterThan(0);
+    expect(oldBirths).toBe(0);
+    expect(youngBirths).not.toBe(oldBirths);
+  });
+
+  test("moves females between reproductive and non-reproductive ages in the expected direction", () => {
+    const asfr = new Array<number>(7).fill(0);
+    asfr[0] = 500;
+    const definitions = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(asfr),
+    });
+    const reproductive = createPopulationWorld(
+      scenarioWithGroups(groupsWith(0, 5), groupsWith(3, 5), definitions),
+    );
+    const nonReproductive = createPopulationWorld(
+      scenarioWithGroups(groupsWith(0, 5), groupsWith(9, 5), definitions),
+    );
+    let reproductiveBirths = 0;
+    let nonReproductiveBirths = 0;
+    for (let day = 0; day < 365; day += 1) {
+      reproductiveBirths += applyDailyDemography(reproductive, definitions, day).totalBirths;
+      nonReproductiveBirths += applyDailyDemography(nonReproductive, definitions, day).totalBirths;
+    }
+    expect(reproductiveBirths).toBeGreaterThan(nonReproductiveBirths);
+  });
+
+  test("increasing the fertility schedule increases births predictably", () => {
+    const lowRates = new Array<number>(7).fill(0);
+    lowRates[1] = 500;
+    const highRates = new Array<number>(7).fill(0);
+    highRates[1] = 1000;
+    const low = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(lowRates),
+    });
+    const high = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(highRates),
+    });
+    const lowWorld = createPopulationWorld(
+      scenarioWithGroups(groupsWith(0, 5), groupsWith(4, 10), low),
+    );
+    const highWorld = createPopulationWorld(
+      scenarioWithGroups(groupsWith(0, 5), groupsWith(4, 10), high),
+    );
+    let lowBirths = 0;
+    let highBirths = 0;
+    for (let day = 0; day < 365; day += 1) {
+      lowBirths += applyDailyDemography(lowWorld, low, day).totalBirths;
+      highBirths += applyDailyDemography(highWorld, high, day).totalBirths;
+    }
+    expect(lowBirths).toBe(5);
+    expect(highBirths).toBe(10);
+  });
+
+  test("fractional birth remainders avoid systematic loss and split sexes exactly", () => {
+    const asfr = new Array<number>(7).fill(0);
+    asfr[0] = 1000;
+    const definitions = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(asfr),
+    });
+    const scenario = scenarioWithGroups(
+      new Array<number>(17).fill(0),
+      groupsWith(3, 5),
+      definitions,
+    );
     const world = createPopulationWorld(scenario);
     let births = 0;
-    for (let day = 0; day < 366; day += 1) {
-      births += applyDailyDemography(world, definitions, day).totalBirths;
+    let maleBirths = 0;
+    let femaleBirths = 0;
+    for (let day = 0; day < 365; day += 1) {
+      const result = applyDailyDemography(world, definitions, day);
+      births += result.totalBirths;
+      maleBirths += result.totalMaleBirths;
+      femaleBirths += result.totalFemaleBirths;
     }
-    // One person at 100% annual fertility over a full year should produce
-    // approximately one birth; the remainder must not silently disappear.
-    expect(births).toBe(1);
-    expect(populationTotal(world.popBlocks[0]!)).toBe(2);
+    expect(births).toBe(5);
+    expect(maleBirths + femaleBirths).toBe(births);
+    expect(world.popBlocks[0]!.maleByAge[0]! + world.popBlocks[0]!.femaleByAge[0]!).toBe(5);
+  });
+
+  test("uses 365 or 366 civil days for annual fertility conversion", () => {
+    const asfr = new Array<number>(7).fill(0);
+    asfr[0] = 1000;
+    const definitions = definitionsWith({
+      mortalityAnchors: zeroMortality(),
+      fertilityAnchors: fertility(asfr),
+    });
+    const scenario = scenarioWithGroups(
+      new Array<number>(17).fill(0),
+      groupsWith(3, 1),
+      definitions,
+    );
+
+    const commonYear = createPopulationWorld(scenario);
+    commonYear.dayIndex = civilDateToDayIndex(1900, 1, 1);
+    applyDailyDemography(commonYear, definitions, commonYear.dayIndex);
+    expect(commonYear.popBlocks[0]!.fractionalBirthRemainder).toBeCloseTo(1 / 365, 12);
+
+    const leapYear = createPopulationWorld(scenario);
+    leapYear.dayIndex = civilDateToDayIndex(1904, 1, 1);
+    applyDailyDemography(leapYear, definitions, leapYear.dayIndex);
+    expect(leapYear.popBlocks[0]!.fractionalBirthRemainder).toBeCloseTo(1 / 366, 12);
   });
 
   test("zero-population blocks produce no events and no NaN", () => {
@@ -146,46 +313,6 @@ describe("M2 births, deaths, and fractional accumulation", () => {
     expect(result.population?.populationStart).toBe(0);
     expect(result.population?.populationEnd).toBe(0);
     expect(populationTotal(world.popBlocks[0]!)).toBe(0);
-  });
-
-  test("uses 365 or 366 civil days for annual rate conversion", () => {
-    const definitions = definitionsWith({
-      mortalityAnchors: [
-        { year: 1900, annualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0) },
-        { year: 2000, annualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0) },
-      ],
-      fertilityAnchors: [
-        { year: 1900, annualBirthsPer1000: 1000 },
-        { year: 2000, annualBirthsPer1000: 1000 },
-      ],
-    });
-    const base = aggregateScenario();
-    const scenario = { ...customScenario(
-      [
-        {
-          id: 0,
-          regionId: 0,
-          professionId: 0,
-          financialAccountId: 0,
-          ageCohorts: cohorts({ 0: 1 }),
-          literacy: 0.5,
-          wealthLevel: 30,
-          initialSavingsSUSD: 1000,
-          militancy: 0.1,
-        },
-      ],
-      { ...base, definitions },
-    ), definitions };
-
-    const commonYear = createPopulationWorld(scenario);
-    commonYear.dayIndex = civilDateToDayIndex(1900, 1, 1);
-    applyDailyDemography(commonYear, definitions, commonYear.dayIndex);
-    expect(commonYear.popBlocks[0]!.fractionalBirthRemainder).toBeCloseTo(1 / 365, 12);
-
-    const leapYear = createPopulationWorld(scenario);
-    leapYear.dayIndex = civilDateToDayIndex(1904, 1, 1);
-    applyDailyDemography(leapYear, definitions, leapYear.dayIndex);
-    expect(leapYear.popBlocks[0]!.fractionalBirthRemainder).toBeCloseTo(1 / 366, 12);
   });
 
   test("world population identity holds over a full century run", () => {

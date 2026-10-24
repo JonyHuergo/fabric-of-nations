@@ -1,5 +1,5 @@
 /**
- * M2 JSON data loader.
+ * M2.1 JSON data loader.
  *
  * JSON files are the canonical static definitions. This loader reads them from
  * `packages/data/data`, validates the definitions through the simulation
@@ -27,6 +27,7 @@ interface RawScenario {
   dataVersion: string;
   status: string;
   description: string;
+  startDayIndex?: number;
   professions: PopulationScenarioDef["professions"];
   regions: PopulationScenarioDef["regions"];
   popBlocks: PopulationScenarioDef["popBlocks"];
@@ -38,8 +39,33 @@ interface RawScenario {
 interface RawDemography {
   mortalityAnchors: PopulationDefinitions["mortalityAnchors"];
   fertilityAnchors: PopulationDefinitions["fertilityAnchors"];
+  sexRatioAtBirth: number;
   fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
   provenance: unknown;
+}
+
+export interface WppAgeSexYear {
+  maleAgeGroups: number[];
+  femaleAgeGroups: number[];
+  maleMortalityPer1000: number[];
+  femaleMortalityPer1000: number[];
+  asfrPer1000Women: number[];
+  tfrFromAsfr: number;
+}
+
+export interface WppAgeSexReference {
+  source: {
+    sourceName: string;
+    sourceUrl: string;
+    accessDate: string;
+    definition: string;
+    units: Record<string, string>;
+    yearConvention: string;
+    license: string;
+    limitations: string;
+    files: Record<string, string>;
+  };
+  years: Record<string, WppAgeSexYear>;
 }
 
 export interface PopulationCalibrationPoint {
@@ -86,6 +112,7 @@ function loadScenario(scenarioFile: string): PopulationScenarioDef {
     needs,
     mortalityAnchors: demography.mortalityAnchors,
     fertilityAnchors: demography.fertilityAnchors,
+    sexRatioAtBirth: demography.sexRatioAtBirth,
     fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
       professionIds.has(entry.professionId),
     ),
@@ -94,6 +121,7 @@ function loadScenario(scenarioFile: string): PopulationScenarioDef {
   return {
     dataVersion: raw.dataVersion,
     scenarioId: raw.scenarioId,
+    ...(raw.startDayIndex === undefined ? {} : { startDayIndex: raw.startDayIndex }),
     professions: raw.professions,
     regions: raw.regions,
     popBlocks: raw.popBlocks,
@@ -109,6 +137,34 @@ export function loadM2WorldAggregate(): PopulationScenarioDef {
 /** Load the synthetic multi-block fixture. */
 export function loadM2MultiBlock(): PopulationScenarioDef {
   return loadScenario("m2_multi_block.json");
+}
+
+/** Load the WPP 1950-initialized age-structure validation scenario. */
+export function loadM2Wpp1950Validation(): PopulationScenarioDef {
+  return loadScenario("m2_wpp_1950_validation.json");
+}
+
+/** Load the source-backed WPP age/sex and demographic reference years. */
+export function loadM2WppAgeSexReference(): WppAgeSexReference {
+  const reference = readJson<WppAgeSexReference>("calibration/wpp_age_sex_reference.json");
+  if (reference.years === undefined || typeof reference.years !== "object") {
+    throw new Error("WPP age/sex reference must contain years");
+  }
+  for (const [year, values] of Object.entries(reference.years)) {
+    if (!/^\d{4}$/.test(year)) throw new Error(`invalid WPP reference year ${year}`);
+    for (const key of [
+      "maleAgeGroups",
+      "femaleAgeGroups",
+      "maleMortalityPer1000",
+      "femaleMortalityPer1000",
+      "asfrPer1000Women",
+    ] as const) {
+      if (!Array.isArray(values[key])) {
+        throw new Error(`WPP reference ${year}.${key} must be an array`);
+      }
+    }
+  }
+  return reference;
 }
 
 /** Load the provisional population calibration targets. */

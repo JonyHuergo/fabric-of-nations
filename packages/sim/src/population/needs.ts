@@ -16,7 +16,7 @@ import {
   quantityTolerance,
   supplyForGood,
 } from "./definitions.js";
-import { regionPopulation } from "./state.js";
+import { populationTotal } from "./state.js";
 import type { World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import type {
@@ -136,8 +136,14 @@ export function settlePopulationNeeds(
   const days = daysInYear(date.year);
   const region = world.regions[0];
   if (region === undefined) throw new RangeError("M2 needs requires one region");
-  const population = regionPopulation(world, region.id);
   const blocks = [...world.popBlocks].sort((left, right) => left.id - right.id);
+  const populationById = new Map<Id, number>();
+  let population = 0;
+  for (const block of blocks) {
+    const blockPopulation = populationTotal(block);
+    populationById.set(block.id, blockPopulation);
+    population += blockPopulation;
+  }
 
   const neededGoods = new Set<string>();
   for (const tier of definitions.needs) {
@@ -167,7 +173,8 @@ export function settlePopulationNeeds(
   const drafts = new Map<Id, DraftBlock>();
   const lowerTiersMet = new Map<Id, boolean>();
   for (const block of blocks) {
-    const blockPopulation = block.ageCohorts.reduce((total, value) => total + value, 0);
+    const blockPopulation = populationById.get(block.id);
+    if (blockPopulation === undefined) throw new RangeError("missing block population");
     const income = incomeById.get(block.id);
     if (income === undefined) {
       throw new RangeError(`missing income fixture for popBlock ${String(block.id)}`);

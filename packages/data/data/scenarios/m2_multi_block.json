@@ -1,12 +1,27 @@
 {
   "scenarioId": "m2-multi-block",
-  "dataVersion": "m2-population-v2",
+  "dataVersion": "m2.1-population-v1",
   "status": "provisional",
   "description": "Synthetic single-region multi-block fixture for needs, scarcity, and population-effect tests. Not a historical population distribution.",
   "professions": [
-    { "id": 0, "key": "peasants", "name": "Peasants", "stratum": "lower" },
-    { "id": 1, "key": "laborers", "name": "Laborers", "stratum": "lower" },
-    { "id": 2, "key": "clerks", "name": "Clerks", "stratum": "middle" }
+    {
+      "id": 0,
+      "key": "peasants",
+      "name": "Peasants",
+      "stratum": "lower"
+    },
+    {
+      "id": 1,
+      "key": "laborers",
+      "name": "Laborers",
+      "stratum": "lower"
+    },
+    {
+      "id": 2,
+      "key": "clerks",
+      "name": "Clerks",
+      "stratum": "middle"
+    }
   ],
   "regions": [
     {
@@ -21,36 +36,147 @@
       "regionId": 0,
       "professionId": 0,
       "financialAccountId": 0,
-      "ageCohorts": [64000, 52000, 48000, 42000, 38000, 32000, 28000, 24000, 20000, 16000, 12000, 8800, 6400, 4400, 2400, 1200, 800],
       "literacy": 0.35,
       "wealthLevel": 30,
       "initialSavingsSUSD": 1000,
-      "militancy": 0.1
+      "militancy": 0.1,
+      "maleAgeGroups": [
+        32664,
+        26562,
+        24531,
+        21342,
+        19162,
+        15853,
+        13899,
+        11830,
+        9892,
+        7876,
+        5847,
+        4219,
+        3006,
+        2008,
+        1066,
+        513,
+        308
+      ],
+      "femaleAgeGroups": [
+        31336,
+        25438,
+        23469,
+        20658,
+        18838,
+        16147,
+        14101,
+        12170,
+        10108,
+        8124,
+        6153,
+        4581,
+        3394,
+        2392,
+        1334,
+        687,
+        492
+      ]
     },
     {
       "id": 1,
       "regionId": 0,
       "professionId": 1,
       "financialAccountId": 1,
-      "ageCohorts": [56000, 45500, 42000, 36750, 33250, 28000, 24500, 21000, 17500, 14000, 10500, 7700, 5600, 3850, 2100, 1050, 700],
       "literacy": 0.5,
       "wealthLevel": 40,
       "initialSavingsSUSD": 1000,
-      "militancy": 0.1
+      "militancy": 0.1,
+      "maleAgeGroups": [
+        28581,
+        23242,
+        21465,
+        18674,
+        16767,
+        13872,
+        12161,
+        10351,
+        8655,
+        6892,
+        5116,
+        3692,
+        2630,
+        1757,
+        933,
+        449,
+        270
+      ],
+      "femaleAgeGroups": [
+        27419,
+        22258,
+        20535,
+        18076,
+        16483,
+        14128,
+        12339,
+        10649,
+        8845,
+        7108,
+        5384,
+        4008,
+        2970,
+        2093,
+        1167,
+        601,
+        430
+      ]
     },
     {
       "id": 2,
       "regionId": 0,
       "professionId": 2,
       "financialAccountId": 2,
-      "ageCohorts": [40000, 32500, 30000, 26250, 23750, 20000, 17500, 15000, 12500, 10000, 7500, 5500, 4000, 2750, 1500, 750, 500],
       "literacy": 0.85,
       "wealthLevel": 60,
       "initialSavingsSUSD": 1000,
-      "militancy": 0.05
+      "militancy": 0.05,
+      "maleAgeGroups": [
+        20415,
+        16601,
+        15332,
+        13339,
+        11976,
+        9908,
+        8687,
+        7394,
+        6182,
+        4923,
+        3655,
+        2637,
+        1879,
+        1255,
+        666,
+        321,
+        193
+      ],
+      "femaleAgeGroups": [
+        19585,
+        15899,
+        14668,
+        12911,
+        11774,
+        10092,
+        8813,
+        7606,
+        6318,
+        5077,
+        3845,
+        2863,
+        2121,
+        1495,
+        834,
+        429,
+        307
+      ]
     }
   ],
   "needsFile": "needs.json",
   "demographyFile": "demography.json",
-  "notes": "Synthetic fixture. All population and wealth values are test inputs, not historical claims."
+  "notes": "Synthetic multi-block fixture. Age/sex groups are synthetic test inputs, not historical claims."
 }

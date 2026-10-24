@@ -6,8 +6,9 @@
  * different simulation.
  */
 
+import { assertValidDayIndex } from "../calendar.js";
 import { MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
-import type { Id, Rate, Seed } from "../types.js";
+import type { Day, Id, Rate, Seed } from "../types.js";
 import {
   requireArray,
   requireFiniteNumber,
@@ -18,11 +19,14 @@ import {
 } from "../validation.js";
 import type { World, CreateWorldOptions } from "../world.js";
 import {
+  AGE_BAND_WIDTH,
   AGE_COHORT_COUNT,
-  WORKING_AGE_FIRST_COHORT,
-  WORKING_AGE_LAST_COHORT,
+  SINGLE_AGE_COUNT,
+  TERMINAL_AGE_INDEX,
+  WORKING_AGE_END,
+  WORKING_AGE_START,
 } from "./constants.js";
-import { assertValidPopulationDefinitions } from "./definitions.js";
+import { assertValidPopulationDefinitions, expandAgeGroupsToSingle } from "./definitions.js";
 import type {
   FinanceState,
   FinancialAccount,
@@ -124,42 +128,31 @@ export function assertValidPopBlock(block: PopBlock): void {
   assertId(record.professionId, "popBlock.professionId");
   assertId(record.financialAccountId, "popBlock.financialAccountId");
 
-  const cohorts = record.ageCohorts;
-  if (!(cohorts instanceof Uint32Array)) {
-    throw new TypeError("popBlock.ageCohorts must be a Uint32Array");
+  const male = record.maleByAge;
+  const female = record.femaleByAge;
+  if (!(male instanceof Uint32Array)) {
+    throw new TypeError("popBlock.maleByAge must be a Uint32Array");
   }
-  if (cohorts.length !== AGE_COHORT_COUNT) {
+  if (!(female instanceof Uint32Array)) {
+    throw new TypeError("popBlock.femaleByAge must be a Uint32Array");
+  }
+  if (male.length !== SINGLE_AGE_COUNT || female.length !== SINGLE_AGE_COUNT) {
     throw new RangeError(
-      `popBlock.ageCohorts must have length ${AGE_COHORT_COUNT}, received ${String(cohorts.length)}`,
+      `popBlock sex-age arrays must have length ${String(SINGLE_AGE_COUNT)}`,
     );
   }
   let total = 0;
-  for (let index = 0; index < cohorts.length; index += 1) {
-    const value = cohorts[index];
-    if (value === undefined) throw new RangeError(`popBlock.ageCohorts[${String(index)}] missing`);
-    total += value;
+  for (let index = 0; index < SINGLE_AGE_COUNT; index += 1) {
+    const maleValue = male[index];
+    const femaleValue = female[index];
+    if (maleValue === undefined || femaleValue === undefined) {
+      throw new RangeError(`popBlock sex-age value missing at age ${String(index)}`);
+    }
+    total += maleValue;
+    total += femaleValue;
   }
   if (!Number.isSafeInteger(total)) {
-    throw new RangeError("popBlock.ageCohorts total is not a safe integer");
-  }
-
-  const carry = record.agingCarry;
-  if (!(carry instanceof Uint8Array)) {
-    throw new TypeError("popBlock.agingCarry must be a Uint8Array");
-  }
-  if (carry.length !== AGE_COHORT_COUNT) {
-    throw new RangeError(
-      `popBlock.agingCarry must have length ${AGE_COHORT_COUNT}, received ${String(carry.length)}`,
-    );
-  }
-  for (let index = 0; index < carry.length; index += 1) {
-    const value = carry[index];
-    if (value === undefined || value > 4) {
-      throw new RangeError(`popBlock.agingCarry[${String(index)}] must be in 0..4`);
-    }
-  }
-  if (carry[AGE_COHORT_COUNT - 1] !== 0) {
-    throw new RangeError("popBlock.agingCarry[16] must be zero; the 80+ cohort does not age out");
+    throw new RangeError("popBlock population is not a safe integer");
   }
 
   assertRate(record.literacy, "popBlock.literacy");
@@ -169,6 +162,7 @@ export function assertValidPopBlock(block: PopBlock): void {
   requireInteger(record.unmetBasicDays, "popBlock.unmetBasicDays", 0, Number.MAX_SAFE_INTEGER);
   requireInteger(record.comfortFulfilledDays, "popBlock.comfortFulfilledDays", 0, Number.MAX_SAFE_INTEGER);
   assertRemainder(record.fractionalBirthRemainder, "popBlock.fractionalBirthRemainder");
+  assertRemainder(record.fractionalMaleBirthRemainder, "popBlock.fractionalMaleBirthRemainder");
   assertRemainder(record.fractionalDeathRemainder, "popBlock.fractionalDeathRemainder");
 }
 
@@ -257,20 +251,53 @@ export function assertValidPopulationState(world: World): void {
   }
 }
 
-/** Sum all 17 cohorts of one pop block. */
+/** Sum all male and female single-age counts of one pop block. */
 export function populationTotal(block: PopBlock): number {
   let total = 0;
-  for (let index = 0; index < block.ageCohorts.length; index += 1) {
-    total += block.ageCohorts[index] ?? 0;
+  for (let index = 0; index < SINGLE_AGE_COUNT; index += 1) {
+    total += block.maleByAge[index] ?? 0;
+    total += block.femaleByAge[index] ?? 0;
   }
   return total;
 }
 
-/** Sum the 15-64 cohorts (indices 3 through 12 inclusive). */
+/** Derive male five-year age-group totals without storing duplicate state. */
+export function maleFiveYearAgeGroups(block: PopBlock): Uint32Array {
+  const groups = new Uint32Array(AGE_COHORT_COUNT);
+  for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
+    const band = Math.min(Math.floor(age / AGE_BAND_WIDTH), TERMINAL_AGE_INDEX);
+    groups[band] = (groups[band] ?? 0) + (block.maleByAge[age] ?? 0);
+  }
+  return groups;
+}
+
+/** Derive female five-year age-group totals without storing duplicate state. */
+export function femaleFiveYearAgeGroups(block: PopBlock): Uint32Array {
+  const groups = new Uint32Array(AGE_COHORT_COUNT);
+  for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
+    const band = Math.min(Math.floor(age / AGE_BAND_WIDTH), TERMINAL_AGE_INDEX);
+    groups[band] = (groups[band] ?? 0) + (block.femaleByAge[age] ?? 0);
+  }
+  return groups;
+}
+
+/** Derive combined five-year age-group totals without storing duplicate state. */
+export function fiveYearAgeGroups(block: PopBlock): Uint32Array {
+  const male = maleFiveYearAgeGroups(block);
+  const female = femaleFiveYearAgeGroups(block);
+  const groups = new Uint32Array(AGE_COHORT_COUNT);
+  for (let index = 0; index < AGE_COHORT_COUNT; index += 1) {
+    groups[index] = (male[index] ?? 0) + (female[index] ?? 0);
+  }
+  return groups;
+}
+
+/** Sum the 15-64 population across both sexes. */
 export function workingAgePopulation(block: PopBlock): number {
   let total = 0;
-  for (let index = WORKING_AGE_FIRST_COHORT; index <= WORKING_AGE_LAST_COHORT; index += 1) {
-    total += block.ageCohorts[index] ?? 0;
+  for (let age = WORKING_AGE_START; age <= WORKING_AGE_END; age += 1) {
+    total += block.maleByAge[age] ?? 0;
+    total += block.femaleByAge[age] ?? 0;
   }
   return total;
 }
@@ -302,7 +329,9 @@ export function createPopulationWorld(
   options: CreateWorldOptions = {},
 ): World {
   const seed: Seed = options.seed ?? 0;
+  const startDayIndex: Day = options.startDayIndex ?? scenario.startDayIndex ?? 0;
   requireUint32(seed, "seed");
+  assertValidDayIndex(startDayIndex);
   requireString(options.scenarioId ?? scenario.scenarioId, "scenarioId", {
     minLength: 1,
     maxLength: MAX_SCENARIO_ID_LENGTH,
@@ -365,20 +394,27 @@ export function createPopulationWorld(
     if (initial.regionId !== region.id) {
       throw new RangeError(`popBlock ${String(initial.id)} must belong to the single M2 region`);
     }
-    if (initial.ageCohorts.length !== AGE_COHORT_COUNT) {
+    if (initial.maleAgeGroups.length !== AGE_COHORT_COUNT) {
       throw new RangeError(
-        `popBlock ${String(initial.id)} ageCohorts must have length ${AGE_COHORT_COUNT}`,
+        `popBlock ${String(initial.id)} maleAgeGroups must have length ${String(AGE_COHORT_COUNT)}`,
       );
     }
-    const cohorts = new Uint32Array(AGE_COHORT_COUNT);
-    let total = 0;
-    for (let index = 0; index < initial.ageCohorts.length; index += 1) {
-      const value = initial.ageCohorts[index];
-      if (value === undefined) throw new RangeError("initial cohort value missing");
-      requireInteger(value, `popBlock ${String(initial.id)} ageCohorts[${String(index)}]`, 0, 0xffff_ffff);
-      cohorts[index] = value;
-      total += value;
+    if (initial.femaleAgeGroups.length !== AGE_COHORT_COUNT) {
+      throw new RangeError(
+        `popBlock ${String(initial.id)} femaleAgeGroups must have length ${String(AGE_COHORT_COUNT)}`,
+      );
     }
+    const maleByAge = expandAgeGroupsToSingle(
+      initial.maleAgeGroups,
+      `popBlock ${String(initial.id)} maleAgeGroups`,
+    );
+    const femaleByAge = expandAgeGroupsToSingle(
+      initial.femaleAgeGroups,
+      `popBlock ${String(initial.id)} femaleAgeGroups`,
+    );
+    let total = 0;
+    for (const value of maleByAge) total += value;
+    for (const value of femaleByAge) total += value;
     if (!Number.isSafeInteger(total)) {
       throw new RangeError(`popBlock ${String(initial.id)} population is not a safe integer`);
     }
@@ -391,8 +427,8 @@ export function createPopulationWorld(
       id: initial.id,
       regionId: initial.regionId,
       professionId: initial.professionId,
-      ageCohorts: cohorts,
-      agingCarry: new Uint8Array(AGE_COHORT_COUNT),
+      maleByAge,
+      femaleByAge,
       literacy: initial.literacy,
       wealthLevel: initial.wealthLevel,
       financialAccountId: initial.financialAccountId,
@@ -401,6 +437,7 @@ export function createPopulationWorld(
       unmetBasicDays: 0,
       comfortFulfilledDays: 0,
       fractionalBirthRemainder: 0,
+      fractionalMaleBirthRemainder: 0,
       fractionalDeathRemainder: 0,
     };
     blocks.push(block);
@@ -425,7 +462,8 @@ export function createPopulationWorld(
     simVersion: SIM_VERSION,
     dataVersion: scenario.dataVersion,
     scenarioId: scenario.scenarioId,
-    dayIndex: 0,
+    dayIndex: startDayIndex,
+    startDayIndex,
     seed,
     regions: [worldRegion],
     popBlocks: blocks,

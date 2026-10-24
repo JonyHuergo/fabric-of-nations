@@ -1,8 +1,8 @@
 {
   "scenarioId": "m2-world-aggregate",
-  "dataVersion": "m2-population-v2",
-  "status": "provisional",
-  "description": "Synthetic single-region world aggregate used only for M2 mechanics and provisional calibration. Not a historical country or a source-verified population series.",
+  "dataVersion": "m2.1-population-v1",
+  "status": "source-backed total; provisional 1900 age structure",
+  "description": "Single-region world aggregate with source-backed 1900 total and provisional 1900 age/sex structure for M2.1 mechanics and total-population calibration. Not a source-verified 1900 age distribution.",
   "professions": [
     {
       "id": 0,
@@ -24,32 +24,51 @@
       "regionId": 0,
       "professionId": 0,
       "financialAccountId": 0,
-      "ageCohorts": [
-        259405966,
-        210767346,
-        194554473,
-        170235164,
-        154022291,
-        129702982,
-        113490109,
-        97277237,
-        81064364,
-        64851491,
-        48638618,
-        35668320,
-        25940596,
-        17834160,
-        9727724,
-        4863862,
-        3242575
-      ],
       "literacy": 0.2,
       "wealthLevel": 30,
       "initialSavingsSUSD": 165000000000,
-      "militancy": 0.1
+      "militancy": 0.1,
+      "maleAgeGroups": [
+        132394964,
+        107660935,
+        99430546,
+        86502648,
+        77669019,
+        64257524,
+        56334599,
+        47948605,
+        40093909,
+        31923550,
+        23700008,
+        17100726,
+        12182869,
+        8138272,
+        4320566,
+        2079627,
+        1249691
+      ],
+      "femaleAgeGroups": [
+        127011002,
+        103106411,
+        95123927,
+        83732516,
+        76353272,
+        65445458,
+        57155510,
+        49328632,
+        40970455,
+        32927941,
+        24938610,
+        18567594,
+        13757727,
+        9695888,
+        5407158,
+        2784235,
+        1992884
+      ]
     }
   ],
   "needsFile": "needs.json",
   "demographyFile": "demography.json",
-  "notes": "The initial total (1,621,287,278) is the January 1, 1900 interpolation of the OWID long-run world-population series (1899/1900 mid-year values). The 17-band age distribution is a provisional stylized distribution, not source-verified. The GDD provisional 1.65B anchor is about 1.7% above this source-derived year-start value; the discrepancy is documented in source_notes.md."
+  "notes": "Initial total 1,621,287,278 is the OWID Jan 1, 1900 interpolation. Male/female age groups use the provisional 1900 age shares split by WPP 1950 age-specific sex shares; this is a documented projection assumption, not a 1900 source. WPP age/sex reference is separate."
 }

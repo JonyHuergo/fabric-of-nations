@@ -1,13 +1,20 @@
-# M2 data sources and calibration status
+# M2.1 demographic sources and calibration status
 
 ## Status
 
-M2 has a **source-backed total world-population reference series** for
-1900–2000, but the full demographic calibration remains **partial** because the
-initial age structure and age-specific fertility/mortality schedules are still
-provisional.
+M2.1 has:
 
-## Integrated population reference
+- a **source-backed total world-population series** for 1900–2000 (OWID);
+- **source-backed WPP 2024 age/sex and age-specific fertility/mortality
+  reference values for 1950, 1975, and 2000**;
+- a **WPP 1950-initialized validation scenario** for age-structure testing;
+- **provisional** 1900 age/sex structure and 1900–1949 age-specific
+  fertility/mortality schedules.
+
+Full historical demographic calibration is **not complete**: the 1900 age
+structure and pre-1950 age-specific schedules are not source-backed.
+
+## Total population reference (1900–2000)
 
 File: `calibration/m2_population_targets.json`
 
@@ -15,31 +22,187 @@ File: `calibration/m2_population_targets.json`
 - Geography: World.
 - Units: persons.
 - Period: 1899–2000; 1899 is included only to derive January 1, 1900.
-- Source: Our World in Data, *Population* long-run series:
-  - HYDE v3.3 (2023) for pre-1800;
-  - Gapminder v7 (2022) for 1800–1949;
-  - UN World Population Prospects 2024 for 1950 onward.
+- Source: Our World in Data, *Population* long-run series (HYDE 2023;
+  Gapminder v7 2022; UN WPP 2024).
 - URL: https://ourworldindata.org/grapher/population.csv?csvType=filtered&useColumnShortNames=true&country=World
 - Access date: 2026-10-23.
-- Confidence: medium. Post-1950 UN WPP is stronger; 1900–1949 uses Gapminder
-  estimates. OWID notes possible breaks at source boundaries.
-- License/attribution: Our World in Data (CC BY 4.0 as displayed at access;
-  verify before redistribution). Cite OWID/Gapminder/UN WPP.
+- Confidence: medium.
+- License/attribution: OWID/CC BY 4.0 attribution; verify before redistribution.
+- Year convention: OWID annual values are treated as mid-year; January 1
+  comparison values are the average of adjacent mid-year values.
 
-### Year convention and interpolation
+## WPP 2024 age/sex, fertility, and mortality references
 
-OWID's annual values are treated as **mid-year** values, following UN WPP
-practice. The simulation starts at January 1, so the reference comparison uses:
+File: `calibration/wpp_age_sex_reference.json`
 
-```text
-Jan1(Y) = (value(Y - 1) + value(Y)) / 2
-```
+Source: United Nations, *World Population Prospects: The 2024 Revision*,
+https://population.un.org/wpp/.
 
-This is an explicit year-fraction interpolation, not a hidden mix of calendars.
-The source's exact year convention should be rechecked against the OWID source
-notes before the calibration is treated as final.
+Downloaded files (World, medium variant, access date 2026-10-23):
 
-### GDD anchor discrepancy
+- `WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz`
+- `WPP2024_PopulationBySingleAgeSex_Medium_1950-2023.csv.gz`
+- `WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz`
+- `WPP2024_Fertility_by_Age5.csv.gz`
+
+### Definitions and units
+
+- Population: persons, WPP **1 January** estimates for age structure.
+- ASFR: live births per 1,000 women per year, by five-year maternal age group.
+- Mortality: central death rate per 1,000 person-years, derived as age-sex
+  deaths divided by mid-year age-sex population for the same year.
+- Geography: World.
+- Variant: Medium.
+- Age/sex validation reference years stored in `wpp_age_sex_reference.json`:
+  1950, 1975, 2000.
+- ASFR and sex-specific mortality are integrated **annually for every year
+  1950–2000** in `demography.json`; the model does not interpolate only three
+  benchmark years.
+
+### Age-band mapping
+
+WPP five-year bands map directly to the simulation's 17 reporting bands:
+
+`0-4, 5-9, ..., 75-79, 80+`.
+
+Within a five-year band, the simulation expands the source total uniformly
+across five single-year ages (terminal 80+ remains at age 80). This is an
+explicit assumption; WPP does not provide the single-year age resolution used
+internally by M2.1 for every published aggregate.
+
+ASFR maternal bands:
+
+`15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49` → seven simulation maternal
+bands. Ages 10–14 are excluded; M2.1 treats reproductive age as 15–49.
+
+### TFR consistency check
+
+TFR implied by the integrated annual ASFR schedules (`sum(ASFR) * 5 / 1000`):
+
+| Year | Implied TFR |
+|---:|---:|
+| 1950 | 4.8268 |
+| 1975 | 4.0546 |
+| 2000 | 2.7357 |
+
+These are consistency checks only; TFR is not substituted for ASFR. Annual WPP
+ASFR values are used directly for 1950–2000.
+
+### Mortality limitations
+
+- Mortality is derived from deaths and mid-year population, not from a published
+  `mx` table; source rounding and denominator choices introduce small uncertainty.
+- Rates are mapped to single-year ages by applying the five-year band rate to
+  each age in that band.
+- The 80+ rate is applied to the open-ended 80+ aggregate.
+
+## WPP 1950 validation scenario
+
+File: `scenarios/m2_wpp_1950_validation.json`
+
+- Starts at 1 January 1950 with WPP 1950 age/sex groups.
+- Total: 2,471,424,002.
+- Used only to validate 1975 and 2000 age structure; it is not the campaign
+  start and is not a source for 1900.
+- Single-year expansion from the 1950 five-year groups is uniform; 80+ remains
+  open-ended.
+- `World.startDayIndex` is 1950-01-01 for this scenario, so the initial January 1
+  is not aged before the first simulated day.
+
+## 1900 initial population and pre-1950 schedules
+
+The campaign starts at January 1, 1900 with total **1,621,287,278** from the OWID
+January 1 interpolation.
+
+**The 1900 age/sex distribution is provisional.** The previous stylized
+17-band age shares were retained and split by WPP 1950 age-specific sex shares.
+This is a projection assumption, not a 1900 source. It is not presented as a
+historical age structure.
+
+**1900–1949 ASFR and mortality are provisional.**
+
+- 1900 ASFR: WPP 1950 schedule × 1.05 (implied TFR ≈ 5.07).
+- 1949 ASFR: WPP 1950 schedule × 1.00.
+- 1900/1949 mortality: the earlier stylized age-band schedule, duplicated by
+  sex, multiplied by **1.45** and capped at 1,000 per 1,000. This factor is a
+  total-population calibration of provisional rates, not a historical mortality
+  observation. It was selected to align the pre-1950 trajectory with the
+  source-backed OWID/WPP 1950 total.
+
+These provisional inputs must be replaced by source-backed historical age
+structure and age-specific schedules before claiming full demographic
+calibration.
+
+## Campaign gameplay baseline result
+
+The campaign is a **no-shock gameplay baseline**, not the historical validation
+configuration. It uses the provisional 1900 age/sex distribution and pre-1950
+schedules.
+
+Public tick path, aggregate campaign scenario, January 1 samples:
+
+| Year | Model | Source Jan 1 | Relative error |
+|---:|---:|---:|---:|
+| 1900 | 1,621,287,278 | 1,621,287,278 | 0.000% |
+| 1950 | 2,454,331,503 | 2,480,507,938 | -1.055% |
+| 2000 | 6,715,972,921 | 6,130,354,660 | +9.553% |
+
+- Maximum annual relative error: **9.553%** at 2000.
+- RMSE across 101 annual samples: **5.320%**.
+- Full-century aggregate hash: `27937e31a211b44f` (seed 20261023).
+
+The 2000 excess is not a coefficient failure: the campaign's 1950 age/sex
+composition is materially younger than WPP because the 1900 distribution and
+pre-1950 schedules are provisional. That composition produces more women in
+reproductive ages and lower old-age mortality than WPP. It is documented rather
+than tuned away with a safety margin.
+
+### Campaign 1950 versus WPP 1950
+
+| Metric | Campaign | WPP | Absolute difference |
+|---|---:|---:|---:|
+| Total | 2,454,331,503 | 2,471,424,002 | -17,092,499 |
+| Male | 1,256,665,701 | 1,230,604,799 | +26,060,902 |
+| Female | 1,197,665,802 | 1,240,819,203 | -43,153,401 |
+| Women 15–49 | 637,625,086 | 617,119,833 | +20,505,253 |
+| Expected annual births at 1950 schedules | 95,854,757 | 90,456,385 | +5,398,372 |
+| Expected annual deaths at 1950 schedules | 39,850,043 | 47,854,576 | -8,004,533 |
+
+The 1950 five-year shares are also too young: 0–14 is about 39.0% versus 34.7%
+in WPP; 50+ is about 7.7% versus 15.6%. Male excess is largely because the
+provisional 1900/1949 mortality is duplicated by sex; WPP has higher male
+mortality. The campaign 1950 total is close, but its age/sex composition is not
+a historical validation result.
+
+## WPP 1950-initialized historical validation
+
+The WPP-initialized scenario uses the source-backed 1950 age/sex distribution and
+source-backed annual 1950–2000 ASFR/mortality.
+
+| Year | Model total | WPP total | Total error | Max five-year share difference | Male-share difference |
+|---:|---:|---:|---:|---:|---:|
+| 1950 | 2,471,424,002 | 2,471,424,002 | 0.00% | 0.00 pp | 0.00 pp |
+| 1975 | 4,041,822,105 | 4,034,031,762 | +0.193% | 1.08 pp | -0.085 pp |
+| 2000 | 6,205,160,776 | 6,129,943,964 | +1.227% | 0.55 pp | -0.185 pp |
+
+Cumulative model vs WPP flows for 1950–1999:
+
+| Flow | Model | WPP | Error |
+|---|---:|---:|---:|
+| Births | 6,117,076,588 | 6,089,003,488 | +0.461% |
+| Deaths | 2,383,339,814 | 2,430,494,039 | -1.939% |
+| Net change | 3,733,736,774 | 3,658,509,449 | +2.057% |
+
+The annual-source schedules remove the previous 5.2–5.5% shortfall. Before this
+correction, using only 1950/1975/2000 anchors produced 5,683,675,382 births and
+2,363,974,692 deaths, ending at 5,791,124,003. The shortfall was primarily the
+missing 1960s fertility peak and annual fertility decline, not an age-transition
+or newborn-assignment defect. The remaining +1.2% total difference is small and
+is not tuned away.
+
+The full validation-regression digest is `6e6db5e440706ab6`.
+
+## GDD anchor discrepancy
 
 | Year | GDD provisional anchor | OWID mid-year | OWID Jan 1 derived |
 |---:|---:|---:|---:|
@@ -47,82 +210,31 @@ notes before the calibration is treated as final.
 | 1950 | 2.500B | 2.493B | 2.481B |
 | 2000 | 6.100B | 6.172B | 6.130B |
 
-The GDD anchors are rounded/provisional. The model scenario now starts at the
-source-derived Jan 1, 1900 value (1,621,287,278 persons) rather than 1.65B. The
-GDD anchors remain useful cross-checks but should not be treated as exact
-year-start definitions.
+The GDD anchors are rounded/provisional. The campaign starts from the source-
+derived Jan 1, 1900 value. Recommend explicitly defining the GDD anchors as
+mid-year or January 1, or replacing them with the source-backed series.
 
-**Recommendation:** revise the GDD anchor table to state whether each anchor is
-mid-year or January 1, or replace the rounded anchors with the source-backed
-series. Do not tune one model to both definitions; the current target is the
-source-backed Jan 1 interpolation.
+## Financial-budget deviation
 
-## Current calibration result
+GDD §6.2 describes daily needs funding from household financial assets plus
+income received, less mandatory payments. M2/M2.1 use **annual disposable
+income only** and do not draw down savings. This is a documented, task-mandated
+deviation; account balances are unchanged and are not used to finance needs.
 
-Run through the public tick path against the OWID Jan 1 interpolation:
+## Performance
 
-| Year | Model | Source Jan 1 | Relative error |
-|---:|---:|---:|---:|
-| 1900 | 1,621,287,278 | 1,621,287,278 | 0.000% |
-| 1950 | 2,479,824,315 | 2,480,507,938 | -0.028% |
-| 2000 | 6,141,488,510 | 6,130,354,660 | +0.182% |
+The single-year, sex-separated state increases work relative to the 17-band M2
+model. M2.1 benchmarks use 200/1,000/3,000/6,000 blocks and report Node timings;
+these are not mobile evidence. See README/DECISIONS for latest measurements.
 
-Maximum annual relative error: **3.707%** at 1924. RMSE across the 101 annual
-samples: **1.907%**. These pass the 5% curve and 3% anchor checks against the
-source-backed total, but this is not a full historical demographic validation.
+## Sources still missing
 
-The crude birth-rate anchors were adjusted by +0.3 per 1,000 from the earlier
-provisional values (31.9/31.9/36.1/25.1 for 1900/1949/1950/2000) to reduce the
-total-population error. Age-specific mortality, the 1900 age structure, and the
-birth-rate anchors remain provisional inputs, not source-backed history.
-
-## Demographic inputs still provisional
-
-The source-backed total-population series is **not sufficient** to validate all
-demographic inputs. Still missing or only stylized:
-
-- 1900 age distribution by 17 five-year bands. The current distribution is a
-  stylized young-population shape, scaled to the source-backed 1900 total.
-- Age-specific mortality-rate anchors for 1900, 1950, and 2000. Current rates are
-  provisional stylized reconstructions.
-- Crude birth-rate anchors for 1900, 1949, 1950, and 2000. Current values are
-  provisional and intentionally include a stylized 1950 transition to exercise
-  the model; they are not source-backed.
-- Fertility multipliers by profession. All M2 fixtures use 1.0.
-- Profession/household-block shares for the multi-block fixture. These are
-  synthetic test inputs, not historical estimates.
-- Initial literacy, wealth, and militancy values. These are synthetic fixture
-  values.
-- Needs quantities and fixture prices. These are test definitions, not
-  historical data.
-
-## Needs
-
-`needs.json` uses GDD good keys and provisional per-capita daily quantities.
-Fixture prices and supply ratios are explicit test inputs, not historical
-prices or production data.
-
-## Source-backed work still required
-
-- Source-backed 1900 age structure. Candidate sources (UN WPP historical
-  reconstructions, Gapminder) were not integrated because their age-band
-  definitions and 1900 estimates were not validated against the 17-band M2
-  classification.
-- Age-specific mortality and fertility series for the reference years. UN WPP
-  2024 (https://population.un.org/wpp/) provides 1950+ age-specific data but its
-  five-year age bands, year convention, and scenario variants still need mapping
-  to the M2 cohort model.
-- Pre-1950 age-specific mortality/fertility series; the current pre-1950 schedule
-  is a stylized reconstruction, not a source-backed historical series.
-- Profession/household composition. The current blocks are synthetic fixtures.
-- A documented license/attribution review before redistribution.
-
-## Test interpretation
-
-- Mechanics verified by automated tests: conservation, aging, remainders,
-  needs allocation, wealth/militancy effects, serialization, determinism.
-- Total-population trajectory compared against the integrated OWID series:
-  **source-backed total-population reference**, but still **partial calibration**
-  because other demographic inputs are provisional.
-- Historical calibration against a complete source-backed demographic dataset:
-  **not yet verified**.
+- Source-backed 1900 age structure and pre-1950 age-specific fertility/mortality.
+- A published source for the sex ratio at birth; the current 1.05 male/female
+  ratio is provisional.
+- Exact single-year within-band distribution; the current expansion is uniform.
+- A full WPP-derived mortality table rather than deaths/mid-year-population
+  derivation.
+- Independent US Census benchmark cross-check.
+- Full historical demographic calibration; total-population agreement is not
+  sufficient to claim it.

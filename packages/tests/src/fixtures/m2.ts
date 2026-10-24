@@ -125,6 +125,20 @@ export function cohorts(
   return result;
 }
 
+export function splitAgeGroups(
+  groups: readonly number[],
+  maleShare = 0.5,
+): { male: number[]; female: number[] } {
+  const male: number[] = [];
+  const female: number[] = [];
+  for (const value of groups) {
+    const maleValue = Math.round(value * maleShare);
+    male.push(maleValue);
+    female.push(value - maleValue);
+  }
+  return { male, female };
+}
+
 export function customScenario(
   popBlocks: PopulationScenarioDef["popBlocks"],
   base: PopulationScenarioDef = aggregateScenario(),
@@ -137,13 +151,16 @@ export function customScenario(
 }
 
 export function oneBlockScenario(totalPerCohort: Partial<Record<number, number>>): PopulationScenarioDef {
+  const groups = cohorts(totalPerCohort);
+  const split = splitAgeGroups(groups);
   return customScenario([
     {
       id: 0,
       regionId: 0,
       professionId: 0,
       financialAccountId: 0,
-      ageCohorts: cohorts(totalPerCohort),
+      maleAgeGroups: split.male,
+      femaleAgeGroups: split.female,
       literacy: 0.5,
       wealthLevel: 30,
       initialSavingsSUSD: 1000,

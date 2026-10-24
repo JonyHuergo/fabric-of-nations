@@ -1,10 +1,10 @@
 # Century decision register
 
 This file records material implementation decisions, GDD/`AGENTS.md` conflicts,
-and provisional assumptions made in M0/M1/M2. It follows GDD §20 and
+and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 `AGENTS.md` §1.
 
-Scope of this session: **M0 project foundation, M1 simulation core, and M2
+Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core**. Economy, production, general markets, politics, technology,
 diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 
@@ -178,30 +178,31 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Consequence:** This is not a general style linter. TypeScript strict mode and
   Jest carry the rest of the enforcement.
 
-### D-012 — Content version is authoritative in the JSON data package for M2
+### D-012 — Content version is authoritative in the JSON data package
 
 - **Resolution:** `packages/data` exports `DATA_PACKAGE_VERSION =
-  "m2-population-v2"` and `@century/sim` exports
-  `DEFAULT_DATA_VERSION = "m2-population-v2"`. The data loader rejects a scenario
-  whose data version does not match, and definitions carry the same version.
-- **Revision:** The M2 audit changed the source-backed 1900 initial population,
-  source-backed calibration target, and crude birth-rate anchors, so the data
-  version was bumped from `m2-population-v1` to `m2-population-v2`. M2 v1 saves
-  are rejected rather than silently reinterpreted under new content.
+  "m2.1-population-v1"` and `@century/sim` exports
+  `DEFAULT_DATA_VERSION = "m2.1-population-v1"`. The data loader rejects a
+  scenario whose data version does not match, and definitions carry the same
+  version.
+- **Revision history:** M2 used `m2-population-v2`; M2.1's single-year age/sex
+  state, WPP schedules, and validation scenarios are a new content/schema
+  revision. Older M2 saves are rejected rather than silently reinterpreted.
 - **Consequence:** M5 must establish the full generated data pipeline and keep
   the two declarations aligned. A mismatch fails loading with an actionable
   error.
 
-### D-013 — No automatic save migrations; M2 rejects M1 saves
+### D-013 — No automatic save migrations; M2.1 rejects older saves
 
 - **Resolution:** The save envelope is versioned, but incompatible format,
   schema, simulation, or content versions are rejected with a `SaveFormatError`.
-  M2 uses world schema `2` and simulation version `0.2.0`; M1 schema-1 saves are
+  M2.1 uses world schema `3` and simulation version `0.3.0`; M1 and M2 saves are
   rejected rather than migrated.
-- **Rationale:** GDD §5.6 permits migration or rejection. An M1 world has no
-  population state, so silently filling defaults would fabricate state.
-- **Consequence:** The first post-M2 schema change must add a migration path or
-  bump the version with an explicit compatibility decision.
+- **Rationale:** GDD §5.6 permits migration or rejection. The age/sex state
+  changed from five-year cohorts to single-year sex arrays, so silently
+  reinterpreting old typed arrays would fabricate state.
+- **Consequence:** The next schema change must add a tested migration or bump the
+  version with an explicit compatibility decision.
 
 ### D-014 — Typecheck resolves `sim` source without prebuilding
 
@@ -240,6 +241,9 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 
 ### D-017 — M2 population state and cohort representation
 
+- **M2.1 status:** superseded by D-025. The 17-band/fifths representation and
+  repeated one-fifth transfer were removed because they cannot represent actual
+  single-year progression; this section is retained as history.
 - **Resolution:** `World` adds `regions: Region[]`, `popBlocks: PopBlock[]`, and
   a minimal `finance.accounts` subset. M2 supports exactly one region.
 - **Cohorts:** 17 five-year bands. `ageCohorts` is `Uint32Array`; working age is
@@ -313,27 +317,36 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   values 1899–2000. Published values are treated as mid-year; January 1 comparison
   values are the average of adjacent years. The initial scenario is the
   source-derived Jan 1, 1900 total, 1,621,287,278.
-- **Acceptance:** Maximum annual relative error ≤ 5% and 1950/2000 anchor errors
-  ≤ 3%, with 1900 exact. The source-backed run currently reports 3.707% maximum
-  (1924), -0.028% at 1950, +0.182% at 2000, and 1.907% RMSE.
-- **Rate adjustment:** The crude birth-rate anchors were raised by 0.3 per 1,000
-  (31.9/31.9/36.1/25.1) to reduce total-population error. This is a
-  total-population calibration adjustment, not evidence that age-specific
-  fertility or mortality is historical.
-- **Status:** **Total-population reference is source-backed; full demographic
-  calibration is partial and incomplete.** The 1900 age structure, age-specific
-  mortality, crude-birth-rate anchors, and profession/household composition remain
-  provisional. The simulation does not read target totals.
+- **Acceptance:** Historical validation uses the WPP 1950-initialized scenario
+  and source-backed annual 1950–2000 ASFR/mortality. It currently reports
+  +0.193% at 1975 and +1.227% at 2000, with maximum five-year share differences
+  1.08 pp and 0.55 pp. The campaign no-shock baseline is tracked separately: its
+  2000 total is +9.553% because its provisional 1950 composition is too young.
+- **Rate adjustment:** M2.1 removes the crude-birth-rate model. The 1900/1949
+  provisional mortality schedules are multiplied by 1.45 (capped at 1,000 per
+  1,000) to align the pre-1950 total trajectory with the source-backed total;
+  this is a total-population calibration of provisional rates, not historical
+  mortality. Pre-1950 ASFR uses the WPP 1950 schedule scaled by 1.05/1.00.
+- **Annual schedules:** WPP ASFR and sex-specific mortality are integrated for
+  every year 1950–2000, not only 1950/1975/2000. Three-anchor interpolation
+  missed the 1960s fertility peak and caused the earlier 5.2–5.5% validation
+  shortfall; annual schedules removed it.
+- **Status:** **Historical validation and gameplay baseline are separate.**
+  Total-population historical validation is source-backed and close; full
+  demographic calibration remains partial because 1900 age/sex and 1900–1949
+  schedules are provisional. The simulation does not read target totals.
 
-### D-022 — M2 schema and versioning
+### D-022 — M2/M2.1 schema and versioning
 
-- **Resolution:** `WORLD_SCHEMA_VERSION = 2`, `SIM_VERSION = "0.2.0"`,
-  `DEFAULT_DATA_VERSION = "m2-population-v2"`; `SAVE_FORMAT_VERSION` remains 1
-  because the envelope shape is unchanged.
-- **Compatibility:** M1 schema-1 / simulation-0.1 saves are rejected clearly;
-  no migration is attempted. Typed arrays are encoded and restored through the
-  existing tagged codec. The full-century aggregate regression digest is
-  `a1b9cb7d0727daa3` for seed `20261023`.
+- **Resolution:** `WORLD_SCHEMA_VERSION = 3`, `SIM_VERSION = "0.3.0"`,
+  `DEFAULT_DATA_VERSION = "m2.1-population-v1"`; `SAVE_FORMAT_VERSION` remains 1
+  because the envelope shape is unchanged. `World.startDayIndex` is serialized
+  so validation scenarios can start on a non-1900 January 1.
+- **Compatibility:** Schema-2/simulation-0.2 saves are rejected clearly; no
+  migration is attempted. Typed arrays are encoded and restored through the
+  existing tagged codec. The campaign no-shock full-century aggregate regression
+  digest is `27937e31a211b44f` for seed `20261023`; the WPP validation digest is
+  `6e6db5e440706ab6`.
 
 ### D-023 — Floating-point precision and invariant tolerances
 
@@ -358,12 +371,110 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   carry active tier state in one array; map needs results once for daily/monthly
   effects. These changes preserve the arithmetic and state hash; tests and the
   century digest confirm it.
-- **Result:** 200 blocks: ~2.58 ms -> ~1.6 ms average; 6,000 blocks: ~192 ms ->
-  ~80 ms average on this Node desktop. 1,000/3,000/6,000-block runs remain
-  diagnostic, not mobile evidence. Remaining cost is dominated by per-block
-  tier/result object allocation and per-block demography.
+- **Result:** M2.1's single-year/sex state increases work. Latest Node results
+  after a 100-tick per-scale warm-up: 200 blocks ~2.97 ms average / 3.91 ms p95;
+  1,000 ~16.62/18.80; 3,000 ~54.21/70.78; 6,000 ~104.84/124.08. The 200-block
+  p95 threshold remains 5 ms and passes; larger scales are diagnostic, not mobile
+  evidence. The death allocator performs largest-remainder allocation at
+  band/sex level and deterministic cumulative placement within each five-year
+  band.
 - **Consequence:** The 200-block provisional Node threshold remains 5 ms p95;
   larger scales are reported without a mobile claim.
+
+### D-025 — M2.1 single-year, sex-separated age representation
+
+- **Issue:** GDD §6.2 specifies 17 five-year buckets and moving approximately
+  one fifth of each cohort annually. That approximation cannot represent a
+  person's actual single-year progression and produces artificial cohort leakage;
+  it also cannot identify women in reproductive age groups.
+- **Resolution:** Authoritative state is two `Uint32Array(81)` arrays per block:
+  male and female single ages 0–79 plus open-ended 80+. The 17 five-year bands
+  are derived for reporting. Scenario initial data remains 17 five-year groups,
+  expanded uniformly to single years; the 80+ group maps to age 80.
+- **Ageing:** every person advances exactly one year each January 1 (except the
+  scenario start day), oldest-to-youngest; 79 enters 80+; 80+ never ages out;
+  newborns enter age 0. No fifths carries or per-cohort fractional transfer.
+- **GDD deviation:** this intentionally supersedes the GDD §6.2 bucketed
+  approximation, authorized by the M2.1 task. Recorded rather than presented as
+  GDD-compliant.
+- **Consequence:** Schema 3; larger state and per-block demographic work; 5-year
+  reporting totals remain available without duplicate authority.
+
+### D-026 — Age-specific female fertility replaces crude birth rate
+
+- **Resolution:** Seven maternal five-year bands (15–19 through 45–49) carry
+  ASFR per 1,000 women. Expected births use female single-age counts, actual
+  civil-year length, fractional accumulation, and the generating block's
+  profession multiplier. Births enter age 0; a documented provisional
+  `sexRatioAtBirth` splits male/female births exactly.
+- **Data:** WPP 2024 annual ASFR for every year 1950–2000; 1900/1949 schedules
+  are provisional WPP-1950-shaped estimates. TFR is used only as a consistency
+  check, never as a substitute for ASFR.
+- **Tests:** equal-total/different-female-age-structure, reproductive vs
+  non-reproductive movement, schedule changes, fractional accumulation, exact sex
+  split, age-0 entry, determinism/save-resume.
+
+### D-027 — WPP 2024 age/sex and mortality references
+
+- **Resolution:** WPP 2024 world 1-January population, deaths, and ASFR files are
+  integrated. Age/sex validation references are stored for 1950, 1975, and 2000;
+  ASFR and sex-specific mortality are integrated for every year 1950–2000.
+  Source metadata, units, age bands, mapping, access date, limitations, and
+  attribution are in `wpp_age_sex_reference.json` and `source_notes.md`.
+- **Mortality:** central death rates are derived as deaths divided by mid-year
+  age-sex population, mapped from 17 five-year bands to single ages, and applied
+  separately by sex for 1950+. 1900/1949 are provisional.
+- **Validation:** the WPP 1950-initialized scenario tests 1975/2000 age structure
+  without relying on the provisional 1900 distribution. Annual schedules give
+  +0.193%/+1.227% total error, max share differences 1.08/0.55 pp, and male-share
+  differences -0.085/-0.185 pp. Three-anchor interpolation was the primary cause
+  of the earlier 5.2–5.5% shortfall; it is corrected by annual data, not by
+  coefficient tuning.
+
+### D-028 — 1900 initial distribution and pre-1950 calibration
+
+- **Resolution:** The 1900 total is source-backed (OWID January 1 interpolation),
+  but the 1900 age/sex distribution is provisional: the prior stylized 17-band
+  shares split by WPP 1950 age-specific sex shares. 1900/1949 ASFR and mortality
+  are provisional; mortality is multiplied by a documented 1.45 total-population
+  calibration factor (capped at 1,000 per 1,000).
+- **Status:** These are calibrated/provisional inputs, not source-backed
+  historical observations. Full demographic calibration remains incomplete.
+
+### D-029 — `startDayIndex` for non-1900 validation starts
+
+- **Resolution:** `World.startDayIndex` records the first represented day.
+  Annual ageing is skipped on that starting January 1. The campaign default is
+  day 0; the WPP 1950 validation scenario starts at 1950-01-01. The field is
+  serialized and hashed.
+- **Consequence:** Validation scenarios do not incorrectly age the initial
+  January 1 population. Schema-3 saves preserve the start boundary.
+
+### D-030 — Death allocation performance change
+
+- **Resolution:** The previous 17-band largest-remainder allocation built
+  per-cell fraction objects and sorted them. With 162 age-sex cells this dominated
+  the tick. M2.1 now performs **largest-remainder allocation at the 34
+  five-year-band/sex level**, then places each band allocation across its
+  single-year ages with a deterministic cumulative split.
+- **Tradeoff:** The literal largest-remainder stage is at band/sex resolution,
+  not every single-year cell; within-band placement is proportional/cumulative.
+  Conservation, deterministic ordering, affected-age tests, and save/resume are
+  preserved. This is recorded as a performance/correctness tradeoff, not hidden.
+
+### D-031 — Static definitions are validated at scenario construction, not every tick
+
+- **Finding:** `tick` revalidated the complete annual 1950–2000 ASFR/mortality
+  definition object on every day. With 53 anchors this dominated the century and
+  validation test paths.
+- **Resolution:** `createPopulationWorld`/the data loader validate the immutable
+  definitions once. Every tick still validates the world, boundary, context
+  presence, income/price/supply fixtures, data/scenario identity, and population
+  state. A context cannot silently use a different data/scenario version.
+- **Consequence:** Invalid definitions are rejected at construction. Callers that
+  build a world and then substitute a structurally different definitions object
+  are outside the supported `TickContext` contract; tests construct scenarios
+  through `createPopulationWorld`.
 
 ## Assumptions recorded for future review
 
@@ -378,9 +489,9 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
    assert the distinction.
 5. M2 uses exactly one region and one shared needs fixture. Multi-region worlds,
    trade markets, migration, and employment are M3/M5 work.
-6. The world-aggregate total-population reference is source-backed (OWID/Gapminder/
-   UN WPP), but the scenario age structure and demographic schedules are
-   provisional. Full historical demographic calibration is incomplete.
+6. The total-population reference and WPP 1950/1975/2000 age/sex references are
+   source-backed. The 1900 age/sex structure and 1900–1949 ASFR/mortality are
+   provisional; full historical demographic calibration is incomplete.
 7. The daily budget excludes savings; no financial account is mutated in M2.
 8. `Math.log`-based wealth and floating demographic accumulation are deterministic
    on a fixed runtime but not proven bit-identical across JavaScript engines.
@@ -391,6 +502,6 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
 - Save compression and atomic platform storage (M6/M7).
 - Worker runtime package and mobile performance device (M7).
 - Historical data versioning and migration (M5).
-- Source-backed world population, age structure, and age-specific demographic
-  series for replacing the provisional M2 calibration fixture.
+- Source-backed 1900 age structure and pre-1950 age-specific fertility/mortality.
+- Source-backed annual sex ratio at birth and exact single-year age distributions.
 - Cross-engine floating-point determinism policy.

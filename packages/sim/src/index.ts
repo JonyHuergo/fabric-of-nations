@@ -2,9 +2,10 @@
  * Public API for the pure Century simulation package.
  *
  * M1 provides core types, calendar, keyed randomness, the minimal world state,
- * the tick driver, versioned serialization, and the test state digest. M2 adds
- * population blocks, cohort ageing, demographics, needs, wealth, and militancy
- * in a single-region fixture. Economy, production, general markets, politics,
+ * the tick driver, versioned serialization, and the test state digest. M2.1 adds
+ * single-year sex-separated population blocks, exact annual ageing, age-specific
+ * fertility, sex-specific mortality, needs, wealth, and militancy in a
+ * single-region fixture. Economy, production, general markets, politics,
  * technology, diplomacy, war, and UI contracts remain future milestones.
  */
 

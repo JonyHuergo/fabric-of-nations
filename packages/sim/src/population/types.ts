@@ -7,7 +7,7 @@
  * world so a save can be matched to the same definitions.
  */
 
-import type { Id, MoneySUSD, Rate } from "../types.js";
+import type { Day, Id, MoneySUSD, Rate } from "../types.js";
 import type { NeedTier } from "./constants.js";
 
 export interface Region {
@@ -37,10 +37,10 @@ export interface PopBlock {
   regionId: Id;
   professionId: Id;
 
-  /** 17 five-year cohort counts, persons. */
-  ageCohorts: Uint32Array;
-  /** Integer carry in fifths of a person for the 1/5 annual transfer, 0..4. */
-  agingCarry: Uint8Array;
+  /** Male persons by single year of age: 0..79, then open-ended 80+. */
+  maleByAge: Uint32Array;
+  /** Female persons by single year of age: 0..79, then open-ended 80+. */
+  femaleByAge: Uint32Array;
 
   literacy: Rate;
   wealthLevel: number;
@@ -54,8 +54,10 @@ export interface PopBlock {
   /** Consecutive days with fully met, active comfort needs. */
   comfortFulfilledDays: number;
 
-  /** Fractional person remainder for births. */
+  /** Fractional person remainder for total births. */
   fractionalBirthRemainder: number;
+  /** Fractional remainder for allocating births to male vs female. */
+  fractionalMaleBirthRemainder: number;
   /** Fractional person remainder for deaths. */
   fractionalDeathRemainder: number;
 }
@@ -76,14 +78,16 @@ export interface NeedTierDef {
 
 export interface MortalityAnchor {
   year: number;
-  /** 17 annual death rates per 1,000 persons in each age band. */
-  annualDeathsPer1000ByAgeBand: readonly number[];
+  /** 17 annual central death rates per 1,000 males in each five-year band. */
+  maleAnnualDeathsPer1000ByAgeBand: readonly number[];
+  /** 17 annual central death rates per 1,000 females in each five-year band. */
+  femaleAnnualDeathsPer1000ByAgeBand: readonly number[];
 }
 
 export interface FertilityAnchor {
   year: number;
-  /** Crude annual births per 1,000 persons. */
-  annualBirthsPer1000: number;
+  /** Seven annual ASFRs per 1,000 women, ages 15-19 through 45-49. */
+  ageSpecificBirthsPer1000Women: readonly number[];
 }
 
 export interface FertilityMultiplierDef {
@@ -104,6 +108,8 @@ export interface PopulationDefinitions {
   needs: readonly NeedTierDef[];
   mortalityAnchors: readonly MortalityAnchor[];
   fertilityAnchors: readonly FertilityAnchor[];
+  /** Male births per one female birth; provisional unless sourced. */
+  sexRatioAtBirth: number;
   fertilityMultipliers: readonly FertilityMultiplierDef[];
 }
 
@@ -112,7 +118,10 @@ export interface PopBlockInitialDef {
   regionId: Id;
   professionId: Id;
   financialAccountId: Id;
-  ageCohorts: readonly number[];
+  /** Male population in 17 five-year bands; expanded to single years at creation. */
+  maleAgeGroups: readonly number[];
+  /** Female population in 17 five-year bands; expanded to single years at creation. */
+  femaleAgeGroups: readonly number[];
   literacy: Rate;
   wealthLevel: number;
   initialSavingsSUSD: MoneySUSD;
@@ -128,6 +137,8 @@ export interface RegionInitialDef {
 export interface PopulationScenarioDef {
   dataVersion: string;
   scenarioId: string;
+  /** Optional non-1900 validation start; defaults to day 0. */
+  startDayIndex?: Day;
   professions: readonly ProfessionIdentityDef[];
   regions: readonly RegionInitialDef[];
   popBlocks: readonly PopBlockInitialDef[];
@@ -211,6 +222,8 @@ export interface DemographyBlockResult {
   popBlockId: Id;
   populationStart: number;
   births: number;
+  maleBirths: number;
+  femaleBirths: number;
   deaths: number;
   populationEnd: number;
 }
@@ -219,6 +232,8 @@ export interface DemographyDayResult {
   aged: boolean;
   blocks: readonly DemographyBlockResult[];
   totalBirths: number;
+  totalMaleBirths: number;
+  totalFemaleBirths: number;
   totalDeaths: number;
   populationStart: number;
   populationEnd: number;

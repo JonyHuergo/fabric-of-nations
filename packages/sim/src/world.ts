@@ -49,6 +49,8 @@ export interface World {
   scenarioId: string;
   /** Next civil day to process; 36,524 is the terminal boundary. */
   dayIndex: Day;
+  /** First day represented by this scenario; annual ageing is skipped on it. */
+  startDayIndex: Day;
   /** Unsigned 32-bit deterministic world seed. */
   seed: Seed;
   /** M2 supports at most one region; the collection is future-compatible. */
@@ -63,25 +65,29 @@ export interface World {
 export interface CreateWorldOptions {
   readonly seed?: Seed;
   readonly scenarioId?: string;
+  readonly startDayIndex?: Day;
 }
 
 /** Create an empty M2-schema world at 1900-01-01. */
 export function createInitialWorld(options: CreateWorldOptions = {}): World {
   const seed = options.seed ?? 0;
   const scenarioId = options.scenarioId ?? DEFAULT_SCENARIO_ID;
+  const startDayIndex = options.startDayIndex ?? 0;
 
   requireUint32(seed, "seed");
   requireString(scenarioId, "scenarioId", {
     minLength: 1,
     maxLength: MAX_SCENARIO_ID_LENGTH,
   });
+  assertValidDayIndex(startDayIndex);
 
   const world: World = {
     schemaVersion: WORLD_SCHEMA_VERSION,
     simVersion: SIM_VERSION,
     dataVersion: DEFAULT_DATA_VERSION,
     scenarioId,
-    dayIndex: 0,
+    dayIndex: startDayIndex,
+    startDayIndex,
     seed,
     regions: [],
     popBlocks: [],
@@ -126,6 +132,10 @@ export function assertValidWorld(world: World): void {
     maxLength: MAX_SCENARIO_ID_LENGTH,
   });
   assertValidDayIndex(world.dayIndex);
+  assertValidDayIndex(world.startDayIndex);
+  if (world.startDayIndex > world.dayIndex) {
+    throw new RangeError("world.startDayIndex must not be after world.dayIndex");
+  }
   requireUint32(world.seed, "world.seed");
 
   const diagnostics = requireRecord(world.diagnostics, "world.diagnostics");

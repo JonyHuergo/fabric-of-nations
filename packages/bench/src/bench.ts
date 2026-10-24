@@ -39,6 +39,7 @@ const M2_AGGREGATE_RUNS = 2;
 const M2_STRESS_SCALES = [200, 1_000, 3_000, 6_000] as const;
 const M2_STRESS_TICKS = 730;
 const WARMUP_TICKS = 2_000;
+const STRESS_WARMUP_TICKS = 100;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -202,7 +203,8 @@ function stressScenario(blockCount: number): PopulationScenarioDef {
       ...template,
       id: index,
       financialAccountId: index,
-      ageCohorts: [...template.ageCohorts],
+      maleAgeGroups: [...template.maleAgeGroups],
+      femaleAgeGroups: [...template.femaleAgeGroups],
     };
   });
   const definitions = { ...base.definitions, scenarioId: `m2-stress-${String(blockCount)}` };
@@ -248,6 +250,7 @@ function main(): void {
       `${String(M2_STRESS_TICKS)} ticks each; 1 run per scale`,
   );
   console.log(`warm-up: ${String(WARMUP_TICKS)} ticks for M1 and M2 aggregate`);
+  console.log(`stress warm-up: ${String(STRESS_WARMUP_TICKS)} ticks per scale`);
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   for (let index = 0; index < WARMUP_TICKS; index += 1) tick(warmupM1);
@@ -270,6 +273,14 @@ function main(): void {
   const m2StressResults: { blocks: number; results: RunResult[] }[] = [];
   for (const blockCount of M2_STRESS_SCALES) {
     const stress = stressScenario(blockCount);
+    const warmWorld = createPopulationWorld(stress, { seed: SEED });
+    const warmContext = contextFor(
+      stress,
+      warmWorld.popBlocks.map((block) => block.id),
+    );
+    for (let index = 0; index < STRESS_WARMUP_TICKS; index += 1) {
+      tick(warmWorld, warmContext);
+    }
     m2StressResults.push({
       blocks: blockCount,
       results: [runPopulationCase(1, stress, M2_STRESS_TICKS)],

@@ -1,47 +1,32 @@
 /**
- * Exact integer annual cohort ageing.
+ * Exact annual single-year ageing.
  *
- * Each cohort carries a remainder in fifths of a person (0..4). At each annual
- * pass, `units = cohort + carry` fifths represent the cohort's one-fifth transfer
- * budget; `floor(units / 5)` people move and `units % 5` remains. Processing from
- * oldest to youngest ensures people moved into a cohort are not moved again in
- * the same pass.
+ * At each annual pass every person ages exactly one year. Cohorts are shifted
+ * oldest-to-youngest so people moved into age a+1 cannot be moved again in the
+ * same pass. Age 79 enters the open-ended 80+ slot; the 80+ slot itself remains.
+ * The youngest slot is emptied here and receives newborn counts later in the day.
  */
 
 import type { World } from "../world.js";
-import { AGE_COHORT_COUNT, AGE_TRANSFER_DENOMINATOR } from "./constants.js";
+import { SINGLE_AGE_COUNT, TERMINAL_AGE_INDEX } from "./constants.js";
 import { populationTotal } from "./state.js";
 
-/** Apply exactly one annual cohort-ageing pass. */
+/** Apply exactly one annual single-year ageing pass. */
 export function applyAnnualAgeing(world: World): void {
   for (const block of world.popBlocks) {
-    const cohorts = block.ageCohorts;
-    const carry = block.agingCarry;
     const before = populationTotal(block);
+    const male = block.maleByAge;
+    const female = block.femaleByAge;
 
-    for (let index = AGE_COHORT_COUNT - 2; index >= 0; index -= 1) {
-      const count = cohorts[index];
-      const previousCarry = carry[index];
-      if (count === undefined || previousCarry === undefined) {
-        throw new RangeError(`popBlock ${String(block.id)} cohort ${String(index)} is missing`);
+    for (let age = TERMINAL_AGE_INDEX - 1; age >= 0; age -= 1) {
+      const destination = age + 1;
+      if (destination >= SINGLE_AGE_COUNT) {
+        throw new RangeError("ageing destination exceeds the single-age array");
       }
-      if (previousCarry > AGE_TRANSFER_DENOMINATOR - 1) {
-        throw new RangeError(
-          `popBlock ${String(block.id)} agingCarry[${String(index)}] is outside 0..4`,
-        );
-      }
-      const units = count + previousCarry;
-      const moved = Math.floor(units / AGE_TRANSFER_DENOMINATOR);
-      const nextCarry = units % AGE_TRANSFER_DENOMINATOR;
-      const destination = (cohorts[index + 1] ?? 0) + moved;
-      if (destination > 0xffff_ffff) {
-        throw new RangeError(
-          `popBlock ${String(block.id)} cohort ${String(index + 1)} exceeds Uint32 range during ageing`,
-        );
-      }
-      cohorts[index] = count - moved;
-      carry[index] = nextCarry;
-      cohorts[index + 1] = destination;
+      male[destination] = (male[destination] ?? 0) + (male[age] ?? 0);
+      female[destination] = (female[destination] ?? 0) + (female[age] ?? 0);
+      male[age] = 0;
+      female[age] = 0;
     }
 
     const after = populationTotal(block);

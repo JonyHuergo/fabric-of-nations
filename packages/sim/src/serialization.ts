@@ -29,7 +29,7 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { checksumOfJson, stableStringify } from "./hash.js";
-import { AGE_COHORT_COUNT } from "./population/constants.js";
+import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type {
   FinanceState,
   FinancialAccount,
@@ -140,8 +140,8 @@ export type SerializedPopBlock = {
   readonly id: number;
   readonly regionId: number;
   readonly professionId: number;
-  readonly ageCohorts: EncodedTypedArray;
-  readonly agingCarry: EncodedTypedArray;
+  readonly maleByAge: EncodedTypedArray;
+  readonly femaleByAge: EncodedTypedArray;
   readonly literacy: number;
   readonly wealthLevel: number;
   readonly financialAccountId: number;
@@ -150,6 +150,7 @@ export type SerializedPopBlock = {
   readonly unmetBasicDays: number;
   readonly comfortFulfilledDays: number;
   readonly fractionalBirthRemainder: number;
+  readonly fractionalMaleBirthRemainder: number;
   readonly fractionalDeathRemainder: number;
 };
 
@@ -160,6 +161,7 @@ export type SerializedWorld = {
   readonly dataVersion: string;
   readonly scenarioId: string;
   readonly dayIndex: number;
+  readonly startDayIndex: number;
   readonly seed: number;
   readonly regions: readonly SerializedRegion[];
   readonly popBlocks: readonly SerializedPopBlock[];
@@ -334,6 +336,7 @@ export function encodeWorld(world: World): SerializedWorld {
     dataVersion: world.dataVersion,
     scenarioId: world.scenarioId,
     dayIndex: world.dayIndex,
+    startDayIndex: world.startDayIndex,
     seed: world.seed,
     regions: world.regions.map((region) => ({
       id: region.id,
@@ -345,8 +348,8 @@ export function encodeWorld(world: World): SerializedWorld {
       id: block.id,
       regionId: block.regionId,
       professionId: block.professionId,
-      ageCohorts: encodeTypedArray(block.ageCohorts),
-      agingCarry: encodeTypedArray(block.agingCarry),
+      maleByAge: encodeTypedArray(block.maleByAge),
+      femaleByAge: encodeTypedArray(block.femaleByAge),
       literacy: block.literacy,
       wealthLevel: block.wealthLevel,
       financialAccountId: block.financialAccountId,
@@ -355,6 +358,7 @@ export function encodeWorld(world: World): SerializedWorld {
       unmetBasicDays: block.unmetBasicDays,
       comfortFulfilledDays: block.comfortFulfilledDays,
       fractionalBirthRemainder: block.fractionalBirthRemainder,
+      fractionalMaleBirthRemainder: block.fractionalMaleBirthRemainder,
       fractionalDeathRemainder: block.fractionalDeathRemainder,
     })),
     finance: {
@@ -419,27 +423,27 @@ function decodeFinanceState(value: unknown): FinanceState {
 
 function decodePopBlock(value: unknown, path: string): PopBlock {
   const record = requireRecord(value, path);
-  const ageCohorts = decodeTypedArray(record.ageCohorts);
-  if (!(ageCohorts instanceof Uint32Array)) {
-    throw new SaveFormatError(`${path}.ageCohorts must decode to Uint32Array`);
+  const maleByAge = decodeTypedArray(record.maleByAge);
+  if (!(maleByAge instanceof Uint32Array)) {
+    throw new SaveFormatError(`${path}.maleByAge must decode to Uint32Array`);
   }
-  if (ageCohorts.length !== AGE_COHORT_COUNT) {
-    throw new SaveFormatError(`${path}.ageCohorts must have length ${String(AGE_COHORT_COUNT)}`);
+  if (maleByAge.length !== SINGLE_AGE_COUNT) {
+    throw new SaveFormatError(`${path}.maleByAge must have length ${String(SINGLE_AGE_COUNT)}`);
   }
-  const agingCarry = decodeTypedArray(record.agingCarry);
-  if (!(agingCarry instanceof Uint8Array) || agingCarry instanceof Uint8ClampedArray) {
-    throw new SaveFormatError(`${path}.agingCarry must decode to Uint8Array`);
+  const femaleByAge = decodeTypedArray(record.femaleByAge);
+  if (!(femaleByAge instanceof Uint32Array)) {
+    throw new SaveFormatError(`${path}.femaleByAge must decode to Uint32Array`);
   }
-  if (agingCarry.length !== AGE_COHORT_COUNT) {
-    throw new SaveFormatError(`${path}.agingCarry must have length ${String(AGE_COHORT_COUNT)}`);
+  if (femaleByAge.length !== SINGLE_AGE_COUNT) {
+    throw new SaveFormatError(`${path}.femaleByAge must have length ${String(SINGLE_AGE_COUNT)}`);
   }
 
   return {
     id: requireUint32(record.id, `${path}.id`),
     regionId: requireUint32(record.regionId, `${path}.regionId`),
     professionId: requireUint32(record.professionId, `${path}.professionId`),
-    ageCohorts,
-    agingCarry,
+    maleByAge,
+    femaleByAge,
     literacy: requireFiniteNumber(record.literacy, `${path}.literacy`),
     wealthLevel: requireFiniteNumber(record.wealthLevel, `${path}.wealthLevel`),
     financialAccountId: requireUint32(
@@ -468,6 +472,10 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
     fractionalBirthRemainder: requireFiniteNumber(
       record.fractionalBirthRemainder,
       `${path}.fractionalBirthRemainder`,
+    ),
+    fractionalMaleBirthRemainder: requireFiniteNumber(
+      record.fractionalMaleBirthRemainder,
+      `${path}.fractionalMaleBirthRemainder`,
     ),
     fractionalDeathRemainder: requireFiniteNumber(
       record.fractionalDeathRemainder,
@@ -521,6 +529,16 @@ function decodeWorldPayload(value: unknown): World {
     CAMPAIGN_TERMINAL_DAY_INDEX,
   );
   assertValidDayIndex(dayIndex);
+  const startDayIndex = requireInteger(
+    payload.startDayIndex,
+    "save payload.startDayIndex",
+    0,
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
+  assertValidDayIndex(startDayIndex);
+  if (startDayIndex > dayIndex) {
+    throw new SaveFormatError("save payload.startDayIndex must not be after dayIndex");
+  }
   const seed = requireUint32(payload.seed, "save payload.seed");
 
   const diagnosticsRecord = requireRecord(payload.diagnostics, "save payload.diagnostics");
@@ -577,6 +595,7 @@ function decodeWorldPayload(value: unknown): World {
     dataVersion,
     scenarioId,
     dayIndex,
+    startDayIndex,
     seed,
     regions,
     popBlocks,

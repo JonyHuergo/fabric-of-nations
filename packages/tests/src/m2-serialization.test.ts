@@ -1,9 +1,11 @@
 import {
   SaveFormatError,
+  SINGLE_AGE_COUNT,
   deserializeWorld,
   hashWorld,
   runTicks,
   serializeWorld,
+  tick,
   type World,
 } from "@century/sim";
 import {
@@ -24,8 +26,8 @@ interface ParsedEnvelope {
   payload?: {
     regions?: unknown;
     popBlocks?: Array<{
-      ageCohorts?: EncodedArrayShape;
-      agingCarry?: EncodedArrayShape;
+      maleByAge?: EncodedArrayShape;
+      femaleByAge?: EncodedArrayShape;
     }>;
     finance?: { accounts?: unknown };
   };
@@ -35,8 +37,8 @@ function parseEnvelope(text: string): ParsedEnvelope {
   return JSON.parse(text) as ParsedEnvelope;
 }
 
-describe("M2 serialization and restoration", () => {
-  test("round-trips typed arrays, accounts, and population fields", () => {
+describe("M2.1 serialization and restoration", () => {
+  test("round-trips single-year sex arrays, accounts, and population fields", () => {
     const { scenario, world } = aggregateWorld();
     const inputs = makeInputs([0]);
     const context = contextFor(scenario, inputs);
@@ -44,17 +46,17 @@ describe("M2 serialization and restoration", () => {
     const serialized = serializeWorld(world);
     const parsed = parseEnvelope(serialized);
     const encodedBlock = parsed.payload?.popBlocks?.[0];
-    expect(encodedBlock?.ageCohorts?.encoding).toBe("typed-array-v1");
-    expect(encodedBlock?.ageCohorts?.kind).toBe("Uint32Array");
-    expect(encodedBlock?.agingCarry?.encoding).toBe("typed-array-v1");
-    expect(encodedBlock?.agingCarry?.kind).toBe("Uint8Array");
+    expect(encodedBlock?.maleByAge?.encoding).toBe("typed-array-v1");
+    expect(encodedBlock?.maleByAge?.kind).toBe("Uint32Array");
+    expect(encodedBlock?.femaleByAge?.encoding).toBe("typed-array-v1");
+    expect(encodedBlock?.femaleByAge?.kind).toBe("Uint32Array");
     expect(Array.isArray(parsed.payload?.finance?.accounts)).toBe(true);
 
     const restored = deserializeWorld(serialized);
-    expect(restored.popBlocks[0]?.ageCohorts).toBeInstanceOf(Uint32Array);
-    expect(restored.popBlocks[0]?.agingCarry).toBeInstanceOf(Uint8Array);
-    expect(restored.popBlocks[0]?.ageCohorts).toHaveLength(17);
-    expect(restored.popBlocks[0]?.agingCarry).toHaveLength(17);
+    expect(restored.popBlocks[0]?.maleByAge).toBeInstanceOf(Uint32Array);
+    expect(restored.popBlocks[0]?.femaleByAge).toBeInstanceOf(Uint32Array);
+    expect(restored.popBlocks[0]?.maleByAge).toHaveLength(SINGLE_AGE_COUNT);
+    expect(restored.popBlocks[0]?.femaleByAge).toHaveLength(SINGLE_AGE_COUNT);
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.finance.accounts).toEqual(world.finance.accounts);
   });
@@ -85,16 +87,35 @@ describe("M2 serialization and restoration", () => {
     expect(hashWorld(restored)).toBe(hashWorld(world));
   });
 
-  test("rejects a schema-1 / simulation-0.1 save with a clear error", () => {
+  test("restores across a birth/death and annual age transition", () => {
+    const { scenario, world } = aggregateWorld();
+    const inputs = makeInputs([0]);
+    const context = contextFor(scenario, inputs, false);
+    runTicks(world, 365, context);
+    const restored = deserializeWorld(serializeWorld(world));
+    const originalResult = tick(world, context);
+    const restoredResult = tick(restored, context);
+    expect(originalResult.population?.aged).toBe(true);
+    expect(restoredResult.population?.aged).toBe(true);
+    expect(restoredResult.population?.demography.totalBirths).toBe(
+      originalResult.population?.demography.totalBirths,
+    );
+    expect(restoredResult.population?.demography.totalDeaths).toBe(
+      originalResult.population?.demography.totalDeaths,
+    );
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+  });
+
+  test("rejects a schema-2 / simulation-0.2 save with a clear error", () => {
     const { world } = aggregateWorld();
     const serialized = serializeWorld(world);
 
     const oldSchema = parseEnvelope(serialized);
-    oldSchema.schemaVersion = 1;
+    oldSchema.schemaVersion = 2;
     expect(() => deserializeWorld(JSON.stringify(oldSchema))).toThrow(/schema/i);
 
     const oldSim = parseEnvelope(serialized);
-    oldSim.simVersion = "0.1.0";
+    oldSim.simVersion = "0.2.0";
     expect(() => deserializeWorld(JSON.stringify(oldSim))).toThrow(/simulation version/i);
   });
 
@@ -102,7 +123,7 @@ describe("M2 serialization and restoration", () => {
     const { world } = aggregateWorld();
     const parsed = parseEnvelope(serializeWorld(world));
     if (parsed.payload?.popBlocks?.[0] === undefined) throw new Error("missing pop block");
-    parsed.payload.popBlocks[0].agingCarry = {
+    parsed.payload.popBlocks[0].femaleByAge = {
       encoding: "typed-array-v1",
       kind: "Int32Array",
     };

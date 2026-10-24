@@ -1,5 +1,5 @@
 /** Version of the static JSON data package. */
-export const DATA_PACKAGE_VERSION = "m2-population-v2";
+export const DATA_PACKAGE_VERSION = "m2.1-population-v1";
 
 /** M2 data is provisional; not source-verified historical calibration. */
 export const DATA_PACKAGE_STATUS = "provisional" as const;

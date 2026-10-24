@@ -1,9 +1,13 @@
 import {
   AGE_COHORT_COUNT,
+  SINGLE_AGE_COUNT,
   assertValidPopulationDefinitions,
   assertValidPopulationInputs,
   assertValidWorld,
   createPopulationWorld,
+  femaleFiveYearAgeGroups,
+  fiveYearAgeGroups,
+  maleFiveYearAgeGroups,
   populationTotal,
   workingAgePopulation,
   worldPopulation,
@@ -11,29 +15,43 @@ import {
 import {
   aggregateScenario,
   aggregateWorld,
-  cohorts,
   contextFor,
   makeInputs,
   multiBlockScenario,
 } from "./fixtures/m2.js";
 import { tick } from "@century/sim";
 
-describe("M2 population state and validation", () => {
-  test("creates the aggregate world with 17 cohorts and a household account", () => {
+describe("M2.1 population state and validation", () => {
+  test("creates the aggregate world with single-year sex state and a household account", () => {
     const { world } = aggregateWorld();
     expect(world.regions).toHaveLength(1);
     expect(world.popBlocks).toHaveLength(1);
     expect(world.finance.accounts).toHaveLength(1);
     const block = world.popBlocks[0]!;
-    expect(block.ageCohorts).toBeInstanceOf(Uint32Array);
-    expect(block.ageCohorts).toHaveLength(AGE_COHORT_COUNT);
-    expect(block.agingCarry).toBeInstanceOf(Uint8Array);
-    expect(block.agingCarry).toHaveLength(AGE_COHORT_COUNT);
+    expect(block.maleByAge).toBeInstanceOf(Uint32Array);
+    expect(block.maleByAge).toHaveLength(SINGLE_AGE_COUNT);
+    expect(block.femaleByAge).toBeInstanceOf(Uint32Array);
+    expect(block.femaleByAge).toHaveLength(SINGLE_AGE_COUNT);
+    expect(fiveYearAgeGroups(block)).toHaveLength(AGE_COHORT_COUNT);
+    expect(maleFiveYearAgeGroups(block)).toHaveLength(AGE_COHORT_COUNT);
+    expect(femaleFiveYearAgeGroups(block)).toHaveLength(AGE_COHORT_COUNT);
     expect(populationTotal(block)).toBe(1_621_287_278);
     expect(workingAgePopulation(block)).toBeGreaterThan(0);
     expect(worldPopulation(world)).toBe(1_621_287_278);
     expect(world.finance.accounts[0]?.id).toBe(block.financialAccountId);
     expect(() => assertValidWorld(world)).not.toThrow();
+  });
+
+  test("derives five-year groups from single-year sex state without duplicate authority", () => {
+    const { world } = aggregateWorld();
+    const block = world.popBlocks[0]!;
+    const male = maleFiveYearAgeGroups(block);
+    const female = femaleFiveYearAgeGroups(block);
+    const combined = fiveYearAgeGroups(block);
+    for (let index = 0; index < AGE_COHORT_COUNT; index += 1) {
+      expect(combined[index]).toBe((male[index] ?? 0) + (female[index] ?? 0));
+    }
+    expect(combined.reduce((total, value) => total + value, 0)).toBe(populationTotal(block));
   });
 
   test("creates the multi-block fixture with one shared region", () => {
@@ -47,18 +65,29 @@ describe("M2 population state and validation", () => {
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
-  test("rejects malformed cohort and account state", () => {
+  test("rejects malformed age arrays and account state", () => {
     const scenario = aggregateScenario();
     const malformedCohorts = {
       ...scenario,
       popBlocks: [
         {
           ...scenario.popBlocks[0]!,
-          ageCohorts: [1, 2, 3],
+          maleAgeGroups: [1, 2, 3],
         },
       ],
     };
     expect(() => createPopulationWorld(malformedCohorts)).toThrow(/length/);
+
+    const malformedFemale = {
+      ...scenario,
+      popBlocks: [
+        {
+          ...scenario.popBlocks[0]!,
+          femaleAgeGroups: [1, 2, 3],
+        },
+      ],
+    };
+    expect(() => createPopulationWorld(malformedFemale)).toThrow(/length/);
 
     const duplicateAccount = {
       ...scenario,
@@ -83,7 +112,7 @@ describe("M2 population state and validation", () => {
     expect(() => assertValidWorld(missingWorld)).toThrow(/account|unknown/i);
   });
 
-  test("rejects invalid rates, wealth, remainders, and cohort counts", () => {
+  test("rejects invalid rates, wealth, remainders, and sex-age arrays", () => {
     const { world } = aggregateWorld();
     const block = world.popBlocks[0]!;
 
@@ -99,11 +128,11 @@ describe("M2 population state and validation", () => {
     expect(() => assertValidWorld(world)).toThrow(/fractionalBirthRemainder/);
     block.fractionalBirthRemainder = 0;
 
-    block.agingCarry[0] = 5;
-    expect(() => assertValidWorld(world)).toThrow(/agingCarry/);
-    block.agingCarry[0] = 0;
+    block.fractionalMaleBirthRemainder = 1;
+    expect(() => assertValidWorld(world)).toThrow(/fractionalMaleBirthRemainder/);
+    block.fractionalMaleBirthRemainder = 0;
 
-    (world.popBlocks[0] as unknown as { ageCohorts: number[] }).ageCohorts = cohorts({ 0: 1 });
+    (world.popBlocks[0] as unknown as { maleByAge: number[] }).maleByAge = [1, 2, 3];
     expect(() => assertValidWorld(world)).toThrow(/Uint32Array/);
   });
 
@@ -115,6 +144,13 @@ describe("M2 population state and validation", () => {
         needs: scenario.definitions.needs.slice(0, 3),
       }),
     ).toThrow(/four tiers|exactly/i);
+
+    expect(() =>
+      assertValidPopulationDefinitions({
+        ...scenario.definitions,
+        sexRatioAtBirth: 0,
+      }),
+    ).toThrow(/sexRatioAtBirth/);
 
     const world = createPopulationWorld(scenario);
     const inputs = makeInputs([0]);

@@ -15,10 +15,14 @@ import {
 } from "../validation.js";
 import type { World } from "../world.js";
 import {
+  AGE_BAND_WIDTH,
   AGE_COHORT_COUNT,
+  MATERNAL_AGE_GROUP_COUNT,
   MONEY_TOLERANCE_SUSD,
   NEED_TIER_ORDER,
   QUANTITY_TOLERANCE,
+  SINGLE_AGE_COUNT,
+  TERMINAL_AGE_INDEX,
   type NeedTier,
 } from "./constants.js";
 import type {
@@ -81,28 +85,57 @@ function assertNeedTierDef(value: unknown, path: string): NeedTierDef {
 function assertMortalityAnchor(value: unknown, path: string): MortalityAnchor {
   const record = requireRecord(value, path);
   const year = requireInteger(record.year, `${path}.year`, 1900, 2000);
-  const rates = requireArray(record.annualDeathsPer1000ByAgeBand, `${path}.annualDeathsPer1000ByAgeBand`);
-  if (rates.length !== AGE_COHORT_COUNT) {
-    throw new RangeError(`${path} must contain ${String(AGE_COHORT_COUNT)} age rates`);
+  const male = requireArray(
+    record.maleAnnualDeathsPer1000ByAgeBand,
+    `${path}.maleAnnualDeathsPer1000ByAgeBand`,
+  );
+  const female = requireArray(
+    record.femaleAnnualDeathsPer1000ByAgeBand,
+    `${path}.femaleAnnualDeathsPer1000ByAgeBand`,
+  );
+  if (male.length !== AGE_COHORT_COUNT || female.length !== AGE_COHORT_COUNT) {
+    throw new RangeError(`${path} must contain ${String(AGE_COHORT_COUNT)} male and female age rates`);
   }
-  for (let index = 0; index < rates.length; index += 1) {
-    assertRateRange(rates[index], `${path}.annualDeathsPer1000ByAgeBand[${String(index)}]`, 1000);
+  for (let index = 0; index < male.length; index += 1) {
+    assertRateRange(
+      male[index],
+      `${path}.maleAnnualDeathsPer1000ByAgeBand[${String(index)}]`,
+      1000,
+    );
+    assertRateRange(
+      female[index],
+      `${path}.femaleAnnualDeathsPer1000ByAgeBand[${String(index)}]`,
+      1000,
+    );
   }
   return {
     year,
-    annualDeathsPer1000ByAgeBand: rates as number[],
+    maleAnnualDeathsPer1000ByAgeBand: male as number[],
+    femaleAnnualDeathsPer1000ByAgeBand: female as number[],
   };
 }
 
 function assertFertilityAnchor(value: unknown, path: string): FertilityAnchor {
   const record = requireRecord(value, path);
+  const rates = requireArray(
+    record.ageSpecificBirthsPer1000Women,
+    `${path}.ageSpecificBirthsPer1000Women`,
+  );
+  if (rates.length !== MATERNAL_AGE_GROUP_COUNT) {
+    throw new RangeError(
+      `${path}.ageSpecificBirthsPer1000Women must contain ${String(MATERNAL_AGE_GROUP_COUNT)} rates`,
+    );
+  }
+  for (let index = 0; index < rates.length; index += 1) {
+    assertRateRange(
+      rates[index],
+      `${path}.ageSpecificBirthsPer1000Women[${String(index)}]`,
+      1000,
+    );
+  }
   return {
     year: requireInteger(record.year, `${path}.year`, 1900, 2000),
-    annualBirthsPer1000: assertRateRange(
-      record.annualBirthsPer1000,
-      `${path}.annualBirthsPer1000`,
-      1000,
-    ),
+    ageSpecificBirthsPer1000Women: rates as number[],
   };
 }
 
@@ -172,6 +205,14 @@ export function assertValidPopulationDefinitions(definitions: PopulationDefiniti
     assertFertilityAnchor(value, `definitions.fertilityAnchors[${String(index)}]`),
   );
   assertSortedYears(fertilityAnchors, "definitions.fertilityAnchors");
+
+  const sexRatioAtBirth = requireFiniteNumber(
+    record.sexRatioAtBirth,
+    "definitions.sexRatioAtBirth",
+  );
+  if (!(sexRatioAtBirth > 0)) {
+    throw new RangeError("definitions.sexRatioAtBirth must be positive");
+  }
 
   const multipliers = requireArray(record.fertilityMultipliers, "definitions.fertilityMultipliers");
   const professionIds = new Set<number>();
@@ -319,28 +360,89 @@ export function assertValidPopulationInputs(
   }
 }
 
-/** Interpolate one cohort's annual mortality rate per 1000 for a civil year. */
+/** Interpolate one five-year band's annual mortality rate per 1,000 for a sex. */
 export function mortalityRatePer1000(
   definitions: PopulationDefinitions,
   year: number,
-  cohortIndex: number,
+  ageBand: number,
+  sex: "male" | "female",
 ): number {
-  if (!Number.isInteger(cohortIndex) || cohortIndex < 0 || cohortIndex >= AGE_COHORT_COUNT) {
-    throw new RangeError(`cohortIndex must be in 0..${String(AGE_COHORT_COUNT - 1)}`);
+  if (!Number.isInteger(ageBand) || ageBand < 0 || ageBand >= AGE_COHORT_COUNT) {
+    throw new RangeError(`ageBand must be in 0..${String(AGE_COHORT_COUNT - 1)}`);
   }
-  return interpolateAnchors(
-    definitions.mortalityAnchors,
-    year,
-    (anchor) => anchor.annualDeathsPer1000ByAgeBand[cohortIndex] ?? 0,
+  return interpolateAnchors(definitions.mortalityAnchors, year, (anchor) =>
+    sex === "male"
+      ? anchor.maleAnnualDeathsPer1000ByAgeBand[ageBand] ?? 0
+      : anchor.femaleAnnualDeathsPer1000ByAgeBand[ageBand] ?? 0,
   );
 }
 
-/** Interpolate the crude annual birth rate per 1000 for a civil year. */
-export function crudeBirthRatePer1000(
+/** Interpolate one maternal band's annual ASFR per 1,000 women for a civil year. */
+export function ageSpecificFertilityRatePer1000(
   definitions: PopulationDefinitions,
   year: number,
+  maternalBand: number,
 ): number {
-  return interpolateAnchors(definitions.fertilityAnchors, year, (anchor) => anchor.annualBirthsPer1000);
+  if (
+    !Number.isInteger(maternalBand) ||
+    maternalBand < 0 ||
+    maternalBand >= MATERNAL_AGE_GROUP_COUNT
+  ) {
+    throw new RangeError(
+      `maternalBand must be in 0..${String(MATERNAL_AGE_GROUP_COUNT - 1)}`,
+    );
+  }
+  return interpolateAnchors(
+    definitions.fertilityAnchors,
+    year,
+    (anchor) => anchor.ageSpecificBirthsPer1000Women[maternalBand] ?? 0,
+  );
+}
+
+/** Map a single-year age to its five-year reporting band. */
+export function fiveYearAgeGroupForAge(age: number): number {
+  if (!Number.isInteger(age) || age < 0 || age >= SINGLE_AGE_COUNT) {
+    throw new RangeError(`age must be in 0..${String(SINGLE_AGE_COUNT - 1)}`);
+  }
+  return Math.min(Math.floor(age / AGE_BAND_WIDTH), TERMINAL_AGE_INDEX);
+}
+
+/**
+ * Expand 17 five-year age-group totals into 81 single-year ages.
+ *
+ * Within finite five-year bands, the remainder is assigned one person at a time
+ * to the youngest ages before falling back to the quotient; this is a documented
+ * uniform within-band assumption, not extra historical information. The 80+
+ * band maps entirely to terminal age 80.
+ */
+export function expandAgeGroupsToSingle(
+  groups: readonly number[],
+  path: string,
+): Uint32Array {
+  if (groups.length !== AGE_COHORT_COUNT) {
+    throw new RangeError(`${path} must contain ${String(AGE_COHORT_COUNT)} age groups`);
+  }
+  const output = new Uint32Array(SINGLE_AGE_COUNT);
+  for (let band = 0; band < AGE_COHORT_COUNT; band += 1) {
+    const raw = groups[band];
+    if (raw === undefined) throw new RangeError(`${path}[${String(band)}] is missing`);
+    const value = requireInteger(raw, `${path}[${String(band)}]`, 0, 0xffff_ffff);
+    if (band === AGE_COHORT_COUNT - 1) {
+      output[TERMINAL_AGE_INDEX] = value;
+      continue;
+    }
+    const base = Math.floor(value / AGE_BAND_WIDTH);
+    const remainder = value % AGE_BAND_WIDTH;
+    for (let offset = 0; offset < AGE_BAND_WIDTH; offset += 1) {
+      output[band * AGE_BAND_WIDTH + offset] = base + (offset < remainder ? 1 : 0);
+    }
+  }
+  let total = 0;
+  for (const value of output) total += value;
+  if (!Number.isSafeInteger(total)) {
+    throw new RangeError(`${path} expanded age total is not a safe integer`);
+  }
+  return output;
 }
 
 function interpolateAnchors<T extends { year: number }>(
@@ -355,16 +457,29 @@ function interpolateAnchors<T extends { year: number }>(
   }
   if (year <= first.year) return select(first);
   if (year >= last.year) return select(last);
-  for (let index = 1; index < anchors.length; index += 1) {
-    const lower = anchors[index - 1];
-    const upper = anchors[index];
-    if (lower === undefined || upper === undefined) continue;
-    if (year <= upper.year) {
-      const fraction = (year - lower.year) / (upper.year - lower.year);
-      return select(lower) + (select(upper) - select(lower)) * fraction;
-    }
+
+  // M2.1 WPP schedules are annual from 1950 onward. Avoid a search on the
+  // hottest path when the definitions have that canonical layout.
+  if (Number.isInteger(year) && year >= 1950 && anchors[2]?.year === 1950) {
+    const annual = anchors[2 + (year - 1950)];
+    if (annual?.year === year) return select(annual);
   }
-  return select(last);
+
+  let low = 1;
+  let high = anchors.length - 1;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    const anchor = anchors[middle];
+    if (anchor === undefined) break;
+    if (year <= anchor.year) high = middle;
+    else low = middle + 1;
+  }
+  const upper = anchors[low];
+  const lower = anchors[low - 1];
+  if (lower === undefined || upper === undefined) return select(last);
+  if (year === upper.year) return select(upper);
+  const fraction = (year - lower.year) / (upper.year - lower.year);
+  return select(lower) + (select(upper) - select(lower)) * fraction;
 }
 
 /** Find a tier definition by key. */

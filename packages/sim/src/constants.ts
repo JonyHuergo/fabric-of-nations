@@ -7,10 +7,10 @@
  */
 
 /** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.2.0";
+export const SIM_VERSION = "0.3.0";
 
 /** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 2;
+export const WORLD_SCHEMA_VERSION = 3;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -19,7 +19,7 @@ export const SAVE_FORMAT_VERSION = 1;
  * Content/data version for M2. The JSON definitions in `packages/data` and the
  * simulation must agree on this value.
  */
-export const DEFAULT_DATA_VERSION = "m2-population-v2";
+export const DEFAULT_DATA_VERSION = "m2.1-population-v1";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m2-empty";

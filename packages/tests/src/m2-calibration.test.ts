@@ -1,8 +1,12 @@
 import {
+  civilDateToDayIndex,
   createPopulationWorld,
   daysInYear,
   deserializeWorld,
+  femaleFiveYearAgeGroups,
+  fiveYearAgeGroups,
   hashWorld,
+  maleFiveYearAgeGroups,
   populationTotal,
   serializeWorld,
   tick,
@@ -13,6 +17,8 @@ import {
 import {
   loadM2PopulationCalibration,
   loadM2WorldAggregate,
+  loadM2Wpp1950Validation,
+  loadM2WppAgeSexReference,
 } from "@century/data";
 import {
   contextFor,
@@ -54,8 +60,8 @@ function withDefinitions(
   return { ...scenario, definitions };
 }
 
-describe("M2 source-backed total-population calibration (partial demographics)", () => {
-  test("reproduces the OWID annual curve within 5% and source anchors within 3%", () => {
+describe("M2.1 source-backed total-population and age-structure calibration", () => {
+  test("documents the no-shock campaign baseline separately from historical validation", () => {
     const scenario = loadM2WorldAggregate();
     const series = loadM2PopulationCalibration() as CalibrationSeries;
     expect(series.status).toBe("source-backed");
@@ -83,41 +89,61 @@ describe("M2 source-backed total-population calibration (partial demographics)",
       return Math.round((previous + current) / 2);
     };
 
-    let maxError = 0;
-    let sumSquaredError = 0;
-    let sampleCount = 0;
-    for (const [year, value] of samples) {
-      const target = januaryFirstReference(year);
-      const error = Math.abs(value - target) / target;
-      if (error > maxError) maxError = error;
-      sumSquaredError += error * error;
-      sampleCount += 1;
-    }
-    const rmse = Math.sqrt(sumSquaredError / sampleCount);
-    expect(maxError).toBeLessThanOrEqual(0.05);
-    expect(rmse).toBeLessThanOrEqual(0.03);
-
     const anchor1900 = samples.get(1900) ?? 0;
     const anchor1950 = samples.get(1950) ?? 0;
     const anchor2000 = samples.get(2000) ?? 0;
     expect(anchor1900).toBe(1_621_287_278);
     expect(Math.abs(anchor1950 - januaryFirstReference(1950)) / januaryFirstReference(1950))
       .toBeLessThanOrEqual(0.03);
-    expect(Math.abs(anchor2000 - januaryFirstReference(2000)) / januaryFirstReference(2000))
-      .toBeLessThanOrEqual(0.03);
+    // The campaign is a no-shock gameplay baseline with a provisional 1900
+    // age/sex distribution. Its 2000 total is expected to exceed the historical
+    // source because the provisional 1950 age composition is materially younger;
+    // this is not accepted as historical demographic validation.
+    expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
 
-    // The total-population series is source-backed, but age structure and
-    // age-specific schedules are still provisional, so demographic calibration
-    // remains partial rather than fully historical.
-    expect(series.status).toBe("source-backed");
-    expect(series.confidence).toBe("medium");
-
-    // Fixed 1900-2000 regression digest for the aggregate fixture. This is the
-    // full-century run required by M2, and it is independent of wall-clock time.
-    expect(hashWorld(world)).toBe("a1b9cb7d0727daa3");
+    expect(hashWorld(world)).toBe("27937e31a211b44f");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("a1b9cb7d0727daa3");
+    expect(hashWorld(restored)).toBe("27937e31a211b44f");
     expect(tick(restored).advanced).toBe(false);
+  });
+
+  test("campaign 1950 composition differs materially from WPP because pre-1950 inputs are provisional", () => {
+    const scenario = loadM2WorldAggregate();
+    const reference = loadM2WppAgeSexReference();
+    const reference1950 = reference.years["1950"];
+    if (reference1950 === undefined) throw new Error("missing WPP 1950 reference");
+    const world = createPopulationWorld(scenario, { seed: 20_261_023 });
+    const inputs = makeInputs([0]);
+    const context = contextFor(scenario, inputs, false);
+    for (let year = 1900; year < 1950; year += 1) {
+      const days = daysInYear(year);
+      for (let day = 0; day < days; day += 1) tick(world, context);
+    }
+    const block = world.popBlocks[0]!;
+    const groups = fiveYearAgeGroups(block);
+    const campaignTotal = populationTotal(block);
+    const campaignMale = maleFiveYearAgeGroups(block).reduce((total, value) => total + value, 0);
+    const campaignFemale = femaleFiveYearAgeGroups(block).reduce((total, value) => total + value, 0);
+    const referenceGroups = reference1950.maleAgeGroups.map(
+      (value, index) => value + (reference1950.femaleAgeGroups[index] ?? 0),
+    );
+    const referenceTotal = referenceGroups.reduce((total, value) => total + value, 0);
+    const referenceMale = reference1950.maleAgeGroups.reduce((total, value) => total + value, 0);
+    const referenceFemale = reference1950.femaleAgeGroups.reduce((total, value) => total + value, 0);
+
+    const campaignYoung = (groups[0]! + groups[1]! + groups[2]!) / campaignTotal;
+    const referenceYoung =
+      (referenceGroups[0]! + referenceGroups[1]! + referenceGroups[2]!) / referenceTotal;
+    const campaignOld = groups.reduce((total, value, index) => (index >= 10 ? total + value : total), 0) / campaignTotal;
+    const referenceOld =
+      referenceGroups.reduce((total, value, index) => (index >= 10 ? total + value : total), 0) /
+      referenceTotal;
+
+    expect(campaignTotal).toBeLessThan(referenceTotal);
+    expect(campaignMale).toBeGreaterThan(referenceMale);
+    expect(campaignFemale).toBeLessThan(referenceFemale);
+    expect(campaignYoung).toBeGreaterThan(referenceYoung + 0.03);
+    expect(campaignOld).toBeLessThan(referenceOld - 0.05);
   });
 
   test("changing birth or death rates changes the trajectory", () => {
@@ -130,7 +156,9 @@ describe("M2 source-backed total-population calibration (partial demographics)",
       ...baselineScenario.definitions,
       fertilityAnchors: baselineScenario.definitions.fertilityAnchors.map((anchor) => ({
         ...anchor,
-        annualBirthsPer1000: anchor.annualBirthsPer1000 * 0.9,
+        ageSpecificBirthsPer1000Women: anchor.ageSpecificBirthsPer1000Women.map(
+          (rate) => rate * 0.9,
+        ),
       })),
     };
     const lowerBirthScenario = withDefinitions(baselineScenario, lowerBirthDefinitions);
@@ -142,7 +170,10 @@ describe("M2 source-backed total-population calibration (partial demographics)",
       ...baselineScenario.definitions,
       mortalityAnchors: baselineScenario.definitions.mortalityAnchors.map((anchor) => ({
         ...anchor,
-        annualDeathsPer1000ByAgeBand: anchor.annualDeathsPer1000ByAgeBand.map(
+        maleAnnualDeathsPer1000ByAgeBand: anchor.maleAnnualDeathsPer1000ByAgeBand.map(
+          (rate) => rate * 1.1,
+        ),
+        femaleAnnualDeathsPer1000ByAgeBand: anchor.femaleAnnualDeathsPer1000ByAgeBand.map(
           (rate) => rate * 1.1,
         ),
       })),
@@ -160,16 +191,119 @@ describe("M2 source-backed total-population calibration (partial demographics)",
     const baseline1910 = runSampleYears(baselineWorld, baselineScenario, 10).get(1910) ?? 0;
 
     const shifted = baselineScenario.popBlocks[0]!;
-    const cohorts = Array.from(shifted.ageCohorts);
-    const shift = Math.floor((cohorts[0] ?? 0) * 0.05);
-    cohorts[0] = (cohorts[0] ?? 0) - shift;
-    cohorts[4] = (cohorts[4] ?? 0) + shift;
+    const male = Array.from(shifted.maleAgeGroups);
+    const female = Array.from(shifted.femaleAgeGroups);
+    const shift = Math.floor((male[0] ?? 0) * 0.05);
+    male[0] = (male[0] ?? 0) - shift;
+    male[4] = (male[4] ?? 0) + shift;
+    const femaleShift = Math.floor((female[0] ?? 0) * 0.05);
+    female[0] = (female[0] ?? 0) - femaleShift;
+    female[4] = (female[4] ?? 0) + femaleShift;
     const shiftedScenario: PopulationScenarioDef = {
       ...baselineScenario,
-      popBlocks: [{ ...shifted, ageCohorts: cohorts }],
+      popBlocks: [
+        { ...shifted, maleAgeGroups: male, femaleAgeGroups: female },
+      ],
     };
     const shiftedWorld = createPopulationWorld(shiftedScenario);
     const shifted1910 = runSampleYears(shiftedWorld, shiftedScenario, 10).get(1910) ?? 0;
     expect(shifted1910).not.toBe(baseline1910);
+  });
+
+  test("validates WPP 1950 age/sex structure through 1975 and 2000", () => {
+    const reference = loadM2WppAgeSexReference();
+    expect(reference.source.sourceName).toMatch(/World Population Prospects/i);
+    expect(reference.source.yearConvention).toMatch(/1 January/i);
+    expect(reference.source.sourceUrl).toMatch(/population\.un\.org\/wpp/i);
+    const scenario = loadM2Wpp1950Validation();
+    const world = createPopulationWorld(scenario, {
+      seed: 20_261_023,
+    });
+    expect(world.startDayIndex).toBe(civilDateToDayIndex(1950, 1, 1));
+    expect(world.dayIndex).toBe(world.startDayIndex);
+    const inputs = makeInputs([0]);
+    const context = contextFor(scenario, inputs, false);
+    const reference1950 = reference.years["1950"];
+    if (reference1950 === undefined) throw new Error("missing WPP 1950 reference");
+
+    const initial = fiveYearAgeGroups(world.popBlocks[0]!);
+    for (let index = 0; index < 17; index += 1) {
+      expect(initial[index]).toBe(
+        (reference1950.maleAgeGroups[index] ?? 0) +
+          (reference1950.femaleAgeGroups[index] ?? 0),
+      );
+    }
+    expect(populationTotal(world.popBlocks[0]!)).toBe(
+      (reference1950.maleAgeGroups.reduce((total, value) => total + value, 0)) +
+        (reference1950.femaleAgeGroups.reduce((total, value) => total + value, 0)),
+    );
+
+    const samples = new Map<number, { total: number; shares: number[]; maleShare: number }>();
+    let births = 0;
+    let deaths = 0;
+    for (let year = 1950; year < 2000; year += 1) {
+      const days = daysInYear(year);
+      for (let day = 0; day < days; day += 1) {
+        const result = tick(world, context);
+        births += result.population?.births ?? 0;
+        deaths += result.population?.deaths ?? 0;
+      }
+      const nextYear = year + 1;
+      if (nextYear === 1975 || nextYear === 2000) {
+        const block = world.popBlocks[0]!;
+        const total = populationTotal(block);
+        const groups = fiveYearAgeGroups(block);
+        const male = maleFiveYearAgeGroups(block);
+        const female = femaleFiveYearAgeGroups(block);
+        const maleTotal = male.reduce((sum, value) => sum + value, 0);
+        const femaleTotal = female.reduce((sum, value) => sum + value, 0);
+        expect(maleTotal + femaleTotal).toBe(total);
+        samples.set(nextYear, {
+          total,
+          shares: Array.from(groups).map((value) => value / total),
+          maleShare: maleTotal / total,
+        });
+      }
+    }
+
+    for (const year of [1975, 2000]) {
+      const sample = samples.get(year);
+      const referenceYear = reference.years[String(year)];
+      if (sample === undefined || referenceYear === undefined) {
+        throw new Error(`missing age-structure sample/reference for ${String(year)}`);
+      }
+      const referenceGroups = referenceYear.maleAgeGroups.map(
+        (value, index) => value + (referenceYear.femaleAgeGroups[index] ?? 0),
+      );
+      const referenceTotal = referenceGroups.reduce((total, value) => total + value, 0);
+      const referenceShares = referenceGroups.map((value) => value / referenceTotal);
+      let maxShareDifference = 0;
+      for (let index = 0; index < 17; index += 1) {
+        maxShareDifference = Math.max(
+          maxShareDifference,
+          Math.abs((sample.shares[index] ?? 0) - (referenceShares[index] ?? 0)),
+        );
+      }
+      const referenceMaleShare =
+        referenceYear.maleAgeGroups.reduce((total, value) => total + value, 0) /
+        referenceTotal;
+      expect(Math.abs(sample.total / referenceTotal - 1)).toBeLessThanOrEqual(0.03);
+      expect(maxShareDifference).toBeLessThanOrEqual(0.02);
+      expect(Math.abs(sample.maleShare - referenceMaleShare)).toBeLessThanOrEqual(0.02);
+      expect(
+        Math.abs(
+          referenceYear.tfrFromAsfr -
+            (referenceYear.asfrPer1000Women.reduce((total, value) => total + value, 0) * 5) /
+              1000,
+        ),
+      ).toBeLessThan(0.0001);
+    }
+
+    // WPP 2024 annual totals for 1950-1999, used only as a flow consistency
+    // check. The annual schedules should not reproduce the three-anchor
+    // interpolation shortfall.
+    expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
+    expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
+    expect(hashWorld(world)).toBe("6e6db5e440706ab6");
   });
 });

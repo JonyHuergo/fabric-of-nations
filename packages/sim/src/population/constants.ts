@@ -1,24 +1,38 @@
 /**
- * M2 population constants.
+ * M2.1 population constants.
  *
- * Structural constants (cohort count, 1/5 annual transfer, working-age bands) are
- * binding model choices. Behavioral coefficients are PROVISIONAL until calibrated
- * against a source-backed scenario. Every coefficient documents its units and
- * cadence here and in DECISIONS.md.
+ * Authoritative age state is single-year and sex-separated. The 17 five-year
+ * bands are reporting/maternal aggregates. Behavioral coefficients are
+ * PROVISIONAL until calibrated against source-backed data. Every coefficient
+ * documents its units and cadence here and in DECISIONS.md.
  */
 
-/** Number of five-year age bands: 0-4, ..., 75-79, 80+. */
-export const AGE_COHORT_COUNT = 17;
+/** Number of five-year reporting bands: 0-4, ..., 75-79, 80+. */
+export const FIVE_YEAR_AGE_GROUP_COUNT = 17;
 
-/** Working age is the 15-64 range: cohort indices 3 (15-19) through 12 (60-64). */
-export const WORKING_AGE_FIRST_COHORT = 3;
-export const WORKING_AGE_LAST_COHORT = 12;
+/** Backwards-compatible name for the reporting band count. */
+export const AGE_COHORT_COUNT = FIVE_YEAR_AGE_GROUP_COUNT;
 
-/**
- * Annual transfer denominator. Each year approximately 1/5 of a cohort moves to
- * the next band. The integer carry is tracked in fifths of a person (0..4).
- */
-export const AGE_TRANSFER_DENOMINATOR = 5;
+/** Single-year age slots: 0..79, plus one open-ended 80+ slot. */
+export const SINGLE_AGE_COUNT = 81;
+
+/** Index of the open-ended 80+ slot. */
+export const TERMINAL_AGE_INDEX = SINGLE_AGE_COUNT - 1;
+
+/** Working age is 15-64 inclusive. */
+export const WORKING_AGE_START = 15;
+export const WORKING_AGE_END = 64;
+
+/** Female reproductive ages 15-49, split into seven five-year maternal bands. */
+export const REPRODUCTIVE_AGE_START = 15;
+export const REPRODUCTIVE_AGE_END = 49;
+export const MATERNAL_AGE_GROUP_COUNT = 7;
+
+/** First maternal five-year band index (15-19) in the 17-band scale. */
+export const MATERNAL_AGE_GROUP_FIRST_INDEX = 3;
+
+/** Width in years of a reporting/maternal band. */
+export const AGE_BAND_WIDTH = 5;
 
 /** Tolerance for fractional remainders and floating comparisons. */
 export const REMAINDER_TOLERANCE = 1e-9;

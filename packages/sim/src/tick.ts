@@ -20,7 +20,6 @@ import { dayIndexToCivilDate, daysInMonth, isTerminalDayIndex } from "./calendar
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "./constants.js";
 import { applyAnnualAgeing } from "./population/ageing.js";
 import {
-  assertValidPopulationDefinitions,
   assertValidPopulationInputs,
 } from "./population/definitions.js";
 import { applyDailyDemography } from "./population/demography.js";
@@ -66,7 +65,6 @@ function validatePopulationContext(world: World, context: TickContext | undefine
   if (population === undefined) {
     throw new RangeError("a population context is required when the world contains pop blocks");
   }
-  assertValidPopulationDefinitions(population.definitions);
   assertValidPopulationInputs(world, population.definitions, population.inputs);
   return population.definitions;
 }
@@ -85,7 +83,7 @@ function runPopulationDay(
   if (population === undefined) throw new RangeError("missing population context");
   const definitions = validatePopulationContext(world, context);
   const date = dayIndexToCivilDate(dayIndex);
-  const aged = date.month === 1 && date.day === 1 && dayIndex !== 0;
+  const aged = date.month === 1 && date.day === 1 && dayIndex !== world.startDayIndex;
   const populationStart = worldPopulation(world);
   if (aged) applyAnnualAgeing(world);
 
