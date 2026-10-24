@@ -279,8 +279,10 @@ export function settlePopulationNeeds(
 
     for (const state of activeStates) {
       const draft = state.draft;
-      const goods: NeedGoodResult[] = [];
+      const goods: NeedGoodResult[] | null = collectNeedDetails ? [] : null;
       let spent = 0;
+      let desiredCost = 0;
+      let fundedCost = 0;
       let fulfilledAll = true;
       for (let index = 0; index < goodKeys.length; index += 1) {
         const goodKey = goodKeys[index];
@@ -296,17 +298,22 @@ export function settlePopulationNeeds(
           throw new RangeError("fulfilled quantity exceeds desired quantity");
         }
         if (fulfilledValue + quantityTolerance(desiredValue, fulfilledValue) < desiredValue) fulfilledAll = false;
-        const unmetDesired = Math.max(0, desiredValue - fulfilledValue);
-        const unmetFunded = Math.max(0, fundedValue - fulfilledValue);
-        goods.push({
-          goodKey,
-          desired: desiredValue,
-          funded: fundedValue,
-          fulfilled: fulfilledValue,
-          unmetDesired,
-          unmetFunded,
-        });
-        spent += fulfilledValue * (priceByGood.get(goodKey) ?? 0);
+        if (goods !== null) {
+          const unmetDesired = Math.max(0, desiredValue - fulfilledValue);
+          const unmetFunded = Math.max(0, fundedValue - fulfilledValue);
+          goods.push({
+            goodKey,
+            desired: desiredValue,
+            funded: fundedValue,
+            fulfilled: fulfilledValue,
+            unmetDesired,
+            unmetFunded,
+          });
+        }
+        const price = priceByGood.get(goodKey) ?? 0;
+        spent += fulfilledValue * price;
+        desiredCost += desiredValue * price;
+        fundedCost += fundedValue * price;
       }
       if (spent > draft.budget + moneyTolerance(draft.budget, spent)) {
         throw new RangeError(
@@ -315,17 +322,9 @@ export function settlePopulationNeeds(
       }
       draft.spent += spent;
       draft.budget = Math.max(0, draft.budget - spent);
-      const desiredCost = goods.reduce(
-        (total, good) => total + good.desired * (priceByGood.get(good.goodKey) ?? 0),
-        0,
-      );
-      const fundedCost = goods.reduce(
-        (total, good) => total + good.funded * (priceByGood.get(good.goodKey) ?? 0),
-        0,
-      );
       const summary = summaryFor(tier, true, fulfilledAll, desiredCost, fundedCost, spent);
       draft.tierSummaries.push(summary);
-      if (collectNeedDetails) draft.tierResults.push({ ...summary, goods });
+      if (goods !== null) draft.tierResults.push({ ...summary, goods });
       if (!fulfilledAll) lowerTiersMet.set(state.blockId, false);
     }
   }

@@ -236,4 +236,114 @@ describe("M2 needs, budgets, and shared supply", () => {
     expect(block?.tierSummaries.every((tier) => tier.active === false)).toBe(true);
     expect(worldPopulation(world)).toBe(0);
   });
+
+  test("summary-only needs match the detailed settlement without tier payloads", () => {
+    const detailed = multiBlockWorld();
+    const summaryOnly = multiBlockWorld();
+    const detailedResult = tick(
+      detailed.world,
+      contextFor(detailed.scenario, makeInputs([0, 1, 2]), true),
+    );
+    const summaryResult = tick(
+      summaryOnly.world,
+      contextFor(summaryOnly.scenario, makeInputs([0, 1, 2]), false),
+    );
+    const detailedNeeds = detailedResult.population?.needs;
+    const summaryNeeds = summaryResult.population?.needs;
+    if (detailedNeeds === undefined || summaryNeeds === undefined) {
+      throw new Error("expected needs results");
+    }
+
+    expect(summaryNeeds.blocks).toHaveLength(detailedNeeds.blocks.length);
+    for (let index = 0; index < detailedNeeds.blocks.length; index += 1) {
+      const detailedBlock = detailedNeeds.blocks[index];
+      const summaryBlock = summaryNeeds.blocks[index];
+      if (detailedBlock === undefined || summaryBlock === undefined) {
+        throw new Error(`missing needs block ${String(index)}`);
+      }
+      expect(summaryBlock.popBlockId).toBe(detailedBlock.popBlockId);
+      expect(summaryBlock.population).toBe(detailedBlock.population);
+      expect(summaryBlock.budgetStartSUSD).toBe(detailedBlock.budgetStartSUSD);
+      expect(summaryBlock.budgetEndSUSD).toBe(detailedBlock.budgetEndSUSD);
+      expect(summaryBlock.spentSUSD).toBe(detailedBlock.spentSUSD);
+      expect(summaryBlock.tiers).toEqual([]);
+      expect(summaryBlock.tierSummaries).toEqual(detailedBlock.tierSummaries);
+    }
+    expect(summaryNeeds.initialSupplyByGood).toEqual(detailedNeeds.initialSupplyByGood);
+    expect(summaryNeeds.remainingSupplyByGood).toEqual(detailedNeeds.remainingSupplyByGood);
+    expect(summaryNeeds.consumedSupplyByGood).toEqual(detailedNeeds.consumedSupplyByGood);
+    expect(hashWorld(summaryOnly.world)).toBe(hashWorld(detailed.world));
+  });
+
+  test("retains the detailed tier and good payload when requested", () => {
+    const scenario = oneBlockScenario({ 0: 1000, 3: 1000, 8: 1000 });
+    const world = createPopulationWorld(scenario);
+    const result = tick(world, contextFor(scenario, makeInputs([0]), true));
+    const block = result.population?.needs.blocks[0];
+    if (block === undefined) throw new Error("expected needs block");
+
+    expect(block.population).toBe(3000);
+    expect(block.budgetStartSUSD).toBeCloseTo(1643.835616438356, 9);
+    expect(block.budgetEndSUSD).toBeCloseTo(1271.835616438356, 9);
+    expect(block.spentSUSD).toBe(372);
+    expect(block.tiers).toHaveLength(4);
+    expect(block.tiers.map((tier) => tier.tier)).toEqual([
+      "subsistence",
+      "basic",
+      "comfort",
+      "luxury",
+    ]);
+    expect(block.tierSummaries.map((summary) => summary.spentSUSD)).toEqual([186, 60, 126, 0]);
+
+    const subsistence = block.tiers.find((tier) => tier.tier === "subsistence");
+    const basic = block.tiers.find((tier) => tier.tier === "basic");
+    const comfort = block.tiers.find((tier) => tier.tier === "comfort");
+    const luxury = block.tiers.find((tier) => tier.tier === "luxury");
+    if (
+      subsistence === undefined ||
+      basic === undefined ||
+      comfort === undefined ||
+      luxury === undefined
+    ) {
+      throw new Error("missing detailed need tier");
+    }
+
+    expect(subsistence.goods).toEqual([
+      { goodKey: "fish", desired: 90, funded: 90, fulfilled: 90, unmetDesired: 0, unmetFunded: 0 },
+      {
+        goodKey: "food-products",
+        desired: 240,
+        funded: 240,
+        fulfilled: 240,
+        unmetDesired: 0,
+        unmetFunded: 0,
+      },
+      {
+        goodKey: "grain",
+        desired: 2700,
+        funded: 2700,
+        fulfilled: 2700,
+        unmetDesired: 0,
+        unmetFunded: 0,
+      },
+      {
+        goodKey: "livestock",
+        desired: 90,
+        funded: 90,
+        fulfilled: 90,
+        unmetDesired: 0,
+        unmetFunded: 0,
+      },
+    ]);
+    expect(basic.goods).toEqual([
+      { goodKey: "clothing", desired: 30, funded: 30, fulfilled: 30, unmetDesired: 0, unmetFunded: 0 },
+      { goodKey: "services", desired: 60, funded: 60, fulfilled: 60, unmetDesired: 0, unmetFunded: 0 },
+    ]);
+    expect(comfort.goods).toEqual([
+      { goodKey: "clothing", desired: 6, funded: 6, fulfilled: 6, unmetDesired: 0, unmetFunded: 0 },
+      { goodKey: "services", desired: 240, funded: 240, fulfilled: 240, unmetDesired: 0, unmetFunded: 0 },
+    ]);
+    expect(luxury.active).toBe(false);
+    expect(luxury.goods).toEqual([]);
+  });
 });
