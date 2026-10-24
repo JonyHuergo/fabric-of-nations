@@ -28,6 +28,7 @@ import {
   saturate,
 } from "./definitions.js";
 import { populationTotal } from "./state.js";
+import { selectDeathBands } from "./deathAllocationSelection.js";
 import type {
   DemographyBlockResult,
   DemographyDayResult,
@@ -69,6 +70,7 @@ interface DeathAllocationScratch {
   readonly bandCounts: Uint32Array;
   readonly bandAllocation: Uint32Array;
   readonly bandRemainders: Float64Array;
+  readonly bandOrder: Uint8Array;
 }
 
 /**
@@ -118,27 +120,16 @@ function allocateDeaths(
     bandRemainders[band] = exact - whole;
   }
   let leftover = deaths - allocated;
-  while (leftover > 0) {
-    let selected = -1;
-    let best = -1;
-    for (let band = 0; band < bandCount; band += 1) {
-      const remainder = bandRemainders[band] ?? -1;
-      if (remainder < 0) continue;
-      const capacity = bandCounts[band] ?? 0;
-      if ((bandAllocation[band] ?? 0) < capacity && remainder > best) {
-        best = remainder;
-        selected = band;
-      }
-    }
-    if (selected < 0) {
-      throw new RangeError(
-        `cannot allocate ${String(deaths)} deaths within age-sex populations for popBlock ${String(popBlockId)}`,
-      );
-    }
-    bandAllocation[selected] = (bandAllocation[selected] ?? 0) + 1;
-    bandRemainders[selected] = -1;
-    leftover -= 1;
-  }
+  selectDeathBands(
+    deaths,
+    leftover,
+    popBlockId,
+    bandCount,
+    bandAllocation,
+    bandCounts,
+    bandRemainders,
+    scratch.bandOrder,
+  );
 
   let maleDeaths = 0;
   let femaleDeaths = 0;
@@ -216,6 +207,7 @@ export function applyDailyDemography(
     bandCounts: new Uint32Array(34),
     bandAllocation: new Uint32Array(34),
     bandRemainders: new Float64Array(34),
+    bandOrder: new Uint8Array(34),
   };
 
   for (const block of world.popBlocks) {
