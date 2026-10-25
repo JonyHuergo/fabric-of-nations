@@ -34,8 +34,9 @@ import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { assertValidWorld, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import { computeBuildingCapacity } from "./production.js";
-import { buildFinanceIndex, type FinanceIndex } from "./accounts.js";
+import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
+import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import {
   runMarketDay,
   type HouseholdDemandRecord,
@@ -90,6 +91,8 @@ export interface EconomyDayResult {
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
     readonly fallbackUsed: boolean;
+    /** Non-null only on a civil month-end, after the month-end wealth update (D-047). */
+    readonly financeClose: FinanceCloseResult | null;
   };
 }
 
@@ -132,17 +135,7 @@ export function cloneWorld(source: World): World {
       priceSUSD: [...market.priceSUSD],
       stockLots: market.stockLots.map((lot) => ({ ...lot })),
     })),
-    finance: {
-      accounts: source.finance.accounts.map((account) => ({ ...account })),
-      postings: source.finance.postings.map((posting) => ({
-        ...posting,
-        lines: posting.lines.map((line) => ({ ...line })),
-      })),
-      nextPostingId: source.finance.nextPostingId,
-      nextAccountId: source.finance.nextAccountId,
-      opening:
-        source.finance.opening === null ? null : { ...source.finance.opening },
-    },
+    finance: cloneFinanceState(source.finance),
     diagnostics: {
       ...source.diagnostics,
       recentWarnings: [...source.diagnostics.recentWarnings],
@@ -603,6 +596,20 @@ function runMarketAttempt(
   return { market, settlement };
 }
 
+/**
+ * Close the monthly finance period on a civil month-end.
+ *
+ * GDD §4.2 step 14 / D-047: the close runs after that day's postings,
+ * needs/militancy update, and month-end wealth update, and before `dayIndex`
+ * advances. M2-only worlds never take this path. The close stages the complete
+ * finance change and replaces `world.finance` only after validation; the caller's
+ * staged world advances the day before publication.
+ */
+function closeMonthEndIfDue(world: World, dayIndex: DayIndex): FinanceCloseResult | null {
+  if (!isLastDayOfMonth(dayIndex)) return null;
+  return closeFinancePeriod(world);
+}
+
 /** Run one integrated economic day on the supplied (already staged) world. */
 export function runEconomicDay(
   world: World,
@@ -734,6 +741,7 @@ export function runEconomicDay(
     needs,
     populationDefinitions,
   );
+  const financeClose = closeMonthEndIfDue(world, dayIndex);
 
   let workingAge = 0;
   for (const block of world.popBlocks) workingAge += workingAgePopulation(block);
@@ -758,6 +766,7 @@ export function runEconomicDay(
       householdDemands: household.records,
       productionDemands: productionRecords,
       fallbackUsed,
+      financeClose,
     },
   };
 }

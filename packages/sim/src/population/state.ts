@@ -521,6 +521,8 @@ export function createPopulationWorld(
       nextPostingId: 1,
       nextAccountId,
       opening: null,
+      periodSummaries: [],
+      closedThroughDay: null,
     } satisfies FinanceState,
     diagnostics: {
       invariantFailureCount: 0,

@@ -1,14 +1,18 @@
 /**
- * Headless M1/M2/M3b benchmark harness.
+ * Headless M1/M2/M3/M4b benchmark harness.
  *
  * This is a Node regression harness, not proof of mobile performance. It runs:
  * - M1 empty-world no-op ticks (backwards regression);
  * - M2 world-aggregate century ticks;
  * - M2 multi-block stress ticks at 200, 1,000, 3,000, and 6,000 pop blocks;
- * - M3b employment-refresh samples on the fixed small M3 world.
+ * - M3b employment-refresh samples on the fixed small M3 world;
+ * - M3c/M3d/M3e/M3f production, market, settlement, and integrated-day samples;
+ * - M4b monthly period-close samples, including close correctness gates.
  *
  * Employment samples reset to a fixed seed-assignment state and time only the
  * real refresh routine. Setup, correctness validation, and hashing are excluded.
+ * The M4b samples time only `closeFinancePeriod`; world cloning and hashing are
+ * outside the measured section.
  *
  * The GDD mobile target (p95 <= 8 ms on a full-scale reference world) requires
  * a device release build and is explicitly not evaluated here.
@@ -26,9 +30,14 @@ import {
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   CAMPAIGN_TICKS,
+  FLOW_TRANSACTION_KINDS,
   SIM_VERSION,
+  assertAccountingIdentity,
   assertValidEmploymentState,
   assertValidWorld,
+  civilDateToDayIndex,
+  cloneWorld,
+  closeFinancePeriod,
   computeBuildingCapacity,
   createEconomyWorld,
   createInitialWorld,
@@ -81,6 +90,11 @@ const M3F_SMALL_ITERATIONS = 8;
 const M3F_STRESS_GROUPS = 5;
 const M3F_STRESS_WARMUP = 1;
 const M3F_STRESS_ITERATIONS = 3;
+const M4B_CLOSE_SMALL_WARMUP = 3;
+const M4B_CLOSE_SMALL_ITERATIONS = 20;
+const M4B_CLOSE_STRESS_GROUPS = 3;
+const M4B_CLOSE_STRESS_WARMUP = 2;
+const M4B_CLOSE_STRESS_ITERATIONS = 10;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -245,6 +259,32 @@ interface EconomicDayBenchmarkResult {
   readonly minTransactions: number;
   readonly minWages: number;
   readonly minUpkeep: number;
+}
+
+interface FinanceCloseBenchmarkResult {
+  readonly label: string;
+  readonly groups: number;
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
+  readonly accounts: number;
+  readonly summaryDay: number;
+  readonly closingPostings: number;
+  readonly minClosingPostings: number;
+  readonly flowTotalSUSD: number;
+  readonly zeroed: boolean;
+  readonly cashConserved: boolean;
+  readonly identityPreserved: boolean;
+  readonly summariesContiguous: boolean;
+  readonly deterministic: boolean;
+  readonly hashesEqual: boolean;
+  readonly hash: string;
 }
 
 function percentile(sortedSamples: readonly number[], fraction: number): number {
@@ -1127,6 +1167,152 @@ function printEconomicDayBenchmark(result: EconomicDayBenchmarkResult): void {
   );
 }
 
+function runFinanceCloseBenchmark(
+  label: string,
+  groups: number,
+  iterations: number,
+  warmupIterations: number,
+): FinanceCloseBenchmarkResult {
+  const scenario = scaledProductionScenario(groups);
+  const context: TickContext = {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
+  // 1900-01-31 is the first civil month-end. The fixture starts two days earlier
+  // so the measured close sees a populated partial period without the long-run
+  // rounding drift of the scaled fixture; the close cost depends on the account
+  // and posting count, not on the period length.
+  const monthEnd = civilDateToDayIndex(1900, 1, 31);
+  const base = createEconomyWorld(scenario, {
+    seed: SEED,
+    startDayIndex: monthEnd - 2,
+  });
+  while (base.dayIndex < monthEnd) tick(base, context);
+  if (base.dayIndex !== monthEnd) {
+    throw new Error("M4b close benchmark failed to reach the first month-end");
+  }
+  const baseCash = designatedCashTotal(base.finance);
+
+  interface CloseMetrics {
+    readonly nanoseconds: number;
+    readonly summaryDay: number;
+    readonly closingPostings: number;
+    readonly flowTotal: number;
+    readonly zeroed: boolean;
+    readonly cashConserved: boolean;
+    readonly identityPreserved: boolean;
+    readonly summariesContiguous: boolean;
+    readonly hash: string;
+  }
+
+  const measure = (world: World): CloseMetrics => {
+    const start = process.hrtime.bigint();
+    const result = closeFinancePeriod(world);
+    const end = process.hrtime.bigint();
+    let flowTotal = 0;
+    for (const kind of FLOW_TRANSACTION_KINDS) flowTotal += result.summary.flowTotalsByKind[kind];
+    let zeroed = true;
+    for (const account of world.finance.accounts) {
+      if (account.category !== "revenue" && account.category !== "expense") continue;
+      if (account.balanceSUSD !== 0) zeroed = false;
+    }
+    let identityPreserved = true;
+    try {
+      assertAccountingIdentity(world.finance);
+    } catch {
+      identityPreserved = false;
+    }
+    const summariesContiguous =
+      world.finance.periodSummaries.length === 1 &&
+      result.summary.periodStartDay === world.startDayIndex &&
+      result.summary.periodEndDay === monthEnd &&
+      world.finance.closedThroughDay === monthEnd;
+    // Advance before hashing: a published world requires closedThroughDay < dayIndex.
+    world.dayIndex = monthEnd + 1;
+    return {
+      nanoseconds: Number(end - start),
+      summaryDay: result.summary.periodEndDay,
+      closingPostings: result.postingIds.length,
+      flowTotal,
+      zeroed,
+      cashConserved: Math.abs(designatedCashTotal(world.finance) - baseCash) <= 1e-6,
+      identityPreserved,
+      summariesContiguous,
+      hash: hashWorld(world),
+    };
+  };
+
+  for (let index = 0; index < warmupIterations; index += 1) measure(cloneWorld(base));
+
+  const samples: number[] = [];
+  let measured: CloseMetrics | null = null;
+  let minClosingPostings = Number.MAX_SAFE_INTEGER;
+  for (let index = 0; index < iterations; index += 1) {
+    const metrics = measure(cloneWorld(base));
+    samples.push(metrics.nanoseconds);
+    minClosingPostings = Math.min(minClosingPostings, metrics.closingPostings);
+    if (measured === null) measured = metrics;
+  }
+  if (measured === null) throw new Error("M4b close benchmark produced no measurements");
+
+  const firstCheck = cloneWorld(base);
+  const firstSummary = JSON.stringify(closeFinancePeriod(firstCheck).summary);
+  firstCheck.dayIndex = monthEnd + 1;
+  const firstHash = hashWorld(firstCheck);
+  const secondCheck = cloneWorld(base);
+  const secondSummary = JSON.stringify(closeFinancePeriod(secondCheck).summary);
+  secondCheck.dayIndex = monthEnd + 1;
+
+  samples.sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+  return {
+    label,
+    groups,
+    iterations,
+    warmupIterations,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / iterations),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    fixtureBlocks: base.popBlocks.length,
+    fixtureBuildings: base.buildings.length,
+    accounts: base.finance.accounts.length,
+    summaryDay: measured.summaryDay,
+    closingPostings: measured.closingPostings,
+    minClosingPostings,
+    flowTotalSUSD: measured.flowTotal,
+    zeroed: measured.zeroed,
+    cashConserved: measured.cashConserved,
+    identityPreserved: measured.identityPreserved,
+    summariesContiguous: measured.summariesContiguous,
+    deterministic: firstSummary === secondSummary,
+    hashesEqual: hashWorld(secondCheck) === firstHash,
+    hash: measured.hash,
+  };
+}
+
+function printFinanceCloseBenchmark(result: FinanceCloseBenchmarkResult): void {
+  console.log(
+    `${result.label} (${String(result.groups)} group(s), ${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings, ${String(result.accounts)} accounts):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} monthly closes at day ${String(result.summaryDay)}; ` +
+      `warm-up ${String(result.warmupIterations)}; close only; setup/clone/hash excluded`,
+  );
+  console.log(
+    `  ${String(result.closingPostings)} closing entries, ${result.flowTotalSUSD.toFixed(4)} SUSD gross flows, ` +
+      `minimum entries ${String(result.minClosingPostings)}`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms, hash ${result.hash}`,
+  );
+}
+
 function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
@@ -1200,7 +1386,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -1237,6 +1423,11 @@ function main(): void {
     `M3f economic days: small M3 world (${String(M3F_SMALL_ITERATIONS)} days, ` +
       `${String(M3F_SMALL_WARMUP)} warm-up) and ${String(M3F_STRESS_GROUPS)}-group stress ` +
       `(${String(M3F_STRESS_ITERATIONS)} days, ${String(M3F_STRESS_WARMUP)} warm-up)`,
+  );
+  console.log(
+    `M4b period closes: small M3 world (${String(M4B_CLOSE_SMALL_ITERATIONS)} closes, ` +
+      `${String(M4B_CLOSE_SMALL_WARMUP)} warm-up) and ${String(M4B_CLOSE_STRESS_GROUPS)}-group stress ` +
+      `(${String(M4B_CLOSE_STRESS_ITERATIONS)} closes, ${String(M4B_CLOSE_STRESS_WARMUP)} warm-up)`,
   );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
@@ -1323,6 +1514,18 @@ function main(): void {
     M3F_STRESS_ITERATIONS,
     M3F_STRESS_WARMUP,
   );
+  const m4bCloseSmall = runFinanceCloseBenchmark(
+    "M4b period close (small)",
+    1,
+    M4B_CLOSE_SMALL_ITERATIONS,
+    M4B_CLOSE_SMALL_WARMUP,
+  );
+  const m4bCloseStress = runFinanceCloseBenchmark(
+    "M4b period close (stress)",
+    M4B_CLOSE_STRESS_GROUPS,
+    M4B_CLOSE_STRESS_ITERATIONS,
+    M4B_CLOSE_STRESS_WARMUP,
+  );
 
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
@@ -1338,6 +1541,8 @@ function main(): void {
   printSettlementBenchmark(m3eStress);
   printEconomicDayBenchmark(m3fSmall);
   printEconomicDayBenchmark(m3fStress);
+  printFinanceCloseBenchmark(m4bCloseSmall);
+  printFinanceCloseBenchmark(m4bCloseStress);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1387,6 +1592,16 @@ function main(): void {
     result.minWages > 0 &&
     result.minUpkeep > 0;
   const m3fValid = economicDayValid(m3fSmall) && economicDayValid(m3fStress);
+  const financeCloseValid = (result: FinanceCloseBenchmarkResult): boolean =>
+    result.hashesEqual &&
+    result.deterministic &&
+    result.zeroed &&
+    result.cashConserved &&
+    result.identityPreserved &&
+    result.summariesContiguous &&
+    result.minClosingPostings > 0 &&
+    result.flowTotalSUSD > 0;
+  const m4bValid = financeCloseValid(m4bCloseSmall) && financeCloseValid(m4bCloseStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -1401,7 +1616,8 @@ function main(): void {
     m3cValid &&
     m3dValid &&
     m3eValid &&
-    m3fValid;
+    m3fValid &&
+    m4bValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1454,6 +1670,14 @@ function main(): void {
   console.log(
     `M3f economic day small checks: ${economicDayValid(m3fSmall) ? "PASS" : "FAIL"}; ` +
       `stress checks: ${economicDayValid(m3fStress) ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M4b period close small checks: ${financeCloseValid(m4bCloseSmall) ? "PASS" : "FAIL"}; ` +
+      `stress checks: ${financeCloseValid(m4bCloseStress) ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M4b close zeroing/cash/identity/contiguity/determinism: ` +
+      `${m4bValid ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

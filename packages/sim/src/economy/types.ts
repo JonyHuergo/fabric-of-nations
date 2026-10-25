@@ -189,6 +189,14 @@ export interface JournalLine {
   amountSUSD: MoneySUSD;
 }
 
+/**
+ * Internal transaction kind available only to the M4b period-close helper. It is
+ * cash-neutral by construction, so it belongs to the cash-neutral partition, but
+ * the public posting APIs reject it at type and runtime boundaries (D-047).
+ */
+export const INTERNAL_TRANSACTION_KINDS = ["period-close"] as const;
+export type InternalTransactionKind = (typeof INTERNAL_TRANSACTION_KINDS)[number];
+
 /** Transaction kinds that must not change aggregate designated cash. */
 export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "goods-purchase",
@@ -197,6 +205,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "upkeep",
   "profit-distribution",
   "owner-capital-injection",
+  ...INTERNAL_TRANSACTION_KINDS,
 ] as const;
 
 /**
@@ -213,7 +222,36 @@ export const TRANSACTION_KINDS = [
   ...CASH_NEUTRAL_TRANSACTION_KINDS,
   ...CASH_CHANGING_TRANSACTION_KINDS,
 ] as const;
+/** Every registered transaction kind, including the internal close-only kind. */
 export type TransactionKind = (typeof TRANSACTION_KINDS)[number];
+
+/**
+ * Kind accepted by the public posting APIs. `period-close` is excluded at the
+ * type level, so a public caller cannot construct arbitrary closing entries.
+ */
+export type PublicTransactionKind = Exclude<TransactionKind, InternalTransactionKind>;
+
+/** True when `value` is the internal close-only transaction kind. */
+export function isInternalTransactionKind(value: string): value is InternalTransactionKind {
+  return (INTERNAL_TRANSACTION_KINDS as readonly string[]).includes(value);
+}
+
+/** The public transaction kinds in registry order. */
+export const PUBLIC_TRANSACTION_KINDS: readonly PublicTransactionKind[] = TRANSACTION_KINDS.filter(
+  (kind): kind is PublicTransactionKind => !isInternalTransactionKind(kind),
+);
+
+/**
+ * The four gross period flows reported by an M4b monthly summary. Each flow is
+ * derived from its mapped expense subtype (D-047); `period-close` is excluded.
+ */
+export const FLOW_TRANSACTION_KINDS = [
+  "goods-purchase",
+  "input-purchase",
+  "wages",
+  "upkeep",
+] as const;
+export type FlowTransactionKind = (typeof FLOW_TRANSACTION_KINDS)[number];
 
 export interface JournalPosting {
   id: number;
@@ -237,6 +275,29 @@ export interface OpeningBalanceRecord {
   checksum: string;
 }
 
+/**
+ * Immutable monthly finance summary captured immediately before a period close
+ * (D-047, GDD §5.5).
+ *
+ * `accountTotals` is the pre-close trial balance keyed by decimal account id. It
+ * contains only nonzero accounts and includes opening balance-sheet balances as
+ * well as the period's revenue and expense. Those opening balances are not period
+ * activity.
+ *
+ * `flowTotalsByKind` carries the four gross flows derived from the mapped expense
+ * balances. Given zero revenue/expense opening balances, the semantic posting
+ * matrix, nonnegative expense balances, and exact closing zeroing, each expense
+ * balance measures gross activity for exactly one period.
+ */
+export interface FinancePeriodSummary {
+  /** Inclusive first day of the period; `World.startDayIndex` for the first period. */
+  periodStartDay: Day;
+  /** Inclusive last day; always a civil month-end. */
+  periodEndDay: Day;
+  accountTotals: Record<Id, MoneySUSD>;
+  flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
+}
+
 export interface FinanceState {
   accounts: FinancialAccount[];
   /** Bounded recent audit buffer; never an unbounded transaction log. */
@@ -246,6 +307,17 @@ export interface FinanceState {
   nextAccountId: number;
   /** Null only when every account balance is zero (for example an empty world). */
   opening: OpeningBalanceRecord | null;
+  /**
+   * Closed monthly periods in ascending period-end order. M4b never compacts or
+   * rewrites them; long-run finance history lives here, not in `postings`.
+   */
+  periodSummaries: FinancePeriodSummary[];
+  /**
+   * Inclusive last day of the most recently closed period, or null before the
+   * first close. A published world requires `null` or `closedThroughDay <
+   * dayIndex`; a staged close may temporarily equal `dayIndex`.
+   */
+  closedThroughDay: Day | null;
 }
 
 /**

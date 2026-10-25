@@ -505,10 +505,12 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       activeBuildingIds: [0, 7],
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
+    // Remove the complete system account set. The system owner may not keep a
+    // revenue account without an equity account (D-047), and the identity stays
+    // balanced because every system balance is zero. Upkeep routing then fails
+    // because no system-reserve account exists.
     world.finance.accounts = world.finance.accounts.filter(
-      (account) =>
-        account.id !== SYSTEM_ACCOUNT_ID &&
-        !(account.subtype === "owner-equity" && account.ownerKind === "system"),
+      (account) => account.ownerKind !== "system",
     );
     const marketDay = runMarketDay(
       world,

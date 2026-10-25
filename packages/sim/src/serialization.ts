@@ -41,9 +41,11 @@ import type {
   CurrencyIssuer,
   CurrencyValuation,
   EmploymentAssignment,
+  FinancePeriodSummary,
   FinanceState,
   FinancialAccount,
   FinancialAccountOwnerKind,
+  FlowTransactionKind,
   JournalLine,
   JournalPosting,
   Market,
@@ -56,6 +58,7 @@ import type {
 import {
   ACCOUNT_CATEGORIES,
   ACCOUNT_SUBTYPES,
+  FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
 } from "./economy/types.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
@@ -190,6 +193,19 @@ export type SerializedFinanceState = {
   readonly nextPostingId: number;
   readonly nextAccountId: number;
   readonly opening: SerializedOpeningBalance | null;
+  readonly periodSummaries: readonly SerializedFinancePeriodSummary[];
+  readonly closedThroughDay: number | null;
+};
+
+/**
+ * Encoded monthly finance summary. `accountTotals` keys are canonical decimal
+ * account ids; `flowTotalsByKind` uses the four registered flow-kind keys.
+ */
+export type SerializedFinancePeriodSummary = {
+  readonly periodStartDay: number;
+  readonly periodEndDay: number;
+  readonly accountTotals: Readonly<Record<string, number>>;
+  readonly flowTotalsByKind: Readonly<Record<string, number>>;
 };
 
 /** Encoded currency issuer. */
@@ -469,6 +485,39 @@ export function decodeTypedArray(value: unknown): SupportedTypedArray {
   return constructTypedArray(kindValue, values);
 }
 
+/**
+ * Canonical decimal account-id key for a period-summary total map. Numeric
+ * object keys are always stored as strings in JSON, so the canonical form is the
+ * plain unsigned decimal representation.
+ */
+function accountTotalKey(accountId: number): string {
+  return String(accountId);
+}
+
+function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePeriodSummary {
+  const accountTotals: Record<string, number> = {};
+  const accountIds = Object.keys(summary.accountTotals)
+    .map((key) => Number(key))
+    .sort((left, right) => left - right);
+  for (const accountId of accountIds) {
+    const value = summary.accountTotals[accountId];
+    if (value === undefined) {
+      throw new RangeError(`summary account total ${String(accountId)} is missing a value`);
+    }
+    accountTotals[accountTotalKey(accountId)] = value;
+  }
+  const flowTotalsByKind: Record<string, number> = {};
+  for (const kind of FLOW_TRANSACTION_KINDS) {
+    flowTotalsByKind[kind] = summary.flowTotalsByKind[kind];
+  }
+  return {
+    periodStartDay: summary.periodStartDay,
+    periodEndDay: summary.periodEndDay,
+    accountTotals,
+    flowTotalsByKind,
+  };
+}
+
 /** Encode all authoritative world fields. Validates the world first. */
 export function encodeWorld(world: World): SerializedWorld {
   assertValidWorld(world);
@@ -607,6 +656,10 @@ export function encodeWorld(world: World): SerializedWorld {
               accountCount: world.finance.opening.accountCount,
               checksum: world.finance.opening.checksum,
             },
+      periodSummaries: [...world.finance.periodSummaries]
+        .sort((left, right) => left.periodEndDay - right.periodEndDay)
+        .map(encodePeriodSummary),
+      closedThroughDay: world.finance.closedThroughDay,
     },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -846,10 +899,57 @@ function decodeOpeningBalance(value: unknown): OpeningBalanceRecord | null {
   };
 }
 
+function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary {
+  const record = requireRecord(value, path);
+  const rawTotals = requireRecord(record.accountTotals, `${path}.accountTotals`);
+  const accountTotals: Record<number, number> = {};
+  for (const key of Object.keys(rawTotals)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(
+        `${path}.accountTotals key ${JSON.stringify(key)} is not a canonical decimal account id`,
+      );
+    }
+    const accountId = Number(key);
+    if (!Number.isSafeInteger(accountId) || accountId > 0xffff_ffff) {
+      throw new SaveFormatError(`${path}.accountTotals key ${JSON.stringify(key)} is out of range`);
+    }
+    accountTotals[accountId] = requireFiniteNumber(
+      rawTotals[key],
+      `${path}.accountTotals[${key}]`,
+    );
+  }
+  const rawFlows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
+  const flowTotalsByKind = {} as Record<FlowTransactionKind, number>;
+  for (const kind of FLOW_TRANSACTION_KINDS) {
+    flowTotalsByKind[kind] = requireFiniteNumber(rawFlows[kind], `${path}.flowTotalsByKind.${kind}`);
+  }
+  return {
+    periodStartDay: requireInteger(
+      record.periodStartDay,
+      `${path}.periodStartDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    periodEndDay: requireInteger(
+      record.periodEndDay,
+      `${path}.periodEndDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    accountTotals,
+    flowTotalsByKind,
+  };
+}
+
 function decodeFinanceState(value: unknown): FinanceState {
   const record = requireRecord(value, "save payload.finance");
   const accounts = requireArray(record.accounts, "save payload.finance.accounts");
   const postings = requireArray(record.postings, "save payload.finance.postings");
+  const summaries = requireArray(
+    record.periodSummaries,
+    "save payload.finance.periodSummaries",
+  );
+  const rawClosed = record.closedThroughDay;
   return {
     accounts: accounts.map((account, index) =>
       decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
@@ -870,6 +970,21 @@ function decodeFinanceState(value: unknown): FinanceState {
       Number.MAX_SAFE_INTEGER,
     ),
     opening: decodeOpeningBalance(record.opening),
+    periodSummaries: summaries.map((summary, index) =>
+      decodePeriodSummary(
+        summary,
+        `save payload.finance.periodSummaries[${String(index)}]`,
+      ),
+    ),
+    closedThroughDay:
+      rawClosed === null
+        ? null
+        : requireInteger(
+            rawClosed,
+            "save payload.finance.closedThroughDay",
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
   };
 }
 

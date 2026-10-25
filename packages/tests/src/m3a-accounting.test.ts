@@ -4,7 +4,7 @@ import {
   postJournalEntry,
   type FinanceState,
   type JournalLine,
-  type TransactionKind,
+  type PublicTransactionKind,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -25,7 +25,7 @@ function financeOf(): FinanceState {
 
 function transfer(
   finance: FinanceState,
-  kind: TransactionKind,
+  kind: PublicTransactionKind,
   from: number,
   to: number,
   amount: number,
@@ -195,7 +195,7 @@ describe("M3a minimal cash ledger", () => {
       }),
     ).toThrow(/day/i);
     expect(() =>
-      postCashTransfer(finance, 0, "not-a-kind" as TransactionKind, {
+      postCashTransfer(finance, 0, "not-a-kind" as PublicTransactionKind, {
         fromAccountId: HOUSEHOLD,
         toAccountId: SELLER_BUILDING,
         amountSUSD: 1,

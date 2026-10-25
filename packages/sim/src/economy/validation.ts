@@ -1,12 +1,14 @@
 /**
- * Structural validation for M3/M4a-1 runtime economy state.
+ * Structural validation for M3/M4a/M4b runtime economy state.
  *
  * Economically valid failures (unqualified populations, unstaffed buildings) are
  * not rejected here. Only malformed state, broken references, invalid ranges,
- * category violations, and accounting invariant violations are.
+ * category violations, semantic-posting violations, accounting invariant
+ * violations, and period-summary violations are.
  */
 
-import { assertValidDayIndex } from "../calendar.js";
+import { assertValidDayIndex, dayIndexToCivilDate, daysInMonth } from "../calendar.js";
+import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { workingAgePopulation } from "../population/state.js";
 import {
@@ -15,33 +17,61 @@ import {
   requireInteger,
   requireRecord,
 } from "../validation.js";
+import type { Day, Id } from "../types.js";
 import type { World } from "../world.js";
 import {
   assertAccountingIdentity,
+  assertOwnerEquityTallies,
+  assertSemanticJournalLine,
   assertValidAccountCategory,
   assertValidAccountSubtype,
   assertValidOpeningRecord,
   buildFinanceIndex,
   categoryAllowsNegativeBalance,
   categoryForSubtype,
+  FLOW_EXPENSE_SUBTYPE,
   isCashAccount,
   subtypeAllowsOwnerKind,
+  tallyOwnerEquity,
   transactionKindChangesCash,
+  type OwnerEquityTally,
 } from "./accounts.js";
 import { assertValidCountryCurrencyState } from "./country.js";
-import { MAX_AUDIT_POSTINGS } from "./constants.js";
+import { MAX_AUDIT_POSTINGS, MAX_PERIOD_SUMMARIES } from "./constants.js";
 import {
+  FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
   type BuildingInstance,
   type EmploymentAssignment,
+  type FinancePeriodSummary,
   type FinanceState,
   type FinancialAccount,
   type FinancialAccountOwnerKind,
+  type FlowTransactionKind,
   type JournalLine,
   type JournalPosting,
   type Market,
   type StockLot,
+  type TransactionKind,
 } from "./types.js";
+
+function toleranceMoney(...values: number[]): number {
+  let scale = 1;
+  for (const value of values) scale = Math.max(scale, Math.abs(value));
+  return MONEY_TOLERANCE_SUSD * scale;
+}
+
+/** True when `dayIndex` is the last civil day of its Gregorian month. */
+function isCivilMonthEnd(dayIndex: Day): boolean {
+  const date = dayIndexToCivilDate(dayIndex);
+  return date.day === daysInMonth(date.year, date.month);
+}
+
+/** Compact `year-month` label used to require at most one summary per month. */
+function civilMonthLabel(dayIndex: Day): string {
+  const date = dayIndexToCivilDate(dayIndex);
+  return `${String(date.year)}-${String(date.month)}`;
+}
 
 function assertAccountOwnerKind(value: unknown, path: string): FinancialAccountOwnerKind {
   if (value !== "popBlock" && value !== "building" && value !== "system") {
@@ -91,6 +121,7 @@ export function assertValidFinancialAccount(account: FinancialAccount): void {
 }
 
 interface PostingLineDelta {
+  readonly account: FinancialAccount;
   readonly debit: number;
   readonly credit: number;
   /** Signed change in the account's normal-side balance. */
@@ -102,6 +133,7 @@ function assertPostingLine(
   value: unknown,
   path: string,
   accounts: ReadonlyMap<number, FinancialAccount>,
+  transactionKind: TransactionKind,
 ): PostingLineDelta {
   const record = requireRecord(value, path);
   const accountId = requireInteger(record.accountId, `${path}.accountId`, 0, 0xffff_ffff);
@@ -114,14 +146,95 @@ function assertPostingLine(
   }
   const amount = requireFiniteNumber(record.amountSUSD, `${path}.amountSUSD`);
   if (!(amount > 0)) throw new RangeError(`${path}.amountSUSD must be strictly positive`);
+  // D-047 semantic matrix: applies to revenue/expense lines for every kind.
+  assertSemanticJournalLine(transactionKind, account, record.side, path);
   const normalSide = account.category === "asset" || account.category === "expense" ? "debit" : "credit";
   const normalDelta = record.side === normalSide ? amount : -amount;
   return {
+    account,
     debit: record.side === "debit" ? amount : 0,
     credit: record.side === "credit" ? amount : 0,
     normalDelta,
     cashDelta: isCashAccount(account) ? normalDelta : 0,
   };
+}
+
+/**
+ * Structural validation for a persisted internal `period-close` posting.
+ *
+ * Public callers cannot create closing entries, so a persisted close posting is
+ * only structurally validated: no cash lines, revenue debits only, expense
+ * credits only, revenue/expense/equity accounts only, and a single equity net
+ * line whose side and amount equal `revenue - expense`. A zero net needs no
+ * equity line. The posting must still balance exactly.
+ */
+function assertValidPeriodClosePosting(
+  lines: readonly unknown[],
+  accounts: ReadonlyMap<number, FinancialAccount>,
+  path: string,
+): void {
+  let debits = 0;
+  let credits = 0;
+  let revenue = 0;
+  let expense = 0;
+  let equityCount = 0;
+  let equityDebit = 0;
+  let equityCredit = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const linePath = `${path}.lines[${String(index)}]`;
+    const line = assertPostingLine(lines[index], linePath, accounts, "period-close");
+    debits += line.debit;
+    credits += line.credit;
+    if (isCashAccount(line.account)) {
+      throw new RangeError(`${linePath} must not reference a designated cash account`);
+    }
+    switch (line.account.category) {
+      case "revenue":
+        revenue += line.debit;
+        break;
+      case "expense":
+        expense += line.credit;
+        break;
+      case "equity":
+        equityCount += 1;
+        equityDebit += line.debit;
+        equityCredit += line.credit;
+        break;
+      default:
+        throw new RangeError(
+          `${linePath} may only reference revenue, expense, or equity accounts in a period-close posting`,
+        );
+    }
+  }
+  if (Math.abs(debits - credits) > toleranceMoney(debits, credits)) {
+    throw new RangeError(
+      `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
+    );
+  }
+  const net = revenue - expense;
+  if (net === 0) {
+    if (equityCount !== 0) {
+      throw new RangeError(`${path} has a zero net but includes an equity line`);
+    }
+    return;
+  }
+  if (equityCount !== 1) {
+    throw new RangeError(`${path} must include exactly one equity net line for a nonzero net`);
+  }
+  if (net > 0) {
+    if (equityDebit !== 0 || Math.abs(equityCredit - net) > toleranceMoney(equityCredit, net)) {
+      throw new RangeError(
+        `${path} must credit owner equity by the net ${String(net)} for a profitable period`,
+      );
+    }
+    return;
+  }
+  const loss = -net;
+  if (equityCredit !== 0 || Math.abs(equityDebit - loss) > toleranceMoney(equityDebit, loss)) {
+    throw new RangeError(
+      `${path} must debit owner equity by the net loss ${String(loss)} for a loss period`,
+    );
+  }
 }
 
 export function assertValidJournalPosting(
@@ -137,27 +250,37 @@ export function assertValidJournalPosting(
   if (!(TRANSACTION_KINDS as readonly string[]).includes(record.transactionKind as string)) {
     throw new RangeError(`${path}.transactionKind is invalid`);
   }
-  let debits = 0;
-  let credits = 0;
-  let cashDelta = 0;
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = assertPostingLine(lines[index], `${path}.lines[${String(index)}]`, accounts);
-    debits += line.debit;
-    credits += line.credit;
-    cashDelta += line.cashDelta;
-  }
-  if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(
-      `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
-    );
-  }
-  if (transactionKindChangesCash(record.transactionKind as string)) {
-    throw new RangeError(`${path}.transactionKind is not implemented in M4a-1`);
-  }
-  if (Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))) {
-    throw new RangeError(
-      `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
-    );
+  const transactionKind = record.transactionKind as TransactionKind;
+  if (transactionKind === "period-close") {
+    assertValidPeriodClosePosting(lines, accounts, path);
+  } else {
+    let debits = 0;
+    let credits = 0;
+    let cashDelta = 0;
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = assertPostingLine(
+        lines[index],
+        `${path}.lines[${String(index)}]`,
+        accounts,
+        transactionKind,
+      );
+      debits += line.debit;
+      credits += line.credit;
+      cashDelta += line.cashDelta;
+    }
+    if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
+      throw new RangeError(
+        `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
+      );
+    }
+    if (transactionKindChangesCash(transactionKind)) {
+      throw new RangeError(`${path}.transactionKind is not implemented in M4a-1`);
+    }
+    if (Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))) {
+      throw new RangeError(
+        `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
+      );
+    }
   }
   if (record.sourceEntityId !== null) {
     requireInteger(record.sourceEntityId, `${path}.sourceEntityId`, 0, 0xffff_ffff);
@@ -244,6 +367,250 @@ export function assertValidFinanceState(finance: FinanceState): void {
   }
 
   assertAccountingIdentity(finance);
+}
+
+/** One canonical decimal account-id key of a summary total map. */
+function parseAccountTotalKey(key: string, path: string): Id {
+  if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+    throw new RangeError(`${path} key ${JSON.stringify(key)} is not a canonical decimal account id`);
+  }
+  const accountId = Number(key);
+  if (!Number.isSafeInteger(accountId) || accountId > 0xffff_ffff) {
+    throw new RangeError(`${path} key ${JSON.stringify(key)} is outside the account id range`);
+  }
+  return accountId;
+}
+
+/**
+ * Validate one persisted monthly summary shape and its references.
+ *
+ * Totals are the pre-close trial balance, so only nonzero accounts are listed.
+ * A non-equity balance is never negative at a close boundary; equity may be
+ * signed. The four current flow totals are always present, finite, and
+ * nonnegative. Cross-period properties (contiguity, month boundaries, ordering)
+ * are checked by `assertValidPeriodSummaries`.
+ */
+export function assertValidFinancePeriodSummary(
+  summary: FinancePeriodSummary,
+  accounts: ReadonlyMap<number, FinancialAccount>,
+  path: string,
+): void {
+  const record = requireRecord(summary, path);
+  const start = requireInteger(
+    record.periodStartDay,
+    `${path}.periodStartDay`,
+    0,
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
+  const end = requireInteger(
+    record.periodEndDay,
+    `${path}.periodEndDay`,
+    0,
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
+  if (start > end) {
+    throw new RangeError(`${path}.periodStartDay must not be after periodEndDay`);
+  }
+  if (!isCivilMonthEnd(end)) {
+    throw new RangeError(`${path}.periodEndDay ${String(end)} is not a civil month-end`);
+  }
+
+  const totals = requireRecord(record.accountTotals, `${path}.accountTotals`);
+  const totalsByAccount = new Map<number, number>();
+  let assets = 0;
+  let liabilities = 0;
+  let equity = 0;
+  let revenues = 0;
+  let expenses = 0;
+  for (const key of Object.keys(totals)) {
+    const accountId = parseAccountTotalKey(key, `${path}.accountTotals`);
+    const account = accounts.get(accountId);
+    if (account === undefined) {
+      throw new RangeError(`${path}.accountTotals references unknown account ${String(accountId)}`);
+    }
+    const value = requireFiniteNumber(totals[key], `${path}.accountTotals.${key}`);
+    if (value === 0) {
+      throw new RangeError(`${path}.accountTotals.${key} must be omitted when zero`);
+    }
+    if (value < 0 && !categoryAllowsNegativeBalance(account.category)) {
+      throw new RangeError(
+        `${path}.${key} must not be negative for ${account.category} account ${String(accountId)}`,
+      );
+    }
+    switch (account.category) {
+      case "asset":
+        assets += value;
+        break;
+      case "liability":
+        liabilities += value;
+        break;
+      case "equity":
+        equity += value;
+        break;
+      case "revenue":
+        revenues += value;
+        break;
+      case "expense":
+        expenses += value;
+        break;
+    }
+    totalsByAccount.set(accountId, value);
+  }
+  // The pre-close trial balance frozen in the summary satisfies the identity.
+  const debitSide = assets + expenses;
+  const creditSide = liabilities + equity + revenues;
+  if (Math.abs(debitSide - creditSide) > toleranceMoney(debitSide, creditSide)) {
+    throw new RangeError(
+      `${path}.accountTotals violates the accounting identity: assets+expenses ${String(debitSide)} != liabilities+equity+revenues ${String(creditSide)}`,
+    );
+  }
+
+  const flows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
+  const flowKeys = Object.keys(flows);
+  for (const key of flowKeys) {
+    if (!(FLOW_TRANSACTION_KINDS as readonly string[]).includes(key)) {
+      throw new RangeError(`${path}.flowTotalsByKind contains unknown flow kind ${JSON.stringify(key)}`);
+    }
+  }
+  if (flowKeys.length !== FLOW_TRANSACTION_KINDS.length) {
+    throw new RangeError(
+      `${path}.flowTotalsByKind must contain exactly the four current flow kinds`,
+    );
+  }
+  const derivedFlows: Record<FlowTransactionKind, number> = {
+    "goods-purchase": 0,
+    "input-purchase": 0,
+    wages: 0,
+    upkeep: 0,
+  };
+  for (const [accountId, value] of totalsByAccount) {
+    const account = accounts.get(accountId);
+    if (account === undefined) continue;
+    for (const kind of FLOW_TRANSACTION_KINDS) {
+      if (account.subtype === FLOW_EXPENSE_SUBTYPE[kind]) derivedFlows[kind] += value;
+    }
+  }
+  for (const kind of FLOW_TRANSACTION_KINDS) {
+    const value = requireFiniteNumber(flows[kind], `${path}.flowTotalsByKind.${kind}`);
+    if (value < 0) {
+      throw new RangeError(`${path}.flowTotalsByKind.${kind} must be nonnegative`);
+    }
+    const derived = derivedFlows[kind];
+    if (Math.abs(value - derived) > toleranceMoney(value, derived)) {
+      throw new RangeError(
+        `${path}.flowTotalsByKind.${kind} ${String(value)} does not match the mapped expense total ${String(derived)}`,
+      );
+    }
+  }
+}
+
+/** Context required to validate period summaries against the world calendar. */
+export interface PeriodSummaryValidationContext {
+  readonly startDayIndex: Day;
+  readonly dayIndex: Day;
+  /**
+   * True only for a staged close whose day has not advanced yet. A published
+   * world always passes `false` (D-047 staged-versus-published distinction).
+   */
+  readonly allowUnadvancedClose: boolean;
+}
+
+/**
+ * Validate the ordered, contiguous summary history and its consistency with
+ * `closedThroughDay`.
+ *
+ * - `closedThroughDay` is null exactly when there are no summaries.
+ * - The first period starts at `World.startDayIndex` and may be partial.
+ * - Later periods start the day after the previous end.
+ * - Every end is a civil month-end, and each later period starts the day after
+ *   the previous end, so at most one summary exists per civil month.
+ * - No summary extends beyond the current day and the last end equals
+ *   `closedThroughDay`.
+ * - Published state additionally requires `closedThroughDay < dayIndex`.
+ */
+export function assertValidPeriodSummaries(
+  finance: FinanceState,
+  context: PeriodSummaryValidationContext,
+): void {
+  const record = requireRecord(finance, "world.finance");
+  const rawSummaries = requireArray(record.periodSummaries, "world.finance.periodSummaries");
+  if (rawSummaries.length > MAX_PERIOD_SUMMARIES) {
+    throw new RangeError(
+      `world.finance.periodSummaries must contain at most ${String(MAX_PERIOD_SUMMARIES)} entries`,
+    );
+  }
+  const rawClosed = record.closedThroughDay;
+  const closedThroughDay =
+    rawClosed === null
+      ? null
+      : requireInteger(
+          rawClosed,
+          "world.finance.closedThroughDay",
+          0,
+          CAMPAIGN_TERMINAL_DAY_INDEX,
+        );
+  if ((rawSummaries.length === 0) !== (closedThroughDay === null)) {
+    throw new RangeError(
+      "world.finance.closedThroughDay must be null exactly when no period summaries exist",
+    );
+  }
+  // Fast path for worlds that have never closed (M2-only and any world before
+  // its first month-end): no per-account work is needed on the hot tick path.
+  if (rawSummaries.length === 0) return;
+
+  const accounts = new Map<number, FinancialAccount>();
+  for (const value of requireArray(record.accounts, "world.finance.accounts")) {
+    const account = value as FinancialAccount;
+    accounts.set(account.id, account);
+  }
+
+  let previousEnd: Day | null = null;
+  for (let index = 0; index < rawSummaries.length; index += 1) {
+    const summary = rawSummaries[index] as FinancePeriodSummary;
+    const path = `world.finance.periodSummaries[${String(index)}]`;
+    assertValidFinancePeriodSummary(summary, accounts, path);
+    const start = summary.periodStartDay;
+    const end = summary.periodEndDay;
+    if (index === 0) {
+      if (start !== context.startDayIndex) {
+        throw new RangeError(
+          `${path}.periodStartDay ${String(start)} must equal world.startDayIndex ${String(context.startDayIndex)}`,
+        );
+      }
+    } else if (previousEnd === null || start !== previousEnd + 1) {
+      throw new RangeError(
+        `${path} is not contiguous; periodStartDay ${String(start)} must follow the previous period end`,
+      );
+    } else if (civilMonthLabel(start) === civilMonthLabel(previousEnd)) {
+      throw new RangeError(
+        `${path} duplicates the civil month of the previous period; at most one summary exists per month`,
+      );
+    }
+    if (end > context.dayIndex) {
+      throw new RangeError(
+        `${path}.periodEndDay ${String(end)} must not extend beyond the current day ${String(context.dayIndex)}`,
+      );
+    }
+    previousEnd = end;
+  }
+
+  if (closedThroughDay !== null && previousEnd !== closedThroughDay) {
+    throw new RangeError(
+      `world.finance.closedThroughDay ${String(closedThroughDay)} must equal the last period end ${String(previousEnd)}`,
+    );
+  }
+  if (closedThroughDay !== null) {
+    if (closedThroughDay > context.dayIndex) {
+      throw new RangeError(
+        `world.finance.closedThroughDay ${String(closedThroughDay)} must not be after the current day ${String(context.dayIndex)}`,
+      );
+    }
+    if (!context.allowUnadvancedClose && closedThroughDay === context.dayIndex) {
+      throw new RangeError(
+        `world.finance.closedThroughDay ${String(closedThroughDay)} must be earlier than world.dayIndex in published state; advance the day before publishing a closed world`,
+      );
+    }
+  }
 }
 
 function assertValidBuilding(building: BuildingInstance): void {
@@ -386,9 +753,14 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
   }
 }
 
-/** Validate M3/M4a-1 collections and their cross-references. */
+/** Validate M3/M4a/M4b collections and their cross-references. */
 export function assertValidEconomyState(world: World): void {
   assertValidFinanceState(world.finance);
+  assertValidPeriodSummaries(world.finance, {
+    startDayIndex: world.startDayIndex,
+    dayIndex: world.dayIndex,
+    allowUnadvancedClose: false,
+  });
   const accounts = buildFinanceIndex(world.finance);
   if (world.finance.opening !== null && world.finance.opening.dayIndex !== world.startDayIndex) {
     throw new RangeError("world.finance.opening.dayIndex must equal world.startDayIndex");
@@ -409,6 +781,10 @@ export function assertValidEconomyState(world: World): void {
   // Generic owner-reference invariant: every owner-owned account must point at
   // an existing owner, regardless of subtype or category. This intentionally
   // covers all current and future building-owned account roles.
+  //
+  // The same pass collects the D-047 owner-equity tallies, so the invariant adds
+  // no extra per-account scan. Reference errors are reported first.
+  const ownerEquityTallies = new Map<string, OwnerEquityTally>();
   for (const account of world.finance.accounts) {
     if (account.ownerKind === "building") {
       if (account.ownerId === null || !buildingById.has(account.ownerId)) {
@@ -423,7 +799,11 @@ export function assertValidEconomyState(world: World): void {
         );
       }
     }
+    tallyOwnerEquity(ownerEquityTallies, account);
   }
+  // D-047 owner-equity invariant: independent of whether a system-reserve cash
+  // account exists.
+  assertOwnerEquityTallies(ownerEquityTallies.values());
 
   const rawAssignments = requireArray(world.employment, "world.employment");
   const assignmentIds = new Set<number>();

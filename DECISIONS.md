@@ -1116,9 +1116,9 @@ behavior remain out of scope.
 
 ### D-047 — M4b monthly period close and finance summaries (approved)
 
-- **Status:** approved for M4b; implementation has not started. GDD v2.3
-  records M4b as future work; a later GDD revision should record the accepted
-  behavior.
+- **Status:** approved and implemented for M4b (see the implementation notes
+  below). GDD v2.3 still records M4b as future work; a later GDD revision should
+  record the accepted behavior. No design rule was changed during implementation.
 - **Scope:** M4b adds a monthly period close for economic worlds and immutable
   monthly finance summaries. It does not add taxes, government finance, debt,
   interest, banks, central banking, monetary issuance, native-currency
@@ -1246,6 +1246,44 @@ behavior remain out of scope.
   reopen/reversal/adjusting entries, a separate retained-earnings subtype,
   flow totals for future cash/equity-transfer kinds, M2-only finance summaries,
   account deletion/remapping, summary compaction, UI, and M4c.
+
+#### D-047 implementation notes (recorded with the M4b implementation)
+
+These clarify D-047 at implementation time; none changes an approved rule.
+
+- **First-period boundary rule.** The first close may occur at any civil
+  month-end on or after `World.startDayIndex`; gap detection applies between
+  *closed* periods. A first period is partial by design (it starts at
+  `startDayIndex`), and published validation cannot prove which calendar days a
+  caller actually processed. A caller that stages `dayIndex` directly (tests and
+  imperative drivers) therefore closes its first period over the skipped
+  calendar months, and the captured balances/flows still describe only processed
+  activity. Once a period has closed, the next close must land on the next
+  month-end; a missed month-end is rejected rather than merged.
+- **Summary encoding.** `accountTotals` keys are canonical unsigned decimal
+  account ids; `flowTotalsByKind` always carries exactly the four current flow
+  kinds. Persisted validation cross-checks each flow total against the mapped
+  expense totals frozen in the same `accountTotals` map and re-checks the
+  trial-balance identity, so a summary cannot disagree with its own balances.
+- **Validation placement.** The owner-equity invariant runs in published/staged
+  economy validation after owner-reference checks (so an orphaned account is
+  reported as a reference error) and in `closeFinancePeriod` before any staging.
+  The internal `period-close` posting helper stays module-private; only
+  `closeFinancePeriod` and `FinanceCloseResult` are exported.
+- **Posting-id guard.** The batch posting-id overflow guard was off by one (it
+  allowed `nextPostingId` to reach `Number.MAX_SAFE_INTEGER + 1`). Corrected in
+  both `postJournalBatch` and the internal close batch; it only affects the
+  unreachable extreme boundary.
+- **Compatibility and digests.** `WORLD_SCHEMA_VERSION = 8`,
+  `SIM_VERSION = "0.8.0"`, `SAVE_FORMAT_VERSION = 1`, data version
+  `m3-economy-v1` unchanged; schema-7/simulation-0.7.0 saves are rejected with
+  no migration (D-013). Updated known-answer digests: empty world
+  `30c4d2bae09c5410`, M2 campaign aggregate `f1782a6a6fa3e118`, WPP validation
+  `997b5f78f3fb4c52`, M3 structural world `ba075368e9f2d67e`.
+- **Limitations.** Node benchmarks remain diagnostics; the mobile p95 target is
+  **NOT EVALUATED**. No taxes, government finance, debt, interest, banks,
+  monetary issuance, native-currency balances, FX, inflation, annual close,
+  reopen/reversal, or UI are implemented.
 
 ## Assumptions recorded for future review
 

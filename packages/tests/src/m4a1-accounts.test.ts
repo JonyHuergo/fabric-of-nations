@@ -22,7 +22,7 @@ import {
   transactionKindChangesCash,
   type FinanceState,
   type FinancialAccount,
-  type TransactionKind,
+  type PublicTransactionKind,
   type World,
 } from "@century/sim";
 import {
@@ -92,6 +92,8 @@ function manualFinance(
     nextPostingId: 1,
     nextAccountId: entries.reduce((max, entry) => Math.max(max, entry.id), 0) + 1,
     opening: null,
+    periodSummaries: [],
+    closedThroughDay: null,
   };
 }
 
@@ -232,34 +234,42 @@ describe("M4a-1 account semantics", () => {
 
   test("allows a signed equity balance and rejects negative revenue and expense balances", () => {
     const world = m3World().world;
+    // Negative equity is representable (category allows a signed balance); the
+    // matrix now forbids reaching it by posting into a revenue/expense account
+    // outside a period close, so construct the balanced state directly.
     const equity = accountOf(world, "popBlock", 0, "owner-equity");
-    const income = accountOf(world, "popBlock", 0, "wage-income");
-    postJournalEntry(world.finance, 0, "owner-capital-injection", [
-      { accountId: equity.id, side: "debit", amountSUSD: equity.balanceSUSD + 100 },
-      { accountId: income.id, side: "credit", amountSUSD: equity.balanceSUSD + 100 },
-    ]);
-    expect(equity.balanceSUSD).toBeCloseTo(-100, 9);
+    const revenue = accountOf(world, "popBlock", 0, "wage-income");
+    const shift = equity.balanceSUSD + 100;
+    equity.balanceSUSD = -100;
+    revenue.balanceSUSD += shift;
+    expect(equity.balanceSUSD).toBeLessThan(0);
+    expect(() => assertValidWorld(world)).not.toThrow();
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
+
+    expect(() =>
+      postJournalEntry(world.finance, 0, "owner-capital-injection", [
+        { accountId: revenue.id, side: "debit", amountSUSD: 100 },
+        { accountId: equity.id, side: "credit", amountSUSD: 100 },
+      ]),
+    ).toThrow(/semantic matrix|may not/i);
+
+    const expense = accountOf(world, "popBlock", 0, "consumption-expense");
+    expect(() =>
+      postJournalEntry(world.finance, 0, "owner-capital-injection", [
+        { accountId: expense.id, side: "credit", amountSUSD: 100 },
+        { accountId: equity.id, side: "debit", amountSUSD: 100 },
+      ]),
+    ).toThrow(/semantic matrix|may not/i);
 
     const negativeRevenue = m3World().world;
     const revenueAccount = accountOf(negativeRevenue, "popBlock", 0, "wage-income");
-    const equityAccount = accountOf(negativeRevenue, "popBlock", 0, "owner-equity");
-    expect(() =>
-      postJournalEntry(negativeRevenue.finance, 0, "owner-capital-injection", [
-        { accountId: revenueAccount.id, side: "debit", amountSUSD: 100 },
-        { accountId: equityAccount.id, side: "credit", amountSUSD: 100 },
-      ]),
-    ).toThrow(/negative/i);
+    revenueAccount.balanceSUSD = -1;
+    expect(() => assertValidWorld(negativeRevenue)).toThrow(/negative revenue/i);
 
     const negativeExpense = m3World().world;
     const expenseAccount = accountOf(negativeExpense, "popBlock", 0, "consumption-expense");
-    const expenseEquity = accountOf(negativeExpense, "popBlock", 0, "owner-equity");
-    expect(() =>
-      postJournalEntry(negativeExpense.finance, 0, "owner-capital-injection", [
-        { accountId: expenseAccount.id, side: "credit", amountSUSD: 100 },
-        { accountId: expenseEquity.id, side: "debit", amountSUSD: 100 },
-      ]),
-    ).toThrow(/negative/i);
+    expenseAccount.balanceSUSD = -1;
+    expect(() => assertValidWorld(negativeExpense)).toThrow(/negative expense/i);
   });
 });
 
@@ -306,7 +316,7 @@ describe("M4a-1 invariants", () => {
 
   test("rejects cash-changing transaction kinds in M4a-1", () => {
     const world = m3World().world;
-    const kind = CASH_CHANGING_TRANSACTION_KINDS[0] as TransactionKind;
+    const kind = CASH_CHANGING_TRANSACTION_KINDS[0] as PublicTransactionKind;
     expect(() =>
       postJournalEntry(world.finance, 0, kind, [
         { accountId: M3_HOUSEHOLD_ACCOUNT_IDS[0], side: "debit", amountSUSD: 5 },

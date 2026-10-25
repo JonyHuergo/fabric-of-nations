@@ -1,4 +1,4 @@
-/** Public M3 economy contracts and validated state helpers. */
+/** Public M3/M4 economy contracts and validated state helpers. */
 
 export * from "./types.js";
 export * from "./constants.js";
@@ -15,3 +15,9 @@ export * from "./production.js";
 export * from "./market.js";
 export * from "./settlement.js";
 export * from "./day.js";
+/**
+ * M4b period close. Only the public close operation and its result type are
+ * exported; the internal `period-close` posting helper stays module-private so
+ * public callers cannot create arbitrary closing entries.
+ */
+export { closeFinancePeriod, type FinanceCloseResult } from "./period.js";

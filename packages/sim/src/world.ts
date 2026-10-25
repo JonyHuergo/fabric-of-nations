@@ -143,6 +143,8 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       nextPostingId: 1,
       nextAccountId: 1,
       opening: null,
+      periodSummaries: [],
+      closedThroughDay: null,
     },
     diagnostics: {
       invariantFailureCount: 0,

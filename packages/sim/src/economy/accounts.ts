@@ -1,10 +1,11 @@
 /**
- * M4a-1 account model helpers.
+ * M4a-1 account model helpers, extended by M4b.
  *
  * Scope: category-aware double-entry accounts, the explicit designated-cash
  * set, the accounting-identity and aggregate-cash invariants, atomic opening
- * balances, and a transient account index. Country/currency identity, taxes,
- * period closing, debt, and monetary issuance are later milestones.
+ * balances, a transient account index, the central D-047 semantic posting matrix,
+ * the owner-equity invariant, and finance-state cloning. Country/currency
+ * identity, taxes, debt, and monetary issuance are later milestones.
  *
  * Balances are stored in normal-side units: asset and expense accounts are
  * debit-normal, liability, equity, and revenue accounts are credit-normal.
@@ -33,8 +34,11 @@ import {
   type FinanceState,
   type FinancialAccount,
   type FinancialAccountOwnerKind,
+  type FlowTransactionKind,
   type JournalSide,
   type OpeningBalanceRecord,
+  type PublicTransactionKind,
+  type TransactionKind,
 } from "./types.js";
 
 /**
@@ -143,6 +147,198 @@ export function categoryAllowsNegativeBalance(category: AccountCategory): boolea
 /** True when the transaction kind may change aggregate designated cash. */
 export function transactionKindChangesCash(kind: string): boolean {
   return kind === "monetary-issuance" || kind === "monetary-redemption";
+}
+
+/**
+ * One permitted revenue/expense journal line for a transaction kind. Cash and
+ * equity lines are not listed: they remain governed by the account and cash
+ * invariants.
+ */
+export interface SemanticLineRule {
+  readonly subtype: AccountSubtype;
+  readonly side: JournalSide;
+}
+
+/**
+ * D-047 semantic posting matrix, defined once and enforced centrally for
+ * individual postings, batched postings, and persisted-posting validation.
+ *
+ * - `goods-purchase`: debit `consumption-expense`, credit `sales-revenue`
+ * - `input-purchase`: debit `input-expense`, credit `sales-revenue`
+ * - `wages`: debit `wage-expense`, credit `wage-income`
+ * - `upkeep`: debit `upkeep-expense`, credit `system-income`
+ *
+ * `profit-distribution` and `owner-capital-injection` may not post to revenue or
+ * expense accounts. The cash-changing monetary kinds are registered with no
+ * revenue/expense semantics; posting them is rejected by the cash invariant.
+ */
+export const SEMANTIC_LINE_RULES: Readonly<
+  Record<PublicTransactionKind, readonly SemanticLineRule[]>
+> = {
+  "goods-purchase": [
+    { subtype: "consumption-expense", side: "debit" },
+    { subtype: "sales-revenue", side: "credit" },
+  ],
+  "input-purchase": [
+    { subtype: "input-expense", side: "debit" },
+    { subtype: "sales-revenue", side: "credit" },
+  ],
+  wages: [
+    { subtype: "wage-expense", side: "debit" },
+    { subtype: "wage-income", side: "credit" },
+  ],
+  upkeep: [
+    { subtype: "upkeep-expense", side: "debit" },
+    { subtype: "system-income", side: "credit" },
+  ],
+  "profit-distribution": [],
+  "owner-capital-injection": [],
+  "monetary-issuance": [],
+  "monetary-redemption": [],
+};
+
+/**
+ * Expense subtype that measures each gross period flow (D-047). The close derives
+ * flow totals from these balances instead of maintaining a redundant accumulator.
+ */
+export const FLOW_EXPENSE_SUBTYPE: Readonly<Record<FlowTransactionKind, AccountSubtype>> = {
+  "goods-purchase": "consumption-expense",
+  "input-purchase": "input-expense",
+  wages: "wage-expense",
+  upkeep: "upkeep-expense",
+};
+
+/**
+ * Enforce the semantic matrix for one journal line. Lines on asset, liability,
+ * and equity accounts are accepted here and remain governed by the account and
+ * cash invariants.
+ *
+ * `period-close` is internal: it may only debit revenue and credit expense
+ * accounts, which is what the closing entries do. The remaining close structure
+ * (no cash, exactly one net equity line) is validated separately.
+ */
+export function assertSemanticJournalLine(
+  kind: TransactionKind,
+  account: FinancialAccount,
+  side: JournalSide,
+  path: string,
+): void {
+  if (account.category !== "revenue" && account.category !== "expense") return;
+  if (kind === "period-close") {
+    const required: JournalSide = account.category === "revenue" ? "debit" : "credit";
+    if (side !== required) {
+      throw new RangeError(
+        `${path}: period-close may only ${required} ${account.category} account ${String(account.id)} (${account.subtype})`,
+      );
+    }
+    return;
+  }
+  const rules = SEMANTIC_LINE_RULES[kind];
+  if (!rules.some((rule) => rule.subtype === account.subtype && rule.side === side)) {
+    throw new RangeError(
+      `${path}: transactionKind ${JSON.stringify(kind)} may not ${side} ${account.category} account ${String(account.id)} (${account.subtype}) under the M4b semantic matrix`,
+    );
+  }
+}
+
+/** Deep-copy authoritative finance state, including summaries and postings. */
+export function cloneFinanceState(finance: FinanceState): FinanceState {
+  return {
+    accounts: finance.accounts.map((account) => ({ ...account })),
+    postings: finance.postings.map((posting) => ({
+      ...posting,
+      lines: posting.lines.map((line) => ({ ...line })),
+    })),
+    nextPostingId: finance.nextPostingId,
+    nextAccountId: finance.nextAccountId,
+    opening: finance.opening === null ? null : { ...finance.opening },
+    periodSummaries: finance.periodSummaries.map((summary) => ({
+      periodStartDay: summary.periodStartDay,
+      periodEndDay: summary.periodEndDay,
+      accountTotals: { ...summary.accountTotals },
+      flowTotalsByKind: { ...summary.flowTotalsByKind },
+    })),
+    closedThroughDay: finance.closedThroughDay,
+  };
+}
+
+/**
+ * Mutable per-owner tally used by the D-047 owner-equity invariant. Validation
+ * collects tallies inside an existing account pass so the invariant adds no extra
+ * per-tick scan.
+ */
+export interface OwnerEquityTally {
+  readonly ownerKind: FinancialAccountOwnerKind;
+  readonly ownerId: Id | null;
+  requiresEquity: boolean;
+  equityAccountCount: number;
+}
+
+/** Stable map key for one owner. */
+export function ownerEquityKey(
+  ownerKind: FinancialAccountOwnerKind,
+  ownerId: Id | null,
+): string {
+  return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}`;
+}
+
+/** Fold one account into an owner-equity tally map. */
+export function tallyOwnerEquity(
+  tallies: Map<string, OwnerEquityTally>,
+  account: FinancialAccount,
+): void {
+  const key = ownerEquityKey(account.ownerKind, account.ownerId);
+  let tally = tallies.get(key);
+  if (tally === undefined) {
+    tally = {
+      ownerKind: account.ownerKind,
+      ownerId: account.ownerId,
+      requiresEquity: false,
+      equityAccountCount: 0,
+    };
+    tallies.set(key, tally);
+  }
+  if (account.category === "revenue" || account.category === "expense") {
+    tally.requiresEquity = true;
+  }
+  if (account.subtype === "owner-equity") tally.equityAccountCount += 1;
+}
+
+/** Throw unless every owner with revenue/expense accounts has one owner-equity. */
+export function assertOwnerEquityTallies(tallies: Iterable<OwnerEquityTally>): void {
+  for (const tally of tallies) {
+    if (!tally.requiresEquity) continue;
+    const label =
+      tally.ownerKind === "system"
+        ? "system owner"
+        : `${tally.ownerKind} owner ${String(tally.ownerId)}`;
+    if (tally.equityAccountCount === 0) {
+      throw new RangeError(
+        `${label} has revenue or expense accounts but no owner-equity account`,
+      );
+    }
+    if (tally.equityAccountCount > 1) {
+      throw new RangeError(`${label} has more than one owner-equity account`);
+    }
+  }
+}
+
+/**
+ * D-047 owner-equity invariant: every owner with at least one revenue or expense
+ * account must have exactly one `owner-equity` account so the close can post the
+ * net period result. System owners are covered independently of whether a
+ * system-reserve cash account exists.
+ *
+ * The close calls this before staging any mutation. Published/staged economy
+ * validation runs the same check from tallies collected in an existing account
+ * pass. It never creates an equity account implicitly.
+ */
+export function assertOwnerEquityInvariant(finance: FinanceState): void {
+  const tallies = new Map<string, OwnerEquityTally>();
+  for (const value of requireArray(finance.accounts, "finance.accounts")) {
+    tallyOwnerEquity(tallies, value as FinancialAccount);
+  }
+  assertOwnerEquityTallies(tallies.values());
 }
 
 function toleranceMoney(...values: number[]): number {
@@ -299,12 +495,15 @@ export interface OpeningBalanceEntry {
 }
 
 /**
- * D-046a: apply opening balances once, atomically, with explicit equity
+ * D-046a/D-047: apply opening balances once, atomically, with explicit equity
  * counterparts supplied by the caller.
  *
  * - Rejects a second application.
  * - Requires every account to start at zero, so balances cannot be silently
  *   re-initialized.
+ * - Rejects nonzero opening entries for revenue and expense accounts: those
+ *   accounts start at zero so an expense balance measures exactly one period's
+ *   gross activity. Opening balance-sheet balances remain allowed.
  * - Validates every entry against its account and category before mutating.
  * - Validates the aggregate accounting identity before mutating.
  * - Records a provenance record and returns it.
@@ -360,6 +559,11 @@ export function applyOpeningBalances(
     if (!categoryAllowsNegativeBalance(account.category) && balance < 0) {
       throw new RangeError(
         `opening balance for ${account.category} account ${String(accountId)} must be non-negative`,
+      );
+    }
+    if ((account.category === "revenue" || account.category === "expense") && balance !== 0) {
+      throw new RangeError(
+        `opening balance for ${account.category} account ${String(accountId)} must be zero; revenue and expense accounts start at zero so expense balances measure gross period activity`,
       );
     }
     switch (account.category) {

@@ -1,15 +1,18 @@
 /**
- * Category-aware balanced ledger for M4a-1.
+ * Category-aware balanced ledger for M4a-1, extended by M4a-3/M4b semantics.
  *
  * Accounts store a balance in normal-side units: asset and expense accounts are
  * debit-normal, liability, equity, and revenue accounts are credit-normal. A
  * posting is validated atomically before any balance changes.
  *
- * Two independent invariants are enforced here:
+ * Three independent invariants are enforced here:
  * - I-1: every posting's total debits equal its total credits.
  * - I-2: ordinary (cash-neutral) postings do not change aggregate designated
  *   cash. Monetary issuance/redemption are registered but not implemented in
  *   M4a-1, so posting them is rejected.
+ * - D-047: the semantic matrix governs which transaction kinds may debit or
+ *   credit revenue and expense accounts. It is enforced centrally for individual
+ *   postings, batches, and persisted-posting validation.
  *
  * Total asset balances are deliberately not conserved (I-3): a future bond
  * issuance can create an asset against a liability without moving cash.
@@ -21,6 +24,7 @@ import type { Day, Id } from "../types.js";
 import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import {
   accountNormalSide,
+  assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
   transactionKindChangesCash,
@@ -28,10 +32,12 @@ import {
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
   TRANSACTION_KINDS,
+  isInternalTransactionKind,
   type FinanceState,
   type FinancialAccount,
   type JournalLine,
   type JournalPosting,
+  type PublicTransactionKind,
   type TransactionKind,
 } from "./types.js";
 
@@ -42,7 +48,7 @@ export interface CashTransferOptions {
 }
 
 export interface JournalEntryInput {
-  readonly transactionKind: TransactionKind;
+  readonly transactionKind: PublicTransactionKind;
   readonly lines: readonly JournalLine[];
   readonly sourceEntityId?: Id | null;
   readonly targetEntityId?: Id | null;
@@ -83,9 +89,24 @@ function assertTransactionKind(value: unknown): asserts value is TransactionKind
   }
 }
 
+/**
+ * Runtime half of the public/internal transaction-kind boundary. The public
+ * posting signatures already exclude `period-close` at the type level; this
+ * rejects a cast or untyped caller before any validation or mutation.
+ */
+function assertPublicTransactionKind(value: unknown): asserts value is PublicTransactionKind {
+  assertTransactionKind(value);
+  if (isInternalTransactionKind(value)) {
+    throw new RangeError(
+      `transactionKind ${JSON.stringify(value)} is internal to the period-close helper and cannot be posted through the public posting API`,
+    );
+  }
+}
+
 function validatePostingLines(
   lines: readonly JournalLine[],
   accounts: Map<number, FinancialAccount>,
+  transactionKind: TransactionKind,
 ): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
   const deltas = new Map<number, number>();
@@ -115,6 +136,8 @@ function validatePostingLines(
     if (!(amount > 0)) {
       throw new RangeError(`journal line ${String(index)}.amountSUSD must be strictly positive`);
     }
+    // D-047 semantic matrix: applies to revenue/expense lines for every kind.
+    assertSemanticJournalLine(transactionKind, account, side, `journal line ${String(index)}`);
     const normalSide = accountNormalSide(account.category);
     const signed = side === normalSide ? amount : -amount;
     if (side === "debit") debits += amount;
@@ -169,16 +192,16 @@ function assertCashConservation(kind: TransactionKind, cashDelta: number): void 
 export function postJournalEntry(
   finance: FinanceState,
   dayIndex: Day,
-  transactionKind: TransactionKind,
+  transactionKind: PublicTransactionKind,
   lines: readonly JournalLine[],
   sourceEntityId: Id | null = null,
   targetEntityId: Id | null = null,
 ): JournalPosting {
   assertValidDayIndex(dayIndex);
-  assertTransactionKind(transactionKind);
+  assertPublicTransactionKind(transactionKind);
   const nextId = requireInteger(finance.nextPostingId, "finance.nextPostingId", 1, Number.MAX_SAFE_INTEGER);
   const accounts = accountMap(finance);
-  const validated = validatePostingLines(lines, accounts);
+  const validated = validatePostingLines(lines, accounts, transactionKind);
   assertBalanceConstraints(accounts, validated.deltas);
   assertCashConservation(transactionKind, validated.cashDelta);
 
@@ -226,13 +249,13 @@ export function postJournalBatch(
     Number.MAX_SAFE_INTEGER,
   );
   if (entries.length === 0) return [];
-  if (nextId + entries.length - 1 > Number.MAX_SAFE_INTEGER) {
+  if (nextId + entries.length > Number.MAX_SAFE_INTEGER) {
     throw new RangeError("finance posting id overflow");
   }
 
   const aggregate = new Map<number, number>();
   const prepared: {
-    readonly transactionKind: TransactionKind;
+    readonly transactionKind: PublicTransactionKind;
     readonly lines: readonly JournalLine[];
     readonly sourceEntityId: Id | null;
     readonly targetEntityId: Id | null;
@@ -240,8 +263,8 @@ export function postJournalBatch(
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
-    assertTransactionKind(entry.transactionKind);
-    const validated = validatePostingLines(entry.lines, accounts);
+    assertPublicTransactionKind(entry.transactionKind);
+    const validated = validatePostingLines(entry.lines, accounts, entry.transactionKind);
     assertCashConservation(entry.transactionKind, validated.cashDelta);
     for (const [accountId, delta] of validated.deltas) {
       aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
@@ -291,7 +314,7 @@ export function postJournalBatch(
 export function postCashTransfer(
   finance: FinanceState,
   dayIndex: Day,
-  transactionKind: TransactionKind,
+  transactionKind: PublicTransactionKind,
   options: CashTransferOptions,
   sourceEntityId: Id | null = null,
   targetEntityId: Id | null = null,
