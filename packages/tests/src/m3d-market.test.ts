@@ -1,5 +1,6 @@
 import {
   createEconomyWorld,
+  designatedCashTotal,
   hashWorld,
   runMarketDay,
   type MarketDayInput,
@@ -719,16 +720,13 @@ describe("M3d determinism, validation, and boundaries", () => {
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
     const world = createEconomyWorld(scenario, { seed: 1 });
-    const cash = world.finance.accounts.reduce((sum, account) => sum + account.balanceSUSD, 0);
+    const cash = designatedCashTotal(world.finance);
     const result = runMarketDay(
       world,
       scenario.definitions,
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 5)]),
     );
     expect(result.pendingTransactions.length).toBeGreaterThan(0);
-    expect(world.finance.accounts.reduce((sum, account) => sum + account.balanceSUSD, 0)).toBeCloseTo(
-      cash,
-      9,
-    );
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(cash, 9);
   });
 });

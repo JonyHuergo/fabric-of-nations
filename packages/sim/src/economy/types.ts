@@ -140,14 +140,43 @@ export interface Market {
 }
 
 export type FinancialAccountOwnerKind = "popBlock" | "building" | "system";
-export type FinancialAccountKind = "household" | "operating" | "system-reserve";
+
+/**
+ * Account categories determine the normal side and the balance constraint.
+ * Asset and expense accounts are debit-normal; liability, equity, and revenue
+ * accounts are credit-normal. Balances are stored in normal-side units.
+ */
+export const ACCOUNT_CATEGORIES = ["asset", "liability", "equity", "revenue", "expense"] as const;
+export type AccountCategory = (typeof ACCOUNT_CATEGORIES)[number];
+
+/**
+ * Functional account roles. `CASH_SUBTYPES` in `accounts.ts` is the explicit
+ * designated-cash set used by the aggregate cash-conservation invariant; it is
+ * never "every asset account".
+ */
+export const ACCOUNT_SUBTYPES = [
+  "household-cash",
+  "operating-cash",
+  "system-reserve-cash",
+  "owner-equity",
+  "wage-income",
+  "sales-revenue",
+  "system-income",
+  "consumption-expense",
+  "input-expense",
+  "wage-expense",
+  "upkeep-expense",
+] as const;
+export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
 export interface FinancialAccount {
   id: Id;
   ownerKind: FinancialAccountOwnerKind;
   /** Null only for system accounts. */
   ownerId: Id | null;
-  accountKind: FinancialAccountKind;
+  category: AccountCategory;
+  subtype: AccountSubtype;
+  /** Balance in normal-side units; non-negative except equity, which may be signed. */
   balanceSUSD: MoneySUSD;
 }
 
@@ -160,13 +189,29 @@ export interface JournalLine {
   amountSUSD: MoneySUSD;
 }
 
-export const TRANSACTION_KINDS = [
+/** Transaction kinds that must not change aggregate designated cash. */
+export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "goods-purchase",
   "input-purchase",
   "wages",
   "upkeep",
   "profit-distribution",
   "owner-capital-injection",
+] as const;
+
+/**
+ * Transaction kinds allowed to change aggregate designated cash. They are
+ * registered so the partition is total, but their mechanisms are future-stage
+ * work and posting them is rejected in M4a-1.
+ */
+export const CASH_CHANGING_TRANSACTION_KINDS = [
+  "monetary-issuance",
+  "monetary-redemption",
+] as const;
+
+export const TRANSACTION_KINDS = [
+  ...CASH_NEUTRAL_TRANSACTION_KINDS,
+  ...CASH_CHANGING_TRANSACTION_KINDS,
 ] as const;
 export type TransactionKind = (typeof TRANSACTION_KINDS)[number];
 
@@ -179,10 +224,28 @@ export interface JournalPosting {
   targetEntityId: Id | null;
 }
 
+/**
+ * Provenance record for the atomically applied opening balances. It is a guard
+ * and audit summary, not a duplicate of account balances.
+ */
+export interface OpeningBalanceRecord {
+  /** Day the opening balances belong to; must equal `World.startDayIndex`. */
+  dayIndex: Day;
+  /** Number of accounts present when the opening balances were applied. */
+  accountCount: number;
+  /** FNV-1a checksum over the canonical sorted opening entries. */
+  checksum: string;
+}
+
 export interface FinanceState {
   accounts: FinancialAccount[];
+  /** Bounded recent audit buffer; never an unbounded transaction log. */
   postings: JournalPosting[];
   nextPostingId: number;
+  /** Deterministic allocator for runtime/derived accounts. */
+  nextAccountId: number;
+  /** Null only when every account balance is zero (for example an empty world). */
+  opening: OpeningBalanceRecord | null;
 }
 
 export interface BuildingInstanceInitialDef {

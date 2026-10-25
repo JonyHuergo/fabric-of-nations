@@ -86,6 +86,14 @@ export interface CreateWorldOptions {
   readonly seed?: Seed;
   readonly scenarioId?: string;
   readonly startDayIndex?: Day;
+  /**
+   * Internal construction control. Economy worlds defer opening-balance
+   * application until every account (buildings, system) exists, then apply the
+   * complete opening set exactly once.
+   */
+  readonly deferOpeningBalances?: boolean;
+  /** Internal construction control: first derived account id to allocate. */
+  readonly accountIdFloor?: number;
 }
 
 /** Create an empty M2-schema world at 1900-01-01. */
@@ -115,7 +123,13 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     employment: [],
     employmentDirty: false,
     markets: [],
-    finance: { accounts: [], postings: [], nextPostingId: 1 },
+    finance: {
+      accounts: [],
+      postings: [],
+      nextPostingId: 1,
+      nextAccountId: 1,
+      opening: null,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

@@ -1,9 +1,9 @@
 /**
- * Structural validation for M3 runtime economy state.
+ * Structural validation for M3/M4a-1 runtime economy state.
  *
  * Economically valid failures (unqualified populations, unstaffed buildings) are
- * not rejected here. Only malformed state, broken references, invalid ranges, and
- * accounting violations are.
+ * not rejected here. Only malformed state, broken references, invalid ranges,
+ * category violations, and accounting invariant violations are.
  */
 
 import { assertValidDayIndex } from "../calendar.js";
@@ -16,6 +16,18 @@ import {
   requireRecord,
 } from "../validation.js";
 import type { World } from "../world.js";
+import {
+  assertAccountingIdentity,
+  assertValidAccountCategory,
+  assertValidAccountSubtype,
+  assertValidOpeningRecord,
+  buildFinanceIndex,
+  categoryAllowsNegativeBalance,
+  categoryForSubtype,
+  isCashAccount,
+  subtypeAllowsOwnerKind,
+  transactionKindChangesCash,
+} from "./accounts.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
   TRANSACTION_KINDS,
@@ -23,7 +35,6 @@ import {
   type EmploymentAssignment,
   type FinanceState,
   type FinancialAccount,
-  type FinancialAccountKind,
   type FinancialAccountOwnerKind,
   type JournalLine,
   type JournalPosting,
@@ -38,46 +49,63 @@ function assertAccountOwnerKind(value: unknown, path: string): FinancialAccountO
   return value;
 }
 
-function assertAccountKind(value: unknown, path: string): FinancialAccountKind {
-  if (value !== "household" && value !== "operating" && value !== "system-reserve") {
-    throw new RangeError(`${path} must be household, operating, or system-reserve`);
-  }
-  return value;
-}
-
 export function assertValidFinancialAccount(account: FinancialAccount): void {
   const record = requireRecord(account, "finance.accounts[]");
   const id = requireInteger(record.id, "finance.accounts[].id", 0, 0xffff_ffff);
   const ownerKind = assertAccountOwnerKind(record.ownerKind, "finance.accounts[].ownerKind");
-  const accountKind = assertAccountKind(record.accountKind, "finance.accounts[].accountKind");
+  const category = record.category;
+  assertValidAccountCategory(category);
+  const subtype = record.subtype;
+  assertValidAccountSubtype(subtype);
+  const expectedCategory = categoryForSubtype(subtype);
+  if (category !== expectedCategory) {
+    throw new RangeError(
+      `finance account ${String(id)} category ${JSON.stringify(category)} does not match subtype ${JSON.stringify(subtype)} (${expectedCategory})`,
+    );
+  }
+  if (!subtypeAllowsOwnerKind(subtype, ownerKind)) {
+    throw new RangeError(
+      `finance account ${String(id)} subtype ${JSON.stringify(subtype)} cannot be owned by ${ownerKind}`,
+    );
+  }
   const ownerId =
     record.ownerId === null
       ? null
       : requireInteger(record.ownerId, "finance.accounts[].ownerId", 0, 0xffff_ffff);
   const balance = requireFiniteNumber(record.balanceSUSD, "finance.accounts[].balanceSUSD");
-  if (balance < 0) throw new RangeError(`finance account ${String(id)} has a negative balance`);
 
-  if (accountKind === "household") {
-    if (ownerKind !== "popBlock" || ownerId === null) {
-      throw new RangeError("household accounts must be owned by a popBlock");
+  if (ownerKind === "system") {
+    if (ownerId !== null) {
+      throw new RangeError(`system account ${String(id)} must have ownerId null`);
     }
-  } else if (accountKind === "operating") {
-    if (ownerKind !== "building" || ownerId === null) {
-      throw new RangeError("operating accounts must be owned by a building");
-    }
-  } else if (ownerKind !== "system" || ownerId !== null) {
-    throw new RangeError("system-reserve accounts must be owned by the system with ownerId null");
+  } else if (ownerId === null) {
+    throw new RangeError(`finance account ${String(id)} requires an ownerId for ${ownerKind}`);
   }
+  if (isCashAccount(account) && ownerKind === "system" && ownerId !== null) {
+    throw new RangeError(`system cash account ${String(id)} must have ownerId null`);
+  }
+  if (!categoryAllowsNegativeBalance(category) && balance < 0) {
+    throw new RangeError(`finance account ${String(id)} has a negative ${category} balance`);
+  }
+}
+
+interface PostingLineDelta {
+  readonly debit: number;
+  readonly credit: number;
+  /** Signed change in the account's normal-side balance. */
+  readonly normalDelta: number;
+  readonly cashDelta: number;
 }
 
 function assertPostingLine(
   value: unknown,
   path: string,
   accounts: ReadonlyMap<number, FinancialAccount>,
-): number {
+): PostingLineDelta {
   const record = requireRecord(value, path);
   const accountId = requireInteger(record.accountId, `${path}.accountId`, 0, 0xffff_ffff);
-  if (!accounts.has(accountId)) {
+  const account = accounts.get(accountId);
+  if (account === undefined) {
     throw new RangeError(`${path} references unknown account ${String(accountId)}`);
   }
   if (record.side !== "debit" && record.side !== "credit") {
@@ -85,7 +113,14 @@ function assertPostingLine(
   }
   const amount = requireFiniteNumber(record.amountSUSD, `${path}.amountSUSD`);
   if (!(amount > 0)) throw new RangeError(`${path}.amountSUSD must be strictly positive`);
-  return record.side === "debit" ? amount : -amount;
+  const normalSide = account.category === "asset" || account.category === "expense" ? "debit" : "credit";
+  const normalDelta = record.side === normalSide ? amount : -amount;
+  return {
+    debit: record.side === "debit" ? amount : 0,
+    credit: record.side === "credit" ? amount : 0,
+    normalDelta,
+    cashDelta: isCashAccount(account) ? normalDelta : 0,
+  };
 }
 
 export function assertValidJournalPosting(
@@ -103,14 +138,24 @@ export function assertValidJournalPosting(
   }
   let debits = 0;
   let credits = 0;
+  let cashDelta = 0;
   for (let index = 0; index < lines.length; index += 1) {
-    const signed = assertPostingLine(lines[index], `${path}.lines[${String(index)}]`, accounts);
-    if (signed > 0) debits += signed;
-    else credits += -signed;
+    const line = assertPostingLine(lines[index], `${path}.lines[${String(index)}]`, accounts);
+    debits += line.debit;
+    credits += line.credit;
+    cashDelta += line.cashDelta;
   }
   if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
     throw new RangeError(
       `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
+    );
+  }
+  if (transactionKindChangesCash(record.transactionKind as string)) {
+    throw new RangeError(`${path}.transactionKind is not implemented in M4a-1`);
+  }
+  if (Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))) {
+    throw new RangeError(
+      `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
     );
   }
   if (record.sourceEntityId !== null) {
@@ -125,8 +170,8 @@ export function assertValidFinanceState(finance: FinanceState): void {
   const record = requireRecord(finance, "world.finance");
   const rawAccounts = requireArray(record.accounts, "world.finance.accounts");
   const accounts = new Map<number, FinancialAccount>();
-  const householdOwners = new Set<number>();
-  const buildingOwners = new Set<number>();
+  const ownerKeys = new Set<string>();
+  let maxAccountId = 0;
   for (const value of rawAccounts) {
     const account = value as FinancialAccount;
     assertValidFinancialAccount(account);
@@ -134,18 +179,14 @@ export function assertValidFinanceState(finance: FinanceState): void {
       throw new RangeError(`duplicate finance account id ${String(account.id)}`);
     }
     accounts.set(account.id, account);
-    if (account.accountKind === "household" && account.ownerId !== null) {
-      if (householdOwners.has(account.ownerId)) {
-        throw new RangeError(`popBlock ${String(account.ownerId)} has multiple household accounts`);
-      }
-      householdOwners.add(account.ownerId);
+    maxAccountId = Math.max(maxAccountId, account.id);
+    const key = `${account.ownerKind}:${account.ownerId === null ? "-" : String(account.ownerId)}:${account.subtype}`;
+    if (ownerKeys.has(key)) {
+      throw new RangeError(
+        `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
+      );
     }
-    if (account.accountKind === "operating" && account.ownerId !== null) {
-      if (buildingOwners.has(account.ownerId)) {
-        throw new RangeError(`building ${String(account.ownerId)} has multiple operating accounts`);
-      }
-      buildingOwners.add(account.ownerId);
-    }
+    ownerKeys.add(key);
   }
 
   const rawPostings = requireArray(record.postings, "world.finance.postings");
@@ -178,6 +219,30 @@ export function assertValidFinanceState(finance: FinanceState): void {
   if (nextPostingId <= maxPostingId) {
     throw new RangeError("world.finance.nextPostingId must be greater than every posting id");
   }
+  const nextAccountId = requireInteger(
+    record.nextAccountId,
+    "world.finance.nextAccountId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  if (nextAccountId <= maxAccountId) {
+    throw new RangeError("world.finance.nextAccountId must be greater than every account id");
+  }
+
+  const opening = record.opening as FinanceState["opening"];
+  if (opening === null || opening === undefined) {
+    for (const account of accounts.values()) {
+      if (account.balanceSUSD !== 0) {
+        throw new RangeError(
+          `world.finance.opening is required when account ${String(account.id)} has a non-zero balance`,
+        );
+      }
+    }
+  } else {
+    assertValidOpeningRecord(opening);
+  }
+
+  assertAccountingIdentity(finance);
 }
 
 function assertValidBuilding(building: BuildingInstance): void {
@@ -295,9 +360,38 @@ function assertValidMarket(
   }
 }
 
-/** Validate M3 collections and their cross-references. */
+function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {
+  for (const block of world.popBlocks) {
+    for (const subtype of ["owner-equity", "wage-income", "consumption-expense"] as const) {
+      index.get("popBlock", block.id, subtype);
+    }
+  }
+  for (const building of world.buildings) {
+    for (const subtype of [
+      "owner-equity",
+      "sales-revenue",
+      "input-expense",
+      "wage-expense",
+      "upkeep-expense",
+    ] as const) {
+      index.get("building", building.id, subtype);
+    }
+  }
+  for (const account of world.finance.accounts) {
+    if (account.ownerKind !== "system" || account.subtype !== "system-reserve-cash") continue;
+    for (const subtype of ["owner-equity", "system-income"] as const) {
+      index.get("system", null, subtype);
+    }
+  }
+}
+
+/** Validate M3/M4a-1 collections and their cross-references. */
 export function assertValidEconomyState(world: World): void {
   assertValidFinanceState(world.finance);
+  const accounts = buildFinanceIndex(world.finance);
+  if (world.finance.opening !== null && world.finance.opening.dayIndex !== world.startDayIndex) {
+    throw new RangeError("world.finance.opening.dayIndex must equal world.startDayIndex");
+  }
 
   const rawBuildings = requireArray(world.buildings, "world.buildings");
   const buildingById = new Map<number, BuildingInstance>();
@@ -311,17 +405,20 @@ export function assertValidEconomyState(world: World): void {
   }
 
   const popBlockIds = new Set<number>(world.popBlocks.map((block) => block.id));
+  // Generic owner-reference invariant: every owner-owned account must point at
+  // an existing owner, regardless of subtype or category. This intentionally
+  // covers all current and future building-owned account roles.
   for (const account of world.finance.accounts) {
-    if (account.accountKind === "operating") {
+    if (account.ownerKind === "building") {
       if (account.ownerId === null || !buildingById.has(account.ownerId)) {
         throw new RangeError(
-          `operating account ${String(account.id)} references unknown building owner`,
+          `building-owned ${account.subtype} account ${String(account.id)} references unknown building owner ${String(account.ownerId)}`,
         );
       }
-    } else if (account.accountKind === "household") {
+    } else if (account.ownerKind === "popBlock") {
       if (account.ownerId === null || !popBlockIds.has(account.ownerId)) {
         throw new RangeError(
-          `household account ${String(account.id)} references unknown popBlock owner`,
+          `popBlock-owned ${account.subtype} account ${String(account.id)} references unknown popBlock owner ${String(account.ownerId)}`,
         );
       }
     }
@@ -431,27 +528,25 @@ export function assertValidEconomyState(world: World): void {
         `building ${String(building.id)} references unknown region ${String(building.regionId)}`,
       );
     }
-    const ownerAccount = world.finance.accounts.find(
-      (account) => account.id === building.ownerAccountId,
-    );
+    const ownerAccount = accounts.byId.get(building.ownerAccountId);
     if (ownerAccount === undefined) {
       throw new RangeError(`building ${String(building.id)} references unknown owner account`);
     }
-    if (ownerAccount.accountKind !== "household") {
-      throw new RangeError(`building ${String(building.id)} owner account must be a household`);
+    if (ownerAccount.subtype !== "household-cash") {
+      throw new RangeError(`building ${String(building.id)} owner account must be household cash`);
     }
-    const operatingAccount = world.finance.accounts.find(
-      (account) => account.id === building.operatingCashAccountId,
-    );
+    const operatingAccount = accounts.byId.get(building.operatingCashAccountId);
     if (operatingAccount === undefined) {
       throw new RangeError(`building ${String(building.id)} references unknown operating account`);
     }
-    if (operatingAccount.accountKind !== "operating" || operatingAccount.ownerId !== building.id) {
+    if (operatingAccount.subtype !== "operating-cash" || operatingAccount.ownerId !== building.id) {
       throw new RangeError(
         `building ${String(building.id)} operating account must be an operating account owned by it`,
       );
     }
   }
+
+  assertOwnerAccountSets(world, accounts);
 }
 
 /** Export for tests and scenario validation. */

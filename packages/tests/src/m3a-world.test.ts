@@ -22,7 +22,7 @@ describe("M3a world state and relationships", () => {
     expect(world.markets).toHaveLength(1);
     expect(region.marketId).toBe(0);
     expect(region.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
-    expect(world.finance.accounts).toHaveLength(13);
+    expect(world.finance.accounts).toHaveLength(67);
     expect(market.priceSUSD).toHaveLength(8);
     expect(market.stockLots.length).toBeGreaterThan(0);
 
@@ -105,14 +105,22 @@ describe("M3a world state and relationships", () => {
 
   test("rejects an operating account with no building owner", () => {
     const world = m3World().world;
+    // Use a free id below nextAccountId so the account-id guard cannot mask the
+    // owner-reference check this test is meant to exercise.
+    const freeId = 4;
+    expect(world.finance.accounts.some((account) => account.id === freeId)).toBe(false);
+    expect(freeId).toBeLessThan(world.finance.nextAccountId);
     world.finance.accounts.push({
-      id: 99,
+      id: freeId,
       ownerKind: "building",
       ownerId: 999,
-      accountKind: "operating",
+      category: "asset",
+      subtype: "operating-cash",
       balanceSUSD: 0,
     });
-    expect(() => assertValidWorld(world)).toThrow(/owner|building|account/i);
+    expect(() => assertValidWorld(world)).toThrow(
+      /operating-cash account 4 references unknown building owner/i,
+    );
   });
 
   test("rejects duplicate inventory lots", () => {

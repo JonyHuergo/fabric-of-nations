@@ -33,6 +33,7 @@ import {
   createEconomyWorld,
   createInitialWorld,
   createPopulationWorld,
+  designatedCashTotal,
   hashWorld,
   populationTotal,
   refreshEmploymentIfDue,
@@ -1015,10 +1016,7 @@ function runEconomicDayBenchmark(
   };
   const world = createEconomyWorld(scenario, { seed: SEED });
   const secondWorld = createEconomyWorld(scenario, { seed: SEED });
-  const cashBefore = world.finance.accounts.reduce(
-    (total, account) => total + account.balanceSUSD,
-    0,
-  );
+  const cashBefore = designatedCashTotal(world.finance);
 
   const runDays = (
     target: World,
@@ -1078,10 +1076,7 @@ function runEconomicDayBenchmark(
   const samples = first.samples.sort((left, right) => left - right);
   let totalNs = 0;
   for (const sample of samples) totalNs += sample;
-  const cashAfter = world.finance.accounts.reduce(
-    (total, account) => total + account.balanceSUSD,
-    0,
-  );
+  const cashAfter = designatedCashTotal(world.finance);
   return {
     label,
     groups,

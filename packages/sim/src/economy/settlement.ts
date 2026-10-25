@@ -34,6 +34,12 @@ import {
   postJournalBatch,
   type JournalEntryInput,
 } from "./accounting.js";
+import {
+  buildFinanceIndex,
+  designatedCashTotal,
+  isCashAccount,
+  type FinanceIndex,
+} from "./accounts.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { assertValidEmploymentState } from "./employment.js";
 import type {
@@ -154,6 +160,8 @@ export interface MarketSettlementResult {
 interface PreparedTransaction extends SettledMarketTransaction {
   readonly key: string;
   readonly transactionKind: "goods-purchase" | "input-purchase";
+  readonly buyerExpenseAccountId: Id;
+  readonly sellerRevenueAccountId: Id;
 }
 
 interface WageGroup {
@@ -170,48 +178,17 @@ function toleranceMoney(...values: number[]): number {
   return MONEY_TOLERANCE_SUSD * scale;
 }
 
-function accountMap(world: World): Map<Id, FinancialAccount> {
-  const map = new Map<Id, FinancialAccount>();
-  for (const account of world.finance.accounts) {
-    if (map.has(account.id)) throw new RangeError(`duplicate finance account ${String(account.id)}`);
-    map.set(account.id, account);
-  }
-  return map;
-}
-
-function householdAccount(
-  world: World,
-  accounts: ReadonlyMap<Id, FinancialAccount>,
-  popBlockId: Id,
-): FinancialAccount {
-  const block = world.popBlocks.find((candidate) => candidate.id === popBlockId);
-  if (block === undefined) throw new RangeError(`unknown popBlock ${String(popBlockId)}`);
-  const account = accounts.get(block.financialAccountId);
-  if (
-    account === undefined ||
-    account.accountKind !== "household" ||
-    account.ownerKind !== "popBlock" ||
-    account.ownerId !== popBlockId
-  ) {
+function householdCash(index: FinanceIndex, popBlockId: Id): FinancialAccount {
+  const account = index.find("popBlock", popBlockId, "household-cash");
+  if (account === undefined) {
     throw new RangeError(`popBlock ${String(popBlockId)} has no valid household account`);
   }
   return account;
 }
 
-function operatingAccount(
-  world: World,
-  accounts: ReadonlyMap<Id, FinancialAccount>,
-  buildingId: Id,
-): FinancialAccount {
-  const building = world.buildings.find((candidate) => candidate.id === buildingId);
-  if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
-  const account = accounts.get(building.operatingCashAccountId);
-  if (
-    account === undefined ||
-    account.accountKind !== "operating" ||
-    account.ownerKind !== "building" ||
-    account.ownerId !== buildingId
-  ) {
+function operatingCash(index: FinanceIndex, buildingId: Id): FinancialAccount {
+  const account = index.find("building", buildingId, "operating-cash");
+  if (account === undefined) {
     throw new RangeError(`building ${String(buildingId)} has no valid operating account`);
   }
   return account;
@@ -244,40 +221,42 @@ function transactionKey(transaction: PendingTransaction): string {
 function prepareTransactions(
   world: World,
   definitions: EconomyDefinitions,
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  index: FinanceIndex,
   transactions: readonly PendingTransaction[],
 ): PreparedTransaction[] {
   const goodIds = new Set(definitions.goods.map((good) => good.id));
-  const buildingIds = new Set(world.buildings.map((building) => building.id));
+  const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const seen = new Set<string>();
   const prepared: PreparedTransaction[] = [];
-  for (let index = 0; index < transactions.length; index += 1) {
-    const transaction = transactions[index];
-    if (transaction === undefined) throw new RangeError(`pending transaction ${String(index)} is missing`);
-    const path = `pendingTransactions[${String(index)}]`;
+  for (let index_ = 0; index_ < transactions.length; index_ += 1) {
+    const transaction = transactions[index_];
+    if (transaction === undefined) throw new RangeError(`pending transaction ${String(index_)} is missing`);
+    const path = `pendingTransactions[${String(index_)}]`;
     assertTransactionAmount(transaction, path);
     if (!goodIds.has(transaction.goodId)) throw new RangeError(`${path}.goodId is unknown`);
-    if (!buildingIds.has(transaction.sellerBuildingId)) {
+    if (!buildingById.has(transaction.sellerBuildingId)) {
       throw new RangeError(`${path}.sellerBuildingId is unknown`);
     }
-    const seller = operatingAccount(world, accounts, transaction.sellerBuildingId);
+    const seller = operatingCash(index, transaction.sellerBuildingId);
+    const sellerRevenue = index.get("building", transaction.sellerBuildingId, "sales-revenue");
     let buyer: FinancialAccount;
+    let buyerExpense: FinancialAccount;
     if (transaction.kind === "household-purchase") {
       if (transaction.buyerPopBlockId === null || transaction.buyerBuildingId !== null) {
         throw new RangeError(`${path} must identify exactly one household buyer`);
       }
-      buyer = householdAccount(world, accounts, transaction.buyerPopBlockId);
+      buyer = householdCash(index, transaction.buyerPopBlockId);
+      buyerExpense = index.get("popBlock", transaction.buyerPopBlockId, "consumption-expense");
     } else if (transaction.kind === "input-purchase") {
       if (transaction.buyerBuildingId === null || transaction.buyerPopBlockId !== null) {
         throw new RangeError(`${path} must identify exactly one building buyer`);
       }
-      const buyerBuilding = world.buildings.find(
-        (candidate) => candidate.id === transaction.buyerBuildingId,
-      );
+      const buyerBuilding = buildingById.get(transaction.buyerBuildingId);
       if (buyerBuilding === undefined || !buyerBuilding.operational) {
         throw new RangeError(`${path}.buyerBuildingId must reference an operational building`);
       }
-      buyer = operatingAccount(world, accounts, transaction.buyerBuildingId);
+      buyer = operatingCash(index, transaction.buyerBuildingId);
+      buyerExpense = index.get("building", transaction.buyerBuildingId, "input-expense");
     } else {
       throw new RangeError(`${path}.kind is invalid`);
     }
@@ -294,6 +273,8 @@ function prepareTransactions(
       ...transaction,
       buyerAccountId: buyer.id,
       sellerAccountId: seller.id,
+      buyerExpenseAccountId: buyerExpense.id,
+      sellerRevenueAccountId: sellerRevenue.id,
       transactionKind:
         transaction.kind === "household-purchase" ? "goods-purchase" : "input-purchase",
       key,
@@ -360,7 +341,7 @@ function buildWageGroups(
   world: World,
   building: BuildingInstance,
   professions: ReadonlyMap<Id, ProfessionDef>,
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  index: FinanceIndex,
   yearDays: number,
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
@@ -370,7 +351,7 @@ function buildWageGroups(
     if (block === undefined) throw new RangeError("employment assignment references an unknown block");
     const profession = professions.get(assignment.professionId);
     if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
-    const account = householdAccount(world, accounts, block.id);
+    const account = householdCash(index, block.id);
     const dailyWage = profession.baseWage1900SUSDPerYear / yearDays;
     if (!Number.isFinite(dailyWage) || !(dailyWage > 0)) {
       throw new RangeError(`invalid daily wage for profession ${String(profession.id)}`);
@@ -441,8 +422,8 @@ export function settleMarketDay(
 
   const market = world.markets.find((candidate) => candidate.id === marketDay.marketId);
   if (market === undefined) throw new RangeError("market-day result references an unknown market");
-  const accounts = accountMap(world);
-  const transactions = prepareTransactions(world, definitions, accounts, marketDay.pendingTransactions);
+  const index = buildFinanceIndex(world.finance);
+  const transactions = prepareTransactions(world, definitions, index, marketDay.pendingTransactions);
 
   const openingBalances = new Map<Id, number>();
   for (const account of world.finance.accounts) openingBalances.set(account.id, account.balanceSUSD);
@@ -461,7 +442,7 @@ export function settleMarketDay(
     );
   }
   for (const [accountId, delta] of marketDeltas) {
-    const account = accounts.get(accountId);
+    const account = index.byId.get(accountId);
     if (account === undefined) throw new RangeError(`unknown settlement account ${String(accountId)}`);
     if (account.balanceSUSD + delta < 0) {
       throw new RangeError(
@@ -476,8 +457,26 @@ export function settleMarketDay(
       const marketEntries: JournalEntryInput[] = transactions.map((transaction) => ({
         transactionKind: transaction.transactionKind,
         lines: [
-          { accountId: transaction.sellerAccountId, side: "debit", amountSUSD: transaction.totalSUSD },
-          { accountId: transaction.buyerAccountId, side: "credit", amountSUSD: transaction.totalSUSD },
+          {
+            accountId: transaction.buyerExpenseAccountId,
+            side: "debit",
+            amountSUSD: transaction.totalSUSD,
+          },
+          {
+            accountId: transaction.sellerAccountId,
+            side: "debit",
+            amountSUSD: transaction.totalSUSD,
+          },
+          {
+            accountId: transaction.buyerAccountId,
+            side: "credit",
+            amountSUSD: transaction.totalSUSD,
+          },
+          {
+            accountId: transaction.sellerRevenueAccountId,
+            side: "credit",
+            amountSUSD: transaction.totalSUSD,
+          },
         ],
         sourceEntityId: transaction.buyerPopBlockId ?? transaction.buyerBuildingId,
         targetEntityId: transaction.sellerBuildingId,
@@ -498,10 +497,10 @@ export function settleMarketDay(
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
-      const groups = buildWageGroups(world, building, professions, accounts, yearDays);
+      const groups = buildWageGroups(world, building, professions, index, yearDays);
       if (groups.length === 0) continue;
       const obligation = groups.reduce((total, group) => total + group.obligationSUSD, 0);
-      const employer = operatingAccount(world, accounts, building.id);
+      const employer = operatingCash(index, building.id);
       const paid = Math.min(employer.balanceSUSD, obligation);
       const allocations = allocateMoney(world, marketDay.dayIndex, paid, groups);
       const payments: WagePayment[] = groups.map((group) => {
@@ -533,18 +532,35 @@ export function settleMarketDay(
         throw new RangeError(`wage payment exceeds employer cash for building ${String(building.id)}`);
       }
       if (paidTotal > 0) {
-        const lines: JournalLine[] = payments
-          .filter((payment) => payment.paidSUSD > 0)
-          .map((payment) => ({
+        const wageExpense = index.get("building", building.id, "wage-expense");
+        const lines: JournalLine[] = [];
+        for (const payment of payments) {
+          if (payment.paidSUSD <= 0) continue;
+          lines.push({
             accountId: payment.accountId,
-            side: "debit" as const,
+            side: "debit",
             amountSUSD: payment.paidSUSD,
-          }));
+          });
+        }
+        lines.push({
+          accountId: wageExpense.id,
+          side: "debit",
+          amountSUSD: paidTotal,
+        });
         lines.push({
           accountId: employer.id,
           side: "credit",
           amountSUSD: paidTotal,
         });
+        for (const payment of payments) {
+          if (payment.paidSUSD <= 0) continue;
+          const income = index.get("popBlock", payment.popBlockId, "wage-income");
+          lines.push({
+            accountId: income.id,
+            side: "credit",
+            amountSUSD: payment.paidSUSD,
+          });
+        }
         wageEntries.push({
           transactionKind: "wages",
           lines,
@@ -571,6 +587,7 @@ export function settleMarketDay(
     const upkeepObligationByBuilding = new Map<Id, number>();
     const unpaidUpkeepByBuilding = new Map<Id, number>();
     let systemAccount: FinancialAccount | undefined;
+    let systemIncome: FinancialAccount | undefined;
     for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
       if (!building.operational) continue;
       const definition = buildingDefinitions.get(building.definitionId);
@@ -584,7 +601,7 @@ export function settleMarketDay(
       if (obligation <= 0) continue;
       if (systemAccount === undefined) {
         const systemAccounts = world.finance.accounts.filter(
-          (account) => account.accountKind === "system-reserve",
+          (account) => account.subtype === "system-reserve-cash",
         );
         if (systemAccounts.length !== 1) {
           throw new RangeError("M3e upkeep requires exactly one system-reserve account");
@@ -593,16 +610,20 @@ export function settleMarketDay(
         if (systemAccount === undefined) {
           throw new RangeError("M3e upkeep requires a system-reserve account");
         }
+        systemIncome = index.get("system", null, "system-income");
       }
-      const employer = operatingAccount(world, accounts, building.id);
+      const employer = operatingCash(index, building.id);
       const paid = Math.min(employer.balanceSUSD, obligation);
       const unpaid = Math.max(0, obligation - paid);
       if (paid > 0) {
+        const upkeepExpense = index.get("building", building.id, "upkeep-expense");
         upkeepEntries.push({
           transactionKind: "upkeep",
           lines: [
             { accountId: systemAccount.id, side: "debit", amountSUSD: paid },
+            { accountId: upkeepExpense.id, side: "debit", amountSUSD: paid },
             { accountId: employer.id, side: "credit", amountSUSD: paid },
+            { accountId: systemIncome!.id, side: "credit", amountSUSD: paid },
           ],
           sourceEntityId: building.id,
           targetEntityId: systemAccount.id,
@@ -665,7 +686,7 @@ export function settleMarketDay(
       .sort((left, right) => left.id - right.id)
       .map((building) => {
         const initialCash = openingBalances.get(building.operatingCashAccountId) ?? 0;
-        const current = operatingAccount(world, accounts, building.id);
+        const current = operatingCash(index, building.id);
         const revenue = revenueByBuilding.get(building.id) ?? 0;
         const inputCosts = inputCostsByBuilding.get(building.id) ?? 0;
         const wagesPaid = wagesByBuilding.get(building.id) ?? 0;
@@ -698,7 +719,7 @@ export function settleMarketDay(
     const households: HouseholdSettlement[] = [...world.popBlocks]
       .sort((left, right) => left.id - right.id)
       .map((block) => {
-        const account = householdAccount(world, accounts, block.id);
+        const account = householdCash(index, block.id);
         const initialCash = openingBalances.get(account.id) ?? 0;
         const purchases = purchasesByBlock.get(block.id) ?? 0;
         const wages = wagesByBlock.get(block.id) ?? 0;
@@ -716,13 +737,14 @@ export function settleMarketDay(
         };
       });
 
-    const initialCash = [...openingBalances.values()].reduce((total, value) => total + value, 0);
-    const endingCash = world.finance.accounts.reduce(
-      (total, account) => total + account.balanceSUSD,
-      0,
-    );
+    let initialCash = 0;
+    for (const account of world.finance.accounts) {
+      if (!isCashAccount(account)) continue;
+      initialCash += openingBalances.get(account.id) ?? 0;
+    }
+    const endingCash = designatedCashTotal(world.finance);
     if (Math.abs(initialCash - endingCash) > toleranceMoney(initialCash, endingCash)) {
-      throw new RangeError("market settlement did not conserve total cash");
+      throw new RangeError("market settlement did not conserve aggregate cash");
     }
 
     const totals: SettlementTotals = {

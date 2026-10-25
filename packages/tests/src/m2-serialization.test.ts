@@ -78,7 +78,7 @@ describe("M2.1 serialization and restoration", () => {
     const { world } = multiBlockWorld();
     const restored = deserializeWorld(serializeWorld(world));
     expect(restored.popBlocks).toHaveLength(3);
-    expect(restored.finance.accounts).toHaveLength(3);
+    expect(restored.finance.accounts).toHaveLength(12);
     for (const block of restored.popBlocks) {
       expect(
         restored.finance.accounts.some((account) => account.id === block.financialAccountId),

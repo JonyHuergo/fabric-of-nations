@@ -1,16 +1,30 @@
 /**
- * Minimal balanced cash ledger for M3.
+ * Category-aware balanced ledger for M4a-1.
  *
- * M3 accounts are cash asset accounts. A debit increases the balance and a
- * credit decreases it. In a transfer the receiving account is debited and the
- * paying account is credited. Every posting is validated atomically before any
- * balance changes.
+ * Accounts store a balance in normal-side units: asset and expense accounts are
+ * debit-normal, liability, equity, and revenue accounts are credit-normal. A
+ * posting is validated atomically before any balance changes.
+ *
+ * Two independent invariants are enforced here:
+ * - I-1: every posting's total debits equal its total credits.
+ * - I-2: ordinary (cash-neutral) postings do not change aggregate designated
+ *   cash. Monetary issuance/redemption are registered but not implemented in
+ *   M4a-1, so posting them is rejected.
+ *
+ * Total asset balances are deliberately not conserved (I-3): a future bond
+ * issuance can create an asset against a liability without moving cash.
  */
 
 import { assertValidDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
 import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
+import {
+  accountNormalSide,
+  categoryAllowsNegativeBalance,
+  isCashAccount,
+  transactionKindChangesCash,
+} from "./accounts.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
   TRANSACTION_KINDS,
@@ -38,6 +52,14 @@ interface ValidatedLines {
   readonly deltas: Map<number, number>;
   readonly debits: number;
   readonly credits: number;
+  /** Signed change to the aggregate designated-cash total. */
+  readonly cashDelta: number;
+}
+
+function toleranceMoney(...values: number[]): number {
+  let scale = 1;
+  for (const value of values) scale = Math.max(scale, Math.abs(value));
+  return MONEY_TOLERANCE_SUSD * scale;
 }
 
 function accountMap(finance: FinanceState): Map<number, FinancialAccount> {
@@ -56,7 +78,7 @@ function accountMap(finance: FinanceState): Map<number, FinancialAccount> {
 function assertTransactionKind(value: unknown): asserts value is TransactionKind {
   if (!(TRANSACTION_KINDS as readonly string[]).includes(value as string)) {
     throw new RangeError(
-      `transactionKind ${JSON.stringify(String(value))} is not a valid M3 transaction kind`,
+      `transactionKind ${JSON.stringify(String(value))} is not a valid transaction kind`,
     );
   }
 }
@@ -69,6 +91,7 @@ function validatePostingLines(
   const deltas = new Map<number, number>();
   let debits = 0;
   let credits = 0;
+  let cashDelta = 0;
   for (let index = 0; index < lines.length; index += 1) {
     const record = requireRecord(lines[index], `journal line ${String(index)}`);
     const accountId = requireInteger(
@@ -92,23 +115,22 @@ function validatePostingLines(
     if (!(amount > 0)) {
       throw new RangeError(`journal line ${String(index)}.amountSUSD must be strictly positive`);
     }
-    if (side === "debit") {
-      debits += amount;
-      deltas.set(accountId, (deltas.get(accountId) ?? 0) + amount);
-    } else {
-      credits += amount;
-      deltas.set(accountId, (deltas.get(accountId) ?? 0) - amount);
-    }
+    const normalSide = accountNormalSide(account.category);
+    const signed = side === normalSide ? amount : -amount;
+    if (side === "debit") debits += amount;
+    else credits += amount;
+    deltas.set(accountId, (deltas.get(accountId) ?? 0) + signed);
+    if (isCashAccount(account)) cashDelta += signed;
   }
   if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
     throw new RangeError(
       `journal posting is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
     );
   }
-  return { deltas, debits, credits };
+  return { deltas, debits, credits, cashDelta };
 }
 
-function assertNonNegativeBalances(
+function assertBalanceConstraints(
   accounts: Map<number, FinancialAccount>,
   deltas: Map<number, number>,
 ): void {
@@ -116,26 +138,33 @@ function assertNonNegativeBalances(
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
     const next = account.balanceSUSD + delta;
-    if (next < 0) {
+    if (!Number.isFinite(next)) {
+      throw new RangeError(`posting would make account ${String(accountId)} non-finite`);
+    }
+    if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
       throw new RangeError(
-        `insufficient funds; posting would overdraw account ${String(accountId)}: ${String(account.balanceSUSD)} + ${String(delta)} < 0`,
+        `insufficient funds; posting would make ${account.category} account ${String(accountId)} negative: ${String(account.balanceSUSD)} + ${String(delta)} < 0`,
       );
     }
   }
 }
 
-function validateLines(
-  lines: readonly JournalLine[],
-  accounts: Map<number, FinancialAccount>,
-): { readonly deltas: Map<number, number> } {
-  const validated = validatePostingLines(lines, accounts);
-  assertNonNegativeBalances(accounts, validated.deltas);
-  return { deltas: validated.deltas };
+function assertCashConservation(kind: TransactionKind, cashDelta: number): void {
+  if (transactionKindChangesCash(kind)) {
+    throw new RangeError(
+      `transactionKind ${JSON.stringify(kind)} changes aggregate cash and is not implemented in M4a-1`,
+    );
+  }
+  if (Math.abs(cashDelta) > toleranceMoney(cashDelta)) {
+    throw new RangeError(
+      `cash-neutral posting ${JSON.stringify(kind)} would change aggregate designated cash by ${String(cashDelta)}`,
+    );
+  }
 }
 
 /**
  * Post a balanced entry. Validation is atomic: no balance or posting changes
- * occur when any line, account, balance, or balance check fails.
+ * occur when any line, account, balance, category, or invariant check fails.
  */
 export function postJournalEntry(
   finance: FinanceState,
@@ -149,10 +178,12 @@ export function postJournalEntry(
   assertTransactionKind(transactionKind);
   const nextId = requireInteger(finance.nextPostingId, "finance.nextPostingId", 1, Number.MAX_SAFE_INTEGER);
   const accounts = accountMap(finance);
-  const { deltas } = validateLines(lines, accounts);
+  const validated = validatePostingLines(lines, accounts);
+  assertBalanceConstraints(accounts, validated.deltas);
+  assertCashConservation(transactionKind, validated.cashDelta);
 
-  // Apply only after every line and every resulting balance has been validated.
-  for (const [accountId, delta] of deltas) {
+  // Apply only after every line, balance, and invariant has been validated.
+  for (const [accountId, delta] of validated.deltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
     account.balanceSUSD += delta;
@@ -176,9 +207,10 @@ export function postJournalEntry(
 
 /**
  * Post several balanced entries atomically. Individual entries are validated
- * against their own debits/credits; account affordability is checked against the
- * net effect of the whole batch before any balance changes. This permits
- * same-settlement sales receipts to fund purchases without an order dependency.
+ * against their own debits/credits and cash conservation; account affordability
+ * is checked against the net effect of the whole batch before any balance
+ * changes. This permits same-settlement sales receipts to fund purchases
+ * without an order dependency.
  */
 export function postJournalBatch(
   finance: FinanceState,
@@ -210,6 +242,7 @@ export function postJournalBatch(
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
     assertTransactionKind(entry.transactionKind);
     const validated = validatePostingLines(entry.lines, accounts);
+    assertCashConservation(entry.transactionKind, validated.cashDelta);
     for (const [accountId, delta] of validated.deltas) {
       aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
     }
@@ -220,7 +253,7 @@ export function postJournalBatch(
       targetEntityId: entry.targetEntityId ?? null,
     });
   }
-  assertNonNegativeBalances(accounts, aggregate);
+  assertBalanceConstraints(accounts, aggregate);
 
   for (const [accountId, delta] of aggregate) {
     const account = accounts.get(accountId);
@@ -250,7 +283,11 @@ export function postJournalBatch(
   return postings;
 }
 
-/** Post a single debit/credit cash transfer. */
+/**
+ * Post a single debit/credit cash transfer. Both accounts must be designated
+ * cash accounts; use `postJournalEntry` for entries that also recognize expense
+ * or revenue.
+ */
 export function postCashTransfer(
   finance: FinanceState,
   dayIndex: Day,
@@ -261,6 +298,14 @@ export function postCashTransfer(
 ): JournalPosting {
   if (options.fromAccountId === options.toAccountId) {
     throw new RangeError("cash transfer payer and receiver must be different accounts");
+  }
+  for (const accountId of [options.fromAccountId, options.toAccountId]) {
+    const account = finance.accounts.find((candidate) => candidate.id === accountId);
+    if (account !== undefined && !isCashAccount(account)) {
+      throw new RangeError(
+        `cash transfer requires designated cash accounts; account ${String(accountId)} is ${account.subtype}`,
+      );
+    }
   }
   return postJournalEntry(
     finance,

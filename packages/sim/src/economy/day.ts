@@ -34,6 +34,7 @@ import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { assertValidWorld, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import { computeBuildingCapacity } from "./production.js";
+import { buildFinanceIndex, type FinanceIndex } from "./accounts.js";
 import {
   runMarketDay,
   type HouseholdDemandRecord,
@@ -134,6 +135,9 @@ export function cloneWorld(source: World): World {
         lines: posting.lines.map((line) => ({ ...line })),
       })),
       nextPostingId: source.finance.nextPostingId,
+      nextAccountId: source.finance.nextAccountId,
+      opening:
+        source.finance.opening === null ? null : { ...source.finance.opening },
     },
     diagnostics: {
       ...source.diagnostics,
@@ -147,17 +151,11 @@ function restoreWorld(target: World, source: World): void {
 }
 
 function accountByOwner(
-  world: World,
+  index: FinanceIndex,
   ownerKind: "popBlock" | "building",
   ownerId: Id,
 ): FinancialAccount {
-  const account = world.finance.accounts.find(
-    (candidate) => candidate.ownerKind === ownerKind && candidate.ownerId === ownerId,
-  );
-  if (account === undefined) {
-    throw new RangeError(`${ownerKind} ${String(ownerId)} has no financial account`);
-  }
-  return account;
+  return index.get(ownerKind, ownerId, ownerKind === "popBlock" ? "household-cash" : "operating-cash");
 }
 
 function needDefinitionsByTier(
@@ -170,6 +168,7 @@ function buildHouseholdDemand(
   world: World,
   economyDefinitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions,
+  index: FinanceIndex,
 ): HouseholdDemandBuild {
   const market = world.markets[0];
   if (market === undefined) throw new RangeError("economic day requires a market");
@@ -181,7 +180,7 @@ function buildHouseholdDemand(
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const population = populationTotal(block);
     if (population <= 0) continue;
-    const account = accountByOwner(world, "popBlock", block.id);
+    const account = accountByOwner(index, "popBlock", block.id);
     let remainingCash = account.balanceSUSD;
 
     for (const tier of [1, 3, 6] as const) {
@@ -300,6 +299,7 @@ function buildProductionDemands(
   definitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions,
   mode: "full" | "cash",
+  index: FinanceIndex,
 ): ProductionDemandRecord[] {
   const market = world.markets[0];
   if (market === undefined) throw new RangeError("economic day requires a market");
@@ -324,7 +324,7 @@ function buildProductionDemands(
     for (const input of desired) desiredCost += input.quantity * input.price;
     let ratio = 1;
     if (mode === "cash") {
-      const account = accountByOwner(world, "building", building.id);
+      const account = accountByOwner(index, "building", building.id);
       const available = Math.max(0, account.balanceSUSD - MONEY_TOLERANCE_SUSD);
       ratio = desiredCost > 0 ? Math.min(1, available / desiredCost) : 1;
     }
@@ -654,10 +654,12 @@ export function runEconomicDay(
   assertValidEmploymentState(world, economyDefinitions);
 
   const afterPopulation = cloneWorld(world);
+  let financeIndex = buildFinanceIndex(world.finance);
   const household = buildHouseholdDemand(
     world,
     economyDefinitions,
     populationDefinitions,
+    financeIndex,
   );
 
   let fallbackUsed = false;
@@ -670,6 +672,7 @@ export function runEconomicDay(
       economyDefinitions,
       populationDefinitions,
       "full",
+      financeIndex,
     );
     productionRecords = fullProduction;
     const result = runMarketAttempt(
@@ -686,11 +689,13 @@ export function runEconomicDay(
     if (!isMarketFundingFailure(error)) throw error;
     fallbackUsed = true;
     restoreWorld(world, afterPopulation);
+    financeIndex = buildFinanceIndex(world.finance);
     const cashProduction = buildProductionDemands(
       world,
       economyDefinitions,
       populationDefinitions,
       "cash",
+      financeIndex,
     );
     productionRecords = cashProduction;
     const result = runMarketAttempt(

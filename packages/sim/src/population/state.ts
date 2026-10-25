@@ -8,6 +8,9 @@
 
 import { assertValidDayIndex } from "../calendar.js";
 import { DEFAULT_DATA_VERSION, MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
+import { applyOpeningBalances, categoryForSubtype } from "../economy/accounts.js";
+import type { OpeningBalanceEntry } from "../economy/accounts.js";
+import type { AccountSubtype } from "../economy/types.js";
 import type { Day, Id, Rate, Seed } from "../types.js";
 import {
   requireArray,
@@ -206,9 +209,9 @@ export function assertValidPopulationState(world: World): void {
         `popBlock ${String(block.id)} references unknown financial account ${String(block.financialAccountId)}`,
       );
     }
-    if (account.accountKind !== "household" || account.ownerKind !== "popBlock") {
+    if (account.subtype !== "household-cash" || account.ownerKind !== "popBlock") {
       throw new RangeError(
-        `financial account ${String(account.id)} must be a popBlock household account`,
+        `financial account ${String(account.id)} must be a popBlock household cash account`,
       );
     }
     if (account.ownerId !== block.id) {
@@ -222,9 +225,9 @@ export function assertValidPopulationState(world: World): void {
     accountOwners.add(account.id);
   }
   for (const account of world.finance.accounts) {
-    if (account.accountKind === "household" && (account.ownerId === null || !blockIds.has(account.ownerId))) {
+    if (account.ownerKind === "popBlock" && (account.ownerId === null || !blockIds.has(account.ownerId))) {
       throw new RangeError(
-        `household financial account ${String(account.id)} references unknown popBlock`,
+        `popBlock financial account ${String(account.id)} references unknown popBlock`,
       );
     }
   }
@@ -383,9 +386,18 @@ export function createPopulationWorld(
   const region = scenario.regions[0];
   if (region === undefined) throw new RangeError("scenario.regions[0] is missing");
 
+  const floor = options.accountIdFloor ?? 1;
+  const maxDeclared = scenario.popBlocks.reduce(
+    (max, block) => Math.max(max, block.financialAccountId),
+    0,
+  );
+  let nextAccountId = Math.max(floor, maxDeclared + 1);
+
   const accounts: FinancialAccount[] = [];
   const blocks: PopBlock[] = [];
-  for (const initial of scenario.popBlocks) {
+  const openingEntries: OpeningBalanceEntry[] = [];
+  const sortedPopBlocks = [...scenario.popBlocks].sort((left, right) => left.id - right.id);
+  for (const initial of sortedPopBlocks) {
     if (!professionIds.has(initial.professionId)) {
       throw new RangeError(
         `popBlock ${String(initial.id)} references unknown profession ${String(initial.professionId)}`,
@@ -441,11 +453,37 @@ export function createPopulationWorld(
       fractionalDeathRemainder: 0,
     };
     blocks.push(block);
-    accounts.push({
-      id: initial.financialAccountId,
-      ownerKind: "popBlock",
-      ownerId: initial.id,
-      accountKind: "household",
+
+    // Every owner receives the same structural account set. The cash account
+    // id is scenario-declared; the rest are deterministically allocated.
+    const equityAccountId = nextAccountId;
+    nextAccountId += 1;
+    const incomeAccountId = nextAccountId;
+    nextAccountId += 1;
+    const expenseAccountId = nextAccountId;
+    nextAccountId += 1;
+    const ownerAccounts: readonly { id: Id; subtype: AccountSubtype }[] = [
+      { id: initial.financialAccountId, subtype: "household-cash" },
+      { id: equityAccountId, subtype: "owner-equity" },
+      { id: incomeAccountId, subtype: "wage-income" },
+      { id: expenseAccountId, subtype: "consumption-expense" },
+    ];
+    for (const ownerAccount of ownerAccounts) {
+      accounts.push({
+        id: ownerAccount.id,
+        ownerKind: "popBlock",
+        ownerId: initial.id,
+        category: categoryForSubtype(ownerAccount.subtype),
+        subtype: ownerAccount.subtype,
+        balanceSUSD: 0,
+      });
+    }
+    openingEntries.push({
+      accountId: initial.financialAccountId,
+      balanceSUSD: initial.initialSavingsSUSD,
+    });
+    openingEntries.push({
+      accountId: equityAccountId,
       balanceSUSD: initial.initialSavingsSUSD,
     });
   }
@@ -474,7 +512,13 @@ export function createPopulationWorld(
     employment: [],
     employmentDirty: false,
     markets: [],
-    finance: { accounts, postings: [], nextPostingId: 1 } satisfies FinanceState,
+    finance: {
+      accounts,
+      postings: [],
+      nextPostingId: 1,
+      nextAccountId,
+      opening: null,
+    } satisfies FinanceState,
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -483,6 +527,9 @@ export function createPopulationWorld(
     },
   };
 
+  if (options.deferOpeningBalances !== true) {
+    applyOpeningBalances(world.finance, startDayIndex, openingEntries);
+  }
   assertValidPopulationState(world);
   return world;
 }

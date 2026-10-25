@@ -189,7 +189,10 @@ describe("M2 needs, budgets, and shared supply", () => {
 
   test("does not finance daily needs from savings account balances", () => {
     const { scenario, world } = multiBlockWorld();
-    for (const account of world.finance.accounts) account.balanceSUSD = 1_000_000_000;
+    for (const account of world.finance.accounts) {
+      if (account.subtype !== "household-cash" && account.subtype !== "owner-equity") continue;
+      account.balanceSUSD = 1_000_000_000;
+    }
     const before = world.finance.accounts.map((account) => account.balanceSUSD);
     const inputs = makeInputs([0, 1, 2], {
       annualIncomePerCapita: 0,

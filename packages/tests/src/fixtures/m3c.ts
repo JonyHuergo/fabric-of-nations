@@ -2,6 +2,7 @@ import { loadM3SmallEconomy } from "@century/data";
 import {
   createEconomyWorld,
   deriveStockByGood,
+  designatedCashTotal,
   type EconomyScenarioDef,
   type InputReservation,
   type World,
@@ -140,7 +141,7 @@ export function lotQuantity(world: World, goodId: number, ownerBuildingId: numbe
 }
 
 export function totalCash(world: World): number {
-  return world.finance.accounts.reduce((total, account) => total + account.balanceSUSD, 0);
+  return designatedCashTotal(world.finance);
 }
 
 export function prices(world: World): number[] {

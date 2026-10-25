@@ -26,7 +26,7 @@ describe("M2.1 population state and validation", () => {
     const { world } = aggregateWorld();
     expect(world.regions).toHaveLength(1);
     expect(world.popBlocks).toHaveLength(1);
-    expect(world.finance.accounts).toHaveLength(1);
+    expect(world.finance.accounts).toHaveLength(4);
     const block = world.popBlocks[0]!;
     expect(block.maleByAge).toBeInstanceOf(Uint32Array);
     expect(block.maleByAge).toHaveLength(SINGLE_AGE_COUNT);
@@ -60,7 +60,7 @@ describe("M2.1 population state and validation", () => {
     expect(world.regions).toHaveLength(1);
     expect(world.popBlocks).toHaveLength(3);
     expect(world.regions[0]?.popBlockIds).toEqual([0, 1, 2]);
-    expect(world.finance.accounts).toHaveLength(3);
+    expect(world.finance.accounts).toHaveLength(12);
     expect(worldPopulation(world)).toBe(1_000_000);
     expect(() => assertValidWorld(world)).not.toThrow();
   });

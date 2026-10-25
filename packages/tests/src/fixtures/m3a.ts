@@ -1,6 +1,7 @@
 import { loadM3SmallEconomy } from "@century/data";
 import {
   createEconomyWorld,
+  designatedCashTotal,
   type EconomyScenarioDef,
   type World,
 } from "@century/sim";
@@ -34,5 +35,5 @@ export function accountBalance(world: World, accountId: number): number {
 }
 
 export function totalCash(world: World): number {
-  return world.finance.accounts.reduce((total, account) => total + account.balanceSUSD, 0);
+  return designatedCashTotal(world.finance);
 }

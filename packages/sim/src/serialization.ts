@@ -32,19 +32,25 @@ import {
 import { checksumOfJson, stableStringify } from "./hash.js";
 import { canonicalizeStockLots } from "./economy/inventory.js";
 import type {
+  AccountCategory,
+  AccountSubtype,
   BuildingInstance,
   EmploymentAssignment,
   FinanceState,
   FinancialAccount,
-  FinancialAccountKind,
   FinancialAccountOwnerKind,
   JournalLine,
   JournalPosting,
   Market,
+  OpeningBalanceRecord,
   StockLot,
   TransactionKind,
 } from "./economy/types.js";
-import { TRANSACTION_KINDS } from "./economy/types.js";
+import {
+  ACCOUNT_CATEGORIES,
+  ACCOUNT_SUBTYPES,
+  TRANSACTION_KINDS,
+} from "./economy/types.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
@@ -140,7 +146,8 @@ export type SerializedFinancialAccount = {
   readonly id: number;
   readonly ownerKind: FinancialAccountOwnerKind;
   readonly ownerId: number | null;
-  readonly accountKind: FinancialAccountKind;
+  readonly category: AccountCategory;
+  readonly subtype: AccountSubtype;
   readonly balanceSUSD: number;
 };
 
@@ -161,11 +168,20 @@ export type SerializedJournalPosting = {
   readonly targetEntityId: number | null;
 };
 
+/** Encoded opening-balance provenance record. */
+export type SerializedOpeningBalance = {
+  readonly dayIndex: number;
+  readonly accountCount: number;
+  readonly checksum: string;
+};
+
 /** Encoded finance state. */
 export type SerializedFinanceState = {
   readonly accounts: readonly SerializedFinancialAccount[];
   readonly postings: readonly SerializedJournalPosting[];
   readonly nextPostingId: number;
+  readonly nextAccountId: number;
+  readonly opening: SerializedOpeningBalance | null;
 };
 
 /** Encoded inventory lot. */
@@ -482,7 +498,8 @@ export function encodeWorld(world: World): SerializedWorld {
           id: account.id,
           ownerKind: account.ownerKind,
           ownerId: account.ownerId,
-          accountKind: account.accountKind,
+          category: account.category,
+          subtype: account.subtype,
           balanceSUSD: account.balanceSUSD,
         })),
       postings: [...world.finance.postings]
@@ -500,6 +517,15 @@ export function encodeWorld(world: World): SerializedWorld {
           targetEntityId: posting.targetEntityId,
         })),
       nextPostingId: world.finance.nextPostingId,
+      nextAccountId: world.finance.nextAccountId,
+      opening:
+        world.finance.opening === null
+          ? null
+          : {
+              dayIndex: world.finance.opening.dayIndex,
+              accountCount: world.finance.opening.accountCount,
+              checksum: world.finance.opening.checksum,
+            },
     },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -550,24 +576,29 @@ function decodeFinancialAccount(value: unknown, path: string): FinancialAccount 
   if (ownerKind !== "popBlock" && ownerKind !== "building" && ownerKind !== "system") {
     throw new SaveFormatError(`${path}.ownerKind is invalid`);
   }
-  const accountKind = record.accountKind;
-  if (accountKind !== "household" && accountKind !== "operating" && accountKind !== "system-reserve") {
-    throw new SaveFormatError(`${path}.accountKind is invalid`);
+  const category = requireString(record.category, `${path}.category`, { minLength: 1 });
+  if (!(ACCOUNT_CATEGORIES as readonly string[]).includes(category)) {
+    throw new SaveFormatError(`${path}.category is invalid`);
+  }
+  const subtype = requireString(record.subtype, `${path}.subtype`, { minLength: 1 });
+  if (!(ACCOUNT_SUBTYPES as readonly string[]).includes(subtype)) {
+    throw new SaveFormatError(`${path}.subtype is invalid`);
   }
   const ownerId =
     record.ownerId === null ? null : requireUint32(record.ownerId, `${path}.ownerId`);
-  if (accountKind === "system-reserve") {
-    if (ownerKind !== "system" || ownerId !== null) {
-      throw new SaveFormatError(`${path} system-reserve account must be owned by system/null`);
+  if (ownerKind === "system") {
+    if (ownerId !== null) {
+      throw new SaveFormatError(`${path} system accounts must have ownerId null`);
     }
   } else if (ownerId === null) {
-    throw new SaveFormatError(`${path}.ownerId is required for ${accountKind} accounts`);
+    throw new SaveFormatError(`${path}.ownerId is required for ${ownerKind} accounts`);
   }
   return {
     id: requireUint32(record.id, `${path}.id`),
     ownerKind,
     ownerId,
-    accountKind,
+    category: category as AccountCategory,
+    subtype: subtype as AccountSubtype,
     balanceSUSD: requireFiniteNumber(record.balanceSUSD, `${path}.balanceSUSD`),
   };
 }
@@ -609,6 +640,28 @@ function decodeJournalPosting(value: unknown, path: string): JournalPosting {
   };
 }
 
+function decodeOpeningBalance(value: unknown): OpeningBalanceRecord | null {
+  if (value === null) return null;
+  const record = requireRecord(value, "save payload.finance.opening");
+  return {
+    dayIndex: requireInteger(
+      record.dayIndex,
+      "save payload.finance.opening.dayIndex",
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    accountCount: requireInteger(
+      record.accountCount,
+      "save payload.finance.opening.accountCount",
+      0,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    checksum: requireString(record.checksum, "save payload.finance.opening.checksum", {
+      minLength: 1,
+    }),
+  };
+}
+
 function decodeFinanceState(value: unknown): FinanceState {
   const record = requireRecord(value, "save payload.finance");
   const accounts = requireArray(record.accounts, "save payload.finance.accounts");
@@ -626,6 +679,13 @@ function decodeFinanceState(value: unknown): FinanceState {
       1,
       Number.MAX_SAFE_INTEGER,
     ),
+    nextAccountId: requireInteger(
+      record.nextAccountId,
+      "save payload.finance.nextAccountId",
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    opening: decodeOpeningBalance(record.opening),
   };
 }
 

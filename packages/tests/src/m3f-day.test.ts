@@ -16,6 +16,7 @@ import {
   buildingAccountId,
   economyTickContext,
   householdAccountId,
+  setCashBalance,
   totalCash,
 } from "./fixtures/m3e.js";
 import {
@@ -109,7 +110,7 @@ describe("M3f integrated economic day", () => {
     const scenario = fullScenario();
     const world = worldFor(scenario);
     const householdId = householdAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === householdId)!.balanceSUSD = 0.5;
+    setCashBalance(world, householdId, 0.5);
     const result = tick(world, contextFor(scenario));
     const household = result.economy?.settlement.households.find(
       (entry) => entry.popBlockId === 0,
@@ -130,7 +131,7 @@ describe("M3f integrated economic day", () => {
     const scenario = fullScenario();
     const world = worldFor(scenario);
     const householdId = householdAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === householdId)!.balanceSUSD = 0;
+    setCashBalance(world, householdId, 0);
     const result = tick(world, contextFor(scenario));
     const household = result.economy?.settlement.households.find(
       (entry) => entry.popBlockId === 0,
@@ -150,10 +151,8 @@ describe("M3f integrated economic day", () => {
     );
     const world = worldFor(scenario, [0, 5, 7]);
     const millId = buildingAccountId(world, 5);
-    const millAccount = world.finance.accounts.find((account) => account.id === millId);
-    if (millAccount === undefined) throw new Error("missing mill account");
-    millAccount.balanceSUSD = 0;
-    const openingMillCash = millAccount.balanceSUSD;
+    setCashBalance(world, millId, 0);
+    const openingMillCash = 0;
     const sellerId = buildingAccountId(world, 0);
     const openingSellerCash = balance(world, sellerId);
     const grainFlowBefore = world.markets[0]?.stockLots
@@ -245,7 +244,7 @@ describe("M3f integrated economic day", () => {
     );
     const world = worldFor(scenario, [0, 5, 7]);
     const millId = buildingAccountId(world, 5);
-    world.finance.accounts.find((account) => account.id === millId)!.balanceSUSD = 0;
+    setCashBalance(world, millId, 0);
     const market = world.markets[0];
     if (market === undefined) throw new Error("missing market");
     const openingPrices = [...market.priceSUSD];
@@ -317,7 +316,7 @@ describe("M3f integrated economic day", () => {
       const account = world.finance.accounts.find(
         (candidate) => candidate.id === building.operatingCashAccountId,
       );
-      if (account !== undefined) account.balanceSUSD = 0;
+      if (account !== undefined) setCashBalance(world, account.id, 0);
     }
     const result = tick(world, contextFor(scenario));
     expect(result.economy?.settlement.totals.unpaidWagesSUSD).toBeGreaterThan(0);

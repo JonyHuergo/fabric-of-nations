@@ -8,9 +8,11 @@ Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
 employment assignment, M3c production/inventory movement, M3d deterministic
 two-pass market clearing with bounded prices, M3e cash settlement/wages/upkeep/
-retained profit, and M3f integrated daily economic tick**. Government finance,
-taxes, debt/credit, inflation/FX, dividends, politics, technology, diplomacy,
-warfare, AI, worker protocol, and UI behavior remain out of scope.
+retained profit, M3f integrated daily economic tick, and M4a-1 category-aware
+double-entry accounts with opening balances and recognition legs**. Countries,
+currencies, taxes, period closing, distributions, debt/credit, inflation/FX,
+politics, technology, diplomacy, warfare, AI, worker protocol, and UI behavior
+remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -937,6 +939,80 @@ warfare, AI, worker protocol, and UI behavior remain out of scope.
   use established transaction prices and must not retroactively alter them.
 - **Status:** GDD v2.2 records the implemented ordering. M3d price semantics and
   M3e accounting semantics remain unchanged.
+
+### D-046 — M4a-1 category-aware double-entry accounts (approved)
+
+- **Status:** approved by the designer before implementation, with the
+  qualifications recorded here. D-044/D-045 remain reserved for M4a-2
+  (SUSD/currency semantics and monetary arrangements).
+- **D-046a — opening balances.** Opening balances are applied **once, atomically**
+  as calibrated initial state, not as one journal posting per account. The
+  application requires every account to start at zero, validates every entry and
+  the aggregate identity against category constraints, requires explicit equity
+  counterparts, and persists an `OpeningBalanceRecord` (`dayIndex`,
+  `accountCount`, canonical FNV-1a checksum). A second application throws. This
+  avoids flooding the 256-entry audit buffer with immediately evicted
+  construction postings.
+- **D-046b — categories and normal sides.** Accounts gain
+  `category: asset | liability | equity | revenue | expense` and a validated
+  `subtype`. Asset and expense accounts are debit-normal; liability, equity, and
+  revenue accounts are credit-normal. Balances are stored in normal-side units.
+  Asset, liability, revenue, and expense balances must be non-negative; equity may
+  be signed as an accumulated deficit. `World.finance.postings` remains the
+  bounded audit buffer; **no unbounded transaction log is introduced.**
+- **D-046c — per-building accounts.** Each pop block receives cash, equity, wage
+  income, and consumption expense accounts; each building receives operating cash,
+  equity, sales revenue, input expense, wage expense, and upkeep expense; the
+  system reserve receives cash, equity, and system income. This is required so a
+  later stage can read per-building pre-tax period results from account balances
+  rather than reconstructing them from aggregates.
+- **D-046d — inventory treatment.** Inventory remains outside the accounting
+  asset model and input purchases are expensed when purchased. This is an
+  explicitly **provisional cash-basis simplification, not full accrual
+  accounting**; there is no COGS, inventory valuation, or period closing in
+  M4a-1.
+- **Corrected invariants (replace the earlier invalid asset-conservation claim).**
+  1. **I-1:** every posting balances; `assets + expenses = liabilities + equity +
+     revenues` holds after complete entries and at day boundaries, never per line.
+  2. **I-2:** the explicit designated-cash set (`household-cash`,
+     `operating-cash`, `system-reserve-cash`) is conserved by every cash-neutral
+     transaction kind. The set is a validated mapping, never "all asset
+     accounts". The building cash subtype is `operating-cash`, consistent with
+     `BuildingInstance.operatingCashAccountId`; the earlier plan wording
+     `building-cash` is superseded. `treasury-cash` and `central-bank-cash`
+     remain deferred to their future owning stages.
+  3. **I-3:** total asset balances are **not** conserved. A future bond issuance
+     may create an asset against a liability without moving cash.
+  4. **I-4:** `monetary-issuance` and `monetary-redemption` are the only
+     registered cash-changing kinds. Their mechanisms, central-bank balance
+     sheet, and debt contracts are future work; posting them in M4a-1 is
+     rejected.
+- **Designated-cash extension.** M4a-1 registers only the three cash subtypes that
+  can exist without countries; M4a-2/M4g add `treasury-cash` and
+  `central-bank-cash` when those accounts exist. The partition-coverage test
+  requires every transaction kind to belong to exactly one of the cash-neutral or
+  cash-changing sets.
+- **Construction.** `FinanceState` gains `nextAccountId` (deterministic
+  allocation) and `opening`. Derived account ids are allocated above every
+  scenario-declared account id. `createEconomyWorld` defers opening application
+  until all accounts exist, then applies the complete set once. Population-only
+  worlds apply their household opening balances during construction.
+- **Recognition.** Market sales post buyer expense/seller revenue legs; wages post
+  wage expense and household income legs; upkeep posts operating expense and
+  system income legs. Cash outcomes, producer cash-basis profit, household cash,
+  and every settlement total are unchanged.
+- **Performance.** `FinanceIndex` is a transient owner/subtype lookup built once
+  per phase. It is not serialized and never authoritative.
+- **Compatibility:** `WORLD_SCHEMA_VERSION = 6`, `SIM_VERSION = "0.6.0"`, data
+  version stays `m3-economy-v1` because static definitions are unchanged.
+  Schema-5/simulation-0.5 saves are rejected; no migration is implemented
+  (D-013). New digests: empty-world `8c2315493f71ab6b`, M2 campaign aggregate
+  `8e8e021bd3c8bcb5`, WPP validation `78a43b9772738cad`, M3 structural-world
+  `0794a85763a141f1`.
+- **Limitations:** no period closing (revenue/expense accumulate), no
+  distributions, no taxes, no debt, no countries/currencies, no inflation/FX.
+  Inventory is not an asset. Node benchmarks remain diagnostics; the mobile
+  p95 ≤ 8 ms target is **NOT EVALUATED**.
 
 ## Assumptions recorded for future review
 

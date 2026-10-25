@@ -12,6 +12,7 @@ import {
   createSettlementWorld,
   householdAccountId,
   runSettlement,
+  setCashBalance,
   totalCash,
 } from "./fixtures/m3e.js";
 import {
@@ -198,7 +199,7 @@ describe("M3e wages", () => {
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
     const millId = buildingAccountId(world, 5);
-    world.finance.accounts.find((account) => account.id === millId)!.balanceSUSD = 0;
+    setCashBalance(world, millId, 0);
     const householdId = householdAccountId(world, 0);
     const workerHouseholdId = householdAccountId(world, 1);
     const sellerId = buildingAccountId(world, 0);
@@ -257,7 +258,7 @@ describe("M3e wages", () => {
     );
     const householdId = householdAccountId(world, 0);
     const employerId = buildingAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === employerId)!.balanceSUSD = 10;
+    setCashBalance(world, employerId, 10);
     const startHousehold = accountBalance(world, householdId);
 
     const settlement = settleMarketDay(world, scenario.definitions, marketDay);
@@ -348,7 +349,7 @@ describe("M3e upkeep", () => {
       activeBuildingIds: [0, 7],
     });
     const farmId = buildingAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === farmId)!.balanceSUSD = 5;
+    setCashBalance(world, farmId, 5);
     const startSystem = accountBalance(world, SYSTEM_ACCOUNT_ID);
     const { settlement } = runSettlement(scenario, world);
     const upkeep = settlement.upkeep.find((entry) => entry.buildingId === 0);
@@ -462,7 +463,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 10)]),
     );
     const householdId = householdAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === householdId)!.balanceSUSD = 0.1;
+    setCashBalance(world, householdId, 0.1);
     const before = world.finance.accounts.map((account) => ({ ...account }));
     const postings = [...world.finance.postings];
     const nextPostingId = world.finance.nextPostingId;
@@ -483,7 +484,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
     const householdId = householdAccountId(world, 0);
-    world.finance.accounts.find((account) => account.id === householdId)!.balanceSUSD = 0;
+    setCashBalance(world, householdId, 0);
     const marketDay = runMarketDay(
       world,
       scenario.definitions,
@@ -505,7 +506,9 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
     world.finance.accounts = world.finance.accounts.filter(
-      (account) => account.id !== SYSTEM_ACCOUNT_ID,
+      (account) =>
+        account.id !== SYSTEM_ACCOUNT_ID &&
+        !(account.subtype === "owner-equity" && account.ownerKind === "system"),
     );
     const marketDay = runMarketDay(
       world,

@@ -1,5 +1,6 @@
 import {
   createEconomyWorld,
+  designatedCashTotal,
   runMarketDay,
   settleMarketDay,
   type EconomyScenarioDef,
@@ -41,7 +42,34 @@ export function buildingAccountId(world: World, buildingId: number): number {
 }
 
 export function totalCash(world: World): number {
-  return world.finance.accounts.reduce((total, account) => total + account.balanceSUSD, 0);
+  return designatedCashTotal(world.finance);
+}
+
+/**
+ * Set a designated cash balance and adjust the matching owner-equity account by
+ * the same delta so the accounting identity stays valid. Test-only helper.
+ */
+export function setCashBalance(world: World, accountId: number, balanceSUSD: number): void {
+  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
+  if (
+    account.subtype !== "household-cash" &&
+    account.subtype !== "operating-cash" &&
+    account.subtype !== "system-reserve-cash"
+  ) {
+    throw new Error(`account ${String(accountId)} is not a designated cash account`);
+  }
+  const equity = world.finance.accounts.find(
+    (candidate) =>
+      candidate.subtype === "owner-equity" &&
+      candidate.ownerKind === account.ownerKind &&
+      candidate.ownerId === account.ownerId,
+  );
+  if (equity === undefined) {
+    throw new Error(`missing owner-equity account for cash account ${String(accountId)}`);
+  }
+  equity.balanceSUSD += balanceSUSD - account.balanceSUSD;
+  account.balanceSUSD = balanceSUSD;
 }
 
 export interface SettlementCase {

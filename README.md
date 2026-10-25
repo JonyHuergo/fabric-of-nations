@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d/M3e/M3f foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1 foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -10,9 +10,12 @@ definitions, state, validation, and serialization)**, **M3b (deterministic
 employment assignment)**, **M3c (production, input reservations, and inventory
 movement)**, **M3d (deterministic two-pass market clearing with bounded
 prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
-household cash)**, and **M3f (integrated daily economic tick)** only. Government
-finance, taxes, debt/credit, inflation/FX, dividends, politics, technology,
-diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
+household cash)**, **M3f (integrated daily economic tick)**, and **M4a-1
+(category-aware double-entry accounts, opening balances, and
+recognition legs)** only. Government finance, taxes, period closing,
+distributions, debt/credit, inflation/FX, countries, currencies, politics,
+technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
+implemented.
 The design authority is the [Century GDD v2.2](./Century_GDD_v2.2.md); persistent
 engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
 are in [`DECISIONS.md`](./DECISIONS.md).
@@ -400,7 +403,61 @@ equality and no-shared-reference test guards the current schema.
   documented in `DECISIONS.md`. No persistent monthly-income accumulator or save
   field is introduced. A later milestone may refine the income window.
 
-No schema, save-format, data-version, or simulation-version change was introduced.
+No schema, save-format, data-version, or simulation-version change was introduced
+by M3f.
+
+## M4a-1 account model and double-entry conversion
+
+M4a-1 converts the M3 cash-only ledger into a category-aware double-entry ledger
+without changing any M3 cash outcome. Country/currency identity, taxes, period
+closing, distributions, debt, and inflation remain later milestones.
+
+- Accounts carry a `category` (`asset`, `liability`, `equity`, `revenue`,
+  `expense`) and a validated functional `subtype` (for example `household-cash`,
+  `sales-revenue`, `input-expense`). Balances are stored in **normal-side units**:
+  asset and expense accounts are debit-normal; liability, equity, and revenue
+  accounts are credit-normal.
+- Every owner receives a structural account set: each pop block has cash, equity,
+  wage income, and consumption expense; each building has operating cash, equity,
+  sales revenue, input expense, wage expense, and upkeep expense; the system
+  reserve has cash, equity, and system income.
+- Market sales, wages, and upkeep now post recognition legs as well as the cash
+  legs. Cash totals, producer cash-basis profit, household cash, and all
+  settlement totals are unchanged; only the journal representation is richer.
+- Input purchases are expensed when purchased. **Inventory is deliberately not an
+  accounting asset in M4**; this is a provisional cash-basis simplification, not
+  full accrual accounting (no COGS or inventory valuation).
+- Opening balances are applied **once, atomically**, with explicit equity
+  counterparts, a persisted `OpeningBalanceRecord` (day, account count, canonical
+  checksum), and an idempotency guard. They are the initial condition, so they do
+  not create one journal posting per account. A second application is rejected.
+- `FinanceState` adds `nextAccountId` for deterministic account allocation and
+  `opening` for the provenance record. Derived account ids are allocated above
+  every scenario-declared account id.
+
+### Invariants
+
+- **I-1 accounting identity:** every posting balances, and
+  `assets + expenses = liabilities + equity + revenues` holds after every entry
+  and at day boundaries. The identity is never tested per line.
+- **I-2 aggregate designated-cash conservation:** the explicit `CASH` set is
+  `household-cash`, `operating-cash`, and `system-reserve-cash` — never "every
+  asset account". Ordinary (cash-neutral) transaction kinds must not change the
+  aggregate. `monetary-issuance` and `monetary-redemption` are the only registered
+  cash-changing kinds; they are not implemented in M4a-1 and posting them is
+  rejected.
+- **I-3 total assets are not conserved:** a future bond issuance can create an
+  asset against a liability without moving cash. The tests keep this distinct
+  from I-2.
+- **I-4 issuance counterpart contract:** the cash-changing kinds are registered so
+  later stages can implement and test their explicit counterparts. No central
+  bank, debt, or monetary issuance exists in M4a-1.
+
+### Performance
+
+`FinanceIndex` is a transient lookup built once per phase and never serialized.
+This removes repeated linear account scans from demand construction and
+settlement; the M3f economic-day benchmark remains the relevant Node diagnostic.
 
 ## Data and calibration
 
@@ -491,22 +548,25 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `5`; simulation version: `0.5.0`; data version:
-  `m3-economy-v1`.
-- Schema-4 / simulation-0.4 saves are rejected with an actionable error; no
+- Schema version: `6`; simulation version: `0.6.0`; data version:
+  `m3-economy-v1` (M4a-1 changes the runtime account contract, not the static
+  definitions).
+- Schema-5 / simulation-0.5 saves are rejected with an actionable error; no
   migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
-  includes `startDayIndex`, fractional birth/male-split/death remainders, and
-  finance accounts.
+  includes `startDayIndex`, fractional birth/male-split/death remainders, finance
+  accounts with `category`/`subtype`, `nextAccountId`, and the opening-balance
+  record.
 - Canonical JSON makes checksum and decode independent of object key insertion
-  order. The state digest covers single-year sex state, accounts, diagnostics, and
-  `startDayIndex`.
+  order. The state digest covers single-year sex state, accounts, diagnostics,
+  `startDayIndex`, and the opening record.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `90e5dcfaa35cdab0`.
-- Full-century aggregate digest: `ebf0a37a515e18d0`.
-- M3 structural-world digest (seed `20261023`): `b4c57b894cda6ae7`.
+  `m1-determinism`): `8c2315493f71ab6b`.
+- Full-century aggregate digest: `8e8e021bd3c8bcb5`.
+- WPP validation digest: `78a43b9772738cad`.
+- M3 structural-world digest (seed `20261023`): `0794a85763a141f1`.
 
-## Benchmark scope and current Node results
+## Benchmark scope and recorded Node results
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
@@ -515,6 +575,28 @@ workloads, M3e settlement workloads, and M3f integrated economic-day workloads.
 Stress scales repeat the three deterministic multi-block templates (400k/350k/250k
 people), so total population grows with block count. Each M2 stress scale uses 100
 warm-up ticks and 730 measured ticks.
+
+**M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
+pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
+authoritative account state and posting line shape, so world hashes differ and
+Node timings shifted. The current M4a-1 Node run on the same machine produced:
+
+| Case | Avg | p95 | Hash |
+|---|---:|---:|---|
+| M1 empty no-op | 0.0014 ms | 0.0019 ms | `ef4c9b445cb9fe46` |
+| M2 aggregate century | 0.122–0.131 ms | 0.221–0.275 ms | `8e8e021bd3c8bcb5` |
+| M2 stress 200 blocks | 3.518 ms | 4.444 ms | `f3910bf5f49a389b` |
+| M3b employment refresh | 0.115 ms | 0.211 ms | `6aa1600321895ea1` |
+| M3c production small | 0.423 ms | 0.802 ms | `c156f26fc0b37489` |
+| M3d market small | 0.974 ms | 1.517 ms | `1ae1b609a2cc5f07` |
+| M3e settlement small | 0.622 ms | 1.032 ms | `17e14e188acd7e7a` |
+| M3f economic day small | 8.393 ms | 13.341 ms | `03477b2f8bdeebad` |
+| M3f economic day stress | 41.407 ms | 49.596 ms | `fd6b87b4c7c1ed16` |
+
+The M3e/M3f workloads are slower under M4a-1 because every transaction now posts
+recognition legs (2 lines became 4–7) and validation covers the richer account
+set. The 200-block p95 threshold still passes. These are Node diagnostics only;
+the GDD mobile p95 ≤ 8 ms target remains **NOT EVALUATED**.
 
 Representative runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
@@ -633,6 +715,17 @@ these timings are not mobile-performance evidence.
 
 ## Known limitations
 
+- M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
+  balances only. Period closing, distributions, remittances, taxes, debt,
+  countries, currencies, inflation, and FX are not implemented.
+- Inventory is not an accounting asset: input purchases are expensed when
+  purchased and there is no COGS or inventory valuation. This is a provisional
+  cash-basis simplification, not full accrual accounting.
+- Revenue and expense account balances accumulate until a later milestone
+  introduces period closing; M4a-1 has no closing entries.
+- Opening balances are applied once as validated initial state with a provenance
+  record rather than as one journal posting per account, so the bounded posting
+  buffer begins with transactions.
 - Full historical demographic calibration is incomplete: the 1900 age/sex
   distribution and 1900–1949 ASFR/mortality are provisional.
 - The WPP 1950-initialized validation is within +0.2%/+1.2% at 1975/2000, with

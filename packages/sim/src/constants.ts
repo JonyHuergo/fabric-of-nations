@@ -7,17 +7,17 @@
  */
 
 /** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.5.0";
+export const SIM_VERSION = "0.6.0";
 
 /** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 5;
+export const WORLD_SCHEMA_VERSION = 6;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
 
 /**
- * Content/data version for M3. The JSON definitions in `packages/data` and the
- * simulation must agree on this value.
+ * Content/data version. M4a-1 changes the runtime account contract but not the
+ * static definitions, so the data package version stays `m3-economy-v1`.
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 

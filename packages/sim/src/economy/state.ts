@@ -17,9 +17,15 @@ import { createPopulationWorld } from "../population/state.js";
 import type { Day, Id } from "../types.js";
 import { requireFiniteNumber, requireInteger } from "../validation.js";
 import { assertValidWorld, type World } from "../world.js";
+import {
+  applyOpeningBalances,
+  categoryForSubtype,
+  type OpeningBalanceEntry,
+} from "./accounts.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import type {
+  AccountSubtype,
   BuildingDef,
   EconomyScenarioDef,
   EmploymentAssignment,
@@ -388,25 +394,104 @@ export function createEconomyWorld(
   options: { readonly seed?: number; readonly scenarioId?: string; readonly startDayIndex?: Day } = {},
 ): World {
   assertValidEconomyScenario(scenario);
-  const world = createPopulationWorld(scenario.population, options);
+  const declaredIds = [
+    ...scenario.population.popBlocks.map((block) => block.financialAccountId),
+    ...scenario.buildingInstances.map((instance) => instance.operatingCashAccountId),
+    ...scenario.systemAccounts.map((account) => account.id),
+  ];
+  const accountIdFloor = declaredIds.reduce((max, id) => Math.max(max, id), 0) + 1;
+  const world = createPopulationWorld(scenario.population, {
+    ...options,
+    deferOpeningBalances: true,
+    accountIdFloor,
+  });
+
+  let nextAccountId = world.finance.nextAccountId;
+  const allocate = (
+    ownerKind: "popBlock" | "building" | "system",
+    ownerId: Id | null,
+    subtype: AccountSubtype,
+  ): Id => {
+    const id = nextAccountId;
+    nextAccountId += 1;
+    world.finance.accounts.push({
+      id,
+      ownerKind,
+      ownerId,
+      category: categoryForSubtype(subtype),
+      subtype,
+      balanceSUSD: 0,
+    });
+    return id;
+  };
+
+  const opening: OpeningBalanceEntry[] = [];
+  const initialSavingsByBlock = new Map(
+    scenario.population.popBlocks.map((block) => [block.id, block.initialSavingsSUSD]),
+  );
+  const equityByBlock = new Map<Id, Id>();
+  for (const account of world.finance.accounts) {
+    if (
+      account.ownerKind === "popBlock" &&
+      account.ownerId !== null &&
+      account.subtype === "owner-equity"
+    ) {
+      equityByBlock.set(account.ownerId, account.id);
+    }
+  }
+  for (const block of world.popBlocks) {
+    const savings = initialSavingsByBlock.get(block.id);
+    if (savings === undefined) {
+      throw new RangeError(`missing initial savings for popBlock ${String(block.id)}`);
+    }
+    const equityId = equityByBlock.get(block.id);
+    if (equityId === undefined) {
+      throw new RangeError(`missing owner-equity account for popBlock ${String(block.id)}`);
+    }
+    opening.push({ accountId: block.financialAccountId, balanceSUSD: savings });
+    opening.push({ accountId: equityId, balanceSUSD: savings });
+  }
 
   for (const account of scenario.systemAccounts) {
     world.finance.accounts.push({
       id: account.id,
       ownerKind: "system",
       ownerId: null,
-      accountKind: "system-reserve",
-      balanceSUSD: account.balanceSUSD,
+      category: "asset",
+      subtype: "system-reserve-cash",
+      balanceSUSD: 0,
     });
   }
-  for (const instance of scenario.buildingInstances) {
+  if (scenario.systemAccounts.length > 0) {
+    const equityId = allocate("system", null, "owner-equity");
+    allocate("system", null, "system-income");
+    let systemTotal = 0;
+    for (const account of scenario.systemAccounts) {
+      systemTotal += account.balanceSUSD;
+      opening.push({ accountId: account.id, balanceSUSD: account.balanceSUSD });
+    }
+    opening.push({ accountId: equityId, balanceSUSD: systemTotal });
+  }
+
+  for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {
     world.finance.accounts.push({
       id: instance.operatingCashAccountId,
       ownerKind: "building",
       ownerId: instance.id,
-      accountKind: "operating",
+      category: "asset",
+      subtype: "operating-cash",
+      balanceSUSD: 0,
+    });
+    const equityId = allocate("building", instance.id, "owner-equity");
+    allocate("building", instance.id, "sales-revenue");
+    allocate("building", instance.id, "input-expense");
+    allocate("building", instance.id, "wage-expense");
+    allocate("building", instance.id, "upkeep-expense");
+    opening.push({
+      accountId: instance.operatingCashAccountId,
       balanceSUSD: instance.initialOperatingCashSUSD,
     });
+    opening.push({ accountId: equityId, balanceSUSD: instance.initialOperatingCashSUSD });
     world.buildings.push({
       id: instance.id,
       definitionId: instance.definitionId,
@@ -420,7 +505,9 @@ export function createEconomyWorld(
       operatingCashAccountId: instance.operatingCashAccountId,
     });
   }
+  world.finance.nextAccountId = nextAccountId;
   world.buildings.sort((left, right) => left.id - right.id);
+  applyOpeningBalances(world.finance, world.startDayIndex, opening);
   world.finance.accounts.sort((left, right) => left.id - right.id);
 
   for (const market of scenario.markets) {
