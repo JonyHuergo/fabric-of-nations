@@ -1,14 +1,15 @@
-# Century — M0/M1/M2.1 foundation
+# Century — M0/M1/M2.1/M3a foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
 per tick.
 
 The repository currently implements **M0 (project foundation)**, **M1
-(simulation core)**, and **M2.1 (corrected population core)** only. There is
-deliberately no production, general goods market, employment allocation,
-government finance, politics, technology, diplomacy, warfare, AI, worker, or
-React Native UI yet. The design authority is the Century GDD v2.1
+(simulation core)**, **M2.1 (corrected population core)**, and **M3a (economy
+definitions, state, validation, and serialization)** only. Employment behavior,
+production, market clearing, wages, pricing, government finance, politics,
+technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
+implemented. The design authority is the Century GDD v2.1
 (`Century_GDD_v2.1.md`); persistent engineering rules are in
 [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
@@ -17,8 +18,8 @@ React Native UI yet. The design authority is the Century GDD v2.1
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, tick, save codec, state digest | none |
-| [`packages/data`](./packages/data) | Canonical JSON static definitions, calibration/source references, and validated loader | `@century/sim` |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, tick, save codec, state digest | none |
+| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
@@ -145,13 +146,65 @@ household-account subset of the future finance state.
   aggregates remain weekly M8 systems.
 - Mortality is daily and uses the previous day's unmet counters.
 
+## M3a economy foundation
+
+M3a adds the validated structural layer for the first economic slice; it does
+not run that economy. A world containing buildings or markets currently rejects
+`tick` with a clear error rather than silently using the M2 needs fixture.
+
+### Catalog and units
+
+- Eight goods: grain, livestock, fish, cotton, wool, textiles, clothing, and
+  food-products. Services are deferred because their non-storable same-day path
+  is not implemented.
+- Eight building definitions: subsistence farm, commercial farm, ranch, fishery,
+  food-processing plant, textile mill, workshop, and warehouse. The workshop
+  consumes textiles and produces clothing.
+- A TU is one standard recipe batch. Capacity is TU/day; recipe quantities are
+  physical units/TU; staffing is workers per (TU/day).
+- Regional resource-limited recipes are deferred. `resourceRequirements` must be
+  empty and regional caps are not applied per building.
+- Building instances are private, located in a region, and linked to an owner
+  household account and an operating cash account.
+
+### Inventory and ledger
+
+- `Market.stockLots` is the sole authoritative inventory representation.
+  `stockByGood` is derived on demand, never serialized, and excluded from the
+  world hash. Lots are canonicalized by `(goodId, ownerBuildingId)`.
+- M3 adds a minimal balanced cash ledger. For cash assets, a debit increases the
+  balance and a credit decreases it; the receiving account is debited and the
+  paying account is credited. Postings are atomic and reject overdrafts.
+- M3a implements only the ledger primitive; wages, production, market clearing,
+  and pricing are later phases.
+
+### Validation
+
+- Scenario validation rejects malformed definitions, broken references, duplicate
+  ids/lots/accounts, invalid ranges, non-private instances, services, non-empty
+  resource requirements, and initial stock above warehouse capacity.
+- Population blocks below profession qualifications and buildings with no
+  eligible workers are valid economic states, not structural data errors.
+- Initial employment assignments are validated for profession match,
+  qualification, participation, and job-slot limits. No assignment algorithm is
+  implemented yet.
+
 ## Data and calibration
 
 Static definitions:
 
-- [`needs.json`](./packages/data/data/needs.json)
+- [`needs.json`](./packages/data/data/needs.json) — M2 needs fixture.
+- [`m3_needs.json`](./packages/data/data/m3_needs.json) — M3 needs, excluding
+  deferred services.
+- [`goods.json`](./packages/data/data/goods.json) — eight M3 goods.
+- [`professions.json`](./packages/data/data/professions.json) — four M3
+  profession definitions.
+- [`buildings.json`](./packages/data/data/buildings.json) — eight M3 building
+  definitions.
 - [`demography.json`](./packages/data/data/demography.json) — ASFR and
   sex-specific mortality anchors.
+- [`scenarios/m3_small_economy.json`](./packages/data/data/scenarios/m3_small_economy.json)
+  — synthetic single-region M3 structural fixture.
 - [`scenarios/m2_world_aggregate.json`](./packages/data/data/scenarios/m2_world_aggregate.json)
 - [`scenarios/m2_multi_block.json`](./packages/data/data/scenarios/m2_multi_block.json)
 - [`scenarios/m2_wpp_1950_validation.json`](./packages/data/data/scenarios/m2_wpp_1950_validation.json)
@@ -178,7 +231,8 @@ validation configuration.
 
 - Maximum annual relative error: **9.553%** at 2000.
 - RMSE across 101 annual samples: **5.320%**.
-- Full-century aggregate hash: `27937e31a211b44f` for seed `20261023`.
+- Full-century aggregate hash: `d421eaf5f04a207b` for seed `20261023` under
+  schema 4.
 
 The 2000 excess comes from the campaign's too-young 1950 age/sex composition,
 not from post-1950 coefficient tuning. At 1950 the campaign has about 17.1M fewer
@@ -203,7 +257,7 @@ The WPP 1950-initialized validation scenario starts at the source-backed
 Cumulative 1950–1999 flows: model births 6,117,076,588 vs WPP 6,089,003,488
 (+0.461%); deaths 2,383,339,814 vs 2,430,494,039 (-1.939%); net change
 3,733,736,774 vs 3,658,509,449 (+2.057%). Validation hash:
-`6e6db5e440706ab6`.
+`858773b2d559b2fc`.
 
 The earlier 5.2–5.5% shortfall came primarily from interpolating only three
 benchmark years; annual WPP schedules restore the 1960s fertility peak and
@@ -224,10 +278,10 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `3`; simulation version: `0.3.0`; data version:
-  `m2.1-population-v1`.
-- Schema-2 / simulation-0.2 saves are rejected with an actionable error; no
-  migration is attempted.
+- Schema version: `4`; simulation version: `0.4.0`; data version:
+  `m3-economy-v1`.
+- Schema-3 / simulation-0.3 / `m2.1-population-v1` saves are rejected with an
+  actionable error; no migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, and
   finance accounts.
@@ -235,8 +289,9 @@ validation and the campaign gameplay baseline are deliberately separate.
   order. The state digest covers single-year sex state, accounts, diagnostics, and
   `startDayIndex`.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `046b5bb48b623b3e`.
-- Full-century aggregate digest: `27937e31a211b44f`.
+  `m1-determinism`): `e200d88ba12e8239`.
+- Full-century aggregate digest: `d421eaf5f04a207b`.
+- M3a structural-world digest (seed `20261023`): `20eadf07f08286ed`.
 
 ## Benchmark scope and current Node results
 
@@ -246,21 +301,23 @@ three deterministic multi-block templates (400k/350k/250k people), so total
 population grows with block count. Each stress scale uses 100 warm-up ticks and
 730 measured ticks.
 
-Latest run on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
+Latest runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
 
 | Case | Blocks | Population | Ticks | Total | Avg/tick | p95 |
 |---|---:|---:|---:|---:|---:|---:|
-| M1 no-op | 0 | 0 | 36,524 | 20–46 ms | 0.0006–0.0013 ms | 0.0006–0.0014 ms |
-| M2 aggregate | 1 | 1.62B start | 36,524 | 1.42–1.62 s | 0.039–0.044 ms | 0.058–0.084 ms |
-| M2.1 stress | 200 | 67,290,866 | 730 | 2.17 s | 2.97 ms | 3.91 ms |
-| M2.1 stress | 1,000 | 336,102,399 | 730 | 12.13 s | 16.62 ms | 18.80 ms |
-| M2.1 stress | 3,000 | 1,008,106,000 | 730 | 39.57 s | 54.21 ms | 70.78 ms |
-| M2.1 stress | 6,000 | 2,016,212,000 | 730 | 76.53 s | 104.84 ms | 124.08 ms |
+| M1 no-op | 0 | 0 | 36,524 | 32–66 ms | 0.0009–0.0018 ms | 0.001–0.003 ms |
+| M2 aggregate | 1 | 1.62B start | 36,524 | 1.27–1.50 s | 0.0347–0.0410 ms | 0.040–0.072 ms |
+| M2.1 stress | 200 | 67,290,866 | 730 | 1.68–1.75 s | 2.31–2.40 ms | 2.78–3.07 ms |
+| M2.1 stress | 1,000 | 336,102,399 | 730 | 8.60–9.42 s | 11.78–12.91 ms | 12.74–15.43 ms |
+| M2.1 stress | 3,000 | 1,008,106,000 | 730 | 29.95–32.24 s | 41.03–44.17 ms | 47.62–52.18 ms |
+| M2.1 stress | 6,000 | 2,016,212,000 | 730 | 63.55–69.08 s | 87.06–94.63 ms | 103.03–117.90 ms |
 
 The 200-block p95 threshold remains 5 ms and passes. Larger scales are
 diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
-**NOT EVALUATED**; this is a Node harness, not a mobile release build.
+**NOT EVALUATED**; this is a Node harness, not a mobile release build. M3a
+structural state is covered by Jest tests rather than a production benchmark
+because M3 economy behavior is not implemented.
 
 ## Known limitations
 
@@ -277,9 +334,13 @@ diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- No production, market, employment, government finance, politics, technology,
+- M3a is structural only: no employment assignment algorithm, production,
+  market clearing, wages, pricing, government finance, politics, technology,
   diplomacy, warfare, AI, migration, social mobility, or UI exists.
-- No M3 or later functionality was started.
+- M3a recipe, population, and price values are synthetic provisional inputs, not
+  calibrated historical data.
+- A world containing buildings or markets currently rejects `tick`; M3
+  population-only fixture behavior is preserved separately.
 
 ## Development workflow
 
@@ -289,5 +350,5 @@ diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3 until M2.1 acceptance criteria pass or the designer accepts a
-   documented exception.
+7. Do not begin M3b until M3a is reviewed and the next phase is explicitly
+   authorized.

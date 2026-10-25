@@ -2825,6 +2825,10 @@
     {
       "professionId": 2,
       "multiplier": 1
+    },
+    {
+      "professionId": 3,
+      "multiplier": 1
     }
   ],
   "provenance": {

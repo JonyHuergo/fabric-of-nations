@@ -12,10 +12,20 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  assertValidEconomyDefinitions,
   assertValidPopulationDefinitions,
+  type BuildingDef,
+  type BuildingInstanceInitialDef,
+  type EconomyDefinitions,
+  type EconomyScenarioDef,
+  type EmploymentAssignmentInitialDef,
+  type GoodDef,
+  type MarketInitialDef,
   type NeedTierDef,
   type PopulationDefinitions,
   type PopulationScenarioDef,
+  type ProfessionDef,
+  type SystemAccountInitialDef,
 } from "@century/sim";
 
 import { DATA_PACKAGE_VERSION } from "./version.js";
@@ -33,6 +43,26 @@ interface RawScenario {
   popBlocks: PopulationScenarioDef["popBlocks"];
   needsFile: string;
   demographyFile: string;
+  notes: string;
+}
+
+interface RawM3Scenario {
+  scenarioId: string;
+  dataVersion: string;
+  status: string;
+  description: string;
+  startDayIndex?: number;
+  professionsFile: string;
+  goodsFile: string;
+  buildingsFile: string;
+  needsFile: string;
+  demographyFile: string;
+  regions: PopulationScenarioDef["regions"];
+  popBlocks: PopulationScenarioDef["popBlocks"];
+  buildingInstances: BuildingInstanceInitialDef[];
+  markets: MarketInitialDef[];
+  systemAccounts: SystemAccountInitialDef[];
+  employment: EmploymentAssignmentInitialDef[];
   notes: string;
 }
 
@@ -142,6 +172,67 @@ export function loadM2MultiBlock(): PopulationScenarioDef {
 /** Load the WPP 1950-initialized age-structure validation scenario. */
 export function loadM2Wpp1950Validation(): PopulationScenarioDef {
   return loadScenario("m2_wpp_1950_validation.json");
+}
+
+/** Load the small M3 economy fixture with validated static definitions. */
+export function loadM3SmallEconomy(): EconomyScenarioDef {
+  const raw = readJson<RawM3Scenario>("scenarios/m3_small_economy.json");
+  if (raw.dataVersion !== DATA_PACKAGE_VERSION) {
+    throw new Error(
+      `scenario dataVersion ${JSON.stringify(raw.dataVersion)} does not match data package version ${JSON.stringify(DATA_PACKAGE_VERSION)}`,
+    );
+  }
+  const goods = readJson<GoodDef[]>(raw.goodsFile);
+  const professions = readJson<ProfessionDef[]>(raw.professionsFile);
+  const buildings = readJson<BuildingDef[]>(raw.buildingsFile);
+  const needs = readJson<NeedTierDef[]>(raw.needsFile);
+  const demography = readJson<RawDemography>(raw.demographyFile);
+  const economyDefinitions: EconomyDefinitions = {
+    dataVersion: raw.dataVersion,
+    scenarioId: raw.scenarioId,
+    goods,
+    professions,
+    buildings,
+  };
+  assertValidEconomyDefinitions(economyDefinitions);
+
+  const professionIds = new Set(professions.map((profession) => profession.id));
+  const definitions: PopulationDefinitions = {
+    dataVersion: raw.dataVersion,
+    scenarioId: raw.scenarioId,
+    needs,
+    mortalityAnchors: demography.mortalityAnchors,
+    fertilityAnchors: demography.fertilityAnchors,
+    sexRatioAtBirth: demography.sexRatioAtBirth,
+    fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
+      professionIds.has(entry.professionId),
+    ),
+  };
+  assertValidPopulationDefinitions(definitions);
+
+  const population: PopulationScenarioDef = {
+    dataVersion: raw.dataVersion,
+    scenarioId: raw.scenarioId,
+    ...(raw.startDayIndex === undefined ? {} : { startDayIndex: raw.startDayIndex }),
+    professions: professions.map((profession) => ({
+      id: profession.id,
+      key: profession.key,
+      name: profession.name,
+      stratum: profession.stratum,
+    })),
+    regions: raw.regions,
+    popBlocks: raw.popBlocks,
+    definitions,
+  };
+
+  return {
+    population,
+    definitions: economyDefinitions,
+    buildingInstances: raw.buildingInstances,
+    markets: raw.markets,
+    systemAccounts: raw.systemAccounts,
+    employment: raw.employment,
+  };
 }
 
 /** Load the source-backed WPP age/sex and demographic reference years. */

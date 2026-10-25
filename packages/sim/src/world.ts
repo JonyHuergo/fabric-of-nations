@@ -1,10 +1,11 @@
 /**
- * Authoritative world state for M2.
+ * Authoritative world state.
  *
- * M1's minimal fields remain. M2 adds a single-region population collection and
- * a minimal household-account subset of the future finance state. Countries,
- * buildings, markets, debt, armies, event queues, and history remain future
- * milestones and are not invented here.
+ * M1 fields remain. M2/M2.1 add a single-region population collection and
+ * household accounts. M3a adds buildings, employment assignments, markets with
+ * authoritative stock lots, and a minimal cash ledger. Later systems (countries,
+ * debt, armies, events, history) remain future milestones and are not invented
+ * here.
  */
 
 import { assertValidDayIndex } from "./calendar.js";
@@ -18,8 +19,15 @@ import {
   SIM_VERSION,
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
+import { assertValidEconomyState } from "./economy/validation.js";
+import type {
+  BuildingInstance,
+  EmploymentAssignment,
+  FinanceState,
+  Market,
+} from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
-import type { FinanceState, PopBlock, Region } from "./population/types.js";
+import type { PopBlock, Region } from "./population/types.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
   requireArray,
@@ -56,7 +64,13 @@ export interface World {
   /** M2 supports at most one region; the collection is future-compatible. */
   regions: Region[];
   popBlocks: PopBlock[];
-  /** Minimal M2 finance subset: household accounts only. */
+  /** M3 building instances. Empty for population-only M2 worlds. */
+  buildings: BuildingInstance[];
+  /** M3 explicit employment assignments. Empty until M3b behavior exists. */
+  employment: EmploymentAssignment[];
+  /** M3 markets. Empty for population-only M2 worlds. */
+  markets: Market[];
+  /** M3 cash ledger accounts and bounded posting history. */
   finance: FinanceState;
   diagnostics: SimulationDiagnostics;
 }
@@ -91,7 +105,10 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     seed,
     regions: [],
     popBlocks: [],
-    finance: { accounts: [] },
+    buildings: [],
+    employment: [],
+    markets: [],
+    finance: { accounts: [], postings: [], nextPostingId: 1 },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -171,6 +188,7 @@ export function assertValidWorld(world: World): void {
   }
 
   assertValidPopulationState(world);
+  assertValidEconomyState(world);
 }
 
 /** True when the world has reached the terminal boundary and no day remains. */

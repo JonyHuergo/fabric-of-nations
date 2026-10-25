@@ -1,6 +1,6 @@
 {
   "scenarioId": "m2-multi-block",
-  "dataVersion": "m2.1-population-v1",
+  "dataVersion": "m3-economy-v1",
   "status": "provisional",
   "description": "Synthetic single-region multi-block fixture for needs, scarcity, and population-effect tests. Not a historical population distribution.",
   "professions": [

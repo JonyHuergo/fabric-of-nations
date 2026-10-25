@@ -14,6 +14,9 @@
  *   13. daily militancy and month-end wealth
  *   14. diagnostics (no history)
  *   15. advance day
+ *
+ * M3a worlds that contain buildings or markets do not use this population-only
+ * path; `tick` rejects them until M3 behavior is implemented.
  */
 
 import { dayIndexToCivilDate, daysInMonth, isTerminalDayIndex } from "./calendar.js";
@@ -139,6 +142,11 @@ export function tick(world: World, context?: TickContext): TickResult {
 
   const processedDay = world.dayIndex;
   let populationResult: PopulationTickResult | undefined;
+  if (world.buildings.length > 0 || world.markets.length > 0) {
+    throw new RangeError(
+      "M3 economy tick behavior is not implemented; only M3a state construction and serialization are available",
+    );
+  }
   if (world.popBlocks.length > 0) {
     populationResult = runPopulationDay(world, processedDay, context ?? {});
   }

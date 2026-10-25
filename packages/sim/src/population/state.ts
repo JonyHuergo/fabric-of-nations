@@ -7,7 +7,7 @@
  */
 
 import { assertValidDayIndex } from "../calendar.js";
-import { MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
+import { DEFAULT_DATA_VERSION, MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
 import type { Day, Id, Rate, Seed } from "../types.js";
 import {
   requireArray,
@@ -83,40 +83,28 @@ export function assertValidRegion(region: Region): void {
     }
     seen.add(id);
   }
-}
-
-/** Validate one household financial account. */
-export function assertValidFinancialAccount(account: FinancialAccount): void {
-  const record = requireRecord(account, "finance.accounts[]");
-  assertId(record.id, "finance.accounts[].id");
-  if (record.ownerKind !== "popBlock") {
-    throw new RangeError('finance account ownerKind must be "popBlock" in M2');
+  if (record.marketId !== null) {
+    assertId(record.marketId, "region.marketId");
   }
-  assertId(record.ownerId, "finance.accounts[].ownerId");
-  if (record.accountKind !== "household") {
-    throw new RangeError('finance account accountKind must be "household" in M2');
+  const buildingIds = requireArray(record.buildingInstanceIds, "region.buildingInstanceIds");
+  const seenBuildings = new Set<number>();
+  for (let index = 0; index < buildingIds.length; index += 1) {
+    const id = buildingIds[index];
+    assertId(id, `region.buildingInstanceIds[${String(index)}]`);
+    if (seenBuildings.has(id)) {
+      throw new RangeError(`region.buildingInstanceIds contains duplicate id ${String(id)}`);
+    }
+    seenBuildings.add(id);
   }
-  assertNonNegative(record.balanceSUSD, "finance.accounts[].balanceSUSD");
-}
-
-/** Validate the minimal M2 finance state. */
-export function assertValidFinanceState(finance: FinanceState): void {
-  const record = requireRecord(finance, "world.finance");
-  const accounts = requireArray(record.accounts, "world.finance.accounts");
-  const ids = new Set<number>();
-  const owners = new Set<number>();
-  for (let index = 0; index < accounts.length; index += 1) {
-    const account = accounts[index] as unknown;
-    assertValidFinancialAccount(account as FinancialAccount);
-    const typed = account as FinancialAccount;
-    if (ids.has(typed.id)) {
-      throw new RangeError(`duplicate finance account id ${String(typed.id)}`);
+  const resourceCaps = requireArray(record.resourceCapsPerDay, "region.resourceCapsPerDay");
+  for (let index = 0; index < resourceCaps.length; index += 1) {
+    const cap = requireFiniteNumber(
+      resourceCaps[index],
+      `region.resourceCapsPerDay[${String(index)}]`,
+    );
+    if (cap < 0) {
+      throw new RangeError(`region.resourceCapsPerDay[${String(index)}] must be non-negative`);
     }
-    if (owners.has(typed.ownerId)) {
-      throw new RangeError(`pop block ${String(typed.ownerId)} has multiple household accounts`);
-    }
-    ids.add(typed.id);
-    owners.add(typed.ownerId);
   }
 }
 
@@ -200,9 +188,11 @@ export function assertValidPopulationState(world: World): void {
   assertUnique(blocks as PopBlock[], (block) => block.id, "world.popBlocks");
   const blockIds = new Set<number>((blocks as PopBlock[]).map((block) => block.id));
 
-  assertValidFinanceState(world.finance);
   const accountById = new Map<number, FinancialAccount>();
   for (const account of world.finance.accounts) {
+    if (accountById.has(account.id)) {
+      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
+    }
     accountById.set(account.id, account);
   }
   const accountOwners = new Set<number>();
@@ -216,6 +206,11 @@ export function assertValidPopulationState(world: World): void {
         `popBlock ${String(block.id)} references unknown financial account ${String(block.financialAccountId)}`,
       );
     }
+    if (account.accountKind !== "household" || account.ownerKind !== "popBlock") {
+      throw new RangeError(
+        `financial account ${String(account.id)} must be a popBlock household account`,
+      );
+    }
     if (account.ownerId !== block.id) {
       throw new RangeError(
         `financial account ${String(account.id)} is not owned by popBlock ${String(block.id)}`,
@@ -227,9 +222,9 @@ export function assertValidPopulationState(world: World): void {
     accountOwners.add(account.id);
   }
   for (const account of world.finance.accounts) {
-    if (!blockIds.has(account.ownerId)) {
+    if (account.accountKind === "household" && (account.ownerId === null || !blockIds.has(account.ownerId))) {
       throw new RangeError(
-        `financial account ${String(account.id)} references unknown popBlock ${String(account.ownerId)}`,
+        `household financial account ${String(account.id)} references unknown popBlock`,
       );
     }
   }
@@ -341,6 +336,11 @@ export function createPopulationWorld(
   }
   if (scenario.dataVersion.length === 0) {
     throw new RangeError("scenario.dataVersion must be non-empty");
+  }
+  if (scenario.dataVersion !== DEFAULT_DATA_VERSION) {
+    throw new RangeError(
+      `scenario.dataVersion ${JSON.stringify(scenario.dataVersion)} is incompatible with this build (${JSON.stringify(DEFAULT_DATA_VERSION)})`,
+    );
   }
   if (scenario.definitions.dataVersion !== scenario.dataVersion) {
     throw new RangeError("scenario and definitions dataVersion must match");
@@ -455,6 +455,9 @@ export function createPopulationWorld(
     key: region.key,
     name: region.name,
     popBlockIds: blocks.map((block) => block.id),
+    marketId: null,
+    buildingInstanceIds: [],
+    resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
   };
 
   const world: World = {
@@ -467,7 +470,10 @@ export function createPopulationWorld(
     seed,
     regions: [worldRegion],
     popBlocks: blocks,
-    finance: { accounts } satisfies FinanceState,
+    buildings: [],
+    employment: [],
+    markets: [],
+    finance: { accounts, postings: [], nextPostingId: 1 } satisfies FinanceState,
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

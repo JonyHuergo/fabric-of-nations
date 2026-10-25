@@ -5,8 +5,10 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 `AGENTS.md` §1.
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
-population core**. Economy, production, general markets, politics, technology,
-diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
+population core, and M3a economy definitions/state/serialization**. Employment
+behavior, production, market clearing, wages, pricing, later finance, politics,
+technology, diplomacy, warfare, AI, worker protocol, and UI behavior remain out
+of scope.
 
 ## Conflicts and ambiguities
 
@@ -507,6 +509,81 @@ diplomacy, warfare, AI, worker protocol, and UI behavior remain out of scope.
   current validation results. D-028 remains the explicit pre-1950 provisional
   decision.
 - **Scope:** documentation only; no simulation code or gameplay behavior changed.
+
+### D-033 — M3a schema 4 transition
+
+- **Resolution:** `WORLD_SCHEMA_VERSION = 4`, `SIM_VERSION = "0.4.0"`,
+  `DEFAULT_DATA_VERSION = "m3-economy-v1"`, and `DEFAULT_SCENARIO_ID = "m3-empty"`.
+  The save envelope remains format version 1. Schema-3, simulation-0.3, and
+  `m2.1-population-v1` saves are rejected with actionable errors; no migration
+  is implemented.
+- **Data:** the existing M2 population scenarios are re-versioned to
+  `m3-economy-v1`; their population schedules and M2 needs fixture are unchanged.
+  M3 scenarios use `m3_needs.json`, which excludes services.
+- **Hashes:** schema/version and new empty economy collections change the world
+  digest. New baselines are M1 empty-world `e200d88ba12e8239`, M2 campaign
+  aggregate `d421eaf5f04a207b`, and WPP validation `858773b2d559b2fc`. The previous
+  M2.1 hashes remain historical references only. M2 population totals, ageing,
+  demographic conservation, and needs-fixture tests are preserved.
+- **Consequence:** M2.1 behavioral totals are the regression check; old world
+  hashes are not. Future schema changes require the same explicit transition.
+
+### D-034 — M3 static economy contracts and throughput units
+
+- **Resolution:** M3 defines eight goods (grain, livestock, fish, cotton, wool,
+  textiles, clothing, food-products) and eight building definitions
+  (subsistence farm, commercial farm, ranch, fishery, food-processing plant,
+  textile mill, workshop, warehouse). The workshop consumes textiles and
+  produces clothing. Services are deferred because their non-storable
+  same-day production/consumption path is not implemented. Regional
+  resource-limited recipes are deferred: `resourceRequirements` must be empty
+  and regional caps are not read or applied per building.
+- **Units:** a TU is one standard recipe batch. Capacity and throughput are
+  TU/day. Recipe quantities are physical units/TU. Staffing coefficients are
+  workers per (TU/day), equivalently worker-days/TU. Building instance level is a
+  dimensionless count of standard units.
+- **Inventory:** `Market.stockLots` is the sole authoritative inventory
+  representation. `stockByGood` is derived on demand, never serialized, and
+  excluded from the world hash. Lots are canonicalized by
+  `(goodId, ownerBuildingId)`; duplicate lots are rejected. Warehouse capacity
+  is storage infrastructure, not inventory ownership.
+- **Ownership:** M3 building instances are private; each has an `ownerAccountId`
+  and an `operatingCashAccountId`. State-owned instances and non-null required
+  technologies are rejected in M3.
+- **Status:** recipe, price, wage, and population coefficients in
+  `goods.json`, `professions.json`, `buildings.json`, and the M3 scenario are
+  provisional synthetic inputs, not calibrated historical values.
+
+### D-035 — M3 minimal cash ledger
+
+- **Resolution:** M3 adds cash asset accounts for households, building
+  operations, and a system reserve. For cash assets, debit increases and credit
+  decreases. The receiving account is debited and the paying account is credited.
+  Every posting is balanced and atomic; an overdraft or invalid line rejects the
+  whole posting. A bounded recent posting buffer is retained.
+- **Semantics:** M3 posts only the cash leg. Revenue, expense, inventory, and
+  equity recognition are deferred to M4. Six transaction-kind names are defined
+  for later use; no wage, production, market-clearing, or pricing behavior is
+  implemented in M3a.
+- **Workflow:** M3a provides the ledger primitive and its tests only. M3b–M3f
+  remain unimplemented.
+
+### D-036 — M3a structural validation versus economic failure
+
+- **Resolution:** Scenario validation rejects malformed definitions, broken
+  references, duplicate ids/lots/accounts, invalid ranges, non-private instances,
+  services, non-empty resource requirements, initial stock above warehouse
+  capacity, and invalid initial assignments. It does not reject population
+  blocks below profession qualification thresholds or buildings with no eligible
+  workers; those are valid economic states.
+- **Initial employment:** scenario-defined assignments are validated for
+  profession match, qualification, participation/working-age eligibility, job
+  slots, and duplicate block/building/profession keys. No assignment algorithm is
+  implemented in M3a.
+- **Tick guard:** a world containing buildings or markets currently throws a clear
+  error from `tick` because M3 economy behavior is not implemented. This prevents
+  an M3 world from silently using the M2 needs fixture. Population-only worlds
+  retain their existing tick path.
 
 ## Assumptions recorded for future review
 

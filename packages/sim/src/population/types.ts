@@ -10,25 +10,23 @@
 import type { Day, Id, MoneySUSD, Rate } from "../types.js";
 import type { NeedTier } from "./constants.js";
 
+export type {
+  FinanceState,
+  FinancialAccount,
+  JournalLine,
+  JournalPosting,
+} from "../economy/types.js";
+
 export interface Region {
   id: Id;
   key: string;
   name: string;
   popBlockIds: Id[];
-}
-
-/** M2 subset of the GDD financial account contract. */
-export interface FinancialAccount {
-  id: Id;
-  ownerKind: "popBlock";
-  ownerId: Id;
-  accountKind: "household";
-  balanceSUSD: MoneySUSD;
-}
-
-/** M2 subset of the GDD finance state. M4 extends this type. */
-export interface FinanceState {
-  accounts: FinancialAccount[];
+  /** Null only for population-only M2 worlds with no market. */
+  marketId: Id | null;
+  buildingInstanceIds: Id[];
+  /** Reserved for future regional resource limits; M3 does not read or apply it. */
+  resourceCapsPerDay: number[];
 }
 
 /** Authoritative population block state. */
@@ -132,6 +130,8 @@ export interface RegionInitialDef {
   id: Id;
   key: string;
   name: string;
+  /** Optional future regional resource caps. M3 does not read them. */
+  resourceCapsPerDay?: readonly number[];
 }
 
 export interface PopulationScenarioDef {

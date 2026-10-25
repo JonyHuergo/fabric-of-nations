@@ -1,0 +1,33 @@
+[
+  {
+    "tier": "subsistence",
+    "activationWealthMin": 0,
+    "items": [
+      { "goodKey": "grain", "quantityPerCapitaPerDay": 0.9 },
+      { "goodKey": "food-products", "quantityPerCapitaPerDay": 0.08 },
+      { "goodKey": "fish", "quantityPerCapitaPerDay": 0.03 },
+      { "goodKey": "livestock", "quantityPerCapitaPerDay": 0.03 }
+    ]
+  },
+  {
+    "tier": "basic",
+    "activationWealthMin": 0,
+    "items": [
+      { "goodKey": "clothing", "quantityPerCapitaPerDay": 0.01 }
+    ]
+  },
+  {
+    "tier": "comfort",
+    "activationWealthMin": 25,
+    "items": [
+      { "goodKey": "clothing", "quantityPerCapitaPerDay": 0.002 }
+    ]
+  },
+  {
+    "tier": "luxury",
+    "activationWealthMin": 60,
+    "items": [
+      { "goodKey": "textiles", "quantityPerCapitaPerDay": 0.002 }
+    ]
+  }
+]

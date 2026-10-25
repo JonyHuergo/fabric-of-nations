@@ -149,7 +149,7 @@ Public tick path, aggregate campaign scenario, January 1 samples:
 
 - Maximum annual relative error: **9.553%** at 2000.
 - RMSE across 101 annual samples: **5.320%**.
-- Full-century aggregate hash: `27937e31a211b44f` (seed 20261023).
+- Full-century aggregate hash: `d421eaf5f04a207b` (seed 20261023, schema 4).
 
 The 2000 excess is not a coefficient failure: the campaign's 1950 age/sex
 composition is materially younger than WPP because the 1900 distribution and
@@ -200,7 +200,7 @@ missing 1960s fertility peak and annual fertility decline, not an age-transition
 or newborn-assignment defect. The remaining +1.2% total difference is small and
 is not tuned away.
 
-The full validation-regression digest is `6e6db5e440706ab6`.
+The full validation-regression digest is `858773b2d559b2fc` (schema 4).
 
 ## GDD anchor discrepancy
 
@@ -238,3 +238,29 @@ these are not mobile evidence. See README/DECISIONS for latest measurements.
 - Independent US Census benchmark cross-check.
 - Full historical demographic calibration; total-population agreement is not
   sufficient to claim it.
+
+## M3a provisional economy inputs
+
+The M3a economy catalog is synthetic and provisional, not historical
+calibration:
+
+- `goods.json`: eight goods. Base prices, transport costs, elasticities, and
+  spoilage rates are provisional units of SUSD per physical unit; spoilage is set
+  to zero because spoilage is deferred. `unitLabel` documents the physical unit.
+- `professions.json`: four professions. Participation rates, qualification
+  thresholds, base annual wages (SUSD/worker-year), training costs, and
+  dimensionless productivity modifiers are provisional.
+- `buildings.json`: eight definitions. Recipe quantities are physical units per
+  TU; staffing coefficients are workers per (TU/day); upkeep and construction
+  costs are SUSD; storage capacities are physical units. Resource requirements
+  are empty because regional resource limits are deferred.
+- `m3_needs.json`: per-capita daily basket quantities in the good's physical
+  unit. Service lines are omitted because non-storable services are deferred.
+- `scenarios/m3_small_economy.json`: synthetic population, initial stock, prices,
+  accounts, and employment assignments. It is a structural fixture, not a
+  historical scenario.
+
+These values are not source-backed, calibrated, or historically validated.
+M3a implements only definitions, state, validation, serialization, and the cash
+ledger; no production, employment matching, market clearing, wages, or pricing
+behavior exists.
