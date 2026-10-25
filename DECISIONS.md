@@ -509,7 +509,8 @@ warfare, AI, worker protocol, and UI behavior remain out of scope.
 - **Supersession:** D-017 remains historical; D-025 is authoritative for the
   population representation. D-021 and D-027 record the annual WPP schedules and
   current validation results. D-028 remains the explicit pre-1950 provisional
-  decision.
+  decision. **GDD v2.2 now supersedes v2.1; D-043 records the daily
+  price/settlement ordering clarification.**
 - **Scope:** documentation only; no simulation code or gameplay behavior changed.
 
 ### D-033 — M3a schema 4 transition
@@ -908,6 +909,34 @@ warfare, AI, worker protocol, and UI behavior remain out of scope.
   test guards it.
 - **Status:** Node diagnostics only. The GDD mobile p95 ≤ 8 ms target remains
   **NOT EVALUATED** on a reference device/release build.
+
+### D-043 — GDD v2.2 daily price/settlement ordering
+
+- **Issue:** GDD v2.1 §4.2 placed real transaction settlement (step 11) before
+  price updates (step 13). M3d applies bounded price adjustment as part of market
+  clearing, and M3f runs M3e settlement afterward. The v2.1 ordering and the
+  accepted implementation were therefore inconsistent.
+- **Resolution:** GDD v2.2 formally retains the accepted ordering: M3d market
+  clearing, final allocation, final overflow, and bounded price adjustment occur
+  before M3e monetary settlement. Prices are determined by physical market
+  imbalance, not by financial settlement. M3e settles the M3d-established
+  quantities and transaction prices and does not feed its cash outcome back into
+  the current day's price. GDD v2.2 step 10 includes the bounded price adjustment;
+  step 11 settles transactions; step 13 covers monthly wealth and future
+  cadence-due macro indicators.
+- **Why not move prices after settlement:** current-day pending transactions are
+  already established at M3d prices, so moving the bounded update after settlement
+  would not change the M3f order of value for those transactions. It would,
+  however, weaken the rule that market clearing determines prices and create an
+  unnecessary future coupling between financial flows and current prices. If a
+  later design deliberately wants settlement-conditioned prices, it must change
+  the model through a new decision and tests.
+- **Consequences:** this is an explicit approved design clarification, not a
+  prose-only reconciliation. No M3d/M3e code change is required by this decision.
+  Future dividends, taxes, interest, government procurement, and transfers must
+  use established transaction prices and must not retroactively alter them.
+- **Status:** GDD v2.2 records the implemented ordering. M3d price semantics and
+  M3e accounting semantics remain unchanged.
 
 ## Assumptions recorded for future review
 

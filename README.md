@@ -13,7 +13,7 @@ prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
 household cash)**, and **M3f (integrated daily economic tick)** only. Government
 finance, taxes, debt/credit, inflation/FX, dividends, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
-The design authority is the Century GDD v2.1 (`Century_GDD_v2.1.md`); persistent
+The design authority is the [Century GDD v2.2](./Century_GDD_v2.2.md); persistent
 engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
 are in [`DECISIONS.md`](./DECISIONS.md).
 
