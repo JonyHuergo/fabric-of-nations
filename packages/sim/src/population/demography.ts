@@ -82,14 +82,13 @@ interface DeathAllocationScratch {
  */
 function allocateDeaths(
   deaths: number,
+  totalExpected: number,
   expected: Float64Array,
   maleCounts: Uint32Array,
   femaleCounts: Uint32Array,
   popBlockId: Id,
   scratch: DeathAllocationScratch,
 ): DeathAllocation {
-  let totalExpected = 0;
-  for (const value of expected) totalExpected += value;
   if (deaths === 0 || totalExpected <= 0) return { male: 0, female: 0 };
 
   const bandCount = 17 * 2;
@@ -243,6 +242,9 @@ export function applyDailyDemography(
       expectedDeaths[SINGLE_AGE_COUNT + age] = ((female[age] ?? 0) * femaleEffective) / days;
     }
 
+    // This is the exact same Float64Array traversal, initial value, and addition
+    // order that allocateDeaths previously used for its largest-remainder
+    // denominator. No expectedDeaths cell changes between this sum and the call.
     let totalExpectedDeaths = 0;
     for (const value of expectedDeaths) totalExpectedDeaths += value;
 
@@ -286,6 +288,7 @@ export function applyDailyDemography(
 
     const deathAllocation = allocateDeaths(
       deaths,
+      totalExpectedDeaths,
       expectedDeaths,
       male,
       female,
