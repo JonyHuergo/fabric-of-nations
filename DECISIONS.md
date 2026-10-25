@@ -512,9 +512,11 @@ behavior remain out of scope.
 - **Supersession:** D-017 remains historical; D-025 is authoritative for the
   population representation. D-021 and D-027 record the annual WPP schedules and
   current validation results. D-028 remains the explicit pre-1950 provisional
-  decision. **GDD v2.2 superseded v2.1, and GDD v2.3 now supersedes v2.2 for the
-  M4a-2 country/currency alignment. D-043 records the daily price/settlement
-  ordering clarification; v2.3 is the current design authority.**
+  decision. **GDD v2.2 superseded v2.1, GDD v2.3 superseded v2.2 for the
+  M4a-2 country/currency alignment, and GDD v2.4 now supersedes v2.3 for the M4b
+  monthly finance close (D-047). D-043 records the daily price/settlement ordering
+  clarification; v2.4 is the current design authority, and v2.3 remains available
+  as historical documentation.**
 - **Scope:** documentation only; no simulation code or gameplay behavior changed.
 
 ### D-033 — M3a schema 4 transition
@@ -1280,6 +1282,10 @@ These clarify D-047 at implementation time; none changes an approved rule.
   no migration (D-013). Updated known-answer digests: empty world
   `30c4d2bae09c5410`, M2 campaign aggregate `f1782a6a6fa3e118`, WPP validation
   `997b5f78f3fb4c52`, M3 structural world `ba075368e9f2d67e`.
+- **GDD alignment.** GDD v2.4 now records the accepted M4b behavior as current
+  (D-047), including the partial-first-period limitation. GDD v2.3 retains the
+  earlier statement that M4b was future work and remains unchanged as historical
+  documentation.
 - **Limitations.** Node benchmarks remain diagnostics; the mobile p95 target is
   **NOT EVALUATED**. No taxes, government finance, debt, interest, banks,
   monetary issuance, native-currency balances, FX, inflation, annual close,

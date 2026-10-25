@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2 foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -12,20 +12,22 @@ movement)**, **M3d (deterministic two-pass market clearing with bounded
 prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
 household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
 (category-aware double-entry accounts, opening balances, and recognition legs)**,
-and **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
-valuation)** only. Government finance, taxes, period closing, distributions,
-debt/credit, dynamic FX, inflation, monetary policy, politics, technology,
-diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
-The design authority is the [Century GDD v2.3](./Century_GDD_v2.3.md);
-v2.2 is retained as [historical documentation](./Century_GDD_v2.2.md). Persistent
-engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
-are in [`DECISIONS.md`](./DECISIONS.md).
+**M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
+valuation)**, and **M4b (monthly finance period close and immutable finance
+summaries)** only. Government finance, taxes, distributions, debt/credit, dynamic
+FX, inflation, monetary policy, annual close, reopen/reversal, politics,
+technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
+implemented. The design authority is the [Century GDD
+v2.4](./Century_GDD_v2.4.md); v2.3 is retained as
+[historical documentation](./Century_GDD_v2.3.md). Persistent engineering rules
+are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
+[`DECISIONS.md`](./DECISIONS.md).
 
 ## Workspace
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -535,6 +537,10 @@ numerical safety choices, not calibration.
 
 ### Persistence
 
+**Historical M4a-2 milestone record.** The values below describe the M4a-2
+milestone; the current M4b build uses schema `8` and simulation version `0.8.0`
+(see the M4b section below).
+
 - `WORLD_SCHEMA_VERSION = 7`; `SIM_VERSION = "0.7.0"`; save format `1`; data
   version `m3-economy-v1` unchanged (no shipped scenario data changed).
 - Schema-6 / simulation-0.6.0 saves are rejected with an actionable error; no
@@ -545,10 +551,91 @@ numerical safety choices, not calibration.
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.3 is the current design authority and records the M4a-2 model
-(D-044/D-045). GDD v2.2 is preserved as
-[historical documentation](./Century_GDD_v2.2.md); its `CurrencyState`/`fxToUSD`
-target is superseded and is not current authoritative state.
+GDD v2.4 is the current design authority and records the M4b monthly finance close
+(D-047) alongside the M4a-2 model (D-044/D-045). GDD v2.3 is preserved as
+[historical documentation](./Century_GDD_v2.3.md); GDD v2.2 remains available as
+[earlier historical documentation](./Century_GDD_v2.2.md), and its
+`CurrencyState`/`fxToUSD` target is superseded and is not current authoritative
+state.
+
+## M4b monthly finance close
+
+M4b adds a monthly period close for economic worlds and immutable monthly finance
+summaries. It does not add taxes, government finance, debt, interest, banking,
+monetary issuance, native-currency balances, FX, inflation, annual close,
+reopen/reversal, or UI.
+
+### Timing and boundaries
+
+- An economic world closes on the last civil day of each Gregorian month, after
+  that day's postings, needs/militancy update, and month-end wealth update, and
+  before `dayIndex` advances. M2-only worlds never close.
+- Period bounds are inclusive. The first period starts at `World.startDayIndex`
+  and may be partial; later periods start the day after the previous end, and
+  every end is a civil month-end.
+- Duplicate, out-of-order, and gapped closes are rejected. The terminal
+  `2000-01-01` boundary is never closed; the last possible period ends
+  `1999-12-31`.
+- Published-state validation cannot prove which days a caller processed before the
+  first close. The accepted convention allows the first close at any civil
+  month-end on or after `startDayIndex`, and contiguity is checked between recorded
+  summaries only. This is documented as a limitation, not a completeness
+  guarantee.
+
+### Summaries and flows
+
+```ts
+FinancePeriodSummary { periodStartDay, periodEndDay, accountTotals, flowTotalsByKind }
+```
+
+- `accountTotals` is the pre-close trial balance: only nonzero accounts, including
+  opening balance-sheet balances and the period's revenue/expense.
+- `flowTotalsByKind` always carries the four gross flows: `goods-purchase` from
+  `consumption-expense`, `input-purchase` from `input-expense`, `wages` from
+  `wage-expense`, and `upkeep` from `upkeep-expense`. `period-close` is not a flow
+  kind, and there is no separate flow accumulator.
+- Opening revenue and expense balances are rejected; those accounts start at zero,
+  so each expense balance measures exactly one period's gross activity. Opening
+  balance-sheet balances are never treated as period flows.
+
+### Closing entries and invariants
+
+- A central semantic matrix fixes the revenue/expense lines for each transaction
+  kind and is enforced for individual, batched, and persisted postings.
+  `profit-distribution` and `owner-capital-injection` may not post to revenue or
+  expense accounts.
+- `period-close` is internal: public posting APIs reject it at type and runtime
+  boundaries, while persisted close entries are structurally validated.
+- For each owner, revenue is debited, expense is credited, and the net
+  `revenue - expense` posts to the owner's existing `owner-equity` in
+  deterministic owner/account order. Equity may be signed; a zero net needs no
+  equity line.
+- Every owner with revenue/expense accounts must have exactly one `owner-equity`
+  account (the system owner independently of reserve-account existence). A missing
+  account fails before mutation.
+- Closing entries are cash-neutral, zero revenue/expense exactly, and preserve the
+  accounting identity. The close copies the finance state, applies and validates
+  the change on the copy, and only then replaces `world.finance`.
+
+### Persistence and staged state
+
+- `FinanceState` gains `periodSummaries` and `closedThroughDay`.
+- A staged close may temporarily have `closedThroughDay === world.dayIndex`; a
+  published or serializable world requires `closedThroughDay === null ||
+  closedThroughDay < world.dayIndex`. World validation, serialization, hashing, and
+  deserialization enforce the published rule; `tick` advances the day before
+  publishing.
+- Summaries are encoded sorted by period end with canonical account/flow keys,
+  included in hashing and deep cloning, and validated on decode.
+- `WORLD_SCHEMA_VERSION = 8`; `SIM_VERSION = "0.8.0"`; save format `1`; data
+  version `m3-economy-v1` unchanged. Schema-7 / simulation-0.7.0 saves are rejected
+  with no migration.
+- New digests: empty world `30c4d2bae09c5410`, M2 campaign aggregate
+  `f1782a6a6fa3e118`, WPP validation `997b5f78f3fb4c52`, M3 structural world
+  `ba075368e9f2d67e`.
+- `FinanceState.periodSummaries` is the long-run monthly finance history; the
+  bounded `postings` buffer remains an audit ring, and no `World.history`
+  collection is added.
 
 ## Data and calibration
 
@@ -639,41 +726,43 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `7`; simulation version: `0.7.0`; data version:
-  `m3-economy-v1` (M4a-2 adds runtime country/currency state but ships no new
-  scenario data).
-- Schema-6 / simulation-0.6.0 saves are rejected with an actionable error; no
+- Schema version: `8`; simulation version: `0.8.0`; data version:
+  `m3-economy-v1` (M4a-2 and M4b add runtime state but ship no new scenario data).
+- Schema-7 / simulation-0.7.0 saves are rejected with an actionable error; no
   migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
-  record, and the M4a-2 country/currency/valuation collections.
+  record, monthly `periodSummaries` with `closedThroughDay`, and the M4a-2
+  country/currency/valuation collections.
 - Canonical JSON makes checksum and decode independent of object key insertion
   order. The state digest covers single-year sex state, accounts, diagnostics,
-  `startDayIndex`, the opening record, and countries/currencies/valuations.
+  `startDayIndex`, the opening record, period summaries, the close boundary, and
+  countries/currencies/valuations.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `31d491d18d02a4af`.
-- Full-century aggregate digest: `7961a6dd7da17bb3`.
-- WPP validation digest: `67cd0a5d67765bf7`.
-- M3 structural-world digest (seed `20261023`): `39a732ddd3dcd3c3`.
+  `m1-determinism`): `30c4d2bae09c5410`.
+- Full-century aggregate digest: `f1782a6a6fa3e118`.
+- WPP validation digest: `997b5f78f3fb4c52`.
+- M3 structural-world digest (seed `20261023`): `ba075368e9f2d67e`.
 
 ## Benchmark scope and recorded Node results
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
-workloads, M3e settlement workloads, and M3f integrated economic-day workloads.
-Stress scales repeat the three deterministic multi-block templates (400k/350k/250k
-people), so total population grows with block count. Each M2 stress scale uses 100
-warm-up ticks and 730 measured ticks.
+workloads, M3e settlement workloads, M3f integrated economic-day workloads, and
+M4b monthly period-close workloads. Stress scales repeat the three deterministic
+multi-block templates (400k/350k/250k people), so total population grows with
+block count. Each M2 stress scale uses 100 warm-up ticks and 730 measured ticks.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
 authoritative account state and posting line shape, so world hashes differ and
-Node timings shifted. M4a-2 additionally adds three empty canonical collections
-to every world (countries, currencies, currency valuations), so the benchmark
-hashes in this section predate M4a-2; timings are not treated as acceptance
-evidence. The current M4a-1 Node run on the same machine produced:
+Node timings shifted. M4a-2 adds three empty canonical collections to every world
+(countries, currencies, currency valuations), and M4b adds monthly summaries and
+the close boundary, so the benchmark hashes in this section predate M4a-2 and M4b;
+timings are not treated as acceptance evidence. The current M4a-1 Node run on the
+same machine produced:
 
 | Case | Avg | p95 | Hash |
 |---|---:|---:|---|
@@ -807,11 +896,17 @@ The M3f benchmark reports Node diagnostics only. The GDD mobile p95 ≤ 8 ms tar
 is **NOT EVALUATED**; the integrated tick uses whole-world structural staging, so
 these timings are not mobile-performance evidence.
 
+The M4b close benchmark times only `closeFinancePeriod` on a world reached two
+days before the first month-end; world cloning, setup, and hashing are excluded.
+It reports closing-entry counts, gross flows, and pass/fail checks for zeroing,
+cash neutrality, the accounting identity, summary contiguity, determinism, and
+cross-run hashes. These are Node diagnostics, not mobile evidence.
+
 ## Known limitations
 
 - M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
-  balances only. Period closing, distributions, remittances, taxes, debt,
-  inflation, and dynamic FX are not implemented.
+  balances only. Distributions, remittances, taxes, debt, inflation, and dynamic
+  FX are not implemented.
 - M4a-2 adds country/currency identity, monetary arrangements, and
   SUSD-relative valuations only. It has no issuance, central bank, treasury
   accounts, native-currency balances, dynamic FX, currency regimes, inflation,
@@ -824,8 +919,14 @@ these timings are not mobile-performance evidence.
 - Inventory is not an accounting asset: input purchases are expensed when
   purchased and there is no COGS or inventory valuation. This is a provisional
   cash-basis simplification, not full accrual accounting.
-- Revenue and expense account balances accumulate until a later milestone
-  introduces period closing; M4a-1 has no closing entries.
+- M4b closes revenue and expense into existing owner equity at each month-end;
+  there is no annual close, reopen, reversal/adjusting entry, retained-earnings
+  subtype, distribution, or tax. Summary flow totals are gross mapped period
+  activity, not profit or taxable income.
+- Published validation cannot prove which days were processed before the first
+  close. The first period may be partial and gap detection applies between
+  recorded summaries only; this convention is documented in the GDD and
+  `DECISIONS.md` and is not a completeness guarantee.
 - Opening balances are applied once as validated initial state with a provenance
   record rather than as one journal posting per account, so the bounded posting
   buffer begins with transactions.
