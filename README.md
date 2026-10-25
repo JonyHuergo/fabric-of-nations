@@ -16,7 +16,8 @@ and **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
 valuation)** only. Government finance, taxes, period closing, distributions,
 debt/credit, dynamic FX, inflation, monetary policy, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
-The design authority is the [Century GDD v2.2](./Century_GDD_v2.2.md); persistent
+The design authority is the [Century GDD v2.3](./Century_GDD_v2.3.md);
+v2.2 is retained as [historical documentation](./Century_GDD_v2.2.md). Persistent
 engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
 are in [`DECISIONS.md`](./DECISIONS.md).
 
@@ -544,10 +545,10 @@ numerical safety choices, not calibration.
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.2 remains the historical design authority. M4a-2 supersedes its target
-`CurrencyState`/`fxToUSD` shape for this milestone as recorded in D-044/D-045; a
-full GDD v2.3 revision is a separate documentation task and v2.2 is preserved
-unchanged.
+GDD v2.3 is the current design authority and records the M4a-2 model
+(D-044/D-045). GDD v2.2 is preserved as
+[historical documentation](./Century_GDD_v2.2.md); its `CurrencyState`/`fxToUSD`
+target is superseded and is not current authoritative state.
 
 ## Data and calibration
 

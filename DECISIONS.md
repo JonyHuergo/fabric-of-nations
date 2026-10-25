@@ -512,8 +512,9 @@ behavior remain out of scope.
 - **Supersession:** D-017 remains historical; D-025 is authoritative for the
   population representation. D-021 and D-027 record the annual WPP schedules and
   current validation results. D-028 remains the explicit pre-1950 provisional
-  decision. **GDD v2.2 now supersedes v2.1; D-043 records the daily
-  price/settlement ordering clarification.**
+  decision. **GDD v2.2 superseded v2.1, and GDD v2.3 now supersedes v2.2 for the
+  M4a-2 country/currency alignment. D-043 records the daily price/settlement
+  ordering clarification; v2.3 is the current design authority.**
 - **Scope:** documentation only; no simulation code or gameplay behavior changed.
 
 ### D-033 — M3a schema 4 transition
@@ -972,7 +973,8 @@ behavior remain out of scope.
   `CurrencyValuationError`; they never default to parity or another currency's
   value. Bounds and tolerances are not calibrated economics.
 - **Status:** implemented in M4a-2. No second unit of account, native-currency
-  balances, or purchasing-power promise is introduced.
+  balances, or purchasing-power promise is introduced. GDD v2.3 records this
+  model as current.
 
 ### D-045 — Country, currency issuer, monetary arrangement, and SUSD-relative valuation (approved)
 
@@ -1036,13 +1038,13 @@ behavior remain out of scope.
 - **Limitations:** no real/inflation-adjusted measure, no currency regimes or
   dynamic rates, no monetary issuance, no native balances, and no historical
   country/currency calibration. Node benchmarks remain diagnostics; the mobile
-  p95 target remains **NOT EVALUATED**.
+  p95 target remains **NOT EVALUATED**. GDD v2.3 records this model as current.
 
 ### D-046 — M4a-1 category-aware double-entry accounts (approved)
 
 - **Status:** approved by the designer before implementation, with the
   qualifications recorded here. D-044/D-045 were reserved for M4a-2 and are now
-  recorded above.
+  recorded above. GDD v2.3 records the M4a-1 baseline as current.
 - **D-046a — opening balances.** Opening balances are applied **once, atomically**
   as calibrated initial state, not as one journal posting per account. The
   application requires every account to start at zero, validates every entry and
