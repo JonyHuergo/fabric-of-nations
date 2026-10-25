@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a/M3b/M3c foundation
+# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -7,10 +7,11 @@ per tick.
 The repository currently implements **M0 (project foundation)**, **M1
 (simulation core)**, **M2.1 (corrected population core)**, **M3a (economy
 definitions, state, validation, and serialization)**, **M3b (deterministic
-employment assignment)**, and **M3c (production, input reservations, and
-inventory movement)** only. Market clearing, wages, pricing, government finance,
-politics, technology, diplomacy, warfare, AI, worker, and React Native UI
-behavior are not implemented. The design authority is the Century GDD v2.1
+employment assignment)**, **M3c (production, input reservations, and inventory
+movement)**, and **M3d (deterministic two-pass market clearing with bounded
+prices)** only. Wages, financial settlement, pricing-side income, government
+finance, politics, technology, diplomacy, warfare, AI, worker, and React Native
+UI behavior are not implemented. The design authority is the Century GDD v2.1
 (`Century_GDD_v2.1.md`); persistent engineering rules are in
 [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
@@ -19,7 +20,7 @@ behavior are not implemented. The design authority is the Century GDD v2.1
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, tick, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -239,6 +240,50 @@ not allocate scarce stock, settle purchases, pay wages, or update prices.
 - Production does not mutate accounts, employment, or prices. Reservations are
   never serialized, and no save may occur mid-phase.
 
+## M3d market clearing and price updates
+
+M3d adds `runMarketDay`, an explicit market-day phase. It is not a complete
+economic tick: it neither computes household budgets nor settles money.
+
+- Demand arrives as explicit records with desired and funded quantities.
+  `fundedQuantity` is supplied by the future M3e budget layer; M3d only allocates
+  funded demand and returns pending transactions.
+- Priority order is household subsistence (1), critical production inputs (2),
+  household basic (3), remaining production inputs (5), household
+  comfort/luxury (6). Government and export demand are absent.
+- Critical inputs are identified from the building definition: essential
+  infrastructure or a producer of subsistence/basic goods gets tier 2; other
+  production inputs get tier 5. Numeric building IDs do not affect priority.
+- Within a tier and good, supply is proportional when short. A partially
+  unfilled funded tier blocks lower tiers for that good. Unfunded demand does
+  not block lower funded demand.
+- Households can buy a higher tier only when all of their active lower-tier
+  desired quantities are fulfilled. All goods in a tier are resolved before the
+  next tier is enabled; Pass B does not unlock new tiers.
+- Pass A reserves opening inventory for household and input demand together.
+  Production receives only accepted input reservations, uses only actual inputs,
+  and releases the remainder. Pass B resolves remaining household demand against
+  current stock after production—already including same-day output and net of
+  actual input use—excluding all outstanding household reservations. If critical
+  or remaining input demand could not be served, the corresponding lower household
+  tiers stay blocked in Pass B because production inputs cannot be reopened.
+- Final household quantities are removed exactly once, then final overflow is
+  applied. Reserved or fulfilled household goods cannot be lost to overflow.
+- M3c production normally applies overflow immediately. M3d uses the
+  backward-compatible `applyOverflow: false` option and applies the shared final
+  overflow helper after Pass B.
+- Prices use provisional, uncalibrated coefficients:
+  `imbalance = (funded demand - sellable supply) / max(funded, supply, 1e-9)`,
+  `dailyChange = clamp(0.10 * imbalance, -0.05, +0.05)`, and
+  `newPrice = clamp(oldPrice * (1 + dailyChange), 0.25*base, 4*base)`.
+  Funded demand counts eligible household and production demand once; sellable
+  supply is opening stock plus same-day production once. Input demand is not
+  netted from supply, and final overflow losses are excluded from today's price.
+- Same-day allocations and pending transactions use the day's opening price. The
+  updated price applies to the next day. Prices remain finite and positive.
+- Reservations, demand allocations, production results, and pending transactions
+  are transient. No financial balance, wage, or settlement state is changed.
+
 ## Data and calibration
 
 Static definitions:
@@ -347,14 +392,13 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
-employment-refresh workload, and M3c production/inventory workloads. Stress
-scales repeat the three deterministic multi-block templates (400k/350k/250k
-people), so total population grows with block count. Each stress scale uses 100
-warm-up ticks and 730 measured ticks.
+employment-refresh workload, M3c production/inventory workloads, and M3d
+market-day workloads. Stress scales repeat the three deterministic multi-block
+templates (400k/350k/250k people), so total population grows with block count.
+Each stress scale uses 100 warm-up ticks and 730 measured ticks.
 
-Latest runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
+Representative runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
-
 | Case | Blocks | Population | Ticks | Total | Avg/tick | p95 |
 |---|---:|---:|---:|---:|---:|---:|
 | M1 no-op | 0 | 0 | 36,524 | 32–66 ms | 0.0009–0.0018 ms | 0.001–0.003 ms |
@@ -375,8 +419,8 @@ then times only the real `refreshEmploymentIfDue` call at day 10. Reset,
 validation, and hashing are excluded. With 100 warm-up refreshes and 1,000
 measured refreshes it produced 8 assignments and 154,400 assigned workers, with
 an identical assignment/world hash `0a375c251ed26af7` on every measured sample.
-Final CI Node result: total `116.7 ms`, average `0.117 ms`, p50 `0.091 ms`,
-p95 `0.225 ms`, p99 `0.384 ms`. Across verified runs, average was
+Final CI Node result: total `116.9 ms`, average `0.117 ms`, p50 `0.090 ms`,
+p95 `0.202 ms`, p99 `0.475 ms`. Across verified runs, average was
 `0.10–0.18 ms`, p95 `0.15–0.42 ms`, and p99 `0.26–0.88 ms`, reflecting normal
 Node timing variation. This is a Node diagnostic only; it is not a mobile or
 full-scale-economy claim.
@@ -387,8 +431,8 @@ timed. Results from the same Node environment:
 
 | Workload | Pop blocks | Buildings | Reservations | Phases | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| M3c small | 4 | 8 | 5 | 500 | 0.207 ms | 0.181 ms | 0.341 ms | 0.723 ms | `098974b94d5446ff` |
-| M3c stress | 40 | 80 | 60 | 100 | 2.301 ms | 2.120 ms | 3.108 ms | 3.918 ms | `dd8cffec9ab41826` |
+| M3c small | 4 | 8 | 5 | 500 | 0.231 ms | 0.187 ms | 0.421 ms | 0.917 ms | `098974b94d5446ff` |
+| M3c stress | 40 | 80 | 60 | 100 | 2.589 ms | 2.274 ms | 4.556 ms | 5.463 ms | `dd8cffec9ab41826` |
 
 The small case produced `349,415.133` units and used `51,687.5` input units per
 phase; the 10-group stress case produced `3,477,524.667` units and used
@@ -396,6 +440,25 @@ phase; the 10-group stress case produced `3,477,524.667` units and used
 produced output, and the world hash was identical across repetitions. Setup,
 reset, validation, and hashing are excluded from timings. These are Node
 diagnostics, not mobile-performance evidence.
+
+The M3d workloads run the real `runMarketDay` phase with fixed demand records,
+reset inventory and prices before each sample, and time only the market day.
+The small case has 4 pop blocks, 8 buildings, 6 household demands, 3 input
+demands, and 11 reservations. The 10-group stress case has 40 pop blocks,
+80 buildings, 60 household demands, 30 input demands, and 1,100 reservations.
+Each sample fulfilled household demand, used same-day output in Pass B, consumed
+production inputs, and changed at least one price.
+
+| Workload | Blocks | Buildings | Demands (H/I) | Reservations | Days | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M3d small | 4 | 8 | 6 / 3 | 11 | 100 | 0.498 ms | 0.446 ms | 0.765 ms | 1.540 ms | `209d39f952437547` |
+| M3d stress | 40 | 80 | 60 / 30 | 1,100 | 50 | 11.864 ms | 11.363 ms | 16.678 ms | 19.195 ms | `ece3de98cd567e6a` |
+
+The small case fulfilled `60,400` household units, including `10,000` in Pass B,
+and consumed `1,687.5` production input units per sample. The stress case
+fulfilled `604,000` household units, including `100,000` in Pass B, and consumed
+`16,875` production input units per sample. This is a Node diagnostic; it makes
+no claim about a runnable economic tick or target-scale mobile performance.
 
 ## Known limitations
 
@@ -412,18 +475,23 @@ diagnostics, not mobile-performance evidence.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- M3a–M3c implement economy state, the cash ledger, employment assignment, and a
-  physical production phase only: no market clearing, wages, pricing, government
+- M3a–M3d implement economy state, the cash ledger, employment assignment, a
+  physical production phase, and two-pass market clearing only: no wages,
+  financial settlement, profit distribution, household income, government
   finance, politics, technology, diplomacy, warfare, AI, migration, social
   mobility, or UI exists.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - A world containing buildings or markets currently rejects `tick`; M3
-  population-only fixture behavior is preserved separately. M3b employment and
-  M3c production are exercised by Jest and focused Node benchmarks, not by a
-  runnable economic tick.
+  population-only fixture behavior is preserved separately. M3b employment, M3c
+  production, and M3d market days are exercised by Jest and focused Node
+  benchmarks, not by a runnable economic tick.
 - M3c storage capacity uses a provisional `quantity × level × condition` rule;
   overflow is pooled by market rather than assigned to individual warehouses.
+- M3d price coefficients are provisional, and price updates use gross opening
+  stock plus same-day production; final overflow losses do not feed back into the
+  same day's price. Market clearing returns pending financial results but does not
+  settle them.
 
 ## Development workflow
 
@@ -433,5 +501,5 @@ diagnostics, not mobile-performance evidence.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3d until M3c is reviewed and the next phase is explicitly
+7. Do not begin M3e until M3d is reviewed and the next phase is explicitly
    authorized.

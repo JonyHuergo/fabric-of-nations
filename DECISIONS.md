@@ -6,9 +6,10 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
-employment assignment, and M3c production/inventory movement**. Market clearing,
-wages, pricing, later finance, politics, technology, diplomacy, warfare, AI,
-worker protocol, and UI behavior remain out of scope.
+employment assignment, M3c production/inventory movement, and M3d deterministic
+two-pass market clearing with bounded prices**. Wages, settlement, profit
+distribution, later finance, politics, technology, diplomacy, warfare, AI, worker
+protocol, and UI behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -673,6 +674,75 @@ worker protocol, and UI behavior remain out of scope.
   employment, or prices.
 - **Benchmark:** a focused Node benchmark runs the real phase on the approved M3
   world and a 10-group/80-building scaled fixture; it is not mobile evidence.
+
+### D-040 — M3d two-pass market clearing and bounded prices
+
+- **Resolution:** M3d adds `runMarketDay`, an explicit market-day phase separate
+  from the daily tick and from M3c production. It accepts validated household
+  and production demand records with explicit `desiredQuantity` and
+  `fundedQuantity`, resolves them by the approved priority tiers, passes accepted
+  input reservations to M3c production with overflow deferred, resolves final
+  household demand with same-day output, removes fulfilled household goods once,
+  applies final overflow, and updates prices boundedly.
+- **No settlement:** M3d neither reads household cash nor mutates financial
+  balances. `fundedQuantity` is supplied by the future M3e budget layer.
+  Household purchases, input purchases, and transaction prices are returned as
+  transient pending transactions. Reservations and pending results are not
+  serialized; no save may occur mid-market-day.
+- **Priority sequence:** household subsistence (tier 1), critical production
+  inputs (tier 2), household basic (tier 3), remaining production inputs (tier
+  5), and household comfort/luxury (tier 6). Government and export demand are
+  absent.
+- **Critical inputs:** a building's inputs are critical (tier 2) when the building
+  is essential infrastructure or produces a good appearing in the subsistence or
+  basic need tiers; otherwise they are remaining (tier 5). The caller supplies
+  needs definitions; M3d validates every production tier against this rule.
+  Numeric building IDs never define priority.
+- **Allocation:** funded demand is served in tier order. Within a tier and good,
+  supply is allocated proportionally when short. A partially unfilled funded
+  tier blocks all lower tiers for that good. Unfunded higher-tier demand never
+  blocks lower funded demand.
+- **Household blocking:** within a tier, all goods are resolved before the next
+  household tier is enabled. A household whose lower active tier is not fully
+  fulfilled against its desired quantity cannot buy higher tiers that day.
+  Higher tiers remain blocked even if Pass B later fills the lower tier; Pass B
+  never unlocks new tiers.
+- **Reservations:** Pass A reserves opening inventory in priority order.
+  Household and production-input reservations together are checked against each
+  opening seller lot. Production consumes only actual input reservations and
+  releases unused quantities. Pass B uses current stock after production, which
+  already includes same-day output and is net of actual input use, excluding all
+  outstanding household reservations; production is never added a second time.
+  Fulfilled household goods are removed exactly once before final overflow. If
+  critical or remaining input demand could not be served in Pass A, the
+  corresponding lower household tiers remain blocked in Pass B; Pass B cannot
+  reopen production inputs. Pass B re-evaluates remaining household
+  tier-1/tier-3 scarcity blocks using its own remaining demand.
+- **Production deferral:** M3c's `ProductionPhaseOptions.applyOverflow` defaults
+  to true, preserving M3c behavior. M3d passes false, then calls the shared
+  `applyOverflowLosses` after Pass B and household removal. Thus new output can
+  serve Pass B but cannot serve same-day production input, and neither reserved
+  nor fulfilled household goods can be lost to overflow.
+- **Transient residual allocation:** lot shares and allocation remainders use the
+  existing keyed RNG with stable purposes (`market.household-residual` and
+  `market.building-residual`) and the day/entity context. Array order and numeric
+  IDs are not economic priority rules.
+- **Price formula:** for each good:
+  `imbalance = (fundedDemand - sellableSupply) / max(fundedDemand, sellableSupply, 1e-9)`;
+  `dailyChange = clamp(0.10 * imbalance, -0.05, +0.05)`;
+  `newPrice = clamp(oldPrice * (1 + dailyChange), 0.25*base, 4*base)`.
+  `fundedDemand` is eligible funded demand across household and production tiers,
+  counted once and including scarcity-unfulfilled and market-blocked eligible
+  demand. `sellableSupply` is opening stock plus same-day production, counted
+  once. Production input consumption is represented by funded input demand, not
+  netted from supply; final overflow losses occur after clearing and are excluded
+  from today's price. Prices are finite/positive, update once after clearing, and
+  next-day reservations use the updated price. Allocations and pending
+  transactions use the day's opening price. Coefficients are provisional, not
+  calibrated.
+- **Boundaries:** no wages, financial settlement, profit distribution, household
+  income, government finance, inflation, FX, or runnable economic tick. The
+  economic-world guard on `tick()` remains intact.
 
 ## Assumptions recorded for future review
 

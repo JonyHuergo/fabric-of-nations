@@ -104,6 +104,15 @@ export interface ProductionPhaseResult {
   readonly overflowLosses: readonly OverflowLoss[];
 }
 
+export interface ProductionPhaseOptions {
+  /**
+   * Apply end-of-phase storage overflow. Defaults to true to preserve M3c
+   * callers. M3d passes false so produced goods can serve Pass B before final
+   * overflow is calculated.
+   */
+  readonly applyOverflow?: boolean;
+}
+
 function tolerance(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
@@ -300,6 +309,101 @@ function assertReservationShape(
   }
 }
 
+function applyOverflowToLots(
+  lots: Map<string, number>,
+  capacityByGood: readonly number[],
+  goodCount: number,
+): OverflowLoss[] {
+  const overflowLosses: OverflowLoss[] = [];
+  for (let goodId = 0; goodId < goodCount; goodId += 1) {
+    const goodLots = [...lots.entries()]
+      .map(([key, quantity]) => {
+        const [goodText, ownerText] = key.split(":");
+        return { key, goodId: Number(goodText), ownerBuildingId: Number(ownerText), quantity };
+      })
+      .filter((lot) => lot.goodId === goodId && lot.quantity > 0)
+      .sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
+    const total = goodLots.reduce((sum, lot) => sum + lot.quantity, 0);
+    const capacity = capacityByGood[goodId] ?? 0;
+    if (total <= capacity + tolerance(total, capacity)) continue;
+    const overflow = total - capacity;
+    const losses = goodLots.map((lot) => ({
+      lot,
+      quantity: (lot.quantity * overflow) / total,
+    }));
+    const lost = losses.reduce((sum, loss) => sum + loss.quantity, 0);
+    let residual = overflow - lost;
+    for (let index = losses.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
+      const loss = losses[index];
+      if (loss === undefined) continue;
+      const headroom = loss.lot.quantity - loss.quantity;
+      if (headroom <= 0) continue;
+      const amount = Math.min(headroom, residual);
+      loss.quantity += amount;
+      residual -= amount;
+    }
+    if (residual > tolerance(residual)) {
+      throw new RangeError(`unable to allocate overflow loss for good ${String(goodId)}`);
+    }
+    for (const loss of losses) {
+      if (!(loss.quantity > 0)) continue;
+      const remaining = loss.lot.quantity - loss.quantity;
+      if (remaining < -tolerance(loss.lot.quantity, loss.quantity)) {
+        throw new RangeError(`overflow loss makes lot ${loss.lot.key} negative`);
+      }
+      if (remaining <= 0) lots.delete(loss.lot.key);
+      else lots.set(loss.lot.key, remaining);
+      overflowLosses.push({
+        goodId,
+        ownerBuildingId: loss.lot.ownerBuildingId,
+        quantity: loss.quantity,
+      });
+    }
+  }
+  return overflowLosses;
+}
+
+/**
+ * Apply final storage overflow to the market's current lots. M3d calls this
+ * after Pass B; M3c's default production phase calls it internally.
+ */
+export function applyOverflowLosses(
+  world: World,
+  definitions: EconomyDefinitions,
+): OverflowLoss[] {
+  assertValidWorld(world);
+  assertValidEconomyDefinitions(definitions);
+  const market = world.markets[0];
+  if (market === undefined) throw new RangeError("M3 overflow requires a market");
+  const lots = new Map<string, number>();
+  for (const lot of market.stockLots) {
+    lots.set(lotKey(lot.goodId, lot.ownerBuildingId), lot.quantity);
+  }
+  const capacityByGood = deriveStorageCapacityByGood(world, definitions);
+  const losses = applyOverflowToLots(lots, capacityByGood, definitions.goods.length);
+  const canonicalLots = canonicalizeStockLots(
+    [...lots.entries()].map(([key, quantity]) => {
+      const [goodText, ownerText] = key.split(":");
+      return {
+        goodId: Number(goodText),
+        ownerBuildingId: Number(ownerText),
+        quantity,
+      };
+    }),
+  );
+  const candidateWorld: World = {
+    ...world,
+    markets: [{ ...market, stockLots: canonicalLots }],
+  };
+  assertValidWorld(candidateWorld);
+  market.stockLots = canonicalLots;
+  losses.sort((left, right) => {
+    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+    return left.ownerBuildingId - right.ownerBuildingId;
+  });
+  return losses;
+}
+
 /**
  * Run one physical production phase against the opening inventory snapshot.
  *
@@ -311,6 +415,7 @@ export function runProductionPhase(
   world: World,
   definitions: EconomyDefinitions,
   reservations: readonly InputReservation[],
+  options: ProductionPhaseOptions = {},
 ): ProductionPhaseResult {
   assertValidWorld(world);
   assertValidEconomyDefinitions(definitions);
@@ -503,55 +608,16 @@ export function runProductionPhase(
     });
   }
 
-  const capacityByGood = deriveStorageCapacityByGood(world, definitions);
-  const overflowLosses: OverflowLoss[] = [];
+  const applyOverflow = options.applyOverflow !== false;
+  const capacityByGood = applyOverflow
+    ? deriveStorageCapacityByGood(world, definitions)
+    : new Array<number>(goods.length).fill(0);
+  const overflowLosses = applyOverflow
+    ? applyOverflowToLots(nextLots, capacityByGood, goods.length)
+    : [];
   const lossByGood = new Array<number>(goods.length).fill(0);
-  for (let goodId = 0; goodId < goods.length; goodId += 1) {
-    const lots = [...nextLots.entries()]
-      .map(([key, quantity]) => {
-        const [goodText, ownerText] = key.split(":");
-        return { key, goodId: Number(goodText), ownerBuildingId: Number(ownerText), quantity };
-      })
-      .filter((lot) => lot.goodId === goodId && lot.quantity > 0)
-      .sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
-    const total = lots.reduce((sum, lot) => sum + lot.quantity, 0);
-    const capacity = capacityByGood[goodId] ?? 0;
-    if (total <= capacity + tolerance(total, capacity)) continue;
-    const overflow = total - capacity;
-    const losses = lots.map((lot) => ({
-      lot,
-      quantity: (lot.quantity * overflow) / total,
-    }));
-    let lost = losses.reduce((sum, loss) => sum + loss.quantity, 0);
-    let residual = overflow - lost;
-    for (let index = losses.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
-      const loss = losses[index];
-      if (loss === undefined) continue;
-      const headroom = loss.lot.quantity - loss.quantity;
-      if (headroom <= 0) continue;
-      const amount = Math.min(headroom, residual);
-      loss.quantity += amount;
-      residual -= amount;
-      lost += amount;
-    }
-    if (residual > tolerance(residual)) {
-      throw new RangeError(`unable to allocate overflow loss for good ${String(goodId)}`);
-    }
-    for (const loss of losses) {
-      if (!(loss.quantity > 0)) continue;
-      const remaining = loss.lot.quantity - loss.quantity;
-      if (remaining < -tolerance(loss.lot.quantity, loss.quantity)) {
-        throw new RangeError(`overflow loss makes lot ${loss.lot.key} negative`);
-      }
-      if (remaining <= 0) nextLots.delete(loss.lot.key);
-      else nextLots.set(loss.lot.key, remaining);
-      overflowLosses.push({
-        goodId,
-        ownerBuildingId: loss.lot.ownerBuildingId,
-        quantity: loss.quantity,
-      });
-      lossByGood[goodId] = (lossByGood[goodId] ?? 0) + loss.quantity;
-    }
+  for (const loss of overflowLosses) {
+    lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
   }
 
   const closingByGood = new Array<number>(goods.length).fill(0);

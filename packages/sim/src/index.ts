@@ -10,8 +10,10 @@
  * schema-5 serialization. M3b adds deterministic workforce eligibility,
  * assignment, retention, and scheduling. M3c adds an explicit physical
  * production phase with transient input reservations, producer-owned output lots,
- * and recorded storage overflow. Economy behavior beyond this, politics,
- * technology, diplomacy, war, and UI contracts remain future milestones.
+ * and recorded storage overflow. M3d adds deterministic two-pass market clearing,
+ * transient household/input reservations, and bounded daily price updates without
+ * financial settlement. Economy behavior beyond this, politics, technology,
+ * diplomacy, war, and UI contracts remain future milestones.
  */
 
 export * from "./types.js";

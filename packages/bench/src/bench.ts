@@ -36,10 +36,12 @@ import {
   hashWorld,
   populationTotal,
   refreshEmploymentIfDue,
+  runMarketDay,
   runProductionPhase,
   tick,
   type EconomyScenarioDef,
   type InputReservation,
+  type MarketDayInput,
   type PopBlockInitialDef,
   type PopulationInputs,
   type PopulationScenarioDef,
@@ -62,6 +64,11 @@ const M3C_SMALL_ITERATIONS = 500;
 const M3C_STRESS_GROUPS = 10;
 const M3C_STRESS_WARMUP = 20;
 const M3C_STRESS_ITERATIONS = 100;
+const M3D_SMALL_WARMUP = 10;
+const M3D_SMALL_ITERATIONS = 100;
+const M3D_STRESS_GROUPS = 10;
+const M3D_STRESS_WARMUP = 10;
+const M3D_STRESS_ITERATIONS = 50;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -142,6 +149,33 @@ interface ProductionBenchmarkResult {
   readonly minReservationsUsed: number;
   readonly minProduction: number;
   readonly minInputsUsed: number;
+}
+
+interface MarketBenchmarkResult {
+  readonly label: string;
+  readonly groups: number;
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly hash: string;
+  readonly hashesEqual: boolean;
+  readonly population: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
+  readonly householdDemands: number;
+  readonly productionDemands: number;
+  readonly reservations: number;
+  readonly householdFulfilled: number;
+  readonly passBFulfilled: number;
+  readonly productionUsed: number;
+  readonly minHouseholdFulfilled: number;
+  readonly minPassBFulfilled: number;
+  readonly minProductionUsed: number;
+  readonly minPriceChanges: number;
 }
 
 function percentile(sortedSamples: readonly number[], fraction: number): number {
@@ -573,6 +607,175 @@ function printProductionBenchmark(result: ProductionBenchmarkResult): void {
   );
 }
 
+function marketDemandInput(
+  world: World,
+  scenario: EconomyScenarioDef,
+  groups: number,
+): MarketDayInput {
+  const householdDemands: MarketDayInput["householdDemands"][number][] = [];
+  const productionDemands: MarketDayInput["productionDemands"][number][] = [];
+  for (let group = 0; group < groups; group += 1) {
+    const block = group * 4;
+    const building = group * 8;
+    householdDemands.push(
+      { popBlockId: block, tier: 1, goodId: 0, desiredQuantity: 60000, fundedQuantity: 60000 },
+      { popBlockId: block + 1, tier: 1, goodId: 7, desiredQuantity: 100, fundedQuantity: 100 },
+      { popBlockId: block + 1, tier: 1, goodId: 2, desiredQuantity: 100, fundedQuantity: 100 },
+      { popBlockId: block + 1, tier: 1, goodId: 1, desiredQuantity: 100, fundedQuantity: 100 },
+      { popBlockId: block + 1, tier: 3, goodId: 6, desiredQuantity: 100, fundedQuantity: 100 },
+      { popBlockId: block + 1, tier: 6, goodId: 5, desiredQuantity: 1000, fundedQuantity: 1000 },
+    );
+    productionDemands.push(
+      { buyerBuildingId: building + 5, tier: 5, goodId: 3, desiredQuantity: 8000, fundedQuantity: 8000 },
+      { buyerBuildingId: building + 5, tier: 5, goodId: 4, desiredQuantity: 1500, fundedQuantity: 1500 },
+      { buyerBuildingId: building + 6, tier: 2, goodId: 5, desiredQuantity: 4000, fundedQuantity: 4000 },
+    );
+  }
+  return {
+    dayIndex: world.dayIndex,
+    marketId: 0,
+    needs: scenario.population.definitions.needs,
+    householdDemands,
+    productionDemands,
+  };
+}
+
+function runMarketBenchmark(
+  label: string,
+  groups: number,
+  iterations: number,
+  warmupIterations: number,
+): MarketBenchmarkResult {
+  const scenario = scaledProductionScenario(groups);
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  refreshEmploymentIfDue(world, scenario.definitions, 0);
+  assertValidEmploymentState(world, scenario.definitions);
+  const market = world.markets[0];
+  if (market === undefined) throw new Error("missing M3 market");
+  const openingLots = market.stockLots.map((lot) => ({ ...lot }));
+  const openingPrices = [...market.priceSUSD];
+  const input = marketDemandInput(world, scenario, groups);
+  if (input.householdDemands.length === 0 || input.productionDemands.length === 0) {
+    throw new Error("market benchmark has no demands");
+  }
+
+  const reset = (): void => {
+    market.stockLots = openingLots.map((lot) => ({ ...lot }));
+    market.priceSUSD = [...openingPrices];
+  };
+  const oneDay = (): {
+    readonly ns: number;
+    readonly result: ReturnType<typeof runMarketDay>;
+  } => {
+    reset();
+    const start = process.hrtime.bigint();
+    const result = runMarketDay(world, scenario.definitions, input);
+    const end = process.hrtime.bigint();
+    return { ns: Number(end - start), result };
+  };
+
+  for (let index = 0; index < warmupIterations; index += 1) oneDay();
+  const samples = new Array<number>(iterations);
+  const hashes = new Set<string>();
+  let minHouseholdFulfilled = Number.MAX_SAFE_INTEGER;
+  let minPassBFulfilled = Number.MAX_SAFE_INTEGER;
+  let minProductionUsed = Number.MAX_SAFE_INTEGER;
+  let minPriceChanges = Number.MAX_SAFE_INTEGER;
+  let householdFulfilled = 0;
+  let passBFulfilled = 0;
+  let productionUsed = 0;
+  let reservations = 0;
+  let hash = "";
+
+  for (let index = 0; index < iterations; index += 1) {
+    const { ns, result } = oneDay();
+    samples[index] = ns;
+    const household = result.householdDemands.reduce(
+      (total, demand) => total + demand.fulfilledQuantity,
+      0,
+    );
+    const passB = result.householdDemands.reduce(
+      (total, demand) => total + demand.passBFulfilled,
+      0,
+    );
+    const used = result.production.reservationUses.reduce(
+      (total, reservation) => total + reservation.usedQuantity,
+      0,
+    );
+    const changedPrices = result.priceUpdates.filter(
+      (update) => Math.abs(update.newPriceSUSD - update.oldPriceSUSD) > 1e-12,
+    ).length;
+    minHouseholdFulfilled = Math.min(minHouseholdFulfilled, household);
+    minPassBFulfilled = Math.min(minPassBFulfilled, passB);
+    minProductionUsed = Math.min(minProductionUsed, used);
+    minPriceChanges = Math.min(minPriceChanges, changedPrices);
+    if (index === 0) {
+      householdFulfilled = household;
+      passBFulfilled = passB;
+      productionUsed = used;
+      reservations = result.reservations.length;
+      assertValidWorld(world);
+    }
+    const sampleHash = hashWorld(world);
+    hashes.add(sampleHash);
+    if (index === 0) hash = sampleHash;
+  }
+
+  samples.sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+  return {
+    label,
+    groups,
+    iterations,
+    warmupIterations,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / iterations),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    hash,
+    hashesEqual: hashes.size === 1,
+    population: world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    fixtureBlocks: world.popBlocks.length,
+    fixtureBuildings: world.buildings.length,
+    householdDemands: input.householdDemands.length,
+    productionDemands: input.productionDemands.length,
+    reservations,
+    householdFulfilled,
+    passBFulfilled,
+    productionUsed,
+    minHouseholdFulfilled,
+    minPassBFulfilled,
+    minProductionUsed,
+    minPriceChanges,
+  };
+}
+
+function printMarketBenchmark(result: MarketBenchmarkResult): void {
+  console.log(
+    `${result.label} (${String(result.groups)} group(s), ${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} market days; warm-up ${String(result.warmupIterations)}; ` +
+      `reset/validation/hash excluded`,
+  );
+  console.log(
+    `  ${String(result.householdDemands)} household demands, ${String(result.productionDemands)} input demands, ` +
+      `${String(result.reservations)} reservations`,
+  );
+  console.log(
+    `  fulfilled ${result.householdFulfilled.toFixed(3)}, Pass B ${result.passBFulfilled.toFixed(3)}, ` +
+      `production input used ${result.productionUsed.toFixed(3)}`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms, population ${String(result.population)}, hash ${result.hash}`,
+  );
+}
+
 function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
@@ -646,7 +849,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -668,6 +871,11 @@ function main(): void {
     `M3c production: small M3 world (${String(M3C_SMALL_ITERATIONS)} phases, ` +
       `${String(M3C_SMALL_WARMUP)} warm-up) and ${String(M3C_STRESS_GROUPS)}-group stress ` +
       `(${String(M3C_STRESS_ITERATIONS)} phases, ${String(M3C_STRESS_WARMUP)} warm-up)`,
+  );
+  console.log(
+    `M3d market days: small M3 world (${String(M3D_SMALL_ITERATIONS)} days, ` +
+      `${String(M3D_SMALL_WARMUP)} warm-up) and ${String(M3D_STRESS_GROUPS)}-group stress ` +
+      `(${String(M3D_STRESS_ITERATIONS)} days, ${String(M3D_STRESS_WARMUP)} warm-up)`,
   );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
@@ -718,6 +926,18 @@ function main(): void {
     M3C_STRESS_ITERATIONS,
     M3C_STRESS_WARMUP,
   );
+  const m3dSmall = runMarketBenchmark(
+    "M3d market day (small)",
+    1,
+    M3D_SMALL_ITERATIONS,
+    M3D_SMALL_WARMUP,
+  );
+  const m3dStress = runMarketBenchmark(
+    "M3d market day (stress)",
+    M3D_STRESS_GROUPS,
+    M3D_STRESS_ITERATIONS,
+    M3D_STRESS_WARMUP,
+  );
 
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
@@ -727,6 +947,8 @@ function main(): void {
   printEmploymentBenchmark(m3bEmployment);
   printProductionBenchmark(m3cSmall);
   printProductionBenchmark(m3cStress);
+  printMarketBenchmark(m3dSmall);
+  printMarketBenchmark(m3dStress);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -755,6 +977,13 @@ function main(): void {
     result.minProduction > 0 &&
     result.minInputsUsed > 0;
   const m3cValid = productionValid(m3cSmall) && productionValid(m3cStress);
+  const marketValid = (result: MarketBenchmarkResult): boolean =>
+    result.hashesEqual &&
+    result.minHouseholdFulfilled > 0 &&
+    result.minPassBFulfilled > 0 &&
+    result.minProductionUsed > 0 &&
+    result.minPriceChanges > 0;
+  const m3dValid = marketValid(m3dSmall) && marketValid(m3dStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -766,7 +995,8 @@ function main(): void {
     aggregateThreshold &&
     stressThreshold &&
     m3bEmploymentValid &&
-    m3cValid;
+    m3cValid &&
+    m3dValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -807,6 +1037,10 @@ function main(): void {
   console.log(
     `M3c production small checks: ${productionValid(m3cSmall) ? "PASS" : "FAIL"}; ` +
       `stress checks: ${productionValid(m3cStress) ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3d market small checks: ${marketValid(m3dSmall) ? "PASS" : "FAIL"}; ` +
+      `stress checks: ${marketValid(m3dStress) ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +
