@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a/M3b foundation
+# Century — M0/M1/M2.1/M3a/M3b/M3c foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -6,11 +6,12 @@ per tick.
 
 The repository currently implements **M0 (project foundation)**, **M1
 (simulation core)**, **M2.1 (corrected population core)**, **M3a (economy
-definitions, state, validation, and serialization)**, and **M3b (deterministic
-employment assignment)** only. Production, market clearing, wages, pricing,
-government finance, politics, technology, diplomacy, warfare, AI, worker, and
-React Native UI behavior are not implemented. The design authority is the
-Century GDD v2.1 (`Century_GDD_v2.1.md`); persistent engineering rules are in
+definitions, state, validation, and serialization)**, **M3b (deterministic
+employment assignment)**, and **M3c (production, input reservations, and
+inventory movement)** only. Market clearing, wages, pricing, government finance,
+politics, technology, diplomacy, warfare, AI, worker, and React Native UI
+behavior are not implemented. The design authority is the Century GDD v2.1
+(`Century_GDD_v2.1.md`); persistent engineering rules are in
 [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
 
@@ -18,7 +19,7 @@ Century GDD v2.1 (`Century_GDD_v2.1.md`); persistent engineering rules are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, tick, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -210,6 +211,34 @@ boundary; it does not add an economic tick path.
 - Employment totals and job-slot counts are derived from state; they are not
   stored as duplicate authoritative sums.
 
+## M3c production and inventory movement
+
+M3c adds an explicit physical production phase, not an economic tick. It does
+not allocate scarce stock, settle purchases, pay wages, or update prices.
+
+- Input reservations are transient, supplied explicitly, and refer only to
+  opening lots. They identify buyer building, market, good, seller lot/building,
+  and positive physical quantity. Total reservations per lot cannot exceed its
+  opening quantity.
+- Capacity uses the approved TU contract:
+  `reference throughput × level × condition × staffing ratio × productivity`.
+  Job slots and workers remain integers; goods quantities are continuous.
+- Executed throughput is limited by capacity and every reserved required input.
+  Only the inputs required for the executed throughput are consumed. Unused
+  reservations remain in their original seller lots without payment or ownership
+  transfer.
+- Outputs are fixed-proportion products credited to the producing building's
+  lot. A warehouse has no recipe, posts no input demand, and produces nothing.
+- Storage capacity is derived from operational storage buildings using
+  `quantity × level × condition` (provisional M3c rule). Post-production overflow
+  is recorded as a proportional loss across affected lots and attributed to each
+  owner; goods are never silently deleted.
+- Conservation identity:
+  `closing = opening + production - used inputs - recorded losses`, with imports
+  and exports explicitly zero. Aggregate stock remains derived from lots.
+- Production does not mutate accounts, employment, or prices. Reservations are
+  never serialized, and no save may occur mid-phase.
+
 ## Data and calibration
 
 Static definitions:
@@ -317,10 +346,11 @@ validation and the campaign gameplay baseline are deliberately separate.
 ## Benchmark scope and current Node results
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
-cases at 200, 1,000, 3,000, and 6,000 population blocks, and an M3b
-employment-refresh workload. Stress scales repeat the three deterministic
-multi-block templates (400k/350k/250k people), so total population grows with
-block count. Each stress scale uses 100 warm-up ticks and 730 measured ticks.
+cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
+employment-refresh workload, and M3c production/inventory workloads. Stress
+scales repeat the three deterministic multi-block templates (400k/350k/250k
+people), so total population grows with block count. Each stress scale uses 100
+warm-up ticks and 730 measured ticks.
 
 Latest runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
@@ -345,11 +375,27 @@ then times only the real `refreshEmploymentIfDue` call at day 10. Reset,
 validation, and hashing are excluded. With 100 warm-up refreshes and 1,000
 measured refreshes it produced 8 assignments and 154,400 assigned workers, with
 an identical assignment/world hash `0a375c251ed26af7` on every measured sample.
-Final CI Node result: total `107.0 ms`, average `0.107 ms`, p50 `0.087 ms`,
-p95 `0.161 ms`, p99 `0.323 ms`. Across three verified runs, average was
-`0.103–0.183 ms`, p95 `0.150–0.422 ms`, and p99 `0.263–0.884 ms`, reflecting
-normal Node timing variation. This is a Node diagnostic only; it is not a mobile
-or full-scale-economy claim.
+Final CI Node result: total `116.7 ms`, average `0.117 ms`, p50 `0.091 ms`,
+p95 `0.225 ms`, p99 `0.384 ms`. Across verified runs, average was
+`0.10–0.18 ms`, p95 `0.15–0.42 ms`, and p99 `0.26–0.88 ms`, reflecting normal
+Node timing variation. This is a Node diagnostic only; it is not a mobile or
+full-scale-economy claim.
+
+The M3c production workloads use fixed reservations derived from opening
+inventory and reset inventory before each phase; only `runProductionPhase` is
+timed. Results from the same Node environment:
+
+| Workload | Pop blocks | Buildings | Reservations | Phases | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M3c small | 4 | 8 | 5 | 500 | 0.207 ms | 0.181 ms | 0.341 ms | 0.723 ms | `098974b94d5446ff` |
+| M3c stress | 40 | 80 | 60 | 100 | 2.301 ms | 2.120 ms | 3.108 ms | 3.918 ms | `dd8cffec9ab41826` |
+
+The small case produced `349,415.133` units and used `51,687.5` input units per
+phase; the 10-group stress case produced `3,477,524.667` units and used
+`516,875` input units per phase. Every measured sample used reservations and
+produced output, and the world hash was identical across repetitions. Setup,
+reset, validation, and hashing are excluded from timings. These are Node
+diagnostics, not mobile-performance evidence.
 
 ## Known limitations
 
@@ -366,15 +412,18 @@ or full-scale-economy claim.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- M3a/M3b implement economy state, the cash ledger, and employment assignment
-  only: no production, market clearing, wages, pricing, government finance,
-  politics, technology, diplomacy, warfare, AI, migration, social mobility, or UI
-  exists.
+- M3a–M3c implement economy state, the cash ledger, employment assignment, and a
+  physical production phase only: no market clearing, wages, pricing, government
+  finance, politics, technology, diplomacy, warfare, AI, migration, social
+  mobility, or UI exists.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - A world containing buildings or markets currently rejects `tick`; M3
-  population-only fixture behavior is preserved separately. The employment path
-  is exercised by Jest tests, not by a production benchmark.
+  population-only fixture behavior is preserved separately. M3b employment and
+  M3c production are exercised by Jest and focused Node benchmarks, not by a
+  runnable economic tick.
+- M3c storage capacity uses a provisional `quantity × level × condition` rule;
+  overflow is pooled by market rather than assigned to individual warehouses.
 
 ## Development workflow
 
@@ -384,5 +433,5 @@ or full-scale-economy claim.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3c until M3b is reviewed and the next phase is explicitly
+7. Do not begin M3d until M3c is reviewed and the next phase is explicitly
    authorized.

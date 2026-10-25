@@ -29,14 +29,18 @@ import {
   SIM_VERSION,
   assertValidEmploymentState,
   assertValidWorld,
+  computeBuildingCapacity,
   createEconomyWorld,
   createInitialWorld,
   createPopulationWorld,
   hashWorld,
   populationTotal,
   refreshEmploymentIfDue,
+  runProductionPhase,
   tick,
   type EconomyScenarioDef,
+  type InputReservation,
+  type PopBlockInitialDef,
   type PopulationInputs,
   type PopulationScenarioDef,
   type TickContext,
@@ -53,6 +57,11 @@ const STRESS_WARMUP_TICKS = 100;
 const M3B_EMPLOYMENT_WARMUP = 100;
 const M3B_EMPLOYMENT_ITERATIONS = 1_000;
 const M3B_EMPLOYMENT_DAY = 10;
+const M3C_SMALL_WARMUP = 50;
+const M3C_SMALL_ITERATIONS = 500;
+const M3C_STRESS_GROUPS = 10;
+const M3C_STRESS_WARMUP = 20;
+const M3C_STRESS_ITERATIONS = 100;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -109,6 +118,30 @@ interface EmploymentBenchmarkResult {
   readonly population: number;
   readonly fixtureBlocks: number;
   readonly fixtureBuildings: number;
+}
+
+interface ProductionBenchmarkResult {
+  readonly label: string;
+  readonly groups: number;
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly hash: string;
+  readonly hashesEqual: boolean;
+  readonly population: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
+  readonly reservations: number;
+  readonly reservationsUsed: number;
+  readonly production: number;
+  readonly inputsUsed: number;
+  readonly minReservationsUsed: number;
+  readonly minProduction: number;
+  readonly minInputsUsed: number;
 }
 
 function percentile(sortedSamples: readonly number[], fraction: number): number {
@@ -307,6 +340,239 @@ function printEmploymentBenchmark(result: EmploymentBenchmarkResult): void {
   );
 }
 
+function scaledProductionScenario(groups: number): EconomyScenarioDef {
+  if (!Number.isInteger(groups) || groups < 1) {
+    throw new RangeError("production benchmark groups must be a positive integer");
+  }
+  const base = loadM3SmallEconomy();
+  const scenario = JSON.parse(JSON.stringify(base)) as EconomyScenarioDef;
+  const blockTemplates = base.population.popBlocks;
+  const buildingTemplates = base.buildingInstances;
+  const popBlocks: PopBlockInitialDef[] = [];
+  const buildingInstances: EconomyScenarioDef["buildingInstances"] = [];
+  const stockLots: { goodId: number; ownerBuildingId: number; quantity: number }[] = [];
+  const operatingAccountBase = groups * 4;
+  const systemAccountId = groups * 12;
+
+  for (let group = 0; group < groups; group += 1) {
+    for (let index = 0; index < 4; index += 1) {
+      const template = blockTemplates[index];
+      if (template === undefined) throw new Error("M3 fixture has no pop-block template");
+      popBlocks.push({
+        ...template,
+        id: group * 4 + index,
+        financialAccountId: group * 4 + index,
+        maleAgeGroups: [...template.maleAgeGroups],
+        femaleAgeGroups: [...template.femaleAgeGroups],
+      });
+    }
+    for (let index = 0; index < 8; index += 1) {
+      const template = buildingTemplates[index];
+      if (template === undefined) throw new Error("M3 fixture has no building template");
+      buildingInstances.push({
+        ...template,
+        id: group * 8 + index,
+        definitionId: index,
+        ownerAccountId: group * 4 + 3,
+        operatingCashAccountId: operatingAccountBase + group * 8 + index,
+      });
+    }
+    const owner = (definitionId: number): number => group * 8 + definitionId;
+    stockLots.push(
+      { goodId: 0, ownerBuildingId: owner(0), quantity: 20000 },
+      { goodId: 0, ownerBuildingId: owner(1), quantity: 30000 },
+      { goodId: 3, ownerBuildingId: owner(1), quantity: 1000 },
+      { goodId: 1, ownerBuildingId: owner(2), quantity: 2000 },
+      { goodId: 4, ownerBuildingId: owner(2), quantity: 200 },
+      { goodId: 2, ownerBuildingId: owner(3), quantity: 2000 },
+      { goodId: 7, ownerBuildingId: owner(4), quantity: 2000 },
+      { goodId: 5, ownerBuildingId: owner(5), quantity: 500 },
+      { goodId: 6, ownerBuildingId: owner(6), quantity: 200 },
+    );
+  }
+
+  scenario.population.popBlocks = popBlocks;
+  scenario.buildingInstances = buildingInstances;
+  scenario.employment = [];
+  scenario.markets = [
+    {
+      id: 0,
+      regionIds: [0],
+      priceSUSD: [...base.markets[0]!.priceSUSD],
+      stockLots,
+    },
+  ];
+  scenario.systemAccounts = [
+    { id: systemAccountId, accountKind: "system-reserve", balanceSUSD: 0 },
+  ];
+  return scenario;
+}
+
+/**
+ * Build a fixed deterministic reservation set for benchmark setup. This is not
+ * market clearing: buildings are visited by id and each takes its desired input
+ * from the first available opening lots. Production only times the physical
+ * phase against these reservations.
+ */
+function reservationSetForWorld(
+  world: World,
+  scenario: EconomyScenarioDef,
+): InputReservation[] {
+  const market = world.markets[0];
+  if (market === undefined) throw new Error("missing M3 market");
+  const remaining = new Map<string, number>();
+  const lotsByGood = new Map<number, { ownerBuildingId: number; quantity: number }[]>();
+  for (const lot of market.stockLots) {
+    remaining.set(`${String(lot.goodId)}:${String(lot.ownerBuildingId)}`, lot.quantity);
+    const list = lotsByGood.get(lot.goodId) ?? [];
+    list.push({ ownerBuildingId: lot.ownerBuildingId, quantity: lot.quantity });
+    lotsByGood.set(lot.goodId, list);
+  }
+  for (const list of lotsByGood.values()) {
+    list.sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
+  }
+  const reservations: InputReservation[] = [];
+  for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
+    const capacity = computeBuildingCapacity(world, scenario.definitions, building.id);
+    if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
+    for (const desired of capacity.desiredInputs) {
+      let remainingDesired = desired.quantity;
+      const lots = lotsByGood.get(desired.goodId) ?? [];
+      for (const lot of lots) {
+        if (remainingDesired <= 0) break;
+        const key = `${String(desired.goodId)}:${String(lot.ownerBuildingId)}`;
+        const available = remaining.get(key) ?? 0;
+        const quantity = Math.min(remainingDesired, available);
+        if (quantity <= 0) continue;
+        reservations.push({
+          buyerBuildingId: building.id,
+          marketId: market.id,
+          goodId: desired.goodId,
+          sellerBuildingId: lot.ownerBuildingId,
+          quantity,
+        });
+        remaining.set(key, available - quantity);
+        remainingDesired -= quantity;
+      }
+    }
+  }
+  return reservations;
+}
+
+function runProductionBenchmark(
+  label: string,
+  groups: number,
+  iterations: number,
+  warmupIterations: number,
+): ProductionBenchmarkResult {
+  const scenario =
+    groups === 1 ? loadM3SmallEconomy() : scaledProductionScenario(groups);
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  refreshEmploymentIfDue(world, scenario.definitions, 0);
+  assertValidEmploymentState(world, scenario.definitions);
+  const market = world.markets[0];
+  if (market === undefined) throw new Error("missing M3 market");
+  const openingLots = market.stockLots.map((lot) => ({ ...lot }));
+  const reservations = reservationSetForWorld(world, scenario);
+  if (reservations.length === 0) {
+    throw new Error("production benchmark has no reservations");
+  }
+
+  const reset = (): void => {
+    market.stockLots = openingLots.map((lot) => ({ ...lot }));
+  };
+  const onePhase = (): {
+    readonly ns: number;
+    readonly result: ReturnType<typeof runProductionPhase>;
+  } => {
+    reset();
+    const start = process.hrtime.bigint();
+    const result = runProductionPhase(world, scenario.definitions, reservations);
+    const end = process.hrtime.bigint();
+    return { ns: Number(end - start), result };
+  };
+
+  for (let index = 0; index < warmupIterations; index += 1) onePhase();
+  const samples = new Array<number>(iterations);
+  const hashes = new Set<string>();
+  let minReservationsUsed = Number.MAX_SAFE_INTEGER;
+  let minProduction = Number.MAX_SAFE_INTEGER;
+  let minInputsUsed = Number.MAX_SAFE_INTEGER;
+  let reservationsUsed = 0;
+  let production = 0;
+  let inputsUsed = 0;
+  let hash = "";
+
+  for (let index = 0; index < iterations; index += 1) {
+    const { ns, result } = onePhase();
+    samples[index] = ns;
+    const usedReservations = result.reservationUses.filter(
+      (use) => use.usedQuantity > 0,
+    ).length;
+    const produced = result.inventory.reduce((total, flow) => total + flow.production, 0);
+    const usedInputs = result.inventory.reduce((total, flow) => total + flow.usedAsInput, 0);
+    minReservationsUsed = Math.min(minReservationsUsed, usedReservations);
+    minProduction = Math.min(minProduction, produced);
+    minInputsUsed = Math.min(minInputsUsed, usedInputs);
+    if (index === 0) {
+      reservationsUsed = usedReservations;
+      production = produced;
+      inputsUsed = usedInputs;
+      assertValidWorld(world);
+    }
+    const sampleHash = hashWorld(world);
+    hashes.add(sampleHash);
+    if (index === 0) hash = sampleHash;
+  }
+
+  samples.sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+  return {
+    label,
+    groups,
+    iterations,
+    warmupIterations,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / iterations),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    hash,
+    hashesEqual: hashes.size === 1,
+    population: world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    fixtureBlocks: world.popBlocks.length,
+    fixtureBuildings: world.buildings.length,
+    reservations: reservations.length,
+    reservationsUsed,
+    production,
+    inputsUsed,
+    minReservationsUsed,
+    minProduction,
+    minInputsUsed,
+  };
+}
+
+function printProductionBenchmark(result: ProductionBenchmarkResult): void {
+  console.log(
+    `${result.label} (${String(result.groups)} group(s), ${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} production phases; warm-up ${String(result.warmupIterations)}; ` +
+      `reset/validation/hash excluded`,
+  );
+  console.log(
+    `  ${String(result.reservations)} reservations, ${String(result.reservationsUsed)} used; ` +
+      `${result.production.toFixed(3)} produced, ${result.inputsUsed.toFixed(3)} inputs used`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms, population ${String(result.population)}, hash ${result.hash}`,
+  );
+}
+
 function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
@@ -380,7 +646,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -397,6 +663,11 @@ function main(): void {
   console.log(
     `M3b employment: small M3 world, ${String(M3B_EMPLOYMENT_ITERATIONS)} measured refreshes, ` +
       `${String(M3B_EMPLOYMENT_WARMUP)} warm-up; dirty-triggered at day ${String(M3B_EMPLOYMENT_DAY)}`,
+  );
+  console.log(
+    `M3c production: small M3 world (${String(M3C_SMALL_ITERATIONS)} phases, ` +
+      `${String(M3C_SMALL_WARMUP)} warm-up) and ${String(M3C_STRESS_GROUPS)}-group stress ` +
+      `(${String(M3C_STRESS_ITERATIONS)} phases, ${String(M3C_STRESS_WARMUP)} warm-up)`,
   );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
@@ -435,6 +706,18 @@ function main(): void {
   }
 
   const m3bEmployment = runM3bEmploymentCase();
+  const m3cSmall = runProductionBenchmark(
+    "M3c production (small)",
+    1,
+    M3C_SMALL_ITERATIONS,
+    M3C_SMALL_WARMUP,
+  );
+  const m3cStress = runProductionBenchmark(
+    "M3c production (stress)",
+    M3C_STRESS_GROUPS,
+    M3C_STRESS_ITERATIONS,
+    M3C_STRESS_WARMUP,
+  );
 
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
@@ -442,6 +725,8 @@ function main(): void {
     printResults(`M2 stress (${String(blocks)} blocks)`, results);
   }
   printEmploymentBenchmark(m3bEmployment);
+  printProductionBenchmark(m3cSmall);
+  printProductionBenchmark(m3cStress);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -464,6 +749,12 @@ function main(): void {
     m3bEmployment.capsValid &&
     m3bEmployment.refreshedEveryIteration &&
     m3bEmployment.minCreatedAssignments > 0;
+  const productionValid = (result: ProductionBenchmarkResult): boolean =>
+    result.hashesEqual &&
+    result.minReservationsUsed > 0 &&
+    result.minProduction > 0 &&
+    result.minInputsUsed > 0;
+  const m3cValid = productionValid(m3cSmall) && productionValid(m3cStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -474,7 +765,8 @@ function main(): void {
     m1Threshold &&
     aggregateThreshold &&
     stressThreshold &&
-    m3bEmploymentValid;
+    m3bEmploymentValid &&
+    m3cValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -511,6 +803,10 @@ function main(): void {
   );
   console.log(
     `M3b employment created assignments every iteration: ${m3bEmployment.minCreatedAssignments > 0 ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3c production small checks: ${productionValid(m3cSmall) ? "PASS" : "FAIL"}; ` +
+      `stress checks: ${productionValid(m3cStress) ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

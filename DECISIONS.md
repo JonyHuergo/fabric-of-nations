@@ -5,10 +5,10 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 `AGENTS.md` §1.
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
-population core, M3a economy definitions/state/serialization, and M3b
-deterministic employment assignment**. Production, market clearing, wages,
-pricing, later finance, politics, technology, diplomacy, warfare, AI, worker
-protocol, and UI behavior remain out of scope.
+population core, M3a economy definitions/state/serialization, M3b deterministic
+employment assignment, and M3c production/inventory movement**. Market clearing,
+wages, pricing, later finance, politics, technology, diplomacy, warfare, AI,
+worker protocol, and UI behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -639,6 +639,40 @@ protocol, and UI behavior remain out of scope.
   pricing, or household market-based needs. The employment path has a focused
   Node benchmark on the fixed small M3 world; it is not a mobile or full-scale
   economy claim.
+
+### D-039 — M3c production phase, reservations, and storage overflow
+
+- **Resolution:** M3c adds an explicit physical production phase
+  (`runProductionPhase`) separate from the daily tick. It consumes supplied,
+  transient `InputReservation` records against the opening inventory snapshot,
+  computes capacity from the approved TU/level/condition/staffing/productivity
+  contract, uses only inputs required for executed throughput, releases unused
+  reservations, and credits fixed-proportion outputs to producer-owned lots.
+  Reservations are never serialized and no save may occur mid-phase.
+- **Validation:** a reservation identifies buyer building, market, good, seller
+  building/lot, and positive physical quantity. Buyer must have a production
+  recipe and require the good; seller lot must exist in opening inventory; total
+  reservations per lot cannot exceed its opening quantity; duplicate
+  buyer/good/seller reservations are rejected. Invalid sets are rejected before
+  inventory mutation.
+- **Input attribution:** used input is allocated proportionally across the
+  reservations for one buyer/good; unused quantities remain in seller lots and
+  create no payment, ownership transfer, or inventory loss.
+- **Storage:** storage capacity is derived from operational building storage
+  contributions. Provisional M3c rule:
+  `contribution = quantity × level × condition`. Warehouses provide capacity
+  only and do not own stock. Overflow loss is applied proportionally across all
+  lots of the affected good with deterministic residual allocation and recorded
+  per lot/owner.
+- **Conservation:** `closing = opening + production - used inputs - recorded
+  losses`; imports and exports are zero and explicit. Aggregate stock remains
+  derived from lots and is neither serialized nor hashed.
+- **Boundaries:** no market clearing/scarcity allocation, wages, ledger
+  settlement, profit distribution, pricing, or economic tick is implemented.
+  The tick guard remains in place. Production does not mutate accounts,
+  employment, or prices.
+- **Benchmark:** a focused Node benchmark runs the real phase on the approved M3
+  world and a 10-group/80-building scaled fixture; it is not mobile evidence.
 
 ## Assumptions recorded for future review
 
