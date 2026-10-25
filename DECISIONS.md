@@ -1114,6 +1114,139 @@ behavior remain out of scope.
   Inventory is not an asset. Node benchmarks remain diagnostics; the mobile
   p95 ≤ 8 ms target is **NOT EVALUATED**.
 
+### D-047 — M4b monthly period close and finance summaries (approved)
+
+- **Status:** approved for M4b; implementation has not started. GDD v2.3
+  records M4b as future work; a later GDD revision should record the accepted
+  behavior.
+- **Scope:** M4b adds a monthly period close for economic worlds and immutable
+  monthly finance summaries. It does not add taxes, government finance, debt,
+  interest, banks, central banking, monetary issuance, native-currency
+  balances, FX conversion, inflation, monetary regimes, currency unions, UI,
+  annual close, reopen, or M4c.
+- **Monthly boundary and pipeline ordering.** Close on the last civil day of each
+  Gregorian month, after all daily postings, needs/militancy, and the month-end
+  monthly-wealth update, and before `dayIndex` advances. The close belongs to
+  GDD §4.2 step 14 and supplies the monthly finance history required by GDD
+  §14.7. The first period starts at `World.startDayIndex` (a partial first period
+  is allowed); later periods start the day after the previous period end. The
+  terminal `2000-01-01` boundary is never closed.
+- **Opening balances.** Opening balances are pre-existing balance-sheet state,
+  not period activity. `applyOpeningBalances` must reject nonzero opening
+  entries for `revenue` and `expense` accounts; revenue/expense accounts start at
+  zero. Opening entries remain allowed for asset, liability, and equity
+  accounts. The first summary's `accountTotals` includes opening balance-sheet
+  balances, while `flowTotalsByKind` contains only post-opening period activity.
+- **Semantic posting domain.** For every journal line, enforce:
+  - `goods-purchase`: debit `consumption-expense`, credit `sales-revenue`;
+  - `input-purchase`: debit `input-expense`, credit `sales-revenue`;
+  - `wages`: debit `wage-expense`, credit `wage-income`;
+  - `upkeep`: debit `upkeep-expense`, credit `system-income`.
+  The matrix applies to revenue/expense lines in every entry of
+  `postJournalEntry`, `postJournalBatch`, and persisted-posting validation.
+  Cash and equity lines remain governed by the existing account and cash
+  invariants. `profit-distribution` and `owner-capital-injection` may not post
+  to revenue or expense accounts; existing test-only uses of
+  `owner-capital-injection` for revenue/expense must be rewritten.
+- **Internal close-only kind.** Add `period-close` for closing entries. Public
+  `postJournalEntry`/`postJournalBatch` reject it at type and runtime
+  boundaries; the close helper uses a non-public posting path. Persisted
+  `period-close` postings are accepted by `assertValidJournalPosting` only with
+  structural validation: no cash lines, revenue debits, expense credits, and an
+  equity line only for a nonzero net, with balanced debits/credits. Public
+  callers cannot create arbitrary closing entries.
+- **Flow derivation.** Derive the four current flow totals from pre-close
+  expense-account balances:
+  - `goods-purchase` ← `consumption-expense`;
+  - `input-purchase` ← `input-expense`;
+  - `wages` ← `wage-expense`;
+  - `upkeep` ← `upkeep-expense`.
+  `period-close` is excluded. Given zero opening revenue/expense, the semantic
+  matrix, nonnegative expense enforcement, and exact closing zeroing, each
+  expense balance is the gross activity for the current period. No separate
+  flow accumulator is introduced; derivation is valid only while these
+  invariants are enforced. If the matrix is not enforced, the derivation is
+  invalid and M4b must not claim these flows.
+- **Owner-equity invariant.** Every owner with any revenue or expense account
+  must have exactly one `owner-equity` account. Pop blocks and buildings are
+  covered by the existing structural account sets; add a general system-owner
+  check independent of whether a system-reserve account exists. The close must
+  fail before mutation if the invariant is violated. It must not create an
+  equity account implicitly or skip the owner's balances.
+- **Closing entries.** For each owner with nonzero revenue/expense balances,
+  debit each revenue account, credit each expense account, and post the net
+  `revenue - expense` to the owner's existing `owner-equity`; positive net
+  credits equity, negative net debits it, and zero net needs no equity line.
+  Equity may become negative. One entry per owner, with deterministic owner
+  order and account-id order. Post all entries as one atomic batch using
+  `period-close`; no cash account is touched and no distribution, tax, debt, or
+  monetary issuance occurs.
+- **Summary.** `FinancePeriodSummary` contains `periodStartDay`,
+  `periodEndDay`, `accountTotals`, and `flowTotalsByKind`, matching the GDD §5.5
+  contract and the period-summary requirement in §8.1. Capture it before closing
+  entries. `accountTotals` is the pre-close trial balance, including opening
+  balance-sheet balances and period revenue/expense, with only nonzero accounts.
+  `flowTotalsByKind` contains the four current derived flows. The summary is
+  immutable. `FinanceState` gains `periodSummaries` and `closedThroughDay`; no
+  `World.history` collection is added in M4b.
+- **Atomic close.** Stage the entire finance state on a deep copy. Apply the
+  closing entries, append the summary, and set `closedThroughDay` on the copy.
+  Validate the complete staged finance state, owner-equity invariant, accounting
+  identity, and summary consistency before replacing `world.finance`. Any
+  failure leaves the original balances, postings, summaries, and close boundary
+  unchanged. This applies to direct close calls and to the whole-day tick; the
+  tick's staged-world clone remains defense in depth.
+- **Staged versus published state.** A staged close may temporarily have
+  `closedThroughDay === world.dayIndex`. A published/serializable world requires
+  `closedThroughDay === null` or `closedThroughDay < world.dayIndex`.
+  `assertValidEconomyState` enforces this strict published invariant;
+  `assertValidWorld`, `serializeWorld`, `hashWorld`, and `deserializeWorld`
+  reject an unadvanced close state through that validation. `tick` advances
+  `dayIndex` before publication. `runEconomicDay` and direct close calls are
+  staging operations; their unadvanced state is not serializable until the day
+  advances.
+- **Summary validation.** Summaries are sorted, unique, and contiguous, with at
+  most one summary per civil month and no more than the campaign's monthly
+  periods; the first `periodStartDay` equals `World.startDayIndex`; each later
+  start is the previous end + 1; each end is a civil month-end; no summary
+  extends beyond the current day; the last end equals `closedThroughDay`;
+  `closedThroughDay` is null iff there are no summaries; account totals reference
+  existing accounts; flow values are finite and nonnegative.
+- **Duplicate, gap, first period, M2-only, terminal.** A duplicate close throws
+  and mutates nothing. A missed month-end/gap is rejected rather than merged.
+  The first period may be partial. M2-only worlds do not close and create no
+  summaries. The terminal 2000-01-01 day is not closed; the final possible
+  period ends 1999-12-31.
+- **Accounting identity.** Before close,
+  `assets + expenses = liabilities + equity + revenues` holds. Closing zeroes
+  revenue/expense, adjusts equity by `revenue - expense`, preserves designated
+  cash, and preserves the identity after close. The summary's pre-close
+  account totals also satisfy the identity.
+- **Serialization, cloning, hashing, and compatibility.** Add
+  `FinancePeriodSummary`, `FinanceState.periodSummaries`, and
+  `FinanceState.closedThroughDay`; encode summaries sorted by period end and
+  account/flow maps with canonical keys; include them in hashing and deep
+  cloning; validate on decode. `WORLD_SCHEMA_VERSION = 8`,
+  `SIM_VERSION = "0.8.0"`, `SAVE_FORMAT_VERSION = 1`, and data version
+  `m3-economy-v1` unchanged. Schema-7/simulation-0.7 saves are rejected with an
+  actionable error; no migration is implemented (D-013).
+- **Required tests.** Opening revenue/expense rejection without mutation;
+  invalid kind/side rejection in individual and batched postings; valid
+  production postings and internal close behavior; public `period-close`
+  rejection and persisted-close structural validation; missing system equity
+  rejection; exact zeroing of revenue/expense and preservation of cash/accounting
+  identity; direct-close atomicity; rejection of unadvanced staged states by
+  world validation, serialization, and hashing; schema-7/simulation-0.7 save
+  rejection. Also cover summary correctness, partial first periods, month-end
+  and leap-year boundaries, duplicate/gap behavior, determinism, save/resume,
+  cloning, and M2/M3/M4a regressions.
+- **Deferred.** Taxes, government revenue/expenditure, debt, interest, banks,
+  central banking, monetary issuance, native-currency balances, FX conversion,
+  inflation, monetary regimes, currency unions, annual/fiscal-year close,
+  reopen/reversal/adjusting entries, a separate retained-earnings subtype,
+  flow totals for future cash/equity-transfer kinds, M2-only finance summaries,
+  account deletion/remapping, summary compaction, UI, and M4c.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
