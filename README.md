@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d foundation
+# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d/M3e foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -8,9 +8,10 @@ The repository currently implements **M0 (project foundation)**, **M1
 (simulation core)**, **M2.1 (corrected population core)**, **M3a (economy
 definitions, state, validation, and serialization)**, **M3b (deterministic
 employment assignment)**, **M3c (production, input reservations, and inventory
-movement)**, and **M3d (deterministic two-pass market clearing with bounded
-prices)** only. Wages, financial settlement, pricing-side income, government
-finance, politics, technology, diplomacy, warfare, AI, worker, and React Native
+movement)**, **M3d (deterministic two-pass market clearing with bounded
+prices)**, and **M3e (cash settlement, wages, retained producer profit, and
+household cash)** only. Government finance, taxes, debt/credit, inflation/FX,
+dividends, politics, technology, diplomacy, warfare, AI, worker, and React Native
 UI behavior are not implemented. The design authority is the Century GDD v2.1
 (`Century_GDD_v2.1.md`); persistent engineering rules are in
 [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
@@ -20,7 +21,7 @@ UI behavior are not implemented. The design authority is the Century GDD v2.1
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, tick, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -246,8 +247,8 @@ M3d adds `runMarketDay`, an explicit market-day phase. It is not a complete
 economic tick: it neither computes household budgets nor settles money.
 
 - Demand arrives as explicit records with desired and funded quantities.
-  `fundedQuantity` is supplied by the future M3e budget layer; M3d only allocates
-  funded demand and returns pending transactions.
+  `fundedQuantity` is supplied by the caller; M3f will derive it from settled
+  cash. M3d only allocates funded demand and returns pending transactions.
 - Priority order is household subsistence (1), critical production inputs (2),
   household basic (3), remaining production inputs (5), household
   comfort/luxury (6). Government and export demand are absent.
@@ -283,6 +284,50 @@ economic tick: it neither computes household budgets nor settles money.
   updated price applies to the next day. Prices remain finite and positive.
 - Reservations, demand allocations, production results, and pending transactions
   are transient. No financial balance, wage, or settlement state is changed.
+
+## M3e cash settlement, wages, and retained profit
+
+M3e adds `settleMarketDay`, an explicit settlement phase that consumes one M3d
+result and mutates authoritative `World.finance` balances. It does not add a
+daily economic tick.
+
+- Each M3d seller-attributed household/input transaction is posted exactly once
+  at its established quantity and price. Seller building operating accounts are
+  credited; buyer household or operating accounts are debited.
+- Market transactions settle as one atomic batch. Same-batch sales receipts may
+  fund a building's purchases; every account must end non-negative. Insufficient
+  market funds reject the entire market batch with no balance or posting changes.
+  Market purchases are never partially settled and create no debt.
+- Wages use actual employment assignments, not building capacity. Daily wages are
+  `baseWage1900SUSDPerYear / daysInYear(civil year)`. Unfilled slots are unpaid,
+  and no worker is paid twice.
+- Wages are paid after market settlement from the employer operating account. If
+  an employer is short, workers receive a deterministic pro-rata payment and the
+  unpaid remainder is reported. No negative balance, debt, or liability is
+  created.
+- Every operational building also pays daily upkeep of
+  `dailyUpkeepSUSDAtLevelOne × level` from its operating account to the single
+  system-reserve account. Upkeep is paid after wages. Condition and staffing do
+  not scale upkeep because the data/GDD define only the level-one daily value.
+  Underfunded upkeep is partially paid and the shortfall is reported; no debt,
+  negative balance, or automatic closure is created. The system reserve is a real
+  account, so upkeep is a transfer, not money destruction.
+- Producer cash-basis profit is
+  `revenue - input costs - wages paid - upkeep paid`. Input consumption is a
+  monetary cost once, through its settled purchase, not again through inventory.
+  Profit is retained in the operating account; no dividend or owner distribution
+  is implemented.
+- Household accounts change only through settled purchases and wage receipts.
+  `wealthLevel` remains a welfare indicator, not cash.
+- SUSD amounts are not rounded per transaction, worker, or upkeep obligation; the
+  existing `1e-6` monetary tolerance is used for invariants. Postings balance and
+  total cash is conserved.
+- `MarketDayResult.settled` is a transient duplicate guard for the same result
+  object; it is not serialized. A deep copy can bypass it, and no persistent
+  settlement ledger is introduced.
+- No schema, save-format, data-version, or simulation-version change is made.
+- Wage index/scarcity/inflation/laws, taxes, interest, debt, dividends, and the
+  M3f daily integration remain deferred.
 
 ## Data and calibration
 
@@ -392,10 +437,11 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
-employment-refresh workload, M3c production/inventory workloads, and M3d
-market-day workloads. Stress scales repeat the three deterministic multi-block
-templates (400k/350k/250k people), so total population grows with block count.
-Each stress scale uses 100 warm-up ticks and 730 measured ticks.
+employment-refresh workload, M3c production/inventory workloads, M3d market-day
+workloads, and M3e settlement workloads. Stress scales repeat the three
+deterministic multi-block templates (400k/350k/250k people), so total population
+grows with block count. Each stress scale uses 100 warm-up ticks and 730 measured
+ticks.
 
 Representative runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
@@ -460,6 +506,25 @@ fulfilled `604,000` household units, including `100,000` in Pass B, and consumed
 `16,875` production input units per sample. This is a Node diagnostic; it makes
 no claim about a runnable economic tick or target-scale mobile performance.
 
+The M3e workloads run the real M3d market day first, reset inventory, prices, and
+finance before each sample, and time only `settleMarketDay`. The benchmark fixture
+seeds cash-backed household and operating accounts so full settlement is possible;
+the unit tests cover underfunded wages/upkeep and rejected market funding
+separately.
+
+| Workload | Blocks | Buildings | Transactions | Wage settlements | Upkeep | Postings | Settlements | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M3e small | 4 | 8 | 11 | 7 | 250 SUSD | 26 | 50 | 0.396 ms | 0.306 ms | 0.650 ms | 2.839 ms | `67728eb2e9c69218` |
+| M3e stress | 40 | 80 | 1,100 | 70 | 2,500 SUSD | 1,250 | 20 | 7.745 ms | 7.509 ms | 9.501 ms | 11.542 ms | `25f6e0a414108bb6` |
+
+The small case settled `3,836.875` SUSD of purchases, `98,904.110` SUSD of
+wages, and `250` SUSD of upkeep, with a `96,014.110` SUSD producer cash-basis
+loss. The stress case settled `38,368.750` SUSD of purchases, `989,041.096` SUSD
+of wages, and `2,500` SUSD of upkeep, with a `960,141.096` SUSD producer loss. No
+wages or upkeep were unpaid in the cash-backed benchmark. Settlement times exclude
+market-day setup, reset, and hashing; settlement validation is included. These are
+Node diagnostics, not mobile-performance evidence.
+
 ## Known limitations
 
 - Full historical demographic calibration is incomplete: the 1900 age/sex
@@ -475,23 +540,30 @@ no claim about a runnable economic tick or target-scale mobile performance.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- M3a–M3d implement economy state, the cash ledger, employment assignment, a
-  physical production phase, and two-pass market clearing only: no wages,
-  financial settlement, profit distribution, household income, government
-  finance, politics, technology, diplomacy, warfare, AI, migration, social
-  mobility, or UI exists.
+- M3a–M3e implement economy state, the cash ledger, employment assignment, a
+  physical production phase, two-pass market clearing, and cash settlement of
+  purchases/wages/upkeep with retained profit only: no taxes, interest, dividends,
+  debt/credit, government finance, politics, technology, diplomacy, warfare, AI,
+  migration, social mobility, or UI exists.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - A world containing buildings or markets currently rejects `tick`; M3
   population-only fixture behavior is preserved separately. M3b employment, M3c
-  production, and M3d market days are exercised by Jest and focused Node
-  benchmarks, not by a runnable economic tick.
+  production, M3d market days, and M3e settlement are exercised by Jest and
+  focused Node benchmarks, not by a runnable economic tick.
 - M3c storage capacity uses a provisional `quantity × level × condition` rule;
   overflow is pooled by market rather than assigned to individual warehouses.
 - M3d price coefficients are provisional, and price updates use gross opening
   stock plus same-day production; final overflow losses do not feed back into the
-  same day's price. Market clearing returns pending financial results but does not
-  settle them.
+  same day's price. M3d still returns pending financial results without settling
+  them.
+- M3e uses base annual wages without wage index, labor scarcity, inflation, law,
+  or wage-productivity adjustments; producer profit is cash-basis and retained.
+  Upkeep is `dailyUpkeepSUSDAtLevelOne × level` for operational buildings and is
+  not condition- or staffing-scaled. Underfunded employers/building accounts pay
+  pro-rata wages/upkeep and report shortfalls without creating debt. Market
+  purchases must be fully funded or the settlement batch is rejected atomically.
+  Owner profit distribution remains deferred.
 
 ## Development workflow
 
@@ -501,5 +573,5 @@ no claim about a runnable economic tick or target-scale mobile performance.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3e until M3d is reviewed and the next phase is explicitly
+7. Do not begin M3f until M3e is reviewed and the next phase is explicitly
    authorized.

@@ -158,6 +158,11 @@ export interface MarketDayResult {
   readonly priceUpdates: readonly PriceUpdate[];
   readonly inventory: readonly MarketInventoryFlow[];
   readonly overflowLosses: readonly OverflowLoss[];
+  /**
+   * Transient duplicate-settlement guard. M3e refuses to settle an already
+   * settled result. This flag is not authoritative state and is never saved.
+   */
+  settled: boolean;
 }
 
 interface DemandState {
@@ -953,6 +958,7 @@ export function runMarketDay(
       priceUpdates,
       inventory,
       overflowLosses,
+      settled: false,
     };
   } catch (error) {
     market.stockLots = openingLots;

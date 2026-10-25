@@ -12,8 +12,10 @@
  * production phase with transient input reservations, producer-owned output lots,
  * and recorded storage overflow. M3d adds deterministic two-pass market clearing,
  * transient household/input reservations, and bounded daily price updates without
- * financial settlement. Economy behavior beyond this, politics, technology,
- * diplomacy, war, and UI contracts remain future milestones.
+ * financial settlement. M3e adds explicit cash settlement of M3d transactions,
+ * daily wages, retained producer profit, and household cash updates. It does not
+ * add a runnable economic tick. Politics, technology, diplomacy, war, and UI
+ * contracts remain future milestones.
  */
 
 export * from "./types.js";

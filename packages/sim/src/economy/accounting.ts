@@ -27,6 +27,19 @@ export interface CashTransferOptions {
   readonly amountSUSD: number;
 }
 
+export interface JournalEntryInput {
+  readonly transactionKind: TransactionKind;
+  readonly lines: readonly JournalLine[];
+  readonly sourceEntityId?: Id | null;
+  readonly targetEntityId?: Id | null;
+}
+
+interface ValidatedLines {
+  readonly deltas: Map<number, number>;
+  readonly debits: number;
+  readonly credits: number;
+}
+
 function accountMap(finance: FinanceState): Map<number, FinancialAccount> {
   const accounts = requireArray(finance.accounts, "finance.accounts");
   const map = new Map<number, FinancialAccount>();
@@ -48,10 +61,10 @@ function assertTransactionKind(value: unknown): asserts value is TransactionKind
   }
 }
 
-function validateLines(
+function validatePostingLines(
   lines: readonly JournalLine[],
   accounts: Map<number, FinancialAccount>,
-): { readonly deltas: Map<number, number> } {
+): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
   const deltas = new Map<number, number>();
   let debits = 0;
@@ -92,6 +105,13 @@ function validateLines(
       `journal posting is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
     );
   }
+  return { deltas, debits, credits };
+}
+
+function assertNonNegativeBalances(
+  accounts: Map<number, FinancialAccount>,
+  deltas: Map<number, number>,
+): void {
   for (const [accountId, delta] of deltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
@@ -102,7 +122,15 @@ function validateLines(
       );
     }
   }
-  return { deltas };
+}
+
+function validateLines(
+  lines: readonly JournalLine[],
+  accounts: Map<number, FinancialAccount>,
+): { readonly deltas: Map<number, number> } {
+  const validated = validatePostingLines(lines, accounts);
+  assertNonNegativeBalances(accounts, validated.deltas);
+  return { deltas: validated.deltas };
 }
 
 /**
@@ -144,6 +172,82 @@ export function postJournalEntry(
     finance.postings.splice(0, finance.postings.length - MAX_AUDIT_POSTINGS);
   }
   return posting;
+}
+
+/**
+ * Post several balanced entries atomically. Individual entries are validated
+ * against their own debits/credits; account affordability is checked against the
+ * net effect of the whole batch before any balance changes. This permits
+ * same-settlement sales receipts to fund purchases without an order dependency.
+ */
+export function postJournalBatch(
+  finance: FinanceState,
+  dayIndex: Day,
+  entries: readonly JournalEntryInput[],
+): JournalPosting[] {
+  assertValidDayIndex(dayIndex);
+  const accounts = accountMap(finance);
+  const nextId = requireInteger(
+    finance.nextPostingId,
+    "finance.nextPostingId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  if (entries.length === 0) return [];
+  if (nextId + entries.length - 1 > Number.MAX_SAFE_INTEGER) {
+    throw new RangeError("finance posting id overflow");
+  }
+
+  const aggregate = new Map<number, number>();
+  const prepared: {
+    readonly transactionKind: TransactionKind;
+    readonly lines: readonly JournalLine[];
+    readonly sourceEntityId: Id | null;
+    readonly targetEntityId: Id | null;
+  }[] = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
+    assertTransactionKind(entry.transactionKind);
+    const validated = validatePostingLines(entry.lines, accounts);
+    for (const [accountId, delta] of validated.deltas) {
+      aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
+    }
+    prepared.push({
+      transactionKind: entry.transactionKind,
+      lines: entry.lines.map((line) => ({ ...line })),
+      sourceEntityId: entry.sourceEntityId ?? null,
+      targetEntityId: entry.targetEntityId ?? null,
+    });
+  }
+  assertNonNegativeBalances(accounts, aggregate);
+
+  for (const [accountId, delta] of aggregate) {
+    const account = accounts.get(accountId);
+    if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
+    account.balanceSUSD += delta;
+  }
+
+  const postings: JournalPosting[] = [];
+  let postingId = nextId;
+  for (const entry of prepared) {
+    const posting: JournalPosting = {
+      id: postingId,
+      dayIndex,
+      transactionKind: entry.transactionKind,
+      lines: entry.lines.map((line) => ({ ...line })),
+      sourceEntityId: entry.sourceEntityId,
+      targetEntityId: entry.targetEntityId,
+    };
+    finance.postings.push(posting);
+    postings.push(posting);
+    postingId += 1;
+  }
+  finance.nextPostingId = postingId;
+  if (finance.postings.length > MAX_AUDIT_POSTINGS) {
+    finance.postings.splice(0, finance.postings.length - MAX_AUDIT_POSTINGS);
+  }
+  return postings;
 }
 
 /** Post a single debit/credit cash transfer. */

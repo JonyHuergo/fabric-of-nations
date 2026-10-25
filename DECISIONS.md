@@ -6,10 +6,11 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
-employment assignment, M3c production/inventory movement, and M3d deterministic
-two-pass market clearing with bounded prices**. Wages, settlement, profit
-distribution, later finance, politics, technology, diplomacy, warfare, AI, worker
-protocol, and UI behavior remain out of scope.
+employment assignment, M3c production/inventory movement, M3d deterministic
+two-pass market clearing with bounded prices, and M3e cash settlement, wages, and
+retained producer profit**. Government finance, taxes, debt/credit, inflation/FX,
+dividends, politics, technology, diplomacy, warfare, AI, worker protocol, and UI
+behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -685,7 +686,8 @@ protocol, and UI behavior remain out of scope.
   household demand with same-day output, removes fulfilled household goods once,
   applies final overflow, and updates prices boundedly.
 - **No settlement:** M3d neither reads household cash nor mutates financial
-  balances. `fundedQuantity` is supplied by the future M3e budget layer.
+  balances. `fundedQuantity` is supplied by the caller; M3f will derive it from
+  settled cash and M3e will settle the resulting pending transactions.
   Household purchases, input purchases, and transaction prices are returned as
   transient pending transactions. Reservations and pending results are not
   serialized; no save may occur mid-market-day.
@@ -743,6 +745,81 @@ protocol, and UI behavior remain out of scope.
 - **Boundaries:** no wages, financial settlement, profit distribution, household
   income, government finance, inflation, FX, or runnable economic tick. The
   economic-world guard on `tick()` remains intact.
+
+### D-041 — M3e cash settlement, wages, and retained profit
+
+- **Resolution:** M3e adds `settleMarketDay`, an explicit phase that consumes one
+  M3d `MarketDayResult` and mutates authoritative `World.finance` balances. It
+  settles the M3d seller-attributed pending transactions, pays wages and daily
+  building upkeep, and returns a transient per-transaction/per-producer/
+  per-household result. It does not integrate a daily tick. GDD §4.1 step 11 and
+  §7.7 require operating costs (including upkeep) to be settled and operating
+  profit to be residual after all recorded operating costs; §4.2 sets this
+  cadence to daily.
+- **Ownership:** household accounts belong to pop blocks; operating accounts
+  belong to buildings; the single system-reserve account receives upkeep. The
+  seller building operating account is credited and the buyer account (household
+  or operating) is debited for each pending market transaction. Wage payments
+  debit the employer operating account and credit the assigned pop-block household
+  accounts. Upkeep debits the building operating account and credits the system
+  reserve. No owner or third-party account is touched by M3e.
+- **Market sequence:** all M3d pending transactions are settled as one atomic
+  batch. Each posting uses the M3d quantity and established transaction price.
+  The batch validates each transaction and the aggregate account net before any
+  balance changes, so same-batch sales receipts may fund a building's purchases.
+  A resulting negative account rejects the entire market batch; balances and
+  postings are restored. Market purchases are never partially settled and never
+  create debt.
+- **Wages:** wage obligations use only actual `EmploymentAssignment.workers`, so
+  unfilled slots are not paid and a worker is not paid twice. The daily rate is
+  `baseWage1900SUSDPerYear / daysInYear(civil year)`; M3e has no wage index, labor
+  scarcity, inflation, laws, or separate productivity-wage adjustment. Wages are
+  paid after market settlement, from the employer operating account. If an
+  employer cannot fund its obligation, it pays pro-rata up to available cash and
+  the unpaid remainder is reported. Unpaid wages are not a liability, debt, or
+  negative balance in M3e; they are a recorded shortfall for later labor systems.
+- **Upkeep:** every operational building owes
+  `dailyUpkeepSUSDAtLevelOne × building.level` per settlement day. GDD §5.3
+  supplies the level-one daily value, §7.2/§7.3 define building maintenance costs,
+  and §7.7 requires upkeep to be separately recorded. M3e does not apply a
+  condition or staffing multiplier because the GDD/data define only the level-one
+  daily value; this is a documented inference, not a hidden rule. Upkeep is paid
+  after wages, from the operating account to the single system-reserve account,
+  using the existing `upkeep` ledger kind. The system reserve is a real account,
+  so upkeep is a transfer, not money destruction. If operating cash is
+  insufficient, the building pays available cash and reports the unpaid upkeep; no
+  debt, negative balance, or automatic closure is created. M3e requires exactly
+  one system-reserve account when upkeep is due.
+- **Producer accounting:** revenue is settled cash from sales of goods by the
+  building; input cost is settled cash paid for production inputs; wage cost is
+  cash actually paid; upkeep cost is cash actually paid. Cash-basis operating
+  profit is `revenue - input costs - wages paid - upkeep paid`; it is retained in
+  the building operating account and is not distributed to owners. No
+  COGS/inventory valuation, taxes, interest, dividends, credit, or owner-capital
+  injections are introduced. Producer ending cash must equal opening cash plus
+  this cash-basis profit.
+- **Household assets:** household accounts change only through settled market
+  purchases and wage receipts. No universal income, savings interest, asset
+  drawdown beyond actual cash, or unexplained transfer exists. `wealthLevel` is a
+  welfare indicator, not cash, and is not updated by M3e.
+- **Rounding:** SUSD amounts are not rounded per transaction, worker, or upkeep
+  obligation; authoritative balances use finite double values with the existing
+  `MONEY_TOLERANCE_SUSD = 1e-6` invariant tolerance. Every journal posting is
+  balanced, and total cash is conserved.
+- **Duplicate protection:** `MarketDayResult.settled` is a transient guard; a
+  second call with the same result object is rejected before mutation. This flag
+  is not serialized or authoritative, so a malicious/accidental deep copy could
+  bypass it; no persistent settlement ledger is added in M3e.
+- **Insufficient funds:** market settlement fails atomically if any buyer cannot
+  fund its aggregate batch. Wage and upkeep shortfalls are partial rather than
+  fatal. A caller/M3f must derive funded market demand from actual cash before
+  M3d; M3e does not retroactively adjust M3d allocations.
+- **Compatibility:** no schema, save-format, data-version, or simulation-version
+  change. `MarketDayResult.settled` is transient. M3d inventory, allocation,
+  priorities, and prices are not altered by settlement.
+- **Deferred:** wage index/scarcity/productivity/inflation/laws, owner profit
+  distribution, taxes, interest, debt, and the M3f daily integration remain future
+  work.
 
 ## Assumptions recorded for future review
 
