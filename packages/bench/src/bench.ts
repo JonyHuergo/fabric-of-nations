@@ -1,10 +1,14 @@
 /**
- * Headless M2 benchmark harness.
+ * Headless M1/M2/M3b benchmark harness.
  *
  * This is a Node regression harness, not proof of mobile performance. It runs:
  * - M1 empty-world no-op ticks (backwards regression);
  * - M2 world-aggregate century ticks;
- * - M2 multi-block stress ticks at 200, 1,000, 3,000, and 6,000 pop blocks.
+ * - M2 multi-block stress ticks at 200, 1,000, 3,000, and 6,000 pop blocks;
+ * - M3b employment-refresh samples on the fixed small M3 world.
+ *
+ * Employment samples reset to a fixed seed-assignment state and time only the
+ * real refresh routine. Setup, correctness validation, and hashing are excluded.
  *
  * The GDD mobile target (p95 <= 8 ms on a full-scale reference world) requires
  * a device release build and is explicitly not evaluated here.
@@ -16,17 +20,23 @@ import process from "node:process";
 import {
   loadM2MultiBlock,
   loadM2WorldAggregate,
+  loadM3SmallEconomy,
   DATA_PACKAGE_VERSION,
 } from "@century/data";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   CAMPAIGN_TICKS,
   SIM_VERSION,
+  assertValidEmploymentState,
+  assertValidWorld,
+  createEconomyWorld,
   createInitialWorld,
   createPopulationWorld,
   hashWorld,
   populationTotal,
+  refreshEmploymentIfDue,
   tick,
+  type EconomyScenarioDef,
   type PopulationInputs,
   type PopulationScenarioDef,
   type TickContext,
@@ -40,6 +50,9 @@ const M2_STRESS_SCALES = [200, 1_000, 3_000, 6_000] as const;
 const M2_STRESS_TICKS = 730;
 const WARMUP_TICKS = 2_000;
 const STRESS_WARMUP_TICKS = 100;
+const M3B_EMPLOYMENT_WARMUP = 100;
+const M3B_EMPLOYMENT_ITERATIONS = 1_000;
+const M3B_EMPLOYMENT_DAY = 10;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -75,6 +88,27 @@ interface RunResult {
   readonly hash: string;
   readonly finalDayIndex: number;
   readonly population: number;
+}
+
+interface EmploymentBenchmarkResult {
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly hash: string;
+  readonly hashesEqual: boolean;
+  readonly capsValid: boolean;
+  readonly refreshedEveryIteration: boolean;
+  readonly minCreatedAssignments: number;
+  readonly assignments: number;
+  readonly assignedWorkers: number;
+  readonly seedAssignments: number;
+  readonly population: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
 }
 
 function percentile(sortedSamples: readonly number[], fraction: number): number {
@@ -163,8 +197,117 @@ function runPopulationCase(
   };
 }
 
-function runM1Case(run: number): RunResult {
-  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
+/**
+ * Measure the real M3b employment refresh. Each sample resets authoritative
+ * employment to the scenario's fixed seed assignments and marks it dirty; only
+ * the refresh call is timed. Reset, correctness validation, and hashing are
+ * outside the measured interval.
+ */
+function runM3bEmploymentCase(): EmploymentBenchmarkResult {
+  const scenario: EconomyScenarioDef = loadM3SmallEconomy();
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  world.dayIndex = M3B_EMPLOYMENT_DAY;
+  const seedAssignments = world.employment.map((assignment) => ({ ...assignment }));
+
+  const reset = (): void => {
+    world.employment = seedAssignments.map((assignment) => ({ ...assignment }));
+    world.employmentDirty = true;
+  };
+  const oneRefresh = (): {
+    readonly ns: number;
+    readonly result: ReturnType<typeof refreshEmploymentIfDue>;
+  } => {
+    reset();
+    const start = process.hrtime.bigint();
+    const result = refreshEmploymentIfDue(
+      world,
+      scenario.definitions,
+      M3B_EMPLOYMENT_DAY,
+    );
+    const end = process.hrtime.bigint();
+    return { ns: Number(end - start), result };
+  };
+
+  for (let index = 0; index < M3B_EMPLOYMENT_WARMUP; index += 1) oneRefresh();
+
+  const samples = new Array<number>(M3B_EMPLOYMENT_ITERATIONS);
+  const hashes = new Set<string>();
+  let capsValid = true;
+  let refreshedEveryIteration = true;
+  let minCreatedAssignments = Number.MAX_SAFE_INTEGER;
+  let assignments = 0;
+  let assignedWorkers = 0;
+  let hash = "";
+
+  for (let index = 0; index < M3B_EMPLOYMENT_ITERATIONS; index += 1) {
+    const { ns, result } = oneRefresh();
+    samples[index] = ns;
+    refreshedEveryIteration = refreshedEveryIteration && result.refreshed;
+    minCreatedAssignments = Math.min(minCreatedAssignments, result.createdAssignments);
+    assertValidEmploymentState(world, scenario.definitions);
+    const actualAssigned = world.employment.reduce(
+      (total, assignment) => total + assignment.workers,
+      0,
+    );
+    capsValid = capsValid && actualAssigned === result.assignedWorkers;
+    const sampleHash = hashWorld(world);
+    hashes.add(sampleHash);
+    if (index === 0) {
+      assignments = world.employment.length;
+      assignedWorkers = actualAssigned;
+      hash = sampleHash;
+      assertValidWorld(world);
+    }
+  }
+
+  samples.sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+
+  return {
+    iterations: M3B_EMPLOYMENT_ITERATIONS,
+    warmupIterations: M3B_EMPLOYMENT_WARMUP,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / M3B_EMPLOYMENT_ITERATIONS),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    hash,
+    hashesEqual: hashes.size === 1,
+    capsValid,
+    refreshedEveryIteration,
+    minCreatedAssignments,
+    assignments,
+    assignedWorkers,
+    seedAssignments: seedAssignments.length,
+    population: world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    fixtureBlocks: world.popBlocks.length,
+    fixtureBuildings: world.buildings.length,
+  };
+}
+
+function printEmploymentBenchmark(result: EmploymentBenchmarkResult): void {
+  console.log(
+    `M3b employment refresh (${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings, ${String(result.seedAssignments)} seed assignments):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} refreshes; warm-up ${String(result.warmupIterations)}; ` +
+      `day ${String(M3B_EMPLOYMENT_DAY)} dirty-triggered; reset/validation/hash excluded`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms`,
+  );
+  console.log(
+    `  assignments ${String(result.assignments)}, assigned workers ${String(result.assignedWorkers)}, ` +
+      `min created/refresh ${String(result.minCreatedAssignments)}, ` +
+      `population ${String(result.population)}, hash ${result.hash}`,
+  );
+}
+
+function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
   const startNs = process.hrtime.bigint();
@@ -237,7 +380,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2 simulation-core benchmark");
+  console.log("Century M1/M2/M3b simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -251,6 +394,10 @@ function main(): void {
   );
   console.log(`warm-up: ${String(WARMUP_TICKS)} ticks for M1 and M2 aggregate`);
   console.log(`stress warm-up: ${String(STRESS_WARMUP_TICKS)} ticks per scale`);
+  console.log(
+    `M3b employment: small M3 world, ${String(M3B_EMPLOYMENT_ITERATIONS)} measured refreshes, ` +
+      `${String(M3B_EMPLOYMENT_WARMUP)} warm-up; dirty-triggered at day ${String(M3B_EMPLOYMENT_DAY)}`,
+  );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   for (let index = 0; index < WARMUP_TICKS; index += 1) tick(warmupM1);
@@ -287,11 +434,14 @@ function main(): void {
     });
   }
 
+  const m3bEmployment = runM3bEmploymentCase();
+
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
   for (const { blocks, results } of m2StressResults) {
     printResults(`M2 stress (${String(blocks)} blocks)`, results);
   }
+  printEmploymentBenchmark(m3bEmployment);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -309,6 +459,11 @@ function main(): void {
   const stressTicksComplete = m2StressResults.every(({ results }) =>
     results.every((result) => result.ticks === M2_STRESS_TICKS),
   );
+  const m3bEmploymentValid =
+    m3bEmployment.hashesEqual &&
+    m3bEmployment.capsValid &&
+    m3bEmployment.refreshedEveryIteration &&
+    m3bEmployment.minCreatedAssignments > 0;
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -318,7 +473,8 @@ function main(): void {
     allTerminal &&
     m1Threshold &&
     aggregateThreshold &&
-    stressThreshold;
+    stressThreshold &&
+    m3bEmploymentValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -343,6 +499,18 @@ function main(): void {
   );
   console.log(
     `M2 1000/3000/6000-block results are diagnostic scale probes, not acceptance thresholds.`,
+  );
+  console.log(
+    `M3b employment caps valid: ${m3bEmployment.capsValid ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3b employment cross-run hash: ${m3bEmployment.hashesEqual ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3b employment refreshed every iteration: ${m3bEmployment.refreshedEveryIteration ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3b employment created assignments every iteration: ${m3bEmployment.minCreatedAssignments > 0 ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

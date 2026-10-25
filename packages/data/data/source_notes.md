@@ -149,7 +149,7 @@ Public tick path, aggregate campaign scenario, January 1 samples:
 
 - Maximum annual relative error: **9.553%** at 2000.
 - RMSE across 101 annual samples: **5.320%**.
-- Full-century aggregate hash: `d421eaf5f04a207b` (seed 20261023, schema 4).
+- Full-century aggregate hash: `ebf0a37a515e18d0` (seed 20261023, schema 5).
 
 The 2000 excess is not a coefficient failure: the campaign's 1950 age/sex
 composition is materially younger than WPP because the 1900 distribution and
@@ -200,7 +200,7 @@ missing 1960s fertility peak and annual fertility decline, not an age-transition
 or newborn-assignment defect. The remaining +1.2% total difference is small and
 is not tuned away.
 
-The full validation-regression digest is `858773b2d559b2fc` (schema 4).
+The full validation-regression digest is `fae7f28d69845067` (schema 5).
 
 ## GDD anchor discrepancy
 

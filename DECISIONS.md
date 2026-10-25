@@ -5,10 +5,10 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 `AGENTS.md` §1.
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
-population core, and M3a economy definitions/state/serialization**. Employment
-behavior, production, market clearing, wages, pricing, later finance, politics,
-technology, diplomacy, warfare, AI, worker protocol, and UI behavior remain out
-of scope.
+population core, M3a economy definitions/state/serialization, and M3b
+deterministic employment assignment**. Production, market clearing, wages,
+pricing, later finance, politics, technology, diplomacy, warfare, AI, worker
+protocol, and UI behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -584,6 +584,61 @@ of scope.
   error from `tick` because M3 economy behavior is not implemented. This prevents
   an M3 world from silently using the M2 needs fixture. Population-only worlds
   retain their existing tick path.
+
+### D-037 — M3b schema 5 employment dirty marker
+
+- **Resolution:** `WORLD_SCHEMA_VERSION = 5`, `SIM_VERSION = "0.5.0"`, data
+  version remains `m3-economy-v1`. `World.employmentDirty` is an authoritative
+  boolean that records a pending initial or immediate employment evaluation.
+  Schema-4 and simulation-0.4 saves are rejected; no migration is implemented.
+- **Rationale:** initial evaluation and explicit dirty events (building closure
+  or changed job capacity) must survive save/resume and must not be inferred from
+  wall-clock or unrelated state. The field is a scheduling marker, not an
+  employment total or job-slot cache.
+- **Consequence:** the world digest changes. New baselines are M1 empty-world
+  `90e5dcfaa35cdab0`, M2 campaign aggregate `ebf0a37a515e18d0`, WPP validation
+  `fae7f28d69845067`, and M3 structural-world `b4c57b894cda6ae7`. M2.1
+  population totals and calibration behavior remain unchanged.
+
+### D-038 — M3b deterministic employment assignment
+
+- **Eligibility:** a block fills only jobs matching its existing
+  `professionId`, subject to literacy and wealth qualification. Eligible
+  workforce is `floor(workingAgePopulation × participationRate)`, with working
+  age derived from ages 15–64 across both sex arrays. Job slots are
+  `floor(workersPerThroughputUnit × referenceThroughputPerDayAtLevelOne × level ×
+  condition)`. Fractional capacity is not assignable.
+- **Retention:** valid existing assignments are retained in ascending keyed draw
+  order using purpose `employment.retain`, tie-broken by assignment id only for
+  exact draw collisions. Each retained assignment receives
+  `min(previous workers, remaining building slots, remaining block eligible
+  workforce)`; partial retention is allowed. Excess assignments/workers are
+  released.
+- **Filling:** for each profession, remaining vacancies are apportioned across
+  eligible blocks by largest remainder (purpose
+  `employment.block-remainder` for exact ties). Blocks are then processed in
+  keyed `employment.fill-order`; each block's quota is apportioned across
+  remaining building vacancies by largest remainder
+  (`employment.building-remainder`). Existing assignments are extended before new
+  assignment ids are created. Unfilled capacity remains vacant; unassigned
+  eligible workers remain unemployed.
+- **Assignment ids:** new ids begin above the maximum existing assignment id.
+  There is no persisted monotonic counter, so an id can be reused after the
+  maximum assignment is removed. This is deterministic for a given state; it
+  does not affect worker allocation or the world hash beyond stable ids.
+- **Scheduling:** `refreshEmploymentIfDue` runs when `employmentDirty` is true or
+  the day is the first civil day of the month. It does not run at the terminal
+  boundary. `createEconomyWorld` sets `employmentDirty = true` so the first
+  explicit evaluation is the scenario initial evaluation. `tick` still rejects
+  economy worlds; a future economic tick must call this routine at the employment
+  stage. Building closure itself is not implemented.
+- **Canonicalization:** assignments are sorted by id; the M3 world sorts pop blocks
+  and region `popBlockIds` by id at construction. The hash is therefore invariant
+  to incidental pop-block, building, and existing-assignment array order.
+- **Limitations:** no production, inventory movement, market clearing, wages,
+  pricing, or household market-based needs. The employment path has a focused
+  Node benchmark on the fixed small M3 world; it is not a mobile or full-scale
+  economy claim.
 
 ## Assumptions recorded for future review
 

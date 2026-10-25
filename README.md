@@ -1,16 +1,16 @@
-# Century — M0/M1/M2.1/M3a foundation
+# Century — M0/M1/M2.1/M3a/M3b foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
 per tick.
 
 The repository currently implements **M0 (project foundation)**, **M1
-(simulation core)**, **M2.1 (corrected population core)**, and **M3a (economy
-definitions, state, validation, and serialization)** only. Employment behavior,
-production, market clearing, wages, pricing, government finance, politics,
-technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
-implemented. The design authority is the Century GDD v2.1
-(`Century_GDD_v2.1.md`); persistent engineering rules are in
+(simulation core)**, **M2.1 (corrected population core)**, **M3a (economy
+definitions, state, validation, and serialization)**, and **M3b (deterministic
+employment assignment)** only. Production, market clearing, wages, pricing,
+government finance, politics, technology, diplomacy, warfare, AI, worker, and
+React Native UI behavior are not implemented. The design authority is the
+Century GDD v2.1 (`Century_GDD_v2.1.md`); persistent engineering rules are in
 [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
 
@@ -18,7 +18,7 @@ implemented. The design authority is the Century GDD v2.1
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, tick, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -148,9 +148,10 @@ household-account subset of the future finance state.
 
 ## M3a economy foundation
 
-M3a adds the validated structural layer for the first economic slice; it does
-not run that economy. A world containing buildings or markets currently rejects
-`tick` with a clear error rather than silently using the M2 needs fixture.
+M3a adds the validated structural layer for the first economic slice; it did not
+run that economy. A world containing buildings or markets still rejects `tick`
+with a clear error rather than silently using the M2 needs fixture; M3b adds an
+explicit employment-refresh boundary but no economic tick path.
 
 ### Catalog and units
 
@@ -186,8 +187,28 @@ not run that economy. A world containing buildings or markets currently rejects
 - Population blocks below profession qualifications and buildings with no
   eligible workers are valid economic states, not structural data errors.
 - Initial employment assignments are validated for profession match,
-  qualification, participation, and job-slot limits. No assignment algorithm is
-  implemented yet.
+  qualification, participation, and job-slot limits.
+
+## M3b employment assignment
+
+M3b implements deterministic workforce evaluation behind an explicit refresh
+boundary; it does not add an economic tick path.
+
+- A block fills only its existing profession, subject to literacy/wealth
+  qualification and `floor(workingAge × participationRate)`.
+- Job slots are
+  `floor(workersPerThroughputUnit × referenceThroughputPerDayAtLevelOne × level ×
+  condition)`; fractional slots are not assignable.
+- Valid existing assignments are retained in keyed order, partially if a slot or
+  eligibility cap requires it. Remaining vacancies are filled by largest-remainder
+  apportionment across eligible blocks, then across building vacancies, with
+  keyed tie-breaking for equal remainders.
+- `World.employmentDirty` triggers immediate evaluation; first-of-month evaluation
+  uses the civil calendar. The terminal boundary is never refreshed.
+- `createEconomyWorld` sets `employmentDirty = true`; the first
+  `refreshEmploymentIfDue` call is the scenario initial evaluation.
+- Employment totals and job-slot counts are derived from state; they are not
+  stored as duplicate authoritative sums.
 
 ## Data and calibration
 
@@ -231,8 +252,8 @@ validation configuration.
 
 - Maximum annual relative error: **9.553%** at 2000.
 - RMSE across 101 annual samples: **5.320%**.
-- Full-century aggregate hash: `d421eaf5f04a207b` for seed `20261023` under
-  schema 4.
+- Full-century aggregate hash: `ebf0a37a515e18d0` for seed `20261023` under
+  schema 5.
 
 The 2000 excess comes from the campaign's too-young 1950 age/sex composition,
 not from post-1950 coefficient tuning. At 1950 the campaign has about 17.1M fewer
@@ -257,7 +278,7 @@ The WPP 1950-initialized validation scenario starts at the source-backed
 Cumulative 1950–1999 flows: model births 6,117,076,588 vs WPP 6,089,003,488
 (+0.461%); deaths 2,383,339,814 vs 2,430,494,039 (-1.939%); net change
 3,733,736,774 vs 3,658,509,449 (+2.057%). Validation hash:
-`858773b2d559b2fc`.
+`fae7f28d69845067`.
 
 The earlier 5.2–5.5% shortfall came primarily from interpolating only three
 benchmark years; annual WPP schedules restore the 1960s fertility peak and
@@ -278,10 +299,10 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `4`; simulation version: `0.4.0`; data version:
+- Schema version: `5`; simulation version: `0.5.0`; data version:
   `m3-economy-v1`.
-- Schema-3 / simulation-0.3 / `m2.1-population-v1` saves are rejected with an
-  actionable error; no migration is attempted.
+- Schema-4 / simulation-0.4 saves are rejected with an actionable error; no
+  migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, and
   finance accounts.
@@ -289,17 +310,17 @@ validation and the campaign gameplay baseline are deliberately separate.
   order. The state digest covers single-year sex state, accounts, diagnostics, and
   `startDayIndex`.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `e200d88ba12e8239`.
-- Full-century aggregate digest: `d421eaf5f04a207b`.
-- M3a structural-world digest (seed `20261023`): `20eadf07f08286ed`.
+  `m1-determinism`): `90e5dcfaa35cdab0`.
+- Full-century aggregate digest: `ebf0a37a515e18d0`.
+- M3 structural-world digest (seed `20261023`): `b4c57b894cda6ae7`.
 
 ## Benchmark scope and current Node results
 
-`pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, and M2.1 stress
-cases at 200, 1,000, 3,000, and 6,000 population blocks. Stress scales repeat the
-three deterministic multi-block templates (400k/350k/250k people), so total
-population grows with block count. Each stress scale uses 100 warm-up ticks and
-730 measured ticks.
+`pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
+cases at 200, 1,000, 3,000, and 6,000 population blocks, and an M3b
+employment-refresh workload. Stress scales repeat the three deterministic
+multi-block templates (400k/350k/250k people), so total population grows with
+block count. Each stress scale uses 100 warm-up ticks and 730 measured ticks.
 
 Latest runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
@@ -315,9 +336,20 @@ processors), 7.93 GiB RAM, seed `20261023`:
 
 The 200-block p95 threshold remains 5 ms and passes. Larger scales are
 diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
-**NOT EVALUATED**; this is a Node harness, not a mobile release build. M3a
-structural state is covered by Jest tests rather than a production benchmark
-because M3 economy behavior is not implemented.
+**NOT EVALUATED**; this is a Node harness, not a mobile release build.
+
+The M3b employment workload uses the fixed small M3 world: 4 pop blocks,
+8 buildings, 3 seed assignments, and 1,061,870 people at seed `20261023`. It
+resets employment to the seed assignments and marks it dirty on each sample,
+then times only the real `refreshEmploymentIfDue` call at day 10. Reset,
+validation, and hashing are excluded. With 100 warm-up refreshes and 1,000
+measured refreshes it produced 8 assignments and 154,400 assigned workers, with
+an identical assignment/world hash `0a375c251ed26af7` on every measured sample.
+Final CI Node result: total `107.0 ms`, average `0.107 ms`, p50 `0.087 ms`,
+p95 `0.161 ms`, p99 `0.323 ms`. Across three verified runs, average was
+`0.103–0.183 ms`, p95 `0.150–0.422 ms`, and p99 `0.263–0.884 ms`, reflecting
+normal Node timing variation. This is a Node diagnostic only; it is not a mobile
+or full-scale-economy claim.
 
 ## Known limitations
 
@@ -334,13 +366,15 @@ because M3 economy behavior is not implemented.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- M3a is structural only: no employment assignment algorithm, production,
-  market clearing, wages, pricing, government finance, politics, technology,
-  diplomacy, warfare, AI, migration, social mobility, or UI exists.
-- M3a recipe, population, and price values are synthetic provisional inputs, not
+- M3a/M3b implement economy state, the cash ledger, and employment assignment
+  only: no production, market clearing, wages, pricing, government finance,
+  politics, technology, diplomacy, warfare, AI, migration, social mobility, or UI
+  exists.
+- M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - A world containing buildings or markets currently rejects `tick`; M3
-  population-only fixture behavior is preserved separately.
+  population-only fixture behavior is preserved separately. The employment path
+  is exercised by Jest tests, not by a production benchmark.
 
 ## Development workflow
 
@@ -350,5 +384,5 @@ because M3 economy behavior is not implemented.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3b until M3a is reviewed and the next phase is explicitly
+7. Do not begin M3c until M3b is reviewed and the next phase is explicitly
    authorized.

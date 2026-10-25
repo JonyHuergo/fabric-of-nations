@@ -101,9 +101,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // this is not accepted as historical demographic validation.
     expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
 
-    expect(hashWorld(world)).toBe("d421eaf5f04a207b");
+    expect(hashWorld(world)).toBe("ebf0a37a515e18d0");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("d421eaf5f04a207b");
+    expect(hashWorld(restored)).toBe("ebf0a37a515e18d0");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -304,6 +304,6 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // interpolation shortfall.
     expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
     expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
-    expect(hashWorld(world)).toBe("858773b2d559b2fc");
+    expect(hashWorld(world)).toBe("fae7f28d69845067");
   });
 });

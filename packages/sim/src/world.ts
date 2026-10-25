@@ -3,9 +3,9 @@
  *
  * M1 fields remain. M2/M2.1 add a single-region population collection and
  * household accounts. M3a adds buildings, employment assignments, markets with
- * authoritative stock lots, and a minimal cash ledger. Later systems (countries,
- * debt, armies, events, history) remain future milestones and are not invented
- * here.
+ * authoritative stock lots, and a minimal cash ledger. M3b adds the persisted
+ * employment-dirty scheduling marker. Later systems (countries, debt, armies,
+ * events, history) remain future milestones and are not invented here.
  */
 
 import { assertValidDayIndex } from "./calendar.js";
@@ -66,8 +66,14 @@ export interface World {
   popBlocks: PopBlock[];
   /** M3 building instances. Empty for population-only M2 worlds. */
   buildings: BuildingInstance[];
-  /** M3 explicit employment assignments. Empty until M3b behavior exists. */
+  /** M3 explicit employment assignments, maintained by the M3b refresh routine. */
   employment: EmploymentAssignment[];
+  /**
+   * True when an employment evaluation is required before the next economic
+   * tick: initial scenario evaluation, building closure, or changed job capacity.
+   * Monthly evaluation is derived from the civil calendar.
+   */
+  employmentDirty: boolean;
   /** M3 markets. Empty for population-only M2 worlds. */
   markets: Market[];
   /** M3 cash ledger accounts and bounded posting history. */
@@ -107,6 +113,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     popBlocks: [],
     buildings: [],
     employment: [],
+    employmentDirty: false,
     markets: [],
     finance: { accounts: [], postings: [], nextPostingId: 1 },
     diagnostics: {
@@ -154,6 +161,9 @@ export function assertValidWorld(world: World): void {
     throw new RangeError("world.startDayIndex must not be after world.dayIndex");
   }
   requireUint32(world.seed, "world.seed");
+  if (typeof world.employmentDirty !== "boolean") {
+    throw new TypeError("world.employmentDirty must be a boolean");
+  }
 
   const diagnostics = requireRecord(world.diagnostics, "world.diagnostics");
   requireInteger(

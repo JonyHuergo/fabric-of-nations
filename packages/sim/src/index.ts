@@ -7,8 +7,9 @@
  * fertility, sex-specific mortality, needs, wealth, and militancy in a
  * single-region fixture. M3a adds validated economy definitions, buildings,
  * employment assignments, inventory lots, markets, a minimal cash ledger, and
- * schema-4 serialization. Economy behavior, politics, technology, diplomacy, war,
- * and UI contracts remain future milestones.
+ * schema-5 serialization. M3b adds deterministic workforce eligibility,
+ * assignment, retention, and scheduling. Economy behavior beyond employment,
+ * politics, technology, diplomacy, war, and UI contracts remain future milestones.
  */
 
 export * from "./types.js";

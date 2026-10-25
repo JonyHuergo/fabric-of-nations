@@ -7,10 +7,10 @@
  */
 
 /** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.4.0";
+export const SIM_VERSION = "0.5.0";
 
 /** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 4;
+export const WORLD_SCHEMA_VERSION = 5;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;

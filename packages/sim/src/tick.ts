@@ -15,8 +15,9 @@
  *   14. diagnostics (no history)
  *   15. advance day
  *
- * M3a worlds that contain buildings or markets do not use this population-only
- * path; `tick` rejects them until M3 behavior is implemented.
+ * M3a/M3b worlds that contain buildings or markets do not use this
+ * population-only path; `tick` rejects them until the economic tick path is
+ * implemented. M3b employment is available through `refreshEmploymentIfDue`.
  */
 
 import { dayIndexToCivilDate, daysInMonth, isTerminalDayIndex } from "./calendar.js";
@@ -144,7 +145,7 @@ export function tick(world: World, context?: TickContext): TickResult {
   let populationResult: PopulationTickResult | undefined;
   if (world.buildings.length > 0 || world.markets.length > 0) {
     throw new RangeError(
-      "M3 economy tick behavior is not implemented; only M3a state construction and serialization are available",
+      "M3 economy tick behavior is not implemented; use refreshEmploymentIfDue explicitly. Only state construction, serialization, and employment refresh are available",
     );
   }
   if (world.popBlocks.length > 0) {

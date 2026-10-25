@@ -472,6 +472,7 @@ export function createPopulationWorld(
     popBlocks: blocks,
     buildings: [],
     employment: [],
+    employmentDirty: false,
     markets: [],
     finance: { accounts, postings: [], nextPostingId: 1 } satisfies FinanceState,
     diagnostics: {

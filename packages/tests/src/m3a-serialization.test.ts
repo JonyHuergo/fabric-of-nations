@@ -28,6 +28,7 @@ interface ParsedPayload {
   };
   buildings?: unknown;
   employment?: unknown;
+  employmentDirty?: unknown;
 }
 
 interface ParsedEnvelope {
@@ -46,9 +47,9 @@ function cloneWorld(): World {
   return createEconomyWorld(scenario, { seed: 20_261_023 });
 }
 
-describe("M3a schema-4 serialization", () => {
+describe("M3a schema-5 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
-    expect(hashWorld(cloneWorld())).toBe("20eadf07f08286ed");
+    expect(hashWorld(cloneWorld())).toBe("b4c57b894cda6ae7");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {
@@ -62,9 +63,10 @@ describe("M3a schema-4 serialization", () => {
 
     const serialized = serializeWorld(world);
     const parsed = parseEnvelope(serialized);
-    expect(parsed.schemaVersion).toBe(4);
+    expect(parsed.schemaVersion).toBe(5);
     expect(parsed.payload?.buildings).toHaveLength(8);
     expect(parsed.payload?.employment).toHaveLength(3);
+    expect(parsed.payload?.employmentDirty).toBe(true);
     expect(parsed.payload?.markets).toHaveLength(1);
     expect(parsed.payload?.finance?.postings).toHaveLength(1);
     expect(parsed.payload?.markets?.[0]?.stockLots).toBeDefined();

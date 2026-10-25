@@ -454,6 +454,14 @@ export function createEconomyWorld(
     world.employment.push(built);
   }
   world.employment.sort((left, right) => left.id - right.id);
+  world.popBlocks.sort((left, right) => left.id - right.id);
+  if (region !== undefined) {
+    region.popBlockIds = world.popBlocks
+      .filter((block) => block.regionId === region.id)
+      .map((block) => block.id)
+      .sort((left, right) => left - right);
+  }
+  world.employmentDirty = true;
 
   assertValidWorld(world);
   return world;

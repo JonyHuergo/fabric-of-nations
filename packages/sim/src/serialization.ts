@@ -1,17 +1,18 @@
 /**
- * Explicit, versioned serialization for the M2 world.
+ * Explicit, versioned serialization for the M3 world.
  *
  * A save is a canonical JSON envelope with save format, schema, simulation, and
  * content versions; scenario/day/seed metadata; a checksum; and the complete
- * encoded payload. The payload includes the M1 diagnostics and the M2 region,
- * pop-block, and minimal finance-account state.
+ * encoded payload. The payload includes diagnostics, population, buildings,
+ * employment assignments and the dirty marker, markets with authoritative stock
+ * lots, and the cash ledger.
  *
  * Typed arrays are never left to `JSON.parse`: each is encoded as a tagged
  * object with an explicit kind, length, and values, and reconstructed as the
- * corresponding typed-array class. M2 uses this codec for `Uint32Array` cohort
- * counts and `Uint8Array` aging carries. Version mismatches, malformed data,
- * checksum failures, and invalid state all produce a `SaveFormatError` instead
- * of a partially restored world.
+ * corresponding typed-array class. Population age state uses this codec for
+ * `Uint32Array`. Version mismatches, malformed data, checksum failures, and
+ * invalid state all produce a `SaveFormatError` instead of a partially restored
+ * world.
  *
  * The checksum is FNV-1a 32 over canonical JSON. It detects accidental
  * corruption and is not a security signature.
@@ -237,6 +238,7 @@ export type SerializedWorld = {
   readonly popBlocks: readonly SerializedPopBlock[];
   readonly buildings: readonly SerializedBuilding[];
   readonly employment: readonly SerializedEmploymentAssignment[];
+  readonly employmentDirty: boolean;
   readonly markets: readonly SerializedMarket[];
   readonly finance: SerializedFinanceState;
   readonly diagnostics: SerializedDiagnostics;
@@ -460,6 +462,7 @@ export function encodeWorld(world: World): SerializedWorld {
         professionId: assignment.professionId,
         workers: assignment.workers,
       })),
+    employmentDirty: world.employmentDirty,
     markets: [...world.markets]
       .sort((left, right) => left.id - right.id)
       .map((market) => ({
@@ -867,6 +870,10 @@ function decodeWorldPayload(value: unknown): World {
   const employment = rawEmployment.map((assignment, index) =>
     decodeEmployment(assignment, `save payload.employment[${String(index)}]`),
   );
+  if (typeof payload.employmentDirty !== "boolean") {
+    throw new SaveFormatError("save payload.employmentDirty must be a boolean");
+  }
+  const employmentDirty = payload.employmentDirty;
   const rawMarkets = requireArray(payload.markets, "save payload.markets");
   const markets = rawMarkets.map((market, index) =>
     decodeMarket(market, `save payload.markets[${String(index)}]`),
@@ -885,6 +892,7 @@ function decodeWorldPayload(value: unknown): World {
     popBlocks,
     buildings,
     employment,
+    employmentDirty,
     markets,
     finance,
     diagnostics: {
