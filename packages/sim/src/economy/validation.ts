@@ -28,6 +28,7 @@ import {
   subtypeAllowsOwnerKind,
   transactionKindChangesCash,
 } from "./accounts.js";
+import { assertValidCountryCurrencyState } from "./country.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
   TRANSACTION_KINDS,
@@ -547,6 +548,13 @@ export function assertValidEconomyState(world: World): void {
   }
 
   assertOwnerAccountSets(world, accounts);
+  assertValidCountryCurrencyState({
+    countries: world.countries,
+    currencies: world.currencies,
+    currencyValuations: world.currencyValuations,
+    regionIds,
+    expectedStartDay: world.startDayIndex,
+  });
 }
 
 /** Export for tests and scenario validation. */

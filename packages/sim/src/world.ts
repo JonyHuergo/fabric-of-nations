@@ -4,8 +4,10 @@
  * M1 fields remain. M2/M2.1 add a single-region population collection and
  * household accounts. M3a adds buildings, employment assignments, markets with
  * authoritative stock lots, and a minimal cash ledger. M3b adds the persisted
- * employment-dirty scheduling marker. Later systems (countries, debt, armies,
- * events, history) remain future milestones and are not invented here.
+ * employment-dirty scheduling marker. M4a-1 adds category-aware accounts.
+ * M4a-2 adds authoritative country, currency-issuer, monetary-arrangement, and
+ * SUSD-relative valuation state. Later systems (debt, armies, events, history)
+ * remain future milestones and are not invented here.
  */
 
 import { assertValidDayIndex } from "./calendar.js";
@@ -22,6 +24,9 @@ import {
 import { assertValidEconomyState } from "./economy/validation.js";
 import type {
   BuildingInstance,
+  Country,
+  Currency,
+  CurrencyValuation,
   EmploymentAssignment,
   FinanceState,
   Market,
@@ -63,6 +68,12 @@ export interface World {
   seed: Seed;
   /** M2 supports at most one region; the collection is future-compatible. */
   regions: Region[];
+  /** M4a-2 country identity. Empty for earlier population/economy fixtures. */
+  countries: Country[];
+  /** M4a-2 currency identity and issuer. */
+  currencies: Currency[];
+  /** M4a-2 SUSD-relative valuations, one per registered currency. */
+  currencyValuations: CurrencyValuation[];
   popBlocks: PopBlock[];
   /** M3 building instances. Empty for population-only M2 worlds. */
   buildings: BuildingInstance[];
@@ -118,6 +129,9 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     startDayIndex,
     seed,
     regions: [],
+    countries: [],
+    currencies: [],
+    currencyValuations: [],
     popBlocks: [],
     buildings: [],
     employment: [],

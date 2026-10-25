@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1 foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2 foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -10,12 +10,12 @@ definitions, state, validation, and serialization)**, **M3b (deterministic
 employment assignment)**, **M3c (production, input reservations, and inventory
 movement)**, **M3d (deterministic two-pass market clearing with bounded
 prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
-household cash)**, **M3f (integrated daily economic tick)**, and **M4a-1
-(category-aware double-entry accounts, opening balances, and
-recognition legs)** only. Government finance, taxes, period closing,
-distributions, debt/credit, inflation/FX, countries, currencies, politics,
-technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
-implemented.
+household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
+(category-aware double-entry accounts, opening balances, and recognition legs)**,
+and **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
+valuation)** only. Government finance, taxes, period closing, distributions,
+debt/credit, dynamic FX, inflation, monetary policy, politics, technology,
+diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
 The design authority is the [Century GDD v2.2](./Century_GDD_v2.2.md); persistent
 engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
 are in [`DECISIONS.md`](./DECISIONS.md).
@@ -459,6 +459,96 @@ closing, distributions, debt, and inflation remain later milestones.
 This removes repeated linear account scans from demand construction and
 settlement; the M3f economic-day benchmark remains the relevant Node diagnostic.
 
+## M4a-2 country and currency identity
+
+M4a-2 adds the minimum country, currency-issuer, monetary-arrangement, and
+SUSD-relative valuation model needed by later finance stages. It does not add
+dynamic FX, monetary policy, issuance, central banks, treasury accounts, native
+balances, inflation, or trade settlement.
+
+### SUSD measurement rule
+
+SUSD is Century's fixed unit of measurement. The unit's definition does not
+change; the SUSD-denominated value of currencies, goods, wages, and assets can
+change. SUSD is not a registered currency, an issuer, a legal tender, or a
+promise of constant purchasing power. Nominal SUSD is distinct from any future
+real/inflation-adjusted measure.
+
+### Authoritative state
+
+`World.countries`, `World.currencies`, and `World.currencyValuations` are
+authoritative runtime state. They are serialized, hashed, validated, and
+structurally cloned. Legacy M2/M3/M4a-1 worlds carry empty collections and remain
+valid.
+
+```ts
+Country  { id, tag, name, monetary, regionIds }
+Currency { id, key, name, issuer }
+CurrencyValuation =
+  | { currencyId, status: "specified", susdPerUnit, setOnDay, source: "scenario" }
+  | { currencyId, status: "unavailable" }
+```
+
+- `Country.monetary` is the sole domestic arrangement; there is no duplicate
+  `Country.currencyId`.
+- `SusdPerCurrencyUnit` is a branded numeric type with a validated constructor;
+  serialized state remains a plain number.
+- `Country.regionIds` is the sole country-to-region ownership authority.
+  Unassigned regions are allowed; `regionOwner` returns the owner, `null` for a
+  known unassigned region, and throws for an unknown region.
+
+### Issuance and arrangement
+
+Issuance is independent of the domestic arrangement:
+
+- `own` selects a currency issued by that country.
+- `adopted` selects a currency issued by another simulated country or a foreign
+  issuer. Adoption never makes the adopter an issuer.
+- A country may issue one currency and adopt a different currency for domestic
+  use; its issued currency may be adopted by another country or remain unused.
+- Each simulated country may issue at most one currency in M4a-2 (deliberate
+  scope restriction).
+- A foreign-issued currency must be adopted by at least one country.
+- Every currency has exactly one issuer and exactly one valuation record.
+- Shared-currency arrangements and union issuers are rejected.
+- Currency keys are unique lower-case identifiers; `susd` is reserved in any
+  casing.
+
+### Valuation and conversion
+
+`CurrencyValuation.susdPerUnit` is the SUSD value of one unit of the currency.
+Cross rates are derived and never stored:
+
+```
+crossRate(from, to) = from.susdPerUnit / to.susdPerUnit
+// units of `to` per one unit of `from`
+```
+
+At 0.25 SUSD/A and 2.00 SUSD/B, A→B is 0.125 and B→A is 8. Conversions validate
+finite non-negative amounts, finite positive rates in `[1e-12, 1e12]`, and
+finite results; overflow and positive underflow are rejected. Missing or
+unavailable valuations raise `CurrencyValuationError`; they never default to
+parity. Rate comparisons use a dimensionless relative tolerance; SUSD amounts
+use the existing money tolerance. Bounds and tolerances are provisional
+numerical safety choices, not calibration.
+
+### Persistence
+
+- `WORLD_SCHEMA_VERSION = 7`; `SIM_VERSION = "0.7.0"`; save format `1`; data
+  version `m3-economy-v1` unchanged (no shipped scenario data changed).
+- Schema-6 / simulation-0.6.0 saves are rejected with an actionable error; no
+  migration is implemented.
+- New digests: empty world `31d491d18d02a4af`, M2 campaign aggregate
+  `7961a6dd7da17bb3`, WPP validation `67cd0a5d67765bf7`, M3 structural world
+  `39a732ddd3dcd3c3`.
+- M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
+  is added to shipped scenarios.
+
+GDD v2.2 remains the historical design authority. M4a-2 supersedes its target
+`CurrencyState`/`fxToUSD` shape for this milestone as recorded in D-044/D-045; a
+full GDD v2.3 revision is a separate documentation task and v2.2 is preserved
+unchanged.
+
 ## Data and calibration
 
 Static definitions:
@@ -548,23 +638,23 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `6`; simulation version: `0.6.0`; data version:
-  `m3-economy-v1` (M4a-1 changes the runtime account contract, not the static
-  definitions).
-- Schema-5 / simulation-0.5 saves are rejected with an actionable error; no
+- Schema version: `7`; simulation version: `0.7.0`; data version:
+  `m3-economy-v1` (M4a-2 adds runtime country/currency state but ships no new
+  scenario data).
+- Schema-6 / simulation-0.6.0 saves are rejected with an actionable error; no
   migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
-  accounts with `category`/`subtype`, `nextAccountId`, and the opening-balance
-  record.
+  accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
+  record, and the M4a-2 country/currency/valuation collections.
 - Canonical JSON makes checksum and decode independent of object key insertion
   order. The state digest covers single-year sex state, accounts, diagnostics,
-  `startDayIndex`, and the opening record.
+  `startDayIndex`, the opening record, and countries/currencies/valuations.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `8c2315493f71ab6b`.
-- Full-century aggregate digest: `8e8e021bd3c8bcb5`.
-- WPP validation digest: `78a43b9772738cad`.
-- M3 structural-world digest (seed `20261023`): `0794a85763a141f1`.
+  `m1-determinism`): `31d491d18d02a4af`.
+- Full-century aggregate digest: `7961a6dd7da17bb3`.
+- WPP validation digest: `67cd0a5d67765bf7`.
+- M3 structural-world digest (seed `20261023`): `39a732ddd3dcd3c3`.
 
 ## Benchmark scope and recorded Node results
 
@@ -579,7 +669,10 @@ warm-up ticks and 730 measured ticks.
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
 authoritative account state and posting line shape, so world hashes differ and
-Node timings shifted. The current M4a-1 Node run on the same machine produced:
+Node timings shifted. M4a-2 additionally adds three empty canonical collections
+to every world (countries, currencies, currency valuations), so the benchmark
+hashes in this section predate M4a-2; timings are not treated as acceptance
+evidence. The current M4a-1 Node run on the same machine produced:
 
 | Case | Avg | p95 | Hash |
 |---|---:|---:|---|
@@ -717,7 +810,16 @@ these timings are not mobile-performance evidence.
 
 - M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
   balances only. Period closing, distributions, remittances, taxes, debt,
-  countries, currencies, inflation, and FX are not implemented.
+  inflation, and dynamic FX are not implemented.
+- M4a-2 adds country/currency identity, monetary arrangements, and
+  SUSD-relative valuations only. It has no issuance, central bank, treasury
+  accounts, native-currency balances, dynamic FX, currency regimes, inflation,
+  monetary policy, or trade settlement.
+- M4a-2 uses only the three runtime collections; no static currency catalog or
+  `fxToUSD` field exists. Currency identity is independent of the domestic
+  arrangement: a country may issue a currency it does not use domestically.
+- M4a-2 country/currency fixtures are inline tests, not shipped historical data;
+  no country, currency, or exchange-rate calibration is claimed.
 - Inventory is not an accounting asset: input purchases are expensed when
   purchased and there is no COGS or inventory valuation. This is a provisional
   cash-basis simplification, not full accrual accounting.

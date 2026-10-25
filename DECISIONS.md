@@ -1,18 +1,19 @@
 # Century decision register
 
 This file records material implementation decisions, GDD/`AGENTS.md` conflicts,
-and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
+and provisional assumptions made in M0/M1/M2/M2.1/M3/M4a-1/M4a-2. It follows GDD §20 and
 `AGENTS.md` §1.
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
 employment assignment, M3c production/inventory movement, M3d deterministic
 two-pass market clearing with bounded prices, M3e cash settlement/wages/upkeep/
-retained profit, M3f integrated daily economic tick, and M4a-1 category-aware
-double-entry accounts with opening balances and recognition legs**. Countries,
-currencies, taxes, period closing, distributions, debt/credit, inflation/FX,
-politics, technology, diplomacy, warfare, AI, worker protocol, and UI behavior
-remain out of scope.
+retained profit, M3f integrated daily economic tick, M4a-1 category-aware
+double-entry accounts with opening balances and recognition legs, and M4a-2
+country/currency identity, monetary arrangements, and SUSD-relative valuation**.
+Taxes, period closing, distributions, debt/credit, dynamic FX, monetary policy,
+inflation, politics, technology, diplomacy, warfare, AI, worker protocol, and UI
+behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -940,11 +941,108 @@ remain out of scope.
 - **Status:** GDD v2.2 records the implemented ordering. M3d price semantics and
   M3e accounting semantics remain unchanged.
 
+### D-044 — SUSD is Century's fixed unit of measurement (approved)
+
+- **Resolution:** SUSD is the universal unit of account used to measure and
+  compare currency valuations, goods prices, wages, production costs, profits,
+  wealth, assets, government finance, and all future economic statistics. Its
+  definition is fixed. The SUSD-denominated value of the things measured can
+  change: a currency may be worth 0.50 SUSD and later 0.35 SUSD; a good may rise
+  from 2 SUSD to 3 SUSD. SUSD is **not** a registered currency, an issuer, a
+  legal tender, or a promise of constant purchasing power. Nominal SUSD is
+  distinct from any future real/inflation-adjusted measure, which must be derived
+  through a documented price index or reference period.
+- **`fxToUSD` rejected:** no field with that name or inverse-rate meaning is
+  implemented. The single authoritative valuation direction is
+  `CurrencyValuation.susdPerUnit = SUSD per ONE unit of the currency`.
+  `crossRate(from, to) = from.susdPerUnit / to.susdPerUnit` yields units of
+  `to` per one unit of `from`. Cross rates are derived, never stored.
+- **Dimensional type:** `SusdPerCurrencyUnit` is a branded numeric type with a
+  validated constructor; it cannot be silently supplied as a `MoneySUSD` amount.
+  Serialized state remains a plain JSON number, reconstructed through the
+  constructor at decode. This is a narrow, documented exception to D-003's
+  general avoidance of branded state types, justified by the distinct dimensions;
+  it does not change determinism or JSON shape.
+- **Validation and tolerance:** amounts must be finite and non-negative; rates
+  must be finite, positive, and inside `[1e-12, 1e12]` (provisional numerical
+  safety bounds). Conversions reject non-finite results, overflow, and positive
+  underflow to zero. Rate comparisons use the dimensionless
+  `CURRENCY_RATE_RELATIVE_TOLERANCE`; SUSD amounts use the existing scaled money
+  tolerance. Missing or unavailable valuations raise a named
+  `CurrencyValuationError`; they never default to parity or another currency's
+  value. Bounds and tolerances are not calibrated economics.
+- **Status:** implemented in M4a-2. No second unit of account, native-currency
+  balances, or purchasing-power promise is introduced.
+
+### D-045 — Country, currency issuer, monetary arrangement, and SUSD-relative valuation (approved)
+
+- **Runtime authority:** `World.countries`, `World.currencies`, and
+  `World.currencyValuations` are authoritative runtime state. They are included
+  in construction, validation, serialization/deserialization, canonical hashing,
+  structural cloning, and save/resume tests. Legacy M2/M3/M4a-1 worlds use empty
+  collections and remain valid.
+- **Country:** `Country { id, tag, name, monetary, regionIds }`.
+  `Country.monetary` is the sole domestic arrangement; there is no top-level
+  `Country.currencyId`. Each country has exactly one arrangement, `own` or
+  `adopted`. Country tags are unique and non-empty; region references are unique,
+  known, and claimed by at most one country.
+- **Region ownership:** `Country.regionIds` is the sole authoritative
+  country-to-region mapping. `Region.countryId` is deliberately not added.
+  Worlds without countries are valid; worlds with countries may leave regions
+  unassigned. `regionOwner` returns the owner id, `null` for a known unassigned
+  region, and throws for an unknown region; it never guesses.
+- **Currency:** `Currency { id, key, name, issuer }`; the issuer is
+  `{kind:"country", countryId}`, `{kind:"foreign", issuerKey}`, or
+  `{kind:"union", unionKey}`. `union` is rejected in M4a-2. Keys are unique
+  lower-case identifiers; `susd` is reserved case-insensitively.
+- **Issuance is independent of the domestic arrangement:**
+  - `own` selects a currency issued by that country.
+  - `adopted` selects a currency issued by someone else — another simulated
+    country or a foreign issuer.
+  - Adoption never changes issuer identity; an adopter does not become the
+    issuer of the adopted currency.
+  - A country may issue one currency and adopt a different one for domestic use.
+    The issued currency may be adopted by another country or remain unused. This
+    is a deliberate design capability, not an accidental consequence.
+  - **Deliberate scope restriction:** each simulated country may issue at most
+    one currency in M4a-2. This is a restriction, not a logical consequence of
+    adoption.
+  - A foreign-issued currency must be adopted by at least one country; a
+    simulated-issued currency may be unused.
+- **Valuation:** exactly one `CurrencyValuation` per currency. `specified`
+  carries `susdPerUnit`, `setOnDay` (must equal the world start day in M4a-2),
+  and `source: "scenario"`. `unavailable` records the absence explicitly and
+  stores no fabricated rate. There is no regime, peg, inflation index, money
+  supply, central-bank account, or dynamic FX field. A scenario-defined
+  valuation is not a permanent peg to SUSD.
+- **Rejected:** shared-currency arrangements, union issuers, duplicate or missing
+  valuations, unknown countries/currencies/regions, duplicate region claims,
+  SUSD as a currency/issuer/arrangement target/valuation, and multiple issued
+  currencies per country.
+- **Out of scope:** issuance operations, legal-tender enforcement, central banks,
+  treasury accounts, currency unions, redenomination, monetary policy, dynamic
+  FX, inflation, native-currency balances, and multi-currency settlement.
+- **Compatibility:** `WORLD_SCHEMA_VERSION = 7`, `SIM_VERSION = "0.7.0"`,
+  `SAVE_FORMAT_VERSION = 1`, data version `m3-economy-v1` unchanged because no
+  shipped scenario data changed. Schema-6/simulation-0.6.0 saves are rejected;
+  no migration is implemented (D-013). New digests: empty world
+  `31d491d18d02a4af`, M2 campaign aggregate `7961a6dd7da17bb3`, WPP validation
+  `67cd0a5d67765bf7`, M3 structural world `39a732ddd3dcd3c3`.
+- **Resolved approvals:** runtime (not static-definition) placement; explicit
+  foreign issuer for adoption; `Country.regionIds` as the only ownership
+  authority; no treasury/central-bank accounts; inline test-only fixtures with no
+  shipped historical data; provisional rate bounds/tolerance; branded valuation
+  type; non-negative amounts and underflow rejection.
+- **Limitations:** no real/inflation-adjusted measure, no currency regimes or
+  dynamic rates, no monetary issuance, no native balances, and no historical
+  country/currency calibration. Node benchmarks remain diagnostics; the mobile
+  p95 target remains **NOT EVALUATED**.
+
 ### D-046 — M4a-1 category-aware double-entry accounts (approved)
 
 - **Status:** approved by the designer before implementation, with the
-  qualifications recorded here. D-044/D-045 remain reserved for M4a-2
-  (SUSD/currency semantics and monetary arrangements).
+  qualifications recorded here. D-044/D-045 were reserved for M4a-2 and are now
+  recorded above.
 - **D-046a — opening balances.** Opening balances are applied **once, atomically**
   as calibrated initial state, not as one journal posting per account. The
   application requires every account to start at zero, validates every entry and

@@ -7,17 +7,17 @@
  */
 
 /** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.6.0";
+export const SIM_VERSION = "0.7.0";
 
 /** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 6;
+export const WORLD_SCHEMA_VERSION = 7;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
 
 /**
- * Content/data version. M4a-1 changes the runtime account contract but not the
- * static definitions, so the data package version stays `m3-economy-v1`.
+ * Content/data version. M4a-2 adds runtime country/currency state but ships no
+ * new scenario data, so the data package version stays `m3-economy-v1`.
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 
@@ -62,3 +62,34 @@ export const MAX_WARNING_LENGTH = 500;
 
 /** Prefix used by the save integrity checksum. Non-cryptographic. */
 export const SAVE_CHECKSUM_PREFIX = "fnv1a32:";
+
+/**
+ * Provisional inclusive bounds for a currency's SUSD valuation. These are
+ * numerical safety bounds, not historically calibrated economics.
+ */
+export const CURRENCY_RATE_MIN = 1e-12;
+export const CURRENCY_RATE_MAX = 1e12;
+
+/**
+ * Dimensionless relative tolerance for currency valuation and cross-rate
+ * comparisons. Money comparisons use the SUSD money tolerance instead.
+ */
+export const CURRENCY_RATE_RELATIVE_TOLERANCE = 1e-12;
+
+/** Reserved key for the SUSD unit of account; never a registered currency. */
+export const SUSD_CURRENCY_KEY = "susd";
+
+/** Maximum accepted length of a registered currency key. */
+export const MAX_CURRENCY_KEY_LENGTH = 32;
+
+/** Maximum accepted length of a currency name. */
+export const MAX_CURRENCY_NAME_LENGTH = 64;
+
+/** Maximum accepted length of a country tag. */
+export const MAX_COUNTRY_TAG_LENGTH = 8;
+
+/** Maximum accepted length of a country name. */
+export const MAX_COUNTRY_NAME_LENGTH = 128;
+
+/** Maximum accepted length of an external issuer key. */
+export const MAX_FOREIGN_ISSUER_KEY_LENGTH = 64;

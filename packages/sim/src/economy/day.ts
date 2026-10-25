@@ -35,6 +35,7 @@ import { assertValidWorld, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import { computeBuildingCapacity } from "./production.js";
 import { buildFinanceIndex, type FinanceIndex } from "./accounts.js";
+import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import {
   runMarketDay,
   type HouseholdDemandRecord,
@@ -115,6 +116,9 @@ export function cloneWorld(source: World): World {
       buildingInstanceIds: [...region.buildingInstanceIds],
       resourceCapsPerDay: [...region.resourceCapsPerDay],
     })),
+    countries: source.countries.map(copyCountry),
+    currencies: source.currencies.map(copyCurrency),
+    currencyValuations: source.currencyValuations.map(copyCurrencyValuation),
     popBlocks: source.popBlocks.map((block) => ({
       ...block,
       maleByAge: block.maleByAge.slice(),

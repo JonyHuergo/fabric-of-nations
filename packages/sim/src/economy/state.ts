@@ -22,6 +22,12 @@ import {
   categoryForSubtype,
   type OpeningBalanceEntry,
 } from "./accounts.js";
+import {
+  assertValidCountryCurrencyState,
+  copyCountry,
+  copyCurrency,
+  copyCurrencyValuation,
+} from "./country.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import type {
@@ -386,6 +392,12 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   }
   const definitionsById = buildingDefinitions(scenario);
   assertInitialEmployment(scenario, definitionsById);
+  assertValidCountryCurrencyState({
+    countries: scenario.countries ?? [],
+    currencies: scenario.currencies ?? [],
+    currencyValuations: scenario.currencyValuations ?? [],
+    regionIds: new Set(scenario.population.regions.map((region) => region.id)),
+  });
 }
 
 /** Build an M3 world from a validated economy scenario. */
@@ -405,6 +417,16 @@ export function createEconomyWorld(
     deferOpeningBalances: true,
     accountIdFloor,
   });
+
+  world.countries = (scenario.countries ?? [])
+    .map(copyCountry)
+    .sort((left, right) => left.id - right.id);
+  world.currencies = (scenario.currencies ?? [])
+    .map(copyCurrency)
+    .sort((left, right) => left.id - right.id);
+  world.currencyValuations = (scenario.currencyValuations ?? [])
+    .map(copyCurrencyValuation)
+    .sort((left, right) => left.currencyId - right.currencyId);
 
   let nextAccountId = world.finance.nextAccountId;
   const allocate = (

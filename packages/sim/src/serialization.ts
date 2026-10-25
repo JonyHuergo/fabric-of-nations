@@ -22,6 +22,7 @@ import { assertValidDayIndex } from "./calendar.js";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   DEFAULT_DATA_VERSION,
+  MAX_FOREIGN_ISSUER_KEY_LENGTH,
   MAX_RECENT_WARNINGS,
   MAX_SCENARIO_ID_LENGTH,
   MAX_WARNING_LENGTH,
@@ -35,6 +36,10 @@ import type {
   AccountCategory,
   AccountSubtype,
   BuildingInstance,
+  Country,
+  Currency,
+  CurrencyIssuer,
+  CurrencyValuation,
   EmploymentAssignment,
   FinanceState,
   FinancialAccount,
@@ -42,8 +47,10 @@ import type {
   JournalLine,
   JournalPosting,
   Market,
+  MonetaryArrangement,
   OpeningBalanceRecord,
   StockLot,
+  SusdPerCurrencyUnit,
   TransactionKind,
 } from "./economy/types.js";
 import {
@@ -51,6 +58,7 @@ import {
   ACCOUNT_SUBTYPES,
   TRANSACTION_KINDS,
 } from "./economy/types.js";
+import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
@@ -184,6 +192,46 @@ export type SerializedFinanceState = {
   readonly opening: SerializedOpeningBalance | null;
 };
 
+/** Encoded currency issuer. */
+export type SerializedCurrencyIssuer =
+  | { readonly kind: "country"; readonly countryId: number }
+  | { readonly kind: "foreign"; readonly issuerKey: string }
+  | { readonly kind: "union"; readonly unionKey: string };
+
+/** Encoded currency identity. */
+export type SerializedCurrency = {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+  readonly issuer: SerializedCurrencyIssuer;
+};
+
+/** Encoded domestic monetary arrangement. */
+export type SerializedMonetaryArrangement =
+  | { readonly kind: "own"; readonly currencyId: number }
+  | { readonly kind: "adopted"; readonly currencyId: number }
+  | { readonly kind: "shared"; readonly currencyId: number; readonly unionKey: string };
+
+/** Encoded country identity and region ownership. */
+export type SerializedCountry = {
+  readonly id: number;
+  readonly tag: string;
+  readonly name: string;
+  readonly monetary: SerializedMonetaryArrangement;
+  readonly regionIds: readonly number[];
+};
+
+/** Encoded SUSD-relative valuation. */
+export type SerializedCurrencyValuation =
+  | {
+      readonly currencyId: number;
+      readonly status: "specified";
+      readonly susdPerUnit: number;
+      readonly setOnDay: number;
+      readonly source: "scenario";
+    }
+  | { readonly currencyId: number; readonly status: "unavailable" };
+
 /** Encoded inventory lot. */
 export type SerializedStockLot = {
   readonly goodId: number;
@@ -251,6 +299,9 @@ export type SerializedWorld = {
   readonly startDayIndex: number;
   readonly seed: number;
   readonly regions: readonly SerializedRegion[];
+  readonly countries: readonly SerializedCountry[];
+  readonly currencies: readonly SerializedCurrency[];
+  readonly currencyValuations: readonly SerializedCurrencyValuation[];
   readonly popBlocks: readonly SerializedPopBlock[];
   readonly buildings: readonly SerializedBuilding[];
   readonly employment: readonly SerializedEmploymentAssignment[];
@@ -438,6 +489,36 @@ export function encodeWorld(world: World): SerializedWorld {
       buildingInstanceIds: [...region.buildingInstanceIds].sort((left, right) => left - right),
       resourceCapsPerDay: [...region.resourceCapsPerDay],
     })),
+    countries: [...world.countries]
+      .sort((left, right) => left.id - right.id)
+      .map((country) => ({
+        id: country.id,
+        tag: country.tag,
+        name: country.name,
+        monetary: { ...country.monetary },
+        regionIds: [...country.regionIds].sort((left, right) => left - right),
+      })),
+    currencies: [...world.currencies]
+      .sort((left, right) => left.id - right.id)
+      .map((currency) => ({
+        id: currency.id,
+        key: currency.key,
+        name: currency.name,
+        issuer: { ...currency.issuer },
+      })),
+    currencyValuations: [...world.currencyValuations]
+      .sort((left, right) => left.currencyId - right.currencyId)
+      .map((valuation) =>
+        valuation.status === "specified"
+          ? {
+              currencyId: valuation.currencyId,
+              status: "specified" as const,
+              susdPerUnit: valuation.susdPerUnit,
+              setOnDay: valuation.setOnDay,
+              source: valuation.source,
+            }
+          : { currencyId: valuation.currencyId, status: "unavailable" as const },
+      ),
     popBlocks: world.popBlocks.map((block) => ({
       id: block.id,
       regionId: block.regionId,
@@ -567,6 +648,109 @@ function decodeRegion(value: unknown, path: string): Region {
     marketId,
     buildingInstanceIds: buildings,
     resourceCapsPerDay: caps,
+  };
+}
+
+function decodeCurrencyIssuer(value: unknown, path: string): CurrencyIssuer {
+  const record = requireRecord(value, path);
+  const kind = record.kind;
+  if (kind === "country") {
+    return {
+      kind: "country",
+      countryId: requireUint32(record.countryId, `${path}.countryId`),
+    };
+  }
+  if (kind === "foreign") {
+    return {
+      kind: "foreign",
+      issuerKey: requireString(record.issuerKey, `${path}.issuerKey`, {
+        minLength: 1,
+        maxLength: MAX_FOREIGN_ISSUER_KEY_LENGTH,
+      }),
+    };
+  }
+  if (kind === "union") {
+    return {
+      kind: "union",
+      unionKey: requireString(record.unionKey, `${path}.unionKey`, { minLength: 1 }),
+    };
+  }
+  throw new SaveFormatError(`${path}.kind is invalid`);
+}
+
+function decodeMonetaryArrangement(value: unknown, path: string): MonetaryArrangement {
+  const record = requireRecord(value, path);
+  const kind = record.kind;
+  const currencyId = requireUint32(record.currencyId, `${path}.currencyId`);
+  if (kind === "own" || kind === "adopted") {
+    return { kind, currencyId };
+  }
+  if (kind === "shared") {
+    return {
+      kind: "shared",
+      currencyId,
+      unionKey: requireString(record.unionKey, `${path}.unionKey`, { minLength: 1 }),
+    };
+  }
+  throw new SaveFormatError(`${path}.kind is invalid`);
+}
+
+function decodeCountry(value: unknown, path: string): Country {
+  const record = requireRecord(value, path);
+  const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    tag: requireString(record.tag, `${path}.tag`, { minLength: 1 }),
+    name: requireString(record.name, `${path}.name`, { minLength: 1 }),
+    monetary: decodeMonetaryArrangement(record.monetary, `${path}.monetary`),
+    regionIds: rawRegionIds.map((regionId, index) =>
+      requireUint32(regionId, `${path}.regionIds[${String(index)}]`),
+    ),
+  };
+}
+
+function decodeCurrency(value: unknown, path: string): Currency {
+  const record = requireRecord(value, path);
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    key: requireString(record.key, `${path}.key`, { minLength: 1 }),
+    name: requireString(record.name, `${path}.name`, { minLength: 1 }),
+    issuer: decodeCurrencyIssuer(record.issuer, `${path}.issuer`),
+  };
+}
+
+function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuation {
+  const record = requireRecord(value, path);
+  const currencyId = requireUint32(record.currencyId, `${path}.currencyId`);
+  const status = record.status;
+  if (status === "unavailable") {
+    return { currencyId, status: "unavailable" };
+  }
+  if (status !== "specified") {
+    throw new SaveFormatError(`${path}.status is invalid`);
+  }
+  const rawRate = requireFiniteNumber(record.susdPerUnit, `${path}.susdPerUnit`);
+  let rate: SusdPerCurrencyUnit;
+  try {
+    rate = asSusdPerCurrencyUnit(rawRate);
+  } catch (error) {
+    throw new SaveFormatError(`${path}.susdPerUnit is invalid: ${errorMessage(error)}`);
+  }
+  const source = requireString(record.source, `${path}.source`, { minLength: 1 });
+  if (source !== "scenario") {
+    throw new SaveFormatError(`${path}.source is not supported in M4a-2`);
+  }
+  return {
+    currencyId,
+    status: "specified",
+    susdPerUnit: rate,
+    setOnDay: requireInteger(
+      record.setOnDay,
+      `${path}.setOnDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    source: "scenario",
   };
 }
 
@@ -918,6 +1102,24 @@ function decodeWorldPayload(value: unknown): World {
   const regions = rawRegions.map((region, index) =>
     decodeRegion(region, `save payload.regions[${String(index)}]`),
   );
+  const rawCountries = requireArray(payload.countries, "save payload.countries");
+  const countries = rawCountries.map((country, index) =>
+    decodeCountry(country, `save payload.countries[${String(index)}]`),
+  );
+  const rawCurrencies = requireArray(payload.currencies, "save payload.currencies");
+  const currencies = rawCurrencies.map((currency, index) =>
+    decodeCurrency(currency, `save payload.currencies[${String(index)}]`),
+  );
+  const rawValuations = requireArray(
+    payload.currencyValuations,
+    "save payload.currencyValuations",
+  );
+  const currencyValuations = rawValuations.map((valuation, index) =>
+    decodeCurrencyValuation(
+      valuation,
+      `save payload.currencyValuations[${String(index)}]`,
+    ),
+  );
   const rawPopBlocks = requireArray(payload.popBlocks, "save payload.popBlocks");
   const popBlocks = rawPopBlocks.map((block, index) =>
     decodePopBlock(block, `save payload.popBlocks[${String(index)}]`),
@@ -949,6 +1151,9 @@ function decodeWorldPayload(value: unknown): World {
     startDayIndex,
     seed,
     regions,
+    countries,
+    currencies,
+    currencyValuations,
     popBlocks,
     buildings,
     employment,

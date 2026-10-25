@@ -15,7 +15,11 @@ export type DayIndex = Day;
 /** Stable dense numeric identifier within one world. */
 export type Id = number;
 
-/** Nominal simulated USD accounting unit. */
+/**
+ * Nominal SUSD unit of account. SUSD is Century's fixed unit of measurement,
+ * not a national currency or a promise of constant purchasing power. Prices,
+ * wages, assets, and currency valuations can change relative to it.
+ */
 export type MoneySUSD = number;
 
 /** Normalized ratio, normally in 0..1. */

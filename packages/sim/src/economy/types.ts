@@ -248,6 +248,67 @@ export interface FinanceState {
   opening: OpeningBalanceRecord | null;
 }
 
+/**
+ * SUSD-equivalent value of one unit of a currency.
+ *
+ * This is not a MoneySUSD amount: its unit is SUSD per one currency unit.
+ * The brand is compile-time only; serialized state remains a plain JSON number.
+ * D-003 deliberately avoided branded numeric types for ordinary state, but this
+ * value has distinct dimensions and the M4a-2 design review explicitly requires
+ * dimensional separation. It is the narrow exception recorded in D-044.
+ */
+declare const susdPerCurrencyUnitBrand: unique symbol;
+export type SusdPerCurrencyUnit = number & {
+  readonly [susdPerCurrencyUnitBrand]: true;
+};
+
+/** Identity of the entity that issues a currency. */
+export type CurrencyIssuer =
+  | { kind: "country"; countryId: Id }
+  | { kind: "foreign"; issuerKey: string }
+  | { kind: "union"; unionKey: string };
+
+export interface Currency {
+  id: Id;
+  /** Stable lower-case key; never `susd` in any casing. */
+  key: string;
+  name: string;
+  issuer: CurrencyIssuer;
+}
+
+/**
+ * A country's domestic monetary arrangement. This is the sole authority for the
+ * currency a country uses domestically; there is no top-level `Country.currencyId`.
+ */
+export type MonetaryArrangement =
+  | { kind: "own"; currencyId: Id }
+  | { kind: "adopted"; currencyId: Id }
+  | { kind: "shared"; currencyId: Id; unionKey: string };
+
+export interface Country {
+  id: Id;
+  tag: string;
+  name: string;
+  monetary: MonetaryArrangement;
+  /** Sole authoritative country-to-region ownership mapping. */
+  regionIds: Id[];
+}
+
+/**
+ * Authoritative SUSD-relative valuation of one currency. `specified` carries
+ * the value; `unavailable` explicitly records that no value is known and never
+ * defaults to parity.
+ */
+export type CurrencyValuation =
+  | {
+      currencyId: Id;
+      status: "specified";
+      susdPerUnit: SusdPerCurrencyUnit;
+      setOnDay: Day;
+      source: "scenario";
+    }
+  | { currencyId: Id; status: "unavailable" };
+
 export interface BuildingInstanceInitialDef {
   id: Id;
   definitionId: Id;
@@ -290,4 +351,8 @@ export interface EconomyScenarioDef {
   markets: MarketInitialDef[];
   systemAccounts: SystemAccountInitialDef[];
   employment: EmploymentAssignmentInitialDef[];
+  /** M4a-2 optional country/currency state; absent means empty collections. */
+  countries?: Country[];
+  currencies?: Currency[];
+  currencyValuations?: CurrencyValuation[];
 }
