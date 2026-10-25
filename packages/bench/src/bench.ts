@@ -41,12 +41,12 @@ import {
   settleMarketDay,
   tick,
   type EconomyScenarioDef,
+  type TickContext,
   type InputReservation,
   type MarketDayInput,
   type PopBlockInitialDef,
   type PopulationInputs,
   type PopulationScenarioDef,
-  type TickContext,
   type World,
 } from "@century/sim";
 
@@ -75,6 +75,11 @@ const M3E_SMALL_ITERATIONS = 50;
 const M3E_STRESS_GROUPS = 10;
 const M3E_STRESS_WARMUP = 5;
 const M3E_STRESS_ITERATIONS = 20;
+const M3F_SMALL_WARMUP = 2;
+const M3F_SMALL_ITERATIONS = 8;
+const M3F_STRESS_GROUPS = 5;
+const M3F_STRESS_WARMUP = 1;
+const M3F_STRESS_ITERATIONS = 3;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -212,6 +217,33 @@ interface SettlementBenchmarkResult {
   readonly minWagesPaidSUSD: number;
   readonly minUpkeepPaidSUSD: number;
   readonly minPostings: number;
+}
+
+interface EconomicDayBenchmarkResult {
+  readonly label: string;
+  readonly groups: number;
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly hash: string;
+  readonly hashesEqual: boolean;
+  readonly cashConserved: boolean;
+  readonly population: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
+  readonly finalDay: number;
+  readonly transactions: number;
+  readonly wageSettlements: number;
+  readonly upkeepSettlements: number;
+  readonly postings: number;
+  readonly fallbackDays: number;
+  readonly minTransactions: number;
+  readonly minWages: number;
+  readonly minUpkeep: number;
 }
 
 function percentile(sortedSamples: readonly number[], fraction: number): number {
@@ -970,6 +1002,136 @@ function printSettlementBenchmark(result: SettlementBenchmarkResult): void {
   );
 }
 
+function runEconomicDayBenchmark(
+  label: string,
+  groups: number,
+  iterations: number,
+  warmupIterations: number,
+): EconomicDayBenchmarkResult {
+  const scenario = scaledProductionScenario(groups);
+  const context: TickContext = {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  const secondWorld = createEconomyWorld(scenario, { seed: SEED });
+  const cashBefore = world.finance.accounts.reduce(
+    (total, account) => total + account.balanceSUSD,
+    0,
+  );
+
+  const runDays = (
+    target: World,
+    measured: boolean,
+  ): {
+    readonly samples: number[];
+    readonly transactions: number;
+    readonly wageSettlements: number;
+    readonly upkeepSettlements: number;
+    readonly postings: number;
+    readonly fallbackDays: number;
+    readonly minTransactions: number;
+    readonly minWages: number;
+    readonly minUpkeep: number;
+  } => {
+    for (let index = 0; index < warmupIterations; index += 1) tick(target, context);
+    const samples: number[] = [];
+    let transactions = 0;
+    let wageSettlements = 0;
+    let upkeepSettlements = 0;
+    let postings = 0;
+    let fallbackDays = 0;
+    let minTransactions = Number.MAX_SAFE_INTEGER;
+    let minWages = Number.MAX_SAFE_INTEGER;
+    let minUpkeep = Number.MAX_SAFE_INTEGER;
+    for (let index = 0; index < iterations; index += 1) {
+      const start = process.hrtime.bigint();
+      const result = tick(target, context);
+      const end = process.hrtime.bigint();
+      if (measured) samples.push(Number(end - start));
+      const economy = result.economy;
+      if (economy === undefined) throw new Error("M3f economic tick did not return economy results");
+      transactions += economy.settlement.transactions.length;
+      wageSettlements += economy.settlement.wages.length;
+      upkeepSettlements += economy.settlement.upkeep.length;
+      postings += economy.settlement.postingIds.length;
+      if (economy.fallbackUsed) fallbackDays += 1;
+      minTransactions = Math.min(minTransactions, economy.settlement.transactions.length);
+      minWages = Math.min(minWages, economy.settlement.wages.length);
+      minUpkeep = Math.min(minUpkeep, economy.settlement.upkeep.length);
+    }
+    return {
+      samples,
+      transactions,
+      wageSettlements,
+      upkeepSettlements,
+      postings,
+      fallbackDays,
+      minTransactions,
+      minWages,
+      minUpkeep,
+    };
+  };
+
+  const first = runDays(world, true);
+  runDays(secondWorld, false);
+  const samples = first.samples.sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+  const cashAfter = world.finance.accounts.reduce(
+    (total, account) => total + account.balanceSUSD,
+    0,
+  );
+  return {
+    label,
+    groups,
+    iterations,
+    warmupIterations,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / iterations),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    hash: hashWorld(world),
+    hashesEqual: hashWorld(secondWorld) === hashWorld(world),
+    cashConserved: Math.abs(cashBefore - cashAfter) <= 1e-6,
+    population: world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    fixtureBlocks: world.popBlocks.length,
+    fixtureBuildings: world.buildings.length,
+    finalDay: world.dayIndex,
+    transactions: first.transactions,
+    wageSettlements: first.wageSettlements,
+    upkeepSettlements: first.upkeepSettlements,
+    postings: first.postings,
+    fallbackDays: first.fallbackDays,
+    minTransactions: first.minTransactions,
+    minWages: first.minWages,
+    minUpkeep: first.minUpkeep,
+  };
+}
+
+function printEconomicDayBenchmark(result: EconomicDayBenchmarkResult): void {
+  console.log(
+    `${result.label} (${String(result.groups)} group(s), ${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} integrated economic days; warm-up ${String(result.warmupIterations)}; ` +
+      `tick only; setup/reset/hash excluded`,
+  );
+  console.log(
+    `  ${String(result.transactions)} transactions, ${String(result.wageSettlements)} wage settlements, ` +
+      `${String(result.upkeepSettlements)} upkeep settlements, ${String(result.postings)} postings, ` +
+      `${String(result.fallbackDays)} conservative-demand fallback day(s)`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms, population ${String(result.population)}, ` +
+      `final day ${String(result.finalDay)}, hash ${result.hash}`,
+  );
+}
+
 function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
@@ -1043,7 +1205,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -1075,6 +1237,11 @@ function main(): void {
     `M3e settlement: small M3 world (${String(M3E_SMALL_ITERATIONS)} settlements, ` +
       `${String(M3E_SMALL_WARMUP)} warm-up) and ${String(M3E_STRESS_GROUPS)}-group stress ` +
       `(${String(M3E_STRESS_ITERATIONS)} settlements, ${String(M3E_STRESS_WARMUP)} warm-up)`,
+  );
+  console.log(
+    `M3f economic days: small M3 world (${String(M3F_SMALL_ITERATIONS)} days, ` +
+      `${String(M3F_SMALL_WARMUP)} warm-up) and ${String(M3F_STRESS_GROUPS)}-group stress ` +
+      `(${String(M3F_STRESS_ITERATIONS)} days, ${String(M3F_STRESS_WARMUP)} warm-up)`,
   );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
@@ -1149,6 +1316,18 @@ function main(): void {
     M3E_STRESS_ITERATIONS,
     M3E_STRESS_WARMUP,
   );
+  const m3fSmall = runEconomicDayBenchmark(
+    "M3f economic day (small)",
+    1,
+    M3F_SMALL_ITERATIONS,
+    M3F_SMALL_WARMUP,
+  );
+  const m3fStress = runEconomicDayBenchmark(
+    "M3f economic day (stress)",
+    M3F_STRESS_GROUPS,
+    M3F_STRESS_ITERATIONS,
+    M3F_STRESS_WARMUP,
+  );
 
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
@@ -1162,6 +1341,8 @@ function main(): void {
   printMarketBenchmark(m3dStress);
   printSettlementBenchmark(m3eSmall);
   printSettlementBenchmark(m3eStress);
+  printEconomicDayBenchmark(m3fSmall);
+  printEconomicDayBenchmark(m3fStress);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1204,6 +1385,13 @@ function main(): void {
     result.minUpkeepPaidSUSD > 0 &&
     result.minPostings > 0;
   const m3eValid = settlementValid(m3eSmall) && settlementValid(m3eStress);
+  const economicDayValid = (result: EconomicDayBenchmarkResult): boolean =>
+    result.hashesEqual &&
+    result.cashConserved &&
+    result.minTransactions > 0 &&
+    result.minWages > 0 &&
+    result.minUpkeep > 0;
+  const m3fValid = economicDayValid(m3fSmall) && economicDayValid(m3fStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -1217,7 +1405,8 @@ function main(): void {
     m3bEmploymentValid &&
     m3cValid &&
     m3dValid &&
-    m3eValid;
+    m3eValid &&
+    m3fValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1266,6 +1455,10 @@ function main(): void {
   console.log(
     `M3e settlement small checks: ${settlementValid(m3eSmall) ? "PASS" : "FAIL"}; ` +
       `stress checks: ${settlementValid(m3eStress) ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M3f economic day small checks: ${economicDayValid(m3fSmall) ? "PASS" : "FAIL"}; ` +
+      `stress checks: ${economicDayValid(m3fStress) ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

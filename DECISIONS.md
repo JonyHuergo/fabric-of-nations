@@ -7,10 +7,10 @@ and provisional assumptions made in M0/M1/M2/M2.1. It follows GDD §20 and
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
 employment assignment, M3c production/inventory movement, M3d deterministic
-two-pass market clearing with bounded prices, and M3e cash settlement, wages, and
-retained producer profit**. Government finance, taxes, debt/credit, inflation/FX,
-dividends, politics, technology, diplomacy, warfare, AI, worker protocol, and UI
-behavior remain out of scope.
+two-pass market clearing with bounded prices, M3e cash settlement/wages/upkeep/
+retained profit, and M3f integrated daily economic tick**. Government finance,
+taxes, debt/credit, inflation/FX, dividends, politics, technology, diplomacy,
+warfare, AI, worker protocol, and UI behavior remain out of scope.
 
 ## Conflicts and ambiguities
 
@@ -567,8 +567,9 @@ behavior remain out of scope.
   equity recognition are deferred to M4. Six transaction-kind names are defined
   for later use; no wage, production, market-clearing, or pricing behavior is
   implemented in M3a.
-- **Workflow:** M3a provides the ledger primitive and its tests only. M3b–M3f
-  remain unimplemented.
+- **Workflow:** M3a provides the ledger primitive and its tests only. When D-035
+  was written, M3b–M3f were unimplemented; later decisions D-038–D-042 record
+  their implementation.
 
 ### D-036 — M3a structural validation versus economic failure
 
@@ -820,6 +821,93 @@ behavior remain out of scope.
 - **Deferred:** wage index/scarcity/productivity/inflation/laws, owner profit
   distribution, taxes, interest, debt, and the M3f daily integration remain future
   work.
+
+### D-042 — M3f integrated economic day
+
+- **Resolution:** `tick` now processes economic worlds through one complete day.
+  The order is: terminal/boundary check and world validation; annual ageing when
+  due; daily births/deaths; employment reconciliation/refresh (dirty or monthly);
+  generation of household and production demand; M3d market clearing with
+  production/input reservations, Pass B, prices, and final overflow; M3e market,
+  wage, and upkeep settlement; needs counters, daily militancy, and monthly wealth
+  when due; then advance `dayIndex` exactly once. M2-only worlds retain the existing
+  M2 path.
+- **Population cadence:** annual ageing occurs on January 1 except the scenario
+  start day, exactly once. Daily demography is applied once before economic
+  demand. If daily demographic change makes existing assignments invalid before
+  the next monthly refresh, the existing `employmentDirty` marker is set and
+  `refreshEmploymentIfDue` repairs it immediately. Otherwise employment follows
+  the established dirty/monthly rule.
+- **Household demand:** needs come from `PopulationDefinitions.needs`, population,
+  wealth activation, and current market prices. Desired quantities are
+  `quantityPerCapitaPerDay × population`. The household account's opening cash is
+  the only budget; same-day wages are not available. Tiers are funded in GDD order
+  (subsistence, basic, comfort/luxury); a tier is fully funded when cash permits,
+  otherwise it is proportionally funded and higher tiers are not generated. A
+  `MONEY_TOLERANCE_SUSD` reserve keeps the actual market debit within available
+  cash. This is a conservative, deterministic funding rule derived from the GDD
+  funded-demand definition.
+- **Production demand:** desired input quantities come from current building
+  capacity and recipes. The day first tries full desired production demand, which
+  permits M3e's atomic same-batch sales receipts to fund input purchases. If
+  settlement fails, the staged day is restored and production demand is regenerated
+  with funded input cost capped by that building's opening operating cash. This
+  fallback is safe but does not use potential same-day receipts; it is recorded in
+  the tick result as `fallbackUsed`.
+- **Atomicity:** the complete day runs on a schema-specific structural deep clone
+  covering every typed array and nested authoritative record. Population,
+  employment, market inventory/prices, finance, postings, and day advancement
+  mutate only the staged world. The staged world is published to the caller's world
+  object only after every phase and final validation succeeds. A failure leaves the
+  original world, its hash, and its serialized representation unchanged.
+  `cloneWorld` must be extended whenever authoritative state gains a field; an
+  equality/no-shared-reference test guards the current schema.
+- **Needs after settlement:** household fulfilled quantities and actual purchase
+  amounts are converted into the existing needs summaries. Unmet subsistence/basic/
+  comfort counters and daily militancy update from actual market outcomes, not the
+  M2 fixture. No needs purchase is invented outside the market.
+- **Monthly wealth:** GDD §6.5 requires a monthly update toward the target
+  `clamp(intercept + slope * ln(perCapitaIncome / subsistenceBasketCost), 0, 99)`.
+  M3f performs that update on the last civil day of each month using the existing
+  M2.1 wealth function. `perCapitaIncome` is the current day's **actual settled
+  household wage receipt** divided by block population and annualized by the civil
+  year; household cash balances are not treated as income, and mandatory payments
+  are zero because M3f has no taxes/other mandatory household payments. The
+  subsistence basket uses current post-market prices. The update runs after needs
+  counters and daily militancy, so it uses the same day's actual outcomes. This
+  preserves January 1 ageing as a separate next-day boundary and requires no new
+  persistent accumulator or save field.
+- **Measurement-window inference:** the GDD defines the target formula and monthly
+  cadence but does not define an income measurement window. Using the current-day
+  settled wage flow annualized by the civil year is the smallest deterministic
+  implementation available from authoritative M3 state; no monthly income
+  accumulator exists. **A trailing-month income average is not implemented.** This
+  is recorded as an explicit limitation, not a claim that one day is an exact
+  monthly or trailing-month average. A later milestone may add an authoritative
+  monthly income accumulator to refine the target without changing the monthly
+  cadence or wealth meaning.
+- **Compatibility:** no schema, save-format, data-version, or simulation-version
+  change. `TickContext` gains an optional `economy.definitions`, and
+  `PopulationTickContext.inputs` becomes optional for economic worlds; M2 callers
+  still provide inputs. No M3d priority, price, or M3e accounting rule changes.
+- **Evidence:** GDD §4.1 step order, §4.2 daily cadence, §4.3 demand priorities,
+  §7 daily production/market, and §7.7 settlement/wage/profit rules. M3d/M3e
+  decisions D-040/D-041 remain authoritative for their phases.
+- **Performance:** the first M3f staging used `serializeWorld`/`deserializeWorld`
+  for the whole-day clone. Profiling showed canonical checksum encoding and save
+  serialization dominated the tick: a clone averaged about 6.15 ms and was executed
+  twice per day. The implementation now uses a schema-specific structural clone
+  covering every typed array and nested record, including journal lines. Clone cost
+  fell to about 0.14 ms and the same M3f benchmark fell from small 19.800/24.480 ms
+  and stress 56.672/59.513 ms (avg/p95) to small 4.535/6.166 ms and stress
+  23.353/28.150 ms, with unchanged hashes. Run-to-run Node variance remains; the
+  pre-optimization run was the committed baseline measurement. Post-optimization
+  profiling is dominated by existing invariant validation; no validation, staging,
+  or determinism rule was removed. `cloneWorld` is schema-specific and must be
+  extended if authoritative state gains a field; an equality/no-shared-reference
+  test guards it.
+- **Status:** Node diagnostics only. The GDD mobile p95 ≤ 8 ms target remains
+  **NOT EVALUATED** on a reference device/release build.
 
 ## Assumptions recorded for future review
 

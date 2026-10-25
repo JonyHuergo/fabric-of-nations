@@ -5,6 +5,7 @@ import {
   type EconomyScenarioDef,
   type MarketDayResult,
   type MarketSettlementResult,
+  type TickContext,
   type World,
 } from "@century/sim";
 import {
@@ -18,6 +19,13 @@ export function accountBalance(world: World, accountId: number): number {
   const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account.balanceSUSD;
+}
+
+export function economyTickContext(scenario: EconomyScenarioDef): TickContext {
+  return {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
 }
 
 export function householdAccountId(world: World, popBlockId: number): number {

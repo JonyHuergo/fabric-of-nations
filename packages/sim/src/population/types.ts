@@ -8,6 +8,7 @@
  */
 
 import type { Day, Id, MoneySUSD, Rate } from "../types.js";
+import type { EconomyDefinitions } from "../economy/types.js";
 import type { NeedTier } from "./constants.js";
 
 export type {
@@ -170,13 +171,20 @@ export interface PopulationInputs {
 /** Optional per-tick population context. */
 export interface PopulationTickContext {
   definitions: PopulationDefinitions;
-  inputs: PopulationInputs;
+  /** Required by the M2-only needs fixture; omitted for integrated M3f worlds. */
+  inputs?: PopulationInputs;
   /** Detailed per-good needs results are omitted when false (benchmarks). */
   collectNeedDetails?: boolean;
 }
 
+export interface EconomyTickContext {
+  readonly definitions: EconomyDefinitions;
+}
+
 export interface TickContext {
   population?: PopulationTickContext;
+  /** Present only for integrated M3f economic worlds. */
+  economy?: EconomyTickContext;
 }
 
 export interface NeedGoodResult {

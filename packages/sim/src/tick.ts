@@ -1,9 +1,8 @@
 /**
- * Deterministic daily tick driver for M2.
+ * Deterministic daily tick driver.
  *
- * The M1 boundary and day-advance stages are preserved. When a population
- * context is supplied and the world contains pop blocks, the implementation
- * follows the GDD daily order:
+ * M2-only worlds with pop blocks and no buildings/markets retain the
+ * population-only path:
  *   1. validate/boundary
  *   2. events/policy (no-op)
  *   3. annual ageing when due
@@ -15,23 +14,29 @@
  *   14. diagnostics (no history)
  *   15. advance day
  *
- * M3a/M3b worlds that contain buildings or markets do not use this
- * population-only path; `tick` rejects them until the economic tick path is
- * implemented. M3b employment is available through `refreshEmploymentIfDue`.
+ * Worlds with buildings or markets use the M3f integrated path. The complete day
+ * is staged on a clone and published only after every phase succeeds.
  */
 
 import { dayIndexToCivilDate, daysInMonth, isTerminalDayIndex } from "./calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "./constants.js";
 import { applyAnnualAgeing } from "./population/ageing.js";
 import {
+  assertValidPopulationDefinitions,
   assertValidPopulationInputs,
 } from "./population/definitions.js";
 import { applyDailyDemography } from "./population/demography.js";
 import { settlePopulationNeeds } from "./population/needs.js";
 import { workingAgePopulation, worldPopulation } from "./population/state.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "./population/wealth.js";
+import {
+  cloneWorld,
+  runEconomicDay,
+  type EconomyDayResult,
+} from "./economy/day.js";
 import type {
   PopulationDefinitions,
+  PopulationInputs,
   PopulationTickResult,
   TickContext,
 } from "./population/types.js";
@@ -46,6 +51,7 @@ export interface TickResult {
   readonly dayIndex: Day;
   readonly campaignComplete: boolean;
   readonly population?: PopulationTickResult;
+  readonly economy?: EconomyDayResult["economy"];
 }
 
 /** Summary of a bounded or complete campaign run. */
@@ -69,8 +75,21 @@ function validatePopulationContext(world: World, context: TickContext | undefine
   if (population === undefined) {
     throw new RangeError("a population context is required when the world contains pop blocks");
   }
-  assertValidPopulationInputs(world, population.definitions, population.inputs);
+  assertValidPopulationDefinitions(population.definitions);
+  if (population.inputs !== undefined) {
+    assertValidPopulationInputs(world, population.definitions, population.inputs);
+  }
   return population.definitions;
+}
+
+function populationInputs(context: TickContext): PopulationInputs {
+  const inputs = context.population?.inputs;
+  if (inputs === undefined) {
+    throw new RangeError(
+      "M2 needs require population.inputs; integrated M3f worlds use market demand instead",
+    );
+  }
+  return inputs;
 }
 
 function lastDayOfMonth(dayIndex: Day): boolean {
@@ -86,6 +105,7 @@ function runPopulationDay(
   const population = context.population;
   if (population === undefined) throw new RangeError("missing population context");
   const definitions = validatePopulationContext(world, context);
+  const inputs = populationInputs(context);
   const date = dayIndexToCivilDate(dayIndex);
   const aged = date.month === 1 && date.day === 1 && dayIndex !== world.startDayIndex;
   const populationStart = worldPopulation(world);
@@ -95,7 +115,7 @@ function runPopulationDay(
   const needs = settlePopulationNeeds(
     world,
     definitions,
-    population.inputs,
+    inputs,
     dayIndex,
     population.collectNeedDetails ?? true,
   );
@@ -103,7 +123,7 @@ function runPopulationDay(
 
   let wealthUpdates: PopulationTickResult["wealthUpdates"] = [];
   if (lastDayOfMonth(dayIndex)) {
-    wealthUpdates = updateMonthlyWealth(world, definitions, population.inputs, dayIndex, needs);
+    wealthUpdates = updateMonthlyWealth(world, definitions, inputs, dayIndex, needs);
   }
 
   let workingAge = 0;
@@ -144,9 +164,31 @@ export function tick(world: World, context?: TickContext): TickResult {
   const processedDay = world.dayIndex;
   let populationResult: PopulationTickResult | undefined;
   if (world.buildings.length > 0 || world.markets.length > 0) {
-    throw new RangeError(
-      "M3 economy tick behavior is not implemented; use refreshEmploymentIfDue explicitly. Only state construction, serialization, and employment refresh are available",
+    const economy = context?.economy;
+    const population = context?.population;
+    if (economy === undefined) {
+      throw new RangeError("an economy context is required for an economic world");
+    }
+    if (population === undefined) {
+      throw new RangeError("a population context is required for an economic world");
+    }
+    const working = cloneWorld(world);
+    const day = runEconomicDay(
+      working,
+      population.definitions,
+      economy.definitions,
+      processedDay,
     );
+    working.dayIndex = processedDay + 1;
+    assertValidWorld(working);
+    Object.assign(world, working);
+    const base: TickResult = {
+      advanced: true,
+      dayProcessed: processedDay,
+      dayIndex: world.dayIndex,
+      campaignComplete: isTerminalDayIndex(world.dayIndex),
+    };
+    return { ...base, population: day.population, economy: day.economy };
   }
   if (world.popBlocks.length > 0) {
     populationResult = runPopulationDay(world, processedDay, context ?? {});

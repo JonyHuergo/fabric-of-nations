@@ -437,8 +437,8 @@ describe("M3c boundaries", () => {
     expect(prices(world)).toEqual(beforePrices);
   });
 
-  test("keeps the M2 needs-fixture guard for economy worlds", () => {
+  test("requires an explicit economy context for an economic world tick", () => {
     const { world } = productionWorld();
-    expect(() => tick(world)).toThrow(/M3 economy tick behavior/i);
+    expect(() => tick(world)).toThrow(/economy context|population context/i);
   });
 });

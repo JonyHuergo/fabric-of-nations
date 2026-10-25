@@ -2,7 +2,6 @@ import {
   createEconomyWorld,
   hashWorld,
   runMarketDay,
-  tick,
   type MarketDayInput,
 } from "@century/sim";
 import {
@@ -715,7 +714,7 @@ describe("M3d determinism, validation, and boundaries", () => {
     expect(hashWorld(world)).toBe(before);
   });
 
-  test("does not settle cash and preserves the economic tick guard", () => {
+  test("does not settle cash while clearing a market day", () => {
     const scenario = marketScenario({
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
@@ -731,6 +730,5 @@ describe("M3d determinism, validation, and boundaries", () => {
       cash,
       9,
     );
-    expect(() => tick(world)).toThrow(/M3 economy tick behavior/i);
   });
 });

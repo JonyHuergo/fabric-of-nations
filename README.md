@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d/M3e foundation
+# Century — M0/M1/M2.1/M3a/M3b/M3c/M3d/M3e/M3f foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -9,19 +9,19 @@ The repository currently implements **M0 (project foundation)**, **M1
 definitions, state, validation, and serialization)**, **M3b (deterministic
 employment assignment)**, **M3c (production, input reservations, and inventory
 movement)**, **M3d (deterministic two-pass market clearing with bounded
-prices)**, and **M3e (cash settlement, wages, retained producer profit, and
-household cash)** only. Government finance, taxes, debt/credit, inflation/FX,
-dividends, politics, technology, diplomacy, warfare, AI, worker, and React Native
-UI behavior are not implemented. The design authority is the Century GDD v2.1
-(`Century_GDD_v2.1.md`); persistent engineering rules are in
-[`AGENTS.md`](./AGENTS.md), and implementation decisions are in
-[`DECISIONS.md`](./DECISIONS.md).
+prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
+household cash)**, and **M3f (integrated daily economic tick)** only. Government
+finance, taxes, debt/credit, inflation/FX, dividends, politics, technology,
+diplomacy, warfare, AI, worker, and React Native UI behavior are not implemented.
+The design authority is the Century GDD v2.1 (`Century_GDD_v2.1.md`); persistent
+engineering rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions
+are in [`DECISIONS.md`](./DECISIONS.md).
 
 ## Workspace
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, tick, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
@@ -151,10 +151,10 @@ household-account subset of the future finance state.
 
 ## M3a economy foundation
 
-M3a adds the validated structural layer for the first economic slice; it did not
-run that economy. A world containing buildings or markets still rejects `tick`
-with a clear error rather than silently using the M2 needs fixture; M3b adds an
-explicit employment-refresh boundary but no economic tick path.
+M3a added the validated structural layer for the first economic slice. M3f now
+integrates that economy into `tick()` for worlds with buildings and markets;
+M2-only worlds continue to use the M2 needs-fixture path. M3b added the explicit
+employment-refresh boundary.
 
 ### Catalog and units
 
@@ -326,8 +326,81 @@ daily economic tick.
   object; it is not serialized. A deep copy can bypass it, and no persistent
   settlement ledger is introduced.
 - No schema, save-format, data-version, or simulation-version change is made.
-- Wage index/scarcity/inflation/laws, taxes, interest, debt, dividends, and the
-  M3f daily integration remain deferred.
+- Wage index/scarcity/inflation/laws, taxes, interest, debt, and dividends remain
+  deferred.
+
+## M3f integrated economic day
+
+M3f turns the public `tick()` into a complete daily economic path for worlds with
+buildings and markets. M2-only worlds continue to use their existing needs fixture
+path.
+
+### Daily order
+
+1. Validate world, terminal boundary, and context.
+2. Stage the complete world with the structural clone.
+3. Annual ageing when due (January 1, except the scenario start day).
+4. Daily births/deaths.
+5. Reconcile/refresh employment when dirty, monthly, or invalidated by
+   demographic change.
+6. Build household and production demand from real state.
+7. Run M3d market clearing, production, Pass B, prices, and final overflow.
+8. Run M3e market, wage, and upkeep settlement.
+9. Update needs counters, daily militancy, and monthly wealth when due.
+10. Advance `dayIndex` exactly once and publish the staged world.
+
+### Household demand and funding
+
+- Needs come from `PopulationDefinitions.needs`, population, wealth activation,
+  and current market prices.
+- Desired physical demand is `quantityPerCapitaPerDay × population`.
+- The household's opening account cash is the only budget. Same-day wages are
+  not available for the earlier market phase.
+- Tiers are funded in GDD order. If cash cannot fully fund the current tier, that
+  tier is proportionally funded and no higher tier is generated. Funded cost is
+  capped below available cash by the existing `1e-6` money tolerance.
+- Multiple goods and tiers are evaluated together, so individually affordable
+  requests cannot overdraw the household in aggregate.
+
+### Production demand and cash safety
+
+- Desired input demand is derived from current building capacity and recipes.
+- The day first tries full desired production demand, allowing valid same-batch
+  sales receipts to fund input purchases through M3e's atomic market batch.
+- If that settlement fails, the staged post-population state is restored and
+  production demand is regenerated with each building's input cost capped by its
+  opening operating cash. This conservative fallback is safe and is reported as
+  `fallbackUsed`.
+- Actual sales that do not materialize cannot leave a negative buyer account.
+
+### Whole-day atomicity
+
+The complete day runs on a structural deep clone of the current schema. Every
+typed array, region, pop block, building, employment assignment, market stock lot,
+price array, finance account, journal posting/line, and diagnostics buffer is
+copied. Population, employment, inventory, prices, finance, postings, needs
+indicators, and the calendar mutate only the clone. The caller's world is updated
+only after every phase and final validation succeeds. A failure leaves the
+original world, hash, and serialized representation unchanged. The clone helper
+must be extended whenever authoritative state gains a field; a serialization
+equality and no-shared-reference test guards the current schema.
+
+### Needs and wealth
+
+- Household need fulfillment and actual purchase spending are converted into the
+  existing needs summaries; unmet subsistence/basic/comfort counters and daily
+  militancy come from actual market outcomes.
+- Monthly wealth is re-estimated on the last civil day of each month using GDD
+  §6.5. Per-capita income is the current day's actual settled household wage
+  receipt annualized by the civil year; current post-market prices define the
+  subsistence basket; mandatory payments are zero because M3f has no taxes.
+  Household cash is not treated as income. The update runs after needs counters
+  and daily militancy, before any subsequent January 1 ageing.
+- The GDD does not define a monthly income measurement window; this convention is
+  documented in `DECISIONS.md`. No persistent monthly-income accumulator or save
+  field is introduced. A later milestone may refine the income window.
+
+No schema, save-format, data-version, or simulation-version change was introduced.
 
 ## Data and calibration
 
@@ -438,10 +511,10 @@ validation and the campaign gameplay baseline are deliberately separate.
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
-workloads, and M3e settlement workloads. Stress scales repeat the three
-deterministic multi-block templates (400k/350k/250k people), so total population
-grows with block count. Each stress scale uses 100 warm-up ticks and 730 measured
-ticks.
+workloads, M3e settlement workloads, and M3f integrated economic-day workloads.
+Stress scales repeat the three deterministic multi-block templates (400k/350k/250k
+people), so total population grows with block count. Each M2 stress scale uses 100
+warm-up ticks and 730 measured ticks.
 
 Representative runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
 processors), 7.93 GiB RAM, seed `20261023`:
@@ -525,6 +598,39 @@ wages or upkeep were unpaid in the cash-backed benchmark. Settlement times exclu
 market-day setup, reset, and hashing; settlement validation is included. These are
 Node diagnostics, not mobile-performance evidence.
 
+The M3f workloads call the real integrated `tick()` on cash-backed M3 worlds. The
+small case uses 4 pop blocks and 8 buildings; the stress case uses 5 groups
+(20 pop blocks, 40 buildings). Setup and hashing are excluded, while the complete
+daily tick is timed. All measured days used the conservative production-demand
+fallback in this benchmark because full desired input demand could not be funded by
+opening cash plus realized same-batch sales.
+
+| Workload | Blocks | Buildings | Days | Transactions | Wages | Upkeep | Postings | Fallback days | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M3f small | 4 | 8 | 8 | 188 | 56 | 64 | 230 | 8 | 4.535 ms | 4.373 ms | 6.166 ms | 6.166 ms | `3a0b14d0ffa84be2` |
+| M3f stress | 20 | 40 | 3 | 2,300 | 105 | 120 | 2,391 | 3 | 23.353 ms | 23.490 ms | 28.150 ms | 28.150 ms | `7a6d5b103aae682a` |
+
+Profiling found that the original save-codec staging clone dominated the tick.
+The clone averaged about `6.15 ms` and the day cloned twice; canonical checksum
+encoding accounted for most sampled time. Replacing that clone with the structural
+clone above reduced clone cost to about `0.14 ms` and produced:
+
+| M3f workload | Before avg / p95 | After avg / p95 | Hash |
+|---|---:|---:|---|
+| small | 19.800 / 24.480 ms | 4.535 / 6.166 ms | `3a0b14d0ffa84be2` |
+| stress | 56.672 / 59.513 ms | 23.353 / 28.150 ms | `7a6d5b103aae682a` |
+
+After the change, CPU profiling is dominated by invariant validation
+(`assertValidJournalPosting`, finance/economy/world/population validation) rather
+than staging. Market clearing and settlement remain smaller shares. These are Node
+diagnostics with the same workloads; hashes and state behavior are unchanged.
+Mobile performance has not been measured on a reference device, so p95 ≤ 8 ms is
+still **NOT EVALUATED**.
+
+The M3f benchmark reports Node diagnostics only. The GDD mobile p95 ≤ 8 ms target
+is **NOT EVALUATED**; the integrated tick uses whole-world structural staging, so
+these timings are not mobile-performance evidence.
+
 ## Known limitations
 
 - Full historical demographic calibration is incomplete: the 1900 age/sex
@@ -540,30 +646,40 @@ Node diagnostics, not mobile-performance evidence.
 - Single-year sex state increases per-block cost; 6,000-block Node timing is not
   mobile evidence.
 - `Math.log`/cross-engine floating-point identity remains an open limitation.
-- M3a–M3e implement economy state, the cash ledger, employment assignment, a
-  physical production phase, two-pass market clearing, and cash settlement of
-  purchases/wages/upkeep with retained profit only: no taxes, interest, dividends,
-  debt/credit, government finance, politics, technology, diplomacy, warfare, AI,
-  migration, social mobility, or UI exists.
+- M3a–M3f implement economy state, the cash ledger, employment assignment, a
+  physical production phase, two-pass market clearing, cash settlement of
+  purchases/wages/upkeep with retained profit, and an integrated economic day:
+  no taxes, interest, dividends, debt/credit, government finance, politics,
+  technology, diplomacy, warfare, AI, migration, social mobility, or UI exists.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
-- A world containing buildings or markets currently rejects `tick`; M3
-  population-only fixture behavior is preserved separately. M3b employment, M3c
-  production, M3d market days, and M3e settlement are exercised by Jest and
-  focused Node benchmarks, not by a runnable economic tick.
+- M3f runs the economic day through the public `tick()` for worlds with buildings
+  and markets; M2-only worlds retain their existing needs-fixture path. M3b–M3e
+  focused benchmarks and M3f integrated-day benchmarks are Node diagnostics, not
+  a runnable full-scale/mobile validation.
 - M3c storage capacity uses a provisional `quantity × level × condition` rule;
   overflow is pooled by market rather than assigned to individual warehouses.
 - M3d price coefficients are provisional, and price updates use gross opening
   stock plus same-day production; final overflow losses do not feed back into the
-  same day's price. M3d still returns pending financial results without settling
-  them.
+  same day's price.
 - M3e uses base annual wages without wage index, labor scarcity, inflation, law,
   or wage-productivity adjustments; producer profit is cash-basis and retained.
   Upkeep is `dailyUpkeepSUSDAtLevelOne × level` for operational buildings and is
   not condition- or staffing-scaled. Underfunded employers/building accounts pay
-  pro-rata wages/upkeep and report shortfalls without creating debt. Market
-  purchases must be fully funded or the settlement batch is rejected atomically.
-  Owner profit distribution remains deferred.
+  pro-rata wages/upkeep and report shortfalls without creating debt. Owner profit
+  distribution remains deferred.
+- M3f monthly wealth uses the current day's actual settled wages annualized by the
+  civil year because no monthly income accumulator exists. **A trailing-month
+  income average is not implemented**; the GDD does not define that measurement
+  window. This limitation is recorded in `DECISIONS.md`.
+- M3f first attempts full desired production demand, then falls back to
+  opening-cash-capped production demand if settlement would be unfunded. The
+  fallback is safe but can underuse valid same-batch sales receipts; it is
+  reported as `fallbackUsed`.
+- M3f stages each economic day with a structural deep clone for whole-day
+  atomicity. The clone is schema-specific and must be extended when authoritative
+  state gains fields; this is a correctness mechanism, not evidence of mobile
+  performance.
 
 ## Development workflow
 
@@ -573,5 +689,5 @@ Node diagnostics, not mobile-performance evidence.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M3f until M3e is reviewed and the next phase is explicitly
+7. Do not begin M4 until M3f is reviewed and the next phase is explicitly
    authorized.

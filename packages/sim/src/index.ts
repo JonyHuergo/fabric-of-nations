@@ -13,9 +13,11 @@
  * and recorded storage overflow. M3d adds deterministic two-pass market clearing,
  * transient household/input reservations, and bounded daily price updates without
  * financial settlement. M3e adds explicit cash settlement of M3d transactions,
- * daily wages, retained producer profit, and household cash updates. It does not
- * add a runnable economic tick. Politics, technology, diplomacy, war, and UI
- * contracts remain future milestones.
+ * daily wages, upkeep, retained producer profit, and household cash updates.
+ * M3f integrates the economic day into the public tick, with real-state demand
+ * construction, cash-safe funding, and whole-day staged atomicity. It does not
+ * add a speculative banking, credit, or later-milestone system. Politics,
+ * technology, diplomacy, war, and UI contracts remain future milestones.
  */
 
 export * from "./types.js";
