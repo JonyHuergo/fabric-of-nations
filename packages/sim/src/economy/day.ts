@@ -38,6 +38,7 @@ import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accou
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
+import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
   runMarketDay,
   type HouseholdDemandRecord,
@@ -46,7 +47,7 @@ import {
   type MarketTier,
   type ProductionDemandRecord,
 } from "./market.js";
-import { settleMarketDay, type MarketSettlementResult } from "./settlement.js";
+import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { assertValidEmploymentState, refreshEmploymentIfDue } from "./employment.js";
 import type {
@@ -54,6 +55,7 @@ import type {
   EconomyDefinitions,
   FinancialAccount,
   GoodDef,
+  Market,
 } from "./types.js";
 
 const M3_TIER_NEEDS: Readonly<Record<1 | 3 | 6, readonly NeedTier[]>> = {
@@ -64,6 +66,7 @@ const M3_TIER_NEEDS: Readonly<Record<1 | 3 | 6, readonly NeedTier[]>> = {
 
 interface HouseholdDemandMeta {
   readonly popBlockId: Id;
+  readonly marketId: Id;
   readonly tier: MarketTier;
   readonly needTier: NeedTier;
   readonly goodId: Id;
@@ -74,6 +77,21 @@ interface HouseholdDemandMeta {
 interface HouseholdDemandBuild {
   readonly records: HouseholdDemandRecord[];
   readonly meta: HouseholdDemandMeta[];
+  readonly marketByPopBlock: ReadonlyMap<Id, Id>;
+}
+
+function marketByRegion(world: World): Map<Id, Id> {
+  const map = new Map<Id, Id>();
+  for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
+    for (const regionId of market.regionIds) map.set(regionId, market.id);
+  }
+  return map;
+}
+
+function marketPrices(world: World, marketId: Id): Market {
+  const market = world.markets.find((candidate) => candidate.id === marketId);
+  if (market === undefined) throw new RangeError(`missing market ${String(marketId)}`);
+  return market;
 }
 
 function isMarketFundingFailure(error: unknown): boolean {
@@ -86,9 +104,13 @@ function isMarketFundingFailure(error: unknown): boolean {
 export interface EconomyDayResult {
   readonly population: PopulationTickResult;
   readonly economy: {
+    /** First market's clearing result, retained for single-market callers. */
     readonly market: MarketDayResult;
+    /** Every cleared market in ascending id order. */
+    readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    readonly migration: MigrationDayResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
@@ -169,16 +191,22 @@ function buildHouseholdDemand(
   populationDefinitions: PopulationDefinitions,
   index: FinanceIndex,
 ): HouseholdDemandBuild {
-  const market = world.markets[0];
-  if (market === undefined) throw new RangeError("economic day requires a market");
+  const regionToMarket = marketByRegion(world);
   const goodByKey = new Map(economyDefinitions.goods.map((good) => [good.key, good]));
   const needByTier = needDefinitionsByTier(populationDefinitions);
   const records: HouseholdDemandRecord[] = [];
   const meta: HouseholdDemandMeta[] = [];
+  const marketByPopBlock = new Map<Id, Id>();
 
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const population = populationTotal(block);
     if (population <= 0) continue;
+    const marketId = regionToMarket.get(block.regionId);
+    if (marketId === undefined) {
+      throw new RangeError(`popBlock ${String(block.id)} is in a region with no market`);
+    }
+    const market = marketPrices(world, marketId);
+    marketByPopBlock.set(block.id, marketId);
     const account = accountByOwner(index, "popBlock", block.id);
     let remainingCash = account.balanceSUSD;
 
@@ -239,6 +267,7 @@ function buildHouseholdDemand(
         });
         meta.push({
           popBlockId: block.id,
+          marketId,
           tier,
           needTier: item.needTier,
           goodId: item.goodId,
@@ -268,7 +297,7 @@ function buildHouseholdDemand(
         ? left.tier - right.tier
         : left.goodId - right.goodId,
   );
-  return { records, meta };
+  return { records, meta, marketByPopBlock };
 }
 
 function criticalGoodIds(
@@ -300,8 +329,7 @@ function buildProductionDemands(
   mode: "full" | "cash",
   index: FinanceIndex,
 ): ProductionDemandRecord[] {
-  const market = world.markets[0];
-  if (market === undefined) throw new RangeError("economic day requires a market");
+  const regionToMarket = marketByRegion(world);
   const critical = criticalGoodIds(definitions, populationDefinitions.needs);
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const records: ProductionDemandRecord[] = [];
@@ -310,6 +338,11 @@ function buildProductionDemands(
     if (!building.operational) continue;
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
+    const marketId = regionToMarket.get(building.regionId);
+    if (marketId === undefined) {
+      throw new RangeError(`building ${String(building.id)} is in a region with no market`);
+    }
+    const market = marketPrices(world, marketId);
     const capacity = computeBuildingCapacity(world, definitions, building.id);
     if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
     const inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
@@ -351,15 +384,15 @@ function buildProductionDemands(
 function makeMarketInput(
   populationDefinitions: PopulationDefinitions,
   dayIndex: DayIndex,
-  household: HouseholdDemandBuild,
+  marketId: Id,
+  household: readonly HouseholdDemandRecord[],
   production: readonly ProductionDemandRecord[],
 ): MarketDayInput {
-  const marketId = 0;
   return {
     dayIndex,
     marketId,
     needs: populationDefinitions.needs,
-    householdDemands: household.records,
+    householdDemands: household,
     productionDemands: production,
   };
 }
@@ -372,19 +405,21 @@ function buildNeedsResult(
   world: World,
   definitions: EconomyDefinitions,
   household: HouseholdDemandBuild,
-  market: MarketDayResult,
+  markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
 ): PopulationNeedsDayResult {
   const resultByKey = new Map(
-    market.householdDemands.map((demand) => [
-      demandResultKey(demand.popBlockId, demand.tier, demand.goodId),
-      demand,
-    ]),
+    markets.flatMap((market) =>
+      market.householdDemands.map((demand) => [
+        demandResultKey(demand.popBlockId, demand.tier, demand.goodId),
+        demand,
+      ] as const),
+    ),
   );
   const householdByName = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
   );
-  const priceByGood = market.openingPrices;
+  const pricesByMarket = new Map(markets.map((market) => [market.marketId, market.openingPrices]));
   const blocks: PopBlockNeedsResult[] = [];
 
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
@@ -411,7 +446,11 @@ function buildNeedsResult(
           demandResultKey(item.popBlockId, item.tier, item.goodId),
         );
         if (demand === undefined) throw new RangeError("missing market household demand result");
-        const price = priceByGood[item.goodId] ?? 0;
+        const marketOpeningPrices = pricesByMarket.get(item.marketId);
+        if (marketOpeningPrices === undefined) {
+          throw new RangeError(`missing market ${String(item.marketId)} for household demand`);
+        }
+        const price = marketOpeningPrices[item.goodId] ?? 0;
         desiredCost += item.desired * price;
         fundedCost += item.funded * price;
         spent += demand.fulfilledQuantity * price;
@@ -461,10 +500,18 @@ function buildNeedsResult(
   const remainingSupplyByGood: Record<string, number> = {};
   const consumedSupplyByGood: Record<string, number> = {};
   for (const good of definitions.goods) {
-    const flow = market.inventory.find((item) => item.goodId === good.id);
-    initialSupplyByGood[good.key] = flow?.openingStock ?? 0;
-    remainingSupplyByGood[good.key] = flow?.closingStock ?? 0;
-    consumedSupplyByGood[good.key] = flow?.householdConsumption ?? 0;
+    let initial = 0;
+    let closing = 0;
+    let consumed = 0;
+    for (const market of markets) {
+      const flow = market.inventory.find((item) => item.goodId === good.id);
+      initial += flow?.openingStock ?? 0;
+      closing += flow?.closingStock ?? 0;
+      consumed += flow?.householdConsumption ?? 0;
+    }
+    initialSupplyByGood[good.key] = initial;
+    remainingSupplyByGood[good.key] = closing;
+    consumedSupplyByGood[good.key] = consumed;
   }
   return { blocks, initialSupplyByGood, remainingSupplyByGood, consumedSupplyByGood };
 }
@@ -520,7 +567,7 @@ function isLastDayOfMonth(dayIndex: DayIndex): boolean {
 function economicWealthInputs(
   world: World,
   definitions: EconomyDefinitions,
-  market: MarketDayResult,
+  markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
   fiscal: FiscalPhaseResult,
   dayIndex: DayIndex,
@@ -532,18 +579,22 @@ function economicWealthInputs(
   const fiscalByBlock = new Map(
     fiscal.blocks.map((entry) => [entry.popBlockId, entry]),
   );
+  const referenceMarket = markets[0];
   const prices = definitions.goods.map((good) => ({
     goodKey: good.key,
-    unitPriceSUSD: market.updatedPrices[good.id] ?? 0,
+    unitPriceSUSD: referenceMarket?.updatedPrices[good.id] ?? 0,
   }));
   const supply = definitions.goods.map((good) => {
-    const flow = market.inventory.find((entry) => entry.goodId === good.id);
+    let closing = 0;
+    for (const market of markets) {
+      const flow = market.inventory.find((entry) => entry.goodId === good.id);
+      closing += flow?.closingStock ?? 0;
+    }
     let population = 0;
     for (const block of world.popBlocks) population += populationTotal(block);
     return {
       goodKey: good.key,
-      availableQuantityPerCapita:
-        population > 0 ? (flow?.closingStock ?? 0) / population : 0,
+      availableQuantityPerCapita: population > 0 ? closing / population : 0,
     };
   });
   const income = world.popBlocks.map((block) => {
@@ -571,7 +622,7 @@ function economicWealthInputs(
 function updateEconomicWealth(
   world: World,
   definitions: EconomyDefinitions,
-  market: MarketDayResult,
+  markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
   fiscal: FiscalPhaseResult,
   dayIndex: DayIndex,
@@ -582,18 +633,53 @@ function updateEconomicWealth(
   const inputs = economicWealthInputs(
     world,
     definitions,
-    market,
+    markets,
     settlement,
     fiscal,
     dayIndex,
   );
+  const year = dayIndexToCivilDate(dayIndex).year;
+  const regionToMarket = marketByRegion(world);
+  const marketById = new Map(markets.map((market) => [market.marketId, market]));
+  const goodIdByKey = new Map(definitions.goods.map((good) => [good.key, good.id]));
+  const subsistence = populationDefinitions.needs.find((tier) => tier.tier === "subsistence");
+  if (subsistence === undefined) {
+    throw new RangeError("population definitions are missing the subsistence tier");
+  }
+  const costByBlock = new Map<Id, number>();
+  for (const block of world.popBlocks) {
+    const marketId = regionToMarket.get(block.regionId);
+    const market = marketId === undefined ? undefined : marketById.get(marketId);
+    if (market === undefined) {
+      throw new RangeError(`popBlock ${String(block.id)} has no market for wealth input`);
+    }
+    let dailyCost = 0;
+    for (const item of subsistence.items) {
+      const goodId = goodIdByKey.get(item.goodKey);
+      if (goodId === undefined) {
+        throw new RangeError(
+          `subsistence need references unknown economy good ${JSON.stringify(item.goodKey)}`,
+        );
+      }
+      dailyCost += item.quantityPerCapitaPerDay * (market.updatedPrices[goodId] ?? 0);
+    }
+    costByBlock.set(block.id, dailyCost * daysInYear(year));
+  }
   return updateMonthlyWealth(
     world,
     populationDefinitions,
     inputs,
     dayIndex,
     needs,
+    costByBlock,
   );
+}
+
+interface MarketAttempt {
+  readonly household: HouseholdDemandBuild;
+  readonly production: readonly ProductionDemandRecord[];
+  readonly markets: readonly MarketDayResult[];
+  readonly settlement: MarketSettlementResult;
 }
 
 function runMarketAttempt(
@@ -601,13 +687,49 @@ function runMarketAttempt(
   definitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions,
   dayIndex: DayIndex,
-  household: HouseholdDemandBuild,
-  production: readonly ProductionDemandRecord[],
-): { readonly market: MarketDayResult; readonly settlement: MarketSettlementResult } {
-  const input = makeMarketInput(populationDefinitions, dayIndex, household, production);
-  const market = runMarketDay(world, definitions, input);
-  const settlement = settleMarketDay(world, definitions, market);
-  return { market, settlement };
+  index: FinanceIndex,
+  mode: "full" | "cash",
+): MarketAttempt {
+  const household = buildHouseholdDemand(
+    world,
+    definitions,
+    populationDefinitions,
+    index,
+  );
+  const production = buildProductionDemands(
+    world,
+    definitions,
+    populationDefinitions,
+    mode,
+    index,
+  );
+  const buildingRegion = new Map(world.buildings.map((building) => [building.id, building.regionId]));
+  const results: MarketDayResult[] = [];
+  for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
+    const regionIds = new Set(market.regionIds);
+    const marketHousehold = household.records.filter(
+      (record) => household.marketByPopBlock.get(record.popBlockId) === market.id,
+    );
+    const marketProduction = production.filter((record) => {
+      const regionId = buildingRegion.get(record.buyerBuildingId);
+      return regionId !== undefined && regionIds.has(regionId);
+    });
+    results.push(
+      runMarketDay(
+        world,
+        definitions,
+        makeMarketInput(
+          populationDefinitions,
+          dayIndex,
+          market.id,
+          marketHousehold,
+          marketProduction,
+        ),
+      ),
+    );
+  }
+  const settlement = settleMarketDays(world, definitions, results);
+  return { household, production, markets: results, settlement };
 }
 
 /**
@@ -652,8 +774,7 @@ export function runEconomicDay(
   if (world.popBlocks.length === 0) {
     throw new RangeError("economic day requires pop blocks");
   }
-  const market = world.markets[0];
-  if (market === undefined) throw new RangeError("economic day requires a market");
+  if (world.markets.length === 0) throw new RangeError("economic day requires a market");
 
   const populationStart = world.popBlocks.reduce(
     (total, block) => total + populationTotal(block),
@@ -675,67 +796,46 @@ export function runEconomicDay(
   } catch {
     world.employmentDirty = true;
   }
-  const employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
+  let employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
+  // M5 migration: monthly, after the initial labor allocation and before the
+  // day's market phase. Moving people invalidates some assignments, so a second
+  // forced refresh repairs releases and fills the post-migration workforce.
+  const migration = runMigrationPhase(world, economyDefinitions, dayIndex);
+  if (migration.flows.length > 0) {
+    world.employmentDirty = true;
+    employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
+  }
   assertValidEmploymentState(world, economyDefinitions);
 
   const afterPopulation = cloneWorld(world);
-  let financeIndex = buildFinanceIndex(world.finance);
-  const household = buildHouseholdDemand(
-    world,
-    economyDefinitions,
-    populationDefinitions,
-    financeIndex,
-  );
-
   let fallbackUsed = false;
-  let productionRecords: ProductionDemandRecord[] = [];
-  let marketResult: MarketDayResult;
-  let settlement: MarketSettlementResult;
+  let attempt: MarketAttempt;
   try {
-    const fullProduction = buildProductionDemands(
-      world,
-      economyDefinitions,
-      populationDefinitions,
-      "full",
-      financeIndex,
-    );
-    productionRecords = fullProduction;
-    const result = runMarketAttempt(
+    attempt = runMarketAttempt(
       world,
       economyDefinitions,
       populationDefinitions,
       dayIndex,
-      household,
-      fullProduction,
+      buildFinanceIndex(world.finance),
+      "full",
     );
-    marketResult = result.market;
-    settlement = result.settlement;
   } catch (error) {
     if (!isMarketFundingFailure(error)) throw error;
     fallbackUsed = true;
     restoreWorld(world, afterPopulation);
-    financeIndex = buildFinanceIndex(world.finance);
-    const cashProduction = buildProductionDemands(
-      world,
-      economyDefinitions,
-      populationDefinitions,
-      "cash",
-      financeIndex,
-    );
-    productionRecords = cashProduction;
-    const result = runMarketAttempt(
+    attempt = runMarketAttempt(
       world,
       economyDefinitions,
       populationDefinitions,
       dayIndex,
-      household,
-      cashProduction,
+      buildFinanceIndex(world.finance),
+      "cash",
     );
-    marketResult = result.market;
-    settlement = result.settlement;
   }
-  if (settlement === undefined) throw new RangeError("economic day did not produce a settlement");
-  if (marketResult === undefined) throw new RangeError("economic day did not clear a market");
+  const household = attempt.household;
+  const productionRecords = attempt.production;
+  const marketResults = attempt.markets;
+  const settlement = attempt.settlement;
 
   // M4c fiscal phase (GDD §4.2 step 12, fiscal part): after market/wage/upkeep
   // settlement and before needs/militancy and wealth. It uses the same day's
@@ -746,7 +846,7 @@ export function runEconomicDay(
     world,
     economyDefinitions,
     household,
-    marketResult,
+    marketResults,
     settlement,
   );
   updateNeedsCounters(world, needs);
@@ -754,7 +854,7 @@ export function runEconomicDay(
   const wealthUpdates = updateEconomicWealth(
     world,
     economyDefinitions,
-    marketResult,
+    marketResults,
     settlement,
     fiscal,
     dayIndex,
@@ -780,9 +880,11 @@ export function runEconomicDay(
   return {
     population,
     economy: {
-      market: marketResult,
+      market: marketResults[0] as MarketDayResult,
+      markets: marketResults,
       settlement,
       fiscal,
+      migration,
       employment,
       householdDemands: household.records,
       productionDemands: productionRecords,

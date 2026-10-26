@@ -6,18 +6,26 @@
  * carry documented units in the milestone that introduces them.
  */
 
-/** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.9.0";
+/**
+ * Version of the simulation behavior. A save is only compatible with the same
+ * version.
+ *
+ * M5 adds multi-region/multi-market state semantics, the country
+ * `immigrationOpen` policy field, migration, and geographic labor access.
+ */
+export const SIM_VERSION = "0.10.0";
 
-/** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 9;
+/** Version of the serialized world schema. M5 adds `Country.immigrationOpen`. */
+export const WORLD_SCHEMA_VERSION = 10;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
 
 /**
  * Content/data version. M4a-2/M4b/M4c add runtime state but ship no new
- * scenario data, so the data package version stays `m3-economy-v1`.
+ * scenario data, so the data package version stays `m3-economy-v1`. M5 ships
+ * additional historical scenario content but changes no existing definition or
+ * scenario meaning, so the version remains stable (D-053).
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 

@@ -111,6 +111,12 @@ export interface ProductionPhaseOptions {
    * overflow is calculated.
    */
   readonly applyOverflow?: boolean;
+  /**
+   * M5 market scope. Defaults to `world.markets[0]` for the existing single-market
+   * callers. Production, reservations, storage capacity, and overflow are all
+   * scoped to that market so a multi-market world never mixes inventories.
+   */
+  readonly marketId?: number;
 }
 
 function tolerance(...values: number[]): number {
@@ -266,11 +272,19 @@ export function computeBuildingCapacity(
 export function deriveStorageCapacityByGood(
   world: World,
   definitions: EconomyDefinitions,
+  marketId?: number,
 ): number[] {
   const capacities = new Array<number>(definitions.goods.length).fill(0);
   const definitionsById = definitionById(definitions);
+  const market =
+    marketId === undefined ? undefined : world.markets.find((candidate) => candidate.id === marketId);
+  if (marketId !== undefined && market === undefined) {
+    throw new RangeError(`unknown market ${String(marketId)} for storage capacity`);
+  }
+  const regionIds = market === undefined ? undefined : new Set(market.regionIds);
   for (const building of world.buildings) {
     if (!building.operational) continue;
+    if (regionIds !== undefined && !regionIds.has(building.regionId)) continue;
     const definition = definitionsById.get(building.definitionId);
     if (definition === undefined) {
       throw new RangeError(`building ${String(building.id)} has no definition`);
@@ -370,16 +384,20 @@ function applyOverflowToLots(
 export function applyOverflowLosses(
   world: World,
   definitions: EconomyDefinitions,
+  marketId?: number,
 ): OverflowLoss[] {
   assertValidWorld(world);
   assertValidEconomyDefinitions(definitions);
-  const market = world.markets[0];
+  const market =
+    marketId === undefined
+      ? world.markets[0]
+      : world.markets.find((candidate) => candidate.id === marketId);
   if (market === undefined) throw new RangeError("M3 overflow requires a market");
   const lots = new Map<string, number>();
   for (const lot of market.stockLots) {
     lots.set(lotKey(lot.goodId, lot.ownerBuildingId), lot.quantity);
   }
-  const capacityByGood = deriveStorageCapacityByGood(world, definitions);
+  const capacityByGood = deriveStorageCapacityByGood(world, definitions, market.id);
   const losses = applyOverflowToLots(lots, capacityByGood, definitions.goods.length);
   const canonicalLots = canonicalizeStockLots(
     [...lots.entries()].map(([key, quantity]) => {
@@ -393,7 +411,9 @@ export function applyOverflowLosses(
   );
   const candidateWorld: World = {
     ...world,
-    markets: [{ ...market, stockLots: canonicalLots }],
+    markets: world.markets.map((candidate) =>
+      candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
+    ),
   };
   assertValidWorld(candidateWorld);
   market.stockLots = canonicalLots;
@@ -422,8 +442,12 @@ export function runProductionPhase(
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }
-  const market = world.markets[0];
+  const market =
+    options.marketId === undefined
+      ? world.markets[0]
+      : world.markets.find((candidate) => candidate.id === options.marketId);
   if (market === undefined) throw new RangeError("M3c production requires a market");
+  const marketRegionIds = new Set(market.regionIds);
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const definitionsById = definitionById(definitions);
   const goods = definitions.goods;
@@ -474,6 +498,9 @@ export function runProductionPhase(
     if (seller === undefined) {
       throw new RangeError(`${path} references an unknown seller building`);
     }
+    if (!market.regionIds.includes(seller.regionId)) {
+      throw new RangeError(`${path} seller building is outside the market`);
+    }
     const sellerLotKey = lotKey(reservation.goodId, reservation.sellerBuildingId);
     const lotQuantity = openingLots.get(sellerLotKey);
     if (lotQuantity === undefined) {
@@ -505,7 +532,10 @@ export function runProductionPhase(
   const reservationUses: ReservationUse[] = [];
   const nextLots = new Map<string, number>(openingLots);
 
-  const buildingIds = [...world.buildings].map((building) => building.id).sort((a, b) => a - b);
+  const buildingIds = [...world.buildings]
+    .filter((building) => marketRegionIds.has(building.regionId))
+    .map((building) => building.id)
+    .sort((a, b) => a - b);
   for (const buildingId of buildingIds) {
     const building = buildingById.get(buildingId);
     if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
@@ -610,7 +640,7 @@ export function runProductionPhase(
 
   const applyOverflow = options.applyOverflow !== false;
   const capacityByGood = applyOverflow
-    ? deriveStorageCapacityByGood(world, definitions)
+    ? deriveStorageCapacityByGood(world, definitions, market.id)
     : new Array<number>(goods.length).fill(0);
   const overflowLosses = applyOverflow
     ? applyOverflowToLots(nextLots, capacityByGood, goods.length)
@@ -635,7 +665,12 @@ export function runProductionPhase(
     const loss = lossByGood[goodId] ?? 0;
     const closing = closingByGood[goodId] ?? 0;
     const expected = opening + production - used - loss;
-    if (Math.abs(expected - closing) > tolerance(expected, closing)) {
+    // Scale by the gross physical terms so large-population cancellation does not
+    // masquerade as a conservation failure.
+    if (
+      Math.abs(expected - closing) >
+      tolerance(opening, production, used, loss, expected, closing)
+    ) {
       throw new RangeError(
         `inventory conservation failed for good ${String(goodId)}: ${String(expected)} != ${String(closing)}`,
       );
@@ -662,7 +697,9 @@ export function runProductionPhase(
   );
   const candidateWorld: World = {
     ...world,
-    markets: [{ ...market, stockLots: canonicalLots }],
+    markets: world.markets.map((candidate) =>
+      candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
+    ),
   };
   assertValidWorld(candidateWorld);
   market.stockLots = canonicalLots;

@@ -151,6 +151,8 @@ export interface SettlementTotals {
 export interface MarketSettlementResult {
   readonly dayIndex: DayIndex;
   readonly marketId: Id;
+  /** Every market cleared by this settlement, in ascending id order. */
+  readonly marketIds: readonly Id[];
   /**
    * Execution-context identity copied from the settled world. The fiscal phase
    * rejects a result that belongs to another seed, scenario, or start day.
@@ -417,34 +419,70 @@ function producerProfit(
 }
 
 /**
- * Settle one M3d market-day result against authoritative financial accounts.
- * Balances and postings mutate only after full validation. Market purchases
- * must be fully funded in the aggregate batch; wages may be partially paid.
+ * Settle one or more M3d market-day results against authoritative financial
+ * accounts. Market purchases must be fully funded in the aggregate batch; wages
+ * and upkeep are paid once per day across every market.
  */
-export function settleMarketDay(
+export function settleMarketDays(
   world: World,
   definitions: EconomyDefinitions,
-  marketDay: MarketDayResult,
+  marketDays: readonly MarketDayResult[],
 ): MarketSettlementResult {
   assertValidWorld(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }
-  if (marketDay.settled) throw new RangeError("market-day result has already been settled");
-  if (marketDay.dayIndex !== world.dayIndex) {
-    throw new RangeError("market-day result dayIndex must match the world");
+  if (marketDays.length === 0) {
+    throw new RangeError("settlement requires at least one market-day result");
   }
-  assertValidDayIndex(marketDay.dayIndex);
-  if (isTerminalDayIndex(marketDay.dayIndex)) {
+  const seenMarketIds = new Set<number>();
+  for (const marketDay of marketDays) {
+    if (marketDay.settled) throw new RangeError("market-day result has already been settled");
+    if (marketDay.dayIndex !== world.dayIndex) {
+      throw new RangeError("market-day result dayIndex must match the world");
+    }
+    if (seenMarketIds.has(marketDay.marketId)) {
+      throw new RangeError(`duplicate market-day result for market ${String(marketDay.marketId)}`);
+    }
+    seenMarketIds.add(marketDay.marketId);
+    if (!world.markets.some((market) => market.id === marketDay.marketId)) {
+      throw new RangeError(`market-day result references unknown market ${String(marketDay.marketId)}`);
+    }
+  }
+  assertValidDayIndex(world.dayIndex);
+  if (isTerminalDayIndex(world.dayIndex)) {
     throw new RangeError("settlement cannot run at the terminal boundary");
   }
   assertValidEmploymentState(world, definitions);
+  const sortedResults = [...marketDays].sort((left, right) => left.marketId - right.marketId);
+  const result = settleMarketDaysInternal(world, definitions, sortedResults);
+  for (const marketDay of marketDays) marketDay.settled = true;
+  return result;
+}
 
-  const market = world.markets.find((candidate) => candidate.id === marketDay.marketId);
-  if (market === undefined) throw new RangeError("market-day result references an unknown market");
+/** Settle one market-day result. Retained for the single-market M3/M4 callers. */
+export function settleMarketDay(
+  world: World,
+  definitions: EconomyDefinitions,
+  marketDay: MarketDayResult,
+): MarketSettlementResult {
+  return settleMarketDays(world, definitions, [marketDay]);
+}
+
+function settleMarketDaysInternal(
+  world: World,
+  definitions: EconomyDefinitions,
+  marketDays: readonly MarketDayResult[],
+): MarketSettlementResult {
+  const dayIndex = marketDays[0]?.dayIndex;
+  if (dayIndex === undefined) throw new RangeError("settlement requires a market-day result");
+  const marketIds = marketDays.map((marketDay) => marketDay.marketId);
+  const marketId = marketIds[0];
+  if (marketId === undefined) throw new RangeError("settlement requires a market-day result");
+  const pendingTransactions = marketDays.flatMap((marketDay) => marketDay.pendingTransactions);
   const index = buildFinanceIndex(world.finance);
-  const transactions = prepareTransactions(world, definitions, index, marketDay.pendingTransactions);
+  const transactions = prepareTransactions(world, definitions, index, pendingTransactions);
 
   const openingBalances = new Map<Id, number>();
   for (const account of world.finance.accounts) openingBalances.set(account.id, account.balanceSUSD);
@@ -502,14 +540,14 @@ export function settleMarketDay(
         sourceEntityId: transaction.buyerPopBlockId ?? transaction.buyerBuildingId,
         targetEntityId: transaction.sellerBuildingId,
       }));
-      postings.push(...postJournalBatch(world.finance, marketDay.dayIndex, marketEntries));
+      postings.push(...postJournalBatch(world.finance, dayIndex, marketEntries));
     }
 
     const professions = new Map(definitions.professions.map((profession) => [profession.id, profession]));
     const buildingDefinitions = new Map(
       definitions.buildings.map((definition) => [definition.id, definition]),
     );
-    const yearDays = daysInYear(dayIndexToCivilDate(marketDay.dayIndex).year);
+    const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
     const wageSettlements: WageSettlement[] = [];
     const wageEntries: JournalEntryInput[] = [];
     for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
@@ -523,7 +561,7 @@ export function settleMarketDay(
       const obligation = groups.reduce((total, group) => total + group.obligationSUSD, 0);
       const employer = operatingCash(index, building.id);
       const paid = Math.min(employer.balanceSUSD, obligation);
-      const allocations = allocateMoney(world, marketDay.dayIndex, paid, groups);
+      const allocations = allocateMoney(world, dayIndex, paid, groups);
       const payments: WagePayment[] = groups.map((group) => {
         const paidSUSD = allocations.get(group.popBlockId) ?? 0;
         return {
@@ -548,6 +586,35 @@ export function settleMarketDay(
           excess -= reduction;
         }
         paidTotal = payments.reduce((total, payment) => total + payment.paidSUSD, 0);
+      }
+      // Proportional allocation can exceed the employer balance by one or two
+      // binary64 ulps even though every amount is finite. A reduction smaller
+      // than an ulp would be a no-op, so step by at least one representable ulp
+      // until the paid total is genuinely affordable. The difference is paid as
+      // reported shortfall, never as debt or negative cash.
+      let roundingGuard = 0;
+      while (paidTotal > employer.balanceSUSD && roundingGuard < 32) {
+        let reduced = false;
+        for (let index = payments.length - 1; index >= 0 && !reduced; index -= 1) {
+          const payment = payments[index];
+          if (payment === undefined || payment.paidSUSD <= 0) continue;
+          const step = Math.max(
+            paidTotal - employer.balanceSUSD,
+            Math.abs(payment.paidSUSD) * Number.EPSILON * 2,
+          );
+          const reduction = Math.min(payment.paidSUSD, step);
+          const nextPaid = payment.paidSUSD - reduction;
+          if (!(nextPaid < payment.paidSUSD)) continue;
+          payments[index] = {
+            ...payment,
+            paidSUSD: nextPaid,
+            unpaidSUSD: payment.unpaidSUSD + (payment.paidSUSD - nextPaid),
+          };
+          reduced = true;
+        }
+        if (!reduced) break;
+        paidTotal = payments.reduce((total, payment) => total + payment.paidSUSD, 0);
+        roundingGuard += 1;
       }
       if (paidTotal > employer.balanceSUSD + toleranceMoney(paidTotal, employer.balanceSUSD)) {
         throw new RangeError(`wage payment exceeds employer cash for building ${String(building.id)}`);
@@ -599,7 +666,7 @@ export function settleMarketDay(
       });
     }
     if (wageEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, marketDay.dayIndex, wageEntries));
+      postings.push(...postJournalBatch(world.finance, dayIndex, wageEntries));
     }
 
     const upkeepSettlements: UpkeepSettlement[] = [];
@@ -663,7 +730,7 @@ export function settleMarketDay(
       unpaidUpkeepByBuilding.set(building.id, unpaid);
     }
     if (upkeepEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, marketDay.dayIndex, upkeepEntries));
+      postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries));
     }
 
     const revenueByBuilding = new Map<Id, number>();
@@ -796,10 +863,10 @@ export function settleMarketDay(
       endingCashAfterSettlementSUSD: endingCash,
     };
 
-    marketDay.settled = true;
     return {
-      dayIndex: marketDay.dayIndex,
-      marketId: marketDay.marketId,
+      dayIndex,
+      marketId,
+      marketIds,
       worldSeed: world.seed,
       scenarioId: world.scenarioId,
       startDayIndex: world.startDayIndex,

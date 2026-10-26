@@ -111,6 +111,12 @@ export interface CreateWorldOptions {
    * system and retain their original owner account set.
    */
   readonly fiscalAccounts?: boolean;
+  /**
+   * Internal construction control. The public M2 path still creates exactly one
+   * region; integrated economy construction passes true so a scenario may author
+   * several regions.
+   */
+  readonly allowMultipleRegions?: boolean;
 }
 
 /** Create an empty M2-schema world at 1900-01-01. */

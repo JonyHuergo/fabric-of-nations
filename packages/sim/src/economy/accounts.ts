@@ -215,6 +215,7 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "welfare-expense", side: "debit" },
     { subtype: "welfare-income", side: "credit" },
   ],
+  "migration-transfer": [],
   "profit-distribution": [],
   "owner-capital-injection": [],
   "monetary-issuance": [],

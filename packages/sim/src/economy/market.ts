@@ -256,14 +256,17 @@ function validateMarketDayInput(
   if (input.dayIndex !== world.dayIndex) {
     throw new RangeError("market-day input dayIndex must match the world's next day");
   }
-  const market = world.markets[0];
-  if (market === undefined) throw new RangeError("M3d requires a market");
-  if (input.marketId !== market.id) throw new RangeError("market-day input marketId mismatch");
+  const market = world.markets.find((candidate) => candidate.id === input.marketId);
+  if (market === undefined) {
+    throw new RangeError(`market-day input references unknown market ${String(input.marketId)}`);
+  }
   if (market.priceSUSD.length !== definitions.goods.length) {
     throw new RangeError("market price array does not match the goods definitions");
   }
+  const marketRegionIds = new Set(market.regionIds);
   const goodIds = new Set(definitions.goods.map((good) => good.id));
   const blockIds = new Set(world.popBlocks.map((block) => block.id));
+  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const buildingById = new Map(definitions.buildings.map((building) => [building.id, building]));
   const criticalGoods = criticalGoodIds(definitions, input.needs);
   const householdKeys = new Set<string>();
@@ -273,6 +276,10 @@ function validateMarketDayInput(
     const path = `householdDemands[${String(index)}]`;
     if (!blockIds.has(demand.popBlockId)) {
       throw new RangeError(`${path}.popBlockId references an unknown pop block`);
+    }
+    const block = blockById.get(demand.popBlockId);
+    if (block !== undefined && !marketRegionIds.has(block.regionId)) {
+      throw new RangeError(`${path}.popBlockId is outside market ${String(market.id)}`);
     }
     if (!isHouseholdTier(demand.tier)) {
       throw new RangeError(`${path}.tier must be 1, 3, or 6`);
@@ -296,6 +303,9 @@ function validateMarketDayInput(
     const building = world.buildings.find((candidate) => candidate.id === demand.buyerBuildingId);
     if (building === undefined) {
       throw new RangeError(`${path}.buyerBuildingId references an unknown building`);
+    }
+    if (!marketRegionIds.has(building.regionId)) {
+      throw new RangeError(`${path}.buyerBuildingId is outside market ${String(market.id)}`);
     }
     if (!building.operational) {
       throw new RangeError(`${path} references a non-operational building`);
@@ -661,7 +671,7 @@ export function runMarketDay(
       world,
       definitions,
       inputReservations,
-      { applyOverflow: false },
+      { applyOverflow: false, marketId: market.id },
     );
 
     const householdReservedByLot = new Map<string, number>();
@@ -762,7 +772,7 @@ export function runMarketDay(
         quantity,
       };
     });
-    const overflowLosses = applyOverflowLosses(world, definitions);
+    const overflowLosses = applyOverflowLosses(world, definitions, market.id);
 
     const usedInputByDemand = new Map<string, number>();
     for (const use of production.reservationUses) {
@@ -928,7 +938,13 @@ export function runMarketDay(
       const loss = lossByGood[goodId] ?? 0;
       const closing = finalStock[goodId] ?? 0;
       const expected = opening + produced - used - household - loss;
-      if (Math.abs(expected - closing) > tolerance(expected, closing)) {
+      // Scale the physical tolerance by the gross terms, not only by the
+      // residual: with large populations the conservation identity subtracts
+      // large nearly equal quantities and can leave a tiny non-zero residual.
+      if (
+        Math.abs(expected - closing) >
+        tolerance(opening, produced, used, household, loss, expected, closing)
+      ) {
         throw new RangeError(
           `final inventory conservation failed for good ${String(goodId)}: ${String(expected)} != ${String(closing)}`,
         );

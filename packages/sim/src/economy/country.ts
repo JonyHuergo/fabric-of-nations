@@ -52,9 +52,20 @@ import type {
 
 const CURRENCY_KEY_PATTERN = /^[a-z][a-z0-9-]*$/;
 
+/** Structural country identity shared by runtime state and scenario input. */
+export interface CountryIdentityInput {
+  readonly id: Id;
+  readonly tag: string;
+  readonly name: string;
+  readonly monetary: MonetaryArrangement;
+  readonly regionIds: readonly Id[];
+  readonly treasuryAccountId: Id;
+  readonly fiscal: FiscalPolicy;
+}
+
 /** Typed input for the country/currency validation pass. */
 export interface CountryCurrencyValidationInput {
-  readonly countries: readonly Country[];
+  readonly countries: readonly CountryIdentityInput[];
   readonly currencies: readonly Currency[];
   readonly currencyValuations: readonly CurrencyValuation[];
   readonly regionIds: ReadonlySet<Id>;
@@ -198,7 +209,7 @@ function assertCurrencyKey(value: unknown, path: string): string {
  */
 export function assertValidCountryCurrencyState(input: CountryCurrencyValidationInput): void {
   const rawCountries = requireArray(input.countries, "world.countries");
-  const countries = new Map<Id, Country>();
+  const countries = new Map<Id, CountryIdentityInput>();
   const tags = new Set<string>();
   const treasuryAccountIds = new Set<Id>();
   for (let index = 0; index < rawCountries.length; index += 1) {

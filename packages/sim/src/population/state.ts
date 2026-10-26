@@ -175,9 +175,9 @@ function assertUnique<T>(values: readonly T[], key: (value: T) => string | numbe
 export function assertValidPopulationState(world: World): void {
   const regions = requireArray(world.regions, "world.regions");
   const blocks = requireArray(world.popBlocks, "world.popBlocks");
-  if (regions.length > 1) {
-    throw new RangeError("M2 supports at most one region");
-  }
+  // M2 construction still creates exactly one region, but M5 economic worlds may
+  // author several. Region/market relationships are validated by the economy
+  // state pass, which knows the market collection.
   for (let index = 0; index < regions.length; index += 1) {
     assertValidRegion(regions[index] as Region);
   }
@@ -353,8 +353,11 @@ export function createPopulationWorld(
   }
   assertValidPopulationDefinitions(scenario.definitions);
 
-  if (scenario.regions.length !== 1) {
+  if (options.allowMultipleRegions !== true && scenario.regions.length !== 1) {
     throw new RangeError("M2 population scenarios must define exactly one region");
+  }
+  if (scenario.regions.length === 0) {
+    throw new RangeError("scenario must define at least one region");
   }
   if (scenario.professions.length === 0) {
     throw new RangeError("M2 scenario must define at least one profession identity");
@@ -362,6 +365,7 @@ export function createPopulationWorld(
   assertUnique(scenario.professions, (profession) => profession.id, "scenario.professions");
   assertUnique(scenario.professions, (profession) => profession.key, "scenario.professions");
   assertUnique(scenario.regions, (region) => region.id, "scenario.regions");
+  assertUnique(scenario.regions, (region) => region.key, "scenario.regions");
   assertUnique(scenario.popBlocks, (block) => block.id, "scenario.popBlocks");
   assertUnique(scenario.popBlocks, (block) => block.financialAccountId, "scenario.popBlocks");
 
@@ -383,8 +387,8 @@ export function createPopulationWorld(
       );
     }
   }
-  const region = scenario.regions[0];
-  if (region === undefined) throw new RangeError("scenario.regions[0] is missing");
+  const regionById = new Map<number, (typeof scenario.regions)[number]>();
+  for (const region of scenario.regions) regionById.set(region.id, region);
 
   const floor = options.accountIdFloor ?? 1;
   const maxDeclared = scenario.popBlocks.reduce(
@@ -403,8 +407,10 @@ export function createPopulationWorld(
         `popBlock ${String(initial.id)} references unknown profession ${String(initial.professionId)}`,
       );
     }
-    if (initial.regionId !== region.id) {
-      throw new RangeError(`popBlock ${String(initial.id)} must belong to the single M2 region`);
+    if (!regionById.has(initial.regionId)) {
+      throw new RangeError(
+        `popBlock ${String(initial.id)} references unknown region ${String(initial.regionId)}`,
+      );
     }
     if (initial.maleAgeGroups.length !== AGE_COHORT_COUNT) {
       throw new RangeError(
@@ -501,15 +507,20 @@ export function createPopulationWorld(
     });
   }
 
-  const worldRegion: Region = {
-    id: region.id,
-    key: region.key,
-    name: region.name,
-    popBlockIds: blocks.map((block) => block.id),
-    marketId: null,
-    buildingInstanceIds: [],
-    resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
-  };
+  const worldRegions: Region[] = [...scenario.regions]
+    .sort((left, right) => left.id - right.id)
+    .map((region) => ({
+      id: region.id,
+      key: region.key,
+      name: region.name,
+      popBlockIds: blocks
+        .filter((block) => block.regionId === region.id)
+        .map((block) => block.id)
+        .sort((left, right) => left - right),
+      marketId: null,
+      buildingInstanceIds: [],
+      resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
+    }));
 
   const world: World = {
     schemaVersion: WORLD_SCHEMA_VERSION,
@@ -519,7 +530,7 @@ export function createPopulationWorld(
     dayIndex: startDayIndex,
     startDayIndex,
     seed,
-    regions: [worldRegion],
+    regions: worldRegions,
     countries: [],
     currencies: [],
     currencyValuations: [],

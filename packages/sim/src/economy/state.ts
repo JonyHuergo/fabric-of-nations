@@ -112,6 +112,9 @@ function assertCountryInitialDefs(
     if (country.initialTreasuryCashSUSD < 0) {
       throw new RangeError(`${path}.initialTreasuryCashSUSD must be non-negative`);
     }
+    if (country.immigrationOpen !== undefined && typeof country.immigrationOpen !== "boolean") {
+      throw new TypeError(`${path}.immigrationOpen must be a boolean when provided`);
+    }
     if (!declaredAccountIds.has(country.treasuryAccountId)) {
       throw new RangeError(`${path}.treasuryAccountId was not registered as a declared account`);
     }
@@ -222,27 +225,21 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
   }
 }
 
-function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<number>): void {
-  if (scenario.markets.length > 1) throw new RangeError("M3 supports at most one market");
+function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<number>): Map<number, number> {
   const regionIds = new Set(scenario.population.regions.map((region) => region.id));
   const goods = scenario.definitions.goods;
   const goodById = new Map(goods.map((good) => [good.id, good]));
   const definitions = buildingDefinitions(scenario);
-  const capacityByGood = new Map<number, number>();
-  for (const instance of scenario.buildingInstances) {
-    if (!instance.operational) continue;
-    const definition = definitions.get(instance.definitionId);
-    if (definition === undefined) continue;
-    for (const capacity of definition.storageCapacityByGood) {
-      capacityByGood.set(
-        capacity.goodId,
-        (capacityByGood.get(capacity.goodId) ?? 0) + capacity.quantity * instance.level,
-      );
-    }
-  }
-  const lotKeys = new Set<string>();
+  const instanceById = new Map(scenario.buildingInstances.map((building) => [building.id, building]));
+  const marketIds = new Set<number>();
+  const regionToMarket = new Map<number, number>();
+
   for (const market of scenario.markets) {
     requireInteger(market.id, `markets[${String(market.id)}].id`, 0, 0xffff_ffff);
+    if (marketIds.has(market.id)) {
+      throw new RangeError(`duplicate market id ${String(market.id)}`);
+    }
+    marketIds.add(market.id);
     if (market.priceSUSD.length !== goods.length) {
       throw new RangeError(
         `market ${String(market.id)} priceSUSD must contain exactly ${String(goods.length)} prices`,
@@ -258,6 +255,9 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
       }
     }
     const seenRegions = new Set<number>();
+    if (market.regionIds.length === 0) {
+      throw new RangeError(`market ${String(market.id)} must list at least one region`);
+    }
     for (const regionId of market.regionIds) {
       if (!regionIds.has(regionId)) {
         throw new RangeError(`market ${String(market.id)} references unknown region ${String(regionId)}`);
@@ -266,7 +266,31 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
         throw new RangeError(`market ${String(market.id)} lists region ${String(regionId)} twice`);
       }
       seenRegions.add(regionId);
+      const existingMarket = regionToMarket.get(regionId);
+      if (existingMarket !== undefined) {
+        throw new RangeError(
+          `region ${String(regionId)} belongs to both market ${String(existingMarket)} and market ${String(market.id)}`,
+        );
+      }
+      regionToMarket.set(regionId, market.id);
     }
+
+    // Storage and initial lots are market-scoped: a warehouse in another market
+    // must not provide capacity for this market's inventory.
+    const capacityByGood = new Map<number, number>();
+    for (const instance of scenario.buildingInstances) {
+      if (!instance.operational) continue;
+      if (!seenRegions.has(instance.regionId)) continue;
+      const definition = definitions.get(instance.definitionId);
+      if (definition === undefined) continue;
+      for (const capacity of definition.storageCapacityByGood) {
+        capacityByGood.set(
+          capacity.goodId,
+          (capacityByGood.get(capacity.goodId) ?? 0) + capacity.quantity * instance.level,
+        );
+      }
+    }
+    const lotKeys = new Set<string>();
     const stockByGood = new Map<number, number>();
     for (const lot of market.stockLots) {
       const good = goodById.get(lot.goodId);
@@ -276,6 +300,12 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
       if (!buildingIds.has(lot.ownerBuildingId)) {
         throw new RangeError(
           `market ${String(market.id)} lot references unknown owner building ${String(lot.ownerBuildingId)}`,
+        );
+      }
+      const owner = instanceById.get(lot.ownerBuildingId);
+      if (owner === undefined || !seenRegions.has(owner.regionId)) {
+        throw new RangeError(
+          `market ${String(market.id)} lot owner building ${String(lot.ownerBuildingId)} is outside the market`,
         );
       }
       const quantity = requireFiniteNumber(lot.quantity, `market ${String(market.id)} lot quantity`);
@@ -296,9 +326,73 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
       const tolerance = QUANTITY_TOLERANCE * Math.max(1, stock, capacity);
       if (stock > capacity + tolerance) {
         throw new RangeError(
-          `market ${String(market.id)} initial stock for good ${String(goodId)} (${String(stock)}) exceeds storage capacity (${String(capacity)})`,
+          `market ${String(market.id)} initial stock for good ${String(goodId)} (${String(stock)}) exceeds its storage capacity (${String(capacity)})`,
         );
       }
+    }
+  }
+
+  if (scenario.markets.length > 0) {
+    for (const region of scenario.population.regions) {
+      if (!regionToMarket.has(region.id)) {
+        throw new RangeError(`region ${String(region.id)} is not assigned to a market`);
+      }
+    }
+    assertCountryMarketCoherence(scenario, regionToMarket);
+  }
+  return regionToMarket;
+}
+
+function countryByRegionId(scenario: EconomyScenarioDef): Map<number, number> {
+  const owners = new Map<number, number>();
+  for (const country of scenario.countries ?? []) {
+    for (const regionId of country.regionIds) owners.set(regionId, country.id);
+  }
+  return owners;
+}
+
+/**
+ * M5 restriction: a country's regions all belong to one market. The GDD's first
+ * multi-market model permits one market per country; mixed membership would need
+ * an explicit customs-zone rule that is not part of M5.
+ */
+function assertCountryMarketCoherence(
+  scenario: EconomyScenarioDef,
+  regionToMarket: ReadonlyMap<number, number>,
+): void {
+  for (const country of scenario.countries ?? []) {
+    let marketId: number | undefined;
+    for (const regionId of country.regionIds) {
+      const candidate = regionToMarket.get(regionId);
+      if (candidate === undefined) continue;
+      if (marketId === undefined) marketId = candidate;
+      else if (marketId !== candidate) {
+        throw new RangeError(
+          `country ${String(country.id)} spans markets ${String(marketId)} and ${String(candidate)}; M5 permits one market per country`,
+        );
+      }
+    }
+  }
+}
+
+function assertBuildingOwnershipGeography(scenario: EconomyScenarioDef): void {
+  const blockByAccount = new Map(
+    scenario.population.popBlocks.map((block) => [block.financialAccountId, block]),
+  );
+  const owners = countryByRegionId(scenario);
+  for (const building of scenario.buildingInstances) {
+    const owner = blockByAccount.get(building.ownerAccountId);
+    if (owner === undefined) {
+      throw new RangeError(
+        `building ${String(building.id)} ownerAccountId must be a pop-block household cash account`,
+      );
+    }
+    const buildingCountry = owners.get(building.regionId) ?? null;
+    const ownerCountry = owners.get(owner.regionId) ?? null;
+    if (buildingCountry !== ownerCountry) {
+      throw new RangeError(
+        `building ${String(building.id)} and its owner popBlock ${String(owner.id)} must belong to the same country`,
+      );
     }
   }
 }
@@ -312,6 +406,8 @@ function assertInitialEmployment(
   const instances = new Map(
     scenario.buildingInstances.map((building) => [building.id, building]),
   );
+  const owners = countryByRegionId(scenario);
+  const countries = new Map((scenario.countries ?? []).map((country) => [country.id, country]));
   const assignmentIds = new Set<number>();
   const assignmentKeys = new Set<string>();
   const blockAssigned = new Map<number, number>();
@@ -331,6 +427,20 @@ function assertInitialEmployment(
     const instance = instances.get(assignment.buildingInstanceId);
     if (instance === undefined) {
       throw new RangeError(`${path} references unknown building instance`);
+    }
+    const sourceCountry = owners.get(block.regionId) ?? null;
+    const destinationCountry = owners.get(instance.regionId) ?? null;
+    if (sourceCountry !== destinationCountry) {
+      if (destinationCountry === null) {
+        throw new RangeError(
+          `${path} cannot assign a resident of country ${String(sourceCountry)} to an unowned region`,
+        );
+      }
+      if (countries.get(destinationCountry)?.immigrationOpen !== true) {
+        throw new RangeError(
+          `${path} crosses a closed border into country ${String(destinationCountry)}`,
+        );
+      }
     }
     if (!instance.operational) {
       throw new RangeError(`${path} references a non-operational building`);
@@ -438,14 +548,7 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   if (scenario.buildingInstances.length > 0 && scenario.markets.length === 0) {
     throw new RangeError("M3 buildings require at least one market");
   }
-  if (scenario.markets.length > 0) {
-    const regionIds = new Set(scenario.population.regions.map((region) => region.id));
-    for (const regionId of regionIds) {
-      if (!scenario.markets[0]?.regionIds.includes(regionId)) {
-        throw new RangeError(`M3 market must include region ${String(regionId)}`);
-      }
-    }
-  }
+  assertBuildingOwnershipGeography(scenario);
   const definitionsById = buildingDefinitions(scenario);
   assertInitialEmployment(scenario, definitionsById);
   assertValidCountryCurrencyState({
@@ -475,6 +578,7 @@ export function createEconomyWorld(
     deferOpeningBalances: true,
     accountIdFloor,
     fiscalAccounts: (scenario.countries ?? []).length > 0,
+    allowMultipleRegions: true,
   });
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
@@ -487,9 +591,10 @@ export function createEconomyWorld(
         tag: initial.tag,
         name: initial.name,
         monetary: { ...initial.monetary },
-        regionIds: [...initial.regionIds],
+        regionIds: [...initial.regionIds].sort((left, right) => left - right),
         treasuryAccountId: initial.treasuryAccountId,
         fiscal: { ...initial.fiscal },
+        immigrationOpen: initial.immigrationOpen ?? false,
       }),
     )
     .sort((left, right) => left.id - right.id);
@@ -634,20 +739,27 @@ export function createEconomyWorld(
   for (const market of scenario.markets) {
     const built: Market = {
       id: market.id,
-      regionIds: [...market.regionIds],
+      regionIds: [...market.regionIds].sort((left, right) => left - right),
       priceSUSD: [...market.priceSUSD],
       stockLots: canonicalizeStockLots(market.stockLots),
     };
     world.markets.push(built);
   }
   world.markets.sort((left, right) => left.id - right.id);
+  const marketByRegion = new Map<number, number>();
+  for (const market of world.markets) {
+    for (const regionId of market.regionIds) marketByRegion.set(regionId, market.id);
+  }
 
-  const region = world.regions[0];
-  if (region !== undefined) {
-    region.marketId = world.markets[0]?.id ?? null;
+  for (const region of world.regions) {
+    region.marketId = marketByRegion.get(region.id) ?? null;
     region.buildingInstanceIds = world.buildings
       .filter((building) => building.regionId === region.id)
       .map((building) => building.id)
+      .sort((left, right) => left - right);
+    region.popBlockIds = world.popBlocks
+      .filter((block) => block.regionId === region.id)
+      .map((block) => block.id)
       .sort((left, right) => left - right);
   }
 
@@ -663,12 +775,6 @@ export function createEconomyWorld(
   }
   world.employment.sort((left, right) => left.id - right.id);
   world.popBlocks.sort((left, right) => left.id - right.id);
-  if (region !== undefined) {
-    region.popBlockIds = world.popBlocks
-      .filter((block) => block.regionId === region.id)
-      .map((block) => block.id)
-      .sort((left, right) => left - right);
-  }
   world.employmentDirty = true;
 
   assertValidWorld(world);

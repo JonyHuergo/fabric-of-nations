@@ -15,6 +15,7 @@ import { workingAgePopulation } from "../population/state.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
+import { buildRegionOwnerMap } from "./country.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import type {
   BuildingDef,
@@ -92,9 +93,43 @@ export function eligibleWorkforceForBlock(
   return Math.floor(workingAgePopulation(block) * profession.participationRate);
 }
 
+/**
+ * M5 labor-access rule.
+ *
+ * A resident may take a job in any region of their own country (internal labor
+ * mobility). A cross-country assignment additionally requires the destination
+ * country's provisional open-border policy. Countryless regions form a single
+ * unrestricted area so pre-M5 fixtures keep their behavior.
+ *
+ * The GDD describes travel/migration limits without fixing them; this is the
+ * smallest documented rule that prevents an unconstrained global labor pool
+ * (D-052).
+ */
+export function laborAccessAllowed(
+  regionOwners: ReadonlyMap<Id, Id>,
+  countries: ReadonlyMap<Id, World["countries"][number]>,
+  sourceRegionId: Id,
+  destinationRegionId: Id,
+): boolean {
+  const sourceCountry = regionOwners.get(sourceRegionId) ?? null;
+  const destinationCountry = regionOwners.get(destinationRegionId) ?? null;
+  if (sourceCountry === destinationCountry) return true;
+  if (destinationCountry === null) return false;
+  return countries.get(destinationCountry)?.immigrationOpen === true;
+}
+
+function countryMaps(world: World): {
+  readonly regionOwners: ReadonlyMap<Id, Id>;
+  readonly countries: ReadonlyMap<Id, World["countries"][number]>;
+} {
+  return {
+    regionOwners: buildRegionOwnerMap(world),
+    countries: new Map(world.countries.map((country) => [country.id, country])),
+  };
+}
+
 /** True when the civil calendar or dirty marker requires employment evaluation. */
-export function isEmploymentRefreshDue(world: World, dayIndex: DayIndex): boolean {
-  assertValidDayIndex(dayIndex);
+export function isEmploymentRefreshDue(world: World, dayIndex: DayIndex): boolean {  assertValidDayIndex(dayIndex);
   if (isTerminalDayIndex(dayIndex)) return false;
   if (dayIndex < world.startDayIndex) {
     throw new RangeError("employment refresh day must not precede the scenario start");
@@ -198,6 +233,7 @@ function validateAssignments(
   const buildingById = new Map(world.buildings.map((b) => [b.id, b]));
   const definitionById = new Map(definitions.buildings.map((b) => [b.id, b]));
   const blockById = new Map(world.popBlocks.map((b) => [b.id, b]));
+  const { regionOwners, countries } = countryMaps(world);
   const assignedByBlock = new Map<Id, number>();
   const assignedBySlot = new Map<string, number>();
   const keys = new Set<string>();
@@ -221,6 +257,13 @@ function validateAssignments(
     }
     if (!building.operational) {
       throw new RangeError(`employment assignment ${key} references a non-operational building`);
+    }
+    if (
+      !laborAccessAllowed(regionOwners, countries, block.regionId, building.regionId)
+    ) {
+      throw new RangeError(
+        `employment assignment ${key} crosses a closed border between regions ${String(block.regionId)} and ${String(building.regionId)}`,
+      );
     }
     const eligible = eligibleWorkforceForBlock(block, profession);
     if (eligible <= 0) {
@@ -302,6 +345,7 @@ export function refreshEmployment(
   );
   const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
+  const { regionOwners, countries } = countryMaps(world);
   for (const building of world.buildings) {
     if (!buildingDefinitionById.has(building.definitionId)) {
       throw new RangeError(
@@ -347,6 +391,7 @@ export function refreshEmployment(
       definition === undefined ||
       !building.operational ||
       assignment.professionId !== block.professionId ||
+      !laborAccessAllowed(regionOwners, countries, block.regionId, building.regionId) ||
       eligibleWorkforceForBlock(block, profession) <= 0 ||
       jobSlotsForBuilding(definition, building, assignment.professionId) <= 0
     ) {
@@ -404,14 +449,8 @@ export function refreshEmployment(
     left.key < right.key ? -1 : left.key > right.key ? 1 : left.id - right.id,
   );
 
-  for (const profession of professions) {
-    const eligibleBlocks = [...world.popBlocks]
-      .filter(
-        (block) =>
-          eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0) > 0,
-      )
-      .sort((left, right) => left.id - right.id);
-    const vacancyBuildings = [...world.buildings]
+  function vacancyBuildingsFor(profession: ProfessionDef): BuildingInstance[] {
+    return [...world.buildings]
       .filter((building) => {
         const definition = buildingDefinitionById.get(building.definitionId);
         if (definition === undefined) return false;
@@ -419,8 +458,14 @@ export function refreshEmployment(
         return slots - (usedSlots.get(`${String(building.id)}:${String(profession.id)}`) ?? 0) > 0;
       })
       .sort((left, right) => left.id - right.id);
-    if (eligibleBlocks.length === 0 || vacancyBuildings.length === 0) continue;
+  }
 
+  function fillVacancies(
+    profession: ProfessionDef,
+    eligibleBlocks: readonly World["popBlocks"][number][],
+    vacancyBuildings: readonly BuildingInstance[],
+  ): void {
+    if (eligibleBlocks.length === 0 || vacancyBuildings.length === 0) return;
     const blockWeights = eligibleBlocks.map(
       (block) => eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0),
     );
@@ -435,7 +480,7 @@ export function refreshEmployment(
     });
     const totalVacancies = buildingWeights.reduce((total, weight) => total + weight, 0);
     const assignable = Math.min(totalEligible, totalVacancies);
-    if (assignable <= 0) continue;
+    if (assignable <= 0) return;
 
     const blockQuotas = apportionLargestRemainder(
       assignable,
@@ -499,7 +544,73 @@ export function refreshEmployment(
         }
         const slotKey = `${String(building.id)}:${String(profession.id)}`;
         usedSlots.set(slotKey, (usedSlots.get(slotKey) ?? 0) + allocation);
+        usedByBlock.set(
+          candidate.block.id,
+          (usedByBlock.get(candidate.block.id) ?? 0) + allocation,
+        );
       }
+    }
+  }
+
+  function groupBuildingsByCountry(
+    buildings: readonly BuildingInstance[],
+  ): Map<number | null, BuildingInstance[]> {
+    const groups = new Map<number | null, BuildingInstance[]>();
+    for (const building of buildings) {
+      const countryId = regionOwners.get(building.regionId) ?? null;
+      const list = groups.get(countryId);
+      if (list === undefined) groups.set(countryId, [building]);
+      else list.push(building);
+    }
+    return groups;
+  }
+
+  const countrySortKey = (countryId: number | null): number => (countryId === null ? -1 : countryId);
+
+  // Pass 1: domestic labor. A country's own residents fill its vacancies before
+  // any foreign labor is considered, so an open border cannot displace domestic
+  // workers in the allocation.
+  for (const profession of professions) {
+    const buildings = vacancyBuildingsFor(profession);
+    if (buildings.length === 0) continue;
+    const groups = groupBuildingsByCountry(buildings);
+    const countryIds = [...groups.keys()].sort(
+      (left, right) => countrySortKey(left) - countrySortKey(right),
+    );
+    for (const countryId of countryIds) {
+      const groupBuildings = groups.get(countryId) ?? [];
+      const eligibleBlocks = world.popBlocks
+        .filter(
+          (block) =>
+            (regionOwners.get(block.regionId) ?? null) === countryId &&
+            eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0) > 0,
+        )
+        .sort((left, right) => left.id - right.id);
+      fillVacancies(profession, eligibleBlocks, groupBuildings);
+    }
+  }
+
+  // Pass 2: cross-border labor, only for destination countries whose provisional
+  // policy admits foreign workers. Remaining vacancies and remaining foreign
+  // eligible workers are allocated deterministically by ascending country id.
+  const openCountryIds = [...countries.values()]
+    .filter((country) => country.immigrationOpen)
+    .map((country) => country.id)
+    .sort((left, right) => left - right);
+  for (const profession of professions) {
+    for (const countryId of openCountryIds) {
+      const groupBuildings = vacancyBuildingsFor(profession).filter(
+        (building) => (regionOwners.get(building.regionId) ?? null) === countryId,
+      );
+      if (groupBuildings.length === 0) continue;
+      const eligibleBlocks = world.popBlocks
+        .filter(
+          (block) =>
+            (regionOwners.get(block.regionId) ?? null) !== countryId &&
+            eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0) > 0,
+        )
+        .sort((left, right) => left.id - right.id);
+      fillVacancies(profession, eligibleBlocks, groupBuildings);
     }
   }
 

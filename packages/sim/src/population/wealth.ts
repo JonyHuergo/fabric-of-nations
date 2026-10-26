@@ -69,6 +69,7 @@ export function updateMonthlyWealth(
   inputs: PopulationInputs,
   dayIndex: DayIndex,
   needs: PopulationNeedsDayResult,
+  annualSubsistenceCostByBlock?: ReadonlyMap<number, number>,
 ): WealthUpdate[] {
   const year = dayIndexToCivilDate(dayIndex).year;
   const annualSubsistenceCost = annualSubsistenceCostPerCapita(definitions, inputs, year);
@@ -91,11 +92,21 @@ export function updateMonthlyWealth(
     if (income === undefined) {
       throw new RangeError(`missing income fixture for popBlock ${String(block.id)}`);
     }
+    // M5: a multi-market world has no single basket price. The caller may pass
+    // the block's own market basket cost; otherwise the shared fixture cost is
+    // used (M2 path).
+    const blockSubsistenceCost = annualSubsistenceCostByBlock?.get(block.id);
+    const subsistenceCost = blockSubsistenceCost ?? annualSubsistenceCost;
+    if (!(subsistenceCost > 0)) {
+      throw new RangeError(
+        `subsistence basket cost must be positive for popBlock ${String(block.id)}`,
+      );
+    }
     const annualDisposable = Math.max(
       0,
       income.annualSettledIncomePerCapitaSUSD - income.annualMandatoryPaymentsPerCapitaSUSD,
     );
-    const ratio = annualDisposable / annualSubsistenceCost;
+    const ratio = annualDisposable / subsistenceCost;
     const baseTarget = clamp(
       WEALTH_INTERCEPT + WEALTH_SLOPE * Math.log(Math.max(ratio, WEALTH_TARGET_EPSILON)),
       WEALTH_MIN,
@@ -119,7 +130,7 @@ export function updateMonthlyWealth(
       targetWealthLevel: roundTo(baseTarget, WEALTH_DECIMAL_PLACES),
       newWealthLevel: newWealth,
       annualDisposableIncomePerCapitaSUSD: annualDisposable,
-      annualSubsistenceCostPerCapitaSUSD: annualSubsistenceCost,
+      annualSubsistenceCostPerCapitaSUSD: subsistenceCost,
     });
     block.wealthLevel = newWealth;
   }

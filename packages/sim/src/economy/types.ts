@@ -210,6 +210,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "upkeep",
   "income-tax",
   "welfare-transfer",
+  "migration-transfer",
   "profit-distribution",
   "owner-capital-injection",
   ...INTERNAL_TRANSACTION_KINDS,
@@ -389,6 +390,15 @@ export interface Country {
   treasuryAccountId: Id;
   /** M4c provisional fiscal policy state. */
   fiscal: FiscalPolicy;
+  /**
+   * M5: whether this country admits foreign residents and cross-border workers.
+   *
+   * The GDD requires international migration to be permitted by an open-border
+   * law or event. M5 has no law system, so the scenario initialises this
+   * provisional policy flag and nothing mutates it. Emigration is unrestricted
+   * in M5 (recorded assumption, D-052). Internal migration does not use it.
+   */
+  immigrationOpen: boolean;
 }
 
 /**
@@ -405,6 +415,8 @@ export interface CountryInitialDef {
   treasuryAccountId: Id;
   initialTreasuryCashSUSD: MoneySUSD;
   fiscal: FiscalPolicy;
+  /** Defaults to false for M4 fixtures that predate M5. */
+  immigrationOpen?: boolean;
 }
 
 /**

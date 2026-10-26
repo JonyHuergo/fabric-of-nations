@@ -243,6 +243,7 @@ export type SerializedCountry = {
   readonly regionIds: readonly number[];
   readonly treasuryAccountId: number;
   readonly fiscal: SerializedFiscalPolicy;
+  readonly immigrationOpen: boolean;
 };
 
 /** Encoded SUSD-relative valuation. */
@@ -559,6 +560,7 @@ export function encodeWorld(world: World): SerializedWorld {
           incomeTaxRate: country.fiscal.incomeTaxRate,
           welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
         },
+        immigrationOpen: country.immigrationOpen,
       })),
     currencies: [...world.currencies]
       .sort((left, right) => left.id - right.id)
@@ -775,6 +777,9 @@ function decodeFiscalPolicy(value: unknown, path: string): { incomeTaxRate: numb
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
+  if (typeof record.immigrationOpen !== "boolean") {
+    throw new SaveFormatError(`${path}.immigrationOpen must be a boolean`);
+  }
   return {
     id: requireUint32(record.id, `${path}.id`),
     tag: requireString(record.tag, `${path}.tag`, { minLength: 1 }),
@@ -785,6 +790,7 @@ function decodeCountry(value: unknown, path: string): Country {
     ),
     treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
     fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
+    immigrationOpen: record.immigrationOpen,
   };
 }
 
