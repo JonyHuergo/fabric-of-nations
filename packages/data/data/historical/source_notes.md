@@ -85,6 +85,15 @@ against the M2 1900 world estimate of about 1.62 billion.
    budgets. They are not historical tax schedules and the model is not a
    historical public-finance reconstruction.
 
+## M5a profit-allocation content
+
+The scenario metadata enables `profitDistribution` with a provisional 0.5 private
+payout rate and a 1.0 state remittance rate. The authored historical buildings are
+private, so this exercises private distributions only; state-enterprise ownership
+and remittance are supported by the engine and covered by focused fixtures, not by
+this eight-polity sample. The rates are provisional structural policy inputs, not
+historical dividend or state-enterprise observations.
+
 ## Known limitations
 
 - No century-scale historical population/occupation trend validation is claimed.

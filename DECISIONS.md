@@ -1822,6 +1822,68 @@ rule.
   from a single run; its documented variance remains a limitation.
 - Mobile performance remains **NOT EVALUATED**: no device release build was run.
 
+### D-056 — M5a profit distribution, retained profit, and state-enterprise remittances
+
+- **Status:** implemented with M5a. It extends M5; it does not change M4b close
+  semantics or M4c fiscal behavior.
+- **Policy state.** `World.profitDistribution` is persisted scenario-initialised
+  policy: `enabled`, `privatePayoutRate`, `stateRemittanceRate`, each rate in
+  0..1. Defaults are disabled, 0.5, and 1.0. Legacy M0–M5 fixtures omit the
+  policy and therefore keep their previously accepted behavior; the shipped M5
+  historical campaign enables it with the same documented rates. This is not a
+  player/AI action control.
+- **Account structures.** Every building in an enabled world owns one
+  `retained-profit` (equity) account in addition to its existing owner-equity,
+  revenue, expense, and operating-cash accounts. Retained profit is therefore
+  distinguishable from owner capital and from the current period's revenue/expense
+  balances. Owner equity remains the owner-capital account.
+- **State ownership.** `BuildingInstance.ownerKind` may be `"private"` or
+  `"state"`. A private owner's `ownerAccountId` must be its pop-block
+  household-cash account; a state owner's must be the owning country's
+  treasury-cash account, and that country must own the building's region. State
+  ownership requires the policy to be enabled. Building definitions must permit
+  the selected ownership kind.
+- **Timing and profit measure.** The phase runs once per economic month-end,
+  immediately after the atomic M4b close, before the day advances. The frozen
+  pre-close period summary supplies each building's period net result:
+  `sales-revenue − input-expense − wage-expense − upkeep-expense`. This is the
+  already-recognized period result, not a new revenue/expense flow. A nonzero net
+  result is reclassified from owner equity to retained profit (profit) or from
+  retained profit to owner equity (loss) using the `profit-retention` kind.
+- **Distribution and remittance.** After reclassification, a building distributes
+  `rate × max(0, retainedProfit)` where the rate is `privatePayoutRate` for a
+  private owner or `stateRemittanceRate` for a state owner. The payout is capped by
+  the building's actual post-close operating cash. The remainder stays in retained
+  profit. A cash-capped shortfall is retained, never deferred, unpaid, or recorded
+  as a liability. Losses are carried as negative retained profit and are offset by
+  later profits; no distribution occurs while retained profit is non-positive.
+- **Posting semantics.** `profit-retention` moves value only between one building's
+  owner-equity and retained-profit accounts. `profit-distribution` moves cash from
+  the building to the designated private owner household and credits that
+  household's owner equity. `state-enterprise-remittance` performs the analogous
+  transfer to the owning country's treasury cash and country owner equity. All
+  three are cash-neutral overall, have no revenue/expense semantic-matrix legs, do
+  not add a flow kind to the M4b summary, and are structurally validated for exact
+  leg counts, matching owners, matching amounts, and opposite sides where
+  applicable.
+- **Atomicity and guards.** The phase validates the world policy, the closed
+  month-end, the latest published summary, the close result, and the duplicate
+  marker before staging anything. All entries are applied to a finance clone; the
+  clone is validated for accounts, postings, summaries, accounting identity, and
+  aggregate designated-cash conservation before it replaces `world.finance`. A
+  previously applied close result is rejected without mutation. The whole-day tick
+  staging remains the outer atomic boundary.
+- **Explicit non-goals.** No corporate/dividend/capital-gains tax, securities
+  market, share issuance/trading, banking, debt, deficit financing, arbitrary
+  player controls, or M5b behavior. Government receipts from state enterprises are
+  not income-tax revenue and do not enter `governmentPeriodTotals`.
+- **Persistence and versions.** World schema is **11**, simulation version
+  **0.11.0**, save format **1**. `dataVersion` remains `m3-economy-v1` because the
+  policy is scenario-provided content and no existing definition or scenario
+  meaning changed. Schema-10/simulation-0.10.0 saves are rejected; no migration.
+  Known-answer digests are re-baselined because the schema version and policy
+  object are hashed state.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

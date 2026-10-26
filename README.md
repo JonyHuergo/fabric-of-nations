@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5 foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -15,17 +15,18 @@ household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
 **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
 valuation)**, **M4b (monthly finance period close and immutable finance
 summaries)**, and **M4c (per-country treasury, daily income tax, and budgeted
-welfare transfers)**, and **M5 (multi-region/multi-country worlds, shared
+welfare transfers)**, **M5 (multi-region/multi-country worlds, shared
 markets, migration, labor mobility, and the initial historical-data pipeline with
-eight authored polities)** only. Corporate/consumption/land/tariff taxes, broader
-government expenditure and services, debt/credit, distributions, dynamic FX,
+eight authored polities)**, and **M5a (retained-profit accounting, private profit
+distributions, state-enterprise ownership, and treasury remittances)** only. Corporate/consumption/land/tariff taxes, broader
+government expenditure and services, debt/credit, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not
-implemented. The designer has adopted planned intermediate stages for profit
-distributions and state-enterprise remittances (M5a), public debt and deficit
-financing (M5b), annual close and controlled corrections (M7a), and
-inflation/FX/monetary-policy foundations (M8a); these are planned only, not
-implemented (see [the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
+implemented. M5a profit distributions and state-enterprise remittances are
+implemented (see below). The designer has adopted planned intermediate stages for
+public debt and deficit financing (M5b), annual close and controlled corrections
+(M7a), and inflation/FX/monetary-policy foundations (M8a); these are planned only,
+not implemented (see [the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
 The design authority is the [Century GDD
 v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
 [historical documentation](./Century_GDD_v2.4.md), and v2.3 as
@@ -562,9 +563,9 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
   is added to shipped scenarios.
 
 GDD v2.5 is the current design authority and records the M4c government fiscal
-loop (D-048) alongside the M4b close (D-047) and the M4a-2 model (D-044/D-045),
-plus the adopted planned intermediate finance stages (planned only; see the
-roadmap below).
+loop (D-048) alongside the M4b close (D-047), the M4a-2 model (D-044/D-045), M5
+(D-051–D-055), and M5a (D-056). M5b, M7a, and M8a remain planned only; see the
+roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -855,20 +856,21 @@ multi-country campaign foundation. It is implemented end to end: eight authored
 
 ### Persistence, versions, and numerical robustness
 
-- Schema **10**, simulation **0.10.0**, save format 1, data version
-  `m3-economy-v1`. `Country.immigrationOpen` is the persisted addition.
-  Schema-9/simulation-0.9.0 saves are rejected; no migration is attempted.
-- `dataVersion` stays `m3-economy-v1` because M5 adds new scenario content without
-  changing any existing definition or scenario meaning (D-053).
+- Schema **11**, simulation **0.11.0**, save format 1, data version
+  `m3-economy-v1`. `Country.immigrationOpen` and `World.profitDistribution` are the
+  persisted additions. Schema-10/simulation-0.10.0 saves are rejected; no migration
+  is attempted.
+- `dataVersion` stays `m3-economy-v1` because M5/M5a add new scenario content and a
+  scenario-provided policy without changing any existing definition or scenario
+  meaning (D-053/D-056).
 - Quantity conservation scales its comparison tolerance by gross physical terms
   so large nearly-cancelling flows do not create false failures. Wage
   affordability reduces a payment by at least one representable ulp when
   proportional allocation exceeds employer cash by rounding; the difference is
   reported as unpaid wages. No cent quantization or cash creation is introduced
   (D-054).
-- M5a (profit distribution/remittances) and M5b (debt/deficit financing) are not
-  implemented. No banking, monetary issuance, FX dynamics, inflation, or new tax
-  categories are added.
+- M5b (debt/deficit financing) is not implemented. No banking, monetary issuance,
+  FX dynamics, inflation, or new tax categories are added.
 
 ### M5 limitations
 
@@ -885,14 +887,47 @@ multi-country campaign foundation. It is implemented end to end: eight authored
   building levels, and market groupings are provisional.
 - Node benchmarks are diagnostics; mobile performance remains **NOT EVALUATED**.
 
+## M5a profit distribution and state-enterprise remittances
+
+M5a adds retained-profit accounting and explicit profit allocation on top of M5.
+It does not change M4b close semantics or M4c fiscal behavior.
+
+- **Policy and ownership.** `World.profitDistribution` is persisted,
+  scenario-initialised policy: `enabled`, `privatePayoutRate` (default 0.5), and
+  `stateRemittanceRate` (default 1.0), each in 0..1. Legacy M0–M5 fixtures default
+  it off; the M5 historical campaign enables it. A building may be private (owned
+  by a pop-block household cash account) or state (owned by the owning country's
+  treasury cash account, with the same country owning the building's region).
+- **Retained profit.** Enabled worlds give every building a `retained-profit`
+  equity account. At each month-end, after the M4b close, each building's frozen
+  period net result (`sales − inputs − wages − upkeep`) is reclassified from owner
+  equity to retained profit; losses become negative retained profit.
+- **Allocation.** A building distributes `rate × positive retained profit`, capped
+  by post-close operating cash. Private owners receive cash/equity in their
+  household; state enterprises remit to treasury cash and country equity using
+  `state-enterprise-remittance`. The remainder stays retained; a cash-capped
+  shortfall is retained, never deferred or recorded as a liability. No distribution
+  occurs while retained profit is non-positive.
+- **Accounting and guards.** `profit-retention`, `profit-distribution`, and
+  `state-enterprise-remittance` are cash-neutral overall, have no revenue/expense
+  legs, add no M4b flow kind, and are structurally validated. The phase stages on a
+  finance clone, re-validates accounts/postings/summaries/identity/cash, rejects a
+  reused close result, and leaves the published world unchanged on failure.
+- **Versions.** Schema **11**, simulation **0.11.0**, save format 1, data version
+  `m3-economy-v1`; schema-10/0.10.0 saves reject with no migration.
+- **Not included.** Corporate/dividend/capital-gains taxes, securities markets,
+  share issuance/trading, banking, debt, deficit financing, arbitrary player/AI
+  distribution controls, or M5b behavior. State remittances are not income-tax
+  revenue and do not enter `governmentPeriodTotals`.
+
 ## Planned development roadmap and intermediate finance stages
 
-M0–M5 are implemented (see the sections above). The designer has adopted
-four intermediate finance stages (recorded as D-050) for work that earlier
-revisions left unassigned. **All four are planned and not implemented**: no
-runtime behavior, schema field, save version, benchmark gate, or UI support exists
-for them yet. They preserve the existing M0–M10 milestone identities and do not
-change M4a/M4b/M4c/M5.
+M0–M5a are implemented (see the sections above). The designer has adopted
+intermediate finance stages (recorded as D-050) for work that earlier revisions
+left unassigned. **M5a is implemented and accepted; M5b, M7a, and M8a remain
+planned and not implemented**: no runtime behavior, schema field, save version,
+benchmark gate, or UI support exists for them yet. They preserve the existing
+M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a.
 
 Intended implementation order:
 
@@ -900,7 +935,7 @@ Intended implementation order:
 
 | Stage | Placement | Planned scope | Status |
 |---|---|---|---|
-| **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Planned |
+| **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Accepted |
 | **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Planned |
 | **M7a** | After M7, before M8 | Annual finance summaries and periods, year-end closing consistent with the M4b monthly close, partial campaign years, and controlled auditable correction/reversal entries that preserve closed history | Planned |
 | **M8a** | After M8, before M9 | Documented inflation/price-level measure, exchange-rate dynamics on the existing country/currency identities, monetary-policy authority/controls with explicit causal mechanisms and balanced money/credit accounting | Planned |
@@ -958,7 +993,9 @@ Static definitions:
   [`historical/calibration_targets_1900.json`](./packages/data/data/historical/calibration_targets_1900.json),
   and [`historical/source_notes.md`](./packages/data/data/historical/source_notes.md).
   Population targets are source-referenced rounded estimates; occupation
-  composition and all other 1900 structure are provisional (D-053).
+  composition and all other 1900 structure are provisional (D-053). The scenario
+  enables the provisional M5a profit-allocation policy (D-056); the historical
+  buildings are private, so state remittances are exercised by focused tests.
 
 ### Campaign gameplay baseline
 
@@ -1022,11 +1059,12 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `10`; simulation version: `0.10.0`; data version:
-  `m3-economy-v1` (M5 adds historical scenario content but changes no existing
-  definition or scenario meaning; see D-053).
-- Schema-9 / simulation-0.9.0 saves are rejected with an actionable error; no
-  migration is attempted. Schema-8 remains rejected as before.
+- Schema version: `11`; simulation version: `0.11.0`; data version:
+  `m3-economy-v1` (M5 adds historical scenario content and M5a adds a
+  scenario-provided policy/account role without changing existing definition or
+  scenario meaning; see D-053/D-056).
+- Schema-10 / simulation-0.10.0 saves are rejected with an actionable error; no
+  migration is attempted. Schema-8 and schema-9 remain rejected as before.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
@@ -1039,14 +1077,14 @@ validation and the campaign gameplay baseline are deliberately separate.
   countries/currencies/valuations, the fiscal policy/treasury fields, and the M5
   border-policy field.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `febc4834bdac39aa`.
-- Full-century aggregate digest: `2224f44c6677f3d2`.
-- WPP validation digest: `259af0427bac8704`.
-- M3 structural-world digest (seed `20261023`): `913149e21c26e730`.
-- The digests were re-baselined for M5 because the world schema version is part of
-  canonical hashed state. No countryless economic balance or behavior changed:
-  the schema field alone changed those digests, while `Country.immigrationOpen`
-  only appears in worlds that declare countries.
+  `m1-determinism`): `4894531eba1af464`.
+- Full-century aggregate digest: `7a84998cf08f8792`.
+- WPP validation digest: `31124b9a752bd284`.
+- M3 structural-world digest (seed `20261023`): `a6286e565c4db47c`.
+- The digests were re-baselined for M5a because the world schema version and
+  `World.profitDistribution` are part of canonical hashed state. Legacy fixtures
+  keep the policy disabled and no new accounts, so their economic behavior is
+  unchanged; the schema/policy fields alone changed the digests.
 - Multi-country digests are exercised by repeated-run and save/resume tests rather
   than a fixed literal, because the eight-polity sample is expected to evolve as
   historical content improves. The M5 benchmark prints the sampled hash.
@@ -1057,11 +1095,11 @@ validation and the campaign gameplay baseline are deliberately separate.
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
 workloads, M3e settlement workloads, M3f integrated economic-day workloads, M4b
-monthly period-close workloads, M4c fiscal-day workloads, and M5 eight-polity
-campaign, migration, serialization, and stress workloads. Stress scales repeat
-the three deterministic multi-block templates (400k/350k/250k people), so total
-population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
-730 measured ticks.
+monthly period-close workloads, M4c fiscal-day workloads, and M5/M5a eight-polity
+campaign, migration, profit-allocation, serialization, and stress workloads.
+Stress scales repeat the three deterministic multi-block templates
+(400k/350k/250k people), so total population grows with block count. Each M2
+stress scale uses 100 warm-up ticks and 730 measured ticks.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
@@ -1245,22 +1283,24 @@ EVALUATED**.
 
 The M5 workload loads the authored eight-polity historical sample and times the
 real integrated `tick()` over a measured sample. It also times a validation +
-serialization round trip, the monthly migration phase (clone excluded), and a
-doubled authored stress fixture. Representative Node `v22.12.0` results on the same
-machine (seed `20261023`, schema 10 / simulation 0.10.0):
+serialization round trip, the monthly migration phase (clone excluded), the M5a
+month-end profit allocation (close/clone excluded), and a doubled authored stress
+fixture. Representative Node `v22.12.0` results on the same machine (seed
+`20261023`, schema 11 / simulation 0.11.0):
 
 | Workload | Countries | Regions | Markets | Blocks | Buildings | Assignments | Ticks | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| M5 eight-polity run 1 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 83.90 ms | 80.75 ms | 96.13 ms | 96.13 ms | `00f38cf3324d4f55` |
-| M5 eight-polity run 2 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 78.06 ms | 78.40 ms | 81.60 ms | 81.60 ms | `00f38cf3324d4f55` |
-| M5 stress (2 ticks) | 8 | 16 | 5 | 128 | 162 | 960 | 2 | — | — | — | — | `7f58c9a02f6db04a` |
+| M5 eight-polity run 1 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 83.81 ms | 82.27 ms | 94.49 ms | 94.49 ms | `0cdabcf3667cf299` |
+| M5 eight-polity run 2 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 80.33 ms | 78.47 ms | 87.93 ms | 87.93 ms | `0cdabcf3667cf299` |
+| M5 stress (2 ticks) | 8 | 16 | 5 | 128 | 162 | 960 | 2 | — | — | — | — | `300475241d309d8e` |
 
 | M5 component | Result |
 |---|---|
-| Combined eight-polity tick | avg 80.98 ms, p50 79.12 ms, p95 96.13 ms, p99 96.13 ms |
-| Validation + serialize/deserialize round trip | avg 54.69 ms, p50 54.20 ms, p95 58.51 ms |
-| Monthly migration phase (clone excluded) | avg 60.52 ms, p50 58.64 ms, p95 69.27 ms; 932,314 people moved in the sample |
-| Projected full 36,524-tick campaign | about 0.82 h at the sample average; **not executed** and not mobile evidence |
+| Combined eight-polity tick | avg 82.07 ms, p50 81.46 ms, p95 94.49 ms, p99 94.49 ms |
+| Validation + serialize/deserialize round trip | avg 55.15 ms, p50 54.32 ms, p95 59.11 ms |
+| Monthly migration phase (clone excluded) | avg 63.18 ms, p50 62.09 ms, p95 70.49 ms; 932,314 people moved in the sample |
+| M5a month-end allocation (close/clone excluded) | avg 5.467 ms, p50 5.181 ms, p95 7.026 ms; 81 buildings, 19,700,176.29 SUSD distributed |
+| Projected full 36,524-tick campaign | about 0.83 h at the sample average; **not executed** and not mobile evidence |
 
 The eight-polity full campaign is projected, not run, so the harness can complete
 in a practical time; the projection is not an acceptance gate. The reproduced M2
@@ -1365,8 +1405,14 @@ settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
 - M5 implements shared/trade-connected markets only through shared market
   membership. It does not implement inter-market physical trade, tariffs,
   cross-market transport charges, or a rest-of-world external-trade account, and
-  it does not add profit distribution/remittances (M5a) or debt/deficit financing
-  (M5b).
+  it does not add M5b debt/deficit financing.
+- M5a distributes only positive retained profit and is capped by actual operating
+  cash. It is a provisional scenario policy (default disabled for legacy
+  fixtures); it does not add dividend/corporate/capital-gains taxes, securities
+  markets, share issuance/trading, banking, debt, deficit financing, or arbitrary
+  player/AI distribution controls. The shipped historical sample has no state-owned
+  building instances, so state remittances are exercised by focused fixtures rather
+  than the eight-polity campaign. State remittances are not income-tax revenue.
 - M5 migration is limited to existing same-profession destination blocks, happens
   monthly, and uses provisional vacancy/wealth pressure and absorption
   coefficients. It does not implement profession promotion/demotion, a free
