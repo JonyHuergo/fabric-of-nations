@@ -3,9 +3,11 @@
  *
  * Scope: category-aware double-entry accounts, the explicit designated-cash
  * set, the accounting-identity and aggregate-cash invariants, atomic opening
- * balances, a transient account index, the central D-047 semantic posting matrix,
- * the owner-equity invariant, and finance-state cloning. Country/currency
- * identity, taxes, debt, and monetary issuance are later milestones.
+ * balances, a transient account index, the central D-047 semantic posting matrix
+ * extended by M4c fiscal kinds, the owner-equity invariant, and finance-state
+ * cloning. Country/currency identity (M4a-2) and the government fiscal loop
+ * (M4c) are implemented; debt, interest, monetary issuance, and later finance
+ * stages remain deferred.
  *
  * Balances are stored in normal-side units: asset and expense accounts are
  * debit-normal, liability, equity, and revenue accounts are credit-normal.
@@ -50,14 +52,15 @@ import {
  * `BuildingInstance.operatingCashAccountId`; the earlier plan wording
  * `building-cash` is superseded.
  *
- * M4a-2/M4g extend `ACCOUNT_SUBTYPES` with `treasury-cash` and
- * `central-bank-cash` when those accounts exist; the mapping is validated so an
- * extension cannot silently omit an account from `CASH`.
+ * M4c adds `treasury-cash` for each country. A later monetary stage may add
+ * `central-bank-cash`; the mapping is validated so an extension cannot silently
+ * omit an account from `CASH`.
  */
 export const CASH_SUBTYPES: readonly AccountSubtype[] = [
   "household-cash",
   "operating-cash",
   "system-reserve-cash",
+  "treasury-cash",
 ];
 
 const CASH_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(CASH_SUBTYPES);
@@ -66,14 +69,19 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "household-cash": "asset",
   "operating-cash": "asset",
   "system-reserve-cash": "asset",
+  "treasury-cash": "asset",
   "owner-equity": "equity",
   "wage-income": "revenue",
   "sales-revenue": "revenue",
   "system-income": "revenue",
+  "income-tax-revenue": "revenue",
+  "welfare-income": "revenue",
   "consumption-expense": "expense",
   "input-expense": "expense",
   "wage-expense": "expense",
   "upkeep-expense": "expense",
+  "income-tax-expense": "expense",
+  "welfare-expense": "expense",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -82,14 +90,19 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "household-cash": ["popBlock"],
   "operating-cash": ["building"],
   "system-reserve-cash": ["system"],
-  "owner-equity": ["popBlock", "building", "system"],
+  "treasury-cash": ["country"],
+  "owner-equity": ["popBlock", "building", "country", "system"],
   "wage-income": ["popBlock"],
   "sales-revenue": ["building"],
   "system-income": ["system"],
+  "income-tax-revenue": ["country"],
+  "welfare-income": ["popBlock"],
   "consumption-expense": ["popBlock"],
   "input-expense": ["building"],
   "wage-expense": ["building"],
   "upkeep-expense": ["building"],
+  "income-tax-expense": ["popBlock"],
+  "welfare-expense": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -167,6 +180,8 @@ export interface SemanticLineRule {
  * - `input-purchase`: debit `input-expense`, credit `sales-revenue`
  * - `wages`: debit `wage-expense`, credit `wage-income`
  * - `upkeep`: debit `upkeep-expense`, credit `system-income`
+ * - `income-tax`: debit `income-tax-expense`, credit `income-tax-revenue`
+ * - `welfare-transfer`: debit `welfare-expense`, credit `welfare-income`
  *
  * `profit-distribution` and `owner-capital-injection` may not post to revenue or
  * expense accounts. The cash-changing monetary kinds are registered with no
@@ -190,6 +205,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   upkeep: [
     { subtype: "upkeep-expense", side: "debit" },
     { subtype: "system-income", side: "credit" },
+  ],
+  "income-tax": [
+    { subtype: "income-tax-expense", side: "debit" },
+    { subtype: "income-tax-revenue", side: "credit" },
+  ],
+  "welfare-transfer": [
+    { subtype: "welfare-expense", side: "debit" },
+    { subtype: "welfare-income", side: "credit" },
   ],
   "profit-distribution": [],
   "owner-capital-injection": [],

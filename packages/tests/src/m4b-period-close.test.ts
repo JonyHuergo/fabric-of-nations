@@ -153,7 +153,8 @@ function saveChecksum(payload: unknown): string {
 const OWNER_KIND_RANK: Readonly<Record<FinancialAccountOwnerKind, number>> = {
   popBlock: 0,
   building: 1,
-  system: 2,
+  country: 2,
+  system: 3,
 };
 
 describe("M4b opening balances and the semantic posting matrix", () => {

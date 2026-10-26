@@ -16,6 +16,15 @@ export const MAX_PERIOD_SUMMARIES = 1200;
 export const M3_DEFERRED_GOOD_KEYS = ["services"] as const;
 
 /**
+ * M4c fiscal numeric-safety bounds. These are validation limits, not calibrated
+ * economics: an income-tax rate is dimensionless in [0, 1] and a welfare budget
+ * is a finite nominal SUSD/year target below the documented safe bound.
+ */
+export const MIN_FISCAL_TAX_RATE = 0;
+export const MAX_FISCAL_TAX_RATE = 1;
+export const MAX_FISCAL_BUDGET_SUSD_PER_YEAR = 1e15;
+
+/**
  * M3d provisional bounded price-update coefficients, not calibrated.
  * imbalance = (funded demand - sellable supply) / max(demand, supply, epsilon).
  * daily change = clamp(kappa * imbalance, -maxDailyChange, +maxDailyChange).

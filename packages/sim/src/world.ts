@@ -105,6 +105,12 @@ export interface CreateWorldOptions {
   readonly deferOpeningBalances?: boolean;
   /** Internal construction control: first derived account id to allocate. */
   readonly accountIdFloor?: number;
+  /**
+   * Internal construction control. M4c fiscal accounts are created only for
+   * worlds that declare countries; countryless M2/M3 fixtures have no fiscal
+   * system and retain their original owner account set.
+   */
+  readonly fiscalAccounts?: boolean;
 }
 
 /** Create an empty M2-schema world at 1900-01-01. */

@@ -17,9 +17,11 @@
  * `closedThroughDay === world.dayIndex`; publishing (validation, serialization,
  * hashing, deserialization, or `tick`) requires the day to advance first.
  *
- * Deferred by design: taxes, government finance, debt, interest, banks, monetary
- * issuance, FX conversion, inflation, annual close, reopen/reversal, and
- * retained-earnings subtypes.
+ * Deferred by design: corporate/consumption/land/tariff taxes, government
+ * services and procurement, debt, interest, banks, monetary issuance, FX
+ * conversion, inflation, annual close, reopen/reversal, and retained-earnings
+ * subtypes. M4c governments close income-tax revenue and welfare expense into
+ * the country owner equity through the same monthly entry as other owners.
  */
 
 import {
@@ -244,7 +246,8 @@ function assertSummaryTrialBalance(
 const OWNER_KIND_ORDER: Readonly<Record<FinancialAccountOwnerKind, number>> = {
   popBlock: 0,
   building: 1,
-  system: 2,
+  country: 2,
+  system: 3,
 };
 
 interface OwnerBooks {

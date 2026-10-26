@@ -24,15 +24,17 @@ import {
 } from "./accounts.js";
 import {
   assertValidCountryCurrencyState,
-  copyCountry,
   copyCurrency,
   copyCurrencyValuation,
+  fiscalPolicyIsActive,
 } from "./country.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import type {
   AccountSubtype,
   BuildingDef,
+  Country,
+  CountryInitialDef,
   EconomyScenarioDef,
   EmploymentAssignment,
   GoodDef,
@@ -88,7 +90,60 @@ function assertInitialAccountIds(scenario: EconomyScenarioDef): Set<number> {
     }
     ids.add(account.id);
   }
+  for (const country of scenario.countries ?? []) {
+    if (ids.has(country.treasuryAccountId)) {
+      throw new RangeError(
+        `duplicate country treasury account id ${String(country.treasuryAccountId)}`,
+      );
+    }
+    ids.add(country.treasuryAccountId);
+  }
   return ids;
+}
+
+function assertCountryInitialDefs(
+  scenario: EconomyScenarioDef,
+  declaredAccountIds: ReadonlySet<number>,
+): void {
+  const countries = scenario.countries ?? [];
+  for (const country of countries as readonly CountryInitialDef[]) {
+    const path = `countries[${String(country.id)}]`;
+    requireFiniteNumber(country.initialTreasuryCashSUSD, `${path}.initialTreasuryCashSUSD`);
+    if (country.initialTreasuryCashSUSD < 0) {
+      throw new RangeError(`${path}.initialTreasuryCashSUSD must be non-negative`);
+    }
+    if (!declaredAccountIds.has(country.treasuryAccountId)) {
+      throw new RangeError(`${path}.treasuryAccountId was not registered as a declared account`);
+    }
+  }
+}
+
+/**
+ * M4c: a country with an active fiscal policy must own every region that
+ * contains population blocks or buildings, otherwise tax and welfare would
+ * silently skip real economic entities. Zero-fiscal worlds keep the M4a-2
+ * rule that unowned regions are permitted.
+ */
+function assertFiscalRegionOwnership(scenario: EconomyScenarioDef): void {
+  const countries = scenario.countries ?? [];
+  if (!countries.some((country) => fiscalPolicyIsActive(country.fiscal))) return;
+  const claimed = new Map<number, number>();
+  for (const country of countries) {
+    for (const regionId of country.regionIds) {
+      claimed.set(regionId, (claimed.get(regionId) ?? 0) + 1);
+    }
+  }
+  const economicRegions = new Set<number>();
+  for (const block of scenario.population.popBlocks) economicRegions.add(block.regionId);
+  for (const building of scenario.buildingInstances) economicRegions.add(building.regionId);
+  for (const regionId of economicRegions) {
+    const claims = claimed.get(regionId) ?? 0;
+    if (claims !== 1) {
+      throw new RangeError(
+        `region ${String(regionId)} must be owned by exactly one country when a fiscal policy is active; found ${String(claims)}`,
+      );
+    }
+  }
 }
 
 function assertNeedsGoodReferences(scenario: EconomyScenarioDef): void {
@@ -376,6 +431,7 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   assertProfessionIdentities(scenario);
 
   const accountIds = assertInitialAccountIds(scenario);
+  assertCountryInitialDefs(scenario, accountIds);
   assertBuildingInstances(scenario, accountIds);
   const buildingIds = new Set(scenario.buildingInstances.map((building) => building.id));
   assertMarkets(scenario, buildingIds);
@@ -398,6 +454,7 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
     currencyValuations: scenario.currencyValuations ?? [],
     regionIds: new Set(scenario.population.regions.map((region) => region.id)),
   });
+  assertFiscalRegionOwnership(scenario);
 }
 
 /** Build an M3 world from a validated economy scenario. */
@@ -410,16 +467,31 @@ export function createEconomyWorld(
     ...scenario.population.popBlocks.map((block) => block.financialAccountId),
     ...scenario.buildingInstances.map((instance) => instance.operatingCashAccountId),
     ...scenario.systemAccounts.map((account) => account.id),
+    ...(scenario.countries ?? []).map((country) => country.treasuryAccountId),
   ];
   const accountIdFloor = declaredIds.reduce((max, id) => Math.max(max, id), 0) + 1;
   const world = createPopulationWorld(scenario.population, {
     ...options,
     deferOpeningBalances: true,
     accountIdFloor,
+    fiscalAccounts: (scenario.countries ?? []).length > 0,
   });
 
+  const countryInitialById = new Map<Id, CountryInitialDef>(
+    (scenario.countries ?? []).map((country) => [country.id, country]),
+  );
   world.countries = (scenario.countries ?? [])
-    .map(copyCountry)
+    .map(
+      (initial): Country => ({
+        id: initial.id,
+        tag: initial.tag,
+        name: initial.name,
+        monetary: { ...initial.monetary },
+        regionIds: [...initial.regionIds],
+        treasuryAccountId: initial.treasuryAccountId,
+        fiscal: { ...initial.fiscal },
+      }),
+    )
     .sort((left, right) => left.id - right.id);
   world.currencies = (scenario.currencies ?? [])
     .map(copyCurrency)
@@ -430,7 +502,7 @@ export function createEconomyWorld(
 
   let nextAccountId = world.finance.nextAccountId;
   const allocate = (
-    ownerKind: "popBlock" | "building" | "system",
+    ownerKind: "popBlock" | "building" | "country" | "system",
     ownerId: Id | null,
     subtype: AccountSubtype,
   ): Id => {
@@ -493,6 +565,33 @@ export function createEconomyWorld(
       opening.push({ accountId: account.id, balanceSUSD: account.balanceSUSD });
     }
     opening.push({ accountId: equityId, balanceSUSD: systemTotal });
+  }
+
+  // M4c government accounts. The treasury cash id is scenario-declared; the
+  // owner equity, tax revenue, and welfare expense accounts are allocated
+  // deterministically. Opening treasury cash is balance-sheet state, not period
+  // activity, so its equity counterpart keeps the opening set balanced.
+  for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+    const initial = countryInitialById.get(country.id);
+    if (initial === undefined) {
+      throw new RangeError(`missing initial definition for country ${String(country.id)}`);
+    }
+    world.finance.accounts.push({
+      id: country.treasuryAccountId,
+      ownerKind: "country",
+      ownerId: country.id,
+      category: "asset",
+      subtype: "treasury-cash",
+      balanceSUSD: 0,
+    });
+    const equityId = allocate("country", country.id, "owner-equity");
+    allocate("country", country.id, "income-tax-revenue");
+    allocate("country", country.id, "welfare-expense");
+    opening.push({
+      accountId: country.treasuryAccountId,
+      balanceSUSD: initial.initialTreasuryCashSUSD,
+    });
+    opening.push({ accountId: equityId, balanceSUSD: initial.initialTreasuryCashSUSD });
   }
 
   for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {

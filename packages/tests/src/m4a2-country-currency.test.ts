@@ -151,13 +151,16 @@ describe("M4a-2 country and currency identity", () => {
 
   test("rejects duplicate country ids and tags", () => {
     const duplicateId = ownCurrencyScenario();
-    duplicateId.countries = [duplicateId.countries![0]!, { ...duplicateId.countries![0]! }];
+    duplicateId.countries = [
+      duplicateId.countries![0]!,
+      { ...duplicateId.countries![0]!, treasuryAccountId: 9002 },
+    ];
     expect(() => build(duplicateId)).toThrow(/duplicate country id/i);
 
     const duplicateTag = ownCurrencyScenario();
     duplicateTag.countries = [
       duplicateTag.countries![0]!,
-      { ...duplicateTag.countries![0]!, id: 1 },
+      { ...duplicateTag.countries![0]!, id: 1, treasuryAccountId: 9002 },
     ];
     expect(() => build(duplicateTag)).toThrow(/duplicate country tag/i);
   });

@@ -171,6 +171,9 @@ function simulatedForeignScenario(): EconomyScenarioDef {
       name: "Second Country",
       monetary: { kind: "own", currencyId: 1 },
       regionIds: [],
+      treasuryAccountId: 9001,
+      initialTreasuryCashSUSD: 0,
+      fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
     },
   ];
   scenario.currencies = [

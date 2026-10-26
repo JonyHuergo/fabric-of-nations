@@ -139,7 +139,7 @@ export interface Market {
   stockLots: StockLot[];
 }
 
-export type FinancialAccountOwnerKind = "popBlock" | "building" | "system";
+export type FinancialAccountOwnerKind = "popBlock" | "building" | "country" | "system";
 
 /**
  * Account categories determine the normal side and the balance constraint.
@@ -158,14 +158,19 @@ export const ACCOUNT_SUBTYPES = [
   "household-cash",
   "operating-cash",
   "system-reserve-cash",
+  "treasury-cash",
   "owner-equity",
   "wage-income",
   "sales-revenue",
   "system-income",
+  "income-tax-revenue",
+  "welfare-income",
   "consumption-expense",
   "input-expense",
   "wage-expense",
   "upkeep-expense",
+  "income-tax-expense",
+  "welfare-expense",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -203,6 +208,8 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "input-purchase",
   "wages",
   "upkeep",
+  "income-tax",
+  "welfare-transfer",
   "profit-distribution",
   "owner-capital-injection",
   ...INTERNAL_TRANSACTION_KINDS,
@@ -357,6 +364,20 @@ export type MonetaryArrangement =
   | { kind: "adopted"; currencyId: Id }
   | { kind: "shared"; currencyId: Id; unionKey: string };
 
+/**
+ * M4c per-country fiscal policy state.
+ *
+ * `incomeTaxRate` is a dimensionless flat rate on wages actually received. It is
+ * provisional hard-bounded state, not law-bounded: M8 taxation laws may replace
+ * it. `welfareBudgetSUSDPerYear` is a requested annual nominal SUSD expenditure
+ * target, not a spendable pool; it is paid daily as
+ * `welfareBudgetSUSDPerYear / daysInYear(civil year)`.
+ */
+export interface FiscalPolicy {
+  incomeTaxRate: Rate;
+  welfareBudgetSUSDPerYear: MoneySUSD;
+}
+
 export interface Country {
   id: Id;
   tag: string;
@@ -364,6 +385,26 @@ export interface Country {
   monetary: MonetaryArrangement;
   /** Sole authoritative country-to-region ownership mapping. */
   regionIds: Id[];
+  /** The country's own designated `treasury-cash` account. */
+  treasuryAccountId: Id;
+  /** M4c provisional fiscal policy state. */
+  fiscal: FiscalPolicy;
+}
+
+/**
+ * Scenario input for one country. `treasuryAccountId` is declared so account
+ * allocation is deterministic and cannot collide with other declared accounts;
+ * `initialTreasuryCashSUSD` is applied once through the opening-balance record.
+ */
+export interface CountryInitialDef {
+  id: Id;
+  tag: string;
+  name: string;
+  monetary: MonetaryArrangement;
+  regionIds: Id[];
+  treasuryAccountId: Id;
+  initialTreasuryCashSUSD: MoneySUSD;
+  fiscal: FiscalPolicy;
 }
 
 /**
@@ -423,8 +464,8 @@ export interface EconomyScenarioDef {
   markets: MarketInitialDef[];
   systemAccounts: SystemAccountInitialDef[];
   employment: EmploymentAssignmentInitialDef[];
-  /** M4a-2 optional country/currency state; absent means empty collections. */
-  countries?: Country[];
+  /** M4a-2 country identity plus M4c treasury/fiscal initial state. */
+  countries?: CountryInitialDef[];
   currencies?: Currency[];
   currencyValuations?: CurrencyValuation[];
 }

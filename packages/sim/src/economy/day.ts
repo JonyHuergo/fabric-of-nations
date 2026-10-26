@@ -37,6 +37,7 @@ import { computeBuildingCapacity } from "./production.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
+import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import {
   runMarketDay,
   type HouseholdDemandRecord,
@@ -87,6 +88,7 @@ export interface EconomyDayResult {
   readonly economy: {
     readonly market: MarketDayResult;
     readonly settlement: MarketSettlementResult;
+    readonly fiscal: FiscalPhaseResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
@@ -511,20 +513,24 @@ function isLastDayOfMonth(dayIndex: DayIndex): boolean {
  *
  * The GDD formula needs annual per-capita income and the current subsistence
  * basket cost. M3 has no monthly income accumulator, so the current day's
- * actual settled wage receipt is annualized by the civil year. Household cash
- * assets are deliberately not treated as income. Mandatory payments are zero
- * because M3f has no taxes or other mandatory household payments yet.
+ * actual settled household income (wages plus welfare received) is annualized
+ * by the civil year. Household cash assets are deliberately not treated as
+ * income. M4c mandatory payments are the income tax actually withheld that day.
  */
 function economicWealthInputs(
   world: World,
   definitions: EconomyDefinitions,
   market: MarketDayResult,
   settlement: MarketSettlementResult,
+  fiscal: FiscalPhaseResult,
   dayIndex: DayIndex,
 ): PopulationInputs {
   const year = dayIndexToCivilDate(dayIndex).year;
   const householdByBlock = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
+  );
+  const fiscalByBlock = new Map(
+    fiscal.blocks.map((entry) => [entry.popBlockId, entry]),
   );
   const prices = definitions.goods.map((good) => ({
     goodKey: good.key,
@@ -546,11 +552,17 @@ function economicWealthInputs(
     if (household === undefined) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
     }
+    const fiscalBlock = fiscalByBlock.get(block.id);
+    const welfareReceived = fiscalBlock?.welfareReceivedSUSD ?? 0;
+    const incomeTax = fiscalBlock?.incomeTaxSUSD ?? 0;
     return {
       popBlockId: block.id,
       annualSettledIncomePerCapitaSUSD:
-        population > 0 ? (household.wagesReceivedSUSD / population) * daysInYear(year) : 0,
-      annualMandatoryPaymentsPerCapitaSUSD: 0,
+        population > 0
+          ? ((household.wagesReceivedSUSD + welfareReceived) / population) * daysInYear(year)
+          : 0,
+      annualMandatoryPaymentsPerCapitaSUSD:
+        population > 0 ? (incomeTax / population) * daysInYear(year) : 0,
     };
   });
   return { prices, supply, income };
@@ -561,6 +573,7 @@ function updateEconomicWealth(
   definitions: EconomyDefinitions,
   market: MarketDayResult,
   settlement: MarketSettlementResult,
+  fiscal: FiscalPhaseResult,
   dayIndex: DayIndex,
   needs: PopulationNeedsDayResult,
   populationDefinitions: PopulationDefinitions,
@@ -571,6 +584,7 @@ function updateEconomicWealth(
     definitions,
     market,
     settlement,
+    fiscal,
     dayIndex,
   );
   return updateMonthlyWealth(
@@ -723,6 +737,11 @@ export function runEconomicDay(
   if (settlement === undefined) throw new RangeError("economic day did not produce a settlement");
   if (marketResult === undefined) throw new RangeError("economic day did not clear a market");
 
+  // M4c fiscal phase (GDD §4.2 step 12, fiscal part): after market/wage/upkeep
+  // settlement and before needs/militancy and wealth. It uses the same day's
+  // settlement result and never estimates wages from account balances.
+  const fiscal = runFiscalPhase(world, settlement, dayIndex);
+
   const needs = buildNeedsResult(
     world,
     economyDefinitions,
@@ -737,6 +756,7 @@ export function runEconomicDay(
     economyDefinitions,
     marketResult,
     settlement,
+    fiscal,
     dayIndex,
     needs,
     populationDefinitions,
@@ -762,6 +782,7 @@ export function runEconomicDay(
     economy: {
       market: marketResult,
       settlement,
+      fiscal,
       employment,
       householdDemands: household.records,
       productionDemands: productionRecords,

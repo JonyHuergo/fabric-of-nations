@@ -36,7 +36,7 @@ import {
   transactionKindChangesCash,
   type OwnerEquityTally,
 } from "./accounts.js";
-import { assertValidCountryCurrencyState } from "./country.js";
+import { assertValidCountryCurrencyState, fiscalPolicyIsActive } from "./country.js";
 import { MAX_AUDIT_POSTINGS, MAX_PERIOD_SUMMARIES } from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
@@ -74,8 +74,13 @@ function civilMonthLabel(dayIndex: Day): string {
 }
 
 function assertAccountOwnerKind(value: unknown, path: string): FinancialAccountOwnerKind {
-  if (value !== "popBlock" && value !== "building" && value !== "system") {
-    throw new RangeError(`${path} must be popBlock, building, or system`);
+  if (
+    value !== "popBlock" &&
+    value !== "building" &&
+    value !== "country" &&
+    value !== "system"
+  ) {
+    throw new RangeError(`${path} must be popBlock, building, country, or system`);
   }
   return value;
 }
@@ -729,9 +734,17 @@ function assertValidMarket(
 }
 
 function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {
+  const fiscalAccountsRequired = world.countries.length > 0;
   for (const block of world.popBlocks) {
-    for (const subtype of ["owner-equity", "wage-income", "consumption-expense"] as const) {
-      index.get("popBlock", block.id, subtype);
+    const subtypes = [
+      "owner-equity",
+      "wage-income",
+      "consumption-expense",
+    ] as const;
+    for (const subtype of subtypes) index.get("popBlock", block.id, subtype);
+    if (fiscalAccountsRequired) {
+      index.get("popBlock", block.id, "income-tax-expense");
+      index.get("popBlock", block.id, "welfare-income");
     }
   }
   for (const building of world.buildings) {
@@ -745,10 +758,48 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
       index.get("building", building.id, subtype);
     }
   }
+  for (const country of world.countries) {
+    const treasury = index.get("country", country.id, "treasury-cash");
+    if (treasury.id !== country.treasuryAccountId) {
+      throw new RangeError(
+        `country ${String(country.id)} treasuryAccountId ${String(country.treasuryAccountId)} does not reference its own treasury-cash account ${String(treasury.id)}`,
+      );
+    }
+    for (const subtype of [
+      "owner-equity",
+      "income-tax-revenue",
+      "welfare-expense",
+    ] as const) {
+      index.get("country", country.id, subtype);
+    }
+  }
   for (const account of world.finance.accounts) {
     if (account.ownerKind !== "system" || account.subtype !== "system-reserve-cash") continue;
     for (const subtype of ["owner-equity", "system-income"] as const) {
       index.get("system", null, subtype);
+    }
+  }
+}
+
+/**
+ * M4c: when any fiscal policy is active, every region that contains pop blocks
+ * or buildings must be claimed by exactly one country. Country validation has
+ * already rejected duplicate claims, so this only needs to reject gaps.
+ */
+function assertFiscalRegionOwnership(world: World): void {
+  if (!world.countries.some((country) => fiscalPolicyIsActive(country.fiscal))) return;
+  const claimed = new Set<number>();
+  for (const country of world.countries) {
+    for (const regionId of country.regionIds) claimed.add(regionId);
+  }
+  const economicRegions = new Set<number>();
+  for (const block of world.popBlocks) economicRegions.add(block.regionId);
+  for (const building of world.buildings) economicRegions.add(building.regionId);
+  for (const regionId of economicRegions) {
+    if (!claimed.has(regionId)) {
+      throw new RangeError(
+        `region ${String(regionId)} must be owned by a country when a fiscal policy is active`,
+      );
     }
   }
 }
@@ -778,6 +829,7 @@ export function assertValidEconomyState(world: World): void {
   }
 
   const popBlockIds = new Set<number>(world.popBlocks.map((block) => block.id));
+  const countryIds = new Set<number>(world.countries.map((country) => country.id));
   // Generic owner-reference invariant: every owner-owned account must point at
   // an existing owner, regardless of subtype or category. This intentionally
   // covers all current and future building-owned account roles.
@@ -796,6 +848,12 @@ export function assertValidEconomyState(world: World): void {
       if (account.ownerId === null || !popBlockIds.has(account.ownerId)) {
         throw new RangeError(
           `popBlock-owned ${account.subtype} account ${String(account.id)} references unknown popBlock owner ${String(account.ownerId)}`,
+        );
+      }
+    } else if (account.ownerKind === "country") {
+      if (account.ownerId === null || !countryIds.has(account.ownerId)) {
+        throw new RangeError(
+          `country-owned ${account.subtype} account ${String(account.id)} references unknown country owner ${String(account.ownerId)}`,
         );
       }
     }
@@ -935,6 +993,7 @@ export function assertValidEconomyState(world: World): void {
     regionIds,
     expectedStartDay: world.startDayIndex,
   });
+  assertFiscalRegionOwnership(world);
 }
 
 /** Export for tests and scenario validation. */

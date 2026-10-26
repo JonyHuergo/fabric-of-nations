@@ -7,17 +7,17 @@
  */
 
 /** Version of the simulation behavior. A save is only compatible with the same version. */
-export const SIM_VERSION = "0.8.0";
+export const SIM_VERSION = "0.9.0";
 
 /** Version of the serialized world schema. */
-export const WORLD_SCHEMA_VERSION = 8;
+export const WORLD_SCHEMA_VERSION = 9;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
 
 /**
- * Content/data version. M4a-2 adds runtime country/currency state but ships no
- * new scenario data, so the data package version stays `m3-economy-v1`.
+ * Content/data version. M4a-2/M4b/M4c add runtime state but ship no new
+ * scenario data, so the data package version stays `m3-economy-v1`.
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 

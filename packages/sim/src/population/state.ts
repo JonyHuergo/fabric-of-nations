@@ -455,19 +455,31 @@ export function createPopulationWorld(
     blocks.push(block);
 
     // Every owner receives the same structural account set. The cash account
-    // id is scenario-declared; the rest are deterministically allocated.
+    // id is scenario-declared; the rest are deterministically allocated. The
+    // M4c fiscal accounts are zero-balance until a country with a fiscal system
+    // exists; keeping them uniform makes the owner account set unambiguous.
     const equityAccountId = nextAccountId;
     nextAccountId += 1;
     const incomeAccountId = nextAccountId;
     nextAccountId += 1;
     const expenseAccountId = nextAccountId;
     nextAccountId += 1;
-    const ownerAccounts: readonly { id: Id; subtype: AccountSubtype }[] = [
+    const ownerAccounts: { id: Id; subtype: AccountSubtype }[] = [
       { id: initial.financialAccountId, subtype: "household-cash" },
       { id: equityAccountId, subtype: "owner-equity" },
       { id: incomeAccountId, subtype: "wage-income" },
       { id: expenseAccountId, subtype: "consumption-expense" },
     ];
+    if (options.fiscalAccounts === true) {
+      const taxExpenseAccountId = nextAccountId;
+      nextAccountId += 1;
+      const welfareIncomeAccountId = nextAccountId;
+      nextAccountId += 1;
+      ownerAccounts.push(
+        { id: taxExpenseAccountId, subtype: "income-tax-expense" },
+        { id: welfareIncomeAccountId, subtype: "welfare-income" },
+      );
+    }
     for (const ownerAccount of ownerAccounts) {
       accounts.push({
         id: ownerAccount.id,

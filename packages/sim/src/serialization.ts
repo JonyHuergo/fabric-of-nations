@@ -228,13 +228,21 @@ export type SerializedMonetaryArrangement =
   | { readonly kind: "adopted"; readonly currencyId: number }
   | { readonly kind: "shared"; readonly currencyId: number; readonly unionKey: string };
 
-/** Encoded country identity and region ownership. */
+/** Encoded fiscal policy. */
+export type SerializedFiscalPolicy = {
+  readonly incomeTaxRate: number;
+  readonly welfareBudgetSUSDPerYear: number;
+};
+
+/** Encoded country identity, region ownership, treasury, and fiscal policy. */
 export type SerializedCountry = {
   readonly id: number;
   readonly tag: string;
   readonly name: string;
   readonly monetary: SerializedMonetaryArrangement;
   readonly regionIds: readonly number[];
+  readonly treasuryAccountId: number;
+  readonly fiscal: SerializedFiscalPolicy;
 };
 
 /** Encoded SUSD-relative valuation. */
@@ -546,6 +554,11 @@ export function encodeWorld(world: World): SerializedWorld {
         name: country.name,
         monetary: { ...country.monetary },
         regionIds: [...country.regionIds].sort((left, right) => left - right),
+        treasuryAccountId: country.treasuryAccountId,
+        fiscal: {
+          incomeTaxRate: country.fiscal.incomeTaxRate,
+          welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+        },
       })),
     currencies: [...world.currencies]
       .sort((left, right) => left.id - right.id)
@@ -748,6 +761,17 @@ function decodeMonetaryArrangement(value: unknown, path: string): MonetaryArrang
   throw new SaveFormatError(`${path}.kind is invalid`);
 }
 
+function decodeFiscalPolicy(value: unknown, path: string): { incomeTaxRate: number; welfareBudgetSUSDPerYear: number } {
+  const record = requireRecord(value, path);
+  return {
+    incomeTaxRate: requireFiniteNumber(record.incomeTaxRate, `${path}.incomeTaxRate`),
+    welfareBudgetSUSDPerYear: requireFiniteNumber(
+      record.welfareBudgetSUSDPerYear,
+      `${path}.welfareBudgetSUSDPerYear`,
+    ),
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -759,6 +783,8 @@ function decodeCountry(value: unknown, path: string): Country {
     regionIds: rawRegionIds.map((regionId, index) =>
       requireUint32(regionId, `${path}.regionIds[${String(index)}]`),
     ),
+    treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
+    fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
   };
 }
 
@@ -810,7 +836,12 @@ function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuatio
 function decodeFinancialAccount(value: unknown, path: string): FinancialAccount {
   const record = requireRecord(value, path);
   const ownerKind = record.ownerKind;
-  if (ownerKind !== "popBlock" && ownerKind !== "building" && ownerKind !== "system") {
+  if (
+    ownerKind !== "popBlock" &&
+    ownerKind !== "building" &&
+    ownerKind !== "country" &&
+    ownerKind !== "system"
+  ) {
     throw new SaveFormatError(`${path}.ownerKind is invalid`);
   }
   const category = requireString(record.category, `${path}.category`, { minLength: 1 });

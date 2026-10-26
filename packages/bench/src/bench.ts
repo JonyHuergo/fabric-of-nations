@@ -7,7 +7,9 @@
  * - M2 multi-block stress ticks at 200, 1,000, 3,000, and 6,000 pop blocks;
  * - M3b employment-refresh samples on the fixed small M3 world;
  * - M3c/M3d/M3e/M3f production, market, settlement, and integrated-day samples;
- * - M4b monthly period-close samples, including close correctness gates.
+ * - M4b monthly period-close samples, including close correctness gates;
+ * - M4c daily fiscal-phase samples, including tax, welfare, treasury,
+ *   cash-conservation, and accounting-identity gates.
  *
  * Employment samples reset to a fixed seed-assignment state and time only the
  * real refresh routine. Setup, correctness validation, and hashing are excluded.
@@ -43,6 +45,7 @@ import {
   createInitialWorld,
   createPopulationWorld,
   designatedCashTotal,
+  asSusdPerCurrencyUnit,
   hashWorld,
   populationTotal,
   refreshEmploymentIfDue,
@@ -50,6 +53,7 @@ import {
   runProductionPhase,
   settleMarketDay,
   tick,
+  type CountryInitialDef,
   type EconomyScenarioDef,
   type TickContext,
   type InputReservation,
@@ -95,6 +99,12 @@ const M4B_CLOSE_SMALL_ITERATIONS = 20;
 const M4B_CLOSE_STRESS_GROUPS = 3;
 const M4B_CLOSE_STRESS_WARMUP = 2;
 const M4B_CLOSE_STRESS_ITERATIONS = 10;
+const M4C_FISCAL_SMALL_WARMUP = 2;
+const M4C_FISCAL_SMALL_ITERATIONS = 10;
+const M4C_FISCAL_STRESS_GROUPS = 3;
+const M4C_FISCAL_STRESS_WARMUP = 1;
+const M4C_FISCAL_STRESS_ITERATIONS = 5;
+const M4C_TREASURY_ACCOUNT_ID = 1_000_000;
 const M1_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_AGGREGATE_P95_REGRESSION_THRESHOLD_MS = 1;
 const M2_STRESS_P95_REGRESSION_THRESHOLD_MS = 5;
@@ -1313,6 +1323,226 @@ function printFinanceCloseBenchmark(result: FinanceCloseBenchmarkResult): void {
   );
 }
 
+interface FiscalBenchmarkResult {
+  readonly label: string;
+  readonly groups: number;
+  readonly iterations: number;
+  readonly warmupIterations: number;
+  readonly totalMs: number;
+  readonly averageMs: number;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly p99Ms: number;
+  readonly fixtureBlocks: number;
+  readonly fixtureBuildings: number;
+  readonly accounts: number;
+  readonly incomeTaxSUSD: number;
+  readonly welfarePaidSUSD: number;
+  readonly welfareShortfallSUSD: number;
+  readonly treasuryStartSUSD: number;
+  readonly treasuryEndSUSD: number;
+  readonly treasuryReconciled: boolean;
+  readonly cashConserved: boolean;
+  readonly identityPreserved: boolean;
+  readonly hashesEqual: boolean;
+  readonly hash: string;
+}
+
+/**
+ * M4c benchmark scenario: the scaled M3 production economy plus one country with
+ * an active income tax and welfare budget. The scaled fixture clears employment
+ * for production benchmarks, so shift-level assignments are synthesized here to
+ * give every group real wage settlements and therefore real tax receipts.
+ */
+function fiscalBenchmarkScenario(groups: number): EconomyScenarioDef {
+  const scenario = scaledProductionScenario(groups);
+  const employment: EconomyScenarioDef["employment"] = [];
+  for (let group = 0; group < groups; group += 1) {
+    employment.push(
+      {
+        id: group * 3,
+        popBlockId: group * 4,
+        buildingInstanceId: group * 8,
+        professionId: 0,
+        workers: 1000,
+      },
+      {
+        id: group * 3 + 1,
+        popBlockId: group * 4 + 1,
+        buildingInstanceId: group * 8 + 1,
+        professionId: 1,
+        workers: 1000,
+      },
+      {
+        id: group * 3 + 2,
+        popBlockId: group * 4 + 2,
+        buildingInstanceId: group * 8 + 6,
+        professionId: 2,
+        workers: 500,
+      },
+    );
+  }
+  const country: CountryInitialDef = {
+    id: 0,
+    tag: "BNC",
+    name: "Benchmark Fiscal Country",
+    monetary: { kind: "own", currencyId: 0 },
+    regionIds: [0],
+    treasuryAccountId: M4C_TREASURY_ACCOUNT_ID,
+    initialTreasuryCashSUSD: 5_000_000,
+    fiscal: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1_000_000 },
+  };
+  return {
+    ...scenario,
+    employment,
+    countries: [country],
+    currencies: [
+      { id: 0, key: "tst", name: "Benchmark Unit", issuer: { kind: "country", countryId: 0 } },
+    ],
+    currencyValuations: [
+      {
+        currencyId: 0,
+        status: "specified",
+        susdPerUnit: asSusdPerCurrencyUnit(1),
+        setOnDay: 0,
+        source: "scenario",
+      },
+    ],
+  };
+}
+
+function treasuryCashOf(world: World): number {
+  const country = world.countries[0];
+  if (country === undefined) throw new Error("M4c benchmark world has no country");
+  const account = world.finance.accounts.find(
+    (candidate) => candidate.id === country.treasuryAccountId,
+  );
+  if (account === undefined) throw new Error("M4c benchmark world has no treasury account");
+  return account.balanceSUSD;
+}
+
+function runFiscalBenchmark(
+  label: string,
+  groups: number,
+  iterations: number,
+  warmupIterations: number,
+): FiscalBenchmarkResult {
+  const scenario = fiscalBenchmarkScenario(groups);
+  const context: TickContext = {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  const secondWorld = createEconomyWorld(scenario, { seed: SEED });
+  const cashBefore = designatedCashTotal(world.finance);
+
+  const runDays = (
+    target: World,
+    measured: boolean,
+  ): {
+    readonly samples: number[];
+    readonly incomeTax: number;
+    readonly welfarePaid: number;
+    readonly welfareShortfall: number;
+    readonly treasuryAtStart: number;
+    readonly minIncomeTax: number;
+    readonly minWelfarePaid: number;
+  } => {
+    for (let index = 0; index < warmupIterations; index += 1) tick(target, context);
+    const treasuryAtStart = treasuryCashOf(target);
+    const samples: number[] = [];
+    let incomeTax = 0;
+    let welfarePaid = 0;
+    let welfareShortfall = 0;
+    let minIncomeTax = Number.MAX_SAFE_INTEGER;
+    let minWelfarePaid = Number.MAX_SAFE_INTEGER;
+    for (let index = 0; index < iterations; index += 1) {
+      const start = process.hrtime.bigint();
+      const result = tick(target, context);
+      const end = process.hrtime.bigint();
+      if (measured) samples.push(Number(end - start));
+      const fiscal = result.economy?.fiscal;
+      if (fiscal === undefined) throw new Error("M4c fiscal tick did not return fiscal results");
+      incomeTax += fiscal.totals.incomeTaxSUSD;
+      welfarePaid += fiscal.totals.welfarePaidSUSD;
+      welfareShortfall += fiscal.totals.welfareShortfallSUSD;
+      minIncomeTax = Math.min(minIncomeTax, fiscal.totals.incomeTaxSUSD);
+      minWelfarePaid = Math.min(minWelfarePaid, fiscal.totals.welfarePaidSUSD);
+    }
+    return {
+      samples,
+      incomeTax,
+      welfarePaid,
+      welfareShortfall,
+      treasuryAtStart,
+      minIncomeTax,
+      minWelfarePaid,
+    };
+  };
+
+  const first = runDays(world, true);
+  runDays(secondWorld, false);
+  const samples = [...first.samples].sort((left, right) => left - right);
+  let totalNs = 0;
+  for (const sample of samples) totalNs += sample;
+
+  let identityPreserved = true;
+  try {
+    assertAccountingIdentity(world.finance);
+  } catch {
+    identityPreserved = false;
+  }
+  const treasuryEnd = treasuryCashOf(world);
+  const expectedTreasury = first.treasuryAtStart + first.incomeTax - first.welfarePaid;
+  const treasuryReconciled =
+    Math.abs(treasuryEnd - expectedTreasury) <= 1e-6 * Math.max(1, Math.abs(expectedTreasury));
+  return {
+    label,
+    groups,
+    iterations,
+    warmupIterations,
+    totalMs: milliseconds(totalNs),
+    averageMs: milliseconds(totalNs / iterations),
+    p50Ms: milliseconds(percentile(samples, 0.5)),
+    p95Ms: milliseconds(percentile(samples, 0.95)),
+    p99Ms: milliseconds(percentile(samples, 0.99)),
+    fixtureBlocks: world.popBlocks.length,
+    fixtureBuildings: world.buildings.length,
+    accounts: world.finance.accounts.length,
+    incomeTaxSUSD: first.incomeTax,
+    welfarePaidSUSD: first.welfarePaid,
+    welfareShortfallSUSD: first.welfareShortfall,
+    treasuryStartSUSD: first.treasuryAtStart,
+    treasuryEndSUSD: treasuryEnd,
+    treasuryReconciled,
+    cashConserved: Math.abs(designatedCashTotal(world.finance) - cashBefore) <= 1e-6,
+    identityPreserved,
+    hashesEqual: hashWorld(secondWorld) === hashWorld(world),
+    hash: hashWorld(world),
+  };
+}
+
+function printFiscalBenchmark(result: FiscalBenchmarkResult): void {
+  console.log(
+    `${result.label} (${String(result.groups)} group(s), ${String(result.fixtureBlocks)} pop blocks, ` +
+      `${String(result.fixtureBuildings)} buildings, ${String(result.accounts)} accounts):`,
+  );
+  console.log(
+    `  ${String(result.iterations)} fiscal economic days; warm-up ${String(result.warmupIterations)}; ` +
+      `tick only; setup/reset/hash excluded`,
+  );
+  console.log(
+    `  income tax ${result.incomeTaxSUSD.toFixed(4)} SUSD, welfare paid ${result.welfarePaidSUSD.toFixed(4)} SUSD, ` +
+      `shortfall ${result.welfareShortfallSUSD.toFixed(4)} SUSD, ` +
+      `treasury ${result.treasuryStartSUSD.toFixed(2)} -> ${result.treasuryEndSUSD.toFixed(2)} SUSD`,
+  );
+  console.log(
+    `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
+      `p50 ${formatMs(result.p50Ms)} ms, p95 ${formatMs(result.p95Ms)} ms, ` +
+      `p99 ${formatMs(result.p99Ms)} ms, hash ${result.hash}`,
+  );
+}
+
 function runM1Case(run: number): RunResult {  const world = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
   const tickSamplesNs = new Array<number>(CAMPAIGN_TICKS);
   let processed = 0;
@@ -1386,7 +1616,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -1428,6 +1658,11 @@ function main(): void {
     `M4b period closes: small M3 world (${String(M4B_CLOSE_SMALL_ITERATIONS)} closes, ` +
       `${String(M4B_CLOSE_SMALL_WARMUP)} warm-up) and ${String(M4B_CLOSE_STRESS_GROUPS)}-group stress ` +
       `(${String(M4B_CLOSE_STRESS_ITERATIONS)} closes, ${String(M4B_CLOSE_STRESS_WARMUP)} warm-up)`,
+  );
+  console.log(
+    `M4c fiscal days: small M3 world (${String(M4C_FISCAL_SMALL_ITERATIONS)} days, ` +
+      `${String(M4C_FISCAL_SMALL_WARMUP)} warm-up) and ${String(M4C_FISCAL_STRESS_GROUPS)}-group stress ` +
+      `(${String(M4C_FISCAL_STRESS_ITERATIONS)} days, ${String(M4C_FISCAL_STRESS_WARMUP)} warm-up)`,
   );
 
   const warmupM1 = createInitialWorld({ seed: SEED, scenarioId: "m1-benchmark" });
@@ -1526,6 +1761,18 @@ function main(): void {
     M4B_CLOSE_STRESS_ITERATIONS,
     M4B_CLOSE_STRESS_WARMUP,
   );
+  const m4cFiscalSmall = runFiscalBenchmark(
+    "M4c fiscal day (small)",
+    1,
+    M4C_FISCAL_SMALL_ITERATIONS,
+    M4C_FISCAL_SMALL_WARMUP,
+  );
+  const m4cFiscalStress = runFiscalBenchmark(
+    "M4c fiscal day (stress)",
+    M4C_FISCAL_STRESS_GROUPS,
+    M4C_FISCAL_STRESS_ITERATIONS,
+    M4C_FISCAL_STRESS_WARMUP,
+  );
 
   printResults("M1 empty-world no-op", m1Results);
   printResults("M2 world aggregate century", m2AggregateResults);
@@ -1543,6 +1790,8 @@ function main(): void {
   printEconomicDayBenchmark(m3fStress);
   printFinanceCloseBenchmark(m4bCloseSmall);
   printFinanceCloseBenchmark(m4bCloseStress);
+  printFiscalBenchmark(m4cFiscalSmall);
+  printFiscalBenchmark(m4cFiscalStress);
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1602,6 +1851,14 @@ function main(): void {
     result.minClosingPostings > 0 &&
     result.flowTotalSUSD > 0;
   const m4bValid = financeCloseValid(m4bCloseSmall) && financeCloseValid(m4bCloseStress);
+  const fiscalValid = (result: FiscalBenchmarkResult): boolean =>
+    result.hashesEqual &&
+    result.treasuryReconciled &&
+    result.cashConserved &&
+    result.identityPreserved &&
+    result.incomeTaxSUSD > 0 &&
+    result.welfarePaidSUSD > 0;
+  const m4cValid = fiscalValid(m4cFiscalSmall) && fiscalValid(m4cFiscalStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&
     m2AggregateResults.every((result) => result.ticks === CAMPAIGN_TICKS) &&
@@ -1617,7 +1874,8 @@ function main(): void {
     m3dValid &&
     m3eValid &&
     m3fValid &&
-    m4bValid;
+    m4bValid &&
+    m4cValid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1678,6 +1936,14 @@ function main(): void {
   console.log(
     `M4b close zeroing/cash/identity/contiguity/determinism: ` +
       `${m4bValid ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M4c fiscal small checks: ${fiscalValid(m4cFiscalSmall) ? "PASS" : "FAIL"}; ` +
+      `stress checks: ${fiscalValid(m4cFiscalStress) ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M4c treasury reconciliation/cash/identity/tax/welfare/determinism: ` +
+      `${m4cValid ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

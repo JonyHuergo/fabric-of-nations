@@ -292,6 +292,7 @@ describe("M4a-1 invariants", () => {
       "household-cash",
       "operating-cash",
       "system-reserve-cash",
+      "treasury-cash",
     ]);
     const world = m3World().world;
     const cashAccounts = world.finance.accounts.filter((account) =>

@@ -1,11 +1,12 @@
 import { loadM3SmallEconomy } from "@century/data";
 import {
   asSusdPerCurrencyUnit,
-  type Country,
+  type CountryInitialDef,
   type Currency,
   type CurrencyIssuer,
   type CurrencyValuation,
   type EconomyScenarioDef,
+  type FiscalPolicy,
   type MonetaryArrangement,
 } from "@century/sim";
 
@@ -13,12 +14,26 @@ export function baseScenario(): EconomyScenarioDef {
   return loadM3SmallEconomy();
 }
 
+/** Zero fiscal policy used by M4a-2 fixtures that only exercise identity. */
+export function zeroFiscal(): FiscalPolicy {
+  return { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 };
+}
+
 export function country(
   id: number,
   monetary: MonetaryArrangement,
   regionIds: number[] = [],
-): Country {
-  return { id, tag: `T${String(id)}`, name: `Test Country ${String(id)}`, monetary, regionIds };
+): CountryInitialDef {
+  return {
+    id,
+    tag: `T${String(id)}`,
+    name: `Test Country ${String(id)}`,
+    monetary,
+    regionIds,
+    treasuryAccountId: 9000 + id,
+    initialTreasuryCashSUSD: 0,
+    fiscal: zeroFiscal(),
+  };
 }
 
 export function issuedCurrency(id: number, key: string, countryId: number): Currency {

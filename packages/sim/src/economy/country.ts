@@ -9,6 +9,10 @@
  *
  * `Country.regionIds` is the sole authoritative country-to-region ownership
  * relation. Unassigned regions are permitted; lookups return an explicit null.
+ *
+ * M4c adds `treasuryAccountId` and the provisional `fiscal` policy to each
+ * country. Issuance and domestic use remain independent, and no monetary
+ * behavior is added.
  */
 
 import { assertValidDayIndex } from "../calendar.js";
@@ -21,9 +25,15 @@ import {
   MAX_FOREIGN_ISSUER_KEY_LENGTH,
   SUSD_CURRENCY_KEY,
 } from "../constants.js";
+import {
+  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+  MAX_FISCAL_TAX_RATE,
+  MIN_FISCAL_TAX_RATE,
+} from "./constants.js";
 import type { Day, Id } from "../types.js";
 import {
   requireArray,
+  requireFiniteNumber,
   requireInteger,
   requireRecord,
   requireString,
@@ -36,6 +46,7 @@ import type {
   Currency,
   CurrencyIssuer,
   CurrencyValuation,
+  FiscalPolicy,
   MonetaryArrangement,
 } from "./types.js";
 
@@ -70,12 +81,54 @@ export function regionOwner(world: World, regionId: Id): Id | null {
   return null;
 }
 
+/**
+ * Transient region-to-country ownership lookup. Country validation has already
+ * rejected duplicate region claims, so a conflict cannot be hidden here.
+ */
+export function buildRegionOwnerMap(world: World): ReadonlyMap<Id, Id> {
+  const owners = new Map<Id, Id>();
+  for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+    for (const regionId of country.regionIds) owners.set(regionId, country.id);
+  }
+  return owners;
+}
+
+/** True when a country has any active M4c fiscal policy. */
+export function fiscalPolicyIsActive(fiscal: FiscalPolicy): boolean {
+  return fiscal.incomeTaxRate > 0 || fiscal.welfareBudgetSUSDPerYear > 0;
+}
+
+/** Validate one fiscal policy and return its normalized value. */
+export function assertValidFiscalPolicy(value: unknown, path: string): FiscalPolicy {
+  const record = requireRecord(value, path);
+  const incomeTaxRate = requireFiniteNumber(record.incomeTaxRate, `${path}.incomeTaxRate`);
+  if (incomeTaxRate < MIN_FISCAL_TAX_RATE || incomeTaxRate > MAX_FISCAL_TAX_RATE) {
+    throw new RangeError(
+      `${path}.incomeTaxRate must be in ${MIN_FISCAL_TAX_RATE}..${MAX_FISCAL_TAX_RATE}, received ${String(incomeTaxRate)}`,
+    );
+  }
+  const welfareBudgetSUSDPerYear = requireFiniteNumber(
+    record.welfareBudgetSUSDPerYear,
+    `${path}.welfareBudgetSUSDPerYear`,
+  );
+  if (welfareBudgetSUSDPerYear < 0) {
+    throw new RangeError(`${path}.welfareBudgetSUSDPerYear must be non-negative`);
+  }
+  if (welfareBudgetSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+    throw new RangeError(
+      `${path}.welfareBudgetSUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+    );
+  }
+  return { incomeTaxRate, welfareBudgetSUSDPerYear };
+}
+
 /** Deep-copy one country record. */
 export function copyCountry(country: Country): Country {
   return {
     ...country,
     monetary: { ...country.monetary },
     regionIds: [...country.regionIds],
+    fiscal: { ...country.fiscal },
   };
 }
 
@@ -147,6 +200,7 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
   const rawCountries = requireArray(input.countries, "world.countries");
   const countries = new Map<Id, Country>();
   const tags = new Set<string>();
+  const treasuryAccountIds = new Set<Id>();
   for (let index = 0; index < rawCountries.length; index += 1) {
     const path = `world.countries[${String(index)}]`;
     const record = requireRecord(rawCountries[index], path);
@@ -163,6 +217,17 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
       maxLength: MAX_COUNTRY_NAME_LENGTH,
     });
     const monetary = assertMonetaryArrangement(record.monetary, `${path}.monetary`);
+    const treasuryAccountId = requireUint32(
+      record.treasuryAccountId,
+      `${path}.treasuryAccountId`,
+    );
+    if (treasuryAccountIds.has(treasuryAccountId)) {
+      throw new RangeError(
+        `duplicate country treasury account id ${String(treasuryAccountId)}`,
+      );
+    }
+    treasuryAccountIds.add(treasuryAccountId);
+    const fiscal = assertValidFiscalPolicy(record.fiscal, `${path}.fiscal`);
     const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
     const regionIds: Id[] = [];
     const seenRegions = new Set<Id>();
@@ -180,7 +245,7 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
       seenRegions.add(regionId);
       regionIds.push(regionId);
     }
-    countries.set(id, { id, tag, name, monetary, regionIds });
+    countries.set(id, { id, tag, name, monetary, regionIds, treasuryAccountId, fiscal });
   }
 
   const regionClaims = new Map<Id, Id>();
