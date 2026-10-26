@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5 foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -15,7 +15,9 @@ household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
 **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
 valuation)**, **M4b (monthly finance period close and immutable finance
 summaries)**, and **M4c (per-country treasury, daily income tax, and budgeted
-welfare transfers)** only. Corporate/consumption/land/tariff taxes, broader
+welfare transfers)**, and **M5 (multi-region/multi-country worlds, shared
+markets, migration, labor mobility, and the initial historical-data pipeline with
+eight authored polities)** only. Corporate/consumption/land/tariff taxes, broader
 government expenditure and services, debt/credit, distributions, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not
@@ -35,8 +37,8 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, save codec, state digest | none |
-| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, save codec, state digest | none |
+| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
 | [`packages/bench`](./packages/bench) | Headless M1–M4c benchmark harness | `@century/sim`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
@@ -761,14 +763,136 @@ timing is unchanged.
 - Node benchmarks remain diagnostics; the mobile p95 target is **NOT
   EVALUATED**.
 
+## M5 multi-region, multi-country, migration, labor mobility, and historical data
+
+M5 turns the single-region/single-market economic world into a validated
+multi-country campaign foundation. It is implemented end to end: eight authored
+1900 polities construct, validate, serialize, save/resume, and run together.
+
+### Geography and markets
+
+- `Country.regionIds` remains the sole authoritative region-ownership mapping and
+  `Market.regionIds` is the authoritative market membership. `Region.marketId` is
+  validated against it. A region belongs to exactly one market; a country's
+  regions must belong to one market in M5. Countryless multi-region fixtures are
+  valid and use an unrestricted countryless area.
+- Every market is cleared exactly once per day in ascending market-id order.
+  Production, input reservations, storage capacity, overflow, prices, and
+  inventory conservation are market-scoped. Shared-market regions pool inventory
+  once, so three regions in one market do not triple goods or demand.
+- Household and production demand is built from opening cash for the buyer's own
+  market. Settlement merges all markets' transactions into one atomic posting
+  batch and pays wages/upkeep once per day. Existing single-market M2/M3/M4
+  fixtures keep their previous behavior.
+- Shared markets are the M5 trade connection: countries whose regions share a
+  market transact across borders through ordinary goods purchases. M5 does not
+  implement inter-market physical trade, tariffs, cross-market transport charges,
+  or a rest-of-world trade account; GDD v2.5 does not specify those mechanics, so
+  they are recorded as explicit non-goals (D-051), not placeholder behavior.
+- Buildings and their owning household must belong to the same country. A
+  building's owner account must be a pop-block household-cash account.
+
+### Migration
+
+- Runs on the first civil day of a month, never on the start day or terminal
+  boundary, after the initial labor allocation.
+- Moves an integer number of people between two existing blocks with the same
+  profession in different regions. The source's single-year sex/age cells are
+  split proportionally with deterministic largest-remainder allocation; world
+  population is conserved exactly. Each migrant's pro-rata share of household cash
+  moves through a balanced `migration-transfer` posting.
+- Destination literacy/wealth/militancy are population-weighted merges; the
+  destination block keeps its needs-history counters; fractional birth/death
+  remainders stay with their original blocks.
+- Pressure is `0.7 × max(0, destination vacancy rate − source vacancy rate) +
+  0.3 × max(0, wealth gap/100)`; monthly migrant fraction is
+  `min(1%, pressure × 1%)`. A destination region may absorb at most 1% of its
+  start-of-month population in one month. These coefficients are provisional.
+- Domestic migration is always allowed. Cross-country migration requires the
+  destination country's `immigrationOpen` policy flag (scenario-initialised
+  provisional state). Emigration is unrestricted in M5. The GDD's open-border law
+  is not implemented until M8; the flag is the explicit substitute.
+- No migration block is created, no free migration pool exists, and no fixed
+  population increment is applied.
+
+### Labor mobility
+
+- Residents may take jobs in any region of their own country. Employment is
+  allocated domestic-first; a country's own residents fill its vacancies before
+  foreign residents are considered. Foreign residents may fill remaining
+  vacancies only in a destination country whose `immigrationOpen` flag is true.
+- Qualification, participation, job-slot, and eligible-workforce caps are
+  unchanged. A migration event marks employment dirty and triggers an immediate
+  deterministic repair/reassignment in the same day.
+- Cross-border wages are paid to the resident household and taxed by the
+  household's residence country, preserving M4c fiscal ownership. No person is
+  counted twice and no workforce is created.
+
+### Historical data pipeline
+
+- Compact, source-annotated tables live under `packages/data/data/historical/`:
+  eight countries, 16 regions, 5 markets, 64 population blocks, 81 building
+  instances, 8 currencies, an empty initial employment table, calibration targets,
+  and `source_notes.md`.
+- `packages/data/src/historical.ts` validates ids, references, ownership/market
+  membership, population/employment/building ranges, currencies, fiscal values,
+  source metadata, and calibration metadata; errors are deterministic and sorted.
+  It expands block totals to five-year age/sex inputs with a documented
+  provisional age profile and emits an `EconomyScenarioDef`.
+- The sample spans industrialized, agrarian, resource-rich, and dependent
+  conditions: United States, United Kingdom, German Empire, France, Russian
+  Empire, Empire of Japan, British India, and Brazil. Three markets span multiple
+  countries. The sample is roughly 648M people and is **not** a world total.
+- Population targets are rounded source-referenced national estimates with
+  declared tolerances; occupation targets are explicitly **provisional** broad
+  ranges for a household-composition proxy, not the GDD employed-worker metric.
+  Currency valuations are `unavailable`; no FX rates are invented. Age structure
+  is one shared provisional 1900 profile, not country-specific.
+- M5 does not implement profession promotion/demotion, so century-scale
+  occupation-trend claims are not made. The M3 production/needs parameters are not
+  historically calibrated; the sample is a structural and invariant test world,
+  not a historical welfare reconstruction.
+
+### Persistence, versions, and numerical robustness
+
+- Schema **10**, simulation **0.10.0**, save format 1, data version
+  `m3-economy-v1`. `Country.immigrationOpen` is the persisted addition.
+  Schema-9/simulation-0.9.0 saves are rejected; no migration is attempted.
+- `dataVersion` stays `m3-economy-v1` because M5 adds new scenario content without
+  changing any existing definition or scenario meaning (D-053).
+- Quantity conservation scales its comparison tolerance by gross physical terms
+  so large nearly-cancelling flows do not create false failures. Wage
+  affordability reduces a payment by at least one representable ulp when
+  proportional allocation exceeds employer cash by rounding; the difference is
+  reported as unpaid wages. No cent quantization or cash creation is introduced
+  (D-054).
+- M5a (profit distribution/remittances) and M5b (debt/deficit financing) are not
+  implemented. No banking, monetary issuance, FX dynamics, inflation, or new tax
+  categories are added.
+
+### M5 limitations
+
+- No inter-market physical trade, tariffs, transport costs between markets, or
+  rest-of-world trade counterparty.
+- No profession promotion/demotion, education, or technology effects (later
+  milestones).
+- Migration is between existing same-profession blocks; a region without a
+  destination block cannot receive that profession.
+- Open-border policy is a scenario flag, not an enacted law; M8 may replace it.
+- Historical calibration is partial: population baselines and authored occupation
+  structure are checked; century-scale population/occupation trends are **not**
+  claimed. Age structure, regional splits, literacy/wealth, fiscal settings,
+  building levels, and market groupings are provisional.
+- Node benchmarks are diagnostics; mobile performance remains **NOT EVALUATED**.
+
 ## Planned development roadmap and intermediate finance stages
 
-Only M0–M4c are implemented (see the sections above). The designer has adopted
+M0–M5 are implemented (see the sections above). The designer has adopted
 four intermediate finance stages (recorded as D-050) for work that earlier
 revisions left unassigned. **All four are planned and not implemented**: no
 runtime behavior, schema field, save version, benchmark gate, or UI support exists
 for them yet. They preserve the existing M0–M10 milestone identities and do not
-change M4a/M4b/M4c.
+change M4a/M4b/M4c/M5.
 
 Intended implementation order:
 
@@ -824,6 +948,17 @@ Static definitions:
 - WPP 2024 ASFR and sex-specific mortality are integrated **annually for
   1950–2000** in `demography.json`.
 - [`source_notes.md`](./packages/data/data/source_notes.md)
+- M5 historical sample: [`scenarios/m5_eight_polities.json`](./packages/data/data/scenarios/m5_eight_polities.json),
+  [`historical/countries_1900.json`](./packages/data/data/historical/countries_1900.json),
+  [`historical/regions_1900.json`](./packages/data/data/historical/regions_1900.json),
+  [`historical/markets_1900.json`](./packages/data/data/historical/markets_1900.json),
+  [`historical/pops_1900.json`](./packages/data/data/historical/pops_1900.json),
+  [`historical/buildings_1900.json`](./packages/data/data/historical/buildings_1900.json),
+  [`historical/employment_1900.json`](./packages/data/data/historical/employment_1900.json),
+  [`historical/calibration_targets_1900.json`](./packages/data/data/historical/calibration_targets_1900.json),
+  and [`historical/source_notes.md`](./packages/data/data/historical/source_notes.md).
+  Population targets are source-referenced rounded estimates; occupation
+  composition and all other 1900 structure are provisional (D-053).
 
 ### Campaign gameplay baseline
 
@@ -887,29 +1022,34 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `9`; simulation version: `0.9.0`; data version:
-  `m3-economy-v1` (M4a-2, M4b, and M4c add runtime state but ship no new scenario
-  data).
-- Schema-8 / simulation-0.8.0 saves are rejected with an actionable error; no
-  migration is attempted.
+- Schema version: `10`; simulation version: `0.10.0`; data version:
+  `m3-economy-v1` (M5 adds historical scenario content but changes no existing
+  definition or scenario meaning; see D-053).
+- Schema-9 / simulation-0.9.0 saves are rejected with an actionable error; no
+  migration is attempted. Schema-8 remains rejected as before.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
   record, monthly `periodSummaries` with `closedThroughDay`, the M4a-2
-  country/currency/valuation collections, and the M4c country
-  `treasuryAccountId`/`fiscal` state.
+  country/currency/valuation collections, the M4c country
+  `treasuryAccountId`/`fiscal` state, and the M5 country `immigrationOpen` policy.
 - Canonical JSON makes checksum and decode independent of object key insertion
   order. The state digest covers single-year sex state, accounts, diagnostics,
   `startDayIndex`, the opening record, period summaries, the close boundary,
-  countries/currencies/valuations, and the fiscal policy/treasury fields.
+  countries/currencies/valuations, the fiscal policy/treasury fields, and the M5
+  border-policy field.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `eead21fcf318a512`.
-- Full-century aggregate digest: `5054423ef7e03e1c`.
-- WPP validation digest: `211784dc6b6627a6`.
-- M3 structural-world digest (seed `20261023`): `302cf66cd1dbb692`.
-- The digests changed from M4b because schema 9 and the country treasury/fiscal
-  fields are part of hashed state; countryless worlds keep their original owner
-  account set and economic outcomes.
+  `m1-determinism`): `febc4834bdac39aa`.
+- Full-century aggregate digest: `2224f44c6677f3d2`.
+- WPP validation digest: `259af0427bac8704`.
+- M3 structural-world digest (seed `20261023`): `913149e21c26e730`.
+- The digests were re-baselined for M5 because the world schema version is part of
+  canonical hashed state. No countryless economic balance or behavior changed:
+  the schema field alone changed those digests, while `Country.immigrationOpen`
+  only appears in worlds that declare countries.
+- Multi-country digests are exercised by repeated-run and save/resume tests rather
+  than a fixed literal, because the eight-polity sample is expected to evolve as
+  historical content improves. The M5 benchmark prints the sampled hash.
 
 ## Benchmark scope and recorded Node results
 
@@ -917,7 +1057,8 @@ validation and the campaign gameplay baseline are deliberately separate.
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
 workloads, M3e settlement workloads, M3f integrated economic-day workloads, M4b
-monthly period-close workloads, and M4c fiscal-day workloads. Stress scales repeat
+monthly period-close workloads, M4c fiscal-day workloads, and M5 eight-polity
+campaign, migration, serialization, and stress workloads. Stress scales repeat
 the three deterministic multi-block templates (400k/350k/250k people), so total
 population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
 730 measured ticks.
@@ -1102,6 +1243,31 @@ remediation rerun; the other rerun failed only the pre-existing provisional
 200-block M2 guard (reported above), not an M4c gate. Mobile p95 remains **NOT
 EVALUATED**.
 
+The M5 workload loads the authored eight-polity historical sample and times the
+real integrated `tick()` over a measured sample. It also times a validation +
+serialization round trip, the monthly migration phase (clone excluded), and a
+doubled authored stress fixture. Representative Node `v22.12.0` results on the same
+machine (seed `20261023`, schema 10 / simulation 0.10.0):
+
+| Workload | Countries | Regions | Markets | Blocks | Buildings | Assignments | Ticks | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M5 eight-polity run 1 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 83.90 ms | 80.75 ms | 96.13 ms | 96.13 ms | `00f38cf3324d4f55` |
+| M5 eight-polity run 2 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 78.06 ms | 78.40 ms | 81.60 ms | 81.60 ms | `00f38cf3324d4f55` |
+| M5 stress (2 ticks) | 8 | 16 | 5 | 128 | 162 | 960 | 2 | — | — | — | — | `7f58c9a02f6db04a` |
+
+| M5 component | Result |
+|---|---|
+| Combined eight-polity tick | avg 80.98 ms, p50 79.12 ms, p95 96.13 ms, p99 96.13 ms |
+| Validation + serialize/deserialize round trip | avg 54.69 ms, p50 54.20 ms, p95 58.51 ms |
+| Monthly migration phase (clone excluded) | avg 60.52 ms, p50 58.64 ms, p95 69.27 ms; 932,314 people moved in the sample |
+| Projected full 36,524-tick campaign | about 0.82 h at the sample average; **not executed** and not mobile evidence |
+
+The eight-polity full campaign is projected, not run, so the harness can complete
+in a practical time; the projection is not an acceptance gate. The reproduced M2
+200-block p95 gate remains at its unchanged provisional 5 ms threshold, but it was
+measured from a single run and its documented variance means one run does not
+settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
+
 ## Known limitations
 
 - M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
@@ -1161,9 +1327,11 @@ EVALUATED**.
   physical production phase, two-pass market clearing, cash settlement of
   purchases/wages/upkeep with retained profit, and an integrated economic day:
   M4a–M4c add accounts, the country/currency model, the monthly close, and the
-  income-tax/welfare fiscal loop. Interest, dividends, debt/credit, broader
-  government finance, politics, technology, diplomacy, warfare, AI, migration,
-  social mobility, and UI remain absent.
+  income-tax/welfare fiscal loop; M5 adds multi-region/multi-country worlds,
+  multiple and shared markets, migration, geographic labor access, and the
+  historical-data pipeline. Interest, dividends, debt/credit, broader government
+  finance, politics, technology, diplomacy, warfare, AI, profession
+  promotion/demotion, inter-market trade, and UI remain absent.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - M3f runs the economic day through the public `tick()` for worlds with buildings
@@ -1194,6 +1362,26 @@ EVALUATED**.
   atomicity. The clone is schema-specific and must be extended when authoritative
   state gains fields; this is a correctness mechanism, not evidence of mobile
   performance.
+- M5 implements shared/trade-connected markets only through shared market
+  membership. It does not implement inter-market physical trade, tariffs,
+  cross-market transport charges, or a rest-of-world external-trade account, and
+  it does not add profit distribution/remittances (M5a) or debt/deficit financing
+  (M5b).
+- M5 migration is limited to existing same-profession destination blocks, happens
+  monthly, and uses provisional vacancy/wealth pressure and absorption
+  coefficients. It does not implement profession promotion/demotion, a free
+  migration pool, remittances, or border-law enactment. `immigrationOpen` is a
+  scenario policy flag, not an M8 law.
+- M5 historical data is a provisional eight-polity sample, not a world total or a
+  full historical reconstruction. Population targets are rounded source-referenced
+  estimates; occupation structure, age structure, regional splits, literacy/
+  wealth, fiscal settings, building levels, and market groupings are provisional.
+  Century-scale population/occupation-trend calibration is **not claimed** because
+  the M3 recipes/needs are not historically calibrated and profession transition
+  is not implemented.
+- M5's full 36,524-tick economic campaign is projected from a measured sample in
+  the benchmark harness, not executed end to end on the eight-polity sample;
+  mobile performance remains **NOT EVALUATED**.
 
 ## Development workflow
 

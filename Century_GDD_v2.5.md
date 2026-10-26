@@ -35,6 +35,14 @@
 > future-system design, determinism, conservation, and scope-control rules
 > remain in force.
 
+> **M5 implementation addendum.** M5 is now implemented and accepted. The current
+> multi-region/multi-country/multi-market, migration, labor-access, and historical
+> data behavior is described in §5.4.4, §6.7–§6.8, §7.4–§7.5, §15.1, §16, and
+> §17.2a; world schema is **10** and simulation version **0.10.0**. M5a, M5b, M7a,
+> and M8a remain planned and are not implemented. This addendum records
+> implementation status; it does not change the M4c baseline or the v2.4/v2.3
+> historical documents.
+
 ---
 
 ## Document purpose and authority
@@ -245,21 +253,27 @@ binding for economic worlds:
    monthly/dirty employment refresh. If daily demographic change makes existing
    assignments invalid before the next monthly refresh, mark employment dirty and
    repair immediately. *(Current M3b/M3f implementation.)*
+5a. **Apply monthly migration when due.** On the first civil day of a month (not
+   the scenario start day), move eligible people between existing same-profession
+   blocks in different regions when the documented vacancy/wealth pressure is
+   positive, respecting domestic/open-border access and the destination inflow
+   cap. Mark employment dirty and refresh it again in the same day after any flow.
+   *(Current M5 implementation, §5.4.4, D-052.)*
 6. **Calculate market opening state.** Record opening stock, storage capacity,
-   prices, and the funded cash available to buyers. *(Current M3d/M3f
-   implementation for the single M3 market.)*
+   prices, and the funded cash available to buyers for each market independently.
+   *(Current M3d/M3f implementation, extended to multiple markets by M5.)*
 7. **Post production-input demand.** Buildings calculate feasible input needs from
-   current capacity, staffing, condition, and opening inventory. The day first
-   attempts full desired production demand, allowing M3e's atomic same-batch sales
-   receipts to fund input purchases. If that attempt would overdraw a buyer, the
-   staged day is restored and production demand is retried with each building's
-   input cost capped by opening operating cash. *(Current M3c/M3d/M3e/M3f
-   implementation.)*
+   current capacity, staffing, condition, and their own market's opening
+   inventory. The day first attempts full desired production demand, allowing
+   M3e's atomic same-batch sales receipts to fund input purchases. If that attempt
+   would overdraw a buyer, the staged day is restored and production demand is
+   retried with each building's input cost capped by opening operating cash.
+   *(Current M3c/M3d/M3e/M3f implementation; market-scoped by M5.)*
 8. **Produce goods.** Execute production using inputs actually allocated. New
    output becomes available to the market for final demand on the same day, but
    cannot serve as an input to another production stage until the next tick. This
    avoids order-dependent same-day production chains. *(Current M3c/M3d
-   implementation.)*
+   implementation; market-scoped by M5.)*
 9. **Post final demand.** Calculate household demand according to opening cash,
    needs tiers, prices, and the funded-demand rule. *(Current M3f implementation
    for households. Government, construction, and export demand are future systems
@@ -693,17 +707,17 @@ sources commonly publish that resolution; creation expands them uniformly to
 single years and places 80+ at index 80. That within-band expansion is a
 documented provisional assumption, not an additional source observation.
 
-**Current schema-9 baseline (M0–M4c).** The code block above is the target
-contract, not a claim that every field exists. The accepted schema-9 `World`
+**Current schema-10 baseline (M0–M5).** The code block above is the target
+contract, not a claim that every field exists. The accepted schema-10 `World`
 contains `schemaVersion`, `simVersion`, `dataVersion`, `scenarioId`, `dayIndex`,
 `startDayIndex`, `seed`, `regions`, `countries`, `currencies`,
 `currencyValuations`, `popBlocks`, `buildings`, `employment`,
 `employmentDirty`, `markets`, `finance`, and `diagnostics`. It does not yet
-contain `treaties`, `armies`, `eventQueue`, or `history`. M4c current `Country`
-contains `id`, `tag`, `name`, `monetary`, `regionIds`, `treasuryAccountId`, and
-`fiscal`; `Region` has no `countryId`, and ownership is authoritative in
-`Country.regionIds`. Current `BuildingInstance` uses `ownerAccountId` and
-`operatingCashAccountId` rather than the target
+contain `treaties`, `armies`, `eventQueue`, or `history`. Current `Country`
+contains `id`, `tag`, `name`, `monetary`, `regionIds`, `treasuryAccountId`,
+`fiscal`, and the M5 `immigrationOpen` policy; `Region` has no `countryId`, and
+ownership is authoritative in `Country.regionIds`. Current `BuildingInstance`
+uses `ownerAccountId` and `operatingCashAccountId` rather than the target
 `ownerCountryId`/`jobsFilledByProfession`; employment lives in the explicit
 assignment collection. Current `Market` stores authoritative `stockLots` plus
 `regionIds` and `priceSUSD`, not the target aggregate flow arrays. M4a-1
@@ -713,8 +727,10 @@ M4c adds the `country` owner kind and the fiscal subtypes (§5.4.3);
 `opening`, `periodSummaries`, and `closedThroughDay`. The M4b monthly summaries
 and close boundary are current authoritative state (§5.4.2); debt contracts, the
 target audit-buffer name, monetary aggregates, and a `World.history` collection
-are future. M4a-2 adds no native-currency balances. These are implementation
-boundaries, not permission to omit conservation or serialization.
+are future. M4a-2 adds no native-currency balances. M5 makes multi-region worlds,
+multiple markets, and migration current behavior (§5.4.4); it adds no migration
+flow history, external-trade account, or new monetary state. These are
+implementation boundaries, not permission to omit conservation or serialization.
 
 ### 5.4.1 M4a-2 country, currency, and valuation model (current)
 
@@ -1023,6 +1039,92 @@ encoded, hashed, deep-cloned, and validated on decode. `WORLD_SCHEMA_VERSION` is
 **9**, `SIM_VERSION` is **0.9.0**, save format remains **1**, and `dataVersion`
 remains `m3-economy-v1` (no shipped scenario data). Schema-8 /
 simulation-0.8.0 saves are rejected with no migration (D-013).
+
+### 5.4.4 M5 multi-region, multi-market, migration, and labor-access model (current)
+
+M5 extends the single-region/single-market M3f/M4c economy to a validated
+multi-country world. It is the accepted design recorded in D-051–D-055. It does
+not add M5a profit distribution/remittances, M5b debt/deficit financing, banking,
+monetary issuance, FX dynamics, inflation, or new tax categories.
+
+**Ownership and market membership.** `Country.regionIds` remains the sole
+country-to-region ownership mapping and `Market.regionIds` is the authoritative
+market membership; `Region.marketId` is validated to agree with it. With markets
+present, every region belongs to exactly one market and every country's regions
+belong to one market. A country's regions may span multiple markets only under a
+future customs-zone design, not in M5. `Region.popBlockIds` and
+`Region.buildingInstanceIds` remain validated derived indexes of the
+authoritative block/building `regionId` fields. Buildings and their owning
+household must be in the same country. Countryless multi-region economy fixtures
+remain valid; countryless regions form one unrestricted area.
+
+**Market clearing.** Every market is a single inventory/price pool and is cleared
+exactly once per economic day in ascending id order. Production, input
+reservations, storage capacity, final overflow, prices, and the inventory
+conservation identity are scoped to that market. Household demand is generated
+from a block's own market prices and opening cash; production demand uses the
+building's own market. A shared-market region therefore contributes its goods,
+demand, and inventory exactly once. Settlement merges all markets' pending
+transactions into one atomic posting batch and pays wages and upkeep once per day.
+Imports, exports, inter-market physical trade, cross-market transport charges,
+tariffs, and a rest-of-world trade account are **not** implemented in M5; those
+mechanics are not specified by this design. Cross-region and cross-country goods
+transactions occur inside a shared market through the ordinary M3e transaction
+kinds.
+
+**Migration.** Migration is an explicit monthly demographic flow between two
+existing population blocks with the same profession in different regions. It runs
+on the first civil day of a month, not on `startDayIndex` or the terminal
+boundary, after the day's first employment allocation. It moves an integer number
+of people, splits the source's single-year sex/age cells proportionally with
+deterministic largest-remainder allocation, and conserves world population
+exactly. Migrants carry a pro-rata share of household cash through a balanced
+`migration-transfer` posting. Destination literacy, wealth, and militancy are
+population-weighted merges; the destination block retains its needs-history
+counters; fractional demographic remainders stay with their original blocks. No
+migration block is created, and no free migration pool or fixed population
+increment exists.
+
+Migration pressure is
+`0.7 × max(0, destination vacancy rate − source vacancy rate) + 0.3 × max(0,
+wealth gap / 100)`, where vacancy rate is unfilled job slots divided by eligible
+regional workforce (0..1). The monthly migrant fraction is
+`min(0.01, pressure × 0.01)` of the source population; a source block moves at
+most once per month; a destination region absorbs at most 1% of its
+start-of-month population in one month. These coefficients are **provisional** and
+stand in for transport/housing friction until those systems exist. Domestic
+migration is always allowed. Cross-country migration requires the destination
+country's provisional `immigrationOpen` policy; emigration is unrestricted in M5.
+The GDD's open-border law is deferred to M8.
+
+**Labor access.** A resident may take a job in any region of their own country.
+Vacancies are filled domestic-first; only remaining vacancies in a destination
+country whose `immigrationOpen` flag is true may be filled by residents of other
+countries. Qualification, participation, job-slot, and eligible-workforce caps are
+unchanged. Migration marks employment dirty and triggers an immediate
+deterministic refresh in the same day. Cross-border wages go to the resident
+household and are taxed in the household's residence country, preserving M4c
+fiscal ownership.
+
+**Historical data.** M5 adds a source-annotated historical pipeline and eight
+authored 1900 sample polities under `packages/data/data/historical/` (United
+States, United Kingdom, German Empire, France, Russian Empire, Empire of Japan,
+British India, and Brazil; 16 regions, 5 markets, 64 blocks, 81 buildings). The
+validator checks identifiers, references, ownership/market membership, ranges,
+monetary/fiscal values, source metadata, and calibration metadata with
+deterministic errors. Population totals are rounded source-referenced estimates;
+occupation composition and other structure are explicitly provisional. The
+sample is not a world total, and M5 does not claim century-scale historical
+population or occupation-trend calibration (no profession promotion/demotion and
+no calibrated M3 recipes/needs). See D-053 and the data source notes.
+
+**Persistence and compatibility.** M5 persists `Country.immigrationOpen` and
+therefore raises `WORLD_SCHEMA_VERSION` to **10** and `SIM_VERSION` to **0.10.0**;
+save format remains **1** and `dataVersion` remains `m3-economy-v1` because no
+existing definition or scenario meaning changed (D-053). Schema-9 /
+simulation-0.9.0 saves are rejected with an actionable error and no migration
+(D-013). Multi-market state uses the existing `Market` shape; no duplicate
+inventory or derived market collection is persisted.
 
 ### 5.5 Minimum supporting contracts
 
@@ -1367,6 +1469,8 @@ Available labor is derived from the 15–64 working-age population and professio
 
 On monthly labor updates, first retain suitable existing matches where possible, then fill vacancies according to qualification, wages, travel/migration limits, and laws. The system may use a stable matching or scored-allocation algorithm, but must document it and test fairness, capacity limits, and repeatability.
 
+**Current M5 labor access.** Assignment remains subject to the caps above. A resident may take a job in any region of their own country (internal cross-region assignment). Vacancies are filled domestic-first; only remaining vacancies in a country whose provisional `immigrationOpen` policy is true may be filled by residents of other countries. Countryless regions form one unrestricted area. A migration event marks employment dirty and triggers an immediate deterministic refresh in the same day. Cross-border wages are paid to the resident household and taxed at residence (D-052).
+
 ### 6.8 Social mobility and migration
 
 Promotion/demotion is represented as population flows between blocks; it must not create or remove people. Promotion requires qualification thresholds such as literacy and wealth, plus available job slots or another documented economic cause. Training costs are real expenses paid to education/service providers or recorded as defined household costs.
@@ -1380,6 +1484,8 @@ Initial causal mechanisms:
 - **International migration:** requires an open-border law or event-defined exception; flows depend on wage/welfare differences, transport, and receiving-country constraints.
 
 Migration decisions are made at aggregate scale, have explicit source and destination blocks, and conserve world population except for documented external migration. The system must be capable of reversals: do not force every industrializing country to follow a monotonic path.
+
+**Current M5 migration.** Migration runs on the first civil day of a month and moves people between existing same-profession blocks in different regions. The source's single-year sex/age cells are split proportionally with deterministic largest-remainder allocation; population is conserved exactly and migrants carry a pro-rata share of household cash through a balanced `migration-transfer` posting. Pressure is a documented function of vacancy differences and wealth gaps; domestic migration is always allowed and cross-country migration requires the destination country's provisional `immigrationOpen` flag. The destination block's needs-history counters and all fractional remainders stay with their original blocks; destination literacy/wealth/militancy are population-weighted merges. Promotion/demotion between professions, education/training, and external migration are not implemented in M5 (§5.4.4, D-052).
 
 ---
 
@@ -1472,7 +1578,7 @@ Production input demand is posted before production. Each day’s newly produced
 
 ### 7.4 Markets and trade zones
 
-A market is a pool of available goods, prices, and demand for a defined set of regions. In the first implementation, a country may use one market; additional markets and trade links are introduced when multi-country simulation is working. **Current M3:** one market, one region group, no imports/exports, tariffs, or external counterparty; final overflow is recorded locally.
+A market is a pool of available goods, prices, and demand for a defined set of regions. In the first implementation, a country may use one market; additional markets and trade links are introduced when multi-country simulation is working. **Current M5:** multiple markets exist, each covering one or more regions; every region belongs to exactly one market and a country's regions belong to one market in M5. Several countries' regions may share a market (the current trade connection). Every market is cleared independently and exactly once per day with market-scoped production, storage, prices, and inventory. M5 has no imports/exports between markets, tariffs, cross-market transport charges, or external rest-of-world counterparty; those are explicit non-goals, not zero-valued placeholders in a transaction stream.
 
 - Markets do not create stock. Stock changes only through production, imports, purchases/consumption, exports, recorded waste, or capacity-driven loss.
 - Warehouse buildings and explicitly defined infrastructure contribute storage capacity.
@@ -1483,7 +1589,7 @@ A market is a pool of available goods, prices, and demand for a defined set of r
 
 ### 7.5 Market clearing and inventories
 
-For each market and good, track opening stock, current production, imports, desired demand, funded demand, fulfilled demand, exports, losses, and closing stock. Apply the priority tiers defined in §4.3. Allocation within a tier is proportional and deterministic. **Current M3:** imports and exports are zero and explicit; authoritative inventory is represented by seller-attributed stock lots; final storage overflow is applied after Pass B and recorded per lot/owner. The identity below remains binding for the implemented terms.
+For each market and good, track opening stock, current production, imports, desired demand, funded demand, fulfilled demand, exports, losses, and closing stock. Apply the priority tiers defined in §4.3. Allocation within a tier is proportional and deterministic. **Current M5:** imports and exports between markets are zero by design (not implemented, D-051); authoritative inventory is represented by seller-attributed stock lots scoped to one market; final storage overflow is applied after Pass B and recorded per lot/owner. A shared market's inventory is counted once even when several regions contribute lots. The identity below remains binding for the implemented terms.
 
 The closing-inventory identity must hold:
 
@@ -1807,7 +1913,9 @@ postings, the requirement that country tax revenue and welfare expense close int
 country owner equity, treasury non-negativity, exact tax/welfare cash
 reconciliation, required fiscal recognition/cash legs, staged-clone publication,
 execution-context/duplicate guards, and phase-qualified transient cash results
-(§5.4.3, D-048/D-049). The following
+(§5.4.3, D-048/D-049). M5 adds the balanced, cash-neutral, asset-only
+`migration-transfer` between household cash accounts; it is not a period flow kind,
+cannot create or destroy money, and does not bypass treasury ownership. The following
 debt, interest, and monetary invariants remain future requirements (debt and
 interest are planned with M5b; monetary invariants with M8a); the monthly
 period-summary invariants are current and recorded in §5.4.2.
@@ -2113,11 +2221,20 @@ The intended initial dataset consists of:
 - `calibration_targets.csv`: metric key, year, geography, definition, units, target value, tolerance, source URL/citation, access date, and confidence.
 - `source_notes.md`: explanations of estimates, boundaries, revisions, missing data, and transformation steps.
 
-**M4a-2/M4c current data scope:** no country/currency historical dataset and no
-shipped fiscal scenario are included. Runtime countries, currencies,
-valuations, treasuries, and fiscal policies are scenario-provided; tests use
-inline fixtures. `countries_1900.csv` and related historical data remain future
-work.
+**M5 current data scope:** the initial historical pipeline exists as
+source-annotated JSON tables under `packages/data/data/historical/` with eight
+authored 1900 polities (United States, United Kingdom, German Empire, France,
+Russian Empire, Empire of Japan, British India, Brazil), 16 regions, 5 markets,
+64 population blocks, 81 building instances, 8 currencies, an initial employment
+table, calibration targets, and source notes. Population totals are rounded
+source-referenced estimates; occupation composition, regional splits, age
+structure, literacy/wealth, fiscal settings, building levels, and market
+groupings are explicitly provisional. The sample is not a world total and does
+not implement the full `countries_1900.csv`/500-region dataset. Currency
+valuations are `unavailable`; no FX rates are invented. M5 does not claim
+century-scale historical population or occupation-trend calibration because the
+M3 recipes/needs are not historically calibrated and profession
+promotion/demotion is not implemented (D-053).
 
 The agent should generate schemas, validators, loaders, and fixtures, then provide a complete authored sample of eight varied polities and validated stubs for the remaining entities. Stubs must be explicitly marked incomplete; do not fabricate detailed historical data to make the world appear complete.
 
@@ -2189,6 +2306,8 @@ The earlier draft proposed agricultural/peasant employment shares of roughly 30�
 
 The model should produce a broad shift from agricultural to industrial and then service employment in relevant countries. **Do not require monotonic decline on every simulated tick or in every scenario.** War, crisis, migration, policy, and territorial changes can temporarily reverse a trend. Acceptance tests should compare specified baseline anchor years and plausible ranges, not demand an implausibly smooth path.
 
+**Current M5 limitation.** The eight-polity historical sample checks authored 1900 population levels against source-referenced targets and authored occupation structure against **provisional** household-composition ranges. It does **not** use the employed-worker statistic above because profession promotion/demotion is not implemented in M5 and the M3 recipes/needs are not historically calibrated. Century-scale occupation-trend claims are therefore explicitly not made; the provisional occupation targets are data-validation inputs, not evidence of a successful historical employment transition.
+
 ### 15.5 Data validation
 
 The loader must reject or warn on:
@@ -2227,13 +2346,13 @@ Use keyed/counter-based deterministic randomness rather than one global mutable 
 1. **Calendar:** exact mapping and leap-year tests through the terminal boundary.
 2. **Determinism:** same initial state, seed, data, and actions produce the same world hash after a known sequence of ticks; compare repeated runs and save/resume runs.
 3. **Serialization:** serialize/deserialize preserves authoritative state and typed-array semantics; invalid/corrupt saves fail safely.
-4. **Population conservation:** world population changes only through births, deaths, and explicitly recorded external migration; annual ageing and profession changes conserve people.
+4. **Population conservation:** world population changes only through births, deaths, and explicitly recorded migration or external migration; annual ageing, migration, and profession changes conserve people. **Current M5:** migration flows between population blocks conserve exact integer population and preserve per-block sex/age cell non-negativity; tests cover origin/destination sums, zero-population sources, destination inflow caps, and calendar boundaries.
 5. **Employment conservation:** no worker is assigned to more than one job; assignment never exceeds available workforce or job slots.
-6. **Goods conservation:** market inventory reconciles with opening stock, production, imports, use, exports, and recorded losses.
-7. **Money/accounting conservation:** each posting balances; transfers have counterpart accounts; money supply changes only through defined mechanisms.
+6. **Goods conservation:** market inventory reconciles with opening stock, production, imports, use, exports, and recorded losses. **Current M5:** each market's inventory is conserved independently; a shared market's stock is counted once across its regions, and no duplicates or negative lots are permitted.
+7. **Money/accounting conservation:** each posting balances; transfers have counterpart accounts; money supply changes only through defined mechanisms. **Current M5:** `migration-transfer` is a balanced, cash-neutral household-to-household transfer and is not a period flow kind.
 8. **No-arbitrary-pools check:** known point pools are forbidden; derived indicators must be rebuildable or explicitly documented.
 9. **Market behavior:** prices respond in the correct direction to persistent supply/demand shocks, remain finite/positive, and are bounded per tick.
-10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, and default remain future tests (planned for M5b; not implemented).
+10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, and default remain future tests (planned for M5b; not implemented). **Current M5:** each country's treasury reconciles only with its own residents' taxes, shared markets do not merge treasuries, and M4b monthly close/cash/identity tests still pass across countries.
 11. **Calibration:** world/country anchors are within source-backed tolerances for a named baseline scenario.
 12. **Regression:** each discovered bug gets a test that fails before the fix and passes afterward.
 13. **Performance:** benchmark representative and worst-case fixture worlds; report p50/p95/p99 rather than only a single average.
@@ -2285,20 +2404,22 @@ Provide at least three fixtures:
 
 Benchmarks must state the exact seed, data version, tick count, hardware/runtime, and measurement procedure. Performance targets are not allowed to be “verified” on a different test scale without stating the difference.
 
+**Current M5:** the harness includes the eight-polity representative campaign (8 countries, 16 regions, 5 markets, 64 blocks, 81 buildings), a doubled-block/building stress fixture (128 blocks, 162 buildings), serialization/validation overhead, and the monthly migration phase. A full 36,524-tick economic campaign is projected from the measured sample rather than executed, and that projection is not a performance gate. The mobile p95 target remains **NOT EVALUATED** because no release build was run on the named reference device.
+
 ---
 
 ## 17. Build order and milestone acceptance criteria
 
 Each milestone is a separate assigned task. Tests and acceptance criteria are prepared before implementation. Do not start the next milestone until the current one is complete or the designer explicitly accepts a documented exception.
 
-**Implementation status.** M0–M4c are implemented and accepted (§17.1–§17.2); M4's remaining unassigned finance work is not implemented. M5–M10 are planned. The intermediate stages M5a, M5b, M7a, and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
+**Implementation status.** M0–M5 are implemented and accepted (§17.1–§17.2 and §17.2a); M4's remaining unassigned finance work is not implemented. M6–M10 are planned. The intermediate stages M5a, M5b, M7a, and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
 
 | Scope | Status |
 |---|---|
-| M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c | Implemented and accepted |
+| M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c, M5 | Implemented and accepted |
 | Remaining M4 finance work not assigned in §17.3 | Not implemented |
 | M5a, M5b, M7a, M8a | Planned, not implemented (§17.3) |
-| M5–M10 | Planned, not implemented |
+| M6–M10 | Planned, not implemented |
 
 | Milestone | Deliverable | Definition of done |
 |---|---|---|
@@ -2371,6 +2492,22 @@ M8–M10 extend the systems after the economic vertical slice is playable. Their
 interfaces may be prepared earlier, but do not implement speculative behavior in
 the vertical-slice milestones. The planned intermediate stages in §17.3 are
 subject to the same rule.
+
+### 17.2a M5 implementation (accepted)
+
+| Stage | Deliverable | Acceptance boundary | Status |
+|---|---|---|---|
+| **M5** | Multi-region/multi-country worlds, multiple and shared markets, monthly migration, geographic labor access, initial historical data pipeline, and eight authored sample polities | Eight polities construct, validate, serialize, save/resume, and tick together; ownership/region/market/block/building/employment relationships validate; each market is cleared once with market-scoped inventory and conservation; shared-market goods/demand are not duplicated; migration is an explicit deterministic flow with exact population conservation and account-balanced cash transfers; labor access respects domestic/open-border, qualification, participation, slot, and workforce caps without double counting; the historical validator rejects structural contradictions and checks source/calibration metadata; finance/fiscal, M4b close, M4c fiscal, determinism, save/resume, and existing M2/M3/M4 regressions pass; schema 10/simulation 0.10.0 round-trips and schema-9/0.9.0 saves reject; benchmark coverage includes a multi-country campaign and stress fixture. | Accepted |
+
+M5 implements §5.4.4 and D-051–D-055. It does **not** implement M5a profit
+distribution/remittances, M5b debt/deficit financing, inter-market physical
+trade, tariffs, a rest-of-world trade account, profession promotion/demotion,
+education, technology, laws, AI, or UI. The M5 historical sample is provisional:
+population totals are rounded source-referenced estimates, occupation composition
+is a provisional household proxy, and century-scale historical
+population/occupation-trend calibration is not claimed. The benchmark reports a
+measured multi-country sample and projects, rather than executes, a full 36,524-
+tick economic campaign; mobile performance remains **NOT EVALUATED**.
 
 ### 17.3 Planned intermediate finance stages (adopted direction)
 
@@ -2558,7 +2695,9 @@ several stages at once:
 `M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
 
 - M4c supplies the initial treasury, income-tax, and welfare-transfer behavior.
-- M5 establishes the multi-country economic and historical-data foundation.
+- M5 (accepted) supplies the multi-country economic, migration, labor-mobility,
+  and historical-data foundation. Its multi-market/ownership structures are the
+  starting point for later enterprise and finance work.
 - M5a establishes defined private profit distributions and state-enterprise
   remittances on the ownership/enterprise structures M5 delivers.
 - M5b establishes public debt and deficit-financing behavior before the AI
@@ -2663,6 +2802,8 @@ The following choices are resolved in this version:
 16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved SUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
 17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded and not mutable by an action; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. Broader taxes and expenditure categories remain future and partly unassigned; profit distributions and state-enterprise remittances are planned in M5a, public debt and deficit financing in M5b, annual close and controlled corrections in M7a, and inflation/FX/monetary-policy foundations in M8a (§17.3). None of those planned stages is implemented.
 18. **Monetary precision and result phases:** authoritative SUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
+19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. Inter-market trade, tariffs, cross-market transport, and a rest-of-world trade account are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052 record the rules and non-goals.
+20. **Historical data pipeline:** the M5 sample is eight authored 1900 polities in source-annotated tables with a deterministic validator/loader. Population totals are rounded source-referenced estimates; occupation composition and other structure are provisional. No century-scale historical population/occupation-trend calibration is claimed, no FX rates are invented, and no simulation code reads calibration totals to force outcomes. D-053 records the contracts and limitations.
 
 ### 20.2 Remaining designer decisions
 
@@ -2688,7 +2829,7 @@ For every agent session:
 5. Require the completion report defined in §18.4.
 6. Review any `DECISIONS.md` items and test failures before assigning the next milestone.
 
-**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M5a/M5b/M7a/M8a, and all later milestones are not started and must not be inferred.
+**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M5a/M5b/M7a/M8a, and all later milestones are not started and must not be inferred.
 
 ---
 

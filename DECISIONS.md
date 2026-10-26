@@ -1643,6 +1643,185 @@ rule.
   and accepted. GDD v2.5 §17.3–§17.4 and `README.md` record the plan as planned,
   not current.
 
+### D-051 — M5 multi-region, multi-country, multi-market architecture
+
+- **Status:** implemented with the M5 milestone. It extends the accepted M4c
+  baseline; it does not change M4a/M4b/M4c behavior or reopen D-045–D-050.
+- **Ownership and membership sources of truth.** `Country.regionIds` remains the
+  sole authoritative country-to-region ownership mapping; `Region` still has no
+  `countryId`. `Market.regionIds` is the authoritative market membership and
+  `Region.marketId` is validated to agree with it. A region belongs to exactly one
+  market when a world has markets. A country's regions must all belong to one
+  market in M5: mixed customs-zone membership would need an explicit rule that is
+  not part of this milestone.
+- **Multi-market clearing.** Every market is cleared exactly once per economic
+  day, in ascending market-id order. Its buyers are the population blocks in its
+  regions and its sellers are the buildings in those regions. Production, input
+  reservations, storage capacity, final overflow, prices, and inventory
+  conservation are market-scoped. Household and production demand are built from
+  opening cash for the block's/building's own market, so shared-market regions
+  cannot double-count goods, demand, or inventory. Settlement merges all market
+  transaction batches into one atomic posting batch and pays wages/upkeep once per
+  day. Existing single-market worlds keep their prior ordering and outcomes.
+- **Trade scope.** M5 implements multiple markets and shared/trade-connected
+  markets (regions of several countries pooled into one market). It does **not**
+  implement inter-market physical trade, tariffs, transport charges between
+  markets, or a rest-of-world external-trade account: GDD v2.5 §7.4/§7.5 does not
+  specify those mechanics, and inventing them was outside M5. Cross-region and
+  cross-country goods transactions occur inside a shared market and are settled
+  through the existing M3e transaction conventions. Goods are never created by
+  trade.
+- **Border policy state.** `Country.immigrationOpen` is added as provisional
+  runtime state. It is scenario-initialised and nothing mutates it in M5. Domestic
+  migration and domestic cross-region labor are always allowed; cross-country
+  migration and cross-country employment require the destination country's
+  `immigrationOpen` flag. Emigration is unrestricted in M5. The GDD requires
+  international migration to be permitted by an open-border law or event; no law
+  system exists yet, so the flag is the explicit scenario-level substitute. M8
+  may replace it with enacted law.
+- **Ownership coherence.** Buildings and their owning household must belong to the
+  same country; a building's owner account must be a pop-block household-cash
+  account. Countryless multi-region economy fixtures remain valid, with
+  unrestricted access only among countryless regions.
+- **Persistence and versions.** `Country.immigrationOpen` is persisted, so world
+  schema becomes **10** and simulation version **0.10.0**. Save format remains 1.
+  Schema-9/simulation-0.9.0 saves are rejected with an actionable error and no
+  migration (D-013). `dataVersion` remains `m3-economy-v1`; see D-053 for the
+  justification for adding historical scenario content without changing the
+  version.
+
+### D-052 — M5 migration and geographic labor mobility
+
+- **Status:** implemented with M5. Coefficients are **provisional**, not
+  calibrated.
+- **Cadence and placement.** Migration runs on the first civil day of a month,
+  never on the scenario start day or terminal boundary. It runs after the initial
+  employment allocation for the day and before the market phase; if any flow
+  occurs, employment is marked dirty and refreshed again in the same day so
+  released workers are reallocated and new residents can take jobs immediately.
+- **Flow accounting.** A flow moves an integer number of people between two
+  existing population blocks with the same profession in different regions. It
+  splits the source's authoritative single-year sex/age cells proportionally with
+  deterministic largest-remainder allocation (keyed `migration.age-remainder`
+  ties), moves each migrant's pro-rata share of household cash through a balanced
+  `migration-transfer` posting, and conserves world population exactly. No
+  migration block is created; a destination block must already exist. Fractional
+  birth/death remainders remain with their original blocks.
+- **Attributes on migration.** Destination literacy, wealth, and militancy are
+  population-weighted merges of source and destination values. The destination
+  block's unmet-needs history counters remain authoritative for the merged block;
+  migrants do not inherit the source block's local needs history. Source
+  attributes are unchanged. These are the smallest compatible rules GDD v2.5
+  leaves open.
+- **Eligibility and pressure.** A destination must be accessible: same country
+  for internal migration, or a destination country with `immigrationOpen` for
+  international migration. Monthly pressure is
+  `0.7 × max(0, destination vacancy rate − source vacancy rate) + 0.3 × max(0,
+  wealth gap / 100)`, where vacancy rate is unfilled job slots divided by
+  eligible regional workforce (clamped 0..1). The migrant fraction is
+  `min(0.01, pressure × 0.01)` of the source population. A source block moves at
+  most once per month. Destinations are ranked by pressure with keyed destination
+  ties; sources are processed in keyed order. A destination region may receive at
+  most 1% of its start-of-month population in one month; this stands in for the
+  transport/housing constraints the GDD mentions until those systems exist.
+- **Labor access.** Employment allocation is domestic-first: a country's own
+  residents fill its vacancies in a first pass; only afterward may residents of
+  other countries fill remaining vacancies in a country whose `immigrationOpen`
+  flag is true. A resident may take a job in any region of their own country.
+  Countryless regions form one unrestricted area. This prevents an unconstrained
+  global labor pool and ensures an open border cannot displace a country's own
+  workforce in the allocation. Assignments remain subject to existing
+  qualification, participation, job-slot, and workforce caps.
+- **Validation and atomicity.** Unknown, duplicated, or contradictory destination
+  references, same-region/same-block flows, profession mismatches, closed
+  borders, and over-population requests are rejected before mutation. The phase
+  stages its population and finance changes and restores the supplied world if a
+  flow fails. The whole-day tick staging remains the outer atomic boundary.
+- **Explicitly not included.** No profession promotion/demotion, free migration
+  pool, fixed population increment, remittances, or border-law enactment is
+  added. M5 migration is aggregate, caused by documented vacancy and wealth
+  gaps, and reversible in principle.
+
+### D-053 — M5 historical data pipeline and eight-polity sample
+
+- **Status:** implemented with M5. The sample is **provisional** and is not a
+  complete historical reconstruction or a world total.
+- **Architecture.** Compact source-annotated tables live under
+  `packages/data/data/historical/` and are loaded and validated by
+  `packages/data/src/historical.ts`. Static goods/professions/buildings/needs/
+  demography remain in the existing validated definition files. The loader
+  expands block totals to five-year age/sex inputs, allocates deterministic block,
+  building, and account ids, and returns an `EconomyScenarioDef`. No
+  country-specific historical exception is embedded in simulation logic.
+- **Input contracts and validator.** The validator checks duplicate ids/tags/keys,
+  country/region/market references, exactly-one owner and exactly-one market,
+  one-market-per-country, unknown professions/building definitions, non-positive
+  or impossible populations/levels/workers, fiscal/currency ranges, source
+  metadata, calibration metadata, and source-backed/provisional status. Errors
+  are aggregated and sorted deterministically. Each country must declare one
+  `totalPopulation` target and one provisional `peasantPopulationShare` target,
+  and the authored data must fall within the declared tolerances.
+- **Eight polities.** United States, United Kingdom, German Empire, France,
+  Russian Empire, Empire of Japan, British India, and Brazil: 16 regions, 5
+  markets, 64 population blocks, 81 building instances, and 8 currencies. Three
+  markets span multiple countries (North Atlantic, Continental Europe, Asian
+  trade). Market groupings are an authored simulation simplification, not
+  historical trade agreements.
+- **Calibration status.** Population totals are rounded, low/medium-confidence
+  national estimates from OWID/Maddison material and are checked against declared
+  source-backed targets. Occupation composition is an authored
+  household-composition proxy checked against **provisional** low-confidence
+  ranges derived from broad agricultural-employment reconstructions. It is not the
+  GDD's employed-worker share and cannot support a century-scale occupation-trend
+  claim. M5 has no profession-promotion mechanism, and the M3 production/needs
+  parameters are not historically calibrated. Age structure uses one shared
+  provisional 1900 world profile; country-specific age structures are not
+  authored. Currency valuations are explicitly unavailable rather than invented.
+  No simulation code reads calibration totals to force outcomes.
+- **Account-id ranges.** Historical loading uses `1000 + blockIndex` for household
+  cash accounts, `100000 + buildingIndex` for operating cash,
+  `200000 + countryId` for treasuries, and `300000` for the single system-reserve
+  account. These are deterministic and collision-checked by scenario validation.
+- **Data version.** `dataVersion` remains `m3-economy-v1`. The historical pipeline
+  adds new scenario content without changing any existing definition or the
+  meaning of any existing scenario; the version is a compatibility identity, not
+  a content hash. This is the intentional justification required by the
+  data-version contract.
+
+### D-054 — M5 numerical robustness for large economies
+
+- **Status:** implemented with M5.
+- **Physical conservation tolerance.** The market and production inventory
+  identity is
+  `closing = opening + production − input use − household use − recorded loss`.
+  When the gross terms are large and nearly cancel, a binary64 residual can
+  exceed a tolerance scaled only by the near-zero result. The tolerance is scaled
+  by the gross terms as well as the result. This is a floating-point comparison
+  fix, not permission to lose goods: the relative tolerance remains
+  `QUANTITY_TOLERANCE` (1e-9) against the largest gross term.
+- **Wage affordability at binary64 precision.** Proportional wage allocation can
+  exceed an employer's cash by one or two ulps even when every amount is finite.
+  When the paid total exceeds the employer balance, the settlement now reduces a
+  payment by at least one representable ulp until the total is genuinely no
+  greater than the balance. The difference is reported as unpaid wages, never as
+  debt, negative cash, or unexplained money. M4c cash conservation and
+  non-negative balance invariants are unchanged.
+- **No quantization.** D-049's continuous SUSD policy is preserved; no cent
+  rounding, epsilon-as-amount, or manufactured conservation result is introduced.
+
+### D-055 — M5 benchmark scope and reported limitations
+
+- **Status:** implemented with M5.
+- The benchmark harness measures a representative eight-polity sample
+  (8 countries, 16 regions, 5 markets, 64 blocks, 81 buildings), a serialization/
+  validation round trip, the monthly migration phase, and a doubled authored
+  stress fixture (128 blocks, 162 buildings). It reports average/p50/p95/p99.
+- A full 36,524-tick economic campaign is **not** executed in the harness; its
+  cost is projected from the measured sample and reported explicitly as a
+  projection. The M2 200-block p95 gate remains unchanged and is still reported
+  from a single run; its documented variance remains a limitation.
+- Mobile performance remains **NOT EVALUATED**: no device release build was run.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

@@ -63,6 +63,7 @@ import {
   type PopulationScenarioDef,
   type World,
 } from "@century/sim";
+import { runM5Benchmarks } from "./m5Bench.js";
 
 const SEED = 20_261_023;
 const MEASURED_RUNS_M1 = 3;
@@ -1792,6 +1793,7 @@ function main(): void {
   printFinanceCloseBenchmark(m4bCloseStress);
   printFiscalBenchmark(m4cFiscalSmall);
   printFiscalBenchmark(m4cFiscalStress);
+  const m5Valid = runM5Benchmarks();
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1875,7 +1877,8 @@ function main(): void {
     m3eValid &&
     m3fValid &&
     m4bValid &&
-    m4cValid;
+    m4cValid &&
+    m5Valid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1944,6 +1947,9 @@ function main(): void {
   console.log(
     `M4c treasury reconciliation/cash/identity/tax/welfare/determinism: ` +
       `${m4cValid ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M5 multi-country campaign/serialization/migration/stress: ${m5Valid ? "PASS" : "FAIL"}`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +
