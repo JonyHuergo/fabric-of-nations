@@ -1517,6 +1517,117 @@ rule.
   government services/procurement/employment, debt/interest, FX/inflation, and UI
   remain absent. Node benchmarks are not mobile-performance evidence.
 
+### D-049 — Post-M4c finance roadmap staging (adopted direction; planned only)
+
+- **Status:** adopted development-plan direction recorded with GDD v2.5. It assigns
+  milestone ownership and an intended order for financial work that earlier
+  revisions left unassigned or bundled into later milestones. It does **not**
+  implement any of that work; the accepted baseline remains M0–M4c. It does not
+  restate, reopen, or change D-048.
+- **Intended order:** `M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 →
+  M10`. The existing M0–M10 identities and objectives are preserved. The
+  intermediate stages are additions, not renumbering or completion of M5–M10, and
+  the playable vertical slice remains M0–M7.
+- **M5a — Profit distributions and enterprise remittances (after M5, before M5b
+  and M6).** Distribute private business profits to designated
+  owners/household capitalists, or retain them as business funds, under explicit
+  deterministic rules; transfer actual state-owned enterprise profits to country
+  treasuries through balanced journal entries; specify ownership, timing, account
+  semantics, and available-funds constraints. A distribution or remittance must
+  not exceed distributable profit or available cash and must preserve the
+  accounting identity, determinism, and M4b close invariants. M5a depends on the
+  ownership/enterprise structures M5 actually establishes; if they are missing,
+  M5a must add them explicitly rather than assume them.
+- **M5b — Public debt and deficit financing (after M5a, before M6).** Versioned debt
+  contracts carrying issuer, holder, principal, interest/coupon terms, issue date,
+  maturity, outstanding liability, and status; issuance with matching
+  asset/liability accounting and actual cash transfers; interest accrual and
+  payment; maturity, principal repayment, refinancing, arrears, and explicit
+  default behavior; a clear separation of fiscal deficit, financing
+  transactions, borrowing proceeds, interest expense, and principal repayment;
+  explicit financing constraints with no unexplained money creation or invisible
+  unpaid obligations; defined issuers and holders without a premature full
+  banking or central-bank system. M5b precedes M6 so country AI operates against
+  defined borrowing constraints, interest, maturities, and default consequences.
+- **M7a — Annual accounting close and controlled corrections (after M7, before
+  M8).** Annual finance summaries and explicit annual-period boundaries;
+  year-end closing entries and account treatment consistent with the M4b monthly
+  close; correct handling of partial years at campaign boundaries; controlled,
+  auditable correction/reversal entries that preserve historical journal
+  integrity instead of editing or deleting previously posted transactions;
+  deterministic ordering, atomicity, validation, persistence, and accounting
+  reconciliation. M7a completes the accounting lifecycle after the M0–M7 playable
+  slice and is not a prerequisite for the initial playable release.
+- **M8a — Inflation, FX dynamics, and monetary-policy foundations (after M8, before
+  M9).** A documented inflation/price-level measure with explicit basket, weights,
+  and time window; exchange-rate dynamics building on the multi-country economy
+  and existing currency identities and valuations; a defined monetary-policy
+  authority and controls using M8 institutions/laws where applicable; explicit
+  causal mechanisms linking policy to economic or monetary outcomes; balanced
+  accounting for any money-supply or credit change; deterministic timing, bounds,
+  persistence, validation, and tests. These mechanisms must not be arbitrary
+  scalar adjustments. A meaningful mechanism that requires a missing prerequisite
+  must record that prerequisite rather than hide it inside M8a.
+- **Slice and dependency constraints.** M7a and M8a are post-slice stages and are
+  not prerequisites for the initial playable release. M5–M7 are not automatically
+  blocked on the later monetary systems. M4c is unaffected; its treasury,
+  income-tax, welfare, accounting, close, and persistence rules remain as
+  recorded in D-048.
+- **Not assigned.** Corporate/consumption/excise/land/property/tariff taxes,
+  broader government services, procurement, employment, subsidies, banking,
+  central banking, and any other finance work not listed above remain
+  unassigned.
+- **Consequence.** Future tasks may be assigned these stages in the recorded order
+  with their own acceptance criteria. No runtime behavior, schema field, save
+  version, benchmark gate, or UI support exists for any of them until implemented
+  and accepted. GDD v2.5 §17.3–§17.4 and `README.md` record the plan as planned,
+  not current.
+
+### D-049 — SUSD monetary precision and phase-qualified cash results (approved)
+
+- **Status:** approved for the M4c remediation and recorded before the
+  implementation changes. It resolves the audit's R-2 precision gap. It does not
+  change M4c tax, welfare, accounting, or close rules and does not add a new
+  monetary system.
+- **Authoritative arithmetic.** Authoritative SUSD balances and fiscal amounts
+  remain continuous JavaScript `number` (IEEE-754 binary64) values. M4c does not
+  introduce cent quantization, decimal rounding, a scaled-integer money type, or
+  a new persisted representation. Tax is `incomeTaxRate × wages` over the
+  settlement amounts; welfare is `welfareBudgetSUSDPerYear / daysInYear(year)`;
+  proportional shares are computed directly in SUSD. The existing M3/M4a/M4b
+  balances and tolerances are unchanged.
+- **Tolerance, not rounding.** `MONEY_TOLERANCE_SUSD = 1e-6` is the existing
+  relative/scale-aware tolerance for invariant comparisons such as accounting
+  identity, cash conservation, reconciliation, and allocation-sum checks. It is
+  not applied to authoritative balances as a rounding operation and must not be
+  widened to conceal a conservation failure. Integer entity/count values continue
+  to use exact checks.
+- **Residual rule.** Deterministic welfare allocation is proportional to
+  population in ascending pop-block order; the final recipient receives the
+  exact remainder so the allocated amounts sum to the payable amount. A
+  floating-point residual within `MONEY_TOLERANCE_SUSD` may be moved to the first
+  recipient, and only tolerance-sized negative artifacts may be clamped to zero.
+  No random draw selects the residual recipient.
+- **Reporting boundaries.** Transient cash fields must state their measurement
+  phase. Settlement results report `endingCashAfterSettlementSUSD` (before the
+  fiscal phase); needs results report `budgetStartBeforeNeedsSUSD` and
+  `budgetEndAfterNeedsSUSD` (after market/needs processing and before fiscal);
+  M4c fiscal block results report `endingCashAfterFiscalSUSD`. The authoritative
+  account ledger, not a transient result field, is the final cash source. Display
+  formatting belongs to a future UI layer and is not applied to authoritative
+  amounts.
+- **Determinism.** Fiscal arithmetic performs operations in a fixed deterministic
+  order (countries ascending id, blocks ascending id, per-block lines in block
+  order, residual to the final block) and uses no transcendental functions. The
+  existing cross-engine `Math.log` wealth limitation remains open and is not
+  claimed to be solved by this decision. Known-answer tests cover representative
+  values, residuals, proportional allocations, and rounding-sensitive cases.
+- **Compatibility.** No schema/version change is required: the changed fields are
+  transient settlement/needs/fiscal results, not persisted authoritative state.
+  World schema 9, simulation 0.9.0, save format 1, and data version
+  `m3-economy-v1` remain unchanged. A future persisted monetary representation
+  change would require a new decision and schema/save migration review.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
