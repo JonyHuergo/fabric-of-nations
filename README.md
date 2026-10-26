@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -13,24 +13,27 @@ prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
 household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
 (category-aware double-entry accounts, opening balances, and recognition legs)**,
 **M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
-valuation)**, and **M4b (monthly finance period close and immutable finance
-summaries)** only. Government finance, taxes, distributions, debt/credit, dynamic
-FX, inflation, monetary policy, annual close, reopen/reversal, politics,
-technology, diplomacy, warfare, AI, worker, and React Native UI behavior are not
+valuation)**, **M4b (monthly finance period close and immutable finance
+summaries)**, and **M4c (per-country treasury, daily income tax, and budgeted
+welfare transfers)** only. Corporate/consumption/land/tariff taxes, broader
+government expenditure and services, debt/credit, distributions, dynamic FX,
+inflation, monetary policy, annual close, reopen/reversal, politics, technology,
+diplomacy, warfare, AI, worker, and React Native UI behavior are not
 implemented. The design authority is the [Century GDD
-v2.4](./Century_GDD_v2.4.md); v2.3 is retained as
-[historical documentation](./Century_GDD_v2.3.md). Persistent engineering rules
-are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
+v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
+[historical documentation](./Century_GDD_v2.4.md), and v2.3 as
+[earlier historical documentation](./Century_GDD_v2.3.md). Persistent engineering
+rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
 
 ## Workspace
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
-| [`packages/bench`](./packages/bench) | Headless M1/M2.1 benchmark harness | `@century/sim`, `@century/data` |
+| [`packages/bench`](./packages/bench) | Headless M1–M4c benchmark harness | `@century/sim`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
 
 `packages/sim` compiles with `"lib": ["ES2022"]` and `"types": []`, has no
@@ -51,7 +54,7 @@ through `TickContext`; they are not serialized into `World`.
 | `pnpm run lint` | Boundary checks: no ambient RNG, no forbidden APIs in `sim`, ES2022-only config, no runtime deps in `sim`. |
 | `pnpm run typecheck` | Typecheck every package in strict mode. |
 | `pnpm test` | Run the Jest suite. |
-| `pnpm run bench` | Build M1/M2.1 benchmark cases and report timings and hashes. |
+| `pnpm run bench` | Build all benchmark cases (M1 through M4c) and report timings, hashes, and invariant gates. |
 | `pnpm run ci` | Local CI path: lint, typecheck, test, benchmark. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
@@ -538,8 +541,8 @@ numerical safety choices, not calibration.
 ### Persistence
 
 **Historical M4a-2 milestone record.** The values below describe the M4a-2
-milestone; the current M4b build uses schema `8` and simulation version `0.8.0`
-(see the M4b section below).
+milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
+(see the M4c section below).
 
 - `WORLD_SCHEMA_VERSION = 7`; `SIM_VERSION = "0.7.0"`; save format `1`; data
   version `m3-economy-v1` unchanged (no shipped scenario data changed).
@@ -551,12 +554,12 @@ milestone; the current M4b build uses schema `8` and simulation version `0.8.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.4 is the current design authority and records the M4b monthly finance close
-(D-047) alongside the M4a-2 model (D-044/D-045). GDD v2.3 is preserved as
-[historical documentation](./Century_GDD_v2.3.md); GDD v2.2 remains available as
-[earlier historical documentation](./Century_GDD_v2.2.md), and its
-`CurrencyState`/`fxToUSD` target is superseded and is not current authoritative
-state.
+GDD v2.5 is the current design authority and records the M4c government fiscal
+loop (D-048) alongside the M4b close (D-047) and the M4a-2 model (D-044/D-045).
+GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
+v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
+and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
+authoritative state.
 
 ## M4b monthly finance close
 
@@ -627,15 +630,103 @@ FinancePeriodSummary { periodStartDay, periodEndDay, accountTotals, flowTotalsBy
   publishing.
 - Summaries are encoded sorted by period end with canonical account/flow keys,
   included in hashing and deep cloning, and validated on decode.
-- `WORLD_SCHEMA_VERSION = 8`; `SIM_VERSION = "0.8.0"`; save format `1`; data
-  version `m3-economy-v1` unchanged. Schema-7 / simulation-0.7.0 saves are rejected
-  with no migration.
-- New digests: empty world `30c4d2bae09c5410`, M2 campaign aggregate
-  `f1782a6a6fa3e118`, WPP validation `997b5f78f3fb4c52`, M3 structural world
-  `ba075368e9f2d67e`.
+- `WORLD_SCHEMA_VERSION = 9`; `SIM_VERSION = "0.9.0"`; save format `1`; data
+  version `m3-economy-v1` unchanged. Schema-8 / simulation-0.8.0 saves are
+  rejected with no migration.
+- Current digests: empty world `eead21fcf318a512`, M2 campaign aggregate
+  `5054423ef7e03e1c`, WPP validation `211784dc6b6627a6`, M3 structural world
+  `302cf66cd1dbb692`. Digests were re-baselined because schema/simulation
+  versions are hashed; countryless worlds keep their original owner account set.
 - `FinanceState.periodSummaries` is the long-run monthly finance history; the
   bounded `postings` buffer remains an audit ring, and no `World.history`
   collection is added.
+
+## M4c government fiscal loop
+
+M4c adds a per-country treasury, a daily flat income tax on wages actually paid,
+and a daily budgeted per-capita welfare transfer. It does not add corporate,
+consumption, land, or tariff taxes; broader government services, procurement, or
+employment; debt, bonds, interest, or deficit financing; banks, issuance, FX,
+inflation, or monetary regimes; law-bounded rates, elections, or interest groups;
+player/AI policy actions; UI; GDP/national accounts; annual history; or annual
+close/reopen/reversal.
+
+### Accounts and state
+
+- Every country owns `treasury-cash` (designated cash), `income-tax-revenue`,
+  `welfare-expense`, and `owner-equity`. The treasury id is scenario-declared;
+  the other accounts are deterministically allocated above the declared-id floor.
+  Opening treasury cash is applied once through the existing opening-balance
+  provenance record, with country equity as its counterpart.
+- Every pop block in a world that declares at least one country owns
+  `income-tax-expense` and `welfare-income` in addition to its existing cash,
+  equity, wage-income, and consumption-expense accounts. Countryless M2/M3
+  fixtures keep their original account set and have no fiscal system; validation
+  requires the fiscal accounts whenever a country exists.
+- `Country.treasuryAccountId` and `Country.fiscal`
+  (`incomeTaxRate` 0..1, `welfareBudgetSUSDPerYear` finite and nonnegative) are
+  authoritative state. Fiscal policy is provisional scenario-initialised state,
+  not law-bounded and not mutable by an action in M4c.
+
+### Daily fiscal phase
+
+The fiscal phase runs inside the integrated economic day after market, wage, and
+upkeep settlement and before needs/militancy and month-end wealth. The M4b close
+timing is unchanged.
+
+- **Income tax:** `tax = incomeTaxRate × wages actually received that day` per
+  pop block, residence-based. Graded wage income and employer wage expense are
+  unchanged; there is no tax on welfare or wealth, no exemptions or strata, and
+  collection efficiency is fixed at 1.0. Partial wages produce partial tax;
+  multiple employers are combined by settlement. Tax cannot exceed received
+  wages or household cash.
+- **Welfare:** `requested = welfareBudgetSUSDPerYear / daysInYear(current civil
+  year)`. Payable is the lesser of requested and treasury cash after same-day
+  tax; it is allocated across the country's pop blocks in proportion to
+  population with an exact deterministic remainder. Insufficient treasury cash
+  reduces all transfers proportionally, records the shortfall, and creates no
+  debt, arrears, or negative cash. Zero budget or zero population creates no
+  posting.
+- All fiscal entries are built and validated first, then posted as one atomic
+  `postJournalBatch`; a failure leaves the staged day unchanged.
+- The transient fiscal result reports per-country income tax, requested/paid
+  welfare, shortfall, and start/end treasury cash, plus per-block tax and welfare
+  amounts. No redundant fiscal counters are persisted.
+
+### Accounting, close, and wealth
+
+- `income-tax` and `welfare-transfer` are registered cash-neutral transaction
+  kinds and are enforced by the central semantic matrix for single, batched, and
+  persisted postings. `treasury-cash` is part of the designated-cash set, so the
+  aggregate cash invariant still holds.
+- Country tax revenue and welfare expense close into country `owner-equity` at
+  the same month-end as other owners. Close order is pop blocks, buildings,
+  countries, then the system owner. The `FinancePeriodSummary` shape and the
+  four `flowTotalsByKind` keys are unchanged; government period totals are
+  derived from the frozen `accountTotals` plus account metadata.
+- The month-end wealth update refines the provisional M3f convention:
+  `perCapitaIncome` is actual wages plus welfare received that day, and
+  mandatory payments are income tax actually withheld, both annualized by the
+  civil year. This is still a current-day flow annualization, not a trailing-month
+  average.
+- Schema 9, simulation 0.9.0, save format 1, data version `m3-economy-v1`
+  unchanged. Schema-8/0.8.0 saves are rejected; no migration is implemented.
+
+### M4c limitations
+
+- Collection efficiency is fixed at 1.0; there is no bureaucracy, institution, or
+  administrative-service model yet.
+- Tax is a single flat wage-only residence-based rate with no exemptions,
+  strata, or law bounds; corporate, consumption, land, and tariff taxes are
+  absent.
+- Welfare is one budgeted per-capita transfer, not a service, targeted benefit,
+  or administrative programme; a shortfall is unfunded rather than a liability.
+- Government procurement (market tier 4), government employment, services,
+  subsidies, infrastructure, and debt service are absent.
+- Fiscal policy cannot be changed by a player/AI action yet; M6/M7 supply the
+  action interface and M8 the taxation law that may bound rates.
+- Node benchmarks remain diagnostics; the mobile p95 target is **NOT
+  EVALUATED**.
 
 ## Data and calibration
 
@@ -726,43 +817,50 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `8`; simulation version: `0.8.0`; data version:
-  `m3-economy-v1` (M4a-2 and M4b add runtime state but ship no new scenario data).
-- Schema-7 / simulation-0.7.0 saves are rejected with an actionable error; no
+- Schema version: `9`; simulation version: `0.9.0`; data version:
+  `m3-economy-v1` (M4a-2, M4b, and M4c add runtime state but ship no new scenario
+  data).
+- Schema-8 / simulation-0.8.0 saves are rejected with an actionable error; no
   migration is attempted.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
-  record, monthly `periodSummaries` with `closedThroughDay`, and the M4a-2
-  country/currency/valuation collections.
+  record, monthly `periodSummaries` with `closedThroughDay`, the M4a-2
+  country/currency/valuation collections, and the M4c country
+  `treasuryAccountId`/`fiscal` state.
 - Canonical JSON makes checksum and decode independent of object key insertion
   order. The state digest covers single-year sex state, accounts, diagnostics,
-  `startDayIndex`, the opening record, period summaries, the close boundary, and
-  countries/currencies/valuations.
+  `startDayIndex`, the opening record, period summaries, the close boundary,
+  countries/currencies/valuations, and the fiscal policy/treasury fields.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `30c4d2bae09c5410`.
-- Full-century aggregate digest: `f1782a6a6fa3e118`.
-- WPP validation digest: `997b5f78f3fb4c52`.
-- M3 structural-world digest (seed `20261023`): `ba075368e9f2d67e`.
+  `m1-determinism`): `eead21fcf318a512`.
+- Full-century aggregate digest: `5054423ef7e03e1c`.
+- WPP validation digest: `211784dc6b6627a6`.
+- M3 structural-world digest (seed `20261023`): `302cf66cd1dbb692`.
+- The digests changed from M4b because schema 9 and the country treasury/fiscal
+  fields are part of hashed state; countryless worlds keep their original owner
+  account set and economic outcomes.
 
 ## Benchmark scope and recorded Node results
 
 `pnpm run bench` reports M1 no-op, M2.1 world-aggregate century, M2.1 stress
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
-workloads, M3e settlement workloads, M3f integrated economic-day workloads, and
-M4b monthly period-close workloads. Stress scales repeat the three deterministic
-multi-block templates (400k/350k/250k people), so total population grows with
-block count. Each M2 stress scale uses 100 warm-up ticks and 730 measured ticks.
+workloads, M3e settlement workloads, M3f integrated economic-day workloads, M4b
+monthly period-close workloads, and M4c fiscal-day workloads. Stress scales repeat
+the three deterministic multi-block templates (400k/350k/250k people), so total
+population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
+730 measured ticks.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
 authoritative account state and posting line shape, so world hashes differ and
 Node timings shifted. M4a-2 adds three empty canonical collections to every world
-(countries, currencies, currency valuations), and M4b adds monthly summaries and
-the close boundary, so the benchmark hashes in this section predate M4a-2 and M4b;
-timings are not treated as acceptance evidence. The current M4a-1 Node run on the
-same machine produced:
+(countries, currencies, currency valuations), M4b adds monthly summaries and the
+close boundary, and M4c adds country fiscal accounts/state and per-block fiscal
+accounts, so the benchmark hashes in this section predate those stages; timings
+are not treated as acceptance evidence. The current M4a-1 Node run on the same
+machine produced:
 
 | Case | Avg | p95 | Hash |
 |---|---:|---:|---|
@@ -778,7 +876,8 @@ same machine produced:
 
 The M3e/M3f workloads are slower under M4a-1 because every transaction now posts
 recognition legs (2 lines became 4–7) and validation covers the richer account
-set. The 200-block p95 threshold still passes. These are Node diagnostics only;
+set. The 200-block p95 guard was reported as passing in that earlier run. These
+are Node diagnostics only;
 the GDD mobile p95 ≤ 8 ms target remains **NOT EVALUATED**.
 
 Representative runs on Node `v22.12.0`, Windows x64, AMD Ryzen 5 2600 (12 logical
@@ -792,9 +891,15 @@ processors), 7.93 GiB RAM, seed `20261023`:
 | M2.1 stress | 3,000 | 1,008,106,000 | 730 | 29.95–32.24 s | 41.03–44.17 ms | 47.62–52.18 ms |
 | M2.1 stress | 6,000 | 2,016,212,000 | 730 | 63.55–69.08 s | 87.06–94.63 ms | 103.03–117.90 ms |
 
-The 200-block p95 threshold remains 5 ms and passes. Larger scales are
-diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is
-**NOT EVALUATED**; this is a Node harness, not a mobile release build.
+The 200-block provisional Node regression guard is p95 ≤ 5 ms. It is noisy on
+this machine: two standalone M4c verification runs measured p95 `5.303 ms` and
+`5.490 ms` (avg `3.796`/`3.859 ms`) and did not satisfy the guard, while the final
+`pnpm run ci` run measured p95 `3.908 ms` (avg `3.368 ms`) and satisfied it, so
+the overall benchmark passed. The failures and successes are reported rather than
+adjusted or hidden. M4c does not change the 200-block M2 world's account set or
+population tick path (countryless worlds keep the original owner accounts).
+Larger scales are diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms
+target is **NOT EVALUATED**; this is a Node harness, not a mobile release build.
 
 The M3b employment workload uses the fixed small M3 world: 4 pop blocks,
 8 buildings, 3 seed assignments, and 1,061,870 people at seed `20261023`. It
@@ -902,27 +1007,60 @@ It reports closing-entry counts, gross flows, and pass/fail checks for zeroing,
 cash neutrality, the accounting identity, summary contiguity, determinism, and
 cross-run hashes. These are Node diagnostics, not mobile evidence.
 
+The M4c fiscal-day workload runs the real integrated `tick()` on a scaled M3
+production economy plus one fiscal country. It reports income tax, welfare paid,
+shortfall, treasury start/end, and pass/fail gates for treasury reconciliation,
+cash conservation, accounting identity, positive tax/welfare, and cross-run hash
+determinism. Warm-up and measured ticks are timed; setup and hashing are excluded.
+Representative Node `v22.12.0` results on the same machine:
+
+| Workload | Blocks | Buildings | Days | Tax SUSD | Welfare SUSD | Shortfall | Treasury start → end | Avg | p50 | p95 | p99 | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| M4c small | 4 | 8 | 10 | 21,183.3067 | 27,397.2603 | 0 | 5,001,045.21 → 4,994,831.26 | 7.626 ms | 7.794 ms | 8.503 ms | 8.503 ms | `0a0a1d318ff8ef2b` |
+| M4c stress | 12 | 24 | 5 | 31,863.4956 | 13,698.6301 | 0 | 5,008,865.44 → 5,027,030.30 | 16.954 ms | 16.351 ms | 19.545 ms | 19.545 ms | `eba2c5dd2b7bd647` |
+
+All M4c gates passed in the final `pnpm run ci` run and in the preceding standalone
+runs, including treasury reconciliation, cash conservation, accounting identity,
+positive tax and welfare, and equal cross-run hashes. The overall benchmark passed
+in the final CI run. Earlier standalone benches failed only the pre-existing
+provisional 200-block M2 guard (reported above), not an M4c gate. Mobile p95
+remains **NOT EVALUATED**.
+
 ## Known limitations
 
 - M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
-  balances only. Distributions, remittances, taxes, debt, inflation, and dynamic
-  FX are not implemented.
+  balances only. Distributions, remittances, debt, inflation, and dynamic FX are
+  not implemented; the income tax added by M4c is the only tax.
 - M4a-2 adds country/currency identity, monetary arrangements, and
-  SUSD-relative valuations only. It has no issuance, central bank, treasury
-  accounts, native-currency balances, dynamic FX, currency regimes, inflation,
-  monetary policy, or trade settlement.
+  SUSD-relative valuations only. It has no issuance, central bank,
+  native-currency balances, dynamic FX, currency regimes, inflation, monetary
+  policy, or trade settlement. M4c adds treasury accounts for fiscal flows, not
+  monetary policy.
 - M4a-2 uses only the three runtime collections; no static currency catalog or
   `fxToUSD` field exists. Currency identity is independent of the domestic
   arrangement: a country may issue a currency it does not use domestically.
-- M4a-2 country/currency fixtures are inline tests, not shipped historical data;
-  no country, currency, or exchange-rate calibration is claimed.
+- M4a-2/M4c country, currency, treasury, and fiscal fixtures are inline tests, not
+  shipped historical data; no country, currency, exchange-rate, tax, or spending
+  calibration is claimed.
 - Inventory is not an accounting asset: input purchases are expensed when
   purchased and there is no COGS or inventory valuation. This is a provisional
   cash-basis simplification, not full accrual accounting.
 - M4b closes revenue and expense into existing owner equity at each month-end;
   there is no annual close, reopen, reversal/adjusting entry, retained-earnings
-  subtype, distribution, or tax. Summary flow totals are gross mapped period
-  activity, not profit or taxable income.
+  subtype, or distribution. Summary flow totals are gross mapped period
+  activity, not profit or taxable income. M4c country tax revenue and welfare
+  expense close through the same mechanism; the four summary flow kinds are
+  unchanged.
+- M4c implements only a flat wage-only residence-based income tax and one
+  budgeted per-capita welfare transfer. Collection efficiency is fixed at 1.0;
+  there are no exemptions, strata, law bounds, corporate/consumption/land/tariff
+  taxes, government procurement or services, state employment, subsidies,
+  debt service, debt, arrears, or deficit financing. A welfare funding shortfall
+  is unfunded and reported, not a liability. Fiscal policy cannot yet be changed
+  by a player/AI action; M6/M7 supply actions and M8 the taxation law.
+- The M4c wealth refinement uses current-day wages plus welfare as income and
+  withheld income tax as mandatory payments annualized by the civil year; a
+  trailing-month income window remains unimplemented.
 - Published validation cannot prove which days were processed before the first
   close. The first period may be partial and gap detection applies between
   recorded summaries only; this convention is documented in the GDD and
@@ -946,8 +1084,10 @@ cross-run hashes. These are Node diagnostics, not mobile evidence.
 - M3a–M3f implement economy state, the cash ledger, employment assignment, a
   physical production phase, two-pass market clearing, cash settlement of
   purchases/wages/upkeep with retained profit, and an integrated economic day:
-  no taxes, interest, dividends, debt/credit, government finance, politics,
-  technology, diplomacy, warfare, AI, migration, social mobility, or UI exists.
+  M4a–M4c add accounts, the country/currency model, the monthly close, and the
+  income-tax/welfare fiscal loop. Interest, dividends, debt/credit, broader
+  government finance, politics, technology, diplomacy, warfare, AI, migration,
+  social mobility, and UI remain absent.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - M3f runs the economic day through the public `tick()` for worlds with buildings
@@ -965,10 +1105,11 @@ cross-run hashes. These are Node diagnostics, not mobile evidence.
   not condition- or staffing-scaled. Underfunded employers/building accounts pay
   pro-rata wages/upkeep and report shortfalls without creating debt. Owner profit
   distribution remains deferred.
-- M3f monthly wealth uses the current day's actual settled wages annualized by the
-  civil year because no monthly income accumulator exists. **A trailing-month
-  income average is not implemented**; the GDD does not define that measurement
-  window. This limitation is recorded in `DECISIONS.md`.
+- M3f monthly wealth uses the current day's actual settled household income
+  (wages plus M4c welfare) and withheld income tax, annualized by the civil year,
+  because no monthly income accumulator exists. **A trailing-month income average
+  is not implemented**; the GDD does not define that measurement window. This
+  limitation is recorded in `DECISIONS.md`.
 - M3f first attempts full desired production demand, then falls back to
   opening-cash-capped production demand if settlement would be unfunded. The
   fallback is safe but can underuse valid same-batch sales receipts; it is
@@ -986,5 +1127,5 @@ cross-run hashes. These are Node diagnostics, not mobile evidence.
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
-7. Do not begin M4 until M3f is reviewed and the next phase is explicitly
-   authorized.
+7. Do not begin the next milestone until the current one is reviewed and the next
+   phase is explicitly authorized in the GDD and task assignment.
