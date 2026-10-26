@@ -34,3 +34,18 @@ export {
   type BuildingProfitAllocationResult,
   type ProfitDistributionResult,
 } from "./profit.js";
+export {
+  createDebtPolicy,
+  assertValidDebtPolicy,
+  assertValidDebtContract,
+  debtMaturityFor,
+  debtOutstandingPrincipal,
+} from "./debtPolicy.js";
+export {
+  issueGovernmentDebt,
+  runDebtPhase,
+  type DebtContractResult,
+  type DebtIssuanceInput,
+  type DebtIssuanceResult,
+  type DebtPhaseResult,
+} from "./debt.js";

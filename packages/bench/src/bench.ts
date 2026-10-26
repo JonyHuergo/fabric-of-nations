@@ -1617,7 +1617,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a/M5b simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);

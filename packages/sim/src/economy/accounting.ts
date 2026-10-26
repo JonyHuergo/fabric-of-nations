@@ -26,9 +26,11 @@ import {
   accountNormalSide,
   assertFiscalPostingStructure,
   assertProfitAllocationStructure,
+  assertDebtPostingStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
+  isDebtPostingKind,
   isProfitAllocationKind,
   transactionKindChangesCash,
 } from "./accounts.js";
@@ -158,6 +160,9 @@ function validatePostingLines(
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);
+  }
+  if (isDebtPostingKind(transactionKind)) {
+    assertDebtPostingStructure(transactionKind, lines, accounts);
   }
   return { deltas, debits, credits, cashDelta };
 }

@@ -176,6 +176,12 @@ export const ACCOUNT_SUBTYPES = [
   "upkeep-expense",
   "income-tax-expense",
   "welfare-expense",
+  "debt-liability",
+  "interest-payable",
+  "interest-expense",
+  "bond-asset",
+  "interest-receivable",
+  "interest-income",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -219,6 +225,11 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "profit-retention",
   "profit-distribution",
   "state-enterprise-remittance",
+  "debt-issuance",
+  "debt-principal-repayment",
+  "interest-accrual",
+  "interest-payment",
+  "debt-default-writeoff",
   "owner-capital-injection",
   ...INTERNAL_TRANSACTION_KINDS,
 ] as const;
@@ -327,6 +338,10 @@ export interface FinanceState {
    * rewrites them; long-run finance history lives here, not in `postings`.
    */
   periodSummaries: FinancePeriodSummary[];
+  /** M5b debt contracts; empty when public debt is disabled/unused. */
+  debtContracts: DebtContract[];
+  /** Deterministic allocator for new debt contract ids. */
+  nextContractId: number;
   /**
    * Inclusive last day of the most recently closed period, or null before the
    * first close. A published world requires `null` or `closedThroughDay <
@@ -387,6 +402,51 @@ export interface FiscalPolicy {
 }
 
 /**
+ * M5b provisional public-debt policy.
+ *
+ * When enabled, the country may issue debt to its designated simulated creditor
+ * at each month-end to finance its accrued fiscal deficit, and may refinance
+ * maturing principal. The creditor is an existing simulated country treasury or
+ * pop-block household cash account; no bank, central bank, bond market, or
+ * external investor pool is introduced. Creditor cash and the outstanding
+ * principal ceiling are hard financing constraints. Rates, terms, and ceilings are
+ * provisional, not calibrated.
+ */
+export interface DebtPolicy {
+  enabled: boolean;
+  creditorKind: "country" | "popBlock";
+  creditorId: Id;
+  /** Annual coupon rate on outstanding principal, 0..1. */
+  annualCouponRate: Rate;
+  /** Contract term in civil days, at least 1. */
+  termDays: number;
+  /** Maximum total outstanding principal, in SUSD. */
+  maxOutstandingPrincipalSUSD: MoneySUSD;
+  refinanceOnMaturity: boolean;
+  /** Days after first arrears before the remaining debt is written off. */
+  arrearsGraceDays: number;
+}
+
+/** M5b public-debt contract. Persisted in `FinanceState`. */
+export interface DebtContract {
+  id: Id;
+  /** Contract schema version; M5b defines version 1. */
+  contractVersion: 1;
+  issuerCountryId: Id;
+  holderKind: "country" | "popBlock";
+  holderId: Id;
+  principalSUSD: MoneySUSD;
+  outstandingPrincipalSUSD: MoneySUSD;
+  annualCouponRate: Rate;
+  issueDay: Day;
+  maturityDay: Day;
+  /** Accrued but unpaid coupon interest. */
+  accruedInterestSUSD: MoneySUSD;
+  status: "active" | "arrears" | "repaid" | "defaulted";
+  arrearsSinceDay: Day | null;
+}
+
+/**
  * M5a provisional profit-allocation policy.
  *
  * When enabled, each economic month-end after the M4b close reclassifies each
@@ -416,6 +476,8 @@ export interface Country {
   treasuryAccountId: Id;
   /** M4c provisional fiscal policy state. */
   fiscal: FiscalPolicy;
+  /** M5b provisional public-debt policy state. */
+  debt: DebtPolicy;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -441,6 +503,8 @@ export interface CountryInitialDef {
   treasuryAccountId: Id;
   initialTreasuryCashSUSD: MoneySUSD;
   fiscal: FiscalPolicy;
+  /** Defaults to disabled for M0–M5a fixtures. */
+  debt?: DebtPolicy;
   /** Defaults to false for M4 fixtures that predate M5. */
   immigrationOpen?: boolean;
 }

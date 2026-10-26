@@ -84,6 +84,12 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "upkeep-expense": "expense",
   "income-tax-expense": "expense",
   "welfare-expense": "expense",
+  "debt-liability": "liability",
+  "interest-payable": "liability",
+  "interest-expense": "expense",
+  "bond-asset": "asset",
+  "interest-receivable": "asset",
+  "interest-income": "revenue",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -106,6 +112,12 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "upkeep-expense": ["building"],
   "income-tax-expense": ["popBlock"],
   "welfare-expense": ["country"],
+  "debt-liability": ["country"],
+  "interest-payable": ["country"],
+  "interest-expense": ["country"],
+  "bond-asset": ["country", "popBlock"],
+  "interest-receivable": ["country", "popBlock"],
+  "interest-income": ["country", "popBlock"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -221,6 +233,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "profit-retention": [],
   "profit-distribution": [],
   "state-enterprise-remittance": [],
+  "debt-issuance": [],
+  "debt-principal-repayment": [],
+  "interest-accrual": [
+    { subtype: "interest-expense", side: "debit" },
+    { subtype: "interest-income", side: "credit" },
+  ],
+  "interest-payment": [],
+  "debt-default-writeoff": [],
   "owner-capital-injection": [],
   "monetary-issuance": [],
   "monetary-redemption": [],
@@ -581,6 +601,226 @@ export function isProfitAllocationKind(value: string): value is ProfitAllocation
   );
 }
 
+/** M5b public-debt transaction kinds. */
+export type DebtPostingKind =
+  | "debt-issuance"
+  | "debt-principal-repayment"
+  | "interest-accrual"
+  | "interest-payment"
+  | "debt-default-writeoff";
+
+/** True when `value` is an M5b debt transaction kind. */
+export function isDebtPostingKind(value: string): value is DebtPostingKind {
+  return (
+    value === "debt-issuance" ||
+    value === "debt-principal-repayment" ||
+    value === "interest-accrual" ||
+    value === "interest-payment" ||
+    value === "debt-default-writeoff"
+  );
+}
+
+/**
+ * Enforce the required legs of the M5b debt transaction kinds.
+ *
+ * Issuance, principal repayment, interest accrual, and interest payment each have
+ * exactly four legs: one issuer country account pair and one holder account pair,
+ * with matching amounts and matching issuer/holder ownership. The default
+ * write-down has a flexible six-leg shape (zero accrued interest omits its legs) and
+ * is validated for owner pairing and equality only.
+ */
+export function assertDebtPostingStructure(
+  kind: DebtPostingKind,
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) throw new RangeError(`${path} must contain debt lines`);
+  const resolved = lines.map((line, index) => {
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(`${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`);
+    }
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(`${path}.lines[${String(index)}] requires a strictly positive finite amount`);
+    }
+    return { line, account };
+  });
+  const find = (
+    predicate: (entry: (typeof resolved)[number]) => boolean,
+    description: string,
+  ): (typeof resolved)[number] => {
+    const matches = resolved.filter(predicate);
+    if (matches.length !== 1) {
+      throw new RangeError(`${path} ${kind} requires exactly one ${description} leg`);
+    }
+    const match = matches[0];
+    if (match === undefined) throw new RangeError(`${path} ${kind} is missing ${description}`);
+    return match;
+  };
+  if (kind === "debt-default-writeoff") {
+    const issuerEquity = find(
+      (entry) =>
+        entry.account.ownerKind === "country" &&
+        entry.account.subtype === "owner-equity" &&
+        entry.line.side === "credit",
+      "issuer owner-equity credit",
+    );
+    const holderEquity = find(
+      (entry) =>
+        (entry.account.ownerKind === "country" || entry.account.ownerKind === "popBlock") &&
+        entry.account.subtype === "owner-equity" &&
+        entry.line.side === "debit",
+      "holder owner-equity debit",
+    );
+    const issuerId = issuerEquity.account.ownerId;
+    if (issuerId === null || issuerId === holderEquity.account.ownerId) {
+      throw new RangeError(`${path} ${kind} issuer and holder must differ`);
+    }
+    const issuerDebits = resolved.filter(
+      (entry) =>
+        entry.account.ownerKind === "country" &&
+        entry.account.ownerId === issuerId &&
+        entry.line.side === "debit",
+    );
+    const holderCredits = resolved.filter(
+      (entry) =>
+        entry.account.ownerKind === holderEquity.account.ownerKind &&
+        entry.account.ownerId === holderEquity.account.ownerId &&
+        entry.line.side === "credit",
+    );
+    if (issuerDebits.length === 0 || holderCredits.length === 0) {
+      throw new RangeError(`${path} ${kind} requires issuer debit and holder credit legs`);
+    }
+    const sum = (entries: readonly (typeof resolved)[number][]): number =>
+      entries.reduce((total, entry) => total + entry.line.amountSUSD, 0);
+    const issuerDebitTotal = sum(issuerDebits);
+    const holderCreditTotal = sum(holderCredits);
+    if (
+      Math.abs(issuerDebitTotal - issuerEquity.line.amountSUSD) >
+        toleranceMoney(issuerDebitTotal, issuerEquity.line.amountSUSD) ||
+      Math.abs(holderCreditTotal - holderEquity.line.amountSUSD) >
+        toleranceMoney(holderCreditTotal, holderEquity.line.amountSUSD)
+    ) {
+      throw new RangeError(`${path} ${kind} write-down legs do not balance to owner equity`);
+    }
+    return;
+  }
+  if (lines.length !== 4) {
+    throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+  }
+  const amount = resolved[0]?.line.amountSUSD ?? 0;
+  for (const entry of resolved) {
+    if (Math.abs(entry.line.amountSUSD - amount) > toleranceMoney(amount, entry.line.amountSUSD)) {
+      throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
+    }
+  }
+
+  if (kind === "interest-accrual") {
+    const expense = find(
+      (entry) => entry.account.subtype === "interest-expense" && entry.line.side === "debit",
+      "issuer interest-expense debit",
+    );
+    const payable = find(
+      (entry) => entry.account.subtype === "interest-payable" && entry.line.side === "credit",
+      "issuer interest-payable credit",
+    );
+    const receivable = find(
+      (entry) => entry.account.subtype === "interest-receivable" && entry.line.side === "debit",
+      "holder interest-receivable debit",
+    );
+    const income = find(
+      (entry) => entry.account.subtype === "interest-income" && entry.line.side === "credit",
+      "holder interest-income credit",
+    );
+    if (expense.account.ownerId === null || expense.account.ownerId !== payable.account.ownerId) {
+      throw new RangeError(`${path} ${kind} issuer legs must share one country owner`);
+    }
+    if (
+      receivable.account.ownerId === null ||
+      receivable.account.ownerId !== income.account.ownerId ||
+      income.account.ownerKind !== receivable.account.ownerKind
+    ) {
+      throw new RangeError(`${path} ${kind} holder legs must share one owner`);
+    }
+    return;
+  }
+
+  if (kind === "interest-payment") {
+    const payable = find(
+      (entry) => entry.account.subtype === "interest-payable" && entry.line.side === "debit",
+      "issuer interest-payable debit",
+    );
+    const treasury = find(
+      (entry) => entry.account.subtype === "treasury-cash" && entry.line.side === "credit",
+      "issuer treasury-cash credit",
+    );
+    const cash = find(
+      (entry) => (entry.account.subtype === "household-cash" || entry.account.subtype === "treasury-cash") && entry.line.side === "debit",
+      "holder cash debit",
+    );
+    const receivable = find(
+      (entry) => entry.account.subtype === "interest-receivable" && entry.line.side === "credit",
+      "holder interest-receivable credit",
+    );
+    if (payable.account.ownerId === null || payable.account.ownerId !== treasury.account.ownerId) {
+      throw new RangeError(`${path} ${kind} issuer legs must share one country owner`);
+    }
+    if (
+      cash.account.ownerId === null ||
+      cash.account.ownerId !== receivable.account.ownerId ||
+      cash.account.ownerKind !== receivable.account.ownerKind
+    ) {
+      throw new RangeError(`${path} ${kind} holder legs must share one owner`);
+    }
+    return;
+  }
+
+  const issuerDebt = find(
+    (entry) => entry.account.ownerKind === "country" && entry.account.subtype === "debt-liability",
+    "issuer debt-liability leg",
+  );
+  const issuerId = issuerDebt.account.ownerId;
+  if (issuerId === null) throw new RangeError(`${path} ${kind} issuer debt-liability has no owner`);
+  const issuerTreasury = find(
+    (entry) => entry.account.ownerKind === "country" && entry.account.ownerId === issuerId && entry.account.subtype === "treasury-cash",
+    "issuer treasury leg",
+  );
+  const holderCash = find(
+    (entry) =>
+      (entry.account.subtype === "household-cash" || entry.account.subtype === "treasury-cash") &&
+      !(entry.account.ownerKind === "country" && entry.account.ownerId === issuerId),
+    "holder cash leg",
+  );
+  const holderAsset = find(
+    (entry) => entry.account.subtype === "bond-asset",
+    "holder bond-asset leg",
+  );
+  if (
+    holderCash.account.ownerKind !== holderAsset.account.ownerKind ||
+    holderCash.account.ownerId === null ||
+    holderCash.account.ownerId !== holderAsset.account.ownerId
+  ) {
+    throw new RangeError(`${path} ${kind} holder cash and bond legs must share one owner`);
+  }
+  const expectedIssuerSide = kind === "debt-issuance" ? "debit" : "credit";
+  const expectedHolderCashSide = kind === "debt-issuance" ? "credit" : "debit";
+  const expectedDebtSide = kind === "debt-issuance" ? "credit" : "debit";
+  const expectedAssetSide = kind === "debt-issuance" ? "debit" : "credit";
+  if (issuerTreasury.line.side !== expectedIssuerSide) {
+    throw new RangeError(`${path} ${kind} issuer treasury leg has the wrong side`);
+  }
+  if (issuerDebt.line.side !== expectedDebtSide) {
+    throw new RangeError(`${path} ${kind} issuer debt leg has the wrong side`);
+  }
+  if (holderCash.line.side !== expectedHolderCashSide) {
+    throw new RangeError(`${path} ${kind} holder cash leg has the wrong side`);
+  }
+  if (holderAsset.line.side !== expectedAssetSide) {
+    throw new RangeError(`${path} ${kind} holder bond leg has the wrong side`);
+  }
+}
+
 /**
  * Enforce the semantic matrix for one journal line. Lines on asset, liability,
  * and equity accounts are accepted here and remain governed by the account and
@@ -631,6 +871,8 @@ export function cloneFinanceState(finance: FinanceState): FinanceState {
       accountTotals: { ...summary.accountTotals },
       flowTotalsByKind: { ...summary.flowTotalsByKind },
     })),
+    debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
+    nextContractId: finance.nextContractId,
     closedThroughDay: finance.closedThroughDay,
   };
 }

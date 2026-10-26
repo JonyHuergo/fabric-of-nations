@@ -547,6 +547,8 @@ export function createPopulationWorld(
       opening: null,
       periodSummaries: [],
       closedThroughDay: null,
+      debtContracts: [],
+      nextContractId: 1,
     } satisfies FinanceState,
     profitDistribution: {
       enabled: false,

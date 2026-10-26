@@ -40,6 +40,8 @@ import type {
   Currency,
   CurrencyIssuer,
   CurrencyValuation,
+  DebtContract,
+  DebtPolicy,
   EmploymentAssignment,
   FinancePeriodSummary,
   FinanceState,
@@ -63,6 +65,7 @@ import {
 } from "./economy/types.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
+import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
@@ -195,6 +198,8 @@ export type SerializedFinanceState = {
   readonly nextAccountId: number;
   readonly opening: SerializedOpeningBalance | null;
   readonly periodSummaries: readonly SerializedFinancePeriodSummary[];
+  readonly debtContracts: readonly SerializedDebtContract[];
+  readonly nextContractId: number;
   readonly closedThroughDay: number | null;
 };
 
@@ -242,6 +247,35 @@ export type SerializedProfitDistributionPolicy = {
   readonly stateRemittanceRate: number;
 };
 
+/** Encoded M5b public-debt policy. */
+export type SerializedDebtPolicy = {
+  readonly enabled: boolean;
+  readonly creditorKind: "country" | "popBlock";
+  readonly creditorId: number;
+  readonly annualCouponRate: number;
+  readonly termDays: number;
+  readonly maxOutstandingPrincipalSUSD: number;
+  readonly refinanceOnMaturity: boolean;
+  readonly arrearsGraceDays: number;
+};
+
+/** Encoded M5b debt contract. */
+export type SerializedDebtContract = {
+  readonly id: number;
+  readonly contractVersion: 1;
+  readonly issuerCountryId: number;
+  readonly holderKind: "country" | "popBlock";
+  readonly holderId: number;
+  readonly principalSUSD: number;
+  readonly outstandingPrincipalSUSD: number;
+  readonly annualCouponRate: number;
+  readonly issueDay: number;
+  readonly maturityDay: number;
+  readonly accruedInterestSUSD: number;
+  readonly status: "active" | "arrears" | "repaid" | "defaulted";
+  readonly arrearsSinceDay: number | null;
+};
+
 /** Encoded country identity, region ownership, treasury, and fiscal policy. */
 export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
@@ -250,6 +284,7 @@ export type SerializedCountry = {  readonly id: number;
   readonly regionIds: readonly number[];
   readonly treasuryAccountId: number;
   readonly fiscal: SerializedFiscalPolicy;
+  readonly debt: SerializedDebtPolicy;
   readonly immigrationOpen: boolean;
 };
 
@@ -568,6 +603,16 @@ export function encodeWorld(world: World): SerializedWorld {
           incomeTaxRate: country.fiscal.incomeTaxRate,
           welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
         },
+        debt: {
+          enabled: country.debt.enabled,
+          creditorKind: country.debt.creditorKind,
+          creditorId: country.debt.creditorId,
+          annualCouponRate: country.debt.annualCouponRate,
+          termDays: country.debt.termDays,
+          maxOutstandingPrincipalSUSD: country.debt.maxOutstandingPrincipalSUSD,
+          refinanceOnMaturity: country.debt.refinanceOnMaturity,
+          arrearsGraceDays: country.debt.arrearsGraceDays,
+        },
         immigrationOpen: country.immigrationOpen,
       })),
     currencies: [...world.currencies]
@@ -682,6 +727,24 @@ export function encodeWorld(world: World): SerializedWorld {
       periodSummaries: [...world.finance.periodSummaries]
         .sort((left, right) => left.periodEndDay - right.periodEndDay)
         .map(encodePeriodSummary),
+      debtContracts: [...world.finance.debtContracts]
+        .sort((left, right) => left.id - right.id)
+        .map((contract) => ({
+          id: contract.id,
+          contractVersion: contract.contractVersion,
+          issuerCountryId: contract.issuerCountryId,
+          holderKind: contract.holderKind,
+          holderId: contract.holderId,
+          principalSUSD: contract.principalSUSD,
+          outstandingPrincipalSUSD: contract.outstandingPrincipalSUSD,
+          annualCouponRate: contract.annualCouponRate,
+          issueDay: contract.issueDay,
+          maturityDay: contract.maturityDay,
+          accruedInterestSUSD: contract.accruedInterestSUSD,
+          status: contract.status,
+          arrearsSinceDay: contract.arrearsSinceDay,
+        })),
+      nextContractId: world.finance.nextContractId,
       closedThroughDay: world.finance.closedThroughDay,
     },
     profitDistribution: {
@@ -787,6 +850,75 @@ function decodeFiscalPolicy(value: unknown, path: string): { incomeTaxRate: numb
   };
 }
 
+function decodeDebtPolicy(value: unknown, path: string): DebtPolicy {
+  const record = requireRecord(value, path);
+  try {
+    return assertValidDebtPolicy(
+      {
+        enabled: record.enabled,
+        creditorKind: record.creditorKind,
+        creditorId: record.creditorId,
+        annualCouponRate: record.annualCouponRate,
+        termDays: record.termDays,
+        maxOutstandingPrincipalSUSD: record.maxOutstandingPrincipalSUSD,
+        refinanceOnMaturity: record.refinanceOnMaturity,
+        arrearsGraceDays: record.arrearsGraceDays,
+      },
+      path,
+    );
+  } catch (error) {
+    throw new SaveFormatError(`${path} is invalid: ${errorMessage(error)}`);
+  }
+}
+
+function decodeDebtContract(value: unknown, path: string): DebtContract {
+  const record = requireRecord(value, path);
+  const status = record.status;
+  if (status !== "active" && status !== "arrears" && status !== "repaid" && status !== "defaulted") {
+    throw new SaveFormatError(`${path}.status is invalid`);
+  }
+  if (record.holderKind !== "country" && record.holderKind !== "popBlock") {
+    throw new SaveFormatError(`${path}.holderKind is invalid`);
+  }
+  if (record.contractVersion !== 1) {
+    throw new SaveFormatError(`${path}.contractVersion must be 1`);
+  }
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    contractVersion: 1,
+    issuerCountryId: requireUint32(record.issuerCountryId, `${path}.issuerCountryId`),
+    holderKind: record.holderKind,
+    holderId: requireUint32(record.holderId, `${path}.holderId`),
+    principalSUSD: requireFiniteNumber(record.principalSUSD, `${path}.principalSUSD`),
+    outstandingPrincipalSUSD: requireFiniteNumber(
+      record.outstandingPrincipalSUSD,
+      `${path}.outstandingPrincipalSUSD`,
+    ),
+    annualCouponRate: requireFiniteNumber(record.annualCouponRate, `${path}.annualCouponRate`),
+    issueDay: requireInteger(record.issueDay, `${path}.issueDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    maturityDay: requireInteger(
+      record.maturityDay,
+      `${path}.maturityDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    accruedInterestSUSD: requireFiniteNumber(
+      record.accruedInterestSUSD,
+      `${path}.accruedInterestSUSD`,
+    ),
+    status,
+    arrearsSinceDay:
+      record.arrearsSinceDay === null
+        ? null
+        : requireInteger(
+            record.arrearsSinceDay,
+            `${path}.arrearsSinceDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -803,6 +935,7 @@ function decodeCountry(value: unknown, path: string): Country {
     ),
     treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
     fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
+    debt: decodeDebtPolicy(record.debt, `${path}.debt`),
     immigrationOpen: record.immigrationOpen,
   };
 }
@@ -1000,6 +1133,10 @@ function decodeFinanceState(value: unknown): FinanceState {
     "save payload.finance.periodSummaries",
   );
   const rawClosed = record.closedThroughDay;
+  const contracts = requireArray(
+    record.debtContracts,
+    "save payload.finance.debtContracts",
+  );
   return {
     accounts: accounts.map((account, index) =>
       decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
@@ -1025,6 +1162,18 @@ function decodeFinanceState(value: unknown): FinanceState {
         summary,
         `save payload.finance.periodSummaries[${String(index)}]`,
       ),
+    ),
+    debtContracts: contracts.map((contract, index) =>
+      decodeDebtContract(
+        contract,
+        `save payload.finance.debtContracts[${String(index)}]`,
+      ),
+    ),
+    nextContractId: requireInteger(
+      record.nextContractId,
+      "save payload.finance.nextContractId",
+      1,
+      Number.MAX_SAFE_INTEGER,
     ),
     closedThroughDay:
       rawClosed === null

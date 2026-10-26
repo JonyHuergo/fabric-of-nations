@@ -161,6 +161,8 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       opening: null,
       periodSummaries: [],
       closedThroughDay: null,
+      debtContracts: [],
+      nextContractId: 1,
     },
     profitDistribution: {
       enabled: false,

@@ -15,7 +15,9 @@ import {
   createEconomyWorld,
   deserializeWorld,
   hashWorld,
+  issueGovernmentDebt,
   populationTotal,
+  runDebtPhase,
   runMigrationPhase,
   runProfitDistributionPhase,
   runTicks,
@@ -36,6 +38,7 @@ const M5_MIGRATION_ITERATIONS = 5;
 const M5_STRESS_TICKS = 2;
 const M5_MIGRATION_DAY = 31;
 const M5A_ALLOCATION_ITERATIONS = 5;
+const M5B_DEBT_DAYS = 31;
 
 interface SampleStats {
   readonly count: number;
@@ -204,6 +207,59 @@ export function runM5Benchmarks(): boolean {
   }
   const m5aStats = stats(m5aSamples);
 
+  // M5b debt-service cost. One representative country borrows from another
+  // country treasury; the phase is timed over a month of daily accrual plus the
+  // month-end coupon. The contract is deliberately long-dated so no maturity or
+  // refinancing dominates the sample.
+  const debtScenario = loadM5EightPolities();
+  const debtCountries = debtScenario.countries ?? [];
+  const issuer = debtCountries[0];
+  const creditor = debtCountries[1];
+  if (issuer === undefined || creditor === undefined) {
+    throw new Error("M5b benchmark requires at least two countries");
+  }
+  issuer.debt = {
+    enabled: true,
+    creditorKind: "country",
+    creditorId: creditor.id,
+    annualCouponRate: 0.03,
+    termDays: 1825,
+    maxOutstandingPrincipalSUSD: 1_000_000_000,
+    refinanceOnMaturity: false,
+    arrearsGraceDays: 90,
+  };
+  const debtWorld = createEconomyWorld(debtScenario, { seed: SEED });
+  const creditorTreasury = debtWorld.finance.accounts.find(
+    (account) =>
+      account.ownerKind === "country" &&
+      account.ownerId === creditor.id &&
+      account.subtype === "treasury-cash",
+  );
+  if (creditorTreasury === undefined) throw new Error("M5b benchmark creditor has no treasury");
+  const debtPrincipal = Math.min(1_000_000, creditorTreasury.balanceSUSD * 0.1);
+  if (debtPrincipal > 0) {
+    issueGovernmentDebt(debtWorld, {
+      issuerCountryId: issuer.id,
+      holderKind: "country",
+      holderId: creditor.id,
+      principalSUSD: debtPrincipal,
+      annualCouponRate: 0.03,
+      termDays: 1825,
+    });
+  }
+  const m5bSamples: number[] = [];
+  let m5bInterestAccrued = 0;
+  for (let day = 0; day < M5B_DEBT_DAYS; day += 1) {
+    debtWorld.dayIndex = day;
+    const start = process.hrtime.bigint();
+    const result = runDebtPhase(debtWorld, day);
+    m5bSamples.push(nanosecondsToMs(process.hrtime.bigint() - start));
+    m5bInterestAccrued += result.interestAccruedSUSD;
+  }
+  const m5bStats = stats(m5bSamples);
+  const m5bContracts = debtWorld.finance.debtContracts.length;
+  assertValidWorld(debtWorld);
+
   // Larger authored stress fixture: doubled blocks and buildings.
   const stress = stressScenario(scenario);
   const stressWorld = createEconomyWorld(stress, { seed: SEED });
@@ -254,6 +310,11 @@ export function runM5Benchmarks(): boolean {
       `${m5aDistributed.toFixed(2)} SUSD distributed in the sample; clone/close excluded`,
   );
   console.log(
+    `  M5b debt phase: avg ${formatMs(m5bStats.averageMs)} ms, p50 ${formatMs(m5bStats.p50Ms)} ms, ` +
+      `p95 ${formatMs(m5bStats.p95Ms)} ms; ${String(m5bContracts)} contracts, ` +
+      `${m5bInterestAccrued.toFixed(2)} SUSD interest accrued in the sample`,
+  );
+  console.log(
     `M5 stress: ${String(stressCounts.countries)} countries, ${String(stressCounts.regions)} regions, ` +
       `${String(stressCounts.markets)} markets, ${String(stressCounts.blocks)} blocks, ` +
       `${String(stressCounts.buildings)} buildings, ${String(stressCounts.employment)} assignments; ` +
@@ -266,6 +327,9 @@ export function runM5Benchmarks(): boolean {
     migratedPeople > 0 &&
     m5aStats.averageMs > 0 &&
     m5aApplied &&
+    m5bStats.averageMs > 0 &&
+    m5bContracts > 0 &&
+    m5bInterestAccrued > 0 &&
     counts.countries === 8 &&
     counts.regions >= 16 &&
     counts.markets >= 5 &&

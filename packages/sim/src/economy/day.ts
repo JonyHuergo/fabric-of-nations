@@ -38,6 +38,7 @@ import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accou
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
+import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
   runProfitDistributionPhase,
@@ -114,6 +115,8 @@ export interface EconomyDayResult {
     readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    /** M5b daily debt service and month-end deficit financing. */
+    readonly debt: DebtPhaseResult;
     readonly migration: MigrationDayResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
@@ -849,6 +852,10 @@ export function runEconomicDay(
   // settlement result and never estimates wages from account balances.
   const fiscal = runFiscalPhase(world, settlement, dayIndex);
 
+  // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
+  // month-end finance the accrued fiscal deficit before the M4b close.
+  const debt = runDebtPhase(world, dayIndex);
+
   const needs = buildNeedsResult(
     world,
     economyDefinitions,
@@ -895,6 +902,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      debt,
       migration,
       employment,
       householdDemands: household.records,

@@ -79,3 +79,36 @@ export const DEFAULT_PROFIT_DISTRIBUTION_ENABLED = false;
 /** Numeric-safety bounds for M5a policy rates. */
 export const MIN_PROFIT_ALLOCATION_RATE = 0;
 export const MAX_PROFIT_ALLOCATION_RATE = 1;
+
+/**
+ * M5b public-debt defaults and numeric-safety bounds. PROVISIONAL.
+ *
+ * Disabled for legacy fixtures. A disabled policy still permits servicing any
+ * existing contracts but never originates new debt.
+ */
+export const DEFAULT_DEBT_POLICY: Readonly<{
+  enabled: boolean;
+  creditorKind: "country" | "popBlock";
+  creditorId: number;
+  annualCouponRate: number;
+  termDays: number;
+  maxOutstandingPrincipalSUSD: number;
+  refinanceOnMaturity: boolean;
+  arrearsGraceDays: number;
+}> = {
+  enabled: false,
+  creditorKind: "country",
+  creditorId: 0,
+  annualCouponRate: 0.03,
+  termDays: 1825,
+  maxOutstandingPrincipalSUSD: 0,
+  refinanceOnMaturity: false,
+  arrearsGraceDays: 90,
+};
+
+export const MIN_DEBT_COUPON_RATE = 0;
+export const MAX_DEBT_COUPON_RATE = 1;
+export const MIN_DEBT_TERM_DAYS = 1;
+export const MAX_DEBT_TERM_DAYS = 36_500;
+export const MAX_DEBT_ARREARS_GRACE_DAYS = 3_650;
+export const MAX_DEBT_PRINCIPAL_SUSD = 1e15;

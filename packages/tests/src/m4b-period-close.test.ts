@@ -104,6 +104,8 @@ function manualFinance(
     nextAccountId: entries.reduce((max, entry) => Math.max(max, entry.id), 0) + 1,
     opening: null,
     periodSummaries: [],
+    debtContracts: [],
+    nextContractId: 1,
     closedThroughDay: null,
   };
 }

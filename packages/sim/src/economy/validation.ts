@@ -24,6 +24,7 @@ import {
   assertFiscalPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
+  assertDebtPostingStructure,
   assertSemanticJournalLine,
   assertValidAccountCategory,
   assertValidAccountSubtype,
@@ -39,11 +40,17 @@ import {
   type OwnerEquityTally,
 } from "./accounts.js";
 import { assertValidCountryCurrencyState, buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import {
+  assertValidDebtContract,
+  assertValidDebtPolicy,
+  debtOutstandingPrincipal,
+} from "./debtPolicy.js";
 import { MAX_AUDIT_POSTINGS, MAX_PERIOD_SUMMARIES } from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
   type BuildingInstance,
+  type DebtContract,
   type EmploymentAssignment,
   type FinancePeriodSummary,
   type FinanceState,
@@ -304,6 +311,15 @@ export function assertValidJournalPosting(
     ) {
       assertProfitAllocationStructure(transactionKind, journalLines, accounts, path);
     }
+    if (
+      transactionKind === "debt-issuance" ||
+      transactionKind === "debt-principal-repayment" ||
+      transactionKind === "interest-accrual" ||
+      transactionKind === "interest-payment" ||
+      transactionKind === "debt-default-writeoff"
+    ) {
+      assertDebtPostingStructure(transactionKind, journalLines, accounts, path);
+    }
   }
   if (record.sourceEntityId !== null) {
     requireInteger(record.sourceEntityId, `${path}.sourceEntityId`, 0, 0xffff_ffff);
@@ -374,6 +390,30 @@ export function assertValidFinanceState(finance: FinanceState): void {
   );
   if (nextAccountId <= maxAccountId) {
     throw new RangeError("world.finance.nextAccountId must be greater than every account id");
+  }
+
+  const rawContracts = requireArray(record.debtContracts, "world.finance.debtContracts");
+  const contractIds = new Set<number>();
+  let maxContractId = 0;
+  for (let index = 0; index < rawContracts.length; index += 1) {
+    const contract = rawContracts[index] as DebtContract;
+    assertValidDebtContract(contract, `world.finance.debtContracts[${String(index)}]`);
+    if (contractIds.has(contract.id)) {
+      throw new RangeError(`duplicate debt contract id ${String(contract.id)}`);
+    }
+    contractIds.add(contract.id);
+    maxContractId = Math.max(maxContractId, contract.id);
+  }
+  const nextContractId = requireInteger(
+    record.nextContractId,
+    "world.finance.nextContractId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  if (nextContractId <= maxContractId) {
+    throw new RangeError(
+      "world.finance.nextContractId must be greater than every debt contract id",
+    );
   }
 
   const opening = record.opening as FinanceState["opening"];
@@ -751,7 +791,11 @@ function assertValidMarket(
   }
 }
 
-function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {  const fiscalAccountsRequired = world.countries.length > 0;
+function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {
+  const fiscalAccountsRequired = world.countries.length > 0;
+  const debtAccountsRequired =
+    world.finance.debtContracts.length > 0 ||
+    world.countries.some((country) => country.debt.enabled);
   for (const block of world.popBlocks) {
     const subtypes = [
       "owner-equity",
@@ -762,6 +806,11 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
     if (fiscalAccountsRequired) {
       index.get("popBlock", block.id, "income-tax-expense");
       index.get("popBlock", block.id, "welfare-income");
+    }
+    if (debtAccountsRequired) {
+      index.get("popBlock", block.id, "bond-asset");
+      index.get("popBlock", block.id, "interest-receivable");
+      index.get("popBlock", block.id, "interest-income");
     }
   }
   for (const building of world.buildings) {
@@ -791,6 +840,18 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
       "welfare-expense",
     ] as const) {
       index.get("country", country.id, subtype);
+    }
+    if (debtAccountsRequired) {
+      for (const subtype of [
+        "debt-liability",
+        "interest-payable",
+        "interest-expense",
+        "bond-asset",
+        "interest-receivable",
+        "interest-income",
+      ] as const) {
+        index.get("country", country.id, subtype);
+      }
     }
   }
   for (const account of world.finance.accounts) {
@@ -881,6 +942,22 @@ export function assertValidEconomyState(world: World): void {
           `country-owned ${account.subtype} account ${String(account.id)} references unknown country owner ${String(account.ownerId)}`,
         );
       }
+    }
+    const debtSubtype =
+      account.subtype === "debt-liability" ||
+      account.subtype === "interest-payable" ||
+      account.subtype === "interest-expense" ||
+      account.subtype === "bond-asset" ||
+      account.subtype === "interest-receivable" ||
+      account.subtype === "interest-income";
+    if (
+      debtSubtype &&
+      world.finance.debtContracts.length === 0 &&
+      !world.countries.some((country) => country.debt.enabled)
+    ) {
+      throw new RangeError(
+        `account ${String(account.id)} has debt subtype ${account.subtype} but public debt is disabled`,
+      );
     }
     tallyOwnerEquity(ownerEquityTallies, account);
   }
@@ -1026,6 +1103,23 @@ export function assertValidEconomyState(world: World): void {
         `country ${String(country.id)} immigrationOpen must be a boolean`,
       );
     }
+    assertValidDebtPolicy(country.debt, `country ${String(country.id)}.debt`);
+    if (country.debt.enabled) {
+      if (country.debt.creditorKind === "country") {
+        if (country.debt.creditorId === country.id) {
+          throw new RangeError(`country ${String(country.id)} cannot be its own debt creditor`);
+        }
+        if (!countryIds.has(country.debt.creditorId)) {
+          throw new RangeError(
+            `country ${String(country.id)} debt creditor references unknown country ${String(country.debt.creditorId)}`,
+          );
+        }
+      } else if (!popBlockIds.has(country.debt.creditorId)) {
+        throw new RangeError(
+          `country ${String(country.id)} debt creditor references unknown popBlock ${String(country.debt.creditorId)}`,
+        );
+      }
+    }
     let countryMarket: number | undefined;
     for (const regionId of country.regionIds) {
       const marketId = regionMarket.get(regionId);
@@ -1040,6 +1134,46 @@ export function assertValidEconomyState(world: World): void {
           `country ${String(country.id)} spans markets ${String(countryMarket)} and ${String(marketId)}; M5 permits one market per country`,
         );
       }
+    }
+  }
+
+  const contractIds = new Set<number>();
+  let maxContractId = 0;
+  for (const contract of world.finance.debtContracts) {
+    assertValidDebtContract(contract, `debt contract ${String(contract.id)}`);
+    if (contractIds.has(contract.id)) {
+      throw new RangeError(`duplicate debt contract id ${String(contract.id)}`);
+    }
+    contractIds.add(contract.id);
+    maxContractId = Math.max(maxContractId, contract.id);
+    if (!countryIds.has(contract.issuerCountryId)) {
+      throw new RangeError(
+        `debt contract ${String(contract.id)} references unknown issuer country ${String(contract.issuerCountryId)}`,
+      );
+    }
+    if (contract.holderKind === "country") {
+      if (!countryIds.has(contract.holderId)) {
+        throw new RangeError(
+          `debt contract ${String(contract.id)} references unknown holder country ${String(contract.holderId)}`,
+        );
+      }
+      if (contract.holderId === contract.issuerCountryId) {
+        throw new RangeError(`debt contract ${String(contract.id)} is held by its own issuer`);
+      }
+    } else if (!popBlockIds.has(contract.holderId)) {
+      throw new RangeError(
+        `debt contract ${String(contract.id)} references unknown holder popBlock ${String(contract.holderId)}`,
+      );
+    }
+  }
+  if (world.finance.nextContractId <= maxContractId) {
+    throw new RangeError(
+      "world.finance.nextContractId must be greater than every debt contract id",
+    );
+  }
+  for (const country of world.countries) {
+    if (debtOutstandingPrincipal(world.finance.debtContracts, country.id) < 0) {
+      throw new RangeError(`country ${String(country.id)} has invalid outstanding debt`);
     }
   }
 

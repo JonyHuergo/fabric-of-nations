@@ -188,7 +188,7 @@ describe("M5 multi-region and multi-country world", () => {
     }
   });
 
-  test("rejects schema-9 and simulation-0.9.0 saves", () => {
+  test("rejects schema-9/10/11 and simulation-0.9.0 saves", () => {
     const { world } = m5World();
     const envelope = JSON.parse(serializeWorld(world)) as {
       schemaVersion: number;
@@ -201,6 +201,10 @@ describe("M5 multi-region and multi-country world", () => {
     envelope.schemaVersion = 10;
     expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
       /Save world schema 10 is incompatible/,
+    );
+    envelope.schemaVersion = 11;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 11 is incompatible/,
     );
     const sim = JSON.parse(serializeWorld(world)) as { simVersion: string };
     sim.simVersion = "0.9.0";

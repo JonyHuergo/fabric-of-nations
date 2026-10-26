@@ -73,7 +73,9 @@ export interface GovernmentPeriodTotals {
   readonly countryId: Id;
   readonly incomeTaxRevenueSUSD: MoneySUSD;
   readonly welfareExpenseSUSD: MoneySUSD;
-  /** Revenue minus welfare expense for the period. */
+  /** M5b interest expense accrued in the period. */
+  readonly interestExpenseSUSD: MoneySUSD;
+  /** Revenue minus welfare and interest expense for the period. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -92,10 +94,10 @@ export function governmentPeriodTotals(
 ): GovernmentPeriodTotals[] {
   const accounts = new Map<Id, FinancialAccount>();
   for (const account of finance.accounts) accounts.set(account.id, account);
-  const totals = new Map<Id, { tax: number; welfare: number }>();
+  const totals = new Map<Id, { tax: number; welfare: number; interest: number }>();
   for (const account of finance.accounts) {
     if (account.ownerKind === "country" && account.ownerId !== null) {
-      totals.set(account.ownerId, totals.get(account.ownerId) ?? { tax: 0, welfare: 0 });
+      totals.set(account.ownerId, totals.get(account.ownerId) ?? { tax: 0, welfare: 0, interest: 0 });
     }
   }
   for (const [accountIdText, value] of Object.entries(summary.accountTotals)) {
@@ -111,12 +113,17 @@ export function governmentPeriodTotals(
       throw new RangeError(`summary account total ${accountIdText} references unknown account`);
     }
     if (account.ownerKind !== "country" || account.ownerId === null) continue;
-    if (account.subtype !== "income-tax-revenue" && account.subtype !== "welfare-expense") {
+    if (
+      account.subtype !== "income-tax-revenue" &&
+      account.subtype !== "welfare-expense" &&
+      account.subtype !== "interest-expense"
+    ) {
       continue;
     }
-    const current = totals.get(account.ownerId) ?? { tax: 0, welfare: 0 };
+    const current = totals.get(account.ownerId) ?? { tax: 0, welfare: 0, interest: 0 };
     if (account.subtype === "income-tax-revenue") current.tax += value;
-    else current.welfare += value;
+    else if (account.subtype === "welfare-expense") current.welfare += value;
+    else current.interest += value;
     totals.set(account.ownerId, current);
   }
   return [...totals.entries()]
@@ -124,7 +131,8 @@ export function governmentPeriodTotals(
       countryId,
       incomeTaxRevenueSUSD: values.tax,
       welfareExpenseSUSD: values.welfare,
-      netFiscalResultSUSD: values.tax - values.welfare,
+      interestExpenseSUSD: values.interest,
+      netFiscalResultSUSD: values.tax - values.welfare - values.interest,
     }))
     .sort((left, right) => left.countryId - right.countryId);
 }

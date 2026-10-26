@@ -34,6 +34,7 @@ import {
   assertValidProfitDistributionPolicy,
   createProfitDistributionPolicy,
 } from "./profit.js";
+import { createDebtPolicy } from "./debtPolicy.js";
 import type {
   AccountSubtype,
   BuildingDef,
@@ -645,6 +646,7 @@ export function createEconomyWorld(
         regionIds: [...initial.regionIds].sort((left, right) => left - right),
         treasuryAccountId: initial.treasuryAccountId,
         fiscal: { ...initial.fiscal },
+        debt: createDebtPolicy(initial.debt),
         immigrationOpen: initial.immigrationOpen ?? false,
       }),
     )
@@ -748,6 +750,25 @@ export function createEconomyWorld(
       balanceSUSD: initial.initialTreasuryCashSUSD,
     });
     opening.push({ accountId: equityId, balanceSUSD: initial.initialTreasuryCashSUSD });
+  }
+
+  // M5b public-debt accounts. They are created only when at least one country has
+  // an enabled debt policy, so legacy fixtures keep their accepted account sets.
+  const debtEnabled = world.countries.some((country) => country.debt.enabled);
+  if (debtEnabled) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      allocate("country", country.id, "debt-liability");
+      allocate("country", country.id, "interest-payable");
+      allocate("country", country.id, "interest-expense");
+      allocate("country", country.id, "bond-asset");
+      allocate("country", country.id, "interest-receivable");
+      allocate("country", country.id, "interest-income");
+    }
+    for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+      allocate("popBlock", block.id, "bond-asset");
+      allocate("popBlock", block.id, "interest-receivable");
+      allocate("popBlock", block.id, "interest-income");
+    }
   }
 
   for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {

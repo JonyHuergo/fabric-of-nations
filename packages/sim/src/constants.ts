@@ -14,13 +14,13 @@
  * `immigrationOpen` policy field, migration, and geographic labor access. M5a
  * adds the persisted profit-allocation policy and retained-profit accounts.
  */
-export const SIM_VERSION = "0.11.0";
+export const SIM_VERSION = "0.12.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
  * M5a adds `World.profitDistribution` and building retained-profit accounts.
  */
-export const WORLD_SCHEMA_VERSION = 11;
+export const WORLD_SCHEMA_VERSION = 12;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
