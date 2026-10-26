@@ -84,14 +84,11 @@ describe("M3a minimal cash ledger", () => {
     expect(balanceOf(finance, SELLER_BUILDING)).toBeCloseTo(beforeBuilding - 3, 9);
   });
 
-  test("profit distribution debits the owner household and credits the building", () => {
+  test("profit distribution requires the M5a retained-profit structure", () => {
     const finance = financeOf();
-    const beforeBuilding = balanceOf(finance, SELLER_BUILDING);
-    const beforeOwner = balanceOf(finance, HOUSEHOLD);
-    transfer(finance, "profit-distribution", SELLER_BUILDING, HOUSEHOLD, 7);
-
-    expect(balanceOf(finance, HOUSEHOLD)).toBeCloseTo(beforeOwner + 7, 9);
-    expect(balanceOf(finance, SELLER_BUILDING)).toBeCloseTo(beforeBuilding - 7, 9);
+    expect(() => transfer(finance, "profit-distribution", SELLER_BUILDING, HOUSEHOLD, 7)).toThrow(
+      /retained-profit/,
+    );
   });
 
   test("owner capital injection debits the receiving building and credits the owner", () => {

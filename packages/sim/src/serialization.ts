@@ -62,6 +62,7 @@ import {
   TRANSACTION_KINDS,
 } from "./economy/types.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
+import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
@@ -234,9 +235,15 @@ export type SerializedFiscalPolicy = {
   readonly welfareBudgetSUSDPerYear: number;
 };
 
+/** Encoded M5a profit-allocation policy. */
+export type SerializedProfitDistributionPolicy = {
+  readonly enabled: boolean;
+  readonly privatePayoutRate: number;
+  readonly stateRemittanceRate: number;
+};
+
 /** Encoded country identity, region ownership, treasury, and fiscal policy. */
-export type SerializedCountry = {
-  readonly id: number;
+export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
   readonly monetary: SerializedMonetaryArrangement;
@@ -333,6 +340,7 @@ export type SerializedWorld = {
   readonly employmentDirty: boolean;
   readonly markets: readonly SerializedMarket[];
   readonly finance: SerializedFinanceState;
+  readonly profitDistribution: SerializedProfitDistributionPolicy;
   readonly diagnostics: SerializedDiagnostics;
 };
 
@@ -675,6 +683,11 @@ export function encodeWorld(world: World): SerializedWorld {
         .sort((left, right) => left.periodEndDay - right.periodEndDay)
         .map(encodePeriodSummary),
       closedThroughDay: world.finance.closedThroughDay,
+    },
+    profitDistribution: {
+      enabled: world.profitDistribution.enabled,
+      privatePayoutRate: world.profitDistribution.privatePayoutRate,
+      stateRemittanceRate: world.profitDistribution.stateRemittanceRate,
     },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1293,6 +1306,17 @@ function decodeWorldPayload(value: unknown): World {
     decodeMarket(market, `save payload.markets[${String(index)}]`),
   );
   const finance = decodeFinanceState(payload.finance);
+  let profitDistribution: World["profitDistribution"];
+  try {
+    profitDistribution = assertValidProfitDistributionPolicy(
+      payload.profitDistribution,
+      "save payload.profitDistribution",
+    );
+  } catch (error) {
+    throw new SaveFormatError(
+      `save payload.profitDistribution is invalid: ${errorMessage(error)}`,
+    );
+  }
 
   const world: World = {
     schemaVersion,
@@ -1312,6 +1336,7 @@ function decodeWorldPayload(value: unknown): World {
     employmentDirty,
     markets,
     finance,
+    profitDistribution,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

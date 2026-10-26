@@ -62,3 +62,20 @@ export const MIGRATION_MONTHLY_MAX_FRACTION = 0.01;
  * systems exist. PROVISIONAL.
  */
 export const MIGRATION_MONTHLY_INFLOW_CAP_FRACTION = 0.01;
+
+/**
+ * M5a profit-allocation policy defaults. PROVISIONAL, not calibrated.
+ *
+ * Legacy M0–M5 scenarios omit the policy and therefore keep it disabled; the M5
+ * historical campaign enables it explicitly. `PRIVATE_PAYOUT_RATE` is the
+ * fraction of positive retained profit distributed to a private owner each
+ * month; `STATE_REMITTANCE_RATE` is the fraction remitted to a country treasury.
+ * Both flows are capped by available operating cash and never create money.
+ */
+export const DEFAULT_PRIVATE_PAYOUT_RATE = 0.5;
+export const DEFAULT_STATE_REMITTANCE_RATE = 1;
+export const DEFAULT_PROFIT_DISTRIBUTION_ENABLED = false;
+
+/** Numeric-safety bounds for M5a policy rates. */
+export const MIN_PROFIT_ALLOCATION_RATE = 0;
+export const MAX_PROFIT_ALLOCATION_RATE = 1;

@@ -61,6 +61,11 @@ export interface FinanceCloseResult {
   readonly postingIds: readonly number[];
   /** Accounts zeroed by the closing entries, in posting order. */
   readonly closedAccountIds: readonly Id[];
+  /**
+   * Transient single-use marker for the M5a profit-allocation phase. It is not
+   * persisted and is set only after the staged allocation has been published.
+   */
+  profitDistributionApplied: boolean;
 }
 
 /** Derived government totals for one persisted M4b summary. */
@@ -583,5 +588,6 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
     summary,
     postingIds: postings.map((posting) => posting.id),
     closedAccountIds,
+    profitDistributionApplied: false,
   };
 }

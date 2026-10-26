@@ -90,6 +90,12 @@ export interface HistoricalScenarioDefinitions {
   readonly demography: string;
 }
 
+export interface HistoricalProfitDistributionInput {
+  readonly enabled: boolean;
+  readonly privatePayoutRate: number;
+  readonly stateRemittanceRate: number;
+}
+
 export interface HistoricalScenarioMeta {
   readonly scenarioId: string;
   readonly dataVersion: string;
@@ -100,6 +106,7 @@ export interface HistoricalScenarioMeta {
   readonly ageStructures: Readonly<Record<string, HistoricalAgeStructure>>;
   readonly files: HistoricalScenarioFiles;
   readonly definitions: HistoricalScenarioDefinitions;
+  readonly profitDistribution?: HistoricalProfitDistributionInput;
 }
 
 export interface HistoricalCurrencyInput {
@@ -414,6 +421,32 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
   if (status !== "provisional" && status !== "calibrated") {
     errors.push('meta.status must be "provisional" or "calibrated"');
   }
+  let profitDistribution: HistoricalProfitDistributionInput | undefined;
+  if (record.profitDistribution !== undefined) {
+    const policy = assertRecord(record.profitDistribution, "meta.profitDistribution", errors);
+    const enabled = booleanField(policy, "enabled", "meta.profitDistribution", errors);
+    const privatePayoutRate = numberField(
+      policy,
+      "privatePayoutRate",
+      "meta.profitDistribution",
+      errors,
+    );
+    const stateRemittanceRate = numberField(
+      policy,
+      "stateRemittanceRate",
+      "meta.profitDistribution",
+      errors,
+    );
+    for (const [name, rate] of [
+      ["privatePayoutRate", privatePayoutRate],
+      ["stateRemittanceRate", stateRemittanceRate],
+    ] as const) {
+      if (!(rate >= 0 && rate <= 1)) {
+        errors.push(`meta.profitDistribution.${name} must be in 0..1`);
+      }
+    }
+    profitDistribution = { enabled, privatePayoutRate, stateRemittanceRate };
+  }
   return {
     scenarioId: stringField(record, "scenarioId", "meta", errors),
     dataVersion: stringField(record, "dataVersion", "meta", errors),
@@ -438,6 +471,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
       needs: stringField(definitions, "needs", "meta.definitions", errors),
       demography: stringField(definitions, "demography", "meta.definitions", errors),
     },
+    ...(profitDistribution === undefined ? {} : { profitDistribution }),
   };
 }
 
@@ -1423,6 +1457,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     countries,
     currencies,
     currencyValuations,
+    ...(data.meta.profitDistribution === undefined
+      ? {}
+      : { profitDistribution: { ...data.meta.profitDistribution } }),
   };
 }
 

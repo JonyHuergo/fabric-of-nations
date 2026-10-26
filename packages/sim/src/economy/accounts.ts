@@ -72,6 +72,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "system-reserve-cash": "asset",
   "treasury-cash": "asset",
   "owner-equity": "equity",
+  "retained-profit": "equity",
   "wage-income": "revenue",
   "sales-revenue": "revenue",
   "system-income": "revenue",
@@ -93,6 +94,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "system-reserve-cash": ["system"],
   "treasury-cash": ["country"],
   "owner-equity": ["popBlock", "building", "country", "system"],
+  "retained-profit": ["building"],
   "wage-income": ["popBlock"],
   "sales-revenue": ["building"],
   "system-income": ["system"],
@@ -216,7 +218,9 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "welfare-income", side: "credit" },
   ],
   "migration-transfer": [],
+  "profit-retention": [],
   "profit-distribution": [],
+  "state-enterprise-remittance": [],
   "owner-capital-injection": [],
   "monetary-issuance": [],
   "monetary-redemption": [],
@@ -424,6 +428,157 @@ export function assertFiscalPostingStructure(
       throw new RangeError(`${path} welfare-transfer block totals do not match country totals`);
     }
   }
+}
+
+/**
+ * Enforce the required legs of the M5a profit-allocation kinds.
+ *
+ * - `profit-retention`: exactly two equity lines on the same building, one
+ *   owner-equity and one retained-profit, opposite sides, equal amounts.
+ * - `profit-distribution`: retained-profit and operating-cash on one building,
+ *   plus household cash and pop-block owner equity on one recipient household,
+ *   all four legs equal.
+ * - `state-enterprise-remittance`: retained-profit and operating-cash on one
+ *   building, plus country treasury cash and country owner equity, all four legs
+ *   equal.
+ *
+ * This is structural validation only. It does not prove that the amount equals
+ * the economically correct distributable profit; the phase and its tests do that.
+ */
+export function assertProfitAllocationStructure(
+  kind: ProfitAllocationKind,
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) throw new RangeError(`${path} must contain profit-allocation lines`);
+  const resolved = lines.map((line, index) => {
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(`${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`);
+    }
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(`${path}.lines[${String(index)}] requires a strictly positive finite amount`);
+    }
+    return { line, account };
+  });
+  const amount = resolved[0]?.line.amountSUSD ?? 0;
+  for (const entry of resolved) {
+    if (Math.abs(entry.line.amountSUSD - amount) > toleranceMoney(amount, entry.line.amountSUSD)) {
+      throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
+    }
+  }
+  const find = (
+    predicate: (entry: (typeof resolved)[number]) => boolean,
+    description: string,
+  ): (typeof resolved)[number] => {
+    const matches = resolved.filter(predicate);
+    if (matches.length !== 1) {
+      throw new RangeError(`${path} ${kind} requires exactly one ${description} leg`);
+    }
+    const match = matches[0];
+    if (match === undefined) throw new RangeError(`${path} ${kind} is missing ${description}`);
+    return match;
+  };
+
+  if (kind === "profit-retention") {
+    if (resolved.length !== 2) {
+      throw new RangeError(`${path} ${kind} must contain exactly two lines`);
+    }
+    const equity = find(
+      (entry) => entry.account.ownerKind === "building" && entry.account.subtype === "owner-equity",
+      "building owner-equity leg",
+    );
+    const retained = find(
+      (entry) => entry.account.ownerKind === "building" && entry.account.subtype === "retained-profit",
+      "building retained-profit leg",
+    );
+    if (equity.line.side === retained.line.side) {
+      throw new RangeError(`${path} ${kind} legs must be on opposite sides`);
+    }
+    if (equity.account.ownerId === null || equity.account.ownerId !== retained.account.ownerId) {
+      throw new RangeError(`${path} ${kind} legs must share one building owner`);
+    }
+    return;
+  }
+
+  const retained = find(
+    (entry) =>
+      entry.account.ownerKind === "building" &&
+      entry.account.subtype === "retained-profit" &&
+      entry.line.side === "debit",
+    "building retained-profit debit",
+  );
+  const operating = find(
+    (entry) =>
+      entry.account.ownerKind === "building" &&
+      entry.account.subtype === "operating-cash" &&
+      entry.line.side === "credit",
+    "building operating-cash credit",
+  );
+  if (retained.account.ownerId === null || retained.account.ownerId !== operating.account.ownerId) {
+    throw new RangeError(`${path} ${kind} building legs must share one building owner`);
+  }
+
+  if (kind === "profit-distribution") {
+    const cash = find(
+      (entry) =>
+        entry.account.ownerKind === "popBlock" &&
+        entry.account.subtype === "household-cash" &&
+        entry.line.side === "debit",
+      "household-cash debit",
+    );
+    const equity = find(
+      (entry) =>
+        entry.account.ownerKind === "popBlock" &&
+        entry.account.subtype === "owner-equity" &&
+        entry.line.side === "credit",
+      "popBlock owner-equity credit",
+    );
+    if (cash.account.ownerId === null || cash.account.ownerId !== equity.account.ownerId) {
+      throw new RangeError(`${path} ${kind} recipient legs must share one popBlock owner`);
+    }
+    if (resolved.length !== 4) {
+      throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+    }
+    return;
+  }
+
+  const cash = find(
+    (entry) =>
+      entry.account.ownerKind === "country" &&
+      entry.account.subtype === "treasury-cash" &&
+      entry.line.side === "debit",
+    "country treasury-cash debit",
+  );
+  const equity = find(
+    (entry) =>
+      entry.account.ownerKind === "country" &&
+      entry.account.subtype === "owner-equity" &&
+      entry.line.side === "credit",
+    "country owner-equity credit",
+  );
+  if (cash.account.ownerId === null || cash.account.ownerId !== equity.account.ownerId) {
+    throw new RangeError(`${path} ${kind} recipient legs must share one country owner`);
+  }
+  if (resolved.length !== 4) {
+    throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+  }
+}
+
+/** Account categories and subtypes used by M5a profit allocation. */
+export type ProfitAllocationKind =
+  | "profit-retention"
+  | "profit-distribution"
+  | "state-enterprise-remittance";
+
+/** True when `value` is one of the M5a profit-allocation transaction kinds. */
+export function isProfitAllocationKind(value: string): value is ProfitAllocationKind {
+  return (
+    value === "profit-retention" ||
+    value === "profit-distribution" ||
+    value === "state-enterprise-remittance"
+  );
 }
 
 /**

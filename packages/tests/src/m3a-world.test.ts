@@ -161,7 +161,7 @@ describe("M3a world state and relationships", () => {
 
     const stateOwned = m3World().world;
     (stateOwned.buildings[0] as unknown as { ownerKind: string }).ownerKind = "state";
-    expect(() => assertValidWorld(stateOwned)).toThrow(/private|ownerKind/i);
+    expect(() => assertValidWorld(stateOwned)).toThrow(/private|ownerKind|state-owned/i);
   });
 
   test("rejects malformed employment assignments", () => {

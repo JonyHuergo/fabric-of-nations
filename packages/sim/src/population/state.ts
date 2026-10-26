@@ -548,6 +548,11 @@ export function createPopulationWorld(
       periodSummaries: [],
       closedThroughDay: null,
     } satisfies FinanceState,
+    profitDistribution: {
+      enabled: false,
+      privatePayoutRate: 0.5,
+      stateRemittanceRate: 1,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

@@ -198,6 +198,10 @@ describe("M5 multi-region and multi-country world", () => {
     expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
       /Save world schema 9 is incompatible/,
     );
+    envelope.schemaVersion = 10;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 10 is incompatible/,
+    );
     const sim = JSON.parse(serializeWorld(world)) as { simVersion: string };
     sim.simVersion = "0.9.0";
     // The envelope still claims the current schema, so the simulation-version

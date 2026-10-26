@@ -11,11 +11,13 @@
 import {
   assertValidWorld,
   cloneWorld,
+  closeFinancePeriod,
   createEconomyWorld,
   deserializeWorld,
   hashWorld,
   populationTotal,
   runMigrationPhase,
+  runProfitDistributionPhase,
   runTicks,
   serializeWorld,
   tick,
@@ -33,6 +35,7 @@ const M5_SERIALIZATION_ITERATIONS = 3;
 const M5_MIGRATION_ITERATIONS = 5;
 const M5_STRESS_TICKS = 2;
 const M5_MIGRATION_DAY = 31;
+const M5A_ALLOCATION_ITERATIONS = 5;
 
 interface SampleStats {
   readonly count: number;
@@ -180,6 +183,27 @@ export function runM5Benchmarks(): boolean {
   }
   const migrationStats = stats(migrationSamples);
 
+  // M5a month-end allocation cost. The world is advanced to a month-end; each
+  // measured iteration clones it, closes the clone outside the timer, and times
+  // only the allocation phase.
+  const m5aBaseWorld = createEconomyWorld(scenario, { seed: SEED });
+  runTicks(m5aBaseWorld, 30, contextFor(scenario));
+  const m5aSamples: number[] = [];
+  let m5aApplied = false;
+  let m5aBuildings = 0;
+  let m5aDistributed = 0;
+  for (let index = 0; index < M5A_ALLOCATION_ITERATIONS; index += 1) {
+    const candidate = cloneWorld(m5aBaseWorld);
+    const close = closeFinancePeriod(candidate);
+    const start = process.hrtime.bigint();
+    const result = runProfitDistributionPhase(candidate, 30, close);
+    m5aSamples.push(nanosecondsToMs(process.hrtime.bigint() - start));
+    m5aApplied = result.applied;
+    m5aBuildings = result.buildings.length;
+    m5aDistributed = result.totalPrivateDistributionSUSD + result.totalStateRemittanceSUSD;
+  }
+  const m5aStats = stats(m5aSamples);
+
   // Larger authored stress fixture: doubled blocks and buildings.
   const stress = stressScenario(scenario);
   const stressWorld = createEconomyWorld(stress, { seed: SEED });
@@ -225,6 +249,11 @@ export function runM5Benchmarks(): boolean {
       `hash ${migrationHash}`,
   );
   console.log(
+    `  M5a profit allocation: avg ${formatMs(m5aStats.averageMs)} ms, p50 ${formatMs(m5aStats.p50Ms)} ms, ` +
+      `p95 ${formatMs(m5aStats.p95Ms)} ms; ${String(m5aBuildings)} buildings, ` +
+      `${m5aDistributed.toFixed(2)} SUSD distributed in the sample; clone/close excluded`,
+  );
+  console.log(
     `M5 stress: ${String(stressCounts.countries)} countries, ${String(stressCounts.regions)} regions, ` +
       `${String(stressCounts.markets)} markets, ${String(stressCounts.blocks)} blocks, ` +
       `${String(stressCounts.buildings)} buildings, ${String(stressCounts.employment)} assignments; ` +
@@ -235,6 +264,8 @@ export function runM5Benchmarks(): boolean {
     runStats.every((result) => result.p95Ms > 0) &&
     migrationStats.averageMs > 0 &&
     migratedPeople > 0 &&
+    m5aStats.averageMs > 0 &&
+    m5aApplied &&
     counts.countries === 8 &&
     counts.regions >= 16 &&
     counts.markets >= 5 &&

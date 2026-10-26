@@ -25,9 +25,11 @@ import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from
 import {
   accountNormalSide,
   assertFiscalPostingStructure,
+  assertProfitAllocationStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
+  isProfitAllocationKind,
   transactionKindChangesCash,
 } from "./accounts.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
@@ -153,6 +155,9 @@ function validatePostingLines(
   }
   if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
     assertFiscalPostingStructure(transactionKind, lines, accounts);
+  }
+  if (isProfitAllocationKind(transactionKind)) {
+    assertProfitAllocationStructure(transactionKind, lines, accounts);
   }
   return { deltas, debits, credits, cashDelta };
 }

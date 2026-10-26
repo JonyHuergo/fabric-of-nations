@@ -27,3 +27,10 @@ export {
   type FinanceCloseResult,
   type GovernmentPeriodTotals,
 } from "./period.js";
+export {
+  assertValidProfitDistributionPolicy,
+  createProfitDistributionPolicy,
+  runProfitDistributionPhase,
+  type BuildingProfitAllocationResult,
+  type ProfitDistributionResult,
+} from "./profit.js";

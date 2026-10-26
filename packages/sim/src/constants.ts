@@ -11,12 +11,16 @@
  * version.
  *
  * M5 adds multi-region/multi-market state semantics, the country
- * `immigrationOpen` policy field, migration, and geographic labor access.
+ * `immigrationOpen` policy field, migration, and geographic labor access. M5a
+ * adds the persisted profit-allocation policy and retained-profit accounts.
  */
-export const SIM_VERSION = "0.10.0";
+export const SIM_VERSION = "0.11.0";
 
-/** Version of the serialized world schema. M5 adds `Country.immigrationOpen`. */
-export const WORLD_SCHEMA_VERSION = 10;
+/**
+ * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
+ * M5a adds `World.profitDistribution` and building retained-profit accounts.
+ */
+export const WORLD_SCHEMA_VERSION = 11;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -25,7 +29,9 @@ export const SAVE_FORMAT_VERSION = 1;
  * Content/data version. M4a-2/M4b/M4c add runtime state but ship no new
  * scenario data, so the data package version stays `m3-economy-v1`. M5 ships
  * additional historical scenario content but changes no existing definition or
- * scenario meaning, so the version remains stable (D-053).
+ * scenario meaning, so the version remains stable (D-053). M5a adds a
+ * scenario-provided policy and account role but does not change existing
+ * definition/scenario meanings, so it also remains stable (D-056).
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 

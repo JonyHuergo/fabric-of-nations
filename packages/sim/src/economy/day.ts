@@ -40,6 +40,10 @@ import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
+  runProfitDistributionPhase,
+  type ProfitDistributionResult,
+} from "./profit.js";
+import {
   runMarketDay,
   type HouseholdDemandRecord,
   type MarketDayInput,
@@ -117,6 +121,8 @@ export interface EconomyDayResult {
     readonly fallbackUsed: boolean;
     /** Non-null only on a civil month-end, after the month-end wealth update (D-047). */
     readonly financeClose: FinanceCloseResult | null;
+    /** M5a month-end allocation; applied false when the policy is disabled. */
+    readonly profitDistribution: ProfitDistributionResult | null;
   };
 }
 
@@ -160,6 +166,7 @@ export function cloneWorld(source: World): World {
       stockLots: market.stockLots.map((lot) => ({ ...lot })),
     })),
     finance: cloneFinanceState(source.finance),
+    profitDistribution: { ...source.profitDistribution },
     diagnostics: {
       ...source.diagnostics,
       recentWarnings: [...source.diagnostics.recentWarnings],
@@ -862,6 +869,10 @@ export function runEconomicDay(
     populationDefinitions,
   );
   const financeClose = closeMonthEndIfDue(world, dayIndex);
+  const profitDistribution =
+    financeClose === null
+      ? null
+      : runProfitDistributionPhase(world, dayIndex, financeClose);
 
   let workingAge = 0;
   for (const block of world.popBlocks) workingAge += workingAgePopulation(block);
@@ -890,6 +901,7 @@ export function runEconomicDay(
       productionDemands: productionRecords,
       fallbackUsed,
       financeClose,
+      profitDistribution,
     },
   };
 }

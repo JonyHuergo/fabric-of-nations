@@ -23,6 +23,7 @@ import {
   assertAccountingIdentity,
   assertFiscalPostingStructure,
   assertOwnerEquityTallies,
+  assertProfitAllocationStructure,
   assertSemanticJournalLine,
   assertValidAccountCategory,
   assertValidAccountSubtype,
@@ -295,6 +296,13 @@ export function assertValidJournalPosting(
     }
     if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
       assertFiscalPostingStructure(transactionKind, journalLines, accounts, path);
+    }
+    if (
+      transactionKind === "profit-retention" ||
+      transactionKind === "profit-distribution" ||
+      transactionKind === "state-enterprise-remittance"
+    ) {
+      assertProfitAllocationStructure(transactionKind, journalLines, accounts, path);
     }
   }
   if (record.sourceEntityId !== null) {
@@ -638,8 +646,8 @@ function assertValidBuilding(building: BuildingInstance): void {
   if (condition < 0 || condition > 1) {
     throw new RangeError("world.buildings[].condition must be in 0..1");
   }
-  if (record.ownerKind !== "private") {
-    throw new RangeError("M3 buildings must have private ownership");
+  if (record.ownerKind !== "private" && record.ownerKind !== "state") {
+    throw new RangeError("world.buildings[].ownerKind must be private or state");
   }
   requireInteger(record.ownerAccountId, "world.buildings[].ownerAccountId", 0, 0xffff_ffff);
   assertValidDayIndex(record.builtOnDay as number);
@@ -766,6 +774,9 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
     ] as const) {
       index.get("building", building.id, subtype);
     }
+    if (world.profitDistribution.enabled) {
+      index.get("building", building.id, "retained-profit");
+    }
   }
   for (const country of world.countries) {
     const treasury = index.get("country", country.id, "treasury-cash");
@@ -851,6 +862,11 @@ export function assertValidEconomyState(world: World): void {
       if (account.ownerId === null || !buildingById.has(account.ownerId)) {
         throw new RangeError(
           `building-owned ${account.subtype} account ${String(account.id)} references unknown building owner ${String(account.ownerId)}`,
+        );
+      }
+      if (account.subtype === "retained-profit" && !world.profitDistribution.enabled) {
+        throw new RangeError(
+          `building ${String(account.ownerId)} has a retained-profit account but profit distribution is disabled`,
         );
       }
     } else if (account.ownerKind === "popBlock") {
@@ -1041,6 +1057,38 @@ export function assertValidEconomyState(world: World): void {
     const ownerAccount = accounts.byId.get(building.ownerAccountId);
     if (ownerAccount === undefined) {
       throw new RangeError(`building ${String(building.id)} references unknown owner account`);
+    }
+    if (building.ownerKind === "state") {
+      if (!world.profitDistribution.enabled) {
+        throw new RangeError(
+          `building ${String(building.id)} is state-owned but profit distribution is disabled`,
+        );
+      }
+      if (
+        ownerAccount.ownerKind !== "country" ||
+        ownerAccount.subtype !== "treasury-cash" ||
+        ownerAccount.ownerId === null
+      ) {
+        throw new RangeError(
+          `building ${String(building.id)} state owner account must be a country treasury-cash account`,
+        );
+      }
+      const buildingCountry = regionOwners.get(building.regionId) ?? null;
+      if (buildingCountry !== ownerAccount.ownerId) {
+        throw new RangeError(
+          `building ${String(building.id)} must be owned by the country that owns its region`,
+        );
+      }
+      const operatingAccount = accounts.byId.get(building.operatingCashAccountId);
+      if (operatingAccount === undefined) {
+        throw new RangeError(`building ${String(building.id)} references unknown operating account`);
+      }
+      if (operatingAccount.subtype !== "operating-cash" || operatingAccount.ownerId !== building.id) {
+        throw new RangeError(
+          `building ${String(building.id)} operating account must be an operating account owned by it`,
+        );
+      }
+      continue;
     }
     if (ownerAccount.subtype !== "household-cash") {
       throw new RangeError(`building ${String(building.id)} owner account must be household cash`);

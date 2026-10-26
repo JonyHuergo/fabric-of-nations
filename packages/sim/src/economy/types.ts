@@ -108,7 +108,11 @@ export interface BuildingInstance {
   level: number;
   condition: Rate;
   ownerKind: "private" | "state";
-  /** M3 requires a private owner account owned by a pop block. */
+  /**
+   * The owner's designated cash account: a pop-block household-cash account for
+   * private ownership, or the owning country's treasury-cash account for state
+   * ownership (M5a).
+   */
   ownerAccountId: Id;
   builtOnDay: Day;
   operational: boolean;
@@ -160,6 +164,7 @@ export const ACCOUNT_SUBTYPES = [
   "system-reserve-cash",
   "treasury-cash",
   "owner-equity",
+  "retained-profit",
   "wage-income",
   "sales-revenue",
   "system-income",
@@ -211,7 +216,9 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "income-tax",
   "welfare-transfer",
   "migration-transfer",
+  "profit-retention",
   "profit-distribution",
+  "state-enterprise-remittance",
   "owner-capital-injection",
   ...INTERNAL_TRANSACTION_KINDS,
 ] as const;
@@ -379,6 +386,25 @@ export interface FiscalPolicy {
   welfareBudgetSUSDPerYear: MoneySUSD;
 }
 
+/**
+ * M5a provisional profit-allocation policy.
+ *
+ * When enabled, each economic month-end after the M4b close reclassifies each
+ * building's closed period net result into its `retained-profit` account and
+ * distributes a fraction of positive retained profit. Private distributions go
+ * to the designated owner household; state enterprises remit to the owning
+ * country treasury. Both are capped by available operating cash. These rates are
+ * provisional, not calibrated. Legacy M0–M5 fixtures default to disabled so
+ * their accepted behavior is unchanged.
+ */
+export interface ProfitDistributionPolicy {
+  enabled: boolean;
+  /** Fraction of positive private retained profit distributed per month, 0..1. */
+  privatePayoutRate: Rate;
+  /** Fraction of positive state-enterprise retained profit remitted per month, 0..1. */
+  stateRemittanceRate: Rate;
+}
+
 export interface Country {
   id: Id;
   tag: string;
@@ -480,4 +506,6 @@ export interface EconomyScenarioDef {
   countries?: CountryInitialDef[];
   currencies?: Currency[];
   currencyValuations?: CurrencyValuation[];
+  /** M5a profit-allocation policy. Omitted means disabled defaults. */
+  profitDistribution?: ProfitDistributionPolicy;
 }

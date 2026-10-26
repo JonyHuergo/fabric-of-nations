@@ -22,6 +22,7 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { assertValidEconomyState } from "./economy/validation.js";
+import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import type {
   BuildingInstance,
   Country,
@@ -30,6 +31,7 @@ import type {
   EmploymentAssignment,
   FinanceState,
   Market,
+  ProfitDistributionPolicy,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
 import type { PopBlock, Region } from "./population/types.js";
@@ -89,6 +91,8 @@ export interface World {
   markets: Market[];
   /** M3 cash ledger accounts and bounded posting history. */
   finance: FinanceState;
+  /** M5a provisional profit-allocation policy; disabled for legacy fixtures. */
+  profitDistribution: ProfitDistributionPolicy;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -158,6 +162,11 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       periodSummaries: [],
       closedThroughDay: null,
     },
+    profitDistribution: {
+      enabled: false,
+      privatePayoutRate: 0.5,
+      stateRemittanceRate: 1,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -206,6 +215,7 @@ export function assertValidWorld(world: World): void {
   if (typeof world.employmentDirty !== "boolean") {
     throw new TypeError("world.employmentDirty must be a boolean");
   }
+  assertValidProfitDistributionPolicy(world.profitDistribution, "world.profitDistribution");
 
   const diagnostics = requireRecord(world.diagnostics, "world.diagnostics");
   requireInteger(

@@ -30,6 +30,10 @@ import {
 } from "./country.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
+import {
+  assertValidProfitDistributionPolicy,
+  createProfitDistributionPolicy,
+} from "./profit.js";
 import type {
   AccountSubtype,
   BuildingDef,
@@ -184,6 +188,15 @@ function assertProfessionIdentities(scenario: EconomyScenarioDef): void {
 function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: ReadonlySet<number>): void {
   const definitions = buildingDefinitions(scenario);
   const regions = new Set(scenario.population.regions.map((region) => region.id));
+  const policy = scenario.profitDistribution ?? {
+    enabled: false,
+    privatePayoutRate: 0.5,
+    stateRemittanceRate: 1,
+  };
+  const treasuryByAccount = new Map<number, number>();
+  for (const country of scenario.countries ?? []) {
+    treasuryByAccount.set(country.treasuryAccountId, country.id);
+  }
   const instanceIds = new Set<number>();
   for (const instance of scenario.buildingInstances) {
     const path = `buildingInstances[${String(instance.id)}]`;
@@ -202,11 +215,24 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
     requireInteger(instance.level, `${path}.level`, 1, Number.MAX_SAFE_INTEGER);
     const condition = requireFiniteNumber(instance.condition, `${path}.condition`);
     if (condition < 0 || condition > 1) throw new RangeError(`${path}.condition must be in 0..1`);
-    if (instance.ownerKind !== "private") {
-      throw new RangeError(`${path}.ownerKind must be private in M3`);
+    if (instance.ownerKind !== "private" && instance.ownerKind !== "state") {
+      throw new RangeError(`${path}.ownerKind must be "private" or "state"`);
+    }
+    if (!definition.ownershipAllowed.includes(instance.ownerKind)) {
+      throw new RangeError(
+        `${path}.ownerKind ${JSON.stringify(instance.ownerKind)} is not permitted by its building definition`,
+      );
     }
     if (!accountIds.has(instance.ownerAccountId)) {
       throw new RangeError(`${path}.ownerAccountId references unknown account`);
+    }
+    if (instance.ownerKind === "state") {
+      if (!policy.enabled) {
+        throw new RangeError(`${path} is state-owned but the M5a profit-distribution policy is disabled`);
+      }
+      if (!treasuryByAccount.has(instance.ownerAccountId)) {
+        throw new RangeError(`${path}.ownerAccountId must be the owning country's treasury account`);
+      }
     }
     assertValidDayIndex(instance.builtOnDay);
     if (typeof instance.operational !== "boolean") {
@@ -380,14 +406,31 @@ function assertBuildingOwnershipGeography(scenario: EconomyScenarioDef): void {
     scenario.population.popBlocks.map((block) => [block.financialAccountId, block]),
   );
   const owners = countryByRegionId(scenario);
+  const treasuryOwner = new Map(
+    (scenario.countries ?? []).map((country) => [country.treasuryAccountId, country.id]),
+  );
   for (const building of scenario.buildingInstances) {
+    const buildingCountry = owners.get(building.regionId) ?? null;
+    if (building.ownerKind === "state") {
+      const ownerCountry = treasuryOwner.get(building.ownerAccountId);
+      if (ownerCountry === undefined) {
+        throw new RangeError(
+          `building ${String(building.id)} state ownerAccountId must be a country treasury account`,
+        );
+      }
+      if (buildingCountry !== ownerCountry) {
+        throw new RangeError(
+          `building ${String(building.id)} and its state owner country ${String(ownerCountry)} must belong to the same country`,
+        );
+      }
+      continue;
+    }
     const owner = blockByAccount.get(building.ownerAccountId);
     if (owner === undefined) {
       throw new RangeError(
         `building ${String(building.id)} ownerAccountId must be a pop-block household cash account`,
       );
     }
-    const buildingCountry = owners.get(building.regionId) ?? null;
     const ownerCountry = owners.get(owner.regionId) ?? null;
     if (buildingCountry !== ownerCountry) {
       throw new RangeError(
@@ -531,6 +574,12 @@ function pathForBlock(blockId: Id): string {
 /** Validate an M3 scenario before constructing authoritative state. */
 export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   assertValidEconomyDefinitions(scenario.definitions);
+  if (scenario.profitDistribution !== undefined) {
+    assertValidProfitDistributionPolicy(
+      scenario.profitDistribution,
+      "scenario.profitDistribution",
+    );
+  }
   if (scenario.population.dataVersion !== scenario.definitions.dataVersion) {
     throw new RangeError("scenario population and economy dataVersion must match");
   }
@@ -580,6 +629,8 @@ export function createEconomyWorld(
     fiscalAccounts: (scenario.countries ?? []).length > 0,
     allowMultipleRegions: true,
   });
+  const profitDistribution = createProfitDistributionPolicy(scenario.profitDistribution);
+  world.profitDistribution = profitDistribution;
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
     (scenario.countries ?? []).map((country) => [country.id, country]),
@@ -713,6 +764,9 @@ export function createEconomyWorld(
     allocate("building", instance.id, "input-expense");
     allocate("building", instance.id, "wage-expense");
     allocate("building", instance.id, "upkeep-expense");
+    if (profitDistribution.enabled) {
+      allocate("building", instance.id, "retained-profit");
+    }
     opening.push({
       accountId: instance.operatingCashAccountId,
       balanceSUSD: instance.initialOperatingCashSUSD,
