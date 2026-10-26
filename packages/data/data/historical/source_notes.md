@@ -94,6 +94,14 @@ and remittance are supported by the engine and covered by focused fixtures, not 
 this eight-polity sample. The rates are provisional structural policy inputs, not
 historical dividend or state-enterprise observations.
 
+## M5b debt content
+
+The authored historical sample does not enable public debt: its countries default to a
+disabled debt policy and no contracts. M5b contract issuance, interest, maturity,
+refinancing, arrears, and default are exercised by focused simulation fixtures, not
+by this sample. No historical debt stocks, coupons, or creditor identities are
+claimed.
+
 ## Known limitations
 
 - No century-scale historical population/occupation trend validation is claimed.

@@ -1884,7 +1884,106 @@ rule.
   Known-answer digests are re-baselined because the schema version and policy
   object are hashed state.
 
-## Assumptions recorded for future review
+### D-057 — M5b public debt, deficit financing, and explicit default
+
+**Context.** M5b must add versioned public-debt contracts, issuance, interest,
+maturity/repayment, refinancing, arrears, and explicit default while separating the
+fiscal deficit, financing flows, borrowing proceeds, interest expense, and principal
+repayment. The GDD delegates the exact holder set, terms, financing rule, and default
+consequences to the implementation stage. M5b must not introduce banking, a central
+bank, bond-market pricing, monetary issuance, or external investor pools.
+
+**Decision.**
+
+- **Issuers and holders.** A country is the only issuer. A contract's holder is an
+  explicitly identified existing simulated entity: another country's treasury-cash
+  account or a pop-block household-cash account. A country may not hold its own
+  debt. This provides domestic and foreign creditors without inventing a bank,
+  external fund, or unexplained cash source.
+- **Policy state.** Each country gains a scenario-initialised `debt` policy:
+  `enabled`, `creditorKind` (`country`/`popBlock`), `creditorId`,
+  `annualCouponRate`, `termDays`, `maxOutstandingPrincipalSUSD`,
+  `refinanceOnMaturity`, and `arrearsGraceDays`. The default is disabled with a
+  zero ceiling, so M0–M5a fixtures and their account sets are unchanged. Rates,
+  terms, ceilings, and grace periods are provisional structural inputs, not
+  calibrated or player/AI controls.
+- **Contract state.** `FinanceState.debtContracts` persists contract version 1,
+  issuer country, holder kind/id, original principal, outstanding principal,
+  annual coupon, issue day, maturity day, accrued interest, status
+  (`active`/`arrears`/`repaid`/`defaulted`), and arrears start day.
+  `FinanceState.nextContractId` is the deterministic allocator. Maturity is capped
+  at the campaign terminal boundary.
+- **Accounts.** Only when at least one country enables debt (or contracts exist),
+  every country receives `debt-liability`, `interest-payable`, and
+  `interest-expense` issuer accounts plus `bond-asset`, `interest-receivable`, and
+  `interest-income` holder accounts; every pop block receives the three holder
+  accounts. Disabled worlds have no debt accounts. This keeps legacy account sets
+  unchanged while allowing any country/household to act as a creditor.
+- **Issuance.** Issuance debits issuer treasury cash and credits issuer debt
+  liability, and debits holder bond asset and credits holder cash. It is
+  cash-neutral overall, requires the holder to have actual cash and the issuer to
+  have outstanding-principal headroom, and never creates money. Explicit issuance is
+  exposed as a validated atomic operation and must use the country's designated
+  creditor; automatic issuance uses the same path.
+- **Interest.** Interest accrues daily on outstanding principal using the actual
+  civil year length (`365` or `366`), as issuer interest expense/interest payable
+  and holder interest receivable/income. Accrual starts the day after issuance.
+  Coupons are paid at each civil month-end, and accrued interest is also settled at
+  maturity. Payment reduces interest payable and issuer treasury cash, and increases
+  holder cash while reducing holder interest receivable. Unpaid interest is explicit
+  accrued liability/receivable and sets `arrears`.
+- **Maturity and refinancing.** On the maturity day, accrued interest is settled
+  first. If the issuer policy allows refinancing and the outstanding-principal
+  ceiling still holds, a replacement contract is issued to the same holder and the
+  old principal is repaid in the same batch, showing both sides. Otherwise available
+  treasury cash repays principal. A partial or unpaid principal leaves the contract
+  outstanding with `arrears` status and an explicit arrears start day.
+- **Arrears and default.** A contract remains `arrears` while due principal or
+  interest is unpaid. After `arrearsGraceDays` from the first arrears day, the
+  remaining principal and accrued interest are written off explicitly:
+  the issuer debits debt liability/interest payable and credits owner equity; the
+  holder credits bond asset/interest receivable and debits owner equity. The contract
+  becomes `defaulted` with zero outstanding. No revenue/expense flow is created, no
+  cash moves, and no obligation is silently erased. Arrears can be cured by later
+  principal repayment before the grace period ends.
+- **Deficit and financing rule.** At each month-end, after daily interest accrual
+  and before the M4b close, each debt-enabled country computes its accrued fiscal
+  deficit as `welfare-expense + interest-expense - income-tax-revenue`. It may issue
+  new debt up to the smaller of that deficit, the designated creditor's actual cash,
+  and outstanding-principal headroom. Borrowing proceeds are a financing inflow, not
+  revenue. Any deficit that cannot be financed is reported as
+  `unfinancedDeficitSUSD`; no invisible liability is created. M4c's welfare
+  shortfall rule is not changed, so a liquidity shortage before month-end can still
+  leave welfare underpaid.
+- **Reporting and flow kinds.** `governmentPeriodTotals` adds
+  `interestExpenseSUSD` and computes `netFiscalResultSUSD` as tax revenue minus
+  welfare and interest expense. Borrowing proceeds and principal repayment are
+  financing/balance-sheet operations outside the four M4b flow kinds. The M4b close
+  still zeroes all revenue/expense accounts, including interest, into owner equity.
+- **Atomicity and validation.** The debt phase clones finance, applies accrual,
+  financing, coupons, maturities, refinancing, and default, then validates accounts,
+  contracts, postings, summaries, accounting identity, and aggregate designated-cash
+  conservation before publication. The explicit issuer stages and validates a
+  candidate world before replacing finance. Any error leaves the published world
+  unchanged. Contract, policy, holder, self-creditor, status, principal, interest,
+  and maturity invariants are validated on load and after every phase.
+- **Persistence and versions.** World schema **12**, simulation version **0.12.0**,
+  save format **1**. `dataVersion` remains `m3-economy-v1`; the policy is
+  scenario-provided and no existing definition changed. Schema-11/simulation-0.11.0
+  saves are rejected with no migration. Known-answer digests are re-baselined
+  because schema 12, `Country.debt`, and finance contract fields are hashed state.
+- **Explicit non-goals.** No commercial banking, deposit money, central bank,
+  monetary issuance, bond-market pricing or auctions, derivatives, external investor
+  pools, debt-to-GDP targeting, debt mutualization, interest taxation, or
+  player/AI debt actions. M5b does not add an external sector or change M4c/M5a
+  behavior when debt is disabled.
+
+**Rejected alternatives.** (a) Borrowing from a new aggregate domestic-credit fund
+would create an unexplained cash source. (b) Deferring welfare into an implicit
+payable would contradict M4c's explicit shortfall rule and create an invisible
+obligation. (c) Immediate default at maturity without an arrears window would not
+exercise the required explicit arrears state. (d) Counting principal repayment or
+borrowing as revenue/expense would corrupt the four-flow summary and fiscal result.## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
 2. The warning buffer is capped at 32 entries of 500 characters each. No

@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -17,16 +17,17 @@ valuation)**, **M4b (monthly finance period close and immutable finance
 summaries)**, and **M4c (per-country treasury, daily income tax, and budgeted
 welfare transfers)**, **M5 (multi-region/multi-country worlds, shared
 markets, migration, labor mobility, and the initial historical-data pipeline with
-eight authored polities)**, and **M5a (retained-profit accounting, private profit
-distributions, state-enterprise ownership, and treasury remittances)** only. Corporate/consumption/land/tariff taxes, broader
-government expenditure and services, debt/credit, dynamic FX,
+eight authored polities)**, **M5a (retained-profit accounting, private profit
+distributions, state-enterprise ownership, and treasury remittances)**, and
+**M5b (versioned public debt, deficit financing, interest, maturity/refinancing,
+arrears, and default)** only. Corporate/consumption/land/tariff taxes, broader
+government expenditure and services, banking/central banking, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not
-implemented. M5a profit distributions and state-enterprise remittances are
-implemented (see below). The designer has adopted planned intermediate stages for
-public debt and deficit financing (M5b), annual close and controlled corrections
-(M7a), and inflation/FX/monetary-policy foundations (M8a); these are planned only,
-not implemented (see [the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
+implemented. The designer has adopted planned intermediate stages for annual close
+and controlled corrections (M7a) and inflation/FX/monetary-policy foundations
+(M8a); these are planned only, not implemented (see
+[the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
 The design authority is the [Century GDD
 v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
 [historical documentation](./Century_GDD_v2.4.md), and v2.3 as
@@ -38,10 +39,10 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample, and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
-| [`packages/bench`](./packages/bench) | Headless M1–M4c benchmark harness | `@century/sim`, `@century/data` |
+| [`packages/bench`](./packages/bench) | Headless M1–M5b benchmark harness | `@century/sim`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
 
 `packages/sim` compiles with `"lib": ["ES2022"]` and `"types": []`, has no
@@ -564,8 +565,8 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 
 GDD v2.5 is the current design authority and records the M4c government fiscal
 loop (D-048) alongside the M4b close (D-047), the M4a-2 model (D-044/D-045), M5
-(D-051–D-055), and M5a (D-056). M5b, M7a, and M8a remain planned only; see the
-roadmap below.
+(D-051–D-055), M5a (D-056), and M5b (D-057). M7a and M8a remain planned only;
+see the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -856,21 +857,22 @@ multi-country campaign foundation. It is implemented end to end: eight authored
 
 ### Persistence, versions, and numerical robustness
 
-- Schema **11**, simulation **0.11.0**, save format 1, data version
-  `m3-economy-v1`. `Country.immigrationOpen` and `World.profitDistribution` are the
-  persisted additions. Schema-10/simulation-0.10.0 saves are rejected; no migration
+- Schema **12**, simulation **0.12.0**, save format 1, data version
+  `m3-economy-v1`. `Country.immigrationOpen`, `World.profitDistribution`,
+  `Country.debt`, and `FinanceState.debtContracts/nextContractId` are the persisted
+  additions. Schema-11/simulation-0.11.0 saves are rejected; no migration
   is attempted.
-- `dataVersion` stays `m3-economy-v1` because M5/M5a add new scenario content and a
-  scenario-provided policy without changing any existing definition or scenario
-  meaning (D-053/D-056).
+- `dataVersion` stays `m3-economy-v1` because M5/M5a/M5b add scenario content and
+  scenario-provided policies without changing any existing definition or scenario
+  meaning (D-053/D-056/D-057).
 - Quantity conservation scales its comparison tolerance by gross physical terms
   so large nearly-cancelling flows do not create false failures. Wage
   affordability reduces a payment by at least one representable ulp when
   proportional allocation exceeds employer cash by rounding; the difference is
   reported as unpaid wages. No cent quantization or cash creation is introduced
   (D-054).
-- M5b (debt/deficit financing) is not implemented. No banking, monetary issuance,
-  FX dynamics, inflation, or new tax categories are added.
+- M5b adds public debt but not banking, deposit money, a central bank, bond-market
+  pricing, monetary issuance, FX dynamics, inflation, or new tax categories.
 
 ### M5 limitations
 
@@ -913,21 +915,74 @@ It does not change M4b close semantics or M4c fiscal behavior.
   legs, add no M4b flow kind, and are structurally validated. The phase stages on a
   finance clone, re-validates accounts/postings/summaries/identity/cash, rejects a
   reused close result, and leaves the published world unchanged on failure.
-- **Versions.** Schema **11**, simulation **0.11.0**, save format 1, data version
-  `m3-economy-v1`; schema-10/0.10.0 saves reject with no migration.
+- **Versions.** Schema **12**, simulation **0.12.0**, save format 1, data version
+  `m3-economy-v1`; schema-11/0.11.0 saves reject with no migration.
 - **Not included.** Corporate/dividend/capital-gains taxes, securities markets,
   share issuance/trading, banking, debt, deficit financing, arbitrary player/AI
-  distribution controls, or M5b behavior. State remittances are not income-tax
+  distribution controls, or the separate M5b debt system. State remittances are not income-tax
   revenue and do not enter `governmentPeriodTotals`.
 
+## M5b public debt and deficit financing
+
+M5b adds versioned public-debt contracts and a deterministic debt-service phase on
+top of M5a. It is a public-finance system, not a banking or monetary system.
+
+- **Issuer and holders.** A country issues SUSD debt to an explicitly identified
+  simulated creditor: another country treasury or a pop-block household cash
+  account. The issuer cannot hold its own debt. No bank, central bank, external
+  investor pool, or bond market exists.
+- **Policy.** Each country has a scenario-initialised `debt` policy: enabled,
+  designated creditor kind/id, annual coupon rate, term in civil days, maximum
+  outstanding principal, refinance-on-maturity, and arrears grace days. Legacy
+  fixtures default it off. Rates, terms, and ceilings are provisional and are not
+  calibrated or player/AI controls.
+- **Contracts.** Contracts persist in `FinanceState.debtContracts` with contract
+  version, issuer, holder, original and outstanding principal, coupon, issue day,
+  maturity, accrued interest, status (`active`, `arrears`, `repaid`, `defaulted`),
+  and arrears start day. `nextContractId` is a deterministic allocator.
+- **Accounting.** Issuance debits issuer treasury cash and credits debt liability,
+  and debits holder bond asset and credits holder cash. Interest accrues daily as
+  issuer interest expense/interest payable and holder interest receivable/income.
+  Coupon payment reduces interest payable/cash and holder cash/receivable. Principal
+  repayment reduces debt liability/cash and holder cash/bond asset. Default writes
+  the remaining liability and interest off against owner equity on both sides.
+  Borrowing is not revenue, principal repayment is not expense, and none of these
+  kinds enters the M4b four-flow summary.
+- **Timing and deficit financing.** After the daily fiscal phase, the debt phase
+  accrues one day of interest (actual-day/365 or /366). At each month-end it pays
+  finances the accrued fiscal deficit, pays accrued coupons
+  (`welfare-expense + interest-expense - income-tax-revenue`) by issuing new debt,
+  processes maturities, and applies the arrears/default rule. Debt issuance is
+  staged and atomic with the day; the M4b close then records the period result.
+- **Constraints.** New issuance is limited by the designated creditor's actual cash,
+  the issuer's outstanding-principal ceiling, and the accrued deficit. A deficit
+  that cannot be financed is reported as `unfinancedDeficitSUSD`; no invisible
+  liability is created. M4c's welfare shortfall rule is unchanged.
+- **Maturity, refinancing, arrears, default.** At maturity, principal is refinanced
+  into a replacement contract when the policy permits and the creditor can fund the
+  net replacement; otherwise available treasury cash repays principal. Unpaid
+  principal or interest sets an explicit `arrears` status. If arrears persist for
+  the policy grace period, the remaining principal and accrued interest are written
+  off explicitly and the contract becomes `defaulted`.
+- **Integration.** M4b close, M4c tax/welfare, M5 shared markets/treasuries, and M5a
+  profit distributions keep their existing semantics. `governmentPeriodTotals` now
+  reports interest expense and a net fiscal result including it. M4b summaries keep
+  exactly the four existing flow kinds.
+- **Versions.** Schema **12**, simulation **0.12.0**, save format 1, data version
+  `m3-economy-v1`. Schema-11/simulation-0.11.0 saves are rejected; no migration.
+- **Limitations.** No commercial banking, deposits, central bank, monetary issuance,
+  bond-market pricing, derivatives, external investors, debt-to-GDP target, debt
+  auctions, or player/AI debt actions. Automatic financing covers the accrued
+  month-end deficit, not an intra-month welfare liquidity shortage. Interest is not
+  taxed. The full campaign is benchmarked from a sample, not executed end to end.
 ## Planned development roadmap and intermediate finance stages
 
-M0–M5a are implemented (see the sections above). The designer has adopted
+M0–M5b are implemented (see the sections above). The designer has adopted
 intermediate finance stages (recorded as D-050) for work that earlier revisions
-left unassigned. **M5a is implemented and accepted; M5b, M7a, and M8a remain
+left unassigned. **M5a and M5b are implemented and accepted; M7a and M8a remain
 planned and not implemented**: no runtime behavior, schema field, save version,
 benchmark gate, or UI support exists for them yet. They preserve the existing
-M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a.
+M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a/M5b.
 
 Intended implementation order:
 
@@ -936,7 +991,7 @@ Intended implementation order:
 | Stage | Placement | Planned scope | Status |
 |---|---|---|---|
 | **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Accepted |
-| **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Planned |
+| **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Accepted |
 | **M7a** | After M7, before M8 | Annual finance summaries and periods, year-end closing consistent with the M4b monthly close, partial campaign years, and controlled auditable correction/reversal entries that preserve closed history | Planned |
 | **M8a** | After M8, before M9 | Documented inflation/price-level measure, exchange-rate dynamics on the existing country/currency identities, monetary-policy authority/controls with explicit causal mechanisms and balanced money/credit accounting | Planned |
 
@@ -1059,11 +1114,11 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `11`; simulation version: `0.11.0`; data version:
+- Schema version: `12`; simulation version: `0.12.0`; data version:
   `m3-economy-v1` (M5 adds historical scenario content and M5a adds a
   scenario-provided policy/account role without changing existing definition or
   scenario meaning; see D-053/D-056).
-- Schema-10 / simulation-0.10.0 saves are rejected with an actionable error; no
+- Schema-11 / simulation-0.11.0 saves are rejected with an actionable error; no
   migration is attempted. Schema-8 and schema-9 remain rejected as before.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
@@ -1077,14 +1132,15 @@ validation and the campaign gameplay baseline are deliberately separate.
   countries/currencies/valuations, the fiscal policy/treasury fields, and the M5
   border-policy field.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `4894531eba1af464`.
-- Full-century aggregate digest: `7a84998cf08f8792`.
-- WPP validation digest: `31124b9a752bd284`.
-- M3 structural-world digest (seed `20261023`): `a6286e565c4db47c`.
-- The digests were re-baselined for M5a because the world schema version and
-  `World.profitDistribution` are part of canonical hashed state. Legacy fixtures
-  keep the policy disabled and no new accounts, so their economic behavior is
-  unchanged; the schema/policy fields alone changed the digests.
+  `m1-determinism`): `62799ae3f9898229`.
+- Full-century aggregate digest: `a9e51553be45d771`.
+- WPP validation digest: `fe593169ffb98c23`.
+- M3 structural-world digest (seed `20261023`): `7f3afde12b30edf7`.
+- The digests were re-baselined for M5b because the world schema version,
+  `Country.debt`, and the finance debt-contract fields are part of canonical hashed
+  state. Legacy fixtures keep debt disabled with empty contracts and no new
+  accounts, so their economic behavior is unchanged; the schema/state fields alone
+  changed the digests.
 - Multi-country digests are exercised by repeated-run and save/resume tests rather
   than a fixed literal, because the eight-polity sample is expected to evolve as
   historical content improves. The M5 benchmark prints the sampled hash.
@@ -1286,21 +1342,22 @@ real integrated `tick()` over a measured sample. It also times a validation +
 serialization round trip, the monthly migration phase (clone excluded), the M5a
 month-end profit allocation (close/clone excluded), and a doubled authored stress
 fixture. Representative Node `v22.12.0` results on the same machine (seed
-`20261023`, schema 11 / simulation 0.11.0):
+`20261023`, schema 12 / simulation 0.12.0):
 
 | Workload | Countries | Regions | Markets | Blocks | Buildings | Assignments | Ticks | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| M5 eight-polity run 1 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 83.81 ms | 82.27 ms | 94.49 ms | 94.49 ms | `0cdabcf3667cf299` |
-| M5 eight-polity run 2 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 80.33 ms | 78.47 ms | 87.93 ms | 87.93 ms | `0cdabcf3667cf299` |
-| M5 stress (2 ticks) | 8 | 16 | 5 | 128 | 162 | 960 | 2 | — | — | — | — | `300475241d309d8e` |
+| M5 eight-polity run 1 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 94.80 ms | 92.78 ms | 113.9 ms | 113.9 ms | `d2669e3679660124` |
+| M5 eight-polity run 2 | 8 | 16 | 5 | 64 | 81 | 240 | 8 | 91.09 ms | 88.24 ms | 103.7 ms | 103.7 ms | `d2669e3679660124` |
+| M5 stress (2 ticks) | 8 | 16 | 5 | 128 | 162 | 960 | 2 | — | — | — | — | `fccc342f56c29851` |
 
 | M5 component | Result |
 |---|---|
-| Combined eight-polity tick | avg 82.07 ms, p50 81.46 ms, p95 94.49 ms, p99 94.49 ms |
-| Validation + serialize/deserialize round trip | avg 55.15 ms, p50 54.32 ms, p95 59.11 ms |
-| Monthly migration phase (clone excluded) | avg 63.18 ms, p50 62.09 ms, p95 70.49 ms; 932,314 people moved in the sample |
-| M5a month-end allocation (close/clone excluded) | avg 5.467 ms, p50 5.181 ms, p95 7.026 ms; 81 buildings, 19,700,176.29 SUSD distributed |
-| Projected full 36,524-tick campaign | about 0.83 h at the sample average; **not executed** and not mobile evidence |
+| Combined eight-polity tick | avg 92.95 ms, p50 90.38 ms, p95 113.9 ms, p99 113.9 ms |
+| Validation + serialize/deserialize round trip | avg 60.22 ms, p50 59.70 ms, p95 62.36 ms |
+| Monthly migration phase (clone excluded) | avg 71.62 ms, p50 73.39 ms, p95 79.33 ms; 932,314 people moved in the sample |
+| M5a month-end allocation (close/clone excluded) | avg 5.933 ms, p50 5.603 ms, p95 7.355 ms; 81 buildings, 19,700,176.29 SUSD distributed |
+| M5b debt phase (daily accrual + month-end coupon) | avg 5.232 ms, p50 4.952 ms, p95 7.242 ms; 2 contracts, 511.64 SUSD interest accrued |
+| Projected full 36,524-tick campaign | about 0.94 h at the sample average; **not executed** and not mobile evidence |
 
 The eight-polity full campaign is projected, not run, so the harness can complete
 in a practical time; the projection is not an acceptance gate. The reproduced M2
@@ -1413,6 +1470,12 @@ settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
   player/AI distribution controls. The shipped historical sample has no state-owned
   building instances, so state remittances are exercised by focused fixtures rather
   than the eight-polity campaign. State remittances are not income-tax revenue.
+- M5b debt is held only by another country treasury or a pop-block household cash
+  account. It does not add commercial banking, deposits, a central bank, monetary
+  issuance, bond-market pricing, derivatives, external investors, a debt-to-GDP
+  target, debt auctions, or player/AI debt actions. Automatic financing covers the
+  accrued month-end deficit, not an intra-month welfare liquidity shortage;
+  interest is not taxed. The full campaign is projected, not executed.
 - M5 migration is limited to existing same-profession destination blocks, happens
   monthly, and uses provisional vacancy/wealth pressure and absorption
   coefficients. It does not implement profession promotion/demotion, a free
