@@ -2122,6 +2122,114 @@ makes the full campaign scale with the square of elapsed months; the hot-path
 clone shares them because the close is the only writer and it appends, while the
 public clone keeps deep isolation.
 
+### D-060 — M7 versioned worker protocol, immutable snapshot bus, and UI boundary
+
+**Context.** M7 must deliver a playable Expo/React Native shell whose UI never
+reads or mutates the live simulation world. The GDD requires a worker proof of
+concept, start/pause/step/action commands, snapshots, save/load, and a versioned
+thread protocol. No mobile worker package had been selected, and the repository
+had no `packages/sim-worker`.
+
+**Decision.**
+
+- **Package split.** Add `packages/sim-worker`. Its root export is app-safe:
+  protocol types/constants, snapshot types, pure selectors, and no simulation
+  imports. The host, snapshot builder, persistence codec, and worker entries are
+  subpath exports. `packages/app` imports only the app-safe root/persistence; the
+  architecture test rejects `@century/sim`/`@century/data` imports in app source.
+- **Protocol version 1.** Commands are `START`, `PAUSE`, `STEP`,
+  `SET_SPEED`, `APPLY_ACTION`, `REQUEST_SNAPSHOT`, `SAVE`, `LOAD`, and `SHUTDOWN`,
+  each with a stable command id. Events are `READY`, `SNAPSHOT`, `STATE`,
+  `ACTION_RESULT`, `SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, `FATAL`, and `SHUTDOWN`.
+  Untrusted messages are parsed and rejected before dispatch.
+- **Ownership.** `SimulationHost` owns the world and applies commands only between
+  completed ticks. It exposes immutable snapshots; the app never receives the
+  world, finance accounts, typed arrays, or mutable references.
+- **Snapshot boundary.** Snapshots contain eight country summaries, 16 region
+  summaries, five market price/stock summaries, eight goods, at most 12 monthly
+  finance periods, and bounded diagnostics. They are recursively frozen and are
+  roughly 12 KiB in the eight-polity sample.
+- **Transports.** Web runs the same generated bundle in a Web Worker created from
+  a Blob URL. Native iOS/Android runs it in a deliberately hidden
+  `react-native-webview`, whose JavaScript context is separate from the React
+  Native UI thread; commands use `injectJavaScript` and responses use
+  `ReactNativeWebView.postMessage`. Node `worker_threads` is the headless proof of
+  concept. No platform-specific worker dependency is added.
+- **Timing.** The worker driver uses wall-clock only to decide how many complete
+  deterministic ticks to run. It caps each pump at four ticks and emits snapshots
+  at most every 100 ms. Saving does not include the driver accumulator, so
+  save/resume remains deterministic in complete ticks.
+- **Actions.** The UI sends only `set-fiscal-policy`; the host stamps the current
+  day and uses the accepted `validateCountryAction`/`applyCountryAction` path. An
+  invalid action returns validation errors and leaves state unchanged.
+- **Save/load.** The wire format is still the canonical simulation save string.
+  The app compresses it with gzip and base64 at the platform-storage boundary
+  (`century-save-gzip1:`), then uses AsyncStorage. This changes storage
+  representation, not the canonical save, checksum, hash, or compatibility.
+- **Generation.** The browser bundle and the validated eight-polity scenario are
+  committed as generated assets; a script regenerates them. The worker bundle is
+  produced with esbuild from sim/typescript source and has no Node dependency.
+- **Failures.** Malformed commands emit `ERROR`; a failed tick pauses the host and
+  emits `FATAL`; a failed load leaves the previous world intact; shutdown rejects
+  later commands.
+
+**Rejected alternatives.** (a) Running the simulation on the RN JS thread would
+violate the off-UI-thread proof-of-concept. (b) Adopting an unmaintained native
+worker package without a device POC would lock in unverified native
+configuration. (c) Letting the app import `@century/sim` for derived values would
+collapse the snapshot boundary. (d) Sending the mutable world or typed arrays
+over the bridge would violate the immutable-snapshot contract. (e) Including the
+driver accumulator in saves would make wall-clock scheduling part of authoritative
+state and break reproducibility. (f) Compressing inside the simulation would
+change the canonical save format and compatibility contract.
+
+### D-061 — M7 Expo shell, screen scope, and unverified native/device acceptance
+
+**Context.** M7's definition of done includes a release build on iOS and Android,
+UI snapshot-only reading, pause/speed/actions/save/load, and measured frame rate
+and on-device tick performance. The execution environment has no Xcode, Android
+SDK/emulator, or reference device.
+
+**Decision.**
+
+- Use Expo 58 / React Native 0.88 / React 19.3 for the app. Web uses
+  `react-native-web`; native uses `react-native-webview` and AsyncStorage.
+- Implement the six specified screens: Map, Country Dashboard, Budget, Population
+  and employment, Markets and prices, and Ledger/financial summary. Keep the
+  selected country/region and tab in React state; use a small React context rather
+  than adding a state-library dependency.
+- The map is a stylized **16-region vector grid** matching the authored sample.
+  The 500-region production map, pan/zoom, occupation overlays, and country-level
+  geometry are not implemented; the screen states this. Charts are limited to a
+  compact net-fiscal history bar strip because GDP, annual history, and per-day
+  chart history do not exist.
+- The verified web interaction path is headless Chromium Pixel 5 emulation:
+  start/pause/step, fiscal action, gzip save, load restoring the saved day and
+  policy, and month-end ledger rendering.
+- **Unmet acceptance:** native iOS/Android **release builds** require Xcode and
+  Android SDK/tooling that are absent. Real-device frame rate, cold start, memory,
+  battery, and on-device tick p95 are **NOT EVALUATED**. Expo web export and
+  iOS/Android Hermes JS bundle exports were produced, but a JS bundle is not a
+  native release build. This milestone is therefore delivered with documented
+  acceptance exceptions, not a claim that mobile acceptance passed.
+- Node measurements are diagnostics only: the worker-host complete tick plus
+  snapshot was p95 80.46 ms on the recorded desktop, far above the 8 ms mobile
+  target; the worker keeps the UI off the simulation thread but cannot by itself
+  satisfy the mobile tick target.
+- The uncompressed full-campaign save-size limit from M6 remains. App-layer gzip
+  reduces the sampled 353.5 KiB save to 72.2 KiB; the 18.76 MiB full-campaign save
+  was not compressed/reopened on a device. Canonical save compatibility is
+  unchanged.
+
+**Rejected alternatives.** (a) Claiming a mobile target passed from Node or a
+desktop web export would be false. (b) Adding a native worker package without a
+device POC would violate GDD §14.2. (c) Fabricating 500-region geometry or pan/zoom
+without map data would misrepresent the authored sample. (d) Adding a large chart
+library before annual history exists would advertise data the simulation does not
+retain. (e) Storing the uncompressed 18.76 MiB save in AsyncStorage without
+measuring platform limits would risk silent save failure; the storage codec is
+compressed and round-trip tested.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
@@ -2150,13 +2258,27 @@ public clone keeps deep isolation.
     save/load/construction/close boundaries. The hot-path `cloneWorldForTick`
     shares immutable closed summary objects and copies only the array; public
     `cloneWorld` deep-copies them (D-059).
+11. M7's worker protocol is version 1 and its snapshots contain at most 12 closed
+    monthly periods; the app receives no live world, finance account, typed array,
+    or mutable reference. Snapshot delivery is rate-limited by the 100 ms driver
+    interval, not guaranteed at 10 Hz when a tick takes longer than 100 ms.
+12. The native WebView transport is a proof of concept, not a native release
+    build. iOS/Android release-build and real-device performance criteria remain
+    open; Node, web, and Hermes-bundle results are not mobile acceptance.
+13. The app stores gzip-compressed canonical saves under
+    `century-save-gzip1:` in AsyncStorage. The canonical save format, checksum,
+    schema, and hash are unchanged.
 
 ## Items intentionally left open
 
 - Campaign victory/end-state presentation (GDD §20.2 default: sandbox report).
-- Save compression and atomic platform storage (M7). M6 measured the
-  full-campaign save size; compression is not implemented.
-- Worker runtime package and mobile performance device (M7).
+- Native iOS/Android release builds, real-device frame rate, memory, battery,
+  cold start, and on-device tick performance (M7 acceptance exception). App-layer
+  gzip storage is implemented, but the full 18.76 MiB save has not been reopened
+  on a device.
+- Save compression inside the canonical save format or history compaction
+  (future; M7 compresses only at the storage boundary).
+- Worker runtime package and mobile performance device (M7 device verification).
 - Historical data versioning and migration (M5).
 - Source-backed 1900 age structure and pre-1950 age-specific fertility/mortality.
 - Source-backed annual sex ratio at birth and exact single-year age distributions.

@@ -5,7 +5,7 @@
 **Version:** 2.5\
 **Revision date:** 2026-10-25\
 **Target platform:** iOS and Android\
-**Application stack:** React Native / Expo, subject to a worker-runtime proof of concept\
+**Application stack:** React Native / Expo with a versioned worker/snapshot bus (M7 implementation; native release verification pending)\
 **Simulation period:** 1900-01-01 through the boundary at 2000-01-01\
 **Simulation resolution:** One simulated civil day per tick
 
@@ -51,9 +51,20 @@
 > stress fixture, and the opt-in full-campaign performance report are described in
 > §4.2, §12, §16.5, and §17.2d (D-058/D-059). World schema is **13** and simulation
 > version **0.13.0**. M6 enables AI in the historical sample and leaves legacy
-> fixtures disabled; M7–M10 remain planned and unimplemented. The GDD 4 MiB save
+> fixtures disabled; M8–M10 remain planned and unimplemented (the M7 addendum
+> follows). The GDD 4 MiB save
 > target is reported against the measured full-campaign save size and is not
 > claimed as met.
+
+> **M7 implementation addendum.** The M7 playable shell, versioned worker
+> protocol, immutable snapshot bus, six specified screens, player action path,
+> and compressed save/load storage are implemented (D-060/D-061). Web export and
+> iOS/Android Hermes JS bundles were produced, and the web interaction path was
+> exercised in headless mobile emulation. **Native iOS/Android release builds and
+> real-device frame rate, memory, battery, cold start, and on-device tick p95 were
+> not measured and remain NOT EVALUATED.** M7 is therefore delivered with a
+> documented native/device acceptance exception; it is not claimed as a passed
+> mobile release. M8 and later milestones remain unstarted.
 
 ---
 
@@ -2317,6 +2328,15 @@ Initial M7 screens:
 
 Later screens add Politics, Technology, Diplomacy, and Military. Keep related details in drill-down views rather than crowding the main dashboard.
 
+**Current M7 implementation.** The six screens exist in `packages/app`: World
+Map, Country Dashboard, Budget, Population and employment, Markets and prices, and
+Ledger/financial summary. The map is a stylized 16-region vector grid matching the
+authored sample, with country colors and selection; the 500-region production
+map, pan/zoom, occupation overlays, and country geometry are **not implemented**.
+Charts are limited to a compact net-fiscal history strip; annual GDP/population
+history is not retained, so broader charts are deferred. Native release builds and
+real-device frame-rate measurement remain **NOT EVALUATED** (D-061).
+
 ### 13.4 Mobile readability
 
 - No numeric table should require more than six columns on a phone.
@@ -2375,6 +2395,16 @@ Do not commit the entire architecture to a specific worker package before provin
 
 Use the simplest maintained approach that passes these tests. Before adding dependencies, document compatibility, maintenance status, native configuration requirements, and why the package is needed. Do not port hot loops to C++/Rust/JSI until profiling shows a real bottleneck and a benchmark proves the expected benefit.
 
+**Current M7 implementation.** `packages/sim-worker` provides protocol version 1,
+the `SimulationHost`, bounded immutable snapshots, save/load, and transport
+entries (D-060). Web uses a Blob-backed Web Worker. iOS/Android use a hidden
+`react-native-webview` whose JavaScript context is separate from the React
+Native UI thread. Node `worker_threads` is the headless proof of concept. The
+three commands required by this section (start/pause/step, action, snapshot/save)
+and shutdown/error handling are implemented. A **native release build on iOS and
+Android has not been produced**; the Hermes JS bundles are not release-build or
+device evidence.
+
 ### 14.3 Thread protocol
 
 The worker protocol must define versioned messages for:
@@ -2387,6 +2417,14 @@ The worker protocol must define versioned messages for:
 - Worker errors, fatal simulation errors, and shutdown.
 
 Commands that affect simulation state are applied only at defined tick boundaries in a stable order. UI commands must not mutate the world directly.
+
+**Current M7 protocol.** Version 1 implements `START`, `PAUSE`, `STEP`,
+`SET_SPEED`, `APPLY_ACTION`, `REQUEST_SNAPSHOT`, `SAVE`, `LOAD`, and `SHUTDOWN`,
+with command IDs; events include `READY`, `SNAPSHOT`, `STATE`, `ACTION_RESULT`,
+`SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, `FATAL`, and `SHUTDOWN`. Snapshots are
+immutable and bounded; the app receives no live world. Save/load wire strings are
+the canonical serializer output, compressed only at the platform-storage boundary
+(D-060/D-061).
 
 ### 14.4 Performance targets
 
@@ -2402,6 +2440,15 @@ Initial engineering targets, to be confirmed on a named reference device:
 Record device model, OS, build type, world size, warm-up, test duration, p50/p95/p99 tick times, snapshot rate, memory, and battery conditions. A Node benchmark is a fast regression test, not proof of mobile performance. Validate performance on-device in a release build. Current M2.1/M3f/M4b/M4c Node benchmarks (which also exercise worlds carrying the M4a-1/M4a-2/M4b/M4c state schema) do **not** evaluate or pass the mobile p95 target; its status remains **NOT EVALUATED**. The M4b close benchmark times only the period close, and the M4c fiscal benchmark times the integrated fiscal day; world cloning, setup, and hashing are excluded from both.
 
 At high speeds, batch ticks only up to a small execution budget before yielding to the runtime. Batching may delay snapshots but must not change tick order or outputs. Do not use `performance.now()` inside the simulation package to decide game outcomes; wall-clock budgeting belongs in the driver.
+
+**Current M7 measurement.** The worker host's complete tick plus immutable
+snapshot measured p50 74.44 ms / p95 80.46 ms in Node on the recorded desktop;
+the snapshot payload was 11.8 KiB and a 353.5 KiB save compressed to 72.2 KiB.
+These are Node diagnostics, not mobile evidence. The mobile p95 ≤ 8 ms target,
+60 fps, cold start, peak memory, and battery targets remain **NOT EVALUATED**.
+The WebView/Web Worker split keeps simulation work off the UI/JS thread, but it
+does not make an 80 ms tick satisfy the mobile tick target. Real-device release
+builds and measurements are an explicit M7 acceptance exception (D-061).
 
 ### 14.5 State management
 
@@ -2582,6 +2629,15 @@ Use keyed/counter-based deterministic randomness rather than one global mutable 
 14. **UI isolation:** app UI modules cannot import or mutate live simulation implementation/state.
 15. **Worker integration:** command ordering, snapshot delivery, error handling, and save/load work on target platforms.
 
+**Current M7:** the app imports only `@century/sim-worker` protocol/snapshot/
+selector/storage contracts; an architecture test rejects `@century/sim` and
+`@century/data` imports and direct simulation helpers. Worker command ordering,
+snapshot sequencing, action validation, bad-load atomicity, shutdown, save/load,
+and a simulated ReactNativeWebView bridge are tested in the worker package/Node.
+Web Worker and headless-browser interaction pass. **Native target-platform
+release verification remains unmet** (D-060/D-061); a JS bundle is not a release
+build.
+
 ### 16.3 Numeric safety
 
 - Validate every external/data input.
@@ -2635,14 +2691,15 @@ Benchmarks must state the exact seed, data version, tick count, hardware/runtime
 
 Each milestone is a separate assigned task. Tests and acceptance criteria are prepared before implementation. Do not start the next milestone until the current one is complete or the designer explicitly accepts a documented exception.
 
-**Implementation status.** M0–M5b and M6 are implemented and accepted (§17.1–§17.2d); M4's remaining unassigned finance work is not implemented. M7–M10 are planned. The intermediate stages M7a and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
+**Implementation status.** M0–M6 are implemented and accepted (§17.1–§17.2d); M4's remaining unassigned finance work is not implemented. M7's playable shell and worker protocol are implemented, but native iOS/Android release builds and real-device performance measurements are **NOT VERIFIED**, so M7 carries a documented acceptance exception (§17.2e, D-061). M8–M10 are planned. The intermediate stages M7a and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
 
 | Scope | Status |
 |---|---|
 | M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c, M5, M5a, M5b, M6 | Implemented and accepted |
 | Remaining M4 finance work not assigned in §17.3 | Not implemented |
+| M7 | Implemented (web/JS verification); native release and device acceptance NOT VERIFIED |
 | M7a, M8a | Planned, not implemented (§17.3) |
-| M7–M10 | Planned, not implemented |
+| M8–M10 | Planned, not implemented |
 
 | Milestone | Deliverable | Definition of done |
 |---|---|---|
@@ -2656,7 +2713,7 @@ Each milestone is a separate assigned task. Tests and acceptance criteria are pr
 | **M5a** | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings (§5.4.5, §17.2b) | Ownership, timing, account semantics, and available-funds rules are explicit and deterministic; a distribution or remittance never exceeds distributable profit or available cash; no negative balances, unexplained money creation, or breakage of the accounting identity, determinism, and M4b close invariants; M5 ownership/enterprise structures are established or explicitly extended rather than assumed. **Implemented and accepted** (§17.2b, D-056). |
 | **M5b** | Public debt and deficit financing: versioned debt contracts, issuance with matching asset/liability entries and actual cash transfers, daily interest accrual, monthly coupons, maturity/principal repayment, refinancing, explicit arrears, and default; deficit financing limited by creditor cash and an outstanding-principal ceiling (§5.4.6, §17.3, D-057) | Fiscal deficit, financing transactions, borrowing proceeds, interest expense, and principal repayment are separately and explicitly recorded; every issuance moves existing cash between identified issuer/holder accounts; outstanding liability reconciles; financing constraints and default consequences are defined; no unexplained money creation, invisible unpaid obligation, or premature full banking/central-bank system. |
 | **M6** | Deterministic country AI v1, action validation, stress testing, simulation performance report | AI can govern the sample world without invalid actions or hidden-information access; full-campaign benchmark reports p50/p95/p99; no unbounded state growth; performance bottlenecks are identified. **Implemented and accepted** (§17.2d, D-058/D-059). |
-| **M7** | Mobile worker proof of concept and playable app: map, snapshot bus, five core screens plus map | Release build runs on iOS and Android; pause/speed/actions/save/load work; UI reads snapshots only; target frame-rate and on-device tick performance are measured and reported. |
+| **M7** | Mobile worker proof of concept and playable app: map, snapshot bus, five core screens plus map | Release build runs on iOS and Android; pause/speed/actions/save/load work; UI reads snapshots only; target frame-rate and on-device tick performance are measured and reported. **Implemented at source/web/JS-bundle level; native release builds and on-device measurements are NOT VERIFIED — documented acceptance exception (§17.2e, D-061).** |
 | **M7a** | *(Planned — not implemented; after M7, before M8.)* Annual finance summaries and annual-period boundaries, year-end closing entries consistent with the M4b monthly close, partial-year handling, and controlled auditable correction/reversal entries (§17.3) | Annual close is deterministic, atomic, validated, persisted, and reconciled; partial first/last campaign years are defined and the terminal boundary is excluded; corrections are posted as new auditable entries with provenance and never edit or delete closed history; monthly summaries, the accounting identity, and four-flow semantics remain intact. Not a prerequisite for the M0–M7 playable slice. |
 | **M8** | Institutions, interest groups, laws, elections, unrest, instability, historical-shock/event content | Law/election outcomes follow documented prerequisites; a revolution or regime crisis can arise from simulated causes; scripted events are idempotent and have provenance. |
 | **M8a** | *(Planned — not implemented; after M8, before M9.)* Inflation/price-level measurement with an explicit basket, weights, and time window; exchange-rate dynamics built on existing country/currency identities and valuations; defined monetary-policy authority and controls with explicit causal mechanisms and balanced money/credit accounting (§17.3) | Measure, basket, weights, window, timing, bounds, persistence, and tests are documented; policy effects have explicit causal mechanisms rather than arbitrary scalar adjustments; any money-supply or credit change has balanced accounting counterparts; prerequisites not delivered by M8 are recorded rather than hidden; no unrestricted issuance, full banking system, or elaborate capital markets are presumed. |
@@ -2774,6 +2831,29 @@ full-campaign benchmark is opt-in (`pnpm run bench:campaign`) and is not part of
 the default `pnpm run ci`; the measured save size is reported against the GDD 4
 MiB engineering target rather than assumed to meet it. D-059 records the hot-path
 summary-validation optimization.
+
+### 17.2e M7 implementation (native/device acceptance exception)
+
+| Stage | Deliverable | Acceptance boundary | Status |
+|---|---|---|---|
+| **M7** | Versioned simulation worker protocol, immutable snapshot bus, hidden WebView/Web Worker transports, six-screen Expo/React Native shell, player fiscal action, pause/step/speed, compressed save/load, and web/JS bundle verification | Web/headless interaction path passes: start/pause/step, shared-validator fiscal action, gzip save/load restoring the saved day and policy, month-end ledger rendering, zero page errors. UI imports only worker protocol/snapshot contracts and reads no live world. **Native iOS/Android release builds, real-device frame rate, cold start, memory, battery, and on-device tick p95 are NOT VERIFIED.** The production 500-region map/pan-zoom and broad charts are not implemented. | Implemented with documented acceptance exception |
+
+M7 implements §13, §14.2–§14.5, and D-060/D-061. The worker protocol is version 1;
+the app receives bounded immutable snapshots and sends commands only through
+`@century/sim-worker`. Web uses a Blob-backed Web Worker; native uses a hidden
+`react-native-webview` as a separate JavaScript context; Node `worker_threads` is
+the headless proof. The six specified screens exist. The map is a 16-region
+authored-sample grid, not the 500-region production map, and pan/zoom is absent.
+Save storage gzip-compresses the canonical save string without changing the
+canonical format, checksum, hash, or schema.
+
+**Acceptance exception.** A native release build requires Xcode and Android
+SDK/tooling that are absent, and no reference device was available. Expo web export
+and iOS/Android Hermes JS bundle exports were produced, but they are not release
+builds. Node and headless-browser results are not mobile performance evidence. The
+mobile p95 ≤ 8 ms target, 60 fps, cold start, peak memory, and battery targets
+remain **NOT EVALUATED**. This exception is explicit and must remain visible until
+a release build is run on a named device.
 
 ### 17.3 Intermediate finance stages (M5a/M5b accepted; M7a/M8a planned)
 
@@ -2973,8 +3053,13 @@ several stages at once:
   ownership structures M5 delivers.
 - M5b establishes public debt and deficit-financing behavior before the AI
   milestone.
-- M6 (accepted) delivers deterministic country AI v1 and shared action validation;
-  M6 and M7 together deliver the first playable mobile vertical slice.
+- M6 (accepted) delivers deterministic country AI v1 and shared action validation.
+- M7 (implemented; native/device acceptance exception) delivers the worker
+  protocol, snapshot bus, and playable six-screen shell. Real-device release
+  verification remains outstanding.
+- M7 and the preceding systems together form the intended playable mobile vertical
+  slice; the slice is not claimed complete until a release build runs on both
+  platforms and on-device performance is measured.
 - M7a completes annual accounting after the first playable slice.
 - M8 establishes political institutions and laws.
 - M8a adds monetary systems on top of those institutional and multi-country
@@ -2985,8 +3070,9 @@ The **vertical slice remains M0–M7**. M7a and M8a are post-slice stages and ar
 not prerequisites for the initial playable release. M5–M7 are not automatically
 blocked on the later monetary systems; M8a may be deferred or narrowed if its
 prerequisites are not met, provided the gap is recorded. M5a, M5b, and M6 are
-current; M7a and M8a are planned and not implemented; no current runtime behavior,
-save field, schema version, or benchmark gate may be inferred from this plan.
+current; M7 is implemented with the native/device acceptance exception above; M7a
+and M8a are planned and not implemented; no current runtime behavior, save field,
+schema version, or benchmark gate may be inferred from this plan.
 
 ---
 
@@ -3067,7 +3153,7 @@ The following choices are resolved in this version:
 9. **Wealth level:** a cached/smoothed index per pop block, not money and not an independently spendable resource. Monthly update uses the provisional income convention in §6.5; M4c includes welfare in the income basis and income tax in mandatory payments; an exact trailing-month average is not implemented.
 10. **Buildings:** physical instances are located in regions and owned by private or state accounts. Current M3 baseline instances are private only.
 11. **Historical calibration:** target values are provisional until metric definition, date convention, and source provenance are complete. Post-1950 WPP validation is source-backed; 1900–1949 population composition and schedules remain provisional; the 1900 campaign is not a historical-validation success.
-12. **Performance:** Node benchmarking is diagnostic; mobile performance is unverified and must be confirmed on a named reference device in a release build. No mobile target has passed. The mobile p95 target is **NOT EVALUATED**. M6 executes a full 36,524-tick Node campaign in opt-in mode and reports p50/p95/p99, but it remains a Node diagnostic.
+12. **Performance:** Node benchmarking is diagnostic; mobile performance is unverified and must be confirmed on a named reference device in a release build. No mobile target has passed. The mobile p95 target is **NOT EVALUATED**. M6 executes a full 36,524-tick Node campaign in opt-in mode and reports p50/p95/p99, but it remains a Node diagnostic. M7's worker host measured complete tick plus snapshot at Node p95 80.46 ms and produced web/iOS/Android JS bundles, but no native release build or real-device measurement exists.
 13. **M2-only finance fixture:** on the M2-only path, needs are funded from annual disposable income only, with no savings drawdown and no account mutation. M3f economic worlds instead use opening household cash and actual settlement; the full intended model remains household financial assets plus settled income less mandatory payments.
 14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate.
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
@@ -3077,6 +3163,7 @@ The following choices are resolved in this version:
 19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. Inter-market trade, tariffs, cross-market transport, and a rest-of-world trade account are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052 record the rules and non-goals.
 20. **Historical data pipeline:** the M5 sample is eight authored 1900 polities in source-annotated tables with a deterministic validator/loader. Population totals are rounded source-referenced estimates; occupation composition and other structure are provisional. No century-scale historical population/occupation-trend calibration is claimed, no FX rates are invented, and no simulation code reads calibration totals to force outcomes. D-053 records the contracts and limitations.
 21. **Country AI:** M6 makes `World.countryAI.enabled` a scenario-provided policy and `Country.ai` the fixed-size persisted schedule/goal state. The AI decision function receives only `CountryAIObservation`; it has one action, `set-fiscal-policy`, shared with a player through `validateCountryAction`/`applyCountryAction`. The AI is deterministic, uses no random draw, and never borrows, issues money, or mutates debt. Construction, infrastructure priority, laws, diplomacy, and military actions remain unimplemented. D-058 records the rules and non-goals; D-059 records the hot-path summary-validation optimization.
+22. **Playable shell and worker bus:** M7 implements `packages/sim-worker` protocol version 1, the `SimulationHost`, bounded immutable snapshots, and Web Worker/WebView/Node transports. The Expo app has the six specified screens and sends only protocol commands; it never imports the simulation implementation or the live world. The map is a 16-region authored-sample grid without pan/zoom or 500-region geometry. Saves are gzip-compressed only at AsyncStorage storage boundary. Native iOS/Android release builds and real-device performance are **NOT VERIFIED**; M7 carries that documented acceptance exception. D-060/D-061 record the architecture and limitations.
 
 ### 20.2 Remaining designer decisions
 
@@ -3102,7 +3189,7 @@ For every agent session:
 5. Require the completion report defined in §18.4.
 6. Review any `DECISIONS.md` items and test failures before assigning the next milestone.
 
-**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M7a/M8a, and all later milestones are not started and must not be inferred.
+**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6** are the accepted baseline. **M7 is implemented at source/web/JS-bundle level with an explicit native-release and real-device acceptance exception (§17.2e); it is not a passed mobile release.** The next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M7a/M8a, and all later milestones are not started and must not be inferred.
 
 ---
 

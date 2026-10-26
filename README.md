@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6 foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -20,15 +20,20 @@ markets, migration, labor mobility, and the initial historical-data pipeline wit
 eight authored polities)**, **M5a (retained-profit accounting, private profit
 distributions, state-enterprise ownership, and treasury remittances)**, and
 **M5b (versioned public debt, deficit financing, interest, maturity/refinancing,
-arrears, and default)**, and **M6 (deterministic country AI v1, persisted AI
+arrears, and default)**, **M6 (deterministic country AI v1, persisted AI
 schedule/goal state, shared player/AI fiscal-policy action validation, AI stress
-fixture, and opt-in full-campaign performance report)** only. Corporate/consumption/land/tariff taxes, broader
+fixture, and opt-in full-campaign performance report)**, and **M7 (versioned
+simulation worker protocol, immutable snapshot bus, six-screen Expo/React Native
+shell, player fiscal action, pause/step/speed, compressed save/load, and
+web/headless verification)**. Corporate/consumption/land/tariff taxes, broader
 government expenditure and services, banking/central banking, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
-diplomacy, warfare, worker, and React Native UI behavior are not
-implemented. The designer has adopted planned intermediate stages for annual close
-and controlled corrections (M7a) and inflation/FX/monetary-policy foundations
-(M8a); these are planned only, not implemented (see
+diplomacy, and warfare remain unimplemented. **M7's native iOS/Android release
+builds and real-device performance were not measured; M7 is delivered with that
+explicit acceptance exception, not as a passed mobile release.** The designer has
+adopted planned intermediate stages for annual close and controlled corrections
+(M7a) and inflation/FX/monetary-policy foundations (M8a); these are planned only,
+not implemented (see
 [the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
 The design authority is the [Century GDD
 v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
@@ -43,9 +48,10 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 |---|---|---|
 | [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
-| [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
-| [`packages/bench`](./packages/bench) | Headless M1–M6 benchmark harness, including the opt-in full-campaign mode | `@century/sim`, `@century/data` |
-| [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
+| [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
+| [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
+| [`packages/bench`](./packages/bench) | Headless M1–M7 benchmark harness, including the opt-in full-campaign mode and M7 worker-host benchmark | `@century/sim`, `@century/sim-worker`, `@century/data` |
+| [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, calibration, worker, and UI-boundary tests | `@century/sim`, `@century/sim-worker`, `@century/data` |
 
 `packages/sim` compiles with `"lib": ["ES2022"]` and `"types": []`, has no
 runtime dependencies, and imports only its own relative `.js` modules. It must
@@ -55,19 +61,24 @@ through `TickContext`; they are not serialized into `World`.
 
 ## Requirements and commands
 
-- Node.js **22.12.0 or newer**
+- Node.js **22.12.0 or newer** (Expo 58 prints an unsupported-runtime warning below
+  **22.13.0**; the M7 exports still completed on Node 22.12.0).
 - pnpm **9.15.9**
 
 | Command | Effect |
 |---|---|
 | `pnpm install` | Install the workspace reproducibly from `pnpm-lock.yaml`. |
-| `pnpm run build` | Compile every package in dependency order. |
+| `pnpm run build` | Compile every package in dependency order and regenerate the app worker bundle. |
 | `pnpm run lint` | Boundary checks: no ambient RNG, no forbidden APIs in `sim`, ES2022-only config, no runtime deps in `sim`. |
-| `pnpm run typecheck` | Typecheck every package in strict mode. |
-| `pnpm test` | Run the Jest suite. |
-| `pnpm run bench` | Build all benchmark cases (M1 through M6) and report timings, hashes, and invariant gates. |
-| `pnpm run bench:campaign` | Opt-in M6 full 36,524-tick campaign benchmark with per-tick p50/p95/p99, AI counts, bounded-state checkpoints, and final save size. Long-running; not part of `pnpm run ci`. |
-| `pnpm run ci` | Local CI path: lint, typecheck, test, benchmark. |
+| `pnpm run typecheck` | Typecheck every package in strict mode, including the app and worker. |
+| `pnpm test` | Run the Jest suite, including M7 worker/protocol/snapshot/save tests. |
+| `pnpm run bench` | Build all benchmark cases (M1 through M7) and report timings, hashes, and invariant gates. |
+| `pnpm run bench:campaign` | Opt-in M6 full 36,524-tick campaign benchmark with per-tick p50/p95/p99, AI counts, bounded-state checkpoints, and final save size. Long-running; part of `pnpm run ci` only indirectly through M6/M7 bounded benchmarks. |
+| `pnpm -F @century/app web` | Start the Expo web development server. |
+| `pnpm -F @century/app export:web` | Produce the static Expo web export. |
+| `pnpm -F @century/app export:ios` / `export:android` | Produce iOS/Android Hermes JS bundles (not native release builds). |
+| `pnpm run app:export` | Export web, iOS, and Android JS bundles; included in `pnpm run ci`. |
+| `pnpm run ci` | Local CI path: lint, typecheck, test, benchmark, and web/iOS/Android app exports. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
 runs the same verification with a frozen lockfile.
@@ -1042,14 +1053,73 @@ alter validation and clone cost, not simulation results or hashes. The measureme
 in [the benchmark section](#benchmark-scope-and-recorded-node-results) and the
 [M6 completion report](#m6-completion-report).
 
+## M7 playable Expo shell and worker protocol
+
+M7 adds the first user-facing Century shell. It is a playable client over the
+existing deterministic simulation, not a new simulation subsystem. **Web and
+Hermes JS bundles are verified; native release builds and real-device performance
+are not.** M7 therefore carries an explicit acceptance exception (D-061).
+
+- **Worker boundary.** `packages/sim-worker` owns the authoritative world. Its
+  app-safe root exports protocol constants, snapshot types, pure selectors, and
+  the storage codec; the host/snapshot/worker entries are subpath exports. The app
+  never imports `@century/sim` or `@century/data`, and the architecture test
+  enforces that boundary.
+- **Protocol version 1.** Commands are `START`, `PAUSE`, `STEP`, `SET_SPEED`,
+  `APPLY_ACTION`, `REQUEST_SNAPSHOT`, `SAVE`, `LOAD`, and `SHUTDOWN`, each with a
+  stable command id. Events are `READY`, `SNAPSHOT`, `STATE`, `ACTION_RESULT`,
+  `SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, `FATAL`, and `SHUTDOWN`. Malformed
+  messages are rejected before dispatch.
+- **Immutable snapshots.** The worker emits bounded, recursively frozen snapshots
+  containing eight country summaries, 16 regions, five market price/stock cards,
+  eight goods, at most 12 monthly finance periods, and bounded diagnostics. The
+  sample snapshot is about 11.8 KiB. No typed arrays, accounts, postings, or live
+  world references cross the boundary. Snapshot delivery is rate-limited to at
+  most one per 100 ms and can lag when a tick is slower.
+- **Transports.** Web uses a Blob-backed Web Worker. iOS/Android use a hidden
+  `react-native-webview` as a separate JavaScript context; commands use
+  `injectJavaScript`, and events use `ReactNativeWebView.postMessage`. Node
+  `worker_threads` is the headless proof of concept. No unmaintained native worker
+  package is adopted.
+- **Screens.** Map, Country Dashboard, Budget, Population and employment, Markets
+  and prices, and Ledger/financial summary. The map is a stylized 16-region
+  authored-sample grid with country selection; the 500-region production map,
+  pan/zoom, and broad annual charts are not implemented. The screen states this.
+- **Controls and actions.** Start/pause, step one day, speeds 1/2/5/10 simulated
+  days per second, save/load, and the shared `set-fiscal-policy` player action.
+  Commands apply only between complete ticks; the app cannot mutate the world.
+- **Save/load.** The canonical save string is compressed with gzip and base64 at
+  the AsyncStorage boundary (`century-save-gzip1:`). This reduces the sampled
+  353.5 KiB save to 72.2 KiB without changing the canonical format, checksum,
+  schema, or hash. Loading restores the saved day and fiscal policy in the
+  verified web path.
+- **Verification.** Expo web export, iOS/Android Hermes bundle exports, a Node
+  worker-thread proof, a simulated ReactNativeWebView bridge probe, and headless
+  Chromium Pixel 5 interactions passed. The browser interaction test covered
+  start/pause/step, fiscal action, gzip save/load, month-end ledger rendering, and
+  zero page errors.
+- **Unmet acceptance.** No native release build was produced because Xcode,
+  Android SDK/emulator, and a reference device are unavailable. Real-device frame
+  rate, cold start, memory, battery, and on-device tick p95 are **NOT EVALUATED**.
+  Node worker tick+snapshot p95 was 80.46 ms, which is not mobile evidence and is
+  far above the 8 ms mobile target. The vertical slice is **not claimed complete**
+  until release builds run on both platforms and on-device measurements are
+  recorded.
+- **Versions.** The simulation schema remains **13**, simulation version
+  **0.13.0**, save format **1**, data version `m3-economy-v1`. M7 adds no
+  authoritative simulation state and no save-compatibility change; the worker
+  protocol has its own version **1**.
+
 ## Planned development roadmap and intermediate finance stages
 
-M0–M6 are implemented (see the sections above). The designer has adopted
-intermediate finance stages (recorded as D-050) for work that earlier revisions
-left unassigned. **M5a, M5b, and M6 are implemented and accepted; M7a and M8a
-remain planned and not implemented**: no runtime behavior, schema field, save
-version, benchmark gate, or UI support exists for them yet. They preserve the
-existing M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a/M5b/M6.
+M0–M6 are implemented and accepted; M7's shell/worker implementation is delivered
+with an explicit native-release and real-device acceptance exception. The designer
+has adopted intermediate finance stages (recorded as D-050) for work that earlier
+revisions left unassigned. **M7a and M8a remain planned and not implemented**: no
+runtime behavior, schema field, save version, benchmark gate, or UI support exists
+for them yet. They preserve the existing M0–M10 milestone identities and do not
+change M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the
+simulation schema.
 
 Intended implementation order:
 
@@ -1192,6 +1262,10 @@ validation and the campaign gameplay baseline are deliberately separate.
   D-053/D-056/D-057/D-058).
 - Schema-12 / simulation-0.12.0 saves are rejected with an actionable error; no
   migration is attempted. Schema-8 through schema-11 remain rejected as before.
+- **M7 does not change the simulation save schema.** Its worker protocol is
+  version 1 separately. The app receives snapshots, never the world. Save storage
+  gzip-compresses the canonical string at the AsyncStorage boundary and preserves
+  its checksum/hash semantics.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
@@ -1228,7 +1302,8 @@ employment-refresh workload, M3c production/inventory workloads, M3d market-day
 workloads, M3e settlement workloads, M3f integrated economic-day workloads, M4b
 monthly period-close workloads, M4c fiscal-day workloads, M5/M5a eight-polity
 campaign, migration, profit-allocation, serialization, and stress workloads, and
-M6 AI-enabled representative/stress workloads. The opt-in
+M6 AI-enabled representative/stress workloads, and M7 worker-host complete
+tick+snapshot/save-codec workloads. The opt-in
 `pnpm run bench:campaign` executes the complete M6 campaign. Stress scales repeat
 the three deterministic multi-block templates (400k/350k/250k people), so total
 population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
@@ -1500,6 +1575,30 @@ The full campaign remains a Node diagnostic. It does not measure device frame ra
 device memory, battery, or mobile release-build performance; the mobile p95 target
 remains **NOT EVALUATED**.
 
+### M7 worker and app results
+
+`pnpm run bench` now includes a bounded M7 worker-host case: complete tick plus
+immutable snapshot, snapshot payload size, and gzip save codec. On the recorded
+Node environment (seed `20261023`, eight-polity sample):
+
+| M7 workload | Result |
+|---|---|
+| Complete tick + snapshot | avg `75.26 ms`, p50 `74.44 ms`, p95 `80.46 ms`, p99 `80.46 ms` |
+| Snapshot payload | `11.8 KiB` |
+| Save storage | `353.5 KiB` canonical → `72.2 KiB` gzip/base64 |
+| Save compress + decompress | avg `38.36 ms`, p50 `29.40 ms`, p95 `62.50 ms` |
+| Node worker-thread proof (`pnpm -F @century/sim-worker poc`) | PASS — start/pause/step/save/load/shutdown round-trip |
+| Expo web export | PASS — `1.4 MB` JS bundle |
+| iOS Hermes JS bundle | PASS — `2.4 MB` `.hbc` |
+| Android Hermes JS bundle | PASS — `2.4 MB` `.hbc` |
+| Headless Chromium Pixel 5 interaction | PASS — start/pause/step, fiscal action, save/load, month-end ledger, zero page errors |
+| Simulated ReactNativeWebView bridge probe | PASS — READY, snapshot, step, no errors |
+
+These are Node/browser/JS-bundle results. **No native release build or real-device
+measurement exists.** Mobile FPS, cold start, memory, battery, and on-device tick
+p95 remain **NOT EVALUATED**. The 80.46 ms Node tick+snapshot p95 is not mobile
+evidence and does not satisfy the 8 ms mobile target.
+
 ## Known limitations
 
 - M4a-1 adds category-aware double-entry accounts, recognition legs, and opening
@@ -1642,6 +1741,22 @@ remains **NOT EVALUATED**.
   not hidden.
 - The M6 full-campaign benchmark is a Node diagnostic and does not measure mobile
   frame rate, device memory, battery, or release-build tick time.
+- **M7 native release builds and real-device performance are not verified.** There
+  is no Xcode/Android SDK/emulator or named reference device in the execution
+  environment. Expo web export and iOS/Android Hermes JS bundles exist, but a JS
+  bundle is not a release build. M7 carries a documented acceptance exception.
+- The M7 map is a 16-region vector-grid prototype, not the 500-region production
+  map; pan/zoom, country geometry, occupation overlays, and broad annual charts
+  are absent. Charts are limited to a net-fiscal history strip.
+- Snapshot delivery is capped at one per 100 ms and can lag when a tick takes
+  longer. The Node worker-host tick+snapshot p95 was 80.46 ms; mobile FPS and
+  responsiveness are unmeasured.
+- M7 compresses saves only at the AsyncStorage boundary. The canonical
+  full-campaign save is still 18.76 MiB and is not compacted; app-layer gzip was
+  tested on an early save (353.5 KiB → 72.2 KiB), not on the full campaign or a
+  device.
+- The native WebView transport is a proof of concept; no native worker package or
+  release configuration was adopted.
 
 ## M6 completion report
 
@@ -1740,6 +1855,126 @@ Branch `main`. The implementation HEAD is
 `cc7d9aa759f00618bbd77f993a617b1e2059eef0`. The documentation commit is the
 immediate child and is the final HEAD reported in the handoff. The working tree is
 clean after both commits, and no later milestone is started.
+
+## M7 completion report
+
+### 1. Source-defined scope and acceptance criteria
+
+The authoritative GDD v2.5 §17 assigns M7: **mobile worker proof of concept and
+playable app — map, snapshot bus, five core screens plus map**. Its definition of
+done is: a release build runs on iOS and Android; pause/speed/actions/save/load
+work; the UI reads snapshots only; target frame rate and on-device tick
+performance are measured and reported. GDD §13 specifies the map, charts, six
+screens, readability, and snapshot data flow; §14.2–§14.5 specify the worker proof,
+versioned protocol, performance targets, and state boundary.
+
+### 2. Implemented functionality and explicit exclusions
+
+Implemented: `packages/sim-worker` protocol version 1; `SimulationHost`; bounded
+immutable snapshots; Web Worker, hidden-WebView, and Node worker-thread
+transports; the six screens; start/pause/step/speeds; fiscal-policy player action
+through the shared validator; gzip/AsyncStorage save/load; app worker-bundle
+generation; M7 worker benchmark; and app/worker tests.
+
+Excluded: native release builds and real-device measurement; the 500-region
+production map and pan/zoom; broad annual charts; annual close, laws, technology,
+diplomacy, warfare, construction, and later-milestone simulation systems; any new
+authoritative simulation state or save-compatibility change.
+
+Key files: [`packages/sim-worker/src/protocol.ts`](./packages/sim-worker/src/protocol.ts),
+[`host.ts`](./packages/sim-worker/src/host.ts),
+[`snapshot.ts`](./packages/sim-worker/src/snapshot.ts),
+[`persistence.ts`](./packages/sim-worker/src/persistence.ts),
+[`webWorkerEntry.ts`](./packages/sim-worker/src/webWorkerEntry.ts),
+[`nodeWorkerEntry.ts`](./packages/sim-worker/src/nodeWorkerEntry.ts),
+[`App.tsx`](./packages/app/App.tsx),
+[`SimulationProvider.tsx`](./packages/app/src/worker/SimulationProvider.tsx),
+[`NativeWorkerHost.tsx`](./packages/app/src/worker/NativeWorkerHost.tsx),
+the six screen files in `packages/app/src/screens`, `m7Bench.ts`, `m7-worker.test.ts`,
+and the generated worker bundle/scenario.
+
+### 3. Important design decisions
+
+D-060 records the protocol, snapshot bus, transports, tick-boundary command
+application, action path, save-storage codec, generation, and failure behavior.
+D-061 records the Expo stack, six-screen scope, map prototype, compressed storage,
+and the explicit native/device acceptance exception. The app imports only the
+worker protocol/snapshot/selector/storage contracts; an architecture test rejects
+`@century/sim`/`@century/data` imports and direct simulation helpers.
+
+### 4. Integration with completed milestones
+
+The worker reuses the existing `tick`, canonical serializer, `hashWorld`,
+`validateCountryAction`, `applyCountryAction`, `governmentPeriodTotals`, and
+country/AI state. No simulation behavior changed. The M7 app action goes through
+the same player/AI validator as M6. The UI never reads or mutates the live world;
+it receives only snapshots. Saves retain schema 13/simulation 0.13.0 and are
+compressed only after serialization.
+
+### 5. Tests, CI, and performance results
+
+The suite has **510 tests in 42 suites** and passes. It adds 8 M7 worker tests
+covering bounded frozen snapshots, no world internals, step/pause/speed,
+valid/invalid actions, atomic load failure, determinism, shutdown, selectors, and
+save compression, plus the app-boundary architecture test. Results:
+
+| Command | Result |
+|---|---|
+| `pnpm run lint` | PASS, exit 0 — boundary checks now exclude `packages/sim-worker` from the pure-sim prefix |
+| `pnpm run typecheck` | PASS, exit 0 — sim, data, worker, tests, app, bench |
+| `pnpm test` | PASS, exit 0 — 42 suites, 510 tests |
+| `pnpm run bench` | PASS, exit 0 — all M1–M7 gates |
+| `pnpm run app:export` | PASS, exit 0 — web + iOS + Android JS/Hermes bundles |
+| `pnpm run ci` | PASS, exit 0 — lint, typecheck, 510 tests, benchmark, app exports |
+| `git diff --check` | PASS — no whitespace errors |
+
+Node M7 worker results: tick+snapshot p95 `80.46 ms`; snapshot `11.8 KiB`; save
+`353.5 KiB` → `72.2 KiB` compressed. Headless Chromium Pixel 5 interaction passed
+start/pause/step, fiscal action, save/load restoring the saved day/policy, and
+month-end ledger rendering with zero page errors. The simulated
+ReactNativeWebView bridge probe passed. These are not device results.
+
+### 6. Commits and parent relationships
+
+- Implementation commit: `42151ec1d594cec440fa0d7944d6dcea0d42412d`
+  (`feat: implement M7 worker protocol and playable Expo shell`). Its parent is
+  the accepted M6 HEAD `d3c2c921f26ae6268811dc29966acdaacff78ca3`.
+- Documentation commit: the immediate child of `42151ec` containing this report,
+  `README.md`, `DECISIONS.md`, `Century_GDD_v2.5.md`, and the app/sim-worker
+  README files. Its exact hash is reported in the handoff; a commit cannot embed
+  its own hash.
+
+### 7. Schema/version changes and save compatibility
+
+No simulation schema/version change. World schema **13**, simulation **0.13.0**,
+save format **1**, data version `m3-economy-v1`. Worker protocol version **1** is
+independent of the save schema. The app's gzip storage wrapper preserves the
+canonical save string and therefore its checksum, hash, validation, and
+compatibility. Older incompatible simulation saves still reject.
+
+### 8. Known limitations and unmet acceptance criteria
+
+- **Native iOS/Android release builds are not produced and real-device
+  performance is not measured.** This is an explicit M7 acceptance exception:
+  release build, target frame rate, cold start, memory, battery, and on-device
+  tick p95 remain **NOT EVALUATED**. The vertical slice is not claimed complete.
+- The map is a 16-region vector grid; 500-region geometry, pan/zoom, and broad
+  annual charts are absent.
+- Snapshot delivery is rate-limited and can lag; Node tick+snapshot p95 is far
+  above the mobile 8 ms target.
+- The full 18.76 MiB canonical save is not compacted; app-layer gzip was tested on
+  an early save and not on the full campaign/device.
+- The historical sample remains provisional; AI is still a fiscal governor.
+- Node/browser results are diagnostics, not mobile evidence.
+
+### 9. Final repository state
+
+Branch `main`. The implementation HEAD is
+`42151ec1d594cec440fa0d7944d6dcea0d42412d`; its parent is the accepted M6 HEAD
+`d3c2c921f26ae6268811dc29966acdaacff78ca3`. The documentation commit is the
+immediate child and is the final HEAD reported in the handoff. The working tree is
+clean after both commits. M7 is delivered with the documented native/device
+acceptance exception; M8 and later milestones are not started.
 
 ## Development workflow
 
