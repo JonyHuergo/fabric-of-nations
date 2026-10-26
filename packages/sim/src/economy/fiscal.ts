@@ -16,23 +16,34 @@
  *    and the difference is reported as a shortfall. No debt, arrears, or
  *    negative cash is created.
  *
- * All entries are built and checked first, then posted as one atomic batch. The
- * phase uses the same day's settlement result and never estimates wages from
- * accumulated account balances. No keyed randomness is used: countries and
- * blocks are processed in ascending id order and the final recipient receives
- * the exact allocation remainder.
+ * All entries are built and applied to an isolated finance clone. The complete
+ * staged world is validated before the clone replaces `world.finance`; any
+ * failure leaves the original accounts and postings untouched. The fiscal phase
+ * consumes the transient settlement result, so a duplicate call with the same
+ * settlement is rejected. No keyed randomness is used: countries and blocks are
+ * processed in ascending id order and the final recipient receives the exact
+ * allocation remainder.
+ *
+ * This module is deliberately not re-exported from the package root. Tests may
+ * import it directly; the supported simulation entry point is `runEconomicDay`
+ * (through `tick`).
  */
 
-import { assertValidDayIndex, dayIndexToCivilDate, daysInYear } from "../calendar.js";
+import {
+  assertValidDayIndex,
+  dayIndexToCivilDate,
+  daysInYear,
+  isTerminalDayIndex,
+} from "../calendar.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
-import type { World } from "../world.js";
+import { assertValidWorld, type World } from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
-import { buildFinanceIndex } from "./accounts.js";
+import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { buildRegionOwnerMap } from "./country.js";
 import type { MarketSettlementResult } from "./settlement.js";
-import type { Country, JournalLine } from "./types.js";
+import type { Country, FinanceState, JournalLine } from "./types.js";
 
 /** Per-block fiscal result for one processed day. */
 export interface FiscalBlockResult {
@@ -42,6 +53,11 @@ export interface FiscalBlockResult {
   readonly incomeTaxSUSD: number;
   /** Welfare actually received that day. */
   readonly welfareReceivedSUSD: number;
+  /**
+   * Household cash after tax and welfare for that block, read from the
+   * authoritative staged account after all fiscal postings.
+   */
+  readonly endingCashAfterFiscalSUSD: number;
 }
 
 /** Per-country fiscal result for one processed day. */
@@ -52,6 +68,7 @@ export interface FiscalCountryResult {
   readonly welfarePaidSUSD: number;
   readonly welfareShortfallSUSD: number;
   readonly treasuryCashStartSUSD: number;
+  /** Treasury cash read from the authoritative staged account after posting. */
   readonly treasuryCashEndSUSD: number;
 }
 
@@ -72,6 +89,66 @@ export interface FiscalPhaseResult {
   readonly postingIds: readonly number[];
 }
 
+/**
+ * Test-only hook for proving publication atomicity. This module is not exported
+ * from the package root, so the hook cannot be reached through the supported
+ * simulation API.
+ */
+export interface FiscalPhaseTestHooks {
+  readonly afterStagedPostings?: (staged: FinanceState) => void;
+}
+
+/**
+ * Validate the fiscal phase's execution context before any mutation or staging.
+ *
+ * The check deliberately covers the world, day, terminal boundary, market, and
+ * the settlement's execution identity so a stale or foreign settlement cannot
+ * be applied to this world.
+ */
+function assertFiscalPreconditions(
+  world: World,
+  settlement: MarketSettlementResult,
+  dayIndex: DayIndex,
+): void {
+  assertValidDayIndex(dayIndex);
+  if (isTerminalDayIndex(dayIndex)) {
+    throw new RangeError("the terminal 2000-01-01 boundary cannot run the fiscal phase");
+  }
+  if (world.dayIndex !== dayIndex) {
+    throw new RangeError(
+      `fiscal phase day ${String(dayIndex)} does not match world.dayIndex ${String(world.dayIndex)}`,
+    );
+  }
+  if (settlement.dayIndex !== dayIndex) {
+    throw new RangeError("fiscal phase settlement day does not match the processed day");
+  }
+  if (settlement.fiscalApplied) {
+    throw new RangeError("fiscal phase has already been applied to this settlement result");
+  }
+  if (
+    settlement.worldSeed !== world.seed ||
+    settlement.scenarioId !== world.scenarioId ||
+    settlement.startDayIndex !== world.startDayIndex
+  ) {
+    throw new RangeError(
+      "fiscal phase settlement does not belong to this world's execution context",
+    );
+  }
+  if (settlement.settlementNextPostingId !== world.finance.nextPostingId) {
+    throw new RangeError(
+      "fiscal phase settlement is stale; finance postings changed after settlement",
+    );
+  }
+  if (!world.markets.some((market) => market.id === settlement.marketId)) {
+    throw new RangeError(
+      `fiscal phase settlement references unknown market ${String(settlement.marketId)}`,
+    );
+  }
+  // Validates country fiscal values, treasury references, account sets, NaN
+  // balances, summaries, and all existing accounting/determinism invariants.
+  assertValidWorld(world);
+}
+
 function toleranceMoney(...values: number[]): number {
   const scale = Math.max(1, ...values.map((value) => Math.abs(value)));
   return MONEY_TOLERANCE_SUSD * scale;
@@ -88,10 +165,18 @@ interface CountryBlockGroup {
   readonly blocks: { popBlockId: Id; population: number }[];
 }
 
+interface BlockFiscalDraft {
+  readonly popBlockId: Id;
+  readonly countryId: Id;
+  readonly incomeTaxSUSD: number;
+  readonly welfareReceivedSUSD: number;
+}
+
 /**
- * Allocate `total` across `weights` proportionally in the given order. The last
- * recipient receives the exact remainder so the result sums to `total` without
- * a random draw. Every weight is a non-negative integer population count.
+ * Allocate `total` across population weights proportionally in the supplied
+ * order. The last recipient receives the exact remainder so the result sums to
+ * `total` without a random draw. Any tolerance-sized floating residue is moved
+ * to the first recipient; only tolerance-sized negatives may be clamped.
  */
 function allocateProportionally(
   total: number,
@@ -110,16 +195,13 @@ function allocateProportionally(
     allocations.set(entry.popBlockId, amount);
     allocated += amount;
   }
-  // Floating-point proportionality can leave a tiny negative remainder on the
-  // last entry when earlier terms round upward. Move that tolerance-sized amount
-  // from the largest allocation so every recipient is non-negative.
   for (const [popBlockId, amount] of allocations) {
     if (amount >= -toleranceMoney(total)) continue;
     throw new RangeError(
       `welfare allocation produced a negative amount for popBlock ${String(popBlockId)}`,
     );
   }
-  let residual = total - sum([...allocations.values()]);
+  const residual = total - sum([...allocations.values()]);
   if (Math.abs(residual) > toleranceMoney(total, residual)) {
     throw new RangeError("welfare allocation did not sum to the payable total");
   }
@@ -142,22 +224,19 @@ function allocateProportionally(
 }
 
 /**
- * Run the M4c fiscal phase against already-settled authoritative state.
- *
- * Inputs: a world and the settlement result of the same day.
- * Effects: posts income-tax and welfare-transfer entries to `world.finance`.
- * Failure: throws before any balance or posting changes.
+ * Execute the fiscal phase on an isolated finance clone and publish only after
+ * the complete staged world validates.
  */
-export function runFiscalPhase(
+function executeFiscalPhase(
   world: World,
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
+  hooks?: FiscalPhaseTestHooks,
 ): FiscalPhaseResult {
-  assertValidDayIndex(dayIndex);
-  if (settlement.dayIndex !== dayIndex) {
-    throw new RangeError("fiscal phase settlement day does not match the processed day");
-  }
-  const index = buildFinanceIndex(world.finance);
+  assertFiscalPreconditions(world, settlement, dayIndex);
+
+  const stagedFinance = cloneFinanceState(world.finance);
+  const index = buildFinanceIndex(stagedFinance);
   const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
   const wagesByBlock = new Map(
     settlement.households.map((household) => [household.popBlockId, household.wagesReceivedSUSD]),
@@ -181,10 +260,7 @@ export function runFiscalPhase(
     if (group === undefined) {
       throw new RangeError(`region owner ${String(countryId)} is not a registered country`);
     }
-    group.blocks.push({
-      popBlockId: block.id,
-      population: populationTotal(block),
-    });
+    group.blocks.push({ popBlockId: block.id, population: populationTotal(block) });
   }
   const anyActive = countries.some(
     (country) =>
@@ -198,8 +274,15 @@ export function runFiscalPhase(
 
   const taxEntries: JournalEntryInput[] = [];
   const welfareEntries: JournalEntryInput[] = [];
-  const blockResults: FiscalBlockResult[] = [];
-  const countryResults: FiscalCountryResult[] = [];
+  const blockDrafts: BlockFiscalDraft[] = [];
+  const countryDrafts: {
+    countryId: Id;
+    incomeTaxSUSD: number;
+    welfareRequestedSUSD: number;
+    welfarePaidSUSD: number;
+    welfareShortfallSUSD: number;
+    treasuryCashStartSUSD: number;
+  }[] = [];
 
   for (const group of groups) {
     const country = group.country;
@@ -300,31 +383,43 @@ export function runFiscalPhase(
       throw new RangeError(`fiscal phase would overdraw treasury for country ${String(country.id)}`);
     }
     for (const block of group.blocks) {
-      blockResults.push({
+      blockDrafts.push({
         popBlockId: block.popBlockId,
         countryId: country.id,
         incomeTaxSUSD: taxByBlock.get(block.popBlockId) ?? 0,
         welfareReceivedSUSD: allocations.get(block.popBlockId) ?? 0,
       });
     }
-    countryResults.push({
+    countryDrafts.push({
       countryId: country.id,
       incomeTaxSUSD: taxTotal,
       welfareRequestedSUSD: requested,
       welfarePaidSUSD: paid,
       welfareShortfallSUSD: shortfall,
       treasuryCashStartSUSD: treasuryCashStart,
-      treasuryCashEndSUSD: treasuryCashEnd,
     });
   }
 
   const entries = [...taxEntries, ...welfareEntries];
-  const postings = postJournalBatch(world.finance, dayIndex, entries);
+  const postings = postJournalBatch(stagedFinance, dayIndex, entries);
+  hooks?.afterStagedPostings?.(stagedFinance);
+
+  // Full staged-world validation covers balances, owner references, treasury
+  // references, country fiscal values, summaries, and accounting invariants.
+  assertValidWorld({ ...world, finance: stagedFinance });
+
+  const blockResults: FiscalBlockResult[] = blockDrafts.map((draft) => ({
+    ...draft,
+    endingCashAfterFiscalSUSD: index.get("popBlock", draft.popBlockId, "household-cash").balanceSUSD,
+  }));
+  const countryResults: FiscalCountryResult[] = countryDrafts.map((draft) => ({
+    ...draft,
+    treasuryCashEndSUSD: index.get("country", draft.countryId, "treasury-cash").balanceSUSD,
+  }));
   for (const result of countryResults) {
-    const treasury = index.get("country", result.countryId, "treasury-cash");
     if (
-      Math.abs(treasury.balanceSUSD - result.treasuryCashEndSUSD) >
-      toleranceMoney(treasury.balanceSUSD, result.treasuryCashEndSUSD)
+      Math.abs(result.treasuryCashEndSUSD - (result.treasuryCashStartSUSD + result.incomeTaxSUSD - result.welfarePaidSUSD)) >
+      toleranceMoney(result.treasuryCashEndSUSD, result.treasuryCashStartSUSD)
     ) {
       throw new RangeError(
         `treasury cash for country ${String(result.countryId)} does not reconcile after the fiscal phase`,
@@ -333,22 +428,50 @@ export function runFiscalPhase(
   }
   blockResults.sort((left, right) => left.popBlockId - right.popBlockId);
   countryResults.sort((left, right) => left.countryId - right.countryId);
+  const totals: FiscalTotals = {
+    incomeTaxSUSD: countryResults.reduce((total, result) => total + result.incomeTaxSUSD, 0),
+    welfareRequestedSUSD: countryResults.reduce(
+      (total, result) => total + result.welfareRequestedSUSD,
+      0,
+    ),
+    welfarePaidSUSD: countryResults.reduce((total, result) => total + result.welfarePaidSUSD, 0),
+    welfareShortfallSUSD: countryResults.reduce(
+      (total, result) => total + result.welfareShortfallSUSD,
+      0,
+    ),
+  };
+
+  // Publish only after every staged postcondition has passed.
+  world.finance = stagedFinance;
+  settlement.fiscalApplied = true;
   return {
     dayIndex,
     countries: countryResults,
     blocks: blockResults,
-    totals: {
-      incomeTaxSUSD: countryResults.reduce((total, result) => total + result.incomeTaxSUSD, 0),
-      welfareRequestedSUSD: countryResults.reduce(
-        (total, result) => total + result.welfareRequestedSUSD,
-        0,
-      ),
-      welfarePaidSUSD: countryResults.reduce((total, result) => total + result.welfarePaidSUSD, 0),
-      welfareShortfallSUSD: countryResults.reduce(
-        (total, result) => total + result.welfareShortfallSUSD,
-        0,
-      ),
-    },
+    totals,
     postingIds: postings.map((posting) => posting.id),
   };
+}
+
+/**
+ * Run the fiscal phase. Exported for direct tests and `runEconomicDay`, but not
+ * re-exported from the package root; callers must not invoke it twice for the
+ * same settlement result.
+ */
+export function runFiscalPhase(
+  world: World,
+  settlement: MarketSettlementResult,
+  dayIndex: DayIndex,
+): FiscalPhaseResult {
+  return executeFiscalPhase(world, settlement, dayIndex);
+}
+
+/** Test-only publication-atomicity hook. Not part of the package API. */
+export function __runFiscalPhaseWithHooks(
+  world: World,
+  settlement: MarketSettlementResult,
+  dayIndex: DayIndex,
+  hooks: FiscalPhaseTestHooks,
+): FiscalPhaseResult {
+  return executeFiscalPhase(world, settlement, dayIndex, hooks);
 }

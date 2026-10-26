@@ -28,7 +28,7 @@ import {
 } from "../calendar.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { drawUint32 } from "../rng.js";
-import type { DayIndex, Id } from "../types.js";
+import type { DayIndex, Id, Seed } from "../types.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
   postJournalBatch,
@@ -115,7 +115,8 @@ export interface ProducerSettlement {
   readonly upkeepObligationSUSD: number;
   readonly unpaidUpkeepSUSD: number;
   readonly profitSUSD: number;
-  readonly endingCashSUSD: number;
+  /** Building cash after market/wages/upkeep settlement (fiscal does not touch it). */
+  readonly endingCashAfterSettlementSUSD: number;
 }
 
 export interface HouseholdSettlement {
@@ -124,7 +125,8 @@ export interface HouseholdSettlement {
   readonly initialCashSUSD: number;
   readonly marketPurchasesSUSD: number;
   readonly wagesReceivedSUSD: number;
-  readonly endingCashSUSD: number;
+  /** Household cash after market/wages/upkeep settlement, before the fiscal phase. */
+  readonly endingCashAfterSettlementSUSD: number;
 }
 
 export interface SettlementTotals {
@@ -142,12 +144,31 @@ export interface SettlementTotals {
   readonly producerWagesSUSD: number;
   readonly producerProfitSUSD: number;
   readonly initialCashSUSD: number;
-  readonly endingCashSUSD: number;
+  /** Aggregate cash after settlement; income tax and welfare are applied later. */
+  readonly endingCashAfterSettlementSUSD: number;
 }
 
 export interface MarketSettlementResult {
   readonly dayIndex: DayIndex;
   readonly marketId: Id;
+  /**
+   * Execution-context identity copied from the settled world. The fiscal phase
+   * rejects a result that belongs to another seed, scenario, or start day.
+   */
+  readonly worldSeed: Seed;
+  readonly scenarioId: string;
+  readonly startDayIndex: DayIndex;
+  /**
+   * Posting-id boundary immediately after settlement. The fiscal phase rejects a
+   * result if intervening postings changed the boundary, detecting a stale
+   * settlement context without an extra full-state hash.
+   */
+  readonly settlementNextPostingId: number;
+  /**
+   * Transient single-use marker for the M4c fiscal phase. It is not persisted
+   * and is set only after the staged fiscal state has been published.
+   */
+  fiscalApplied: boolean;
   readonly transactions: readonly SettledMarketTransaction[];
   readonly wages: readonly WageSettlement[];
   readonly upkeep: readonly UpkeepSettlement[];
@@ -712,7 +733,7 @@ export function settleMarketDay(
             wagesPaid,
             upkeepPaid,
           ),
-          endingCashSUSD: current.balanceSUSD,
+          endingCashAfterSettlementSUSD: current.balanceSUSD,
         };
       });
 
@@ -733,7 +754,7 @@ export function settleMarketDay(
           initialCashSUSD: initialCash,
           marketPurchasesSUSD: purchases,
           wagesReceivedSUSD: wages,
-          endingCashSUSD: account.balanceSUSD,
+          endingCashAfterSettlementSUSD: account.balanceSUSD,
         };
       });
 
@@ -772,13 +793,18 @@ export function settleMarketDay(
       producerWagesSUSD: producers.reduce((total, producer) => total + producer.wagesPaidSUSD, 0),
       producerProfitSUSD: producers.reduce((total, producer) => total + producer.profitSUSD, 0),
       initialCashSUSD: initialCash,
-      endingCashSUSD: endingCash,
+      endingCashAfterSettlementSUSD: endingCash,
     };
 
     marketDay.settled = true;
     return {
       dayIndex: marketDay.dayIndex,
       marketId: marketDay.marketId,
+      worldSeed: world.seed,
+      scenarioId: world.scenarioId,
+      startDayIndex: world.startDayIndex,
+      settlementNextPostingId: world.finance.nextPostingId,
+      fiscalApplied: false,
       transactions: transactions.map(({ key: _key, transactionKind: _kind, ...transaction }) => transaction),
       wages: wageSettlements,
       upkeep: upkeepSettlements,

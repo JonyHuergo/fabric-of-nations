@@ -138,7 +138,7 @@ describe("M3f integrated economic day", () => {
     );
     expect(household?.marketPurchasesSUSD).toBe(0);
     expect(household?.wagesReceivedSUSD).toBeGreaterThan(0);
-    expect(household?.endingCashSUSD).toBeGreaterThan(0);
+    expect(household?.endingCashAfterSettlementSUSD).toBeGreaterThan(0);
   });
 
   test("uses valid same-batch sales receipts to fund a production-input purchase", () => {
@@ -198,7 +198,7 @@ describe("M3f integrated economic day", () => {
     expect(millProducer.initialCashSUSD).toBe(openingMillCash);
     expect(millProducer.revenueSUSD).toBeCloseTo(millSale.totalSUSD, 9);
     expect(millProducer.inputCostsSUSD).toBeCloseTo(millInput.totalSUSD, 9);
-    expect(millProducer.endingCashSUSD).toBeCloseTo(
+    expect(millProducer.endingCashAfterSettlementSUSD).toBeCloseTo(
       millProducer.initialCashSUSD +
         millProducer.revenueSUSD -
         millProducer.inputCostsSUSD -
@@ -206,11 +206,11 @@ describe("M3f integrated economic day", () => {
         millProducer.upkeepPaidSUSD,
       9,
     );
-    expect(millProducer.endingCashSUSD).toBeGreaterThanOrEqual(0);
+    expect(millProducer.endingCashAfterSettlementSUSD).toBeGreaterThanOrEqual(0);
     expect(sellerProducer.initialCashSUSD).toBe(openingSellerCash);
     expect(sellerProducer.revenueSUSD).toBeGreaterThanOrEqual(millInput.totalSUSD);
-    expect(balance(world, sellerId)).toBeCloseTo(sellerProducer.endingCashSUSD, 9);
-    expect(balance(world, millId)).toBeCloseTo(millProducer.endingCashSUSD, 9);
+    expect(balance(world, sellerId)).toBeCloseTo(sellerProducer.endingCashAfterSettlementSUSD, 9);
+    expect(balance(world, millId)).toBeCloseTo(millProducer.endingCashAfterSettlementSUSD, 9);
 
     const grainFlow = result.economy?.market.inventory.find(
       (flow) => flow.goodId === GRAIN_ID,

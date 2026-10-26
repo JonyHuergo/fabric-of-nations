@@ -642,7 +642,7 @@ describe("M3e conservation, determinism, and inventory separation", () => {
     expect(world.markets[0]!.priceSUSD).toEqual(pricesBefore);
     expect(totalCash(world)).toBeCloseTo(before, 9);
     expect(settlement.totals.initialCashSUSD).toBeCloseTo(before, 9);
-    expect(settlement.totals.endingCashSUSD).toBeCloseTo(before, 9);
+    expect(settlement.totals.endingCashAfterSettlementSUSD).toBeCloseTo(before, 9);
     for (const posting of world.finance.postings) {
       const debits = posting.lines
         .filter((line) => line.side === "debit")
@@ -658,7 +658,7 @@ describe("M3e conservation, determinism, and inventory separation", () => {
     );
     const householdChange = settlement.households.reduce(
       (total, householdResult) =>
-        total + householdResult.endingCashSUSD - householdResult.initialCashSUSD,
+        total + householdResult.endingCashAfterSettlementSUSD - householdResult.initialCashSUSD,
       0,
     );
     const systemChange = accountBalance(world, SYSTEM_ACCOUNT_ID) - systemBefore;

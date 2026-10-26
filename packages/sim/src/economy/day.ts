@@ -449,8 +449,8 @@ function buildNeedsResult(
     blocks.push({
       popBlockId: block.id,
       population,
-      budgetStartSUSD: householdSettlement.initialCashSUSD,
-      budgetEndSUSD: householdSettlement.initialCashSUSD - spent,
+      budgetStartBeforeNeedsSUSD: householdSettlement.initialCashSUSD,
+      budgetEndAfterNeedsSUSD: householdSettlement.initialCashSUSD - spent,
       spentSUSD: spent,
       tiers: tierResults,
       tierSummaries: summaries,

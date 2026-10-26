@@ -220,10 +220,11 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
 - **Adopted planning decision:** D-050 records the post-M4c finance roadmap
   staging, order, and slice boundary. It assigns ownership only; it does not
   implement the stages and does not alter D-048.
-- **Separate concurrent decision:** D-049 (SUSD monetary precision and
-  phase-qualified cash results) was recorded in `DECISIONS.md` while this revision
-  was in progress. Its implementation changes are not part of this documentation
-  commit, and this report does not treat them as accepted M4c behavior.
+- **Precision decision and remediation:** D-049 records the SUSD monetary
+  precision and phase-qualified result semantics. The M4c remediation implements
+  that decision (staged fiscal publication, phase-qualified cash fields, and
+  structural fiscal posting validation); the remediation addendum below records
+  the evidence.
 - **Current implementation behavior:** validation enforces fiscal values, account
   completeness/ownership, treasury references and collisions, region ownership
   when fiscal is active, tax/welfare cash limits, cash neutrality, the accounting
@@ -280,19 +281,20 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
   `GDD_V2.4_CHANGE_REPORT.md` are byte-identical (same Git blob hash) to the
   commits that introduced them; no v2.3/v2.4 file was touched by this revision.
 - The documentation commit changes only `Century_GDD_v2.5.md`,
-  `GDD_V2.5_CHANGE_REPORT.md`, `README.md`, and `DECISIONS.md` (the last only to
-  renumber the roadmap decision to D-050 after a concurrently committed D-049).
-  The working tree also contains unrelated, concurrent M4c-remediation changes
-  under `packages/sim` and `packages/tests`; they are not part of this commit and
-  were preserved untouched.
+  `GDD_V2.5_CHANGE_REPORT.md`, `README.md`, and `DECISIONS.md` (the last for the
+  D-050 roadmap after the separately committed D-049). The M4c remediation is a
+  later implementation commit touching simulation, tests, benchmark, and the
+  supporting documentation; it is recorded in the addendum below.
 - The M4c implementation commit `557b37b` changed simulation, tests, and
   benchmark files; the D-048 decision commit `ec125bd` changed only
-  `DECISIONS.md`.
+  `DECISIONS.md`; the D-049 decision commit `44d3544` changed only
+  `DECISIONS.md`. The later M4c remediation commit hardens the fiscal phase,
+  result contracts, posting validation, and tests on top of these commits; see
+  the remediation addendum below.
 - The M4c test/benchmark evidence recorded above (32 suites/399 tests, lint,
   typecheck, CI PASS, benchmark timings) was executed during the M4c
-  implementation/documentation baseline before this follow-up. This
-  documentation-only follow-up did not rerun simulation CI or benchmarks, per the
-  task.
+  implementation/documentation baseline before the remediation. The remediation
+  addendum records its own 416-test suite, targeted checks, and benchmark reruns.
 - `git diff --check` passes. Markdown fences are balanced: 12 in
   `Century_GDD_v2.5.md`, 6 in `README.md`, and 0 in this change report. README
   internal links and anchors resolve, and the dependency order
@@ -301,6 +303,86 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
 - M4c is marked implemented only where the committed code, tests, and D-048
   support it; M5a/M5b/M7a/M8a are marked planned everywhere.
 - M0–M7 remains the playable vertical slice in the GDD and README.
+
+## M4c remediation addendum (post-audit)
+
+The independent adversarial audit of M4c returned `CHANGES REQUESTED`. The
+remediation applies the audit findings without adding a new milestone or changing
+the M4b summary/close contract.
+
+**C-1 (public fiscal-phase guards) — fixed.** `runFiscalPhase` is no longer
+re-exported from the package root. The phase now requires a valid world, the
+current `world.dayIndex`, a non-terminal day, a settlement matching the world's
+seed/scenario/start day/market and posting boundary, and an unconsumed settlement;
+a transient `fiscalApplied` marker rejects duplicate execution. It validates the
+world and treasury state before staging. Tests cover duplicate invocation, a wrong
+world/day, a stale settlement context, a stale posting boundary, the terminal
+boundary, NaN treasury state, and the public API boundary.
+
+**C-2 (true fiscal atomicity) — fixed.** Fiscal entries are applied to an isolated
+finance clone; the complete staged world and treasury reconciliation are validated
+before `world.finance` is replaced. A post-posting test hook corrupts the staged
+treasury and proves the original serialized world, postings, and settlement
+consumption state are unchanged. An integrated `tick` failure test also proves the
+published world is unchanged.
+
+**C-3 (phase-qualified cash results) — fixed.** Settlement/producer/household and
+totals cash fields are `endingCashAfterSettlementSUSD`; needs fields are
+`budgetStartBeforeNeedsSUSD`/`budgetEndAfterNeedsSUSD`; fiscal blocks report
+`endingCashAfterFiscalSUSD` read from the authoritative staged account. Tests
+assert the settlement phase, needs phase, final account reconciliation, and that a
+settlement balance is not presented as final cash.
+
+**C-4 (conditional-account documentation) — fixed.** The stale population-state
+comment now states that fiscal accounts exist only when a country/fiscal-account
+construction is present. A regression test asserts the countryless four-account
+set and the fiscal-enabled six-account set.
+
+**C-5 (behavioral test gaps) — fixed.** Added a successful 100% tax, real
+multi-employer payments, a genuine employer-funding shortfall, a populated
+unemployed block, nonzero-rate proof that welfare/wealth are not taxed, a
+zero-population block, exact one-unit residual allocation, January 1 ageing,
+leap-year wealth plus month-end close, valid tax/welfare batches, malformed fiscal
+save decode, duplicate/day/terminal/NaN guards, post-staging atomicity, and an
+integrated tick failure. Misleading test names were corrected and fabricated
+settlement results are no longer used to claim real employer/unemployment
+behavior (the remaining cash-limit guard test uses a synthetic settlement only to
+force an impossible cash state).
+
+**R-1 (fiscal posting recognition) — fixed.** A central structural validator
+requires complete recognition/cash legs and matching per-block/country totals for
+`income-tax` and `welfare-transfer` in single, batched, and persisted postings.
+Cash-only, incomplete, wrong-sided, and mismatched entries are rejected; valid tax
+and welfare batches pass. This is structural validation, not an economic proof of
+the amount.
+
+**R-2 (monetary precision) — fixed in D-049 and code/tests.** Continuous binary64
+SUSD arithmetic with no cent quantization; `MONEY_TOLERANCE_SUSD` is an invariant
+tolerance only; phase-qualified transient fields; residual allocation in one
+deterministic rule. Tests include a one-third posting, exact one-unit allocation,
+and conservation/reconciliation.
+
+**R-3 (noisy M2 benchmark) — investigated; unresolved variance retained.** An
+isolated pre-M4c worktree at `02d3bfb` measured M2 200-block avg `3.694 ms`, p95
+`4.854 ms`, p99 `6.238 ms` (PASS). Current remediation run A measured avg
+`3.783 ms`, p95 `5.031 ms` (guard missed); run B measured avg `3.703 ms`, p95
+`4.519 ms` (PASS); the final `pnpm run ci` measured p95 `3.861 ms` (PASS). The
+provisional 5 ms gate is not changed; the variance is reported honestly.
+Countryless M2 account sets and the population tick path are unchanged. M4c's
+staged validation increased its own Node p95 to `12.452 ms` (small) and `19.802
+ms` (stress) in the final CI run; these are Node diagnostics, not mobile evidence.
+
+**R-4 (government totals derivation) — fixed.** `governmentPeriodTotals(finance,
+summary)` derives per-country income-tax revenue, welfare expense, and net result
+from a frozen M4b summary's `accountTotals` plus account metadata, without storing
+redundant totals or adding a flow kind. A post-close test checks agreement with the
+summary account totals.
+
+Verification: `pnpm run lint`, `pnpm run typecheck`, and the full `pnpm test` suite
+(32 suites, 416 tests) passed; the final remediation benchmark run passed all
+gates. No schema/version change was required: world schema 9, simulation 0.9.0,
+save format 1, and data version `m3-economy-v1` remain; only transient result
+fields were renamed. Mobile p95 remains **NOT EVALUATED**.
 
 ## Stop condition
 

@@ -24,6 +24,7 @@ import type { Day, Id } from "../types.js";
 import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import {
   accountNormalSide,
+  assertFiscalPostingStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
@@ -149,6 +150,9 @@ function validatePostingLines(
     throw new RangeError(
       `journal posting is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
     );
+  }
+  if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
+    assertFiscalPostingStructure(transactionKind, lines, accounts);
   }
   return { deltas, debits, credits, cashDelta };
 }

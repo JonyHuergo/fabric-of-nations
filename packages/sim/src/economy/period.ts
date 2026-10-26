@@ -31,7 +31,8 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
-import type { Day, Id, MoneySUSD, Month } from "../types.js";import { requireInteger } from "../validation.js";
+import type { Day, Id, MoneySUSD, Month } from "../types.js";
+import { requireInteger } from "../validation.js";
 import type { World } from "../world.js";
 import {
   accountNormalSide,
@@ -60,6 +61,67 @@ export interface FinanceCloseResult {
   readonly postingIds: readonly number[];
   /** Accounts zeroed by the closing entries, in posting order. */
   readonly closedAccountIds: readonly Id[];
+}
+
+/** Derived government totals for one persisted M4b summary. */
+export interface GovernmentPeriodTotals {
+  readonly countryId: Id;
+  readonly incomeTaxRevenueSUSD: MoneySUSD;
+  readonly welfareExpenseSUSD: MoneySUSD;
+  /** Revenue minus welfare expense for the period. */
+  readonly netFiscalResultSUSD: MoneySUSD;
+}
+
+/**
+ * Derive per-country government totals from one frozen period summary and the
+ * current account registry. This is reporting only: it stores no redundant
+ * totals, does not modify the summary, and does not add a flow kind.
+ *
+ * The caller must supply the finance state whose accounts the summary references.
+ * Account deletion/remapping is not implemented, so the registry remains valid
+ * for historical summaries in the current schema.
+ */
+export function governmentPeriodTotals(
+  finance: FinanceState,
+  summary: FinancePeriodSummary,
+): GovernmentPeriodTotals[] {
+  const accounts = new Map<Id, FinancialAccount>();
+  for (const account of finance.accounts) accounts.set(account.id, account);
+  const totals = new Map<Id, { tax: number; welfare: number }>();
+  for (const account of finance.accounts) {
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      totals.set(account.ownerId, totals.get(account.ownerId) ?? { tax: 0, welfare: 0 });
+    }
+  }
+  for (const [accountIdText, value] of Object.entries(summary.accountTotals)) {
+    if (!Number.isFinite(value)) {
+      throw new RangeError(`summary account total ${accountIdText} is not finite`);
+    }
+    const accountId = Number(accountIdText);
+    if (!Number.isSafeInteger(accountId) || accountId < 0 || accountId > 0xffff_ffff) {
+      throw new RangeError(`summary account total ${accountIdText} is not a valid account id`);
+    }
+    const account = accounts.get(accountId);
+    if (account === undefined) {
+      throw new RangeError(`summary account total ${accountIdText} references unknown account`);
+    }
+    if (account.ownerKind !== "country" || account.ownerId === null) continue;
+    if (account.subtype !== "income-tax-revenue" && account.subtype !== "welfare-expense") {
+      continue;
+    }
+    const current = totals.get(account.ownerId) ?? { tax: 0, welfare: 0 };
+    if (account.subtype === "income-tax-revenue") current.tax += value;
+    else current.welfare += value;
+    totals.set(account.ownerId, current);
+  }
+  return [...totals.entries()]
+    .map(([countryId, values]) => ({
+      countryId,
+      incomeTaxRevenueSUSD: values.tax,
+      welfareExpenseSUSD: values.welfare,
+      netFiscalResultSUSD: values.tax - values.welfare,
+    }))
+    .sort((left, right) => left.countryId - right.countryId);
 }
 
 function toleranceMoney(...values: number[]): number {

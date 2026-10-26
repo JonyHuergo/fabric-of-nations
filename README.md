@@ -694,23 +694,44 @@ timing is unchanged.
   reduces all transfers proportionally, records the shortfall, and creates no
   debt, arrears, or negative cash. Zero budget or zero population creates no
   posting.
-- All fiscal entries are built and validated first, then posted as one atomic
-  `postJournalBatch`; a failure leaves the staged day unchanged.
+- All fiscal entries are built and applied to an isolated finance clone; the
+  complete staged world and treasury reconciliation are validated before the
+  clone replaces `world.finance`. A failure leaves the original accounts,
+  postings, posting ids, summaries, close boundary, and settlement consumption
+  state unchanged. The fiscal phase is internal to `runEconomicDay` and is not
+  re-exported from the package root.
+- Execution guards reject a wrong world/day, the terminal boundary, a settlement
+  from another seed/scenario/start day/market, a stale posting boundary, a reused
+  settlement, and invalid world/treasury state before any staging.
 - The transient fiscal result reports per-country income tax, requested/paid
-  welfare, shortfall, and start/end treasury cash, plus per-block tax and welfare
-  amounts. No redundant fiscal counters are persisted.
+  welfare, shortfall, start/end treasury cash, and per-block tax/welfare plus
+  `endingCashAfterFiscalSUSD`, read from the authoritative staged account. No
+  redundant fiscal counters are persisted.
 
 ### Accounting, close, and wealth
 
 - `income-tax` and `welfare-transfer` are registered cash-neutral transaction
   kinds and are enforced by the central semantic matrix for single, batched, and
-  persisted postings. `treasury-cash` is part of the designated-cash set, so the
-  aggregate cash invariant still holds.
+  persisted postings. Their structural validator additionally requires the
+  complete recognition and cash legs with matching per-block and country totals;
+  cash-only or incomplete fiscal entries are rejected. `treasury-cash` is part of
+  the designated-cash set, so the aggregate cash invariant still holds.
 - Country tax revenue and welfare expense close into country `owner-equity` at
   the same month-end as other owners. Close order is pop blocks, buildings,
   countries, then the system owner. The `FinancePeriodSummary` shape and the
-  four `flowTotalsByKind` keys are unchanged; government period totals are
-  derived from the frozen `accountTotals` plus account metadata.
+  four `flowTotalsByKind` keys are unchanged.
+  `governmentPeriodTotals(finance, summary)` derives per-country income-tax
+  revenue, welfare expense, and net fiscal result from the frozen `accountTotals`
+  plus account metadata without storing redundant totals.
+- Transient cash fields are phase-qualified: settlement reports
+  `endingCashAfterSettlementSUSD` (before fiscal), needs reports
+  `budgetStartBeforeNeedsSUSD` / `budgetEndAfterNeedsSUSD` (before/after needs
+  spending), and fiscal blocks report `endingCashAfterFiscalSUSD`. The
+  authoritative account ledger is final end-of-day cash.
+- SUSD uses continuous floating-point arithmetic in a fixed deterministic order;
+  there is no cent quantization. `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant
+  tolerance, not a rounding operation. D-049 records the precision policy,
+  residual allocation rule, and phase-qualified result semantics.
 - The month-end wealth update refines the provisional M3f convention:
   `perCapitaIncome` is actual wages plus welfare received that day, and
   mandatory payments are income tax actually withheld, both annualized by the
@@ -732,6 +753,11 @@ timing is unchanged.
   subsidies, infrastructure, and debt service are absent.
 - Fiscal policy cannot be changed by a player/AI action yet; M6/M7 supply the
   action interface and M8 the taxation law that may bound rates.
+- The fiscal phase's test-only post-staging hook is deliberately not exported
+  from the package root; it exists only for publication-atomicity regression
+  tests.
+- Monetary precision is continuous floating point; cross-engine bit identity is
+  not claimed beyond the existing documented limitation.
 - Node benchmarks remain diagnostics; the mobile p95 target is **NOT
   EVALUATED**.
 
@@ -935,15 +961,19 @@ processors), 7.93 GiB RAM, seed `20261023`:
 | M2.1 stress | 3,000 | 1,008,106,000 | 730 | 29.95–32.24 s | 41.03–44.17 ms | 47.62–52.18 ms |
 | M2.1 stress | 6,000 | 2,016,212,000 | 730 | 63.55–69.08 s | 87.06–94.63 ms | 103.03–117.90 ms |
 
-The 200-block provisional Node regression guard is p95 ≤ 5 ms. It is noisy on
-this machine: two standalone M4c verification runs measured p95 `5.303 ms` and
-`5.490 ms` (avg `3.796`/`3.859 ms`) and did not satisfy the guard, while the final
-`pnpm run ci` run measured p95 `3.908 ms` (avg `3.368 ms`) and satisfied it, so
-the overall benchmark passed. The failures and successes are reported rather than
-adjusted or hidden. M4c does not change the 200-block M2 world's account set or
-population tick path (countryless worlds keep the original owner accounts).
-Larger scales are diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms
-target is **NOT EVALUATED**; this is a Node harness, not a mobile release build.
+The 200-block provisional Node regression guard is p95 ≤ 5 ms. A remediation
+remeasurement compared an isolated pre-M4c worktree at `02d3bfb` with the current
+build on the same machine and fixed scenario/settings. Baseline (`02d3bfb`):
+avg `3.694 ms`, p50 `3.520 ms`, p95 `4.854 ms`, p99 `6.238 ms` (PASS). Current
+remediation run A: avg `3.783 ms`, p50 `3.533 ms`, p95 `5.031 ms`, p99 `8.704 ms`
+(guard missed); run B: avg `3.703 ms`, p50 `3.503 ms`, p95 `4.519 ms`, p99
+`6.489 ms` (PASS); final `pnpm run ci`: avg `3.331 ms`, p50 `3.310 ms`, p95
+`3.861 ms`, p99 `4.191 ms` (PASS). The guard is provisional and remains noisy; the
+misses and passes are reported rather than adjusted or hidden. Countryless worlds
+keep the original M2 account set and population tick path, so this is treated as
+Node measurement variation, not a demonstrated M4c regression. Larger scales are
+diagnostic, not acceptance thresholds. The GDD mobile p95 ≤ 8 ms target is **NOT
+EVALUATED**; this is a Node harness, not a mobile release build.
 
 The M3b employment workload uses the fixed small M3 world: 4 pop blocks,
 8 buildings, 3 seed assignments, and 1,061,870 people at seed `20261023`. It
@@ -1060,15 +1090,17 @@ Representative Node `v22.12.0` results on the same machine:
 
 | Workload | Blocks | Buildings | Days | Tax SUSD | Welfare SUSD | Shortfall | Treasury start → end | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| M4c small | 4 | 8 | 10 | 21,183.3067 | 27,397.2603 | 0 | 5,001,045.21 → 4,994,831.26 | 7.626 ms | 7.794 ms | 8.503 ms | 8.503 ms | `0a0a1d318ff8ef2b` |
-| M4c stress | 12 | 24 | 5 | 31,863.4956 | 13,698.6301 | 0 | 5,008,865.44 → 5,027,030.30 | 16.954 ms | 16.351 ms | 19.545 ms | 19.545 ms | `eba2c5dd2b7bd647` |
+| M4c small | 4 | 8 | 10 | 21,183.3067 | 27,397.2603 | 0 | 5,001,045.21 → 4,994,831.26 | 9.712 ms | 9.502 ms | 12.452 ms | 12.452 ms | `0a0a1d318ff8ef2b` |
+| M4c stress | 12 | 24 | 5 | 31,863.4956 | 13,698.6301 | 0 | 5,008,865.44 → 5,027,030.30 | 18.524 ms | 18.870 ms | 19.802 ms | 19.802 ms | `eba2c5dd2b7bd647` |
 
-All M4c gates passed in the final `pnpm run ci` run and in the preceding standalone
-runs, including treasury reconciliation, cash conservation, accounting identity,
-positive tax and welfare, and equal cross-run hashes. The overall benchmark passed
-in the final CI run. Earlier standalone benches failed only the pre-existing
-provisional 200-block M2 guard (reported above), not an M4c gate. Mobile p95
-remains **NOT EVALUATED**.
+The remediation added a full staged-world validation and fiscal posting-structure
+checks, so M4c timings increased versus the pre-remediation table; they remain
+Node diagnostics and are not mobile evidence. All M4c gates passed, including
+treasury reconciliation, cash conservation, accounting identity, positive tax and
+welfare, and equal cross-run hashes. The overall benchmark passed in the final
+remediation rerun; the other rerun failed only the pre-existing provisional
+200-block M2 guard (reported above), not an M4c gate. Mobile p95 remains **NOT
+EVALUATED**.
 
 ## Known limitations
 

@@ -454,10 +454,11 @@ export function createPopulationWorld(
     };
     blocks.push(block);
 
-    // Every owner receives the same structural account set. The cash account
-    // id is scenario-declared; the rest are deterministically allocated. The
-    // M4c fiscal accounts are zero-balance until a country with a fiscal system
-    // exists; keeping them uniform makes the owner account set unambiguous.
+    // The cash account id is scenario-declared; the rest are deterministically
+    // allocated. M4c fiscal accounts are conditional: they are created only when
+    // the economy scenario declares at least one country and passes
+    // `fiscalAccounts: true`. Countryless M2/M3 worlds keep their original
+    // four-account owner set and have no fiscal phase.
     const equityAccountId = nextAccountId;
     nextAccountId += 1;
     const incomeAccountId = nextAccountId;

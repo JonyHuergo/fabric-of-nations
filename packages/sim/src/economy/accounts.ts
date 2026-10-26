@@ -37,6 +37,7 @@ import {
   type FinancialAccount,
   type FinancialAccountOwnerKind,
   type FlowTransactionKind,
+  type JournalLine,
   type JournalSide,
   type OpeningBalanceRecord,
   type PublicTransactionKind,
@@ -230,6 +231,199 @@ export const FLOW_EXPENSE_SUBTYPE: Readonly<Record<FlowTransactionKind, AccountS
   wages: "wage-expense",
   upkeep: "upkeep-expense",
 };
+
+/**
+ * Enforce the required recognition and cash legs of the M4c fiscal kinds.
+ *
+ * The generic semantic matrix deliberately constrains only revenue/expense
+ * subtypes, so cash-only or incomplete entries would otherwise pass public
+ * posting validation. A fiscal entry must have, in one balanced entry:
+ *
+ * - income-tax: household income-tax expense and cash, plus country treasury
+ *   cash and income-tax revenue, with equal totals and matching block/country
+ *   owners;
+ * - welfare-transfer: country welfare expense and treasury cash, plus household
+ *   cash and welfare income, with the same totals and matching owners.
+ *
+ * This is structural validation. It proves the entry has the required legs and
+ * balanced fiscal totals; it does not prove that a tax or welfare amount was
+ * derived from the economically correct wage or budget calculation.
+ */
+export function assertFiscalPostingStructure(
+  kind: "income-tax" | "welfare-transfer",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) {
+    throw new RangeError(`${path} must contain fiscal lines`);
+  }
+  const countryDebits = new Map<Id, number>();
+  const countryCredits = new Map<Id, number>();
+  const blockExpense = new Map<Id, number>();
+  const blockCash = new Map<Id, number>();
+  const blockIncome = new Map<Id, number>();
+  const countryOwners = new Set<Id>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    if (kind === "income-tax") {
+      if (account.subtype === "income-tax-expense" && line.side === "debit") {
+        if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+          throw new RangeError(`${path} income-tax-expense must belong to a popBlock`);
+        }
+        blockExpense.set(
+          account.ownerId,
+          (blockExpense.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "household-cash" && line.side === "credit") {
+        if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+          throw new RangeError(`${path} household-cash must belong to a popBlock`);
+        }
+        blockCash.set(
+          account.ownerId,
+          (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "treasury-cash" && line.side === "debit") {
+        if (account.ownerKind !== "country" || account.ownerId === null) {
+          throw new RangeError(`${path} treasury-cash must belong to a country`);
+        }
+        countryOwners.add(account.ownerId);
+        countryDebits.set(
+          account.ownerId,
+          (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "income-tax-revenue" && line.side === "credit") {
+        if (account.ownerKind !== "country" || account.ownerId === null) {
+          throw new RangeError(`${path} income-tax-revenue must belong to a country`);
+        }
+        countryOwners.add(account.ownerId);
+        countryCredits.set(
+          account.ownerId,
+          (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else {
+        throw new RangeError(
+          `${path} has an invalid income-tax line for ${account.subtype} on the ${line.side} side`,
+        );
+      }
+    } else {
+      if (account.subtype === "welfare-expense" && line.side === "debit") {
+        if (account.ownerKind !== "country" || account.ownerId === null) {
+          throw new RangeError(`${path} welfare-expense must belong to a country`);
+        }
+        countryOwners.add(account.ownerId);
+        countryDebits.set(
+          account.ownerId,
+          (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "treasury-cash" && line.side === "credit") {
+        if (account.ownerKind !== "country" || account.ownerId === null) {
+          throw new RangeError(`${path} treasury-cash must belong to a country`);
+        }
+        countryOwners.add(account.ownerId);
+        countryCredits.set(
+          account.ownerId,
+          (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "household-cash" && line.side === "debit") {
+        if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+          throw new RangeError(`${path} household-cash must belong to a popBlock`);
+        }
+        blockCash.set(
+          account.ownerId,
+          (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else if (account.subtype === "welfare-income" && line.side === "credit") {
+        if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+          throw new RangeError(`${path} welfare-income must belong to a popBlock`);
+        }
+        blockIncome.set(
+          account.ownerId,
+          (blockIncome.get(account.ownerId) ?? 0) + line.amountSUSD,
+        );
+      } else {
+        throw new RangeError(
+          `${path} has an invalid welfare-transfer line for ${account.subtype} on the ${line.side} side`,
+        );
+      }
+    }
+  }
+  if (countryOwners.size !== 1) {
+    throw new RangeError(`${path} fiscal entry must reference exactly one country`);
+  }
+  const owner = [...countryOwners][0];
+  if (owner === undefined) throw new RangeError(`${path} fiscal entry has no country owner`);
+  const tolerance = (left: number, right: number): number =>
+    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+  const countryDebitTotal = countryDebits.get(owner) ?? 0;
+  const countryCreditTotal = countryCredits.get(owner) ?? 0;
+  if (!(countryDebitTotal > 0) || !(countryCreditTotal > 0)) {
+    throw new RangeError(`${path} fiscal entry has no positive country-side total`);
+  }
+  if (kind === "income-tax") {
+    if (blockExpense.size === 0 || blockCash.size === 0) {
+      throw new RangeError(`${path} income-tax requires household expense and cash legs`);
+    }
+    if (blockExpense.size !== blockCash.size) {
+      throw new RangeError(`${path} income-tax requires matching per-block expense and cash legs`);
+    }
+    let total = 0;
+    for (const [popBlockId, expense] of blockExpense) {
+      const cash = blockCash.get(popBlockId);
+      if (cash === undefined || Math.abs(expense - cash) > tolerance(expense, cash)) {
+        throw new RangeError(
+          `${path} income-tax block ${String(popBlockId)} expense and cash legs do not match`,
+        );
+      }
+      total += expense;
+    }
+    if (
+      Math.abs(total - countryDebitTotal) > tolerance(total, countryDebitTotal) ||
+      Math.abs(total - countryCreditTotal) > tolerance(total, countryCreditTotal)
+    ) {
+      throw new RangeError(`${path} income-tax block totals do not match country totals`);
+    }
+  } else {
+    if (blockIncome.size === 0 || blockCash.size === 0) {
+      throw new RangeError(
+        `${path} welfare-transfer requires household income and cash legs`,
+      );
+    }
+    if (blockIncome.size !== blockCash.size) {
+      throw new RangeError(
+        `${path} welfare-transfer requires matching per-block income and cash legs`,
+      );
+    }
+    let total = 0;
+    for (const [popBlockId, income] of blockIncome) {
+      const cash = blockCash.get(popBlockId);
+      if (cash === undefined || Math.abs(income - cash) > tolerance(income, cash)) {
+        throw new RangeError(
+          `${path} welfare-transfer block ${String(popBlockId)} income and cash legs do not match`,
+        );
+      }
+      total += income;
+    }
+    if (
+      Math.abs(total - countryDebitTotal) > tolerance(total, countryDebitTotal) ||
+      Math.abs(total - countryCreditTotal) > tolerance(total, countryCreditTotal)
+    ) {
+      throw new RangeError(`${path} welfare-transfer block totals do not match country totals`);
+    }
+  }
+}
 
 /**
  * Enforce the semantic matrix for one journal line. Lines on asset, liability,

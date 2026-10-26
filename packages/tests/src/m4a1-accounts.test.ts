@@ -517,9 +517,9 @@ describe("M4a-1 recognition preserves M3 cash behaviour", () => {
         producer.inputCostsSUSD -
         producer.wagesPaidSUSD -
         producer.upkeepPaidSUSD;
-      expect(producer.endingCashSUSD).toBeCloseTo(expected, 9);
+      expect(producer.endingCashAfterSettlementSUSD).toBeCloseTo(expected, 9);
     }
-    expect(settlement.settlement.totals.endingCashSUSD).toBeCloseTo(
+    expect(settlement.settlement.totals.endingCashAfterSettlementSUSD).toBeCloseTo(
       settlement.settlement.totals.initialCashSUSD,
       9,
     );

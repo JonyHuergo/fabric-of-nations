@@ -212,8 +212,10 @@ export interface NeedTierResult extends NeedTierSummary {
 export interface PopBlockNeedsResult {
   popBlockId: Id;
   population: number;
-  budgetStartSUSD: number;
-  budgetEndSUSD: number;
+  /** Cash/goods budget at the start of the needs phase, before market spending. */
+  budgetStartBeforeNeedsSUSD: number;
+  /** Remaining budget after needs spending; excludes any later fiscal phase. */
+  budgetEndAfterNeedsSUSD: number;
   spentSUSD: number;
   tiers: readonly NeedTierResult[];
   tierSummaries: readonly NeedTierSummary[];

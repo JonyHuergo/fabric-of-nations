@@ -363,8 +363,8 @@ export function settlePopulationNeeds(
     results.push({
       popBlockId: block.id,
       population: draft.population,
-      budgetStartSUSD: draft.budgetStart,
-      budgetEndSUSD: draft.budget,
+      budgetStartBeforeNeedsSUSD: draft.budgetStart,
+      budgetEndAfterNeedsSUSD: draft.budget,
       spentSUSD: draft.spent,
       tiers: collectNeedDetails ? draft.tierResults : [],
       tierSummaries: draft.tierSummaries,

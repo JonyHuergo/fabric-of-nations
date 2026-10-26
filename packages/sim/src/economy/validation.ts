@@ -21,6 +21,7 @@ import type { Day, Id } from "../types.js";
 import type { World } from "../world.js";
 import {
   assertAccountingIdentity,
+  assertFiscalPostingStructure,
   assertOwnerEquityTallies,
   assertSemanticJournalLine,
   assertValidAccountCategory,
@@ -262,6 +263,7 @@ export function assertValidJournalPosting(
     let debits = 0;
     let credits = 0;
     let cashDelta = 0;
+    const journalLines: JournalLine[] = [];
     for (let index = 0; index < lines.length; index += 1) {
       const line = assertPostingLine(
         lines[index],
@@ -272,6 +274,11 @@ export function assertValidJournalPosting(
       debits += line.debit;
       credits += line.credit;
       cashDelta += line.cashDelta;
+      journalLines.push({
+        accountId: line.account.id,
+        side: line.debit > 0 ? "debit" : "credit",
+        amountSUSD: line.debit > 0 ? line.debit : line.credit,
+      });
     }
     if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
       throw new RangeError(
@@ -285,6 +292,9 @@ export function assertValidJournalPosting(
       throw new RangeError(
         `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
       );
+    }
+    if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
+      assertFiscalPostingStructure(transactionKind, journalLines, accounts, path);
     }
   }
   if (record.sourceEntityId !== null) {
@@ -733,8 +743,7 @@ function assertValidMarket(
   }
 }
 
-function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {
-  const fiscalAccountsRequired = world.countries.length > 0;
+function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFinanceIndex>): void {  const fiscalAccountsRequired = world.countries.length > 0;
   for (const block of world.popBlocks) {
     const subtypes = [
       "owner-equity",

@@ -325,9 +325,11 @@ validation succeeds. A failure leaves the original world, its hash, and its
 serialized representation unchanged. The M4b period close is itself an additional
 atomic stage: it copies the finance state, applies the closing entries and the
 summary on that copy, validates the result, and only then replaces `world.finance`
-(§5.4.2). The M4c fiscal phase builds and validates the whole day's fiscal entries
-first and posts them as one atomic batch. The M2-only path retains its
-population-only behavior and does not use the M3f economic staging path.
+(§5.4.2). The M4c fiscal phase stages on an isolated finance clone, validates the
+complete staged world and treasury reconciliation, and only then replaces
+`world.finance`; it also consumes the transient settlement result so duplicate or
+stale execution is rejected. The M2-only path retains its population-only
+behavior and does not use the M3f economic staging path.
 
 **M2-only and economic-world distinction.** A world with no buildings or markets
 uses the M2-only path: ageing, daily demography, the M2 needs fixture, daily
@@ -347,11 +349,13 @@ issuance, and no FX process; the close remains cash-neutral and moves no
 designated cash.
 
 **M4c current scope.** M4c adds the fiscal part of step 12 and the fiscal
-accounts, policy state, posting kinds, and wealth inputs described in §5.4.3 and
-§8. It adds no government procurement or service demand, no state employment, no
-subsidies or debt service, no corporate/consumption/land/tariff taxation, no
-debt or deficit financing, and no monetary, FX, or inflation behavior. Fiscal
-policy is scenario-initialised runtime state; nothing in M4c mutates it.
+accounts, policy state, posting kinds, structural posting validation, government
+period-total derivation, phase-qualified transient cash fields, and wealth inputs
+described in §5.4.3 and §8. It adds no government procurement or service demand,
+no state employment, no subsidies or debt service, no
+corporate/consumption/land/tariff taxation, no debt or deficit financing, and no
+monetary, FX, or inflation behavior. Fiscal policy is scenario-initialised runtime
+state; nothing in M4c mutates it.
 
 This pipeline may be revised only through a documented design decision and
 regression tests. All markets must use a stable order or an order-independent
@@ -960,12 +964,50 @@ is transferred, the shortfall is recorded, and no debt, arrears, or negative
 cash is created. A zero budget creates no posting; with zero population the
 requested amount is reported as shortfall because there is no recipient.
 
-**Atomicity and result.** The whole day's fiscal entries are built and validated
-before one `postJournalBatch`; a failure leaves the staged day unchanged. The
+**Atomicity, guards, and result.** The fiscal phase is an internal stage invoked
+by `runEconomicDay` and is deliberately not re-exported from the package root. It
+validates the world, the processed day (including terminal-boundary rejection),
+the settlement's world/day/seed/scenario/start-day/market context, a stale
+posting boundary, and a single-use marker before staging anything. The day's
+entries are applied to an isolated finance clone; the complete staged world is
+validated and treasury reconciliation is checked before the clone replaces
+`world.finance`. Any failure leaves the original accounts, postings, posting ids,
+summaries, close boundary, and settlement consumption state unchanged. The
 transient phase result reports per-country income tax, requested/paid welfare,
-shortfall, and start/end treasury cash, plus per-block tax and welfare amounts.
-No redundant fiscal counters are persisted; the authoritative record is the
-account balances and the M4b monthly summaries.
+shortfall, start/end treasury cash, and per-block tax/welfare amounts plus
+`endingCashAfterFiscalSUSD` read from the staged authoritative account. The
+supported simulation entry point remains `tick`/`runEconomicDay`; tests import the
+phase module directly only to exercise staging and guards.
+
+**Posting structure.** The central fiscal validator requires each `income-tax` or
+`welfare-transfer` entry to contain its recognition and cash legs with matching
+per-block and country totals: income tax needs household tax expense/cash plus
+country treasury/tax revenue; welfare needs country welfare expense/treasury plus
+household cash/welfare income. Cash-only or incomplete fiscal postings are
+rejected for single, batched, and persisted validation. This is structural
+validation only and does not claim to prove that an amount was economically
+justified by a specific wage or budget calculation.
+
+**Government period totals.** `governmentPeriodTotals(finance, summary)` derives
+per-country income-tax revenue, welfare expense, and net fiscal result from a
+frozen M4b summary's `accountTotals` plus the current account registry. It stores
+no redundant totals and does not add a flow kind.
+
+**Monetary precision.** Authoritative SUSD amounts remain continuous binary64
+`number` values in a fixed deterministic order; there is no cent quantization,
+decimal money type, or fixed-point migration. `MONEY_TOLERANCE_SUSD = 1e-6` is
+used for invariant/reconciliation comparisons only, never as a rounding operation
+on balances. The welfare residual rule is proportional by population in ascending
+block-id order with the exact remainder and no random draw. D-049 records the
+full policy; display formatting belongs to a future UI layer.
+
+**Transient cash fields.** Settlement results report
+`endingCashAfterSettlementSUSD` (after market/wages/upkeep, before fiscal). Needs
+results report `budgetStartBeforeNeedsSUSD` and `budgetEndAfterNeedsSUSD` (before
+and after needs spending, before fiscal). Fiscal block results report
+`endingCashAfterFiscalSUSD`. Only the authoritative ledger balance is final
+end-of-day cash; these transient fields are phase-qualified and must not be
+presented as final cash.
 
 **Validation.** Non-finite, negative, or out-of-range fiscal values; missing,
 duplicated, mismatched, or wrongly owned country accounts; a treasury reference
@@ -1763,7 +1805,9 @@ atomic staged close validation (§5.4.2, D-047). M4c adds the `treasury-cash`
 designated-cash subtype, cash-neutral `income-tax` and `welfare-transfer`
 postings, the requirement that country tax revenue and welfare expense close into
 country owner equity, treasury non-negativity, exact tax/welfare cash
-reconciliation, and atomic fiscal-batch validation (§5.4.3, D-048). The following
+reconciliation, required fiscal recognition/cash legs, staged-clone publication,
+execution-context/duplicate guards, and phase-qualified transient cash results
+(§5.4.3, D-048/D-049). The following
 debt, interest, and monetary invariants remain future requirements (debt and
 interest are planned with M5b; monetary invariants with M8a); the monthly
 period-summary invariants are current and recorded in §5.4.2.
@@ -2313,7 +2357,7 @@ planned in §17.3 (M5b, M5a, M7a, and M8a respectively) and are not implemented.
 | **M4a-1** | Category-aware double-entry accounts, normal-side balances, opening balances, recognition legs | Account categories/subtypes validate; opening balances apply once with provenance; postings balance and the accounting identity holds; M3 cash outcomes and producer/household settlement totals are unchanged; serialization, determinism, and rollback tests pass. | Accepted |
 | **M4a-2** | Country/currency identity, monetary arrangements, SUSD-relative valuation, country-region ownership | Runtime `countries`/`currencies`/`currencyValuations` validate, serialize, hash, and clone; `own`/`adopted` rules validate; foreign adoption and one-issued-currency restrictions are enforced; region ownership is authoritative in `Country.regionIds`; conversion direction and unavailable-valuation errors are tested; no M3/M4a-1 economic outcome changes. | Accepted |
 | **M4b** | Monthly period close, immutable finance summaries, semantic posting matrix, internal `period-close`, staged-versus-published close boundary | Economic worlds close on civil month-ends after settlement, needs/militancy, and month-end wealth; the first period may be partial and duplicate/gap/terminal cases reject; summaries capture the pre-close trial balance and the four mapped gross flows; revenue/expense opening balances are zero and the semantic matrix is enforced for single, batched, and persisted postings; closing entries zero revenue/expense exactly, close into existing owner equity in deterministic order, remain cash-neutral, and preserve the accounting identity; missing owner equity fails before mutation; the close is atomic and staged; published validation/serialization/hashing/deserialization reject an unadvanced close; summaries and `closedThroughDay` round-trip, clone, hash, and validate; schema-7/simulation-0.7.0 saves are rejected; deterministic and benchmark coverage passes. | Accepted |
-| **M4c** | Per-country treasury and fiscal accounts, `Country.fiscal` policy state, daily income tax on actual wages, daily budgeted per-capita welfare transfer with proportional shortfall, fiscal posting kinds and semantic matrix, wealth-input refinement | Country and household fiscal account sets validate; treasury opening cash applies once with provenance and balance-sheet counterparts; fiscal values, treasury references, id collisions, and region-ownership gaps reject before mutation; income tax equals the flat rate on actual received wages and cannot exceed them or household cash; welfare uses the civil year's day count, allocates exactly per capita, and reduces proportionally when treasury cash is insufficient without debt, arrears, or negative cash; fiscal postings are cash-neutral, balanced, semantically validated for single/batched/persisted forms, and close into country equity in deterministic order; M4b summary shape and four flow kinds are unchanged; M2/M3/M4a/M4b behavior is preserved for zero-fiscal and countryless worlds; schema-9/simulation-0.9.0 round-trip, determinism, save/resume, and benchmark coverage pass; schema-8/0.8.0 saves reject. | Accepted |
+| **M4c** | Per-country treasury and fiscal accounts, `Country.fiscal` policy state, daily income tax on actual wages, daily budgeted per-capita welfare transfer with proportional shortfall, fiscal posting kinds and semantic matrix, wealth-input refinement | Country and household fiscal account sets validate; treasury opening cash applies once with provenance and balance-sheet counterparts; fiscal values, treasury references, id collisions, and region-ownership gaps reject before mutation; income tax equals the flat rate on actual received wages and cannot exceed them or household cash; welfare uses the civil year's day count, allocates exactly per capita, and reduces proportionally when treasury cash is insufficient without debt, arrears, or negative cash; fiscal postings are cash-neutral, balanced, structurally require their recognition/cash legs, are semantically validated for single/batched/persisted forms, and close into country equity in deterministic order; the fiscal phase is staged on a finance clone and publishes only after complete staged validation, rejects duplicate/stale/wrong-day/terminal execution before mutation, and leaves the original state unchanged on a post-posting failure; transient settlement/needs/fiscal cash fields are phase-qualified and `governmentPeriodTotals` derives government totals from a frozen summary; M4b summary shape and four flow kinds are unchanged; M2/M3/M4a/M4b behavior is preserved for zero-fiscal and countryless worlds; schema-9/simulation-0.9.0 round-trip, determinism, save/resume, and benchmark coverage pass; schema-8/0.8.0 saves reject. | Accepted |
 
 M4b did not add taxes or government finance, and M4c adds only the fiscal subset
 described in §5.4.3 and §8.3–§8.4. Neither stage adds corporate, consumption,
@@ -2618,6 +2662,7 @@ The following choices are resolved in this version:
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
 16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved SUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
 17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded and not mutable by an action; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. Broader taxes and expenditure categories remain future and partly unassigned; profit distributions and state-enterprise remittances are planned in M5a, public debt and deficit financing in M5b, annual close and controlled corrections in M7a, and inflation/FX/monetary-policy foundations in M8a (§17.3). None of those planned stages is implemented.
+18. **Monetary precision and result phases:** authoritative SUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
 
 ### 20.2 Remaining designer decisions
 

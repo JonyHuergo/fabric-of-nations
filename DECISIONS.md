@@ -1562,6 +1562,21 @@ rule.
   `m3-economy-v1` remain unchanged. A future persisted monetary representation
   change would require a new decision and schema/save migration review.
 
+#### D-049 implementation notes (recorded with the M4c remediation)
+
+- The transient fields were renamed as documented: `endingCashSUSD` became
+  `endingCashAfterSettlementSUSD` on producer/household settlement and totals,
+  `budgetStartSUSD`/`budgetEndSUSD` became
+  `budgetStartBeforeNeedsSUSD`/`budgetEndAfterNeedsSUSD`, and fiscal blocks report
+  `endingCashAfterFiscalSUSD`. No persisted schema field changed.
+- Fiscal amounts remain unrounded `number` values. Tests assert a one-third
+  posting stays `1/3`, a one-unit welfare budget allocates exactly to one, and
+  tax/treasury/household reconciliation uses the authoritative accounts rather
+  than formatted currency.
+- `MONEY_TOLERANCE_SUSD` remains limited to invariant/reconciliation comparisons;
+  no clamp or tolerance is used to manufacture a passing conservation result.
+  The existing cross-engine floating-point limitation remains open.
+
 ### D-050 — Post-M4c finance roadmap staging (adopted direction; planned only)
 
 - **Status:** adopted development-plan direction recorded with GDD v2.5. It assigns

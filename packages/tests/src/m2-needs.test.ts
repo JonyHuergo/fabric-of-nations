@@ -30,9 +30,9 @@ describe("M2 needs, budgets, and shared supply", () => {
 
     expect(needs.blocks).toHaveLength(3);
     for (const block of needs.blocks) {
-      expect(block.budgetStartSUSD).toBeGreaterThanOrEqual(0);
-      expect(block.budgetEndSUSD).toBeGreaterThanOrEqual(0);
-      expect(block.budgetEndSUSD).toBeCloseTo(block.budgetStartSUSD - block.spentSUSD, 6);
+      expect(block.budgetStartBeforeNeedsSUSD).toBeGreaterThanOrEqual(0);
+      expect(block.budgetEndAfterNeedsSUSD).toBeGreaterThanOrEqual(0);
+      expect(block.budgetEndAfterNeedsSUSD).toBeCloseTo(block.budgetStartBeforeNeedsSUSD - block.spentSUSD, 6);
       expect(block.spentSUSD).toBeCloseTo(totalSpent(block.tierSummaries), 6);
       for (const summary of block.tierSummaries) {
         if (summary.active) expect(summary.fullyMet).toBe(true);
@@ -65,8 +65,8 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.spentSUSD).toBeLessThanOrEqual(block.budgetStartSUSD + 1e-6);
-      expect(block.budgetEndSUSD).toBeGreaterThanOrEqual(0);
+      expect(block.spentSUSD).toBeLessThanOrEqual(block.budgetStartBeforeNeedsSUSD + 1e-6);
+      expect(block.budgetEndAfterNeedsSUSD).toBeGreaterThanOrEqual(0);
       const subsistence = block.tierSummaries.find((summary) => summary.tier === "subsistence");
       const basic = block.tierSummaries.find((summary) => summary.tier === "basic");
       expect(subsistence?.active).toBe(true);
@@ -202,9 +202,9 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.budgetStartSUSD).toBe(0);
+      expect(block.budgetStartBeforeNeedsSUSD).toBe(0);
       expect(block.spentSUSD).toBe(0);
-      expect(block.budgetEndSUSD).toBe(0);
+      expect(block.budgetEndAfterNeedsSUSD).toBe(0);
     }
     expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
   });
@@ -220,9 +220,9 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.budgetStartSUSD).toBe(0);
+      expect(block.budgetStartBeforeNeedsSUSD).toBe(0);
       expect(block.spentSUSD).toBe(0);
-      expect(block.budgetEndSUSD).toBe(0);
+      expect(block.budgetEndAfterNeedsSUSD).toBe(0);
     }
     expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
   });
@@ -235,7 +235,7 @@ describe("M2 needs, budgets, and shared supply", () => {
     const block = needs?.blocks[0];
     expect(block?.population).toBe(0);
     expect(block?.spentSUSD).toBe(0);
-    expect(block?.budgetStartSUSD).toBe(0);
+    expect(block?.budgetStartBeforeNeedsSUSD).toBe(0);
     expect(block?.tierSummaries.every((tier) => tier.active === false)).toBe(true);
     expect(worldPopulation(world)).toBe(0);
   });
@@ -266,8 +266,8 @@ describe("M2 needs, budgets, and shared supply", () => {
       }
       expect(summaryBlock.popBlockId).toBe(detailedBlock.popBlockId);
       expect(summaryBlock.population).toBe(detailedBlock.population);
-      expect(summaryBlock.budgetStartSUSD).toBe(detailedBlock.budgetStartSUSD);
-      expect(summaryBlock.budgetEndSUSD).toBe(detailedBlock.budgetEndSUSD);
+      expect(summaryBlock.budgetStartBeforeNeedsSUSD).toBe(detailedBlock.budgetStartBeforeNeedsSUSD);
+      expect(summaryBlock.budgetEndAfterNeedsSUSD).toBe(detailedBlock.budgetEndAfterNeedsSUSD);
       expect(summaryBlock.spentSUSD).toBe(detailedBlock.spentSUSD);
       expect(summaryBlock.tiers).toEqual([]);
       expect(summaryBlock.tierSummaries).toEqual(detailedBlock.tierSummaries);
@@ -286,8 +286,8 @@ describe("M2 needs, budgets, and shared supply", () => {
     if (block === undefined) throw new Error("expected needs block");
 
     expect(block.population).toBe(3000);
-    expect(block.budgetStartSUSD).toBeCloseTo(1643.835616438356, 9);
-    expect(block.budgetEndSUSD).toBeCloseTo(1271.835616438356, 9);
+    expect(block.budgetStartBeforeNeedsSUSD).toBeCloseTo(1643.835616438356, 9);
+    expect(block.budgetEndAfterNeedsSUSD).toBeCloseTo(1271.835616438356, 9);
     expect(block.spentSUSD).toBe(372);
     expect(block.tiers).toHaveLength(4);
     expect(block.tiers.map((tier) => tier.tier)).toEqual([
