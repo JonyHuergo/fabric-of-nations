@@ -1,20 +1,28 @@
 # GDD v2.5 — Change Report
 
-**Status:** documentation revision; committed with the M4c documentation update.\
+**Status:** documentation revision; committed with the M4c documentation and
+finance-roadmap updates.\
 **Authoritative document:** `Century_GDD_v2.5.md`\
 **Supersedes:** `Century_GDD_v2.4.md` (retained as historical, byte-for-byte unchanged)\
 **Implementation baseline:** accepted M0–M4c; M4c implementation commit `557b37be63ecec5f8bb1826c77bb35a43e1e9531`, parent `ec125bdeb23ee1ddd1abe1429eb4c78b66171b9a` (D-048 decision commit)\
+**Planning baseline:** D-050 and GDD v2.5 §17.3–§17.4 adopt M5a, M5b, M7a, and M8a as **planned, not implemented** stages\
 **Change date:** 2026-10-25
 
 ## Purpose
 
 This revision reconciles the authoritative design document with the committed
 M4c government fiscal loop: a per-country treasury, a daily flat income tax on
-wages actually paid, and a daily budgeted per-capita welfare transfer. It
-preserves the long-term design intent, the historical v2.3/v2.4 documents, the
-determinism/conservation rules, the country/currency model, the deferred finance
-systems, and the unverified mobile-performance status. It does not add
-requirements beyond D-048 and the implemented behavior.
+wages actually paid, and a daily budgeted per-capita welfare transfer. It also
+adopts the post-M4c finance roadmap direction: intermediate stages M5a, M5b,
+M7a, and M8a, inserted into the existing M0–M10 order without renumbering those
+milestones.
+
+The revision preserves the long-term design intent, the historical v2.3/v2.4
+documents, the determinism/conservation rules, the country/currency model, the
+deferred finance systems, and the unverified mobile-performance status. It does
+not add requirements beyond D-048 for implemented behavior. The intermediate
+stages are planned design only; they are not implemented and are not claimed as
+runtime support.
 
 Implementation baseline versions are world schema 9, simulation version 0.9.0,
 save format 1, and data version `m3-economy-v1`. This documentation revision does
@@ -37,14 +45,16 @@ not change any of them.
 | §8.3 government revenue | Adds the current M4c flat wage-only residence-based income tax, fixed collection efficiency, and the provisional non-law-bounded rate; keeps all other revenue sources future. | `fiscal.ts`; D-048 |
 | §8.4 government expenditure | Adds the current M4c budgeted per-capita welfare transfer, exact allocation, proportional shortfall, and no-debt rule; keeps all other expenditure categories, procurement, and services future. | `fiscal.ts`; D-048 |
 | §8.7 finance invariants | Adds treasury cash, fiscal cash-neutrality, country close, and atomic fiscal-batch invariants while preserving existing requirements. | `assertValidEconomyState`, `runFiscalPhase` |
+| §8.3–§8.6 stage ownership | Labels state-enterprise remittance (M5a), public debt and interest (M5b), annual close and controlled corrections (M7a), and inflation/FX/monetary policy (M8a) as planned, not implemented; keeps all other future finance work unassigned. | D-050 |
 | §14.4 performance | Notes that the M4c fiscal benchmark times the integrated fiscal day, excludes setup/hashing, and does not evaluate the mobile p95 target. | `packages/bench/src/bench.ts` |
 | §15.1 data scope | Notes that no country/currency historical dataset or shipped fiscal scenario exists; M4c fixtures are inline tests. | test fixtures; D-048 |
 | §16.2/§16.4 tests and conservation | Adds the current M4c fiscal test coverage and the current government-cash equation interpretation (no borrowing, interest, or accrued arrears; shortfall is unfunded). | `m4c-fiscal.test.ts`; D-048 |
-| §17 milestone plan | Updates the M4 row and adds M4c as an accepted §17.2 stage with its acceptance boundary; updates §17.1/§20.3 baselines to M0–M4c. | Commit `557b37b`; D-048 |
-| §20.1 decisions | Item 5 records M4c fiscal postings/close; new item 17 records the provisional fiscal policy and its limits. | D-048 |
-| §21 glossary | Adds fiscal policy, treasury, and welfare shortfall; updates the current-implementation baseline. | D-048 |
-| README | Identifies v2.5 as the current design authority and v2.4/v2.3 as historical; records M4c in the implemented baseline, adds an M4c section, and updates schema/digest/benchmark/limitation references. | M4c implementation |
-| DECISIONS | Adds D-048 implementation notes (conditional fiscal accounts, timing, validation placement, digests, benchmark, limitations) without rewriting prior decisions. | D-048; this revision |
+| §17 milestone plan | Updates the M4 row, adds M4c as an accepted §17.2 stage, and states the implementation status (M0–M4c implemented; M5–M10 planned). | Commit `557b37b`; D-048 |
+| §17.3–§17.4 (new) | Adds the planned intermediate stages M5a, M5b, M7a, and M8a with scope, placement, dependencies, non-goals, the implementation order, and the preserved M0–M7 slice boundary. | D-050; designer-adopted direction |
+| §20.1 decisions | Item 5 records M4c fiscal postings/close and the M7a annual-close plan; item 17 records the provisional fiscal policy plus the planned stage ownership. | D-048; D-050 |
+| §21 glossary | Adds fiscal policy, treasury, welfare shortfall, and planned intermediate stage; updates the current-implementation baseline. | D-048; D-050 |
+| README | Identifies v2.5 as the current design authority and v2.4/v2.3 as historical; records M4c in the implemented baseline, adds an M4c section, adds the planned roadmap, and updates schema/digest/benchmark/limitation references. | M4c implementation; D-050 |
+| DECISIONS | Adds D-048 implementation notes and D-050 roadmap staging without rewriting prior decisions. | D-048; D-050 |
 
 ## M4c model recorded in v2.5
 
@@ -82,6 +92,29 @@ the M4c commit implements:
   `m3-economy-v1`, and rejection of schema-8 / simulation-0.8.0 saves without
   migration. Countryless and zero-fiscal worlds keep their prior behavior.
 
+## Planned intermediate finance stages adopted in v2.5
+
+These stages are **planned design, not implementation**. They are recorded in GDD
+v2.5 §17.3–§17.4 and D-050, and no runtime behavior, schema field, save version,
+benchmark gate, or UI support exists for them.
+
+| Stage | Placement | Why it is placed there | Scope recorded |
+|---|---|---|---|
+| **M5a** | After M5, before M5b and M6 | M5 must first establish the multi-country economic/historical-data foundation and whatever ownership/enterprise structures exist; profit distribution and state-enterprise remittance cannot be specified before the entities and profit measure they move. | Private-profit distributions to designated owners/household capitalists or deterministic retention; actual state-owned-enterprise remittances to country treasuries through balanced entries; ownership, timing, account semantics, available-funds constraints; no distribution above distributable profit or available cash; accounting identity, determinism, and M4b close invariants preserved. |
+| **M5b** | After M5a, before M6 | M5a supplies defined profit, enterprise remittance, and ownership structures needed for credible debt capacity and repayment analysis. M6 country AI must operate against borrowing constraints, interest, maturities, and default consequences that already exist rather than invent them. | Versioned debt contracts (issuer, holder, principal, interest/coupon, issue, maturity, outstanding liability, status); issuance with matching asset/liability entries and cash transfers; interest, maturity, principal repayment, refinancing, arrears, explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal; financing constraints; no premature full banking/central-bank system. |
+| **M7a** | After M7, before M8 | M7 delivers the first playable mobile vertical slice; annual close and controlled corrections complete the accounting lifecycle after that slice rather than delaying it. | Annual finance summaries and explicit periods; year-end closing consistent with the M4b monthly close; partial campaign years; controlled auditable correction/reversal entries preserving closed history; deterministic ordering, atomicity, validation, persistence, reconciliation. Not a prerequisite for the playable release. |
+| **M8a** | After M8, before M9 | M8 establishes political institutions and laws, which supply monetary-policy authority and controls; M5/M5a/M5b supply the multi-country, enterprise-finance, and debt channels through which policy transmits. | Documented inflation/price-level measure (basket, weights, window); exchange-rate dynamics on existing country/currency identities and valuations; defined monetary authority/controls with explicit causal mechanisms; balanced money/credit accounting; deterministic timing, bounds, persistence, validation, tests; missing prerequisites recorded rather than hidden. |
+
+**Dependency order recorded throughout v2.5 and README:**
+
+`M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
+
+**Preserved slice.** The playable vertical slice remains **M0–M7**. M7a and M8a
+are post-slice stages and are not prerequisites for the initial playable release.
+M5–M7 are not automatically blocked on later monetary systems. M4c is unaffected;
+its implemented treasury, income-tax, welfare, close, and persistence behavior is
+not reopened.
+
 ## Superseded v2.4 statements and replacements
 
 - v2.4 “current schema-8 baseline (M0–M4b)” → v2.5 “current schema-9 baseline
@@ -96,8 +129,14 @@ the M4c commit implements:
   records wages plus welfare as income and withheld income tax as mandatory
   payments, still a current-day annualization.
 - v2.4 “M4c is future/unassigned” in the header, §17.2, §20.1, and §20.3 → v2.5
-  records M4c as an accepted stage and leaves the remaining M4 work and later
-  milestones unimplemented.
+  records M4c as an accepted stage and leaves the remaining unassigned M4 work
+  and later milestone objectives not implemented.
+- v2.4 “debt, distributions, annual close, inflation/FX, and monetary policy are
+  unassigned future work” → v2.5 still marks them not implemented but assigns the
+  adopted subset to planned stages: M5b (public debt), M5a (profit
+  distributions/enterprise remittances), M7a (annual close/controlled
+  corrections), and M8a (inflation/FX/monetary policy). Ownership of other future
+  finance work is still unassigned.
 
 No other system was rewritten. The v2.4 provisional and future-system language for
 corporate/consumption/land/tariff taxes, broader government expenditure and
@@ -144,19 +183,33 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
 - Wealth uses a current-day flow annualization, not a trailing-month average.
 - Currency rate bounds/tolerances remain provisional numerical safety choices.
 
-**Deferred:**
+**Planned (adopted, not implemented):**
 
-- Corporate, consumption/excise, land/property, and tariff taxes; state-enterprise
-  remittance; colonial/subject transfers; broader government expenditure,
-  procurement, services, state employment, subsidies, infrastructure, and debt
-  service.
-- Debt/bonds, interest, maturities, default, deficit financing, banks, a central
-  bank, monetary issuance, FX, inflation, and monetary regimes.
-- Law-bounded rates/enactment, elections, interest groups, and M8 institutions.
-- Player/AI policy actions, UI/snapshots/commands, multi-region/multi-country
-  authoring, GDP/national accounts, annual history, annual close,
-  reopen/reversal/adjusting entries, retained-earnings subtypes, summary
-  compaction, and new M4b flow kinds.
+- M5a: private profit distributions to designated owners/household capitalists or
+  deterministic retention, and actual state-owned-enterprise remittances through
+  balanced entries.
+- M5b: public debt contracts, issuance, interest, maturity/principal repayment,
+  refinancing, arrears, default, and deficit financing.
+- M7a: annual finance summaries/periods, year-end close, partial years, and
+  controlled auditable correction/reversal entries.
+- M8a: documented inflation/price level, exchange-rate dynamics, and
+  monetary-policy authority/controls with explicit causal mechanisms and balanced
+  money/credit accounting.
+
+**Deferred / not implemented in the accepted baseline:**
+
+- The top-level milestones M5–M10 remain planned and unimplemented; their
+  objectives are unchanged.
+- Finance work not assigned to an intermediate stage: corporate,
+  consumption/excise, land/property, and tariff taxes; colonial/subject
+  transfers; broader government expenditure, procurement, services, state
+  employment, subsidies, and infrastructure.
+- Banks, a central bank, monetary issuance, and any monetary system beyond the
+  M8a stage's explicit scope.
+- Law-bounded rates/enactment and the M8 institutional details themselves.
+- Player/AI policy actions, UI/snapshots/commands, GDP/national accounts, broader
+  annual history, retained-earnings subtypes, summary compaction, long-term
+  history compaction, and new M4b flow kinds.
 
 ## Decisions versus restrictions
 
@@ -164,6 +217,13 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
   D-047, D-046, and D-044/D-045 remain the earlier finance decisions and are not
   rewritten. D-048 implementation notes record the conditional fiscal-account
   clarification and the digests.
+- **Adopted planning decision:** D-050 records the post-M4c finance roadmap
+  staging, order, and slice boundary. It assigns ownership only; it does not
+  implement the stages and does not alter D-048.
+- **Separate concurrent decision:** D-049 (SUSD monetary precision and
+  phase-qualified cash results) was recorded in `DECISIONS.md` while this revision
+  was in progress. Its implementation changes are not part of this documentation
+  commit, and this report does not treat them as accepted M4c behavior.
 - **Current implementation behavior:** validation enforces fiscal values, account
   completeness/ownership, treasury references and collisions, region ownership
   when fiscal is active, tax/welfare cash limits, cash neutrality, the accounting
@@ -171,36 +231,79 @@ inflation, annual close, reopen/reversal, and UI is preserved as future design.
 - **Documented deviations:** the countryless fiscal account set is conditional on
   a declared country, and collection efficiency is fixed at 1.0; both are stated
   in §5.4.3/§8.3 and D-048 implementation notes.
-- **Deferred:** the GDD preserves future finance and monetary design as future
-  goals without claiming they are implemented.
+- **Planned design:** M5a, M5b, M7a, and M8a are roadmap commitments with scope,
+  placement, and dependency rationale but no code or test evidence.
+- **Deferred:** the GDD preserves other future finance and monetary design as
+  future goals without claiming they are implemented.
+
+## Evidence classification
+
+**Confirmed against committed code and decision records (implemented):**
+
+- Per-country treasury/fiscal accounts, `Country.treasuryAccountId`, and
+  `Country.fiscal`; conditional fiscal-account creation for worlds that declare a
+  country.
+- Daily income tax `incomeTaxRate × wages actually received`, residence-based and
+  wage-only; no tax on welfare or wealth; wage/cash limits.
+- Daily welfare `welfareBudgetSUSDPerYear / daysInYear`, treasury-cash funding
+  limit, per-capita allocation with an exact deterministic remainder,
+  proportional shortfall, and no debt/arrears/negative cash.
+- `income-tax`/`welfare-transfer` kinds, semantic matrix, designated-cash
+  treatment, country close into owner equity, and the close owner order pop
+  blocks → buildings → countries → system owner.
+- M4b summary shape/four flow kinds unchanged; wealth inputs use wages plus
+  welfare and withheld income tax.
+- Schema 9, simulation 0.9.0, save format 1, data version `m3-economy-v1`;
+  schema-8/0.8.0 rejection.
+- Git history: M4c implementation commit `557b37b`; D-048 recorded in `ec125bd`.
+
+**Planned design (no implementation evidence):**
+
+- M5a profit distributions/state-enterprise remittances; M5b public debt and
+  deficit financing; M7a annual close and controlled corrections; M8a inflation,
+  FX dynamics, and monetary-policy foundations.
+- Their placement, dependency order, accounting distinctions, non-goals, and the
+  M0–M7 slice boundary are design commitments, not current runtime behavior.
+- The future `DebtContract` support type is a placeholder; M5b must extend it with
+  contract versioning and outstanding liability.
+
+**Not claimed:**
+
+- No corporate/consumption/land/tariff taxes, broader government expenditure,
+  banking, central bank, monetary issuance, debt, FX, inflation, annual close, or
+  player/AI fiscal actions exist in the accepted build.
+- Mobile performance remains **NOT EVALUATED**.
 
 ## Validation
 
-- `Century_GDD_v2.3.md` and `Century_GDD_v2.4.md` remain byte-for-byte unchanged;
-  `git diff` shows no changes to either document or to the v2.3/v2.4 change
-  reports.
-- Only documentation files were changed in this revision: `Century_GDD_v2.5.md`,
-  `GDD_V2.5_CHANGE_REPORT.md`, `README.md`, and `DECISIONS.md`.
-- The M4c implementation commit `557b37b` changed only simulation, tests, and
+- `Century_GDD_v2.3.md`, `GDD_V2.3_CHANGE_REPORT.md`, `Century_GDD_v2.4.md`, and
+  `GDD_V2.4_CHANGE_REPORT.md` are byte-identical (same Git blob hash) to the
+  commits that introduced them; no v2.3/v2.4 file was touched by this revision.
+- The documentation commit changes only `Century_GDD_v2.5.md`,
+  `GDD_V2.5_CHANGE_REPORT.md`, `README.md`, and `DECISIONS.md` (the last only to
+  renumber the roadmap decision to D-050 after a concurrently committed D-049).
+  The working tree also contains unrelated, concurrent M4c-remediation changes
+  under `packages/sim` and `packages/tests`; they are not part of this commit and
+  were preserved untouched.
+- The M4c implementation commit `557b37b` changed simulation, tests, and
   benchmark files; the D-048 decision commit `ec125bd` changed only
   `DECISIONS.md`.
-- Tests executed before this documentation revision: `pnpm test` passed 32 suites
-  and 399 tests; `pnpm run typecheck` passed; `pnpm run lint` passed; `git diff
-  --check` was clean.
-- `pnpm run ci` completed with exit code 0. It ran lint, typecheck, the 399-test
-  suite, and the benchmark; the benchmark result was **PASS**. Every M1/M2 hash
-  gate and every M3/M4b/M4c correctness gate passed. The final CI M4c fiscal-day
-  results were avg/p95 `7.626/8.503 ms` (small) and `16.954/19.545 ms` (stress),
-  with identical cross-run hashes, reconciled treasuries, conserved cash, and the
-  accounting identity preserved. The provisional 200-block M2 Node guard was p95
-  `3.908 ms` in the final run (satisfied); two preceding standalone runs measured
-  `5.303 ms` and `5.490 ms` and failed that guard, which is reported as Node
-  measurement variance rather than adjusted. Mobile p95 remains **NOT
-  EVALUATED**.
-- Markdown code fences are balanced (12 fences in the document, unchanged from
-  v2.4), and internal section references were checked.
+- The M4c test/benchmark evidence recorded above (32 suites/399 tests, lint,
+  typecheck, CI PASS, benchmark timings) was executed during the M4c
+  implementation/documentation baseline before this follow-up. This
+  documentation-only follow-up did not rerun simulation CI or benchmarks, per the
+  task.
+- `git diff --check` passes. Markdown fences are balanced: 12 in
+  `Century_GDD_v2.5.md`, 6 in `README.md`, and 0 in this change report. README
+  internal links and anchors resolve, and the dependency order
+  `M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10` is repeated
+  consistently in GDD §17.3–§17.4, this report, and README.
+- M4c is marked implemented only where the committed code, tests, and D-048
+  support it; M5a/M5b/M7a/M8a are marked planned everywhere.
+- M0–M7 remains the playable vertical slice in the GDD and README.
 
 ## Stop condition
 
 Documentation only. M4c was already implemented and committed; this revision does
-not reopen it. The next implementation milestone is not started.
+not reopen it. No new simulation feature was implemented. The next implementation
+milestone is not started.

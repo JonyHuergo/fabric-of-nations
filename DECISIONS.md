@@ -1517,13 +1517,58 @@ rule.
   government services/procurement/employment, debt/interest, FX/inflation, and UI
   remain absent. Node benchmarks are not mobile-performance evidence.
 
-### D-049 — Post-M4c finance roadmap staging (adopted direction; planned only)
+### D-049 — SUSD monetary precision and phase-qualified cash results (approved)
+
+- **Status:** approved for the M4c remediation and recorded before the
+  implementation changes. It resolves the audit's R-2 precision gap. It does not
+  change M4c tax, welfare, accounting, or close rules and does not add a new
+  monetary system.
+- **Authoritative arithmetic.** Authoritative SUSD balances and fiscal amounts
+  remain continuous JavaScript `number` (IEEE-754 binary64) values. M4c does not
+  introduce cent quantization, decimal rounding, a scaled-integer money type, or
+  a new persisted representation. Tax is `incomeTaxRate × wages` over the
+  settlement amounts; welfare is `welfareBudgetSUSDPerYear / daysInYear(year)`;
+  proportional shares are computed directly in SUSD. The existing M3/M4a/M4b
+  balances and tolerances are unchanged.
+- **Tolerance, not rounding.** `MONEY_TOLERANCE_SUSD = 1e-6` is the existing
+  relative/scale-aware tolerance for invariant comparisons such as accounting
+  identity, cash conservation, reconciliation, and allocation-sum checks. It is
+  not applied to authoritative balances as a rounding operation and must not be
+  widened to conceal a conservation failure. Integer entity/count values continue
+  to use exact checks.
+- **Residual rule.** Deterministic welfare allocation is proportional to
+  population in ascending pop-block order; the final recipient receives the
+  exact remainder so the allocated amounts sum to the payable amount. A
+  floating-point residual within `MONEY_TOLERANCE_SUSD` may be moved to the first
+  recipient, and only tolerance-sized negative artifacts may be clamped to zero.
+  No random draw selects the residual recipient.
+- **Reporting boundaries.** Transient cash fields must state their measurement
+  phase. Settlement results report `endingCashAfterSettlementSUSD` (before the
+  fiscal phase); needs results report `budgetStartBeforeNeedsSUSD` and
+  `budgetEndAfterNeedsSUSD` (after market/needs processing and before fiscal);
+  M4c fiscal block results report `endingCashAfterFiscalSUSD`. The authoritative
+  account ledger, not a transient result field, is the final cash source. Display
+  formatting belongs to a future UI layer and is not applied to authoritative
+  amounts.
+- **Determinism.** Fiscal arithmetic performs operations in a fixed deterministic
+  order (countries ascending id, blocks ascending id, per-block lines in block
+  order, residual to the final block) and uses no transcendental functions. The
+  existing cross-engine `Math.log` wealth limitation remains open and is not
+  claimed to be solved by this decision. Known-answer tests cover representative
+  values, residuals, proportional allocations, and rounding-sensitive cases.
+- **Compatibility.** No schema/version change is required: the changed fields are
+  transient settlement/needs/fiscal results, not persisted authoritative state.
+  World schema 9, simulation 0.9.0, save format 1, and data version
+  `m3-economy-v1` remain unchanged. A future persisted monetary representation
+  change would require a new decision and schema/save migration review.
+
+### D-050 — Post-M4c finance roadmap staging (adopted direction; planned only)
 
 - **Status:** adopted development-plan direction recorded with GDD v2.5. It assigns
   milestone ownership and an intended order for financial work that earlier
   revisions left unassigned or bundled into later milestones. It does **not**
   implement any of that work; the accepted baseline remains M0–M4c. It does not
-  restate, reopen, or change D-048.
+  restate, reopen, or change D-048 or D-049.
 - **Intended order:** `M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 →
   M10`. The existing M0–M10 identities and objectives are preserved. The
   intermediate stages are additions, not renumbering or completion of M5–M10, and
@@ -1582,51 +1627,6 @@ rule.
   version, benchmark gate, or UI support exists for any of them until implemented
   and accepted. GDD v2.5 §17.3–§17.4 and `README.md` record the plan as planned,
   not current.
-
-### D-049 — SUSD monetary precision and phase-qualified cash results (approved)
-
-- **Status:** approved for the M4c remediation and recorded before the
-  implementation changes. It resolves the audit's R-2 precision gap. It does not
-  change M4c tax, welfare, accounting, or close rules and does not add a new
-  monetary system.
-- **Authoritative arithmetic.** Authoritative SUSD balances and fiscal amounts
-  remain continuous JavaScript `number` (IEEE-754 binary64) values. M4c does not
-  introduce cent quantization, decimal rounding, a scaled-integer money type, or
-  a new persisted representation. Tax is `incomeTaxRate × wages` over the
-  settlement amounts; welfare is `welfareBudgetSUSDPerYear / daysInYear(year)`;
-  proportional shares are computed directly in SUSD. The existing M3/M4a/M4b
-  balances and tolerances are unchanged.
-- **Tolerance, not rounding.** `MONEY_TOLERANCE_SUSD = 1e-6` is the existing
-  relative/scale-aware tolerance for invariant comparisons such as accounting
-  identity, cash conservation, reconciliation, and allocation-sum checks. It is
-  not applied to authoritative balances as a rounding operation and must not be
-  widened to conceal a conservation failure. Integer entity/count values continue
-  to use exact checks.
-- **Residual rule.** Deterministic welfare allocation is proportional to
-  population in ascending pop-block order; the final recipient receives the
-  exact remainder so the allocated amounts sum to the payable amount. A
-  floating-point residual within `MONEY_TOLERANCE_SUSD` may be moved to the first
-  recipient, and only tolerance-sized negative artifacts may be clamped to zero.
-  No random draw selects the residual recipient.
-- **Reporting boundaries.** Transient cash fields must state their measurement
-  phase. Settlement results report `endingCashAfterSettlementSUSD` (before the
-  fiscal phase); needs results report `budgetStartBeforeNeedsSUSD` and
-  `budgetEndAfterNeedsSUSD` (after market/needs processing and before fiscal);
-  M4c fiscal block results report `endingCashAfterFiscalSUSD`. The authoritative
-  account ledger, not a transient result field, is the final cash source. Display
-  formatting belongs to a future UI layer and is not applied to authoritative
-  amounts.
-- **Determinism.** Fiscal arithmetic performs operations in a fixed deterministic
-  order (countries ascending id, blocks ascending id, per-block lines in block
-  order, residual to the final block) and uses no transcendental functions. The
-  existing cross-engine `Math.log` wealth limitation remains open and is not
-  claimed to be solved by this decision. Known-answer tests cover representative
-  values, residuals, proportional allocations, and rounding-sensitive cases.
-- **Compatibility.** No schema/version change is required: the changed fields are
-  transient settlement/needs/fiscal results, not persisted authoritative state.
-  World schema 9, simulation 0.9.0, save format 1, and data version
-  `m3-economy-v1` remain unchanged. A future persisted monetary representation
-  change would require a new decision and schema/save migration review.
 
 ## Assumptions recorded for future review
 

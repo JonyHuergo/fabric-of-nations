@@ -19,7 +19,12 @@ welfare transfers)** only. Corporate/consumption/land/tariff taxes, broader
 government expenditure and services, debt/credit, distributions, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
 diplomacy, warfare, AI, worker, and React Native UI behavior are not
-implemented. The design authority is the [Century GDD
+implemented. The designer has adopted planned intermediate stages for profit
+distributions and state-enterprise remittances (M5a), public debt and deficit
+financing (M5b), annual close and controlled corrections (M7a), and
+inflation/FX/monetary-policy foundations (M8a); these are planned only, not
+implemented (see [the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
+The design authority is the [Century GDD
 v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
 [historical documentation](./Century_GDD_v2.4.md), and v2.3 as
 [earlier historical documentation](./Century_GDD_v2.3.md). Persistent engineering
@@ -555,7 +560,9 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
   is added to shipped scenarios.
 
 GDD v2.5 is the current design authority and records the M4c government fiscal
-loop (D-048) alongside the M4b close (D-047) and the M4a-2 model (D-044/D-045).
+loop (D-048) alongside the M4b close (D-047) and the M4a-2 model (D-044/D-045),
+plus the adopted planned intermediate finance stages (planned only; see the
+roadmap below).
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -727,6 +734,43 @@ timing is unchanged.
   action interface and M8 the taxation law that may bound rates.
 - Node benchmarks remain diagnostics; the mobile p95 target is **NOT
   EVALUATED**.
+
+## Planned development roadmap and intermediate finance stages
+
+Only M0–M4c are implemented (see the sections above). The designer has adopted
+four intermediate finance stages (recorded as D-050) for work that earlier
+revisions left unassigned. **All four are planned and not implemented**: no
+runtime behavior, schema field, save version, benchmark gate, or UI support exists
+for them yet. They preserve the existing M0–M10 milestone identities and do not
+change M4a/M4b/M4c.
+
+Intended implementation order:
+
+`M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
+
+| Stage | Placement | Planned scope | Status |
+|---|---|---|---|
+| **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Planned |
+| **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Planned |
+| **M7a** | After M7, before M8 | Annual finance summaries and periods, year-end closing consistent with the M4b monthly close, partial campaign years, and controlled auditable correction/reversal entries that preserve closed history | Planned |
+| **M8a** | After M8, before M9 | Documented inflation/price-level measure, exchange-rate dynamics on the existing country/currency identities, monetary-policy authority/controls with explicit causal mechanisms and balanced money/credit accounting | Planned |
+
+Key boundaries:
+
+- **The playable vertical slice remains M0–M7.** M7a and M8a are post-slice stages
+  and are not prerequisites for the initial playable release. M5–M7 are not
+  blocked on the later monetary systems.
+- **M5a depends on M5** for the multi-country foundation and the
+  ownership/enterprise structures it actually delivers; if those structures are
+  missing, M5a must add them explicitly rather than assume them.
+- **M5b precedes M6** so country AI operates against defined borrowing
+  constraints, interest, maturities, and default consequences.
+- **M8a follows M8** because monetary authority and policy controls depend on
+  institutions and laws; any missing prerequisite (for example a banking/deposit
+  system or monetary aggregate) must be recorded rather than hidden.
+- The full planned scope, acceptance boundaries, and dependency rationale are in
+  GDD v2.5 §17.3–§17.4. This section is a repository summary, not a claim of
+  current support.
 
 ## Data and calibration
 

@@ -23,10 +23,17 @@
 > phase position in the daily pipeline, (c) records the M4c limitations
 > (fixed collection efficiency, flat wage-only residence-based tax, a single
 > budgeted welfare transfer, and no debt or government services), (d) records
-> M4c in the milestone plan, and (e) updates the current schema, simulation,
-> persistence, and history descriptions to the M4c baseline. The broader
-> vision, historical goals, future-system design, determinism, conservation,
-> and scope-control rules remain in force.
+> M4c in the milestone plan, (e) updates the current schema, simulation,
+> persistence, and history descriptions to the M4c baseline, and (f) adopts the
+> planned intermediate finance stages M5a (profit distributions and
+> state-enterprise remittances), M5b (public debt and deficit financing), M7a
+> (annual accounting close and controlled corrections), and M8a (inflation, FX
+> dynamics, and monetary-policy foundations) in the order `M4c → M5 → M5a → M5b
+> → M6 → M7 → M7a → M8 → M8a → M9 → M10`. The stages in (f) are **planned and not
+> implemented**; they do not change the M4a/M4b/M4c baseline, and the playable
+> vertical slice remains M0–M7. The broader vision, historical goals,
+> future-system design, determinism, conservation, and scope-control rules
+> remain in force.
 
 ---
 
@@ -266,14 +273,18 @@ binding for economic worlds:
     and building upkeep through the accounting interface, using the transaction
     quantities and prices established by market clearing. *(Current M3e
     implementation for those flows. Dividends, government procurement, interest,
-    and debt are future systems.)*
+    and debt are future systems; profit distributions and state-enterprise
+    remittances are planned in M5a, and public debt and interest in M5b, with
+    their pipeline placement fixed when those stages are specified.)*
 12. **Accrue finance and settle due contracts.** Accrue daily income tax on
     wages actually received, pay the country's daily budgeted welfare transfer,
     and — on a civil month-end — post the government fiscal flows before the
     period close. Interest accrual, bond maturities, borrowing, default, and
-    reserve changes are future systems. *(Current M4c implementation of the
-    fiscal part of this step, D-048. There are no debt contracts, interest
-    accruals, banks, or monetary operations.)*
+    reserve changes are future systems; public-debt issuance, interest, maturities,
+    and default are planned in M5b, with their daily placement fixed when that
+    stage is specified. *(Current M4c implementation of the fiscal part of this
+    step, D-048. There are no debt contracts, interest accruals, banks, or monetary
+    operations.)*
 13. **Update cadence-due indicators.** Apply the monthly wealth update when the
     civil month ends, using the convention in §6.5. *(Current M3f monthly wealth
     with the M4c income-tax/welfare input refinement. Other daily/weekly/monthly
@@ -284,8 +295,9 @@ binding for economic worlds:
     that day's postings, needs/militancy, and month-end wealth update, and record
     the immutable monthly summary before `dayIndex` advances (§5.4.2, D-047).
     *(Invariant and diagnostic counters, the M4b monthly finance close, and the
-    M4c fiscal flows exist; annual history and historical-event recording are
-    future systems.)*
+    M4c fiscal flows exist; annual finance summaries and annual close are planned
+    in M7a; broader annual history and historical-event recording are future
+    systems.)*
 15. **Advance `dayIndex`.** Move to the next civil day or the terminal boundary.
     *(Current implementation. A completed close is publishable only after this
     step: see the staged-versus-published rule in §5.4.2.)*
@@ -381,7 +393,7 @@ only if the full-demand attempt would overdraw a buyer.
 - Use actual calendar months, not a fixed 30-day month.
 - Annual demographic transitions and annual history samples occur at documented civil-calendar boundaries. January 1 ageing is skipped on a scenario's initial January 1.
 - Monthly systems should have explicit due checks, not independent timers. **Current M3f/M4b/M4c:** monthly wealth runs on the last civil day of the month after needs and daily militancy, and the M4b finance period close runs immediately after that month-end wealth update, before the day advances (§4.2 step 14, §5.4.2). Income tax and the welfare transfer are daily fiscal flows inside step 12, not month-end timers. Other monthly finance, political, and history systems are future work.
-- Accruals remain daily even when payment settles monthly. A monthly settlement must not duplicate or omit accruals. **Current M4c:** income tax accrues and is withheld daily; welfare accrues and is paid daily; the monthly close recognizes the period result but does not re-run either flow. *(Future debt and interest accrual systems remain unimplemented.)*
+- Accruals remain daily even when payment settles monthly. A monthly settlement must not duplicate or omit accruals. **Current M4c:** income tax accrues and is withheld daily; welfare accrues and is paid daily; the monthly close recognizes the period result but does not re-run either flow. *(Future debt and interest accrual are planned in M5b, and annual close in M7a; none is implemented.)*
 
 ---
 
@@ -744,8 +756,10 @@ The result is units of `to` per one unit of `from`. `susdPerUnit` is a valuation
 input, not by itself a peg. M4a-2 does not implement dynamic FX, floating or
 managed exchange rates, inflation, monetary policy, central-bank operations, gold
 convertibility, legal-tender enforcement, issuance operations, native-currency
-balances, or currency conversion during market settlement. Those remain future
-systems or unassigned work, not current behavior.
+balances, or currency conversion during market settlement. Exchange-rate dynamics,
+inflation measurement, and monetary-policy foundations are planned in M8a
+(§17.3); the other listed items remain future or unassigned. None is current
+behavior.
 
 ### 5.4.2 M4b monthly finance close and period summaries (current)
 
@@ -837,9 +851,10 @@ close debits every revenue account, credits every expense account, and posts the
 net `revenue - expense` to that owner's existing `owner-equity` account. A
 positive net credits equity; a negative net debits it; equity may therefore become
 signed and may be negative. A zero net needs no equity line. One entry is created
-per owner, in deterministic owner order (pop blocks, then buildings, then the
-system owner) with account-id order inside the entry, and all entries are applied
-as one atomic batch. Closing entries are cash-neutral and preserve the accounting
+per owner, in deterministic owner order (pop blocks, then buildings, then
+countries, then the system owner; M4c inserted countries after buildings) with
+account-id order inside the entry, and all entries are applied as one atomic
+batch. Closing entries are cash-neutral and preserve the accounting
 identity `assets + expenses = liabilities + equity + revenues`; they zero revenue
 and expense balances exactly. They never create a distribution, tax, debt, or
 monetary issuance.
@@ -1558,8 +1573,10 @@ period result in owner equity and records an immutable monthly summary. M4c adds
 country treasury, daily income-tax withholding, a daily budgeted welfare transfer,
 and the `income-tax`/`welfare-transfer` posting kinds (§5.4.3, D-048). Debt
 contracts, banks, central banks, foreign holders, corporate/consumption/land/
-tariff taxes, interest, monetary issuance, annual close, reopen/reversal, and the
-Ledger UI are **not implemented**. M3f settles market purchases, wages, and upkeep
+tariff taxes, interest, monetary issuance, annual close, and reopen/reversal are
+**not implemented**; public debt and interest are planned in M5b, annual close and
+controlled corrections in M7a, and inflation/FX/monetary policy in M8a (§17.3).
+The Ledger UI is not implemented. M3f settles market purchases, wages, and upkeep
 against this ledger; M4c settles taxes and welfare.
 
 Each transaction is represented by journal lines whose total debits equal total
@@ -1584,7 +1601,7 @@ or extend:
 
 - `FinancialAccount`: stable ID, owner/type, account category/subtype, current balance, and optional country/sector reference. *(M4a-1 baseline: category/subtype accounts with normal-side balances; M4c adds the `country` owner kind and fiscal subtypes; no country/sector reference.)*
 - `JournalPosting`: day, transaction type/source, account lines, amount, and optional entity IDs. *(Current M4c baseline implemented, including structurally validated internal `period-close` entries and cash-neutral `income-tax`/`welfare-transfer` entries.)*
-- `DebtContract`: issuer, holder sector/account, principal, annual coupon, issue date, maturity date, and priority/status. *(Future; milestone ownership is not assigned by this revision.)*
+- `DebtContract`: issuer, holder sector/account, principal, annual coupon, issue date, maturity date, and priority/status. *(Future; planned for M5b in §17.3. M5b must extend this contract with contract versioning and outstanding liability; the placeholder above is not current state.)*
 - `FinanceState`: accounts, contracts, period summaries, monetary aggregates, and audit buffer. *(M4b/M4c baseline: accounts, postings, nextPostingId, nextAccountId, opening, periodSummaries, closedThroughDay; contracts/monetary aggregates/`World.history` future.)*
 
 Accounts and balances are authoritative; `Treasury.cash`, money supply, and sector totals should be derived or updated from the finance subsystem through one interface, not duplicated independently across systems.
@@ -1596,8 +1613,9 @@ Debt holders may be domestic households/businesses, foreign investors, or the ce
 **Current M4c subset: a flat residence-based income tax on wages actually paid.**
 No land, corporate, consumption/excise, tariff, state-enterprise, or
 colonial/subject revenue is implemented, and no collection- or
-administration-efficiency mechanism exists. Milestone ownership for the remaining
-revenue work is not assigned by this revision.
+administration-efficiency mechanism exists. State-enterprise profit remittance is
+planned in M5a (§17.3); the remaining revenue work is not assigned by this
+revision.
 
 **M4c income tax (implemented, provisional).** For each pop block, the daily tax
 is `Country.fiscal.incomeTaxRate × wages actually received that day`. The rate is
@@ -1621,7 +1639,7 @@ Future revenue sources and their requirements remain:
 | Corporate tax | Taxable business profits | Losses and deductions require explicit rules. |
 | Consumption/excise tax | Eligible good transactions | Tax is collected once at the defined transaction stage. |
 | Tariffs | Imports crossing a tariff boundary | Apply only to transactions legally subject to the tariff. |
-| State enterprise profit | Actual state-owned enterprise profit remitted | Cannot exceed available profit/remittance. |
+| State enterprise profit | Actual state-owned enterprise profit remitted (planned M5a) | Cannot exceed available profit/remittance. |
 | Colonial/subject transfers | Defined transfers from subject administrations or regions | Record the payer, recipient, extraction/transfer rule, and political consequences. |
 
 Collection efficiency is derived from bureaucrat staffing, literacy, funded administration, infrastructure, and institutions. A provisional formula may be used, but it must have normalized inputs, explicit units, clamps, and calibration tests. Avoid a magic `taxCapacity` variable whose own causal meaning is undefined. M4c deliberately fixes efficiency at 1.0 until those systems exist.
@@ -1633,9 +1651,11 @@ Tax rates are law-bounded player controls. All taxable amounts, exemptions, and 
 **Current M4c subset: one budgeted per-capita welfare transfer.** No
 administration, military, education, healthcare, infrastructure, subsidy, debt
 service, or colonial expenditure is implemented; there is no government
-procurement demand (market priority tier 4) and no government employment.
-Milestone ownership for the remaining expenditure work is not assigned by this
-revision.
+procurement demand (market priority tier 4) and no government employment. Debt
+service is planned with M5b (§17.3); the remaining expenditure work is not
+assigned by this revision. Profit distributions and state-enterprise remittances
+are transfers of recognized profit, not government expenditure, and are planned
+in M5a.
 
 **M4c welfare transfer (implemented, provisional).** The country's
 `welfareBudgetSUSDPerYear` is a requested annual nominal expenditure target, not a
@@ -1671,9 +1691,19 @@ Education expenditure funds teachers, schools, education services, and research 
 
 ### 8.5 Deficits, borrowing, credit, and default
 
-**Status: future system; not implemented in M4a-1–M4c.** No debt contract,
-deficit financing, credit, interest accrual, bond maturity, or default mechanism
-exists. Milestone ownership for this future work is not assigned by this revision.
+**Status: future system; planned for M5b (§17.3), not implemented in
+M4a-1–M4c.** No debt contract, deficit financing, credit, interest accrual, bond
+maturity, or default mechanism exists.
+
+For M5b, the fiscal deficit is the accrued revenue-minus-expenditure result of a
+defined period. Borrowing proceeds are a financing inflow that increases cash and
+a liability, never revenue. Principal repayment reduces cash and the liability and
+is not ordinary expenditure. Interest accrues as an expense and its payment
+reduces cash; neither is principal repayment. Refinancing must show the retirement
+of the old contract and the issuance of the new one. Arrears and default must be
+explicit contract statuses or liabilities, not an unrecorded gap. A complete
+contract must carry a version, issuer, holder, principal, interest/coupon terms,
+issue date, maturity, outstanding liability, and status.
 
 A deficit occurs when accrued expenditure exceeds revenue over the defined period. It must be financed by an explicitly permitted source or result in arrears/default under an explicit rule.
 
@@ -1701,8 +1731,9 @@ All M4a-1/M4a-2/M4b monetary balances and quoted prices are stored in nominal SU
 A per-country inflation index and FX/regime state remain future design goals; the
 v2.2 representation is superseded, and no such authoritative field exists in
 M4a-2. Future aggregate rules may model macroeconomic consequences without
-simulating every local-currency note and deposit denomination. Milestone
-ownership for that future work is not assigned by this revision.
+simulating every local-currency note and deposit denomination. This work is
+planned for M8a (§17.3) and is not implemented; any monetary-policy mechanism
+whose prerequisite is missing must record that prerequisite rather than hide it.
 
 The following inflation and currency-regime material is future design, not
 current behavior:
@@ -1733,7 +1764,8 @@ designated-cash subtype, cash-neutral `income-tax` and `welfare-transfer`
 postings, the requirement that country tax revenue and welfare expense close into
 country owner equity, treasury non-negativity, exact tax/welfare cash
 reconciliation, and atomic fiscal-batch validation (§5.4.3, D-048). The following
-debt, interest, and monetary invariants remain future requirements; the monthly
+debt, interest, and monetary invariants remain future requirements (debt and
+interest are planned with M5b; monetary invariants with M8a); the monthly
 period-summary invariants are current and recorded in §5.4.2.
 
 - Every journal posting balances.
@@ -2157,7 +2189,7 @@ Use keyed/counter-based deterministic randomness rather than one global mutable 
 7. **Money/accounting conservation:** each posting balances; transfers have counterpart accounts; money supply changes only through defined mechanisms.
 8. **No-arbitrary-pools check:** known point pools are forbidden; derived indicators must be rebuildable or explicitly documented.
 9. **Market behavior:** prices respond in the correct direction to persistent supply/demand shocks, remain finite/positive, and are bounded per tick.
-10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, and default remain future tests.
+10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, and default remain future tests (planned for M5b; not implemented).
 11. **Calibration:** world/country anchors are within source-backed tolerances for a named baseline scenario.
 12. **Regression:** each discovered bug gets a test that fails before the fix and passes afterward.
 13. **Performance:** benchmark representative and worst-case fixture worlds; report p50/p95/p99 rather than only a single average.
@@ -2215,6 +2247,15 @@ Benchmarks must state the exact seed, data version, tick count, hardware/runtime
 
 Each milestone is a separate assigned task. Tests and acceptance criteria are prepared before implementation. Do not start the next milestone until the current one is complete or the designer explicitly accepts a documented exception.
 
+**Implementation status.** M0–M4c are implemented and accepted (§17.1–§17.2); M4's remaining unassigned finance work is not implemented. M5–M10 are planned. The intermediate stages M5a, M5b, M7a, and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
+
+| Scope | Status |
+|---|---|
+| M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c | Implemented and accepted |
+| Remaining M4 finance work not assigned in §17.3 | Not implemented |
+| M5a, M5b, M7a, M8a | Planned, not implemented (§17.3) |
+| M5–M10 | Planned, not implemented |
+
 | Milestone | Deliverable | Definition of done |
 |---|---|---|
 | **M0** | Monorepo scaffold, TypeScript configuration, tests, benchmark harness, pnpm CI command | Repository installs reproducibly; `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm run typecheck`, `pnpm run lint`, `pnpm run bench`, and `pnpm run ci` execute. No simulation behavior yet. |
@@ -2222,15 +2263,19 @@ Each milestone is a separate assigned task. Tests and acceptance criteria are pr
 | **M2** | Population blocks, single-year sex-separated age state, age-specific fertility/mortality, needs baskets, wealth index in a single-region fixture | Single-year/sex population conservation passes; five-year bands reconcile as derived aggregates; births enter age 0 with documented sex split; deterministic fractional accumulation passes; no negative counts; unmet needs change the specified outcomes. Needs use the M2 annual-disposable-income fixture without savings drawdown or account mutation. Historical total calibration is reported separately and is not required for structural M2 completion. |
 | **M2.1** | Population correction and demographic validation: authoritative single-year/sex state, exact annual ageing, ASFR fertility, sex-specific mortality, annual WPP 1950–2000 schedules, WPP-1950 validation scenario | Structural correctness, conservation, save/resume, and deterministic regression tests pass; annual age/sex and total validation against WPP is reported with absolute/relative differences. Post-1950 WPP validation is source-backed; 1900–1949 age structure/schedules remain provisional. The campaign's +9.553% 2000 difference is documented as a no-shock baseline limitation, not historical calibration success. Full pre-1950 historical calibration remains incomplete. |
 | **M3** | Buildings, employment assignments, goods, production, market clearing, inventory, price updates, wages/profits, and an integrated economic tick in a small economy | Goods conservation passes; price-shock tests behave correctly; scarce-goods allocation is order-independent; no NaN/infinity; insolvent or unproductive buildings can fail without creating value. The accepted M3 baseline is delivered through stages M3a–M3f below. |
-| **M4** | Finance/public-finance extension, staged: M4a-1 category-aware double-entry accounts and opening balances; M4a-2 country/currency identity, monetary arrangements, and SUSD-relative valuation; M4b monthly period close and finance summaries; M4c per-country treasury, daily income tax, and budgeted welfare transfers; later finance/public-finance work (corporate/consumption/land/tariff taxes, broader government expenditure, debt/interest/maturity, inflation/FX indices, monetary policy; milestone ownership not assigned by this revision) | M4a-1/M4a-2/M4b/M4c acceptance is recorded in §17.2. The full M4 definition of done remains future: all postings balance; cash/debt/interest/maturity tests reconcile; no money appears without a defined source; controlled deficit and default cases behave as specified. M4 extends the M3a/M3e foundation; it does not introduce the first accounting interface. |
+| **M4** | Finance/public-finance extension, staged: M4a-1 category-aware double-entry accounts and opening balances; M4a-2 country/currency identity, monetary arrangements, and SUSD-relative valuation; M4b monthly period close and finance summaries; M4c per-country treasury, daily income tax, and budgeted welfare transfers; remaining finance/public-finance work not assigned to a later stage (corporate/consumption/land/tariff taxes, broader non-debt government expenditure and services; milestone ownership not assigned by this revision) | M4a-1/M4a-2/M4b/M4c acceptance is recorded in §17.2. The remaining unassigned M4 revenue/expenditure definition of done stays future: all postings balance; no money appears without a defined source. The debt/interest/maturity, distribution/remittance, annual-close, and inflation/FX/monetary items formerly bundled into M4's eventual goal are reassigned by §17.3 to M5b, M5a, M7a, and M8a respectively; their acceptance criteria belong to those stages and are not M4 acceptance. M4 extends the M3a/M3e foundation; it does not introduce the first accounting interface. |
 | **M5** | Multi-region/multi-country worlds, shared/trade markets, migration, labor mobility, initial historical data pipeline | Eight authored sample polities run together; data validator passes; population, goods, and finance invariants pass; occupation structure trends meet country-specific baseline ranges where data supports them. |
+| **M5a** | *(Planned — not implemented.)* Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings (§17.3) | Ownership, timing, account semantics, and available-funds rules are explicit and deterministic; a distribution or remittance never exceeds distributable profit or available cash; no negative balances, unexplained money creation, or breakage of the accounting identity, determinism, and M4b close invariants; M5 ownership/enterprise structures are established or explicitly extended rather than assumed. |
+| **M5b** | *(Planned — not implemented.)* Public debt and deficit financing: versioned debt contracts, issuance with matching asset/liability entries and actual cash transfers, interest accrual/payment, maturity and principal repayment, refinancing, arrears, and explicit default behavior (§17.3) | Fiscal deficit, financing transactions, borrowing proceeds, interest expense, and principal repayment are separately and explicitly recorded; every issuance moves existing cash between identified issuer/holder accounts; outstanding liability reconciles; financing constraints and default consequences are defined; no unexplained money creation, invisible unpaid obligation, or premature full banking/central-bank system. |
 | **M6** | Deterministic country AI v1, action validation, stress testing, simulation performance report | AI can govern the sample world without invalid actions or hidden-information access; full-campaign benchmark reports p50/p95/p99; no unbounded state growth; performance bottlenecks are identified. |
 | **M7** | Mobile worker proof of concept and playable app: map, snapshot bus, five core screens plus map | Release build runs on iOS and Android; pause/speed/actions/save/load work; UI reads snapshots only; target frame-rate and on-device tick performance are measured and reported. |
+| **M7a** | *(Planned — not implemented; after M7, before M8.)* Annual finance summaries and annual-period boundaries, year-end closing entries consistent with the M4b monthly close, partial-year handling, and controlled auditable correction/reversal entries (§17.3) | Annual close is deterministic, atomic, validated, persisted, and reconciled; partial first/last campaign years are defined and the terminal boundary is excluded; corrections are posted as new auditable entries with provenance and never edit or delete closed history; monthly summaries, the accounting identity, and four-flow semantics remain intact. Not a prerequisite for the M0–M7 playable slice. |
 | **M8** | Institutions, interest groups, laws, elections, unrest, instability, historical-shock/event content | Law/election outcomes follow documented prerequisites; a revolution or regime crisis can arise from simulated causes; scripted events are idempotent and have provenance. |
+| **M8a** | *(Planned — not implemented; after M8, before M9.)* Inflation/price-level measurement with an explicit basket, weights, and time window; exchange-rate dynamics built on existing country/currency identities and valuations; defined monetary-policy authority and controls with explicit causal mechanisms and balanced money/credit accounting (§17.3) | Measure, basket, weights, window, timing, bounds, persistence, and tests are documented; policy effects have explicit causal mechanisms rather than arbitrary scalar adjustments; any money-supply or credit change has balanced accounting counterparts; prerequisites not delivered by M8 are recorded rather than hidden; no unrestricted issuance, full banking system, or elaborate capital markets are presumed. |
 | **M9** | Technology tree, research staffing/work, education and literacy mechanics | Acyclic tree validates; tech progress occurs only from assigned work; unlocking technology measurably and correctly changes the specified systems; literacy outcomes match the test scenarios. |
 | **M10** | Diplomacy, treaties, armies, mobilization, combat, casualties, occupation, peace | Two-country conflict resolves end-to-end; casualties and mobilization reconcile with population/workforce; equipment and finance are consumed correctly; peace/territorial changes update all affected systems. |
 
-**Vertical slice:** M0–M7. The slice is complete only when the player can start a scenario, inspect the country/world, change available economic policies, advance/pause time, save/load, and observe deterministic, causally connected consequences on a device.
+**Vertical slice:** M0–M7. The slice is complete only when the player can start a scenario, inspect the country/world, change available economic policies, advance/pause time, save/load, and observe deterministic, causally connected consequences on a device. M5a and M5b are finance stages inside this build order; M7a and M8a are post-slice stages (M7a before M8, M8a before M9) and are **not** prerequisites for the initial playable release.
 
 ### 17.1 M3 implementation stages (accepted baseline)
 
@@ -2251,15 +2296,17 @@ document.
 The accepted M3f revision records the monthly-wealth income convention in §6.5 and
 D-042. It does not implement a trailing-month income accumulator. M4a-1, M4a-2,
 M4b, and M4c are accepted stages (§17.2); the remaining M4 finance work is not
-started.
+started, and the adopted intermediate stages in §17.3 are planned, not
+implemented.
 
 ### 17.2 M4 implementation stages (accepted foundation)
 
 M4 is staged. M4a-1, M4a-2, M4b, and M4c are accepted. The remaining
-corporate/consumption/land/tariff tax, broader government-expenditure,
-debt/interest/maturity, inflation/FX, monetary-policy, annual-close, and
-reopen/reversal work is not implemented. The ownership and acceptance criteria of
-that future work are not assigned by this revision.
+corporate/consumption/land/tariff tax and broader non-debt government-expenditure
+work is not implemented and its ownership is not assigned by this revision.
+Debt/interest/maturity, profit distributions and state-enterprise remittances,
+annual close and controlled corrections, and inflation/FX/monetary-policy work are
+planned in §17.3 (M5b, M5a, M7a, and M8a respectively) and are not implemented.
 
 | Stage | Deliverable | Acceptance boundary | Status |
 |---|---|---|---|
@@ -2272,10 +2319,219 @@ M4b did not add taxes or government finance, and M4c adds only the fiscal subset
 described in §5.4.3 and §8.3–§8.4. Neither stage adds corporate, consumption,
 land, or tariff taxes, broader government services or procurement, debt, interest,
 banks, monetary issuance, native-currency balances, FX, inflation, annual close,
-reopen/reversal, or UI. The full M4 definition of done in the milestone table
-above remains future work.
+reopen/reversal, or UI. Those deferred systems are not silently folded back into
+M4: §17.3 assigns the adopted subset to planned intermediate stages, and the rest
+remains unassigned future work.
 
-M8–M10 extend the systems after the economic vertical slice is playable. Their interfaces may be prepared earlier, but do not implement speculative behavior in the vertical-slice milestones.
+M8–M10 extend the systems after the economic vertical slice is playable. Their
+interfaces may be prepared earlier, but do not implement speculative behavior in
+the vertical-slice milestones. The planned intermediate stages in §17.3 are
+subject to the same rule.
+
+### 17.3 Planned intermediate finance stages (adopted direction)
+
+**Status: planned and not implemented.** The designer has adopted the following
+intermediate stages for financial work that earlier revisions left unassigned or
+listed only as later M4 or later-milestone goals; the staging is recorded as
+D-050. They extend the roadmap; they do not mark any stage complete, do not change
+the accepted M4a/M4b/M4c design, and must not be described as runtime support
+until each stage is separately implemented, tested, and accepted. The existing
+M0–M10 identities are preserved and not renumbered, and the vertical slice
+remains M0–M7.
+
+The intended implementation order is:
+
+`M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
+
+#### M5a — Profit distributions and enterprise remittances
+
+**Placement:** after M5, before M5b and M6. **Status:** planned, not implemented.
+
+**Planned scope.**
+
+- Distribute private business profits to designated owners/household capitalists,
+  or retain them as business funds, using explicit deterministic rules.
+- Transfer actual state-owned enterprise profits to country treasuries through
+  balanced journal entries.
+- Specify the ownership, timing, account semantics, and available-funds
+  constraints for both flows.
+- Prevent any distribution or remittance from exceeding distributable profit or
+  available cash.
+- Preserve the accounting identity, determinism, and the M4b closing invariants.
+
+**Ownership and timing requirements.** Each flow must name the profit measure, the
+accounting period it belongs to, the distributing entity, the recipient account
+or owner, and the posting day. A distribution or remittance is a transfer of
+already-recognized profit and cash, not a new expense, revenue, or money creation.
+Retained profit must remain distinguishable from newly earned profit and from
+owner capital. The stage must state whether a shortfall is retained, deferred, or
+unpaid, and must not create negative cash, an implicit liability, or an
+unrecorded obligation.
+
+**Dependencies and assumptions.** M5a depends on the multi-country economic and
+historical-data foundation established by M5 and on the ownership and enterprise
+structures M5 actually delivers. If M5 does not establish designated private
+business owners/capitalists, state-enterprise ownership, or an explicit enterprise
+profit measure, M5a must add those structures explicitly as part of its own scope.
+It must not silently assume that missing structures already exist.
+
+**Non-goals.** M5a does not add corporate income tax, dividend tax, capital gains,
+securities markets, share issuance or trading, banking, debt, or arbitrary
+player/AI distribution controls. It does not change the four M4b flow kinds or the
+monthly close semantics; any new distribution/remittance posting kind and its
+semantic-matrix entry are added explicitly with the stage.
+
+#### M5b — Public debt and deficit financing
+
+**Placement:** after M5a, before M6. **Status:** planned, not implemented.
+
+**Planned scope.**
+
+- Versioned debt contracts carrying issuer, holder, principal, interest/coupon
+  terms, issue date, maturity, outstanding liability, and status.
+- Debt issuance with matching asset/liability accounting and actual cash
+  transfers.
+- Interest accrual and payment, maturity, principal repayment, refinancing,
+  arrears, and explicitly defined default behavior.
+- A clear separation between the fiscal deficit, financing transactions,
+  borrowing proceeds, interest expense, and principal repayment.
+- Explicit financing constraints; no unexplained money creation and no invisible
+  unpaid obligations.
+- Support for the defined issuers and holders without prematurely implementing a
+  full banking or central-bank system.
+
+**Accounting distinction.** The fiscal deficit is an accrued revenue-minus-
+expenditure result for a defined period. Borrowing proceeds are a financing inflow
+that increases cash and a liability; they are not revenue. Principal repayment
+reduces cash and the liability; it is not ordinary expenditure. Interest expense
+accrues as an expense and its payment reduces cash; neither is principal
+repayment. Refinancing replaces one contract with another and must show both
+sides. Arrears and default must be represented by explicit contract status and,
+where applicable, explicit liabilities or write-downs rather than an unrecorded
+gap between requested and paid amounts.
+
+**Dependencies and rationale.** M5b follows M5a because a credible debt-capacity
+and repayment analysis depends on defined profit distributions, enterprise
+remittances, and the ownership/enterprise structures those flows require. M5b
+precedes M6 so country AI can operate against a financial environment in which
+borrowing constraints, interest, maturities, and default consequences are already
+defined. The debt contract extends the future `DebtContract` support type; it is
+not current state. Holders are limited to the issuers/holders the stage defines
+(for example country treasuries, household/business accounts, and an explicitly
+represented external counterparty); a bank or central-bank system is not implied.
+
+**Non-goals.** M5b does not add commercial banking, deposit money, a central bank,
+unrestricted monetary issuance, bond markets with market-determined prices,
+derivatives, or a full capital market. It does not change M4b monthly summaries or
+M4c fiscal behavior.
+
+#### M7a — Annual accounting close and controlled corrections
+
+**Placement:** after M7, before M8. **Status:** planned, not implemented.
+
+**Planned scope.**
+
+- Annual finance summaries and explicit annual-period boundaries.
+- Year-end closing entries and account treatment consistent with the M4b monthly
+  close semantics.
+- Correct handling of partial years at campaign boundaries.
+- Controlled, auditable correction/reversal entries that preserve historical
+  journal integrity rather than editing or deleting previously posted
+  transactions.
+- Deterministic ordering, atomicity, validation, persistence, and accounting
+  reconciliation.
+
+**Boundaries and requirements.** Annual periods must be explicit and validated:
+the first and last campaign years may be partial, each later annual period starts
+after the previous year-end, and the terminal `2000-01-01` boundary is not a
+processed year. Year-end closing must follow the M4b rules (zero revenue/expense
+into existing owner equity, cash-neutral, deterministic owner order, accounting
+identity preserved) and must not re-run daily tax, welfare, or market flows. A
+correction or reversal is a new posting with provenance identifying the original
+entry and the reason; closed monthly or annual summaries are immutable and are
+never rewritten. If a correction must affect a previously reported period, the
+stage must define the explicit presentation rule rather than silently editing
+history.
+
+**Placement rationale.** M7a completes the accounting lifecycle after the M0–M7
+playable vertical slice. It is **not** a prerequisite for the initial playable
+release and must not block M5–M7. M8 follows once annual reporting and corrections
+are defined.
+
+**Non-goals.** M7a does not add inflation adjustment, real/nominal restatement,
+tax assessment, audit institutions, or a UI ledger. It does not rewrite M4b
+monthly summaries or add new M4b flow kinds.
+
+#### M8a — Inflation, FX dynamics, and monetary-policy foundations
+
+**Placement:** after M8, before M9. **Status:** planned, not implemented.
+
+**Planned scope.**
+
+- A documented inflation/price-level measure with an explicit basket, weights, and
+  time window.
+- Exchange-rate dynamics building on the multi-country economy and the existing
+  currency identities and valuations.
+- A defined monetary-policy authority and policy controls, using the institutions
+  and laws established by M8 where applicable.
+- Explicit causal mechanisms linking policy to the relevant economic or monetary
+  outcomes.
+- Balanced accounting for any money-supply or credit changes that are introduced.
+- Deterministic timing, bounds, persistence, validation, and tests.
+
+**Measurement and mechanism requirements.** The inflation measure must name the
+basket, base period, weights, price sources, refresh cadence, and treatment of
+missing or new goods; it is a derived index, not a spendable value or an arbitrary
+scalar. Exchange-rate dynamics must build on `CurrencyValuation` and the existing
+country/currency identities; `susdPerUnit` remains a valuation input, not by
+itself a peg. Monetary-policy authority must be an institution- or law-backed
+actor with explicit instruments, timing, bounds, and transmission channels. Any
+change in money supply, credit, or central-bank balance sheet must have balanced
+counterpart entries and a defined source or use. A policy must not be simulated
+as a direct arbitrary adjustment to inflation, output, or the exchange rate.
+
+**Dependencies and missing prerequisites.** M8a follows M8 because monetary
+authority and policy controls depend on political institutions and laws; it
+follows M5/M5a/M5b because multi-country trade, enterprise finance, and debt
+provide the transmission channels and balance-sheet counterparts. If a meaningful
+monetary-policy mechanism requires a prerequisite that M8 and the earlier stages
+do not deliver (for example a defined banking/deposit system, a monetary
+aggregate, or a securities market), the stage must record that prerequisite and
+either include it explicitly in the accepted scope or leave the mechanism
+unimplemented. It must not hide the prerequisite inside M8a or approximate it with
+an arbitrary scalar.
+
+**Non-goals.** M8a does not presume a fully functioning banking system,
+unrestricted monetary issuance, elaborate capital markets, every local-currency
+denomination, or a complete payment system. Those remain future or explicit stage
+scope. It does not reopen M4a-2 valuation rules or M4c fiscal rules.
+
+### 17.4 Dependency plan and slice boundary
+
+The intended order is binding for planning, not an authorization to implement
+several stages at once:
+
+`M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
+
+- M4c supplies the initial treasury, income-tax, and welfare-transfer behavior.
+- M5 establishes the multi-country economic and historical-data foundation.
+- M5a establishes defined private profit distributions and state-enterprise
+  remittances on the ownership/enterprise structures M5 delivers.
+- M5b establishes public debt and deficit-financing behavior before the AI
+  milestone.
+- M6 and M7 deliver country AI and the first playable mobile vertical slice.
+- M7a completes annual accounting after the first playable slice.
+- M8 establishes political institutions and laws.
+- M8a adds monetary systems on top of those institutional and multi-country
+  foundations.
+- M9 and M10 retain their existing technology and diplomacy/war goals.
+
+The **vertical slice remains M0–M7**. M7a and M8a are post-slice stages and are
+not prerequisites for the initial playable release. M5–M7 are not automatically
+blocked on the later monetary systems; M8a may be deferred or narrowed if its
+prerequisites are not met, provided the gap is recorded. M5a, M5b, M7a, and M8a
+are planned and not implemented; no current runtime behavior, save field, schema
+version, or benchmark gate may be inferred from this plan.
 
 ---
 
@@ -2349,7 +2605,7 @@ The following choices are resolved in this version:
 2. **Employment:** explicit quantitative assignments; no single `employedAt` per pop block.
 3. **Market stock:** physical inventory requires storage capacity; the Warehouse is included in v1.
 4. **Accounting unit:** SUSD is the fixed unit of measurement/accounting denomination, not a national currency. M4a-1 balances are nominal SUSD. M4a-2 adds currency identity and scenario-provided or unavailable SUSD-relative valuation; it does not implement dynamic FX, inflation, monetary policy, native-currency balances, or currency conversion in settlement. Future regime/FX effects remain aggregate and simplified.
-5. **Accounting integrity:** financial flows use balanced double-entry postings. M4a-1 adds category-aware accounts, normal-side balances, recognition legs, and opening balances. M4b adds the monthly period close, immutable monthly finance summaries, the semantic posting matrix, and the internal `period-close` kind (§5.4.2, D-047). M4c adds country treasury and fiscal accounts, the cash-neutral `income-tax` and `welfare-transfer` kinds, and fiscal close into country equity (§5.4.3, D-048). Annual close, reopen/reversal, and long-term history compaction remain future.
+5. **Accounting integrity:** financial flows use balanced double-entry postings. M4a-1 adds category-aware accounts, normal-side balances, recognition legs, and opening balances. M4b adds the monthly period close, immutable monthly finance summaries, the semantic posting matrix, and the internal `period-close` kind (§5.4.2, D-047). M4c adds country treasury and fiscal accounts, the cash-neutral `income-tax` and `welfare-transfer` kinds, and fiscal close into country equity (§5.4.3, D-048). Annual close and controlled correction/reversal entries are planned in M7a; long-term history compaction remains future.
 6. **Randomness:** keyed/counter-based deterministic random draws, not one shared mutable PRNG stream.
 7. **Daily ordering:** the pipeline in §4.2 is binding unless changed with tests and a decision record. In particular, M3d market clearing includes bounded price adjustment before M3e settlement; settlement uses established transaction prices (D-043). Moving price adjustment after settlement requires a new decision and regression tests.
 8. **Dependency markets:** dependencies initially share the overlord’s market unless data, event, or policy specifies another customs zone; transfers remain separate recorded flows.
@@ -2361,7 +2617,7 @@ The following choices are resolved in this version:
 14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate.
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
 16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved SUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
-17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded and not mutable by an action; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. Broader taxes, expenditure categories, debt, and monetary finance remain future.
+17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded and not mutable by an action; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. Broader taxes and expenditure categories remain future and partly unassigned; profit distributions and state-enterprise remittances are planned in M5a, public debt and deficit financing in M5b, annual close and controlled corrections in M7a, and inflation/FX/monetary-policy foundations in M8a (§17.3). None of those planned stages is implemented.
 
 ### 20.2 Remaining designer decisions
 
@@ -2371,7 +2627,7 @@ These are intentionally left open because they depend on desired gameplay depth 
 2. **Player country selection:** default is any fully authored sovereign polity in the selected scenario; incomplete stubs are not playable until validated.
 3. **Ironman/reload restrictions:** default is unrestricted save/load, with no Ironman mode in v1.
 4. **Historical deviations:** default is a baseline event set that allows outcomes to diverge; no forced “railroad” restoration after an alternate outcome unless an event explicitly requires it.
-5. **Monetary depth beyond v1:** default is the fixed-SUSD measurement model with M4a-2 currency identity and SUSD-relative valuation; dynamic FX, inflation regimes, monetary policy, central banking, detailed local denominations, and banking instruments remain deferred and are not current M4a-2 behavior.
+5. **Monetary depth beyond v1:** default is the fixed-SUSD measurement model with M4a-2 currency identity and SUSD-relative valuation; dynamic FX, inflation, monetary policy, central banking, detailed local denominations, and banking instruments remain deferred and are not current M4a-2 behavior. M8a is the planned stage for inflation measurement, exchange-rate dynamics, and monetary-policy foundations, but it is not implemented and any missing prerequisite must be recorded.
 6. **Monthly-wealth income window:** the current convention uses current-day actual settled wages annualized by the civil year because the GDD does not define a monthly window and no accumulator exists. An exact trailing-month average requires an authoritative per-block income accumulator and a schema/save-format change. The default remains the documented provisional convention until the designer chooses a measurement window and migration policy.
 
 The agent must not expand these topics autonomously during early milestones. It may add proposals to `DECISIONS.md` for designer review.
@@ -2387,7 +2643,7 @@ For every agent session:
 5. Require the completion report defined in §18.4.
 6. Review any `DECISIONS.md` items and test failures before assigning the next milestone.
 
-**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work and all later milestones are not started and must not be inferred.
+**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M5a/M5b/M7a/M8a, and all later milestones are not started and must not be inferred.
 
 ---
 
@@ -2425,6 +2681,7 @@ For every agent session:
 - **Tick:** one simulation update for one civil day.
 - **Trailing-month income average:** a monthly average of household income over the preceding civil month. M3f does **not** implement this; its monthly wealth convention annualizes one day's actual settled wages.
 - **Current implementation:** the behavior actually delivered and tested by the accepted M0–M4c baseline, as distinct from provisional rules and future requirements.
+- **Planned intermediate stage:** one of M5a, M5b, M7a, or M8a in §17.3. These stages extend the roadmap and are not implemented; they do not change the accepted M0–M4c baseline or the M0–M7 vertical slice boundary.
 - **Whole-day staging:** running all phases of an economic day on a structural clone and publishing it only after every phase and final validation succeeds.
 - **Vertical slice:** the smallest playable end-to-end version that proves the complete product path rather than only isolated systems.
 
