@@ -1291,6 +1291,163 @@ These clarify D-047 at implementation time; none changes an approved rule.
   monetary issuance, native-currency balances, FX, inflation, annual close,
   reopen/reversal, or UI are implemented.
 
+### D-048 — M4c government fiscal loop (approved)
+
+- **Status:** approved for M4c and recorded before implementation, following the
+  D-046/D-047 practice. It assigns milestone ownership for the tax and government
+  expenditure work that GDD v2.4 §17.2 lists as the remaining M4 public-finance
+  items. No existing M4a/M4b rule is changed.
+- **Scope.** M4c adds a per-country treasury, a daily flat income tax on wages
+  actually paid, a daily budgeted per-capita welfare transfer, and the fiscal
+  accounting, validation, persistence, wealth-input, and close integration they
+  require. It does not add any other tax, government service or procurement,
+  debt, interest, banks, monetary issuance, FX, inflation, monetary regimes,
+  laws, elections, interest groups, player/AI actions, UI, GDP, national
+  accounts, annual history, annual close, reopen/reversal, or multi-region data
+  authoring.
+- **Fiscal policy state.** `Country.fiscal` is authoritative runtime state with
+  `incomeTaxRate` (dimensionless, 0..1) and `welfareBudgetSUSDPerYear` (nominal
+  SUSD per civil year, finite and nonnegative). It is initialized by
+  `CountryInitialDef.fiscal`. Rates are provisional hard-bounded values, not
+  law-bounded: M8 may replace them with enacted taxation laws. Any additional
+  bound is a documented numeric-safety constant in `economy/constants.ts`, not
+  tuning. `Country.treasuryAccountId` references the country's own
+  `treasury-cash` account.
+- **Country accounts.** Every country has exactly one each of `treasury-cash`
+  (asset, designated cash), `income-tax-revenue` (revenue), `welfare-expense`
+  (expense), and `owner-equity` (equity). The treasury account id is
+  scenario-declared; the remaining country accounts are deterministically
+  allocated above the declared-id floor. Opening treasury cash is applied once
+  through `applyOpeningBalances` with the country equity account as its
+  counterpart, so the opening record and the accounting identity cover it.
+  Opening revenue/expense balances remain rejected.
+- **Household accounts.** Every pop block gains `income-tax-expense` (expense)
+  and `welfare-income` (revenue). The existing per-block cash, equity,
+  wage-income, and consumption-expense accounts are unchanged. Worlds without a
+  country still carry the two zero-balance fiscal accounts so the owner account
+  set is uniform and a save is never structurally ambiguous.
+- **Ownership kind.** `FinancialAccountOwnerKind` gains `country`. The new
+  account subtypes are registered in the subtype/category and
+  subtype/owner-kind maps. `treasury-cash` joins the explicit designated-cash
+  set used by the I-2 aggregate cash-conservation invariant; taxes and transfers
+  are cash-neutral movements between designated-cash accounts.
+- **Transaction kinds and semantic matrix.** `income-tax` and
+  `welfare-transfer` are registered public cash-neutral transaction kinds and
+  are added to the central semantic matrix enforced for individual, batched,
+  and persisted postings:
+  - `income-tax`: debit `income-tax-expense`, credit `income-tax-revenue`;
+  - `welfare-transfer`: debit `welfare-expense`, credit `welfare-income`.
+  Cash and equity lines remain governed by the existing account/cash
+  invariants. `FLOW_TRANSACTION_KINDS` is unchanged at the four M4b flow kinds.
+- **Pipeline placement.** The fiscal phase runs inside the integrated economic
+  day after market/wage/upkeep settlement (GDD §4.2 step 11) and before the
+  needs/militancy update and month-end wealth update (step 13). It is part of
+  the unimplemented §4.2 step 12 finance work, not a new clock. Period close
+  timing is unchanged: still the last civil day of the month after postings,
+  needs/militancy, and month-end wealth, before `dayIndex` advances (step 14).
+  The fiscal phase uses the settlement result of the same day; it never reads
+  accumulated balances to estimate wages.
+- **Income tax.** For each pop block, `tax = incomeTaxRate × wages actually
+  received that day`. Residence country is the owner of the block's region.
+  There are no exemptions, strata, wealth taxes, or tax on welfare, and
+  collection efficiency is fixed at 1.0. No tax is due on zero or unpaid wages.
+  Multiple employers are already combined by settlement into the block's daily
+  wage receipt. The posted entry debits each block's `income-tax-expense`,
+  credits its `household-cash`, debits the country's `treasury-cash`, and
+  credits `income-tax-revenue`. Gross wage income and employer wage expense are
+  unchanged. Tax cannot exceed the day's received wages or the block's cash; a
+  violation is an implementation error and fails without mutation.
+- **Welfare transfer.** For each country, `requested = welfareBudgetSUSDPerYear
+  / daysInYear(currentCivilYear)`. Payable is the lesser of `requested` and
+  treasury cash available after that day's income-tax receipts. Payable is
+  allocated across the country's pop blocks in proportion to population in
+  ascending block-id order, with the final block receiving the exact remainder
+  so the allocated amounts sum exactly to payable. No keyed random draw is used;
+  the residual convention here is deterministic ordering, not the M3e random
+  residual order. The entry debits `welfare-expense`, credits each block's
+  `welfare-income`, debits each block's `household-cash`, and credits
+  `treasury-cash`. When treasury cash is insufficient, all transfers are reduced
+  proportionally by allocating only the payable total; the difference between
+  requested and paid is recorded as a shortfall. No debt, arrears, borrowing, or
+  negative cash is created. A zero budget or zero population creates no
+  posting; with zero population the requested amount is reported as shortfall
+  because there is no recipient.
+- **Atomicity.** All fiscal entries for the day are built and validated first,
+  then posted as one `postJournalBatch`. A fiscal failure leaves the staged day
+  unchanged; the public `tick` continues to stage the whole economic day on a
+  clone and publish only after final validation.
+- **Wealth inputs.** On the month-end wealth update, `perCapitaIncome` is the
+  block's actual settled wages plus welfare received that day, and
+  `annualMandatoryPaymentsPerCapitaSUSD` is the income tax actually withheld
+  that day. Both are divided by block population and annualized by the actual
+  civil-year length, matching the existing daily-flow convention. Unpaid wages
+  and unfunded welfare are not income. This refines the provisional M3f
+  convention; it does not introduce a trailing-month average or accumulator.
+- **Summaries and close.** The M4b `FinancePeriodSummary` shape, the four
+  `flowTotalsByKind` keys, and the closing semantics are unchanged. Country
+  `income-tax-revenue` and `welfare-expense` balances are closed into the
+  country's existing `owner-equity` at month-end, cash-neutrally, in
+  deterministic owner order: pop blocks, then buildings, then countries, then
+  the system owner. Government period totals are derived from the frozen
+  summary `accountTotals` plus account metadata; no new flow kind is added.
+- **Validation.** Rejected before mutation: non-finite, negative, or
+  out-of-range fiscal values; missing, duplicated, mismatched, or wrongly owned
+  country accounts; a treasury reference that is not the country's own
+  `treasury-cash`; duplicate treasury account ids or collisions with other
+  declared account ids; opening revenue/expense balances; and region ownership
+  gaps. When any fiscal policy is nonzero, every region containing pop blocks or
+  buildings must be claimed by exactly one country. Countryless and zero-fiscal
+  worlds remain valid and economically unchanged. Existing owner-equity,
+  accounting-identity, nonnegative non-equity balance, cash-conservation,
+  posting-balance, and staged-close invariants are not weakened.
+- **Determinism.** No randomness is added. Countries are processed in ascending
+  id order, pop blocks in ascending id order, allocations use the residual rule
+  above, and the single fiscal batch has a fixed entry order. Identical state,
+  seed, and actions produce identical hashes.
+- **Persistence and compatibility.** New authoritative fields: `Country.
+  treasuryAccountId`, `Country.fiscal`, the country-owned accounts, and the two
+  per-block fiscal accounts. Serialization encodes, hashes, deep-clones
+  (`copyCountry` copies `fiscal`), and validates them. `WORLD_SCHEMA_VERSION =
+  9`, `SIM_VERSION = "0.9.0"`, `SAVE_FORMAT_VERSION = 1`, `dataVersion`
+  `m3-economy-v1` unchanged (no shipped scenario data). Schema-8/
+  simulation-0.8.0 saves are rejected with an actionable error and no migration
+  (D-013). Known-answer digests are re-baselined because schema/simulation
+  versions and the uniform pop-block account set are hashed.
+- **Required tests.** Fiscal-value validation; account construction and
+  completeness; treasury reference and collision rejection; opening treasury
+  cash applied once; region-ownership rejection when fiscal is active; income
+  tax formula, zero rate/wages, unemployment, partial wages, multiple
+  employers/blocks/countries, no tax on welfare or wealth, gross wage
+  recognition intact, and cash limits; welfare 365/366-day budgets, per-capita
+  exact allocation, zero budget/population, sufficient/insufficient treasury,
+  proportional reduction, exact shortfall, and no negative cash/debt; semantic
+  matrix acceptance and rejection for single, batched, and persisted postings;
+  cash-subtype/kind partition coverage; country close into equity with
+  deterministic order and unchanged four-flow summaries; multi-day treasury
+  reconciliation; fiscal effects on subsequent demand/needs; multi-country
+  isolation; M2/M3/M4a/M4b regressions; repeated-run and save/resume hashes;
+  injected fiscal failure leaves state unchanged; M2-only worlds skip the phase;
+  schema-8/0.8.0 rejection; and a dedicated M4c fiscal-day benchmark.
+- **Limitations.** Collection efficiency is fixed at 1.0; fiscal policy is not
+  law-bounded or mutable by an action; taxes are flat, wage-only, residence-
+  based, with no exemptions or strata; welfare is a single per-capita budgeted
+  transfer with no service, targeting, or administrative cost; corporate,
+  consumption, land, tariff, and state-enterprise revenue are absent; corporate
+  tax cannot be assessed from per-building period results until a later stage;
+  the wealth income basis remains a current-day flow annualization, not a
+  trailing-month average; Node benchmarks remain diagnostics and the mobile p95
+  target is **NOT EVALUATED**.
+- **Deferred.** Corporate/consumption/excise/tariff/land/property taxes,
+  state-enterprise remittance, colonial transfers, debt/bonds/interest/
+  maturities/default, banks/central bank/issuance, FX/inflation/regimes,
+  government procurement or tier-4 market demand, government employment and
+  public services, subsidies, infrastructure maintenance, debt service,
+  law-bounded rates/enactment/elections/interest groups, player/AI policy
+  actions, UI/snapshots/commands, multi-region/multi-country authoring, GDP/
+  national accounts/`CountryStats`/annual history/`World.history`, annual or
+  fiscal-year close, reopen/reversal/adjusting entries, retained-earnings
+  subtype, summary compaction, and new M4b flow-total kinds.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
