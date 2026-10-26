@@ -1983,7 +1983,146 @@ would create an unexplained cash source. (b) Deferring welfare into an implicit
 payable would contradict M4c's explicit shortfall rule and create an invisible
 obligation. (c) Immediate default at maturity without an arrears window would not
 exercise the required explicit arrears state. (d) Counting principal repayment or
-borrowing as revenue/expense would corrupt the four-flow summary and fiscal result.## Assumptions recorded for future review
+borrowing as revenue/expense would corrupt the four-flow summary and fiscal result.
+
+### D-058 — M6 deterministic country AI v1 and shared action validation
+
+**Context.** M6 must add a rule-based country AI that can govern the eight-polity
+sample without invalid actions or hidden-information access, plus an action
+validation path shared with a player. The GDD delegates the exact rules,
+persistence shape, information boundary, and action subset to implementation.
+Most GDD priority categories (construction, infrastructure priority, laws,
+security, diplomacy) refer to systems that do not exist yet; inventing those
+systems would exceed M6.
+
+**Decision.**
+
+- **Implemented action set.** M6 implements exactly one action kind,
+  `set-fiscal-policy`, which sets the existing M4c `incomeTaxRate` and
+  `welfareBudgetSUSDPerYear` together. The player and the AI pass through the
+  same `validateCountryAction` and `applyCountryAction` operations. An action is
+  rejected before mutation; a changed candidate country is published only after
+  the complete candidate world validates.
+- **Excluded actions.** Building queues/construction, infrastructure or production
+  priority, laws, debt actions, diplomacy, and military actions are not
+  implemented. Their underlying systems are absent or explicitly outside the
+  accepted M5b boundary. The action union is extensible but no speculative action
+  is accepted at runtime.
+- **Persisted policy and state.** `World.countryAI.enabled` is a
+  scenario-provided enable flag, default false, so legacy M0–M5b fixtures keep
+  their behavior. Each `Country` gains a fixed-size `ai` state with
+  `nextEvaluationDay`, `currentGoalId`, `lastDecisionDay`, and a bounded
+  `lastActionSummary`. There is no action log, per-day history, or growing
+  planning buffer.
+- **Cadence and staggering.** A country evaluates when its persisted
+  `nextEvaluationDay` is due. The first evaluation is the first day strictly
+  after the scenario start whose absolute day index is congruent to the stable
+  country id modulo seven; subsequent evaluations are seven days apart. The
+  terminal 2000-01-01 boundary never evaluates. This preserves the authored
+  policy on the start day and spreads eight sample countries across the week.
+- **Information boundary.** `buildCountryAIObservation` exposes only own-country
+  fiscal policy, treasury cash, region ids, own population blocks and their need
+  and unrest indicators, the latest closed own-country fiscal totals, and own
+  debt exposure. It excludes other countries' treasury/fiscal/debt state, other
+  countries' population blocks, household account balances, future events, and
+  the world seed. `planCountryActions` takes only that observation and is pure.
+- **Decision rules.** Priority is solvency before relief. A country is under
+  solvency pressure when treasury cash is below six months of observed annual
+  outlays or, once a month has closed, observed annualized outlays exceed
+  annualized income-tax revenue. It then raises the income tax by one percentage
+  point up to a provisional 25% self-cap and cuts welfare to the affordable
+  revenue share. Hardship triggers when at least 5% of own population has seven
+  consecutive unmet subsistence days or population-weighted militancy is at least
+  0.15. The relief target sets income tax to at least 5% and welfare to 25% of
+  observed annualized tax revenue. Treasury reserves are a solvency buffer, not an
+  ongoing spending target, so the welfare target is stable once revenue is
+  observed; a new welfare action is suppressed unless the target changes by at
+  least 10%, which prevents month-to-month revenue noise from producing weekly
+  actions. An early prototype that drew down surplus each evaluation kept
+  escalating welfare and was rejected. The AI only raises or maintains tax; it
+  never borrows, issues money, changes debt policy, or creates a spendable pool.
+- **Determinism.** No random draw is used in v1. Countries and blocks are
+  processed in ascending id order, policy rates are rounded to six decimals and
+  welfare to cents, and no-op changes are suppressed by documented tolerances.
+  Identical state and day produce identical proposals and hashes.
+- **Failure behavior.** An AI proposal that fails the shared validator is counted
+  in `diagnostics.invalidActionCount`, recorded as a bounded warning, and
+  skipped; it cannot corrupt the day. A player action that fails the validator
+  throws and leaves the world unchanged. Tests assert zero rejected AI proposals
+  on the sample campaign.
+- **Sample enablement.** The M5 historical scenario sets `countryAI.enabled =
+  true`; all synthetic legacy fixtures omit it and remain disabled. This is a
+  scenario policy change, not a change to existing definitions, so the data
+  version remains `m3-economy-v1`.
+- **Persistence and versions.** World schema **13**, simulation version
+  **0.13.0**, save format **1**. Schema-12/simulation-0.12.0 saves are rejected
+  with no migration. Known-answer digests are re-baselined because
+  `World.countryAI` and `Country.ai` are hashed state.
+- **Benchmarks.** The default Node benchmark adds a 14-tick representative AI
+  sample and a doubled-block/building AI stress fixture. The opt-in
+  `pnpm run bench:campaign` executes all 36,524 ticks and reports p50/p95/p99,
+  bounded state checkpoints, AI proposal counts, and the final save size. The
+  mobile p95 target remains **NOT EVALUATED**; Node timings are not mobile
+  evidence.
+
+**Rejected alternatives.** (a) Letting the AI mutate `World` directly through a
+second private path would violate the “same validation as the player” rule.
+(b) Giving the AI the live world object would make hidden-information access a
+convention rather than a testable boundary. (c) Adding construction queues or
+laws to make the priority list look complete would implement unassigned systems
+and speculative mechanics. (d) Using a global random stream for AI choice would
+break keyed determinism. (e) Treating missing pre-close revenue as zero caused
+avoidable tax increases in an early prototype and was replaced by an explicit
+“unknown until first close” rule. (f) A per-evaluation action log would grow
+without bound and duplicate the audit posting buffer.
+
+### D-059 — Bounded revalidation of immutable monthly summaries on the tick path
+
+**Context.** The M6 full-campaign benchmark initially took about 108 seconds for
+500 AI-enabled days and grew with the number of closed months. Profiling showed
+that repeated validation of every immutable `FinancePeriodSummary` dominated the
+tick cost: each tick validated the complete growing history three or more times,
+even though summaries are created only by the atomic M4b close and are never
+mutated afterwards.
+
+**Decision.** Add an explicit `PeriodSummaryValidationMode` with `"all"` and
+`"latest"` modes. `assertValidWorld`, construction, save encoding/decoding, the
+monthly close, and the profit-allocation phase keep complete validation. The hot
+tick path uses `assertValidWorldForTick`, which validates the newest summary, its
+contiguity links, the calendar boundary, the accounting identity, and the
+closed-through rule, but does not reparse every older immutable summary.
+`cloneWorld` and `runEconomicDay` accept an internal skip-validation option only
+when their caller has already validated the same staged world.
+
+**Consequences.** Simulation results and hashes are unchanged; the 500-day probe
+fell from about 108 s to about 66 s. A corrupted older summary is still rejected
+at every save/load/construction boundary and by `assertValidWorld`; a focused
+test proves `assertValidWorldForTick` accepts the corruption while
+`assertValidWorld` and serialization reject it. This is a validation-cost
+optimization, not a relaxation of the published-state contract. A second profile
+of the 10-year campaign showed the structural clone deep-copying every closed
+summary's account totals on every tick. Because closed summaries are immutable
+after the atomic M4b close, the hot-path `cloneWorldForTick` shares the summary
+objects and copies only the array; the staged close appends a new summary to its
+own array and never edits an older one. Public `cloneWorld` retains full
+summary-deep-copy isolation, which the accepted M4b tests require. This removes
+the remaining per-tick growth with the length of the monthly history without
+weakening the public clone contract. The executed full campaign then completed in
+102.63 minutes at p50 144.3 ms / p95 185.8 ms / p99 1,024.0 ms, with constant
+accounts, 256 capped postings, 1,200 bounded summaries, and zero invalid AI
+actions.
+
+**Rejected alternatives.** (a) Keeping full per-tick validation and only
+projecting the campaign would not satisfy M6's full-campaign requirement.
+(b) Dropping older summaries would break the accepted M4b immutable monthly
+history and the four-flow ledger. (c) Caching a validation result in module-level
+state would add hidden global state and make replay order-dependent. (d) Copying
+immutable summaries on every tick preserves a stronger isolation property but
+makes the full campaign scale with the square of elapsed months; the hot-path
+clone shares them because the close is the only writer and it appends, while the
+public clone keeps deep isolation.
+
+## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
 2. The warning buffer is capped at 32 entries of 500 characters each. No
@@ -2002,13 +2141,26 @@ borrowing as revenue/expense would corrupt the four-flow summary and fiscal resu
 7. The daily budget excludes savings; no financial account is mutated in M2.
 8. `Math.log`-based wealth and floating demographic accumulation are deterministic
    on a fixed runtime but not proven bit-identical across JavaScript engines.
+9. M6 AI fiscal rules and constants are provisional policy heuristics, not
+   calibrated behavioral parameters. The AI uses only own-country/public
+   information, has no construction, law, debt, diplomatic, or military actions,
+   and does not lower income tax in v1.
+10. `assertValidWorldForTick` validates the newest monthly summary and its links,
+    not every immutable older summary; complete validation remains mandatory at
+    save/load/construction/close boundaries. The hot-path `cloneWorldForTick`
+    shares immutable closed summary objects and copies only the array; public
+    `cloneWorld` deep-copies them (D-059).
 
 ## Items intentionally left open
 
 - Campaign victory/end-state presentation (GDD §20.2 default: sandbox report).
-- Save compression and atomic platform storage (M6/M7).
+- Save compression and atomic platform storage (M7). M6 measured the
+  full-campaign save size; compression is not implemented.
 - Worker runtime package and mobile performance device (M7).
 - Historical data versioning and migration (M5).
 - Source-backed 1900 age structure and pre-1950 age-specific fertility/mortality.
 - Source-backed annual sex ratio at birth and exact single-year age distributions.
 - Cross-engine floating-point determinism policy.
+- Country-AI construction, infrastructure-priority, law, debt, diplomatic, and
+  military actions await their underlying systems; M6 accepts only fiscal policy
+  changes.

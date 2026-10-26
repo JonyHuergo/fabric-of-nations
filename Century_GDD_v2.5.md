@@ -29,11 +29,12 @@
 > state-enterprise remittances), M5b (public debt and deficit financing), M7a
 > (annual accounting close and controlled corrections), and M8a (inflation, FX
 > dynamics, and monetary-policy foundations) in the order `M4c → M5 → M5a → M5b
-> → M6 → M7 → M7a → M8 → M8a → M9 → M10`. The stages in (f) are **planned and not
-> implemented**; they do not change the M4a/M4b/M4c baseline, and the playable
-> vertical slice remains M0–M7. The broader vision, historical goals,
-> future-system design, determinism, conservation, and scope-control rules
-> remain in force.
+> → M6 → M7 → M7a → M8 → M8a → M9 → M10`. M5a and M5b were adopted as planned
+> stages in this revision and are now implemented and accepted; M7a and M8a remain
+> **planned and not implemented**. The adopted stages do not change the
+> M4a/M4b/M4c baseline, and the playable vertical slice remains M0–M7. The broader
+> vision, historical goals, future-system design, determinism, conservation, and
+> scope-control rules remain in force.
 
 > **M5 implementation addendum.** M5 is implemented and accepted. The current
 > multi-region/multi-country/multi-market, migration, labor-access, and historical
@@ -43,6 +44,16 @@
 > M7a and M8a remain planned and are not implemented. This addendum records
 > implementation status; it does not change the M4c baseline or the v2.4/v2.3
 > historical documents.
+
+> **M6 implementation addendum.** M6 is implemented and accepted. Deterministic
+> country AI v1, the persisted AI schedule/goal state, the own-country/public
+> observation boundary, shared player/AI fiscal-policy action validation, the M6
+> stress fixture, and the opt-in full-campaign performance report are described in
+> §4.2, §12, §16.5, and §17.2d (D-058/D-059). World schema is **13** and simulation
+> version **0.13.0**. M6 enables AI in the historical sample and leaves legacy
+> fixtures disabled; M7–M10 remain planned and unimplemented. The GDD 4 MiB save
+> target is reported against the measured full-campaign save size and is not
+> claimed as met.
 
 ---
 
@@ -241,8 +252,11 @@ binding for economic worlds:
    boundary, do not process another day. Validate the world and explicit context.
    *(Current implementation.)*
 2. **Apply scheduled events and effective policy changes.** An event must apply at
-   most once unless explicitly defined as recurring. *(Future system; currently a
-   no-op. No event or policy system is implemented.)*
+   most once unless explicitly defined as recurring. *(Current M6: country AI
+   evaluates on its staggered seven-day schedule and applies only validated
+   fiscal-policy changes through the same action validator a player uses.
+   Scheduled events and general law/policy systems remain future; there is no
+   event queue.)*
 3. **Apply annual single-year ageing when required.** Advance every person exactly
    one year, oldest-to-youngest, without creating or destroying population. Age 79
    enters the open-ended 80+ slot; the 80+ slot does not age out. Skip ageing on
@@ -339,18 +353,21 @@ transaction prices.
 **Whole-day atomicity.** For an economic world, the complete day is staged on a
 structural deep clone of the authoritative world. Population, employment,
 inventory, prices, finance, postings, country/currency/valuation state, country
-fiscal state and fiscal postings, monthly finance summaries, needs indicators,
-wealth, and calendar state mutate only the staged world. The staged world is
-published to the caller's world object only after every phase and final
-validation succeeds. A failure leaves the original world, its hash, and its
-serialized representation unchanged. The M4b period close is itself an additional
-atomic stage: it copies the finance state, applies the closing entries and the
-summary on that copy, validates the result, and only then replaces `world.finance`
-(§5.4.2). The M4c fiscal phase stages on an isolated finance clone, validates the
-complete staged world and treasury reconciliation, and only then replaces
-`world.finance`; it also consumes the transient settlement result so duplicate or
-stale execution is rejected. The M2-only path retains its population-only
-behavior and does not use the M3f economic staging path.
+fiscal state, country AI policy/goal state, fiscal postings, monthly finance
+summaries, needs indicators, wealth, and calendar state mutate only the staged
+world. The staged world is published to the caller's world object only after every
+phase and final validation succeeds. A failure leaves the original world, its hash,
+and its serialized representation unchanged. The M4b period close is itself an
+additional atomic stage: it copies the finance state, applies the closing entries
+and the summary on that copy, validates the result, and only then replaces
+`world.finance` (§5.4.2). The M4c fiscal phase stages on an isolated finance clone,
+validates the complete staged world and treasury reconciliation, and only then
+replaces `world.finance`; it also consumes the transient settlement result so
+duplicate or stale execution is rejected. The M6 AI phase validates every proposed
+action before applying it and validates the candidate world before replacing a
+country's fiscal policy; a rejected AI proposal is counted and skipped. The
+M2-only path retains its population-only behavior and does not use the M3f
+economic staging path.
 
 **M2-only and economic-world distinction.** A world with no buildings or markets
 uses the M2-only path: ageing, daily demography, the M2 needs fixture, daily
@@ -1432,6 +1449,7 @@ Rules for these contracts:
 - `InterestGroupState.influence`, `InstitutionState.quality`, and `overload` are derived/cached indicators, not spendable resources.
 - Keep the finance audit buffer bounded. Long-run finance history belongs in the M4b monthly period summaries, not in `postings`.
 - Later military/diplomacy types may grow, but empty M1 collections must not cause fake behavior or create daily work.
+- **Current M6:** `AIState` is implemented on `Country.ai` with exactly the four fields shown, and `World.countryAI.enabled` is the scenario-provided enable policy. No other sketched political/military type is implemented.
 
 ### 5.6 Static/runtime split and serialization
 
@@ -2193,9 +2211,16 @@ Occupation must not silently change sovereignty. Track controller, legal owner/s
 
 ## 12. Country AI
 
+**Implementation status.** M6 implements deterministic country AI v1, persisted
+AI goal state, shared player/AI action validation, and a bounded fiscal action
+set. It is enabled by the M5 historical sample and disabled by legacy fixtures.
+Construction queues, infrastructure/production priorities, laws, debt actions,
+diplomacy, and military actions are **not** implemented because their underlying
+systems are absent or outside the accepted M5b boundary (D-058).
+
 ### 12.1 Deterministic decision model
 
-Country AI is rule-based and evaluated every seven days, staggered by stable country ID. Its output is a list of proposed actions; the simulation validates legality, affordability, prerequisites, and timing before applying them.
+Country AI is rule-based and evaluated every seven days, staggered by stable country ID. Its output is a list of proposed actions; the simulation validates legality, affordability, prerequisites, and timing before applying them. M6's first evaluation is the first day after the scenario start whose absolute day index is congruent to the stable country id modulo seven; subsequent evaluations are seven days apart, and the terminal 2000-01-01 boundary is never evaluated.
 
 Initial goal priority for the economic/political AI:
 
@@ -2209,6 +2234,22 @@ Initial goal priority for the economic/political AI:
 
 Priority may be adjusted by regime, laws, security conditions, institutions, and scenario. The list is not a script that every country must follow in every circumstance.
 
+**Current M6 mapping.** Only priorities 1 and 2 have implemented actions. The AI
+selects one of three persisted goals: `restore-solvency` (treasury below six
+months of observed outlays, or observed annual outlays above observed annualized
+income-tax revenue), `relieve-hardship` (at least 5% of own population with seven
+consecutive unmet subsistence days, or population-weighted militancy at or above
+0.15), or `maintain`. Solvency takes precedence. The relief target sets income
+tax to at least a provisional 5% and welfare to 25% of observed annualized tax
+revenue. Treasury reserves are a solvency buffer, not an ongoing spending target,
+so the welfare target is stable once revenue is observed; a new welfare action is
+suppressed unless the target changes by at least 10%. Solvency raises tax by one
+percentage point toward a provisional 25% self-cap and cuts welfare to affordable
+capacity. Missing pre-close revenue is treated as unknown, not zero. The goal persists in `Country.ai.currentGoalId`
+until a later scheduled evaluation changes it. Priorities 3–7 have no implemented
+action because construction, infrastructure priority, education, technology,
+military, and diplomacy systems do not exist yet.
+
 ### 12.2 AI information and reproducibility
 
 - An AI may use information available to the country it governs and public information defined as visible to players.
@@ -2218,9 +2259,28 @@ Priority may be adjusted by regime, laws, security conditions, institutions, and
 - Any stochastic choice must use keyed deterministic randomness with an explicit purpose identifier.
 - Avoid AI re-planning that emits contradictory actions every tick. Goals persist until completion, invalidation, or a documented re-evaluation rule.
 
+**Current M6 boundary.** The decision function receives only a
+`CountryAIObservation`: own fiscal policy, own treasury cash, own region ids, own
+population blocks and their need/unrest indicators, the latest closed
+own-country fiscal totals, and own debt exposure. Other countries'
+treasury/fiscal/debt state, other countries' blocks, household account balances,
+future events, and the world seed are absent. The M6 rules use no random draw.
+Countries and blocks are processed in ascending id order; rates are rounded to
+six decimals and money to cents; no-op changes are suppressed. M6 tests mutate
+hidden fields and assert that the governed country's observation and decision do
+not change.
+
 ### 12.3 Initial action set
 
 For M6, actions may include setting tax/spending policy, queuing a building, adjusting permitted laws once laws exist, and prioritizing infrastructure or production. Military and diplomatic actions are added only after their systems are implemented. M4c provides the authoritative `Country.fiscal` state those actions will mutate; it does not implement the action interface itself.
+
+**Current M6 action.** The only implemented action is `set-fiscal-policy`, which
+sets `Country.fiscal.incomeTaxRate` and `Country.fiscal.welfareBudgetSUSDPerYear`
+atomically. `validateCountryAction` and `applyCountryAction` are the shared
+player/AI path. A failed validation leaves the world unchanged. An AI proposal
+that fails validation is counted in `diagnostics.invalidActionCount`, recorded in
+the bounded warning buffer, and skipped. No building queue, law, infrastructure
+priority, debt, diplomacy, or military action is accepted.
 
 ---
 
@@ -2336,7 +2396,7 @@ Initial engineering targets, to be confirmed on a named reference device:
 - UI: target 60 fps, with no persistent stutter when simulation runs.
 - Cold start: under 2.5 seconds on the reference device, subject to measurement method.
 - Peak memory: under 250 MB on the reference device.
-- Save size: target under 4 MB for the initial full-scale world; revise only after measuring real state.
+- Save size: target under 4 MB for the initial full-scale world; revise only after measuring real state. **Current M6 measurement:** the opt-in full-campaign save is reported in README/D-058. The 4 MiB target is not met because M4b retains one pre-close trial balance per closed month; the history is bounded at 1200 summaries but compression/history compaction is not implemented.
 - Sustained 10 days/second: battery drain target no more than twice measured idle drain under a controlled test.
 
 Record device model, OS, build type, world size, warm-up, test duration, p50/p95/p99 tick times, snapshot rate, memory, and battery conditions. A Node benchmark is a fast regression test, not proof of mobile performance. Validate performance on-device in a release build. Current M2.1/M3f/M4b/M4c Node benchmarks (which also exercise worlds carrying the M4a-1/M4a-2/M4b/M4c state schema) do **not** evaluate or pass the mobile p95 target; its status remains **NOT EVALUATED**. The M4b close benchmark times only the period close, and the M4c fiscal benchmark times the integrated fiscal day; world cloning, setup, and hashing are excluded from both.
@@ -2515,7 +2575,7 @@ Use keyed/counter-based deterministic randomness rather than one global mutable 
 7. **Money/accounting conservation:** each posting balances; transfers have counterpart accounts; money supply changes only through defined mechanisms. **Current M5:** `migration-transfer` is a balanced, cash-neutral household-to-household transfer and is not a period flow kind.
 8. **No-arbitrary-pools check:** known point pools are forbidden; derived indicators must be rebuildable or explicitly documented.
 9. **Market behavior:** prices respond in the correct direction to persistent supply/demand shocks, remain finite/positive, and are bounded per tick.
-10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, refinancing, arrears, and default are now covered by M5b focused tests. M5a and M5b are implemented; M7a/M8a remain future. **Current M5:** each country's treasury reconciles only with its own residents' taxes, shared markets do not merge treasuries, and M4b monthly close/cash/identity tests still pass across countries. **Current M5a:** private distributions and state-enterprise remittances are backed only by positive retained profit and available cash, preserve the accounting identity and aggregate cash, do not create a flow kind, reject duplicate execution, and do not change M4b/M4c results when disabled. **Current M5b:** issuance/principal/interest financing and debt service reconcile against identified issuer/holder accounts, preserve aggregate cash, keep borrowing and principal outside revenue/expense, and cover interest, maturity, refinancing, arrears, default write-down, financing constraints, atomic rollback, save/resume, and deterministic replay.
+10. **Finance behavior:** debt issuance, interest, maturity, taxes, transfers, and default reconcile on controlled test fixtures. **Current M4c:** income-tax withholding, welfare payment/shortfall, treasury reconciliation, fiscal cash neutrality, country close, and the four-flow summary contract are covered; debt, interest, maturity, refinancing, arrears, and default are now covered by M5b focused tests. M5a and M5b are implemented; M7a/M8a remain future. **Current M5:** each country's treasury reconciles only with its own residents' taxes, shared markets do not merge treasuries, and M4b monthly close/cash/identity tests still pass across countries. **Current M5a:** private distributions and state-enterprise remittances are backed only by positive retained profit and available cash, preserve the accounting identity and aggregate cash, do not create a flow kind, reject duplicate execution, and do not change M4b/M4c results when disabled. **Current M5b:** issuance/principal/interest financing and debt service reconcile against identified issuer/holder accounts, preserve aggregate cash, keep borrowing and principal outside revenue/expense, and cover interest, maturity, refinancing, arrears, default write-down, financing constraints, atomic rollback, save/resume, and deterministic replay. **Current M6:** player and AI fiscal-policy actions share one validator, invalid actions leave the world unchanged, AI proposals use only own-country/public observation, zero invalid AI actions are accepted in the sample campaign, AI state round-trips and hashes, goal/schedule state is fixed-size, and the historical sample's AI run remains deterministic across replay and save/resume.
 11. **Calibration:** world/country anchors are within source-backed tolerances for a named baseline scenario.
 12. **Regression:** each discovered bug gets a test that fails before the fix and passes afterward.
 13. **Performance:** benchmark representative and worst-case fixture worlds; report p50/p95/p99 rather than only a single average.
@@ -2567,7 +2627,7 @@ Provide at least three fixtures:
 
 Benchmarks must state the exact seed, data version, tick count, hardware/runtime, and measurement procedure. Performance targets are not allowed to be “verified” on a different test scale without stating the difference.
 
-**Current M5/M5a/M5b:** the harness includes the eight-polity representative campaign (8 countries, 16 regions, 5 markets, 64 blocks, 81 buildings), a doubled-block/building stress fixture (128 blocks, 162 buildings), serialization/validation overhead, the monthly migration phase, the M5a month-end profit-allocation phase (close/clone excluded), and a focused M5b debt-accrual/coupon phase over one month. A full 36,524-tick economic campaign is projected from the measured sample rather than executed, and that projection is not a performance gate. The mobile p95 target remains **NOT EVALUATED** because no release build was run on the named reference device.
+**Current M5/M5a/M5b/M6:** the harness includes the eight-polity representative campaign (8 countries, 16 regions, 5 markets, 64 blocks, 81 buildings), a doubled-block/building stress fixture (128 blocks, 162 buildings), serialization/validation overhead, the monthly migration phase, the M5a month-end profit-allocation phase (close/clone excluded), a focused M5b debt-accrual/coupon phase over one month, and M6 AI evaluations in both the representative and stress fixtures. The opt-in `pnpm run bench:campaign` command executes all 36,524 economic ticks with AI enabled and reports per-tick p50/p95/p99, AI evaluation/action counts, bounded-state checkpoints, and the final save size. The default CI benchmark remains bounded; the full campaign is not part of `pnpm run ci`. The mobile p95 target remains **NOT EVALUATED** because no release build was run on the named reference device.
 
 ---
 
@@ -2575,14 +2635,14 @@ Benchmarks must state the exact seed, data version, tick count, hardware/runtime
 
 Each milestone is a separate assigned task. Tests and acceptance criteria are prepared before implementation. Do not start the next milestone until the current one is complete or the designer explicitly accepts a documented exception.
 
-**Implementation status.** M0–M5b are implemented and accepted (§17.1–§17.2c); M4's remaining unassigned finance work is not implemented. M6–M10 are planned. The intermediate stages M7a and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
+**Implementation status.** M0–M5b and M6 are implemented and accepted (§17.1–§17.2d); M4's remaining unassigned finance work is not implemented. M7–M10 are planned. The intermediate stages M7a and M8a are planned additions in §17.3, not implemented milestones. No later stage is implied by the existence of its support type or by this plan.
 
 | Scope | Status |
 |---|---|
-| M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c, M5, M5a, M5b | Implemented and accepted |
+| M0, M1, M2/M2.1, M3a–M3f, M4a-1, M4a-2, M4b, M4c, M5, M5a, M5b, M6 | Implemented and accepted |
 | Remaining M4 finance work not assigned in §17.3 | Not implemented |
 | M7a, M8a | Planned, not implemented (§17.3) |
-| M6–M10 | Planned, not implemented |
+| M7–M10 | Planned, not implemented |
 
 | Milestone | Deliverable | Definition of done |
 |---|---|---|
@@ -2595,7 +2655,7 @@ Each milestone is a separate assigned task. Tests and acceptance criteria are pr
 | **M5** | Multi-region/multi-country worlds, shared/trade markets, migration, labor mobility, initial historical data pipeline | Eight authored sample polities run together; data validator passes; population, goods, and finance invariants pass; occupation structure trends meet country-specific baseline ranges where data supports them. |
 | **M5a** | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings (§5.4.5, §17.2b) | Ownership, timing, account semantics, and available-funds rules are explicit and deterministic; a distribution or remittance never exceeds distributable profit or available cash; no negative balances, unexplained money creation, or breakage of the accounting identity, determinism, and M4b close invariants; M5 ownership/enterprise structures are established or explicitly extended rather than assumed. **Implemented and accepted** (§17.2b, D-056). |
 | **M5b** | Public debt and deficit financing: versioned debt contracts, issuance with matching asset/liability entries and actual cash transfers, daily interest accrual, monthly coupons, maturity/principal repayment, refinancing, explicit arrears, and default; deficit financing limited by creditor cash and an outstanding-principal ceiling (§5.4.6, §17.3, D-057) | Fiscal deficit, financing transactions, borrowing proceeds, interest expense, and principal repayment are separately and explicitly recorded; every issuance moves existing cash between identified issuer/holder accounts; outstanding liability reconciles; financing constraints and default consequences are defined; no unexplained money creation, invisible unpaid obligation, or premature full banking/central-bank system. |
-| **M6** | Deterministic country AI v1, action validation, stress testing, simulation performance report | AI can govern the sample world without invalid actions or hidden-information access; full-campaign benchmark reports p50/p95/p99; no unbounded state growth; performance bottlenecks are identified. |
+| **M6** | Deterministic country AI v1, action validation, stress testing, simulation performance report | AI can govern the sample world without invalid actions or hidden-information access; full-campaign benchmark reports p50/p95/p99; no unbounded state growth; performance bottlenecks are identified. **Implemented and accepted** (§17.2d, D-058/D-059). |
 | **M7** | Mobile worker proof of concept and playable app: map, snapshot bus, five core screens plus map | Release build runs on iOS and Android; pause/speed/actions/save/load work; UI reads snapshots only; target frame-rate and on-device tick performance are measured and reported. |
 | **M7a** | *(Planned — not implemented; after M7, before M8.)* Annual finance summaries and annual-period boundaries, year-end closing entries consistent with the M4b monthly close, partial-year handling, and controlled auditable correction/reversal entries (§17.3) | Annual close is deterministic, atomic, validated, persisted, and reconciled; partial first/last campaign years are defined and the terminal boundary is excluded; corrections are posted as new auditable entries with provenance and never edit or delete closed history; monthly summaries, the accounting identity, and four-flow semantics remain intact. Not a prerequisite for the M0–M7 playable slice. |
 | **M8** | Institutions, interest groups, laws, elections, unrest, instability, historical-shock/event content | Law/election outcomes follow documented prerequisites; a revolution or regime crisis can arise from simulated causes; scripted events are idempotent and have provenance. |
@@ -2697,6 +2757,24 @@ derivatives, external investor pools, debt-to-GDP targeting, interest taxation, 
 player/AI debt actions. Legacy M0–M5a fixtures default the country debt policy off
 and retain their accepted account sets, behavior, and digests except for the
 intentional schema/state-version rebaseline.
+
+### 17.2d M6 implementation (accepted)
+
+| Stage | Deliverable | Acceptance boundary | Status |
+|---|---|---|---|
+| **M6** | Deterministic rule-based country AI v1, persisted schedule/goal state, own-country/public observation boundary, shared player/AI fiscal-policy action validation, historical-sample governance, AI stress fixture, and opt-in full-campaign performance report | Every sample country evaluates on its staggered seven-day schedule; the AI uses only own-country/public observation and is deterministic for a given state and day; invalid player actions are rejected without mutation; AI proposals use the same validator and produce zero rejected proposals in the sample campaign; fiscal actions never create money, debt, negative cash, or a hidden obligation; AI state, actions, diagnostics, replay, save/resume, and schema-13/simulation-0.13.0 round-trips pass; schema-12/0.12.0 saves reject; full-campaign p50/p95/p99, bounded state, AI action counts, and bottlenecks are reported; mobile performance remains **NOT EVALUATED**. | Accepted |
+
+M6 implements §12 and D-058. It enables AI for the historical sample and leaves
+legacy fixtures disabled. Its only action is `set-fiscal-policy`; construction
+queues, infrastructure/production priorities, laws, debt actions, diplomacy, and
+military actions are explicit non-goals because their systems do not exist or
+remain outside the accepted M5b boundary. M6 adds no new revenue/expense posting
+kind, no new money source, and no change to M4b close or M4c fiscal semantics. The
+full-campaign benchmark is opt-in (`pnpm run bench:campaign`) and is not part of
+the default `pnpm run ci`; the measured save size is reported against the GDD 4
+MiB engineering target rather than assumed to meet it. D-059 records the hot-path
+summary-validation optimization.
+
 ### 17.3 Intermediate finance stages (M5a/M5b accepted; M7a/M8a planned)
 
 **Status: M5a and M5b implemented and accepted; M7a and M8a planned and not
@@ -2895,7 +2973,8 @@ several stages at once:
   ownership structures M5 delivers.
 - M5b establishes public debt and deficit-financing behavior before the AI
   milestone.
-- M6 and M7 deliver country AI and the first playable mobile vertical slice.
+- M6 (accepted) delivers deterministic country AI v1 and shared action validation;
+  M6 and M7 together deliver the first playable mobile vertical slice.
 - M7a completes annual accounting after the first playable slice.
 - M8 establishes political institutions and laws.
 - M8a adds monetary systems on top of those institutional and multi-country
@@ -2905,9 +2984,9 @@ several stages at once:
 The **vertical slice remains M0–M7**. M7a and M8a are post-slice stages and are
 not prerequisites for the initial playable release. M5–M7 are not automatically
 blocked on the later monetary systems; M8a may be deferred or narrowed if its
-prerequisites are not met, provided the gap is recorded. M5a and M5b are current; M7a and M8a
-are planned and not implemented; no current runtime behavior, save field, schema
-version, or benchmark gate may be inferred from this plan.
+prerequisites are not met, provided the gap is recorded. M5a, M5b, and M6 are
+current; M7a and M8a are planned and not implemented; no current runtime behavior,
+save field, schema version, or benchmark gate may be inferred from this plan.
 
 ---
 
@@ -2988,15 +3067,16 @@ The following choices are resolved in this version:
 9. **Wealth level:** a cached/smoothed index per pop block, not money and not an independently spendable resource. Monthly update uses the provisional income convention in §6.5; M4c includes welfare in the income basis and income tax in mandatory payments; an exact trailing-month average is not implemented.
 10. **Buildings:** physical instances are located in regions and owned by private or state accounts. Current M3 baseline instances are private only.
 11. **Historical calibration:** target values are provisional until metric definition, date convention, and source provenance are complete. Post-1950 WPP validation is source-backed; 1900–1949 population composition and schedules remain provisional; the 1900 campaign is not a historical-validation success.
-12. **Performance:** Node benchmarking is diagnostic; mobile performance is unverified and must be confirmed on a named reference device in a release build. No mobile target has passed. The mobile p95 target is **NOT EVALUATED**.
+12. **Performance:** Node benchmarking is diagnostic; mobile performance is unverified and must be confirmed on a named reference device in a release build. No mobile target has passed. The mobile p95 target is **NOT EVALUATED**. M6 executes a full 36,524-tick Node campaign in opt-in mode and reports p50/p95/p99, but it remains a Node diagnostic.
 13. **M2-only finance fixture:** on the M2-only path, needs are funded from annual disposable income only, with no savings drawdown and no account mutation. M3f economic worlds instead use opening household cash and actual settlement; the full intended model remains household financial assets plus settled income less mandatory payments.
 14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate.
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
 16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved SUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
-17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded and not mutable by an action; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. M5a adds scenario-initialised `World.profitDistribution` and balanced private distributions/state-enterprise remittances (D-056); it does not make state receipts income-tax revenue. M5b adds scenario-initialised `Country.debt`, versioned contracts, deficit financing, interest, maturity/refinancing, arrears, and explicit default (D-057); borrowing is not revenue and principal repayment is not expenditure. Broader taxes and expenditure categories remain future and partly unassigned; annual close and controlled corrections are planned in M7a, and inflation/FX/monetary-policy foundations in M8a (§17.3). Those remaining planned stages are not implemented.
+17. **Government fiscal policy:** M4c makes `Country.fiscal` (`incomeTaxRate`, `welfareBudgetSUSDPerYear`) and `Country.treasuryAccountId` authoritative. The rate is a provisional hard-bounded flat tax on actual wages, not law-bounded; collection efficiency is fixed at 1.0; welfare is a single budgeted per-capita transfer with proportional funding reduction. D-048 records the approved scope, timing, and limitations. M5a adds scenario-initialised `World.profitDistribution` and balanced private distributions/state-enterprise remittances (D-056); it does not make state receipts income-tax revenue. M5b adds scenario-initialised `Country.debt`, versioned contracts, deficit financing, interest, maturity/refinancing, arrears, and explicit default (D-057); borrowing is not revenue and principal repayment is not expenditure. M6 adds the shared `set-fiscal-policy` player/AI action and `World.countryAI`/`Country.ai` state (D-058); the action changes only the two M4c fiscal fields and creates no money or posting. Broader taxes and expenditure categories remain future and partly unassigned; annual close and controlled corrections are planned in M7a, and inflation/FX/monetary-policy foundations in M8a (§17.3). Those remaining planned stages are not implemented.
 18. **Monetary precision and result phases:** authoritative SUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
 19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. Inter-market trade, tariffs, cross-market transport, and a rest-of-world trade account are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052 record the rules and non-goals.
 20. **Historical data pipeline:** the M5 sample is eight authored 1900 polities in source-annotated tables with a deterministic validator/loader. Population totals are rounded source-referenced estimates; occupation composition and other structure are provisional. No century-scale historical population/occupation-trend calibration is claimed, no FX rates are invented, and no simulation code reads calibration totals to force outcomes. D-053 records the contracts and limitations.
+21. **Country AI:** M6 makes `World.countryAI.enabled` a scenario-provided policy and `Country.ai` the fixed-size persisted schedule/goal state. The AI decision function receives only `CountryAIObservation`; it has one action, `set-fiscal-policy`, shared with a player through `validateCountryAction`/`applyCountryAction`. The AI is deterministic, uses no random draw, and never borrows, issues money, or mutates debt. Construction, infrastructure priority, laws, diplomacy, and military actions remain unimplemented. D-058 records the rules and non-goals; D-059 records the hot-path summary-validation optimization.
 
 ### 20.2 Remaining designer decisions
 
@@ -3022,7 +3102,7 @@ For every agent session:
 5. Require the completion report defined in §18.4.
 6. Review any `DECISIONS.md` items and test failures before assigning the next milestone.
 
-**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M7a/M8a, and all later milestones are not started and must not be inferred.
+**Initial task:** for a new project, start with M0 and M1 only, using §§3–5, §§14, 16–18 as binding references. The first deliverable is a tested simulation foundation, not the economy or UI. For the current repository, **M0/M1/M2/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6** are the accepted baseline; the next milestone must be assigned explicitly from §17 and must not be inferred from this document alone. The remaining M4 finance work, the planned intermediate stages M7a/M8a, and all later milestones are not started and must not be inferred.
 
 ---
 

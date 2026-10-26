@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b foundation
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6 foundation
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -20,10 +20,12 @@ markets, migration, labor mobility, and the initial historical-data pipeline wit
 eight authored polities)**, **M5a (retained-profit accounting, private profit
 distributions, state-enterprise ownership, and treasury remittances)**, and
 **M5b (versioned public debt, deficit financing, interest, maturity/refinancing,
-arrears, and default)** only. Corporate/consumption/land/tariff taxes, broader
+arrears, and default)**, and **M6 (deterministic country AI v1, persisted AI
+schedule/goal state, shared player/AI fiscal-policy action validation, AI stress
+fixture, and opt-in full-campaign performance report)** only. Corporate/consumption/land/tariff taxes, broader
 government expenditure and services, banking/central banking, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
-diplomacy, warfare, AI, worker, and React Native UI behavior are not
+diplomacy, warfare, worker, and React Native UI behavior are not
 implemented. The designer has adopted planned intermediate stages for annual close
 and controlled corrections (M7a) and inflation/FX/monetary-policy foundations
 (M8a); these are planned only, not implemented (see
@@ -39,10 +41,10 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, save codec, state digest | none |
-| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample, and validated loader | `@century/sim` |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, save codec, state digest | none |
+| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/app`](./packages/app) | Placeholder for the future Expo/React Native shell (M7) | none |
-| [`packages/bench`](./packages/bench) | Headless M1–M5b benchmark harness | `@century/sim`, `@century/data` |
+| [`packages/bench`](./packages/bench) | Headless M1–M6 benchmark harness, including the opt-in full-campaign mode | `@century/sim`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, and calibration tests | `@century/sim`, `@century/data` |
 
 `packages/sim` compiles with `"lib": ["ES2022"]` and `"types": []`, has no
@@ -63,7 +65,8 @@ through `TickContext`; they are not serialized into `World`.
 | `pnpm run lint` | Boundary checks: no ambient RNG, no forbidden APIs in `sim`, ES2022-only config, no runtime deps in `sim`. |
 | `pnpm run typecheck` | Typecheck every package in strict mode. |
 | `pnpm test` | Run the Jest suite. |
-| `pnpm run bench` | Build all benchmark cases (M1 through M4c) and report timings, hashes, and invariant gates. |
+| `pnpm run bench` | Build all benchmark cases (M1 through M6) and report timings, hashes, and invariant gates. |
+| `pnpm run bench:campaign` | Opt-in M6 full 36,524-tick campaign benchmark with per-tick p50/p95/p99, AI counts, bounded-state checkpoints, and final save size. Long-running; not part of `pnpm run ci`. |
 | `pnpm run ci` | Local CI path: lint, typecheck, test, benchmark. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
@@ -975,14 +978,78 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
   auctions, or player/AI debt actions. Automatic financing covers the accrued
   month-end deficit, not an intra-month welfare liquidity shortage. Interest is not
   taxed. The full campaign is benchmarked from a sample, not executed end to end.
+## M6 deterministic country AI and action validation
+
+M6 adds a rule-based country AI, a persisted evaluation schedule and goal, and one
+shared player/AI action path. It is not a planner, a construction system, or a
+politics system.
+
+- **Enablement.** `World.countryAI.enabled` is scenario-provided and defaults to
+  false. The eight-polity historical sample enables it; legacy M0–M5b fixtures
+  remain disabled and retain their accepted economic behavior, with digests
+  rebaselined only by the intentional schema/state change.
+- **Cadence.** A country's first evaluation is the first day after the scenario
+  start whose absolute day index is congruent to its stable country id modulo
+  seven; later evaluations are seven days apart. The terminal `2000-01-01`
+  boundary never evaluates. `Country.ai` persists `nextEvaluationDay`,
+  `currentGoalId`, `lastDecisionDay`, and a bounded `lastActionSummary`.
+- **Information boundary.** The decision function receives only
+  `CountryAIObservation`: own fiscal policy, own treasury cash, own region ids,
+  own population blocks and needs/unrest counters, the latest closed own-country
+  fiscal totals, and own debt exposure. Other countries' private state, household
+  account balances, future events, and the seed are absent. A test mutates hidden
+  fields and asserts the governed country's observation and decision are unchanged.
+- **Goals and rules.** Priority is solvency before relief. `restore-solvency`
+  applies when treasury cash is below six months of observed annual outlays or
+  observed annual outlays exceed observed annualized income-tax revenue; it raises
+  tax by one percentage point toward a provisional 25% self-cap and cuts welfare
+  to the affordable revenue share. `relieve-hardship` applies when at least 5% of own
+  population has seven consecutive unmet subsistence days or weighted militancy is
+  at least 0.15; it sets income tax to at least 5% and welfare to 25% of observed
+  annualized tax revenue. Treasury reserves are a solvency buffer, not an ongoing
+  spending target, so the welfare target is stable once revenue is observed; a new
+  welfare action is suppressed unless the target changes by at least 10%, which
+  prevents month-to-month revenue noise from producing weekly actions.
+  `maintain` makes no change. Missing pre-close revenue is unknown, not zero.
+  Constants are provisional, documented in `packages/sim/src/economy/constants.ts`,
+  and are not calibrated behavioral parameters.
+- **Action validation.** `set-fiscal-policy` is the only implemented action.
+  `validateCountryAction` and `applyCountryAction` are shared by player and AI.
+  Invalid player actions throw and leave the world unchanged. Invalid AI proposals
+  are counted in `diagnostics.invalidActionCount`, recorded in the bounded warning
+  buffer, and skipped; the sample campaign reports zero.
+- **No money creation.** The action changes only the existing M4c fiscal policy.
+  It creates no cash, debt, posting, flow kind, negative balance, or hidden
+  obligation. M4b close and M4c fiscal semantics are unchanged.
+- **Not included.** Building queues/construction, infrastructure or production
+  prioritization, laws, debt actions, diplomacy, military actions, AI randomness,
+  and any AI access to hidden state. M6 does not lower income tax in v1.
+- **Versions.** Schema **13**, simulation **0.13.0**, save format 1, data version
+  `m3-economy-v1`; schema-12/0.12.0 saves reject with no migration.
+
+### M6 performance behavior
+
+Profiling the full campaign found two growing costs in the tick clone path:
+repeatedly revalidating every immutable monthly summary, and deep-copying every
+closed summary's account totals on every tick. `assertValidWorldForTick` now
+validates the newest summary and its links on the hot path, while construction,
+save/load, the monthly close, and `assertValidWorld` still validate the complete
+history (D-059). The hot-path `cloneWorldForTick` copies the summary array but
+shares the immutable closed summary objects, so a staged close appends a new
+summary without copying the century-long history; public `cloneWorld` retains full
+summary-deep-copy isolation required by the accepted M4b tests. These changes
+alter validation and clone cost, not simulation results or hashes. The measurements and identified bottlenecks are
+in [the benchmark section](#benchmark-scope-and-recorded-node-results) and the
+[M6 completion report](#m6-completion-report).
+
 ## Planned development roadmap and intermediate finance stages
 
-M0–M5b are implemented (see the sections above). The designer has adopted
+M0–M6 are implemented (see the sections above). The designer has adopted
 intermediate finance stages (recorded as D-050) for work that earlier revisions
-left unassigned. **M5a and M5b are implemented and accepted; M7a and M8a remain
-planned and not implemented**: no runtime behavior, schema field, save version,
-benchmark gate, or UI support exists for them yet. They preserve the existing
-M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a/M5b.
+left unassigned. **M5a, M5b, and M6 are implemented and accepted; M7a and M8a
+remain planned and not implemented**: no runtime behavior, schema field, save
+version, benchmark gate, or UI support exists for them yet. They preserve the
+existing M0–M10 milestone identities and do not change M4a/M4b/M4c/M5/M5a/M5b/M6.
 
 Intended implementation order:
 
@@ -1005,6 +1072,9 @@ Key boundaries:
   missing, M5a must add them explicitly rather than assume them.
 - **M5b precedes M6** so country AI operates against defined borrowing
   constraints, interest, maturities, and default consequences.
+- **M6 (accepted)** adds deterministic country AI v1 and shared player/AI fiscal
+  action validation. It does not add construction, laws, debt actions, diplomacy,
+  or military actions.
 - **M8a follows M8** because monetary authority and policy controls depend on
   institutions and laws; any missing prerequisite (for example a banking/deposit
   system or monetary aggregate) must be recorded rather than hidden.
@@ -1049,8 +1119,9 @@ Static definitions:
   and [`historical/source_notes.md`](./packages/data/data/historical/source_notes.md).
   Population targets are source-referenced rounded estimates; occupation
   composition and all other 1900 structure are provisional (D-053). The scenario
-  enables the provisional M5a profit-allocation policy (D-056); the historical
-  buildings are private, so state remittances are exercised by focused tests.
+  enables the provisional M5a profit-allocation policy (D-056) and the M6
+  country-AI policy (D-058); the historical buildings are private, so state
+  remittances are exercised by focused tests.
 
 ### Campaign gameplay baseline
 
@@ -1114,36 +1185,40 @@ validation and the campaign gameplay baseline are deliberately separate.
 
 ## Determinism and serialization
 
-- Schema version: `12`; simulation version: `0.12.0`; data version:
-  `m3-economy-v1` (M5 adds historical scenario content and M5a adds a
-  scenario-provided policy/account role without changing existing definition or
-  scenario meaning; see D-053/D-056).
-- Schema-11 / simulation-0.11.0 saves are rejected with an actionable error; no
-  migration is attempted. Schema-8 and schema-9 remain rejected as before.
+- Schema version: `13`; simulation version: `0.13.0`; data version:
+  `m3-economy-v1` (M5 adds historical scenario content, M5a adds a
+  scenario-provided policy/account role, M5b adds debt state, and M6 adds the
+  AI policy/state without changing existing definition or scenario meaning; see
+  D-053/D-056/D-057/D-058).
+- Schema-12 / simulation-0.12.0 saves are rejected with an actionable error; no
+  migration is attempted. Schema-8 through schema-11 remain rejected as before.
 - `maleByAge` and `femaleByAge` are tagged `Uint32Array` values. The payload also
   includes `startDayIndex`, fractional birth/male-split/death remainders, finance
   accounts with `category`/`subtype`, `nextAccountId`, the opening-balance
   record, monthly `periodSummaries` with `closedThroughDay`, the M4a-2
   country/currency/valuation collections, the M4c country
-  `treasuryAccountId`/`fiscal` state, and the M5 country `immigrationOpen` policy.
+  `treasuryAccountId`/`fiscal` state, the M5 country `immigrationOpen` policy, the
+  M5b debt policy/contract state, and the M6 `countryAI` policy plus each
+  country's fixed-size `ai` schedule/goal state.
 - Canonical JSON makes checksum and decode independent of object key insertion
   order. The state digest covers single-year sex state, accounts, diagnostics,
   `startDayIndex`, the opening record, period summaries, the close boundary,
-  countries/currencies/valuations, the fiscal policy/treasury fields, and the M5
-  border-policy field.
+  countries/currencies/valuations, the fiscal policy/treasury fields, the M5
+  border-policy field, debt state, and AI state.
 - Empty-world M1 regression digest (seed `123456789`, scenario
-  `m1-determinism`): `62799ae3f9898229`.
-- Full-century aggregate digest: `a9e51553be45d771`.
-- WPP validation digest: `fe593169ffb98c23`.
-- M3 structural-world digest (seed `20261023`): `7f3afde12b30edf7`.
-- The digests were re-baselined for M5b because the world schema version,
-  `Country.debt`, and the finance debt-contract fields are part of canonical hashed
-  state. Legacy fixtures keep debt disabled with empty contracts and no new
-  accounts, so their economic behavior is unchanged; the schema/state fields alone
-  changed the digests.
+  `m1-determinism`): `6fb09e29921a441b`.
+- Full-century aggregate digest: `1833f89be242413d`.
+- WPP validation digest: `1a5c39b503b54f1b`.
+- M3 structural-world digest (seed `20261023`): `509ad0250da27037`.
+- The digests were re-baselined for M6 because the world schema version,
+  `World.countryAI`, and `Country.ai` are part of canonical hashed state. Legacy
+  fixtures keep AI disabled with null goals, so their economic behavior and
+  account sets are unchanged; the schema/state fields alone changed the digests.
+  D-058 records the version decision, and D-059 records the tick-path summary
+  validation optimization that leaves hashes unchanged.
 - Multi-country digests are exercised by repeated-run and save/resume tests rather
   than a fixed literal, because the eight-polity sample is expected to evolve as
-  historical content improves. The M5 benchmark prints the sampled hash.
+  historical content improves. The M5/M6 benchmarks print the sampled hashes.
 
 ## Benchmark scope and recorded Node results
 
@@ -1151,11 +1226,13 @@ validation and the campaign gameplay baseline are deliberately separate.
 cases at 200, 1,000, 3,000, and 6,000 population blocks, an M3b
 employment-refresh workload, M3c production/inventory workloads, M3d market-day
 workloads, M3e settlement workloads, M3f integrated economic-day workloads, M4b
-monthly period-close workloads, M4c fiscal-day workloads, and M5/M5a eight-polity
-campaign, migration, profit-allocation, serialization, and stress workloads.
-Stress scales repeat the three deterministic multi-block templates
-(400k/350k/250k people), so total population grows with block count. Each M2
-stress scale uses 100 warm-up ticks and 730 measured ticks.
+monthly period-close workloads, M4c fiscal-day workloads, M5/M5a eight-polity
+campaign, migration, profit-allocation, serialization, and stress workloads, and
+M6 AI-enabled representative/stress workloads. The opt-in
+`pnpm run bench:campaign` executes the complete M6 campaign. Stress scales repeat
+the three deterministic multi-block templates (400k/350k/250k people), so total
+population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
+730 measured ticks.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
@@ -1341,8 +1418,8 @@ The M5 workload loads the authored eight-polity historical sample and times the
 real integrated `tick()` over a measured sample. It also times a validation +
 serialization round trip, the monthly migration phase (clone excluded), the M5a
 month-end profit allocation (close/clone excluded), and a doubled authored stress
-fixture. Representative Node `v22.12.0` results on the same machine (seed
-`20261023`, schema 12 / simulation 0.12.0):
+fixture. The M5 table below is the historical M5b run, recorded under schema 12 /
+simulation 0.12.0; the current M6 run uses schema 13 / simulation 0.13.0.
 
 | Workload | Countries | Regions | Markets | Blocks | Buildings | Assignments | Ticks | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -1359,11 +1436,69 @@ fixture. Representative Node `v22.12.0` results on the same machine (seed
 | M5b debt phase (daily accrual + month-end coupon) | avg 5.232 ms, p50 4.952 ms, p95 7.242 ms; 2 contracts, 511.64 SUSD interest accrued |
 | Projected full 36,524-tick campaign | about 0.94 h at the sample average; **not executed** and not mobile evidence |
 
-The eight-polity full campaign is projected, not run, so the harness can complete
-in a practical time; the projection is not an acceptance gate. The reproduced M2
-200-block p95 gate remains at its unchanged provisional 5 ms threshold, but it was
-measured from a single run and its documented variance means one run does not
-settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
+The M5 full campaign was projected, not run, in the historical M5 table above. M6
+adds an actual opt-in full-campaign execution. The reproduced M2 200-block p95 gate
+remains at its unchanged provisional 5 ms threshold, but it was measured from a
+single run and its documented variance means one run does not settle it. Mobile
+p95 ≤ 8 ms remains **NOT EVALUATED**.
+
+### M6 country-AI Node results
+
+`pnpm run bench` now includes a 14-tick AI-enabled representative sample and a
+14-tick doubled-block/building AI stress fixture. Both are timed with the real
+`tick()`; the sample is run twice to check determinism. Representative Node
+`v22.12.0` results on the same machine (seed `20261023`, schema 13 / simulation
+0.13.0):
+
+| Workload | Ticks | Avg | p50 | p95 | p99 | AI evaluations | Rejected | Hash |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| M6 sample run 1 | 14 | 83.15 ms | 83.02 ms | 90.57 ms | 90.57 ms | 16 | 0 | `e3b9d9965555d440` |
+| M6 sample run 2 | 14 | 85.43 ms | 82.69 ms | 104.7 ms | 104.7 ms | 16 | 0 | `e3b9d9965555d440` |
+| M6 combined | 28 | 84.29 ms | 83.02 ms | 94.34 ms | 104.7 ms | 16 (per run) | 0 | `e3b9d9965555d440` |
+| M6 AI stress | 14 | 183.8 ms | 183.2 ms | 200.8 ms | 200.8 ms | 14 | 0 | `05db5c1247d296a8` |
+
+The representative sample applied 4 AI fiscal actions across the measured ticks,
+and the stress fixture (128 blocks, 162 buildings) recorded 14 evaluations with
+zero rejected actions. Both runs produced the same hash, and
+`diagnostics.invalidActionCount` was 0. A second `pnpm run bench` inside the final
+`pnpm run ci` measured the combined sample at p50 `78.24 ms` / p95 `88.31 ms` /
+p99 `114.7 ms` and the stress fixture at p95 `205.6 ms`; the difference is normal
+Node run-to-run variation. These are Node diagnostics; mobile performance remains
+**NOT EVALUATED**.
+
+The opt-in full campaign executes all 36,524 ticks on the eight-polity sample and
+is not part of `pnpm run ci`. Representative Node `v22.12.0` results:
+
+| Metric | Result |
+|---|---|
+| Campaign | 36,524 daily ticks, seed `20261023`, end day 36,524 (terminal) |
+| World | 8 countries, 16 regions, 5 markets, 64 blocks, 81 buildings; final population 85,487,776 |
+| Tick timing | total 102.63 min; avg **168.6 ms**, p50 **144.3 ms**, p95 **185.8 ms**, p99 **1,024.0 ms** |
+| AI activity | 41,740 evaluations, 269 applied policy actions, 0 rejected, `invalidActionCount = 0` |
+| State checkpoints | 986 accounts at every checkpoint; postings capped at 256; 0 → 1,200 monthly summaries; 0 debt contracts |
+| Final hash / save | `d1f5895277720e80`; 19,207.4 KiB (18.76 MiB) |
+| Bounded-state gates | constant accounts PASS, postings ≤ 256 PASS, summaries ≤ 1,200 PASS |
+| GDD 4 MiB save target | **NOT MET** (18.76 MiB); M4b retains one pre-close trial balance per month |
+
+The p99 is much higher than p95, indicating occasional heavier ticks; the median
+path is about 144 ms. The benchmark reports the tail but does not decompose every
+spike into close, validation, or garbage-collection time. The full campaign is a
+Node diagnostic, not a mobile measurement. It does not measure device frame rate,
+device memory, battery, or release-build tick time; the mobile p95 target remains
+**NOT EVALUATED**.
+
+A Node CPU profile of a 300-day sample after the clone fix attributes the remaining
+self time mainly to repeated whole-world validation
+(`assertValidWorld`/`assertValidFinanceState`/`assertValidEconomyState`, roughly a
+quarter of samples), finance-index/account lookups (roughly 15%), immutable-summary
+validation (roughly 6%), garbage collection (roughly 5%), and market/settlement
+work (a few percent). AI evaluation itself is not a dominant cost. M6 identifies
+these bottlenecks but does not undertake a broader validation/architecture
+refactor.
+
+The full campaign remains a Node diagnostic. It does not measure device frame rate,
+device memory, battery, or mobile release-build performance; the mobile p95 target
+remains **NOT EVALUATED**.
 
 ## Known limitations
 
@@ -1426,9 +1561,10 @@ settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
   M4a–M4c add accounts, the country/currency model, the monthly close, and the
   income-tax/welfare fiscal loop; M5 adds multi-region/multi-country worlds,
   multiple and shared markets, migration, geographic labor access, and the
-  historical-data pipeline. Interest, dividends, debt/credit, broader government
-  finance, politics, technology, diplomacy, warfare, AI, profession
-  promotion/demotion, inter-market trade, and UI remain absent.
+  historical-data pipeline. Dividends/securities markets, broader government
+  finance, politics, technology, diplomacy, warfare, profession
+  promotion/demotion, inter-market trade, and UI remain absent. M6 adds a
+  rule-based country AI and one fiscal-policy action, not a general planner.
 - M3 recipe, population, and price values are synthetic provisional inputs, not
   calibrated historical data.
 - M3f runs the economic day through the public `tick()` for worlds with buildings
@@ -1488,9 +1624,122 @@ settle it. Mobile p95 ≤ 8 ms remains **NOT EVALUATED**.
   Century-scale population/occupation-trend calibration is **not claimed** because
   the M3 recipes/needs are not historically calibrated and profession transition
   is not implemented.
-- M5's full 36,524-tick economic campaign is projected from a measured sample in
-  the benchmark harness, not executed end to end on the eight-polity sample;
-  mobile performance remains **NOT EVALUATED**.
+- M5's full 36,524-tick economic campaign was projected from a measured sample in
+  the M5 benchmark; M6 executes it only in the opt-in
+  `pnpm run bench:campaign` mode, not in `pnpm run ci`. Mobile performance remains
+  **NOT EVALUATED**.
+- M6 AI is a provisional rule-based fiscal governor, not a full planner. It can
+  only set income tax and the welfare budget. Construction queues, infrastructure
+  and production priorities, laws, debt actions, diplomacy, military actions, and
+  AI randomness are not implemented. Its thresholds are provisional policy
+  heuristics, not calibrated behavior; it never lowers income tax in v1, and its
+  pre-close revenue basis is unknown rather than estimated.
+- M6's full-campaign measurement shows the pre-close trial balances retained for
+  every closed month dominate save size: the measured full-campaign save is
+  **18.76 MiB**, above the GDD's 4 MiB engineering target. The monthly history is
+  bounded (`MAX_PERIOD_SUMMARIES = 1200`) and is not per-day growth, but compression
+  or history compaction is not implemented. This target is reported as **NOT MET**,
+  not hidden.
+- The M6 full-campaign benchmark is a Node diagnostic and does not measure mobile
+  frame rate, device memory, battery, or release-build tick time.
+
+## M6 completion report
+
+### 1. Exact M6 scope and GDD acceptance criteria
+
+The authoritative GDD v2.5 §17 assigns M6: **deterministic country AI v1, action
+validation, stress testing, and a simulation performance report**. Its definition
+of done is: the AI can govern the sample world without invalid actions or
+hidden-information access; a full-campaign benchmark reports p50/p95/p99; there is
+no unbounded state growth; and performance bottlenecks are identified.
+
+### 2. Features implemented and explicit exclusions
+
+Implemented: persisted AI enable policy and fixed-size per-country schedule/goal
+state; seven-day staggered evaluation by stable country id; a pure decision
+function over an own-country/public observation; solvency-before-relief fiscal
+rules; the shared `set-fiscal-policy` player/AI action with atomic validation and
+application; AI action diagnostics; sample-world AI enablement; AI-enabled
+representative and stress benchmarks; an opt-in full-campaign benchmark; and
+bounded hot-path summary validation.
+
+Excluded: construction/building queues, infrastructure or production priorities,
+laws, debt actions, diplomacy, military actions, AI randomness, hidden-information
+access, AI tax cuts, annual close, UI, and any new money source, tax, expenditure,
+or posting kind.
+
+### 3. Important design decisions and integration behavior
+
+D-058 records the AI rules, observation boundary, cadence, persistence, shared
+validator, failure behavior, and non-goals. D-059 records the tick-path validation
+and immutable-summary clone optimizations. AI runs at pipeline step 2 before
+ageing/demography and market phases; its policy changes therefore affect the same
+day exactly as a player policy change made at the previous tick boundary. The AI
+phase participates in whole-day staging: a later phase failure discards the AI
+action with the rest of the day. AI does not touch finance accounts or postings;
+only `Country.fiscal` and `Country.ai` change.
+
+### 4. Tests, CI results, and benchmarks
+
+The full test suite has **502 tests in 41 suites** and passes. It adds 13 focused
+M6 tests covering cadence, hidden information, decision boundaries, shared
+validation, atomic rejection, deterministic replay, save/resume, zero invalid
+actions, bounded state growth, immutable-summary sharing, malformed AI state, and
+the summary-validation boundary. The bounded M6 sample ran at p50 `83.02 ms` /
+p95 `94.34 ms`, the AI stress fixture at p95 `200.8 ms`, and the full campaign at
+p50 `144.3 ms` / p95 `185.8 ms` / p99 `1,024.0 ms` on the recorded Node machine.
+`pnpm run lint`, `pnpm run typecheck`, `pnpm test`, `pnpm run bench`, and
+`pnpm run ci` results are recorded below. Full workloads are in
+[the benchmark section](#benchmark-scope-and-recorded-node-results).
+
+| Command | Result |
+|---|---|
+| `pnpm run lint` | PASS, exit 0: boundary checks passed (106 TypeScript files, 45 in `packages/sim`) |
+| `pnpm run typecheck` | PASS, exit 0: all five workspace packages |
+| `pnpm test` | PASS, exit 0: 41 suites, 502 tests |
+| `pnpm run bench` | PASS, exit 0: all M1–M6 gates |
+| `pnpm run bench:campaign` | PASS, exit 0: 36,524 ticks, terminal reached, bounded state, zero invalid actions |
+| `pnpm run ci` | PASS, exit 0: lint, typecheck, 502 tests, benchmark (CI test time 493.2 s) |
+| `git diff --check` | PASS: no whitespace errors (CRLF conversion notices only) |
+
+### 5. Commit hashes and parent relationships
+
+- Implementation commit: `f321c01432a55858a07e0ccc9e2c6acac4ffbc09`
+  (`feat: implement M6 deterministic country AI and action validation`). Its
+  parent is the accepted M5b HEAD
+  `cc7d9aa759f00618bbd77f993a617b1e2059eef0`.
+- Documentation commit: the immediate child of `f321c01` containing this report,
+  `README.md`, `DECISIONS.md`, `Century_GDD_v2.5.md`, and the data README. Its
+  exact hash is reported in the handoff accompanying this milestone; a commit
+  cannot embed its own hash.
+
+### 6. Schema/version changes and save compatibility
+
+World schema **13**, simulation version **0.13.0**, save format **1**, data version
+`m3-economy-v1`. The new hashed state is `World.countryAI` and `Country.ai`;
+known-answer digests are re-baselined. Schema-12/simulation-0.12.0 saves are
+rejected with an actionable error and no migration. Older incompatible saves remain
+rejected; no migration policy changed.
+
+### 7. Known limitations, calibration, and unmeasured performance
+
+The AI is a provisional fiscal governor, not a planner; its thresholds are
+uncalibrated policy heuristics. It has no construction, law, debt, diplomatic, or
+military action and never lowers income tax in v1. The eight-polity historical
+sample is still provisional and not a world total. The full-campaign save is
+**18.76 MiB**, which exceeds the GDD 4 MiB engineering target because M4b retains
+one pre-close trial balance per month; compression/history compaction is not
+implemented. The monthly history is bounded at 1,200 summaries and is not per-day
+growth. Node benchmark timings are diagnostics; mobile performance and the mobile
+p95 ≤ 8 ms target remain **NOT EVALUATED**.
+
+### 8. Final repository state
+
+Branch `main`. The implementation HEAD is
+`f321c01432a55858a07e0ccc9e2c6acac4ffbc09`; its parent is the accepted M5b HEAD
+`cc7d9aa759f00618bbd77f993a617b1e2059eef0`. The documentation commit is the
+immediate child and is the final HEAD reported in the handoff. The working tree is
+clean after both commits, and no later milestone is started.
 
 ## Development workflow
 

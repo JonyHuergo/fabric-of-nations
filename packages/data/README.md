@@ -28,3 +28,9 @@ M2.1 content remains under `data/`:
   and mortality references for 1950/1975/2000.
 - `data/source_notes.md` — provenance, source conventions, calibration status,
   and missing inputs.
+
+M5 adds the source-annotated eight-polity 1900 sample under `data/historical/`
+and `data/scenarios/m5_eight_polities.json`. The scenario enables the provisional
+M5a profit-allocation policy and the M6 country-AI policy; the AI rules live in
+`@century/sim`, not in this data package, and the sample does not claim historical
+government behavior. See `data/historical/source_notes.md`.
