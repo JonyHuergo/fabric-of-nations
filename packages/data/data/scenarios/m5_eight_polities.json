@@ -3,12 +3,15 @@
     "scenarioId": "m5-eight-polities",
     "dataVersion": "m3-economy-v1",
     "status": "provisional",
-    "description": "Authored 1900 sample of eight polities for M5 multi-region, multi-market, migration, and labor-mobility validation, with the provisional M5a profit-allocation policy enabled. Population totals are rounded national estimates; occupation composition, market membership, and profit-allocation rates are provisional authored inputs. This is not a complete historical reconstruction and its eight polities are not a world total.",
+    "description": "Authored 1900 sample of eight polities for M5 multi-region, multi-market, migration, and labor-mobility validation, with the provisional M5a profit-allocation policy and M6 country-AI policy enabled. Population totals are rounded national estimates; occupation composition, market membership, profit-allocation rates, and AI fiscal rules are provisional authored inputs. This is not a complete historical reconstruction and its eight polities are not a world total.",
     "startDayIndex": 0,
     "profitDistribution": {
       "enabled": true,
       "privatePayoutRate": 0.5,
       "stateRemittanceRate": 1
+    },
+    "countryAI": {
+      "enabled": true
     },
     "sources": [
       {

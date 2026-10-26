@@ -64,6 +64,7 @@ import {
   type World,
 } from "@century/sim";
 import { runM5Benchmarks } from "./m5Bench.js";
+import { runM6BoundedBenchmarks } from "./m6Bench.js";
 
 const SEED = 20_261_023;
 const MEASURED_RUNS_M1 = 3;
@@ -1617,7 +1618,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a/M5b simulation-core benchmark");
+  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a/M5b/M6 simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -1794,6 +1795,7 @@ function main(): void {
   printFiscalBenchmark(m4cFiscalSmall);
   printFiscalBenchmark(m4cFiscalStress);
   const m5Valid = runM5Benchmarks();
+  const m6Valid = runM6BoundedBenchmarks();
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1878,7 +1880,8 @@ function main(): void {
     m3fValid &&
     m4bValid &&
     m4cValid &&
-    m5Valid;
+    m5Valid &&
+    m6Valid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1950,6 +1953,12 @@ function main(): void {
   );
   console.log(
     `M5 multi-country campaign/serialization/migration/stress: ${m5Valid ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M6 country-AI campaign/stress/validation: ${m6Valid ? "PASS" : "FAIL"}`,
+  );
+  console.log(
+    `M6 full-campaign benchmark: separate opt-in command "pnpm run bench:campaign"`,
   );
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +

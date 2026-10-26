@@ -14,7 +14,7 @@ import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import type { NeedTierDef } from "../population/types.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex } from "../types.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorldForTick, type World } from "../world.js";
 import {
   M3_PRICE_EPSILON,
   M3_PRICE_KAPPA,
@@ -244,7 +244,7 @@ function validateMarketDayInput(
   readonly buildingById: Map<number, BuildingDef>;
   readonly blockIds: Set<number>;
 } {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");

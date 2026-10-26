@@ -28,6 +28,11 @@ import {
   copyCurrencyValuation,
   fiscalPolicyIsActive,
 } from "./country.js";
+import {
+  assertValidCountryAIPolicy,
+  createCountryAIPolicy,
+  createCountryAIState,
+} from "./aiState.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
@@ -581,6 +586,9 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
       "scenario.profitDistribution",
     );
   }
+  if (scenario.countryAI !== undefined) {
+    assertValidCountryAIPolicy(scenario.countryAI, "scenario.countryAI");
+  }
   if (scenario.population.dataVersion !== scenario.definitions.dataVersion) {
     throw new RangeError("scenario population and economy dataVersion must match");
   }
@@ -632,6 +640,8 @@ export function createEconomyWorld(
   });
   const profitDistribution = createProfitDistributionPolicy(scenario.profitDistribution);
   world.profitDistribution = profitDistribution;
+  const countryAI = createCountryAIPolicy(scenario.countryAI);
+  world.countryAI = countryAI;
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
     (scenario.countries ?? []).map((country) => [country.id, country]),
@@ -647,6 +657,7 @@ export function createEconomyWorld(
         treasuryAccountId: initial.treasuryAccountId,
         fiscal: { ...initial.fiscal },
         debt: createDebtPolicy(initial.debt),
+        ai: createCountryAIState(initial.id, world.startDayIndex),
         immigrationOpen: initial.immigrationOpen ?? false,
       }),
     )

@@ -447,6 +447,49 @@ export interface DebtContract {
 }
 
 /**
+ * M6 country-AI goal identifiers.
+ *
+ * A goal persists in `CountryAIState.currentGoalId` until the next scheduled
+ * evaluation changes the observed pressure, or the policy already matches the
+ * goal's target. The identifiers are persisted and hashed, so their spelling is
+ * part of the save contract.
+ */
+export const COUNTRY_AI_GOAL_IDS = [
+  "maintain",
+  "relieve-hardship",
+  "restore-solvency",
+] as const;
+export type CountryAIGoalId = (typeof COUNTRY_AI_GOAL_IDS)[number];
+
+/**
+ * M6 persisted per-country AI state (GDD §5.6 `AIState`).
+ *
+ * The state is small and fixed-size: a schedule day, the current goal, the last
+ * decision day, and a bounded diagnostic summary. It does not contain a
+ * per-tick history or an unbounded action log. `lastActionSummary` is diagnostic
+ * only and is never read as an authority for policy.
+ */
+export interface CountryAIState {
+  /** Next day on which this country evaluates. */
+  nextEvaluationDay: Day;
+  /** Current persistent goal, or null before the first evaluation. */
+  currentGoalId: CountryAIGoalId | null;
+  /** Day of the most recent evaluation, or null before the first evaluation. */
+  lastDecisionDay: Day | null;
+  /** Bounded diagnostic summary of the most recently applied action. */
+  lastActionSummary: string | null;
+}
+
+/**
+ * M6 world-level country-AI enable policy. Disabled for legacy fixtures; the
+ * M5 historical campaign enables it explicitly. This is a scenario-provided
+ * policy, not a spendable resource.
+ */
+export interface CountryAIPolicy {
+  enabled: boolean;
+}
+
+/**
  * M5a provisional profit-allocation policy.
  *
  * When enabled, each economic month-end after the M4b close reclassifies each
@@ -478,6 +521,8 @@ export interface Country {
   fiscal: FiscalPolicy;
   /** M5b provisional public-debt policy state. */
   debt: DebtPolicy;
+  /** M6 persisted country-AI schedule and goal state. */
+  ai: CountryAIState;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -572,4 +617,6 @@ export interface EconomyScenarioDef {
   currencyValuations?: CurrencyValuation[];
   /** M5a profit-allocation policy. Omitted means disabled defaults. */
   profitDistribution?: ProfitDistributionPolicy;
+  /** M6 country-AI enable policy. Omitted means disabled defaults. */
+  countryAI?: CountryAIPolicy;
 }

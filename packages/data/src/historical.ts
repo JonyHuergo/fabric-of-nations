@@ -96,6 +96,10 @@ export interface HistoricalProfitDistributionInput {
   readonly stateRemittanceRate: number;
 }
 
+export interface HistoricalCountryAIInput {
+  readonly enabled: boolean;
+}
+
 export interface HistoricalScenarioMeta {
   readonly scenarioId: string;
   readonly dataVersion: string;
@@ -107,6 +111,7 @@ export interface HistoricalScenarioMeta {
   readonly files: HistoricalScenarioFiles;
   readonly definitions: HistoricalScenarioDefinitions;
   readonly profitDistribution?: HistoricalProfitDistributionInput;
+  readonly countryAI?: HistoricalCountryAIInput;
 }
 
 export interface HistoricalCurrencyInput {
@@ -447,6 +452,12 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
     }
     profitDistribution = { enabled, privatePayoutRate, stateRemittanceRate };
   }
+  let countryAI: HistoricalCountryAIInput | undefined;
+  if (record.countryAI !== undefined) {
+    const policy = assertRecord(record.countryAI, "meta.countryAI", errors);
+    const enabled = booleanField(policy, "enabled", "meta.countryAI", errors);
+    countryAI = { enabled };
+  }
   return {
     scenarioId: stringField(record, "scenarioId", "meta", errors),
     dataVersion: stringField(record, "dataVersion", "meta", errors),
@@ -472,6 +483,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
       demography: stringField(definitions, "demography", "meta.definitions", errors),
     },
     ...(profitDistribution === undefined ? {} : { profitDistribution }),
+    ...(countryAI === undefined ? {} : { countryAI }),
   };
 }
 
@@ -1460,6 +1472,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     ...(data.meta.profitDistribution === undefined
       ? {}
       : { profitDistribution: { ...data.meta.profitDistribution } }),
+    ...(data.meta.countryAI === undefined
+      ? {}
+      : { countryAI: { ...data.meta.countryAI } }),
   };
 }
 

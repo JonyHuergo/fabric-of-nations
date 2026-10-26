@@ -38,7 +38,7 @@ import {
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorldForTick, type World } from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { buildRegionOwnerMap } from "./country.js";
@@ -146,7 +146,7 @@ function assertFiscalPreconditions(
   }
   // Validates country fiscal values, treasury references, account sets, NaN
   // balances, summaries, and all existing accounting/determinism invariants.
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
 }
 
 function toleranceMoney(...values: number[]): number {
@@ -406,7 +406,7 @@ function executeFiscalPhase(
 
   // Full staged-world validation covers balances, owner references, treasury
   // references, country fiscal values, summaries, and accounting invariants.
-  assertValidWorld({ ...world, finance: stagedFinance });
+  assertValidWorldForTick({ ...world, finance: stagedFinance });
 
   const blockResults: FiscalBlockResult[] = blockDrafts.map((draft) => ({
     ...draft,

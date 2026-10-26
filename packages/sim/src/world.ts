@@ -22,10 +22,13 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { assertValidEconomyState } from "./economy/validation.js";
+import type { EconomyValidationOptions } from "./economy/validation.js";
+import { assertValidCountryAIPolicy, assertValidCountryAIStates } from "./economy/aiState.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import type {
   BuildingInstance,
   Country,
+  CountryAIPolicy,
   Currency,
   CurrencyValuation,
   EmploymentAssignment,
@@ -93,6 +96,8 @@ export interface World {
   finance: FinanceState;
   /** M5a provisional profit-allocation policy; disabled for legacy fixtures. */
   profitDistribution: ProfitDistributionPolicy;
+  /** M6 country-AI enable policy; disabled for legacy fixtures. */
+  countryAI: CountryAIPolicy;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -169,6 +174,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       privatePayoutRate: 0.5,
       stateRemittanceRate: 1,
     },
+    countryAI: { enabled: false },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -187,7 +193,10 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
  * This is intentionally strict: it is called before every tick and before save
  * encoding. It never clamps or repairs values.
  */
-export function assertValidWorld(world: World): void {
+export function assertValidWorld(
+  world: World,
+  options: EconomyValidationOptions = {},
+): void {
   requireInteger(
     world.schemaVersion,
     "world.schemaVersion",
@@ -218,6 +227,8 @@ export function assertValidWorld(world: World): void {
     throw new TypeError("world.employmentDirty must be a boolean");
   }
   assertValidProfitDistributionPolicy(world.profitDistribution, "world.profitDistribution");
+  assertValidCountryAIPolicy(world.countryAI, "world.countryAI");
+  assertValidCountryAIStates(world.countries);
 
   const diagnostics = requireRecord(world.diagnostics, "world.diagnostics");
   requireInteger(
@@ -252,7 +263,19 @@ export function assertValidWorld(world: World): void {
   }
 
   assertValidPopulationState(world);
-  assertValidEconomyState(world);
+  assertValidEconomyState(world, options);
+}
+
+/**
+ * Hot-path validation used inside the tick pipeline.
+ *
+ * Immutable closed-period summaries are validated completely at creation,
+ * save/load, and close boundaries, but only the newest summary and its links are
+ * revalidated before publication on every tick. This keeps per-tick validation
+ * from growing with the century-long summary history (D-059).
+ */
+export function assertValidWorldForTick(world: World): void {
+  assertValidWorld(world, { periodSummaries: "latest" });
 }
 
 /** True when the world has reached the terminal boundary and no day remains. */

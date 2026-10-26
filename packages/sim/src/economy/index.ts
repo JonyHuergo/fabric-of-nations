@@ -15,6 +15,8 @@ export * from "./production.js";
 export * from "./market.js";
 export * from "./settlement.js";
 export * from "./migration.js";
+export * from "./aiState.js";
+export * from "./ai.js";
 export * from "./day.js";
 /**
  * M4b period close. Only the public close operation and its result type are

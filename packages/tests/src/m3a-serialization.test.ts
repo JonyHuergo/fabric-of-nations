@@ -47,9 +47,9 @@ function cloneWorld(): World {
   return createEconomyWorld(scenario, { seed: 20_261_023 });
 }
 
-describe("M3a schema-12 serialization", () => {
+describe("M3a schema-13 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
-    expect(hashWorld(cloneWorld())).toBe("7f3afde12b30edf7");
+    expect(hashWorld(cloneWorld())).toBe("509ad0250da27037");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {
@@ -63,7 +63,7 @@ describe("M3a schema-12 serialization", () => {
 
     const serialized = serializeWorld(world);
     const parsed = parseEnvelope(serialized);
-    expect(parsed.schemaVersion).toBe(12);
+    expect(parsed.schemaVersion).toBe(13);
     expect(parsed.payload?.buildings).toHaveLength(8);
     expect(parsed.payload?.employment).toHaveLength(3);
     expect(parsed.payload?.employmentDirty).toBe(true);

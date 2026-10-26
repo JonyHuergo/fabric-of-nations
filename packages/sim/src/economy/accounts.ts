@@ -854,8 +854,19 @@ export function assertSemanticJournalLine(
   }
 }
 
-/** Deep-copy authoritative finance state, including summaries and postings. */
-export function cloneFinanceState(finance: FinanceState): FinanceState {
+/**
+ * Deep-copy mutable authoritative finance state, including postings.
+ *
+ * By default closed `periodSummaries` are deep-copied too, preserving the public
+ * clone-isolation contract: mutating a cloned summary must not affect the source.
+ * The hot tick path can opt into sharing immutable summaries because the staged
+ * close only appends a new summary to its own array and never edits an older one
+ * (D-059). The default is safe; sharing is an explicit internal caller choice.
+ */
+export function cloneFinanceState(
+  finance: FinanceState,
+  options: { readonly shareImmutableSummaries?: boolean } = {},
+): FinanceState {
   return {
     accounts: finance.accounts.map((account) => ({ ...account })),
     postings: finance.postings.map((posting) => ({
@@ -865,12 +876,15 @@ export function cloneFinanceState(finance: FinanceState): FinanceState {
     nextPostingId: finance.nextPostingId,
     nextAccountId: finance.nextAccountId,
     opening: finance.opening === null ? null : { ...finance.opening },
-    periodSummaries: finance.periodSummaries.map((summary) => ({
-      periodStartDay: summary.periodStartDay,
-      periodEndDay: summary.periodEndDay,
-      accountTotals: { ...summary.accountTotals },
-      flowTotalsByKind: { ...summary.flowTotalsByKind },
-    })),
+    periodSummaries:
+      options.shareImmutableSummaries === true
+        ? finance.periodSummaries.slice()
+        : finance.periodSummaries.map((summary) => ({
+            periodStartDay: summary.periodStartDay,
+            periodEndDay: summary.periodEndDay,
+            accountTotals: { ...summary.accountTotals },
+            flowTotalsByKind: { ...summary.flowTotalsByKind },
+          })),
     debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
     nextContractId: finance.nextContractId,
     closedThroughDay: finance.closedThroughDay,

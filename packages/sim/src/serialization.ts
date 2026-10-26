@@ -37,6 +37,9 @@ import type {
   AccountSubtype,
   BuildingInstance,
   Country,
+  CountryAIGoalId,
+  CountryAIPolicy,
+  CountryAIState,
   Currency,
   CurrencyIssuer,
   CurrencyValuation,
@@ -63,6 +66,10 @@ import {
   FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
 } from "./economy/types.js";
+import {
+  assertValidCountryAIPolicy,
+  assertValidCountryAIState,
+} from "./economy/aiState.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
@@ -247,6 +254,19 @@ export type SerializedProfitDistributionPolicy = {
   readonly stateRemittanceRate: number;
 };
 
+/** Encoded M6 country-AI enable policy. */
+export type SerializedCountryAIPolicy = {
+  readonly enabled: boolean;
+};
+
+/** Encoded fixed-size M6 per-country AI state. */
+export type SerializedCountryAIState = {
+  readonly nextEvaluationDay: number;
+  readonly currentGoalId: CountryAIGoalId | null;
+  readonly lastDecisionDay: number | null;
+  readonly lastActionSummary: string | null;
+};
+
 /** Encoded M5b public-debt policy. */
 export type SerializedDebtPolicy = {
   readonly enabled: boolean;
@@ -285,6 +305,7 @@ export type SerializedCountry = {  readonly id: number;
   readonly treasuryAccountId: number;
   readonly fiscal: SerializedFiscalPolicy;
   readonly debt: SerializedDebtPolicy;
+  readonly ai: SerializedCountryAIState;
   readonly immigrationOpen: boolean;
 };
 
@@ -376,6 +397,7 @@ export type SerializedWorld = {
   readonly markets: readonly SerializedMarket[];
   readonly finance: SerializedFinanceState;
   readonly profitDistribution: SerializedProfitDistributionPolicy;
+  readonly countryAI: SerializedCountryAIPolicy;
   readonly diagnostics: SerializedDiagnostics;
 };
 
@@ -613,6 +635,12 @@ export function encodeWorld(world: World): SerializedWorld {
           refinanceOnMaturity: country.debt.refinanceOnMaturity,
           arrearsGraceDays: country.debt.arrearsGraceDays,
         },
+        ai: {
+          nextEvaluationDay: country.ai.nextEvaluationDay,
+          currentGoalId: country.ai.currentGoalId,
+          lastDecisionDay: country.ai.lastDecisionDay,
+          lastActionSummary: country.ai.lastActionSummary,
+        },
         immigrationOpen: country.immigrationOpen,
       })),
     currencies: [...world.currencies]
@@ -752,6 +780,7 @@ export function encodeWorld(world: World): SerializedWorld {
       privatePayoutRate: world.profitDistribution.privatePayoutRate,
       stateRemittanceRate: world.profitDistribution.stateRemittanceRate,
     },
+    countryAI: { enabled: world.countryAI.enabled },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
       invalidActionCount: world.diagnostics.invalidActionCount,
@@ -871,6 +900,22 @@ function decodeDebtPolicy(value: unknown, path: string): DebtPolicy {
   }
 }
 
+function decodeCountryAIPolicy(value: unknown, path: string): CountryAIPolicy {
+  try {
+    return assertValidCountryAIPolicy(value, path);
+  } catch (error) {
+    throw new SaveFormatError(`${path} is invalid: ${errorMessage(error)}`);
+  }
+}
+
+function decodeCountryAIState(value: unknown, path: string): CountryAIState {
+  try {
+    return assertValidCountryAIState(value, path);
+  } catch (error) {
+    throw new SaveFormatError(`${path} is invalid: ${errorMessage(error)}`);
+  }
+}
+
 function decodeDebtContract(value: unknown, path: string): DebtContract {
   const record = requireRecord(value, path);
   const status = record.status;
@@ -936,6 +981,7 @@ function decodeCountry(value: unknown, path: string): Country {
     treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
     fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
     debt: decodeDebtPolicy(record.debt, `${path}.debt`),
+    ai: decodeCountryAIState(record.ai, `${path}.ai`),
     immigrationOpen: record.immigrationOpen,
   };
 }
@@ -1466,6 +1512,10 @@ function decodeWorldPayload(value: unknown): World {
       `save payload.profitDistribution is invalid: ${errorMessage(error)}`,
     );
   }
+  const countryAI = decodeCountryAIPolicy(
+    payload.countryAI,
+    "save payload.countryAI",
+  );
 
   const world: World = {
     schemaVersion,
@@ -1486,6 +1536,7 @@ function decodeWorldPayload(value: unknown): World {
     markets,
     finance,
     profitDistribution,
+    countryAI,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

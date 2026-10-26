@@ -102,6 +102,16 @@ refinancing, arrears, and default are exercised by focused simulation fixtures, 
 by this sample. No historical debt stocks, coupons, or creditor identities are
 claimed.
 
+## M6 country-AI content
+
+The scenario metadata enables `countryAI`. The AI rules are code-level provisional
+policy heuristics, not authored historical data, and the sample does not claim that
+any historical government followed them. The AI changes only the existing fiscal
+policy fields; no AI construction, law, debt, diplomatic, or military action exists.
+The sample's initial fiscal settings remain the authored provisional inputs
+described above; AI evaluations may change them during a campaign, so a post-1900
+fiscal path is a model outcome, not a historical observation.
+
 ## Known limitations
 
 - No century-scale historical population/occupation trend validation is claimed.

@@ -31,9 +31,10 @@ import type {
 } from "../population/types.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.js";
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import { computeBuildingCapacity } from "./production.js";
+import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
@@ -115,6 +116,8 @@ export interface EconomyDayResult {
     readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    /** M6 country-AI evaluation and validated fiscal-policy changes. */
+    readonly ai: CountryAIPhaseResult;
     /** M5b daily debt service and month-end deficit financing. */
     readonly debt: DebtPhaseResult;
     readonly migration: MigrationDayResult;
@@ -142,8 +145,14 @@ function quantityTolerance(...values: number[]): number {
 }
 
 /** Deep-copy authoritative world state, including every typed array and nested record. */
-export function cloneWorld(source: World): World {
-  assertValidWorld(source);
+export function cloneWorld(
+  source: World,
+  options: {
+    readonly validate?: boolean;
+    readonly shareImmutableSummaries?: boolean;
+  } = {},
+): World {
+  if (options.validate !== false) assertValidWorld(source);
   return {
     ...source,
     regions: source.regions.map((region) => ({
@@ -168,13 +177,30 @@ export function cloneWorld(source: World): World {
       priceSUSD: [...market.priceSUSD],
       stockLots: market.stockLots.map((lot) => ({ ...lot })),
     })),
-    finance: cloneFinanceState(source.finance),
+    finance: cloneFinanceState(
+      source.finance,
+      options.shareImmutableSummaries === true
+        ? { shareImmutableSummaries: true }
+        : {},
+    ),
     profitDistribution: { ...source.profitDistribution },
+    countryAI: { ...source.countryAI },
     diagnostics: {
       ...source.diagnostics,
       recentWarnings: [...source.diagnostics.recentWarnings],
     },
   };
+}
+
+/**
+ * Internal hot-path clone for the staged economic day.
+ *
+ * The caller has already validated the source, and the staged day may share
+ * immutable closed-period summaries because the only writer appends a new summary
+ * to its own array. Public `cloneWorld` keeps full summary isolation.
+ */
+export function cloneWorldForTick(source: World): World {
+  return cloneWorld(source, { validate: false, shareImmutableSummaries: true });
 }
 
 function restoreWorld(target: World, source: World): void {
@@ -762,8 +788,9 @@ export function runEconomicDay(
   populationDefinitions: PopulationDefinitions,
   economyDefinitions: EconomyDefinitions,
   dayIndex: DayIndex,
+  options: { readonly validateWorld?: boolean } = {},
 ): EconomyDayResult {
-  assertValidWorld(world);
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidPopulationDefinitions(populationDefinitions);
   assertValidEconomyDefinitions(economyDefinitions);
   if (populationDefinitions.dataVersion !== world.dataVersion) {
@@ -785,6 +812,12 @@ export function runEconomicDay(
     throw new RangeError("economic day requires pop blocks");
   }
   if (world.markets.length === 0) throw new RangeError("economic day requires a market");
+
+  // M6 pipeline step 2: apply effective policy changes. Country AI evaluates on
+  // its staggered day and applies only validated fiscal-policy actions. The
+  // staged day is already validated above, so the phase skips a duplicate full
+  // validation; every applied action still validates its candidate world.
+  const ai = runCountryAIPhase(world, dayIndex, { validateWorld: false });
 
   const populationStart = world.popBlocks.reduce(
     (total, block) => total + populationTotal(block),
@@ -817,7 +850,7 @@ export function runEconomicDay(
   }
   assertValidEmploymentState(world, economyDefinitions);
 
-  const afterPopulation = cloneWorld(world);
+  const afterPopulation = cloneWorldForTick(world);
   let fallbackUsed = false;
   let attempt: MarketAttempt;
   try {
@@ -902,6 +935,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      ai,
       debt,
       migration,
       employment,

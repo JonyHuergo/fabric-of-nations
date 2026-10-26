@@ -579,6 +579,26 @@ export interface PeriodSummaryValidationContext {
 }
 
 /**
+ * How much immutable period-summary history to revalidate.
+ *
+ * `"all"` is the default and is required at save/load/construction boundaries,
+ * where untrusted or newly built state must be checked completely.
+ *
+ * `"latest"` validates the newest summary and the cross-period links needed to
+ * publish the current close state, but does not re-parse every older immutable
+ * summary. M6 uses it on the hot tick path after profiling showed repeated
+ * validation of the growing summary history dominating the full-campaign
+ * benchmark. Older summaries are created by the atomic close and are never
+ * mutated, so this changes validation cost, not simulation semantics (D-059).
+ */
+export type PeriodSummaryValidationMode = "all" | "latest";
+
+/** Optional economy-validation scope. */
+export interface EconomyValidationOptions {
+  readonly periodSummaries?: PeriodSummaryValidationMode;
+}
+
+/**
  * Validate the ordered, contiguous summary history and its consistency with
  * `closedThroughDay`.
  *
@@ -594,6 +614,7 @@ export interface PeriodSummaryValidationContext {
 export function assertValidPeriodSummaries(
   finance: FinanceState,
   context: PeriodSummaryValidationContext,
+  mode: PeriodSummaryValidationMode = "all",
 ): void {
   const record = requireRecord(finance, "world.finance");
   const rawSummaries = requireArray(record.periodSummaries, "world.finance.periodSummaries");
@@ -627,8 +648,13 @@ export function assertValidPeriodSummaries(
     accounts.set(account.id, account);
   }
 
-  let previousEnd: Day | null = null;
-  for (let index = 0; index < rawSummaries.length; index += 1) {
+  const firstIndex = mode === "latest" ? rawSummaries.length - 1 : 0;
+  let previousEnd: Day | null =
+    firstIndex === 0
+      ? null
+      : ((rawSummaries[firstIndex - 1] as FinancePeriodSummary | undefined)
+          ?.periodEndDay ?? null);
+  for (let index = firstIndex; index < rawSummaries.length; index += 1) {
     const summary = rawSummaries[index] as FinancePeriodSummary;
     const path = `world.finance.periodSummaries[${String(index)}]`;
     assertValidFinancePeriodSummary(summary, accounts, path);
@@ -886,13 +912,20 @@ function assertFiscalRegionOwnership(world: World): void {
 }
 
 /** Validate M3/M4a/M4b collections and their cross-references. */
-export function assertValidEconomyState(world: World): void {
+export function assertValidEconomyState(
+  world: World,
+  options: EconomyValidationOptions = {},
+): void {
   assertValidFinanceState(world.finance);
-  assertValidPeriodSummaries(world.finance, {
-    startDayIndex: world.startDayIndex,
-    dayIndex: world.dayIndex,
-    allowUnadvancedClose: false,
-  });
+  assertValidPeriodSummaries(
+    world.finance,
+    {
+      startDayIndex: world.startDayIndex,
+      dayIndex: world.dayIndex,
+      allowUnadvancedClose: false,
+    },
+    options.periodSummaries ?? "all",
+  );
   const accounts = buildFinanceIndex(world.finance);
   if (world.finance.opening !== null && world.finance.opening.dayIndex !== world.startDayIndex) {
     throw new RangeError("world.finance.opening.dayIndex must equal world.startDayIndex");

@@ -30,7 +30,7 @@ import { settlePopulationNeeds } from "./population/needs.js";
 import { workingAgePopulation, worldPopulation } from "./population/state.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "./population/wealth.js";
 import {
-  cloneWorld,
+  cloneWorldForTick,
   runEconomicDay,
   type EconomyDayResult,
 } from "./economy/day.js";
@@ -42,7 +42,7 @@ import type {
 } from "./population/types.js";
 import type { Day } from "./types.js";
 import { requireInteger } from "./validation.js";
-import { assertValidWorld, type World } from "./world.js";
+import { assertValidWorldForTick, type World } from "./world.js";
 
 /** Explicit result of one attempted daily transition. */
 export interface TickResult {
@@ -150,7 +150,7 @@ function runPopulationDay(
  * a population context is supplied. No hidden state or wall-clock dependency.
  */
 export function tick(world: World, context?: TickContext): TickResult {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
 
   if (world.dayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX) {
     return {
@@ -172,15 +172,16 @@ export function tick(world: World, context?: TickContext): TickResult {
     if (population === undefined) {
       throw new RangeError("a population context is required for an economic world");
     }
-    const working = cloneWorld(world);
+    const working = cloneWorldForTick(world);
     const day = runEconomicDay(
       working,
       population.definitions,
       economy.definitions,
       processedDay,
+      { validateWorld: false },
     );
     working.dayIndex = processedDay + 1;
-    assertValidWorld(working);
+    assertValidWorldForTick(working);
     Object.assign(world, working);
     const base: TickResult = {
       advanced: true,
@@ -209,7 +210,7 @@ function runUntil(
   limit: number,
   context?: TickContext,
 ): { readonly startDayIndex: Day; readonly ticksProcessed: number } {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   const startDayIndex = world.dayIndex;
   let ticksProcessed = 0;
   while (ticksProcessed < limit && world.dayIndex < CAMPAIGN_TERMINAL_DAY_INDEX) {

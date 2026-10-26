@@ -29,7 +29,7 @@ import {
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id, Seed } from "../types.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorldForTick, type World } from "../world.js";
 import {
   postJournalBatch,
   type JournalEntryInput,
@@ -428,7 +428,7 @@ export function settleMarketDays(
   definitions: EconomyDefinitions,
   marketDays: readonly MarketDayResult[],
 ): MarketSettlementResult {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");

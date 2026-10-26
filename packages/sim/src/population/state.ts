@@ -555,6 +555,7 @@ export function createPopulationWorld(
       privatePayoutRate: 0.5,
       stateRemittanceRate: 1,
     },
+    countryAI: { enabled: false },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

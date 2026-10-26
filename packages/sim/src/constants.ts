@@ -13,14 +13,17 @@
  * M5 adds multi-region/multi-market state semantics, the country
  * `immigrationOpen` policy field, migration, and geographic labor access. M5a
  * adds the persisted profit-allocation policy and retained-profit accounts.
+ * M6 adds the country-AI enable policy, fixed-size per-country AI state, and
+ * validated player/AI fiscal-policy actions.
  */
-export const SIM_VERSION = "0.12.0";
+export const SIM_VERSION = "0.13.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
  * M5a adds `World.profitDistribution` and building retained-profit accounts.
+ * M6 adds `World.countryAI` and `Country.ai`.
  */
-export const WORLD_SCHEMA_VERSION = 12;
+export const WORLD_SCHEMA_VERSION = 13;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -31,7 +34,9 @@ export const SAVE_FORMAT_VERSION = 1;
  * additional historical scenario content but changes no existing definition or
  * scenario meaning, so the version remains stable (D-053). M5a adds a
  * scenario-provided policy and account role but does not change existing
- * definition/scenario meanings, so it also remains stable (D-056).
+ * definition/scenario meanings, so it also remains stable (D-056). M6 adds a
+ * scenario-provided AI enable policy without changing existing definitions, so
+ * it remains stable (D-058).
  */
 export const DEFAULT_DATA_VERSION = "m3-economy-v1";
 

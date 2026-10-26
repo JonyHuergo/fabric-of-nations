@@ -26,7 +26,7 @@ import { populationTotal, regionPopulation } from "../population/state.js";
 import { roundTo } from "../population/definitions.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
 import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { buildRegionOwnerMap } from "./country.js";
@@ -400,7 +400,7 @@ export function runMigrationPhase(
   definitions: EconomyDefinitions,
   dayIndex: DayIndex,
 ): MigrationDayResult {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");

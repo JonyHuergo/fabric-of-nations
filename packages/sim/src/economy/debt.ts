@@ -6,7 +6,7 @@ import type { Day, DayIndex, Id } from "../types.js";
 
 import { requireFiniteNumber, requireInteger } from "../validation.js";
 
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 
 import { postJournalBatch, postJournalEntry, type JournalEntryInput } from "./accounting.js";
 
@@ -574,7 +574,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
     const candidate: World = {
         ...world, finance: staged
     };
-    assertValidWorld(candidate);
+    assertValidWorldForTick(candidate);
     world.finance = staged;
     const contracts = [...results.values()].sort((left, right) => left.contractId - right.contractId);
     return {

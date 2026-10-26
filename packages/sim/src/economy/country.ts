@@ -140,6 +140,8 @@ export function copyCountry(country: Country): Country {
     monetary: { ...country.monetary },
     regionIds: [...country.regionIds],
     fiscal: { ...country.fiscal },
+    debt: { ...country.debt },
+    ai: { ...country.ai },
   };
 }
 

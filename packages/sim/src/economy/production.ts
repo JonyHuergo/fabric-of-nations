@@ -11,7 +11,7 @@
  */
 
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
-import { assertValidWorld, type World } from "../world.js";
+import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { canonicalizeStockLots, deriveStockByGood } from "./inventory.js";
 import type {
@@ -386,7 +386,7 @@ export function applyOverflowLosses(
   definitions: EconomyDefinitions,
   marketId?: number,
 ): OverflowLoss[] {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   const market =
     marketId === undefined
@@ -415,7 +415,7 @@ export function applyOverflowLosses(
       candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
     ),
   };
-  assertValidWorld(candidateWorld);
+  assertValidWorldForTick(candidateWorld);
   market.stockLots = canonicalLots;
   losses.sort((left, right) => {
     if (left.goodId !== right.goodId) return left.goodId - right.goodId;
@@ -437,7 +437,7 @@ export function runProductionPhase(
   reservations: readonly InputReservation[],
   options: ProductionPhaseOptions = {},
 ): ProductionPhaseResult {
-  assertValidWorld(world);
+  assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
@@ -701,7 +701,7 @@ export function runProductionPhase(
       candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
     ),
   };
-  assertValidWorld(candidateWorld);
+  assertValidWorldForTick(candidateWorld);
   market.stockLots = canonicalLots;
 
   reservationUses.sort((left, right) => {
