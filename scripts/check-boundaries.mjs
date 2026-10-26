@@ -131,7 +131,7 @@ function report(file, message) {
 }
 
 const sourceFiles = walk(PACKAGES, (path) => path.endsWith(".ts"));
-const simSourceFiles = sourceFiles.filter((path) => path.startsWith(SIM));
+const simSourceFiles = sourceFiles.filter((path) => path.startsWith(`${SIM}${sep}`));
 const simForbidden = [
   [/\bMath\s*\.\s*random\s*\(/, "Math.random() is forbidden"],
   [/\bDate\b/, "Date/host calendar APIs are forbidden"],
@@ -157,7 +157,7 @@ for (const file of sourceFiles) {
     report(file, "Math.random() is forbidden in packages/");
   }
 
-  if (!file.startsWith(SIM)) continue;
+  if (!file.startsWith(`${SIM}${sep}`)) continue;
 
   for (const [pattern, message] of simForbidden) {
     if (pattern.test(code)) report(file, message);

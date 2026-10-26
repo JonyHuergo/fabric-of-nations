@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@century/data": "workspace:*",
-    "@century/sim": "workspace:*"
+    "@century/sim": "workspace:*",
+    "@century/sim-worker": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "22.10.2"

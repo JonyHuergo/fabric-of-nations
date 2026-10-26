@@ -19,6 +19,10 @@ module.exports = {
   moduleNameMapper: {
     "^@century/data$": "<rootDir>/../data/src/index.ts",
     "^@century/sim$": "<rootDir>/../sim/src/index.ts",
+    "^@century/sim-worker$": "<rootDir>/../sim-worker/src/index.ts",
+    "^@century/sim-worker/host$": "<rootDir>/../sim-worker/src/host.ts",
+    "^@century/sim-worker/persistence$": "<rootDir>/../sim-worker/src/persistence.ts",
+    "^@century/sim-worker/snapshot$": "<rootDir>/../sim-worker/src/snapshot.ts",
     "^(\\.{1,2}/.*)\\.js$": "$1"
   }
 };

@@ -2,21 +2,35 @@
   "name": "@century/app",
   "version": "0.3.0",
   "private": true,
-  "type": "module",
-  "description": "Century application shell. Placeholder until the M7 mobile worker proof of concept.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
+  "description": "Century M7 Expo/React Native playable shell with a WebView/Web Worker simulation host.",
+  "main": "./index.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "start": "expo start",
+    "web": "expo start --web",
+    "export:web": "expo export --platform web --output-dir dist-web",
+    "export:ios": "expo export --platform ios --output-dir dist-ios",
+    "export:android": "expo export --platform android --output-dir dist-android",
+    "build:worker": "node ./scripts/build-worker.mjs",
+    "build": "node ./scripts/build-worker.mjs && tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@babel/runtime": "7.29.7",
+    "@century/sim-worker": "workspace:*",
+    "@expo/metro-runtime": "58.0.15",
+    "@react-native-async-storage/async-storage": "3.1.1",
+    "expo": "58.0.19",
+    "expo-status-bar": "58.0.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-web": "0.21.4",
+    "react-native-webview": "14.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
   }
 }

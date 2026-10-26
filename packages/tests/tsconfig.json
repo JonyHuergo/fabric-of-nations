@@ -7,7 +7,11 @@
     "baseUrl": ".",
     "paths": {
       "@century/data": ["../data/src/index.ts"],
-      "@century/sim": ["../sim/src/index.ts"]
+      "@century/sim": ["../sim/src/index.ts"],
+      "@century/sim-worker": ["../sim-worker/src/index.ts"],
+      "@century/sim-worker/host": ["../sim-worker/src/host.ts"],
+      "@century/sim-worker/persistence": ["../sim-worker/src/persistence.ts"],
+      "@century/sim-worker/snapshot": ["../sim-worker/src/snapshot.ts"]
     }
   },
   "include": ["src/**/*.ts"]

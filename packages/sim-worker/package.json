@@ -1,0 +1,48 @@
+{
+  "name": "@century/sim-worker",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Century simulation worker protocol, snapshot builder, and headless worker host.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./host": {
+      "types": "./dist/host.d.ts",
+      "import": "./dist/host.js"
+    },
+    "./persistence": {
+      "types": "./dist/persistence.d.ts",
+      "import": "./dist/persistence.js"
+    },
+    "./snapshot": {
+      "types": "./dist/snapshot.d.ts",
+      "import": "./dist/snapshot.js"
+    },
+    "./node": {
+      "types": "./dist/nodeWorkerEntry.d.ts",
+      "import": "./dist/nodeWorkerEntry.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "scenario:build": "node ./scripts/generate-scenario.mjs",
+    "poc": "node ./dist/nodePoc.js"
+  },
+  "dependencies": {
+    "@century/sim": "workspace:*",
+    "fflate": "0.8.3"
+  },
+  "devDependencies": {
+    "@century/data": "workspace:*",
+    "@types/node": "22.10.2"
+  }
+}

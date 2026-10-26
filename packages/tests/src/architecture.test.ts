@@ -200,15 +200,33 @@ describe("simulation isolation", () => {
     }
   });
 
-  test("the app package is a placeholder with no simulation imports", () => {
-    const appSource = walk(join(PACKAGES, "app", "src"), (path) => path.endsWith(".ts"));
+  test("the app consumes snapshots/protocol only and never simulation internals", () => {
+    const appSource = walk(
+      join(PACKAGES, "app"),
+      (path) =>
+        (path.endsWith(".ts") || path.endsWith(".tsx")) && !path.includes("generated"),
+    );
     expect(appSource.length).toBeGreaterThan(0);
+    let importsWorkerContract = false;
     for (const file of appSource) {
       const source = readFileSync(file, "utf8");
       expect(source).not.toMatch(
-        /\bfrom\s+['"]@century\/sim['"]|\bimport\s*\(\s*['"]@century\/sim['"]/,
+        /\bfrom\s+['"]@century\/(sim|data)['"]|\bimport\s*\(\s*['"]@century\/(sim|data)['"]/,
       );
+      expect(source).not.toMatch(
+        /\b(createEconomyWorld|serializeWorld|deserializeWorld|runEconomicDay|assertValidWorld)\b/,
+      );
+      if (/['"]@century\/sim-worker(?:\/[a-z-]+)?['"]/.test(source)) {
+        importsWorkerContract = true;
+      }
     }
+    expect(importsWorkerContract).toBe(true);
+
+    const workerAppEntry = readFileSync(
+      join(PACKAGES, "sim-worker", "src", "index.ts"),
+      "utf8",
+    );
+    expect(workerAppEntry).not.toMatch(/@century\/sim|@century\/data/);
   });
 
   test("simulation code does not import calibration targets or the data package", () => {

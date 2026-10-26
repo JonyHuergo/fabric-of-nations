@@ -13,9 +13,10 @@
     "test": "pnpm -r --if-present test",
     "bench": "pnpm build && pnpm -F @century/bench start",
     "bench:campaign": "pnpm build && pnpm -F @century/bench campaign",
-    "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm bench"
+    "app:export": "pnpm -F @century/app export:web && pnpm -F @century/app export:ios && pnpm -F @century/app export:android",
+    "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
   "devDependencies": {
-    "typescript": "5.7.2"
+    "typescript": "5.9.3"
   }
 }
