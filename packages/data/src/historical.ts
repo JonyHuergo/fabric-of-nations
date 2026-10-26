@@ -1,0 +1,1432 @@
+/**
+ * M5 initial historical-data pipeline.
+ *
+ * The authored data is a compact, source-annotated description of eight 1900
+ * polities. Static economy definitions (`goods`, `professions`, `buildings`,
+ * `needs`, demography) stay in the existing validated data files. This module
+ * validates the historical tables, expands each population block's total into
+ * the authoritative 17-band age/sex inputs from a documented provisional age
+ * profile, and produces an `EconomyScenarioDef` for the simulation.
+ *
+ * The historical data is deliberately provisional: it is an authored sample for
+ * exercising the multi-country systems, not a full historical reconstruction.
+ * Population totals are rounded national estimates; occupation composition is a
+ * documented provisional allocation; exchange rates are unavailable rather than
+ * invented. See `data/historical/source_notes.md`.
+ */
+
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import {
+  asSusdPerCurrencyUnit,
+  assertValidEconomyDefinitions,
+  assertValidPopulationDefinitions,
+  type BuildingDef,
+  type BuildingInstanceInitialDef,
+  type CountryInitialDef,
+  type CurrencyValuation,
+  type EconomyDefinitions,
+  type EconomyScenarioDef,
+  type EmploymentAssignmentInitialDef,
+  type GoodDef,
+  type MarketInitialDef,
+  type NeedTierDef,
+  type PopulationDefinitions,
+  type PopulationScenarioDef,
+  type ProfessionDef,
+  type RegionInitialDef,
+  type SystemAccountInitialDef,
+} from "@century/sim";
+
+import { DATA_PACKAGE_VERSION } from "./version.js";
+
+const DATA_ROOT = fileURLToPath(new URL("../data/", import.meta.url));
+
+export const HISTORICAL_SCENARIO_FILE = "scenarios/m5_eight_polities.json";
+
+/** Household account-id floor used by the historical loader. */
+export const HISTORICAL_HOUSEHOLD_ACCOUNT_BASE = 1_000;
+/** Building operating-cash account-id floor. */
+export const HISTORICAL_BUILDING_ACCOUNT_BASE = 100_000;
+/** Country treasury account-id floor (plus the numeric country id). */
+export const HISTORICAL_TREASURY_ACCOUNT_BASE = 200_000;
+/** Single system-reserve account id. */
+export const HISTORICAL_SYSTEM_ACCOUNT_ID = 300_000;
+
+export interface HistoricalSource {
+  readonly id: string;
+  readonly title: string;
+  readonly url: string;
+  readonly accessDate: string;
+  readonly license: string;
+  readonly notes: string;
+}
+
+export interface HistoricalAgeStructure {
+  readonly maleCounts: readonly number[];
+  readonly femaleCounts: readonly number[];
+  readonly sourceIds: readonly string[];
+  readonly status: "provisional" | "calibrated";
+  readonly notes: string;
+}
+
+export interface HistoricalScenarioFiles {
+  readonly countries: string;
+  readonly regions: string;
+  readonly markets: string;
+  readonly populations: string;
+  readonly buildings: string;
+  readonly employment: string;
+  readonly calibration: string;
+}
+
+export interface HistoricalScenarioDefinitions {
+  readonly goods: string;
+  readonly professions: string;
+  readonly buildings: string;
+  readonly needs: string;
+  readonly demography: string;
+}
+
+export interface HistoricalScenarioMeta {
+  readonly scenarioId: string;
+  readonly dataVersion: string;
+  readonly status: "provisional" | "calibrated";
+  readonly description: string;
+  readonly startDayIndex: number;
+  readonly sources: readonly HistoricalSource[];
+  readonly ageStructures: Readonly<Record<string, HistoricalAgeStructure>>;
+  readonly files: HistoricalScenarioFiles;
+  readonly definitions: HistoricalScenarioDefinitions;
+}
+
+export interface HistoricalCurrencyInput {
+  readonly key: string;
+  readonly name: string;
+  readonly valuation:
+    | { readonly status: "unavailable" }
+    | {
+        readonly status: "specified";
+        readonly susdPerUnit: number;
+        readonly sourceIds: readonly string[];
+      };
+}
+
+export interface HistoricalCountryInput {
+  readonly id: number;
+  readonly tag: string;
+  readonly name: string;
+  readonly regionIds: readonly number[];
+  readonly currency: HistoricalCurrencyInput;
+  readonly fiscal: {
+    readonly incomeTaxRate: number;
+    readonly welfareBudgetSUSDPerYear: number;
+  };
+  readonly initialTreasuryCashSUSD: number;
+  readonly immigrationOpen: boolean;
+  readonly sourceIds: readonly string[];
+  readonly occupationSourceIds: readonly string[];
+}
+
+export interface HistoricalRegionInput {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+  readonly resourceCapsPerDay?: readonly number[];
+  readonly sourceIds: readonly string[];
+  readonly calibrationStatus: "source-backed" | "provisional";
+}
+
+export interface HistoricalMarketInput {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+  readonly regionIds: readonly number[];
+  readonly priceBasis: "base-1900";
+  readonly status: "provisional" | "calibrated";
+  readonly sourceIds: readonly string[];
+}
+
+export interface HistoricalPopulationInput {
+  readonly regionId: number;
+  readonly professionKey: string;
+  readonly population: number;
+  readonly literacy: number;
+  readonly wealthLevel: number;
+  readonly savingsPerCapitaSUSD: number;
+  readonly militancy: number;
+  readonly sourceIds: readonly string[];
+  readonly calibrationStatus: "source-backed" | "provisional";
+}
+
+export interface HistoricalBuildingInput {
+  readonly key: string;
+  readonly regionId: number;
+  readonly definitionKey: string;
+  readonly level: number;
+  readonly ownerProfessionKey: string;
+  readonly operatingCashSUSD: number;
+  readonly status: "provisional" | "calibrated";
+}
+
+export interface HistoricalEmploymentInput {
+  readonly buildingKey: string;
+  readonly regionId: number;
+  readonly professionKey: string;
+  readonly workers: number;
+}
+
+export type HistoricalCalibrationMetric = "totalPopulation" | "peasantPopulationShare";
+
+export interface HistoricalCalibrationTarget {
+  readonly id: string;
+  readonly metric: HistoricalCalibrationMetric;
+  readonly countryTag: string;
+  readonly year: number;
+  readonly units: string;
+  readonly definition: string;
+  readonly target: number;
+  readonly toleranceAbsolute?: number;
+  readonly toleranceRelative?: number;
+  readonly sourceIds: readonly string[];
+  readonly confidence: "low" | "medium" | "high";
+  readonly status: "source-backed" | "provisional";
+  readonly notes: string;
+}
+
+export interface HistoricalData {
+  readonly meta: HistoricalScenarioMeta;
+  readonly countries: readonly HistoricalCountryInput[];
+  readonly regions: readonly HistoricalRegionInput[];
+  readonly markets: readonly HistoricalMarketInput[];
+  readonly populations: readonly HistoricalPopulationInput[];
+  readonly buildings: readonly HistoricalBuildingInput[];
+  readonly employment: readonly HistoricalEmploymentInput[];
+  readonly calibration: readonly HistoricalCalibrationTarget[];
+}
+
+export interface HistoricalValidation {
+  readonly errors: readonly string[];
+  readonly warnings: readonly string[];
+}
+
+/** Aggregated validation failure with deterministically ordered messages. */
+export class HistoricalDataError extends Error {
+  readonly errors: readonly string[];
+  constructor(errors: readonly string[]) {
+    super(`Invalid M5 historical data:\n- ${errors.join("\n- ")}`);
+    this.name = "HistoricalDataError";
+    this.errors = errors;
+  }
+}
+
+function readJson<T>(relativePath: string): T {
+  const text = readFileSync(join(DATA_ROOT, relativePath), "utf8");
+  return JSON.parse(text) as T;
+}
+
+function assertRecord(value: unknown, path: string, errors: string[]): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    errors.push(`${path} must be an object`);
+    return {};
+  }
+  return value as Record<string, unknown>;
+}
+
+function stringField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+  options: { minLength?: number; maxLength?: number } = {},
+): string {
+  const value = record[key];
+  const minLength = options.minLength ?? 1;
+  if (typeof value !== "string" || value.length < minLength) {
+    errors.push(`${path}.${key} must be a string of at least ${String(minLength)} characters`);
+    return "";
+  }
+  if (options.maxLength !== undefined && value.length > options.maxLength) {
+    errors.push(`${path}.${key} must be at most ${String(options.maxLength)} characters`);
+  }
+  return value;
+}
+
+function numberField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+): number {
+  const value = record[key];
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    errors.push(`${path}.${key} must be a finite number`);
+    return Number.NaN;
+  }
+  return value;
+}
+
+function booleanField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+): boolean {
+  const value = record[key];
+  if (typeof value !== "boolean") {
+    errors.push(`${path}.${key} must be a boolean`);
+    return false;
+  }
+  return value;
+}
+
+function arrayField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+): readonly unknown[] {
+  const value = record[key];
+  if (!Array.isArray(value)) {
+    errors.push(`${path}.${key} must be an array`);
+    return [];
+  }
+  return value;
+}
+
+function stringArrayField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+): string[] {
+  const values = arrayField(record, key, path, errors);
+  const output: string[] = [];
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (typeof value !== "string" || value.length === 0) {
+      errors.push(`${path}.${key}[${String(index)}] must be a non-empty string`);
+    } else {
+      output.push(value);
+    }
+  }
+  return output;
+}
+
+function numberArrayField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+  expectedLength?: number,
+): number[] {
+  const values = arrayField(record, key, path, errors);
+  const output: number[] = [];
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      errors.push(`${path}.${key}[${String(index)}] must be a finite number`);
+    } else {
+      output.push(value);
+    }
+  }
+  if (expectedLength !== undefined && output.length !== expectedLength) {
+    errors.push(`${path}.${key} must contain exactly ${String(expectedLength)} values`);
+  }
+  return output;
+}
+
+function integerArrayField(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  errors: string[],
+  expectedLength?: number,
+): number[] {
+  const values = arrayField(record, key, path, errors);
+  const output: number[] = [];
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+      errors.push(`${path}.${key}[${String(index)}] must be a non-negative integer`);
+    } else {
+      output.push(value);
+    }
+  }
+  if (expectedLength !== undefined && output.length !== expectedLength) {
+    errors.push(`${path}.${key} must contain exactly ${String(expectedLength)} values`);
+  }
+  return output;
+}
+
+function readSources(value: unknown, errors: string[]): HistoricalSource[] {
+  if (!Array.isArray(value)) {
+    errors.push("meta.sources must be an array");
+    return [];
+  }
+  const sources: HistoricalSource[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    const path = `meta.sources[${String(index)}]`;
+    const record = assertRecord(value[index], path, errors);
+    sources.push({
+      id: stringField(record, "id", path, errors),
+      title: stringField(record, "title", path, errors),
+      url: stringField(record, "url", path, errors),
+      accessDate: stringField(record, "accessDate", path, errors),
+      license: stringField(record, "license", path, errors),
+      notes: stringField(record, "notes", path, errors),
+    });
+  }
+  return sources;
+}
+
+function readAgeStructures(
+  value: unknown,
+  errors: string[],
+): Record<string, HistoricalAgeStructure> {
+  const record = assertRecord(value, "meta.ageStructures", errors);
+  const output: Record<string, HistoricalAgeStructure> = {};
+  for (const [key, raw] of Object.entries(record)) {
+    const path = `meta.ageStructures.${key}`;
+    const entry = assertRecord(raw, path, errors);
+    const status = stringField(entry, "status", path, errors);
+    if (status !== "provisional" && status !== "calibrated") {
+      errors.push(`${path}.status must be "provisional" or "calibrated"`);
+    }
+    output[key] = {
+      maleCounts: integerArrayField(entry, "maleCounts", path, errors, 17),
+      femaleCounts: integerArrayField(entry, "femaleCounts", path, errors, 17),
+      sourceIds: stringArrayField(entry, "sourceIds", path, errors),
+      status: status === "calibrated" ? "calibrated" : "provisional",
+      notes: stringField(entry, "notes", path, errors),
+    };
+  }
+  return output;
+}
+
+function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
+  const record = assertRecord(value, "meta", errors);
+  const files = assertRecord(record.files, "meta.files", errors);
+  const definitions = assertRecord(record.definitions, "meta.definitions", errors);
+  const status = stringField(record, "status", "meta", errors);
+  if (status !== "provisional" && status !== "calibrated") {
+    errors.push('meta.status must be "provisional" or "calibrated"');
+  }
+  return {
+    scenarioId: stringField(record, "scenarioId", "meta", errors),
+    dataVersion: stringField(record, "dataVersion", "meta", errors),
+    status: status === "calibrated" ? "calibrated" : "provisional",
+    description: stringField(record, "description", "meta", errors),
+    startDayIndex: numberField(record, "startDayIndex", "meta", errors),
+    sources: readSources(record.sources, errors),
+    ageStructures: readAgeStructures(record.ageStructures, errors),
+    files: {
+      countries: stringField(files, "countries", "meta.files", errors),
+      regions: stringField(files, "regions", "meta.files", errors),
+      markets: stringField(files, "markets", "meta.files", errors),
+      populations: stringField(files, "populations", "meta.files", errors),
+      buildings: stringField(files, "buildings", "meta.files", errors),
+      employment: stringField(files, "employment", "meta.files", errors),
+      calibration: stringField(files, "calibration", "meta.files", errors),
+    },
+    definitions: {
+      goods: stringField(definitions, "goods", "meta.definitions", errors),
+      professions: stringField(definitions, "professions", "meta.definitions", errors),
+      buildings: stringField(definitions, "buildings", "meta.definitions", errors),
+      needs: stringField(definitions, "needs", "meta.definitions", errors),
+      demography: stringField(definitions, "demography", "meta.definitions", errors),
+    },
+  };
+}
+
+/** Load the raw M5 historical tables from the data package. */
+export function loadM5HistoricalData(): HistoricalData {
+  const rawScenario = readJson<unknown>(HISTORICAL_SCENARIO_FILE);
+  const errors: string[] = [];
+  const metaRecord = assertRecord(rawScenario, "scenario", errors);
+  const meta = readMeta(metaRecord.meta, errors);
+  if (errors.length > 0) throw new HistoricalDataError(errors.sort());
+
+  const countries = readJson<unknown>(meta.files.countries);
+  const regions = readJson<unknown>(meta.files.regions);
+  const markets = readJson<unknown>(meta.files.markets);
+  const populations = readJson<unknown>(meta.files.populations);
+  const buildings = readJson<unknown>(meta.files.buildings);
+  const employment = readJson<unknown>(meta.files.employment);
+  const calibration = readJson<unknown>(meta.files.calibration);
+  for (const [label, value] of [
+    ["countries", countries],
+    ["regions", regions],
+    ["markets", markets],
+    ["populations", populations],
+    ["buildings", buildings],
+    ["employment", employment],
+    ["calibration", calibration],
+  ] as const) {
+    if (!Array.isArray(value)) {
+      throw new HistoricalDataError([`${label} data must be a JSON array`]);
+    }
+  }
+
+  const data = parseHistoricalTables({
+    meta,
+    countries,
+    regions,
+    markets,
+    populations,
+    buildings,
+    employment,
+    calibration,
+  });
+  assertValidM5HistoricalData(data);
+  return data;
+}
+
+interface RawTables {
+  readonly meta: HistoricalScenarioMeta;
+  readonly countries: unknown;
+  readonly regions: unknown;
+  readonly markets: unknown;
+  readonly populations: unknown;
+  readonly buildings: unknown;
+  readonly employment: unknown;
+  readonly calibration: unknown;
+}
+
+function parseHistoricalTables(tables: RawTables): HistoricalData {
+  const errors: string[] = [];
+  const meta = tables.meta;
+  const countries = parseCountries(tables.countries, errors);
+  const regions = parseRegions(tables.regions, errors);
+  const markets = parseMarkets(tables.markets, errors);
+  const populations = parsePopulations(tables.populations, errors);
+  const buildings = parseBuildings(tables.buildings, errors);
+  const employment = parseEmployment(tables.employment, errors);
+  const calibration = parseCalibration(tables.calibration, errors);
+  if (errors.length > 0) throw new HistoricalDataError([...errors].sort());
+  return { meta, countries, regions, markets, populations, buildings, employment, calibration };
+}
+
+function parseCountries(value: unknown, errors: string[]): HistoricalCountryInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `countries[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const currencyRecord = assertRecord(record.currency, `${path}.currency`, errors);
+    const valuationRecord = assertRecord(
+      currencyRecord.valuation,
+      `${path}.currency.valuation`,
+      errors,
+    );
+    const valuationStatus = stringField(
+      valuationRecord,
+      "status",
+      `${path}.currency.valuation`,
+      errors,
+    );
+    if (valuationStatus !== "specified" && valuationStatus !== "unavailable") {
+      errors.push(`${path}.currency.valuation.status must be "specified" or "unavailable"`);
+    }
+    const fiscal = assertRecord(record.fiscal, `${path}.fiscal`, errors);
+    return {
+      id: numberField(record, "id", path, errors),
+      tag: stringField(record, "tag", path, errors, { maxLength: 8 }),
+      name: stringField(record, "name", path, errors),
+      regionIds: numberArrayField(record, "regionIds", path, errors),
+      currency: {
+        key: stringField(currencyRecord, "key", `${path}.currency`, errors),
+        name: stringField(currencyRecord, "name", `${path}.currency`, errors),
+        valuation:
+          valuationStatus === "specified"
+            ? {
+                status: "specified" as const,
+                susdPerUnit: numberField(
+                  valuationRecord,
+                  "susdPerUnit",
+                  `${path}.currency.valuation`,
+                  errors,
+                ),
+                sourceIds: stringArrayField(
+                  valuationRecord,
+                  "sourceIds",
+                  `${path}.currency.valuation`,
+                  errors,
+                ),
+              }
+            : { status: "unavailable" as const },
+      },
+      fiscal: {
+        incomeTaxRate: numberField(fiscal, "incomeTaxRate", `${path}.fiscal`, errors),
+        welfareBudgetSUSDPerYear: numberField(
+          fiscal,
+          "welfareBudgetSUSDPerYear",
+          `${path}.fiscal`,
+          errors,
+        ),
+      },
+      initialTreasuryCashSUSD: numberField(record, "initialTreasuryCashSUSD", path, errors),
+      immigrationOpen: booleanField(record, "immigrationOpen", path, errors),
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+      occupationSourceIds: stringArrayField(record, "occupationSourceIds", path, errors),
+    };
+  });
+}
+
+function parseRegions(value: unknown, errors: string[]): HistoricalRegionInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `regions[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "calibrationStatus", path, errors);
+    if (status !== "source-backed" && status !== "provisional") {
+      errors.push(`${path}.calibrationStatus must be "source-backed" or "provisional"`);
+    }
+    const caps =
+      record.resourceCapsPerDay === undefined
+        ? undefined
+        : numberArrayField(record, "resourceCapsPerDay", path, errors);
+    return {
+      id: numberField(record, "id", path, errors),
+      key: stringField(record, "key", path, errors),
+      name: stringField(record, "name", path, errors),
+      ...(caps === undefined ? {} : { resourceCapsPerDay: caps }),
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+      calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
+    };
+  });
+}
+
+function parseMarkets(value: unknown, errors: string[]): HistoricalMarketInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `markets[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const basis = stringField(record, "priceBasis", path, errors);
+    if (basis !== "base-1900") {
+      errors.push(`${path}.priceBasis must be "base-1900"`);
+    }
+    const status = stringField(record, "status", path, errors);
+    if (status !== "provisional" && status !== "calibrated") {
+      errors.push(`${path}.status must be "provisional" or "calibrated"`);
+    }
+    return {
+      id: numberField(record, "id", path, errors),
+      key: stringField(record, "key", path, errors),
+      name: stringField(record, "name", path, errors),
+      regionIds: numberArrayField(record, "regionIds", path, errors),
+      priceBasis: "base-1900",
+      status: status === "calibrated" ? "calibrated" : "provisional",
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+    };
+  });
+}
+
+function parsePopulations(value: unknown, errors: string[]): HistoricalPopulationInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `populations[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "calibrationStatus", path, errors);
+    if (status !== "source-backed" && status !== "provisional") {
+      errors.push(`${path}.calibrationStatus must be "source-backed" or "provisional"`);
+    }
+    return {
+      regionId: numberField(record, "regionId", path, errors),
+      professionKey: stringField(record, "professionKey", path, errors),
+      population: numberField(record, "population", path, errors),
+      literacy: numberField(record, "literacy", path, errors),
+      wealthLevel: numberField(record, "wealthLevel", path, errors),
+      savingsPerCapitaSUSD: numberField(record, "savingsPerCapitaSUSD", path, errors),
+      militancy: numberField(record, "militancy", path, errors),
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+      calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
+    };
+  });
+}
+
+function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `buildings[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "status", path, errors);
+    if (status !== "provisional" && status !== "calibrated") {
+      errors.push(`${path}.status must be "provisional" or "calibrated"`);
+    }
+    return {
+      key: stringField(record, "key", path, errors),
+      regionId: numberField(record, "regionId", path, errors),
+      definitionKey: stringField(record, "definitionKey", path, errors),
+      level: numberField(record, "level", path, errors),
+      ownerProfessionKey: stringField(record, "ownerProfessionKey", path, errors),
+      operatingCashSUSD: numberField(record, "operatingCashSUSD", path, errors),
+      status: status === "calibrated" ? "calibrated" : "provisional",
+    };
+  });
+}
+
+function parseEmployment(value: unknown, errors: string[]): HistoricalEmploymentInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `employment[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    return {
+      buildingKey: stringField(record, "buildingKey", path, errors),
+      regionId: numberField(record, "regionId", path, errors),
+      professionKey: stringField(record, "professionKey", path, errors),
+      workers: numberField(record, "workers", path, errors),
+    };
+  });
+}
+
+function parseCalibration(value: unknown, errors: string[]): HistoricalCalibrationTarget[] {
+  const values = value as readonly unknown[];
+  const metrics = new Set<string>(["totalPopulation", "peasantPopulationShare"]);
+  const confidences = new Set<string>(["low", "medium", "high"]);
+  const statuses = new Set<string>(["source-backed", "provisional"]);
+  return values.map((raw, index) => {
+    const path = `calibration[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const metric = stringField(record, "metric", path, errors);
+    if (!metrics.has(metric)) {
+      errors.push(`${path}.metric must be totalPopulation or peasantPopulationShare`);
+    }
+    const confidence = stringField(record, "confidence", path, errors);
+    if (!confidences.has(confidence)) {
+      errors.push(`${path}.confidence must be low, medium, or high`);
+    }
+    const status = stringField(record, "status", path, errors);
+    if (!statuses.has(status)) {
+      errors.push(`${path}.status must be source-backed or provisional`);
+    }
+    const toleranceAbsolute =
+      record.toleranceAbsolute === undefined
+        ? undefined
+        : numberField(record, "toleranceAbsolute", path, errors);
+    const toleranceRelative =
+      record.toleranceRelative === undefined
+        ? undefined
+        : numberField(record, "toleranceRelative", path, errors);
+    return {
+      id: stringField(record, "id", path, errors),
+      metric: metric === "peasantPopulationShare" ? "peasantPopulationShare" : "totalPopulation",
+      countryTag: stringField(record, "countryTag", path, errors),
+      year: numberField(record, "year", path, errors),
+      units: stringField(record, "units", path, errors),
+      definition: stringField(record, "definition", path, errors),
+      target: numberField(record, "target", path, errors),
+      ...(toleranceAbsolute === undefined ? {} : { toleranceAbsolute }),
+      ...(toleranceRelative === undefined ? {} : { toleranceRelative }),
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+      confidence:
+        confidence === "high" ? "high" : confidence === "medium" ? "medium" : "low",
+      status: status === "source-backed" ? "source-backed" : "provisional",
+      notes: stringField(record, "notes", path, errors),
+    };
+  });
+}
+
+function isPositiveInteger(value: number): boolean {
+  return Number.isInteger(value) && value > 0;
+}
+
+function isNonNegativeInteger(value: number): boolean {
+  return Number.isInteger(value) && value >= 0;
+}
+
+export interface HistoricalDefinitionKeys {
+  readonly professions: ReadonlySet<string>;
+  readonly buildings: ReadonlySet<string>;
+}
+
+function loadDefinitionKeys(meta: HistoricalScenarioMeta): HistoricalDefinitionKeys | null {
+  try {
+    const professions = readJson<readonly { key: string }[]>(meta.definitions.professions);
+    const buildings = readJson<readonly { key: string }[]>(meta.definitions.buildings);
+    return {
+      professions: new Set(professions.map((profession) => profession.key)),
+      buildings: new Set(buildings.map((building) => building.key)),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validate the complete historical dataset and its cross-references. Errors are
+ * returned in a deterministic sorted order. The loader throws with this list.
+ *
+ * `definitionKeys` may be supplied by a caller that has already loaded the static
+ * catalogs; when omitted the validator reads the referenced definition files so
+ * unknown professions/buildings are still caught.
+ */
+export function validateM5HistoricalData(
+  data: HistoricalData,
+  definitionKeys?: HistoricalDefinitionKeys,
+): HistoricalValidation {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const keys = definitionKeys ?? loadDefinitionKeys(data.meta);
+  if (keys === null) {
+    errors.push("could not load profession/building definitions for reference validation");
+  }
+  const sourceIds = new Set(data.meta.sources.map((source) => source.id));
+  for (const source of data.meta.sources) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(source.accessDate)) {
+      errors.push(`meta.sources[${source.id}].accessDate must be YYYY-MM-DD`);
+    }
+    if (source.url.length === 0) errors.push(`meta.sources[${source.id}].url must not be empty`);
+  }
+  const requireSources = (ids: readonly string[], path: string): void => {
+    if (ids.length === 0) errors.push(`${path} must list at least one source id`);
+    for (const id of ids) {
+      if (!sourceIds.has(id)) errors.push(`${path} references unknown source ${JSON.stringify(id)}`);
+    }
+  };
+  if (data.meta.dataVersion !== DATA_PACKAGE_VERSION) {
+    errors.push(
+      `meta.dataVersion ${JSON.stringify(data.meta.dataVersion)} must equal ${JSON.stringify(DATA_PACKAGE_VERSION)}`,
+    );
+  }
+  if (data.meta.status !== "provisional") {
+    warnings.push("M5 historical scenario is an authored provisional sample, not a full reconstruction");
+  }
+  const ageStructure = data.meta.ageStructures["world-1900-provisional"];
+  if (ageStructure === undefined) {
+    errors.push("meta.ageStructures is missing world-1900-provisional");
+  } else {
+    requireSources(ageStructure.sourceIds, "meta.ageStructures.world-1900-provisional.sourceIds");
+    const maleTotal = ageStructure.maleCounts.reduce((total, value) => total + value, 0);
+    const femaleTotal = ageStructure.femaleCounts.reduce((total, value) => total + value, 0);
+    if (maleTotal <= 0 || femaleTotal <= 0) {
+      errors.push("age-structure profile counts must be positive");
+    }
+  }
+
+  const regionById = new Map<number, HistoricalRegionInput>();
+  const regionKeys = new Set<string>();
+  const regionOwner = new Map<number, number>();
+  const countryRegionIds = new Map<number, number[]>();
+  const countryById = new Map<number, HistoricalCountryInput>();
+  const countryTags = new Set<string>();
+  const currencyKeys = new Set<string>();
+  for (let index = 0; index < data.countries.length; index += 1) {
+    const country = data.countries[index];
+    if (country === undefined) continue;
+    const path = `countries[${String(index)}]`;
+    if (!isNonNegativeInteger(country.id)) errors.push(`${path}.id must be a non-negative integer`);
+    if (countryById.has(country.id)) errors.push(`${path}.id ${String(country.id)} is duplicated`);
+    countryById.set(country.id, country);
+    if (countryTags.has(country.tag)) errors.push(`${path}.tag ${JSON.stringify(country.tag)} is duplicated`);
+    countryTags.add(country.tag);
+    if (country.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
+    const seenRegions = new Set<number>();
+    for (const regionId of country.regionIds) {
+      if (seenRegions.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
+      seenRegions.add(regionId);
+      const existing = regionOwner.get(regionId);
+      if (existing !== undefined) {
+        errors.push(`region ${String(regionId)} is claimed by countries ${String(existing)} and ${String(country.id)}`);
+      }
+      regionOwner.set(regionId, country.id);
+    }
+    countryRegionIds.set(country.id, [...country.regionIds].sort((left, right) => left - right));
+    requireSources(country.sourceIds, `${path}.sourceIds`);
+    requireSources(country.occupationSourceIds, `${path}.occupationSourceIds`);
+    if (!/^[a-z][a-z0-9-]*$/.test(country.currency.key)) {
+      errors.push(`${path}.currency.key must be a lower-case identifier`);
+    }
+    if (country.currency.key === "susd") errors.push(`${path}.currency.key is reserved for SUSD`);
+    if (currencyKeys.has(country.currency.key)) {
+      errors.push(`${path}.currency.key ${JSON.stringify(country.currency.key)} is duplicated`);
+    }
+    currencyKeys.add(country.currency.key);
+    const fiscal = country.fiscal;
+    if (!(fiscal.incomeTaxRate >= 0 && fiscal.incomeTaxRate <= 1)) {
+      errors.push(`${path}.fiscal.incomeTaxRate must be in 0..1`);
+    }
+    if (!(fiscal.welfareBudgetSUSDPerYear >= 0)) {
+      errors.push(`${path}.fiscal.welfareBudgetSUSDPerYear must be non-negative`);
+    }
+    if (!(country.initialTreasuryCashSUSD >= 0)) {
+      errors.push(`${path}.initialTreasuryCashSUSD must be non-negative`);
+    }
+    if (country.currency.valuation.status === "specified") {
+      if (!(country.currency.valuation.susdPerUnit > 0)) {
+        errors.push(`${path}.currency.valuation.susdPerUnit must be positive`);
+      }
+      requireSources(country.currency.valuation.sourceIds, `${path}.currency.valuation.sourceIds`);
+    }
+  }
+
+  const regionCountry = new Map<number, number>();
+  for (let index = 0; index < data.regions.length; index += 1) {
+    const region = data.regions[index];
+    if (region === undefined) continue;
+    const path = `regions[${String(index)}]`;
+    if (!isPositiveInteger(region.id) && region.id !== 0) {
+      errors.push(`${path}.id must be a non-negative integer`);
+    }
+    if (regionById.has(region.id)) errors.push(`${path}.id ${String(region.id)} is duplicated`);
+    regionById.set(region.id, region);
+    if (regionKeys.has(region.key)) errors.push(`${path}.key ${JSON.stringify(region.key)} is duplicated`);
+    regionKeys.add(region.key);
+    requireSources(region.sourceIds, `${path}.sourceIds`);
+    const owner = regionOwner.get(region.id);
+    if (owner === undefined) {
+      errors.push(`region ${String(region.id)} has no owning country`);
+    } else {
+      regionCountry.set(region.id, owner);
+    }
+  }
+  for (const regionId of regionOwner.keys()) {
+    if (!regionById.has(regionId)) {
+      errors.push(`country ownership references unknown region ${String(regionId)}`);
+    }
+  }
+
+  const marketById = new Map<number, HistoricalMarketInput>();
+  const mapRegionMarket = new Map<number, number>();
+  const marketKeys = new Set<string>();
+  for (let index = 0; index < data.markets.length; index += 1) {
+    const market = data.markets[index];
+    if (market === undefined) continue;
+    const path = `markets[${String(index)}]`;
+    if (!isNonNegativeInteger(market.id)) errors.push(`${path}.id must be a non-negative integer`);
+    if (marketById.has(market.id)) errors.push(`${path}.id ${String(market.id)} is duplicated`);
+    marketById.set(market.id, market);
+    if (marketKeys.has(market.key)) errors.push(`${path}.key ${JSON.stringify(market.key)} is duplicated`);
+    marketKeys.add(market.key);
+    if (market.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
+    const seen = new Set<number>();
+    for (const regionId of market.regionIds) {
+      if (!regionById.has(regionId)) {
+        errors.push(`${path}.regionIds references unknown region ${String(regionId)}`);
+      }
+      if (seen.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
+      seen.add(regionId);
+      const existing = mapRegionMarket.get(regionId);
+      if (existing !== undefined) {
+        errors.push(`region ${String(regionId)} belongs to markets ${String(existing)} and ${String(market.id)}`);
+      }
+      mapRegionMarket.set(regionId, market.id);
+    }
+    requireSources(market.sourceIds, `${path}.sourceIds`);
+  }
+  for (const region of data.regions) {
+    if (!mapRegionMarket.has(region.id)) {
+      errors.push(`region ${String(region.id)} is not assigned to a market`);
+    }
+  }
+  for (const country of data.countries) {
+    let countryMarket: number | undefined;
+    for (const regionId of country.regionIds) {
+      const marketId = mapRegionMarket.get(regionId);
+      if (marketId === undefined) continue;
+      if (countryMarket === undefined) countryMarket = marketId;
+      else if (countryMarket !== marketId) {
+        errors.push(
+          `country ${JSON.stringify(country.tag)} spans markets ${String(countryMarket)} and ${String(marketId)}; M5 permits one market per country`,
+        );
+      }
+    }
+    if (countryMarket === undefined) {
+      errors.push(`country ${JSON.stringify(country.tag)} has no region in a market`);
+    }
+  }
+
+  const populationKeys = new Set<string>();
+  const populationByRegion = new Map<number, HistoricalPopulationInput[]>();
+  const countryPopulation = new Map<number, number>();
+  const countryPeasants = new Map<number, number>();
+  for (let index = 0; index < data.populations.length; index += 1) {
+    const population = data.populations[index];
+    if (population === undefined) continue;
+    const path = `populations[${String(index)}]`;
+    const region = regionById.get(population.regionId);
+    if (region === undefined) {
+      errors.push(`${path}.regionId references unknown region ${String(population.regionId)}`);
+      continue;
+    }
+    const key = `${String(population.regionId)}:${population.professionKey}`;
+    if (populationKeys.has(key)) errors.push(`${path} duplicates region/profession ${key}`);
+    populationKeys.add(key);
+    if (keys !== null && !keys.professions.has(population.professionKey)) {
+      errors.push(`${path}.professionKey references unknown profession ${JSON.stringify(population.professionKey)}`);
+    }
+    if (!isPositiveInteger(population.population)) {
+      errors.push(`${path}.population must be a positive integer`);
+    }
+    if (!(population.literacy >= 0 && population.literacy <= 1)) {
+      errors.push(`${path}.literacy must be in 0..1`);
+    }
+    if (!(population.wealthLevel >= 0 && population.wealthLevel <= 99)) {
+      errors.push(`${path}.wealthLevel must be in 0..99`);
+    }
+    if (!(population.savingsPerCapitaSUSD >= 0)) {
+      errors.push(`${path}.savingsPerCapitaSUSD must be non-negative`);
+    }
+    if (!(population.militancy >= 0 && population.militancy <= 1)) {
+      errors.push(`${path}.militancy must be in 0..1`);
+    }
+    requireSources(population.sourceIds, `${path}.sourceIds`);
+    const list = populationByRegion.get(population.regionId) ?? [];
+    list.push(population);
+    populationByRegion.set(population.regionId, list);
+    const countryId = regionCountry.get(population.regionId);
+    if (countryId !== undefined) {
+      countryPopulation.set(countryId, (countryPopulation.get(countryId) ?? 0) + population.population);
+      if (population.professionKey === "peasants") {
+        countryPeasants.set(countryId, (countryPeasants.get(countryId) ?? 0) + population.population);
+      }
+    }
+  }
+  for (const region of data.regions) {
+    if ((populationByRegion.get(region.id) ?? []).length === 0) {
+      errors.push(`region ${String(region.id)} has no population block`);
+    }
+  }
+
+  const buildingKeys = new Set<string>();
+  const buildingsByRegion = new Map<number, HistoricalBuildingInput[]>();
+  for (let index = 0; index < data.buildings.length; index += 1) {
+    const building = data.buildings[index];
+    if (building === undefined) continue;
+    const path = `buildings[${String(index)}]`;
+    if (buildingKeys.has(building.key)) errors.push(`${path}.key ${JSON.stringify(building.key)} is duplicated`);
+    buildingKeys.add(building.key);
+    if (!regionById.has(building.regionId)) {
+      errors.push(`${path}.regionId references unknown region ${String(building.regionId)}`);
+    }
+    if (keys !== null && !keys.buildings.has(building.definitionKey)) {
+      errors.push(`${path}.definitionKey references unknown building definition ${JSON.stringify(building.definitionKey)}`);
+    }
+    if (keys !== null && !keys.professions.has(building.ownerProfessionKey)) {
+      errors.push(`${path}.ownerProfessionKey references unknown profession ${JSON.stringify(building.ownerProfessionKey)}`);
+    }
+    if (!isPositiveInteger(building.level)) {
+      errors.push(`${path}.level must be a positive integer`);
+    }
+    if (!(building.operatingCashSUSD >= 0)) {
+      errors.push(`${path}.operatingCashSUSD must be non-negative`);
+    }
+    const ownerBlock = (populationByRegion.get(building.regionId) ?? []).find(
+      (population) => population.professionKey === building.ownerProfessionKey,
+    );
+    if (ownerBlock === undefined) {
+      errors.push(
+        `${path}.ownerProfessionKey ${JSON.stringify(building.ownerProfessionKey)} has no population block in region ${String(building.regionId)}`,
+      );
+    }
+    const list = buildingsByRegion.get(building.regionId) ?? [];
+    list.push(building);
+    buildingsByRegion.set(building.regionId, list);
+  }
+  for (const region of data.regions) {
+    if ((buildingsByRegion.get(region.id) ?? []).length === 0) {
+      errors.push(`region ${String(region.id)} has no building`);
+    }
+  }
+
+  const employmentKeys = new Set<string>();
+  const buildingByKey = new Map(data.buildings.map((building) => [building.key, building]));
+  for (let index = 0; index < data.employment.length; index += 1) {
+    const entry = data.employment[index];
+    if (entry === undefined) continue;
+    const path = `employment[${String(index)}]`;
+    const building = buildingByKey.get(entry.buildingKey);
+    if (building === undefined) {
+      errors.push(`${path}.buildingKey references unknown building ${JSON.stringify(entry.buildingKey)}`);
+    } else if (building.regionId !== entry.regionId) {
+      errors.push(`${path}.regionId does not match the building's region`);
+    }
+    if (!isPositiveInteger(entry.workers)) errors.push(`${path}.workers must be a positive integer`);
+    const key = `${String(entry.regionId)}:${entry.professionKey}:${entry.buildingKey}`;
+    if (employmentKeys.has(key)) errors.push(`${path} duplicates employment ${key}`);
+    employmentKeys.add(key);
+    const block = (populationByRegion.get(entry.regionId) ?? []).find(
+      (population) => population.professionKey === entry.professionKey,
+    );
+    if (block === undefined) {
+      errors.push(
+        `${path} references unknown region/profession ${String(entry.regionId)}:${entry.professionKey}`,
+      );
+    }
+  }
+
+  const calibrationIds = new Set<string>();
+  for (let index = 0; index < data.calibration.length; index += 1) {
+    const target = data.calibration[index];
+    if (target === undefined) continue;
+    const path = `calibration[${String(index)}]`;
+    if (calibrationIds.has(target.id)) errors.push(`${path}.id ${JSON.stringify(target.id)} is duplicated`);
+    calibrationIds.add(target.id);
+    if (!countryTags.has(target.countryTag)) {
+      errors.push(`${path}.countryTag references unknown country tag ${JSON.stringify(target.countryTag)}`);
+    }
+    if (!Number.isInteger(target.year) || target.year < 1900 || target.year > 2000) {
+      errors.push(`${path}.year must be an integer in 1900..2000`);
+    }
+    if (!(target.target > 0)) errors.push(`${path}.target must be positive`);
+    if (target.metric === "peasantPopulationShare" && target.target > 1) {
+      errors.push(`${path}.target must be in 0..1 for a share metric`);
+    }
+    const hasTolerance =
+      target.toleranceAbsolute !== undefined || target.toleranceRelative !== undefined;
+    if (!hasTolerance) errors.push(`${path} must declare a tolerance`);
+    if (target.toleranceAbsolute !== undefined && target.toleranceAbsolute < 0) {
+      errors.push(`${path}.toleranceAbsolute must be non-negative`);
+    }
+    if (target.toleranceRelative !== undefined && target.toleranceRelative < 0) {
+      errors.push(`${path}.toleranceRelative must be non-negative`);
+    }
+    requireSources(target.sourceIds, `${path}.sourceIds`);
+    if (target.notes.length === 0) errors.push(`${path}.notes must not be empty`);
+  }
+
+  // Country calibration: every country must declare a total-population target and
+  // a provisional occupation-structure target. Authored values must fall in the
+  // declared tolerance, so an inconsistent sample cannot pass validation.
+  for (const country of data.countries) {
+    const populationTarget = data.calibration.find(
+      (target) => target.countryTag === country.tag && target.metric === "totalPopulation",
+    );
+    const occupationTarget = data.calibration.find(
+      (target) => target.countryTag === country.tag && target.metric === "peasantPopulationShare",
+    );
+    if (populationTarget === undefined) {
+      errors.push(`country ${JSON.stringify(country.tag)} is missing a totalPopulation target`);
+    } else {
+      const value = countryPopulation.get(country.id) ?? 0;
+      const tolerance =
+        populationTarget.toleranceRelative !== undefined
+          ? Math.abs(populationTarget.target) * populationTarget.toleranceRelative
+          : (populationTarget.toleranceAbsolute ?? 0);
+      if (Math.abs(value - populationTarget.target) > tolerance) {
+        errors.push(
+          `country ${JSON.stringify(country.tag)} authored population ${String(value)} misses target ${String(populationTarget.target)} +/- ${String(tolerance)}`,
+        );
+      }
+    }
+    if (occupationTarget === undefined) {
+      errors.push(`country ${JSON.stringify(country.tag)} is missing a peasantPopulationShare target`);
+      warnings.push(
+        `country ${JSON.stringify(country.tag)} occupation composition is provisional; M5 has no profession-promotion mechanism`,
+      );
+    } else {
+      const total = countryPopulation.get(country.id) ?? 0;
+      const share = total > 0 ? (countryPeasants.get(country.id) ?? 0) / total : 0;
+      const tolerance = occupationTarget.toleranceAbsolute ?? 0;
+      if (Math.abs(share - occupationTarget.target) > tolerance) {
+        errors.push(
+          `country ${JSON.stringify(country.tag)} authored peasant share ${share.toFixed(4)} misses provisional target ${String(occupationTarget.target)} +/- ${String(tolerance)}`,
+        );
+      }
+    }
+  }
+
+  if (data.meta.ageStructures["world-1900-provisional"]?.status === "provisional") {
+    warnings.push("age structure is provisional and not country-specific");
+  }
+  if (data.countries.every((country) => country.currency.valuation.status === "unavailable")) {
+    warnings.push("all historical currency valuations are unavailable; M5 performs no FX conversion");
+  }
+  return { errors: [...errors].sort(), warnings: [...warnings].sort() };
+}
+
+/** Throw `HistoricalDataError` when validation reports any error. */
+export function assertValidM5HistoricalData(data: HistoricalData): void {
+  const { errors } = validateM5HistoricalData(data);
+  if (errors.length > 0) throw new HistoricalDataError(errors);
+}
+
+function largestRemainder(
+  total: number,
+  weights: readonly number[],
+  path: string,
+): number[] {
+  if (!Number.isInteger(total) || total < 0) {
+    throw new RangeError(`${path} total must be a non-negative integer`);
+  }
+  let totalWeight = 0;
+  for (const weight of weights) {
+    if (!Number.isFinite(weight) || weight < 0) {
+      throw new RangeError(`${path} weights must be finite and non-negative`);
+    }
+    totalWeight += weight;
+  }
+  if (totalWeight <= 0) throw new RangeError(`${path} weights must have a positive sum`);
+  const allocations = weights.map((weight) => Math.floor((total * weight) / totalWeight));
+  let assigned = allocations.reduce((sum, value) => sum + value, 0);
+  const remainders = weights.map((weight, index) => {
+    const exact = (total * weight) / totalWeight;
+    return { index, remainder: exact - Math.floor(exact) };
+  });
+  remainders.sort(
+    (left, right) => right.remainder - left.remainder || left.index - right.index,
+  );
+  for (const candidate of remainders) {
+    if (assigned >= total) break;
+    allocations[candidate.index] = (allocations[candidate.index] ?? 0) + 1;
+    assigned += 1;
+  }
+  if (assigned !== total) throw new RangeError(`${path} allocation did not conserve the total`);
+  return allocations;
+}
+
+/** Expand one block's total population across the 34 sex/age band cells. */
+export function expandHistoricalPopulation(
+  population: number,
+  profile: HistoricalAgeStructure,
+  path: string,
+): { readonly maleAgeGroups: number[]; readonly femaleAgeGroups: number[] } {
+  const weights = [...profile.maleCounts, ...profile.femaleCounts];
+  const allocations = largestRemainder(population, weights, path);
+  return {
+    maleAgeGroups: allocations.slice(0, 17),
+    femaleAgeGroups: allocations.slice(17),
+  };
+}
+
+/** Build the validated economy scenario from the historical tables. */
+export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenarioDef {
+  assertValidM5HistoricalData(data);
+  const goods = readJson<GoodDef[]>(data.meta.definitions.goods);
+  const professions = readJson<ProfessionDef[]>(data.meta.definitions.professions);
+  const buildings = readJson<BuildingDef[]>(data.meta.definitions.buildings);
+  const needs = readJson<NeedTierDef[]>(data.meta.definitions.needs);
+  const demography = readJson<{
+    mortalityAnchors: PopulationDefinitions["mortalityAnchors"];
+    fertilityAnchors: PopulationDefinitions["fertilityAnchors"];
+    sexRatioAtBirth: number;
+    fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
+  }>(data.meta.definitions.demography);
+
+  const economyDefinitions: EconomyDefinitions = {
+    dataVersion: data.meta.dataVersion,
+    scenarioId: data.meta.scenarioId,
+    goods,
+    professions,
+    buildings,
+  };
+  assertValidEconomyDefinitions(economyDefinitions);
+
+  const professionByKey = new Map(professions.map((profession) => [profession.key, profession]));
+  const buildingByKey = new Map(buildings.map((building) => [building.key, building]));
+  const profile = data.meta.ageStructures["world-1900-provisional"];
+  if (profile === undefined) throw new HistoricalDataError(["missing world-1900-provisional age structure"]);
+
+  const populationDefinitions: PopulationDefinitions = {
+    dataVersion: data.meta.dataVersion,
+    scenarioId: data.meta.scenarioId,
+    needs,
+    mortalityAnchors: demography.mortalityAnchors,
+    fertilityAnchors: demography.fertilityAnchors,
+    sexRatioAtBirth: demography.sexRatioAtBirth,
+    fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
+      professions.some((profession) => profession.id === entry.professionId),
+    ),
+  };
+  assertValidPopulationDefinitions(populationDefinitions);
+
+  const sortedPopulations = [...data.populations].sort((left, right) => {
+    if (left.regionId !== right.regionId) return left.regionId - right.regionId;
+    return left.professionKey < right.professionKey
+      ? -1
+      : left.professionKey > right.professionKey
+        ? 1
+        : 0;
+  });
+  const blockIdByKey = new Map<string, number>();
+  const accountIdByKey = new Map<string, number>();
+  const popBlocks = sortedPopulations.map((population, index) => {
+    const profession = professionByKey.get(population.professionKey);
+    if (profession === undefined) {
+      throw new HistoricalDataError([
+        `population ${String(population.regionId)}:${population.professionKey} references an unknown profession`,
+      ]);
+    }
+    const householdAccountId = HISTORICAL_HOUSEHOLD_ACCOUNT_BASE + index;
+    const key = `${String(population.regionId)}:${population.professionKey}`;
+    blockIdByKey.set(key, index);
+    accountIdByKey.set(key, householdAccountId);
+    const ages = expandHistoricalPopulation(
+      population.population,
+      profile,
+      `population ${key}`,
+    );
+    return {
+      id: index,
+      regionId: population.regionId,
+      professionId: profession.id,
+      financialAccountId: householdAccountId,
+      maleAgeGroups: ages.maleAgeGroups,
+      femaleAgeGroups: ages.femaleAgeGroups,
+      literacy: population.literacy,
+      wealthLevel: population.wealthLevel,
+      initialSavingsSUSD: population.population * population.savingsPerCapitaSUSD,
+      militancy: population.militancy,
+    };
+  });
+
+  const regions: RegionInitialDef[] = [...data.regions]
+    .sort((left, right) => left.id - right.id)
+    .map((region) => ({
+      id: region.id,
+      key: region.key,
+      name: region.name,
+      ...(region.resourceCapsPerDay === undefined
+        ? {}
+        : { resourceCapsPerDay: region.resourceCapsPerDay }),
+    }));
+
+  const sortedMarkets = [...data.markets].sort((left, right) => left.id - right.id);
+  const sortedBuildings = [...data.buildings].sort((left, right) => {
+    if (left.regionId !== right.regionId) return left.regionId - right.regionId;
+    if (left.definitionKey !== right.definitionKey) {
+      return left.definitionKey < right.definitionKey ? -1 : 1;
+    }
+    if (left.level !== right.level) return left.level - right.level;
+    return left.key < right.key ? -1 : left.key > right.key ? 1 : 0;
+  });
+  const buildingIdByKey = new Map<string, number>();
+  const buildingInstances: BuildingInstanceInitialDef[] = sortedBuildings.map(
+    (building, index) => {
+      const definition = buildingByKey.get(building.definitionKey);
+      if (definition === undefined) {
+        throw new HistoricalDataError([
+          `building ${building.key} references unknown definition ${building.definitionKey}`,
+        ]);
+      }
+      const ownerKey = `${String(building.regionId)}:${building.ownerProfessionKey}`;
+      const ownerAccountId = accountIdByKey.get(ownerKey);
+      if (ownerAccountId === undefined) {
+        throw new HistoricalDataError([
+          `building ${building.key} has no owner household in ${ownerKey}`,
+        ]);
+      }
+      buildingIdByKey.set(building.key, index);
+      return {
+        id: index,
+        definitionId: definition.id,
+        regionId: building.regionId,
+        level: building.level,
+        condition: 1,
+        ownerKind: "private",
+        ownerAccountId,
+        builtOnDay: data.meta.startDayIndex,
+        operational: true,
+        operatingCashAccountId: HISTORICAL_BUILDING_ACCOUNT_BASE + index,
+        initialOperatingCashSUSD: building.operatingCashSUSD,
+      };
+    },
+  );
+
+  const employment: EmploymentAssignmentInitialDef[] = [...data.employment]
+    .map((entry, index) => {
+      const buildingId = buildingIdByKey.get(entry.buildingKey);
+      const popBlockId = blockIdByKey.get(`${String(entry.regionId)}:${entry.professionKey}`);
+      const profession = professionByKey.get(entry.professionKey);
+      if (buildingId === undefined || popBlockId === undefined || profession === undefined) {
+        throw new HistoricalDataError([
+          `employment ${entry.buildingKey} could not be resolved after construction`,
+        ]);
+      }
+      return {
+        id: index,
+        popBlockId,
+        buildingInstanceId: buildingId,
+        professionId: profession.id,
+        workers: entry.workers,
+      };
+    })
+    .sort((left, right) => left.id - right.id);
+
+  const markets: MarketInitialDef[] = sortedMarkets.map((market) => ({
+    id: market.id,
+    regionIds: [...market.regionIds].sort((left, right) => left - right),
+    priceSUSD: goods.map((good) => good.basePrice1900SUSD),
+    stockLots: [],
+  }));
+
+  const currencies = data.countries
+    .slice()
+    .sort((left, right) => left.id - right.id)
+    .map((country) => ({
+      id: country.id,
+      key: country.currency.key,
+      name: country.currency.name,
+      issuer: { kind: "country" as const, countryId: country.id },
+    }));
+  const currencyValuations: CurrencyValuation[] = data.countries
+    .slice()
+    .sort((left, right) => left.id - right.id)
+    .map((country) =>
+      country.currency.valuation.status === "specified"
+        ? {
+            currencyId: country.id,
+            status: "specified" as const,
+            susdPerUnit: asSusdPerCurrencyUnit(country.currency.valuation.susdPerUnit),
+            setOnDay: data.meta.startDayIndex,
+            source: "scenario" as const,
+          }
+        : { currencyId: country.id, status: "unavailable" as const },
+    );
+
+  const countries: CountryInitialDef[] = data.countries
+    .slice()
+    .sort((left, right) => left.id - right.id)
+    .map((country) => ({
+      id: country.id,
+      tag: country.tag,
+      name: country.name,
+      monetary: { kind: "own", currencyId: country.id },
+      regionIds: [...country.regionIds].sort((left, right) => left - right),
+      treasuryAccountId: HISTORICAL_TREASURY_ACCOUNT_BASE + country.id,
+      initialTreasuryCashSUSD: country.initialTreasuryCashSUSD,
+      fiscal: { ...country.fiscal },
+      immigrationOpen: country.immigrationOpen,
+    }));
+
+  const systemAccounts: SystemAccountInitialDef[] = [
+    {
+      id: HISTORICAL_SYSTEM_ACCOUNT_ID,
+      accountKind: "system-reserve",
+      balanceSUSD: 0,
+    },
+  ];
+
+  const population: PopulationScenarioDef = {
+    dataVersion: data.meta.dataVersion,
+    scenarioId: data.meta.scenarioId,
+    startDayIndex: data.meta.startDayIndex,
+    professions: professions.map((profession) => ({
+      id: profession.id,
+      key: profession.key,
+      name: profession.name,
+      stratum: profession.stratum,
+    })),
+    regions,
+    popBlocks,
+    definitions: populationDefinitions,
+  };
+
+  return {
+    population,
+    definitions: economyDefinitions,
+    buildingInstances,
+    markets,
+    systemAccounts,
+    employment,
+    countries,
+    currencies,
+    currencyValuations,
+  };
+}
+
+/** Load and build the eight-polity M5 scenario. */
+export function loadM5EightPolities(): EconomyScenarioDef {
+  return buildM5HistoricalScenario(loadM5HistoricalData());
+}

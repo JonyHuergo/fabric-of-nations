@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "scenarioId": "m5-eight-polities",
+    "dataVersion": "m3-economy-v1",
+    "status": "provisional",
+    "description": "Authored 1900 sample of eight polities for M5 multi-region, multi-market, migration, and labor-mobility validation. Population totals are rounded national estimates; occupation composition and market membership are provisional authored allocations. This is not a complete historical reconstruction and its eight polities are not a world total.",
+    "startDayIndex": 0,
+    "sources": [
+      {
+        "id": "owid-population",
+        "title": "Our World in Data — Population, long-run series",
+        "url": "https://ourworldindata.org/grapher/population",
+        "accessDate": "2026-10-26",
+        "license": "CC BY 4.0",
+        "notes": "Round national population estimates for 1900. The campaign sample covers eight polities only; it is not a world total and does not reconcile to the M2 world aggregate."
+      },
+      {
+        "id": "maddison-2023",
+        "title": "Maddison Project Database 2023",
+        "url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023",
+        "accessDate": "2026-10-26",
+        "license": "CC BY 4.0",
+        "notes": "Long-run population and income reconstructions used as cross-checks for rounded 1900 national totals."
+      },
+      {
+        "id": "owid-employment-by-sector",
+        "title": "Our World in Data — Employment by sector (historical reconstructions)",
+        "url": "https://ourworldindata.org/employment-by-sector",
+        "accessDate": "2026-10-26",
+        "license": "CC BY 4.0",
+        "notes": "Broad 1900 agricultural-employment reconstructions used only to set wide provisional occupation-structure ranges, not as measured observations."
+      },
+      {
+        "id": "project-m2-1900-age-structure",
+        "title": "Century M2 provisional 1900 world age structure",
+        "url": "internal:packages/data/data/scenarios/m2_world_aggregate.json",
+        "accessDate": "2026-10-26",
+        "license": "Project data",
+        "notes": "Provisional 1900 world age/sex profile used to expand each historical block total. It is not a country-specific age observation."
+      },
+      {
+        "id": "project-authored-sample",
+        "title": "Century M5 authored sample tables and source notes",
+        "url": "internal:packages/data/data/historical/source_notes.md",
+        "accessDate": "2026-10-26",
+        "license": "Project data",
+        "notes": "Authored region boundaries, market membership, fiscal settings, building levels, and structure allocations. Explicitly provisional."
+      }
+    ],
+    "ageStructures": {
+      "world-1900-provisional": {
+        "maleCounts": [
+          132394964, 107660935, 99430546, 86502648, 77669019, 64257524, 56334599,
+          47948605, 40093909, 31923550, 23700008, 17100726, 12182869, 8138272,
+          4320566, 2079627, 1249691
+        ],
+        "femaleCounts": [
+          127011002, 103106411, 95123927, 83732516, 76353272, 65445458, 57155510,
+          49328632, 40970455, 32927941, 24938610, 18567594, 13757727, 9695888,
+          5407158, 2784235, 1992884
+        ],
+        "sourceIds": ["project-m2-1900-age-structure"],
+        "status": "provisional",
+        "notes": "World 1900 five-year profile reused for every country. Country-specific age structures are not implemented and would be required for historical age-structure validation."
+      }
+    },
+    "files": {
+      "countries": "historical/countries_1900.json",
+      "regions": "historical/regions_1900.json",
+      "markets": "historical/markets_1900.json",
+      "populations": "historical/pops_1900.json",
+      "buildings": "historical/buildings_1900.json",
+      "employment": "historical/employment_1900.json",
+      "calibration": "historical/calibration_targets_1900.json"
+    },
+    "definitions": {
+      "goods": "goods.json",
+      "professions": "professions.json",
+      "buildings": "buildings.json",
+      "needs": "m3_needs.json",
+      "demography": "demography.json"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "id": 0,
+    "key": "north-atlantic",
+    "name": "North Atlantic trade market",
+    "regionIds": [0, 1, 2, 3],
+    "priceBasis": "base-1900",
+    "status": "provisional",
+    "sourceIds": ["project-authored-sample"]
+  },
+  {
+    "id": 1,
+    "key": "continental-europe",
+    "name": "Continental European trade market",
+    "regionIds": [4, 5, 6, 7],
+    "priceBasis": "base-1900",
+    "status": "provisional",
+    "sourceIds": ["project-authored-sample"]
+  },
+  {
+    "id": 2,
+    "key": "russian-empire",
+    "name": "Russian imperial market",
+    "regionIds": [8, 9],
+    "priceBasis": "base-1900",
+    "status": "provisional",
+    "sourceIds": ["project-authored-sample"]
+  },
+  {
+    "id": 3,
+    "key": "asian-trade",
+    "name": "Asian trade market",
+    "regionIds": [10, 11, 12, 13],
+    "priceBasis": "base-1900",
+    "status": "provisional",
+    "sourceIds": ["project-authored-sample"]
+  },
+  {
+    "id": 4,
+    "key": "brazil",
+    "name": "Brazilian market",
+    "regionIds": [14, 15],
+    "priceBasis": "base-1900",
+    "status": "provisional",
+    "sourceIds": ["project-authored-sample"]
+  }
+]

@@ -1,0 +1,18 @@
+[
+  { "id": 0, "key": "usa-northeast", "name": "United States Northeast", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 1, "key": "usa-south", "name": "United States South", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 2, "key": "gbr-britain", "name": "Great Britain", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 3, "key": "gbr-ireland", "name": "Ireland", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 4, "key": "deu-prussia", "name": "Prussia", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 5, "key": "deu-south", "name": "Southern Germany", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 6, "key": "fra-north", "name": "Northern France", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 7, "key": "fra-south", "name": "Southern France", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 8, "key": "rus-ukraine", "name": "Russian Ukraine", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 9, "key": "rus-central", "name": "Central Russia", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 10, "key": "jpn-honshu", "name": "Honshu", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 11, "key": "jpn-kyushu", "name": "Kyushu", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 12, "key": "ind-bengal", "name": "Bengal", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 13, "key": "ind-madras", "name": "Madras", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 14, "key": "bra-southeast", "name": "Brazilian Southeast", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" },
+  { "id": 15, "key": "bra-northeast", "name": "Brazilian Northeast", "sourceIds": ["owid-population", "project-authored-sample"], "calibrationStatus": "provisional" }
+]

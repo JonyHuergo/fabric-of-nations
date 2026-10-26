@@ -1,0 +1,731 @@
+[
+  {
+    "key": "usa-northeast-subsistence-farm",
+    "regionId": 0,
+    "definitionKey": "subsistence-farm",
+    "level": 70,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-northeast-commercial-farm",
+    "regionId": 0,
+    "definitionKey": "commercial-farm",
+    "level": 43,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-northeast-warehouse",
+    "regionId": 0,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-northeast-food-processing",
+    "regionId": 0,
+    "definitionKey": "food-processing",
+    "level": 40,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-northeast-textile-mill",
+    "regionId": 0,
+    "definitionKey": "textile-mill",
+    "level": 60,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-northeast-workshop",
+    "regionId": 0,
+    "definitionKey": "workshop",
+    "level": 60,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-south-subsistence-farm",
+    "regionId": 1,
+    "definitionKey": "subsistence-farm",
+    "level": 57,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-south-commercial-farm",
+    "regionId": 1,
+    "definitionKey": "commercial-farm",
+    "level": 35,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-south-warehouse",
+    "regionId": 1,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-south-food-processing",
+    "regionId": 1,
+    "definitionKey": "food-processing",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-subsistence-farm",
+    "regionId": 2,
+    "definitionKey": "subsistence-farm",
+    "level": 20,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-commercial-farm",
+    "regionId": 2,
+    "definitionKey": "commercial-farm",
+    "level": 51,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-warehouse",
+    "regionId": 2,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-food-processing",
+    "regionId": 2,
+    "definitionKey": "food-processing",
+    "level": 50,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-textile-mill",
+    "regionId": 2,
+    "definitionKey": "textile-mill",
+    "level": 80,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-britain-workshop",
+    "regionId": 2,
+    "definitionKey": "workshop",
+    "level": 70,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-ireland-subsistence-farm",
+    "regionId": 3,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-ireland-commercial-farm",
+    "regionId": 3,
+    "definitionKey": "commercial-farm",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-ireland-warehouse",
+    "regionId": 3,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-ireland-food-processing",
+    "regionId": 3,
+    "definitionKey": "food-processing",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-subsistence-farm",
+    "regionId": 4,
+    "definitionKey": "subsistence-farm",
+    "level": 59,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-commercial-farm",
+    "regionId": 4,
+    "definitionKey": "commercial-farm",
+    "level": 37,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-warehouse",
+    "regionId": 4,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-food-processing",
+    "regionId": 4,
+    "definitionKey": "food-processing",
+    "level": 40,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-textile-mill",
+    "regionId": 4,
+    "definitionKey": "textile-mill",
+    "level": 50,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-prussia-workshop",
+    "regionId": 4,
+    "definitionKey": "workshop",
+    "level": 40,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-south-subsistence-farm",
+    "regionId": 5,
+    "definitionKey": "subsistence-farm",
+    "level": 39,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-south-commercial-farm",
+    "regionId": 5,
+    "definitionKey": "commercial-farm",
+    "level": 25,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-south-warehouse",
+    "regionId": 5,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-south-food-processing",
+    "regionId": 5,
+    "definitionKey": "food-processing",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-south-workshop",
+    "regionId": 5,
+    "definitionKey": "workshop",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-subsistence-farm",
+    "regionId": 6,
+    "definitionKey": "subsistence-farm",
+    "level": 43,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-commercial-farm",
+    "regionId": 6,
+    "definitionKey": "commercial-farm",
+    "level": 21,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-warehouse",
+    "regionId": 6,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-food-processing",
+    "regionId": 6,
+    "definitionKey": "food-processing",
+    "level": 30,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-textile-mill",
+    "regionId": 6,
+    "definitionKey": "textile-mill",
+    "level": 30,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-north-workshop",
+    "regionId": 6,
+    "definitionKey": "workshop",
+    "level": 30,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-south-subsistence-farm",
+    "regionId": 7,
+    "definitionKey": "subsistence-farm",
+    "level": 35,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-south-commercial-farm",
+    "regionId": 7,
+    "definitionKey": "commercial-farm",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-south-warehouse",
+    "regionId": 7,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-south-food-processing",
+    "regionId": 7,
+    "definitionKey": "food-processing",
+    "level": 15,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-ukraine-subsistence-farm",
+    "regionId": 8,
+    "definitionKey": "subsistence-farm",
+    "level": 211,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-ukraine-commercial-farm",
+    "regionId": 8,
+    "definitionKey": "commercial-farm",
+    "level": 25,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-ukraine-warehouse",
+    "regionId": 8,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-ukraine-food-processing",
+    "regionId": 8,
+    "definitionKey": "food-processing",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-subsistence-farm",
+    "regionId": 9,
+    "definitionKey": "subsistence-farm",
+    "level": 268,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-commercial-farm",
+    "regionId": 9,
+    "definitionKey": "commercial-farm",
+    "level": 31,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-warehouse",
+    "regionId": 9,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-food-processing",
+    "regionId": 9,
+    "definitionKey": "food-processing",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-textile-mill",
+    "regionId": 9,
+    "definitionKey": "textile-mill",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-central-workshop",
+    "regionId": 9,
+    "definitionKey": "workshop",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-subsistence-farm",
+    "regionId": 10,
+    "definitionKey": "subsistence-farm",
+    "level": 86,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-commercial-farm",
+    "regionId": 10,
+    "definitionKey": "commercial-farm",
+    "level": 21,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-warehouse",
+    "regionId": 10,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-food-processing",
+    "regionId": 10,
+    "definitionKey": "food-processing",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-textile-mill",
+    "regionId": 10,
+    "definitionKey": "textile-mill",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-honshu-workshop",
+    "regionId": 10,
+    "definitionKey": "workshop",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-kyushu-subsistence-farm",
+    "regionId": 11,
+    "definitionKey": "subsistence-farm",
+    "level": 40,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-kyushu-commercial-farm",
+    "regionId": 11,
+    "definitionKey": "commercial-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-kyushu-warehouse",
+    "regionId": 11,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-kyushu-food-processing",
+    "regionId": 11,
+    "definitionKey": "food-processing",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-subsistence-farm",
+    "regionId": 12,
+    "definitionKey": "subsistence-farm",
+    "level": 415,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-commercial-farm",
+    "regionId": 12,
+    "definitionKey": "commercial-farm",
+    "level": 81,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-warehouse",
+    "regionId": 12,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-food-processing",
+    "regionId": 12,
+    "definitionKey": "food-processing",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-textile-mill",
+    "regionId": 12,
+    "definitionKey": "textile-mill",
+    "level": 20,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-bengal-workshop",
+    "regionId": 12,
+    "definitionKey": "workshop",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-madras-subsistence-farm",
+    "regionId": 13,
+    "definitionKey": "subsistence-farm",
+    "level": 339,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-madras-commercial-farm",
+    "regionId": 13,
+    "definitionKey": "commercial-farm",
+    "level": 66,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-madras-warehouse",
+    "regionId": 13,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ind-madras-food-processing",
+    "regionId": 13,
+    "definitionKey": "food-processing",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-subsistence-farm",
+    "regionId": 14,
+    "definitionKey": "subsistence-farm",
+    "level": 33,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-commercial-farm",
+    "regionId": 14,
+    "definitionKey": "commercial-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-warehouse",
+    "regionId": 14,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-food-processing",
+    "regionId": 14,
+    "definitionKey": "food-processing",
+    "level": 10,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-textile-mill",
+    "regionId": 14,
+    "definitionKey": "textile-mill",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-southeast-workshop",
+    "regionId": 14,
+    "definitionKey": "workshop",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-northeast-subsistence-farm",
+    "regionId": 15,
+    "definitionKey": "subsistence-farm",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 20000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-northeast-commercial-farm",
+    "regionId": 15,
+    "definitionKey": "commercial-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-northeast-warehouse",
+    "regionId": 15,
+    "definitionKey": "warehouse",
+    "level": 100,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-northeast-food-processing",
+    "regionId": 15,
+    "definitionKey": "food-processing",
+    "level": 5,
+    "ownerProfessionKey": "laborers",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  }
+]
