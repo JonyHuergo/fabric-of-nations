@@ -357,10 +357,22 @@ export interface FinanceState {
    * rewrites them; long-run finance history lives here, not in `postings`.
    */
   periodSummaries: FinancePeriodSummary[];
-  /** M5b debt contracts; empty when public debt is disabled/unused. */
+  /**
+   * Bounded debt records: all active/arrears contracts plus the most recent
+   * terminated contracts. Older terminated records are aggregated in
+   * `debtHistory` (D-066).
+   */
   debtContracts: DebtContract[];
+  /** One bounded aggregate per issuer for compacted terminated contracts. */
+  debtHistory: DebtHistoryAggregate[];
   /** Deterministic allocator for new debt contract ids. */
   nextContractId: number;
+  /**
+   * Month-to-date requested welfare budget per country. This is a reporting and
+   * financing-requirement memo, not a liability: unpaid welfare remains an unmet
+   * budget and is never posted as a payable. Reset at monthly close.
+   */
+  welfareRequestedThisMonth: Record<Id, MoneySUSD>;
   /**
    * Inclusive last day of the most recently closed period, or null before the
    * first close. A published world requires `null` or `closedThroughDay <
@@ -444,6 +456,22 @@ export interface DebtPolicy {
   refinanceOnMaturity: boolean;
   /** Days after first arrears before the remaining debt is written off. */
   arrearsGraceDays: number;
+}
+
+/**
+ * Bounded aggregate of retired debt contracts (D-066). One record per issuer
+ * preserves principal history after individual terminated contracts are compacted.
+ */
+export interface DebtHistoryAggregate {
+  readonly issuerCountryId: Id;
+  /** Fully repaid or refinanced contracts removed from retained detail. */
+  readonly contractsRetired: number;
+  /** Defaulted contracts removed from retained detail. */
+  readonly contractsDefaulted: number;
+  readonly principalIssuedSUSD: MoneySUSD;
+  readonly principalRepaidSUSD: MoneySUSD;
+  readonly principalWrittenOffSUSD: MoneySUSD;
+  readonly interestWrittenOffSUSD: MoneySUSD;
 }
 
 /** M5b public-debt contract. Persisted in `FinanceState`. */

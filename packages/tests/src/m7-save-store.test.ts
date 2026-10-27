@@ -13,7 +13,7 @@ import {
 } from "@century/sim-worker/persistence";
 
 const SEED = 20_261_023;
-const SCHEMA = 15;
+const SCHEMA = 16;
 
 class MemoryBackend implements SaveStorageBackend {
   public readonly values = new Map<string, string>();
@@ -128,9 +128,9 @@ describe("replace-safe save storage", () => {
     const store = new SaveStore(backend, { expectedSchemaVersion: SCHEMA });
     const save = makeSave();
     const parsed = JSON.parse(save) as { schemaVersion: number };
-    parsed.schemaVersion = 14;
+    parsed.schemaVersion = 15;
     backend.values.set("century.m7.save.v1", compressSaveForStorage(JSON.stringify(parsed)));
-    await expect(store.load()).rejects.toThrow(/schema 14/);
+    await expect(store.load()).rejects.toThrow(/schema 15/);
 
     backend.values.set("century.m7.save.v1", "century-save-gzip1:truncated");
     await expect(store.load()).rejects.toThrow(/readable saved game/i);

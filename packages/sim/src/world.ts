@@ -173,7 +173,9 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       periodSummaries: [],
       closedThroughDay: null,
       debtContracts: [],
+      debtHistory: [],
       nextContractId: 1,
+      welfareRequestedThisMonth: {},
     },
     profitDistribution: {
       enabled: false,

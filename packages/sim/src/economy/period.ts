@@ -635,6 +635,9 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
   const postings = postPeriodCloseEntries(staged, world.dayIndex, entries);
   staged.periodSummaries.push(summary);
   staged.closedThroughDay = bounds.endDay;
+  // The requested-welfare memo has served the month-end financing decision; it
+  // is not a liability and starts a new month at zero.
+  staged.welfareRequestedThisMonth = {};
   compactFinanceHistory(staged);
 
   assertOwnerEquityInvariant(staged);

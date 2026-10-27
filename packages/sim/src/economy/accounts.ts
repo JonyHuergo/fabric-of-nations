@@ -896,7 +896,9 @@ export function cloneFinanceState(
                 }),
           })),
     debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
+    debtHistory: finance.debtHistory.map((aggregate) => ({ ...aggregate })),
     nextContractId: finance.nextContractId,
+    welfareRequestedThisMonth: { ...finance.welfareRequestedThisMonth },
     closedThroughDay: finance.closedThroughDay,
   };
 }

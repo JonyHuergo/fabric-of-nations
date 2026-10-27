@@ -45,12 +45,19 @@ import {
   assertValidDebtPolicy,
   debtOutstandingPrincipal,
 } from "./debtPolicy.js";
-import { MAX_AUDIT_POSTINGS, MAX_PERIOD_SUMMARIES } from "./constants.js";
+import {
+  MAX_ACTIVE_DEBT_CONTRACTS,
+  MAX_AUDIT_POSTINGS,
+  MAX_DEBT_HISTORY_AGGREGATES,
+  MAX_PERIOD_SUMMARIES,
+  MAX_RETAINED_TERMINATED_DEBT_CONTRACTS,
+} from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
   type BuildingInstance,
   type DebtContract,
+  type DebtHistoryAggregate,
   type EmploymentAssignment,
   type FinancePeriodSummary,
   type FinanceState,
@@ -395,6 +402,8 @@ export function assertValidFinanceState(finance: FinanceState): void {
   const rawContracts = requireArray(record.debtContracts, "world.finance.debtContracts");
   const contractIds = new Set<number>();
   let maxContractId = 0;
+  let activeContracts = 0;
+  let terminatedContracts = 0;
   for (let index = 0; index < rawContracts.length; index += 1) {
     const contract = rawContracts[index] as DebtContract;
     assertValidDebtContract(contract, `world.finance.debtContracts[${String(index)}]`);
@@ -403,6 +412,22 @@ export function assertValidFinanceState(finance: FinanceState): void {
     }
     contractIds.add(contract.id);
     maxContractId = Math.max(maxContractId, contract.id);
+    if (contract.status === "active" || contract.status === "arrears") activeContracts += 1;
+    else terminatedContracts += 1;
+  }
+  if (activeContracts > MAX_ACTIVE_DEBT_CONTRACTS) {
+    throw new RangeError(
+      `world.finance.debtContracts has ${String(activeContracts)} active contracts; maximum ${String(
+        MAX_ACTIVE_DEBT_CONTRACTS,
+      )}`,
+    );
+  }
+  if (terminatedContracts > MAX_RETAINED_TERMINATED_DEBT_CONTRACTS) {
+    throw new RangeError(
+      `world.finance.debtContracts retains ${String(terminatedContracts)} terminated contracts; maximum ${String(
+        MAX_RETAINED_TERMINATED_DEBT_CONTRACTS,
+      )}`,
+    );
   }
   const nextContractId = requireInteger(
     record.nextContractId,
@@ -414,6 +439,59 @@ export function assertValidFinanceState(finance: FinanceState): void {
     throw new RangeError(
       "world.finance.nextContractId must be greater than every debt contract id",
     );
+  }
+
+  const rawHistory = requireArray(record.debtHistory, "world.finance.debtHistory");
+  if (rawHistory.length > MAX_DEBT_HISTORY_AGGREGATES) {
+    throw new RangeError(
+      `world.finance.debtHistory must contain at most ${String(MAX_DEBT_HISTORY_AGGREGATES)} entries`,
+    );
+  }
+  const historyIssuers = new Set<number>();
+  for (let index = 0; index < rawHistory.length; index += 1) {
+    const aggregate = rawHistory[index] as DebtHistoryAggregate;
+    const path = `world.finance.debtHistory[${String(index)}]`;
+    const recordHistory = requireRecord(aggregate, path);
+    const issuer = requireInteger(recordHistory.issuerCountryId, `${path}.issuerCountryId`, 0, 0xffff_ffff);
+    if (historyIssuers.has(issuer)) {
+      throw new RangeError(`duplicate debt history aggregate for issuer ${String(issuer)}`);
+    }
+    historyIssuers.add(issuer);
+    for (const field of [
+      "contractsRetired",
+      "contractsDefaulted",
+    ] as const) {
+      requireInteger(recordHistory[field], `${path}.${field}`, 0, 1_000_000);
+    }
+    for (const field of [
+      "principalIssuedSUSD",
+      "principalRepaidSUSD",
+      "principalWrittenOffSUSD",
+      "interestWrittenOffSUSD",
+    ] as const) {
+      const value = requireFiniteNumber(recordHistory[field], `${path}.${field}`);
+      if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
+    }
+  }
+
+  const rawWelfare = requireRecord(
+    record.welfareRequestedThisMonth,
+    "world.finance.welfareRequestedThisMonth",
+  );
+  for (const key of Object.keys(rawWelfare)) {
+    const countryId = parseAccountTotalKey(
+      key,
+      "world.finance.welfareRequestedThisMonth",
+    );
+    const value = requireFiniteNumber(
+      rawWelfare[key],
+      `world.finance.welfareRequestedThisMonth.${key}`,
+    );
+    if (value < 0) {
+      throw new RangeError(
+        `world.finance.welfareRequestedThisMonth.${String(countryId)} must be non-negative`,
+      );
+    }
   }
 
   const opening = record.opening as FinanceState["opening"];

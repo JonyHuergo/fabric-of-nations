@@ -5,8 +5,18 @@
     "name": "United States",
     "regionIds": [0, 1],
     "currency": { "key": "usd", "name": "United States dollar", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.0, "welfareBudgetSUSDPerYear": 0 },
-    "initialTreasuryCashSUSD": 3810000,
+    "fiscal": { "incomeTaxRate": 0.0, "welfareBudgetSUSDPerYear": 2000000 },
+    "initialTreasuryCashSUSD": 100000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 1000000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
     "immigrationOpen": true,
     "sourceIds": ["owid-population", "maddison-2023"],
     "occupationSourceIds": ["owid-employment-by-sector"]

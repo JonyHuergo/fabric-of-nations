@@ -390,6 +390,10 @@ function executeFiscalPhase(
         welfareReceivedSUSD: allocations.get(block.popBlockId) ?? 0,
       });
     }
+    if (requested > 0 || stagedFinance.welfareRequestedThisMonth[country.id] !== undefined) {
+      stagedFinance.welfareRequestedThisMonth[country.id] =
+        (stagedFinance.welfareRequestedThisMonth[country.id] ?? 0) + requested;
+    }
     countryDrafts.push({
       countryId: country.id,
       incomeTaxSUSD: taxTotal,

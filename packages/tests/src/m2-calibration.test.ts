@@ -101,11 +101,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // this is not accepted as historical demographic validation.
     expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
 
-    // Schema 15 changes the canonical history representation; the digest changes
-    // even though the M2 population behavior is unchanged.
-    expect(hashWorld(world)).toBe("cecc46ad3e68279b");
+    // Schema 16 adds debt-history and welfare-memo state; the digest changes even
+    // though the M2 population behavior is unchanged.
+    expect(hashWorld(world)).toBe("8dd9d61f759bf4ad");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("cecc46ad3e68279b");
+    expect(hashWorld(restored)).toBe("8dd9d61f759bf4ad");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -306,6 +306,6 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // interpolation shortfall.
     expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
     expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
-    expect(hashWorld(world)).toBe("1595e451fec66613");
+    expect(hashWorld(world)).toBe("1abcea85003e5107");
   });
 });

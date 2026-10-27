@@ -139,6 +139,20 @@ export interface HistoricalCountryInput {
     readonly welfareBudgetSUSDPerYear: number;
   };
   readonly initialTreasuryCashSUSD: number;
+  /**
+   * Optional public-debt policy. Debt is a provincially authored policy input,
+   * not a historical claim; omitted countries use the disabled default.
+   */
+  readonly debt?: {
+    readonly enabled: boolean;
+    readonly creditorKind: "country" | "popBlock";
+    readonly creditorId: number;
+    readonly annualCouponRate: number;
+    readonly termDays: number;
+    readonly maxOutstandingPrincipalSUSD: number;
+    readonly refinanceOnMaturity: boolean;
+    readonly arrearsGraceDays: number;
+  };
   readonly immigrationOpen: boolean;
   readonly sourceIds: readonly string[];
   readonly occupationSourceIds: readonly string[];
@@ -588,6 +602,41 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       errors.push(`${path}.currency.valuation.status must be "specified" or "unavailable"`);
     }
     const fiscal = assertRecord(record.fiscal, `${path}.fiscal`, errors);
+    const debt =
+      record.debt === undefined
+        ? undefined
+        : (() => {
+            const debtor = assertRecord(record.debt, `${path}.debt`, errors);
+            const creditorKind = stringField(debtor, "creditorKind", `${path}.debt`, errors);
+            if (creditorKind !== "country" && creditorKind !== "popBlock") {
+              errors.push(`${path}.debt.creditorKind must be "country" or "popBlock"`);
+            }
+            return {
+              enabled: booleanField(debtor, "enabled", `${path}.debt`, errors),
+              creditorKind: creditorKind === "popBlock" ? ("popBlock" as const) : ("country" as const),
+              creditorId: numberField(debtor, "creditorId", `${path}.debt`, errors),
+              annualCouponRate: numberField(
+                debtor,
+                "annualCouponRate",
+                `${path}.debt`,
+                errors,
+              ),
+              termDays: numberField(debtor, "termDays", `${path}.debt`, errors),
+              maxOutstandingPrincipalSUSD: numberField(
+                debtor,
+                "maxOutstandingPrincipalSUSD",
+                `${path}.debt`,
+                errors,
+              ),
+              refinanceOnMaturity: booleanField(
+                debtor,
+                "refinanceOnMaturity",
+                `${path}.debt`,
+                errors,
+              ),
+              arrearsGraceDays: numberField(debtor, "arrearsGraceDays", `${path}.debt`, errors),
+            };
+          })();
     return {
       id: numberField(record, "id", path, errors),
       tag: stringField(record, "tag", path, errors, { maxLength: 8 }),
@@ -625,6 +674,7 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
         ),
       },
       initialTreasuryCashSUSD: numberField(record, "initialTreasuryCashSUSD", path, errors),
+      ...(debt === undefined ? {} : { debt }),
       immigrationOpen: booleanField(record, "immigrationOpen", path, errors),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       occupationSourceIds: stringArrayField(record, "occupationSourceIds", path, errors),
@@ -934,6 +984,27 @@ export function validateM5HistoricalData(
     }
     if (!(country.initialTreasuryCashSUSD >= 0)) {
       errors.push(`${path}.initialTreasuryCashSUSD must be non-negative`);
+    }
+    if (country.debt !== undefined) {
+      const debt = country.debt;
+      if (!(debt.annualCouponRate >= 0 && debt.annualCouponRate <= 1)) {
+        errors.push(`${path}.debt.annualCouponRate must be in 0..1`);
+      }
+      if (!Number.isInteger(debt.termDays) || debt.termDays < 1) {
+        errors.push(`${path}.debt.termDays must be a positive integer`);
+      }
+      if (!(debt.maxOutstandingPrincipalSUSD >= 0)) {
+        errors.push(`${path}.debt.maxOutstandingPrincipalSUSD must be non-negative`);
+      }
+      if (!Number.isInteger(debt.arrearsGraceDays) || debt.arrearsGraceDays < 0) {
+        errors.push(`${path}.debt.arrearsGraceDays must be a non-negative integer`);
+      }
+      if (!Number.isInteger(debt.creditorId) || debt.creditorId < 0) {
+        errors.push(`${path}.debt.creditorId must be a non-negative integer`);
+      }
+      if (debt.creditorKind === "country" && debt.creditorId === country.id) {
+        errors.push(`${path}.debt cannot name its own country as creditor`);
+      }
     }
     if (country.currency.valuation.status === "specified") {
       if (!(country.currency.valuation.susdPerUnit > 0)) {
@@ -1518,6 +1589,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       treasuryAccountId: HISTORICAL_TREASURY_ACCOUNT_BASE + country.id,
       initialTreasuryCashSUSD: country.initialTreasuryCashSUSD,
       fiscal: { ...country.fiscal },
+      ...(country.debt === undefined ? {} : { debt: { ...country.debt } }),
       immigrationOpen: country.immigrationOpen,
     }));
 

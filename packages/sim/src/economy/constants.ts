@@ -121,6 +121,15 @@ export const MAX_DEBT_TERM_DAYS = 36_500;
 export const MAX_DEBT_ARREARS_GRACE_DAYS = 3_650;
 export const MAX_DEBT_PRINCIPAL_SUSD = 1e15;
 
+/** Hard cap on simultaneously active/arrears debt contracts. */
+export const MAX_ACTIVE_DEBT_CONTRACTS = 64;
+
+/** Number of most recent terminated contracts retained for detailed history. */
+export const MAX_RETAINED_TERMINATED_DEBT_CONTRACTS = 32;
+
+/** One aggregate per issuer is expected; this is a defensive storage cap. */
+export const MAX_DEBT_HISTORY_AGGREGATES = 256;
+
 /**
  * M6 country-AI v1 constants. PROVISIONAL policy rules, not calibrated
  * economics. Every rule is deterministic and uses only own-country or public

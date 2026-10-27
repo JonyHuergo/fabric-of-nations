@@ -12,7 +12,7 @@ import { postJournalBatch, postJournalEntry, type JournalEntryInput } from "./ac
 
 import { assertAccountingIdentity, buildFinanceIndex, cloneFinanceState, designatedCashTotal, type FinanceIndex, } from "./accounts.js";
 
-import { MAX_DEBT_COUPON_RATE, MAX_DEBT_TERM_DAYS, MIN_DEBT_COUPON_RATE, MIN_DEBT_TERM_DAYS, } from "./constants.js";
+import { MAX_ACTIVE_DEBT_CONTRACTS, MAX_DEBT_COUPON_RATE, MAX_DEBT_TERM_DAYS, MAX_RETAINED_TERMINATED_DEBT_CONTRACTS, MIN_DEBT_COUPON_RATE, MIN_DEBT_TERM_DAYS, } from "./constants.js";
 
 import type { Country, DebtContract, DebtPolicy, FinanceState } from "./types.js";
 
@@ -125,13 +125,23 @@ function interestPaymentEntry(index: FinanceIndex, contract: DebtContract, amoun
 }
 
 function defaultWriteoffEntry(index: FinanceIndex, contract: DebtContract): JournalEntryInput | null {
-    const principal = contract.outstandingPrincipalSUSD;
-    const interest = contract.accruedInterestSUSD;
+    const issuer = issuerAccounts(index, contract.issuerCountryId);
+    const holder = holderAccounts(index, contract.holderKind, contract.holderId);
+    // Contract-level accrued amounts can differ from aggregate posting-account
+    // balances by a floating residual. Never write off more than both sides hold.
+    const principal = Math.min(
+        contract.outstandingPrincipalSUSD,
+        issuer.liability.balanceSUSD,
+        holder.bond.balanceSUSD,
+    );
+    const interest = Math.min(
+        contract.accruedInterestSUSD,
+        issuer.payable.balanceSUSD,
+        holder.receivable.balanceSUSD,
+    );
     const total = principal + interest;
     if (!(total > 0))
         return null;
-    const issuer = issuerAccounts(index, contract.issuerCountryId);
-    const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     const holderEquity = index.get(contract.holderKind, contract.holderId, "owner-equity");
     const lines = [...(principal > 0 ? [{
                 accountId: issuer.liability.id, side: "debit" as const, amountSUSD: principal
@@ -160,6 +170,74 @@ function defaultWriteoffEntry(index: FinanceIndex, contract: DebtContract): Jour
 function appendContract(finance: FinanceState, contract: DebtContract): void {
     finance.debtContracts.push(contract);
     finance.debtContracts.sort((left, right) => left.id - right.id);
+}
+
+function activeDebtContractCount(contracts: readonly DebtContract[]): number {
+    return contracts.filter((contract) => contract.status === "active" || contract.status === "arrears").length;
+}
+
+function recordRetiredContract(
+    finance: FinanceState,
+    contract: DebtContract,
+    principalBefore: number,
+    interestBefore: number,
+): void {
+    const defaulted = contract.status === "defaulted";
+    let aggregate = finance.debtHistory.find(
+        (entry) => entry.issuerCountryId === contract.issuerCountryId,
+    );
+    if (aggregate === undefined) {
+        aggregate = {
+            issuerCountryId: contract.issuerCountryId,
+            contractsRetired: 0,
+            contractsDefaulted: 0,
+            principalIssuedSUSD: 0,
+            principalRepaidSUSD: 0,
+            principalWrittenOffSUSD: 0,
+            interestWrittenOffSUSD: 0,
+        };
+        finance.debtHistory.push(aggregate);
+        finance.debtHistory.sort((left, right) => left.issuerCountryId - right.issuerCountryId);
+    }
+    const updated = {
+        ...aggregate,
+        contractsRetired: aggregate.contractsRetired + (defaulted ? 0 : 1),
+        contractsDefaulted: aggregate.contractsDefaulted + (defaulted ? 1 : 0),
+        principalIssuedSUSD: aggregate.principalIssuedSUSD + contract.principalSUSD,
+        principalRepaidSUSD:
+            aggregate.principalRepaidSUSD +
+            (defaulted
+                ? Math.max(0, contract.principalSUSD - principalBefore)
+                : contract.principalSUSD),
+        principalWrittenOffSUSD:
+            aggregate.principalWrittenOffSUSD + (defaulted ? principalBefore : 0),
+        interestWrittenOffSUSD:
+            aggregate.interestWrittenOffSUSD + (defaulted ? interestBefore : 0),
+    };
+    const index = finance.debtHistory.findIndex(
+        (entry) => entry.issuerCountryId === contract.issuerCountryId,
+    );
+    finance.debtHistory[index] = updated;
+}
+
+/**
+ * Retain every active/arrears contract and only the newest bounded set of
+ * terminated contracts. Older terminated detail is already represented in
+ * `debtHistory`; removing it therefore cannot orphan a liability, bond asset,
+ * accrued interest, or cash transfer.
+ */
+function compactDebtContracts(finance: FinanceState): number {
+    const terminated = finance.debtContracts
+        .filter((contract) => contract.status === "repaid" || contract.status === "defaulted")
+        .sort((left, right) => left.id - right.id);
+    if (terminated.length <= MAX_RETAINED_TERMINATED_DEBT_CONTRACTS) return 0;
+    const remove = new Set(
+        terminated
+            .slice(0, terminated.length - MAX_RETAINED_TERMINATED_DEBT_CONTRACTS)
+            .map((contract) => contract.id),
+    );
+    finance.debtContracts = finance.debtContracts.filter((contract) => !remove.has(contract.id));
+    return remove.size;
 }
 
 function newContract(finance: FinanceState, issuerCountryId: Id, holderKind: "country" | "popBlock", holderId: Id, principalSUSD: number, annualCouponRate: number, issueDay: Day, termDays: number): DebtContract {
@@ -230,6 +308,11 @@ export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): Deb
     if (debtOutstandingPrincipal(staged.debtContracts, issuerCountry.id) + principal > ceiling + MONEY_TOLERANCE_SUSD) {
         throw new RangeError("debt issuance exceeds the outstanding-principal ceiling");
     }
+    if (activeDebtContractCount(staged.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
+        throw new RangeError(
+            `debt issuance would exceed the active-contract cap of ${String(MAX_ACTIVE_DEBT_CONTRACTS)}`,
+        );
+    }
     const contract = newContract(staged, issuerCountry.id, input.holderKind, input.holderId, principal, coupon, world.dayIndex, termDays);
     const postings = postJournalBatch(staged, world.dayIndex, [issuanceEntry(index, contract)]);
     appendContract(staged, contract);
@@ -268,6 +351,8 @@ export interface DebtPhaseResult {
     readonly interestPaidSUSD: number;
     readonly principalRepaidSUSD: number;
     readonly debtIssuedForDeficitSUSD: number;
+    /** Month-to-date budget/interest gap not covered by treasury liquidity. */
+    readonly financingRequirementSUSD: number;
     readonly unfinancedDeficitSUSD: number;
     readonly principalWrittenOffSUSD: number;
     readonly interestWrittenOffSUSD: number;
@@ -275,7 +360,7 @@ export interface DebtPhaseResult {
 
 function emptyDebtResult(dayIndex: DayIndex): DebtPhaseResult {
     return {
-        ran: false, dayIndex, contracts: [], interestAccruedSUSD: 0, interestPaidSUSD: 0, principalRepaidSUSD: 0, debtIssuedForDeficitSUSD: 0, unfinancedDeficitSUSD: 0, principalWrittenOffSUSD: 0, interestWrittenOffSUSD: 0,
+        ran: false, dayIndex, contracts: [], interestAccruedSUSD: 0, interestPaidSUSD: 0, principalRepaidSUSD: 0, debtIssuedForDeficitSUSD: 0, financingRequirementSUSD: 0, unfinancedDeficitSUSD: 0, principalWrittenOffSUSD: 0, interestWrittenOffSUSD: 0,
     };
 }
 
@@ -298,11 +383,21 @@ function markArrears(contract: DebtContract, dayIndex: DayIndex): void {
     }
 }
 
-function countryDeficit(index: FinanceIndex, countryId: Id): number {
+function countryFinancingRequirement(
+    finance: FinanceState,
+    index: FinanceIndex,
+    countryId: Id,
+): number {
     const revenue = index.get("country", countryId, "income-tax-revenue").balanceSUSD;
-    const welfare = index.get("country", countryId, "welfare-expense").balanceSUSD;
+    const requestedWelfare = finance.welfareRequestedThisMonth[countryId] ?? 0;
     const interest = index.get("country", countryId, "interest-expense").balanceSUSD;
-    return Math.max(0, welfare + interest - revenue);
+    const treasuryCash = index.get("country", countryId, "treasury-cash").balanceSUSD;
+    // The memo includes welfare paid and unpaid. Subtracting actual treasury
+    // liquidity means a country with cash (including prior state-enterprise
+    // remittances) does not borrow solely because the accounting formula is
+    // narrower than its cash position. Unpaid welfare remains an unmet budget,
+    // not a liability, and borrowing never posts back-pay.
+    return Math.max(0, requestedWelfare + interest - revenue - treasuryCash);
 }
 
 function accrueInterest(staged: FinanceState, index: FinanceIndex, contract: DebtContract, dayIndex: DayIndex): number {
@@ -325,7 +420,10 @@ function payAccruedInterest(staged: FinanceState, index: FinanceIndex, contract:
     if (contract.accruedInterestSUSD <= 0)
         return 0;
     const treasury = index.get("country", contract.issuerCountryId, "treasury-cash");
-    const amount = Math.min(contract.accruedInterestSUSD, treasury.balanceSUSD);
+    const payable = index.get("country", contract.issuerCountryId, "interest-payable");
+    // Contract-level accrued interest and the posting account can differ by a
+    // floating residual; never debit more payable than actually exists.
+    const amount = Math.min(contract.accruedInterestSUSD, payable.balanceSUSD, treasury.balanceSUSD);
     if (!(amount > 0))
         return 0;
     postJournalEntry(staged, dayIndex, "interest-payment", interestPaymentEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
@@ -363,9 +461,11 @@ function refinanceContract(staged: FinanceState, index: FinanceIndex, contract: 
     const entries = [issuanceEntry(index, replacement), principalRepaymentEntry(index, contract, principal),];
     postJournalBatch(staged, dayIndex, entries);
     appendContract(staged, replacement);
+    const principalBefore = contract.outstandingPrincipalSUSD;
     contract.outstandingPrincipalSUSD = 0;
     contract.status = "repaid";
     contract.arrearsSinceDay = null;
+    recordRetiredContract(staged, contract, principalBefore, contract.accruedInterestSUSD);
     return replacement.id;
 }
 
@@ -373,8 +473,18 @@ function defaultContract(staged: FinanceState, index: FinanceIndex, contract: De
     principal: number;
     interest: number;
 } {
-    const principal = contract.outstandingPrincipalSUSD;
-    const interest = contract.accruedInterestSUSD;
+    const issuer = issuerAccounts(index, contract.issuerCountryId);
+    const holder = holderAccounts(index, contract.holderKind, contract.holderId);
+    const principal = Math.min(
+        contract.outstandingPrincipalSUSD,
+        issuer.liability.balanceSUSD,
+        holder.bond.balanceSUSD,
+    );
+    const interest = Math.min(
+        contract.accruedInterestSUSD,
+        issuer.payable.balanceSUSD,
+        holder.receivable.balanceSUSD,
+    );
     const entry = defaultWriteoffEntry(index, contract);
     if (entry !== null)
         postJournalEntry(staged, dayIndex, "debt-default-writeoff", entry.lines, contract.issuerCountryId, contract.holderId);
@@ -382,6 +492,7 @@ function defaultContract(staged: FinanceState, index: FinanceIndex, contract: De
     contract.accruedInterestSUSD = 0;
     contract.status = "defaulted";
     contract.arrearsSinceDay = null;
+    recordRetiredContract(staged, contract, principal, interest);
     return {
         principal, interest
     };
@@ -408,6 +519,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
     let interestPaid = 0;
     let principalRepaid = 0;
     let debtIssued = 0;
+    let financingRequirement = 0;
     let unfinanced = 0;
     let principalWrittenOff = 0;
     let interestWrittenOff = 0;
@@ -431,22 +543,27 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
             const policy = country.debt;
             if (!policy.enabled)
                 continue;
-            const deficit = countryDeficit(index, country.id);
-            if (!(deficit > 0))
+            const requirement = countryFinancingRequirement(staged, index, country.id);
+            financingRequirement += requirement;
+            if (!(requirement > 0))
                 continue;
             assertIssuerAndHolder(world, policy, country);
+            if (activeDebtContractCount(staged.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
+                unfinanced += requirement;
+                continue;
+            }
             const holder = holderAccounts(index, policy.creditorKind, policy.creditorId);
             const headroom = policy.maxOutstandingPrincipalSUSD - debtOutstandingPrincipal(staged.debtContracts, country.id);
-            const amount = Math.min(deficit, holder.cash.balanceSUSD, headroom);
+            const amount = Math.min(requirement, holder.cash.balanceSUSD, headroom);
             if (!(amount > 0)) {
-                unfinanced += deficit;
+                unfinanced += requirement;
                 continue;
             }
             const contract = newContract(staged, country.id, policy.creditorKind, policy.creditorId, amount, policy.annualCouponRate, dayIndex, policy.termDays);
             postJournalEntry(staged, dayIndex, "debt-issuance", issuanceEntry(index, contract).lines, country.id, policy.creditorId);
             appendContract(staged, contract);
             debtIssued += amount;
-            unfinanced += Math.max(0, deficit - amount);
+            unfinanced += Math.max(0, requirement - amount);
             record(contract, {
                 debtIssuedSUSD: amount
             });
@@ -492,6 +609,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
             else {
                 contract.status = "repaid";
                 contract.arrearsSinceDay = null;
+                recordRetiredContract(staged, contract, 0, 0);
             }
             record(contract, {
                 status: contract.status
@@ -529,6 +647,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
             });
             continue;
         }
+        const principalBefore = contract.outstandingPrincipalSUSD;
         const treasury = index.get("country", contract.issuerCountryId, "treasury-cash");
         const pay = Math.min(contract.outstandingPrincipalSUSD, treasury.balanceSUSD);
         if (pay > 0) {
@@ -545,6 +664,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
             contract.outstandingPrincipalSUSD = 0;
             contract.status = "repaid";
             contract.arrearsSinceDay = null;
+            recordRetiredContract(staged, contract, principalBefore, 0);
         }
         record(contract, {
             status: contract.status, outstandingPrincipalSUSD: contract.outstandingPrincipalSUSD
@@ -565,6 +685,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
             status: contract.status, outstandingPrincipalSUSD: 0, interestAccruedSUSD: 0,
         });
     }
+    compactDebtContracts(staged);
     assertValidFinanceState(staged);
     assertAccountingIdentity(staged);
     const closingCash = designatedCashTotal(staged);
@@ -578,7 +699,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
     world.finance = staged;
     const contracts = [...results.values()].sort((left, right) => left.contractId - right.contractId);
     return {
-        ran: true, dayIndex, contracts, interestAccruedSUSD: interestAccrued, interestPaidSUSD: interestPaid, principalRepaidSUSD: principalRepaid, debtIssuedForDeficitSUSD: debtIssued, unfinancedDeficitSUSD: unfinanced, principalWrittenOffSUSD: principalWrittenOff, interestWrittenOffSUSD: interestWrittenOff,
+        ran: true, dayIndex, contracts, interestAccruedSUSD: interestAccrued, interestPaidSUSD: interestPaid, principalRepaidSUSD: principalRepaid, debtIssuedForDeficitSUSD: debtIssued, financingRequirementSUSD: financingRequirement, unfinancedDeficitSUSD: unfinanced, principalWrittenOffSUSD: principalWrittenOff, interestWrittenOffSUSD: interestWrittenOff,
     };
 }
 

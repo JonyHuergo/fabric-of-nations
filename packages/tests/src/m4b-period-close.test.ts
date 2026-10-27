@@ -105,7 +105,9 @@ function manualFinance(
     opening: null,
     periodSummaries: [],
     debtContracts: [],
+    debtHistory: [],
     nextContractId: 1,
+    welfareRequestedThisMonth: {},
     closedThroughDay: null,
   };
 }

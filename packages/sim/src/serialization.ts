@@ -206,8 +206,21 @@ export type SerializedFinanceState = {
   readonly opening: SerializedOpeningBalance | null;
   readonly periodSummaries: readonly SerializedFinancePeriodSummary[];
   readonly debtContracts: readonly SerializedDebtContract[];
+  readonly debtHistory: readonly SerializedDebtHistoryAggregate[];
   readonly nextContractId: number;
+  readonly welfareRequestedThisMonth: Readonly<Record<string, number>>;
   readonly closedThroughDay: number | null;
+};
+
+/** Encoded aggregate of compacted terminated debt contracts. */
+export type SerializedDebtHistoryAggregate = {
+  readonly issuerCountryId: number;
+  readonly contractsRetired: number;
+  readonly contractsDefaulted: number;
+  readonly principalIssuedSUSD: number;
+  readonly principalRepaidSUSD: number;
+  readonly principalWrittenOffSUSD: number;
+  readonly interestWrittenOffSUSD: number;
 };
 
 /**
@@ -814,7 +827,23 @@ export function encodeWorld(world: World): SerializedWorld {
           status: contract.status,
           arrearsSinceDay: contract.arrearsSinceDay,
         })),
+      debtHistory: [...world.finance.debtHistory]
+        .sort((left, right) => left.issuerCountryId - right.issuerCountryId)
+        .map((aggregate) => ({
+          issuerCountryId: aggregate.issuerCountryId,
+          contractsRetired: aggregate.contractsRetired,
+          contractsDefaulted: aggregate.contractsDefaulted,
+          principalIssuedSUSD: aggregate.principalIssuedSUSD,
+          principalRepaidSUSD: aggregate.principalRepaidSUSD,
+          principalWrittenOffSUSD: aggregate.principalWrittenOffSUSD,
+          interestWrittenOffSUSD: aggregate.interestWrittenOffSUSD,
+        })),
       nextContractId: world.finance.nextContractId,
+      welfareRequestedThisMonth: Object.fromEntries(
+        Object.entries(world.finance.welfareRequestedThisMonth).sort(
+          (left, right) => Number(left[0]) - Number(right[0]),
+        ),
+      ),
       closedThroughDay: world.finance.closedThroughDay,
     },
     profitDistribution: {
@@ -1255,6 +1284,39 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
   };
 }
 
+function decodeDebtHistoryAggregate(
+  value: unknown,
+  path: string,
+): SerializedDebtHistoryAggregate {
+  const record = requireRecord(value, path);
+  return {
+    issuerCountryId: requireUint32(record.issuerCountryId, `${path}.issuerCountryId`),
+    contractsRetired: requireInteger(record.contractsRetired, `${path}.contractsRetired`, 0, 1_000_000),
+    contractsDefaulted: requireInteger(
+      record.contractsDefaulted,
+      `${path}.contractsDefaulted`,
+      0,
+      1_000_000,
+    ),
+    principalIssuedSUSD: requireFiniteNumber(
+      record.principalIssuedSUSD,
+      `${path}.principalIssuedSUSD`,
+    ),
+    principalRepaidSUSD: requireFiniteNumber(
+      record.principalRepaidSUSD,
+      `${path}.principalRepaidSUSD`,
+    ),
+    principalWrittenOffSUSD: requireFiniteNumber(
+      record.principalWrittenOffSUSD,
+      `${path}.principalWrittenOffSUSD`,
+    ),
+    interestWrittenOffSUSD: requireFiniteNumber(
+      record.interestWrittenOffSUSD,
+      `${path}.interestWrittenOffSUSD`,
+    ),
+  };
+}
+
 function decodeFinanceState(value: unknown): FinanceState {
   const record = requireRecord(value, "save payload.finance");
   const accounts = requireArray(record.accounts, "save payload.finance.accounts");
@@ -1268,6 +1330,32 @@ function decodeFinanceState(value: unknown): FinanceState {
     record.debtContracts,
     "save payload.finance.debtContracts",
   );
+  const debtHistory = requireArray(
+    record.debtHistory,
+    "save payload.finance.debtHistory",
+  );
+  const rawWelfareRequested = requireRecord(
+    record.welfareRequestedThisMonth,
+    "save payload.finance.welfareRequestedThisMonth",
+  );
+  const welfareRequestedThisMonth: Record<number, number> = {};
+  for (const key of Object.keys(rawWelfareRequested)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(
+        `save payload.finance.welfareRequestedThisMonth key ${JSON.stringify(key)} is not a canonical decimal country id`,
+      );
+    }
+    const countryId = Number(key);
+    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+      throw new SaveFormatError(
+        `save payload.finance.welfareRequestedThisMonth key ${JSON.stringify(key)} is out of range`,
+      );
+    }
+    welfareRequestedThisMonth[countryId] = requireFiniteNumber(
+      rawWelfareRequested[key],
+      `save payload.finance.welfareRequestedThisMonth[${key}]`,
+    );
+  }
   return {
     accounts: accounts.map((account, index) =>
       decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
@@ -1300,12 +1388,19 @@ function decodeFinanceState(value: unknown): FinanceState {
         `save payload.finance.debtContracts[${String(index)}]`,
       ),
     ),
+    debtHistory: debtHistory.map((aggregate, index) =>
+      decodeDebtHistoryAggregate(
+        aggregate,
+        `save payload.finance.debtHistory[${String(index)}]`,
+      ),
+    ),
     nextContractId: requireInteger(
       record.nextContractId,
       "save payload.finance.nextContractId",
       1,
       Number.MAX_SAFE_INTEGER,
     ),
+    welfareRequestedThisMonth,
     closedThroughDay:
       rawClosed === null
         ? null

@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v2",
+    "dataVersion": "m3-economy-v3",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3194,7 +3194,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v2",
+      "dataVersion": "m3-economy-v3",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6085,7 +6085,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v2",
+    "dataVersion": "m3-economy-v3",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -8273,10 +8273,20 @@ export const M5_SCENARIO = ({
         1
       ],
       "treasuryAccountId": 200000,
-      "initialTreasuryCashSUSD": 3810000,
+      "initialTreasuryCashSUSD": 100000,
       "fiscal": {
         "incomeTaxRate": 0,
-        "welfareBudgetSUSDPerYear": 0
+        "welfareBudgetSUSDPerYear": 2000000
+      },
+      "debt": {
+        "enabled": true,
+        "creditorKind": "country",
+        "creditorId": 1,
+        "annualCouponRate": 0.04,
+        "termDays": 365,
+        "maxOutstandingPrincipalSUSD": 1000000,
+        "refinanceOnMaturity": true,
+        "arrearsGraceDays": 365
       },
       "immigrationOpen": true
     },

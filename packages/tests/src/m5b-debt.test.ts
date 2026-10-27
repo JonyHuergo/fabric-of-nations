@@ -119,16 +119,34 @@ describe("M5b public debt and deficit financing", () => {
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
-  test("finances the accrued month-end deficit with explicit debt, not revenue", () => {
+  test("does not borrow when treasury liquidity covers the accrued budget gap", () => {
     const scenario = m5bScenario({ welfareBudgetSUSDPerYear: 36_500 });
     const world = createM5bWorld(scenario);
     const last = tickM5b(world, scenario, 31);
-      expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBeCloseTo(3_100, 6);
+    expect(last.economy!.debt.financingRequirementSUSD).toBe(0);
+    expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBe(0);
+    expect(world.finance.debtContracts).toHaveLength(0);
+    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(6_900, 6);
+  });
+
+  test("finances a genuine month-end shortfall with explicit debt, not revenue", () => {
+    const scenario = m5bScenario({
+      welfareBudgetSUSDPerYear: 36_500,
+      initialState: (value) => {
+        const country = value.countries?.find((candidate) => candidate.id === M5B_COUNTRY_A);
+        if (country === undefined) throw new Error("missing fixture country");
+        country.initialTreasuryCashSUSD = 0;
+      },
+    });
+    const world = createM5bWorld(scenario);
+    const last = tickM5b(world, scenario, 31);
+    expect(last.economy!.debt.financingRequirementSUSD).toBeCloseTo(3_100, 6);
+    expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBeCloseTo(3_100, 6);
     const contract = world.finance.debtContracts[0]!;
     expect(contract.issuerCountryId).toBe(M5B_COUNTRY_A);
     expect(contract.holderId).toBe(M5B_COUNTRY_B);
     expect(contract.principalSUSD).toBeCloseTo(3_100, 6);
-    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(10_000, 6);
+    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(3_100, 6);
     expect(treasury(world, M5B_COUNTRY_B).balanceSUSD).toBeCloseTo(6_900, 6);
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBeCloseTo(3_100, 6);
     expect(last.economy!.financeClose).not.toBeNull();
