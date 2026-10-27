@@ -1,4 +1,4 @@
-﻿# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, and E2 fiscal management
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, and E3 public construction
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -46,9 +46,10 @@ adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0, E1, and E2 are implemented in GDD v2.9 §17A**, and
-E3–E6 are planned, not implemented. The design authority is the [Century GDD
-v2.9](./Century_GDD_v2.9.md); v2.8 is retained as
+economic program; **E0, E1, E2, and E3 are implemented in GDD v2.10 §17A**, and
+E4–E6 are planned, not implemented. The design authority is the [Century GDD
+v2.10](./Century_GDD_v2.10.md); v2.9 is retained as
+[historical E2 documentation](./Century_GDD_v2.9.md), v2.8 as
 [historical M7a/E1 documentation](./Century_GDD_v2.8.md), v2.7 as
 [historical E1 documentation](./Century_GDD_v2.7.md), v2.6 as
 [historical E0 documentation](./Century_GDD_v2.6.md), v2.5 as
@@ -62,7 +63,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -593,11 +594,11 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.9 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.10 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.9
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.10
 records M7a annual accounting (§17B) and the Economic Management Overhaul (§17A; E0
-design, E1 and E2 implementations); E3–E6 are planned, and M8a remains planned only.
+design, E1/E2/E3 implementations); E4–E6 are planned, and M8a remains planned only.
 See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
@@ -3028,12 +3029,14 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
-## Economic Management Overhaul — E0 design, E1/E2 implementation, and M7a annual accounting
+## Economic Management Overhaul — E0 design, E1/E2/E3 implementation, and M7a annual accounting
 
 GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
-(GDD §17A; D-070). **E0 is documentation/design; E1 and E2 are implemented; M7a annual
-accounting is implemented in GDD v2.8/v2.9.** E3–E6 and M8a are planned and not
-implemented; no E3–E6 mechanic or scenario data change exists.
+(GDD §17A; D-070). **E0 is documentation/design; E1, E2, and E3 are implemented; M7a
+annual accounting is implemented in GDD v2.8/v2.9.** E4–E6 and M8a are planned and not
+implemented. E3's materials/procurement, private co-financing, public-enterprise
+operation/expansion, infrastructure, and land/space remain explicit later-stage
+dependencies.
 
 The overhaul's central goal is that the player governs a country's economy through
 consequential policy choices, public spending, investment, and institution-building:
@@ -3064,21 +3067,26 @@ adapt. The specification covers:
 - **Acceptance:** overall player questions, strategy divergence, per-stage testable
   criteria, and concrete usability tasks.
 
-The complete E0 specification is preserved in [GDD v2.9 §17A](./Century_GDD_v2.9.md);
-GDD v2.8 is retained as [historical M7a/E1 documentation](./Century_GDD_v2.8.md), GDD
+The complete E0 specification is preserved in [GDD v2.10 §17A](./Century_GDD_v2.10.md);
+GDD v2.9 is retained as [historical E2 documentation](./Century_GDD_v2.9.md), GDD v2.8
+as [historical M7a/E1 documentation](./Century_GDD_v2.8.md), GDD
 v2.7 as [historical E1 documentation](./Century_GDD_v2.7.md), and
 GDD v2.6 as [historical E0 documentation](./Century_GDD_v2.6.md). The E1 change report
 is [GDD_V2.7_CHANGE_REPORT.md](./GDD_V2.7_CHANGE_REPORT.md), the M7a change report is
 [GDD_V2.8_CHANGE_REPORT.md](./GDD_V2.8_CHANGE_REPORT.md), the E2 change report is
-[GDD_V2.9_CHANGE_REPORT.md](./GDD_V2.9_CHANGE_REPORT.md), and the planning/E1/M7a/E2
-decisions are D-070, D-071, D-072, and D-073 in [DECISIONS.md](./DECISIONS.md). E1
-resolves report retention for its scope (12 monthly summaries plus 48 session actions);
-M7a resolves bounded annual retention (100 annual summaries, 64 corrections, latest 12
-exposed in snapshots); E2 resolves the implemented fiscal instruments, budget
-decomposition, reserve semantics, business-tax accounting, and financing actions. The
-other E0 questions remain open: construction accounting/materials, land/property, trade
-counterparties, banking/credit, inflation measurement, health/pensions/bargaining,
-sector classification, action expansion, GDP definitions, and save/schema migration
+[GDD_V2.9_CHANGE_REPORT.md](./GDD_V2.9_CHANGE_REPORT.md), the E3 change report is
+[GDD_V2.10_CHANGE_REPORT.md](./GDD_V2.10_CHANGE_REPORT.md), and the planning/E1/M7a/E2/E3
+decisions are D-070, D-071, D-072, D-073, and D-074 in [DECISIONS.md](./DECISIONS.md).
+E1 resolves report retention for its scope (12 monthly summaries plus 48 session
+actions); M7a resolves bounded annual retention (100 annual summaries, 64 corrections,
+latest 12 exposed in snapshots); E2 resolves the implemented fiscal instruments, budget
+decomposition, reserve semantics, business-tax accounting, and financing actions; E3
+resolves construction accounting (work-in-progress capitalization), the money+idle-
+labor+time scope, materials deferral, completion working capital, cancellation
+write-off, actions, bounds, and schema 19. The other E0 questions remain open:
+construction materials/procurement, land/property, trade counterparties,
+banking/credit, inflation measurement, health/pensions/bargaining, sector
+classification, broader action expansion, GDP definitions, and save/schema migration
 (GDD §17A.16). CEN-AUDIT-016 sovereignty remains unresolved.
 
 ### E1 — delivered economic clarity and monthly reports
@@ -3189,6 +3197,63 @@ Tests: `e2-fiscal-management.test.ts` plus updated fiscal/debt/AI/report/worker 
 No benchmark, performance measurement, campaign, profiling, or device test was run for
 E2 under the developer's no-benchmark restriction. Implementation commit:
 `f9aa4e0e2ea9d59dd1999d72704eb9d5261d75d2`.
+
+### E3 — delivered public investment and construction
+
+E3 turns public investment into a real project mechanic:
+
+- **Validated project queue.** A project type is a productive building definition with
+  a positive construction cost and authored `constructionWorkers` crew cap, state
+  ownership permitted, no required technology, and no resource requirements. The
+  player selects a country-owned region and authorizes the project through the shared
+  validated action path; the treasury must cover the cost plus the 30-day working-
+  capital target, but money is not escrowed.
+- **Real idle labor, money, and time.** Each processed day a project hires only
+  eligible workers not assigned to production, up to its crew cap and the treasury
+  cash available. Construction workers are never added to `world.employment`, so they
+  cannot be double-counted. Gross wages are paid to household blocks and capitalized.
+  Progress is cumulative gross payroll / authorized cost, not a timer or per-tick
+  bonus; the final payment is clamped exactly. A project with no affordable worker
+  waits with a `funds` or `labor` reason and resumes when the constraint clears.
+- **Capitalization and completion.** Daily wages debit country
+  `construction-in-progress` and credit treasury; households receive cash/wage income.
+  Completion reclassifies the spent amount to country `public-capital`, creates a
+  level-1/condition-1 operational state-owned building with a full account set, adds it
+  to the region, and transfers a cash-limited 30-day-upkeep working-capital endowment.
+  The building first produces through the ordinary employment/production/market systems
+  on the next processed day; there is no instant output bonus.
+- **Pause, cancel, and failure.** Pause/resume preserves progress. Cancellation writes
+  spent work-in-progress off to country owner equity with no refund, receivable, or
+  liability. Funds/labor stalls and cancellation are atomic and validated; completed
+  and cancelled projects are terminal.
+- **Bounded state.** At most 32 non-terminal projects, 32 retained terminated records,
+  and 256 compacted per-country history aggregates; monotonic project/building ids.
+  Project queue/history are versioned, serialized, validated, and replay-preserved.
+- **Interface.** A Construction tab shows treasury/WIP/public capital, idle labor and
+  mean wage, project-type cost/crew/output/working capital, upfront requirement, a
+  static duration estimate with assumptions, queue progress, blockers, pause/resume/
+  cancel, and retained history. Ledger shows construction outlay/write-off separately
+  from welfare/interest expense. The app reads immutable snapshots only.
+- **Deliberate scope.** Materials/procurement, private co-financing, subsidies/loans/
+  guarantees, public-enterprise operation/expansion, transport-dependent infrastructure,
+  land/space, destruction/closure, and owner insolvency are **not** E3 mechanics; they
+  are explicit E4/E5/E6a dependencies. The UI states this limitation rather than
+  implying material consumption exists. Construction is player-only; AI construction is
+  future work.
+
+Schema is **19**, simulation **0.19.0**, save format **1**, data version
+**`m3-economy-v4`**, and worker protocol **6** (project types/queue/labor/WIP/public
+capital fields, construction budget fields, and three action DTOs). The data-version
+bump is required because every authored building definition now carries
+`constructionWorkers` and permits state ownership; historical/generated artifacts were
+regenerated. Schema-18 and older saves are rejected; no migration is authorized.
+Tests: `e3-construction.test.ts` (selection/authorization, idle-labor progress,
+completion/production, stalls/resumption, cancellation/rollback, pause/resume,
+reporting, save/replay, terminal boundary, bounded history, snapshot/preview), plus
+updated worker/UI/report/serialization/hash tests. No benchmark, performance
+measurement, campaign, profiling, or device test was run for E3 under the developer's
+no-benchmark restriction; no benchmark code, thresholds, or reports were changed.
+Implementation commit: `e3b6fff5025af747f0fc78cc6941e1f93631e5ea`.
 
 ## Development workflow
 

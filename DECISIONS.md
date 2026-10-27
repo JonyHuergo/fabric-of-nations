@@ -1,4 +1,4 @@
-﻿# Century decision register
+# Century decision register
 
 This file records material implementation decisions, GDD/`AGENTS.md` conflicts,
 and provisional assumptions made in M0/M1/M2/M2.1/M3/M4a-1/M4a-2. It follows GDD §20 and
@@ -3185,6 +3185,149 @@ commit is `f9aa4e0e2ea9d59dd1999d72704eb9d5261d75d2`. Commands deliberately excl
 `pnpm run ci` (it invokes benchmarks), campaign/performance runs, profiling, and device
 measurements; the repository-wide correctness suite was run instead.
 
+## D-074 — E3 public construction: work-in-progress capitalization, idle labor, and schema 19
+
+**Status:** accepted and implemented in code/tests/bundle commit `e3b6fff5025af747f0fc78cc6941e1f93631e5ea`. GDD v2.10 §17A.19 records the delivered scope,
+accounting, limits, and acceptance evidence. This decision resolves E3's delegated
+project/accounting/labor choices and the §17A.16 open questions that E3 was allowed to
+close.
+
+**Context.** E3 must turn public investment into a real economic mechanic: a player
+selects a project, reads its cost/requirements/duration, authorizes and finances it,
+observes progress and stalls, and receives a productive asset only after construction.
+The current model has building definitions, regional ownership, employment, market
+production, treasury cash, state-enterprise ownership/remittance, and validated player
+actions, but no project queue, construction labor, construction accounting, or
+construction bill of materials.
+
+**Decision.**
+
+1. **Project class and ownership.** E3 offers government-financed, government-owned
+   productive building projects based on existing validated building definitions. A
+   type is offered only if it has a productive output, a positive authored cost, a
+   positive authored construction crew, no required technology, no resource
+   requirements, and permits state ownership. Warehouse-only capacity is not offered.
+   Private-supported projects, subsidies/loans/guarantees, public-enterprise
+   operation/expansion policy, and transport-dependent infrastructure are not E3.
+2. **Scope is money + idle labor + time; materials are deferred.** `BuildingDef` has
+   no construction bill of materials and the model has no government procurement
+   demand/delivery path. §17A.16 explicitly allowed E3 to start with money + labor +
+   time. E3 does not fabricate an abstract material input or silently consume goods.
+   Material requirements, procurement, and their postings are E4 dependencies.
+3. **Idle-labor hiring.** Construction uses eligible workers who are not assigned to a
+   production building (`eligibleWorkforceForBlock − world.employment − workers claimed
+   by earlier projects that day`), in ascending block id order, up to the definition's
+   `constructionWorkers` cap. Construction workers are not added to
+   `world.employment`, so no worker is double-counted. They are paid the block
+   profession's base daily wage. If no idle worker is available, the project waits and
+   records `labor`.
+4. **Progress is causal payroll, not a timer.** Gross paid construction wages increase
+   `spentSUSD` and progress; completion occurs when cumulative spend reaches
+   `totalCostSUSD`. The final worker-day payment is clamped so spend equals the
+   authorized cost exactly. No progress occurs on the authorization day, while paused,
+   while blocked, or on the terminal 2000-01-01 boundary. A project that cannot pay the
+   cheapest available daily wage waits with `funds`.
+5. **Authorize-then-pay, with no escrow.** Authorization requires treasury cash for
+   `totalCostSUSD + workingCapitalSUSD`, but no cash is reserved. Construction is
+   pay-as-you-go; a later funding lapse stalls progress rather than creating debt,
+   overdraft, or a hidden liability. Treasury cash is checked against actual daily
+   wages, so a project may hire fewer workers or none.
+6. **Work-in-progress capitalization.** Daily gross construction wages debit a country
+   `construction-in-progress` asset and credit treasury; workers' household blocks
+   receive the same gross as cash and `wage-income` (cash-neutral). On completion the
+   full spent amount is reclassified from `construction-in-progress` to
+   `public-capital`. Construction cost is capital spending, not welfare/interest
+   expense. The existing daily income tax is applied to construction wages using the
+   block's remaining allowance after settled market wages.
+7. **Completion working capital.** A completed building receives a cash-limited
+   working-capital endowment equal to at most 30 days of its level-1 daily upkeep. The
+   transfer is country treasury/owner-equity → building operating cash/owner equity;
+   it is not an expense and does not create money. The 30-day target is provisional
+   structural content, not historical calibration.
+8. **Cancellation and pause.** Cancellation is player-only for non-terminal projects.
+   Spent work-in-progress is written off to country owner equity; there is no refund,
+   receivable, or liability. Pause stops hiring/progress and preserves spend; resume
+   continues from the same progress. Completed/cancelled projects are terminal.
+9. **Completion asset.** Completion allocates the monotonic `nextBuildingId`, creates a
+   level-1/condition-1 operational state-owned building owned by the country treasury,
+   creates the full required account set (including `retained-profit` when the M5a
+   policy is enabled), updates the region building list, and sets `employmentDirty`.
+   The building participates in ordinary production/employment/market/tax/remittance
+   systems from the next processed day; it grants no instant output bonus.
+10. **Phase order and atomicity.** Construction runs after the business-tax phase and
+    before the debt phase/monthly close, so month-end financing sees reduced cash and
+    in-period outlays are captured. Projects are processed in ascending id order. The
+    phase stages finance, project state, buildings, and regions, validates the complete
+    candidate, and publishes only on success. Funding/labor claims are deterministic.
+11. **State, bounds, and persistence.** Schema 19 adds `World.construction`
+    (`projects`, `history`, `nextProjectId`, `nextBuildingId`). At most 32 non-terminal
+    projects exist; at most 32 terminated records are retained in detail; older
+    terminated records are compacted into per-country counters/amounts (bounded at 256
+    aggregates). `nextProjectId` and `nextBuildingId` are monotonic. Save/load and
+    deterministic replay preserve the queue and history; hash fixtures change
+    intentionally.
+12. **Data version `m3-economy-v4`.** Every authored building definition gains
+    `constructionWorkers` and permits `"state"` ownership. This changes definition
+    meaning, so the data version is bumped rather than shipped silently. The historical
+    and generated scenario artifacts are regenerated. The state-ownership permission
+    enables E3's completed asset; it does not itself implement E4 enterprise policy.
+13. **Actions and UI.** Player actions are `start-construction`,
+    `cancel-construction`, and `set-construction-paused`; they use the existing
+    validation/apply path and are rejected for AI sources. Worker protocol 6 adds
+    project types, per-country project/queue/history/labor/WIP/public-capital fields,
+    construction budget fields, and the new action DTOs. The Construction tab exposes
+    selection, upfront requirement, static duration estimate with assumptions,
+    progress, blockers, pause/resume/cancel, history, and capital outlay; the app reads
+    only immutable snapshots.
+14. **Reporting.** `constructionSpentSUSD` and `constructionWrittenOffSUSD` are added
+    to the month-to-date memo and monthly/annual budget decompositions. They are
+    reported separately from welfare/interest expense so capital spending is not
+    misclassified.
+
+**Rejected alternatives.**
+
+- **Expense construction immediately.** Rejected because it would depress the fiscal
+  result without an asset and misstate the balance sheet; E3's delegated choice is
+  work-in-progress capitalization.
+- **Instant/free asset on authorization.** Rejected by E3's explicit no-instant-bonus
+  requirement and the GDD non-acceptance criteria.
+- **Private owner or government-supported private project.** Rejected as E3 scope: it
+  requires E4 subsidy/loan/guarantee instruments and private investment behavior.
+- **Reserve/escrow the full authorization.** Rejected because it would hide the
+  pay-as-you-go liquidity trade-off and create an unmodeled restricted-cash pool; the
+  chosen rule checks affordability at authorization but does not reserve.
+- **Fixed per-tick or wall-clock construction progress.** Rejected; progress is paid
+  labor only.
+- **Abstract material input without inventories/procurement.** Rejected as decorative;
+  materials are explicitly deferred instead.
+- **Subtract construction workers from production employment.** Rejected because it
+  would displace existing production; E3 hires only genuinely idle eligible workers
+  and waits if none exist.
+
+**Consequences.**
+
+- Schema 19 / simulation 0.19.0 / protocol 6 / data v4 are incompatible with earlier
+  saves and clients; no migration is implemented under D-013.
+- New canonical hashes and known-answer fixtures; updated tests were changed only where
+  the state/schema intentionally changed.
+- Construction is player-only; AI construction remains future work and must not use
+  hidden information.
+- The duration shown is a static projection from today's idle crew/wage and continuous
+  funding, not a forecast.
+- Materials, private co-financing, public-enterprise operation/expansion, land/space,
+  infrastructure, destruction/closure, and owner-insolvency treatment remain explicit
+  dependencies rather than simulated levers.
+
+**Verification.** `packages/tests/src/e3-construction.test.ts` covers selection,
+authorization constraints, idle-labor hiring, progress/completion, state-owned building
+and accounts, post-completion production/employment, funds/labor stalls and resumption,
+cancellation write-off/rollback, pause/resume, monthly/annual construction reporting,
+save/load/deterministic replay, terminal-boundary rejection, bounded-history compaction,
+snapshot fields, and preview validity. Worker/UI path tests cover the validated action
+round-trip and Construction tab wiring. Full tests/typecheck results are in the v2.10
+change report. No benchmarks or performance measurements were run under the active
+no-benchmark restriction, and no benchmark code/threshold/report was modified.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
@@ -3257,6 +3400,19 @@ measurements; the repository-wide correctness suite was run instead.
     welfare is not retroactively funded. Treasury cash includes prior state-
     enterprise remittances. Contract caps (64 active, 32 recent terminated) and the
     256 aggregate-history guard are provisional bounded-state limits.
+22. E3 construction uses the block profession's base daily wage
+    (`baseWage1900SUSDPerYear / daysInYear`) and the existing daily income-tax
+    allowance/rate on construction wages. It does not model construction-specific
+    wage premiums, hiring frictions, training, or contractor margins.
+23. The completion working-capital target of 30 days of level-1 upkeep is provisional
+    structural content, not calibration. It is cash-limited and may be partially
+    funded; the unpaid target is not a liability.
+24. Construction project caps (32 non-terminal, 32 retained terminated, 256 history
+    aggregates) are provisional bounded-state limits. Project ids and building ids are
+    monotonic per world.
+25. E3 does not model construction materials, procurement, land/space, infrastructure
+    access, destruction/closure, or owner insolvency. These are explicit E4/E5/E6a
+    dependencies; no abstract substitute is used.
 
 ## Items intentionally left open
 
