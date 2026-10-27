@@ -761,10 +761,11 @@ function runMarketAttempt(
           marketHousehold,
           marketProduction,
         ),
+        { validateWorld: false },
       ),
     );
   }
-  const settlement = settleMarketDays(world, definitions, results);
+  const settlement = settleMarketDays(world, definitions, results, { validateWorld: false });
   return { household, production, markets: results, settlement };
 }
 
@@ -843,7 +844,9 @@ export function runEconomicDay(
   // M5 migration: monthly, after the initial labor allocation and before the
   // day's market phase. Moving people invalidates some assignments, so a second
   // forced refresh repairs releases and fills the post-migration workforce.
-  const migration = runMigrationPhase(world, economyDefinitions, dayIndex);
+  const migration = runMigrationPhase(world, economyDefinitions, dayIndex, {
+    validateWorld: false,
+  });
   if (migration.flows.length > 0) {
     world.employmentDirty = true;
     employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
@@ -883,11 +886,11 @@ export function runEconomicDay(
   // M4c fiscal phase (GDD §4.2 step 12, fiscal part): after market/wage/upkeep
   // settlement and before needs/militancy and wealth. It uses the same day's
   // settlement result and never estimates wages from account balances.
-  const fiscal = runFiscalPhase(world, settlement, dayIndex);
+  const fiscal = runFiscalPhase(world, settlement, dayIndex, { validateWorld: false });
 
   // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
   // month-end finance the accrued fiscal deficit before the M4b close.
-  const debt = runDebtPhase(world, dayIndex);
+  const debt = runDebtPhase(world, dayIndex, { validateWorld: false });
 
   const needs = buildNeedsResult(
     world,
@@ -927,6 +930,16 @@ export function runEconomicDay(
     needs,
     wealthUpdates,
   };
+
+  // Public direct callers keep the day-boundary guarantee: the phases above run
+  // in verified-phase mode, and the complete staged day is validated once here
+  // before it is returned. The month-end close is intentionally staged but not
+  // advanced yet, so this check allows that one transient state. `tick` passes
+  // `validateWorld: false` because it validates the complete staged world again
+  // before publication, after advancing the day (D-067).
+  if (options.validateWorld !== false) {
+    assertValidWorldForTick(world, { allowUnadvancedClose: true });
+  }
 
   return {
     population,

@@ -46,6 +46,7 @@ import {
   requireString,
   requireUint32,
 } from "./validation.js";
+import { recordWorldValidation } from "./validationStats.js";
 
 /** Diagnostic counters and bounded buffers. None of these affect game outcomes. */
 export interface SimulationDiagnostics {
@@ -197,6 +198,20 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
 }
 
 /**
+ * Phase-level validation control for the staged integrated day.
+ *
+ * Public phase entry points validate the whole world by default. The integrated
+ * `runEconomicDay` pipeline passes `validateWorld: false` because it has already
+ * validated the world at the day boundary and publishes only after the caller
+ * revalidates the complete staged world. Phase-specific checks (reservation
+ * shape, inventory conservation, accounting identity, posting structure,
+ * revaluation, and rollback) always remain active.
+ */
+export interface PhaseValidationOptions {
+  readonly validateWorld?: boolean;
+}
+
+/**
  * Validate all authoritative world fields and their relationships.
  *
  * This is intentionally strict: it is called before every tick and before save
@@ -206,6 +221,7 @@ export function assertValidWorld(
   world: World,
   options: EconomyValidationOptions = {},
 ): void {
+  recordWorldValidation();
   requireInteger(
     world.schemaVersion,
     "world.schemaVersion",
@@ -291,8 +307,11 @@ export function assertValidWorld(
  * revalidated before publication on every tick. This keeps per-tick validation
  * from growing with the century-long summary history (D-059).
  */
-export function assertValidWorldForTick(world: World): void {
-  assertValidWorld(world, { periodSummaries: "latest" });
+export function assertValidWorldForTick(
+  world: World,
+  options: EconomyValidationOptions = {},
+): void {
+  assertValidWorld(world, { ...options, periodSummaries: "latest" });
 }
 
 /** True when the world has reached the terminal boundary and no day remains. */

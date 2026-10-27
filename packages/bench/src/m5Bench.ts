@@ -17,11 +17,14 @@ import {
   hashWorld,
   issueGovernmentDebt,
   populationTotal,
+  readValidationInstrumentation,
+  resetValidationInstrumentation,
   runDebtPhase,
   runMigrationPhase,
   runProfitDistributionPhase,
   runTicks,
   serializeWorld,
+  setValidationInstrumentationEnabled,
   tick,
   type EconomyScenarioDef,
   type TickContext,
@@ -137,23 +140,29 @@ export function runM5Benchmarks(): boolean {
 
   // Representative eight-polity campaign sample, two deterministic runs.
   const runSamples: number[][] = [];
+  const runValidationCounts: number[] = [];
   let hashes: string[] = [];
   let finalWorld: World | null = null;
   for (let run = 0; run < M5_RUNS; run += 1) {
     const world = createEconomyWorld(scenario, { seed: SEED });
     for (let index = 0; index < M5_WARMUP_TICKS; index += 1) tick(world, context);
+    setValidationInstrumentationEnabled(true);
+    resetValidationInstrumentation();
     const samples: number[] = [];
     for (let index = 0; index < M5_MEASURED_TICKS; index += 1) {
       const start = process.hrtime.bigint();
       tick(world, context);
       samples.push(nanosecondsToMs(process.hrtime.bigint() - start));
     }
+    runValidationCounts.push(readValidationInstrumentation().worldValidations);
+    setValidationInstrumentationEnabled(false);
     runSamples.push(samples);
     hashes.push(hashWorld(world));
     finalWorld = world;
   }
   const runStats = runSamples.map(stats);
   const combined = stats(runSamples.flat());
+  const totalValidations = runValidationCounts.reduce((total, value) => total + value, 0);
   const deterministic = new Set(hashes).size === 1;
   if (finalWorld === null) throw new Error("M5 benchmark did not run");
   assertValidWorld(finalWorld);
@@ -290,6 +299,10 @@ export function runM5Benchmarks(): boolean {
   console.log(
     `  combined: avg ${formatMs(combined.averageMs)} ms/tick, p50 ${formatMs(combined.p50Ms)} ms, ` +
       `p95 ${formatMs(combined.p95Ms)} ms, p99 ${formatMs(combined.p99Ms)} ms`,
+  );
+  console.log(
+    `  world validations: ${String(totalValidations)} over ${String(combined.count)} ticks ` +
+      `(${(totalValidations / Math.max(1, combined.count)).toFixed(2)}/tick; boundary checks plus one per applied AI action)`,
   );
   console.log(
     `  projected full campaign (${String(36_524)} economic ticks at the sample average): ` +

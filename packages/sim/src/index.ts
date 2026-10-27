@@ -25,6 +25,7 @@ export * from "./constants.js";
 export * from "./calendar.js";
 export * from "./rng.js";
 export * from "./world.js";
+export * from "./validationStats.js";
 export * from "./population/index.js";
 export * from "./economy/index.js";
 export * from "./tick.js";

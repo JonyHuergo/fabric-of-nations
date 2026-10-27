@@ -6,7 +6,7 @@ import type { Day, DayIndex, Id } from "../types.js";
 
 import { requireFiniteNumber, requireInteger } from "../validation.js";
 
-import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
+import { assertValidWorld, assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 
 import { postJournalBatch, postJournalEntry, type JournalEntryInput } from "./accounting.js";
 
@@ -499,7 +499,7 @@ function defaultContract(staged: FinanceState, index: FinanceIndex, contract: De
 }
 
 /** * Run the daily debt phase. Interest accrues daily; coupon interest is paid at * month-end; principal maturities are processed on their contract date. When the * policy is enabled, a month-end deficit is financed up to the designated * creditor's cash and the issuer's outstanding-principal ceiling. */
-export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult {
+export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseValidationOptions = {}): DebtPhaseResult {
     assertValidDayIndex(dayIndex);
     if (isTerminalDayIndex(dayIndex)) {
         throw new RangeError("debt phase cannot run at the terminal boundary");
@@ -509,7 +509,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
     if (world.finance.debtContracts.length === 0 && !world.countries.some((country) => country.debt.enabled)) {
         return emptyDebtResult(dayIndex);
     }
-    assertValidFinanceState(world.finance);
+    if (options.validateWorld !== false) assertValidFinanceState(world.finance);
     const staged = cloneFinanceState(world.finance);
     const index = buildFinanceIndex(staged);
     const openingCash = designatedCashTotal(world.finance);
@@ -686,7 +686,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
         });
     }
     compactDebtContracts(staged);
-    assertValidFinanceState(staged);
+    if (options.validateWorld !== false) assertValidFinanceState(staged);
     assertAccountingIdentity(staged);
     const closingCash = designatedCashTotal(staged);
     if (Math.abs(openingCash - closingCash) > toleranceMoney(openingCash, closingCash)) {
@@ -695,7 +695,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex): DebtPhaseResult 
     const candidate: World = {
         ...world, finance: staged
     };
-    assertValidWorldForTick(candidate);
+    if (options.validateWorld !== false) assertValidWorldForTick(candidate);
     world.finance = staged;
     const contracts = [...results.values()].sort((left, right) => left.contractId - right.contractId);
     return {

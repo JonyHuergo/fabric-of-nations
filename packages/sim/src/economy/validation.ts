@@ -730,6 +730,11 @@ export type PeriodSummaryValidationMode = "all" | "latest";
 /** Optional economy-validation scope. */
 export interface EconomyValidationOptions {
   readonly periodSummaries?: PeriodSummaryValidationMode;
+  /**
+   * Allow the transient end-of-day state where a close has been staged but the
+   * day has not advanced yet. Published worlds keep this false (D-047/D-067).
+   */
+  readonly allowUnadvancedClose?: boolean;
 }
 
 /**
@@ -1056,7 +1061,7 @@ export function assertValidEconomyState(
     {
       startDayIndex: world.startDayIndex,
       dayIndex: world.dayIndex,
-      allowUnadvancedClose: false,
+      allowUnadvancedClose: options.allowUnadvancedClose ?? false,
     },
     options.periodSummaries ?? "all",
   );

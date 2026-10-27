@@ -38,7 +38,11 @@ import {
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
-import { assertValidWorldForTick, type World } from "../world.js";
+import {
+  assertValidWorldForTick,
+  type PhaseValidationOptions,
+  type World,
+} from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { buildRegionOwnerMap } from "./country.js";
@@ -109,6 +113,7 @@ function assertFiscalPreconditions(
   world: World,
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
+  options: PhaseValidationOptions = {},
 ): void {
   assertValidDayIndex(dayIndex);
   if (isTerminalDayIndex(dayIndex)) {
@@ -146,7 +151,7 @@ function assertFiscalPreconditions(
   }
   // Validates country fiscal values, treasury references, account sets, NaN
   // balances, summaries, and all existing accounting/determinism invariants.
-  assertValidWorldForTick(world);
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
 }
 
 function toleranceMoney(...values: number[]): number {
@@ -232,8 +237,9 @@ function executeFiscalPhase(
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
   hooks?: FiscalPhaseTestHooks,
+  options: PhaseValidationOptions = {},
 ): FiscalPhaseResult {
-  assertFiscalPreconditions(world, settlement, dayIndex);
+  assertFiscalPreconditions(world, settlement, dayIndex, options);
 
   const stagedFinance = cloneFinanceState(world.finance);
   const index = buildFinanceIndex(stagedFinance);
@@ -410,7 +416,9 @@ function executeFiscalPhase(
 
   // Full staged-world validation covers balances, owner references, treasury
   // references, country fiscal values, summaries, and accounting invariants.
-  assertValidWorldForTick({ ...world, finance: stagedFinance });
+  if (options.validateWorld !== false) {
+    assertValidWorldForTick({ ...world, finance: stagedFinance });
+  }
 
   const blockResults: FiscalBlockResult[] = blockDrafts.map((draft) => ({
     ...draft,
@@ -466,8 +474,9 @@ export function runFiscalPhase(
   world: World,
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
+  options: PhaseValidationOptions = {},
 ): FiscalPhaseResult {
-  return executeFiscalPhase(world, settlement, dayIndex);
+  return executeFiscalPhase(world, settlement, dayIndex, undefined, options);
 }
 
 /** Test-only publication-atomicity hook. Not part of the package API. */
@@ -476,6 +485,7 @@ export function __runFiscalPhaseWithHooks(
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
   hooks: FiscalPhaseTestHooks,
+  options: PhaseValidationOptions = {},
 ): FiscalPhaseResult {
-  return executeFiscalPhase(world, settlement, dayIndex, hooks);
+  return executeFiscalPhase(world, settlement, dayIndex, hooks, options);
 }

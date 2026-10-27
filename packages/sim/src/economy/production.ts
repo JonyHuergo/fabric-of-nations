@@ -117,6 +117,13 @@ export interface ProductionPhaseOptions {
    * scoped to that market so a multi-market world never mixes inventories.
    */
   readonly marketId?: number;
+  /**
+   * Whole-world validation control. Defaults to true. The integrated economic
+   * day passes false because it validates once at the day boundary and again
+   * before publishing the staged world; the phase's own input, reservation, and
+   * inventory-conservation checks still run.
+   */
+  readonly validateWorld?: boolean;
 }
 
 function tolerance(...values: number[]): number {
@@ -385,8 +392,9 @@ export function applyOverflowLosses(
   world: World,
   definitions: EconomyDefinitions,
   marketId?: number,
+  options: ProductionPhaseOptions = {},
 ): OverflowLoss[] {
-  assertValidWorldForTick(world);
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   const market =
     marketId === undefined
@@ -415,7 +423,7 @@ export function applyOverflowLosses(
       candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
     ),
   };
-  assertValidWorldForTick(candidateWorld);
+  if (options.validateWorld !== false) assertValidWorldForTick(candidateWorld);
   market.stockLots = canonicalLots;
   losses.sort((left, right) => {
     if (left.goodId !== right.goodId) return left.goodId - right.goodId;
@@ -437,7 +445,7 @@ export function runProductionPhase(
   reservations: readonly InputReservation[],
   options: ProductionPhaseOptions = {},
 ): ProductionPhaseResult {
-  assertValidWorldForTick(world);
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
@@ -701,7 +709,7 @@ export function runProductionPhase(
       candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
     ),
   };
-  assertValidWorldForTick(candidateWorld);
+  if (options.validateWorld !== false) assertValidWorldForTick(candidateWorld);
   market.stockLots = canonicalLots;
 
   reservationUses.sort((left, right) => {

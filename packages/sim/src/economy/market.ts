@@ -14,7 +14,7 @@ import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import type { NeedTierDef } from "../population/types.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex } from "../types.js";
-import { assertValidWorldForTick, type World } from "../world.js";
+import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
   M3_PRICE_EPSILON,
   M3_PRICE_KAPPA,
@@ -238,13 +238,14 @@ function validateMarketDayInput(
   world: World,
   definitions: EconomyDefinitions,
   input: MarketDayInput,
+  options: PhaseValidationOptions = {},
 ): {
   readonly marketId: number;
   readonly criticalGoods: ReadonlySet<number>;
   readonly buildingById: Map<number, BuildingDef>;
   readonly blockIds: Set<number>;
 } {
-  assertValidWorldForTick(world);
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
@@ -608,8 +609,9 @@ export function runMarketDay(
   world: World,
   definitions: EconomyDefinitions,
   input: MarketDayInput,
+  options: PhaseValidationOptions = {},
 ): MarketDayResult {
-  const validated = validateMarketDayInput(world, definitions, input);
+  const validated = validateMarketDayInput(world, definitions, input, options);
   const market = world.markets.find((candidate) => candidate.id === validated.marketId);
   if (market === undefined) throw new RangeError("missing market");
   const openingLots = market.stockLots.map((lot) => ({ ...lot }));
@@ -671,7 +673,13 @@ export function runMarketDay(
       world,
       definitions,
       inputReservations,
-      { applyOverflow: false, marketId: market.id },
+      {
+        applyOverflow: false,
+        marketId: market.id,
+        ...(options.validateWorld === undefined
+          ? {}
+          : { validateWorld: options.validateWorld }),
+      },
     );
 
     const householdReservedByLot = new Map<string, number>();
@@ -785,7 +793,7 @@ export function runMarketDay(
         quantity,
       };
     });
-    const overflowLosses = applyOverflowLosses(world, definitions, market.id);
+    const overflowLosses = applyOverflowLosses(world, definitions, market.id, options);
 
     const usedInputByDemand = new Map<string, number>();
     for (const use of production.reservationUses) {
