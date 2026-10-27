@@ -948,12 +948,19 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
 - **Policy.** Each country has a scenario-initialised `debt` policy: enabled,
   designated creditor kind/id, annual coupon rate, term in civil days, maximum
   outstanding principal, refinance-on-maturity, and arrears grace days. Legacy
-  fixtures default it off. Rates, terms, and ceilings are provisional and are not
-  calibrated or player/AI controls.
-- **Contracts.** Contracts persist in `FinanceState.debtContracts` with contract
-  version, issuer, holder, original and outstanding principal, coupon, issue day,
-  maturity, accrued interest, status (`active`, `arrears`, `repaid`, `defaulted`),
-  and arrears start day. `nextContractId` is a deterministic allocator.
+  fixtures default it off. The shipped eight-polity scenario enables it only for
+  the USA player country (GBR creditor, 4% coupon, 365-day term, 1,000,000 ceiling,
+  refinance on maturity, 365-day grace) with a provisional 2,000,000 SUSD/year
+  welfare budget and 100,000 opening treasury. Rates, terms, ceilings, and the
+  scenario activation are provisional, not calibrated or player/AI controls.
+- **Contracts and bounds.** Active/arrears contracts persist in
+  `FinanceState.debtContracts` with contract version, issuer, holder, original and
+  outstanding principal, coupon, issue day, maturity, accrued interest, status
+  (`active`, `arrears`, `repaid`, `defaulted`), and arrears start day. Up to 64
+  active contracts are allowed; the newest 32 terminated contracts are retained.
+  Older terminated records are compacted into exact per-issuer `debtHistory`
+  aggregates (counts, issued/repaid/written-off principal, written-off interest).
+  `nextContractId` remains deterministic.
 - **Accounting.** Issuance debits issuer treasury cash and credits debt liability,
   and debits holder bond asset and credits holder cash. Interest accrues daily as
   issuer interest expense/interest payable and holder interest receivable/income.
@@ -962,16 +969,24 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
   the remaining liability and interest off against owner equity on both sides.
   Borrowing is not revenue, principal repayment is not expense, and none of these
   kinds enters the M4b four-flow summary.
-- **Timing and deficit financing.** After the daily fiscal phase, the debt phase
-  accrues one day of interest (actual-day/365 or /366). At each month-end it pays
-  finances the accrued fiscal deficit, pays accrued coupons
-  (`welfare-expense + interest-expense - income-tax-revenue`) by issuing new debt,
-  processes maturities, and applies the arrears/default rule. Debt issuance is
-  staged and atomic with the day; the M4b close then records the period result.
-- **Constraints.** New issuance is limited by the designated creditor's actual cash,
-  the issuer's outstanding-principal ceiling, and the accrued deficit. A deficit
-  that cannot be financed is reported as `unfinancedDeficitSUSD`; no invisible
-  liability is created. M4c's welfare shortfall rule is unchanged.
+- **Timing and financing.** After the daily fiscal phase, the debt phase accrues one
+  day of interest (actual-day/365 or /366). At each month-end it computes a
+  **financing requirement**
+  `max(0, welfareRequestedThisMonth + interestExpense − incomeTaxRevenue − treasuryCash)`,
+  issues up to the creditor cash/ceiling/active-contract cap, pays accrued coupons,
+  processes maturities, and applies the arrears/default rule. The requested-welfare
+  memo is month-to-date, includes unpaid budget, and resets at close. It is not a
+  liability; borrowing never posts retroactive back-pay. Treasury cash includes prior
+  state-enterprise remittances, which are liquidity rather than tax revenue.
+- **Constraints and reporting.** New issuance is limited by the designated
+  creditor's actual cash, the issuer's outstanding-principal ceiling, and the active
+  contract cap. An unissued requirement is reported as `unfinancedDeficitSUSD`; no
+  invisible liability is created. The accounting fiscal result remains tax revenue
+  minus actual welfare and interest expense; the two measures are distinct.
+- **Scenario activity.** A bounded 31-day run of the shipped scenario issues a
+  month-end USA contract and records the matching liability/bond asset; active
+  liability equals the sum of active contract principal. Longer bounded probes cross
+  coupon, maturity, refinancing, arrears/default, and compaction boundaries.
 - **Maturity, refinancing, arrears, default.** At maturity, principal is refinanced
   into a replacement contract when the policy permits and the creditor can fund the
   net replacement; otherwise available treasury cash repays principal. Unpaid
@@ -982,13 +997,13 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
   profit distributions keep their existing semantics. `governmentPeriodTotals` now
   reports interest expense and a net fiscal result including it. M4b summaries keep
   exactly the four existing flow kinds.
-- **Versions.** Schema **12**, simulation **0.12.0**, save format 1, data version
-  `m3-economy-v1`. Schema-11/simulation-0.11.0 saves are rejected; no migration.
+- **Versions (Batch 4).** Schema **16**, simulation **0.16.0**, save format 1, data
+  version `m3-economy-v3`. Schema-15 and older saves are rejected; no migration.
 - **Limitations.** No commercial banking, deposits, central bank, monetary issuance,
   bond-market pricing, derivatives, external investors, debt-to-GDP target, debt
-  auctions, or player/AI debt actions. Automatic financing covers the accrued
-  month-end deficit, not an intra-month welfare liquidity shortage. Interest is not
-  taxed. The full campaign is benchmarked from a sample, not executed end to end.
+  auctions, or player/AI debt issuance actions. Automatic financing is liquidity-
+  based and does not retroactively pay earlier unmet welfare. Interest is not taxed.
+  The full campaign was not executed end to end.
 ## M6 deterministic country AI and action validation
 
 M6 adds a rule-based country AI, a persisted evaluation schedule and goal, and one
@@ -1959,8 +1974,9 @@ ReactNativeWebView bridge probe passed. These are not device results.
 
 No simulation schema/version change **at the M7 baseline**. World schema was
 **13**, simulation **0.13.0**, save format **1**, data version `m3-economy-v1`.
-**Superseded by the post-M7 remediation (D-062/D-063 and D-065):** schema **15**,
-simulation **0.15.0**, data version `m3-economy-v2`, save format still **1**.
+**Superseded by the post-M7 remediation (D-062/D-063, D-065, D-066):** schema
+**16**, simulation **0.16.0**, data version `m3-economy-v3`, save format still
+**1**.
 Worker protocol version **2** is independent of the save schema. The app's gzip storage wrapper preserves the
 canonical save string and therefore its checksum, hash, validation, and
 compatibility. Older incompatible simulation saves still reject.
@@ -2117,8 +2133,9 @@ pass.
 ### Schema, data version, and save compatibility
 
 - Batch 1 values were `WORLD_SCHEMA_VERSION` **14** and `SIM_VERSION` **0.14.0**.
-  **Superseded by Batch 3:** schema **15** and simulation **0.15.0**.
-- `DATA_PACKAGE_VERSION` **`m3-economy-v2`**; all scenario files declare it.
+  **Superseded by Batch 3/Batch 4:** schema **16** and simulation **0.16.0**.
+- Batch 1 `DATA_PACKAGE_VERSION` was **`m3-economy-v2`**; Batch 4 changes the
+  scenario fiscal/debt meaning and moves it to **`m3-economy-v3`**.
 - Save format remains **1**; envelope/checksum logic is unchanged.
 - Saves from schema 13 / sim 0.13.0 / data `m3-economy-v1` are intentionally
   rejected rather than loaded under different definitions. There is no migration.
@@ -2134,8 +2151,9 @@ pass.
 - M5 sample tick cost rose with the 113-building scenario (~180–205 ms/tick in the
   final run; projected 1.8–2.0 h for the campaign). This worsens the existing
   speed-control/performance limitation; mobile remains unmeasured.
-- Public debt remains disabled in the shipped scenario. The M5b benchmark still
-  injects a contract; a debt remediation batch is separate.
+- Batch 1 left public debt disabled in the shipped scenario. Batch 4 (D-066) now
+  enables it for the USA player country only; the historical note is retained for
+  the Batch 1 state.
 - Save-size/worker-reliability/speed-control remediation batches are not included.
 - Native release builds and real-device performance remain **NOT EVALUATED**.
 
@@ -2260,7 +2278,8 @@ claim.
 - The selected days/second remains best-effort; no guarantee of sustained target
   throughput is made. General performance optimization is out of scope.
 - Save compression/size, autosave, storage quotas, history compaction, public debt,
-  worker transport replacement, and economic calibration are out of scope.
+  worker transport replacement, and economic calibration were out of scope for
+  Batch 2/3; Batch 4 separately addresses debt activation and bounded contracts.
 - The full 36,524-tick campaign and stress/soak tests were not run in this batch.
 
 ### Commits
@@ -2396,9 +2415,10 @@ mobile evidence.
 
 ### Compatibility and versioning
 
-- `WORLD_SCHEMA_VERSION` **15**; `SIM_VERSION` **0.15.0**.
-- `SAVE_FORMAT_VERSION` remains **1** (envelope shape unchanged).
-- Data version remains `m3-economy-v2`; scenario data is unchanged.
+- Batch 3 values were schema **15**, simulation **0.15.0**, data
+  `m3-economy-v2`. **Superseded by Batch 4:** schema **16**, simulation **0.16.0**,
+  data `m3-economy-v3`. `SAVE_FORMAT_VERSION` remains **1** (envelope shape
+  unchanged).
 - Schema-14 and older saves are **rejected explicitly**, not silently
   reinterpreted. There is no migration.
 - The app’s `SUPPORTED_SAVE_SCHEMA_VERSION` is 15 and must be updated with the
@@ -2425,6 +2445,116 @@ mobile evidence.
 
 Implementation commit: `3fcd18253a6b3f9bd98d0177e47d7aa96134f84e`
 (parent `d4e5488f1d44c784b4c2061897c3e3d4040d49d7`). Documentation commit: the
+immediate child containing this section, `DECISIONS.md`, and
+`Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
+
+## Post-M7 remediation batch 4 — public debt, financing, and bounded contracts
+
+**Scope.** D-066 activates public debt in the shipped playable policy, corrects the
+financing requirement for cash and unpaid welfare, and bounds contract storage. It
+does not start another milestone or change unrelated simulation mechanics.
+
+### Debt activation
+
+Exactly one polity, the USA player country, has debt enabled in the shipped
+scenario:
+
+| Input | Value |
+|---|---:|
+| Welfare budget | 2,000,000 SUSD/year |
+| Opening treasury | 100,000 SUSD |
+| Creditor | GBR country treasury (id 1) |
+| Annual coupon | 4% |
+| Term | 365 civil days |
+| Outstanding ceiling | 1,000,000 SUSD |
+| Refinance on maturity | true |
+| Arrears grace | 365 days |
+
+The other seven countries remain disabled. The USA is exempt from AI fiscal
+decisions, so its authored policy is not silently overwritten. Debt financing is
+automatic at month-end and is not a player/AI debt-issuance action. All values are
+provisional, not historical calibration.
+
+A bounded 31-day scenario run issues a month-end USA contract and records the
+matching treasury/liability and GBR bond asset. Contract liability equals active
+outstanding principal and the creditor bond asset in that test.
+
+### Financing semantics
+
+The accounting fiscal result remains income-tax revenue minus **actual** welfare
+expense and interest expense. The separate financing requirement is:
+
+`max(0, welfareRequestedThisMonth + interestExpense − incomeTaxRevenue − treasuryCash)`
+
+- `welfareRequestedThisMonth` is a month-to-date budget memo, including welfare the
+  treasury could not pay. It is **not** a payable or liability and resets at close.
+- Borrowing never posts retroactive welfare; proceeds remain available for future
+  obligations.
+- Treasury cash includes prior state-enterprise remittances. Those remittances are
+  liquidity, not tax revenue; sufficient cash prevents unnecessary borrowing.
+- The requirement is capped by creditor cash, outstanding headroom, and the active
+  contract cap. Unissued requirement is reported as `unfinancedDeficitSUSD`.
+- Borrowing/principal remain financing movements, not revenue/expense. Interest is
+  an expense; the M4b four flow kinds are unchanged.
+
+### Contract bounds and history
+
+- All active/arrears contracts are retained, capped at **64**.
+- The newest **32** terminated contracts are retained in detail.
+- Older zero-balance terminated contracts are compacted into one exact
+  `debtHistory` aggregate per issuer: retired/defaulted counts, principal issued,
+  principal repaid, principal written off, and interest written off.
+- No contract with outstanding principal or accrued interest is removed.
+- Explicit issuance beyond the active cap fails; automatic financing reports the
+  unissued amount instead of silently omitting it.
+- History aggregates are defensively capped at 256 and validated.
+
+### Verification
+
+Commands actually executed:
+
+- `pnpm run lint` — **PASS** (133 TypeScript files, 45 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (six workspace packages).
+- `pnpm test` — **PASS: 50 suites, 557 tests**.
+- `pnpm run ci` — **PASS, exit code 0**: lint, typecheck, 557 tests, standard
+  benchmark, web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+New/extended coverage:
+
+- `m5b-debt.test.ts`: 14 tests covering issuance, creditor cash, ceiling,
+  no-unnecessary borrowing with treasury liquidity, genuine shortfall, cash and
+  bond legs, coupons, maturity, refinancing, arrears/default, fiscal reporting,
+  deterministic round-trip, invalid policies/contracts, and rollback.
+- `m5b-debt-bounded.test.ts`: shipped USA policy and 31-day issuance, welfare
+  shortfall memo without back-pay, liquidity/remittance effect, active contract cap
+  validation, terminated-contract compaction, save/load/hash equality, and active
+  liability/bond reconciliation.
+- Existing M4b/M4c/M5/M5a/M6/M7 suites remain green.
+
+Final CI benchmark (standard `pnpm run bench`, PASS): M5 sample p50 214.1 ms / p95
+233.3 ms, projected full campaign 2.11 h (not run); M6 p50 212.0 / p95 224.3 ms;
+M7 tick+snapshot p50 207.7 / p95 210.7 ms; early save 440.7 KiB → 83.1 KiB; M2
+200-block stress p95 3.80 ms. Node diagnostics, not mobile evidence.
+
+### Compatibility and limitations
+
+- `WORLD_SCHEMA_VERSION` **16**; `SIM_VERSION` **0.16.0**.
+- `SAVE_FORMAT_VERSION` **1**; `dataVersion` **`m3-economy-v3`**.
+- Schema-15 and older saves are explicitly rejected; no migration.
+- The full 36,524-tick campaign was not run. No native release/device verification.
+- Debt remains a simple public-finance subsystem: no banking, central bank, bond
+  market/auction, external investors, debt-to-GDP target, interest taxation, or
+  player/AI debt issuance action.
+- The financing formula is liquidity-based; it does not retroactively fund earlier
+  unmet welfare. The accounting result and financing requirement can differ.
+- Contract caps are provisional; the USA activation amounts and terms are
+  provisional authored inputs, not historical data.
+
+### Commits
+
+Implementation commit: `e12b66d8a262fd5b09c2e5b23280cdeed16ae8b1`
+(parent `9c0a827d580184125430efebccd852b4ca663eb6`). Documentation commit: the
 immediate child containing this section, `DECISIONS.md`, and
 `Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
 

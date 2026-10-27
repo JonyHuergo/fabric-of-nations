@@ -1230,9 +1230,21 @@ outstanding principal, refinance-on-maturity, and arrears grace days. The defaul
 disabled with a zero ceiling. `FinanceState.debtContracts` persists contract version
 1, issuer, holder kind/id, original and outstanding principal, coupon, issue and
 maturity days, accrued interest, status (`active`/`arrears`/`repaid`/`defaulted`),
-and arrears start day. `nextContractId` is deterministic. Maturity is capped at the
-campaign terminal boundary. Rates, terms, ceilings, and grace periods are provisional
-structural inputs, not calibrated or mutable controls.
+and arrears start day. `FinanceState.welfareRequestedThisMonth` is a month-to-date
+budget memo for financing, not a liability, and resets at close.
+
+**Bounded contract storage.** `debtContracts` retains all active/arrears contracts
+plus the most recent **32** terminated records. Older terminated records are removed
+only after their principal/default history is folded into
+`FinanceState.debtHistory`, one aggregate per issuer (`contractsRetired`,
+`contractsDefaulted`, `principalIssuedSUSD`, `principalRepaidSUSD`,
+`principalWrittenOffSUSD`, `interestWrittenOffSUSD`). Active contracts are capped at
+**64**; explicit issuance beyond the cap fails, while automatic financing reports
+the amount as unfinanced. A hard cap never silently omits an outstanding liability;
+only zero-balance terminated detail is compacted. `nextContractId` remains
+deterministic. Maturity is capped at the campaign terminal boundary. Rates, terms,
+ceilings, caps, and grace periods are provisional structural inputs, not calibrated
+or mutable controls.
 
 **Accounts.** When at least one country enables debt (or contracts exist), every
 country has `debt-liability`, `interest-payable`, and `interest-expense` issuer
@@ -1270,26 +1282,44 @@ bond asset/interest receivable and debits owner equity. The contract becomes
 and no obligation is silently erased.
 
 **Deficit and financing rule.** At each month-end, after daily interest accrual and
-before the M4b close, a debt-enabled country computes its accrued fiscal deficit as
-`welfare-expense + interest-expense - income-tax-revenue`. It may issue debt up to
-the smaller of that deficit, the designated creditor's actual cash, and outstanding
-headroom. Borrowing proceeds are financing, not revenue. Any unfinanced deficit is
-reported as `unfinancedDeficitSUSD`; no invisible liability is created. M4c's
-welfare shortfall rule is unchanged, so an intra-month liquidity shortage can still
-underpay welfare. Principal repayment is not expenditure. `governmentPeriodTotals`
-reports interest expense and a net fiscal result including it; the M4b four flow
-kinds remain unchanged.
+before the M4b close, a debt-enabled country computes a **financing requirement**:
+
+`max(0, welfareRequestedThisMonth + interestExpense - incomeTaxRevenue - treasuryCash)`
+
+`welfareRequestedThisMonth` records the budgeted daily welfare requests actually
+accrued during the month, including amounts that could not be paid. Actual
+`welfare-expense` remains cash-basis, and unpaid welfare is a reporting memo, not a
+payable or liability; borrowing never posts retroactive back-pay. Treasury cash
+includes prior state-enterprise remittances, so a country with sufficient liquidity
+does not borrow merely because remittance cash is not income-tax revenue. The
+requirement is capped by the designated creditor's actual cash and outstanding
+headroom; the active-contract cap is an explicit additional constraint. Borrowing
+proceeds are financing, not revenue. Any unissued requirement is reported as
+`unfinancedDeficitSUSD`; no invisible liability is created. Principal repayment is
+not expenditure. `governmentPeriodTotals` reports interest expense and a net fiscal
+result including it; the M4b four flow kinds remain unchanged. The accounting fiscal
+result and the liquidity-based financing requirement are distinct reported measures.
 
 **Atomicity.** The phase clones finance and applies accrual, financing, coupons,
 maturities, refinancing, and default, then validates accounts, contracts, postings,
 summaries, accounting identity, and aggregate designated-cash conservation before
 publishing. Failures leave the authoritative world unchanged.
 
-**Schema and compatibility.** World schema **12**, simulation **0.12.0**, save format
-**1**, `dataVersion` **`m3-economy-v1`**. Schema-11/simulation-0.11.0 saves are
-rejected; no migration. M5b does not add banking, deposit money, a central bank,
-monetary issuance, bond-market pricing/auctions, derivatives, external investors,
-debt-to-GDP targeting, interest taxation, or player/AI debt actions.
+**Scenario activation and compatibility.** The shipped eight-polity scenario enables
+debt for the USA (the designated player country) only: welfare budget 2,000,000
+SUSD/year, opening treasury 100,000 SUSD, creditor GBR, 4% annual coupon, 365-day
+term, 1,000,000 SUSD ceiling, refinance on maturity, 365-day arrears grace. These are
+provisional authored inputs, not historical calibration. The other seven countries
+remain debt-disabled. Since the player country is exempt from AI fiscal decisions,
+its authored fiscal/debt policy is not silently overwritten; debt financing itself
+is automatic at month-end and is not a player/AI debt action.
+
+**Schema and compatibility (Batch 4).** World schema **16**, simulation **0.16.0**,
+save format **1**, `dataVersion` **`m3-economy-v3`**. Schema-15/older saves are
+rejected; no migration. M5b still does not add banking, deposit money, a central
+bank, monetary issuance, bond-market pricing/auctions, derivatives, external
+investors, debt-to-GDP targeting, interest taxation, or player/AI debt issuance
+actions.
 ### 5.5 Minimum supporting contracts
 
 The `World` interface above references supporting types so the core package can
@@ -2025,19 +2055,24 @@ pop-block household. Contracts persist version, issuer, holder, principal,
 outstanding liability, coupon, issue/maturity, accrued interest, status, and arrears
 start day (§5.4.6, D-057). The current rule is:
 
-- The fiscal deficit is the accrued period result
-  `welfare-expense + interest-expense - income-tax-revenue`. Borrowing proceeds are a
-  financing inflow that increases cash and liability, never revenue. Principal
-  repayment reduces cash and liability and is not ordinary expenditure. Interest
-  accrues daily as an expense and payment reduces cash; neither is principal
-  repayment.
+- The accounting fiscal result is tax revenue minus actual welfare expense and
+  interest expense. The **financing requirement** is
+  `max(0, requested-welfare-this-month + interest-expense - income-tax-revenue - treasury-cash)`.
+  Requested welfare includes unpaid budget and is a memo, not a payable; deficit
+  borrowing never retroactively pays earlier unmet welfare. Treasury cash includes
+  state-enterprise remittances, which are financing liquidity, not tax revenue.
+  Borrowing proceeds are a financing inflow that increases cash and liability,
+  never revenue. Principal repayment reduces cash and liability and is not ordinary
+  expenditure. Interest accrues daily as an expense and payment reduces cash; neither
+  is principal repayment.
 - Refinancing retires the old contract and issues the replacement in one validated
   batch, showing both sides. Arrears and default are explicit contract statuses with
   a grace period and an explicit owner-equity write-down; no unrecorded gap exists.
 - Month-end financing is constrained by the designated creditor's actual cash, the
-  outstanding-principal ceiling, and the accrued deficit. An unfinanced deficit is
-  reported, not booked as an invisible liability. M4c welfare liquidity shortfalls
-  are unchanged.
+  outstanding-principal ceiling, and the active-contract cap. An unfinanced
+  requirement is reported, not booked as an invisible liability. M4c welfare
+  liquidity shortfalls remain cash-basis and are reported separately without
+  creating a payable.
 - No debt-to-GDP target, market pricing, bank/central-bank holder, external investor
   pool, debt auction, or player/AI debt action exists.
 
@@ -2908,6 +2943,18 @@ mobile p95 ≤ 8 ms target, 60 fps, cold start, peak memory, and battery targets
 remain **NOT EVALUATED**. This exception is explicit and must remain visible until
 a release build is run on a named device.
 
+**Post-M7 remediation batch 4 (D-066).** Public debt is active for the USA player
+country only, with GBR as designated creditor; the other seven polities remain
+disabled. Financing uses a month-to-date requested-welfare memo and subtracts
+treasury liquidity (including prior state-enterprise remittances), so sufficient
+cash prevents unnecessary borrowing while an unpaid welfare budget is not silently
+ignored. Unpaid welfare is not a liability and is not retroactively paid. Active
+contracts are capped at 64, the latest 32 terminated records are retained, and
+older terminated detail is compacted into exact per-issuer aggregates. Schema is 16,
+sim 0.16.0, data `m3-economy-v3`; older saves are rejected. Default/arrears,
+refinancing, coupon, maturity, cash conservation, and bounded-history tests pass;
+the full campaign was not rerun and native device behavior remains unverified.
+
 **Post-M7 remediation batch 3 (D-065).** Canonical save history now retains 12
 detailed monthly trial balances and compact exact per-country fiscal/flow totals
 for older months; the 1,200-period history and dates remain. A representative
@@ -2936,8 +2983,9 @@ base-price recipe margins, opening intermediate stock, and opening prices at the
 documented lower provisional bound. The USA is the designated player country; the
 AI is excluded from its fiscal decisions. These are provisional feasibility
 calibrations, not historical calibration. The authoritative state schema is 14 and
-the data version is `m3-economy-v2`; older saves are intentionally rejected. Public
-debt remains disabled in the shipped scenario. Long-run per-block income
+the data version was `m3-economy-v2`; older saves are intentionally rejected. Public
+debt was disabled in the shipped scenario at that batch; Batch 4 (D-066) later
+activates it for the USA player country only. Long-run per-block income
 distribution and the missing construction/profession-transition systems remain
 uncalibrated.
 

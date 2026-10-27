@@ -1946,9 +1946,11 @@ bank, bond-market pricing, monetary issuance, or external investor pools.
   becomes `defaulted` with zero outstanding. No revenue/expense flow is created, no
   cash moves, and no obligation is silently erased. Arrears can be cured by later
   principal repayment before the grace period ends.
-- **Deficit and financing rule.** At each month-end, after daily interest accrual
-  and before the M4b close, each debt-enabled country computes its accrued fiscal
-  deficit as `welfare-expense + interest-expense - income-tax-revenue`. It may issue
+- **Deficit and financing rule (superseded by D-066).** At each month-end, after
+  daily interest accrual and before the M4b close, each debt-enabled country computed
+  its accrued fiscal deficit as
+  `welfare-expense + interest-expense - income-tax-revenue`. D-066 replaces this with
+  the liquidity-based financing requirement. It may issue
   new debt up to the smaller of that deficit, the designated creditor's actual cash,
   and outstanding-principal headroom. Borrowing proceeds are a financing inflow, not
   revenue. Any deficit that cannot be financed is reported as
@@ -2492,10 +2494,11 @@ last valid save is retained. Autosave success is shown only after storage
 verification; failure is shown as `Autosave failed: …`. A worker restart still
 loses unsaved in-memory state and directs the player to a saved game.
 
-**Versioning.** `WORLD_SCHEMA_VERSION` is **15** and `SIM_VERSION` is **0.15.0**.
-`SAVE_FORMAT_VERSION` remains **1** because the envelope shape is unchanged.
-Schema-14 saves (and older data versions) are explicitly rejected; there is no
-silent migration. Data version remains `m3-economy-v2`. The app’s supported schema
+**Versioning.** At Batch 3 `WORLD_SCHEMA_VERSION` was **15** and `SIM_VERSION`
+**0.15.0**; D-066 later raises them to **16 / 0.16.0** and bumps data to
+`m3-economy-v3`. `SAVE_FORMAT_VERSION` remains **1** because the envelope shape is
+unchanged. Schema-14 and older saves are explicitly rejected; there is no silent
+migration. The app’s supported schema
 constant is explicit and must be updated with the sim schema.
 
 **Tests.** Added compaction/round-trip/hash/4 MiB/worker-LOAD tests
@@ -2505,6 +2508,87 @@ tests (`m7-save-store.test.ts`), autosave debounce/failure-gating tests
 autosave wiring guards. Existing save/load, checksum, player-country, and
 deterministic-continuation tests were rerun. Web/native actual storage and bridge
 behavior remain unverified on a device.
+
+## D-066 — Active public debt, liquidity-based financing, and bounded contracts
+
+**Status:** implemented in Batch 4. This supersedes D-057’s deficit formula and
+dormant-scenario status while preserving its accounting, holder, and default rules.
+
+**Why activate it.** The GDD treats M5b public debt as part of the current finance
+model, and the playable shipped scenario is the only way a player observes that
+model. Leaving every country disabled made a completed feature permanently dormant.
+The GDD also delegates the exact terms, holder set, and financing rule to the
+implementation stage.
+
+**Scenario policy.** Debt is enabled for exactly one polity, the **USA player
+country**:
+
+- welfare budget **2,000,000 SUSD/year**;
+- opening treasury **100,000 SUSD**;
+- creditor **GBR** (id 1), another country treasury with actual cash;
+- annual coupon **4%**;
+- term **365 civil days**;
+- outstanding-principal ceiling **1,000,000 SUSD**;
+- refinance on maturity **true**;
+- arrears grace **365 days**.
+
+The other seven countries remain debt-disabled. The USA is exempt from AI fiscal
+decisions (D-063), so its authored fiscal/debt policy is not silently overwritten;
+debt financing itself is automatic at month-end. The values are provisional
+scenario inputs, not historical calibration and not a claim that Brazil/India/etc.
+had no public debt.
+
+**Deficit and financing semantics.** Two distinct measures are reported:
+
+- **Accounting fiscal result:** income-tax revenue minus actual welfare expense and
+  interest expense. Actual welfare expense remains the cash actually paid.
+- **Financing requirement:**
+  `max(0, welfareRequestedThisMonth + interestExpense − incomeTaxRevenue − treasuryCash)`.
+
+`welfareRequestedThisMonth` is a month-to-date memo accumulated by the fiscal phase
+from daily budgeted requests and reset at monthly close. It includes welfare that
+the treasury could not pay. It is **not** a payable, liability, or debt. Borrowing
+never posts retroactive welfare payments; the cash proceeds remain available for
+future obligations. This satisfies the audit distinction between budget, accrued
+expense, actual payment, and shortfall without inventing an implicit obligation.
+Treasury cash includes prior state-enterprise remittances, which are financing
+liquidity (not tax revenue), so sufficient cash prevents unnecessary borrowing. The
+requirement is also capped by creditor cash, the outstanding ceiling, and the active
+contract cap. Unissued requirement is reported as `unfinancedDeficitSUSD`; it is never
+silently omitted or booked as an invisible liability. Borrowing and principal are
+financing movements; interest is expense; the four M4b flow kinds are unchanged.
+
+**Bounded contract state.** `FinanceState.debtContracts` retains all active/arrears
+contracts plus the newest **32** terminated contracts. Active contracts are capped at
+**64**. Older terminated contracts are compacted into one `debtHistory` aggregate per
+issuer containing contract counts, issued principal, repaid principal, written-off
+principal, and written-off interest. Compaction only removes contracts with zero
+outstanding principal and zero accrued interest, so no active liability, bond asset,
+or accrued interest is dropped. Explicit issuance beyond the active cap throws;
+automatic financing reports the remaining requirement as unfinanced. History
+aggregates are capped defensively at 256 and validated for finite nonnegative values.
+
+**Accounting.** Issuance, accrual, coupon payment, principal repayment, refinancing,
+and default keep the D-057 balanced-entry rules. The debt phase remains staged and
+atomic, revalidates accounts, contracts, history, summaries, accounting identity,
+and aggregate designated-cash conservation, and publishes only after success.
+Interest payment and default-writeoff amounts are clamped to both sides’ actual
+posting-account balances to tolerate floating residuals without making a liability
+negative.
+
+**Versioning.** `WORLD_SCHEMA_VERSION` **16**, `SIM_VERSION` **0.16.0**, save format
+**1**, `dataVersion` **`m3-economy-v3`** (the scenario’s fiscal/debt meaning changed).
+Schema-15 and older saves are rejected explicitly; no migration.
+
+**Tests.** `m5b-debt.test.ts` covers issuance, creditor cash, ceiling, no unnecessary
+issuance with liquidity, genuine shortfall, credits, coupons, maturity, refinancing,
+arrears/default, fiscal reporting, deterministic round-trip, and rollback.
+`m5b-debt-bounded.test.ts` covers the shipped USA policy, welfare-shortfall memo
+(no back-pay), remittance/liquidity effect, contract caps, history compaction,
+save/load/hash equality, and active liability/bond reconciliation. `m5b-debt-
+bounded` also asserts the active cap through validation. The full campaign was not
+run; the bounded scenario run crosses several month-end/coupon/default boundaries.
+Native device behavior remains unverified.
 
 ## Assumptions recorded for future review
 
@@ -2569,6 +2653,15 @@ behavior remain unverified on a device.
     suspends JavaScript before the debounced save runs can lose progress since the
     last verified save; the UI does not claim otherwise. AsyncStorage cannot provide
     a true cross-key transaction, so staged/previous keys are the recovery boundary.
+20. The shipped debt activation is a one-country provisional policy. The USA’s
+    2,000,000 SUSD/year welfare budget, 100,000 opening treasury, GBR creditor, 4%
+    coupon, 365-day term, 1,000,000 ceiling, and 365-day grace are authored scenario
+    inputs, not historical claims. Other countries remain disabled.
+21. The financing requirement is liquidity-based and distinct from the accounting
+    fiscal result. Requested welfare is a month-to-date memo, not a payable; unpaid
+    welfare is not retroactively funded. Treasury cash includes prior state-
+    enterprise remittances. Contract caps (64 active, 32 recent terminated) and the
+    256 aggregate-history guard are provisional bounded-state limits.
 
 ## Items intentionally left open
 
