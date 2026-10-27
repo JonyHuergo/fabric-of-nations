@@ -463,6 +463,8 @@ export interface SimulationSnapshot {
   readonly simVersion: string;
   /** Designated player country, or null when no player control is configured. */
   readonly playerCountryId: number | null;
+  /** State-enterprise ownership/remittance policy required by public construction. */
+  readonly constructionEnabled: boolean;
   readonly countries: readonly CountrySnapshot[];
   readonly regions: readonly RegionSnapshot[];
   readonly markets: readonly MarketSnapshot[];
@@ -1242,6 +1244,7 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isString(value.dataVersion, 128)) return false;
   if (!isString(value.simVersion, 128)) return false;
   if (!isNullableId(value.playerCountryId)) return false;
+  if (typeof value.constructionEnabled !== "boolean") return false;
   if (!Array.isArray(value.countries) || !value.countries.every(isCountrySnapshot)) return false;
   if (
     value.playerCountryId !== null &&

@@ -67,6 +67,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     dataVersion: "test",
     simVersion: "test",
     playerCountryId: null,
+    constructionEnabled: false,
     countries: [
       {
         id: 0,

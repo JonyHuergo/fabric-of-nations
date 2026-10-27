@@ -850,6 +850,7 @@ export function buildSimulationSnapshot(
     dataVersion: world.dataVersion,
     simVersion: world.simVersion,
     playerCountryId: world.playerCountryId,
+    constructionEnabled: world.profitDistribution.enabled,
     countries,
     regions: regionSnapshots(world),
     markets: marketSnapshots(world, definitions, capacities.byMarket),

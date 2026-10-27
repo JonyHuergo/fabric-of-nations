@@ -45,6 +45,11 @@ export function previewConstruction(
   if (projectType === undefined) {
     errors.push("The selected project type is not buildable under the current rules.");
   }
+  if (!snapshot.constructionEnabled) {
+    errors.push(
+      "Public construction requires the state-enterprise profit-distribution policy, which is disabled in this scenario.",
+    );
+  }
   if (!country.regionIds.includes(regionId)) {
     errors.push("The selected region is not owned by this country.");
   }

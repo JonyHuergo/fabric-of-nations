@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import {
@@ -51,7 +51,8 @@ export function ConstructionScreen({
   }
   const isPlayerCountry =
     snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
-  const canAct = isPlayerCountry && !busy && connection === "ready";
+  const canAct =
+    isPlayerCountry && snapshot.constructionEnabled && !busy && connection === "ready";
   const selectedType =
     definitionId === null
       ? null
@@ -132,6 +133,12 @@ export function ConstructionScreen({
           value={`${String(country.constructionHistory.projectsCompleted)} completed · ${String(country.constructionHistory.projectsCancelled)} cancelled`}
           detail={`Compacted spent ${formatSUSD(country.constructionHistory.totalSpentSUSD)} · written off ${formatSUSD(country.constructionHistory.totalWrittenOffSUSD)}`}
         />
+        {!snapshot.constructionEnabled ? (
+          <Text style={styles.error}>
+            This scenario disables the state-enterprise profit-distribution policy, so public
+            construction is unavailable. No project can be authorized.
+          </Text>
+        ) : null}
       </Section>
 
       <Section

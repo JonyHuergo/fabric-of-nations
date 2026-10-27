@@ -570,6 +570,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
       f.scenario.population.definitions,
     );
     expect(snapshot.protocolVersion).toBe(PROTOCOL_VERSION);
+    expect(snapshot.constructionEnabled).toBe(true);
     expect(snapshot.projectTypes.length).toBeGreaterThan(0);
     const farmType = snapshot.projectTypes.find((type) => type.definitionId === FARM)!;
     expect(farmType.constructionCostSUSD).toBeGreaterThan(0);
