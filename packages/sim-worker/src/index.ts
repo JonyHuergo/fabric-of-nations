@@ -6,6 +6,7 @@
  * selectors from here.
  */
 
+export * from "./autosave.js";
 export * from "./protocol.js";
 export * from "./selectors.js";
 export * from "./supervisor.js";

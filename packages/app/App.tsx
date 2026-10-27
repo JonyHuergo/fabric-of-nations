@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -26,6 +27,7 @@ import { MapScreen } from "./src/screens/MapScreen";
 import { MarketsScreen } from "./src/screens/MarketsScreen";
 import { PopulationScreen } from "./src/screens/PopulationScreen";
 import { colors, radii, spacing } from "./src/theme";
+import type { StoredCampaign } from "./src/storage/saveStorage";
 import {
   SimulationProvider,
   useSimulation,
@@ -62,6 +64,13 @@ function CenturyApp() {
     speedDaysPerSecond,
     achievedDaysPerSecond,
     busy,
+    startup,
+    savedCampaign,
+    overwritePrompt,
+    resumeSavedGame,
+    startNewGame,
+    confirmOverwrite,
+    cancelOverwrite,
     start,
     pause,
     step,
@@ -74,6 +83,7 @@ function CenturyApp() {
   const [tab, setTab] = useState<TabId>("map");
   const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
+  const [newGamePrompt, setNewGamePrompt] = useState(false);
 
   useEffect(() => {
     if (snapshot !== null && selectedCountryId === null) {
@@ -87,6 +97,30 @@ function CenturyApp() {
     if (snapshot === null) return "Starting simulation…";
     return `${snapshot.date.label} · ${snapshot.scenarioId} · sim ${snapshot.simVersion}`;
   }, [snapshot]);
+
+  if (startup === "checking") return <StartupCheckingScreen />;
+  if (startup === "choice" && savedCampaign !== null) {
+    return (
+      <>
+        <CampaignChoiceScreen
+          campaign={savedCampaign}
+          onContinue={resumeSavedGame}
+          onNewGame={() => setNewGamePrompt(true)}
+        />
+        <ConfirmDialog
+          visible={newGamePrompt}
+          title="Start a new campaign?"
+          message={`This starts a fresh 1900 world. The saved campaign (${savedCampaign.metadata.dateLabel}) is preserved until you explicitly save the new one, and saving will ask for confirmation.`}
+          confirmLabel="Start new campaign"
+          onConfirm={() => {
+            setNewGamePrompt(false);
+            startNewGame();
+          }}
+          onCancel={() => setNewGamePrompt(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -162,7 +196,110 @@ function CenturyApp() {
           )}
         </AppErrorBoundary>
       </ScrollView>
+      <ConfirmDialog
+        visible={overwritePrompt}
+        title="Replace the saved campaign?"
+        message={`Saving now replaces the last saved campaign${
+          savedCampaign === null ? "" : ` (${savedCampaign.metadata.dateLabel})`
+        }. The immediately previous valid save is retained as a recovery copy, but the newest overwrite is deliberate.`}
+        confirmLabel="Save and replace"
+        onConfirm={confirmOverwrite}
+        onCancel={cancelOverwrite}
+      />
     </SafeAreaView>
+  );
+}
+
+function StartupCheckingScreen() {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.startupCenter}>
+        <ActivityIndicator color={colors.accent} />
+        <Text style={styles.startupTitle}>CENTURY</Text>
+        <Text style={styles.startupMessage}>Checking for a saved campaign…</Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function CampaignChoiceScreen({
+  campaign,
+  onContinue,
+  onNewGame,
+}: {
+  readonly campaign: StoredCampaign;
+  readonly onContinue: () => void;
+  readonly onNewGame: () => void;
+}) {
+  const recovered =
+    campaign.source === "previous"
+      ? "Recovered the previous valid save; the newest save was unreadable."
+      : campaign.source === "staging"
+        ? "Recovered a fully written save whose primary replacement was interrupted."
+        : null;
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.startupCenter}>
+        <Text style={styles.title}>CENTURY</Text>
+        <Text style={styles.startupTitle}>Continue campaign?</Text>
+        <View style={styles.startupCard}>
+          <Text style={styles.startupDate}>{campaign.metadata.dateLabel}</Text>
+          <Text style={styles.startupMessage}>
+            {campaign.metadata.scenarioId} · sim {campaign.metadata.simVersion} · schema{" "}
+            {String(campaign.metadata.schemaVersion)}
+          </Text>
+          <Text style={styles.startupMessage}>
+            Saved state: {Math.round(campaign.save.length / 1024)} KiB canonical ·{" "}
+            {Math.round(campaign.storedBytes / 1024)} KiB stored
+          </Text>
+          {recovered === null ? null : <Text style={styles.startupWarning}>{recovered}</Text>}
+        </View>
+        <View style={styles.startupActions}>
+          <ActionButton label="Continue" tone="accent" onPress={onContinue} />
+          <ActionButton label="New Game" tone="danger" onPress={onNewGame} />
+        </View>
+        <Text style={styles.startupNote}>
+          New Game starts a fresh 1900 world without deleting the old save. Saving the new
+          campaign asks before replacing it.
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function ConfirmDialog({
+  visible,
+  title,
+  message,
+  confirmLabel,
+  onConfirm,
+  onCancel,
+}: {
+  readonly visible: boolean;
+  readonly title: string;
+  readonly message: string;
+  readonly confirmLabel: string;
+  readonly onConfirm: () => void;
+  readonly onCancel: () => void;
+}) {
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
+      <View style={styles.modalBackdrop}>
+        <View style={styles.modalCard}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <Text style={styles.modalMessage}>{message}</Text>
+          <View style={styles.startupActions}>
+            <ActionButton label={confirmLabel} tone="danger" onPress={onConfirm} />
+            <ActionButton label="Cancel" onPress={onCancel} />
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -368,4 +505,52 @@ const styles = StyleSheet.create({
   content: { padding: spacing.md, paddingBottom: spacing.xxl, width: "100%", maxWidth: 900, alignSelf: "center" },
   loading: { alignItems: "center", paddingVertical: spacing.xxl },
   loadingText: { color: colors.muted, fontSize: 12, marginTop: spacing.md, textAlign: "center" },
+  startupCenter: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  startupTitle: { color: colors.text, fontSize: 18, fontWeight: "700", textAlign: "center" },
+  startupMessage: { color: colors.muted, fontSize: 12, lineHeight: 18, textAlign: "center" },
+  startupDate: { color: colors.accent, fontSize: 20, fontWeight: "700", textAlign: "center" },
+  startupCard: {
+    width: "100%",
+    maxWidth: 460,
+    padding: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    gap: spacing.xs,
+  },
+  startupWarning: { color: colors.red, fontSize: 11, lineHeight: 16, textAlign: "center" },
+  startupActions: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: spacing.sm },
+  startupNote: {
+    color: colors.faint,
+    fontSize: 10,
+    lineHeight: 15,
+    textAlign: "center",
+    maxWidth: 460,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.lg,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 460,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  modalTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
+  modalMessage: { color: colors.muted, fontSize: 12, lineHeight: 18 },
 });

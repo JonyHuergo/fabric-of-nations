@@ -42,9 +42,13 @@ import {
   cloneFinanceState,
   FLOW_EXPENSE_SUBTYPE,
 } from "./accounts.js";
-import { MAX_AUDIT_POSTINGS } from "./constants.js";
+import {
+  MAX_AUDIT_POSTINGS,
+  MAX_DETAILED_PERIOD_SUMMARIES,
+} from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
+  type FinancePeriodFiscalTotals,
   type FinancePeriodSummary,
   type FinanceState,
   type FinancialAccount,
@@ -92,6 +96,20 @@ export function governmentPeriodTotals(
   finance: FinanceState,
   summary: FinancePeriodSummary,
 ): GovernmentPeriodTotals[] {
+  if (summary.countryFiscalTotals !== undefined) {
+    return Object.entries(summary.countryFiscalTotals)
+      .map(([countryIdText, totals]) => {
+        const countryId = Number(countryIdText);
+        return {
+          countryId,
+          incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
+          welfareExpenseSUSD: totals.welfareExpenseSUSD,
+          interestExpenseSUSD: totals.interestExpenseSUSD,
+          netFiscalResultSUSD: totals.netFiscalResultSUSD,
+        };
+      })
+      .sort((left, right) => left.countryId - right.countryId);
+  }
   const accounts = new Map<Id, FinancialAccount>();
   for (const account of finance.accounts) accounts.set(account.id, account);
   const totals = new Map<Id, { tax: number; welfare: number; interest: number }>();
@@ -135,6 +153,43 @@ export function governmentPeriodTotals(
       netFiscalResultSUSD: values.tax - values.welfare - values.interest,
     }))
     .sort((left, right) => left.countryId - right.countryId);
+}
+
+/**
+ * Compact old monthly summaries to exact per-country fiscal totals plus the four
+ * gross flow totals (D-065). The most recent `MAX_DETAILED_PERIOD_SUMMARIES`
+ * retain their full pre-close trial balance for the Ledger window. This is a
+ * deterministic state transformation: no simulation decision reads a historical
+ * `accountTotals`, and every retained fiscal value is exact.
+ *
+ * Returns the number of newly compacted summaries.
+ */
+export function compactFinanceHistory(finance: FinanceState): number {
+  const cutoff = Math.max(0, finance.periodSummaries.length - MAX_DETAILED_PERIOD_SUMMARIES);
+  let compacted = 0;
+  for (let index = 0; index < cutoff; index += 1) {
+    const summary = finance.periodSummaries[index];
+    if (summary === undefined || summary.countryFiscalTotals !== undefined) continue;
+    const totals = governmentPeriodTotals(finance, summary);
+    const countryFiscalTotals: Record<Id, FinancePeriodFiscalTotals> = {};
+    for (const entry of totals) {
+      countryFiscalTotals[entry.countryId] = {
+        incomeTaxRevenueSUSD: entry.incomeTaxRevenueSUSD,
+        welfareExpenseSUSD: entry.welfareExpenseSUSD,
+        interestExpenseSUSD: entry.interestExpenseSUSD,
+        netFiscalResultSUSD: entry.netFiscalResultSUSD,
+      };
+    }
+    finance.periodSummaries[index] = {
+      periodStartDay: summary.periodStartDay,
+      periodEndDay: summary.periodEndDay,
+      accountTotals: {},
+      flowTotalsByKind: { ...summary.flowTotalsByKind },
+      countryFiscalTotals,
+    };
+    compacted += 1;
+  }
+  return compacted;
 }
 
 function toleranceMoney(...values: number[]): number {
@@ -580,6 +635,7 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
   const postings = postPeriodCloseEntries(staged, world.dayIndex, entries);
   staged.periodSummaries.push(summary);
   staged.closedThroughDay = bounds.endDay;
+  compactFinanceHistory(staged);
 
   assertOwnerEquityInvariant(staged);
   assertValidFinanceState(staged);

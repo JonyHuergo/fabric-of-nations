@@ -12,6 +12,14 @@ export const MAX_AUDIT_POSTINGS = 256;
  */
 export const MAX_PERIOD_SUMMARIES = 1200;
 
+/**
+ * Number of most recent monthly summaries that retain the full pre-close trial
+ * balance. Older summaries retain period dates, the four gross flow totals, and
+ * per-country fiscal totals, but not the account-level trial balance (D-065).
+ * Twelve matches the Ledger snapshot window and keeps canonical saves bounded.
+ */
+export const MAX_DETAILED_PERIOD_SUMMARIES = 12;
+
 /** M3 excludes non-storable service output; services are deferred. */
 export const M3_DEFERRED_GOOD_KEYS = ["services"] as const;
 

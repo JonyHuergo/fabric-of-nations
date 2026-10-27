@@ -320,8 +320,27 @@ export interface FinancePeriodSummary {
   periodStartDay: Day;
   /** Inclusive last day; always a civil month-end. */
   periodEndDay: Day;
+  /**
+   * Pre-close account trial balance. Nonempty for the most recent
+   * `MAX_DETAILED_PERIOD_SUMMARIES`; empty for compacted summaries, which retain
+   * `countryFiscalTotals` and `flowTotalsByKind` instead.
+   */
   accountTotals: Record<Id, MoneySUSD>;
   flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
+  /**
+   * Per-country fiscal totals retained after account-level compaction (D-065).
+   * Absent on detailed summaries. Reporting-only, exact values from the
+   * pre-close trial balance; not used by simulation decisions.
+   */
+  countryFiscalTotals?: Record<Id, FinancePeriodFiscalTotals>;
+}
+
+/** Exact per-country fiscal totals retained in a compacted period summary. */
+export interface FinancePeriodFiscalTotals {
+  readonly incomeTaxRevenueSUSD: MoneySUSD;
+  readonly welfareExpenseSUSD: MoneySUSD;
+  readonly interestExpenseSUSD: MoneySUSD;
+  readonly netFiscalResultSUSD: MoneySUSD;
 }
 
 export interface FinanceState {

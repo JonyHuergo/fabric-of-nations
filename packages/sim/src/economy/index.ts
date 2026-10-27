@@ -25,6 +25,7 @@ export * from "./day.js";
  */
 export {
   closeFinancePeriod,
+  compactFinanceHistory,
   governmentPeriodTotals,
   type FinanceCloseResult,
   type GovernmentPeriodTotals,

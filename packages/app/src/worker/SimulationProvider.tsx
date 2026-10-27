@@ -11,6 +11,7 @@ import {
 import { AppState, Platform } from "react-native";
 
 import {
+  AutosaveScheduler,
   PROTOCOL_VERSION,
   WorkerSupervisor,
   type SimulationSnapshot,
@@ -19,7 +20,11 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 
-import { readSave, storeSave } from "../storage/saveStorage";
+import {
+  readStoredCampaign,
+  storeSave,
+  type StoredCampaign,
+} from "../storage/saveStorage";
 import {
   NativeWorkerHost,
   type NativeWorkerHandle,
@@ -31,6 +36,7 @@ import {
 } from "./webWorkerClient";
 
 export type ConnectionState = "connecting" | "ready" | "error" | "closed";
+export type CampaignStartup = "checking" | "choice" | "playing";
 
 export interface SimulationContextValue {
   readonly snapshot: SimulationSnapshot | null;
@@ -42,6 +48,13 @@ export interface SimulationContextValue {
   readonly achievedDaysPerSecond: number;
   /** True while a save, load, or policy action is awaiting a reply. */
   readonly busy: boolean;
+  readonly startup: CampaignStartup;
+  readonly savedCampaign: StoredCampaign | null;
+  readonly overwritePrompt: boolean;
+  readonly resumeSavedGame: () => void;
+  readonly startNewGame: () => void;
+  readonly confirmOverwrite: () => void;
+  readonly cancelOverwrite: () => void;
   readonly start: () => void;
   readonly pause: () => void;
   readonly step: () => void;
@@ -80,6 +93,12 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const resumeOnVisibleRef = useRef(false);
   /** Increments on worker replacement so old async work cannot touch new state. */
   const sessionRef = useRef(0);
+  const autosaveArmedRef = useRef(false);
+  const autosaveOnPauseRef = useRef(false);
+  const autosaveSchedulerRef = useRef<AutosaveScheduler | null>(null);
+  const saveKindRef = useRef<"manual" | "autosave" | null>(null);
+  const startupRef = useRef<CampaignStartup>("checking");
+  const autosaveRequestRef = useRef<() => void>(() => {});
   const [snapshot, setSnapshot] = useState<SimulationSnapshot | null>(null);
   const [connection, setConnection] = useState<ConnectionState>("connecting");
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +108,9 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     useState<SpeedDaysPerSecond>(1);
   const [achievedDaysPerSecond, setAchievedDaysPerSecond] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [startup, setStartup] = useState<CampaignStartup>("checking");
+  const [savedCampaign, setSavedCampaign] = useState<StoredCampaign | null>(null);
+  const [overwritePrompt, setOverwritePrompt] = useState(false);
   const [webEpoch, setWebEpoch] = useState(0);
   const [nativeEpoch, setNativeEpoch] = useState(0);
 
@@ -98,6 +120,9 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   useEffect(() => {
     connectionRef.current = connection;
   }, [connection]);
+  useEffect(() => {
+    startupRef.current = startup;
+  }, [startup]);
 
   const nextCommandId = useCallback((prefix: string): string => {
     commandCounter.current += 1;
@@ -107,6 +132,36 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const setRunningState = useCallback((value: boolean) => {
     runningRef.current = value;
     setRunning(value);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void readStoredCampaign()
+      .then((campaign) => {
+        if (cancelled) return;
+        if (campaign === null) {
+          setSavedCampaign(null);
+          setStartup("playing");
+          startupRef.current = "playing";
+          autosaveArmedRef.current = true;
+          return;
+        }
+        setSavedCampaign(campaign);
+        setStartup("choice");
+        startupRef.current = "choice";
+        autosaveArmedRef.current = false;
+      })
+      .catch((storageError: unknown) => {
+        if (cancelled) return;
+        setError(`Saved game could not be read: ${messageOf(storageError)}`);
+        setStartup("playing");
+        startupRef.current = "playing";
+        // Preserve any existing file; a fresh autosave must not replace it.
+        autosaveArmedRef.current = false;
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleSupervisorError = useCallback((message: string) => {
@@ -119,6 +174,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     // Clear pending replies/timeouts first; otherwise a late timeout could
     // overwrite the transport failure or leave a stale action in flight.
     supervisorRef.current?.fail(message);
+    autosaveSchedulerRef.current?.cancel();
+    saveKindRef.current = null;
     setError(message);
     setSaveStatus(null);
     setConnection("error");
@@ -133,6 +190,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       _commandType: WorkerCommand["type"] | "READY",
       message: string,
     ) => {
+      autosaveSchedulerRef.current?.cancel();
+      saveKindRef.current = null;
       setError(message);
       setSaveStatus(null);
       setConnection("error");
@@ -160,6 +219,10 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           setRunningState(event.running);
           setSpeedDaysPerSecond(event.speedDaysPerSecond as SpeedDaysPerSecond);
           setAchievedDaysPerSecond(event.achievedDaysPerSecond);
+          if (!event.running && autosaveOnPauseRef.current) {
+            autosaveOnPauseRef.current = false;
+            autosaveRequestRef.current();
+          }
           return;
         case "ACTION_RESULT": {
           const supervisor = supervisorRef.current;
@@ -183,6 +246,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
         }
         case "SAVE_RESULT": {
           const generation = sessionRef.current;
+          const kind = saveKindRef.current ?? "manual";
+          saveKindRef.current = null;
           // Keep busy through the storage write so a second save cannot race
           // the same storage key.
           void storeSave(event.save)
@@ -190,16 +255,25 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
               if (generation !== sessionRef.current) return;
               setBusy(false);
               setError(null);
+              autosaveArmedRef.current = true;
+              setSavedCampaign({
+                save: event.save,
+                metadata: info.metadata,
+                source: "primary",
+                storedBytes: info.compressedBytes,
+              });
               setSaveStatus(
-                `Saved ${String(Math.round(info.saveBytes / 1024))} KiB as ${String(
-                  Math.round(info.compressedBytes / 1024),
-                )} KiB`,
+                `${kind === "autosave" ? "Autosaved" : "Saved"} ${info.metadata.dateLabel} · ${String(
+                  Math.round(info.saveBytes / 1024),
+                )} KiB canonical · ${String(Math.round(info.compressedBytes / 1024))} KiB stored`,
               );
             })
             .catch((saveError: unknown) => {
               if (generation !== sessionRef.current) return;
               setBusy(false);
-              setError(messageOf(saveError));
+              setError(
+                `${kind === "autosave" ? "Autosave failed" : "Save failed"}: ${messageOf(saveError)}`,
+              );
               setSaveStatus(null);
             });
           return;
@@ -218,25 +292,40 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             }
             setConnection("ready");
             connectionRef.current = "ready";
+            setStartup("playing");
+            startupRef.current = "playing";
+            autosaveArmedRef.current = true;
             setError(null);
             setSaveStatus("Saved game loaded");
           } else {
             setError(event.errors.join("; ") || "The save could not be loaded.");
             setSaveStatus(null);
+            // Do not silently overwrite a save that this build could not load.
+            autosaveArmedRef.current = false;
           }
+          saveKindRef.current = null;
           setBusy(false);
           return;
         }
         case "ERROR":
           setBusy(supervisorRef.current?.hasPendingCritical ?? false);
           setSaveStatus(null);
-          setError(event.message);
+          setError(
+            saveKindRef.current === "autosave"
+              ? `Autosave failed: ${event.message}`
+              : saveKindRef.current === "manual"
+                ? `Save failed: ${event.message}`
+                : event.message,
+          );
+          saveKindRef.current = null;
           if (event.code === "closed") {
             setConnection("closed");
             connectionRef.current = "closed";
           }
           return;
         case "FATAL":
+          saveKindRef.current = null;
+          autosaveSchedulerRef.current?.cancel();
           setBusy(false);
           setSaveStatus(null);
           setError(event.message);
@@ -278,6 +367,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   );
 
   const start = useCallback(() => {
+    autosaveOnPauseRef.current = false;
+    autosaveSchedulerRef.current?.cancel();
     if (
       send({ protocolVersion: PROTOCOL_VERSION, type: "START", commandId: nextCommandId("start") })
     ) {
@@ -287,6 +378,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   }, [nextCommandId, send]);
 
   const pause = useCallback(() => {
+    autosaveOnPauseRef.current = autosaveArmedRef.current;
     if (
       send({ protocolVersion: PROTOCOL_VERSION, type: "PAUSE", commandId: nextCommandId("pause") })
     ) {
@@ -334,33 +426,120 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     [nextCommandId, send],
   );
 
+  const doSave = useCallback(
+    (kind: "manual" | "autosave") => {
+      const accepted = send({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SAVE",
+        commandId: nextCommandId("save"),
+      });
+      if (accepted) {
+        saveKindRef.current = kind;
+        setSaveStatus(kind === "autosave" ? "Autosaving…" : "Saving…");
+      }
+    },
+    [nextCommandId, send],
+  );
+
+  const requestAutosave = useCallback(() => {
+    if (!autosaveArmedRef.current || startupRef.current !== "playing") return;
+    autosaveSchedulerRef.current?.request();
+  }, []);
+
+  useEffect(() => {
+    const scheduler = new AutosaveScheduler({
+      delayMs: 500,
+      canSave: () =>
+        autosaveArmedRef.current &&
+        startupRef.current === "playing" &&
+        !(supervisorRef.current?.hasPendingCritical ?? false),
+      save: () => doSave("autosave"),
+    });
+    autosaveSchedulerRef.current = scheduler;
+    return () => {
+      scheduler.dispose();
+      if (autosaveSchedulerRef.current === scheduler) autosaveSchedulerRef.current = null;
+    };
+  }, [doSave]);
+
+  useEffect(() => {
+    autosaveRequestRef.current = requestAutosave;
+  }, [requestAutosave]);
+
   const saveGame = useCallback(() => {
+    if (savedCampaign !== null && !autosaveArmedRef.current) {
+      setOverwritePrompt(true);
+      return;
+    }
+    doSave("manual");
+  }, [doSave, savedCampaign]);
+
+  const confirmOverwrite = useCallback(() => {
+    setOverwritePrompt(false);
+    // Arm only after the replacement is verified; a failed overwrite must not
+    // enable autosave over the still-valid old campaign.
+    autosaveArmedRef.current = false;
+    doSave("manual");
+  }, [doSave]);
+
+  const cancelOverwrite = useCallback(() => {
+    setOverwritePrompt(false);
+  }, []);
+
+  const resumeSavedGame = useCallback(() => {
+    if (savedCampaign === null) {
+      setError("No saved game is available to continue.");
+      return;
+    }
+    setStartup("playing");
+    startupRef.current = "playing";
+    autosaveArmedRef.current = true;
     const accepted = send({
       protocolVersion: PROTOCOL_VERSION,
-      type: "SAVE",
-      commandId: nextCommandId("save"),
+      type: "LOAD",
+      commandId: nextCommandId("load"),
+      save: savedCampaign.save,
     });
-    if (accepted) setSaveStatus("Saving…");
-  }, [nextCommandId, send]);
+    setSaveStatus(accepted ? "Loading saved game…" : null);
+  }, [nextCommandId, savedCampaign, send]);
+
+  const startNewGame = useCallback(() => {
+    setStartup("playing");
+    startupRef.current = "playing";
+    if (savedCampaign === null) {
+      autosaveArmedRef.current = true;
+      return;
+    }
+    // Do not silently overwrite the existing campaign with a fresh world. The
+    // player must explicitly confirm a later save.
+    autosaveArmedRef.current = false;
+    setSaveStatus(
+      "New campaign started. The previous saved game is preserved until you explicitly save.",
+    );
+  }, [savedCampaign]);
 
   const loadGame = useCallback(async () => {
     const generation = sessionRef.current;
     setSaveStatus("Reading save…");
     try {
-      const save = await readSave();
+      const campaign = await readStoredCampaign();
       if (generation !== sessionRef.current) return;
-      if (save === null) {
+      if (campaign === null) {
         setError("No saved game was found.");
         setSaveStatus(null);
         return;
       }
+      setSavedCampaign(campaign);
+      setStartup("playing");
+      startupRef.current = "playing";
+      autosaveArmedRef.current = true;
       const accepted = send({
         protocolVersion: PROTOCOL_VERSION,
         type: "LOAD",
         commandId: nextCommandId("load"),
-        save,
+        save: campaign.save,
       });
-      setSaveStatus(accepted ? "Loading save…" : null);
+      setSaveStatus(accepted ? "Loading saved game…" : null);
     } catch (loadError) {
       setError(messageOf(loadError));
       setSaveStatus(null);
@@ -369,6 +548,10 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
 
   const restartWorker = useCallback(() => {
     sessionRef.current += 1;
+    autosaveArmedRef.current = false;
+    autosaveOnPauseRef.current = false;
+    autosaveSchedulerRef.current?.cancel();
+    saveKindRef.current = null;
     supervisorRef.current?.dispose();
     supervisorRef.current = null;
     if (Platform.OS === "web") {
@@ -451,9 +634,13 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
 
   useEffect(() => {
     const hide = (): void => {
-      if (!runningRef.current) return;
-      resumeOnVisibleRef.current = true;
-      pause();
+      if (runningRef.current) {
+        resumeOnVisibleRef.current = true;
+        pause();
+        return;
+      }
+      // Already paused: backgrounding is still a safe autosave point.
+      if (autosaveArmedRef.current) requestAutosave();
     };
     const show = (): void => {
       if (!resumeOnVisibleRef.current) return;
@@ -473,7 +660,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       else if (status === "active") show();
     });
     return () => subscription.remove();
-  }, [pause, start]);
+  }, [pause, requestAutosave, start]);
 
   const value = useMemo<SimulationContextValue>(
     () => ({
@@ -485,6 +672,13 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       speedDaysPerSecond,
       achievedDaysPerSecond,
       busy,
+      startup,
+      savedCampaign,
+      overwritePrompt,
+      resumeSavedGame,
+      startNewGame,
+      confirmOverwrite,
+      cancelOverwrite,
       start,
       pause,
       step,
@@ -506,6 +700,13 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       speedDaysPerSecond,
       achievedDaysPerSecond,
       busy,
+      startup,
+      savedCampaign,
+      overwritePrompt,
+      resumeSavedGame,
+      startNewGame,
+      confirmOverwrite,
+      cancelOverwrite,
       start,
       pause,
       step,

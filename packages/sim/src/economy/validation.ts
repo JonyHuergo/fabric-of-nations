@@ -479,53 +479,105 @@ export function assertValidFinancePeriodSummary(
   }
 
   const totals = requireRecord(record.accountTotals, `${path}.accountTotals`);
+  const compacted = record.countryFiscalTotals !== undefined;
   const totalsByAccount = new Map<number, number>();
-  let assets = 0;
-  let liabilities = 0;
-  let equity = 0;
-  let revenues = 0;
-  let expenses = 0;
-  for (const key of Object.keys(totals)) {
-    const accountId = parseAccountTotalKey(key, `${path}.accountTotals`);
-    const account = accounts.get(accountId);
-    if (account === undefined) {
-      throw new RangeError(`${path}.accountTotals references unknown account ${String(accountId)}`);
+  const countryIds = new Set<number>();
+  if (compacted) {
+    for (const account of accounts.values()) {
+      if (account.ownerKind === "country" && account.ownerId !== null) {
+        countryIds.add(account.ownerId);
+      }
     }
-    const value = requireFiniteNumber(totals[key], `${path}.accountTotals.${key}`);
-    if (value === 0) {
-      throw new RangeError(`${path}.accountTotals.${key} must be omitted when zero`);
-    }
-    if (value < 0 && !categoryAllowsNegativeBalance(account.category)) {
+  }
+  if (compacted) {
+    if (Object.keys(totals).length !== 0) {
       throw new RangeError(
-        `${path}.${key} must not be negative for ${account.category} account ${String(accountId)}`,
+        `${path}.accountTotals must be empty when countryFiscalTotals is present`,
       );
     }
-    switch (account.category) {
-      case "asset":
-        assets += value;
-        break;
-      case "liability":
-        liabilities += value;
-        break;
-      case "equity":
-        equity += value;
-        break;
-      case "revenue":
-        revenues += value;
-        break;
-      case "expense":
-        expenses += value;
-        break;
+    const fiscal = requireRecord(record.countryFiscalTotals, `${path}.countryFiscalTotals`);
+    for (const key of Object.keys(fiscal)) {
+      const countryId = parseAccountTotalKey(key, `${path}.countryFiscalTotals`);
+      if (!countryIds.has(countryId)) {
+        throw new RangeError(
+          `${path}.countryFiscalTotals references unknown country ${String(countryId)}`,
+        );
+      }
+      const entry = requireRecord(fiscal[key], `${path}.countryFiscalTotals.${key}`);
+      const tax = requireFiniteNumber(
+        entry.incomeTaxRevenueSUSD,
+        `${path}.countryFiscalTotals.${key}.incomeTaxRevenueSUSD`,
+      );
+      const welfare = requireFiniteNumber(
+        entry.welfareExpenseSUSD,
+        `${path}.countryFiscalTotals.${key}.welfareExpenseSUSD`,
+      );
+      const interest = requireFiniteNumber(
+        entry.interestExpenseSUSD,
+        `${path}.countryFiscalTotals.${key}.interestExpenseSUSD`,
+      );
+      const net = requireFiniteNumber(
+        entry.netFiscalResultSUSD,
+        `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD`,
+      );
+      if (tax < 0 || welfare < 0 || interest < 0) {
+        throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
+      }
+      const expectedNet = tax - welfare - interest;
+      if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
+        throw new RangeError(
+          `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,
+        );
+      }
     }
-    totalsByAccount.set(accountId, value);
-  }
-  // The pre-close trial balance frozen in the summary satisfies the identity.
-  const debitSide = assets + expenses;
-  const creditSide = liabilities + equity + revenues;
-  if (Math.abs(debitSide - creditSide) > toleranceMoney(debitSide, creditSide)) {
-    throw new RangeError(
-      `${path}.accountTotals violates the accounting identity: assets+expenses ${String(debitSide)} != liabilities+equity+revenues ${String(creditSide)}`,
-    );
+  } else {
+    let assets = 0;
+    let liabilities = 0;
+    let equity = 0;
+    let revenues = 0;
+    let expenses = 0;
+    for (const key of Object.keys(totals)) {
+      const accountId = parseAccountTotalKey(key, `${path}.accountTotals`);
+      const account = accounts.get(accountId);
+      if (account === undefined) {
+        throw new RangeError(`${path}.accountTotals references unknown account ${String(accountId)}`);
+      }
+      const value = requireFiniteNumber(totals[key], `${path}.accountTotals.${key}`);
+      if (value === 0) {
+        throw new RangeError(`${path}.accountTotals.${key} must be omitted when zero`);
+      }
+      if (value < 0 && !categoryAllowsNegativeBalance(account.category)) {
+        throw new RangeError(
+          `${path}.${key} must not be negative for ${account.category} account ${String(accountId)}`,
+        );
+      }
+      switch (account.category) {
+        case "asset":
+          assets += value;
+          break;
+        case "liability":
+          liabilities += value;
+          break;
+        case "equity":
+          equity += value;
+          break;
+        case "revenue":
+          revenues += value;
+          break;
+        case "expense":
+          expenses += value;
+          break;
+      }
+      totalsByAccount.set(accountId, value);
+    }
+    // The pre-close trial balance frozen in the summary satisfies the identity.
+    const debitSide = assets + expenses;
+    const creditSide = liabilities + equity + revenues;
+    if (Math.abs(debitSide - creditSide) > toleranceMoney(debitSide, creditSide)) {
+      throw new RangeError(
+        `${path}.accountTotals violates the accounting identity: assets+expenses ${String(debitSide)} != liabilities+equity+revenues ${String(creditSide)}`,
+      );
+    }
   }
 
   const flows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
@@ -546,11 +598,13 @@ export function assertValidFinancePeriodSummary(
     wages: 0,
     upkeep: 0,
   };
-  for (const [accountId, value] of totalsByAccount) {
-    const account = accounts.get(accountId);
-    if (account === undefined) continue;
-    for (const kind of FLOW_TRANSACTION_KINDS) {
-      if (account.subtype === FLOW_EXPENSE_SUBTYPE[kind]) derivedFlows[kind] += value;
+  if (!compacted) {
+    for (const [accountId, value] of totalsByAccount) {
+      const account = accounts.get(accountId);
+      if (account === undefined) continue;
+      for (const kind of FLOW_TRANSACTION_KINDS) {
+        if (account.subtype === FLOW_EXPENSE_SUBTYPE[kind]) derivedFlows[kind] += value;
+      }
     }
   }
   for (const kind of FLOW_TRANSACTION_KINDS) {
@@ -558,11 +612,13 @@ export function assertValidFinancePeriodSummary(
     if (value < 0) {
       throw new RangeError(`${path}.flowTotalsByKind.${kind} must be nonnegative`);
     }
-    const derived = derivedFlows[kind];
-    if (Math.abs(value - derived) > toleranceMoney(value, derived)) {
-      throw new RangeError(
-        `${path}.flowTotalsByKind.${kind} ${String(value)} does not match the mapped expense total ${String(derived)}`,
-      );
+    if (!compacted) {
+      const derived = derivedFlows[kind];
+      if (Math.abs(value - derived) > toleranceMoney(value, derived)) {
+        throw new RangeError(
+          `${path}.flowTotalsByKind.${kind} ${String(value)} does not match the mapped expense total ${String(derived)}`,
+        );
+      }
     }
   }
 }

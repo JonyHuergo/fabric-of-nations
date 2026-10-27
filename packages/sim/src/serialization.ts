@@ -219,6 +219,18 @@ export type SerializedFinancePeriodSummary = {
   readonly periodEndDay: number;
   readonly accountTotals: Readonly<Record<string, number>>;
   readonly flowTotalsByKind: Readonly<Record<string, number>>;
+  /** Present only on compacted summaries; `accountTotals` is then empty. */
+  readonly countryFiscalTotals?: Readonly<
+    Record<
+      string,
+      {
+        readonly incomeTaxRevenueSUSD: number;
+        readonly welfareExpenseSUSD: number;
+        readonly interestExpenseSUSD: number;
+        readonly netFiscalResultSUSD: number;
+      }
+    >
+  >;
 };
 
 /** Encoded currency issuer. */
@@ -585,11 +597,40 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
   for (const kind of FLOW_TRANSACTION_KINDS) {
     flowTotalsByKind[kind] = summary.flowTotalsByKind[kind];
   }
+  if (summary.countryFiscalTotals === undefined) {
+    return {
+      periodStartDay: summary.periodStartDay,
+      periodEndDay: summary.periodEndDay,
+      accountTotals,
+      flowTotalsByKind,
+    };
+  }
+  const countryFiscalTotals: Record<string, {
+    incomeTaxRevenueSUSD: number;
+    welfareExpenseSUSD: number;
+    interestExpenseSUSD: number;
+    netFiscalResultSUSD: number;
+  }> = {};
+  for (const countryId of Object.keys(summary.countryFiscalTotals)
+    .map((key) => Number(key))
+    .sort((left, right) => left - right)) {
+    const totals = summary.countryFiscalTotals[countryId];
+    if (totals === undefined) {
+      throw new RangeError(`summary country fiscal total ${String(countryId)} is missing`);
+    }
+    countryFiscalTotals[accountTotalKey(countryId)] = {
+      incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
+      welfareExpenseSUSD: totals.welfareExpenseSUSD,
+      interestExpenseSUSD: totals.interestExpenseSUSD,
+      netFiscalResultSUSD: totals.netFiscalResultSUSD,
+    };
+  }
   return {
     periodStartDay: summary.periodStartDay,
     periodEndDay: summary.periodEndDay,
     accountTotals,
     flowTotalsByKind,
+    countryFiscalTotals,
   };
 }
 
@@ -1154,6 +1195,47 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
   for (const kind of FLOW_TRANSACTION_KINDS) {
     flowTotalsByKind[kind] = requireFiniteNumber(rawFlows[kind], `${path}.flowTotalsByKind.${kind}`);
   }
+  let countryFiscalTotals: FinancePeriodSummary["countryFiscalTotals"];
+  if (record.countryFiscalTotals !== undefined) {
+    const rawFiscal = requireRecord(record.countryFiscalTotals, `${path}.countryFiscalTotals`);
+    const fiscal: NonNullable<FinancePeriodSummary["countryFiscalTotals"]> = {};
+    for (const key of Object.keys(rawFiscal)) {
+      if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+        throw new SaveFormatError(
+          `${path}.countryFiscalTotals key ${JSON.stringify(key)} is not a canonical decimal country id`,
+        );
+      }
+      const countryId = Number(key);
+      if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+        throw new SaveFormatError(
+          `${path}.countryFiscalTotals key ${JSON.stringify(key)} is out of range`,
+        );
+      }
+      const entry = requireRecord(
+        rawFiscal[key],
+        `${path}.countryFiscalTotals[${key}]`,
+      );
+      fiscal[countryId] = {
+        incomeTaxRevenueSUSD: requireFiniteNumber(
+          entry.incomeTaxRevenueSUSD,
+          `${path}.countryFiscalTotals[${key}].incomeTaxRevenueSUSD`,
+        ),
+        welfareExpenseSUSD: requireFiniteNumber(
+          entry.welfareExpenseSUSD,
+          `${path}.countryFiscalTotals[${key}].welfareExpenseSUSD`,
+        ),
+        interestExpenseSUSD: requireFiniteNumber(
+          entry.interestExpenseSUSD,
+          `${path}.countryFiscalTotals[${key}].interestExpenseSUSD`,
+        ),
+        netFiscalResultSUSD: requireFiniteNumber(
+          entry.netFiscalResultSUSD,
+          `${path}.countryFiscalTotals[${key}].netFiscalResultSUSD`,
+        ),
+      };
+    }
+    countryFiscalTotals = fiscal;
+  }
   return {
     periodStartDay: requireInteger(
       record.periodStartDay,
@@ -1169,6 +1251,7 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
     ),
     accountTotals,
     flowTotalsByKind,
+    ...(countryFiscalTotals === undefined ? {} : { countryFiscalTotals }),
   };
 }
 

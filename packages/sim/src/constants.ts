@@ -16,14 +16,15 @@
  * M6 adds the country-AI enable policy, fixed-size per-country AI state, and
  * validated player/AI fiscal-policy actions.
  */
-export const SIM_VERSION = "0.14.0";
+export const SIM_VERSION = "0.15.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
  * M5a adds `World.profitDistribution` and building retained-profit accounts.
- * M6 adds `World.countryAI` and `Country.ai`.
+ * M6 adds `World.countryAI` and `Country.ai`. Batch 3 adds compacted monthly
+ * summary fiscal totals and changes the canonical history retained (D-065).
  */
-export const WORLD_SCHEMA_VERSION = 14;
+export const WORLD_SCHEMA_VERSION = 15;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;

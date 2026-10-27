@@ -9,6 +9,39 @@ function source(path: string): string {
   return readFileSync(join(APP, path), "utf8");
 }
 
+describe("campaign startup and autosave wiring", () => {
+  test("startup reads saved metadata and offers Continue or New Game", () => {
+    const provider = source("src/worker/SimulationProvider.tsx");
+    const app = source("App.tsx");
+    expect(provider).toContain("readStoredCampaign");
+    expect(provider).toContain('setStartup("choice")');
+    expect(provider).toContain("resumeSavedGame");
+    expect(provider).toContain("startNewGame");
+    expect(app).toContain("CampaignChoiceScreen");
+    expect(app).toContain("Continue");
+    expect(app).toContain("New Game");
+    expect(app).toContain("ConfirmDialog");
+  });
+
+  test("overwrite confirmation, autosave debounce, and failure feedback are present", () => {
+    const provider = source("src/worker/SimulationProvider.tsx");
+    expect(provider).toContain("overwritePrompt");
+    expect(provider).toContain("confirmOverwrite");
+    expect(provider).toContain("AutosaveScheduler");
+    expect(provider).toContain("requestAutosave");
+    expect(provider).toContain('kind === "autosave"');
+    expect(provider).toContain('"Autosave failed"');
+    expect(provider).toContain('"Autosaved"');
+  });
+
+  test("the storage adapter uses the current schema and replace-safe SaveStore", () => {
+    const storage = source("src/storage/saveStorage.ts");
+    expect(storage).toContain("SaveStore");
+    expect(storage).toContain("SUPPORTED_SAVE_SCHEMA_VERSION = 15");
+    expect(storage).toContain("readStoredCampaign");
+  });
+});
+
 /**
  * Source-level wiring guards for platform paths that cannot be exercised in the
  * Node test harness. These do not claim native-device behavior is verified; they

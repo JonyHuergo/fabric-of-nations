@@ -884,6 +884,16 @@ export function cloneFinanceState(
             periodEndDay: summary.periodEndDay,
             accountTotals: { ...summary.accountTotals },
             flowTotalsByKind: { ...summary.flowTotalsByKind },
+            ...(summary.countryFiscalTotals === undefined
+              ? {}
+              : {
+                  countryFiscalTotals: Object.fromEntries(
+                    Object.entries(summary.countryFiscalTotals).map(([countryId, totals]) => [
+                      countryId,
+                      { ...totals },
+                    ]),
+                  ),
+                }),
           })),
     debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
     nextContractId: finance.nextContractId,
