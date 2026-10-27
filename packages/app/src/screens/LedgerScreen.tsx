@@ -1,15 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import {
+  buildMonthlyReports,
   countryById,
   fiscalResultLabel,
   formatSUSD,
-  latestFinancePeriod,
+  recentPlayerActions,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { MiniBars, Section } from "../components/ui";
+import { MiniBars, Notice, Section } from "../components/ui";
 import { colors, spacing } from "../theme";
+import { useSimulation } from "../worker/SimulationProvider";
 
 const FLOW_LABELS: Readonly<Record<string, string>> = {
   "goods-purchase": "Household goods",
@@ -25,6 +27,7 @@ export function LedgerScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const { actionHistory } = useSimulation();
   const country = countryById(snapshot, countryId);
   if (country === null) {
     return (
@@ -33,9 +36,19 @@ export function LedgerScreen({
       </Section>
     );
   }
-  const latest = latestFinancePeriod(country);
-  const history = [...country.financeHistory].reverse();
+  const reports = buildMonthlyReports(country);
+  const latest = reports[0] ?? null;
   const netValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
+  const actions = recentPlayerActions(actionHistory, 12);
+  const actionsInLatestPeriod =
+    latest === null
+      ? []
+      : actionHistory.filter(
+          (action) =>
+            action.countryId === country.id &&
+            action.dayIndex >= latest.periodStartDay &&
+            action.dayIndex <= latest.periodEndDay,
+        );
   return (
     <View>
       <Section
@@ -50,34 +63,174 @@ export function LedgerScreen({
           <>
             <Text style={styles.result}>{fiscalResultLabel(latest.netFiscalResultSUSD)}</Text>
             <Text style={styles.resultDetail}>
-              {formatSUSD(latest.netFiscalResultSUSD)} · period ending day{" "}
-              {String(latest.periodEndDay)}
+              {formatSUSD(latest.netFiscalResultSUSD)} · {latest.periodStartLabel} to{" "}
+              {latest.periodEndLabel}
             </Text>
             {netValues.length > 1 ? <MiniBars values={netValues} /> : null}
           </>
         )}
       </Section>
 
-      <Section title="Country fiscal lines" subtitle="Nominal SUSD; from the frozen pre-close trial balance.">
-        {history.length === 0 ? (
+      <Section
+        title="Monthly economic report"
+        subtitle="Closed-period flows and end-of-close balances. A closing balance is not a period flow."
+      >
+        {latest === null ? (
+          <Text style={styles.empty}>No closed period yet.</Text>
+        ) : (
+          <>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Income tax</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.incomeTaxSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Welfare expense</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.welfareExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Interest expense</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.interestExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Net fiscal result</Text>
+              <Text
+                style={[
+                  styles.reportValue,
+                  latest.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                ]}
+              >
+                {formatSUSD(latest.netFiscalResultSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Treasury at close</Text>
+              <Text style={styles.reportValue}>
+                {latest.treasuryCash === null
+                  ? "Not retained"
+                  : formatSUSD(latest.treasuryCash.endSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Treasury change</Text>
+              <Text style={styles.reportValue}>
+                {latest.treasuryCash?.changeSUSD === null ||
+                latest.treasuryCash?.changeSUSD === undefined
+                  ? "Not derivable"
+                  : formatSUSD(latest.treasuryCash.changeSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Debt principal at close</Text>
+              <Text style={styles.reportValue}>
+                {latest.debtOutstanding === null
+                  ? "Not retained"
+                  : `${formatSUSD(latest.debtOutstanding.endSUSD)}${
+                      latest.debtOutstanding.changeSUSD === null
+                        ? ""
+                        : ` (${formatSUSD(latest.debtOutstanding.changeSUSD)})`
+                    }`}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Household cash at close</Text>
+              <Text style={styles.reportValue}>
+                {latest.householdCash === null
+                  ? "Not retained"
+                  : formatSUSD(latest.householdCash.endSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Confirmed player actions in period</Text>
+              <Text style={styles.reportValue}>
+                {String(actionsInLatestPeriod.length)}
+                {actionsInLatestPeriod.length === 0 ? " (none)" : ""}
+              </Text>
+            </View>
+            <Notice title="What this report does not contain">
+              Market prices, production, shortages, and employment are not retained as a
+              monthly series in the current snapshot. Their current values are shown on the
+              Overview, Markets, and Population screens and are not presented here as monthly
+              changes. Older compacted months retain fiscal flows but not account-level
+              balances.
+            </Notice>
+          </>
+        )}
+      </Section>
+
+      <Section
+        title="Recent monthly closes"
+        subtitle="Newest first. Detailed balances appear only for the retained detailed window."
+      >
+        {reports.length === 0 ? (
           <Text style={styles.empty}>No closed periods.</Text>
         ) : (
-          history.map((period) => (
-            <View key={period.periodEndDay} style={styles.periodRow}>
-              <Text style={styles.periodDate}>Day {String(period.periodEndDay)}</Text>
+          reports.slice(0, 6).map((report) => (
+            <View key={report.periodEndDay} style={styles.periodRow}>
+              <Text style={styles.periodDate}>
+                {report.periodStartLabel} → {report.periodEndLabel}
+              </Text>
               <View style={styles.columns}>
-                <Text style={styles.cell}>Tax {formatSUSD(period.incomeTaxSUSD)}</Text>
-                <Text style={styles.cell}>Welfare {formatSUSD(period.welfareExpenseSUSD)}</Text>
-                <Text style={styles.cell}>Interest {formatSUSD(period.interestExpenseSUSD)}</Text>
+                <Text style={styles.cell}>Tax {formatSUSD(report.incomeTaxSUSD)}</Text>
+                <Text style={styles.cell}>Welfare {formatSUSD(report.welfareExpenseSUSD)}</Text>
+                <Text style={styles.cell}>Interest {formatSUSD(report.interestExpenseSUSD)}</Text>
+                <Text style={styles.cell}>
+                  Treasury{" "}
+                  {report.treasuryCash === null
+                    ? "n/a"
+                    : formatSUSD(report.treasuryCash.endSUSD)}
+                </Text>
               </View>
               <Text
                 style={[
                   styles.net,
-                  period.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                  report.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
                 ]}
               >
-                {formatSUSD(period.netFiscalResultSUSD)}
+                {formatSUSD(report.netFiscalResultSUSD)}
               </Text>
+            </View>
+          ))
+        )}
+      </Section>
+
+      <Section
+        title="Confirmed player actions"
+        subtitle="Appended only from authoritative worker ACTION_RESULT replies. Session-only; cleared on load or worker restart."
+      >
+        {actions.length === 0 ? (
+          <Text style={styles.empty}>No confirmed fiscal actions this session.</Text>
+        ) : (
+          actions.map((action) => (
+            <View key={action.actionId} style={styles.actionRow}>
+              <View style={styles.actionHeader}>
+                <Text style={styles.actionDate}>
+                  {action.dateLabel} · {action.countryTag ?? `country ${String(action.countryId)}`}
+                </Text>
+                <Text
+                  style={[styles.actionStatus, action.accepted ? styles.positive : styles.negative]}
+                >
+                  {action.accepted ? "APPLIED" : "REJECTED"}
+                </Text>
+              </View>
+              <Text style={styles.actionDetail}>
+                Requested tax{" "}
+                {action.requested === null
+                  ? "unknown"
+                  : `${(action.requested.incomeTaxRate * 100).toFixed(2)}%`}
+                {"; welfare "}
+                {action.requested === null
+                  ? "unknown"
+                  : `${formatSUSD(action.requested.welfareBudgetSUSDPerYear)}/yr`}
+              </Text>
+              {action.applied === null ? null : (
+                <Text style={styles.actionDetail}>
+                  Confirmed applied: tax {(action.applied.incomeTaxRate * 100).toFixed(2)}%;
+                  welfare {formatSUSD(action.applied.welfareBudgetSUSDPerYear)}/yr
+                </Text>
+              )}
+              {action.errors.length === 0 ? null : (
+                <Text style={styles.actionError}>{action.errors.join("; ")}</Text>
+              )}
             </View>
           ))
         )}
@@ -122,6 +275,21 @@ const styles = StyleSheet.create({
   empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
   result: { color: colors.text, fontSize: 22, fontWeight: "700" },
   resultDetail: { color: colors.muted, fontSize: 12, marginTop: spacing.xs },
+  reportRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+    borderBottomColor: colors.border,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  reportLabel: { color: colors.muted, fontSize: 12, flexShrink: 1, paddingRight: spacing.sm },
+  reportValue: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
+    textAlign: "right",
+  },
   periodRow: {
     borderBottomColor: colors.border,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -133,6 +301,16 @@ const styles = StyleSheet.create({
   net: { fontSize: 12, fontWeight: "700", marginTop: 3, fontVariant: ["tabular-nums"] },
   positive: { color: colors.green },
   negative: { color: colors.red },
+  actionRow: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: spacing.sm,
+  },
+  actionHeader: { flexDirection: "row", justifyContent: "space-between" },
+  actionDate: { color: colors.text, fontSize: 11, fontWeight: "600" },
+  actionStatus: { fontSize: 9, fontWeight: "800", letterSpacing: 0.6 },
+  actionDetail: { color: colors.muted, fontSize: 10, marginTop: 2, lineHeight: 14 },
+  actionError: { color: colors.red, fontSize: 10, marginTop: 2, lineHeight: 14 },
   flowRow: {
     flexDirection: "row",
     justifyContent: "space-between",

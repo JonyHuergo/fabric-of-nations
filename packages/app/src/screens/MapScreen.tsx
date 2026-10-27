@@ -6,10 +6,11 @@ import {
   formatCount,
   formatRate,
   formatSUSD,
+  latestMonthlyReport,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Section, StatRow } from "../components/ui";
+import { Notice, Section, StatRow } from "../components/ui";
 import { colors, radii, spacing } from "../theme";
 
 export interface MapScreenProps {
@@ -28,6 +29,7 @@ export function MapScreen({
   onSelectRegion,
 }: MapScreenProps) {
   const selected = countryById(snapshot, selectedCountryId);
+  const selectedLatest = selected === null ? null : latestMonthlyReport(selected);
   return (
     <View>
       <Section
@@ -74,6 +76,7 @@ export function MapScreen({
               <Text style={styles.legendTag}>{country.tag}</Text>
               <Text style={styles.legendName} numberOfLines={1}>
                 {country.name}
+                {country.id === snapshot.playerCountryId ? " · Player" : ""}
               </Text>
             </Pressable>
           ))}
@@ -81,9 +84,18 @@ export function MapScreen({
       </Section>
 
       {selected === null ? null : (
-        <Section title={`${selected.name} (${selected.tag})`} subtitle="Selected country summary">
+        <Section
+          title={`${selected.name} (${selected.tag})`}
+          subtitle={`Selected country summary · ${
+            selected.id === snapshot.playerCountryId ? "Player-controlled" : "AI-controlled"
+          }`}
+        >
           <StatRow label="Population" value={formatCount(selected.population)} />
           <StatRow label="Treasury cash" value={formatSUSD(selected.treasuryCashSUSD)} />
+          <StatRow
+            label="Public debt principal"
+            value={formatSUSD(selected.debtOutstandingPrincipalSUSD)}
+          />
           <StatRow label="Income tax" value={formatRate(selected.fiscal.incomeTaxRate)} />
           <StatRow
             label="Welfare budget"
@@ -94,6 +106,20 @@ export function MapScreen({
             value={formatRate(selected.hardshipPopulationShare)}
             detail="Share of population in blocks with 7+ unmet subsistence days"
           />
+          <StatRow
+            label="Latest closed month"
+            value={
+              selectedLatest === null
+                ? "No close yet"
+                : formatSUSD(selectedLatest.netFiscalResultSUSD)
+            }
+            detail="Net fiscal result (flow)"
+          />
+          <Notice title="Map scope">
+            The map shows current territory and population. Economic overlays and the
+            500-region map are future work; use Overview, Markets, Population, and Budget for
+            diagnosis.
+          </Notice>
         </Section>
       )}
     </View>

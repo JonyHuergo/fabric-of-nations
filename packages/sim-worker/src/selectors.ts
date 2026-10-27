@@ -126,6 +126,39 @@ export function marketForCountry(
   return null;
 }
 
+/** Every market containing at least one region owned by the country. */
+export function marketsForCountry(
+  snapshot: SimulationSnapshot,
+  country: CountrySnapshot | null,
+): readonly MarketSnapshot[] {
+  if (country === null) return [];
+  const countryRegions = new Set(country.regionIds);
+  return snapshot.markets
+    .filter((market) => market.regionIds.some((regionId) => countryRegions.has(regionId)))
+    .sort((left, right) => left.id - right.id);
+}
+
+/** Static need tiers whose goods are essential for diagnosis (subsistence/basic). */
+export function essentialGoodIds(snapshot: SimulationSnapshot): readonly number[] {
+  const ids = new Set<number>();
+  for (const tier of snapshot.needTiers) {
+    if (tier.tier !== "subsistence" && tier.tier !== "basic") continue;
+    for (const good of tier.goods) ids.add(good.goodId);
+  }
+  return [...ids].sort((left, right) => left - right);
+}
+
+/** Estimated current daily output capacity for one good, or zero. */
+export function productionCapacityForGood(
+  country: CountrySnapshot,
+  goodId: number,
+): number {
+  return (
+    country.productionCapacityByGood.find((entry) => entry.goodId === goodId)?.dailyCapacity ??
+    0
+  );
+}
+
 /** Markets sorted for the markets screen. */
 export function sortedMarkets(snapshot: SimulationSnapshot): readonly MarketSnapshot[] {
   return [...snapshot.markets].sort((left, right) => left.id - right.id);

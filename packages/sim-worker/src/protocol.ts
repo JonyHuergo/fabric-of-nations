@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 2 as const;
+export const PROTOCOL_VERSION = 3 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -27,40 +27,40 @@ export interface FiscalPolicyActionDto {
 }
 
 export type WorkerCommand =
-  | { readonly protocolVersion: 2; readonly type: "START"; readonly commandId: string }
-  | { readonly protocolVersion: 2; readonly type: "PAUSE"; readonly commandId: string }
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "PAUSE"; readonly commandId: string }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "STEP";
       readonly commandId: string;
       readonly ticks: number;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "SET_SPEED";
       readonly commandId: string;
       readonly daysPerSecond: SpeedDaysPerSecond;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "APPLY_ACTION";
       readonly commandId: string;
       readonly actionId: string;
       readonly action: FiscalPolicyActionDto;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "REQUEST_SNAPSHOT";
       readonly commandId: string;
     }
-  | { readonly protocolVersion: 2; readonly type: "SAVE"; readonly commandId: string }
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "SAVE"; readonly commandId: string }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "LOAD";
       readonly commandId: string;
       readonly save: string;
     }
-  | { readonly protocolVersion: 2; readonly type: "SHUTDOWN"; readonly commandId: string };
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "SHUTDOWN"; readonly commandId: string };
 
 export interface SnapshotCivilDate {
   readonly year: number;
@@ -84,9 +84,45 @@ export interface SnapshotFiscalTotals {
   readonly netFiscalResultSUSD: number;
 }
 
+export interface SnapshotProductionCapacity {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly unitLabel: string;
+  readonly category: string;
+  /**
+   * Estimated daily output at the current building level, condition, staffing,
+   * and productivity. This is a capacity, not realized production or demand.
+   */
+  readonly dailyCapacity: number;
+}
+
+export interface SnapshotNeedTierGood {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly unitLabel: string;
+}
+
+export interface SnapshotNeedTier {
+  readonly tier: "subsistence" | "basic" | "comfort" | "luxury";
+  readonly goods: readonly SnapshotNeedTierGood[];
+}
+
 export interface SnapshotFinancePeriod extends SnapshotFiscalTotals {
   /** World-wide gross flows for the four M4b flow kinds. */
   readonly grossFlowTotals: Readonly<Record<string, number>>;
+  /** Canonical labels for the inclusive closed period. */
+  readonly periodStartLabel: string;
+  readonly periodEndLabel: string;
+  /**
+   * End-of-close balances when the summary still retains account detail
+   * (the recent detailed window). Older compacted summaries keep only fiscal
+   * flows, so these are null rather than a fabricated zero.
+   */
+  readonly treasuryCashEndSUSD: number | null;
+  readonly debtOutstandingEndSUSD: number | null;
+  readonly householdCashEndSUSD: number | null;
 }
 
 export interface CountrySnapshot {
@@ -98,9 +134,17 @@ export interface CountrySnapshot {
   readonly treasuryCashSUSD: number;
   readonly debtEnabled: boolean;
   readonly debtOutstandingPrincipalSUSD: number;
+  readonly debtInterestPayableSUSD: number;
   readonly population: number;
   readonly workingAgePopulation: number;
   readonly employedWorkers: number;
+  /** Household cash stock across the country's population blocks. */
+  readonly householdCashSUSD: number;
+  /**
+   * Estimated daily wage obligation/taxable wage base from current employment
+   * at base wages. It is a current-base static estimate, not realized wages.
+   */
+  readonly estimatedDailyWageBaseSUSD: number;
   /** Population-weighted own-country indicators, 0..1 or 0..99 as named. */
   readonly literacy: number;
   readonly wealthLevel: number;
@@ -109,6 +153,8 @@ export interface CountrySnapshot {
   readonly blocksWithUnmetSubsistence: number;
   readonly blocksWithUnmetBasic: number;
   readonly buildingCount: number;
+  /** Estimated capacity for every good in the catalog; zero means no capacity. */
+  readonly productionCapacityByGood: readonly SnapshotProductionCapacity[];
   readonly latestFiscal: SnapshotFiscalTotals | null;
   readonly financeHistory: readonly SnapshotFinancePeriod[];
 }
@@ -138,6 +184,8 @@ export interface MarketPriceSnapshot {
   readonly unitLabel: string;
   readonly priceSUSD: number;
   readonly stockQuantity: number;
+  /** Estimated daily output capacity of buildings in this market, not demand. */
+  readonly dailyProductionCapacity: number;
 }
 
 export interface MarketSnapshot {
@@ -155,7 +203,7 @@ export interface SnapshotDiagnostics {
 
 /** The complete immutable UI snapshot. It contains no live world references. */
 export interface SimulationSnapshot {
-  readonly protocolVersion: 2;
+  readonly protocolVersion: typeof PROTOCOL_VERSION;
   readonly sequence: number;
   readonly dayIndex: number;
   readonly date: SnapshotCivilDate;
@@ -179,19 +227,21 @@ export interface SimulationSnapshot {
   readonly regions: readonly RegionSnapshot[];
   readonly markets: readonly MarketSnapshot[];
   readonly goods: readonly GoodSnapshot[];
+  /** Static authored need tiers, used for evidence-based diagnosis. */
+  readonly needTiers: readonly SnapshotNeedTier[];
   readonly diagnostics: SnapshotDiagnostics;
 }
 
 export type WorkerEvent =
-  | { readonly protocolVersion: 2; readonly type: "READY"; readonly snapshot: SimulationSnapshot }
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "READY"; readonly snapshot: SimulationSnapshot }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "SNAPSHOT";
       readonly commandId: string | null;
       readonly snapshot: SimulationSnapshot;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "STATE";
       readonly commandId: string | null;
       readonly running: boolean;
@@ -199,7 +249,7 @@ export type WorkerEvent =
       readonly achievedDaysPerSecond: number;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "ACTION_RESULT";
       readonly commandId: string;
       readonly actionId: string;
@@ -208,13 +258,13 @@ export type WorkerEvent =
       readonly snapshot: SimulationSnapshot;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "SAVE_RESULT";
       readonly commandId: string;
       readonly save: string;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "LOAD_RESULT";
       readonly commandId: string;
       readonly accepted: boolean;
@@ -222,15 +272,15 @@ export type WorkerEvent =
       readonly snapshot: SimulationSnapshot;
     }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "ERROR";
       readonly commandId: string | null;
       readonly code: string;
       readonly message: string;
     }
-  | { readonly protocolVersion: 2; readonly type: "FATAL"; readonly message: string }
+  | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "FATAL"; readonly message: string }
   | {
-      readonly protocolVersion: 2;
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "SHUTDOWN";
       readonly commandId: string | null;
     };
@@ -437,11 +487,58 @@ function isFiscalTotals(value: unknown): value is SnapshotFiscalTotals {
   );
 }
 
+function isNullableFiniteNumber(value: unknown): value is number | null {
+  return value === null || isFiniteNumber(value);
+}
+
 function isFinancePeriod(value: unknown): value is SnapshotFinancePeriod {
   if (!isFiscalTotals(value)) return false;
   const record = value as unknown as Record<string, unknown>;
   if (!isRecord(record.grossFlowTotals)) return false;
-  return Object.values(record.grossFlowTotals).every((entry) => isFiniteNumber(entry));
+  if (!Object.values(record.grossFlowTotals).every((entry) => isFiniteNumber(entry))) {
+    return false;
+  }
+  return (
+    isString(record.periodStartLabel, 10) &&
+    isString(record.periodEndLabel, 10) &&
+    isNullableFiniteNumber(record.treasuryCashEndSUSD) &&
+    isNullableFiniteNumber(record.debtOutstandingEndSUSD) &&
+    isNullableFiniteNumber(record.householdCashEndSUSD)
+  );
+}
+
+function isProductionCapacity(value: unknown): value is SnapshotProductionCapacity {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.goodId, 0, 0xffff_ffff) &&
+    isString(value.goodKey, 64) &&
+    isString(value.goodName, 256) &&
+    isString(value.unitLabel, 64) &&
+    isString(value.category, 64) &&
+    isFiniteNumber(value.dailyCapacity) &&
+    value.dailyCapacity >= 0
+  );
+}
+
+function isNeedTier(value: unknown): value is SnapshotNeedTier {
+  if (!isRecord(value)) return false;
+  if (
+    value.tier !== "subsistence" &&
+    value.tier !== "basic" &&
+    value.tier !== "comfort" &&
+    value.tier !== "luxury"
+  ) {
+    return false;
+  }
+  if (!Array.isArray(value.goods)) return false;
+  return value.goods.every(
+    (good) =>
+      isRecord(good) &&
+      isIntegerIn(good.goodId, 0, 0xffff_ffff) &&
+      isString(good.goodKey, 64) &&
+      isString(good.goodName, 256) &&
+      isString(good.unitLabel, 64),
+  );
 }
 
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
@@ -455,9 +552,12 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isFiniteNumber(value.treasuryCashSUSD)) return false;
   if (typeof value.debtEnabled !== "boolean") return false;
   if (!isFiniteNumber(value.debtOutstandingPrincipalSUSD)) return false;
+  if (!isFiniteNumber(value.debtInterestPayableSUSD)) return false;
   if (!isFiniteNumber(value.population)) return false;
   if (!isFiniteNumber(value.workingAgePopulation)) return false;
   if (!isFiniteNumber(value.employedWorkers)) return false;
+  if (!isFiniteNumber(value.householdCashSUSD)) return false;
+  if (!isFiniteNumber(value.estimatedDailyWageBaseSUSD)) return false;
   if (!isFiniteNumber(value.literacy)) return false;
   if (!isFiniteNumber(value.wealthLevel)) return false;
   if (!isFiniteNumber(value.militancy)) return false;
@@ -465,6 +565,8 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isIntegerIn(value.blocksWithUnmetSubsistence, 0, 1_000_000)) return false;
   if (!isIntegerIn(value.blocksWithUnmetBasic, 0, 1_000_000)) return false;
   if (!isIntegerIn(value.buildingCount, 0, 1_000_000)) return false;
+  if (!Array.isArray(value.productionCapacityByGood)) return false;
+  if (!value.productionCapacityByGood.every(isProductionCapacity)) return false;
   if (value.latestFiscal !== null && !isFiscalTotals(value.latestFiscal)) return false;
   if (!Array.isArray(value.financeHistory)) return false;
   return value.financeHistory.every((period) => isFinancePeriod(period));
@@ -508,7 +610,9 @@ function isMarketSnapshot(value: unknown): value is MarketSnapshot {
       isString(price.goodName, 256) &&
       isString(price.unitLabel, 64) &&
       isFiniteNumber(price.priceSUSD) &&
-      isFiniteNumber(price.stockQuantity)
+      isFiniteNumber(price.stockQuantity) &&
+      isFiniteNumber(price.dailyProductionCapacity) &&
+      price.dailyProductionCapacity >= 0
     );
   });
 }
@@ -560,6 +664,7 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!Array.isArray(value.regions) || !value.regions.every(isRegionSnapshot)) return false;
   if (!Array.isArray(value.markets) || !value.markets.every(isMarketSnapshot)) return false;
   if (!Array.isArray(value.goods) || !value.goods.every(isGoodSnapshot)) return false;
+  if (!Array.isArray(value.needTiers) || !value.needTiers.every(isNeedTier)) return false;
   return isDiagnostics(value.diagnostics);
 }
 

@@ -7,6 +7,8 @@ import {
   formatRate,
   formatSUSD,
   latestFinancePeriod,
+  latestMonthlyReport,
+  previewFiscalPolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
@@ -46,7 +48,16 @@ export function BudgetScreen({
     );
   }
   const latest = latestFinancePeriod(country);
+  const latestMonthly = latestMonthlyReport(country);
   const historyValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
+  const parsedTaxPercent = Number.parseFloat(taxText);
+  const parsedWelfare = Number.parseFloat(welfareText);
+  const preview = previewFiscalPolicy(
+    snapshot,
+    country,
+    Number.isFinite(parsedTaxPercent) ? parsedTaxPercent / 100 : Number.NaN,
+    Number.isFinite(parsedWelfare) ? parsedWelfare : Number.NaN,
+  );
 
   const apply = () => {
     if (!isPlayerCountry) {
@@ -131,6 +142,68 @@ export function BudgetScreen({
           ))}
         </View>
         {localError === null ? null : <Text style={styles.error}>{localError}</Text>}
+        <Section
+          title="Before you commit"
+          subtitle="Static estimate from the current snapshot. It holds today's estimated wage base, employment, prices, and behaviour constant; it is not a forecast."
+        >
+          <StatRow
+            label="Affected country"
+            value={`${country.name} (${country.tag})`}
+            detail={isPlayerCountry ? "Player-controlled; action uses the shared validator." : "AI-controlled; player actions are rejected."}
+          />
+          <StatRow
+            label="Estimated daily wage base"
+            value={formatSUSD(preview.estimatedDailyWageBaseSUSD)}
+            detail="Current employment × base wages ÷ civil year days. Actual received wages can differ."
+          />
+          <StatRow
+            label="Income tax now → proposed"
+            value={`${formatRate(preview.currentIncomeTaxRate)} → ${formatRate(preview.proposedIncomeTaxRate)}`}
+            detail={`Estimated tax ${formatSUSD(preview.currentDailyIncomeTaxSUSD)} → ${formatSUSD(preview.proposedDailyIncomeTaxSUSD)} per day.`}
+          />
+          <StatRow
+            label="Monthly tax effect"
+            value={formatSUSD(preview.monthlyIncomeTaxDeltaSUSD)}
+            detail="Static change for the current civil month's day count, before behaviour changes."
+          />
+          <StatRow
+            label="Welfare now → proposed"
+            value={`${formatSUSD(preview.currentWelfareBudgetSUSDPerYear)}/yr → ${formatSUSD(preview.proposedWelfareBudgetSUSDPerYear)}/yr`}
+            detail={`Estimated daily welfare ${formatSUSD(preview.currentDailyWelfareSUSD)} → ${formatSUSD(preview.proposedDailyWelfareSUSD)}.`}
+          />
+          <StatRow
+            label="Monthly welfare effect"
+            value={formatSUSD(preview.monthlyWelfareDeltaSUSD)}
+            detail="Static change; welfare is reduced proportionally if treasury cash is insufficient."
+          />
+          <StatRow
+            label="Estimated net monthly fiscal change"
+            value={formatSUSD(preview.estimatedMonthlyFiscalDeltaSUSD)}
+            detail="Tax change minus welfare change; excludes interest, borrowing, principal, and economic response."
+          />
+          <StatRow
+            label="Treasury / latest monthly interest"
+            value={`${formatSUSD(preview.treasuryCashSUSD)} / ${
+              preview.latestMonthlyInterestSUSD === null
+                ? "no closed month"
+                : formatSUSD(preview.latestMonthlyInterestSUSD)
+            }`}
+            detail={
+              latestMonthly === null
+                ? "No closed month to compare."
+                : `Latest month: net ${formatSUSD(latestMonthly.netFiscalResultSUSD)}; treasury at close ${
+                    latestMonthly.treasuryCash === null
+                      ? "not retained"
+                      : formatSUSD(latestMonthly.treasuryCash.endSUSD)
+                  }.`
+            }
+          />
+          {preview.constraints.map((constraint) => (
+            <Text key={constraint} style={styles.previewNote}>
+              • {constraint}
+            </Text>
+          ))}
+        </Section>
         <View style={styles.applyRow}>
           <ActionButton
             label={isPlayerCountry ? "Apply fiscal policy" : "AI-controlled country"}
@@ -142,7 +215,7 @@ export function BudgetScreen({
         {isPlayerCountry ? null : (
           <Text style={styles.note}>
             This country is governed by the AI. Select the player country (shown as
-            &quot;Player country&quot; on Budget/Country) to change fiscal policy.
+            &quot;Player country&quot; on Overview/Budget) to change fiscal policy.
           </Text>
         )}
         {running ? (
@@ -195,5 +268,6 @@ const styles = StyleSheet.create({
   quickRow: { flexDirection: "row", flexWrap: "wrap", marginTop: spacing.sm, rowGap: spacing.xs },
   applyRow: { marginTop: spacing.md },
   error: { color: colors.red, fontSize: 12, marginTop: spacing.sm },
+  previewNote: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },
   note: { color: colors.faint, fontSize: 11, marginTop: spacing.sm, lineHeight: 16 },
 });

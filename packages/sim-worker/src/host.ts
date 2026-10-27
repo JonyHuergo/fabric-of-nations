@@ -121,7 +121,7 @@ export class SimulationHost {
       running: this.running,
       speedDaysPerSecond: this.speed,
       achievedDaysPerSecond: this.achievedDaysPerSecond,
-    });
+    }, this.scenario.population.definitions);
   }
 
   /** Discard pending wall-time debt and reset the achieved-rate window. */

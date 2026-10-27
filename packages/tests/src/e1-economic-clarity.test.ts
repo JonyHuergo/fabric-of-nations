@@ -1,0 +1,234 @@
+/**
+ * E1 economic clarity selectors and snapshot contract.
+ *
+ * These tests use the real eight-polity world and snapshot builder for the
+ * contract/report checks, plus an isolated synthetic copy for the explanation
+ * rules. No authoritative state is mutated by the selectors.
+ */
+
+import {
+  createEconomyWorld,
+  runTicks,
+  type EconomyScenarioDef,
+  type TickContext,
+} from "@century/sim";
+import { loadM5EightPolities } from "@century/data";
+import {
+  MAX_PLAYER_ACTION_HISTORY,
+  appendPlayerAction,
+  buildEconomicExplanations,
+  buildMonthlyReports,
+  latestMonthlyReport,
+  parseWorkerEvent,
+  previewFiscalPolicy,
+  recentPlayerActions,
+  type PlayerActionRecord,
+  type SimulationSnapshot,
+} from "@century/sim-worker";
+import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
+
+const SEED = 20_261_023;
+
+type DeepMutable<T> = T extends readonly (infer U)[]
+  ? DeepMutable<U>[]
+  : T extends object
+    ? { -readonly [K in keyof T]: DeepMutable<T[K]> }
+    : T;
+
+function contextFor(scenario: EconomyScenarioDef): TickContext {
+  return {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
+}
+
+function snapshotAt(ticks: number): { readonly snapshot: SimulationSnapshot; readonly scenario: EconomyScenarioDef } {
+  const scenario = loadM5EightPolities();
+  const world = createEconomyWorld(scenario, { seed: SEED });
+  if (ticks > 0) runTicks(world, ticks, contextFor(scenario));
+  const snapshot = buildSimulationSnapshot(
+    world,
+    scenario.definitions,
+    {
+      sequence: 1,
+      running: false,
+      speedDaysPerSecond: 1,
+      achievedDaysPerSecond: 0,
+    },
+    scenario.population.definitions,
+  );
+  return { snapshot, scenario };
+}
+
+function actionRecord(
+  index: number,
+  accepted: boolean,
+): PlayerActionRecord {
+  return {
+    actionId: `action-${String(index)}`,
+    kind: "set-fiscal-policy",
+    countryId: 0,
+    countryTag: "USA",
+    dayIndex: 10 + index,
+    dateLabel: "1900-01-11",
+    requested: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1000 },
+    accepted,
+    applied: accepted ? { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1000 } : null,
+    errors: accepted ? [] : ["policy rejected by shared validator"],
+  };
+}
+
+describe("E1 economic clarity", () => {
+  test("the snapshot exposes supported production, wage, need, and capacity data", () => {
+    const { snapshot } = snapshotAt(0);
+    expect(snapshot.protocolVersion).toBe(3);
+    expect(snapshot.needTiers.length).toBeGreaterThan(0);
+    expect(snapshot.needTiers.some((tier) => tier.tier === "subsistence")).toBe(true);
+    for (const country of snapshot.countries) {
+      expect(country.productionCapacityByGood).toHaveLength(snapshot.goods.length);
+      expect(country.estimatedDailyWageBaseSUSD).toBeGreaterThanOrEqual(0);
+      expect(country.householdCashSUSD).toBeGreaterThanOrEqual(0);
+      expect(country.debtInterestPayableSUSD).toBeGreaterThanOrEqual(0);
+    }
+    for (const market of snapshot.markets) {
+      for (const price of market.prices) {
+        expect(price.dailyProductionCapacity).toBeGreaterThanOrEqual(0);
+      }
+    }
+    expect(() => parseWorkerEvent({ protocolVersion: 3, type: "READY", snapshot })).not.toThrow();
+    const missing = {
+      ...snapshot,
+      needTiers: undefined,
+    } as unknown as SimulationSnapshot;
+    expect(() =>
+      parseWorkerEvent({ protocolVersion: 3, type: "READY", snapshot: missing }),
+    ).toThrow(/valid snapshot/);
+  });
+
+  test("monthly reports separate closed-period flows from close balances", () => {
+    const { snapshot } = snapshotAt(31);
+    const country = snapshot.countries.find((entry) => entry.id === 0);
+    expect(country).toBeDefined();
+    if (country === undefined) return;
+    expect(country.financeHistory.length).toBeGreaterThan(0);
+    const reports = buildMonthlyReports(country);
+    expect(reports.length).toBe(country.financeHistory.length);
+    const latest = latestMonthlyReport(country);
+    expect(latest).not.toBeNull();
+    if (latest === null) return;
+    const period = country.financeHistory[country.financeHistory.length - 1]!;
+    expect(latest.periodEndLabel).toBe(period.periodEndLabel);
+    expect(latest.incomeTaxSUSD).toBe(period.incomeTaxSUSD);
+    expect(latest.welfareExpenseSUSD).toBe(period.welfareExpenseSUSD);
+    expect(latest.interestExpenseSUSD).toBe(period.interestExpenseSUSD);
+    // The most recent summary retains account detail, so close balances exist.
+    expect(period.treasuryCashEndSUSD).not.toBeNull();
+    expect(latest.treasuryCash?.endSUSD).toBe(period.treasuryCashEndSUSD);
+    expect(latest.treasuryCash?.changeSUSD).toBeNull(); // no earlier detailed close
+    expect(latest.detailedBalances).toBe(true);
+  });
+
+  test("fiscal preview is a current-base static calculation", () => {
+    const { snapshot } = snapshotAt(0);
+    const country = snapshot.countries.find((entry) => entry.id === 0);
+    expect(country).toBeDefined();
+    if (country === undefined) return;
+    const preview = previewFiscalPolicy(snapshot, country, 0.2, 200_000);
+    expect(preview.isPlayerCountry).toBe(true);
+    expect(preview.proposedDailyIncomeTaxSUSD).toBeCloseTo(
+      0.2 * preview.estimatedDailyWageBaseSUSD,
+      8,
+    );
+    expect(preview.proposedDailyWelfareSUSD).toBeCloseTo(200_000 / 365, 8);
+    expect(preview.monthlyIncomeTaxDeltaSUSD).toBeCloseTo(
+      (0.2 - country.fiscal.incomeTaxRate) * preview.estimatedDailyWageBaseSUSD * 31,
+      8,
+    );
+    expect(preview.constraints.length).toBeGreaterThan(0);
+    expect(preview.constraints.join(" ")).toMatch(/not realized future wages/);
+    // The preview operates on immutable snapshot data only.
+    expect(snapshot.countries[0]?.fiscal.incomeTaxRate).toBe(country.fiscal.incomeTaxRate);
+  });
+
+  test("explanations use evidence, period caveats, and no fabricated attribution", () => {
+    const { snapshot } = snapshotAt(0);
+    const source = snapshot.countries.find((entry) => entry.id === 0);
+    expect(source).toBeDefined();
+    if (source === undefined) return;
+    const synthetic = JSON.parse(JSON.stringify(snapshot)) as DeepMutable<SimulationSnapshot>;
+    const country = synthetic.countries.find((entry) => entry.id === 0)!;
+    country.blocksWithUnmetSubsistence = 2;
+    country.blocksWithUnmetBasic = 3;
+    country.hardshipPopulationShare = 0.2;
+    country.householdCashSUSD = 1000;
+    country.estimatedDailyWageBaseSUSD = 50;
+    for (const entry of country.productionCapacityByGood) entry.dailyCapacity = 0;
+    for (const market of synthetic.markets) {
+      for (const price of market.prices) price.stockQuantity = 0;
+    }
+    const explanations = buildEconomicExplanations(synthetic, country);
+    expect(explanations.length).toBeGreaterThan(0);
+    const subsistence = explanations.find((entry) => entry.id === "subsistence-unmet");
+    expect(subsistence).toBeDefined();
+    expect(subsistence?.severity).toBe("critical");
+    expect(subsistence?.evidence.join(" ")).toMatch(/zero current market stock/);
+    expect(subsistence?.caveat).toMatch(/not proof of a single cause/);
+    expect(explanations.every((entry) => entry.observation.length > 0)).toBe(true);
+    expect(explanations.every((entry) => !/% caused by/.test(entry.observation))).toBe(true);
+  });
+
+  test("compacted summaries do not fabricate close balances", () => {
+    const { snapshot } = snapshotAt(31);
+    const source = snapshot.countries.find((entry) => entry.id === 0);
+    expect(source).toBeDefined();
+    if (source === undefined) return;
+    const base = source.financeHistory[0];
+    expect(base).toBeDefined();
+    if (base === undefined) return;
+    const synthetic = JSON.parse(JSON.stringify(snapshot)) as DeepMutable<SimulationSnapshot>;
+    const country = synthetic.countries.find((entry) => entry.id === 0)!;
+    country.financeHistory = [
+      {
+        ...base,
+        periodEndDay: base.periodEndDay - 30,
+        treasuryCashEndSUSD: null,
+        debtOutstandingEndSUSD: null,
+        householdCashEndSUSD: null,
+      },
+      {
+        ...base,
+        periodEndDay: base.periodEndDay,
+        treasuryCashEndSUSD: 120,
+        debtOutstandingEndSUSD: 40,
+        householdCashEndSUSD: 900,
+      },
+    ];
+    const reports = buildMonthlyReports(country);
+    expect(reports[0]?.detailedBalances).toBe(true);
+    expect(reports[0]?.treasuryCash?.endSUSD).toBe(120);
+    // The preceding summary is compacted, so no change is invented.
+    expect(reports[0]?.treasuryCash?.changeSUSD).toBeNull();
+    expect(reports[1]?.detailedBalances).toBe(false);
+    expect(reports[1]?.treasuryCash).toBeNull();
+    expect(reports[1]?.debtOutstanding).toBeNull();
+  });
+
+  test("confirmed action history is bounded and a rejected action is never applied", () => {
+    let history: readonly PlayerActionRecord[] = [];
+    for (let index = 0; index < MAX_PLAYER_ACTION_HISTORY + 5; index += 1) {
+      history = appendPlayerAction(history, actionRecord(index, true));
+    }
+    expect(history).toHaveLength(MAX_PLAYER_ACTION_HISTORY);
+    expect(history[0]?.actionId).toBe("action-5");
+    const recent = recentPlayerActions(history, 12);
+    expect(recent).toHaveLength(12);
+    expect(recent[0]?.actionId).toBe(`action-${String(MAX_PLAYER_ACTION_HISTORY + 4)}`);
+
+    const rejected = actionRecord(999, false);
+    history = appendPlayerAction(history, rejected);
+    const last = history[history.length - 1];
+    expect(last?.accepted).toBe(false);
+    expect(last?.applied).toBeNull();
+    expect(last?.errors).toEqual(["policy rejected by shared validator"]);
+  });
+});

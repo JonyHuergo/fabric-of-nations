@@ -37,8 +37,8 @@ import {
 type TabId = "map" | "country" | "budget" | "population" | "markets" | "ledger";
 
 const TABS: readonly { readonly id: TabId; readonly label: string }[] = [
+  { id: "country", label: "Overview" },
   { id: "map", label: "Map" },
-  { id: "country", label: "Country" },
   { id: "budget", label: "Budget" },
   { id: "population", label: "Population" },
   { id: "markets", label: "Markets" },
@@ -80,7 +80,7 @@ function CenturyApp() {
     restartWorker,
     clearError,
   } = useSimulation();
-  const [tab, setTab] = useState<TabId>("map");
+  const [tab, setTab] = useState<TabId>("country");
   const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
   const [newGamePrompt, setNewGamePrompt] = useState(false);
@@ -95,7 +95,12 @@ function CenturyApp() {
 
   const headerSubtitle = useMemo(() => {
     if (snapshot === null) return "Starting simulation…";
-    return `${snapshot.date.label} · ${snapshot.scenarioId} · sim ${snapshot.simVersion}`;
+    const player =
+      snapshot.playerCountryId === null
+        ? null
+        : (snapshot.countries.find((country) => country.id === snapshot.playerCountryId) ?? null);
+    const playerLabel = player === null ? "No player country" : `Player: ${player.tag}`;
+    return `${snapshot.date.label} · ${playerLabel} · ${snapshot.scenarioId}`;
   }, [snapshot]);
 
   if (startup === "checking") return <StartupCheckingScreen />;

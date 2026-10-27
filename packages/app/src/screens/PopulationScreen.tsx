@@ -4,10 +4,11 @@ import {
   countryById,
   formatCount,
   formatRate,
+  formatSUSD,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Section, StatRow } from "../components/ui";
+import { Notice, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 
 export function PopulationScreen({
@@ -36,6 +37,7 @@ export function PopulationScreen({
             <Text style={styles.countryTag}>{entry.tag}</Text>
             <Text style={styles.countryName} numberOfLines={1}>
               {entry.name}
+              {entry.id === snapshot.playerCountryId ? " · Player" : ""}
             </Text>
             <View style={styles.numbers}>
               <Text style={styles.number}>{formatCount(entry.population)}</Text>
@@ -59,21 +61,48 @@ export function PopulationScreen({
             value={formatCount(country.workingAgePopulation)}
             detail="M2 working-age definition"
           />
-          <StatRow label="Employed workers" value={formatCount(country.employedWorkers)} />
-          <StatRow label="Literacy" value={formatRate(country.literacy)} />
-          <StatRow label="Wealth level" value={country.wealthLevel.toFixed(1)} detail="0–99 index" />
-          <StatRow label="Militancy" value={formatRate(country.militancy)} />
+          <StatRow
+            label="Employed workers"
+            value={formatCount(country.employedWorkers)}
+            detail="Assignments to operational buildings; stock."
+          />
+          <StatRow
+            label="Working-age not in modeled employment"
+            value={formatCount(
+              Math.max(0, country.workingAgePopulation - country.employedWorkers),
+            )}
+            detail="Residual, not an unemployment rate: the model does not measure job search or labor-force participation separately."
+          />
+          <StatRow
+            label="Household cash"
+            value={formatSUSD(country.householdCashSUSD)}
+            detail="Sum of household cash accounts; stock."
+          />
+          <StatRow
+            label="Estimated daily wage base"
+            value={formatSUSD(country.estimatedDailyWageBaseSUSD)}
+            detail="Current employment × base wages ÷ civil year days; current-base estimate, not realized wages."
+          />
+          <StatRow label="Literacy" value={formatRate(country.literacy)} detail="population-weighted, 0–100%" />
+          <StatRow label="Wealth level" value={country.wealthLevel.toFixed(1)} detail="0–99 index; not money." />
+          <StatRow label="Militancy" value={formatRate(country.militancy)} detail="population-weighted index." />
           <StatRow
             label="Blocks with unmet subsistence"
-            value={`${String(country.blocksWithUnmetSubsistence)} of ${String(
+            value={`${String(country.blocksWithUnmetSubsistence)} block(s)`}
+            detail={`Country has ${String(
               snapshot.regions.filter((region) => region.countryId === country.id).length,
-            )} regions`}
+            )} regions. Any unmet subsistence day in the block's current counter.`}
           />
           <StatRow
             label="Blocks with unmet basic needs"
             value={String(country.blocksWithUnmetBasic)}
-            detail="consecutive-day counters are authoritative"
+            detail="Consecutive-day counters are authoritative."
           />
+          <Notice title="What these figures mean">
+            Population, worker, and cash values are stocks. The wage base is a current
+            employment estimate. The model does not calculate an unemployment rate, labor-force
+            participation rate, or per-capita income; no such figure is shown.
+          </Notice>
         </Section>
       )}
     </View>

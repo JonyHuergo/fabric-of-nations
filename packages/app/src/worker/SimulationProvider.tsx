@@ -14,6 +14,8 @@ import {
   AutosaveScheduler,
   PROTOCOL_VERSION,
   WorkerSupervisor,
+  appendPlayerAction,
+  type PlayerActionRecord,
   type SimulationSnapshot,
   type SpeedDaysPerSecond,
   type WorkerCommand,
@@ -64,6 +66,8 @@ export interface SimulationContextValue {
     incomeTaxRate: number,
     welfareBudgetSUSDPerYear: number,
   ) => void;
+  /** Confirmed fiscal actions for the current session, oldest first. */
+  readonly actionHistory: readonly PlayerActionRecord[];
   readonly saveGame: () => void;
   readonly loadGame: () => void;
   readonly restartWorker: () => void;
@@ -99,7 +103,18 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const saveKindRef = useRef<"manual" | "autosave" | null>(null);
   const startupRef = useRef<CampaignStartup>("checking");
   const autosaveRequestRef = useRef<() => void>(() => {});
+  const pendingActionsRef = useRef(
+    new Map<
+      string,
+      {
+        readonly countryId: number;
+        readonly incomeTaxRate: number;
+        readonly welfareBudgetSUSDPerYear: number;
+      }
+    >(),
+  );
   const [snapshot, setSnapshot] = useState<SimulationSnapshot | null>(null);
+  const [actionHistory, setActionHistory] = useState<readonly PlayerActionRecord[]>([]);
   const [connection, setConnection] = useState<ConnectionState>("connecting");
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -225,6 +240,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           }
           return;
         case "ACTION_RESULT": {
+          const request = pendingActionsRef.current.get(event.actionId) ?? null;
+          pendingActionsRef.current.delete(event.actionId);
           const supervisor = supervisorRef.current;
           if (
             supervisor === null ||
@@ -233,6 +250,36 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setSnapshot(event.snapshot);
             setRunningState(event.snapshot.running);
             setAchievedDaysPerSecond(event.snapshot.achievedDaysPerSecond);
+          }
+          const country =
+            request === null
+              ? null
+              : (event.snapshot.countries.find((entry) => entry.id === request.countryId) ??
+                null);
+          if (request !== null) {
+            setActionHistory((history) =>
+              appendPlayerAction(history, {
+                actionId: event.actionId,
+                kind: "set-fiscal-policy",
+                countryId: request.countryId,
+                countryTag: country?.tag ?? null,
+                dayIndex: event.snapshot.dayIndex,
+                dateLabel: event.snapshot.date.label,
+                requested: {
+                  incomeTaxRate: request.incomeTaxRate,
+                  welfareBudgetSUSDPerYear: request.welfareBudgetSUSDPerYear,
+                },
+                accepted: event.accepted,
+                applied:
+                  event.accepted && country !== null
+                    ? {
+                        incomeTaxRate: country.fiscal.incomeTaxRate,
+                        welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+                      }
+                    : null,
+                errors: [...event.errors],
+              }),
+            );
           }
           setBusy(false);
           if (event.accepted) {
@@ -297,6 +344,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             autosaveArmedRef.current = true;
             setError(null);
             setSaveStatus("Saved game loaded");
+            setActionHistory([]);
+            pendingActionsRef.current.clear();
           } else {
             setError(event.errors.join("; ") || "The save could not be loaded.");
             setSaveStatus(null);
@@ -414,14 +463,24 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const applyFiscalPolicy = useCallback(
     (countryId: number, incomeTaxRate: number, welfareBudgetSUSDPerYear: number) => {
       actionCounter.current += 1;
+      const actionId = `ui-fiscal-${String(actionCounter.current)}`;
+      pendingActionsRef.current.set(actionId, {
+        countryId,
+        incomeTaxRate,
+        welfareBudgetSUSDPerYear,
+      });
       const accepted = send({
         protocolVersion: PROTOCOL_VERSION,
         type: "APPLY_ACTION",
         commandId: nextCommandId("apply"),
-        actionId: `ui-fiscal-${String(actionCounter.current)}`,
+        actionId,
         action: { kind: "set-fiscal-policy", countryId, incomeTaxRate, welfareBudgetSUSDPerYear },
       });
-      if (accepted) setSaveStatus("Applying fiscal policy…");
+      if (accepted) {
+        setSaveStatus("Applying fiscal policy…");
+      } else {
+        pendingActionsRef.current.delete(actionId);
+      }
     },
     [nextCommandId, send],
   );
@@ -563,6 +622,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       setNativeEpoch((value) => value + 1);
     }
     setSnapshot(null);
+    setActionHistory([]);
+    pendingActionsRef.current.clear();
     setConnection("connecting");
     connectionRef.current = "connecting";
     setError(null);
@@ -684,6 +745,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       step,
       setSpeed,
       applyFiscalPolicy,
+      actionHistory,
       saveGame,
       loadGame,
       restartWorker,
@@ -712,6 +774,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       step,
       setSpeed,
       applyFiscalPolicy,
+      actionHistory,
       saveGame,
       loadGame,
       restartWorker,

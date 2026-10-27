@@ -138,6 +138,29 @@ export function MiniBars({
   );
 }
 
+export function Notice({
+  title,
+  children,
+  tone = "info",
+}: {
+  readonly title?: string;
+  readonly children: ReactNode;
+  readonly tone?: "info" | "warning" | "critical";
+}) {
+  return (
+    <View
+      style={[
+        styles.notice,
+        tone === "warning" ? styles.noticeWarning : null,
+        tone === "critical" ? styles.noticeCritical : null,
+      ]}
+    >
+      {title === undefined ? null : <Text style={styles.noticeTitle}>{title}</Text>}
+      <Text style={styles.noticeBody}>{children}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   section: {
     backgroundColor: colors.surface,
@@ -219,4 +242,16 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   barTrack: { flex: 1, justifyContent: "flex-end" },
+  notice: {
+    backgroundColor: colors.background,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
+  noticeWarning: { borderColor: colors.accent },
+  noticeCritical: { borderColor: colors.red },
+  noticeTitle: { color: colors.text, fontSize: 12, fontWeight: "700", marginBottom: 3 },
+  noticeBody: { color: colors.muted, fontSize: 11, lineHeight: 16 },
 });
