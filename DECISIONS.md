@@ -2762,6 +2762,93 @@ postcondition use; `m3f-day.test.ts` clone mutation/isolation; `m4b-period-close
 exact equity restoration; `m2-demography.test.ts` exact century identity; and
 `m5b-debt.test.ts` exact accounting effects and identity.
 
+## D-069 — Historical-data boundary validation, stable employment ids, and generated-artifact integrity
+
+**Status:** implemented in Batch 7. Addresses CEN-AUDIT-015 (historical data accepted at
+load time that world construction later rejects, order-dependent employment ids, and
+silently collapsed metadata) and CEN-AUDIT-020 (app import boundary, generated worker
+drift, and data-version consistency). No calibration, scenario content, economic
+formula, debt policy, worker lifecycle, save compaction, or performance threshold
+changes.
+
+**Historical-loader boundary.** `validateM5HistoricalData` now rejects at the data
+boundary the values that world construction would reject later, and keeps aggregating
+`HistoricalDataError` messages rather than throwing raw `RangeError` for authored
+content:
+
+- `startDayIndex` must be a processable campaign day integer
+  (`0..35,523`), matching `assertValidDayIndex`/world construction.
+- Country, region, market, and employment ids must be unsigned 32-bit.
+- Currency keys (lower-case identifier, max 32), currency names (max 64), country
+  tags (max 8), and country names (max 128) use the same limits as the simulation.
+- `susdPerUnit` must be inside the shared `CURRENCY_RATE_MIN`/`MAX` bounds, and
+  specified valuations still require declared sources.
+- Welfare budgets must not exceed `MAX_FISCAL_BUDGET_SUSD_PER_YEAR`; debt coupon,
+  term, grace, principal ceiling, creditor id, and country-creditor existence are
+  checked against the same safe bounds as the debt engine.
+- Initial inventory lots require a known good, a known owner building inside the
+  market, and a positive finite quantity; negative region resource caps are rejected.
+- Building definitions must allow private ownership.
+- Population savings-per-capita times population must remain finite.
+- Employment records require a known building, the matching building region, a known
+  profession, a profession that is actually a job of that building definition, a
+  positive safe-integer worker count within the definition/level job slots, and a
+  qualified regional workforce. Aggregate assignments per region/profession must not
+  exceed `floor(workingAgePopulation * participationRate)` computed from the same
+  expanded age profile used to build the world.
+
+The loader still calls the shared `assertValidEconomyDefinitions` and
+`assertValidPopulationDefinitions` for static definitions. It does not loosen any
+simulation validator.
+
+**Stable employment ids.** Authored employment records have no explicit id field.
+Generated assignment ids are now assigned after resolving the authoritative
+`buildingInstanceId`, `popBlockId`, and `professionId`, sorting by that tuple, and
+numbering from zero. Input array order therefore does not affect ids or the canonical
+world hash. Duplicate composite identity
+(`regionId:professionKey:buildingKey`) is rejected with both the duplicate path and the
+first declaration index; no ambiguous record is resolved arbitrarily. This is
+documented in the type/build path and covered by a permuted two-record fixture.
+
+**Duplicate metadata.** `meta.sources[].id` and calibration targets keyed by
+`(countryTag, metric)` are checked for duplicates with both conflicting indices.
+Calibration target ids, country tags/ids, currency keys, region/market/building keys,
+population keys, employment composite keys, and stock-lot keys were already unique and
+remain so. Keys that are legitimately repeated (for example a source referenced by
+several records) are not rejected.
+
+**App import boundary.** `@century/sim-worker` exposes root, `persistence`, `host`,
+`snapshot`, and `node` entries. The app may import only the root barrel and
+`persistence`; importing `host`, `snapshot`, `node`, any other worker subpath, or
+`@century/sim`/`@century/data` (including subpaths) fails the architecture test. The
+committed generated bundle is treated as opaque worker payload: it may export only
+`SIM_WORKER_SCRIPT`, `SIM_WORKER_HTML`, `SIM_WORKER_BUNDLE_BYTES`, and
+`SIM_WORKER_HTML_BYTES`, and the app may import it only through the two relative
+generated-module imports. Positive and negative import fixtures exercise the policy.
+
+**Generated artifacts.** The existing esbuild toolchain remains the only bundler.
+`build-worker.mjs --check` regenerates the bundle in memory and compares it with the
+committed file without writing; it reports the byte lengths and first difference on
+mismatch. `generate-scenario.mjs --check` does the same for the worker scenario
+module. Explicit regeneration remains `pnpm -F @century/app build:worker` and
+`pnpm -F @century/sim-worker scenario:build`. The root `check:worker` command builds
+the data package once, then runs both check-only commands. CI runs `check:worker`
+before `pnpm bench` because the bench build regenerates the committed artifacts; this
+keeps the check meaningful while preserving the explicit regeneration path. The
+worker-bundle test proves the current artifact passes, independent generations are
+byte-identical, and an intentionally stale copy fails without being overwritten.
+
+**Data-version consistency.** `DATA_PACKAGE_VERSION`, the simulation
+`DEFAULT_DATA_VERSION`, `DATA_PACKAGE_INFO.version`, every scenario JSON
+`dataVersion` (top-level or `meta`), and the historical meta data version must agree.
+A test enforces this. This batch is validation-only and does not change authored
+economic content or scenario meaning, so **no data/schema/simulation version bump is
+required**. Incompatible older saves continue to be rejected exactly as before.
+
+**Out of scope.** The separate `CEN-AUDIT-016` sovereignty question remains
+unresolved; this batch does not invent a political model. No calibration or economic
+content changed.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

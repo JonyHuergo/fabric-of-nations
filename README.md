@@ -2832,6 +2832,159 @@ Implementation commit: `a0ca78086a9df47699d5b3e500cafa0dfec46f51`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
+## Post-M7 remediation batch 7 — historical-data integrity and generated-artifact drift
+
+**Scope.** D-069 addresses `CEN-AUDIT-015` and `CEN-AUDIT-020` only: inconsistent
+historical-loader validation, order-dependent employment identifiers, silently
+collapsed metadata, the app import boundary, generated worker/scenario drift, and
+data-version consistency. No economic content, calibration, scenario meaning, schema,
+save format, debt policy, worker lifecycle, performance threshold, or UI behavior
+changed. `CEN-AUDIT-016` (sovereignty) remains unresolved and is not addressed here.
+
+### Confirmed findings and root causes
+
+- The historical loader accepted several values that world construction later
+  rejected: out-of-range `startDayIndex`, currency keys/names beyond simulation
+  limits, exchange rates outside the shared numeric bounds, oversized welfare
+  budgets and debt terms, non-32-bit ids, negative region resource caps, and
+  employment records that exceeded building job slots or qualified workforce.
+- Employment identifiers were assigned from the authored JSON array index before
+  sorting. The shipped employment file is empty, but populating it would make ids and
+  the canonical hash depend on record order.
+- `meta.sources` ids and calibration targets keyed by `(countryTag, metric)` were not
+  duplicate-checked; later `Set`/`find` lookups silently collapsed them.
+- The app architecture test allowed any `@century/sim-worker/*` subpath, including
+  the privileged `host` and `snapshot` implementations, and skipped generated files.
+- The committed worker bundle and worker scenario module had no drift check in CI, so
+  a source change could leave the app using stale generated output.
+
+### Historical-loader validation
+
+`validateM5HistoricalData` now rejects at the data boundary, with aggregated
+`HistoricalDataError` diagnostics that name the field and record:
+
+- `startDayIndex` must be an integer in `0..35,523` (a processable campaign day).
+- Country, region, market, and employment ids must be unsigned 32-bit values.
+- Country tags/names, currency keys/names, and currency formats use the same limits
+  as `assertValidCountryCurrencyState`.
+- `susdPerUnit` must be inside `CURRENCY_RATE_MIN..CURRENCY_RATE_MAX`; specified
+  valuations still require known sources.
+- Welfare budgets, debt coupons, terms, grace periods, principal ceilings, creditor
+  ids, and country-creditor existence use the debt/fiscal safe bounds.
+- Currency, region, and country relationships; private building ownership; stock-lot
+  good/owner/market references and positive quantities; finite savings products; and
+  non-negative resource caps are checked.
+- Employment requires a known building and matching region, a known profession that
+  is a job of that building definition, a positive safe-integer worker count within
+  the definition/level job slots, and enough qualified regional workforce. Aggregate
+  assignments per region/profession are compared with
+  `floor(workingAge * participationRate)` from the same expanded age profile used for
+  world construction.
+
+`assertValidEconomyDefinitions` and `assertValidPopulationDefinitions` remain the
+shared static-definition validators. No simulation validator was loosened and no
+calibration value was changed to satisfy a new check.
+
+### Stable employment identifiers
+
+Authored employment has no explicit id field, so generated ids are now assigned after
+resolving `(buildingInstanceId, popBlockId, professionId)`: records are sorted by that
+authoritative tuple and numbered from zero. Record order therefore cannot change ids
+or the canonical hash. Duplicate composite identity
+(`regionId:professionKey:buildingKey`) is rejected with the duplicate path and the
+first declaration index. A two-record fixture is built forward and reversed; both
+scenarios expose the same ids and produce the same world hash.
+
+### Duplicate metadata
+
+`meta.sources[].id` duplicates and calibration duplicates keyed by
+`(countryTag, metric)` now report both conflicting indices. Existing unique checks for
+calibration ids, country tags/ids, currency keys, region/market/building keys,
+population keys, employment keys, and stock-lot keys remain. Duplicates that are valid
+by design, such as one source referenced by several records, are not rejected.
+
+### App import boundary
+
+The architecture test now applies an explicit allowlist based on the worker package's
+public exports:
+
+- **Allowed:** `@century/sim-worker` (root protocol/selectors/autosave/supervisor) and
+  `@century/sim-worker/persistence` for the storage codec.
+- **Rejected:** `@century/sim-worker/host`, `*/snapshot`, `*/node`, any other worker
+  subpath, and `@century/sim` or `@century/data` including subpaths.
+- **Generated module:** the committed bundle is treated as opaque payload; it may
+  export only `SIM_WORKER_SCRIPT`, `SIM_WORKER_HTML`,
+  `SIM_WORKER_BUNDLE_BYTES`, and `SIM_WORKER_HTML_BYTES`.
+
+Positive and negative import fixtures exercise the policy, and the actual app source
+is scanned with the same rule.
+
+### Generated-artifact integrity
+
+The existing esbuild toolchain remains the only bundler. `build-worker.mjs --check`
+regenerates in memory and compares against the committed file without writing;
+`generate-scenario.mjs --check` does the same for the worker scenario module. Mismatch
+messages report byte lengths and the first differing byte.
+
+- Explicit regeneration: `pnpm -F @century/app build:worker` and
+  `pnpm -F @century/sim-worker scenario:build`.
+- Check-only path: `pnpm run check:worker` builds the data package once, then runs
+  both `--check` commands. It does not overwrite either artifact.
+- CI runs `check:worker` **before** `pnpm bench`, because the bench build regenerates
+  the committed artifacts. The check therefore detects stale commits rather than
+  validating output produced earlier in the same pipeline.
+- A test proves the current bundle passes, two independent generations are
+  byte-identical, and a stale copy fails without being overwritten.
+
+### Data-version semantics
+
+`DATA_PACKAGE_VERSION`, simulation `DEFAULT_DATA_VERSION`,
+`DATA_PACKAGE_INFO.version`, every scenario JSON `dataVersion` (top-level or `meta`),
+and the historical meta value must agree; a focused test enforces this. This batch is
+validation-only and changes no authored economic content or scenario meaning, so **no
+data, schema, or simulation version bump is required**. Incompatible older saves
+continue to be rejected under the existing policy.
+
+### Verification
+
+Commands actually executed:
+
+- `pnpm build` — **PASS**; commits the regenerated worker bundle/scenario only when
+  their sources change.
+- `pnpm run check:worker` — **PASS** (scenario and app bundle are current).
+- `pnpm run lint` — **PASS** (139 TypeScript files, 46 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (six workspace packages).
+- Focused historical/architecture/version/bundle suites — **PASS**.
+- `pnpm test` — **PASS: 55 suites, 585 tests**.
+- `pnpm run ci` — **PASS, exit code 0**: check:worker, lint, typecheck, 585 tests,
+  standard benchmark, and web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+Not run: full 36,524-tick campaign, long soak/stress tests, profilers, or native
+builds. Check-only verification, explicit bundle regeneration, and Expo exports are
+distinct steps in the report: CI runs the check before the bench build; the bench's
+`pnpm build` may regenerate artifacts but only after the check has passed.
+
+### Remaining limitations
+
+- `CEN-AUDIT-016` sovereignty is unresolved; no political model was invented.
+- The loader validates authored historical data, not arbitrary third-party data
+  schemas; `JSON.parse` cannot report duplicate object keys.
+- Employment identity is stable under record reordering. Adding/removing records can
+  renumber later ids (sequential scheme); the authoritative tuple and duplicate
+  rejection remain deterministic.
+- Generated-artifact checks cover the committed app bundle and worker scenario module;
+  other generated data artifacts are governed by their own scripts and tests.
+- No native/device measurement was performed; the mobile performance target remains
+  **NOT EVALUATED**.
+
+### Commits
+
+Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
+(parent `b45d0253acfc344040a7067d6df5cacdf785c8e6`). Documentation commit: the
+immediate child containing this section and `DECISIONS.md`. The final HEAD is
+reported in the handoff.
+
 ## Development workflow
 
 1. Read `AGENTS.md` and the relevant GDD milestone.
