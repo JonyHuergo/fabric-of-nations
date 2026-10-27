@@ -1331,7 +1331,7 @@ goods/buildings/professions/needs catalog, opening intermediate stock, and openi
 prices at the lower provisional bound. The older timings and the 81-building /
 85,487,776-population campaign row are retained as history and are **not** results
 of the current scenario. The current `pnpm bench` results are recorded in
-“Post-M7 remediation batch 3” near the end of this file. The full 36,524-tick
+“Post-M7 remediation batch 5” near the end of this file. The full 36,524-tick
 campaign has not been rerun after D-062.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
@@ -2557,6 +2557,148 @@ Implementation commit: `e12b66d8a262fd5b09c2e5b23280cdeed16ae8b1`
 (parent `9c0a827d580184125430efebccd852b4ca663eb6`). Documentation commit: the
 immediate child containing this section, `DECISIONS.md`, and
 `Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
+
+## Post-M7 remediation batch 5 — simulation validation boundary and measured performance
+
+**Scope.** D-067 addresses the remaining high-priority simulation-performance
+finding only: repeated whole-world validation inside phase calls that already run
+inside the atomically staged economic day. It changes no economic formula,
+coefficient, scenario, cadence, save format, schema, or AI policy. The full campaign
+and native builds were not run.
+
+### Bottleneck confirmed
+
+Source inspection and the eight-polity fixture (8 countries, 16 regions, 5 markets,
+64 blocks, 113 buildings, 316 assignments) showed **55.55 whole-world validations per
+tick** before the change. Every market validated the whole world at market entry, at
+production entry and candidate publication, and at overflow entry and candidate
+publication; settlement, both fiscal checks, migration, and the debt phase added
+more. The shipped market path also falls back to its conservative cash-funded
+attempt on most early days, repeating the complete five-market sequence. A Node CPU
+profile attributed roughly a quarter of sampled self time to whole-world validation.
+
+### Change
+
+`runEconomicDay` now treats whole-world validation as a day-boundary concern. Public
+phase entry points (`runMarketDay`, `runProductionPhase`, `applyOverflowLosses`,
+`settleMarketDays`/`settleMarketDay`, `runFiscalPhase`, `runMigrationPhase`,
+`runDebtPhase`) accept optional `PhaseValidationOptions`; their default remains full
+whole-world validation. The integrated day calls them with `validateWorld: false`
+after its own entry validation, and `tick` still validates the input world and the
+complete staged world before `Object.assign` publication. A direct `runEconomicDay`
+call (without `tick`) validates at entry and once again after the finished day.
+
+- **Removed:** per-market, per-production, per-overflow, per-settlement, per-fiscal,
+  per-migration, and per-debt whole-world sweeps inside the staged day (about 53.4
+  validations per tick on this fixture).
+- **Retained:** tick entry/publication validation; one candidate validation per
+  applied AI action; reservation, reference, and quantity checks; inventory
+  conservation; posting structure and semantic checks; account, cash, and
+  accounting-identity checks; debt cash conservation; phase rollback; and full
+  validation at construction, save/load, and close.
+- **Relocated:** the redundant phase checks now happen once at the day boundary.
+
+`validationStats.ts` adds a diagnostic-only counter, disabled by default. It is not
+authoritative state, is never serialized or hashed, and does not affect any
+simulation decision. It exists so tests and the M5 benchmark can prove the reduction.
+
+### Bounded before/after measurement
+
+Controlled workload: fresh eight-polity world, seed `20261023`, 2 warm-up ticks, then
+3 runs × 20 measured `tick()` calls; setup and hashing excluded from timing. The
+pre-change run used the same probe with instrumentation enabled.
+
+Environment: Node `v24.22.1`, Windows x64 (`10.0.26200`), AMD Ryzen 5 2600 (6 cores /
+12 logical processors), 8 GiB RAM.
+
+| Run | Samples | avg | p50 | p95 | p99 | whole-world validations/tick | hash after 22 ticks |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Before (`53a60f68`) | 60 | 226.7 ms | 229.0 ms | 266.0 ms | 299.1 ms | 55.55 | `914a75412ed40483` |
+| After (`ccc74bde`) | 60 | 54.3 ms | 53.5 ms | 64.4 ms | 92.3 ms | 2.15 | `914a75412ed40483` |
+| After, repeat | 60 | 53.8 ms | 52.3 ms | 72.1 ms | 91.7 ms | 2.15 | `914a75412ed40483` |
+
+The apparent gain is far larger than the observed run-to-run spread. These are Node
+diagnostics, not mobile evidence.
+
+Standard `pnpm run bench` (final CI run; same bounded harness as Batch 4):
+
+| Case | Batch 4 p50 / p95 | Batch 5 p50 / p95 |
+|---|---:|---:|
+| M5 eight-polity tick | 214.1 / 233.3 ms | 49.2 / 55.3 ms |
+| M6 AI sample tick | 212.0 / 224.3 ms | 48.9 / 57.6 ms |
+| M7 complete tick + snapshot | 207.7 / 210.7 ms | 46.2 / 49.1 ms |
+| M2 200-block stress | p95 3.80 ms | p95 4.00 ms |
+
+The M5 benchmark now prints `world validations: 32 over 16 ticks (2.00/tick;
+boundary checks plus one per applied AI action)`. The projected full campaign from
+the M5 sample average is `0.50 h`; the 36,524-tick campaign was **not** executed.
+One earlier bounded standard-bench run measured M5 p95 `56.0 ms`, M6 p95 `51.3 ms`,
+and M7 p95 `54.0 ms`, which is ordinary run-to-run variation.
+
+### Correctness evidence
+
+`batch5-validation.test.ts` adds ten tests:
+
+1. the pre-optimization 22-tick state hash is unchanged (`914a75412ed40483`), on the
+   real multi-country economic path rather than an empty world;
+2. a tick performs exactly two whole-world validations (entry + publication) despite
+   five markets and a funding-fallback attempt;
+3. only applied AI actions add a candidate validation (two boundary checks plus one
+   per applied action);
+4. public phase entry points still reject an invalid world by default, while the
+   staged opt-out is explicit;
+5. phase-scoped reservation validation still rejects an invalid quantity in staged
+   mode without mutating inventory;
+6. markets are cleared in ascending id order exactly once and a duplicate settlement
+   is rejected;
+7. designated cash is conserved every tick and finance/world validation stays clean;
+8. save/load continuation through the January close and February migration is
+   hash-identical to an uninterrupted run;
+9. direct `runEconomicDay` on a month-end validates its staged close without
+   advancing the day, while published-state validation still rejects an unadvanced
+   close;
+10. the debt phase in staged mode matches the default validated path for an explicit
+    issuance, month-end interest accrual, coupon payment, cash conservation, and hash.
+
+The full suite also retains its existing pinned hashes, monthly-close, save/load,
+determinism, debt, and conservation tests. The full campaign was not run.
+
+### Verification
+
+Commands actually executed:
+
+- `pnpm run lint` — **PASS** (135 TypeScript files, 46 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (six workspace packages).
+- `pnpm test` — **PASS: 51 suites, 567 tests**.
+- `pnpm run bench` — **PASS, exit code 0**; every reported threshold and gate passed.
+- `pnpm run ci` — **PASS, exit code 0**: lint, typecheck, 567 tests, standard
+  benchmark, and web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+### Compatibility and limitations
+
+- `WORLD_SCHEMA_VERSION` **16**, `SIM_VERSION` **0.16.0**, `SAVE_FORMAT_VERSION`
+  **1**, `dataVersion` **`m3-economy-v3`** — all unchanged. No save migration is
+  required because this batch changes neither authoritative fields nor their order.
+- No GDD mechanic or acceptance criterion changed. The GDD's day-staging and
+  final-validation requirement is preserved.
+- An invalid intermediate value inside the staged day is now reported at the end of
+  the day instead of inside the exact market/phase that wrote it. The day remains
+  atomic and invalid state still cannot be published; direct public phase calls
+  still fail immediately.
+- Finance-index lookup/construction is now the largest residual per-tick profile
+  share. It is not changed in this batch.
+- The full 36,524-tick campaign was not executed; `0.50 h` is a projection.
+- No native build, device, memory, battery, or frame-rate measurement exists. The
+  GDD mobile p95 ≤ 8 ms target remains **NOT EVALUATED**; a lower Node p95 does not
+  establish it.
+
+### Commits
+
+Implementation commit: `ccc74bde00b894fa36acdfbcfef556c806b53bad`
+(parent `53a60f68ab7af3a71f9ad81158e60b521dcff97a`). Documentation commit: the
+immediate child containing this section and `DECISIONS.md`. The final HEAD is
+reported in the handoff.
 
 ## Development workflow
 

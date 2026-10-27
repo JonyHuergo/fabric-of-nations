@@ -2590,6 +2590,80 @@ bounded` also asserts the active cap through validation. The full campaign was n
 run; the bounded scenario run crosses several month-end/coupon/default boundaries.
 Native device behavior remains unverified.
 
+## D-067 — Day-boundary whole-world validation and explicit staged-phase mode
+
+**Status:** implemented in Batch 5. Supersedes only the redundant phase-level
+whole-world validation placement; no simulation formula, coefficient, cadence, or
+schema changes.
+
+**Problem confirmed from source and measurement.** On the eight-polity sample the
+integrated day performed **55.55 whole-world validations per tick**. The same
+validated state was rechecked at the start of `runMarketDay` for every market, by
+`runProductionPhase` (entry and candidate), by `applyOverflowLosses` (entry and
+candidate), by `settleMarketDays`, by both fiscal checks, by the migration phase, by
+the debt phase, and at the start and end of `tick`. The M5 fixture has five markets,
+and its market-funding fallback repeats the complete market attempt, so market
+validation alone occurred up to 50 times per day. A Node CPU profile attributed
+roughly a quarter of sampled self time to these validations before the change.
+
+**Decision.** Validation is relocated to the two boundaries that can actually publish
+state, and internal phase calls become explicit about it:
+
+- `tick` validates the input world once and the complete staged world once before
+  `Object.assign` publication. Failure still discards the staged clone.
+- Public phase entry points (`runMarketDay`, `runProductionPhase`,
+  `applyOverflowLosses`, `settleMarketDays`/`settleMarketDay`, `runFiscalPhase`,
+  `runMigrationPhase`, `runDebtPhase`) accept optional `PhaseValidationOptions`.
+  Their default remains full whole-world validation, so direct/API/test callers keep
+  the original guarantee.
+- `runEconomicDay` calls those phases with `validateWorld: false` only after its own
+  day-boundary validation. When called directly with validation enabled it also
+  validates the finished day once before returning. That check passes
+  `allowUnadvancedClose: true` because a month-end close is intentionally staged
+  before the day advances; published-state validation keeps the D-047 rule.
+- Phase-scoped checks always remain active in staged mode: reservation shape and
+  quantity, buyer/seller/market references, inventory conservation, posting
+  structure/semantics, account and cash reconciliation, accounting identity, debt
+  cash conservation, and rollback. Only the repeated whole-world sweep was redundant.
+- An applied country-AI action still validates its candidate world once; that
+  validation is evidence for the policy change, not a per-tick repetition.
+
+**Instrumentation.** `validationStats.ts` exposes a diagnostic-only counter, disabled
+by default. `assertValidWorld` increments it when enabled. It is not authoritative
+state, is never serialized or hashed, and does not affect simulation decisions; it
+exists so tests and the M5 benchmark can prove the reduction. Module-level diagnosis
+is deliberate and documented here because it is not an input to any simulation
+function.
+
+**Measured result (Node, this machine, eight-polity sample, seed 20261023).** The
+20-tick probe fell from **55.55 to 2.15 whole-world validations per tick** and from
+`avg 226.7 ms / p50 229.0 ms / p95 266.0 ms` to `avg 54.3 ms / p50 53.5 ms / p95
+64.4 ms` over the same 60 samples; a repeat after-run measured `avg 53.8 / p50 52.3
+/ p95 72.1 ms`. The optimized runs measured 2 boundary validations per tick plus one
+candidate validation per applied AI action (for example 42 validations over 20 ticks
+with two applied actions). The state hash after 22 ticks is unchanged
+(`914a75412ed40483`), and two fresh runs produce the same hash. The standard
+benchmark and correctness results are recorded in the Batch 5 README section. These
+are Node diagnostics, not mobile evidence; the full campaign was not run.
+
+**Consequences and limits.** An invalid intermediate staged value is now detected at
+the end of the staged day rather than immediately inside the market/phase that wrote
+it. Because the day is staged and published only after end-of-day validation, invalid
+state still cannot reach the authoritative world, and the error still aborts the
+whole day. Public phase calls retain immediate detection. Finance-index lookup and
+construction (owner/subtype string keys) are now the largest residual per-tick cost;
+that separate concern is not changed in this batch. No schema, save-format, data, or
+simulation version change is required.
+
+**Tests.** `batch5-validation.test.ts` covers the pinned pre-optimization state hash,
+two boundary validations per tick despite five markets and funding fallback, one
+candidate validation per applied AI action, default public-phase validation,
+staged-mode reservation validation, multi-market ordering and exactly-once
+settlement, per-tick designated-cash conservation with finance validity,
+save/load continuation through a monthly close, direct month-end `runEconomicDay`
+validation, and debt-phase staged/default hash equivalence with interest and coupon
+payment.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
