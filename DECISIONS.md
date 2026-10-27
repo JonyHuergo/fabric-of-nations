@@ -2230,6 +2230,107 @@ retain. (e) Storing the uncompressed 18.76 MiB save in AsyncStorage without
 measuring platform limits would risk silent save failure; the storage codec is
 compressed and round-trip tested.
 
+## D-062 — Post-M7 historical scenario feasibility calibration
+
+**Status:** implemented in the post-M7 remediation batch. **Provisional**, not
+historical calibration.
+
+**Problem.** The M5 eight-polity sample used the legacy M3 catalog unchanged:
+subsistence required fish and livestock but the sample instantiated no fishery or
+ranch; grain capacity was ~65% of the authored 0.9 kg/capita/day requirement;
+food-products capacity was ~9%; clothing capacity was ~12% of basic+comfort
+demand; and every authored recipe had negative net value at base prices and base
+wages. The only executed full campaign consequently reported a fall from
+648,210,406 to 85,487,776 people. This was a data/scenario contradiction, not a
+ledger failure: the accounting identities balanced.
+
+**Decision.** Keep the legacy `goods.json`, `buildings.json`, `professions.json`,
+and `m3_needs.json` as the accepted M2–M4 fixture baseline. Introduce a separate
+historical catalog (`historical_goods.json`, `historical_buildings.json`,
+`historical_professions.json`, `historical_needs.json`) used only by the
+`m5-eight-polities` scenario. The historical catalog is a provisional structural
+calibration:
+
+- Needs: grain 0.527, food-products 0.03, fish 0.03, livestock 0.03 kg/capita/day;
+  basic clothing 0.01 and comfort clothing 0.002 garments/capita/day.
+- Recipes: farms/ranches/fisheries produce more per worker; food processing is a
+  2:1 grain-to-food process; textile and clothing recipes have realistic
+  value-added; peasant/laborer/owner professions are separated where local labor
+  composition requires it.
+- Building levels: allocated **per market** in proportion to regional population,
+  with market totals sized to that market's own demand. Shared markets pool
+  production; there is no inter-market trade.
+- Prices: base prices are higher value-added prices; opening prices are the
+  documented lower bound (`0.25 × base`) for every good. Opening intermediate
+  stock (grain, cotton, wool, textiles) covers one day of demand so the
+  one-day production-chain lag does not prevent processing on day 0.
+- Operating cash: input-using buildings hold three days of wage cover; farms,
+  ranches, and fisheries hold a smaller buffer and rely on same-day sales.
+- Participation and wages: peasants 0.60/60 SUSD/yr, laborers 0.40/130,
+  clerks 0.55/250; private payout rate 1.0 so the absence of an investment
+  system does not leave profits stranded inside building cash.
+
+**Before/after (world totals, nominal units/day).**
+
+| Good | Before capacity | Before need | After capacity | After need |
+|---|---:|---:|---:|---:|
+| Grain (household + processing input) | 380.8 M | 998.2 M (583.4 household + 414.9 processing) | 381.5 M | 380.9 M |
+| Food products | 4.65 M | 51.9 M | 19.66 M | 19.45 M |
+| Fish | 0 | 19.4 M | 19.5 M | 19.4 M |
+| Livestock | 0 | 19.4 M | 19.5 M | 19.4 M |
+| Clothing (basic + comfort) | 0.75 M | 7.78 M | 6.55 M | 6.48 M |
+| Textiles (clothing input + luxury) | 1.65 M | 14.26 M | 4.62 M | 4.57 M |
+
+“Before” grain and textile need include the input required to satisfy the full
+authored final demand; the legacy capacity could not process that demand in the
+first place, which is the defect.
+
+Recipe net value at base prices was negative for all seven legacy recipes
+(−0.34 to −1.00 SUSD per worker-day). In the historical catalog every recipe is
+positive at base prices and at the opening lower-bound prices; the feasibility
+test asserts both. The legacy M3 catalog and its accepted tests are unchanged.
+
+**Consequences.** `DATA_PACKAGE_VERSION` is `m3-economy-v2`; the historical
+scenario's data version changes, so older saves are rejected rather than silently
+loaded under different definitions. The calibration is a feasibility floor, not a
+historical claim. It does not implement construction, profession transition,
+inter-market trade, government procurement, or full income redistribution. A
+bounded 31-day test shows no world-level famine (under 10% of population in blocks
+with an unmet subsistence counter), but some clerk/capitalist blocks in
+Russia/India/Brazil remain cash-constrained; per-block income distribution is
+explicitly left for later calibration. There is no claim of century-scale
+population growth or historical accuracy.
+
+## D-063 — Designated player country and AI fiscal exclusion
+
+**Status:** implemented in the post-M7 remediation batch.
+
+**Problem.** The M7 shell let the player set fiscal policy for any polity while
+the M6 AI was enabled for all eight and wrote the same `Country.fiscal` fields.
+The player's only action could be silently reversed within seven simulated days,
+and there was no "player's country" in authoritative state.
+
+**Decision.** Add an optional `World.playerCountryId` (schema 14). The historical
+scenario designates the USA (`playerCountryTag: "USA"`, id 0). `runCountryAIPhase`
+skips exactly that country; all other countries remain AI-controlled and continue
+to use the same observation, validation, and application path. The constructor,
+world validation, canonical encoding, state hash, save/load, snapshot, and worker
+protocol preserve the field. The app selects the player country by default, marks
+the Budget/Country context as player- or AI-controlled, and disables fiscal edits
+for AI-controlled countries. The player still uses the shared
+`validateCountryAction`/`applyCountryAction` path.
+
+**Why state, not app-only.** Save/load and deterministic replay must preserve the
+configuration and its behavior. Storing it in the world also prevents a client
+from silently declaring a different player country after load. The field is
+nullable so legacy fixtures retain their prior all-AI behavior.
+
+**Consequences.** `WORLD_SCHEMA_VERSION` 14, `SIM_VERSION` 0.14.0. Saves from
+schema 13 / sim 0.13.0 / data `m3-economy-v1` are intentionally rejected. The AI
+loses one of eight sample evaluations; AI-controlled countries are unchanged. The
+UI restriction is a presentation guard; the authoritative exclusion is in the
+simulation phase.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
@@ -2266,8 +2367,16 @@ compressed and round-trip tested.
     build. iOS/Android release-build and real-device performance criteria remain
     open; Node, web, and Hermes-bundle results are not mobile acceptance.
 13. The app stores gzip-compressed canonical saves under
-    `century-save-gzip1:` in AsyncStorage. The canonical save format, checksum,
-    schema, and hash are unchanged.
+    `century-save-gzip1:` in AsyncStorage. The canonical save format is unchanged;
+    schema 14 adds the player-country field and therefore rejects older saves.
+14. The historical scenario uses a separate provisional catalog (D-062). It does
+    not change the accepted M2–M4 fixture definitions. Its opening prices are the
+    lower price bound, which keeps the fixed-capacity market from drifting below
+    the bound while one day of intermediate stock supports the production chain.
+15. Per-block income distribution remains provisional: the bounded feasibility
+    run does not claim that every clerk/capitalist block is cash-sufficient over a
+    century. Construction, profession transition, and redistributive policy remain
+    future work.
 
 ## Items intentionally left open
 

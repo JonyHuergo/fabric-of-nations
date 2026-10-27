@@ -1309,6 +1309,16 @@ the three deterministic multi-block templates (400k/350k/250k people), so total
 population grows with block count. Each M2 stress scale uses 100 warm-up ticks and
 730 measured ticks.
 
+**Post-M7 remediation note (D-062/D-063).** The M5/M6/M7 tables later in this
+section were recorded before the historical scenario feasibility calibration. That
+scenario now has 113 buildings (including fisheries/ranches), a separate historical
+goods/buildings/professions/needs catalog, opening intermediate stock, and opening
+prices at the lower provisional bound. The older timings and the 81-building /
+85,487,776-population campaign row are retained as history and are **not** results
+of the current scenario. The current `pnpm bench` results are recorded in
+“Post-M7 remediation batch 1” near the end of this file. The full 36,524-tick
+campaign has not been rerun after D-062.
+
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
 pre-M4a-1 (schema-5) baselines and are retained as history. M4a-1 changes
 authoritative account state and posting line shape, so world hashes differ and
@@ -1946,9 +1956,11 @@ ReactNativeWebView bridge probe passed. These are not device results.
 
 ### 7. Schema/version changes and save compatibility
 
-No simulation schema/version change. World schema **13**, simulation **0.13.0**,
-save format **1**, data version `m3-economy-v1`. Worker protocol version **1** is
-independent of the save schema. The app's gzip storage wrapper preserves the
+No simulation schema/version change **at the M7 baseline**. World schema was
+**13**, simulation **0.13.0**, save format **1**, data version `m3-economy-v1`.
+**Superseded by the post-M7 remediation (D-062/D-063):** schema **14**, simulation
+**0.14.0**, data version `m3-economy-v2`, save format still **1**. Worker protocol
+version **1** is independent of the save schema. The app's gzip storage wrapper preserves the
 canonical save string and therefore its checksum, hash, validation, and
 compatibility. Older incompatible simulation saves still reject.
 
@@ -1975,6 +1987,162 @@ Branch `main`. The implementation HEAD is
 immediate child and is the final HEAD reported in the handoff. The working tree is
 clean after both commits. M7 is delivered with the documented native/device
 acceptance exception; M8 and later milestones are not started.
+
+## Post-M7 remediation batch 1 — scenario feasibility and player agency
+
+**Scope.** This batch implements D-062 and D-063. It does not start M8, does not
+enable public debt, and does not change the worker transports, save compression,
+speed controls, or native code.
+
+### Root causes confirmed and fixed
+
+The audit confirmed that the shipped eight-polity sample combined the legacy M3
+catalog with historical building instances that had **no fishery or ranch**, while
+the needs catalog required fish and livestock every day. Grain capacity was ~65% of
+the authored 0.9 kg/capita/day need, food-products ~9%, and clothing ~12% of
+basic+comfort demand. Separately, every legacy recipe had negative net value at
+base prices and base wages, and the sample had no designated player country while
+the AI governed all eight polities.
+
+The historical scenario now uses a separate provisional catalog
+(`historical_goods.json`, `historical_buildings.json`,
+`historical_professions.json`, `historical_needs.json`). The legacy M2–M4
+baseline catalog is unchanged and its tests still pass.
+
+### Capacity versus need (world totals, nominal units/day)
+
+| Good | Before capacity | Before need | After capacity | After need |
+|---|---:|---:|---:|---:|
+| Grain (household + processing input) | 380.8 M | 998.2 M (583.4 household + 414.9 processing) | 381.5 M | 380.9 M |
+| Food products | 4.65 M | 51.9 M | 19.66 M | 19.45 M |
+| Fish | 0 | 19.4 M | 19.5 M | 19.4 M |
+| Livestock | 0 | 19.4 M | 19.5 M | 19.4 M |
+| Clothing (basic + comfort) | 0.75 M | 7.78 M | 6.55 M | 6.48 M |
+| Textiles (clothing input + luxury) | 1.65 M | 14.26 M | 4.62 M | 4.57 M |
+
+“Before” grain and textile need include the input required to satisfy the full
+authored final demand; the legacy capacity could not process that demand in the
+first place, which is the defect. The per-market checks are stricter than these
+world totals: each market's own population, processing inputs, and building stock
+must cover that market's demand.
+The shipped scenario has 113 building instances (81 prior + 16 ranches + 16
+fisheries) and 316 initial employment assignments.
+
+### Recipe economics
+
+All seven legacy recipes were negative at base prices and wages, from −0.34 to
+−1.00 SUSD per worker-day. The historical catalog is positive at **both** base
+prices and the opening lower-bound prices for every recipe. Examples at base
+prices per throughput unit: subsistence farm +33,390; commercial farm +49,753
+(laborer variant) / +57,425 (peasant variant); ranch +29,534; fishery +27,945;
+food processing +24,377; textile mill +34,220; workshop +60,613 (laborer variant)
+/ +62,531 (peasant variant). The feasibility test recomputes these from the
+validated definitions rather than hardcoding the table.
+
+Provisional calibration choices:
+
+- Needs: grain 0.527, food-products 0.03, fish 0.03, livestock 0.03 kg/capita/day;
+  basic clothing 0.01 and comfort clothing 0.002 garments/capita/day.
+- Recipes: higher output per worker, a 2:1 grain-to-food process, value-added
+  textile/clothing prices, and peasant/laborer variants where local labor
+  composition requires them.
+- Levels: per-market totals sized to that market's demand, distributed across
+  regions in proportion to regional population.
+- Opening prices: `0.25 × base` (the documented lower bound), so a fixed-capacity
+  market does not drift below the price floor when opening stock is present.
+- Opening intermediate stock: one day of grain, cotton, wool, and textiles,
+  attributed to in-market producer buildings. This supplies the one-day
+  production-chain lag; there is no inter-market trade.
+- Operating cash: three days of wage cover for input-using buildings; smaller
+  buffers for farms/ranches/fisheries, which sell on the same day.
+- Participation/wages: peasants 0.60/60 SUSD/yr, laborers 0.40/130, clerks
+  0.55/250; private payout rate 1.0 to avoid stranded retained cash without an
+  investment system.
+
+These are structural feasibility assumptions, **not** historical calibration.
+
+### Player-country mechanism
+
+The historical scenario designates the USA (`playerCountryTag: "USA"`, id 0).
+`World.playerCountryId` is authoritative, serialized, hashed, and included in the
+snapshot. `runCountryAIPhase` skips exactly that country; AI-controlled countries
+continue through the unchanged observation/validator/application path. The app
+selects the player country by default, marks Budget/Country context, and disables
+fiscal edits for AI-controlled countries. The player still uses the shared
+`validateCountryAction`/`applyCountryAction` path.
+
+Regression coverage: `m6-player-country.test.ts` asserts the designation, applies
+a player action, advances through the country's scheduled AI evaluation, confirms
+the policy is unchanged, confirms AI countries are still evaluated, and verifies
+save/load plus deterministic replay preserve the configuration. `m3d-market.test.ts`
+adds the Pass-B eligibility regression that the first-day/stockout scenario needed.
+
+### Verification results
+
+Commands executed:
+
+- `pnpm run lint` — PASS (125 TypeScript files, 45 in `packages/sim`).
+- `pnpm typecheck` — PASS (all six workspace packages).
+- `pnpm test` — PASS: **44 suites, 518 tests**.
+- `pnpm run bench` — PASS in the final CI run. Representative results:
+  - M1 36,524 ticks: 0.002–0.004 ms avg, hashes equal.
+  - M2 world aggregate 36,524 ticks: ~0.10 ms avg, p95 ~0.18 ms, hash
+    `0731b26b151efb09`.
+  - M2 200-block stress: p50 3.47 ms, p95 **4.70 ms** (provisional ≤5 ms gate
+    satisfied; earlier runs varied as high as 5.15 ms and failed that provisional
+    gate).
+  - M5 eight-polity sample: p50 **182.4 ms**, p95 **205.2 ms**, 113 buildings,
+    population 648,229,543; projected full campaign ~1.80 h (not executed).
+  - M6 sample: p50 182.6 ms, p95 193.2 ms, 14 evaluations, **1 applied** action,
+    0 rejected. The benchmark seeds a benchmark-only fiscal stress on one
+    AI-controlled country so the `applied > 0` gate exercises the real path; this
+    does not change the shipped scenario.
+  - M7 worker host: complete tick+snapshot p95 **220.2 ms**, snapshot 11.7 KiB,
+    save 413.1 KiB → 80.2 KiB compressed.
+- `pnpm run ci` — PASS, exit 0 (lint, typecheck, 518 tests, benchmark, web/iOS/
+  Android Expo exports).
+- `git diff --check` — PASS.
+
+The full 36,524-tick campaign was **not** rerun after D-062. The previously recorded
+85,487,776 final population belongs to the pre-remediation scenario and must not be
+quoted as the current outcome. The bounded 31-day feasibility run shows no
+world-level famine: under 10% of population remains in blocks with an unmet
+subsistence counter, and total population does not decline by more than 0.5%.
+Some clerk/capitalist blocks in Russia/India/Brazil remain cash-constrained; this is
+recorded as a remaining income-distribution calibration limitation, not a capacity
+pass.
+
+### Schema, data version, and save compatibility
+
+- `WORLD_SCHEMA_VERSION` **14** (adds `playerCountryId`).
+- `SIM_VERSION` **0.14.0** (AI behavior and scenario calibration changed).
+- `DATA_PACKAGE_VERSION` **`m3-economy-v2`**; all scenario files declare it.
+- Save format remains **1**; envelope/checksum logic is unchanged.
+- Saves from schema 13 / sim 0.13.0 / data `m3-economy-v1` are intentionally
+  rejected rather than loaded under different definitions. There is no migration.
+- Generated `m5Scenario.ts` and the app worker bundle were regenerated.
+
+### Remaining limitations
+
+- Per-block income distribution is not calibrated: some clerk/capitalist blocks are
+  still cash-constrained in the bounded run. Construction, profession transition,
+  inter-market trade, and government procurement do not exist yet.
+- The full campaign has not been rerun; century-scale population/occupation
+  behavior is unverified. No historical calibration claim is made.
+- M5 sample tick cost rose with the 113-building scenario (~180–205 ms/tick in the
+  final run; projected 1.8–2.0 h for the campaign). This worsens the existing
+  speed-control/performance limitation; mobile remains unmeasured.
+- Public debt remains disabled in the shipped scenario. The M5b benchmark still
+  injects a contract; a debt remediation batch is separate.
+- Save-size/worker-reliability/speed-control remediation batches are not included.
+- Native release builds and real-device performance remain **NOT EVALUATED**.
+
+### Commits
+
+Implementation commit: `f7fedbe6045d0f28ac54f8b60019518ba8a8ba18`
+(parent `c528240160de6281e9c0e44a2e38b13302db811d`). Documentation commit: the
+immediate child containing this section, `DECISIONS.md`, and
+`Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
 
 ## Development workflow
 

@@ -2279,7 +2279,12 @@ future events, and the world seed are absent. The M6 rules use no random draw.
 Countries and blocks are processed in ascending id order; rates are rounded to
 six decimals and money to cents; no-op changes are suppressed. M6 tests mutate
 hidden fields and assert that the governed country's observation and decision do
-not change.
+not change. **Post-M7 player control (D-063):** an optional designated
+`playerCountryId` in authoritative state exempts exactly one country from the
+country AI's fiscal decisions. AI-controlled countries continue to use the same
+observation, validator, and application path. The exemption is a control
+boundary, not a hidden-information grant; the player does not receive AI-only
+information and the AI does not read the player's private state.
 
 ### 12.3 Initial action set
 
@@ -2350,6 +2355,12 @@ real-device frame-rate measurement remain **NOT EVALUATED** (D-061).
 The app subscribes to immutable snapshots emitted by the simulation worker at a target rate of up to 10 snapshots per second. A snapshot contains only the fields needed for the visible UI and selection context. The UI must never read or mutate the live simulation world.
 
 Snapshot rate can be reduced under load. Dropping intermediate visual snapshots is acceptable; dropping simulation ticks or changing simulation results is not.
+
+**Post-M7 player control (D-063).** The snapshot includes the optional
+`playerCountryId`. The Budget screen treats that country as player-controlled and
+marks other countries as AI-controlled; fiscal edits are restricted to the player
+country in the shipped shell. The snapshot remains immutable and contains no live
+world or private AI state.
 
 ---
 
@@ -2854,6 +2865,18 @@ builds. Node and headless-browser results are not mobile performance evidence. T
 mobile p95 ≤ 8 ms target, 60 fps, cold start, peak memory, and battery targets
 remain **NOT EVALUATED**. This exception is explicit and must remain visible until
 a release build is run on a named device.
+
+**Post-M7 remediation batch 1 (D-062/D-063).** The shipped eight-polity scenario
+was re-authored for structural feasibility: it now has a viable fish and livestock
+source in every market, a population-scaled per-market building allocation, positive
+base-price recipe margins, opening intermediate stock, and opening prices at the
+documented lower provisional bound. The USA is the designated player country; the
+AI is excluded from its fiscal decisions. These are provisional feasibility
+calibrations, not historical calibration. The authoritative state schema is 14 and
+the data version is `m3-economy-v2`; older saves are intentionally rejected. Public
+debt remains disabled in the shipped scenario. Long-run per-block income
+distribution and the missing construction/profession-transition systems remain
+uncalibrated.
 
 ### 17.3 Intermediate finance stages (M5a/M5b accepted; M7a/M8a planned)
 
