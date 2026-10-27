@@ -3,7 +3,6 @@ import {
   civilDateToDayIndex,
   createPopulationWorld,
   populationTotal,
-  runTicks,
   tick,
   type FertilityAnchor,
   type MortalityAnchor,
@@ -99,7 +98,6 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
       deaths += blockResult.deaths;
       const current = populationTotal(world.popBlocks[0]!);
       expect(current).toBe(previous + blockResult.births - blockResult.deaths);
-      expect(current).toBeGreaterThanOrEqual(0);
       previous = current;
     }
     expect(previous).toBe(1_621_287_278 + births - deaths);
@@ -319,8 +317,19 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     const { scenario, world } = aggregateWorld();
     const inputs = makeInputs([0]);
     const start = populationTotal(world.popBlocks[0]!);
-    const summary = runTicks(world, 36_524, contextFor(scenario, inputs, false));
-    expect(summary.ticksProcessed).toBe(36_524);
-    expect(populationTotal(world.popBlocks[0]!)).toBeGreaterThan(start);
+    let births = 0;
+    let deaths = 0;
+    for (let day = 0; day < 36_524; day += 1) {
+      const result = tick(world, contextFor(scenario, inputs, false));
+      if (result.population === undefined) throw new Error("expected a population result");
+      births += result.population.births;
+      deaths += result.population.deaths;
+    }
+    expect(world.dayIndex).toBe(36_524);
+    expect(births).toBeGreaterThan(0);
+    expect(deaths).toBeGreaterThan(0);
+    // The century total equals the opening population plus every birth minus
+    // every death; a positive end total alone would not prove conservation.
+    expect(populationTotal(world.popBlocks[0]!)).toBe(start + births - deaths);
   });
 });

@@ -1,11 +1,17 @@
 import {
+  assertAccountingIdentity,
+  assertValidEmploymentState,
   assertValidWorld,
   cloneWorld,
   createEconomyWorld,
+  designatedCashTotal,
   hashWorld,
+  runMarketDay,
   runTicks,
+  settleMarketDay,
   settleMarketDays,
   tick,
+  type MarketDayResult,
   type TickContext,
 } from "@century/sim";
 import {
@@ -21,6 +27,22 @@ function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
     population: { definitions: scenario.population.definitions },
     economy: { definitions: scenario.definitions },
   };
+}
+
+/** One demand-free market-day result per market, for settlement-only tests. */
+function emptyMarketDays(
+  scenario: ReturnType<typeof m5Scenario>,
+  world: ReturnType<typeof createEconomyWorld>,
+): MarketDayResult[] {
+  return world.markets.map((market) =>
+    runMarketDay(world, scenario.definitions, {
+      dayIndex: world.dayIndex,
+      marketId: market.id,
+      needs: scenario.population.definitions.needs,
+      householdDemands: [],
+      productionDemands: [],
+    }),
+  );
 }
 
 describe("M5 multi-market clearing and conservation", () => {
@@ -165,12 +187,106 @@ describe("M5 multi-market clearing and conservation", () => {
     expect(tick(world, context(scenario)).advanced).toBe(true);
   });
 
-  test("cross-region input purchases settle through the shared market", () => {
+  test("cross-region purchases settle through the shared market", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    runTicks(world, 6, context(scenario));
-    expect(world.markets[0]?.stockLots.length ?? 0).toBeGreaterThanOrEqual(0);
+    const first = tick(world, context(scenario));
+    runTicks(world, 5, context(scenario));
+    const transactions = first.economy?.settlement.transactions ?? [];
     assertValidWorld(world);
     expect(world.regions.find((region) => region.id === M5_REGION_B1)?.marketId).toBe(1);
+    const buildingRegion = new Map(
+      world.buildings.map((building) => [building.id, building.regionId]),
+    );
+    const blockRegion = new Map(world.popBlocks.map((block) => [block.id, block.regionId]));
+    const crossRegion = transactions.some((transaction) => {
+      const sellerRegion = buildingRegion.get(transaction.sellerBuildingId);
+      const buyerRegion =
+        transaction.buyerPopBlockId !== null
+          ? blockRegion.get(transaction.buyerPopBlockId)
+          : transaction.buyerBuildingId !== null
+            ? buildingRegion.get(transaction.buyerBuildingId)
+            : undefined;
+      return (
+        sellerRegion !== undefined &&
+        buyerRegion !== undefined &&
+        sellerRegion !== buyerRegion
+      );
+    });
+    expect(crossRegion).toBe(true);
+    expect(world.markets[0]?.stockLots.length ?? 0).toBeGreaterThan(0);
+    assertAccountingIdentity(world.finance);
+  });
+
+  test("settlement requires every market and pays wages/upkeep once per day", () => {
+    const scenario = m5Scenario();
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    tick(world, context(scenario)); // day 0: creates valid employment
+    const day = world.dayIndex;
+    const results = emptyMarketDays(scenario, world);
+    expect(results).toHaveLength(world.markets.length);
+    const before = hashWorld(world);
+
+    expect(() => settleMarketDays(world, scenario.definitions, [results[0]!])).toThrow(
+      /every world market/,
+    );
+    expect(() => settleMarketDay(world, scenario.definitions, results[0]!)).toThrow(
+      /single-market/,
+    );
+    expect(hashWorld(world)).toBe(before);
+
+    const settlement = settleMarketDays(world, scenario.definitions, results);
+    expect(settlement.dayIndex).toBe(day);
+    expect(settlement.marketIds).toEqual([0, 1]);
+    expect(results.every((result) => result.settled)).toBe(true);
+
+    const wageBuildingIds = settlement.wages.map((wage) => wage.buildingId);
+    const upkeepBuildingIds = settlement.upkeep.map((upkeep) => upkeep.buildingId);
+    expect(wageBuildingIds.length).toBeGreaterThan(0);
+    expect(new Set(wageBuildingIds).size).toBe(wageBuildingIds.length);
+    expect(upkeepBuildingIds.length).toBeGreaterThan(0);
+    expect(new Set(upkeepBuildingIds).size).toBe(upkeepBuildingIds.length);
+    expect(new Set(settlement.producers.map((producer) => producer.buildingId)).size).toBe(
+      settlement.producers.length,
+    );
+    expect(settlement.totals.wagesPaidSUSD).toBeCloseTo(
+      settlement.wages.reduce((total, wage) => total + wage.paidSUSD, 0),
+      8,
+    );
+    expect(settlement.totals.upkeepPaidSUSD).toBeCloseTo(
+      settlement.upkeep.reduce((total, upkeep) => total + upkeep.paidSUSD, 0),
+      8,
+    );
+    const wagesPostings = world.finance.postings.filter(
+      (posting) => posting.transactionKind === "wages" && posting.dayIndex === day,
+    );
+    const upkeepPostings = world.finance.postings.filter(
+      (posting) => posting.transactionKind === "upkeep" && posting.dayIndex === day,
+    );
+    expect(wagesPostings).toHaveLength(settlement.wages.filter((wage) => wage.paidSUSD > 0).length);
+    expect(upkeepPostings).toHaveLength(settlement.upkeep.filter((upkeep) => upkeep.paidSUSD > 0).length);
+    assertAccountingIdentity(world.finance);
+    assertValidEmploymentState(world, scenario.definitions);
+    assertValidWorld(world);
+  });
+
+  test("a failed multi-market settlement leaves finance unchanged", () => {
+    const scenario = m5Scenario();
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    // Build unsettled market days before removing the account so no persisted
+    // posting references it. Settlement then fails inside the upkeep phase after
+    // market and wage work has already been staged.
+    const results = emptyMarketDays(scenario, world);
+    world.finance.accounts = world.finance.accounts.filter(
+      (account) => account.subtype !== "system-reserve-cash",
+    );
+    const before = JSON.stringify(world.finance);
+    const cashBefore = designatedCashTotal(world.finance);
+    expect(() => settleMarketDays(world, scenario.definitions, results)).toThrow(
+      /system-reserve/,
+    );
+    expect(JSON.stringify(world.finance)).toBe(before);
+    expect(designatedCashTotal(world.finance)).toBe(cashBefore);
+    expect(results.every((result) => !result.settled)).toBe(true);
   });
 });

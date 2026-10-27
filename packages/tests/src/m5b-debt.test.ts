@@ -1,4 +1,5 @@
 import {
+  assertAccountingIdentity,
   assertValidWorld,
   cloneWorld,
   createEconomyWorld,
@@ -79,6 +80,7 @@ describe("M5b public debt and deficit financing", () => {
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBeCloseTo(1000, 8);
     expect(account(world, "country", M5B_COUNTRY_B, "bond-asset").balanceSUSD).toBeCloseTo(1000, 8);
     expect(world.finance.postings.at(-1)?.transactionKind).toBe("debt-issuance");
+    assertAccountingIdentity(world.finance);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
@@ -104,18 +106,34 @@ describe("M5b public debt and deficit financing", () => {
     const scenario = m5bScenario({ debt: { termDays: 60, maxOutstandingPrincipalSUSD: 1000 } });
     const world = createM5bWorld(scenario);
     issue(world, 1000, 60);
+    const treasuryABefore = treasury(world, M5B_COUNTRY_A).balanceSUSD;
+    const treasuryBBefore = treasury(world, M5B_COUNTRY_B).balanceSUSD;
     tickM5b(world, scenario, 31);
-    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeLessThan(11_000);
-    expect(treasury(world, M5B_COUNTRY_B).balanceSUSD).toBeGreaterThan(9_000);
+    // Contract issued on day 0; days 1..30 accrue one 365th of the annual coupon.
+    const expectedInterest = (1000 * 0.12 * 30) / 365;
+    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(
+      treasuryABefore - expectedInterest,
+      8,
+    );
+    expect(treasury(world, M5B_COUNTRY_B).balanceSUSD).toBeCloseTo(
+      treasuryBBefore + expectedInterest,
+      8,
+    );
     expect(account(world, "country", M5B_COUNTRY_B, "interest-income").balanceSUSD).toBe(0);
     expect(account(world, "country", M5B_COUNTRY_A, "interest-expense").balanceSUSD).toBe(0);
     const contract = world.finance.debtContracts[0]!;
     expect(contract.accruedInterestSUSD).toBeCloseTo(0, 8);
     expect(contract.outstandingPrincipalSUSD).toBeCloseTo(1000, 8);
+    const summary = world.finance.periodSummaries.at(-1)!;
+    const totals = governmentPeriodTotals(world.finance, summary).find(
+      (entry) => entry.countryId === M5B_COUNTRY_A,
+    )!;
+    expect(totals.interestExpenseSUSD).toBeCloseTo(expectedInterest, 8);
     const payments = world.finance.postings.filter(
       (posting) => posting.transactionKind === "interest-payment",
     );
-    expect(payments.length).toBeGreaterThan(0);
+    expect(payments).toHaveLength(1);
+    assertAccountingIdentity(world.finance);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
@@ -158,30 +176,60 @@ describe("M5b public debt and deficit financing", () => {
     const scenario = m5bScenario();
     const world = createM5bWorld(scenario);
     issue(world, 1000, 10);
+    const treasuryABefore = treasury(world, M5B_COUNTRY_A).balanceSUSD;
+    const treasuryBBefore = treasury(world, M5B_COUNTRY_B).balanceSUSD;
     tickM5b(world, scenario, 11);
+    // Days 1..10 accrue; maturity on day 10 pays the coupon and the principal.
+    const expectedInterest = (1000 * 0.12 * 10) / 365;
     const contract = world.finance.debtContracts[0]!;
     expect(contract.status).toBe("repaid");
     expect(contract.outstandingPrincipalSUSD).toBe(0);
-    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeLessThan(11_000);
-    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeGreaterThan(9_900);
+    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(
+      treasuryABefore - expectedInterest - 1000,
+      8,
+    );
+    expect(treasury(world, M5B_COUNTRY_B).balanceSUSD).toBeCloseTo(
+      treasuryBBefore + expectedInterest + 1000,
+      8,
+    );
     expect(account(world, "country", M5B_COUNTRY_B, "bond-asset").balanceSUSD).toBe(0);
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBe(0);
     expect(world.finance.postings.some((posting) => posting.transactionKind === "debt-principal-repayment")).toBe(true);
+    assertAccountingIdentity(world.finance);
   });
 
   test("refinances maturing principal with explicit replacement contract", () => {
     const scenario = m5bScenario({ debt: { termDays: 10, refinanceOnMaturity: true } });
     const world = createM5bWorld(scenario);
     issue(world, 1000, 10);
+    const treasuryABefore = treasury(world, M5B_COUNTRY_A).balanceSUSD;
+    const treasuryBBefore = treasury(world, M5B_COUNTRY_B).balanceSUSD;
     tickM5b(world, scenario, 11);
+    const expectedInterest = (1000 * 0.12 * 10) / 365;
     expect(world.finance.debtContracts).toHaveLength(2);
     const [oldContract, replacement] = world.finance.debtContracts;
     expect(oldContract?.status).toBe("repaid");
     expect(oldContract?.outstandingPrincipalSUSD).toBe(0);
     expect(replacement?.status).toBe("active");
     expect(replacement?.outstandingPrincipalSUSD).toBeCloseTo(1000, 8);
+    // Refinancing transfers principal from the replacement, so only the coupon
+    // moves net cash between the two treasuries.
+    expect(treasury(world, M5B_COUNTRY_A).balanceSUSD).toBeCloseTo(
+      treasuryABefore - expectedInterest,
+      8,
+    );
+    expect(treasury(world, M5B_COUNTRY_B).balanceSUSD).toBeCloseTo(
+      treasuryBBefore + expectedInterest,
+      8,
+    );
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBeCloseTo(1000, 8);
     expect(account(world, "country", M5B_COUNTRY_B, "bond-asset").balanceSUSD).toBeCloseTo(1000, 8);
+    const oldHistory = world.finance.debtHistory.find(
+      (entry) => entry.issuerCountryId === M5B_COUNTRY_A,
+    );
+    expect(oldHistory?.contractsRetired).toBe(1);
+    expect(oldHistory?.principalRepaidSUSD).toBeCloseTo(1000, 8);
+    assertAccountingIdentity(world.finance);
   });
 
   test("marks arrears and defaults explicitly when principal cannot be paid", () => {
@@ -209,6 +257,18 @@ describe("M5b public debt and deficit financing", () => {
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBe(0);
     expect(account(world, "country", M5B_COUNTRY_B, "bond-asset").balanceSUSD).toBe(0);
     expect(world.finance.postings.some((posting) => posting.transactionKind === "debt-default-writeoff")).toBe(true);
+    // Day 40 is the first day at or after the 30-day grace period. Days 1..40
+    // accrue before the write-off: 1000 * 0.12 * 40 / 365.
+    const expectedWrittenOffInterest = (1000 * 0.12 * 40) / 365;
+    const history = world.finance.debtHistory.find(
+      (entry) => entry.issuerCountryId === M5B_COUNTRY_A,
+    )!;
+    expect(history.contractsDefaulted).toBe(1);
+    expect(history.contractsRetired).toBe(0);
+    expect(history.principalIssuedSUSD).toBeCloseTo(1000, 8);
+    expect(history.principalWrittenOffSUSD).toBeCloseTo(1000, 8);
+    expect(history.interestWrittenOffSUSD).toBeCloseTo(expectedWrittenOffInterest, 8);
+    assertAccountingIdentity(world.finance);
   });
 
   test("reports interest expense in fiscal totals without adding a flow kind", () => {
@@ -233,6 +293,7 @@ describe("M5b public debt and deficit financing", () => {
     expect(account(world, "popBlock", 0, "household-cash").balanceSUSD).toBeCloseTo(before - 100, 8);
     expect(account(world, "popBlock", 0, "bond-asset").balanceSUSD).toBeCloseTo(100, 8);
     expect(account(world, "country", M5B_COUNTRY_A, "debt-liability").balanceSUSD).toBeCloseTo(100, 8);
+    assertAccountingIdentity(world.finance);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
@@ -248,6 +309,8 @@ describe("M5b public debt and deficit financing", () => {
     tickM5b(restored, scenario, 5);
     expect(hashWorld(restored)).toBe(hashWorld(first));
     expect(hashWorld(cloneWorld(first))).toBe(hashWorld(first));
+    assertAccountingIdentity(first.finance);
+    assertAccountingIdentity(restored.finance);
   });
 
   test("invalid policies and contracts are rejected", () => {

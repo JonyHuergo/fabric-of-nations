@@ -1,5 +1,6 @@
 import {
   applyMigrationRequest,
+  assertValidEmploymentState,
   assertValidWorld,
   createEconomyWorld,
   designatedCashTotal,
@@ -175,6 +176,8 @@ describe("M5 migration", () => {
   test("rejects invalid and missing destination references without mutation", () => {
     const { scenario, world } = worldAt(31);
     const before = hashWorld(world);
+    const employmentBefore = world.employment.map((assignment) => ({ ...assignment }));
+    const dirtyBefore = world.employmentDirty;
     expect(() =>
       applyMigrationRequest(world, scenario.definitions, 31, {
         sourcePopBlockId: 0,
@@ -183,6 +186,8 @@ describe("M5 migration", () => {
       }),
     ).toThrow(/unknown destination pop block/);
     expect(hashWorld(world)).toBe(before);
+    expect(world.employment).toEqual(employmentBefore);
+    expect(world.employmentDirty).toBe(dirtyBefore);
 
     expect(() =>
       applyMigrationRequest(world, scenario.definitions, 31, {
@@ -210,6 +215,55 @@ describe("M5 migration", () => {
       }),
     ).toThrow(/open border/);
     expect(hashWorld(world)).toBe(before);
+  });
+
+  test("a direct phase repairs employment and conserves population and cash", () => {
+    const { scenario, world } = worldAt(31);
+    const beforePopulation = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    const beforeCash = designatedCashTotal(world.finance);
+
+    const result = runMigrationPhase(world, scenario.definitions, 31);
+    expect(result.ran).toBe(true);
+    expect(result.flows.length).toBeGreaterThan(0);
+    expect(result.totalPeople).toBeGreaterThan(0);
+    expect(result.employmentRefresh).not.toBeNull();
+    expect(result.employmentRefresh?.refreshed).toBe(true);
+
+    expect(world.employmentDirty).toBe(false);
+    assertValidEmploymentState(world, scenario.definitions);
+    assertValidWorld(world);
+    expect(
+      world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    ).toBe(beforePopulation);
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(beforeCash, 6);
+  });
+
+  test("an explicit request repairs employment and keeps the world publishable", () => {
+    const { scenario, world } = worldAt(31);
+    const beforePopulation = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    const beforeCash = designatedCashTotal(world.finance);
+    const dayBefore = world.dayIndex;
+
+    const flow = applyMigrationRequest(world, scenario.definitions, 31, {
+      sourcePopBlockId: 0,
+      destinationPopBlockId: 5,
+      people: 10,
+    });
+    expect(flow.people).toBe(10);
+    expect(world.dayIndex).toBe(dayBefore);
+    expect(world.employmentDirty).toBe(false);
+    assertValidEmploymentState(world, scenario.definitions);
+    assertValidWorld(world);
+    expect(
+      world.popBlocks.reduce((total, block) => total + populationTotal(block), 0),
+    ).toBe(beforePopulation);
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(beforeCash, 6);
   });
 
   test("accepts an explicit flow into an open country and rejects a closed one", () => {

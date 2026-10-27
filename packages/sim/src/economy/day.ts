@@ -842,14 +842,13 @@ export function runEconomicDay(
   }
   let employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
   // M5 migration: monthly, after the initial labor allocation and before the
-  // day's market phase. Moving people invalidates some assignments, so a second
-  // forced refresh repairs releases and fills the post-migration workforce.
+  // day's market phase. The migration phase owns the post-flow employment repair
+  // when it moves people, so the integrated day does not repeat it.
   const migration = runMigrationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
-  if (migration.flows.length > 0) {
-    world.employmentDirty = true;
-    employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
+  if (migration.employmentRefresh !== null) {
+    employment = migration.employmentRefresh;
   }
   assertValidEmploymentState(world, economyDefinitions);
 

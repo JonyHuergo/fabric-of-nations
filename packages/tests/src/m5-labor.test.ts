@@ -6,7 +6,6 @@ import {
   eligibleWorkforceForBlock,
   jobSlotsForBuilding,
   populationTotal,
-  refreshEmployment,
   runTicks,
   tick,
   workingAgePopulation,
@@ -170,8 +169,8 @@ describe("M5 labor mobility", () => {
       people: 1_000,
     });
     expect(flow.people).toBe(1_000);
-    world.employmentDirty = true;
-    refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
+    // applyMigrationRequest owns the post-flow employment repair.
+    expect(world.employmentDirty).toBe(false);
     const afterSourceWorkers = world.employment
       .filter((assignment) => assignment.popBlockId === 0)
       .reduce((total, assignment) => total + assignment.workers, 0);

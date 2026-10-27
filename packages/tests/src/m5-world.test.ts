@@ -1,14 +1,16 @@
 import {
-  MIGRATION_MONTHLY_INFLOW_CAP_FRACTION,
+  assertValidEmploymentState,
   assertValidEconomyScenario,
   assertValidWorld,
   createEconomyWorld,
+  designatedCashTotal,
   hashWorld,
   populationTotal,
   runMigrationPhase,
   runTicks,
   serializeWorld,
   deserializeWorld,
+  tick,
   type TickContext,
 } from "@century/sim";
 import {
@@ -144,10 +146,13 @@ describe("M5 multi-region and multi-country world", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     const start = hashWorld(world);
-    runTicks(world, 31, context(scenario));
+    runTicks(world, 31, context(scenario)); // reaches day 31 (February 1)
+    const migration = tick(world, context(scenario)); // processes day 31
+    expect(migration.economy?.migration.ran).toBe(true);
+    expect(migration.economy?.migration.totalPeople ?? 0).toBeGreaterThan(0);
+    expect(world.dayIndex).toBe(32);
     expect(hashWorld(world)).not.toBe(start);
     assertValidWorld(world);
-    expect(world.dayIndex).toBe(31);
   });
 
   test("migration phase is a no-op outside the first day of a month", () => {
@@ -156,19 +161,38 @@ describe("M5 multi-region and multi-country world", () => {
     const before = hashWorld(world);
     const result = runMigrationPhase(world, scenario.definitions, 0);
     expect(result.ran).toBe(false);
+    expect(result.employmentRefresh).toBeNull();
     expect(hashWorld(world)).toBe(before);
   });
 
-  test("conserves population across a migration tick", () => {
+  test("conserves population and cash across an actual migration tick", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    runTicks(world, 31, context(scenario));
-    const total = world.popBlocks.reduce((sum, block) => sum + populationTotal(block), 0);
-    expect(total).toBeGreaterThan(0);
-    // Cash and population invariants are validated by the published world check.
+    runTicks(world, 31, context(scenario)); // day 31 is due for migration
+    const populationBefore = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    const cashBefore = designatedCashTotal(world.finance);
+
+    const result = tick(world, context(scenario));
+    expect(result.economy?.migration.ran).toBe(true);
+    expect(result.economy?.migration.totalPeople ?? 0).toBeGreaterThan(0);
+    expect(result.population).toBeDefined();
+    const births = result.population?.births ?? 0;
+    const deaths = result.population?.deaths ?? 0;
+    const populationAfter = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    // Migration moves people between blocks; it does not change the world total.
+    // The only world-level population change is the day's births minus deaths.
+    expect(populationAfter).toBe(populationBefore + births - deaths);
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 6);
+    expect(world.employmentDirty).toBe(false);
+    assertValidEmploymentState(world, scenario.definitions);
     assertValidWorld(world);
-    expect(world.dayIndex).toBe(31);
-    expect(MIGRATION_MONTHLY_INFLOW_CAP_FRACTION).toBeGreaterThan(0);
+    expect(world.dayIndex).toBe(32);
   });
 
   test("keeps a countryless multi-region world valid and tickable", () => {

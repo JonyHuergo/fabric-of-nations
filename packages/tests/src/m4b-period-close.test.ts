@@ -599,6 +599,7 @@ describe("M4b monthly periodic close", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     const equity = equityAccountOf(world, "popBlock", 0);
     const revenue = accountOf(world, "popBlock", 0, "wage-income");
+    const originalEquity = equity.balanceSUSD;
     const shift = equity.balanceSUSD + 100;
     equity.balanceSUSD = -100;
     revenue.balanceSUSD += shift;
@@ -608,7 +609,7 @@ describe("M4b monthly periodic close", () => {
     world.dayIndex = FIRST_MONTH_END;
     const close = closeFinancePeriod(world);
     expect(close.summary.accountTotals[equity.id]).toBeCloseTo(-100, 9);
-    expect(equityAccountOf(world, "popBlock", 0).balanceSUSD).toBeGreaterThanOrEqual(0);
+    expect(equityAccountOf(world, "popBlock", 0).balanceSUSD).toBeCloseTo(originalEquity, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
 

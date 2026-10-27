@@ -333,14 +333,22 @@ describe("M3f integrated economic day", () => {
     const clone = cloneWorld(world);
     expect(serializeWorld(clone)).toBe(serializeWorld(world));
     const originalSerialized = serializeWorld(world);
+    const originalAgeCell = world.popBlocks[0]!.maleByAge[0] ?? 0;
+    const originalBalance = clone.finance.accounts[0]!.balanceSUSD;
+    const originalLot = clone.markets[0]!.stockLots[0]!.quantity;
 
-    clone.popBlocks[0]!.maleByAge[0] = (clone.popBlocks[0]!.maleByAge[0] ?? 0) + 1;
+    clone.popBlocks[0]!.maleByAge[0] = originalAgeCell + 1;
     clone.finance.accounts[0]!.balanceSUSD += 1;
     clone.markets[0]!.stockLots[0]!.quantity += 1;
     clone.diagnostics.recentWarnings.push("clone-only");
     const clonePosting = clone.finance.postings[0];
     if (clonePosting !== undefined) clonePosting.lines[0]!.amountSUSD += 1;
 
+    // The clone changed exactly where it was mutated...
+    expect(clone.popBlocks[0]!.maleByAge[0]).toBe(originalAgeCell + 1);
+    expect(clone.finance.accounts[0]!.balanceSUSD).toBeCloseTo(originalBalance + 1, 9);
+    expect(clone.markets[0]!.stockLots[0]!.quantity).toBeCloseTo(originalLot + 1, 9);
+    // ...and the source world remains byte-identical.
     expect(serializeWorld(world)).toBe(originalSerialized);
     expect(clone.popBlocks[0]!.maleByAge).not.toBe(world.popBlocks[0]!.maleByAge);
     expect(clone.finance.accounts[0]).not.toBe(world.finance.accounts[0]);

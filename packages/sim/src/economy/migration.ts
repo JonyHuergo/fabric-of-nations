@@ -43,8 +43,13 @@ import {
   MIGRATION_WEALTH_WEIGHT,
 } from "./constants.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import { eligibleWorkforceForBlock, jobSlotsForBuilding } from "./employment.js";
-import type { EconomyDefinitions, FinancialAccount } from "./types.js";
+import {
+  eligibleWorkforceForBlock,
+  jobSlotsForBuilding,
+  refreshEmployment,
+  type EmploymentRefreshResult,
+} from "./employment.js";
+import type { EconomyDefinitions, EmploymentAssignment, FinancialAccount } from "./types.js";
 
 export const MIGRATION_SOURCE_ORDER_PURPOSE = "migration.source-order";
 export const MIGRATION_DESTINATION_PURPOSE = "migration.destination";
@@ -69,6 +74,13 @@ export interface MigrationDayResult {
   readonly totalFinancialTransferSUSD: number;
   readonly sourceBlocksConsidered: number;
   readonly destinationsCappedByInflowLimit: number;
+  /**
+   * Forced employment refresh performed by the phase after at least one flow, or
+   * null when no population moved. A successful phase therefore leaves
+   * assignments valid for the resulting working-age population without requiring
+   * the caller to repair them.
+   */
+  readonly employmentRefresh: EmploymentRefreshResult | null;
 }
 
 function emptyResult(dayIndex: DayIndex): MigrationDayResult {
@@ -80,6 +92,7 @@ function emptyResult(dayIndex: DayIndex): MigrationDayResult {
     totalFinancialTransferSUSD: 0,
     sourceBlocksConsidered: 0,
     destinationsCappedByInflowLimit: 0,
+    employmentRefresh: null,
   };
 }
 
@@ -260,6 +273,8 @@ function householdAccount(world: World, popBlockId: Id): FinancialAccount {
 
 interface MigrationBackup {
   readonly finance: ReturnType<typeof cloneFinanceState>;
+  readonly employment: readonly EmploymentAssignment[];
+  readonly employmentDirty: boolean;
   readonly blocks: readonly {
     readonly block: World["popBlocks"][number];
     readonly male: Uint32Array;
@@ -273,6 +288,8 @@ interface MigrationBackup {
 function backupWorld(world: World): MigrationBackup {
   return {
     finance: cloneFinanceState(world.finance),
+    employment: world.employment.map((assignment) => ({ ...assignment })),
+    employmentDirty: world.employmentDirty,
     blocks: world.popBlocks.map((block) => ({
       block,
       male: block.maleByAge.slice(),
@@ -286,6 +303,8 @@ function backupWorld(world: World): MigrationBackup {
 
 function restoreWorld(world: World, backup: MigrationBackup): void {
   world.finance = backup.finance;
+  world.employment = backup.employment.map((assignment) => ({ ...assignment }));
+  world.employmentDirty = backup.employmentDirty;
   for (const entry of backup.blocks) {
     entry.block.maleByAge = entry.male.slice();
     entry.block.femaleByAge = entry.female.slice();
@@ -303,10 +322,14 @@ export interface MigrationRequest {
 }
 
 /**
- * Apply one explicit migration request. This is the internal flow primitive and
- * the testable boundary for invalid or missing destination references. It
- * validates the complete flow before mutation and restores the supplied world if
- * any step fails.
+ * Apply one explicit migration request.
+ *
+ * Public postcondition: on success, population, household cash, and employment
+ * assignments are all consistent with the new working-age population. The
+ * phase forces an employment refresh after moving people and clears
+ * `employmentDirty`. On failure, population cells, finance, employment, and the
+ * dirty marker are restored to their pre-call values before the error is
+ * rethrown. The request does not advance `world.dayIndex`.
  */
 export function applyMigrationRequest(
   world: World,
@@ -380,6 +403,8 @@ export function applyMigrationRequest(
       flows,
       new Map<Id, number>(),
     );
+    world.employmentDirty = true;
+    refreshEmployment(world, definitions, dayIndex, { force: true });
   } catch (error) {
     restoreWorld(world, backup);
     throw error;
@@ -397,8 +422,16 @@ function regionOwnerId(world: World, regionId: Id): Id | null {
 }
 
 /**
- * Run the monthly migration phase. Only the first civil day of a month and only
- * after the scenario start; otherwise returns `ran: false` without mutation.
+ * Run the monthly migration phase.
+ *
+ * Public postcondition: when at least one flow is applied, the phase forces an
+ * employment refresh and clears `employmentDirty`, so the returned world has
+ * assignments valid for the resulting working-age population. `flows`,
+ * population, household cash, and postings are published only after every flow
+ * and the refresh succeed; a failure restores population, finance, employment,
+ * and the dirty marker. Only the first civil day of a month and only after the
+ * scenario start performs flows; otherwise the function returns `ran: false`
+ * without mutation.
  */
 export function runMigrationPhase(
   world: World,
@@ -440,6 +473,7 @@ export function runMigrationPhase(
 
   const backup = backupWorld(world);
   const flows: MigrationFlow[] = [];
+  let employmentRefresh: EmploymentRefreshResult | null = null;
   const inflowByRegion = new Map<Id, number>();
   const standingByRegion = new Map<Id, number>();
   for (const region of world.regions) {
@@ -547,6 +581,10 @@ export function runMigrationPhase(
       for (const [key, value] of computeRegionSignals(world, definitions)) signals.set(key, value);
       if (!blocksById.has(source.id)) throw new RangeError("migration lost its source block");
     }
+    if (flows.length > 0) {
+      world.employmentDirty = true;
+      employmentRefresh = refreshEmployment(world, definitions, dayIndex, { force: true });
+    }
   } catch (error) {
     restoreWorld(world, backup);
     throw error;
@@ -566,6 +604,7 @@ export function runMigrationPhase(
     totalFinancialTransferSUSD,
     sourceBlocksConsidered,
     destinationsCappedByInflowLimit,
+    employmentRefresh,
   };
 }
 

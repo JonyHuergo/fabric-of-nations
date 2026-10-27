@@ -419,9 +419,15 @@ function producerProfit(
 }
 
 /**
- * Settle one or more M3d market-day results against authoritative financial
- * accounts. Market purchases must be fully funded in the aggregate batch; wages
- * and upkeep are paid once per day across every market.
+ * Settle one complete day of market results against authoritative financial
+ * accounts.
+ *
+ * Public postcondition: callers must supply exactly one unsettled result for
+ * every market in the world. Wages and upkeep are once-per-day obligations for
+ * every building, so a partial batch is rejected before any mutation rather than
+ * paying those obligations per market. Market purchases must be fully funded in
+ * the aggregate batch. On success every result is marked settled; on failure the
+ * finance accounts, postings, and posting counter are restored.
  */
 export function settleMarketDays(
   world: World,
@@ -451,6 +457,11 @@ export function settleMarketDays(
       throw new RangeError(`market-day result references unknown market ${String(marketDay.marketId)}`);
     }
   }
+  if (seenMarketIds.size !== world.markets.length) {
+    throw new RangeError(
+      `settlement requires exactly one market-day result for every world market; received ${String(seenMarketIds.size)} of ${String(world.markets.length)}`,
+    );
+  }
   assertValidDayIndex(world.dayIndex);
   if (isTerminalDayIndex(world.dayIndex)) {
     throw new RangeError("settlement cannot run at the terminal boundary");
@@ -462,13 +473,24 @@ export function settleMarketDays(
   return result;
 }
 
-/** Settle one market-day result. Retained for the single-market M3/M4 callers. */
+/**
+ * Settle the single market of a one-market world.
+ *
+ * This convenience wrapper exists for the M3/M4 fixtures. A world with multiple
+ * markets must call `settleMarketDays` with one result for every market, because
+ * wages and upkeep are once-per-day obligations that must not be paid per market.
+ */
 export function settleMarketDay(
   world: World,
   definitions: EconomyDefinitions,
   marketDay: MarketDayResult,
   options: PhaseValidationOptions = {},
 ): MarketSettlementResult {
+  if (world.markets.length !== 1) {
+    throw new RangeError(
+      `settleMarketDay is only valid for a single-market world; this world has ${String(world.markets.length)} markets. Use settleMarketDays with every market-day result`,
+    );
+  }
   return settleMarketDays(world, definitions, [marketDay], options);
 }
 
