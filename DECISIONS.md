@@ -2851,9 +2851,10 @@ content changed.
 
 ## D-070 — Economic Management Overhaul and the E0–E6 roadmap
 
-**Status:** accepted as design and planning direction in GDD v2.6 (E0). **E1–E6 are
-not implemented.** No runtime behavior, schema field, save content, UI control, or
-version change is authorized by this decision. Individual E stages still require an
+**Status:** accepted as design and planning direction in GDD v2.6 (E0). **E1 is
+implemented in GDD v2.7/D-071; E2–E6 are not implemented.** No runtime behavior,
+schema field, save content, UI control, or version change beyond E1's derived snapshot
+contract is authorized by this decision. Individual E stages still require an
 explicit implementation assignment and their own acceptance.
 
 **Why a new program.** The completed M0–M7 implementation gives Century a deep
@@ -2930,6 +2931,79 @@ GDD v2.6 was reviewed against the accepted M0–M7 records for implementation tr
 the current baseline remains schema 16 / simulation 0.16.0 / save format 1 / data
 version `m3-economy-v3`. The full v2.5 document is retained byte-for-byte as
 historical documentation.
+
+## D-071 — E1 economic clarity, confirmed action history, and snapshot protocol 3
+
+**Status:** accepted and implemented. GDD v2.7 §17A.17 records the delivered scope and
+limits. E2–E6 remain unimplemented.
+
+**Why.** The E0 specification identified that the M7 interface presented data without
+helping the player diagnose it, compare choices, or judge whether a policy worked. E1
+was assigned to make existing mechanics understandable, not to add mechanics. The
+implementation therefore adds selectors and bounded presentation data around the
+existing snapshot/finance/action contracts.
+
+**Decisions.**
+
+1. **Overview is the default tab.** The existing Country screen becomes the national
+   economic overview; the other five screens retain their responsibilities and gain
+   definitions/drill-down evidence. This is one primary diagnostic surface, not a set
+   of disconnected screens.
+2. **Supported production is capacity, not realized output.** E1 exposes
+   `productionCapacityByGood` and market capacity derived with
+   `computeBuildingCapacity` (level, condition, staffing, productivity). The UI labels
+   it estimated capacity. The snapshot does not retain last-day production or demand;
+   no such series is fabricated.
+3. **Household purchasing power is represented by stocks/current estimates only.**
+   `householdCashSUSD` is the sum of household-cash account balances; the wage base is
+   current employment × profession base wage ÷ civil-year days. Neither is realized
+   income. Working-age minus employed is explicitly not an unemployment rate.
+4. **Fiscal preview is static current-base arithmetic.** It shows the affected country,
+   estimated daily wage base, current/proposed tax and welfare, daily/monthly deltas,
+   treasury, latest interest, and constraints. It does not forecast behavior, output,
+   employment, or prices, and it does not mutate the snapshot. Only the existing
+   `set-fiscal-policy` action can be sent.
+5. **Monthly reports use closed-period flows and close balances.** The existing
+   `FinancePeriodSummary` window is retained (max 12). Fiscal lines are flows; treasury/
+   debt/household cash are balances only while account detail is retained. Compacted
+   summaries return `null`; no balance change is derived across a compacted gap.
+   Market/production/employment history is absent and labelled, not invented.
+6. **Action history is confirmed, bounded, and session-only.** The provider stages a
+   pending request at send time but appends only on `ACTION_RESULT`, using
+   `event.accepted`, the confirmed snapshot's fiscal values, date, and errors. It is
+   capped at 48, cleared on load/restart, and never persisted into the world/save/hash.
+   This avoids authoritative state and schema changes while satisfying E1's
+   confirmation requirement. Cross-session persistence is deferred.
+7. **Explanations are a small evidence rule set.** Rules cover unmet subsistence/basic
+   needs, household cash/wage pressure, fiscal pressure, and essential-capacity gaps.
+   Each records the observation period, exact fields, a caveat, and a target screen.
+   Correlation is not presented as policy causation; no percentages or long-term
+   predictions are fabricated.
+8. **Snapshot protocol is 3.** The snapshot gained required presentation fields and
+   need metadata. Commands/events and the validated action shape are unchanged. World
+   schema 16, simulation 0.16.0, save format 1, data version `m3-economy-v3`, hashing,
+   serialization, and save compaction are untouched. This is an additive snapshot
+   contract change, not authoritative-world state.
+9. **No new economic mechanics.** E1 does not add tax bases, spending categories,
+   construction queues, subsidies/procurement, labor-law effects, trade/tariffs,
+   banking/credit/inflation/FX, or monetary controls. E2–E6 remain unimplemented.
+
+**Consequences.** The app now depends on protocol 3 snapshot fields; the generated
+worker bundle must be regenerated with the established generator. Tests must cover the
+snapshot contract, monthly flow/balance semantics, compacted summaries, preview
+arithmetic, explanations, bounded history, and rejected actions. Native/device
+verification and historical market series remain open; no calibration changed.
+
+**Open choices.** Action-history persistence across saves, retained monthly market/
+production series, and broader explanation coverage remain deferred. Report retention
+is now concretely 12 monthly summaries plus 48 session actions; later stages may extend
+it only with a bounded design.
+
+**Verification.** See GDD v2.7 §17A.17 and the E1 change report for tests/commands.
+Implementation commit is `90160ce2f9b9570034b37f08f44f767502f790cd`. The implementation
+changes no simulation source, scenario data, save schema, hashing, or version constant;
+only worker protocol/snapshot presentation data, selectors, app/UI, tests, generated
+worker bundle, and documentation changed.
 
 ## Assumptions recorded for future review
 

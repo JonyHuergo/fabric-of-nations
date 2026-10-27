@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, E0 economic design
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, E0 design and E1 economic clarity
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -25,7 +25,10 @@ schedule/goal state, shared player/AI fiscal-policy action validation, AI stress
 fixture, and opt-in full-campaign performance report)**, and **M7 (versioned
 simulation worker protocol, immutable snapshot bus, six-screen Expo/React Native
 shell, player fiscal action, pause/step/speed, compressed save/load, and
-web/headless verification)**. Corporate/consumption/land/tariff taxes, broader
+web/headless verification)**. **E1 (Economic Clarity and Monthly Reports)** adds a
+national overview, evidence-based diagnosis, fiscal-policy previews, bounded monthly
+economic reports, and a session-confirmed action history without adding an economic
+mechanic. Corporate/consumption/land/tariff taxes, broader
 government expenditure and services, banking/central banking, dynamic FX,
 inflation, monetary policy, annual close, reopen/reversal, politics, technology,
 diplomacy, and warfare remain unimplemented. **M7's native iOS/Android release
@@ -36,9 +39,10 @@ adopted planned intermediate stages for annual close and controlled corrections
 not implemented (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic design program; **E0 is documentation only in GDD v2.6 §17A**, and E1–E6
-are planned, not implemented. The design authority is the [Century GDD
-v2.6](./Century_GDD_v2.6.md); v2.5 is retained as
+economic program; **E0 is documented and E1 is implemented in GDD v2.7 §17A**, and
+E2–E6 are planned, not implemented. The design authority is the [Century GDD
+v2.7](./Century_GDD_v2.7.md); v2.6 is retained as
+[historical E0 documentation](./Century_GDD_v2.6.md), v2.5 as
 [historical documentation](./Century_GDD_v2.5.md), v2.4 as
 [earlier historical documentation](./Century_GDD_v2.4.md), and v2.3 as
 [earlier historical documentation](./Century_GDD_v2.3.md). Persistent engineering
@@ -580,10 +584,11 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.6 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.7 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). The v2.6
-Economic Management Overhaul (§17A) is design-only for E1–E6; M7a and M8a remain
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). The v2.7
+Economic Management Overhaul (§17A) records E0 design and E1 implementation;
+E2–E6 are planned, and M7a/M8a remain
 planned only. See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
@@ -1136,12 +1141,13 @@ M0–M6 are implemented and accepted; M7's shell/worker implementation is delive
 with an explicit native-release and real-device acceptance exception. The designer
 has adopted intermediate finance stages (recorded as D-050) for work that earlier
 revisions left unassigned, and the **Economic Management Overhaul (E0–E6)** as the
-player-facing economic program (D-070). **E0 is documentation only; E1–E6 and
-M7a/M8a remain planned and not implemented**: no runtime behavior, schema field, save
-version, benchmark gate, or UI support exists for them yet. They preserve the
-existing M0–M10 milestone identities and do not change
-M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the simulation
-schema.
+player-facing economic program (D-070). **E0 and E1 are implemented; E2–E6 and
+M7a/M8a remain planned and not implemented.** E1 is presentation/selectors, a
+bounded monthly report, and session-confirmed action history; it adds no new
+economic mechanic, schema field, save version, or benchmark gate. The later stages
+preserve existing M0–M10 milestone identities and do not change
+M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the
+simulation schema.
 
 Finance/engineering order:
 
@@ -1155,8 +1161,8 @@ Combined planning order with the player-facing economic program:
 |---|---|---|---|
 | **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Accepted |
 | **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Accepted |
-| **E0** | Design now | Economic Management policy framework, dependencies, authority boundaries, accounting/persistence implications, UI information architecture, acceptance criteria, E0–E6 sequence, and exclusions (GDD v2.6 §17A) | Documented; no code |
-| **E1** | After M7 | Economic clarity/dashboard, supported causal explanations, pre-commitment explanations, bounded monthly economic report/action history, focused improvements to the six M7 screens | Planned |
+| **E0** | Design now | Economic Management policy framework, dependencies, authority boundaries, accounting/persistence implications, UI information architecture, acceptance criteria, E0–E6 sequence, and exclusions (GDD v2.6 §17A; preserved in v2.7) | Documented; no simulation code |
+| **E1** | After M7 | Economic clarity/dashboard, supported causal explanations, pre-commitment explanations, bounded monthly economic report/action history, focused improvements to the six M7 screens | **Implemented** (GDD v2.7 §17A.17; D-071) |
 | **E2** | After E1 (M7a recommended first) | Fiscal management: supported tax/spending instruments, budget allocation, reserves, borrowing/repayment/refinancing controls, financing constraints | Planned |
 | **E3** | After E2 | Public investment/construction: project queue, real money/labor/material/time requirements, financing, progress/completion, cancellation/failure, actual assets | Planned |
 | **E4** | After E3 | Industrial/business policy: selected subsidies, procurement, investment incentives, public-enterprise investment, sector programs | Planned |
@@ -1169,7 +1175,7 @@ Combined planning order with the player-facing economic program:
 
 Key boundaries:
 
-- **The playable vertical slice remains M0–M7.** M7a, M8a, and E1–E6 are post-slice
+- **The playable vertical slice remains M0–M7.** M7a, M8a, and E2–E6 are post-slice
   stages and are not prerequisites for the initial playable release. M5–M7 are not
   blocked on the later monetary systems.
 - **M5a depends on M5** for the multi-country foundation and the
@@ -1184,12 +1190,13 @@ Key boundaries:
   institutions and laws; any missing prerequisite (for example a banking/deposit
   system or monetary aggregate) must be recorded rather than hidden. In v2.6 its
   scope is retained as E6b.
-- **E0 is design only.** No E1–E6 lever, report, construction queue, trade rule, or
-  monetary control is implemented or claimed. E1 must not add major new mechanics;
-  every later lever has an explicit dependency or remains unimplemented.
+- **E0 is design; E1 is implemented.** E1 adds no E2–E6 lever, construction queue,
+  trade rule, or monetary control. Every later lever still has an explicit
+  dependency or remains unimplemented. E1's snapshot additions are derived
+  presentation data; world schema, save format, and simulation rules are unchanged.
 - The full planned scope, acceptance boundaries, and dependency rationale are in
-  GDD v2.6 §17A and §17.5. This section is a repository summary, not a claim of
-  current support.
+  GDD v2.7 §17A and §17.5. This section is a repository summary, not a claim of
+  current support beyond E1.
 
 ## Data and calibration
 
@@ -2001,7 +2008,8 @@ No simulation schema/version change **at the M7 baseline**. World schema was
 **Superseded by the post-M7 remediation (D-062/D-063, D-065, D-066):** schema
 **16**, simulation **0.16.0**, data version `m3-economy-v3`, save format still
 **1**.
-Worker protocol version **2** is independent of the save schema. The app's gzip storage wrapper preserves the
+Worker protocol version **2** at M7 completion (now **3** after E1's additive snapshot
+fields) is independent of the save schema. The app's gzip storage wrapper preserves the
 canonical save string and therefore its checksum, hash, validation, and
 compatibility. Older incompatible simulation saves still reject.
 
@@ -3009,12 +3017,12 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
-## Economic Management Overhaul — E0 design record
+## Economic Management Overhaul — E0 design and E1 implementation
 
-GDD v2.6 adds the **Economic Management Overhaul** as a first-class design program
-(GDD §17A; D-070). **E0 is documentation only.** E1–E6 are planned and not
-implemented; no gameplay code, scenario data, save schema, generated artifact, app
-behavior, or version constant changed in this revision.
+GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
+(GDD §17A; D-070). **E0 is documentation/design; E1 is implemented in GDD v2.7.**
+E2–E6 are planned and not implemented; no E2–E6 mechanic, scenario data, save schema,
+or authoritative world change exists.
 
 The overhaul's central goal is that the player governs a country's economy through
 consequential policy choices, public spending, investment, and institution-building:
@@ -3045,14 +3053,57 @@ adapt. The specification covers:
 - **Acceptance:** overall player questions, strategy divergence, per-stage testable
   criteria, and concrete usability tasks.
 
-The complete specification is in [GDD v2.6 §17A](./Century_GDD_v2.6.md); the
-change report is [GDD_V2.6_CHANGE_REPORT.md](./GDD_V2.6_CHANGE_REPORT.md), and the
-planning decision is D-070 in [DECISIONS.md](./DECISIONS.md). E0 resolves no
-unimplemented mechanism: construction accounting/materials, land/property, trade
-counterparties, banking/credit, inflation measurement, health/pensions/bargaining,
-sector classification, action expansion, GDP definitions, report retention, and
-save/schema migration remain open (GDD §17A.16). CEN-AUDIT-016 sovereignty remains
-unresolved.
+The complete E0 specification is preserved in [GDD v2.7 §17A](./Century_GDD_v2.7.md);
+GDD v2.6 remains as [historical E0 documentation](./Century_GDD_v2.6.md). The E0
+change report is [GDD_V2.6_CHANGE_REPORT.md](./GDD_V2.6_CHANGE_REPORT.md), the E1
+change report is [GDD_V2.7_CHANGE_REPORT.md](./GDD_V2.7_CHANGE_REPORT.md), and the
+planning decision is D-070 with the E1 implementation decision D-071 in
+[DECISIONS.md](./DECISIONS.md). E1 resolves report retention for its scope (12
+monthly summaries plus 48 session actions); the other E0 questions remain open:
+construction accounting/materials, land/property, trade counterparties, banking/credit,
+inflation measurement, health/pensions/bargaining, sector classification, action
+expansion, GDP definitions, and save/schema migration (GDD §17A.16). CEN-AUDIT-016
+sovereignty remains unresolved.
+
+### E1 — delivered economic clarity and monthly reports
+
+E1 turns the six M7 screens into a coherent diagnostic interface without adding an
+economic mechanic:
+
+- **Overview is the default tab.** It identifies the player/AI country and shows
+  population, working-age, employed, hardship, treasury, and debt with stock labels;
+  evidence-based problems; estimated production capacity by good; current essential-goods
+  stock/prices/capacity; the latest closed fiscal month; and where to investigate.
+- **Explanations are evidence-based.** A small rule set covers unmet subsistence/basic
+  needs, household cash/wage-base pressure, fiscal pressure, and essential-goods capacity
+  gaps. Each states the observation, supporting snapshot fields, caveats, and the
+  screen to inspect. No causal percentages or forecasts are fabricated.
+- **Budget previews the existing fiscal action.** It shows the affected country, current
+  estimated wage base, current/proposed tax and welfare, daily/monthly static deltas,
+  treasury, latest interest, and constraints. The preview is pure and does not mutate
+  authoritative state; only `set-fiscal-policy` is sent.
+- **Ledger has a monthly report and confirmed action history.** Fiscal flows are closed
+  period totals; treasury/debt/household-cash are end-of-close balances where the
+  detailed window retains them. Compacted months show flows without invented balances.
+  Actions are appended only from authoritative `ACTION_RESULT` replies, bounded to 48,
+  and session-only (cleared on load/restart).
+- **Population/Markets/Map** add definitions and evidence: working-age-not-employed is
+  explicitly not unemployment; market capacity is a flow and stock is a balance; historical
+  market/demand series are absent and labelled as such.
+
+E1 uses snapshot fields derived from existing population, building, market, finance, and
+need definitions. Worker protocol is **3** because the snapshot contract gained required
+presentation fields; world schema **16**, simulation **0.16.0**, save format **1**, and
+data version **`m3-economy-v3`** are unchanged. No authoritative state, hash, save content,
+or simulation rule changed.
+
+Tests: `e1-economic-clarity.test.ts` covers snapshot/protocol validation, production/wage/
+need fields, monthly flow-versus-balance semantics, compacted-summary no-fabrication,
+fiscal preview arithmetic, evidence/caveat explanations, bounded action history, and a
+rejected action remaining rejected. `e1-ui-wiring.test.ts` covers the Overview default,
+screen wiring, preview/report/action-history surfaces, and forbidden headline claims.
+Implementation commit: `90160ce2f9b9570034b37f08f44f767502f790cd`. See the completion
+report for exact commands and results.
 
 ## Development workflow
 

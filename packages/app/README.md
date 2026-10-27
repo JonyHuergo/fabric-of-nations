@@ -1,23 +1,31 @@
 # @century/app
 
-Century's M7 Expo / React Native playable shell.
+Century's M7 Expo / React Native playable shell, updated for E1 economic clarity.
 
 ## Screens
 
-1. **Map** — stylized 4×4 vector-grid prototype of the 16 authored regions, with
-   country colors and selection. The 500-region production map and pan/zoom are
-   not implemented.
-2. **Country** — population, working-age population, employment, literacy, wealth,
-   militancy, hardship, treasury, debt, and fiscal policy.
-3. **Budget** — treasury, income tax, welfare, latest net fiscal result, a compact
-   net-fiscal history, and the `set-fiscal-policy` action.
-4. **Population** — country population/employment aggregates and needs counters.
-5. **Markets** — each authored market's goods, prices, and stock.
-6. **Ledger** — immutable monthly country fiscal lines, world gross flows, and
-   bounded diagnostics.
+1. **Overview** (default) — player/AI identity, population/working-age/employment/
+   hardship, treasury/debt, evidence-based problems, estimated production capacity,
+   essential-goods stock/prices/capacity, latest closed month, and drill-down guidance.
+2. **Map** — stylized 4×4 vector-grid prototype of the 16 authored regions, with
+   country colors, player marker, selection, and a compact current summary. The
+   500-region production map and pan/zoom are not implemented.
+3. **Budget** — treasury, income tax, welfare, latest result, compact net-fiscal history,
+   the `set-fiscal-policy` action, and a pure pre-commitment preview (current estimated
+   wage base, tax/welfare deltas, constraints).
+4. **Population** — country population/employment aggregates, household cash, estimated
+   daily wage base, and needs counters. Working-age minus employed is explicitly not an
+   unemployment rate.
+5. **Markets** — each authored market's goods, prices, stock, and estimated daily
+   production capacity; essential goods are marked.
+6. **Ledger** — immutable monthly country fiscal flows and close balances, monthly
+   economic report, confirmed session action history, world gross flows, and bounded
+   diagnostics.
 
 Controls: start/pause, step one day, speeds 1/2/5/10 simulated days per second,
-save, and load. Actions are sent only through the versioned worker protocol.
+save, and load. Actions are sent only through the versioned worker protocol. Action
+history is appended only from authoritative `ACTION_RESULT` replies and is bounded to
+48 session entries; it is cleared on load or worker restart.
 
 ## Architecture
 
