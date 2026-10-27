@@ -2664,6 +2664,104 @@ save/load continuation through a monthly close, direct month-end `runEconomicDay
 validation, and debt-phase staged/default hash equivalence with interest and coupon
 payment.
 
+## D-068 — Public migration/settlement postconditions and integrated evidence
+
+**Status:** implemented in Batch 6. Addresses CEN-AUDIT-017 (phase APIs that could
+publish invalid or double-settled state outside the integrated day) and
+CEN-AUDIT-012 (weak assertions and missing integrated accounting evidence). No
+simulation formula, coefficient, calibration constant, schema, save format, data
+version, worker protocol, debt policy, or player-country behavior changes.
+
+**Migration contract.** Moving people can reduce a source block's eligible workforce
+below its existing assignments; `assertValidWorld` checks structural assignment
+references but does not enforce the eligible-workforce cap. Previously the integrated
+day repaired this externally, while direct `runMigrationPhase` and
+`applyMigrationRequest` calls left `employmentDirty = false` with possibly invalid
+assignments.
+
+- `applyMigrationRequest` and `runMigrationPhase` now own the repair: after at least
+  one flow they set `employmentDirty = true` and force `refreshEmployment`. On success
+  the assignments are valid, the dirty marker is false, and
+  `MigrationDayResult.employmentRefresh` exposes the transient refresh summary.
+- The integrated day uses `migration.employmentRefresh` and no longer repeats the
+  repair, so the tick path performs exactly one post-migration refresh.
+- The phase backup now includes the employment array and dirty marker. A failure in a
+  flow or in the refresh restores population cells, finance/postings, employment, and
+  the dirty marker before rethrowing. `applyMigrationRequest` still does not advance
+  `world.dayIndex`.
+- No flow on a non-month-start day leaves state untouched and returns
+  `employmentRefresh: null`.
+
+**Settlement contract.** Wages and upkeep are once-per-day obligations for every
+building, not per-market obligations. `settleMarketDays` previously settled every
+building's wages/upkeep regardless of which market results were supplied, so two
+single-market calls on a multi-market world would pay twice. The public contract is
+now explicit:
+
+- `settleMarketDays` requires exactly one unsettled result for **every** market in the
+  world. Duplicate, foreign, stale, or partial batches reject before any mutation.
+- `settleMarketDay` is restricted to worlds with exactly one market; multi-market
+  callers must pass the complete batch.
+- Success marks every result settled. Failure still restores account balances,
+  postings, and the next-posting counter; no settlement result is marked settled.
+- The integrated day already supplied every market result and keeps its behavior.
+
+**Test-quality corrections.** `CEN-AUDIT-012` items were fixed at their source rather
+than mechanically rewriting the suite:
+
+- The vacuous `stockLots.length >= 0` assertion was replaced by an actual cross-region
+  transaction check against settlement results.
+- The M5 world migration tests ran 31 ticks, ending at day 31 without processing the
+  February migration. They now process day 31 and assert the migration result,
+  population identity, designated-cash conservation, and employment validity.
+- The `cloneWorld` isolation test now asserts that the clone changed exactly where it
+  was mutated and that the source serialization is unchanged.
+- The period-close equity test now asserts exact restoration to the original equity
+  after closing the injected shift instead of a nonnegative bound.
+- Debt tests now assert exact issuance, coupon, maturity repayment, refinancing, and
+  default amounts (including written-off interest), plus the accounting identity.
+  Bounded contract-history behavior remains covered by `m5b-debt-bounded.test.ts`.
+- The century demography test now accumulates every birth and death and asserts
+  `end = start + births - deaths` instead of only `end > start`.
+- The labor test relies on the new migration postcondition instead of manually
+  refreshing employment after an explicit request.
+
+**Integrated evidence.** `batch6-integration.test.ts` runs the shipped eight-polity
+sample for 34 ticks from day 28 to day 62, covering the January close (day 30), the
+February migration (day 31), the February close (day 58), and the March migration
+(day 59). An explicit 100,000 SUSD debt contract is active throughout. Every tick
+asserts population conservation (`end = start + births - deaths`), global designated
+cash invariance, the accounting identity, one wage/upkeep settlement per building, and
+employment validity. The test also asserts close ordering, contiguous summaries,
+issuer liability/creditor bond reconciliation, accrued-interest two-sided
+reconciliation, bounded contract/history counts, and save/load continuation from day
+40 to day 62 with an identical state hash. The money model has no creation or
+destruction: debt principal, coupons, taxes, welfare, wages, upkeep, purchases, and
+migration transfers are all account-to-account movements.
+
+**Preserved Batch 5 behavior.** The pinned 22-tick hash
+`914a75412ed40483` is unchanged and the validation-count tests still pass. A fresh
+42-tick run (which crosses the day-30 close and the day-31 migration) produced
+`01a981deb85422a4`, exactly the hash recorded for the same workload under Batch 5.
+Moving the employment repair into the migration phase therefore changes API
+postconditions, not simulation outcomes. The standard benchmark's M5 tick hash
+remains `5b01b64ad8829490`; its isolated migration-phase fingerprint changed from
+`eb031b91b6096a3b` to `8e348ae368bb5bd5` because the timed phase now includes its
+required employment refresh, so that component timing is no longer comparable to
+Batch 5.
+
+**Versioning.** No schema, save-format, data, or simulation version change is
+required. Public behavior changes are limited to the migration postcondition,
+`MigrationDayResult.employmentRefresh`, and settlement batch coverage.
+
+**Tests.** New/updated: `batch6-integration.test.ts`; `m5-migration.test.ts` direct
+phase/request postconditions and failure restoration; `m5-market.test.ts` complete
+batch enforcement, once-per-building settlement, and failed-settlement rollback;
+`m5-world.test.ts` actual migration tick and hash-changing month run; `m5-labor.test.ts`
+postcondition use; `m3f-day.test.ts` clone mutation/isolation; `m4b-period-close.test.ts`
+exact equity restoration; `m2-demography.test.ts` exact century identity; and
+`m5b-debt.test.ts` exact accounting effects and identity.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

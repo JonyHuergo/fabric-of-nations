@@ -2700,6 +2700,138 @@ Implementation commit: `ccc74bde00b894fa36acdfbcfef556c806b53bad`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
+## Post-M7 remediation batch 6 — public phase contracts and integrated economic evidence
+
+**Scope.** D-068 addresses `CEN-AUDIT-017` (migration and settlement phase APIs that
+could leave invalid state or double-pay wages/upkeep outside the integrated day) and
+`CEN-AUDIT-012` (weak assertions and missing integrated multi-country accounting,
+debt, and save/resume evidence). It changes no economic formula, coefficient,
+calibration constant, scenario, schema, save format, data version, worker protocol,
+debt policy, player-country behavior, or speed control.
+
+### Confirmed findings and root causes
+
+- **Migration.** Moving people can reduce a source block's eligible workforce below
+  its existing assignment count. Whole-world validation checks assignment references
+  and job slots but does not enforce the eligible-workforce cap; the integrated day
+  repaired this externally, while direct `runMigrationPhase` and
+  `applyMigrationRequest` calls returned `employmentDirty = false` with invalid
+  assignments. A failed explicit request also did not restore employment state.
+- **Settlement.** `settleMarketDays` paid wages and upkeep for **every** building
+  regardless of which market results were supplied. A caller settling two markets one
+  at a time therefore paid once per market. The single-market wrapper could be used
+  on a multi-market world.
+- **Test quality.** `m5-market` contained a vacuous `stockLots.length >= 0`; the M5
+  world migration tests ran 31 ticks, ending at day 31 without ever processing the
+  February migration; a clone-isolation test asserted only the untouched source; the
+  period-close equity test used a nonnegative bound; several debt tests asserted
+  bounds or returned values rather than exact accounting effects; and the century
+  demography test proved only that the end total was positive.
+
+### Public contracts after the fix
+
+**Migration.** `runMigrationPhase` and `applyMigrationRequest` now own their
+post-flow repair. When at least one flow is applied they set `employmentDirty` and
+force `refreshEmployment`; on success assignments are valid for the new working-age
+population and the dirty marker is false. `MigrationDayResult.employmentRefresh`
+exposes the transient refresh summary. On failure, population cells, finance and
+postings, employment assignments, and the dirty marker are restored. The integrated
+day consumes `migration.employmentRefresh` and performs no second repair. A
+non-month-start phase call remains a no-op with `employmentRefresh: null`.
+
+**Settlement.** `settleMarketDays` requires exactly one unsettled result for every
+market in the world; duplicate, foreign, stale, or partial batches reject before any
+mutation. `settleMarketDay` is restricted to one-market worlds. Success marks every
+result settled; failure restores account balances, postings, and the posting counter
+without marking results settled. The integrated day already supplied the complete
+batch and keeps its behavior.
+
+### Meaningful tests added or corrected
+
+- `batch6-integration.test.ts` (new): bounded eight-polity run across two month-end
+  closes, two migration dates, active public debt, and save/load continuation.
+- Migration: direct phase and explicit-request tests assert employment validity,
+  population conservation, cash conservation, unchanged day index, and
+  failure restoration of assignments and the dirty marker. The labor test now relies
+  on the postcondition instead of manually refreshing.
+- Settlement: complete-batch enforcement, single-market restriction, one wage/upkeep
+  settlement per building, duplicate rejection, and failed-settlement rollback.
+- The vacuous stock-lot assertion was replaced by an actual cross-region transaction
+  check. The 31-tick migration tests now process day 31 and assert the migration
+  result, population identity, and cash conservation.
+- Clone isolation now asserts the clone changed exactly where mutated and the source
+  serialization is unchanged. The period-close test asserts exact equity restoration.
+- Debt tests assert exact issuance, coupon, maturity repayment, refinancing, and
+  default amounts (including written-off interest) and the accounting identity.
+- The century demography test now accumulates every birth and death and asserts
+  `end = start + births - deaths`.
+
+### Integrated evidence
+
+The new integration test starts at day 28 on the shipped eight-polity sample (8
+countries, 16 regions, 5 markets, 113 buildings), issues an explicit 100,000 SUSD
+public-debt contract, and processes days 28–61. It covers the January close (day 30),
+February migration (day 31), February close (day 58), and March migration (day 59).
+Every tick asserts population conservation, global designated-cash invariance, the
+finance accounting identity, exactly one wage/upkeep entry per building, market
+ordering, and employment validity. It also checks close ordering, contiguous
+summaries, issuer liability/creditor bond and accrued-interest reconciliation, bounded
+contract/history counts, and save/load continuation from day 40 to day 62 with an
+identical state hash. The money model has no creation or destruction: debt
+principal, coupons, taxes, welfare, wages, upkeep, purchases, and migration transfers
+are account-to-account movements. Contract-history compaction is not exercised by
+this one-to-two-contract run; `m5b-debt-bounded.test.ts` retains that coverage.
+
+### Batch 5 preservation
+
+The Batch 5 pinned 22-tick hash `914a75412ed40483` is unchanged, and the validation
+counter still shows two boundary validations per tick plus one per applied AI action.
+A fresh 42-tick run crossing the day-30 close and day-31 migration produced
+`01a981deb85422a4`, exactly the hash recorded for the same workload under Batch 5, so
+moving the employment repair into the migration phase preserves simulation outcomes.
+The standard benchmark's M5 tick hash remains `5b01b64ad8829490`; its isolated
+migration-phase fingerprint changed from `eb031b91b6096a3b` to `8e348ae368bb5bd5`
+because that timed phase now includes its own required employment refresh. This is an
+API postcondition change, not a tick-outcome change. The benchmark's migration-phase
+timing is therefore not comparable to the Batch 5 migration-mutation-only measurement.
+
+### Verification
+
+Commands actually executed:
+
+- `pnpm build` — **PASS**; regenerated worker bundle committed.
+- `pnpm run lint` — **PASS** (136 TypeScript files, 46 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (six workspace packages).
+- `pnpm test` — **PASS: 52 suites, 572 tests**.
+- `pnpm run ci` — **PASS, exit code 0**: lint, typecheck, 572 tests, standard
+  benchmark, and web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+The full 36,524-tick campaign, soak/stress runs, profiler campaign, and native builds
+were not run. The standard bounded benchmark remains part of CI.
+
+### Compatibility and limitations
+
+- No `WORLD_SCHEMA_VERSION`, `SIM_VERSION`, `SAVE_FORMAT_VERSION`, or `dataVersion`
+  change. Save compatibility is unchanged.
+- Public API behavior changes are limited to the migration postcondition,
+  `MigrationDayResult.employmentRefresh`, and settlement batch coverage. A direct
+  migration call now refreshes employment, which is additional work but preserves the
+  integrated tick's outcome.
+- `settleMarketDay` is intentionally narrower; multi-market callers must use
+  `settleMarketDays`.
+- No native/device or mobile measurement exists. The GDD mobile target remains **NOT
+  EVALUATED**.
+- The 42-tick hash equivalence is evidence for the eight-polity fixture at that
+  horizon, not a full-campaign recalibration. No calibration data changed.
+
+### Commits
+
+Implementation commit: `a0ca78086a9df47699d5b3e500cafa0dfec46f51`
+(parent `e13651c76a0013f8bfb2841e5b4aa2eaf18cc71c`). Documentation commit: the
+immediate child containing this section and `DECISIONS.md`. The final HEAD is
+reported in the handoff.
+
 ## Development workflow
 
 1. Read `AGENTS.md` and the relevant GDD milestone.
