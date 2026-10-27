@@ -1,6 +1,6 @@
 {
   "scenarioId": "m2-wpp-1950-validation",
-  "dataVersion": "m3-economy-v1",
+  "dataVersion": "m3-economy-v2",
   "status": "source-backed",
   "startDayIndex": 18262,
   "description": "World population initialized from WPP 2024 1 January 1950 age/sex groups for validating 1975 and 2000 age structure. Not a campaign-start scenario.",

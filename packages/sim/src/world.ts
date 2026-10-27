@@ -98,6 +98,12 @@ export interface World {
   profitDistribution: ProfitDistributionPolicy;
   /** M6 country-AI enable policy; disabled for legacy fixtures. */
   countryAI: CountryAIPolicy;
+  /**
+   * Post-M7 designated player country. Null for legacy fixtures and for worlds
+   * with no player-control designation. The AI skips fiscal decisions for this
+   * country; player actions still use the shared validator/application path.
+   */
+  playerCountryId: Id | null;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -175,6 +181,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       stateRemittanceRate: 1,
     },
     countryAI: { enabled: false },
+    playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -229,6 +236,14 @@ export function assertValidWorld(
   assertValidProfitDistributionPolicy(world.profitDistribution, "world.profitDistribution");
   assertValidCountryAIPolicy(world.countryAI, "world.countryAI");
   assertValidCountryAIStates(world.countries);
+  if (world.playerCountryId !== null) {
+    const playerCountryId = requireUint32(world.playerCountryId, "world.playerCountryId");
+    if (!world.countries.some((country) => country.id === playerCountryId)) {
+      throw new RangeError(
+        `world.playerCountryId ${String(playerCountryId)} is not a registered country`,
+      );
+    }
+  }
 
   const diagnostics = requireRecord(world.diagnostics, "world.diagnostics");
   requireInteger(

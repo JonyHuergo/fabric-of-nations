@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v1",
+    "dataVersion": "m3-economy-v2",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3194,7 +3194,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v1",
+      "dataVersion": "m3-economy-v2",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -3203,11 +3203,11 @@ export const M5_SCENARIO = ({
           "items": [
             {
               "goodKey": "grain",
-              "quantityPerCapitaPerDay": 0.9
+              "quantityPerCapitaPerDay": 0.527
             },
             {
               "goodKey": "food-products",
-              "quantityPerCapitaPerDay": 0.08
+              "quantityPerCapitaPerDay": 0.03
             },
             {
               "goodKey": "fish",
@@ -6085,7 +6085,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v1",
+    "dataVersion": "m3-economy-v2",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6093,7 +6093,7 @@ export const M5_SCENARIO = ({
         "key": "grain",
         "name": "Grain",
         "category": "food",
-        "basePrice1900SUSD": 0.05,
+        "basePrice1900SUSD": 0.25,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6104,7 +6104,7 @@ export const M5_SCENARIO = ({
         "key": "livestock",
         "name": "Livestock",
         "category": "food",
-        "basePrice1900SUSD": 0.2,
+        "basePrice1900SUSD": 0.5,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6115,7 +6115,7 @@ export const M5_SCENARIO = ({
         "key": "fish",
         "name": "Fish",
         "category": "food",
-        "basePrice1900SUSD": 0.1,
+        "basePrice1900SUSD": 0.5,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6148,7 +6148,7 @@ export const M5_SCENARIO = ({
         "key": "textiles",
         "name": "Textiles",
         "category": "industrial",
-        "basePrice1900SUSD": 1,
+        "basePrice1900SUSD": 2.8,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6159,7 +6159,7 @@ export const M5_SCENARIO = ({
         "key": "clothing",
         "name": "Clothing",
         "category": "industrial",
-        "basePrice1900SUSD": 1,
+        "basePrice1900SUSD": 4,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6170,7 +6170,7 @@ export const M5_SCENARIO = ({
         "key": "food-products",
         "name": "Food Products",
         "category": "food",
-        "basePrice1900SUSD": 0.1,
+        "basePrice1900SUSD": 1,
         "transportCostPerUnit": 0,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
@@ -6183,10 +6183,10 @@ export const M5_SCENARIO = ({
         "key": "peasants",
         "name": "Peasants",
         "stratum": "lower",
-        "participationRate": 0.45,
+        "participationRate": 0.6,
         "qualificationLiteracy": 0,
         "qualificationWealthLevel": 0,
-        "baseWage1900SUSDPerYear": 180,
+        "baseWage1900SUSDPerYear": 60,
         "trainingCostSUSD": 0,
         "laborProductivityModifier": 1
       },
@@ -6195,10 +6195,10 @@ export const M5_SCENARIO = ({
         "key": "laborers",
         "name": "Laborers",
         "stratum": "lower",
-        "participationRate": 0.5,
+        "participationRate": 0.4,
         "qualificationLiteracy": 0.1,
         "qualificationWealthLevel": 0,
-        "baseWage1900SUSDPerYear": 250,
+        "baseWage1900SUSDPerYear": 130,
         "trainingCostSUSD": 0,
         "laborProductivityModifier": 1
       },
@@ -6210,7 +6210,7 @@ export const M5_SCENARIO = ({
         "participationRate": 0.55,
         "qualificationLiteracy": 0.7,
         "qualificationWealthLevel": 20,
-        "baseWage1900SUSDPerYear": 450,
+        "baseWage1900SUSDPerYear": 250,
         "trainingCostSUSD": 0,
         "laborProductivityModifier": 1.1
       },
@@ -6243,7 +6243,7 @@ export const M5_SCENARIO = ({
         "jobs": [
           {
             "professionId": 0,
-            "workersPerThroughputUnit": 50000
+            "workersPerThroughputUnit": 25000
           }
         ],
         "constructionCostSUSD": 1000,
@@ -6297,17 +6297,17 @@ export const M5_SCENARIO = ({
         "outputs": [
           {
             "goodId": 1,
-            "quantityPerThroughputUnit": 15000
+            "quantityPerThroughputUnit": 60000
           },
           {
             "goodId": 4,
-            "quantityPerThroughputUnit": 2000
+            "quantityPerThroughputUnit": 8000
           }
         ],
         "jobs": [
           {
-            "professionId": 1,
-            "workersPerThroughputUnit": 30000
+            "professionId": 0,
+            "workersPerThroughputUnit": 15000
           }
         ],
         "constructionCostSUSD": 1500,
@@ -6329,13 +6329,13 @@ export const M5_SCENARIO = ({
         "outputs": [
           {
             "goodId": 2,
-            "quantityPerThroughputUnit": 20000
+            "quantityPerThroughputUnit": 60000
           }
         ],
         "jobs": [
           {
-            "professionId": 1,
-            "workersPerThroughputUnit": 25000
+            "professionId": 0,
+            "workersPerThroughputUnit": 12500
           }
         ],
         "constructionCostSUSD": 1200,
@@ -6356,13 +6356,13 @@ export const M5_SCENARIO = ({
         "inputs": [
           {
             "goodId": 0,
-            "quantityPerThroughputUnit": 120000
+            "quantityPerThroughputUnit": 126000
           }
         ],
         "outputs": [
           {
             "goodId": 7,
-            "quantityPerThroughputUnit": 15000
+            "quantityPerThroughputUnit": 63000
           }
         ],
         "jobs": [
@@ -6399,7 +6399,7 @@ export const M5_SCENARIO = ({
         "outputs": [
           {
             "goodId": 5,
-            "quantityPerThroughputUnit": 6000
+            "quantityPerThroughputUnit": 16600
           }
         ],
         "jobs": [
@@ -6426,13 +6426,13 @@ export const M5_SCENARIO = ({
         "inputs": [
           {
             "goodId": 5,
-            "quantityPerThroughputUnit": 5000
+            "quantityPerThroughputUnit": 13000
           }
         ],
         "outputs": [
           {
             "goodId": 6,
-            "quantityPerThroughputUnit": 3000
+            "quantityPerThroughputUnit": 26000
           }
         ],
         "jobs": [
@@ -6505,6 +6505,75 @@ export const M5_SCENARIO = ({
           "private"
         ],
         "isEssentialInfrastructure": true
+      },
+      {
+        "id": 8,
+        "key": "commercial-farm-peasant",
+        "name": "Peasant Commercial Farm",
+        "referenceThroughputPerDayAtLevelOne": 1,
+        "inputs": [],
+        "outputs": [
+          {
+            "goodId": 0,
+            "quantityPerThroughputUnit": 250000
+          },
+          {
+            "goodId": 3,
+            "quantityPerThroughputUnit": 10000
+          }
+        ],
+        "jobs": [
+          {
+            "professionId": 0,
+            "workersPerThroughputUnit": 40000
+          }
+        ],
+        "constructionCostSUSD": 2000,
+        "dailyUpkeepSUSDAtLevelOne": 40,
+        "storageCapacityByGood": [],
+        "resourceRequirements": [],
+        "requiredTechnologyId": null,
+        "ownershipAllowed": [
+          "private"
+        ],
+        "isEssentialInfrastructure": false
+      },
+      {
+        "id": 9,
+        "key": "workshop-peasant",
+        "name": "Peasant Workshop",
+        "referenceThroughputPerDayAtLevelOne": 1,
+        "inputs": [
+          {
+            "goodId": 5,
+            "quantityPerThroughputUnit": 13000
+          }
+        ],
+        "outputs": [
+          {
+            "goodId": 6,
+            "quantityPerThroughputUnit": 26000
+          }
+        ],
+        "jobs": [
+          {
+            "professionId": 2,
+            "workersPerThroughputUnit": 5000
+          },
+          {
+            "professionId": 0,
+            "workersPerThroughputUnit": 10000
+          }
+        ],
+        "constructionCostSUSD": 2500,
+        "dailyUpkeepSUSDAtLevelOne": 40,
+        "storageCapacityByGood": [],
+        "resourceRequirements": [],
+        "requiredTechnologyId": null,
+        "ownershipAllowed": [
+          "private"
+        ],
+        "isEssentialInfrastructure": false
       }
     ]
   },
@@ -6513,88 +6582,88 @@ export const M5_SCENARIO = ({
       "id": 0,
       "definitionId": 1,
       "regionId": 0,
-      "level": 43,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1003,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100000,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 1,
-      "definitionId": 4,
+      "definitionId": 3,
       "regionId": 0,
-      "level": 40,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1002,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100001,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 2,
-      "definitionId": 0,
-      "regionId": 0,
-      "level": 70,
+      "level": 21,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1003,
       "builtOnDay": 0,
       "operational": true,
+      "operatingCashAccountId": 100001,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 2,
+      "definitionId": 4,
+      "regionId": 0,
+      "level": 20,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1001,
+      "builtOnDay": 0,
+      "operational": true,
       "operatingCashAccountId": 100002,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 3,
-      "definitionId": 5,
+      "definitionId": 2,
       "regionId": 0,
-      "level": 60,
+      "level": 21,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1002,
+      "ownerAccountId": 1003,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100003,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 4,
-      "definitionId": 7,
+      "definitionId": 0,
       "regionId": 0,
-      "level": 100,
+      "level": 137,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1003,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100004,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 5,
-      "definitionId": 6,
+      "definitionId": 5,
       "regionId": 0,
-      "level": 60,
+      "level": 31,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1002,
+      "ownerAccountId": 1001,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100005,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 6,
-      "definitionId": 1,
-      "regionId": 1,
-      "level": 35,
+      "definitionId": 7,
+      "regionId": 0,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1003,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100006,
@@ -6602,90 +6671,90 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 7,
-      "definitionId": 4,
-      "regionId": 1,
-      "level": 20,
+      "definitionId": 6,
+      "regionId": 0,
+      "level": 29,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1006,
+      "ownerAccountId": 1001,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100007,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 8,
-      "definitionId": 0,
+      "definitionId": 1,
       "regionId": 1,
-      "level": 57,
+      "level": 14,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100008,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 9,
-      "definitionId": 7,
+      "definitionId": 3,
       "regionId": 1,
-      "level": 100,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100009,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 10,
-      "definitionId": 1,
-      "regionId": 2,
-      "level": 51,
+      "definitionId": 4,
+      "regionId": 1,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1005,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100010,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 11,
-      "definitionId": 4,
-      "regionId": 2,
-      "level": 50,
+      "definitionId": 2,
+      "regionId": 1,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1010,
+      "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100011,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 12,
       "definitionId": 0,
-      "regionId": 2,
-      "level": 20,
+      "regionId": 1,
+      "level": 112,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100012,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 13,
-      "definitionId": 5,
-      "regionId": 2,
-      "level": 80,
+      "definitionId": 7,
+      "regionId": 1,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1010,
+      "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100013,
@@ -6693,6 +6762,84 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 14,
+      "definitionId": 1,
+      "regionId": 2,
+      "level": 15,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1011,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100014,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 15,
+      "definitionId": 3,
+      "regionId": 2,
+      "level": 19,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1011,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100015,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 16,
+      "definitionId": 4,
+      "regionId": 2,
+      "level": 18,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1009,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100016,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 17,
+      "definitionId": 2,
+      "regionId": 2,
+      "level": 19,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1011,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100017,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 18,
+      "definitionId": 0,
+      "regionId": 2,
+      "level": 122,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1011,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100018,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 19,
+      "definitionId": 5,
+      "regionId": 2,
+      "level": 27,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1009,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100019,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 20,
       "definitionId": 7,
       "regionId": 2,
       "level": 100,
@@ -6701,51 +6848,38 @@ export const M5_SCENARIO = ({
       "ownerAccountId": 1011,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100014,
+      "operatingCashAccountId": 100020,
       "initialOperatingCashSUSD": 50000
     },
     {
-      "id": 15,
+      "id": 21,
       "definitionId": 6,
       "regionId": 2,
-      "level": 70,
+      "level": 26,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1010,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100015,
-      "initialOperatingCashSUSD": 50000
+      "operatingCashAccountId": 100021,
+      "initialOperatingCashSUSD": 3000000
     },
     {
-      "id": 16,
+      "id": 22,
       "definitionId": 1,
       "regionId": 3,
-      "level": 6,
+      "level": 1,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1015,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100016,
-      "initialOperatingCashSUSD": 50000
+      "operatingCashAccountId": 100022,
+      "initialOperatingCashSUSD": 200000
     },
     {
-      "id": 17,
-      "definitionId": 4,
-      "regionId": 3,
-      "level": 5,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1014,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100017,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 18,
-      "definitionId": 0,
+      "id": 23,
+      "definitionId": 3,
       "regionId": 3,
       "level": 2,
       "condition": 1,
@@ -6753,11 +6887,50 @@ export const M5_SCENARIO = ({
       "ownerAccountId": 1015,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100018,
-      "initialOperatingCashSUSD": 20000
+      "operatingCashAccountId": 100023,
+      "initialOperatingCashSUSD": 200000
     },
     {
-      "id": 19,
+      "id": 24,
+      "definitionId": 4,
+      "regionId": 3,
+      "level": 2,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1013,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100024,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 25,
+      "definitionId": 2,
+      "regionId": 3,
+      "level": 2,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1015,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100025,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 26,
+      "definitionId": 0,
+      "regionId": 3,
+      "level": 13,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1015,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100026,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 27,
       "definitionId": 7,
       "regionId": 3,
       "level": 100,
@@ -6766,199 +6939,95 @@ export const M5_SCENARIO = ({
       "ownerAccountId": 1015,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100019,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 20,
-      "definitionId": 1,
-      "regionId": 4,
-      "level": 37,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1019,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100020,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 21,
-      "definitionId": 4,
-      "regionId": 4,
-      "level": 40,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1018,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100021,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 22,
-      "definitionId": 0,
-      "regionId": 4,
-      "level": 59,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1019,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100022,
-      "initialOperatingCashSUSD": 20000
-    },
-    {
-      "id": 23,
-      "definitionId": 5,
-      "regionId": 4,
-      "level": 50,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1018,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100023,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 24,
-      "definitionId": 7,
-      "regionId": 4,
-      "level": 100,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1019,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100024,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 25,
-      "definitionId": 6,
-      "regionId": 4,
-      "level": 40,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1018,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100025,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 26,
-      "definitionId": 1,
-      "regionId": 5,
-      "level": 25,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1023,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100026,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 27,
-      "definitionId": 4,
-      "regionId": 5,
-      "level": 20,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1022,
-      "builtOnDay": 0,
-      "operational": true,
       "operatingCashAccountId": 100027,
       "initialOperatingCashSUSD": 50000
     },
     {
       "id": 28,
-      "definitionId": 0,
-      "regionId": 5,
-      "level": 39,
+      "definitionId": 1,
+      "regionId": 4,
+      "level": 13,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100028,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 29,
-      "definitionId": 7,
-      "regionId": 5,
-      "level": 100,
+      "definitionId": 3,
+      "regionId": 4,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100029,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 30,
-      "definitionId": 6,
-      "regionId": 5,
-      "level": 10,
+      "definitionId": 4,
+      "regionId": 4,
+      "level": 16,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1022,
+      "ownerAccountId": 1017,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100030,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 31,
-      "definitionId": 1,
-      "regionId": 6,
-      "level": 21,
+      "definitionId": 2,
+      "regionId": 4,
+      "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100031,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 32,
-      "definitionId": 4,
-      "regionId": 6,
-      "level": 30,
+      "definitionId": 0,
+      "regionId": 4,
+      "level": 110,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1026,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100032,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 33,
-      "definitionId": 0,
-      "regionId": 6,
-      "level": 43,
+      "definitionId": 5,
+      "regionId": 4,
+      "level": 28,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1017,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100033,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 34,
-      "definitionId": 5,
-      "regionId": 6,
-      "level": 30,
+      "definitionId": 7,
+      "regionId": 4,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1026,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100034,
@@ -6966,90 +7035,90 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 35,
-      "definitionId": 7,
-      "regionId": 6,
-      "level": 100,
+      "definitionId": 6,
+      "regionId": 4,
+      "level": 19,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1017,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100035,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 36,
-      "definitionId": 6,
-      "regionId": 6,
-      "level": 30,
+      "definitionId": 1,
+      "regionId": 5,
+      "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1026,
+      "ownerAccountId": 1023,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100036,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 37,
-      "definitionId": 1,
-      "regionId": 7,
-      "level": 17,
+      "definitionId": 3,
+      "regionId": 5,
+      "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1023,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100037,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 38,
       "definitionId": 4,
-      "regionId": 7,
-      "level": 15,
+      "regionId": 5,
+      "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1030,
+      "ownerAccountId": 1021,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100038,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 39,
-      "definitionId": 0,
-      "regionId": 7,
-      "level": 35,
+      "definitionId": 2,
+      "regionId": 5,
+      "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1023,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100039,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 40,
-      "definitionId": 7,
-      "regionId": 7,
-      "level": 100,
+      "definitionId": 0,
+      "regionId": 5,
+      "level": 74,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1023,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100040,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 41,
-      "definitionId": 1,
-      "regionId": 8,
-      "level": 25,
+      "definitionId": 7,
+      "regionId": 5,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1023,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100041,
@@ -7057,103 +7126,103 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 42,
-      "definitionId": 4,
-      "regionId": 8,
-      "level": 10,
+      "definitionId": 6,
+      "regionId": 5,
+      "level": 13,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1034,
+      "ownerAccountId": 1021,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100042,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 43,
-      "definitionId": 0,
-      "regionId": 8,
-      "level": 211,
+      "definitionId": 1,
+      "regionId": 6,
+      "level": 8,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100043,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 44,
-      "definitionId": 7,
-      "regionId": 8,
-      "level": 100,
+      "definitionId": 3,
+      "regionId": 6,
+      "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100044,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 45,
-      "definitionId": 1,
-      "regionId": 9,
-      "level": 31,
-      "condition": 1,
-      "ownerKind": "private",
-      "ownerAccountId": 1039,
-      "builtOnDay": 0,
-      "operational": true,
-      "operatingCashAccountId": 100045,
-      "initialOperatingCashSUSD": 50000
-    },
-    {
-      "id": 46,
       "definitionId": 4,
-      "regionId": 9,
+      "regionId": 6,
       "level": 10,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1038,
+      "ownerAccountId": 1025,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100045,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 46,
+      "definitionId": 2,
+      "regionId": 6,
+      "level": 11,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100046,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 47,
       "definitionId": 0,
-      "regionId": 9,
-      "level": 268,
+      "regionId": 6,
+      "level": 70,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100047,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 48,
       "definitionId": 5,
-      "regionId": 9,
-      "level": 10,
+      "regionId": 6,
+      "level": 18,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1038,
+      "ownerAccountId": 1025,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100048,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 49,
       "definitionId": 7,
-      "regionId": 9,
+      "regionId": 6,
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100049,
@@ -7162,89 +7231,89 @@ export const M5_SCENARIO = ({
     {
       "id": 50,
       "definitionId": 6,
-      "regionId": 9,
-      "level": 5,
+      "regionId": 6,
+      "level": 12,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1038,
+      "ownerAccountId": 1025,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100050,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 51,
       "definitionId": 1,
-      "regionId": 10,
-      "level": 21,
+      "regionId": 7,
+      "level": 7,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1031,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100051,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 52,
-      "definitionId": 4,
-      "regionId": 10,
-      "level": 20,
+      "definitionId": 3,
+      "regionId": 7,
+      "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1042,
+      "ownerAccountId": 1031,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100052,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 53,
-      "definitionId": 0,
-      "regionId": 10,
-      "level": 86,
+      "definitionId": 4,
+      "regionId": 7,
+      "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100053,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 54,
-      "definitionId": 5,
-      "regionId": 10,
-      "level": 20,
+      "definitionId": 2,
+      "regionId": 7,
+      "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1042,
+      "ownerAccountId": 1031,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100054,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 55,
-      "definitionId": 7,
-      "regionId": 10,
-      "level": 100,
+      "definitionId": 0,
+      "regionId": 7,
+      "level": 57,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1031,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100055,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 56,
-      "definitionId": 6,
-      "regionId": 10,
-      "level": 20,
+      "definitionId": 7,
+      "regionId": 7,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1042,
+      "ownerAccountId": 1031,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100056,
@@ -7252,77 +7321,77 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 57,
-      "definitionId": 1,
-      "regionId": 11,
-      "level": 10,
+      "definitionId": 8,
+      "regionId": 8,
+      "level": 23,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1035,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100057,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 58,
-      "definitionId": 4,
-      "regionId": 11,
-      "level": 5,
+      "definitionId": 3,
+      "regionId": 8,
+      "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1046,
+      "ownerAccountId": 1035,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100058,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 59,
-      "definitionId": 0,
-      "regionId": 11,
-      "level": 40,
+      "definitionId": 4,
+      "regionId": 8,
+      "level": 29,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1033,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100059,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 60,
-      "definitionId": 7,
-      "regionId": 11,
-      "level": 100,
+      "definitionId": 2,
+      "regionId": 8,
+      "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1035,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100060,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 61,
-      "definitionId": 1,
-      "regionId": 12,
-      "level": 81,
+      "definitionId": 0,
+      "regionId": 8,
+      "level": 196,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1035,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100061,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 62,
-      "definitionId": 4,
-      "regionId": 12,
-      "level": 20,
+      "definitionId": 7,
+      "regionId": 8,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1050,
+      "ownerAccountId": 1035,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100062,
@@ -7330,194 +7399,194 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 63,
-      "definitionId": 0,
-      "regionId": 12,
-      "level": 415,
+      "definitionId": 8,
+      "regionId": 9,
+      "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100063,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 64,
-      "definitionId": 5,
-      "regionId": 12,
-      "level": 20,
+      "definitionId": 3,
+      "regionId": 9,
+      "level": 38,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1050,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100064,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 65,
-      "definitionId": 7,
-      "regionId": 12,
-      "level": 100,
+      "definitionId": 4,
+      "regionId": 9,
+      "level": 36,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1037,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100065,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 66,
-      "definitionId": 6,
-      "regionId": 12,
-      "level": 10,
+      "definitionId": 2,
+      "regionId": 9,
+      "level": 38,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1050,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100066,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 67,
-      "definitionId": 1,
-      "regionId": 13,
-      "level": 66,
+      "definitionId": 0,
+      "regionId": 9,
+      "level": 249,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100067,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 68,
-      "definitionId": 4,
-      "regionId": 13,
-      "level": 10,
+      "definitionId": 5,
+      "regionId": 9,
+      "level": 66,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1054,
+      "ownerAccountId": 1037,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100068,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 69,
-      "definitionId": 0,
-      "regionId": 13,
-      "level": 339,
+      "definitionId": 7,
+      "regionId": 9,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100069,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 50000
     },
     {
       "id": 70,
-      "definitionId": 7,
-      "regionId": 13,
-      "level": 100,
+      "definitionId": 9,
+      "regionId": 9,
+      "level": 63,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1037,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100070,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 71,
-      "definitionId": 1,
-      "regionId": 14,
-      "level": 10,
+      "definitionId": 8,
+      "regionId": 10,
+      "level": 12,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1043,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100071,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 72,
-      "definitionId": 4,
-      "regionId": 14,
-      "level": 10,
+      "definitionId": 3,
+      "regionId": 10,
+      "level": 15,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1058,
+      "ownerAccountId": 1043,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100072,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 73,
-      "definitionId": 0,
-      "regionId": 14,
-      "level": 33,
+      "definitionId": 4,
+      "regionId": 10,
+      "level": 14,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1041,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100073,
-      "initialOperatingCashSUSD": 20000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 74,
-      "definitionId": 5,
-      "regionId": 14,
-      "level": 5,
+      "definitionId": 2,
+      "regionId": 10,
+      "level": 15,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1058,
+      "ownerAccountId": 1043,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100074,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 75,
-      "definitionId": 7,
-      "regionId": 14,
-      "level": 100,
+      "definitionId": 0,
+      "regionId": 10,
+      "level": 98,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1043,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100075,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 200000
     },
     {
       "id": 76,
-      "definitionId": 6,
-      "regionId": 14,
-      "level": 5,
+      "definitionId": 5,
+      "regionId": 10,
+      "level": 25,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1058,
+      "ownerAccountId": 1041,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100076,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 77,
-      "definitionId": 1,
-      "regionId": 15,
-      "level": 5,
+      "definitionId": 7,
+      "regionId": 10,
+      "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1043,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100077,
@@ -7525,32 +7594,448 @@ export const M5_SCENARIO = ({
     },
     {
       "id": 78,
-      "definitionId": 4,
-      "regionId": 15,
-      "level": 5,
+      "definitionId": 9,
+      "regionId": 10,
+      "level": 24,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1062,
+      "ownerAccountId": 1040,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100078,
-      "initialOperatingCashSUSD": 50000
+      "initialOperatingCashSUSD": 3000000
     },
     {
       "id": 79,
+      "definitionId": 8,
+      "regionId": 11,
+      "level": 5,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1047,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100079,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 80,
+      "definitionId": 3,
+      "regionId": 11,
+      "level": 7,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1047,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100080,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 81,
+      "definitionId": 4,
+      "regionId": 11,
+      "level": 7,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1045,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100081,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 82,
+      "definitionId": 2,
+      "regionId": 11,
+      "level": 7,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1047,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100082,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 83,
       "definitionId": 0,
+      "regionId": 11,
+      "level": 46,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1047,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100083,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 84,
+      "definitionId": 7,
+      "regionId": 11,
+      "level": 100,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1047,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100084,
+      "initialOperatingCashSUSD": 50000
+    },
+    {
+      "id": 85,
+      "definitionId": 8,
+      "regionId": 12,
+      "level": 51,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1051,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100085,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 86,
+      "definitionId": 3,
+      "regionId": 12,
+      "level": 65,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1051,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100086,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 87,
+      "definitionId": 4,
+      "regionId": 12,
+      "level": 63,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1049,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100087,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 88,
+      "definitionId": 2,
+      "regionId": 12,
+      "level": 65,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1051,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100088,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 89,
+      "definitionId": 0,
+      "regionId": 12,
+      "level": 427,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1051,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100089,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 90,
+      "definitionId": 5,
+      "regionId": 12,
+      "level": 112,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1049,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100090,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 91,
+      "definitionId": 7,
+      "regionId": 12,
+      "level": 100,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1051,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100091,
+      "initialOperatingCashSUSD": 50000
+    },
+    {
+      "id": 92,
+      "definitionId": 9,
+      "regionId": 12,
+      "level": 107,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1048,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100092,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 93,
+      "definitionId": 8,
+      "regionId": 13,
+      "level": 42,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1055,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100093,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 94,
+      "definitionId": 3,
+      "regionId": 13,
+      "level": 54,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1055,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100094,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 95,
+      "definitionId": 4,
+      "regionId": 13,
+      "level": 51,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1053,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100095,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 96,
+      "definitionId": 2,
+      "regionId": 13,
+      "level": 54,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1055,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100096,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 97,
+      "definitionId": 0,
+      "regionId": 13,
+      "level": 350,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1055,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100097,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 98,
+      "definitionId": 7,
+      "regionId": 13,
+      "level": 100,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1055,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100098,
+      "initialOperatingCashSUSD": 50000
+    },
+    {
+      "id": 99,
+      "definitionId": 1,
+      "regionId": 14,
+      "level": 5,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1059,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100099,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 100,
+      "definitionId": 3,
+      "regionId": 14,
+      "level": 6,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1059,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100100,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 101,
+      "definitionId": 4,
+      "regionId": 14,
+      "level": 6,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1057,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100101,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 102,
+      "definitionId": 2,
+      "regionId": 14,
+      "level": 6,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1059,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100102,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 103,
+      "definitionId": 0,
+      "regionId": 14,
+      "level": 39,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1059,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100103,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 104,
+      "definitionId": 5,
+      "regionId": 14,
+      "level": 10,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1057,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100104,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 105,
+      "definitionId": 7,
+      "regionId": 14,
+      "level": 100,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1059,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100105,
+      "initialOperatingCashSUSD": 50000
+    },
+    {
+      "id": 106,
+      "definitionId": 6,
+      "regionId": 14,
+      "level": 9,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1056,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100106,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 107,
+      "definitionId": 1,
       "regionId": 15,
-      "level": 15,
+      "level": 3,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1063,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100079,
-      "initialOperatingCashSUSD": 20000
+      "operatingCashAccountId": 100107,
+      "initialOperatingCashSUSD": 200000
     },
     {
-      "id": 80,
+      "id": 108,
+      "definitionId": 3,
+      "regionId": 15,
+      "level": 3,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1063,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100108,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 109,
+      "definitionId": 4,
+      "regionId": 15,
+      "level": 3,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1061,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100109,
+      "initialOperatingCashSUSD": 3000000
+    },
+    {
+      "id": 110,
+      "definitionId": 2,
+      "regionId": 15,
+      "level": 3,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1063,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100110,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 111,
+      "definitionId": 0,
+      "regionId": 15,
+      "level": 18,
+      "condition": 1,
+      "ownerKind": "private",
+      "ownerAccountId": 1063,
+      "builtOnDay": 0,
+      "operational": true,
+      "operatingCashAccountId": 100111,
+      "initialOperatingCashSUSD": 200000
+    },
+    {
+      "id": 112,
       "definitionId": 7,
       "regionId": 15,
       "level": 100,
@@ -7559,7 +8044,7 @@ export const M5_SCENARIO = ({
       "ownerAccountId": 1063,
       "builtOnDay": 0,
       "operational": true,
-      "operatingCashAccountId": 100080,
+      "operatingCashAccountId": 100112,
       "initialOperatingCashSUSD": 50000
     }
   ],
@@ -7573,16 +8058,37 @@ export const M5_SCENARIO = ({
         3
       ],
       "priceSUSD": [
-        0.05,
-        0.2,
-        0.1,
-        0.15,
-        0.25,
+        0.0625,
+        0.125,
+        0.125,
+        0.0375,
+        0.0625,
+        0.7,
         1,
-        1,
-        0.1
+        0.25
       ],
-      "stockLots": []
+      "stockLots": [
+        {
+          "goodId": 0,
+          "ownerBuildingId": 4,
+          "quantity": 69209900
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 0,
+          "quantity": 464000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 3,
+          "quantity": 87000
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 5,
+          "quantity": 715000
+        }
+      ]
     },
     {
       "id": 1,
@@ -7593,16 +8099,37 @@ export const M5_SCENARIO = ({
         7
       ],
       "priceSUSD": [
-        0.05,
-        0.2,
-        0.1,
-        0.15,
-        0.25,
+        0.0625,
+        0.125,
+        0.125,
+        0.0375,
+        0.0625,
+        0.7,
         1,
-        1,
-        0.1
+        0.25
       ],
-      "stockLots": []
+      "stockLots": [
+        {
+          "goodId": 0,
+          "ownerBuildingId": 32,
+          "quantity": 55808300
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 28,
+          "quantity": 368000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 31,
+          "quantity": 69000
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 33,
+          "quantity": 572000
+        }
+      ]
     },
     {
       "id": 2,
@@ -7611,16 +8138,37 @@ export const M5_SCENARIO = ({
         9
       ],
       "priceSUSD": [
-        0.05,
-        0.2,
-        0.1,
-        0.15,
-        0.25,
+        0.0625,
+        0.125,
+        0.125,
+        0.0375,
+        0.0625,
+        0.7,
         1,
-        1,
-        0.1
+        0.25
       ],
-      "stockLots": []
+      "stockLots": [
+        {
+          "goodId": 0,
+          "ownerBuildingId": 61,
+          "quantity": 79862000
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 57,
+          "quantity": 528000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 60,
+          "quantity": 99000
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 68,
+          "quantity": 819000
+        }
+      ]
     },
     {
       "id": 3,
@@ -7631,16 +8179,37 @@ export const M5_SCENARIO = ({
         13
       ],
       "priceSUSD": [
-        0.05,
-        0.2,
-        0.1,
-        0.15,
-        0.25,
+        0.0625,
+        0.125,
+        0.125,
+        0.0375,
+        0.0625,
+        0.7,
         1,
-        1,
-        0.1
+        0.25
       ],
-      "stockLots": []
+      "stockLots": [
+        {
+          "goodId": 0,
+          "ownerBuildingId": 75,
+          "quantity": 165624000
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 71,
+          "quantity": 1096000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 74,
+          "quantity": 205500
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 76,
+          "quantity": 1703000
+        }
+      ]
     },
     {
       "id": 4,
@@ -7649,16 +8218,37 @@ export const M5_SCENARIO = ({
         15
       ],
       "priceSUSD": [
-        0.05,
-        0.2,
-        0.1,
-        0.15,
-        0.25,
+        0.0625,
+        0.125,
+        0.125,
+        0.0375,
+        0.0625,
+        0.7,
         1,
-        1,
-        0.1
+        0.25
       ],
-      "stockLots": []
+      "stockLots": [
+        {
+          "goodId": 0,
+          "ownerBuildingId": 103,
+          "quantity": 10409200
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 99,
+          "quantity": 80000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 102,
+          "quantity": 15000
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 104,
+          "quantity": 117000
+        }
+      ]
     }
   ],
   "systemAccounts": [
@@ -7831,6 +8421,7 @@ export const M5_SCENARIO = ({
       "immigrationOpen": true
     }
   ],
+  "playerCountryId": 0,
   "currencies": [
     {
       "id": 0,
@@ -7941,7 +8532,7 @@ export const M5_SCENARIO = ({
   ],
   "profitDistribution": {
     "enabled": true,
-    "privatePayoutRate": 0.5,
+    "privatePayoutRate": 1,
     "stateRemittanceRate": 1
   },
   "countryAI": {

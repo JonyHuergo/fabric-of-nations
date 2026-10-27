@@ -1,0 +1,189 @@
+[
+  {
+    "id": 0,
+    "key": "subsistence-farm",
+    "name": "Subsistence Farm",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [{ "goodId": 0, "quantityPerThroughputUnit": 150000 }],
+    "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 25000 }],
+    "constructionCostSUSD": 1000,
+    "dailyUpkeepSUSDAtLevelOne": 20,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": true
+  },
+  {
+    "id": 1,
+    "key": "commercial-farm",
+    "name": "Commercial Farm",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [
+      { "goodId": 0, "quantityPerThroughputUnit": 250000 },
+      { "goodId": 3, "quantityPerThroughputUnit": 10000 }
+    ],
+    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 40000 }],
+    "constructionCostSUSD": 2000,
+    "dailyUpkeepSUSDAtLevelOne": 40,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 2,
+    "key": "ranch",
+    "name": "Ranch",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [
+      { "goodId": 1, "quantityPerThroughputUnit": 60000 },
+      { "goodId": 4, "quantityPerThroughputUnit": 8000 }
+    ],
+    "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 15000 }],
+    "constructionCostSUSD": 1500,
+    "dailyUpkeepSUSDAtLevelOne": 30,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 3,
+    "key": "fishery",
+    "name": "Fishery",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [{ "goodId": 2, "quantityPerThroughputUnit": 60000 }],
+    "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 12500 }],
+    "constructionCostSUSD": 1200,
+    "dailyUpkeepSUSDAtLevelOne": 25,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 4,
+    "key": "food-processing",
+    "name": "Food Processing Plant",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [{ "goodId": 0, "quantityPerThroughputUnit": 126000 }],
+    "outputs": [{ "goodId": 7, "quantityPerThroughputUnit": 63000 }],
+    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 20000 }],
+    "constructionCostSUSD": 3000,
+    "dailyUpkeepSUSDAtLevelOne": 35,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": true
+  },
+  {
+    "id": 5,
+    "key": "textile-mill",
+    "name": "Textile Mill",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [
+      { "goodId": 3, "quantityPerThroughputUnit": 8000 },
+      { "goodId": 4, "quantityPerThroughputUnit": 1500 }
+    ],
+    "outputs": [{ "goodId": 5, "quantityPerThroughputUnit": 16600 }],
+    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 30000 }],
+    "constructionCostSUSD": 4000,
+    "dailyUpkeepSUSDAtLevelOne": 50,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 6,
+    "key": "workshop",
+    "name": "Workshop",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [{ "goodId": 5, "quantityPerThroughputUnit": 13000 }],
+    "outputs": [{ "goodId": 6, "quantityPerThroughputUnit": 26000 }],
+    "jobs": [
+      { "professionId": 2, "workersPerThroughputUnit": 5000 },
+      { "professionId": 1, "workersPerThroughputUnit": 10000 }
+    ],
+    "constructionCostSUSD": 2500,
+    "dailyUpkeepSUSDAtLevelOne": 40,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 7,
+    "key": "warehouse",
+    "name": "Warehouse",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [],
+    "jobs": [],
+    "constructionCostSUSD": 500,
+    "dailyUpkeepSUSDAtLevelOne": 10,
+    "storageCapacityByGood": [
+      { "goodId": 0, "quantity": 2000000 },
+      { "goodId": 1, "quantity": 2000000 },
+      { "goodId": 2, "quantity": 2000000 },
+      { "goodId": 3, "quantity": 2000000 },
+      { "goodId": 4, "quantity": 2000000 },
+      { "goodId": 5, "quantity": 2000000 },
+      { "goodId": 6, "quantity": 2000000 },
+      { "goodId": 7, "quantity": 2000000 }
+    ],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": true
+  },
+  {
+    "id": 8,
+    "key": "commercial-farm-peasant",
+    "name": "Peasant Commercial Farm",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [
+      { "goodId": 0, "quantityPerThroughputUnit": 250000 },
+      { "goodId": 3, "quantityPerThroughputUnit": 10000 }
+    ],
+    "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 40000 }],
+    "constructionCostSUSD": 2000,
+    "dailyUpkeepSUSDAtLevelOne": 40,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  },
+  {
+    "id": 9,
+    "key": "workshop-peasant",
+    "name": "Peasant Workshop",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [{ "goodId": 5, "quantityPerThroughputUnit": 13000 }],
+    "outputs": [{ "goodId": 6, "quantityPerThroughputUnit": 26000 }],
+    "jobs": [
+      { "professionId": 2, "workersPerThroughputUnit": 5000 },
+      { "professionId": 0, "workersPerThroughputUnit": 10000 }
+    ],
+    "constructionCostSUSD": 2500,
+    "dailyUpkeepSUSDAtLevelOne": 40,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": null,
+    "ownershipAllowed": ["private"],
+    "isEssentialInfrastructure": false
+  }
+]

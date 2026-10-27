@@ -576,6 +576,11 @@ export function runCountryAIPhase(
   let rejectedActionCount = 0;
 
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+    // Post-M7 player control: the designated player country is never governed by
+    // the AI, so the player's fiscal settings cannot be silently overwritten.
+    // AI-controlled countries still use the same observation, validator, and
+    // application path below.
+    if (world.playerCountryId !== null && country.id === world.playerCountryId) continue;
     if (dayIndex < country.ai.nextEvaluationDay) continue;
     const observation = buildCountryAIObservation(world, country.id, dayIndex);
     const decision = planCountryActions(observation);

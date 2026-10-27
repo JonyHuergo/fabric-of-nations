@@ -163,6 +163,27 @@ describe("M3d priority and household eligibility", () => {
     expect(demandFor(result, 0, 6, TEXTILES_ID).fulfilledQuantity).toBe(0);
   });
 
+  test("Pass B unlocks a higher tier when same-day production fills a lower tier", () => {
+    const scenario = marketScenario({
+      lots: [{ goodId: CLOTHING_ID, ownerBuildingId: 6, quantity: 5 }],
+    });
+    produceFarmAtTen(scenario);
+    const world = createEconomyWorld(scenario, { seed: 1 });
+    const result = runMarketDay(
+      world,
+      scenario.definitions,
+      marketInput(scenario, world, [
+        household(0, 1, GRAIN_ID, 10),
+        household(0, 3, CLOTHING_ID, 5),
+      ]),
+    );
+    // No opening grain: Pass A cannot fill the subsistence tier, but the farm
+    // produces grain during the same market day. Pass B fills subsistence and
+    // must then unlock basic clothing rather than keeping it frozen ineligible.
+    expect(demandFor(result, 0, 1, GRAIN_ID).fulfilledQuantity).toBeCloseTo(10, 9);
+    expect(demandFor(result, 0, 3, CLOTHING_ID).fulfilledQuantity).toBeCloseTo(5, 9);
+  });
+
   test("different households can have different funded quantities", () => {
     const scenario = marketScenario({
       produce: false,

@@ -165,6 +165,8 @@ export interface SimulationSnapshot {
   readonly scenarioId: string;
   readonly dataVersion: string;
   readonly simVersion: string;
+  /** Designated player country, or null when no player control is configured. */
+  readonly playerCountryId: number | null;
   readonly countries: readonly CountrySnapshot[];
   readonly regions: readonly RegionSnapshot[];
   readonly markets: readonly MarketSnapshot[];
@@ -395,6 +397,9 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
     typeof record.running === "boolean" &&
     typeof record.speedDaysPerSecond === "number" &&
     typeof record.scenarioId === "string" &&
+    (record.playerCountryId === null ||
+      (typeof record.playerCountryId === "number" &&
+        Number.isInteger(record.playerCountryId))) &&
     Array.isArray(record.countries) &&
     Array.isArray(record.regions) &&
     Array.isArray(record.markets) &&

@@ -72,7 +72,9 @@ function CenturyApp() {
 
   useEffect(() => {
     if (snapshot !== null && selectedCountryId === null) {
-      setSelectedCountryId(snapshot.countries[0]?.id ?? null);
+      setSelectedCountryId(
+        snapshot.playerCountryId ?? snapshot.countries[0]?.id ?? null,
+      );
     }
   }, [snapshot, selectedCountryId]);
 

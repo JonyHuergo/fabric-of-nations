@@ -708,6 +708,19 @@ export function runMarketDay(
 
     const passBBlocked = new Set<number>();
     for (const tier of [1, 3, 6] as const) {
+      // Pass A eligibility reflects opening stock only. Pass B may fill a lower
+      // tier from same-day production, so recompute eligibility after each
+      // completed tier and include newly unlocked funded demand in the price
+      // signal (it was excluded from the Pass-A signal).
+      for (const demand of demands) {
+        if (demand.kind !== "household" || demand.tier !== tier) continue;
+        const wasEligible = demand.eligible;
+        demand.eligible = householdTierEligible(demands, demand);
+        if (!wasEligible && demand.eligible) {
+          priceFundedByGood[demand.goodId] =
+            (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
+        }
+      }
       const tierDemands = demands.filter(
         (demand) =>
           demand.kind === "household" &&

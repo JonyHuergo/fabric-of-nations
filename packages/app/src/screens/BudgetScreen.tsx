@@ -27,6 +27,10 @@ export function BudgetScreen({
   const [welfareText, setWelfareText] = useState("0");
   const [localError, setLocalError] = useState<string | null>(null);
 
+  const isPlayerCountry =
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
   const fiscalTax = country?.fiscal.incomeTaxRate ?? 0;
   const fiscalWelfare = country?.fiscal.welfareBudgetSUSDPerYear ?? 0;
   useEffect(() => {
@@ -45,6 +49,12 @@ export function BudgetScreen({
   const historyValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
 
   const apply = () => {
+    if (!isPlayerCountry) {
+      setLocalError(
+        "This is an AI-controlled country. Fiscal policy can only be changed for the player country.",
+      );
+      return;
+    }
     const taxPercent = Number.parseFloat(taxText);
     const welfare = Number.parseFloat(welfareText);
     if (!Number.isFinite(taxPercent) || taxPercent < 0 || taxPercent > 100) {
@@ -63,7 +73,7 @@ export function BudgetScreen({
     <View>
       <Section
         title="Budget"
-        subtitle={`${country.name} · changes apply at the next command boundary through the shared player/AI validator.`}
+        subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · changes apply at the next command boundary through the shared player/AI validator.`}
       >
         <StatRow label="Treasury cash" value={formatSUSD(country.treasuryCashSUSD)} />
         <StatRow label="Income tax" value={formatRate(fiscalTax)} detail="flat rate on actual wages" />
@@ -122,8 +132,19 @@ export function BudgetScreen({
         </View>
         {localError === null ? null : <Text style={styles.error}>{localError}</Text>}
         <View style={styles.applyRow}>
-          <ActionButton label="Apply fiscal policy" tone="accent" onPress={apply} />
+          <ActionButton
+            label={isPlayerCountry ? "Apply fiscal policy" : "AI-controlled country"}
+            tone="accent"
+            onPress={apply}
+            disabled={!isPlayerCountry}
+          />
         </View>
+        {isPlayerCountry ? null : (
+          <Text style={styles.note}>
+            This country is governed by the AI. Select the player country (shown as
+            &quot;Player country&quot; on Budget/Country) to change fiscal policy.
+          </Text>
+        )}
         {running ? (
           <Text style={styles.note}>
             Simulation is running. Actions are accepted between ticks; pause for a predictable

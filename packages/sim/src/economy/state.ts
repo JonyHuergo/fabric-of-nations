@@ -589,6 +589,17 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   if (scenario.countryAI !== undefined) {
     assertValidCountryAIPolicy(scenario.countryAI, "scenario.countryAI");
   }
+  if (scenario.playerCountryId !== undefined && scenario.playerCountryId !== null) {
+    requireInteger(
+      scenario.playerCountryId,
+      "scenario.playerCountryId",
+      0,
+      0xffff_ffff,
+    );
+    if (!(scenario.countries ?? []).some((country) => country.id === scenario.playerCountryId)) {
+      throw new RangeError("scenario.playerCountryId is not a registered country");
+    }
+  }
   if (scenario.population.dataVersion !== scenario.definitions.dataVersion) {
     throw new RangeError("scenario population and economy dataVersion must match");
   }
@@ -642,6 +653,7 @@ export function createEconomyWorld(
   world.profitDistribution = profitDistribution;
   const countryAI = createCountryAIPolicy(scenario.countryAI);
   world.countryAI = countryAI;
+  world.playerCountryId = scenario.playerCountryId ?? null;
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
     (scenario.countries ?? []).map((country) => [country.id, country]),

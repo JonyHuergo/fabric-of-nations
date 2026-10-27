@@ -619,4 +619,10 @@ export interface EconomyScenarioDef {
   profitDistribution?: ProfitDistributionPolicy;
   /** M6 country-AI enable policy. Omitted means disabled defaults. */
   countryAI?: CountryAIPolicy;
+  /**
+   * Post-M7 player-control designation. The AI does not make fiscal decisions for
+   * this country. Omitted or null means no designated player country (legacy
+   * fixtures), and every country remains AI-eligible when the AI is enabled.
+   */
+  playerCountryId?: Id | null;
 }

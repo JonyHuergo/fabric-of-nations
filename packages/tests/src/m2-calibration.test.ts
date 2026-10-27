@@ -101,9 +101,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // this is not accepted as historical demographic validation.
     expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
 
-    expect(hashWorld(world)).toBe("1833f89be242413d");
+    // Schema 14 adds the nullable player-country field; the digest changes even
+    // though the M2 population behavior is unchanged.
+    expect(hashWorld(world)).toBe("0731b26b151efb09");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("1833f89be242413d");
+    expect(hashWorld(restored)).toBe("0731b26b151efb09");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -304,6 +306,6 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // interpolation shortfall.
     expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
     expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
-    expect(hashWorld(world)).toBe("1a5c39b503b54f1b");
+    expect(hashWorld(world)).toBe("9453fbaf2cc02591");
   });
 });

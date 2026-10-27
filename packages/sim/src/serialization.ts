@@ -398,6 +398,7 @@ export type SerializedWorld = {
   readonly finance: SerializedFinanceState;
   readonly profitDistribution: SerializedProfitDistributionPolicy;
   readonly countryAI: SerializedCountryAIPolicy;
+  readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
 
@@ -781,6 +782,7 @@ export function encodeWorld(world: World): SerializedWorld {
       stateRemittanceRate: world.profitDistribution.stateRemittanceRate,
     },
     countryAI: { enabled: world.countryAI.enabled },
+    playerCountryId: world.playerCountryId,
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
       invalidActionCount: world.diagnostics.invalidActionCount,
@@ -1516,6 +1518,10 @@ function decodeWorldPayload(value: unknown): World {
     payload.countryAI,
     "save payload.countryAI",
   );
+  const playerCountryId =
+    payload.playerCountryId === null
+      ? null
+      : requireUint32(payload.playerCountryId, "save payload.playerCountryId");
 
   const world: World = {
     schemaVersion,
@@ -1537,6 +1543,7 @@ function decodeWorldPayload(value: unknown): World {
     finance,
     profitDistribution,
     countryAI,
+    playerCountryId,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

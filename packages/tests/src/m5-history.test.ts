@@ -28,7 +28,7 @@ describe("M5 historical data pipeline", () => {
     expect(data.regions).toHaveLength(16);
     expect(data.markets).toHaveLength(5);
     expect(data.populations).toHaveLength(64);
-    expect(data.buildings).toHaveLength(81);
+    expect(data.buildings).toHaveLength(113);
     expect(data.employment).toHaveLength(0);
     expect(data.calibration).toHaveLength(16);
     expect(validation.warnings.length).toBeGreaterThan(0);
@@ -41,7 +41,7 @@ describe("M5 historical data pipeline", () => {
     expect(world.regions).toHaveLength(16);
     expect(world.markets).toHaveLength(5);
     expect(world.popBlocks).toHaveLength(64);
-    expect(world.buildings).toHaveLength(81);
+    expect(world.buildings).toHaveLength(113);
     assertValidWorld(world);
     const populationBefore = world.popBlocks.reduce(
       (total, block) => total + populationTotal(block),

@@ -556,6 +556,7 @@ export function createPopulationWorld(
       stateRemittanceRate: 1,
     },
     countryAI: { enabled: false },
+    playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

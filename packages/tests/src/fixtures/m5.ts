@@ -45,7 +45,7 @@ export const M5_HOUSEHOLD_ACCOUNTS: readonly Id[] = [
 
 export function m5EconomyDefinitions(): EconomyDefinitions {
   return {
-    dataVersion: "m3-economy-v1",
+    dataVersion: "m3-economy-v2",
     scenarioId: "m5-fixture",
     goods: [
       {
@@ -199,7 +199,7 @@ function mortality(year: number): {
 
 export function m5PopulationDefinitions(): PopulationDefinitions {
   return {
-    dataVersion: "m3-economy-v1",
+    dataVersion: "m3-economy-v2",
     scenarioId: "m5-fixture",
     needs: [
       {
@@ -338,7 +338,7 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
   const definitions = m5EconomyDefinitions();
   return {
     population: {
-      dataVersion: "m3-economy-v1",
+      dataVersion: "m3-economy-v2",
       scenarioId: "m5-fixture",
       professions: definitions.professions.map((profession) => ({
         id: profession.id,

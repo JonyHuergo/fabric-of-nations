@@ -106,6 +106,8 @@ export interface HistoricalScenarioMeta {
   readonly status: "provisional" | "calibrated";
   readonly description: string;
   readonly startDayIndex: number;
+  /** Country tag designated as the player-controlled country. */
+  readonly playerCountryTag: string;
   readonly sources: readonly HistoricalSource[];
   readonly ageStructures: Readonly<Record<string, HistoricalAgeStructure>>;
   readonly files: HistoricalScenarioFiles;
@@ -151,12 +153,21 @@ export interface HistoricalRegionInput {
   readonly calibrationStatus: "source-backed" | "provisional";
 }
 
+export interface HistoricalStockLotInput {
+  readonly goodKey: string;
+  readonly ownerBuildingKey: string;
+  readonly quantity: number;
+}
+
 export interface HistoricalMarketInput {
   readonly id: number;
   readonly key: string;
   readonly name: string;
   readonly regionIds: readonly number[];
   readonly priceBasis: "base-1900";
+  /** Provisional multiplier applied to base-1900 prices for the opening price. */
+  readonly initialPriceMultiplier: number;
+  readonly stockLots: readonly HistoricalStockLotInput[];
   readonly status: "provisional" | "calibrated";
   readonly sourceIds: readonly string[];
 }
@@ -464,6 +475,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
     status: status === "calibrated" ? "calibrated" : "provisional",
     description: stringField(record, "description", "meta", errors),
     startDayIndex: numberField(record, "startDayIndex", "meta", errors),
+    playerCountryTag: stringField(record, "playerCountryTag", "meta", errors),
     sources: readSources(record.sources, errors),
     ageStructures: readAgeStructures(record.ageStructures, errors),
     files: {
@@ -657,12 +669,33 @@ function parseMarkets(value: unknown, errors: string[]): HistoricalMarketInput[]
     if (status !== "provisional" && status !== "calibrated") {
       errors.push(`${path}.status must be "provisional" or "calibrated"`);
     }
+    const initialPriceMultiplier =
+      record.initialPriceMultiplier === undefined
+        ? 1
+        : numberField(record, "initialPriceMultiplier", path, errors);
+    const rawLots = record.stockLots === undefined ? [] : record.stockLots;
+    const stockLots = Array.isArray(rawLots)
+      ? rawLots.map((lot, lotIndex) => {
+          const lotPath = `${path}.stockLots[${String(lotIndex)}]`;
+          const lotRecord = assertRecord(lot, lotPath, errors);
+          return {
+            goodKey: stringField(lotRecord, "goodKey", lotPath, errors),
+            ownerBuildingKey: stringField(lotRecord, "ownerBuildingKey", lotPath, errors),
+            quantity: numberField(lotRecord, "quantity", lotPath, errors),
+          };
+        })
+      : (() => {
+          errors.push(`${path}.stockLots must be an array when provided`);
+          return [];
+        })();
     return {
       id: numberField(record, "id", path, errors),
       key: stringField(record, "key", path, errors),
       name: stringField(record, "name", path, errors),
       regionIds: numberArrayField(record, "regionIds", path, errors),
       priceBasis: "base-1900",
+      initialPriceMultiplier,
+      stockLots,
       status: status === "calibrated" ? "calibrated" : "provisional",
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
     };
@@ -785,15 +818,18 @@ function isNonNegativeInteger(value: number): boolean {
 export interface HistoricalDefinitionKeys {
   readonly professions: ReadonlySet<string>;
   readonly buildings: ReadonlySet<string>;
+  readonly goods: ReadonlySet<string>;
 }
 
 function loadDefinitionKeys(meta: HistoricalScenarioMeta): HistoricalDefinitionKeys | null {
   try {
     const professions = readJson<readonly { key: string }[]>(meta.definitions.professions);
     const buildings = readJson<readonly { key: string }[]>(meta.definitions.buildings);
+    const goods = readJson<readonly { key: string }[]>(meta.definitions.goods);
     return {
       professions: new Set(professions.map((profession) => profession.key)),
       buildings: new Set(buildings.map((building) => building.key)),
+      goods: new Set(goods.map((good) => good.key)),
     };
   } catch {
     return null;
@@ -907,6 +943,12 @@ export function validateM5HistoricalData(
     }
   }
 
+  if (!countryTags.has(data.meta.playerCountryTag)) {
+    errors.push(
+      `meta.playerCountryTag ${JSON.stringify(data.meta.playerCountryTag)} is not a registered country`,
+    );
+  }
+
   const regionCountry = new Map<number, number>();
   for (let index = 0; index < data.regions.length; index += 1) {
     const region = data.regions[index];
@@ -936,6 +978,9 @@ export function validateM5HistoricalData(
   const marketById = new Map<number, HistoricalMarketInput>();
   const mapRegionMarket = new Map<number, number>();
   const marketKeys = new Set<string>();
+  const buildingRegionByKey = new Map(
+    data.buildings.map((building) => [building.key, building.regionId] as const),
+  );
   for (let index = 0; index < data.markets.length; index += 1) {
     const market = data.markets[index];
     if (market === undefined) continue;
@@ -946,6 +991,9 @@ export function validateM5HistoricalData(
     if (marketKeys.has(market.key)) errors.push(`${path}.key ${JSON.stringify(market.key)} is duplicated`);
     marketKeys.add(market.key);
     if (market.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
+    if (!(market.initialPriceMultiplier >= 0.25 && market.initialPriceMultiplier <= 4)) {
+      errors.push(`${path}.initialPriceMultiplier must be in 0.25..4`);
+    }
     const seen = new Set<number>();
     for (const regionId of market.regionIds) {
       if (!regionById.has(regionId)) {
@@ -958,6 +1006,29 @@ export function validateM5HistoricalData(
         errors.push(`region ${String(regionId)} belongs to markets ${String(existing)} and ${String(market.id)}`);
       }
       mapRegionMarket.set(regionId, market.id);
+    }
+    const lotKeys = new Set<string>();
+    for (let lotIndex = 0; lotIndex < market.stockLots.length; lotIndex += 1) {
+      const lot = market.stockLots[lotIndex];
+      if (lot === undefined) continue;
+      const lotPath = `${path}.stockLots[${String(lotIndex)}]`;
+      if (keys !== null && !keys.goods.has(lot.goodKey)) {
+        errors.push(`${lotPath}.goodKey references unknown good ${JSON.stringify(lot.goodKey)}`);
+      }
+      const ownerRegionId = buildingRegionByKey.get(lot.ownerBuildingKey);
+      if (ownerRegionId === undefined) {
+        errors.push(
+          `${lotPath}.ownerBuildingKey references unknown building ${JSON.stringify(lot.ownerBuildingKey)}`,
+        );
+      } else if (!seen.has(ownerRegionId)) {
+        errors.push(`${lotPath}.ownerBuildingKey is outside the market`);
+      }
+      if (!(lot.quantity > 0) || !Number.isFinite(lot.quantity)) {
+        errors.push(`${lotPath}.quantity must be a positive finite number`);
+      }
+      const lotKey = `${lot.goodKey}:${lot.ownerBuildingKey}`;
+      if (lotKeys.has(lotKey)) errors.push(`${lotPath} duplicates a market stock lot`);
+      lotKeys.add(lotKey);
     }
     requireSources(market.sourceIds, `${path}.sourceIds`);
   }
@@ -1390,11 +1461,25 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     })
     .sort((left, right) => left.id - right.id);
 
+  const goodByKey = new Map(goods.map((good) => [good.key, good]));
   const markets: MarketInitialDef[] = sortedMarkets.map((market) => ({
     id: market.id,
     regionIds: [...market.regionIds].sort((left, right) => left - right),
-    priceSUSD: goods.map((good) => good.basePrice1900SUSD),
-    stockLots: [],
+    priceSUSD: goods.map((good) => good.basePrice1900SUSD * market.initialPriceMultiplier),
+    stockLots: market.stockLots.map((lot) => {
+      const good = goodByKey.get(lot.goodKey);
+      const ownerBuildingId = buildingIdByKey.get(lot.ownerBuildingKey);
+      if (good === undefined || ownerBuildingId === undefined) {
+        throw new HistoricalDataError([
+          `market ${String(market.id)} stock lot ${lot.goodKey}:${lot.ownerBuildingKey} could not be resolved`,
+        ]);
+      }
+      return {
+        goodId: good.id,
+        ownerBuildingId,
+        quantity: lot.quantity,
+      };
+    }),
   }));
 
   const currencies = data.countries
@@ -1459,6 +1544,15 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     definitions: populationDefinitions,
   };
 
+  const playerCountry = data.countries.find(
+    (country) => country.tag === data.meta.playerCountryTag,
+  );
+  if (playerCountry === undefined) {
+    throw new HistoricalDataError([
+      `meta.playerCountryTag ${JSON.stringify(data.meta.playerCountryTag)} is not a registered country`,
+    ]);
+  }
+
   return {
     population,
     definitions: economyDefinitions,
@@ -1467,6 +1561,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     systemAccounts,
     employment,
     countries,
+    playerCountryId: playerCountry.id,
     currencies,
     currencyValuations,
     ...(data.meta.profitDistribution === undefined

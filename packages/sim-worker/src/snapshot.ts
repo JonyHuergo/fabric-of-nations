@@ -283,6 +283,7 @@ export function buildSimulationSnapshot(
     scenarioId: world.scenarioId,
     dataVersion: world.dataVersion,
     simVersion: world.simVersion,
+    playerCountryId: world.playerCountryId,
     countries,
     regions: regionSnapshots(world),
     markets: marketSnapshots(world, definitions),

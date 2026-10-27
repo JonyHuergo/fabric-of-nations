@@ -126,6 +126,24 @@ interface AiDaySummary {
   readonly rejected: number;
 }
 
+/**
+ * Benchmark-only fiscal stress trigger. The post-D-062 historical sample is
+ * solvent enough that the bounded 14-tick sample can legitimately produce zero
+ * AI actions, which would make the "applied > 0" gate vacuous. Seed one
+ * AI-controlled country (never the player country) with a welfare commitment it
+ * cannot reserve against its opening treasury, so the deterministic
+ * restore-solvency rule exercises the shared action path. This does not change
+ * the shipped scenario.
+ */
+function applyBenchmarkFiscalTrigger(scenario: EconomyScenarioDef): void {
+  const country = scenario.countries?.find(
+    (candidate) => candidate.id !== (scenario.playerCountryId ?? null),
+  );
+  if (country === undefined) return;
+  country.fiscal.welfareBudgetSUSDPerYear = 10_000_000;
+  country.initialTreasuryCashSUSD = 0;
+}
+
 function countAiDay(result: ReturnType<typeof tick>): AiDaySummary {
   const phase = result.economy?.ai;
   return {
@@ -141,6 +159,7 @@ export function runM6BoundedBenchmarks(): boolean {
   if (scenario.countryAI?.enabled !== true) {
     throw new Error("the M6 benchmark requires the historical sample's AI policy enabled");
   }
+  applyBenchmarkFiscalTrigger(scenario);
   const context = contextFor(scenario);
   const runSamples: number[][] = [];
   const hashes: string[] = [];
@@ -263,6 +282,7 @@ interface StateCheckpoint {
  */
 export function runM6FullCampaignBenchmark(): boolean {
   const scenario = loadM5EightPolities();
+  applyBenchmarkFiscalTrigger(scenario);
   const context = contextFor(scenario);
   const world = createEconomyWorld(scenario, { seed: M6_SEED });
   const samples: number[] = [];
