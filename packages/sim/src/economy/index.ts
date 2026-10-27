@@ -69,6 +69,34 @@ export {
   type BusinessTaxPhaseResult,
 } from "./businessTax.js";
 export {
+  cancelConstruction,
+  runConstructionPhase,
+  setConstructionPaused,
+  startConstruction,
+  validateConstructionCancel,
+  validateConstructionPause,
+  validateConstructionStart,
+  type ConstructionPhaseResult,
+  type ConstructionProjectInput,
+  type ConstructionProjectResult,
+  type ConstructionStartInput,
+} from "./construction.js";
+export {
+  assertValidConstructionState,
+  constructionCanProgress,
+  constructionDailyWage,
+  constructionIdleWorkers,
+  constructionIdleWorkersByBlock,
+  constructionPlannedJobs,
+  constructionProjectIsLive,
+  constructionProjectIsTerminal,
+  constructionProjectProgress,
+  constructionProjectRemaining,
+  constructionWorkingCapital,
+  summarizeConstructionProject,
+  type ConstructionProjectSummary,
+} from "./constructionModel.js";
+export {
   accumulateBudgetMemo,
   addBudgetTotals,
   assertValidBudgetTotals,

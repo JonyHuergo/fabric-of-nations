@@ -71,6 +71,8 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "operating-cash": "asset",
   "system-reserve-cash": "asset",
   "treasury-cash": "asset",
+  "construction-in-progress": "asset",
+  "public-capital": "asset",
   "owner-equity": "equity",
   "retained-profit": "equity",
   "wage-income": "revenue",
@@ -101,6 +103,8 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "operating-cash": ["building"],
   "system-reserve-cash": ["system"],
   "treasury-cash": ["country"],
+  "construction-in-progress": ["country"],
+  "public-capital": ["country"],
   "owner-equity": ["popBlock", "building", "country", "system"],
   "retained-profit": ["building"],
   "wage-income": ["popBlock"],
@@ -241,6 +245,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "business-tax-expense", side: "debit" },
     { subtype: "business-tax-revenue", side: "credit" },
   ],
+  "construction-wage": [{ subtype: "wage-income", side: "credit" }],
+  "construction-capitalization": [],
+  "construction-writeoff": [],
+  "construction-working-capital": [],
   "migration-transfer": [],
   "profit-retention": [],
   "profit-distribution": [],
@@ -549,6 +557,138 @@ export function assertBusinessTaxPostingStructure(
     Math.abs(expenseTotal - cashInTotal) > tolerance(expenseTotal, cashInTotal)
   ) {
     throw new RangeError(`${path} business-profit-tax legs do not balance`);
+  }
+}
+
+/**
+ * Enforce the required legs of the E3 construction posting kinds.
+ *
+ * - `construction-wage`: one country's work-in-progress is debited and its
+ *   treasury credited; one or more households are debited (cash) and credited
+ *   (`wage-income`) for the same gross total. The entry is a cash-neutral
+ *   capitalization of actual labor.
+ * - `construction-capitalization`: one country moves completed work-in-progress
+ *   to public capital (both assets).
+ * - `construction-writeoff`: one country writes cancelled work-in-progress off
+ *   against its owner equity.
+ * - `construction-working-capital`: one country transfers a working-capital
+ *   endowment to one completed state-owned building (country equity/cash to
+ *   building cash/equity).
+ *
+ * This is structural validation only; the construction phase proves the amounts.
+ */
+export function assertConstructionPostingStructure(
+  kind:
+    | "construction-wage"
+    | "construction-capitalization"
+    | "construction-writeoff"
+    | "construction-working-capital",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) throw new RangeError(`${path} must contain construction lines`);
+  const countries = new Set<Id>();
+  const buildings = new Set<Id>();
+  const totals = new Map<string, number>();
+  const add = (key: string, amount: number): void => {
+    totals.set(key, (totals.get(key) ?? 0) + amount);
+  };
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countries.add(account.ownerId);
+    }
+    if (account.ownerKind === "building" && account.ownerId !== null) {
+      buildings.add(account.ownerId);
+    }
+    add(`${account.subtype}:${line.side}`, line.amountSUSD);
+  }
+  const tolerance = (left: number, right: number): number =>
+    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+  const value = (key: string): number => totals.get(key) ?? 0;
+  if (kind === "construction-wage") {
+    if (countries.size !== 1) {
+      throw new RangeError(`${path} construction-wage must reference exactly one country`);
+    }
+    if (buildings.size !== 0) {
+      throw new RangeError(`${path} construction-wage must not reference a building`);
+    }
+    const gross = value("construction-in-progress:debit");
+    if (
+      !(gross > 0) ||
+      Math.abs(gross - value("treasury-cash:credit")) > tolerance(gross, value("treasury-cash:credit")) ||
+      Math.abs(gross - value("household-cash:debit")) > tolerance(gross, value("household-cash:debit")) ||
+      Math.abs(gross - value("wage-income:credit")) > tolerance(gross, value("wage-income:credit"))
+    ) {
+      throw new RangeError(`${path} construction-wage legs do not balance`);
+    }
+    return;
+  }
+  if (kind === "construction-capitalization") {
+    if (countries.size !== 1 || buildings.size !== 0) {
+      throw new RangeError(`${path} construction-capitalization must reference exactly one country`);
+    }
+    const amount = value("construction-in-progress:credit");
+    if (
+      !(amount > 0) ||
+      Math.abs(amount - value("public-capital:debit")) > tolerance(amount, value("public-capital:debit"))
+    ) {
+      throw new RangeError(`${path} construction-capitalization legs do not balance`);
+    }
+    return;
+  }
+  if (kind === "construction-writeoff") {
+    if (countries.size !== 1 || buildings.size !== 0) {
+      throw new RangeError(`${path} construction-writeoff must reference exactly one country`);
+    }
+    const amount = value("construction-in-progress:credit");
+    if (
+      !(amount > 0) ||
+      Math.abs(amount - value("owner-equity:debit")) > tolerance(amount, value("owner-equity:debit"))
+    ) {
+      throw new RangeError(`${path} construction-writeoff legs do not balance`);
+    }
+    return;
+  }
+  if (countries.size !== 1 || buildings.size !== 1) {
+    throw new RangeError(
+      `${path} construction-working-capital must reference exactly one country and one building`,
+    );
+  }
+  let countryEquityDebit = 0;
+  let buildingEquityCredit = 0;
+  for (const line of lines) {
+    const account = accounts.get(line.accountId);
+    if (account === undefined || account.subtype !== "owner-equity") continue;
+    if (account.ownerKind === "country" && line.side === "debit") {
+      countryEquityDebit += line.amountSUSD;
+    } else if (account.ownerKind === "building" && line.side === "credit") {
+      buildingEquityCredit += line.amountSUSD;
+    } else {
+      throw new RangeError(`${path} construction-working-capital has an invalid owner-equity leg`);
+    }
+  }
+  const amount = value("treasury-cash:credit");
+  if (
+    !(amount > 0) ||
+    Math.abs(amount - value("operating-cash:debit")) > tolerance(amount, value("operating-cash:debit")) ||
+    Math.abs(amount - countryEquityDebit) > tolerance(amount, countryEquityDebit) ||
+    Math.abs(amount - buildingEquityCredit) > tolerance(amount, buildingEquityCredit)
+  ) {
+    throw new RangeError(`${path} construction-working-capital legs do not balance`);
   }
 }
 

@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 5 as const;
+export const PROTOCOL_VERSION = 6 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -18,6 +18,13 @@ export const MAX_SNAPSHOT_ANNUAL_REPORTS = 12;
  * authoritative validator.
  */
 export const MAX_ACTIVE_DEBT_CONTRACTS = 64;
+
+/**
+ * Presentation bound matching the simulation's active-construction cap. The UI
+ * uses it only to explain/disable an obviously impossible action; the simulation
+ * remains the authoritative validator.
+ */
+export const MAX_ACTIVE_CONSTRUCTION_PROJECTS = 32;
 
 /** Discrete speed choices exposed by the M7 UI, in simulated days per second. */
 export const SPEED_VALUES = [1, 2, 5, 10] as const;
@@ -57,12 +64,35 @@ export interface SetDebtPolicyActionDto {
   readonly maxOutstandingPrincipalSUSD: number;
 }
 
+export interface StartConstructionActionDto {
+  readonly kind: "start-construction";
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly definitionId: number;
+}
+
+export interface CancelConstructionActionDto {
+  readonly kind: "cancel-construction";
+  readonly countryId: number;
+  readonly projectId: number;
+}
+
+export interface SetConstructionPausedActionDto {
+  readonly kind: "set-construction-paused";
+  readonly countryId: number;
+  readonly projectId: number;
+  readonly paused: boolean;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
   | IssueDebtActionDto
   | RepayDebtActionDto
-  | SetDebtPolicyActionDto;
+  | SetDebtPolicyActionDto
+  | StartConstructionActionDto
+  | CancelConstructionActionDto
+  | SetConstructionPausedActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -127,6 +157,8 @@ export interface SnapshotBudgetTotals {
   readonly principalRepaidSUSD: number;
   readonly interestPaidSUSD: number;
   readonly unfinancedRequirementSUSD: number;
+  readonly constructionSpentSUSD: number;
+  readonly constructionWrittenOffSUSD: number;
 }
 
 /** Current open-period budget memo. Values are flows so far this month. */
@@ -164,6 +196,75 @@ export interface SnapshotDebtContract {
   readonly maturityDay: number;
   readonly accruedInterestSUSD: number;
   readonly status: "active" | "arrears" | "repaid" | "defaulted";
+}
+
+/** Output capacity of a buildable project type at level 1 / condition 1. */
+export interface SnapshotProjectOutput {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly unitLabel: string;
+  readonly quantityPerThroughputUnit: number;
+  readonly dailyCapacityAtLevelOne: number;
+}
+
+/** Buildable public-construction project type derived from validated data. */
+export interface SnapshotProjectType {
+  readonly definitionId: number;
+  readonly key: string;
+  readonly name: string;
+  readonly constructionCostSUSD: number;
+  readonly constructionWorkers: number;
+  readonly plannedJobs: number;
+  readonly dailyUpkeepSUSDAtLevelOne: number;
+  readonly workingCapitalSUSD: number;
+  readonly outputs: readonly SnapshotProjectOutput[];
+}
+
+/** Current/persisted public-construction project. */
+export interface SnapshotConstructionProject {
+  readonly id: number;
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly regionName: string;
+  readonly definitionId: number;
+  readonly definitionKey: string;
+  readonly definitionName: string;
+  readonly status:
+    | "authorized"
+    | "active"
+    | "waiting"
+    | "paused"
+    | "completed"
+    | "cancelled";
+  readonly authorizedDay: number;
+  readonly startedDay: number | null;
+  readonly completedDay: number | null;
+  readonly cancelledDay: number | null;
+  readonly totalCostSUSD: number;
+  readonly workingCapitalSUSD: number;
+  readonly workingCapitalPaidSUSD: number;
+  readonly spentSUSD: number;
+  readonly progress: number;
+  readonly remainingSUSD: number;
+  readonly lastWorkers: number;
+  readonly blockedReason: "labor" | "funds" | null;
+  readonly buildingId: number | null;
+}
+
+/** Bounded aggregate of compacted construction history for one country. */
+export interface SnapshotConstructionHistory {
+  readonly projectsCompleted: number;
+  readonly projectsCancelled: number;
+  readonly totalSpentSUSD: number;
+  readonly totalWrittenOffSUSD: number;
+}
+
+/** Current construction-labor availability and wage estimate. */
+export interface SnapshotConstructionLabor {
+  readonly idleWorkers: number;
+  /** Idle-worker-weighted mean daily base wage, 0 when no idle workers. */
+  readonly dailyWageSUSD: number;
 }
 
 export interface SnapshotFiscalTotals {
@@ -286,6 +387,16 @@ export interface CountrySnapshot {
   readonly financeHistory: readonly SnapshotFinancePeriod[];
   /** Most recent closed annual reports; older annual summaries remain persisted. */
   readonly annualReports: readonly SnapshotAnnualReport[];
+  /** E3 retained construction projects, ascending id. */
+  readonly constructionProjects: readonly SnapshotConstructionProject[];
+  /** Bounded aggregate of compacted completed/cancelled projects. */
+  readonly constructionHistory: SnapshotConstructionHistory;
+  /** Current idle construction labor and wage estimate. */
+  readonly constructionLabor: SnapshotConstructionLabor;
+  /** Country work-in-progress asset balance (capitalized labor not yet completed). */
+  readonly constructionInProgressSUSD: number;
+  /** Country capitalized public-capital asset balance. */
+  readonly publicCapitalSUSD: number;
 }
 
 export interface RegionSnapshot {
@@ -358,6 +469,8 @@ export interface SimulationSnapshot {
   readonly goods: readonly GoodSnapshot[];
   /** Static authored need tiers, used for evidence-based diagnosis. */
   readonly needTiers: readonly SnapshotNeedTier[];
+  /** Validated buildable public-construction project types. */
+  readonly projectTypes: readonly SnapshotProjectType[];
   readonly diagnostics: SnapshotDiagnostics;
 }
 
@@ -586,6 +699,55 @@ function parseAction(value: unknown): CountryActionDto {
       maxOutstandingPrincipalSUSD,
     };
   }
+  if (kind === "start-construction") {
+    return {
+      kind: "start-construction",
+      countryId,
+      regionId: requireInteger(
+        record.regionId,
+        "command.action.regionId",
+        0,
+        0xffff_ffff,
+      ),
+      definitionId: requireInteger(
+        record.definitionId,
+        "command.action.definitionId",
+        0,
+        0xffff_ffff,
+      ),
+    };
+  }
+  if (kind === "cancel-construction") {
+    return {
+      kind: "cancel-construction",
+      countryId,
+      projectId: requireInteger(
+        record.projectId,
+        "command.action.projectId",
+        1,
+        0xffff_ffff,
+      ),
+    };
+  }
+  if (kind === "set-construction-paused") {
+    if (typeof record.paused !== "boolean") {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.paused must be a boolean",
+      );
+    }
+    return {
+      kind: "set-construction-paused",
+      countryId,
+      projectId: requireInteger(
+        record.projectId,
+        "command.action.projectId",
+        1,
+        0xffff_ffff,
+      ),
+      paused: record.paused,
+    };
+  }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }
 
@@ -715,6 +877,8 @@ const BUDGET_TOTAL_FIELDS = [
   "principalRepaidSUSD",
   "interestPaidSUSD",
   "unfinancedRequirementSUSD",
+  "constructionSpentSUSD",
+  "constructionWrittenOffSUSD",
 ] as const;
 
 function isBudgetTotals(value: unknown): value is SnapshotBudgetTotals {
@@ -854,6 +1018,92 @@ function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
   );
 }
 
+function isProjectOutput(value: unknown): value is SnapshotProjectOutput {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.goodId, 0, 0xffff_ffff) &&
+    isString(value.goodKey, 128) &&
+    isString(value.goodName, 256) &&
+    isString(value.unitLabel, 64) &&
+    isFiniteNumber(value.quantityPerThroughputUnit) &&
+    isFiniteNumber(value.dailyCapacityAtLevelOne)
+  );
+}
+
+function isProjectType(value: unknown): value is SnapshotProjectType {
+  if (!isRecord(value)) return false;
+  if (!Array.isArray(value.outputs)) return false;
+  return (
+    isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
+    isString(value.key, 128) &&
+    isString(value.name, 256) &&
+    isFiniteNumber(value.constructionCostSUSD) &&
+    isIntegerIn(value.constructionWorkers, 1, 1_000_000) &&
+    isFiniteNumber(value.plannedJobs) &&
+    isFiniteNumber(value.dailyUpkeepSUSDAtLevelOne) &&
+    isFiniteNumber(value.workingCapitalSUSD) &&
+    value.outputs.every((output) => isProjectOutput(output))
+  );
+}
+
+function isConstructionProject(value: unknown): value is SnapshotConstructionProject {
+  if (!isRecord(value)) return false;
+  const status = value.status;
+  if (
+    status !== "authorized" &&
+    status !== "active" &&
+    status !== "waiting" &&
+    status !== "paused" &&
+    status !== "completed" &&
+    status !== "cancelled"
+  ) {
+    return false;
+  }
+  if (
+    value.blockedReason !== null &&
+    value.blockedReason !== "labor" &&
+    value.blockedReason !== "funds"
+  ) {
+    return false;
+  }
+  return (
+    isIntegerIn(value.id, 1, 0xffff_ffff) &&
+    isIntegerIn(value.countryId, 0, 0xffff_ffff) &&
+    isIntegerIn(value.regionId, 0, 0xffff_ffff) &&
+    isString(value.regionName, 256) &&
+    isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
+    isString(value.definitionKey, 128) &&
+    isString(value.definitionName, 256) &&
+    isIntegerIn(value.authorizedDay, 0, 36_524) &&
+    (value.startedDay === null || isIntegerIn(value.startedDay, 0, 36_524)) &&
+    (value.completedDay === null || isIntegerIn(value.completedDay, 0, 36_524)) &&
+    (value.cancelledDay === null || isIntegerIn(value.cancelledDay, 0, 36_524)) &&
+    isFiniteNumber(value.totalCostSUSD) &&
+    isFiniteNumber(value.workingCapitalSUSD) &&
+    isFiniteNumber(value.workingCapitalPaidSUSD) &&
+    isFiniteNumber(value.spentSUSD) &&
+    isFiniteNumber(value.progress) &&
+    isFiniteNumber(value.remainingSUSD) &&
+    isIntegerIn(value.lastWorkers, 0, 1_000_000) &&
+    (value.buildingId === null || isIntegerIn(value.buildingId, 0, 0xffff_ffff))
+  );
+}
+
+function isConstructionHistory(value: unknown): value is SnapshotConstructionHistory {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.projectsCompleted, 0, 1_000_000) &&
+    isIntegerIn(value.projectsCancelled, 0, 1_000_000) &&
+    isFiniteNumber(value.totalSpentSUSD) &&
+    isFiniteNumber(value.totalWrittenOffSUSD)
+  );
+}
+
+function isConstructionLabor(value: unknown): value is SnapshotConstructionLabor {
+  if (!isRecord(value)) return false;
+  return isIntegerIn(value.idleWorkers, 0, 100_000_000) && isFiniteNumber(value.dailyWageSUSD);
+}
+
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
@@ -899,7 +1149,15 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!Array.isArray(value.financeHistory)) return false;
   if (!value.financeHistory.every((period) => isFinancePeriod(period))) return false;
   if (!Array.isArray(value.annualReports)) return false;
-  return value.annualReports.every((report) => isAnnualReport(report));
+  if (!value.annualReports.every((report) => isAnnualReport(report))) return false;
+  if (!Array.isArray(value.constructionProjects)) return false;
+  if (!value.constructionProjects.every((project) => isConstructionProject(project))) {
+    return false;
+  }
+  if (!isConstructionHistory(value.constructionHistory)) return false;
+  if (!isConstructionLabor(value.constructionLabor)) return false;
+  if (!isFiniteNumber(value.constructionInProgressSUSD)) return false;
+  return isFiniteNumber(value.publicCapitalSUSD);
 }
 
 function isRegionSnapshot(value: unknown): value is RegionSnapshot {
@@ -995,6 +1253,9 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!Array.isArray(value.markets) || !value.markets.every(isMarketSnapshot)) return false;
   if (!Array.isArray(value.goods) || !value.goods.every(isGoodSnapshot)) return false;
   if (!Array.isArray(value.needTiers) || !value.needTiers.every(isNeedTier)) return false;
+  if (!Array.isArray(value.projectTypes) || !value.projectTypes.every(isProjectType)) {
+    return false;
+  }
   return isDiagnostics(value.diagnostics);
 }
 

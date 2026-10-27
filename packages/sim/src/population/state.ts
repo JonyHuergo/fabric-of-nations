@@ -561,6 +561,12 @@ export function createPopulationWorld(
       stateRemittanceRate: 1,
     },
     countryAI: { enabled: false },
+    construction: {
+      projects: [],
+      history: [],
+      nextProjectId: 1,
+      nextBuildingId: 1,
+    },
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,

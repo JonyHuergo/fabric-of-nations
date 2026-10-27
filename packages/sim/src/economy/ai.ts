@@ -60,6 +60,14 @@ import {
 import { assertValidFiscalPolicy } from "./country.js";
 import { debtOutstandingPrincipal } from "./debtPolicy.js";
 import {
+  cancelConstruction,
+  setConstructionPaused,
+  startConstruction,
+  validateConstructionCancel,
+  validateConstructionPause,
+  validateConstructionStart,
+} from "./construction.js";
+import {
   issueGovernmentDebt,
   repayGovernmentDebt,
   validateDebtIssuance,
@@ -67,11 +75,13 @@ import {
 } from "./debt.js";
 import { governmentPeriodTotals } from "./period.js";
 import type {
+  ConstructionProject,
   Country,
   CountryAIGoalId,
   CountryAIState,
   DebtContract,
   DebtPolicy,
+  EconomyDefinitions,
   FiscalPolicy,
   FinancialAccount,
 } from "./types.js";
@@ -139,12 +149,44 @@ export interface SetDebtPolicyAction {
   readonly maxOutstandingPrincipalSUSD: MoneySUSD;
 }
 
+/** Start one E3 public-construction project in a country-owned region. */
+export interface StartConstructionAction {
+  readonly kind: "start-construction";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly regionId: Id;
+  readonly definitionId: Id;
+}
+
+/** Cancel one non-terminal construction project. */
+export interface CancelConstructionAction {
+  readonly kind: "cancel-construction";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly projectId: Id;
+}
+
+/** Pause or resume one non-terminal construction project. */
+export interface SetConstructionPausedAction {
+  readonly kind: "set-construction-paused";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly projectId: Id;
+  readonly paused: boolean;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
   | IssueDebtAction
   | RepayDebtAction
-  | SetDebtPolicyAction;
+  | SetDebtPolicyAction
+  | StartConstructionAction
+  | CancelConstructionAction
+  | SetConstructionPausedAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -166,6 +208,8 @@ export interface CountryActionApplication {
   readonly debtContract: DebtContract | null;
   /** Principal repaid by a `repay-debt` action, else zero. */
   readonly principalPaidSUSD: MoneySUSD;
+  /** Started/cancelled/paused project for construction actions, else null. */
+  readonly constructionProject: ConstructionProject | null;
 }
 
 /** One observed population block. Own-country blocks only. */
@@ -506,6 +550,7 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
 export function validateCountryAction(
   world: World,
   action: CountryAction,
+  definitions?: EconomyDefinitions,
 ): CountryActionValidation {
   const errors: string[] = [];
   if (action === null || typeof action !== "object") {
@@ -515,12 +560,15 @@ export function validateCountryAction(
     action.kind !== "set-fiscal-policy" &&
     action.kind !== "issue-debt" &&
     action.kind !== "repay-debt" &&
-    action.kind !== "set-debt-policy"
+    action.kind !== "set-debt-policy" &&
+    action.kind !== "start-construction" &&
+    action.kind !== "cancel-construction" &&
+    action.kind !== "set-construction-paused"
   ) {
     return {
       valid: false,
       errors: [
-        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", or "set-debt-policy"',
+        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", or "set-construction-paused"',
       ],
     };
   }
@@ -594,6 +642,48 @@ export function validateCountryAction(
       } catch (error) {
         errors.push(errorMessage(error));
       }
+    } else if (action.kind === "start-construction") {
+      if (action.source === "ai") {
+        errors.push("AI public construction is not implemented");
+      }
+      if (definitions === undefined) {
+        errors.push("start-construction requires the validated economy definitions");
+      } else {
+        try {
+          validateConstructionStart(world, definitions, {
+            countryId: country.id,
+            regionId: action.regionId,
+            definitionId: action.definitionId,
+          });
+        } catch (error) {
+          errors.push(errorMessage(error));
+        }
+      }
+    } else if (action.kind === "cancel-construction") {
+      if (action.source === "ai") {
+        errors.push("AI public construction is not implemented");
+      }
+      try {
+        validateConstructionCancel(world, {
+          countryId: country.id,
+          projectId: action.projectId,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-construction-paused") {
+      if (action.source === "ai") {
+        errors.push("AI public construction is not implemented");
+      }
+      try {
+        validateConstructionPause(
+          world,
+          { countryId: country.id, projectId: action.projectId },
+          action.paused,
+        );
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
     } else {
       try {
         validateDebtPolicyChange(world, country, action);
@@ -649,8 +739,9 @@ function validateDebtPolicyChange(
 export function applyCountryAction(
   world: World,
   action: CountryAction,
+  definitions?: EconomyDefinitions,
 ): CountryActionApplication {
-  const validation = validateCountryAction(world, action);
+  const validation = validateCountryAction(world, action, definitions);
   if (!validation.valid) {
     throw new RangeError(`invalid country action: ${validation.errors.join("; ")}`);
   }
@@ -684,6 +775,7 @@ export function applyCountryAction(
         debt: previousDebt,
         debtContract: null,
         principalPaidSUSD: 0,
+        constructionProject: null,
         changed: false,
       };
     }
@@ -706,6 +798,7 @@ export function applyCountryAction(
       debt: { ...candidateCountry.debt },
       debtContract: null,
       principalPaidSUSD: 0,
+      constructionProject: null,
       changed: true,
     };
   }
@@ -729,6 +822,7 @@ export function applyCountryAction(
       debt: { ...country.debt },
       debtContract: issuance.contract,
       principalPaidSUSD: 0,
+      constructionProject: null,
       changed: true,
     };
   }
@@ -749,6 +843,73 @@ export function applyCountryAction(
       debt: { ...country.debt },
       debtContract: repayment.contract,
       principalPaidSUSD: repayment.principalPaidSUSD,
+      constructionProject: null,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "start-construction") {
+    if (definitions === undefined) {
+      throw new RangeError("start-construction requires the validated economy definitions");
+    }
+    const project = startConstruction(world, definitions, {
+      countryId: country.id,
+      regionId: action.regionId,
+      definitionId: action.definitionId,
+    });
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: project,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "cancel-construction") {
+    const cancelled = cancelConstruction(
+      world,
+      { countryId: country.id, projectId: action.projectId },
+      action.dayIndex,
+    );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: cancelled.project,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "set-construction-paused") {
+    const project = setConstructionPaused(
+      world,
+      { countryId: country.id, projectId: action.projectId },
+      action.paused,
+    );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: project,
       changed: true,
     };
   }
@@ -772,6 +933,7 @@ export function applyCountryAction(
       debt: previousDebt,
       debtContract: null,
       principalPaidSUSD: 0,
+      constructionProject: null,
       changed: false,
     };
   }
@@ -794,6 +956,7 @@ export function applyCountryAction(
     debt: { ...debt },
     debtContract: null,
     principalPaidSUSD: 0,
+    constructionProject: null,
     changed: true,
   };
 }

@@ -249,6 +249,12 @@ function assertBuilding(
       record.constructionCostSUSD,
       `${path}.constructionCostSUSD`,
     ),
+    constructionWorkers: requireInteger(
+      record.constructionWorkers,
+      `${path}.constructionWorkers`,
+      1,
+      1_000_000,
+    ),
     dailyUpkeepSUSDAtLevelOne: assertNonNegative(
       record.dailyUpkeepSUSDAtLevelOne,
       `${path}.dailyUpkeepSUSDAtLevelOne`,

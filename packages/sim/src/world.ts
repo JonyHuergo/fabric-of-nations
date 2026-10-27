@@ -29,6 +29,7 @@ import type {
   BuildingInstance,
   Country,
   CountryAIPolicy,
+  ConstructionState,
   Currency,
   CurrencyValuation,
   EmploymentAssignment,
@@ -99,6 +100,8 @@ export interface World {
   profitDistribution: ProfitDistributionPolicy;
   /** M6 country-AI enable policy; disabled for legacy fixtures. */
   countryAI: CountryAIPolicy;
+  /** E3 public-construction project queue and bounded history. */
+  construction: ConstructionState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -187,6 +190,12 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       stateRemittanceRate: 1,
     },
     countryAI: { enabled: false },
+    construction: {
+      projects: [],
+      history: [],
+      nextProjectId: 1,
+      nextBuildingId: 1,
+    },
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,

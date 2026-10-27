@@ -8,11 +8,12 @@
     "outputs": [{ "goodId": 0, "quantityPerThroughputUnit": 150000 }],
     "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 25000 }],
     "constructionCostSUSD": 1000,
+    "constructionWorkers": 80,
     "dailyUpkeepSUSDAtLevelOne": 20,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": true
   },
   {
@@ -27,11 +28,12 @@
     ],
     "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 40000 }],
     "constructionCostSUSD": 2000,
+    "constructionWorkers": 120,
     "dailyUpkeepSUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -46,11 +48,12 @@
     ],
     "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 15000 }],
     "constructionCostSUSD": 1500,
+    "constructionWorkers": 60,
     "dailyUpkeepSUSDAtLevelOne": 30,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -62,11 +65,12 @@
     "outputs": [{ "goodId": 2, "quantityPerThroughputUnit": 60000 }],
     "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 12500 }],
     "constructionCostSUSD": 1200,
+    "constructionWorkers": 50,
     "dailyUpkeepSUSDAtLevelOne": 25,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -78,11 +82,12 @@
     "outputs": [{ "goodId": 7, "quantityPerThroughputUnit": 63000 }],
     "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 20000 }],
     "constructionCostSUSD": 3000,
+    "constructionWorkers": 100,
     "dailyUpkeepSUSDAtLevelOne": 35,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": true
   },
   {
@@ -97,11 +102,12 @@
     "outputs": [{ "goodId": 5, "quantityPerThroughputUnit": 16600 }],
     "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 30000 }],
     "constructionCostSUSD": 4000,
+    "constructionWorkers": 150,
     "dailyUpkeepSUSDAtLevelOne": 50,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -116,11 +122,12 @@
       { "professionId": 1, "workersPerThroughputUnit": 10000 }
     ],
     "constructionCostSUSD": 2500,
+    "constructionWorkers": 80,
     "dailyUpkeepSUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -132,6 +139,7 @@
     "outputs": [],
     "jobs": [],
     "constructionCostSUSD": 500,
+    "constructionWorkers": 40,
     "dailyUpkeepSUSDAtLevelOne": 10,
     "storageCapacityByGood": [
       { "goodId": 0, "quantity": 2000000 },
@@ -145,7 +153,7 @@
     ],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": true
   },
   {
@@ -160,11 +168,12 @@
     ],
     "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 40000 }],
     "constructionCostSUSD": 2000,
+    "constructionWorkers": 120,
     "dailyUpkeepSUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   },
   {
@@ -179,11 +188,12 @@
       { "professionId": 0, "workersPerThroughputUnit": 10000 }
     ],
     "constructionCostSUSD": 2500,
+    "constructionWorkers": 80,
     "dailyUpkeepSUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private"],
+    "ownershipAllowed": ["private", "state"],
     "isEssentialInfrastructure": false
   }
 ]

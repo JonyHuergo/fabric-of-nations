@@ -37,6 +37,8 @@ export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
     principalRepaidSUSD: 0,
     interestPaidSUSD: 0,
     unfinancedRequirementSUSD: 0,
+    constructionSpentSUSD: 0,
+    constructionWrittenOffSUSD: 0,
     businessTaxAssessedDay: null,
   };
 }
@@ -75,6 +77,8 @@ export function accumulateBudgetMemo(
     readonly principalRepaidSUSD?: MoneySUSD;
     readonly interestPaidSUSD?: MoneySUSD;
     readonly unfinancedRequirementSUSD?: MoneySUSD;
+    readonly constructionSpentSUSD?: MoneySUSD;
+    readonly constructionWrittenOffSUSD?: MoneySUSD;
     readonly businessTaxAssessedDay?: Day;
   },
 ): FinanceBudgetMemo {
@@ -120,6 +124,16 @@ export function accumulateBudgetMemo(
       delta.unfinancedRequirementSUSD ?? 0,
       "unfinancedRequirementSUSD",
     ),
+    constructionSpentSUSD: addAmount(
+      current.constructionSpentSUSD,
+      delta.constructionSpentSUSD ?? 0,
+      "constructionSpentSUSD",
+    ),
+    constructionWrittenOffSUSD: addAmount(
+      current.constructionWrittenOffSUSD,
+      delta.constructionWrittenOffSUSD ?? 0,
+      "constructionWrittenOffSUSD",
+    ),
     businessTaxAssessedDay:
       delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
   };
@@ -138,6 +152,8 @@ export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudg
     principalRepaidSUSD: memo.principalRepaidSUSD,
     interestPaidSUSD: memo.interestPaidSUSD,
     unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
+    constructionSpentSUSD: memo.constructionSpentSUSD,
+    constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
   };
 }
 
@@ -158,6 +174,10 @@ export function addBudgetTotals(
     interestPaidSUSD: left.interestPaidSUSD + right.interestPaidSUSD,
     unfinancedRequirementSUSD:
       left.unfinancedRequirementSUSD + right.unfinancedRequirementSUSD,
+    constructionSpentSUSD:
+      left.constructionSpentSUSD + right.constructionSpentSUSD,
+    constructionWrittenOffSUSD:
+      left.constructionWrittenOffSUSD + right.constructionWrittenOffSUSD,
   };
 }
 
@@ -172,6 +192,8 @@ export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
     principalRepaidSUSD: 0,
     interestPaidSUSD: 0,
     unfinancedRequirementSUSD: 0,
+    constructionSpentSUSD: 0,
+    constructionWrittenOffSUSD: 0,
   };
 }
 
@@ -199,6 +221,8 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
     "principalRepaidSUSD",
     "interestPaidSUSD",
     "unfinancedRequirementSUSD",
+    "constructionSpentSUSD",
+    "constructionWrittenOffSUSD",
   ] as const) {
     const value = requireFiniteNumber(record[field], `${path}.${field}`);
     if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
@@ -254,6 +278,8 @@ export function assertValidBudgetTotals(
     "principalRepaidSUSD",
     "interestPaidSUSD",
     "unfinancedRequirementSUSD",
+    "constructionSpentSUSD",
+    "constructionWrittenOffSUSD",
   ] as const) {
     const value = requireFiniteNumber(record[field], `${path}.${field}`);
     if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);

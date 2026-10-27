@@ -12,5 +12,6 @@ export * from "./selectors.js";
 export * from "./supervisor.js";
 export * from "./actionHistory.js";
 export * from "./fiscalPreview.js";
+export * from "./constructionPreview.js";
 export * from "./reports.js";
 export * from "./explanations.js";

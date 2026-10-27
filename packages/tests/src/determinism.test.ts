@@ -27,9 +27,9 @@ describe("determinism", () => {
     const world = createInitialWorld({ seed: 123_456_789, scenarioId: "m1-determinism" });
     runCampaign(world);
 
-    // Known-answer digest for the M1 empty-world tick driver under schema 18.
+    // Known-answer digest for the M1 empty-world tick driver under schema 19.
     // A change here requires an intentional simulation-version decision.
-    expect(hashWorld(world)).toBe("a9a9806e2fc28050");
+    expect(hashWorld(world)).toBe("17ac4e9d7b9555eb");
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {

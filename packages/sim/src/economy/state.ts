@@ -770,6 +770,8 @@ export function createEconomyWorld(
     const equityId = allocate("country", country.id, "owner-equity");
     allocate("country", country.id, "income-tax-revenue");
     allocate("country", country.id, "business-tax-revenue");
+    allocate("country", country.id, "construction-in-progress");
+    allocate("country", country.id, "public-capital");
     allocate("country", country.id, "welfare-expense");
     opening.push({
       accountId: country.treasuryAccountId,
@@ -882,6 +884,8 @@ export function createEconomyWorld(
   world.employment.sort((left, right) => left.id - right.id);
   world.popBlocks.sort((left, right) => left.id - right.id);
   world.employmentDirty = true;
+  world.construction.nextBuildingId =
+    world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;
 
   assertValidWorld(world);
   return world;

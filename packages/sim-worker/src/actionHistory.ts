@@ -31,6 +31,17 @@ export type PlayerActionRequest =
       readonly kind: "set-debt-policy";
       readonly refinanceOnMaturity: boolean;
       readonly maxOutstandingPrincipalSUSD: number;
+    }
+  | {
+      readonly kind: "start-construction";
+      readonly regionId: number;
+      readonly definitionId: number;
+    }
+  | { readonly kind: "cancel-construction"; readonly projectId: number }
+  | {
+      readonly kind: "set-construction-paused";
+      readonly projectId: number;
+      readonly paused: boolean;
     };
 
 export interface PlayerActionRecord {
@@ -80,5 +91,11 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
       return `repay ${action.amountSUSD.toFixed(2)} SUSD on contract ${String(action.contractId)}`;
     case "set-debt-policy":
       return `ceiling ${action.maxOutstandingPrincipalSUSD.toFixed(2)} SUSD, refinance on maturity ${action.refinanceOnMaturity ? "on" : "off"}`;
+    case "start-construction":
+      return `start construction type ${String(action.definitionId)} in region ${String(action.regionId)}`;
+    case "cancel-construction":
+      return `cancel construction project ${String(action.projectId)}`;
+    case "set-construction-paused":
+      return `${action.paused ? "pause" : "resume"} construction project ${String(action.projectId)}`;
   }
 }

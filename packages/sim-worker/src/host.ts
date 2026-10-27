@@ -316,7 +316,11 @@ export class SimulationHost {
       dayIndex: this.world.dayIndex,
       source: "player",
     } as CountryAction;
-    const validation = validateCountryAction(this.world, command);
+    const validation = validateCountryAction(
+      this.world,
+      command,
+      this.scenario.definitions,
+    );
     if (!validation.valid) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,
@@ -330,7 +334,7 @@ export class SimulationHost {
       return;
     }
     try {
-      applyCountryAction(this.world, command);
+      applyCountryAction(this.world, command, this.scenario.definitions);
     } catch (error) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,

@@ -116,6 +116,8 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
           principalRepaidSUSD: 0,
           interestPaidSUSD: 0,
           unfinancedRequirementSUSD: 0,
+          constructionSpentSUSD: 0,
+          constructionWrittenOffSUSD: 0,
           businessTaxBaseMonthToDateSUSD: 0,
         },
         literacy: 0.9,
@@ -129,6 +131,16 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         latestFiscal: null,
         financeHistory: [],
         annualReports: [],
+        constructionProjects: [],
+        constructionHistory: {
+          projectsCompleted: 0,
+          projectsCancelled: 0,
+          totalSpentSUSD: 0,
+          totalWrittenOffSUSD: 0,
+        },
+        constructionLabor: { idleWorkers: 0, dailyWageSUSD: 0 },
+        constructionInProgressSUSD: 0,
+        publicCapitalSUSD: 0,
       },
     ],
     regions: [
@@ -154,6 +166,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     ],
     goods: [{ id: 0, key: "grain", name: "Grain", unitLabel: "kg", category: "food" }],
     needTiers: [],
+    projectTypes: [],
     diagnostics: { invalidActionCount: 0, invariantFailureCount: 0, recentWarnings: [] },
   };
 }

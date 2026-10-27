@@ -161,6 +161,21 @@ export const MAX_RETAINED_TERMINATED_DEBT_CONTRACTS = 32;
 export const MAX_DEBT_HISTORY_AGGREGATES = 256;
 
 /**
+ * E3 construction bounds. These are structural safety limits, not tuning.
+ *
+ * - At most 32 non-terminal construction projects exist at once.
+ * - The newest 32 completed/cancelled project records are retained in detail.
+ * - Older terminated records are aggregated per country (defensive cap 256).
+ * - A completed building is endowed with 30 days of its definition's daily
+ *   upkeep as working capital, limited by actual treasury cash. This is
+ *   provisional structural content, not calibration.
+ */
+export const MAX_ACTIVE_CONSTRUCTION_PROJECTS = 32;
+export const MAX_RETAINED_TERMINATED_CONSTRUCTION_PROJECTS = 32;
+export const MAX_CONSTRUCTION_HISTORY_AGGREGATES = 256;
+export const CONSTRUCTION_WORKING_CAPITAL_DAYS = 30;
+
+/**
  * M6 country-AI v1 constants. PROVISIONAL policy rules, not calibrated
  * economics. Every rule is deterministic and uses only own-country or public
  * state.

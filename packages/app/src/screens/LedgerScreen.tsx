@@ -129,6 +129,18 @@ export function LedgerScreen({
               </Text>
             </View>
             <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction outlay (capital, not expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.constructionSpentSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction written off</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.constructionWrittenOffSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result</Text>
               <Text
                 style={[
@@ -259,6 +271,18 @@ export function LedgerScreen({
               <Text style={styles.reportLabel}>Unfinanced requirement (annual)</Text>
               <Text style={styles.reportValue}>
                 {formatSUSD(latestAnnual.unfinancedRequirementSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction outlay (annual capital flow)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.constructionSpentSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction written off (annual)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.constructionWrittenOffSUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>

@@ -61,6 +61,22 @@ describe("E1 UI wiring", () => {
     expect(ledger).toContain("Session-only; cleared on load or worker restart");
   });
 
+  test("the construction screen is wired to snapshots and the shared action path", () => {
+    const app = source("App.tsx");
+    expect(app).toContain('{ id: "construction", label: "Construction" }');
+    const construction = source("src/screens/ConstructionScreen.tsx");
+    expect(construction).toContain("previewConstruction");
+    expect(construction).toContain("start-construction");
+    expect(construction).toContain("cancel-construction");
+    expect(construction).toContain("set-construction-paused");
+    expect(construction).toContain("Authorize construction");
+    expect(construction).toContain("Project queue");
+    expect(construction).toContain("waiting for");
+    expect(construction).not.toContain("__world");
+    const ledger = source("src/screens/LedgerScreen.tsx");
+    expect(ledger).toContain("Construction outlay");
+  });
+
   test("the provider appends action history only from confirmed results", () => {
     const provider = source("src/worker/SimulationProvider.tsx");
     expect(provider).toContain('case "ACTION_RESULT"');
@@ -82,6 +98,7 @@ describe("E1 UI wiring", () => {
     for (const path of [
       "src/screens/CountryScreen.tsx",
       "src/screens/BudgetScreen.tsx",
+      "src/screens/ConstructionScreen.tsx",
       "src/screens/LedgerScreen.tsx",
       "src/screens/MarketsScreen.tsx",
       "src/screens/PopulationScreen.tsx",

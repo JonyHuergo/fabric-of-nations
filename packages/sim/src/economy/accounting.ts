@@ -25,6 +25,7 @@ import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from
 import {
   accountNormalSide,
   assertBusinessTaxPostingStructure,
+  assertConstructionPostingStructure,
   assertFiscalPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -161,6 +162,14 @@ function validatePostingLines(
   }
   if (transactionKind === "business-profit-tax") {
     assertBusinessTaxPostingStructure(lines, accounts);
+  }
+  if (
+    transactionKind === "construction-wage" ||
+    transactionKind === "construction-capitalization" ||
+    transactionKind === "construction-writeoff" ||
+    transactionKind === "construction-working-capital"
+  ) {
+    assertConstructionPostingStructure(transactionKind, lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);

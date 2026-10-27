@@ -22,6 +22,7 @@ import type { World } from "../world.js";
 import {
   assertBusinessTaxPostingStructure,
   assertAccountingIdentity,
+  assertConstructionPostingStructure,
   assertFiscalPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
@@ -41,6 +42,7 @@ import {
   type OwnerEquityTally,
 } from "./accounts.js";
 import { assertValidCountryCurrencyState, buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,
   assertValidFinanceBudgetMemo,
@@ -327,6 +329,14 @@ export function assertValidJournalPosting(
     }
     if (transactionKind === "business-profit-tax") {
       assertBusinessTaxPostingStructure(journalLines, accounts, path);
+    }
+    if (
+      transactionKind === "construction-wage" ||
+      transactionKind === "construction-capitalization" ||
+      transactionKind === "construction-writeoff" ||
+      transactionKind === "construction-working-capital"
+    ) {
+      assertConstructionPostingStructure(transactionKind, journalLines, accounts, path);
     }
     if (
       transactionKind === "profit-retention" ||
@@ -1259,6 +1269,8 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
       "owner-equity",
       "income-tax-revenue",
       "business-tax-revenue",
+      "construction-in-progress",
+      "public-capital",
       "welfare-expense",
     ] as const) {
       index.get("country", country.id, subtype);
@@ -1703,6 +1715,7 @@ export function assertValidEconomyState(
   }
 
   assertOwnerAccountSets(world, accounts);
+  assertValidConstructionState(world);
   assertValidCountryCurrencyState({
     countries: world.countries,
     currencies: world.currencies,

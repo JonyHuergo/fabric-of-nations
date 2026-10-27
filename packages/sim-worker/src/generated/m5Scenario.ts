@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v3",
+    "dataVersion": "m3-economy-v4",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3194,7 +3194,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v3",
+      "dataVersion": "m3-economy-v4",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6085,7 +6085,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v3",
+    "dataVersion": "m3-economy-v4",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6247,12 +6247,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 1000,
+        "constructionWorkers": 80,
         "dailyUpkeepSUSDAtLevelOne": 20,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": true
       },
@@ -6279,12 +6281,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 2000,
+        "constructionWorkers": 120,
         "dailyUpkeepSUSDAtLevelOne": 40,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6311,12 +6315,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 1500,
+        "constructionWorkers": 60,
         "dailyUpkeepSUSDAtLevelOne": 30,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6339,12 +6345,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 1200,
+        "constructionWorkers": 50,
         "dailyUpkeepSUSDAtLevelOne": 25,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6372,12 +6380,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 3000,
+        "constructionWorkers": 100,
         "dailyUpkeepSUSDAtLevelOne": 35,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": true
       },
@@ -6409,12 +6419,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 4000,
+        "constructionWorkers": 150,
         "dailyUpkeepSUSDAtLevelOne": 50,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6446,12 +6458,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 2500,
+        "constructionWorkers": 80,
         "dailyUpkeepSUSDAtLevelOne": 40,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6464,6 +6478,7 @@ export const M5_SCENARIO = ({
         "outputs": [],
         "jobs": [],
         "constructionCostSUSD": 500,
+        "constructionWorkers": 40,
         "dailyUpkeepSUSDAtLevelOne": 10,
         "storageCapacityByGood": [
           {
@@ -6502,7 +6517,8 @@ export const M5_SCENARIO = ({
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": true
       },
@@ -6529,12 +6545,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 2000,
+        "constructionWorkers": 120,
         "dailyUpkeepSUSDAtLevelOne": 40,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       },
@@ -6566,12 +6584,14 @@ export const M5_SCENARIO = ({
           }
         ],
         "constructionCostSUSD": 2500,
+        "constructionWorkers": 80,
         "dailyUpkeepSUSDAtLevelOne": 40,
         "storageCapacityByGood": [],
         "resourceRequirements": [],
         "requiredTechnologyId": null,
         "ownershipAllowed": [
-          "private"
+          "private",
+          "state"
         ],
         "isEssentialInfrastructure": false
       }

@@ -40,6 +40,10 @@ import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import { runBusinessTaxPhase, type BusinessTaxPhaseResult } from "./businessTax.js";
+import {
+  runConstructionPhase,
+  type ConstructionPhaseResult,
+} from "./construction.js";
 import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
@@ -119,6 +123,8 @@ export interface EconomyDayResult {
     readonly fiscal: FiscalPhaseResult;
     /** E2 month-end business-profit tax assessment and collection. */
     readonly businessTax: BusinessTaxPhaseResult;
+    /** E3 public-construction labor, spending, and completion. */
+    readonly construction: ConstructionPhaseResult;
     /** M6 country-AI evaluation and validated fiscal-policy changes. */
     readonly ai: CountryAIPhaseResult;
     /** M5b daily debt service and month-end deficit financing. */
@@ -188,6 +194,11 @@ export function cloneWorld(
     ),
     profitDistribution: { ...source.profitDistribution },
     countryAI: { ...source.countryAI },
+    construction: {
+      ...source.construction,
+      projects: source.construction.projects.map((project) => ({ ...project })),
+      history: source.construction.history.map((aggregate) => ({ ...aggregate })),
+    },
     diagnostics: {
       ...source.diagnostics,
       recentWarnings: [...source.diagnostics.recentWarnings],
@@ -896,6 +907,17 @@ export function runEconomicDay(
   // the tax expense/revenue belong to the period that generated the profit.
   const businessTax = runBusinessTaxPhase(world, dayIndex, { validateWorld: false });
 
+  // E3 construction: hire idle labor, pay and capitalize construction wages, and
+  // complete projects. It runs before the debt phase so month-end financing sees
+  // the resulting treasury cash, and before the close so outlays are in-period.
+  const construction = runConstructionPhase(
+    world,
+    economyDefinitions,
+    dayIndex,
+    settlement,
+    { validateWorld: false },
+  );
+
   // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
   // month-end finance the accrued fiscal deficit before the M4b close.
   const debt = runDebtPhase(world, dayIndex, { validateWorld: false });
@@ -957,6 +979,7 @@ export function runEconomicDay(
       settlement,
       fiscal,
       businessTax,
+      construction,
       ai,
       debt,
       migration,

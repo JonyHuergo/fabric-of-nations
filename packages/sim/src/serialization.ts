@@ -37,6 +37,8 @@ import type {
   AccountSubtype,
   AnnualFinanceSummary,
   BuildingInstance,
+  ConstructionProject,
+  ConstructionState,
   Country,
   CountryAIGoalId,
   CountryAIPolicy,
@@ -232,6 +234,8 @@ export type SerializedFinanceBudgetMemo = {
   readonly principalRepaidSUSD: number;
   readonly interestPaidSUSD: number;
   readonly unfinancedRequirementSUSD: number;
+  readonly constructionSpentSUSD: number;
+  readonly constructionWrittenOffSUSD: number;
   readonly businessTaxAssessedDay: number | null;
 };
 
@@ -245,6 +249,45 @@ export type SerializedFinanceBudgetTotals = {
   readonly principalRepaidSUSD: number;
   readonly interestPaidSUSD: number;
   readonly unfinancedRequirementSUSD: number;
+  readonly constructionSpentSUSD: number;
+  readonly constructionWrittenOffSUSD: number;
+};
+
+/** Encoded E3 construction project. */
+export type SerializedConstructionProject = {
+  readonly id: number;
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly definitionId: number;
+  readonly status: ConstructionProject["status"];
+  readonly authorizedDay: number;
+  readonly startedDay: number | null;
+  readonly completedDay: number | null;
+  readonly cancelledDay: number | null;
+  readonly totalCostSUSD: number;
+  readonly workingCapitalSUSD: number;
+  readonly workingCapitalPaidSUSD: number;
+  readonly spentSUSD: number;
+  readonly lastWorkers: number;
+  readonly blockedReason: "labor" | "funds" | null;
+  readonly buildingId: number | null;
+};
+
+/** Encoded compacted construction history aggregate. */
+export type SerializedConstructionHistoryAggregate = {
+  readonly countryId: number;
+  readonly projectsCompleted: number;
+  readonly projectsCancelled: number;
+  readonly totalSpentSUSD: number;
+  readonly totalWrittenOffSUSD: number;
+};
+
+/** Encoded E3 construction state. */
+export type SerializedConstructionState = {
+  readonly projects: readonly SerializedConstructionProject[];
+  readonly history: readonly SerializedConstructionHistoryAggregate[];
+  readonly nextProjectId: number;
+  readonly nextBuildingId: number;
 };
 
 /** Encoded per-country fiscal totals retained by a compacted summary. */
@@ -499,6 +542,7 @@ export type SerializedWorld = {
   readonly finance: SerializedFinanceState;
   readonly profitDistribution: SerializedProfitDistributionPolicy;
   readonly countryAI: SerializedCountryAIPolicy;
+  readonly construction: SerializedConstructionState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -712,6 +756,8 @@ function encodeBudgetTotals(
       principalRepaidSUSD: entry.principalRepaidSUSD,
       interestPaidSUSD: entry.interestPaidSUSD,
       unfinancedRequirementSUSD: entry.unfinancedRequirementSUSD,
+      constructionSpentSUSD: entry.constructionSpentSUSD,
+      constructionWrittenOffSUSD: entry.constructionWrittenOffSUSD,
     };
   }
   return encoded;
@@ -1002,6 +1048,8 @@ export function encodeWorld(world: World): SerializedWorld {
               principalRepaidSUSD: memo.principalRepaidSUSD,
               interestPaidSUSD: memo.interestPaidSUSD,
               unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
+              constructionSpentSUSD: memo.constructionSpentSUSD,
+              constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
               businessTaxAssessedDay: memo.businessTaxAssessedDay,
             },
           ]),
@@ -1014,6 +1062,39 @@ export function encodeWorld(world: World): SerializedWorld {
       stateRemittanceRate: world.profitDistribution.stateRemittanceRate,
     },
     countryAI: { enabled: world.countryAI.enabled },
+    construction: {
+      projects: [...world.construction.projects]
+        .sort((left, right) => left.id - right.id)
+        .map((project) => ({
+          id: project.id,
+          countryId: project.countryId,
+          regionId: project.regionId,
+          definitionId: project.definitionId,
+          status: project.status,
+          authorizedDay: project.authorizedDay,
+          startedDay: project.startedDay,
+          completedDay: project.completedDay,
+          cancelledDay: project.cancelledDay,
+          totalCostSUSD: project.totalCostSUSD,
+          workingCapitalSUSD: project.workingCapitalSUSD,
+          workingCapitalPaidSUSD: project.workingCapitalPaidSUSD,
+          spentSUSD: project.spentSUSD,
+          lastWorkers: project.lastWorkers,
+          blockedReason: project.blockedReason,
+          buildingId: project.buildingId,
+        })),
+      history: [...world.construction.history]
+        .sort((left, right) => left.countryId - right.countryId)
+        .map((aggregate) => ({
+          countryId: aggregate.countryId,
+          projectsCompleted: aggregate.projectsCompleted,
+          projectsCancelled: aggregate.projectsCancelled,
+          totalSpentSUSD: aggregate.totalSpentSUSD,
+          totalWrittenOffSUSD: aggregate.totalWrittenOffSUSD,
+        })),
+      nextProjectId: world.construction.nextProjectId,
+      nextBuildingId: world.construction.nextBuildingId,
+    },
     playerCountryId: world.playerCountryId,
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1199,6 +1280,14 @@ function decodeBudgetTotals(
         entry.unfinancedRequirementSUSD,
         `${path}[${key}].unfinancedRequirementSUSD`,
       ),
+      constructionSpentSUSD: requireFiniteNumber(
+        entry.constructionSpentSUSD,
+        `${path}[${key}].constructionSpentSUSD`,
+      ),
+      constructionWrittenOffSUSD: requireFiniteNumber(
+        entry.constructionWrittenOffSUSD,
+        `${path}[${key}].constructionWrittenOffSUSD`,
+      ),
     };
   }
   return totals;
@@ -1235,6 +1324,14 @@ function decodeBudgetMemo(
     unfinancedRequirementSUSD: requireFiniteNumber(
       record.unfinancedRequirementSUSD,
       `${path}.unfinancedRequirementSUSD`,
+    ),
+    constructionSpentSUSD: requireFiniteNumber(
+      record.constructionSpentSUSD,
+      `${path}.constructionSpentSUSD`,
+    ),
+    constructionWrittenOffSUSD: requireFiniteNumber(
+      record.constructionWrittenOffSUSD,
+      `${path}.constructionWrittenOffSUSD`,
     ),
     businessTaxAssessedDay:
       record.businessTaxAssessedDay === null
@@ -1929,6 +2026,116 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
   };
 }
 
+function decodeConstructionProject(
+  value: unknown,
+  path: string,
+): ConstructionProject {
+  const record = requireRecord(value, path);
+  const status = record.status;
+  if (
+    status !== "authorized" &&
+    status !== "active" &&
+    status !== "waiting" &&
+    status !== "paused" &&
+    status !== "completed" &&
+    status !== "cancelled"
+  ) {
+    throw new SaveFormatError(`${path}.status is invalid`);
+  }
+  const blockedReason = record.blockedReason;
+  if (blockedReason !== null && blockedReason !== "labor" && blockedReason !== "funds") {
+    throw new SaveFormatError(`${path}.blockedReason is invalid`);
+  }
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    countryId: requireUint32(record.countryId, `${path}.countryId`),
+    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    definitionId: requireUint32(record.definitionId, `${path}.definitionId`),
+    status,
+    authorizedDay: requireInteger(record.authorizedDay, `${path}.authorizedDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    startedDay:
+      record.startedDay === null
+        ? null
+        : requireInteger(record.startedDay, `${path}.startedDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    completedDay:
+      record.completedDay === null
+        ? null
+        : requireInteger(record.completedDay, `${path}.completedDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    cancelledDay:
+      record.cancelledDay === null
+        ? null
+        : requireInteger(record.cancelledDay, `${path}.cancelledDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    totalCostSUSD: requireFiniteNumber(record.totalCostSUSD, `${path}.totalCostSUSD`),
+    workingCapitalSUSD: requireFiniteNumber(
+      record.workingCapitalSUSD,
+      `${path}.workingCapitalSUSD`,
+    ),
+    workingCapitalPaidSUSD: requireFiniteNumber(
+      record.workingCapitalPaidSUSD,
+      `${path}.workingCapitalPaidSUSD`,
+    ),
+    spentSUSD: requireFiniteNumber(record.spentSUSD, `${path}.spentSUSD`),
+    lastWorkers: requireInteger(record.lastWorkers, `${path}.lastWorkers`, 0, 0xffff_ffff),
+    blockedReason,
+    buildingId:
+      record.buildingId === null
+        ? null
+        : requireUint32(record.buildingId, `${path}.buildingId`),
+  };
+}
+
+function decodeConstructionState(value: unknown): ConstructionState {
+  const path = "save payload.construction";
+  const record = requireRecord(value, path);
+  const rawProjects = requireArray(record.projects, `${path}.projects`);
+  const projects = rawProjects.map((project, index) =>
+    decodeConstructionProject(project, `${path}.projects[${String(index)}]`),
+  );
+  const rawHistory = requireArray(record.history, `${path}.history`);
+  const history = rawHistory.map((aggregate, index) => {
+    const entry = requireRecord(aggregate, `${path}.history[${String(index)}]`);
+    return {
+      countryId: requireUint32(entry.countryId, `${path}.history[${String(index)}].countryId`),
+      projectsCompleted: requireInteger(
+        entry.projectsCompleted,
+        `${path}.history[${String(index)}].projectsCompleted`,
+        0,
+        1_000_000,
+      ),
+      projectsCancelled: requireInteger(
+        entry.projectsCancelled,
+        `${path}.history[${String(index)}].projectsCancelled`,
+        0,
+        1_000_000,
+      ),
+      totalSpentSUSD: requireFiniteNumber(
+        entry.totalSpentSUSD,
+        `${path}.history[${String(index)}].totalSpentSUSD`,
+      ),
+      totalWrittenOffSUSD: requireFiniteNumber(
+        entry.totalWrittenOffSUSD,
+        `${path}.history[${String(index)}].totalWrittenOffSUSD`,
+      ),
+    };
+  });
+  return {
+    projects,
+    history,
+    nextProjectId: requireInteger(
+      record.nextProjectId,
+      `${path}.nextProjectId`,
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    nextBuildingId: requireInteger(
+      record.nextBuildingId,
+      `${path}.nextBuildingId`,
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+  };
+}
+
 function decodeWorldPayload(value: unknown): World {
   const payload = requireRecord(value, "save payload");
 
@@ -2082,6 +2289,7 @@ function decodeWorldPayload(value: unknown): World {
     payload.countryAI,
     "save payload.countryAI",
   );
+  const construction = decodeConstructionState(payload.construction);
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -2107,6 +2315,7 @@ function decodeWorldPayload(value: unknown): World {
     finance,
     profitDistribution,
     countryAI,
+    construction,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,

@@ -10,6 +10,12 @@ import {
   AI_HARDSHIP_SUBSISTENCE_DAYS,
   buildFinanceIndex,
   computeBuildingCapacity,
+  constructionDailyWage,
+  constructionIdleWorkersByBlock,
+  constructionPlannedJobs,
+  constructionProjectProgress,
+  constructionProjectRemaining,
+  constructionWorkingCapital,
   dayIndexToCivilDate,
   daysInYear,
   debtOutstandingPrincipal,
@@ -37,12 +43,16 @@ import {
   type SnapshotAnnualReport,
   type SnapshotBudgetMonthToDate,
   type SnapshotBudgetTotals,
+  type SnapshotConstructionHistory,
+  type SnapshotConstructionLabor,
+  type SnapshotConstructionProject,
   type SnapshotDebtContract,
   type SnapshotDebtPolicy,
   type SnapshotFinancePeriod,
   type SnapshotFiscalTotals,
   type SnapshotNeedTier,
   type SnapshotProductionCapacity,
+  type SnapshotProjectType,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -189,6 +199,8 @@ function budgetTotalsSnapshot(
     principalRepaidSUSD: roundDisplay(totals.principalRepaidSUSD, 6),
     interestPaidSUSD: roundDisplay(totals.interestPaidSUSD, 6),
     unfinancedRequirementSUSD: roundDisplay(totals.unfinancedRequirementSUSD, 6),
+    constructionSpentSUSD: roundDisplay(totals.constructionSpentSUSD, 6),
+    constructionWrittenOffSUSD: roundDisplay(totals.constructionWrittenOffSUSD, 6),
   };
 }
 
@@ -202,6 +214,131 @@ function emptyBudgetTotalsSnapshot(): SnapshotBudgetTotals {
     principalRepaidSUSD: 0,
     interestPaidSUSD: 0,
     unfinancedRequirementSUSD: 0,
+    constructionSpentSUSD: 0,
+    constructionWrittenOffSUSD: 0,
+  };
+}
+
+/** Validated public-construction project types derived from building definitions. */
+function projectTypeSnapshots(definitions: EconomyDefinitions): readonly SnapshotProjectType[] {
+  const goods = new Map(definitions.goods.map((good) => [good.id, good]));
+  return [...definitions.buildings]
+    .filter(
+      (definition) =>
+        definition.ownershipAllowed.includes("state") &&
+        definition.outputs.length > 0 &&
+        definition.constructionCostSUSD > 0 &&
+        Number.isInteger(definition.constructionWorkers) &&
+        definition.constructionWorkers > 0 &&
+        definition.requiredTechnologyId === null &&
+        definition.resourceRequirements.length === 0,
+    )
+    .sort((left, right) => left.id - right.id)
+    .map((definition) => ({
+      definitionId: definition.id,
+      key: definition.key,
+      name: definition.name,
+      constructionCostSUSD: roundDisplay(definition.constructionCostSUSD, 6),
+      constructionWorkers: definition.constructionWorkers,
+      plannedJobs: roundDisplay(constructionPlannedJobs(definition), 2),
+      dailyUpkeepSUSDAtLevelOne: roundDisplay(definition.dailyUpkeepSUSDAtLevelOne, 6),
+      workingCapitalSUSD: roundDisplay(constructionWorkingCapital(definition), 6),
+      outputs: definition.outputs
+        .map((output) => {
+          const good = goods.get(output.goodId);
+          return {
+            goodId: output.goodId,
+            goodKey: good?.key ?? `good-${String(output.goodId)}`,
+            goodName: good?.name ?? `Good ${String(output.goodId)}`,
+            unitLabel: good?.unitLabel ?? "unit",
+            quantityPerThroughputUnit: output.quantityPerThroughputUnit,
+            dailyCapacityAtLevelOne: roundDisplay(
+              output.quantityPerThroughputUnit *
+                definition.referenceThroughputPerDayAtLevelOne,
+              4,
+            ),
+          };
+        })
+        .sort((left, right) => left.goodId - right.goodId),
+    }));
+}
+
+function constructionProjectSnapshots(
+  world: World,
+  definitions: EconomyDefinitions,
+  countryId: number,
+): readonly SnapshotConstructionProject[] {
+  const regionById = new Map(world.regions.map((region) => [region.id, region]));
+  const definitionById = new Map(
+    definitions.buildings.map((definition) => [definition.id, definition]),
+  );
+  return [...world.construction.projects]
+    .filter((project) => project.countryId === countryId)
+    .sort((left, right) => left.id - right.id)
+    .map((project) => {
+      const definition = definitionById.get(project.definitionId);
+      return {
+        id: project.id,
+        countryId: project.countryId,
+        regionId: project.regionId,
+        regionName: regionById.get(project.regionId)?.name ?? `Region ${String(project.regionId)}`,
+        definitionId: project.definitionId,
+        definitionKey: definition?.key ?? `definition-${String(project.definitionId)}`,
+        definitionName: definition?.name ?? `Definition ${String(project.definitionId)}`,
+        status: project.status,
+        authorizedDay: project.authorizedDay,
+        startedDay: project.startedDay,
+        completedDay: project.completedDay,
+        cancelledDay: project.cancelledDay,
+        totalCostSUSD: roundDisplay(project.totalCostSUSD, 6),
+        workingCapitalSUSD: roundDisplay(project.workingCapitalSUSD, 6),
+        workingCapitalPaidSUSD: roundDisplay(project.workingCapitalPaidSUSD, 6),
+        spentSUSD: roundDisplay(project.spentSUSD, 6),
+        progress: roundDisplay(constructionProjectProgress(project), 6),
+        remainingSUSD: roundDisplay(constructionProjectRemaining(project), 6),
+        lastWorkers: project.lastWorkers,
+        blockedReason: project.blockedReason,
+        buildingId: project.buildingId,
+      };
+    });
+}
+
+function constructionHistorySnapshot(
+  world: World,
+  countryId: number,
+): SnapshotConstructionHistory {
+  const aggregate = world.construction.history.find((entry) => entry.countryId === countryId);
+  return {
+    projectsCompleted: aggregate?.projectsCompleted ?? 0,
+    projectsCancelled: aggregate?.projectsCancelled ?? 0,
+    totalSpentSUSD: roundDisplay(aggregate?.totalSpentSUSD ?? 0, 6),
+    totalWrittenOffSUSD: roundDisplay(aggregate?.totalWrittenOffSUSD ?? 0, 6),
+  };
+}
+
+function constructionLaborSnapshot(
+  world: World,
+  definitions: EconomyDefinitions,
+  countryId: number,
+  yearDays: number,
+): SnapshotConstructionLabor {
+  const idle = constructionIdleWorkersByBlock(world, definitions, countryId);
+  const professions = new Map(
+    definitions.professions.map((profession) => [profession.id, profession]),
+  );
+  let workers = 0;
+  let weightedWage = 0;
+  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+    const count = idle.get(block.id) ?? 0;
+    if (count <= 0) continue;
+    const profession = professions.get(block.professionId);
+    if (profession === undefined) continue;
+    workers += count;
+    weightedWage += count * constructionDailyWage(profession, yearDays);
+  }
+  return {
+    idleWorkers: workers,
+    dailyWageSUSD: workers > 0 ? roundDisplay(weightedWage / workers, 6) : 0,
   };
 }
 
@@ -478,6 +615,8 @@ function countrySnapshot(
     principalRepaidSUSD: roundDisplay(memo.principalRepaidSUSD, 6),
     interestPaidSUSD: roundDisplay(memo.interestPaidSUSD, 6),
     unfinancedRequirementSUSD: roundDisplay(memo.unfinancedRequirementSUSD, 6),
+    constructionSpentSUSD: roundDisplay(memo.constructionSpentSUSD, 6),
+    constructionWrittenOffSUSD: roundDisplay(memo.constructionWrittenOffSUSD, 6),
     businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
   };
   const latestFiscal = history.length === 0 ? null : (history[history.length - 1] ?? null);
@@ -524,6 +663,17 @@ function countrySnapshot(
     latestFiscal,
     financeHistory: history,
     annualReports: annualReportSnapshots(world, country.id),
+    constructionProjects: constructionProjectSnapshots(world, definitions, country.id),
+    constructionHistory: constructionHistorySnapshot(world, country.id),
+    constructionLabor: constructionLaborSnapshot(world, definitions, country.id, yearDays),
+    constructionInProgressSUSD: roundDisplay(
+      index.find("country", country.id, "construction-in-progress")?.balanceSUSD ?? 0,
+      6,
+    ),
+    publicCapitalSUSD: roundDisplay(
+      index.find("country", country.id, "public-capital")?.balanceSUSD ?? 0,
+      6,
+    ),
   };
 }
 
@@ -604,6 +754,10 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     for (const contract of country.debtContracts) Object.freeze(contract);
     Object.freeze(country.debtContracts);
     Object.freeze(country.budgetMonthToDate);
+    for (const project of country.constructionProjects) Object.freeze(project);
+    Object.freeze(country.constructionProjects);
+    Object.freeze(country.constructionHistory);
+    Object.freeze(country.constructionLabor);
     for (const entry of country.productionCapacityByGood) Object.freeze(entry);
     Object.freeze(country.productionCapacityByGood);
     for (const period of country.financeHistory) {
@@ -629,6 +783,12 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(tier);
   }
   Object.freeze(snapshot.needTiers);
+  for (const projectType of snapshot.projectTypes) {
+    for (const output of projectType.outputs) Object.freeze(output);
+    Object.freeze(projectType.outputs);
+    Object.freeze(projectType);
+  }
+  Object.freeze(snapshot.projectTypes);
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
@@ -695,6 +855,7 @@ export function buildSimulationSnapshot(
     markets: marketSnapshots(world, definitions, capacities.byMarket),
     goods: goodsSnapshots(definitions),
     needTiers: needTierSnapshots(populationDefinitions, definitions),
+    projectTypes: projectTypeSnapshots(definitions),
     diagnostics,
   });
 }

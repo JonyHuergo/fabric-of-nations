@@ -84,6 +84,12 @@ export interface BuildingDef {
   outputs: GoodQuantityDef[];
   jobs: ProfessionJobDef[];
   constructionCostSUSD: MoneySUSD;
+  /**
+   * E3 maximum daily construction crew for this project type. The crew is hired
+   * from idle eligible workers and paid their profession's base daily wage; the
+   * project advances only as that gross payroll accumulates toward the cost.
+   */
+  constructionWorkers: number;
   dailyUpkeepSUSDAtLevelOne: MoneySUSD;
   storageCapacityByGood: StorageCapacityDef[];
   /** M3 requires this list to be empty; regional resource limits are deferred. */
@@ -163,6 +169,8 @@ export const ACCOUNT_SUBTYPES = [
   "operating-cash",
   "system-reserve-cash",
   "treasury-cash",
+  "construction-in-progress",
+  "public-capital",
   "owner-equity",
   "retained-profit",
   "wage-income",
@@ -226,6 +234,10 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "income-tax",
   "welfare-transfer",
   "business-profit-tax",
+  "construction-wage",
+  "construction-capitalization",
+  "construction-writeoff",
+  "construction-working-capital",
   "migration-transfer",
   "profit-retention",
   "profit-distribution",
@@ -388,6 +400,10 @@ export interface FinancePeriodBudgetTotals {
   readonly principalRepaidSUSD: MoneySUSD;
   readonly interestPaidSUSD: MoneySUSD;
   readonly unfinancedRequirementSUSD: MoneySUSD;
+  /** E3 gross construction labor paid (capitalized, not an expense). */
+  readonly constructionSpentSUSD: MoneySUSD;
+  /** E3 work-in-progress written off on cancellation. */
+  readonly constructionWrittenOffSUSD: MoneySUSD;
 }
 
 /**
@@ -405,6 +421,8 @@ export interface FinanceBudgetMemo {
   readonly principalRepaidSUSD: MoneySUSD;
   readonly interestPaidSUSD: MoneySUSD;
   readonly unfinancedRequirementSUSD: MoneySUSD;
+  readonly constructionSpentSUSD: MoneySUSD;
+  readonly constructionWrittenOffSUSD: MoneySUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
@@ -641,6 +659,83 @@ export interface DebtContract {
   accruedInterestSUSD: MoneySUSD;
   status: "active" | "arrears" | "repaid" | "defaulted";
   arrearsSinceDay: Day | null;
+}
+
+/**
+ * E3 construction project status.
+ *
+ * - `authorized`: accepted but not yet started; it never progresses on the day
+ *   it was authorized.
+ * - `active`: at least one worker was hired on the most recent construction day.
+ * - `waiting`: no progress that day because funds or idle labor were unavailable.
+ * - `paused`: player-suspended; no hiring or spending.
+ * - `completed`: the asset exists and the full authorized cost was spent.
+ * - `cancelled`: stopped by the player; remaining budget is not a liability and
+ *   the spent work-in-progress was written off.
+ */
+export const CONSTRUCTION_PROJECT_STATUSES = [
+  "authorized",
+  "active",
+  "waiting",
+  "paused",
+  "completed",
+  "cancelled",
+] as const;
+export type ConstructionProjectStatus = (typeof CONSTRUCTION_PROJECT_STATUSES)[number];
+
+/**
+ * One persisted public-construction project.
+ *
+ * `totalCostSUSD` is the building definition's construction cost snapshot at
+ * authorization; construction advances by gross labor payroll until `spentSUSD`
+ * reaches it. `workingCapitalSUSD` is the completion endowment target (30 days of
+ * the building's daily upkeep), paid from treasury only to the extent cash is
+ * available. Project ids are stable and queue order is ascending id.
+ */
+export interface ConstructionProject {
+  id: Id;
+  countryId: Id;
+  regionId: Id;
+  definitionId: Id;
+  status: ConstructionProjectStatus;
+  authorizedDay: Day;
+  startedDay: Day | null;
+  completedDay: Day | null;
+  cancelledDay: Day | null;
+  totalCostSUSD: MoneySUSD;
+  workingCapitalSUSD: MoneySUSD;
+  workingCapitalPaidSUSD: MoneySUSD;
+  spentSUSD: MoneySUSD;
+  /** Workers hired on the most recent progress day (0 when waiting/paused). */
+  lastWorkers: number;
+  /** Why the most recent construction day made no progress, if it did not. */
+  blockedReason: "labor" | "funds" | null;
+  /** Building created on completion; null otherwise. */
+  buildingId: Id | null;
+}
+
+/**
+ * Bounded per-country aggregate of projects whose individual records were
+ * compacted. It preserves counts and capital amounts without building ids.
+ */
+export interface ConstructionHistoryAggregate {
+  readonly countryId: Id;
+  readonly projectsCompleted: number;
+  readonly projectsCancelled: number;
+  readonly totalSpentSUSD: MoneySUSD;
+  readonly totalWrittenOffSUSD: MoneySUSD;
+}
+
+/** Authoritative E3 construction state. */
+export interface ConstructionState {
+  /** Active/paused projects plus the most recent terminated records. */
+  projects: ConstructionProject[];
+  /** Bounded aggregate of compacted completed/cancelled projects. */
+  history: ConstructionHistoryAggregate[];
+  /** Deterministic allocator for project ids. */
+  nextProjectId: Id;
+  /** Deterministic allocator for completed-building ids. */
+  nextBuildingId: Id;
 }
 
 /**

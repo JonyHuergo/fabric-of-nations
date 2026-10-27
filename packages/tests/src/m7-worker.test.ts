@@ -123,6 +123,99 @@ describe("M7 simulation worker host", () => {
     host.handleCommand(command("PAUSE", "pause-2"));
   });
 
+  test("round-trips a construction action through the validated worker protocol", () => {
+    const { host, events } = createHarness();
+    const before = lastSnapshot(events);
+    const country = before.countries.find((entry) => entry.id === before.playerCountryId)!;
+    const projectType = before.projectTypes.find((entry) => entry.outputs.length > 0)!;
+    expect(projectType).toBeDefined();
+    const regionId = country.regionIds[0]!;
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "construct-start",
+      actionId: "ui-construct-1",
+      action: {
+        kind: "start-construction",
+        countryId: country.id,
+        regionId,
+        definitionId: projectType.definitionId,
+      },
+    });
+    const accepted = lastEvent(events, "ACTION_RESULT");
+    expect(accepted?.accepted).toBe(true);
+    expect(accepted?.actionId).toBe("ui-construct-1");
+    const afterStart = lastSnapshot(events);
+    const startedCountry = afterStart.countries.find((entry) => entry.id === country.id)!;
+    expect(startedCountry.constructionProjects).toHaveLength(1);
+    const projectId = startedCountry.constructionProjects[0]!.id;
+    expect(startedCountry.constructionProjects[0]?.status).toBe("authorized");
+    expect(startedCountry.constructionLabor.idleWorkers).toBeGreaterThan(0);
+
+    host.handleCommand(command("STEP", "construct-step-1", { ticks: 2 }));
+    const progressing = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
+    expect(progressing.constructionProjects[0]?.status).toBe("active");
+    expect(progressing.constructionProjects[0]?.spentSUSD).toBeGreaterThan(0);
+    expect(progressing.constructionInProgressSUSD).toBeGreaterThan(0);
+
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "construct-pause",
+      actionId: "ui-construct-2",
+      action: {
+        kind: "set-construction-paused",
+        countryId: country.id,
+        projectId,
+        paused: true,
+      },
+    });
+    expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(true);
+    expect(
+      lastSnapshot(events).countries.find((entry) => entry.id === country.id)!
+        .constructionProjects[0]?.status,
+    ).toBe("paused");
+
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "construct-cancel",
+      actionId: "ui-construct-3",
+      action: {
+        kind: "cancel-construction",
+        countryId: country.id,
+        projectId,
+      },
+    });
+    expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(true);
+    const cancelled = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
+    expect(cancelled.constructionProjects[0]?.status).toBe("cancelled");
+    expect(cancelled.constructionInProgressSUSD).toBeCloseTo(0, 6);
+  });
+
+  test("rejects a construction action with invalid region/definition ids", () => {
+    const { host, events } = createHarness();
+    const before = lastSnapshot(events);
+    const country = before.countries.find((entry) => entry.id === before.playerCountryId)!;
+    // The worker always supplies definitions; this asserts the UI cannot smuggle
+    // an action that bypasses the same validation by sending a malformed type.
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "construct-bad",
+      actionId: "ui-construct-bad",
+      action: {
+        kind: "start-construction",
+        countryId: country.id,
+        regionId: 99_999,
+        definitionId: 99_999,
+      },
+    });
+    expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(false);
+    expect(lastSnapshot(events).countries.find((entry) => entry.id === country.id)!
+      .constructionProjects).toHaveLength(0);
+  });
+
   test("applies a valid player action and rejects invalid actions atomically", () => {
     const { host, events } = createHarness();
     host.handleCommand(command("STEP", "step-1", { ticks: 1 }));
