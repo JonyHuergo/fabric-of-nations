@@ -2849,6 +2849,88 @@ required**. Incompatible older saves continue to be rejected exactly as before.
 unresolved; this batch does not invent a political model. No calibration or economic
 content changed.
 
+## D-070 — Economic Management Overhaul and the E0–E6 roadmap
+
+**Status:** accepted as design and planning direction in GDD v2.6 (E0). **E1–E6 are
+not implemented.** No runtime behavior, schema field, save content, UI control, or
+version change is authorized by this decision. Individual E stages still require an
+explicit implementation assignment and their own acceptance.
+
+**Why a new program.** The completed M0–M7 implementation gives Century a deep
+simulation, a playable shell, fiscal state, enterprise finance, debt, and a snapshot
+architecture, but the player still has only a small fiscal action set and an
+inspection-oriented interface. The audit/product finding is that Century must become
+a game about economic governance, not a dashboard. GDD v2.6 §17A is the authoritative
+specification: a diagnose–choose–finance–observe loop, seven policy areas, an
+explainable economic interface, eleven design principles, E0–E6 stages, and explicit
+implementation-status/dependency labels.
+
+**Combined planning order.** The existing M0–M10 identities are preserved. The
+player-facing program is inserted as:
+
+```
+M7 → E0 → E1 → M7a (recommended before E2) → E2 → E3 → E4
+   → M8 → M9 → E5 → E6 → M10
+```
+
+Rationale:
+
+- E1–E4 need only existing M7 snapshots, M4b summaries, M4c fiscal state, M5/M5a/M5b
+  enterprise/debt state, the market/production/employment model, and validated
+  actions. They can deliver economic clarity, fiscal management, construction, and
+  industrial policy before the political/technology milestones.
+- **M7a** remains an independent planned accounting stage; it is recommended before
+  E2 if annual fiscal reporting is included, but it does not gate E1 or E3–E6.
+- **M8** (laws/institutions) and **M9** (technology/education) precede **E5** because
+  labor/social legal institutions and human-capital/service effects need those
+  mechanics. E1–E4 must not invent them.
+- **E6a** trade must follow real inter-market/transport/customs work; **E6b** is the
+  retained **M8a** monetary-foundation scope, scheduled after E5/M8/M9 to satisfy its
+  prerequisites. M8a is not deleted, renumbered, or reduced; only its planned slot is
+  refined.
+- **M10** remains last.
+
+This supersedes the prior planned post-M7 order only for the economic program. The
+finance/engineering sequence `M4c → … → M7 → M7a → M8 → M8a → M9 → M10` remains the
+record for those stages; where the two orders differ (E stages inserted; M8a executed
+as E6b), this decision and GDD §17.5/§17.4 are authoritative.
+
+**Boundaries fixed by this decision.**
+
+- One player-controlled country; AI never silently overwrites the player's fiscal or
+  economic policy.
+- Policies operate through real bases/flows/institutions/projects. No decorative
+  control, generic policy pool, sector score, or instant construction bonus.
+- Borrowing ≠ revenue; principal repayment ≠ ordinary expenditure; interest is
+  separate. Existing M5b/M4b/M4c accounting, close, determinism, atomicity, and save
+  compatibility remain binding.
+- No tariffs/trade policy before real trade/customs mechanics; no shared-market
+  relabeling. No monetary policy before money/credit, banking/institutional, and
+  inflation/FX foundations.
+- Reports are bounded, derived, deterministic, save-compatible presentation data, not
+  a second economy or per-day full history. UI uses immutable snapshots/selectors
+  only.
+- No GDP/headline aggregate until §7.8 defines a coherent calculation. No real-value
+  display without a documented price index. No false causal precision.
+
+**Open choices (not accepted by this decision).** GDD §17A.16 records the unresolved
+questions: construction capitalization/materials, land/property, trade counterparty,
+banking/credit/monetary institutions, inflation measure, health/pensions/collective
+bargaining, sector classification, player/AI action expansion, GDP/headline measures,
+report retention, and save/schema migration. Each later E stage must resolve the
+questions it needs with its own decision and tests. The default is to leave the lever
+unimplemented.
+
+**CEN-AUDIT-016 sovereignty** remains unresolved. This decision does not invent a
+sovereignty/market-relationship model and does not authorize one as part of E0–E6.
+
+**Verification.** This is a documentation-only decision. It changes no simulation
+source, test, scenario data, save schema, generated artifact, or version constant.
+GDD v2.6 was reviewed against the accepted M0–M7 records for implementation truth;
+the current baseline remains schema 16 / simulation 0.16.0 / save format 1 / data
+version `m3-economy-v3`. The full v2.5 document is retained byte-for-byte as
+historical documentation.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, E0 economic design
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -34,10 +34,13 @@ explicit acceptance exception, not as a passed mobile release.** The designer ha
 adopted planned intermediate stages for annual close and controlled corrections
 (M7a) and inflation/FX/monetary-policy foundations (M8a); these are planned only,
 not implemented (see
-[the roadmap](#planned-development-roadmap-and-intermediate-finance-stages)).
-The design authority is the [Century GDD
-v2.5](./Century_GDD_v2.5.md); v2.4 is retained as
-[historical documentation](./Century_GDD_v2.4.md), and v2.3 as
+[the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
+The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
+economic design program; **E0 is documentation only in GDD v2.6 §17A**, and E1–E6
+are planned, not implemented. The design authority is the [Century GDD
+v2.6](./Century_GDD_v2.6.md); v2.5 is retained as
+[historical documentation](./Century_GDD_v2.5.md), v2.4 as
+[earlier historical documentation](./Century_GDD_v2.4.md), and v2.3 as
 [earlier historical documentation](./Century_GDD_v2.3.md). Persistent engineering
 rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
@@ -577,10 +580,11 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.5 is the current design authority and records the M4c government fiscal
-loop (D-048) alongside the M4b close (D-047), the M4a-2 model (D-044/D-045), M5
-(D-051–D-055), M5a (D-056), and M5b (D-057). M7a and M8a remain planned only;
-see the roadmap below.
+GDD v2.6 is the current design authority. At the time of this M4a-2 section, v2.5
+recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). The v2.6
+Economic Management Overhaul (§17A) is design-only for E1–E6; M7a and M8a remain
+planned only. See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -803,8 +807,9 @@ multi-country campaign foundation. It is implemented end to end: eight authored
 - Shared markets are the M5 trade connection: countries whose regions share a
   market transact across borders through ordinary goods purchases. M5 does not
   implement inter-market physical trade, tariffs, cross-market transport charges,
-  or a rest-of-world trade account; GDD v2.5 does not specify those mechanics, so
-  they are recorded as explicit non-goals (D-051), not placeholder behavior.
+  or a rest-of-world trade account; GDD v2.6 §17A.8 now specifies the intended trade
+  framework and prerequisites, but they remain unimplemented (D-051/D-070), not
+  placeholder behavior.
 - Buildings and their owning household must belong to the same country. A
   building's owner account must be a pop-block household-cash account.
 
@@ -1125,32 +1130,47 @@ are not.** M7 therefore carries an explicit acceptance exception (D-061).
   authoritative simulation state and no save-compatibility change; the worker
   protocol has its own version **1**.
 
-## Planned development roadmap and intermediate finance stages
+## Planned development roadmap, Economic Management Overhaul, and intermediate finance stages
 
 M0–M6 are implemented and accepted; M7's shell/worker implementation is delivered
 with an explicit native-release and real-device acceptance exception. The designer
 has adopted intermediate finance stages (recorded as D-050) for work that earlier
-revisions left unassigned. **M7a and M8a remain planned and not implemented**: no
-runtime behavior, schema field, save version, benchmark gate, or UI support exists
-for them yet. They preserve the existing M0–M10 milestone identities and do not
-change M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the
-simulation schema.
+revisions left unassigned, and the **Economic Management Overhaul (E0–E6)** as the
+player-facing economic program (D-070). **E0 is documentation only; E1–E6 and
+M7a/M8a remain planned and not implemented**: no runtime behavior, schema field, save
+version, benchmark gate, or UI support exists for them yet. They preserve the
+existing M0–M10 milestone identities and do not change
+M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the simulation
+schema.
 
-Intended implementation order:
+Finance/engineering order:
 
 `M4c → M5 → M5a → M5b → M6 → M7 → M7a → M8 → M8a → M9 → M10`
+
+Combined planning order with the player-facing economic program:
+
+`M7 → E0 → E1 → M7a (recommended before E2) → E2 → E3 → E4 → M8 → M9 → E5 → E6 → M10`
 
 | Stage | Placement | Planned scope | Status |
 |---|---|---|---|
 | **M5a** | After M5, before M5b and M6 | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings; ownership, timing, account semantics, and available-funds constraints | Accepted |
 | **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Accepted |
-| **M7a** | After M7, before M8 | Annual finance summaries and periods, year-end closing consistent with the M4b monthly close, partial campaign years, and controlled auditable correction/reversal entries that preserve closed history | Planned |
-| **M8a** | After M8, before M9 | Documented inflation/price-level measure, exchange-rate dynamics on the existing country/currency identities, monetary-policy authority/controls with explicit causal mechanisms and balanced money/credit accounting | Planned |
+| **E0** | Design now | Economic Management policy framework, dependencies, authority boundaries, accounting/persistence implications, UI information architecture, acceptance criteria, E0–E6 sequence, and exclusions (GDD v2.6 §17A) | Documented; no code |
+| **E1** | After M7 | Economic clarity/dashboard, supported causal explanations, pre-commitment explanations, bounded monthly economic report/action history, focused improvements to the six M7 screens | Planned |
+| **E2** | After E1 (M7a recommended first) | Fiscal management: supported tax/spending instruments, budget allocation, reserves, borrowing/repayment/refinancing controls, financing constraints | Planned |
+| **E3** | After E2 | Public investment/construction: project queue, real money/labor/material/time requirements, financing, progress/completion, cancellation/failure, actual assets | Planned |
+| **E4** | After E3 | Industrial/business policy: selected subsidies, procurement, investment incentives, public-enterprise investment, sector programs | Planned |
+| **M8** | After E4 | Political institutions, laws, elections, unrest, instability, events | Planned |
+| **M9** | After M8 | Technology, research, education/literacy mechanics | Planned |
+| **E5** | After M8/M9 | Labor/social institutions: services/transfers/training, health/education effects, labor laws, pensions/social insurance where supported | Planned |
+| **E6** | After E5 | E6a real trade/commercial policy; E6b monetary foundations (retained M8a scope) | Planned |
+| **M7a** | After M7, before M8; recommended before E2 | Annual finance summaries/periods, year-end close consistent with M4b, partial years, controlled correction/reversal | Planned |
+| **M8a** | Retained as E6b | Inflation/price-level measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | Planned |
 
 Key boundaries:
 
-- **The playable vertical slice remains M0–M7.** M7a and M8a are post-slice stages
-  and are not prerequisites for the initial playable release. M5–M7 are not
+- **The playable vertical slice remains M0–M7.** M7a, M8a, and E1–E6 are post-slice
+  stages and are not prerequisites for the initial playable release. M5–M7 are not
   blocked on the later monetary systems.
 - **M5a depends on M5** for the multi-country foundation and the
   ownership/enterprise structures it actually delivers; if those structures are
@@ -1162,9 +1182,13 @@ Key boundaries:
   or military actions.
 - **M8a follows M8** because monetary authority and policy controls depend on
   institutions and laws; any missing prerequisite (for example a banking/deposit
-  system or monetary aggregate) must be recorded rather than hidden.
+  system or monetary aggregate) must be recorded rather than hidden. In v2.6 its
+  scope is retained as E6b.
+- **E0 is design only.** No E1–E6 lever, report, construction queue, trade rule, or
+  monetary control is implemented or claimed. E1 must not add major new mechanics;
+  every later lever has an explicit dependency or remains unimplemented.
 - The full planned scope, acceptance boundaries, and dependency rationale are in
-  GDD v2.5 §17.3–§17.4. This section is a repository summary, not a claim of
+  GDD v2.6 §17A and §17.5. This section is a repository summary, not a claim of
   current support.
 
 ## Data and calibration
@@ -1787,7 +1811,7 @@ evidence and does not satisfy the 8 ms mobile target.
 
 ### 1. Exact M6 scope and GDD acceptance criteria
 
-The authoritative GDD v2.5 §17 assigns M6: **deterministic country AI v1, action
+The then-authoritative GDD v2.5 §17 assigns M6: **deterministic country AI v1, action
 validation, stress testing, and a simulation performance report**. Its definition
 of done is: the AI can govern the sample world without invalid actions or
 hidden-information access; a full-campaign benchmark reports p50/p95/p99; there is
@@ -1886,7 +1910,7 @@ clean after both commits, and no later milestone is started.
 
 ### 1. Source-defined scope and acceptance criteria
 
-The authoritative GDD v2.5 §17 assigns M7: **mobile worker proof of concept and
+The then-authoritative GDD v2.5 §17 assigns M7: **mobile worker proof of concept and
 playable app — map, snapshot bus, five core screens plus map**. Its definition of
 done is: a release build runs on iOS and Android; pause/speed/actions/save/load
 work; the UI reads snapshots only; target frame rate and on-device tick
@@ -2984,6 +3008,51 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 (parent `b45d0253acfc344040a7067d6df5cacdf785c8e6`). Documentation commit: the
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
+
+## Economic Management Overhaul — E0 design record
+
+GDD v2.6 adds the **Economic Management Overhaul** as a first-class design program
+(GDD §17A; D-070). **E0 is documentation only.** E1–E6 are planned and not
+implemented; no gameplay code, scenario data, save schema, generated artifact, app
+behavior, or version constant changed in this revision.
+
+The overhaul's central goal is that the player governs a country's economy through
+consequential policy choices, public spending, investment, and institution-building:
+diagnose the economy, choose a strategy, implement and finance it, then observe and
+adapt. The specification covers:
+
+- **Seven policy areas:** fiscal/public finance; public investment/construction;
+  industrial/business policy; trade/commercial policy; labor/social policy; monetary
+  policy/currency; regulation/structural reform. Every instrument names its base,
+  calculation/posting path, affected agents, timing, consequences, implementation
+  status, and dependencies.
+- **Economic interface:** five player questions, a national dashboard with defined
+  units/periods, evidence-based causal explanations, pre-commitment explanations, and
+  a bounded monthly report/action history. No undefined GDP headline or false causal
+  precision.
+- **Eleven principles:** one player-controlled country, real mechanics, trade-offs,
+  time lags, government constraints, explainable outcomes, institutionally
+  appropriate policies, determinism, UI/simulation separation, calibration honesty,
+  and no decorative controls.
+- **Roadmap:** E0 design, then E1 economic clarity/reports, E2 fiscal management, E3
+  public investment/construction, E4 industrial/business policy, E5 labor/social
+  institutions, and E6 trade/monetary economy (E6a trade, E6b retained M8a monetary
+  foundations).
+- **Integration:** combined order `M7 → E0 → E1 → M7a (recommended before E2) → E2 →
+  E3 → E4 → M8 → M9 → E5 → E6 → M10`. M0–M7 records, M7a, M8a, and M8–M10 are not
+  renumbered; M8a keeps its scope as E6b. The M7 native/device exception remains
+  separate.
+- **Acceptance:** overall player questions, strategy divergence, per-stage testable
+  criteria, and concrete usability tasks.
+
+The complete specification is in [GDD v2.6 §17A](./Century_GDD_v2.6.md); the
+change report is [GDD_V2.6_CHANGE_REPORT.md](./GDD_V2.6_CHANGE_REPORT.md), and the
+planning decision is D-070 in [DECISIONS.md](./DECISIONS.md). E0 resolves no
+unimplemented mechanism: construction accounting/materials, land/property, trade
+counterparties, banking/credit, inflation measurement, health/pensions/bargaining,
+sector classification, action expansion, GDP definitions, report retention, and
+save/schema migration remain open (GDD §17A.16). CEN-AUDIT-016 sovereignty remains
+unresolved.
 
 ## Development workflow
 
