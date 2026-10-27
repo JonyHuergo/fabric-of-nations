@@ -83,19 +83,31 @@ export function Pill({
   label,
   active,
   onPress,
+  disabled = false,
 }: {
   readonly label: string;
   readonly active: boolean;
   readonly onPress: () => void;
+  readonly disabled?: boolean;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ selected: active, disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.pill, active ? styles.pillActive : null]}
+      style={[styles.pill, active ? styles.pillActive : null, disabled ? styles.buttonDisabled : null]}
     >
-      <Text style={[styles.pillLabel, active ? styles.pillLabelActive : null]}>{label}</Text>
+      <Text
+        style={[
+          styles.pillLabel,
+          active ? styles.pillLabelActive : null,
+          disabled ? styles.buttonLabelDisabled : null,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }

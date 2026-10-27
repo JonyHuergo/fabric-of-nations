@@ -215,7 +215,7 @@ describe("M7 simulation worker host", () => {
     const { host, events } = createHarness();
     host.handleCommand({ protocolVersion: 99, type: "START", commandId: "bad-1" });
     expect(lastEvent(events, "ERROR")?.code).toBe("unsupported_protocol");
-    host.handleCommand({ protocolVersion: 1, type: "STEP", commandId: "bad-2", ticks: 0 });
+    host.handleCommand({ protocolVersion: PROTOCOL_VERSION, type: "STEP", commandId: "bad-2", ticks: 0 });
     expect(lastEvent(events, "ERROR")?.code).toBe("invalid_message");
     host.handleCommand(command("SHUTDOWN", "shutdown-1"));
     expect(lastEvent(events, "SHUTDOWN")).toBeDefined();
@@ -233,6 +233,81 @@ describe("M7 simulation worker host", () => {
     expect(formatRate(0.125)).toBe("12.5%");
     expect(fiscalResultLabel(-1)).toBe("Deficit");
     expect(marketForCountry(snapshot, country)?.regionIds.length).toBeGreaterThan(0);
+  });
+
+  test("bounds a long elapsed-time stall instead of replaying the backlog", () => {
+    const { host, events, advanceClock } = createHarness();
+    host.handleCommand(command("START", "start-stall"));
+    advanceClock(60_000);
+    host.pump(61_000);
+    expect(lastSnapshot(events).dayIndex).toBe(1);
+    for (let index = 1; index <= 10; index += 1) {
+      host.pump(61_000 + index * 100);
+    }
+    // 60 seconds of wall time must not become 60 simulated days.
+    expect(lastSnapshot(events).dayIndex).toBeLessThanOrEqual(2);
+    expect(lastSnapshot(events).running).toBe(true);
+  });
+
+  test("pause/resume and speed changes discard outstanding wall-time debt", () => {
+    const paused = createHarness();
+    paused.host.handleCommand(command("START", "start-pause"));
+    paused.advanceClock(60_000);
+    paused.host.handleCommand(command("PAUSE", "pause-after-stall"));
+    paused.advanceClock(100);
+    paused.host.handleCommand(command("START", "resume-after-pause"));
+    paused.host.pump(61_100);
+    paused.advanceClock(1_000);
+    paused.host.pump(62_100);
+    expect(lastSnapshot(paused.events).dayIndex).toBe(1);
+
+    const sped = createHarness();
+    sped.host.handleCommand(command("START", "start-speed"));
+    sped.advanceClock(5_000);
+    sped.host.handleCommand(
+      command("SET_SPEED", "speed-change", { daysPerSecond: 10 }),
+    );
+    sped.host.pump(6_000);
+    sped.advanceClock(100);
+    sped.host.pump(6_100);
+    // The 5 s accumulated at 1x is discarded when the speed changes.
+    expect(lastSnapshot(sped.events).dayIndex).toBe(1);
+    expect(lastSnapshot(sped.events).speedDaysPerSecond).toBe(10);
+  });
+
+  test("STEP and START behave predictably at the terminal boundary", () => {
+    const scenario = loadM5EightPolities();
+    const terminalScenario = {
+      ...scenario,
+      population: { ...scenario.population, startDayIndex: 36_524 },
+    };
+    const events: WorkerEvent[] = [];
+    let now = 1_000;
+    const host = new SimulationHost({
+      scenario: terminalScenario,
+      seed: SEED,
+      emit: (event) => events.push(event),
+      autoPump: false,
+      clock: () => now,
+    });
+    expect(lastSnapshot(events).dayIndex).toBe(36_524);
+    host.handleCommand(command("START", "start-terminal"));
+    expect(lastEvent(events, "ERROR")?.code).toBe("campaign_complete");
+    host.handleCommand(command("STEP", "step-terminal", { ticks: 1 }));
+    expect(lastSnapshot(events).dayIndex).toBe(36_524);
+    expect(lastSnapshot(events).running).toBe(false);
+    now += 1_000;
+  });
+
+  test("correlates command replies and leaves pump snapshots uncorrelated", () => {
+    const { host, events } = createHarness();
+    host.handleCommand(command("START", "start-correlated"));
+    expect(lastEvent(events, "STATE")?.commandId).toBe("start-correlated");
+    host.handleCommand(command("REQUEST_SNAPSHOT", "snapshot-correlated"));
+    const snapshotEvent = lastEvent(events, "SNAPSHOT");
+    expect(snapshotEvent?.commandId).toBe("snapshot-correlated");
+    host.handleCommand(command("PAUSE", "pause-correlated"));
+    expect(lastEvent(events, "STATE")?.commandId).toBe("pause-correlated");
   });
 
   test("compresses saves for storage and rejects malformed stored payloads", () => {

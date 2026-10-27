@@ -33,16 +33,28 @@ export class WebWorkerClient implements WorkerClient {
       this.handleMessage(event.data);
     };
     this.worker.onerror = (event: ErrorEvent) => {
-      this.emitError(event.message.length > 0 ? event.message : "web worker failed");
+      this.fail(event.message.length > 0 ? event.message : "web worker failed");
     };
     this.worker.onmessageerror = () => {
-      this.emitError("web worker returned an unreadable message");
+      this.fail("web worker returned an unreadable message");
     };
   }
 
+  public get isOpen(): boolean {
+    return !this.closed;
+  }
+
   public send(command: WorkerCommand): void {
-    if (this.closed) return;
-    this.worker.postMessage(command);
+    if (this.closed) {
+      throw new Error("web worker is closed");
+    }
+    try {
+      this.worker.postMessage(command);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.fail(`web worker failed to accept a command: ${message}`);
+      throw error;
+    }
   }
 
   public subscribe(listener: EventListener): () => void {
@@ -75,6 +87,20 @@ export class WebWorkerClient implements WorkerClient {
     } catch (error) {
       this.emitError(error instanceof Error ? error.message : String(error));
     }
+  }
+
+  private fail(message: string): void {
+    if (this.closed) return;
+    this.closed = true;
+    try {
+      this.worker.terminate();
+    } finally {
+      URL.revokeObjectURL(this.url);
+    }
+    const errorListeners = [...this.errorListeners];
+    this.listeners.clear();
+    this.errorListeners.clear();
+    for (const listener of errorListeners) listener(message);
   }
 
   private emitError(message: string): void {

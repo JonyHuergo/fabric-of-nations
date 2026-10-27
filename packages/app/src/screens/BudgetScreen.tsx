@@ -21,7 +21,7 @@ export function BudgetScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
-  const { applyFiscalPolicy, running } = useSimulation();
+  const { applyFiscalPolicy, running, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [taxText, setTaxText] = useState("0.05");
   const [welfareText, setWelfareText] = useState("0");
@@ -136,7 +136,7 @@ export function BudgetScreen({
             label={isPlayerCountry ? "Apply fiscal policy" : "AI-controlled country"}
             tone="accent"
             onPress={apply}
-            disabled={!isPlayerCountry}
+            disabled={!isPlayerCountry || busy || connection !== "ready"}
           />
         </View>
         {isPlayerCountry ? null : (

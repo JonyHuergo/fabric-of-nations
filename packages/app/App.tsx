@@ -17,6 +17,7 @@ import {
   type SpeedDaysPerSecond,
 } from "@century/sim-worker";
 
+import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
 import { ActionButton, Pill } from "./src/components/ui";
 import { BudgetScreen } from "./src/screens/BudgetScreen";
 import { CountryScreen } from "./src/screens/CountryScreen";
@@ -28,6 +29,7 @@ import { colors, radii, spacing } from "./src/theme";
 import {
   SimulationProvider,
   useSimulation,
+  type ConnectionState,
 } from "./src/worker/SimulationProvider";
 
 type TabId = "map" | "country" | "budget" | "population" | "markets" | "ledger";
@@ -58,12 +60,15 @@ function CenturyApp() {
     saveStatus,
     running,
     speedDaysPerSecond,
+    achievedDaysPerSecond,
+    busy,
     start,
     pause,
     step,
     setSpeed,
     saveGame,
     loadGame,
+    restartWorker,
     clearError,
   } = useSimulation();
   const [tab, setTab] = useState<TabId>("map");
@@ -103,14 +108,18 @@ function CenturyApp() {
         </View>
         <Controls
           snapshot={snapshot}
+          connection={connection}
           running={running}
           speedDaysPerSecond={speedDaysPerSecond}
+          achievedDaysPerSecond={achievedDaysPerSecond}
+          busy={busy}
           onStart={start}
           onPause={pause}
           onStep={step}
           onSpeed={setSpeed}
           onSave={saveGame}
           onLoad={loadGame}
+          onRestart={restartWorker}
         />
         {saveStatus === null ? null : <Text style={styles.saveStatus}>{saveStatus}</Text>}
         {error === null ? null : (
@@ -128,28 +137,30 @@ function CenturyApp() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        {snapshot === null ? (
-          <View style={styles.loading}>
-            <ActivityIndicator color={colors.accent} />
-            <Text style={styles.loadingText}>
-              {connection === "error"
-                ? "Simulation host failed to start. Check the error banner."
-                : "Waiting for the first immutable snapshot…"}
-            </Text>
-          </View>
-        ) : (
-          <Screen
-            tab={tab}
-            snapshot={snapshot}
-            selectedCountryId={selectedCountryId}
-            selectedRegionId={selectedRegionId}
-            onSelectCountry={setSelectedCountryId}
-            onSelectRegion={(regionId, countryId) => {
-              setSelectedRegionId(regionId);
-              if (countryId !== null) setSelectedCountryId(countryId);
-            }}
-          />
-        )}
+        <AppErrorBoundary onRestart={restartWorker}>
+          {snapshot === null ? (
+            <View style={styles.loading}>
+              <ActivityIndicator color={colors.accent} />
+              <Text style={styles.loadingText}>
+                {connection === "error"
+                  ? "Simulation host failed to start. Restart the worker and load a saved game."
+                  : "Waiting for the first immutable snapshot…"}
+              </Text>
+            </View>
+          ) : (
+            <Screen
+              tab={tab}
+              snapshot={snapshot}
+              selectedCountryId={selectedCountryId}
+              selectedRegionId={selectedRegionId}
+              onSelectCountry={setSelectedCountryId}
+              onSelectRegion={(regionId, countryId) => {
+                setSelectedRegionId(regionId);
+                if (countryId !== null) setSelectedCountryId(countryId);
+              }}
+            />
+          )}
+        </AppErrorBoundary>
       </ScrollView>
     </SafeAreaView>
   );
@@ -157,49 +168,78 @@ function CenturyApp() {
 
 function Controls({
   snapshot,
+  connection,
   running,
   speedDaysPerSecond,
+  achievedDaysPerSecond,
+  busy,
   onStart,
   onPause,
   onStep,
   onSpeed,
   onSave,
   onLoad,
+  onRestart,
 }: {
   readonly snapshot: SimulationSnapshot | null;
+  readonly connection: ConnectionState;
   readonly running: boolean;
   readonly speedDaysPerSecond: number;
+  readonly achievedDaysPerSecond: number;
+  readonly busy: boolean;
   readonly onStart: () => void;
   readonly onPause: () => void;
   readonly onStep: () => void;
   readonly onSpeed: (speed: SpeedDaysPerSecond) => void;
   readonly onSave: () => void;
   readonly onLoad: () => void;
+  readonly onRestart: () => void;
 }) {
+  const achievedLabel =
+    running && achievedDaysPerSecond > 0
+      ? ` · ~${achievedDaysPerSecond.toFixed(1)} actual`
+      : "";
+  const controlsDisabled = busy || connection !== "ready";
   return (
     <View style={styles.controls}>
       <View style={styles.controlGroup}>
         {running ? (
-          <ActionButton label="Pause" onPress={onPause} />
+          <ActionButton label="Pause" onPress={onPause} disabled={controlsDisabled} />
         ) : (
-          <ActionButton label="Start" tone="accent" onPress={onStart} />
+          <ActionButton
+            label="Start"
+            tone="accent"
+            onPress={onStart}
+            disabled={controlsDisabled}
+          />
         )}
-        <ActionButton label="Step 1 day" onPress={onStep} />
+        <ActionButton label="Step 1 day" onPress={onStep} disabled={controlsDisabled} />
       </View>
       <View style={styles.speedRow}>
-        <Text style={styles.controlLabel}>{formatSpeed(speedDaysPerSecond)}</Text>
+        <Text style={styles.controlLabel}>
+          Target {formatSpeed(speedDaysPerSecond)}
+          {achievedLabel} · best effort
+        </Text>
         {SPEED_VALUES.map((speed) => (
           <Pill
             key={speed}
             label={`${String(speed)}x`}
             active={speedDaysPerSecond === speed}
             onPress={() => onSpeed(speed)}
+            disabled={controlsDisabled}
           />
         ))}
       </View>
       <View style={styles.controlGroup}>
-        <ActionButton label="Save" onPress={onSave} disabled={snapshot === null} />
-        <ActionButton label="Load" onPress={onLoad} />
+        <ActionButton
+          label="Save"
+          onPress={onSave}
+          disabled={snapshot === null || controlsDisabled}
+        />
+        <ActionButton label="Load" onPress={onLoad} disabled={controlsDisabled} />
+        {connection === "error" || connection === "closed" ? (
+          <ActionButton label="Restart worker" tone="danger" onPress={onRestart} />
+        ) : null}
       </View>
     </View>
   );

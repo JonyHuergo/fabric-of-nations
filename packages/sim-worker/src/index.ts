@@ -8,3 +8,4 @@
 
 export * from "./protocol.js";
 export * from "./selectors.js";
+export * from "./supervisor.js";

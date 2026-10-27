@@ -3,12 +3,14 @@ import {
   useCallback,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import { StyleSheet, View } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 
 import {
   parseWorkerEvent,
+  PROTOCOL_VERSION,
   type WorkerCommand,
   type WorkerEvent,
 } from "@century/sim-worker";
@@ -22,6 +24,8 @@ interface WebViewHandle {
 export interface NativeWorkerHandle {
   send(command: WorkerCommand): void;
   close(): void;
+  /** Remount the hidden WebView with a fresh simulation context. */
+  restart(): void;
 }
 
 export interface NativeWorkerHostProps {
@@ -48,7 +52,7 @@ export const NativeWorkerHost = forwardRef<NativeWorkerHandle, NativeWorkerHostP
     const webViewRef = useRef<WebViewHandle | null>(null);
     const readyRef = useRef(false);
     const pendingRef = useRef<WorkerCommand[]>([]);
-
+    const [reloadKey, setReloadKey] = useState(0);
 
     const send = useCallback((command: WorkerCommand) => {
       if (!readyRef.current) {
@@ -65,12 +69,18 @@ export const NativeWorkerHost = forwardRef<NativeWorkerHandle, NativeWorkerHostP
         close() {
           if (readyRef.current) {
             injectCommand(webViewRef.current, {
-              protocolVersion: 1,
+              protocolVersion: PROTOCOL_VERSION,
               type: "SHUTDOWN",
               commandId: "app-native-close",
             });
           }
           pendingRef.current = [];
+          readyRef.current = false;
+        },
+        restart() {
+          pendingRef.current = [];
+          readyRef.current = false;
+          setReloadKey((value) => value + 1);
         },
       }),
       [send],
@@ -100,6 +110,7 @@ export const NativeWorkerHost = forwardRef<NativeWorkerHandle, NativeWorkerHostP
     return (
       <View style={styles.hidden} pointerEvents="none">
         <WebView
+          key={reloadKey}
           ref={(node) => {
             webViewRef.current = node as unknown as WebViewHandle | null;
           }}
@@ -112,7 +123,20 @@ export const NativeWorkerHost = forwardRef<NativeWorkerHandle, NativeWorkerHostP
           onMessage={handleMessage}
           onLoadEnd={handleLoadEnd}
           onError={() => {
+            readyRef.current = false;
             onError("native simulation WebView failed to load");
+          }}
+          onRenderProcessGone={() => {
+            readyRef.current = false;
+            pendingRef.current = [];
+            onError(
+              "native simulation WebView process was terminated by the operating system",
+            );
+          }}
+          onContentProcessDidTerminate={() => {
+            readyRef.current = false;
+            pendingRef.current = [];
+            onError("native simulation WebView content process terminated");
           }}
           style={styles.webView}
         />

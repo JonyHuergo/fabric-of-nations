@@ -37,6 +37,8 @@ export interface SnapshotRuntimeState {
   readonly sequence: number;
   readonly running: boolean;
   readonly speedDaysPerSecond: number;
+  /** Presentation-only measured throughput; never feeds simulation state. */
+  readonly achievedDaysPerSecond: number;
 }
 
 function roundDisplay(value: number, decimals = 4): number {
@@ -279,6 +281,8 @@ export function buildSimulationSnapshot(
     },
     running: runtime.running,
     speedDaysPerSecond: runtime.speedDaysPerSecond,
+    achievedDaysPerSecond: runtime.achievedDaysPerSecond,
+    speedIsBestEffort: true,
     campaignComplete: world.dayIndex >= 36_524,
     scenarioId: world.scenarioId,
     dataVersion: world.dataVersion,
