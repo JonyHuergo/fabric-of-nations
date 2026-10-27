@@ -603,9 +603,9 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 
 GDD v2.11 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.10
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.11
 records M7a annual accounting (§17B) and the Economic Management Overhaul (§17A; E0
-design, E1/E2/E3 implementations); E4–E6 are planned, and M8a remains planned only.
+design, E1/E2/E3/E4 implementations); E5–E6 are planned, and M8a remains planned only.
 See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
@@ -3039,11 +3039,11 @@ reported in the handoff.
 ## Economic Management Overhaul — E0 design, E1/E2/E3/E4 implementation, and M7a annual accounting
 
 GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
-(GDD §17A; D-070). **E0 is documentation/design; E1, E2, and E3 are implemented; M7a
-annual accounting is implemented in GDD v2.8/v2.9.** E4–E6 and M8a are planned and not
-implemented. E3's materials/procurement, private co-financing, public-enterprise
-operation/expansion, infrastructure, and land/space remain explicit later-stage
-dependencies.
+(GDD §17A; D-070). **E0 is documentation/design; E1, E2, E3, and E4 are implemented;
+M7a annual accounting is implemented in GDD v2.8/v2.9.** E5–E6 and M8a are planned and
+not implemented. Private co-financing, loans, guarantees, investment tax credits,
+general goods/services procurement, public-enterprise expansion/discontinuation,
+infrastructure, and land/space remain explicit later-stage dependencies.
 
 The overhaul's central goal is that the player governs a country's economy through
 consequential policy choices, public spending, investment, and institution-building:
@@ -3074,8 +3074,9 @@ adapt. The specification covers:
 - **Acceptance:** overall player questions, strategy divergence, per-stage testable
   criteria, and concrete usability tasks.
 
-The complete E0 specification is preserved in [GDD v2.10 §17A](./Century_GDD_v2.10.md);
-GDD v2.9 is retained as [historical E2 documentation](./Century_GDD_v2.9.md), GDD v2.8
+The complete E0 specification is preserved in [GDD v2.11 §17A](./Century_GDD_v2.11.md);
+GDD v2.10 is retained as [historical E3 documentation](./Century_GDD_v2.10.md), GDD
+v2.9 as [historical E2 documentation](./Century_GDD_v2.9.md), GDD v2.8
 as [historical M7a/E1 documentation](./Century_GDD_v2.8.md), GDD
 v2.7 as [historical E1 documentation](./Century_GDD_v2.7.md), and
 GDD v2.6 as [historical E0 documentation](./Century_GDD_v2.6.md). The E1 change report
