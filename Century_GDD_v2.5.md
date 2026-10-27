@@ -2362,6 +2362,15 @@ marks other countries as AI-controlled; fiscal edits are restricted to the playe
 country in the shipped shell. The snapshot remains immutable and contains no live
 world or private AI state.
 
+**Batch 2 reliability (D-064).** The snapshot includes target speed, measured
+achieved speed, and a best-effort flag. The provider accepts only strictly newer
+snapshot sequences, ignores late/duplicate command replies, pauses on web/native
+backgrounding without catch-up, and exposes a restart path after a timeout or
+transport failure. Restart loses unsaved in-memory state and says so. A contained
+error boundary handles rendering failure without blanking the whole app; the
+header/restart controls remain available. Native device behavior is not verified
+by these callbacks.
+
 ---
 
 ## 14. Technical architecture and persistence
@@ -2429,13 +2438,19 @@ The worker protocol must define versioned messages for:
 
 Commands that affect simulation state are applied only at defined tick boundaries in a stable order. UI commands must not mutate the world directly.
 
-**Current M7 protocol.** Version 1 implements `START`, `PAUSE`, `STEP`,
-`SET_SPEED`, `APPLY_ACTION`, `REQUEST_SNAPSHOT`, `SAVE`, `LOAD`, and `SHUTDOWN`,
-with command IDs; events include `READY`, `SNAPSHOT`, `STATE`, `ACTION_RESULT`,
-`SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, `FATAL`, and `SHUTDOWN`. Snapshots are
-immutable and bounded; the app receives no live world. Save/load wire strings are
-the canonical serializer output, compressed only at the platform-storage boundary
-(D-060/D-061).
+**Current protocol (Batch 2, D-064).** Version **2** implements `START`, `PAUSE`,
+`STEP`, `SET_SPEED`, `APPLY_ACTION`, `REQUEST_SNAPSHOT`, `SAVE`, `LOAD`, and
+`SHUTDOWN`, with command IDs; events include `READY`, `SNAPSHOT`, `STATE`,
+`ACTION_RESULT`, `SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, `FATAL`, and `SHUTDOWN`.
+`STATE`/`SNAPSHOT` carry a nullable correlation ID; pump snapshots are
+uncorrelated, requested snapshots echo the request. Snapshots carry target speed,
+measured achieved speed, and an explicit best-effort flag. The supervisor enforces
+bounded readiness/command timeouts, one critical save/load/apply, monotonic
+snapshot sequences, and late/duplicate reply rejection. Snapshot structure is
+validated down to the date/country/region/market fields the UI dereferences.
+Snapshots are immutable and bounded; the app receives no live world. Save/load wire
+strings are the canonical serializer output, compressed only at the platform-storage
+boundary (D-060/D-061).
 
 ### 14.4 Performance targets
 
@@ -2451,6 +2466,15 @@ Initial engineering targets, to be confirmed on a named reference device:
 Record device model, OS, build type, world size, warm-up, test duration, p50/p95/p99 tick times, snapshot rate, memory, and battery conditions. A Node benchmark is a fast regression test, not proof of mobile performance. Validate performance on-device in a release build. Current M2.1/M3f/M4b/M4c Node benchmarks (which also exercise worlds carrying the M4a-1/M4a-2/M4b/M4c state schema) do **not** evaluate or pass the mobile p95 target; its status remains **NOT EVALUATED**. The M4b close benchmark times only the period close, and the M4c fiscal benchmark times the integrated fiscal day; world cloning, setup, and hashing are excluded from both.
 
 At high speeds, batch ticks only up to a small execution budget before yielding to the runtime. Batching may delay snapshots but must not change tick order or outputs. Do not use `performance.now()` inside the simulation package to decide game outcomes; wall-clock budgeting belongs in the driver.
+
+**Batch 2 pacing policy (D-064).** The worker accepts at most 1,000 ms of elapsed
+wall time per pump, caps retained backlog at 1,000 ms, and executes at most four
+ticks per pump. `START`, `PAUSE`, `STEP`, `LOAD`, and `SET_SPEED` discard
+outstanding wall-time debt; backgrounding pauses and does not replay the suspended
+interval. The selected speed is a target: snapshots expose measured achieved speed
+and the UI labels it best-effort. These limits protect determinism and terminal
+boundaries; they do not guarantee the requested days/second. A 60-second stall is
+therefore bounded to a short burst rather than 60 simulated days.
 
 **Current M7 measurement.** The worker host's complete tick plus immutable
 snapshot measured p50 74.44 ms / p95 80.46 ms in Node on the recorded desktop;
@@ -2849,7 +2873,8 @@ summary-validation optimization.
 |---|---|---|---|
 | **M7** | Versioned simulation worker protocol, immutable snapshot bus, hidden WebView/Web Worker transports, six-screen Expo/React Native shell, player fiscal action, pause/step/speed, compressed save/load, and web/JS bundle verification | Web/headless interaction path passes: start/pause/step, shared-validator fiscal action, gzip save/load restoring the saved day and policy, month-end ledger rendering, zero page errors. UI imports only worker protocol/snapshot contracts and reads no live world. **Native iOS/Android release builds, real-device frame rate, cold start, memory, battery, and on-device tick p95 are NOT VERIFIED.** The production 500-region map/pan-zoom and broad charts are not implemented. | Implemented with documented acceptance exception |
 
-M7 implements §13, §14.2–§14.5, and D-060/D-061. The worker protocol is version 1;
+M7 implements §13, §14.2–§14.5, and D-060/D-061. The worker protocol is version 2
+after Batch 2 (D-064);
 the app receives bounded immutable snapshots and sends commands only through
 `@century/sim-worker`. Web uses a Blob-backed Web Worker; native uses a hidden
 `react-native-webview` as a separate JavaScript context; Node `worker_threads` is
@@ -2865,6 +2890,16 @@ builds. Node and headless-browser results are not mobile performance evidence. T
 mobile p95 ≤ 8 ms target, 60 fps, cold start, peak memory, and battery targets
 remain **NOT EVALUATED**. This exception is explicit and must remain visible until
 a release build is run on a named device.
+
+**Post-M7 remediation batch 2 (D-064).** The worker now has a bounded pump
+backlog, explicit pause/resume/speed/step/load accumulator semantics, target-vs-
+achieved speed telemetry, a readiness timeout, command/reply correlation and
+timeouts, stale/duplicate reply rejection, a single critical save/load/apply lock,
+restart-with-loss-of-unsaved-state recovery, native WebView process-failure hooks,
+strict nested snapshot validation, and a contained rendering-error boundary.
+Protocol version 2 is incompatible with version 1; the app and worker are rebuilt
+together. Native release/device behavior and on-device pacing remain **NOT
+VERIFIED**; no automatic recovery of lost in-memory state is claimed.
 
 **Post-M7 remediation batch 1 (D-062/D-063).** The shipped eight-polity scenario
 was re-authored for structural feasibility: it now has a viable fish and livestock

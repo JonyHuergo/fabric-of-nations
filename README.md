@@ -1316,7 +1316,7 @@ goods/buildings/professions/needs catalog, opening intermediate stock, and openi
 prices at the lower provisional bound. The older timings and the 81-building /
 85,487,776-population campaign row are retained as history and are **not** results
 of the current scenario. The current `pnpm bench` results are recorded in
-“Post-M7 remediation batch 1” near the end of this file. The full 36,524-tick
+“Post-M7 remediation batch 2” near the end of this file. The full 36,524-tick
 campaign has not been rerun after D-062.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
@@ -2141,6 +2141,130 @@ pass.
 
 Implementation commit: `f7fedbe6045d0f28ac54f8b60019518ba8a8ba18`
 (parent `c528240160de6281e9c0e44a2e38b13302db811d`). Documentation commit: the
+immediate child containing this section, `DECISIONS.md`, and
+`Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
+
+## Post-M7 remediation batch 2 — worker reliability and pacing
+
+**Scope.** D-064 implements the Batch 2 worker/pacing findings only. It does not
+change tick semantics, economic calculations, save format/size, debt, speed-control
+design, worker transports, or native code. Standard CI was run; the full campaign,
+stress/soak tests, and native release builds were not.
+
+### Pacing policy
+
+- A pump accepts at most **1,000 ms** of elapsed wall time, retains at most
+  **1,000 ms** of backlog, and executes at most **4 ticks**.
+- A suspended tab/WebView therefore cannot replay minutes or years. A 60-second
+  stall advances at most one second of simulated wall time and no more than four
+  ticks in the first burst.
+- `START`, `PAUSE`, `STEP`, `LOAD`, and `SET_SPEED` discard outstanding backlog.
+  Pause stops the timer; step is exact; load pauses and requires explicit Start; a
+  speed change applies only forward.
+- Web pauses on `visibilitychange`/hidden and resumes only if it was running before
+  hiding. Native uses `AppState` `background`/`inactive` and resumes on `active`
+  under the same condition. The host clamp remains the fallback if a lifecycle event
+  is missed.
+- The selected days/second is a **target**, not a guarantee. Snapshots include a
+  rolling 500 ms `achievedDaysPerSecond` and `speedIsBestEffort: true`; the UI shows
+  “Target … · ~actual actual · best effort”.
+- Terminal behavior is preserved: Start at 2000-01-01 is rejected with
+  `campaign_complete`, Step does not advance, Load remains available.
+
+### Supervision, correlation, and recovery
+
+- `WorkerSupervisor` (transport-independent, in `@century/sim-worker`) enforces a
+  **10 s readiness timeout**, **15 s ordinary command timeout**, and **60 s
+  save/load/apply timeout**.
+- Commands and replies are correlated by `commandId`. Pump snapshots use
+  `commandId: null`; requested snapshots echo the request. Duplicate and late
+  replies are dropped after a command settles or times out.
+- Only one save/load/apply critical operation can be in flight. Save/Load/Apply
+  controls are disabled while busy; a second critical request is rejected with a
+  clear message.
+- Snapshot sequences must be strictly newer. The high-water mark resets with a
+  replacement worker.
+- Timeout, transport error, malformed message, `FATAL`, or native WebView process
+  termination clears pending operations/status, marks the connection failed, and
+  shows **Restart worker**.
+- Restart creates a fresh 1900 simulation context. **Unsaved in-memory progress is
+  lost**; the UI states that and directs the player to load a saved game. No
+  automatic recovery of lost state is claimed.
+- Native callbacks `onRenderProcessGone` and `onContentProcessDidTerminate` route
+  into the same failure path. This is wiring, not device verification.
+
+### Protocol and snapshot hardening
+
+- Worker protocol is now **version 2**. Version 1 clients are intentionally
+  incompatible; the app and bundled worker are rebuilt together.
+- `STATE`/`SNAPSHOT` carry nullable command correlation; `ACTION_RESULT` and
+  `SHUTDOWN` are correlated; `STATE`/snapshots carry achieved-speed telemetry.
+- Snapshot validation now checks the fields the UI dereferences: civil date,
+  country fiscal/finance history, regions and nullable country/market ids, goods,
+  market prices, diagnostics, player-country reference, and speed telemetry.
+  Malformed messages are rejected before rendering.
+- `AppErrorBoundary` contains screen-render failures; the header and controls stay
+  usable, and the fallback offers Retry rendering and Restart worker.
+- UI code still imports only public `@century/sim-worker` contracts, not
+  `@century/sim` or `@century/data`.
+
+### Tests and verification
+
+Commands actually executed:
+
+- `pnpm run lint` — **PASS** (128 TypeScript files, 45 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (all six workspace packages).
+- `pnpm test` — **PASS: 46 suites, 534 tests**.
+- `pnpm run ci` — **PASS, exit code 0**: lint, typecheck, 534 tests, standard
+  benchmark, and web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+New/extended tests:
+
+- `m7-worker.test.ts`: 60 s stall bounded; pause/resume and speed-change debt
+  discard; terminal Start/Step; command correlation; existing save/load,
+  determinism, malformed-command, and compression tests.
+- `m7-supervisor.test.ts`: readiness timeout, command timeout, duplicate/late
+  replies, strictly newer snapshots, one-critical lock, reset/dispose, transport
+  failure clearing, parser rejection of malformed nested snapshot data.
+- `m7-app-lifecycle.test.ts`: source-level wiring guards for native process-failure
+  callbacks, AppState/visibility pause-resume, restart, status clearing, and the
+  error boundary. These are not native runtime tests.
+
+Final CI benchmark (standard `pnpm run bench`, PASS):
+
+| Workload | Result |
+|---|---|
+| M1 36,524 ticks | 0.002–0.004 ms avg; equal hashes |
+| M2 aggregate | ~0.10 ms avg, p95 ~0.18 ms |
+| M2 200-block stress | p50 3.44 ms, p95 **4.47 ms** (provisional ≤5 ms gate satisfied) |
+| M5 eight-polity sample | p50 **210.5 ms**, p95 **274.4 ms**, 113 buildings; projected campaign **2.19 h** (not executed) |
+| M6 sample | p50 238.5 ms, p95 327.1 ms; 14 evaluations, 1 applied, 0 rejected |
+| M7 worker host | tick+snapshot p50 **229.4 ms**, p95 **470.9 ms**; snapshot 11.8 KiB; save 413.1 KiB → 80.2 KiB compressed |
+| M7 save codec | 43.69 ms avg compress+decompress |
+
+These are Node diagnostics under current machine load, not mobile evidence. The
+M5/M6/M7 numbers shifted from the previous report; no tick logic was changed in
+this batch, so this is not presented as a throughput improvement or regression
+claim.
+
+### Remaining limitations
+
+- Native release builds and physical-device behavior are **NOT VERIFIED**. The
+  `AppState`, WebView process-termination, and visibility paths compile and are
+  source-guarded, but cannot be proven on device here.
+- There is no automatic restoration of unsaved in-memory state after a worker
+  restart. Restart begins a fresh 1900 world; only saved games can be reloaded.
+- The selected days/second remains best-effort; no guarantee of sustained target
+  throughput is made. General performance optimization is out of scope.
+- Save compression/size, autosave, storage quotas, history compaction, public debt,
+  worker transport replacement, and economic calibration are out of scope.
+- The full 36,524-tick campaign and stress/soak tests were not run in this batch.
+
+### Commits
+
+Implementation commit: `8bbd0ec8275f5697a408b062802b77acc39f3bc8`
+(parent `7c5463474dd553a8605bedf61b0975047aab43b9`). Documentation commit: the
 immediate child containing this section, `DECISIONS.md`, and
 `Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
 

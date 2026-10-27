@@ -2331,6 +2331,93 @@ loses one of eight sample evaluations; AI-controlled countries are unchanged. Th
 UI restriction is a presentation guard; the authoritative exclusion is in the
 simulation phase.
 
+## D-064 — Bounded simulation pacing, worker supervision, and protocol v2
+
+**Status:** implemented in the Batch 2 remediation. This changes scheduling and
+transport behavior, not tick semantics or economic calculations.
+
+**Problems.** The M7 pump retained all elapsed wall time in an unbounded
+accumulator. A suspended tab or WebView could therefore replay minutes or years of
+ticks when the timer resumed. The app had no readiness timeout, command/reply
+timeout, or command correlation for `STATE`/`SNAPSHOT`/`ACTION_RESULT`; a lost or
+late reply could leave the UI waiting indefinitely or let an old reply overwrite
+newer state. Snapshot validation checked only top-level shape, so malformed nested
+date/country/region/market fields could reach a screen and blank the app. The
+hidden WebView had no process-termination callback wiring.
+
+**Pacing decision.** `SimulationHost` enforces all of the following:
+
+- At most **1,000 ms of elapsed time is accepted per pump**, and retained backlog
+  is capped at **1,000 ms**.
+- At most **4 ticks are executed per pump**. A long stall therefore produces a
+  bounded short burst, never a replay of the stalled interval.
+- `START`, `PAUSE`, `STEP`, `LOAD`, and `SET_SPEED` discard outstanding wall-time
+  debt and reset the achieved-rate window. Pause stops the timer. Step pauses and
+  advances exactly the requested number of complete ticks. Load pauses and requires
+  an explicit `START`. A speed change applies only forward; it does not preserve
+  debt accumulated at the old speed.
+- The selected speed is a **target**. `SimulationSnapshot` now includes
+  `achievedDaysPerSecond` (rolling 500 ms measurement) and
+  `speedIsBestEffort: true`; the UI labels the selected value as a target, shows the
+  measured rate, and says “best effort”. The achieved value is presentation-only
+  and never enters world state, hashes, saves, or tick decisions.
+- Web pauses on `document.visibilitychange`/hidden and resumes only if the
+  simulation was running before hiding. Native pauses on React Native `AppState`
+  `background`/`inactive` and resumes on `active` under the same condition. The
+  host clamp remains a defense if a lifecycle event is missed.
+- Terminal behavior is unchanged: `START` at the terminal day is rejected with
+  `campaign_complete`; `STEP` does not advance; `LOAD` remains available.
+
+**Supervision decision.** A transport-independent `WorkerSupervisor` now owns:
+
+- **10 s readiness timeout** and **15 s ordinary command timeout**;
+  **60 s** for save/load/apply critical operations.
+- Command/reply correlation by `commandId` for `STATE`, `SNAPSHOT`,
+  `ACTION_RESULT`, `SAVE_RESULT`, `LOAD_RESULT`, `ERROR`, and `SHUTDOWN`.
+  Pump snapshots use `commandId: null`; a requested snapshot echoes the request ID.
+- Duplicate and late replies are dropped after a command settles or times out.
+- Only one save/load/apply critical operation may be in flight; the UI disables
+  those controls while busy.
+- Snapshots are accepted only when their sequence is strictly newer than the last
+  accepted sequence. The high-water mark resets with a replacement worker.
+- A readiness or command timeout, transport error, malformed message, `FATAL`, or
+  native process termination clears pending operations and transient status,
+  marks the connection failed, and exposes **Restart worker**. Restart creates a
+  fresh 1900 simulation context: unsaved progress is lost, and the UI says so. It
+  does not claim to recover lost in-memory state.
+- The native WebView wires `onRenderProcessGone` and
+  `onContentProcessDidTerminate` into the same error path. This is callback wiring,
+  not device verification.
+
+**Protocol v2.** `PROTOCOL_VERSION` is now **2**. `STATE`/`SNAPSHOT` carry a
+nullable `commandId`; `ACTION_RESULT` and `SHUTDOWN` carry correlation fields;
+`STATE` and snapshots carry achieved-speed telemetry. Snapshot validation now
+checks the fields the UI dereferences, including civil date, country fiscal and
+finance-history fields, regions and their nullable country/market ids, goods,
+market prices, diagnostics, and the player-country reference. Unknown or malformed
+messages are rejected before rendering. App code still imports only the public
+`@century/sim-worker` contracts and never `@century/sim` or `@century/data`.
+
+**Rendering containment.** `AppErrorBoundary` wraps the screen content (header and
+controls remain usable), reports the render error, offers “Retry rendering” and
+“Restart worker”, and explicitly warns that restart loses unsaved progress.
+
+**Tests.** Added `m7-supervisor.test.ts` (readiness/command timeouts, correlation,
+late/duplicate replies, stale sequence, critical lock, reset/dispose, transport
+failure, malformed nested snapshots) and `m7-app-lifecycle.test.ts` (native
+process-failure and AppState/visibility/error-boundary wiring guards). Extended
+`m7-worker.test.ts` with 60 s stall, pause/resume, speed-change, terminal
+START/STEP, and correlation tests. Full CI passes; native-device behavior remains
+unverified.
+
+**Consequences and limits.** The protocol is incompatible with version 1 clients;
+the app and bundled worker are rebuilt together. Timer stalls no longer produce
+uncontrolled catch-up, but pacing is still best-effort and the target rate is not
+guaranteed. Save-size, storage quotas, autosave, debt, worker transport
+reliability beyond the supervised process, and general performance optimization
+remain out of this batch. The 36,524-tick campaign, stress/soak runs, native
+release builds, and on-device measurements were not run.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
@@ -2377,6 +2464,13 @@ simulation phase.
     run does not claim that every clerk/capitalist block is cash-sufficient over a
     century. Construction, profession transition, and redistributive policy remain
     future work.
+16. Pacing constants (1,000 ms accepted/capped backlog, four ticks per pump) are
+    provisional reliability limits, not a guarantee that the selected days/second
+    target is sustained. The achieved-rate telemetry is a 500 ms presentation
+    measurement.
+17. Worker protocol 2 is intentionally incompatible with protocol 1. The web and
+    native bundles are built together. Native AppState/process-failure behavior is
+    wired but remains unverified on a physical release build.
 
 ## Items intentionally left open
 
