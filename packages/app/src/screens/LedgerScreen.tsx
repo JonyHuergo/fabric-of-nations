@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import {
   buildMonthlyReports,
   countryById,
+  describePlayerAction,
   fiscalResultLabel,
   formatSUSD,
   latestAnnualReport,
@@ -88,12 +89,44 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>{formatSUSD(latest.incomeTaxSUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>Welfare expense</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.welfareExpenseSUSD)}</Text>
+              <Text style={styles.reportLabel}>Business-profit tax</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.businessTaxRevenueSUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>Interest expense</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.interestExpenseSUSD)}</Text>
+              <Text style={styles.reportLabel}>Welfare paid (of requested)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.welfareExpenseSUSD)} /{" "}
+                {formatSUSD(latest.welfareRequestedSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Welfare shortfall (unpaid budget)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.welfareShortfallSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Business tax assessed / uncollected</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.businessTaxAssessedSUSD)} /{" "}
+                {formatSUSD(latest.businessTaxUncollectedSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Interest expense / cash paid</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.interestExpenseSUSD)} / {formatSUSD(latest.interestPaidSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Borrowed / principal repaid</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.debtIssuedSUSD)} / {formatSUSD(latest.principalRepaidSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Unfinanced requirement</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.unfinancedRequirementSUSD)}
+              </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result</Text>
@@ -189,12 +222,44 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>{formatSUSD(latestAnnual.incomeTaxSUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>Welfare expense (annual flow)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.welfareExpenseSUSD)}</Text>
+              <Text style={styles.reportLabel}>Business-profit tax (annual flow)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.businessTaxRevenueSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Welfare paid / requested (annual flows)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.welfareExpenseSUSD)} /{" "}
+                {formatSUSD(latestAnnual.welfareRequestedSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Welfare shortfall (annual flow)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.welfareShortfallSUSD)}
+              </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Interest expense (annual flow)</Text>
               <Text style={styles.reportValue}>{formatSUSD(latestAnnual.interestExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Borrowed / principal repaid (annual financing)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.debtIssuedSUSD)} /{" "}
+                {formatSUSD(latestAnnual.principalRepaidSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Interest cash paid (annual financing)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.interestPaidSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Unfinanced requirement (annual)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.unfinancedRequirementSUSD)}
+              </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result (annual flow)</Text>
@@ -314,19 +379,11 @@ export function LedgerScreen({
                 </Text>
               </View>
               <Text style={styles.actionDetail}>
-                Requested tax{" "}
-                {action.requested === null
-                  ? "unknown"
-                  : `${(action.requested.incomeTaxRate * 100).toFixed(2)}%`}
-                {"; welfare "}
-                {action.requested === null
-                  ? "unknown"
-                  : `${formatSUSD(action.requested.welfareBudgetSUSDPerYear)}/yr`}
+                Requested: {describePlayerAction(action.requested)}
               </Text>
               {action.applied === null ? null : (
                 <Text style={styles.actionDetail}>
-                  Confirmed applied: tax {(action.applied.incomeTaxRate * 100).toFixed(2)}%;
-                  welfare {formatSUSD(action.applied.welfareBudgetSUSDPerYear)}/yr
+                  Confirmed applied: {describePlayerAction(action.applied)}
                 </Text>
               )}
               {action.errors.length === 0 ? null : (

@@ -6,12 +6,18 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 4 as const;
+export const PROTOCOL_VERSION = 5 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
 export const MAX_SNAPSHOT_LEDGER_MONTHS = 12;
 export const MAX_SNAPSHOT_ANNUAL_REPORTS = 12;
+/**
+ * Presentation bound matching the simulation's active-contract cap. The UI uses
+ * it only to disable an obviously impossible issuance; the simulation remains the
+ * authoritative validator.
+ */
+export const MAX_ACTIVE_DEBT_CONTRACTS = 64;
 
 /** Discrete speed choices exposed by the M7 UI, in simulated days per second. */
 export const SPEED_VALUES = [1, 2, 5, 10] as const;
@@ -19,13 +25,44 @@ export type SpeedDaysPerSecond = (typeof SPEED_VALUES)[number];
 
 export const DEFAULT_SPEED_DAYS_PER_SECOND: SpeedDaysPerSecond = 1;
 
-/** A set-fiscal-policy request as sent by the UI. The worker stamps the day. */
+/** A player action as sent by the UI. The worker stamps the day and source. */
 export interface FiscalPolicyActionDto {
   readonly kind: "set-fiscal-policy";
   readonly countryId: number;
   readonly incomeTaxRate: number;
+  readonly incomeTaxAllowanceSUSDPerYear: number;
   readonly welfareBudgetSUSDPerYear: number;
+  readonly welfareMaxWealthLevel: number;
+  readonly businessProfitTaxRate: number;
+  readonly reserveTargetSUSD: number;
 }
+
+export interface IssueDebtActionDto {
+  readonly kind: "issue-debt";
+  readonly countryId: number;
+  readonly amountSUSD: number;
+}
+
+export interface RepayDebtActionDto {
+  readonly kind: "repay-debt";
+  readonly countryId: number;
+  readonly contractId: number;
+  readonly amountSUSD: number;
+}
+
+export interface SetDebtPolicyActionDto {
+  readonly kind: "set-debt-policy";
+  readonly countryId: number;
+  readonly refinanceOnMaturity: boolean;
+  readonly maxOutstandingPrincipalSUSD: number;
+}
+
+/** Every action the player UI may request. */
+export type CountryActionDto =
+  | FiscalPolicyActionDto
+  | IssueDebtActionDto
+  | RepayDebtActionDto
+  | SetDebtPolicyActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -47,7 +84,7 @@ export type WorkerCommand =
       readonly type: "APPLY_ACTION";
       readonly commandId: string;
       readonly actionId: string;
-      readonly action: FiscalPolicyActionDto;
+      readonly action: CountryActionDto;
     }
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
@@ -73,7 +110,60 @@ export interface SnapshotCivilDate {
 
 export interface SnapshotFiscalPolicy {
   readonly incomeTaxRate: number;
+  readonly incomeTaxAllowanceSUSDPerYear: number;
   readonly welfareBudgetSUSDPerYear: number;
+  readonly welfareMaxWealthLevel: number;
+  readonly businessProfitTaxRate: number;
+  readonly reserveTargetSUSD: number;
+}
+
+/** E2 budget decomposition for one closed period (flows, not balances). */
+export interface SnapshotBudgetTotals {
+  readonly welfareRequestedSUSD: number;
+  readonly welfareShortfallSUSD: number;
+  readonly businessTaxAssessedSUSD: number;
+  readonly businessTaxUncollectedSUSD: number;
+  readonly debtIssuedSUSD: number;
+  readonly principalRepaidSUSD: number;
+  readonly interestPaidSUSD: number;
+  readonly unfinancedRequirementSUSD: number;
+}
+
+/** Current open-period budget memo. Values are flows so far this month. */
+export interface SnapshotBudgetMonthToDate extends SnapshotBudgetTotals {
+  readonly businessTaxBaseMonthToDateSUSD: number;
+}
+
+/** M5b debt policy plus derived financing constraints. */
+export interface SnapshotDebtPolicy {
+  readonly enabled: boolean;
+  readonly refinanceOnMaturity: boolean;
+  readonly maxOutstandingPrincipalSUSD: number;
+  readonly creditorKind: "country" | "popBlock";
+  readonly creditorId: number;
+  readonly creditorLabel: string;
+  readonly annualCouponRate: number;
+  readonly termDays: number;
+  readonly arrearsGraceDays: number;
+  /** Creditor's current designated cash; a hard issuance limit. */
+  readonly creditorCashSUSD: number;
+  /** Remaining outstanding-principal headroom under the ceiling. */
+  readonly headroomSUSD: number;
+}
+
+/** One outstanding debt contract exposed for repayment planning. */
+export interface SnapshotDebtContract {
+  readonly id: number;
+  readonly holderKind: "country" | "popBlock";
+  readonly holderId: number;
+  readonly holderLabel: string;
+  readonly principalSUSD: number;
+  readonly outstandingPrincipalSUSD: number;
+  readonly annualCouponRate: number;
+  readonly issueDay: number;
+  readonly maturityDay: number;
+  readonly accruedInterestSUSD: number;
+  readonly status: "active" | "arrears" | "repaid" | "defaulted";
 }
 
 export interface SnapshotFiscalTotals {
@@ -110,7 +200,9 @@ export interface SnapshotNeedTier {
   readonly goods: readonly SnapshotNeedTierGood[];
 }
 
-export interface SnapshotFinancePeriod extends SnapshotFiscalTotals {
+export interface SnapshotFinancePeriod extends SnapshotFiscalTotals, SnapshotBudgetTotals {
+  /** E2 business-profit tax revenue recognized in the period. */
+  readonly businessTaxRevenueSUSD: number;
   /** World-wide gross flows for the four M4b flow kinds. */
   readonly grossFlowTotals: Readonly<Record<string, number>>;
   /** Canonical labels for the inclusive closed period. */
@@ -126,7 +218,7 @@ export interface SnapshotFinancePeriod extends SnapshotFiscalTotals {
   readonly householdCashEndSUSD: number | null;
 }
 
-export interface SnapshotAnnualReport {
+export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
   readonly year: number;
   readonly periodStartDay: number;
   readonly periodEndDay: number;
@@ -134,6 +226,7 @@ export interface SnapshotAnnualReport {
   readonly periodEndLabel: string;
   readonly complete: boolean;
   readonly incomeTaxSUSD: number;
+  readonly businessTaxRevenueSUSD: number;
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
   readonly netFiscalResultSUSD: number;
@@ -153,6 +246,10 @@ export interface CountrySnapshot {
   readonly debtEnabled: boolean;
   readonly debtOutstandingPrincipalSUSD: number;
   readonly debtInterestPayableSUSD: number;
+  /** Player-visible debt policy and derived financing limits. */
+  readonly debtPolicy: SnapshotDebtPolicy;
+  /** Outstanding/arrears contracts, in ascending id order (bounded by the cap). */
+  readonly debtContracts: readonly SnapshotDebtContract[];
   readonly population: number;
   readonly workingAgePopulation: number;
   readonly employedWorkers: number;
@@ -163,6 +260,18 @@ export interface CountrySnapshot {
    * at base wages. It is a current-base static estimate, not realized wages.
    */
   readonly estimatedDailyWageBaseSUSD: number;
+  /**
+   * Estimated daily taxable wage base after the current income-tax allowance.
+   * Exact for the current policy given the base-wage estimate; not realized
+   * wages, and not an exemption estimate for a different allowance.
+   */
+  readonly estimatedDailyTaxableWageBaseSUSD: number;
+  /** Blocks with a positive estimated daily wage base (for allowance estimates). */
+  readonly estimatedWageEarningBlockCount: number;
+  /** Month-to-date taxable enterprise profit used by the business-tax preview. */
+  readonly businessTaxBaseMonthToDateSUSD: number;
+  /** Current open-period budget memo (flows so far this month). */
+  readonly budgetMonthToDate: SnapshotBudgetMonthToDate;
   /** Population-weighted own-country indicators, 0..1 or 0..99 as named. */
   readonly literacy: number;
   readonly wealthLevel: number;
@@ -364,34 +473,120 @@ function requireInteger(
   return number;
 }
 
-function parseAction(value: unknown): FiscalPolicyActionDto {
+function parseAction(value: unknown): CountryActionDto {
   const record = requireRecord(value, "command.action");
-  if (record.kind !== "set-fiscal-policy") {
-    throw new ProtocolError("invalid_action", 'command.action.kind must be "set-fiscal-policy"');
-  }
-  const incomeTaxRate = requireFiniteNumber(
-    record.incomeTaxRate,
-    "command.action.incomeTaxRate",
-  );
-  if (incomeTaxRate < 0 || incomeTaxRate > 1) {
-    throw new ProtocolError("invalid_action", "command.action.incomeTaxRate must be in 0..1");
-  }
-  const welfareBudgetSUSDPerYear = requireFiniteNumber(
-    record.welfareBudgetSUSDPerYear,
-    "command.action.welfareBudgetSUSDPerYear",
-  );
-  if (welfareBudgetSUSDPerYear < 0) {
-    throw new ProtocolError(
-      "invalid_action",
-      "command.action.welfareBudgetSUSDPerYear must be non-negative",
+  const countryId = requireInteger(record.countryId, "command.action.countryId", 0, 0xffff_ffff);
+  const kind = record.kind;
+  if (kind === "set-fiscal-policy") {
+    const incomeTaxRate = requireFiniteNumber(
+      record.incomeTaxRate,
+      "command.action.incomeTaxRate",
     );
+    if (incomeTaxRate < 0 || incomeTaxRate > 1) {
+      throw new ProtocolError("invalid_action", "command.action.incomeTaxRate must be in 0..1");
+    }
+    const businessProfitTaxRate = requireFiniteNumber(
+      record.businessProfitTaxRate,
+      "command.action.businessProfitTaxRate",
+    );
+    if (businessProfitTaxRate < 0 || businessProfitTaxRate > 1) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.businessProfitTaxRate must be in 0..1",
+      );
+    }
+    const incomeTaxAllowanceSUSDPerYear = requireFiniteNumber(
+      record.incomeTaxAllowanceSUSDPerYear,
+      "command.action.incomeTaxAllowanceSUSDPerYear",
+    );
+    if (incomeTaxAllowanceSUSDPerYear < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.incomeTaxAllowanceSUSDPerYear must be non-negative",
+      );
+    }
+    const welfareBudgetSUSDPerYear = requireFiniteNumber(
+      record.welfareBudgetSUSDPerYear,
+      "command.action.welfareBudgetSUSDPerYear",
+    );
+    if (welfareBudgetSUSDPerYear < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.welfareBudgetSUSDPerYear must be non-negative",
+      );
+    }
+    const welfareMaxWealthLevel = requireInteger(
+      record.welfareMaxWealthLevel,
+      "command.action.welfareMaxWealthLevel",
+      0,
+      99,
+    );
+    const reserveTargetSUSD = requireFiniteNumber(
+      record.reserveTargetSUSD,
+      "command.action.reserveTargetSUSD",
+    );
+    if (reserveTargetSUSD < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.reserveTargetSUSD must be non-negative",
+      );
+    }
+    return {
+      kind: "set-fiscal-policy",
+      countryId,
+      incomeTaxRate,
+      incomeTaxAllowanceSUSDPerYear,
+      welfareBudgetSUSDPerYear,
+      welfareMaxWealthLevel,
+      businessProfitTaxRate,
+      reserveTargetSUSD,
+    };
   }
-  return {
-    kind: "set-fiscal-policy",
-    countryId: requireInteger(record.countryId, "command.action.countryId", 0, 0xffff_ffff),
-    incomeTaxRate,
-    welfareBudgetSUSDPerYear,
-  };
+  if (kind === "issue-debt") {
+    const amountSUSD = requireFiniteNumber(record.amountSUSD, "command.action.amountSUSD");
+    if (!(amountSUSD > 0)) {
+      throw new ProtocolError("invalid_action", "command.action.amountSUSD must be positive");
+    }
+    return { kind: "issue-debt", countryId, amountSUSD };
+  }
+  if (kind === "repay-debt") {
+    const contractId = requireInteger(
+      record.contractId,
+      "command.action.contractId",
+      0,
+      0xffff_ffff,
+    );
+    const amountSUSD = requireFiniteNumber(record.amountSUSD, "command.action.amountSUSD");
+    if (!(amountSUSD > 0)) {
+      throw new ProtocolError("invalid_action", "command.action.amountSUSD must be positive");
+    }
+    return { kind: "repay-debt", countryId, contractId, amountSUSD };
+  }
+  if (kind === "set-debt-policy") {
+    if (typeof record.refinanceOnMaturity !== "boolean") {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.refinanceOnMaturity must be a boolean",
+      );
+    }
+    const maxOutstandingPrincipalSUSD = requireFiniteNumber(
+      record.maxOutstandingPrincipalSUSD,
+      "command.action.maxOutstandingPrincipalSUSD",
+    );
+    if (maxOutstandingPrincipalSUSD < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.maxOutstandingPrincipalSUSD must be non-negative",
+      );
+    }
+    return {
+      kind: "set-debt-policy",
+      countryId,
+      refinanceOnMaturity: record.refinanceOnMaturity,
+      maxOutstandingPrincipalSUSD,
+    };
+  }
+  throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }
 
 function isSpeed(value: number): value is SpeedDaysPerSecond {
@@ -511,9 +706,85 @@ function isNullableFiniteNumber(value: unknown): value is number | null {
   return value === null || isFiniteNumber(value);
 }
 
+const BUDGET_TOTAL_FIELDS = [
+  "welfareRequestedSUSD",
+  "welfareShortfallSUSD",
+  "businessTaxAssessedSUSD",
+  "businessTaxUncollectedSUSD",
+  "debtIssuedSUSD",
+  "principalRepaidSUSD",
+  "interestPaidSUSD",
+  "unfinancedRequirementSUSD",
+] as const;
+
+function isBudgetTotals(value: unknown): value is SnapshotBudgetTotals {
+  if (!isRecord(value)) return false;
+  return BUDGET_TOTAL_FIELDS.every(
+    (field) => isFiniteNumber(value[field]) && (value[field] as number) >= 0,
+  );
+}
+
+function isBudgetMonthToDate(value: unknown): value is SnapshotBudgetMonthToDate {
+  if (!isBudgetTotals(value)) return false;
+  const record = value as unknown as Record<string, unknown>;
+  return isFiniteNumber(record.businessTaxBaseMonthToDateSUSD);
+}
+
+function isSnapshotDebtPolicy(value: unknown): value is SnapshotDebtPolicy {
+  if (!isRecord(value)) return false;
+  if (typeof value.enabled !== "boolean") return false;
+  if (typeof value.refinanceOnMaturity !== "boolean") return false;
+  for (const field of [
+    "maxOutstandingPrincipalSUSD",
+    "annualCouponRate",
+    "creditorCashSUSD",
+    "headroomSUSD",
+  ] as const) {
+    if (!isFiniteNumber(value[field])) return false;
+  }
+  if ((value.maxOutstandingPrincipalSUSD as number) < 0) return false;
+  if ((value.creditorCashSUSD as number) < 0) return false;
+  if ((value.headroomSUSD as number) < 0) return false;
+  if ((value.annualCouponRate as number) < 0 || (value.annualCouponRate as number) > 1) {
+    return false;
+  }
+  if (value.creditorKind !== "country" && value.creditorKind !== "popBlock") return false;
+  if (!isIntegerIn(value.creditorId, 0, 0xffff_ffff)) return false;
+  if (!isString(value.creditorLabel, 256)) return false;
+  if (!isIntegerIn(value.termDays, 1, 36_500)) return false;
+  if (!isIntegerIn(value.arrearsGraceDays, 0, 3_650)) return false;
+  return true;
+}
+
+function isSnapshotDebtContract(value: unknown): value is SnapshotDebtContract {
+  if (!isRecord(value)) return false;
+  if (
+    value.status !== "active" &&
+    value.status !== "arrears" &&
+    value.status !== "repaid" &&
+    value.status !== "defaulted"
+  ) {
+    return false;
+  }
+  if (value.holderKind !== "country" && value.holderKind !== "popBlock") return false;
+  return (
+    isIntegerIn(value.id, 0, 0xffff_ffff) &&
+    isIntegerIn(value.holderId, 0, 0xffff_ffff) &&
+    isString(value.holderLabel, 256) &&
+    isFiniteNumber(value.principalSUSD) &&
+    isFiniteNumber(value.outstandingPrincipalSUSD) &&
+    isFiniteNumber(value.annualCouponRate) &&
+    isIntegerIn(value.issueDay, 0, 36_524) &&
+    isIntegerIn(value.maturityDay, 0, 36_524) &&
+    isFiniteNumber(value.accruedInterestSUSD)
+  );
+}
+
 function isFinancePeriod(value: unknown): value is SnapshotFinancePeriod {
   if (!isFiscalTotals(value)) return false;
   const record = value as unknown as Record<string, unknown>;
+  if (!isFiniteNumber(record.businessTaxRevenueSUSD)) return false;
+  if (!isBudgetTotals(record)) return false;
   if (!isRecord(record.grossFlowTotals)) return false;
   if (!Object.values(record.grossFlowTotals).every((entry) => isFiniteNumber(entry))) {
     return false;
@@ -563,6 +834,7 @@ function isNeedTier(value: unknown): value is SnapshotNeedTier {
 
 function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
   if (!isRecord(value)) return false;
+  if (!isBudgetTotals(value)) return false;
   return (
     isIntegerIn(value.year, 1900, 1999) &&
     isIntegerIn(value.periodStartDay, 0, 36_524) &&
@@ -571,6 +843,7 @@ function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
     isString(value.periodEndLabel, 10) &&
     typeof value.complete === "boolean" &&
     isFiniteNumber(value.incomeTaxSUSD) &&
+    isFiniteNumber(value.businessTaxRevenueSUSD) &&
     isFiniteNumber(value.welfareExpenseSUSD) &&
     isFiniteNumber(value.interestExpenseSUSD) &&
     isFiniteNumber(value.netFiscalResultSUSD) &&
@@ -587,17 +860,32 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isString(value.tag, 32) || !isString(value.name, 256)) return false;
   if (!isNumberArray(value.regionIds)) return false;
   if (!isRecord(value.fiscal)) return false;
-  if (!isFiniteNumber(value.fiscal.incomeTaxRate)) return false;
-  if (!isFiniteNumber(value.fiscal.welfareBudgetSUSDPerYear)) return false;
+  for (const field of [
+    "incomeTaxRate",
+    "welfareBudgetSUSDPerYear",
+    "incomeTaxAllowanceSUSDPerYear",
+    "welfareMaxWealthLevel",
+    "businessProfitTaxRate",
+    "reserveTargetSUSD",
+  ] as const) {
+    if (!isFiniteNumber(value.fiscal[field])) return false;
+  }
   if (!isFiniteNumber(value.treasuryCashSUSD)) return false;
   if (typeof value.debtEnabled !== "boolean") return false;
   if (!isFiniteNumber(value.debtOutstandingPrincipalSUSD)) return false;
   if (!isFiniteNumber(value.debtInterestPayableSUSD)) return false;
+  if (!isSnapshotDebtPolicy(value.debtPolicy)) return false;
+  if (!Array.isArray(value.debtContracts)) return false;
+  if (!value.debtContracts.every((contract) => isSnapshotDebtContract(contract))) return false;
   if (!isFiniteNumber(value.population)) return false;
   if (!isFiniteNumber(value.workingAgePopulation)) return false;
   if (!isFiniteNumber(value.employedWorkers)) return false;
   if (!isFiniteNumber(value.householdCashSUSD)) return false;
   if (!isFiniteNumber(value.estimatedDailyWageBaseSUSD)) return false;
+  if (!isFiniteNumber(value.estimatedDailyTaxableWageBaseSUSD)) return false;
+  if (!isIntegerIn(value.estimatedWageEarningBlockCount, 0, 1_000_000)) return false;
+  if (!isFiniteNumber(value.businessTaxBaseMonthToDateSUSD)) return false;
+  if (!isBudgetMonthToDate(value.budgetMonthToDate)) return false;
   if (!isFiniteNumber(value.literacy)) return false;
   if (!isFiniteNumber(value.wealthLevel)) return false;
   if (!isFiniteNumber(value.militancy)) return false;

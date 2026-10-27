@@ -29,7 +29,7 @@ import {
   PROTOCOL_VERSION,
   ProtocolError,
   parseWorkerCommand,
-  type FiscalPolicyActionDto,
+  type CountryActionDto,
   type SimulationSnapshot,
   type SpeedDaysPerSecond,
   type WorkerCommand,
@@ -307,16 +307,15 @@ export class SimulationHost {
   private applyAction(
     commandId: string,
     actionId: string,
-    action: FiscalPolicyActionDto,
+    action: CountryActionDto,
   ): void {
-    const command: CountryAction = {
-      kind: "set-fiscal-policy",
-      countryId: action.countryId,
+    // The DTO union mirrors the validated action union; only the worker-stamped
+    // day and source are added here. Narrowing by `kind` is preserved at runtime.
+    const command = {
+      ...action,
       dayIndex: this.world.dayIndex,
       source: "player",
-      incomeTaxRate: action.incomeTaxRate,
-      welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
-    };
+    } as CountryAction;
     const validation = validateCountryAction(this.world, command);
     if (!validation.valid) {
       this.emitEvent({

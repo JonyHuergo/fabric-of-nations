@@ -110,7 +110,7 @@ function manualFinance(
     debtContracts: [],
     debtHistory: [],
     nextContractId: 1,
-    welfareRequestedThisMonth: {},
+    budgetMemosThisMonth: {},
     closedThroughDay: null,
   };
 }

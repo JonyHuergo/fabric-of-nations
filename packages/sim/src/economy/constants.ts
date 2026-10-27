@@ -37,13 +37,30 @@ export const MAX_CORRECTION_REASON_LENGTH = 500;
 export const M3_DEFERRED_GOOD_KEYS = ["services"] as const;
 
 /**
- * M4c fiscal numeric-safety bounds. These are validation limits, not calibrated
- * economics: an income-tax rate is dimensionless in [0, 1] and a welfare budget
- * is a finite nominal SUSD/year target below the documented safe bound.
+ * M4c/E2 fiscal numeric-safety bounds. These are validation limits, not
+ * calibrated economics: a tax rate is dimensionless in [0, 1], a budget,
+ * exemption, or reserve target is a finite nominal SUSD amount below the
+ * documented safe bound, and the welfare wealth ceiling is a population wealth
+ * level (0..99, where 99 covers every block and is therefore universal).
  */
 export const MIN_FISCAL_TAX_RATE = 0;
 export const MAX_FISCAL_TAX_RATE = 1;
 export const MAX_FISCAL_BUDGET_SUSD_PER_YEAR = 1e15;
+
+/** Highest population wealth level; mirrors `WEALTH_MAX` (0..99). */
+export const MAX_WELFARE_WEALTH_LEVEL = 99;
+
+/**
+ * E2 provisional fiscal-policy defaults. The shipped historical scenario declares
+ * only the M4c rate and welfare budget, so every E2 instrument starts neutral:
+ * no income-tax exemption, universal welfare eligibility, no business-profit tax,
+ * and no treasury reserve floor. A neutral policy preserves the accepted M4c/M5b
+ * behavior exactly; the player changes these through validated actions.
+ */
+export const DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR = 0;
+export const DEFAULT_WELFARE_MAX_WEALTH_LEVEL = MAX_WELFARE_WEALTH_LEVEL;
+export const DEFAULT_BUSINESS_PROFIT_TAX_RATE = 0;
+export const DEFAULT_RESERVE_TARGET_SUSD = 0;
 
 /**
  * M3d provisional bounded price-update coefficients, not calibrated.

@@ -1,0 +1,275 @@
+/**
+ * E2 public-budget memo helpers (D-073).
+ *
+ * The month-to-date memo accumulates requested/assessed amounts and financing
+ * movements reported alongside the accounting flows. It is not a liability and
+ * never substitutes for an account posting:
+ *
+ * - requested welfare the treasury could not pay is an unmet budget, not debt;
+ * - assessed business tax that exceeds a building's operating cash is an
+ *   uncollected shortfall, not a receivable;
+ * - borrowing and principal repayment are financing movements, not revenue or
+ *   expense.
+ *
+ * Helpers are pure with respect to the finance object passed in: callers stage a
+ * finance clone, mutate the clone through these helpers, and publish only after
+ * validation.
+ */
+
+import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
+import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import type { Day, Id, MoneySUSD } from "../types.js";
+import { requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
+import type {
+  FinanceBudgetMemo,
+  FinancePeriodBudgetTotals,
+  FinanceState,
+} from "./types.js";
+
+/** The zero memo for a country with no current-period activity. */
+export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
+  return {
+    welfareRequestedSUSD: 0,
+    welfareShortfallSUSD: 0,
+    businessTaxAssessedSUSD: 0,
+    businessTaxUncollectedSUSD: 0,
+    debtIssuedSUSD: 0,
+    principalRepaidSUSD: 0,
+    interestPaidSUSD: 0,
+    unfinancedRequirementSUSD: 0,
+    businessTaxAssessedDay: null,
+  };
+}
+
+/** Current memo for one country, or the zero memo. Never mutates. */
+export function readBudgetMemo(finance: FinanceState, countryId: Id): FinanceBudgetMemo {
+  return finance.budgetMemosThisMonth[countryId] ?? emptyFinanceBudgetMemo();
+}
+
+/** Add one nonnegative amount to a memo field with finite-result checking. */
+function addAmount(current: number, delta: number, label: string): number {
+  if (!Number.isFinite(delta) || delta < 0) {
+    throw new RangeError(`budget memo ${label} delta must be a finite nonnegative amount`);
+  }
+  const next = current + delta;
+  if (!Number.isFinite(next) || next < 0) {
+    throw new RangeError(`budget memo ${label} would become non-finite`);
+  }
+  return next;
+}
+
+/**
+ * Accumulate period activity into one country's memo. The memo entry is created
+ * only when something is recorded, so a world with no fiscal activity keeps an
+ * empty map and an unchanged canonical form.
+ */
+export function accumulateBudgetMemo(
+  finance: FinanceState,
+  countryId: Id,
+  delta: {
+    readonly welfareRequestedSUSD?: MoneySUSD;
+    readonly welfareShortfallSUSD?: MoneySUSD;
+    readonly businessTaxAssessedSUSD?: MoneySUSD;
+    readonly businessTaxUncollectedSUSD?: MoneySUSD;
+    readonly debtIssuedSUSD?: MoneySUSD;
+    readonly principalRepaidSUSD?: MoneySUSD;
+    readonly interestPaidSUSD?: MoneySUSD;
+    readonly unfinancedRequirementSUSD?: MoneySUSD;
+    readonly businessTaxAssessedDay?: Day;
+  },
+): FinanceBudgetMemo {
+  const current = readBudgetMemo(finance, countryId);
+  const next: FinanceBudgetMemo = {
+    welfareRequestedSUSD: addAmount(
+      current.welfareRequestedSUSD,
+      delta.welfareRequestedSUSD ?? 0,
+      "welfareRequestedSUSD",
+    ),
+    welfareShortfallSUSD: addAmount(
+      current.welfareShortfallSUSD,
+      delta.welfareShortfallSUSD ?? 0,
+      "welfareShortfallSUSD",
+    ),
+    businessTaxAssessedSUSD: addAmount(
+      current.businessTaxAssessedSUSD,
+      delta.businessTaxAssessedSUSD ?? 0,
+      "businessTaxAssessedSUSD",
+    ),
+    businessTaxUncollectedSUSD: addAmount(
+      current.businessTaxUncollectedSUSD,
+      delta.businessTaxUncollectedSUSD ?? 0,
+      "businessTaxUncollectedSUSD",
+    ),
+    debtIssuedSUSD: addAmount(
+      current.debtIssuedSUSD,
+      delta.debtIssuedSUSD ?? 0,
+      "debtIssuedSUSD",
+    ),
+    principalRepaidSUSD: addAmount(
+      current.principalRepaidSUSD,
+      delta.principalRepaidSUSD ?? 0,
+      "principalRepaidSUSD",
+    ),
+    interestPaidSUSD: addAmount(
+      current.interestPaidSUSD,
+      delta.interestPaidSUSD ?? 0,
+      "interestPaidSUSD",
+    ),
+    unfinancedRequirementSUSD: addAmount(
+      current.unfinancedRequirementSUSD,
+      delta.unfinancedRequirementSUSD ?? 0,
+      "unfinancedRequirementSUSD",
+    ),
+    businessTaxAssessedDay:
+      delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
+  };
+  finance.budgetMemosThisMonth[countryId] = next;
+  return next;
+}
+
+/** Frozen period budget totals from a month-to-date memo. */
+export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudgetTotals {
+  return {
+    welfareRequestedSUSD: memo.welfareRequestedSUSD,
+    welfareShortfallSUSD: memo.welfareShortfallSUSD,
+    businessTaxAssessedSUSD: memo.businessTaxAssessedSUSD,
+    businessTaxUncollectedSUSD: memo.businessTaxUncollectedSUSD,
+    debtIssuedSUSD: memo.debtIssuedSUSD,
+    principalRepaidSUSD: memo.principalRepaidSUSD,
+    interestPaidSUSD: memo.interestPaidSUSD,
+    unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
+  };
+}
+
+/** Exact field-by-field sum used for annual aggregation. */
+export function addBudgetTotals(
+  left: FinancePeriodBudgetTotals,
+  right: FinancePeriodBudgetTotals,
+): FinancePeriodBudgetTotals {
+  return {
+    welfareRequestedSUSD: left.welfareRequestedSUSD + right.welfareRequestedSUSD,
+    welfareShortfallSUSD: left.welfareShortfallSUSD + right.welfareShortfallSUSD,
+    businessTaxAssessedSUSD:
+      left.businessTaxAssessedSUSD + right.businessTaxAssessedSUSD,
+    businessTaxUncollectedSUSD:
+      left.businessTaxUncollectedSUSD + right.businessTaxUncollectedSUSD,
+    debtIssuedSUSD: left.debtIssuedSUSD + right.debtIssuedSUSD,
+    principalRepaidSUSD: left.principalRepaidSUSD + right.principalRepaidSUSD,
+    interestPaidSUSD: left.interestPaidSUSD + right.interestPaidSUSD,
+    unfinancedRequirementSUSD:
+      left.unfinancedRequirementSUSD + right.unfinancedRequirementSUSD,
+  };
+}
+
+/** Zero period budget totals. */
+export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
+  return {
+    welfareRequestedSUSD: 0,
+    welfareShortfallSUSD: 0,
+    businessTaxAssessedSUSD: 0,
+    businessTaxUncollectedSUSD: 0,
+    debtIssuedSUSD: 0,
+    principalRepaidSUSD: 0,
+    interestPaidSUSD: 0,
+    unfinancedRequirementSUSD: 0,
+  };
+}
+
+/** Validate one memo record. */
+export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: string): void {
+  const record = requireRecord(memo, path);
+  const welfareRequested = requireFiniteNumber(
+    record.welfareRequestedSUSD,
+    `${path}.welfareRequestedSUSD`,
+  );
+  const welfareShortfall = requireFiniteNumber(
+    record.welfareShortfallSUSD,
+    `${path}.welfareShortfallSUSD`,
+  );
+  const businessTaxAssessed = requireFiniteNumber(
+    record.businessTaxAssessedSUSD,
+    `${path}.businessTaxAssessedSUSD`,
+  );
+  const businessTaxUncollected = requireFiniteNumber(
+    record.businessTaxUncollectedSUSD,
+    `${path}.businessTaxUncollectedSUSD`,
+  );
+  for (const field of [
+    "debtIssuedSUSD",
+    "principalRepaidSUSD",
+    "interestPaidSUSD",
+    "unfinancedRequirementSUSD",
+  ] as const) {
+    const value = requireFiniteNumber(record[field], `${path}.${field}`);
+    if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
+  }
+  for (const [label, value] of [
+    ["welfareRequestedSUSD", welfareRequested],
+    ["welfareShortfallSUSD", welfareShortfall],
+    ["businessTaxAssessedSUSD", businessTaxAssessed],
+    ["businessTaxUncollectedSUSD", businessTaxUncollected],
+  ] as const) {
+    if (value < 0) throw new RangeError(`${path}.${label} must be non-negative`);
+  }
+  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.welfareShortfallSUSD must not exceed the request`);
+  }
+  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
+  }
+  if (record.businessTaxAssessedDay !== null) {
+    requireInteger(
+      record.businessTaxAssessedDay,
+      `${path}.businessTaxAssessedDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
+  }
+}
+
+/** Validate one frozen period budget total record. */
+export function assertValidBudgetTotals(
+  totals: FinancePeriodBudgetTotals,
+  path: string,
+): void {
+  const record = requireRecord(totals, path);
+  const welfareRequested = requireFiniteNumber(
+    record.welfareRequestedSUSD,
+    `${path}.welfareRequestedSUSD`,
+  );
+  const welfareShortfall = requireFiniteNumber(
+    record.welfareShortfallSUSD,
+    `${path}.welfareShortfallSUSD`,
+  );
+  const businessTaxAssessed = requireFiniteNumber(
+    record.businessTaxAssessedSUSD,
+    `${path}.businessTaxAssessedSUSD`,
+  );
+  const businessTaxUncollected = requireFiniteNumber(
+    record.businessTaxUncollectedSUSD,
+    `${path}.businessTaxUncollectedSUSD`,
+  );
+  for (const field of [
+    "debtIssuedSUSD",
+    "principalRepaidSUSD",
+    "interestPaidSUSD",
+    "unfinancedRequirementSUSD",
+  ] as const) {
+    const value = requireFiniteNumber(record[field], `${path}.${field}`);
+    if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
+  }
+  for (const [label, value] of [
+    ["welfareRequestedSUSD", welfareRequested],
+    ["welfareShortfallSUSD", welfareShortfall],
+    ["businessTaxAssessedSUSD", businessTaxAssessed],
+    ["businessTaxUncollectedSUSD", businessTaxUncollected],
+  ] as const) {
+    if (value < 0) throw new RangeError(`${path}.${label} must be non-negative`);
+  }
+  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.welfareShortfallSUSD must not exceed the request`);
+  }
+  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
+  }
+}

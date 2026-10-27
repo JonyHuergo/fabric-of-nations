@@ -16,7 +16,14 @@ export function baseScenario(): EconomyScenarioDef {
 
 /** Zero fiscal policy used by M4a-2 fixtures that only exercise identity. */
 export function zeroFiscal(): FiscalPolicy {
-  return { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 };
+  return {
+    incomeTaxRate: 0,
+    incomeTaxAllowanceSUSDPerYear: 0,
+    welfareBudgetSUSDPerYear: 0,
+    welfareMaxWealthLevel: 99,
+    businessProfitTaxRate: 0,
+    reserveTargetSUSD: 0,
+  };
 }
 
 export function country(

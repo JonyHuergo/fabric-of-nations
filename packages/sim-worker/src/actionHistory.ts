@@ -1,5 +1,5 @@
 /**
- * E1 bounded confirmed player-action history.
+ * E1/E2 bounded confirmed player-action history.
  *
  * Records are presentation-only and exist for the current app session. They are
  * appended only from an authoritative ACTION_RESULT, not when the UI sends a
@@ -8,22 +8,42 @@
 
 export const MAX_PLAYER_ACTION_HISTORY = 48;
 
+/** Confirmed E2 fiscal-policy values. */
 export interface FiscalPolicyRequestValues {
   readonly incomeTaxRate: number;
+  readonly incomeTaxAllowanceSUSDPerYear: number;
   readonly welfareBudgetSUSDPerYear: number;
+  readonly welfareMaxWealthLevel: number;
+  readonly businessProfitTaxRate: number;
+  readonly reserveTargetSUSD: number;
 }
+
+/** A requested or confirmed player action, discriminated by kind. */
+export type PlayerActionRequest =
+  | ({ readonly kind: "set-fiscal-policy" } & FiscalPolicyRequestValues)
+  | { readonly kind: "issue-debt"; readonly amountSUSD: number }
+  | {
+      readonly kind: "repay-debt";
+      readonly contractId: number;
+      readonly amountSUSD: number;
+    }
+  | {
+      readonly kind: "set-debt-policy";
+      readonly refinanceOnMaturity: boolean;
+      readonly maxOutstandingPrincipalSUSD: number;
+    };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
-  readonly kind: "set-fiscal-policy";
+  readonly kind: PlayerActionRequest["kind"];
   readonly countryId: number;
   readonly countryTag: string | null;
   readonly dayIndex: number;
   readonly dateLabel: string;
-  readonly requested: FiscalPolicyRequestValues | null;
+  readonly requested: PlayerActionRequest | null;
   readonly accepted: boolean;
-  /** Snapshot-confirmed applied policy values; null when rejected or unknown. */
-  readonly applied: FiscalPolicyRequestValues | null;
+  /** Snapshot-confirmed applied values; null when rejected or not derivable. */
+  readonly applied: PlayerActionRequest | null;
   readonly errors: readonly string[];
 }
 
@@ -46,4 +66,19 @@ export function recentPlayerActions(
 ): readonly PlayerActionRecord[] {
   if (limit <= 0) return [];
   return [...history].reverse().slice(0, limit);
+}
+
+/** Short human-readable summary of a requested/applied action. */
+export function describePlayerAction(action: PlayerActionRequest | null): string {
+  if (action === null) return "unknown";
+  switch (action.kind) {
+    case "set-fiscal-policy":
+      return `tax ${(action.incomeTaxRate * 100).toFixed(2)}%, exemption ${action.incomeTaxAllowanceSUSDPerYear.toFixed(0)}/yr, welfare ${action.welfareBudgetSUSDPerYear.toFixed(0)}/yr, welfare ceiling wealth ${String(action.welfareMaxWealthLevel)}, business tax ${(action.businessProfitTaxRate * 100).toFixed(2)}%, reserve ${action.reserveTargetSUSD.toFixed(0)}`;
+    case "issue-debt":
+      return `borrow ${action.amountSUSD.toFixed(2)} SUSD`;
+    case "repay-debt":
+      return `repay ${action.amountSUSD.toFixed(2)} SUSD on contract ${String(action.contractId)}`;
+    case "set-debt-policy":
+      return `ceiling ${action.maxOutstandingPrincipalSUSD.toFixed(2)} SUSD, refinance on maturity ${action.refinanceOnMaturity ? "on" : "off"}`;
+  }
 }

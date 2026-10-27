@@ -156,7 +156,11 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(country.treasuryAccountId).toBe(FISCAL_TREASURY_ACCOUNT_ID);
     expect(country.fiscal).toEqual({
       incomeTaxRate: 0.1,
+      incomeTaxAllowanceSUSDPerYear: 0,
       welfareBudgetSUSDPerYear: 36_500,
+      welfareMaxWealthLevel: 99,
+      businessProfitTaxRate: 0,
+      reserveTargetSUSD: 0,
     });
     expect(account(world, "country", country.id, "treasury-cash").id).toBe(
       FISCAL_TREASURY_ACCOUNT_ID,
@@ -312,7 +316,11 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(parsed.payload.countries[0]?.treasuryAccountId).toBe(FISCAL_TREASURY_ACCOUNT_ID);
     expect(parsed.payload.countries[0]?.fiscal).toEqual({
       incomeTaxRate: 0.15,
+      incomeTaxAllowanceSUSDPerYear: 0,
       welfareBudgetSUSDPerYear: 12_000,
+      welfareMaxWealthLevel: 99,
+      businessProfitTaxRate: 0,
+      reserveTargetSUSD: 0,
     });
 
     const restored = deserializeWorld(serialized);

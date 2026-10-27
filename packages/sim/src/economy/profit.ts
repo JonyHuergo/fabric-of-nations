@@ -258,13 +258,18 @@ export function runProfitDistributionPhase(
     const inputExpense = accountFor(index, building.id, "input-expense");
     const wageExpense = accountFor(index, building.id, "wage-expense");
     const upkeepExpense = accountFor(index, building.id, "upkeep-expense");
+    // E2: an assessed business-profit tax is a period expense of the payer, so
+    // the distributable result is after tax. The account is absent in countryless
+    // fixtures, where no business tax can be assessed.
+    const businessTaxExpense = index.find("building", building.id, "business-tax-expense");
     const recipient = recipientAccounts(index, building);
 
     let periodNet =
       summaryBalance(close, revenue.id) -
       summaryBalance(close, inputExpense.id) -
       summaryBalance(close, wageExpense.id) -
-      summaryBalance(close, upkeepExpense.id);
+      summaryBalance(close, upkeepExpense.id) -
+      (businessTaxExpense === undefined ? 0 : summaryBalance(close, businessTaxExpense.id));
     if (!Number.isFinite(periodNet)) {
       throw new RangeError(`building ${String(building.id)} period net result is not finite`);
     }

@@ -49,9 +49,16 @@ import {
   MAX_DETAILED_PERIOD_SUMMARIES,
 } from "./constants.js";
 import {
+  addBudgetTotals,
+  budgetTotalsFromMemo,
+  emptyBudgetTotals,
+  readBudgetMemo,
+} from "./budget.js";
+import {
   FLOW_TRANSACTION_KINDS,
   type AnnualClosingBalances,
   type AnnualFinanceSummary,
+  type FinancePeriodBudgetTotals,
   type FinancePeriodFiscalTotals,
   type FinancePeriodSummary,
   type FinanceState,
@@ -80,10 +87,12 @@ export interface FinanceCloseResult {
 export interface GovernmentPeriodTotals {
   readonly countryId: Id;
   readonly incomeTaxRevenueSUSD: MoneySUSD;
+  /** E2 business-profit tax revenue collected by the country. */
+  readonly businessTaxRevenueSUSD: MoneySUSD;
   readonly welfareExpenseSUSD: MoneySUSD;
   /** M5b interest expense accrued in the period. */
   readonly interestExpenseSUSD: MoneySUSD;
-  /** Revenue minus welfare and interest expense for the period. */
+  /** Tax revenue minus welfare and interest expense for the period. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -107,6 +116,7 @@ export function governmentPeriodTotals(
         return {
           countryId,
           incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
+          businessTaxRevenueSUSD: totals.businessTaxRevenueSUSD,
           welfareExpenseSUSD: totals.welfareExpenseSUSD,
           interestExpenseSUSD: totals.interestExpenseSUSD,
           netFiscalResultSUSD: totals.netFiscalResultSUSD,
@@ -116,10 +126,16 @@ export function governmentPeriodTotals(
   }
   const accounts = new Map<Id, FinancialAccount>();
   for (const account of finance.accounts) accounts.set(account.id, account);
-  const totals = new Map<Id, { tax: number; welfare: number; interest: number }>();
+  const totals = new Map<
+    Id,
+    { tax: number; businessTax: number; welfare: number; interest: number }
+  >();
   for (const account of finance.accounts) {
     if (account.ownerKind === "country" && account.ownerId !== null) {
-      totals.set(account.ownerId, totals.get(account.ownerId) ?? { tax: 0, welfare: 0, interest: 0 });
+      totals.set(
+        account.ownerId,
+        totals.get(account.ownerId) ?? { tax: 0, businessTax: 0, welfare: 0, interest: 0 },
+      );
     }
   }
   for (const [accountIdText, value] of Object.entries(summary.accountTotals)) {
@@ -137,13 +153,16 @@ export function governmentPeriodTotals(
     if (account.ownerKind !== "country" || account.ownerId === null) continue;
     if (
       account.subtype !== "income-tax-revenue" &&
+      account.subtype !== "business-tax-revenue" &&
       account.subtype !== "welfare-expense" &&
       account.subtype !== "interest-expense"
     ) {
       continue;
     }
-    const current = totals.get(account.ownerId) ?? { tax: 0, welfare: 0, interest: 0 };
+    const current =
+      totals.get(account.ownerId) ?? { tax: 0, businessTax: 0, welfare: 0, interest: 0 };
     if (account.subtype === "income-tax-revenue") current.tax += value;
+    else if (account.subtype === "business-tax-revenue") current.businessTax += value;
     else if (account.subtype === "welfare-expense") current.welfare += value;
     else current.interest += value;
     totals.set(account.ownerId, current);
@@ -152,9 +171,10 @@ export function governmentPeriodTotals(
     .map(([countryId, values]) => ({
       countryId,
       incomeTaxRevenueSUSD: values.tax,
+      businessTaxRevenueSUSD: values.businessTax,
       welfareExpenseSUSD: values.welfare,
       interestExpenseSUSD: values.interest,
-      netFiscalResultSUSD: values.tax - values.welfare - values.interest,
+      netFiscalResultSUSD: values.tax + values.businessTax - values.welfare - values.interest,
     }))
     .sort((left, right) => left.countryId - right.countryId);
 }
@@ -179,6 +199,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
     for (const entry of totals) {
       countryFiscalTotals[entry.countryId] = {
         incomeTaxRevenueSUSD: entry.incomeTaxRevenueSUSD,
+        businessTaxRevenueSUSD: entry.businessTaxRevenueSUSD,
         welfareExpenseSUSD: entry.welfareExpenseSUSD,
         interestExpenseSUSD: entry.interestExpenseSUSD,
         netFiscalResultSUSD: entry.netFiscalResultSUSD,
@@ -190,6 +211,12 @@ export function compactFinanceHistory(finance: FinanceState): number {
       accountTotals: {},
       flowTotalsByKind: { ...summary.flowTotalsByKind },
       countryFiscalTotals,
+      countryBudgetTotals: Object.fromEntries(
+        Object.entries(summary.countryBudgetTotals).map(([countryId, budget]) => [
+          countryId,
+          { ...budget },
+        ]),
+      ),
     };
     compacted += 1;
   }
@@ -272,6 +299,32 @@ function resolveClosePeriod(world: World): ClosePeriodBounds {
 }
 
 /**
+ * Freeze the month-to-date budget memo into exact per-country period totals.
+ *
+ * Only countries with at least one nonzero period value are stored; a missing
+ * entry is exactly zero. This keeps the bounded save small (most countries have
+ * no welfare, business tax, or financing activity in a given month) without
+ * losing any nonzero amount. Actual welfare paid and business tax collected
+ * remain derivable from the account-based fiscal totals and are not duplicated.
+ */
+function captureBudgetTotals(finance: FinanceState): Record<Id, FinancePeriodBudgetTotals> {
+  const countryIds = new Set<Id>();
+  for (const account of finance.accounts) {
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countryIds.add(account.ownerId);
+    }
+  }
+  const totals: Record<Id, FinancePeriodBudgetTotals> = {};
+  for (const countryId of [...countryIds].sort((left, right) => left - right)) {
+    const periodTotals = budgetTotalsFromMemo(readBudgetMemo(finance, countryId));
+    if (Object.values(periodTotals).some((value) => value !== 0)) {
+      totals[countryId] = periodTotals;
+    }
+  }
+  return totals;
+}
+
+/**
  * Capture the pre-close trial balance and gross period flows.
  *
  * `accountTotals` keeps only nonzero accounts and includes opening balance-sheet
@@ -306,6 +359,7 @@ function capturePeriodSummary(
     periodEndDay: bounds.endDay,
     accountTotals,
     flowTotalsByKind,
+    countryBudgetTotals: captureBudgetTotals(finance),
   };
 }
 
@@ -659,18 +713,22 @@ function buildAnnualSummary(
     Id,
     {
       incomeTaxRevenueSUSD: number;
+      businessTaxRevenueSUSD: number;
       welfareExpenseSUSD: number;
       interestExpenseSUSD: number;
       netFiscalResultSUSD: number;
     }
   > = {};
+  const budgetTotals: Record<Id, FinancePeriodBudgetTotals> = {};
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     fiscalTotals[country.id] = {
       incomeTaxRevenueSUSD: 0,
+      businessTaxRevenueSUSD: 0,
       welfareExpenseSUSD: 0,
       interestExpenseSUSD: 0,
       netFiscalResultSUSD: 0,
     };
+    budgetTotals[country.id] = emptyBudgetTotals();
   }
   const flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD> = {
     "goods-purchase": 0,
@@ -685,11 +743,19 @@ function buildAnnualSummary(
       fiscalTotals[countryTotals.countryId] = {
         incomeTaxRevenueSUSD:
           current.incomeTaxRevenueSUSD + countryTotals.incomeTaxRevenueSUSD,
+        businessTaxRevenueSUSD:
+          current.businessTaxRevenueSUSD + countryTotals.businessTaxRevenueSUSD,
         welfareExpenseSUSD: current.welfareExpenseSUSD + countryTotals.welfareExpenseSUSD,
         interestExpenseSUSD:
           current.interestExpenseSUSD + countryTotals.interestExpenseSUSD,
         netFiscalResultSUSD: 0,
       };
+    }
+    for (const [countryIdText, budget] of Object.entries(summary.countryBudgetTotals)) {
+      const countryId = Number(countryIdText);
+      const current = budgetTotals[countryId];
+      if (current === undefined) continue;
+      budgetTotals[countryId] = addBudgetTotals(current, budget);
     }
     for (const kind of FLOW_TRANSACTION_KINDS) {
       flowTotalsByKind[kind] += summary.flowTotalsByKind[kind];
@@ -697,7 +763,18 @@ function buildAnnualSummary(
   }
   for (const totals of Object.values(fiscalTotals)) {
     totals.netFiscalResultSUSD =
-      totals.incomeTaxRevenueSUSD - totals.welfareExpenseSUSD - totals.interestExpenseSUSD;
+      totals.incomeTaxRevenueSUSD +
+      totals.businessTaxRevenueSUSD -
+      totals.welfareExpenseSUSD -
+      totals.interestExpenseSUSD;
+  }
+  // Zero-only annual budget entries carry no information; omit them exactly as
+  // monthly summaries do. Missing entries are treated as zero by reporting.
+  for (const key of Object.keys(budgetTotals)) {
+    const totals = budgetTotals[Number(key)];
+    if (totals !== undefined && Object.values(totals).every((value) => value === 0)) {
+      delete budgetTotals[Number(key)];
+    }
   }
 
   const closingBalances: Record<Id, AnnualClosingBalances> = {};
@@ -735,6 +812,7 @@ function buildAnnualSummary(
     periodEndDay: endDay,
     complete: periodStartDay === civilDateToDayIndex(year, 1, 1),
     fiscalTotals,
+    budgetTotals,
     flowTotalsByKind,
     closingBalances,
     correctionCount,
@@ -771,9 +849,10 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
   const postings = postPeriodCloseEntries(staged, world.dayIndex, entries);
   staged.periodSummaries.push(summary);
   staged.closedThroughDay = bounds.endDay;
-  // The requested-welfare memo has served the month-end financing decision; it
-  // is not a liability and starts a new month at zero.
-  staged.welfareRequestedThisMonth = {};
+  // The budget memo (requested/shortfall, assessments, and financing movements)
+  // has been frozen into the summary. It is not a liability and starts a new
+  // month at zero.
+  staged.budgetMemosThisMonth = {};
   compactFinanceHistory(staged);
   if (dayIndexToCivilDate(world.dayIndex).month === 12) {
     staged.annualSummaries.push(buildAnnualSummary(staged, world, world.dayIndex));

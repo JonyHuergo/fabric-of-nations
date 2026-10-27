@@ -137,7 +137,11 @@ describe("M7 simulation worker host", () => {
         kind: "set-fiscal-policy",
         countryId: countryBefore.id,
         incomeTaxRate: 0.2,
+        incomeTaxAllowanceSUSDPerYear: 0,
         welfareBudgetSUSDPerYear: 100,
+        welfareMaxWealthLevel: 99,
+        businessProfitTaxRate: 0,
+        reserveTargetSUSD: 0,
       },
     });
     const accepted = lastEvent(events, "ACTION_RESULT");
@@ -155,7 +159,11 @@ describe("M7 simulation worker host", () => {
         kind: "set-fiscal-policy",
         countryId: 99,
         incomeTaxRate: 0.2,
+        incomeTaxAllowanceSUSDPerYear: 0,
         welfareBudgetSUSDPerYear: 100,
+        welfareMaxWealthLevel: 99,
+        businessProfitTaxRate: 0,
+        reserveTargetSUSD: 0,
       },
     });
     const rejected = lastEvent(events, "ACTION_RESULT");

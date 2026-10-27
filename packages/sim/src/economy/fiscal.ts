@@ -45,7 +45,8 @@ import {
 } from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
-import { buildRegionOwnerMap } from "./country.js";
+import { accumulateBudgetMemo } from "./budget.js";
+import { buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import type { Country, FinanceState, JournalLine } from "./types.js";
 
@@ -68,10 +69,15 @@ export interface FiscalBlockResult {
 export interface FiscalCountryResult {
   readonly countryId: Id;
   readonly incomeTaxSUSD: number;
+  /** Budgeted daily welfare request before the cash and eligibility limits. */
   readonly welfareRequestedSUSD: number;
   readonly welfarePaidSUSD: number;
   readonly welfareShortfallSUSD: number;
+  /** Blocks that were eligible for the transfer under the current policy. */
+  readonly welfareEligibleBlocks: number;
+  readonly welfareEligiblePopulation: number;
   readonly treasuryCashStartSUSD: number;
+  readonly reserveTargetSUSD: number;
   /** Treasury cash read from the authoritative staged account after posting. */
   readonly treasuryCashEndSUSD: number;
 }
@@ -167,7 +173,11 @@ function sum(values: readonly number[]): number {
 
 interface CountryBlockGroup {
   readonly country: Country;
-  readonly blocks: { popBlockId: Id; population: number }[];
+  readonly blocks: {
+    popBlockId: Id;
+    population: number;
+    wealthLevel: number;
+  }[];
 }
 
 interface BlockFiscalDraft {
@@ -266,12 +276,13 @@ function executeFiscalPhase(
     if (group === undefined) {
       throw new RangeError(`region owner ${String(countryId)} is not a registered country`);
     }
-    group.blocks.push({ popBlockId: block.id, population: populationTotal(block) });
+    group.blocks.push({
+      popBlockId: block.id,
+      population: populationTotal(block),
+      wealthLevel: block.wealthLevel,
+    });
   }
-  const anyActive = countries.some(
-    (country) =>
-      country.fiscal.incomeTaxRate > 0 || country.fiscal.welfareBudgetSUSDPerYear > 0,
-  );
+  const anyActive = countries.some((country) => fiscalPolicyIsActive(country.fiscal));
   if (anyActive && unowned.length > 0) {
     throw new RangeError(
       `fiscal policy is active but pop blocks ${unowned.map((id) => String(id)).join(", ")} are in unowned regions`,
@@ -287,13 +298,44 @@ function executeFiscalPhase(
     welfareRequestedSUSD: number;
     welfarePaidSUSD: number;
     welfareShortfallSUSD: number;
+    welfareEligibleBlocks: number;
+    welfareEligiblePopulation: number;
     treasuryCashStartSUSD: number;
+    reserveTargetSUSD: number;
   }[] = [];
 
+  interface CountryFiscalPlan {
+    readonly group: CountryBlockGroup;
+    readonly taxByBlock: ReadonlyMap<Id, number>;
+    readonly incomeTaxSUSD: number;
+    readonly treasuryCashStartSUSD: number;
+    readonly welfareRequestedSUSD: number;
+    readonly reserveTargetSUSD: number;
+  }
+  const plans: CountryFiscalPlan[] = [];
+
+  // Pass 1: income tax. Posting it first makes the welfare phase read the exact
+  // post-tax treasury balance, so paying the entire available cash leaves an
+  // exact zero instead of a floating-association residual.
   for (const group of groups) {
     const country = group.country;
-    const rate = country.fiscal.incomeTaxRate;
+    const fiscal = country.fiscal;
+    const rate = fiscal.incomeTaxRate;
+    // E2 income-tax schedule: the annual exemption is pro-rated over the civil
+    // year and subtracted from each block's actual daily wage receipt.
+    const dailyAllowance = fiscal.incomeTaxAllowanceSUSDPerYear / yearDays;
+    if (!Number.isFinite(dailyAllowance) || dailyAllowance < 0) {
+      throw new RangeError(`invalid income-tax allowance for country ${String(country.id)}`);
+    }
     const treasuryCashStart = index.get("country", country.id, "treasury-cash").balanceSUSD;
+    const requested = fiscal.welfareBudgetSUSDPerYear / yearDays;
+    if (!Number.isFinite(requested) || requested < 0) {
+      throw new RangeError(`invalid welfare request for country ${String(country.id)}`);
+    }
+    const reserveTarget = fiscal.reserveTargetSUSD;
+    if (!Number.isFinite(reserveTarget) || reserveTarget < 0) {
+      throw new RangeError(`invalid reserve target for country ${String(country.id)}`);
+    }
     const taxLines: JournalLine[] = [];
     const taxByBlock = new Map<Id, number>();
     let taxTotal = 0;
@@ -303,7 +345,8 @@ function executeFiscalPhase(
         if (!Number.isFinite(wages) || wages < 0) {
           throw new RangeError(`invalid settled wages for popBlock ${String(block.popBlockId)}`);
         }
-        const tax = rate * wages;
+        const taxable = Math.max(0, wages - dailyAllowance);
+        const tax = rate * taxable;
         if (!Number.isFinite(tax) || tax < 0) {
           throw new RangeError(`invalid income tax for popBlock ${String(block.popBlockId)}`);
         }
@@ -338,33 +381,53 @@ function executeFiscalPhase(
         targetEntityId: null,
       });
     }
+    plans.push({
+      group,
+      taxByBlock,
+      incomeTaxSUSD: taxTotal,
+      treasuryCashStartSUSD: treasuryCashStart,
+      welfareRequestedSUSD: requested,
+      reserveTargetSUSD: reserveTarget,
+    });
+  }
+  const taxPostings = postJournalBatch(stagedFinance, dayIndex, taxEntries);
 
-    const requested = country.fiscal.welfareBudgetSUSDPerYear / yearDays;
-    if (!Number.isFinite(requested) || requested < 0) {
-      throw new RangeError(`invalid welfare request for country ${String(country.id)}`);
-    }
-    const available = treasuryCashStart + taxTotal;
+  // Pass 2: welfare. The index references the mutable staged accounts, so the
+  // treasury balance already includes this day's income tax.
+  for (const plan of plans) {
+    const country = plan.group.country;
+    const requested = plan.welfareRequestedSUSD;
+    const available = index.get("country", country.id, "treasury-cash").balanceSUSD;
     if (available < 0) {
       throw new RangeError(`treasury cash is negative for country ${String(country.id)}`);
     }
-    const payable = requested > 0 ? Math.min(requested, Math.max(0, available)) : 0;
+    // E2 treasury reserve floor: welfare may not draw cash below the policy
+    // target. The reserve is a liquidity policy, not a spendable pool, and it
+    // never creates cash: when actual cash is already below the target, nothing
+    // is transferred and the requested amount is an explicit shortfall.
+    const payableCeiling = Math.max(0, available - plan.reserveTargetSUSD);
+    // E2 welfare eligibility: only blocks at or below the wealth ceiling receive
+    // the transfer. A policy with no eligible blocks pays nothing and reports the
+    // full request as a shortfall, exactly as the zero-population case does.
+    const eligible = plan.group.blocks.filter(
+      (block) =>
+        block.population > 0 &&
+        block.wealthLevel <= country.fiscal.welfareMaxWealthLevel,
+    );
+    const eligiblePopulation = eligible.reduce((total, block) => total + block.population, 0);
+    const payable =
+      requested > 0 && eligible.length > 0 ? Math.min(requested, payableCeiling) : 0;
     const allocations =
-      payable > 0
-        ? allocateProportionally(
-            payable,
-            group.blocks.filter((block) => block.population > 0),
-          )
-        : new Map<Id, number>();
-    let paid = 0;
+      payable > 0 ? allocateProportionally(payable, eligible) : new Map<Id, number>();
+    const paid = payable;
     const welfareLines: JournalLine[] = [];
-    for (const block of group.blocks) {
+    for (const block of eligible) {
       const amount = allocations.get(block.popBlockId) ?? 0;
       if (!(amount > 0)) continue;
       const cash = index.get("popBlock", block.popBlockId, "household-cash");
       const income = index.get("popBlock", block.popBlockId, "welfare-income");
       welfareLines.push({ accountId: cash.id, side: "debit", amountSUSD: amount });
       welfareLines.push({ accountId: income.id, side: "credit", amountSUSD: amount });
-      paid += amount;
     }
     if (paid > available + toleranceMoney(paid, available)) {
       throw new RangeError(
@@ -384,34 +447,35 @@ function executeFiscalPhase(
       });
     }
     const shortfall = Math.max(0, requested - paid);
-    const treasuryCashEnd = treasuryCashStart + taxTotal - paid;
-    if (treasuryCashEnd < 0) {
-      throw new RangeError(`fiscal phase would overdraw treasury for country ${String(country.id)}`);
-    }
-    for (const block of group.blocks) {
+    for (const block of plan.group.blocks) {
       blockDrafts.push({
         popBlockId: block.popBlockId,
         countryId: country.id,
-        incomeTaxSUSD: taxByBlock.get(block.popBlockId) ?? 0,
+        incomeTaxSUSD: plan.taxByBlock.get(block.popBlockId) ?? 0,
         welfareReceivedSUSD: allocations.get(block.popBlockId) ?? 0,
       });
     }
-    if (requested > 0 || stagedFinance.welfareRequestedThisMonth[country.id] !== undefined) {
-      stagedFinance.welfareRequestedThisMonth[country.id] =
-        (stagedFinance.welfareRequestedThisMonth[country.id] ?? 0) + requested;
+    if (requested > 0 || shortfall > 0) {
+      accumulateBudgetMemo(stagedFinance, country.id, {
+        welfareRequestedSUSD: requested,
+        welfareShortfallSUSD: shortfall,
+      });
     }
     countryDrafts.push({
       countryId: country.id,
-      incomeTaxSUSD: taxTotal,
+      incomeTaxSUSD: plan.incomeTaxSUSD,
       welfareRequestedSUSD: requested,
       welfarePaidSUSD: paid,
       welfareShortfallSUSD: shortfall,
-      treasuryCashStartSUSD: treasuryCashStart,
+      welfareEligibleBlocks: eligible.length,
+      welfareEligiblePopulation: eligiblePopulation,
+      treasuryCashStartSUSD: plan.treasuryCashStartSUSD,
+      reserveTargetSUSD: plan.reserveTargetSUSD,
     });
   }
 
-  const entries = [...taxEntries, ...welfareEntries];
-  const postings = postJournalBatch(stagedFinance, dayIndex, entries);
+  const welfarePostings = postJournalBatch(stagedFinance, dayIndex, welfareEntries);
+  const postings = [...taxPostings, ...welfarePostings];
   hooks?.afterStagedPostings?.(stagedFinance);
 
   // Full staged-world validation covers balances, owner references, treasury

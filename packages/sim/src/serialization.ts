@@ -47,11 +47,15 @@ import type {
   DebtContract,
   DebtPolicy,
   EmploymentAssignment,
+  FinanceBudgetMemo,
   FinanceCorrection,
+  FinancePeriodBudgetTotals,
+  FinancePeriodFiscalTotals,
   FinancePeriodSummary,
   FinanceState,
   FinancialAccount,
   FinancialAccountOwnerKind,
+  FiscalPolicy,
   FlowTransactionKind,
   JournalLine,
   JournalPosting,
@@ -74,6 +78,7 @@ import {
 } from "./economy/aiState.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
+import { assertValidFiscalPolicy } from "./economy/country.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
@@ -213,8 +218,42 @@ export type SerializedFinanceState = {
   readonly debtContracts: readonly SerializedDebtContract[];
   readonly debtHistory: readonly SerializedDebtHistoryAggregate[];
   readonly nextContractId: number;
-  readonly welfareRequestedThisMonth: Readonly<Record<string, number>>;
+  readonly budgetMemosThisMonth: Readonly<Record<string, SerializedFinanceBudgetMemo>>;
   readonly closedThroughDay: number | null;
+};
+
+/** Encoded E2 month-to-date budget memo for one country. */
+export type SerializedFinanceBudgetMemo = {
+  readonly welfareRequestedSUSD: number;
+  readonly welfareShortfallSUSD: number;
+  readonly businessTaxAssessedSUSD: number;
+  readonly businessTaxUncollectedSUSD: number;
+  readonly debtIssuedSUSD: number;
+  readonly principalRepaidSUSD: number;
+  readonly interestPaidSUSD: number;
+  readonly unfinancedRequirementSUSD: number;
+  readonly businessTaxAssessedDay: number | null;
+};
+
+/** Encoded E2 per-country budget decomposition. */
+export type SerializedFinanceBudgetTotals = {
+  readonly welfareRequestedSUSD: number;
+  readonly welfareShortfallSUSD: number;
+  readonly businessTaxAssessedSUSD: number;
+  readonly businessTaxUncollectedSUSD: number;
+  readonly debtIssuedSUSD: number;
+  readonly principalRepaidSUSD: number;
+  readonly interestPaidSUSD: number;
+  readonly unfinancedRequirementSUSD: number;
+};
+
+/** Encoded per-country fiscal totals retained by a compacted summary. */
+export type SerializedCountryFiscalTotals = {
+  readonly incomeTaxRevenueSUSD: number;
+  readonly businessTaxRevenueSUSD: number;
+  readonly welfareExpenseSUSD: number;
+  readonly interestExpenseSUSD: number;
+  readonly netFiscalResultSUSD: number;
 };
 
 /** Encoded aggregate of compacted terminated debt contracts. */
@@ -238,17 +277,9 @@ export type SerializedFinancePeriodSummary = {
   readonly accountTotals: Readonly<Record<string, number>>;
   readonly flowTotalsByKind: Readonly<Record<string, number>>;
   /** Present only on compacted summaries; `accountTotals` is then empty. */
-  readonly countryFiscalTotals?: Readonly<
-    Record<
-      string,
-      {
-        readonly incomeTaxRevenueSUSD: number;
-        readonly welfareExpenseSUSD: number;
-        readonly interestExpenseSUSD: number;
-        readonly netFiscalResultSUSD: number;
-      }
-    >
-  >;
+  readonly countryFiscalTotals?: Readonly<Record<string, SerializedCountryFiscalTotals>>;
+  /** E2 budget decomposition per country; present on every summary. */
+  readonly countryBudgetTotals: Readonly<Record<string, SerializedFinanceBudgetTotals>>;
 };
 
 /** Encoded annual finance summary. No account-level trial balance is stored. */
@@ -257,17 +288,8 @@ export type SerializedAnnualFinanceSummary = {
   readonly periodStartDay: number;
   readonly periodEndDay: number;
   readonly complete: boolean;
-  readonly fiscalTotals: Readonly<
-    Record<
-      string,
-      {
-        readonly incomeTaxRevenueSUSD: number;
-        readonly welfareExpenseSUSD: number;
-        readonly interestExpenseSUSD: number;
-        readonly netFiscalResultSUSD: number;
-      }
-    >
-  >;
+  readonly fiscalTotals: Readonly<Record<string, SerializedCountryFiscalTotals>>;
+  readonly budgetTotals: Readonly<Record<string, SerializedFinanceBudgetTotals>>;
   readonly flowTotalsByKind: Readonly<Record<string, number>>;
   readonly closingBalances: Readonly<
     Record<
@@ -319,7 +341,11 @@ export type SerializedMonetaryArrangement =
 /** Encoded fiscal policy. */
 export type SerializedFiscalPolicy = {
   readonly incomeTaxRate: number;
+  readonly incomeTaxAllowanceSUSDPerYear: number;
   readonly welfareBudgetSUSDPerYear: number;
+  readonly welfareMaxWealthLevel: number;
+  readonly businessProfitTaxRate: number;
+  readonly reserveTargetSUSD: number;
 };
 
 /** Encoded M5a profit-allocation policy. */
@@ -644,6 +670,53 @@ function accountTotalKey(accountId: number): string {
   return String(accountId);
 }
 
+function encodeCountryFiscalTotals(
+  totals: Record<number, FinancePeriodFiscalTotals>,
+): Record<string, SerializedCountryFiscalTotals> {
+  const encoded: Record<string, SerializedCountryFiscalTotals> = {};
+  for (const countryId of Object.keys(totals)
+    .map((key) => Number(key))
+    .sort((left, right) => left - right)) {
+    const entry = totals[countryId];
+    if (entry === undefined) {
+      throw new RangeError(`summary country fiscal total ${String(countryId)} is missing`);
+    }
+    encoded[accountTotalKey(countryId)] = {
+      incomeTaxRevenueSUSD: entry.incomeTaxRevenueSUSD,
+      businessTaxRevenueSUSD: entry.businessTaxRevenueSUSD,
+      welfareExpenseSUSD: entry.welfareExpenseSUSD,
+      interestExpenseSUSD: entry.interestExpenseSUSD,
+      netFiscalResultSUSD: entry.netFiscalResultSUSD,
+    };
+  }
+  return encoded;
+}
+
+function encodeBudgetTotals(
+  totals: Record<number, FinancePeriodBudgetTotals>,
+): Record<string, SerializedFinanceBudgetTotals> {
+  const encoded: Record<string, SerializedFinanceBudgetTotals> = {};
+  for (const countryId of Object.keys(totals)
+    .map((key) => Number(key))
+    .sort((left, right) => left - right)) {
+    const entry = totals[countryId];
+    if (entry === undefined) {
+      throw new RangeError(`summary country budget total ${String(countryId)} is missing`);
+    }
+    encoded[accountTotalKey(countryId)] = {
+      welfareRequestedSUSD: entry.welfareRequestedSUSD,
+      welfareShortfallSUSD: entry.welfareShortfallSUSD,
+      businessTaxAssessedSUSD: entry.businessTaxAssessedSUSD,
+      businessTaxUncollectedSUSD: entry.businessTaxUncollectedSUSD,
+      debtIssuedSUSD: entry.debtIssuedSUSD,
+      principalRepaidSUSD: entry.principalRepaidSUSD,
+      interestPaidSUSD: entry.interestPaidSUSD,
+      unfinancedRequirementSUSD: entry.unfinancedRequirementSUSD,
+    };
+  }
+  return encoded;
+}
+
 function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePeriodSummary {
   const accountTotals: Record<string, number> = {};
   const accountIds = Object.keys(summary.accountTotals)
@@ -660,32 +733,14 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
   for (const kind of FLOW_TRANSACTION_KINDS) {
     flowTotalsByKind[kind] = summary.flowTotalsByKind[kind];
   }
+  const countryBudgetTotals = encodeBudgetTotals(summary.countryBudgetTotals);
   if (summary.countryFiscalTotals === undefined) {
     return {
       periodStartDay: summary.periodStartDay,
       periodEndDay: summary.periodEndDay,
       accountTotals,
       flowTotalsByKind,
-    };
-  }
-  const countryFiscalTotals: Record<string, {
-    incomeTaxRevenueSUSD: number;
-    welfareExpenseSUSD: number;
-    interestExpenseSUSD: number;
-    netFiscalResultSUSD: number;
-  }> = {};
-  for (const countryId of Object.keys(summary.countryFiscalTotals)
-    .map((key) => Number(key))
-    .sort((left, right) => left - right)) {
-    const totals = summary.countryFiscalTotals[countryId];
-    if (totals === undefined) {
-      throw new RangeError(`summary country fiscal total ${String(countryId)} is missing`);
-    }
-    countryFiscalTotals[accountTotalKey(countryId)] = {
-      incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
-      welfareExpenseSUSD: totals.welfareExpenseSUSD,
-      interestExpenseSUSD: totals.interestExpenseSUSD,
-      netFiscalResultSUSD: totals.netFiscalResultSUSD,
+      countryBudgetTotals,
     };
   }
   return {
@@ -693,7 +748,8 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
     periodEndDay: summary.periodEndDay,
     accountTotals,
     flowTotalsByKind,
-    countryFiscalTotals,
+    countryFiscalTotals: encodeCountryFiscalTotals(summary.countryFiscalTotals),
+    countryBudgetTotals,
   };
 }
 
@@ -728,7 +784,11 @@ export function encodeWorld(world: World): SerializedWorld {
         treasuryAccountId: country.treasuryAccountId,
         fiscal: {
           incomeTaxRate: country.fiscal.incomeTaxRate,
+          incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
           welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+          welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
+          businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
+          reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
         },
         debt: {
           enabled: country.debt.enabled,
@@ -867,19 +927,8 @@ export function encodeWorld(world: World): SerializedWorld {
           periodStartDay: summary.periodStartDay,
           periodEndDay: summary.periodEndDay,
           complete: summary.complete,
-          fiscalTotals: Object.fromEntries(
-            Object.entries(summary.fiscalTotals)
-              .sort((left, right) => Number(left[0]) - Number(right[0]))
-              .map(([countryId, totals]) => [
-                countryId,
-                {
-                  incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
-                  welfareExpenseSUSD: totals.welfareExpenseSUSD,
-                  interestExpenseSUSD: totals.interestExpenseSUSD,
-                  netFiscalResultSUSD: totals.netFiscalResultSUSD,
-                },
-              ]),
-          ),
+          fiscalTotals: encodeCountryFiscalTotals(summary.fiscalTotals),
+          budgetTotals: encodeBudgetTotals(summary.budgetTotals),
           flowTotalsByKind: { ...summary.flowTotalsByKind },
           closingBalances: Object.fromEntries(
             Object.entries(summary.closingBalances)
@@ -939,10 +988,23 @@ export function encodeWorld(world: World): SerializedWorld {
           interestWrittenOffSUSD: aggregate.interestWrittenOffSUSD,
         })),
       nextContractId: world.finance.nextContractId,
-      welfareRequestedThisMonth: Object.fromEntries(
-        Object.entries(world.finance.welfareRequestedThisMonth).sort(
-          (left, right) => Number(left[0]) - Number(right[0]),
-        ),
+      budgetMemosThisMonth: Object.fromEntries(
+        Object.entries(world.finance.budgetMemosThisMonth)
+          .sort((left, right) => Number(left[0]) - Number(right[0]))
+          .map(([countryId, memo]) => [
+            countryId,
+            {
+              welfareRequestedSUSD: memo.welfareRequestedSUSD,
+              welfareShortfallSUSD: memo.welfareShortfallSUSD,
+              businessTaxAssessedSUSD: memo.businessTaxAssessedSUSD,
+              businessTaxUncollectedSUSD: memo.businessTaxUncollectedSUSD,
+              debtIssuedSUSD: memo.debtIssuedSUSD,
+              principalRepaidSUSD: memo.principalRepaidSUSD,
+              interestPaidSUSD: memo.interestPaidSUSD,
+              unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
+              businessTaxAssessedDay: memo.businessTaxAssessedDay,
+            },
+          ]),
       ),
       closedThroughDay: world.finance.closedThroughDay,
     },
@@ -1040,14 +1102,149 @@ function decodeMonetaryArrangement(value: unknown, path: string): MonetaryArrang
   throw new SaveFormatError(`${path}.kind is invalid`);
 }
 
-function decodeFiscalPolicy(value: unknown, path: string): { incomeTaxRate: number; welfareBudgetSUSDPerYear: number } {
+function decodeFiscalPolicy(value: unknown, path: string): FiscalPolicy {
+  try {
+    return assertValidFiscalPolicy(value, path);
+  } catch (error) {
+    throw new SaveFormatError(`${path} is invalid: ${errorMessage(error)}`);
+  }
+}
+
+function decodeCountryFiscalTotals(
+  value: unknown,
+  path: string,
+): Record<number, FinancePeriodFiscalTotals> {
+  const raw = requireRecord(value, path);
+  const totals: Record<number, FinancePeriodFiscalTotals> = {};
+  for (const key of Object.keys(raw)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(`${path} key ${JSON.stringify(key)} is not a canonical decimal country id`);
+    }
+    const countryId = Number(key);
+    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+      throw new SaveFormatError(`${path} key ${JSON.stringify(key)} is out of range`);
+    }
+    const entry = requireRecord(raw[key], `${path}[${key}]`);
+    totals[countryId] = {
+      incomeTaxRevenueSUSD: requireFiniteNumber(
+        entry.incomeTaxRevenueSUSD,
+        `${path}[${key}].incomeTaxRevenueSUSD`,
+      ),
+      businessTaxRevenueSUSD: requireFiniteNumber(
+        entry.businessTaxRevenueSUSD,
+        `${path}[${key}].businessTaxRevenueSUSD`,
+      ),
+      welfareExpenseSUSD: requireFiniteNumber(
+        entry.welfareExpenseSUSD,
+        `${path}[${key}].welfareExpenseSUSD`,
+      ),
+      interestExpenseSUSD: requireFiniteNumber(
+        entry.interestExpenseSUSD,
+        `${path}[${key}].interestExpenseSUSD`,
+      ),
+      netFiscalResultSUSD: requireFiniteNumber(
+        entry.netFiscalResultSUSD,
+        `${path}[${key}].netFiscalResultSUSD`,
+      ),
+    };
+  }
+  return totals;
+}
+
+function decodeBudgetTotals(
+  value: unknown,
+  path: string,
+): Record<number, FinancePeriodBudgetTotals> {
+  const raw = requireRecord(value, path);
+  const totals: Record<number, FinancePeriodBudgetTotals> = {};
+  for (const key of Object.keys(raw)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(`${path} key ${JSON.stringify(key)} is not a canonical decimal country id`);
+    }
+    const countryId = Number(key);
+    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+      throw new SaveFormatError(`${path} key ${JSON.stringify(key)} is out of range`);
+    }
+    const entry = requireRecord(raw[key], `${path}[${key}]`);
+    totals[countryId] = {
+      welfareRequestedSUSD: requireFiniteNumber(
+        entry.welfareRequestedSUSD,
+        `${path}[${key}].welfareRequestedSUSD`,
+      ),
+      welfareShortfallSUSD: requireFiniteNumber(
+        entry.welfareShortfallSUSD,
+        `${path}[${key}].welfareShortfallSUSD`,
+      ),
+      businessTaxAssessedSUSD: requireFiniteNumber(
+        entry.businessTaxAssessedSUSD,
+        `${path}[${key}].businessTaxAssessedSUSD`,
+      ),
+      businessTaxUncollectedSUSD: requireFiniteNumber(
+        entry.businessTaxUncollectedSUSD,
+        `${path}[${key}].businessTaxUncollectedSUSD`,
+      ),
+      debtIssuedSUSD: requireFiniteNumber(
+        entry.debtIssuedSUSD,
+        `${path}[${key}].debtIssuedSUSD`,
+      ),
+      principalRepaidSUSD: requireFiniteNumber(
+        entry.principalRepaidSUSD,
+        `${path}[${key}].principalRepaidSUSD`,
+      ),
+      interestPaidSUSD: requireFiniteNumber(
+        entry.interestPaidSUSD,
+        `${path}[${key}].interestPaidSUSD`,
+      ),
+      unfinancedRequirementSUSD: requireFiniteNumber(
+        entry.unfinancedRequirementSUSD,
+        `${path}[${key}].unfinancedRequirementSUSD`,
+      ),
+    };
+  }
+  return totals;
+}
+
+function decodeBudgetMemo(
+  value: unknown,
+  path: string,
+): FinanceBudgetMemo {
   const record = requireRecord(value, path);
   return {
-    incomeTaxRate: requireFiniteNumber(record.incomeTaxRate, `${path}.incomeTaxRate`),
-    welfareBudgetSUSDPerYear: requireFiniteNumber(
-      record.welfareBudgetSUSDPerYear,
-      `${path}.welfareBudgetSUSDPerYear`,
+    welfareRequestedSUSD: requireFiniteNumber(
+      record.welfareRequestedSUSD,
+      `${path}.welfareRequestedSUSD`,
     ),
+    welfareShortfallSUSD: requireFiniteNumber(
+      record.welfareShortfallSUSD,
+      `${path}.welfareShortfallSUSD`,
+    ),
+    businessTaxAssessedSUSD: requireFiniteNumber(
+      record.businessTaxAssessedSUSD,
+      `${path}.businessTaxAssessedSUSD`,
+    ),
+    businessTaxUncollectedSUSD: requireFiniteNumber(
+      record.businessTaxUncollectedSUSD,
+      `${path}.businessTaxUncollectedSUSD`,
+    ),
+    debtIssuedSUSD: requireFiniteNumber(record.debtIssuedSUSD, `${path}.debtIssuedSUSD`),
+    principalRepaidSUSD: requireFiniteNumber(
+      record.principalRepaidSUSD,
+      `${path}.principalRepaidSUSD`,
+    ),
+    interestPaidSUSD: requireFiniteNumber(record.interestPaidSUSD, `${path}.interestPaidSUSD`),
+    unfinancedRequirementSUSD: requireFiniteNumber(
+      record.unfinancedRequirementSUSD,
+      `${path}.unfinancedRequirementSUSD`,
+    ),
+    businessTaxAssessedDay:
+      record.businessTaxAssessedDay === null
+        ? null
+        : requireInteger(
+            record.businessTaxAssessedDay,
+            `${path}.businessTaxAssessedDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
   };
 }
 
@@ -1302,36 +1499,11 @@ function decodeOpeningBalance(value: unknown): OpeningBalanceRecord | null {
 
 function decodeAnnualSummary(value: unknown, path: string): AnnualFinanceSummary {
   const record = requireRecord(value, path);
-  const rawFiscal = requireRecord(record.fiscalTotals, `${path}.fiscalTotals`);
-  const fiscalTotals: AnnualFinanceSummary["fiscalTotals"] = {};
-  for (const key of Object.keys(rawFiscal)) {
-    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
-      throw new SaveFormatError(`${path}.fiscalTotals key ${JSON.stringify(key)} is not canonical`);
-    }
-    const countryId = Number(key);
-    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
-      throw new SaveFormatError(`${path}.fiscalTotals key ${JSON.stringify(key)} is out of range`);
-    }
-    const entry = requireRecord(rawFiscal[key], `${path}.fiscalTotals[${key}]`);
-    fiscalTotals[countryId] = {
-      incomeTaxRevenueSUSD: requireFiniteNumber(
-        entry.incomeTaxRevenueSUSD,
-        `${path}.fiscalTotals[${key}].incomeTaxRevenueSUSD`,
-      ),
-      welfareExpenseSUSD: requireFiniteNumber(
-        entry.welfareExpenseSUSD,
-        `${path}.fiscalTotals[${key}].welfareExpenseSUSD`,
-      ),
-      interestExpenseSUSD: requireFiniteNumber(
-        entry.interestExpenseSUSD,
-        `${path}.fiscalTotals[${key}].interestExpenseSUSD`,
-      ),
-      netFiscalResultSUSD: requireFiniteNumber(
-        entry.netFiscalResultSUSD,
-        `${path}.fiscalTotals[${key}].netFiscalResultSUSD`,
-      ),
-    };
-  }
+  const fiscalTotals = decodeCountryFiscalTotals(
+    record.fiscalTotals,
+    `${path}.fiscalTotals`,
+  );
+  const budgetTotals = decodeBudgetTotals(record.budgetTotals, `${path}.budgetTotals`);
   const rawFlows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
   const flowTotalsByKind = {} as Record<FlowTransactionKind, number>;
   for (const kind of FLOW_TRANSACTION_KINDS) {
@@ -1385,6 +1557,7 @@ function decodeAnnualSummary(value: unknown, path: string): AnnualFinanceSummary
     ),
     complete: record.complete,
     fiscalTotals,
+    budgetTotals,
     flowTotalsByKind,
     closingBalances,
     correctionCount: requireInteger(
@@ -1442,45 +1615,15 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
   }
   let countryFiscalTotals: FinancePeriodSummary["countryFiscalTotals"];
   if (record.countryFiscalTotals !== undefined) {
-    const rawFiscal = requireRecord(record.countryFiscalTotals, `${path}.countryFiscalTotals`);
-    const fiscal: NonNullable<FinancePeriodSummary["countryFiscalTotals"]> = {};
-    for (const key of Object.keys(rawFiscal)) {
-      if (!/^(0|[1-9][0-9]*)$/.test(key)) {
-        throw new SaveFormatError(
-          `${path}.countryFiscalTotals key ${JSON.stringify(key)} is not a canonical decimal country id`,
-        );
-      }
-      const countryId = Number(key);
-      if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
-        throw new SaveFormatError(
-          `${path}.countryFiscalTotals key ${JSON.stringify(key)} is out of range`,
-        );
-      }
-      const entry = requireRecord(
-        rawFiscal[key],
-        `${path}.countryFiscalTotals[${key}]`,
-      );
-      fiscal[countryId] = {
-        incomeTaxRevenueSUSD: requireFiniteNumber(
-          entry.incomeTaxRevenueSUSD,
-          `${path}.countryFiscalTotals[${key}].incomeTaxRevenueSUSD`,
-        ),
-        welfareExpenseSUSD: requireFiniteNumber(
-          entry.welfareExpenseSUSD,
-          `${path}.countryFiscalTotals[${key}].welfareExpenseSUSD`,
-        ),
-        interestExpenseSUSD: requireFiniteNumber(
-          entry.interestExpenseSUSD,
-          `${path}.countryFiscalTotals[${key}].interestExpenseSUSD`,
-        ),
-        netFiscalResultSUSD: requireFiniteNumber(
-          entry.netFiscalResultSUSD,
-          `${path}.countryFiscalTotals[${key}].netFiscalResultSUSD`,
-        ),
-      };
-    }
-    countryFiscalTotals = fiscal;
+    countryFiscalTotals = decodeCountryFiscalTotals(
+      record.countryFiscalTotals,
+      `${path}.countryFiscalTotals`,
+    );
   }
+  const countryBudgetTotals = decodeBudgetTotals(
+    record.countryBudgetTotals,
+    `${path}.countryBudgetTotals`,
+  );
   return {
     periodStartDay: requireInteger(
       record.periodStartDay,
@@ -1497,6 +1640,7 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
     accountTotals,
     flowTotalsByKind,
     ...(countryFiscalTotals === undefined ? {} : { countryFiscalTotals }),
+    countryBudgetTotals,
   };
 }
 
@@ -1558,26 +1702,26 @@ function decodeFinanceState(value: unknown): FinanceState {
     record.debtHistory,
     "save payload.finance.debtHistory",
   );
-  const rawWelfareRequested = requireRecord(
-    record.welfareRequestedThisMonth,
-    "save payload.finance.welfareRequestedThisMonth",
+  const rawMemos = requireRecord(
+    record.budgetMemosThisMonth,
+    "save payload.finance.budgetMemosThisMonth",
   );
-  const welfareRequestedThisMonth: Record<number, number> = {};
-  for (const key of Object.keys(rawWelfareRequested)) {
+  const budgetMemosThisMonth: Record<number, FinanceBudgetMemo> = {};
+  for (const key of Object.keys(rawMemos)) {
     if (!/^(0|[1-9][0-9]*)$/.test(key)) {
       throw new SaveFormatError(
-        `save payload.finance.welfareRequestedThisMonth key ${JSON.stringify(key)} is not a canonical decimal country id`,
+        `save payload.finance.budgetMemosThisMonth key ${JSON.stringify(key)} is not a canonical decimal country id`,
       );
     }
     const countryId = Number(key);
     if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
       throw new SaveFormatError(
-        `save payload.finance.welfareRequestedThisMonth key ${JSON.stringify(key)} is out of range`,
+        `save payload.finance.budgetMemosThisMonth key ${JSON.stringify(key)} is out of range`,
       );
     }
-    welfareRequestedThisMonth[countryId] = requireFiniteNumber(
-      rawWelfareRequested[key],
-      `save payload.finance.welfareRequestedThisMonth[${key}]`,
+    budgetMemosThisMonth[countryId] = decodeBudgetMemo(
+      rawMemos[key],
+      `save payload.finance.budgetMemosThisMonth[${key}]`,
     );
   }
   return {
@@ -1642,7 +1786,7 @@ function decodeFinanceState(value: unknown): FinanceState {
       1,
       Number.MAX_SAFE_INTEGER,
     ),
-    welfareRequestedThisMonth,
+    budgetMemosThisMonth,
     closedThroughDay:
       rawClosed === null
         ? null

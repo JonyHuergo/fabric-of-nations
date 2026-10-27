@@ -169,12 +169,14 @@ export const ACCOUNT_SUBTYPES = [
   "sales-revenue",
   "system-income",
   "income-tax-revenue",
+  "business-tax-revenue",
   "welfare-income",
   "consumption-expense",
   "input-expense",
   "wage-expense",
   "upkeep-expense",
   "income-tax-expense",
+  "business-tax-expense",
   "welfare-expense",
   "debt-liability",
   "interest-payable",
@@ -223,6 +225,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "upkeep",
   "income-tax",
   "welfare-transfer",
+  "business-profit-tax",
   "migration-transfer",
   "profit-retention",
   "profit-distribution",
@@ -336,14 +339,74 @@ export interface FinancePeriodSummary {
    * pre-close trial balance; not used by simulation decisions.
    */
   countryFiscalTotals?: Record<Id, FinancePeriodFiscalTotals>;
+  /**
+   * E2 per-country budget decomposition: requested/paid/shortfall, financing
+   * movements, and the explicit unfinanced requirement. Exact period values,
+   * retained on both detailed and compacted summaries.
+   */
+  countryBudgetTotals: Record<Id, FinancePeriodBudgetTotals>;
 }
 
-/** Exact per-country fiscal totals retained in a compacted period summary. */
+/** Exact per-country fiscal totals retained in a period summary (D-047, E2). */
 export interface FinancePeriodFiscalTotals {
   readonly incomeTaxRevenueSUSD: MoneySUSD;
+  /** E2 business-profit tax revenue collected through the treasury. */
+  readonly businessTaxRevenueSUSD: MoneySUSD;
   readonly welfareExpenseSUSD: MoneySUSD;
   readonly interestExpenseSUSD: MoneySUSD;
+  /** Tax revenue minus welfare and interest expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
+}
+
+/**
+ * E2 budget decomposition retained per closed period (D-073).
+ *
+ * These amounts separate what was requested/assessed from what was actually paid
+ * or collected, and separate deficit financing from revenue and expense:
+ *
+ * - `welfareRequestedSUSD` is the authorized daily budget share accumulated over
+ *   the period, including any amount the treasury could not pay.
+ * - `welfareShortfallSUSD` is the unpaid part. It is an unmet budget, never a
+ *   liability, and `welfareRequested = welfarePaid + welfareShortfall` exactly
+ *   (welfare paid is the period `welfareExpenseSUSD`).
+ * - `businessTaxAssessedSUSD` is the period-end assessment; collected revenue is
+ *   the period `businessTaxRevenueSUSD` and `businessTaxUncollectedSUSD` is the
+ *   difference that exceeded a building's operating cash (no receivable is
+ *   created).
+ * - `debtIssuedSUSD` and `principalRepaidSUSD` are financing movements, not
+ *   revenue or expense. `interestPaidSUSD` is the cash coupon/maturity payment,
+ *   distinct from the accrued `interestExpenseSUSD`. `unfinancedRequirementSUSD`
+ *   is the month-end financing requirement left unfunded by the creditor,
+ *   ceiling, and contract-cap constraints.
+ */
+export interface FinancePeriodBudgetTotals {
+  readonly welfareRequestedSUSD: MoneySUSD;
+  readonly welfareShortfallSUSD: MoneySUSD;
+  readonly businessTaxAssessedSUSD: MoneySUSD;
+  readonly businessTaxUncollectedSUSD: MoneySUSD;
+  readonly debtIssuedSUSD: MoneySUSD;
+  readonly principalRepaidSUSD: MoneySUSD;
+  readonly interestPaidSUSD: MoneySUSD;
+  readonly unfinancedRequirementSUSD: MoneySUSD;
+}
+
+/**
+ * E2 month-to-date budget memo accumulated by the daily fiscal phase, the
+ * month-end business-profit tax phase, and the debt phase. It is moved into the
+ * immutable period summary at the monthly close and reset. It is a reporting and
+ * financing-requirement memo, not a liability.
+ */
+export interface FinanceBudgetMemo {
+  readonly welfareRequestedSUSD: MoneySUSD;
+  readonly welfareShortfallSUSD: MoneySUSD;
+  readonly businessTaxAssessedSUSD: MoneySUSD;
+  readonly businessTaxUncollectedSUSD: MoneySUSD;
+  readonly debtIssuedSUSD: MoneySUSD;
+  readonly principalRepaidSUSD: MoneySUSD;
+  readonly interestPaidSUSD: MoneySUSD;
+  readonly unfinancedRequirementSUSD: MoneySUSD;
+  /** Day of the most recent period-end business-tax assessment, if any. */
+  readonly businessTaxAssessedDay: Day | null;
 }
 
 /** Year-end balance-sheet values retained by an annual summary. */
@@ -370,6 +433,8 @@ export interface AnnualFinanceSummary {
   complete: boolean;
   /** Annual government flows per country. */
   fiscalTotals: Record<Id, FinancePeriodFiscalTotals>;
+  /** Annual budget decomposition per country; exact sums of monthly values. */
+  budgetTotals: Record<Id, FinancePeriodBudgetTotals>;
   /** Annual world-wide gross flows for the four M4b flow kinds. */
   flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
   /** End-of-year balances per country. */
@@ -424,11 +489,12 @@ export interface FinanceState {
   /** Deterministic allocator for new debt contract ids. */
   nextContractId: number;
   /**
-   * Month-to-date requested welfare budget per country. This is a reporting and
+   * Month-to-date budget memo per country. This is a reporting and
    * financing-requirement memo, not a liability: unpaid welfare remains an unmet
-   * budget and is never posted as a payable. Reset at monthly close.
+   * budget and is never posted as a payable. Reset at monthly close after the
+   * values are frozen into the period summary.
    */
-  welfareRequestedThisMonth: Record<Id, MoneySUSD>;
+  budgetMemosThisMonth: Record<Id, FinanceBudgetMemo>;
   /**
    * Inclusive last day of the most recently closed period, or null before the
    * first close. A published world requires `null` or `closedThroughDay <
@@ -475,18 +541,46 @@ export type MonetaryArrangement =
   | { kind: "shared"; currencyId: Id; unionKey: string };
 
 /**
- * M4c per-country fiscal policy state.
+ * M4c/E2 per-country fiscal policy state.
  *
- * `incomeTaxRate` is a dimensionless flat rate on wages actually received. It is
- * provisional hard-bounded state, not law-bounded: M8 taxation laws may replace
- * it. `welfareBudgetSUSDPerYear` is a requested annual nominal SUSD expenditure
- * target, not a spendable pool; it is paid daily as
- * `welfareBudgetSUSDPerYear / daysInYear(civil year)`.
+ * Every field is provisional hard-bounded policy, not law-bounded: M8 taxation
+ * and budget laws may later replace enacted values. All amounts are nominal SUSD
+ * and all rates are dimensionless.
+ *
+ * - `incomeTaxRate` is a flat rate on the taxable part of wages actually
+ *   received, withheld daily by the fiscal phase.
+ * - `incomeTaxAllowanceSUSDPerYear` is a per-pop-block annual exemption,
+ *   pro-rated by the civil year length and subtracted from the block's actual
+ *   daily wage receipt before the rate applies.
+ * - `welfareBudgetSUSDPerYear` is a requested annual expenditure target, paid
+ *   daily as `budget / daysInYear(civil year)`; it is not a spendable pool.
+ * - `welfareMaxWealthLevel` is the inclusive eligibility ceiling on the block
+ *   wealth level (0..99). 99 reproduces universal eligibility.
+ * - `businessProfitTaxRate` is assessed once per civil month-end on each taxed
+ *   building's positive period net result.
+ * - `reserveTargetSUSD` is a treasury liquidity floor, not a spendable pool: the
+ *   daily welfare transfer may not draw treasury cash below it, and a player
+ *   principal repayment may not take cash below it.
  */
 export interface FiscalPolicy {
   incomeTaxRate: Rate;
+  incomeTaxAllowanceSUSDPerYear: MoneySUSD;
   welfareBudgetSUSDPerYear: MoneySUSD;
+  welfareMaxWealthLevel: number;
+  businessProfitTaxRate: Rate;
+  reserveTargetSUSD: MoneySUSD;
 }
+
+/**
+ * Scenario input for a fiscal policy. The M4c rate and welfare budget are
+ * required for compatibility with existing authored content; E2 schedule,
+ * eligibility, business-tax, and reserve fields default to their neutral values.
+ */
+export type FiscalPolicyInput = Pick<
+  FiscalPolicy,
+  "incomeTaxRate" | "welfareBudgetSUSDPerYear"
+> &
+  Partial<FiscalPolicy>;
 
 /**
  * M5b provisional public-debt policy.
@@ -650,7 +744,7 @@ export interface CountryInitialDef {
   regionIds: Id[];
   treasuryAccountId: Id;
   initialTreasuryCashSUSD: MoneySUSD;
-  fiscal: FiscalPolicy;
+  fiscal: FiscalPolicyInput;
   /** Defaults to disabled for M0–M5a fixtures. */
   debt?: DebtPolicy;
   /** Defaults to false for M4 fixtures that predate M5. */

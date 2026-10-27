@@ -85,7 +85,9 @@ describe("bounded debt contracts and financing semantics", () => {
     );
     expect(fiscal?.welfareShortfallSUSD).toBeCloseTo(100, 6);
     expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBeCloseTo(3_100, 6);
-    expect(world.finance.welfareRequestedThisMonth[M5B_COUNTRY_A] ?? 0).toBe(0);
+    expect(
+      world.finance.budgetMemosThisMonth[M5B_COUNTRY_A]?.welfareRequestedSUSD ?? 0,
+    ).toBe(0);
     // Borrowing adds cash but does not retroactively post welfare expense.
     expect(treasuryCash(world, M5B_COUNTRY_A)).toBeCloseTo(3_100, 6);
     expect(

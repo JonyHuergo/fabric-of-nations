@@ -77,12 +77,14 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "sales-revenue": "revenue",
   "system-income": "revenue",
   "income-tax-revenue": "revenue",
+  "business-tax-revenue": "revenue",
   "welfare-income": "revenue",
   "consumption-expense": "expense",
   "input-expense": "expense",
   "wage-expense": "expense",
   "upkeep-expense": "expense",
   "income-tax-expense": "expense",
+  "business-tax-expense": "expense",
   "welfare-expense": "expense",
   "debt-liability": "liability",
   "interest-payable": "liability",
@@ -105,12 +107,14 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "sales-revenue": ["building"],
   "system-income": ["system"],
   "income-tax-revenue": ["country"],
+  "business-tax-revenue": ["country"],
   "welfare-income": ["popBlock"],
   "consumption-expense": ["popBlock"],
   "input-expense": ["building"],
   "wage-expense": ["building"],
   "upkeep-expense": ["building"],
   "income-tax-expense": ["popBlock"],
+  "business-tax-expense": ["building"],
   "welfare-expense": ["country"],
   "debt-liability": ["country"],
   "interest-payable": ["country"],
@@ -232,6 +236,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "welfare-transfer": [
     { subtype: "welfare-expense", side: "debit" },
     { subtype: "welfare-income", side: "credit" },
+  ],
+  "business-profit-tax": [
+    { subtype: "business-tax-expense", side: "debit" },
+    { subtype: "business-tax-revenue", side: "credit" },
   ],
   "migration-transfer": [],
   "profit-retention": [],
@@ -451,6 +459,96 @@ export function assertFiscalPostingStructure(
     ) {
       throw new RangeError(`${path} welfare-transfer block totals do not match country totals`);
     }
+  }
+}
+
+/**
+ * Enforce the required legs of the E2 business-profit tax kind.
+ *
+ * One entry moves cash from exactly one taxed building to exactly one country:
+ *
+ * - debit the building's `business-tax-expense`, credit its `operating-cash`;
+ * - debit the country's `treasury-cash`, credit its `business-tax-revenue`.
+ *
+ * Both sides must carry the same total. This is structural validation only; the
+ * month-end phase proves the amount equals `rate × positive period result` and
+ * that the building belongs to the taxing country's regions.
+ */
+export function assertBusinessTaxPostingStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) {
+    throw new RangeError(`${path} must contain business-profit-tax lines`);
+  }
+  const buildings = new Set<Id>();
+  const countries = new Set<Id>();
+  let expenseTotal = 0;
+  let cashOutTotal = 0;
+  let revenueTotal = 0;
+  let cashInTotal = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.subtype === "business-tax-expense" && line.side === "debit") {
+      if (account.ownerKind !== "building" || account.ownerId === null) {
+        throw new RangeError(`${path} business-tax-expense must belong to a building`);
+      }
+      buildings.add(account.ownerId);
+      expenseTotal += line.amountSUSD;
+    } else if (account.subtype === "operating-cash" && line.side === "credit") {
+      if (account.ownerKind !== "building" || account.ownerId === null) {
+        throw new RangeError(`${path} operating-cash must belong to a building`);
+      }
+      buildings.add(account.ownerId);
+      cashOutTotal += line.amountSUSD;
+    } else if (account.subtype === "treasury-cash" && line.side === "debit") {
+      if (account.ownerKind !== "country" || account.ownerId === null) {
+        throw new RangeError(`${path} treasury-cash must belong to a country`);
+      }
+      countries.add(account.ownerId);
+      cashInTotal += line.amountSUSD;
+    } else if (account.subtype === "business-tax-revenue" && line.side === "credit") {
+      if (account.ownerKind !== "country" || account.ownerId === null) {
+        throw new RangeError(`${path} business-tax-revenue must belong to a country`);
+      }
+      countries.add(account.ownerId);
+      revenueTotal += line.amountSUSD;
+    } else {
+      throw new RangeError(
+        `${path} has an invalid business-profit-tax line for ${account.subtype} on the ${line.side} side`,
+      );
+    }
+  }
+  if (buildings.size !== 1) {
+    throw new RangeError(`${path} business-profit-tax entry must reference exactly one building`);
+  }
+  if (countries.size !== 1) {
+    throw new RangeError(`${path} business-profit-tax entry must reference exactly one country`);
+  }
+  const tolerance = (left: number, right: number): number =>
+    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+  if (!(expenseTotal > 0) || !(revenueTotal > 0)) {
+    throw new RangeError(`${path} business-profit-tax entry has no positive total`);
+  }
+  if (
+    Math.abs(expenseTotal - cashOutTotal) > tolerance(expenseTotal, cashOutTotal) ||
+    Math.abs(expenseTotal - revenueTotal) > tolerance(expenseTotal, revenueTotal) ||
+    Math.abs(expenseTotal - cashInTotal) > tolerance(expenseTotal, cashInTotal)
+  ) {
+    throw new RangeError(`${path} business-profit-tax legs do not balance`);
   }
 }
 
@@ -904,11 +1002,23 @@ export function cloneFinanceState(
                     ]),
                   ),
                 }),
+            countryBudgetTotals: Object.fromEntries(
+              Object.entries(summary.countryBudgetTotals).map(([countryId, totals]) => [
+                countryId,
+                { ...totals },
+              ]),
+            ),
           })),
     annualSummaries: finance.annualSummaries.map((summary) => ({
       ...summary,
       fiscalTotals: Object.fromEntries(
         Object.entries(summary.fiscalTotals).map(([countryId, totals]) => [
+          countryId,
+          { ...totals },
+        ]),
+      ),
+      budgetTotals: Object.fromEntries(
+        Object.entries(summary.budgetTotals).map(([countryId, totals]) => [
           countryId,
           { ...totals },
         ]),
@@ -929,7 +1039,12 @@ export function cloneFinanceState(
     debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
     debtHistory: finance.debtHistory.map((aggregate) => ({ ...aggregate })),
     nextContractId: finance.nextContractId,
-    welfareRequestedThisMonth: { ...finance.welfareRequestedThisMonth },
+    budgetMemosThisMonth: Object.fromEntries(
+      Object.entries(finance.budgetMemosThisMonth).map(([countryId, memo]) => [
+        countryId,
+        { ...memo },
+      ]),
+    ),
     closedThroughDay: finance.closedThroughDay,
   };
 }

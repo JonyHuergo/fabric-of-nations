@@ -553,7 +553,7 @@ export function createPopulationWorld(
       debtContracts: [],
       debtHistory: [],
       nextContractId: 1,
-      welfareRequestedThisMonth: {},
+      budgetMemosThisMonth: {},
     } satisfies FinanceState,
     profitDistribution: {
       enabled: false,

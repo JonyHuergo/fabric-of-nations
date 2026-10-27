@@ -15,6 +15,7 @@ import {
 import { loadM5EightPolities } from "@century/data";
 import {
   MAX_PLAYER_ACTION_HISTORY,
+  PROTOCOL_VERSION,
   appendPlayerAction,
   buildEconomicExplanations,
   buildMonthlyReports,
@@ -71,9 +72,27 @@ function actionRecord(
     countryTag: "USA",
     dayIndex: 10 + index,
     dateLabel: "1900-01-11",
-    requested: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1000 },
+    requested: {
+      kind: "set-fiscal-policy",
+      incomeTaxRate: 0.1,
+      incomeTaxAllowanceSUSDPerYear: 0,
+      welfareBudgetSUSDPerYear: 1000,
+      welfareMaxWealthLevel: 99,
+      businessProfitTaxRate: 0,
+      reserveTargetSUSD: 0,
+    },
     accepted,
-    applied: accepted ? { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1000 } : null,
+    applied: accepted
+      ? {
+          kind: "set-fiscal-policy",
+          incomeTaxRate: 0.1,
+          incomeTaxAllowanceSUSDPerYear: 0,
+          welfareBudgetSUSDPerYear: 1000,
+          welfareMaxWealthLevel: 99,
+          businessProfitTaxRate: 0,
+          reserveTargetSUSD: 0,
+        }
+      : null,
     errors: accepted ? [] : ["policy rejected by shared validator"],
   };
 }
@@ -81,7 +100,7 @@ function actionRecord(
 describe("E1 economic clarity", () => {
   test("the snapshot exposes supported production, wage, need, and capacity data", () => {
     const { snapshot } = snapshotAt(0);
-    expect(snapshot.protocolVersion).toBe(4);
+    expect(snapshot.protocolVersion).toBe(PROTOCOL_VERSION);
     expect(snapshot.needTiers.length).toBeGreaterThan(0);
     expect(snapshot.needTiers.some((tier) => tier.tier === "subsistence")).toBe(true);
     for (const country of snapshot.countries) {
@@ -95,13 +114,15 @@ describe("E1 economic clarity", () => {
         expect(price.dailyProductionCapacity).toBeGreaterThanOrEqual(0);
       }
     }
-    expect(() => parseWorkerEvent({ protocolVersion: 4, type: "READY", snapshot })).not.toThrow();
+    expect(() =>
+      parseWorkerEvent({ protocolVersion: PROTOCOL_VERSION, type: "READY", snapshot }),
+    ).not.toThrow();
     const missing = {
       ...snapshot,
       needTiers: undefined,
     } as unknown as SimulationSnapshot;
     expect(() =>
-      parseWorkerEvent({ protocolVersion: 4, type: "READY", snapshot: missing }),
+      parseWorkerEvent({ protocolVersion: PROTOCOL_VERSION, type: "READY", snapshot: missing }),
     ).toThrow(/valid snapshot/);
   });
 

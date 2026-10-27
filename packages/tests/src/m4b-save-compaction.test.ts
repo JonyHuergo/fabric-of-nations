@@ -45,6 +45,7 @@ function monthlyPeriods(count: number): FinancePeriodSummary[] {
         wages: 0,
         upkeep: 0,
       },
+      countryBudgetTotals: {},
     });
     previousEnd = end;
   }
@@ -72,6 +73,15 @@ function worldWithRepresentativeHistory(): {
       ...period,
       accountTotals: { ...baseSummary.accountTotals },
       flowTotalsByKind: { ...baseSummary.flowTotalsByKind },
+      // Keep the synthetic detailed months internally consistent with the
+      // copied pre-close balances: requested welfare must equal paid plus
+      // shortfall for the summary to validate.
+      countryBudgetTotals: Object.fromEntries(
+        Object.entries(baseSummary.countryBudgetTotals).map(([countryId, totals]) => [
+          countryId,
+          { ...totals },
+        ]),
+      ),
     }));
     world.finance.closedThroughDay = periods.at(-1)?.periodEndDay ?? null;
     world.dayIndex = (periods.at(-1)?.periodEndDay ?? 0) + 1;

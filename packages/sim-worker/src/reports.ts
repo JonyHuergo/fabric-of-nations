@@ -21,8 +21,17 @@ export interface MonthlyEconomicReport {
   readonly periodStartLabel: string;
   readonly periodEndLabel: string;
   readonly incomeTaxSUSD: number;
+  readonly businessTaxRevenueSUSD: number;
+  readonly welfareRequestedSUSD: number;
   readonly welfareExpenseSUSD: number;
+  readonly welfareShortfallSUSD: number;
+  readonly businessTaxAssessedSUSD: number;
+  readonly businessTaxUncollectedSUSD: number;
+  readonly debtIssuedSUSD: number;
+  readonly principalRepaidSUSD: number;
   readonly interestExpenseSUSD: number;
+  readonly interestPaidSUSD: number;
+  readonly unfinancedRequirementSUSD: number;
   readonly netFiscalResultSUSD: number;
   readonly grossFlowTotals: Readonly<Record<string, number>>;
   readonly detailedBalances: boolean;
@@ -56,8 +65,17 @@ export function buildMonthlyReports(country: CountrySnapshot): readonly MonthlyE
       periodStartLabel: period.periodStartLabel,
       periodEndLabel: period.periodEndLabel,
       incomeTaxSUSD: period.incomeTaxSUSD,
+      businessTaxRevenueSUSD: period.businessTaxRevenueSUSD,
+      welfareRequestedSUSD: period.welfareRequestedSUSD,
       welfareExpenseSUSD: period.welfareExpenseSUSD,
+      welfareShortfallSUSD: period.welfareShortfallSUSD,
+      businessTaxAssessedSUSD: period.businessTaxAssessedSUSD,
+      businessTaxUncollectedSUSD: period.businessTaxUncollectedSUSD,
+      debtIssuedSUSD: period.debtIssuedSUSD,
+      principalRepaidSUSD: period.principalRepaidSUSD,
       interestExpenseSUSD: period.interestExpenseSUSD,
+      interestPaidSUSD: period.interestPaidSUSD,
+      unfinancedRequirementSUSD: period.unfinancedRequirementSUSD,
       netFiscalResultSUSD: period.netFiscalResultSUSD,
       grossFlowTotals: period.grossFlowTotals,
       detailedBalances: period.treasuryCashEndSUSD !== null,

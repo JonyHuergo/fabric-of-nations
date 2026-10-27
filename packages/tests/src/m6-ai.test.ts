@@ -17,9 +17,12 @@ import {
   serializeWorld,
   tick,
   validateCountryAction,
+  WORLD_SCHEMA_VERSION,
   type CountryAIObservation,
   type CountryAction,
   type EconomyScenarioDef,
+  type FiscalPolicy,
+  type SetFiscalPolicyAction,
   type TickContext,
   type World,
 } from "@century/sim";
@@ -49,11 +52,30 @@ function tickDays(world: World, scenario: EconomyScenarioDef, days: number): voi
   for (let index = 0; index < days; index += 1) tick(world, context);
 }
 
+function fiscalPolicy(overrides: Partial<FiscalPolicy> = {}): FiscalPolicy {
+  return {
+    incomeTaxRate: 0,
+    incomeTaxAllowanceSUSDPerYear: 0,
+    welfareBudgetSUSDPerYear: 0,
+    welfareMaxWealthLevel: 99,
+    businessProfitTaxRate: 0,
+    reserveTargetSUSD: 0,
+    ...overrides,
+  };
+}
+
+function fiscalActionOf(action: CountryAction | undefined): SetFiscalPolicyAction {
+  if (action === undefined || action.kind !== "set-fiscal-policy") {
+    throw new Error("expected a set-fiscal-policy action");
+  }
+  return action;
+}
+
 function observation(overrides: Partial<CountryAIObservation> = {}): CountryAIObservation {
   return {
     countryId: M5_COUNTRY_A,
     dayIndex: 7,
-    fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
+    fiscal: fiscalPolicy(),
     treasuryCashSUSD: 1_000_000,
     regionIds: [0],
     population: 1_000,
@@ -83,9 +105,13 @@ function action(overrides: Partial<CountryAction> = {}): CountryAction {
     dayIndex: 0,
     source: "player",
     incomeTaxRate: 0.2,
+    incomeTaxAllowanceSUSDPerYear: 0,
     welfareBudgetSUSDPerYear: 100,
+    welfareMaxWealthLevel: 99,
+    businessProfitTaxRate: 0,
+    reserveTargetSUSD: 0,
     ...overrides,
-  };
+  } as CountryAction;
 }
 
 describe("M6 country AI and action validation", () => {
@@ -131,8 +157,9 @@ describe("M6 country AI and action validation", () => {
     const noHistory = planCountryActions(observation());
     expect(noHistory.goalId).toBe("relieve-hardship");
     expect(noHistory.actions).toHaveLength(1);
-    expect(noHistory.actions[0]!.incomeTaxRate).toBe(AI_HARDSHIP_MIN_TAX_RATE);
-    expect(noHistory.actions[0]!.welfareBudgetSUSDPerYear).toBe(0);
+    const noHistoryAction = fiscalActionOf(noHistory.actions[0]);
+    expect(noHistoryAction.incomeTaxRate).toBe(AI_HARDSHIP_MIN_TAX_RATE);
+    expect(noHistoryAction.welfareBudgetSUSDPerYear).toBe(0);
 
     const observed = planCountryActions(
       observation({
@@ -146,7 +173,7 @@ describe("M6 country AI and action validation", () => {
       }),
     );
     expect(observed.goalId).toBe("relieve-hardship");
-    const proposed = observed.actions[0]!;
+    const proposed = fiscalActionOf(observed.actions[0]);
     expect(proposed.kind).toBe("set-fiscal-policy");
     expect(proposed.incomeTaxRate).toBe(AI_HARDSHIP_MIN_TAX_RATE);
     const annualTaxRevenue = (100_000 * 365) / 30;
@@ -159,7 +186,7 @@ describe("M6 country AI and action validation", () => {
   test("solvency takes priority over relief and cuts unaffordable welfare", () => {
     const decision = planCountryActions(
       observation({
-        fiscal: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 60_000 },
+        fiscal: fiscalPolicy({ incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 60_000 }),
         treasuryCashSUSD: 100,
         lastClosedPeriod: {
           periodStartDay: 0,
@@ -172,8 +199,9 @@ describe("M6 country AI and action validation", () => {
     );
     expect(decision.goalId).toBe("restore-solvency");
     expect(decision.actions).toHaveLength(1);
-    expect(decision.actions[0]!.incomeTaxRate).toBeCloseTo(0.11, 12);
-    expect(decision.actions[0]!.welfareBudgetSUSDPerYear).toBeLessThan(60_000);
+    const solvencyAction = fiscalActionOf(decision.actions[0]);
+    expect(solvencyAction.incomeTaxRate).toBeCloseTo(0.11, 12);
+    expect(solvencyAction.welfareBudgetSUSDPerYear).toBeLessThan(60_000);
     expect(AI_TREASURY_BUFFER_MONTHS).toBeGreaterThan(0);
   });
 
@@ -193,7 +221,7 @@ describe("M6 country AI and action validation", () => {
             comfortFulfilledDays: 10,
           },
         ],
-        fiscal: { incomeTaxRate: 0.05, welfareBudgetSUSDPerYear: 10_000 },
+        fiscal: fiscalPolicy({ incomeTaxRate: 0.05, welfareBudgetSUSDPerYear: 10_000 }),
         treasuryCashSUSD: 10_000_000,
         lastClosedPeriod: {
           periodStartDay: 0,
@@ -221,7 +249,7 @@ describe("M6 country AI and action validation", () => {
     // militancy, and the world seed. None may affect country A's decision.
     const otherCountry = second.countries.find((country) => country.id === M5_COUNTRY_B);
     if (otherCountry === undefined) throw new Error("missing country B");
-    otherCountry.fiscal = { incomeTaxRate: 0.9, welfareBudgetSUSDPerYear: 999_999 };
+    otherCountry.fiscal = fiscalPolicy({ incomeTaxRate: 0.9, welfareBudgetSUSDPerYear: 999_999 });
     const countryARegions = new Set(
       second.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds ?? [],
     );
@@ -267,6 +295,10 @@ describe("M6 country AI and action validation", () => {
       action({ incomeTaxRate: Number.NaN }),
       action({ welfareBudgetSUSDPerYear: -1 }),
       action({ welfareBudgetSUSDPerYear: Number.POSITIVE_INFINITY }),
+      action({ incomeTaxAllowanceSUSDPerYear: -1 }),
+      action({ welfareMaxWealthLevel: 100 }),
+      action({ businessProfitTaxRate: 1.5 }),
+      action({ reserveTargetSUSD: -1 }),
     ];
     for (const invalid of invalidActions) {
       expect(validateCountryAction(world, invalid).valid).toBe(false);
@@ -350,7 +382,7 @@ describe("M6 country AI and action validation", () => {
       schemaVersion: number;
       payload: { countryAI: { enabled: boolean }; countries: { ai: Record<string, unknown> }[] };
     };
-    expect(payload.schemaVersion).toBe(17);
+    expect(payload.schemaVersion).toBe(WORLD_SCHEMA_VERSION);
     expect(payload.payload.countryAI.enabled).toBe(true);
     expect(payload.payload.countries[0]?.ai).toBeDefined();
     const restored = deserializeWorld(serialized);

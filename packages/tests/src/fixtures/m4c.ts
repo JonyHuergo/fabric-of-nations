@@ -11,7 +11,14 @@ export const FISCAL_TREASURY_ACCOUNT_ID = 1000;
 export const FISCAL_COUNTRY_ID = 0;
 
 export function zeroFiscalPolicy(): FiscalPolicy {
-  return { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 };
+  return {
+    incomeTaxRate: 0,
+    incomeTaxAllowanceSUSDPerYear: 0,
+    welfareBudgetSUSDPerYear: 0,
+    welfareMaxWealthLevel: 99,
+    businessProfitTaxRate: 0,
+    reserveTargetSUSD: 0,
+  };
 }
 
 export function fiscalCountry(overrides: Partial<CountryInitialDef> = {}): CountryInitialDef {

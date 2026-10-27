@@ -39,6 +39,7 @@ import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accou
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
+import { runBusinessTaxPhase, type BusinessTaxPhaseResult } from "./businessTax.js";
 import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
@@ -116,6 +117,8 @@ export interface EconomyDayResult {
     readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    /** E2 month-end business-profit tax assessment and collection. */
+    readonly businessTax: BusinessTaxPhaseResult;
     /** M6 country-AI evaluation and validated fiscal-policy changes. */
     readonly ai: CountryAIPhaseResult;
     /** M5b daily debt service and month-end deficit financing. */
@@ -887,6 +890,12 @@ export function runEconomicDay(
   // settlement result and never estimates wages from account balances.
   const fiscal = runFiscalPhase(world, settlement, dayIndex, { validateWorld: false });
 
+  // E2 business-profit tax: assessed on the just-completed civil month's
+  // recognized building results. It runs before the debt phase so collected
+  // revenue reduces that month's financing requirement, and before the close so
+  // the tax expense/revenue belong to the period that generated the profit.
+  const businessTax = runBusinessTaxPhase(world, dayIndex, { validateWorld: false });
+
   // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
   // month-end finance the accrued fiscal deficit before the M4b close.
   const debt = runDebtPhase(world, dayIndex, { validateWorld: false });
@@ -947,6 +956,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      businessTax,
       ai,
       debt,
       migration,

@@ -20,6 +20,7 @@ import {
 import type { Day, Id } from "../types.js";
 import type { World } from "../world.js";
 import {
+  assertBusinessTaxPostingStructure,
   assertAccountingIdentity,
   assertFiscalPostingStructure,
   assertOwnerEquityTallies,
@@ -40,6 +41,10 @@ import {
   type OwnerEquityTally,
 } from "./accounts.js";
 import { assertValidCountryCurrencyState, buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import {
+  assertValidBudgetTotals,
+  assertValidFinanceBudgetMemo,
+} from "./budget.js";
 import {
   assertValidDebtContract,
   assertValidDebtPolicy,
@@ -64,6 +69,7 @@ import {
   type DebtHistoryAggregate,
   type EmploymentAssignment,
   type FinanceCorrection,
+  type FinancePeriodBudgetTotals,
   type FinancePeriodSummary,
   type FinanceState,
   type FinancialAccount,
@@ -319,6 +325,9 @@ export function assertValidJournalPosting(
     if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
       assertFiscalPostingStructure(transactionKind, journalLines, accounts, path);
     }
+    if (transactionKind === "business-profit-tax") {
+      assertBusinessTaxPostingStructure(journalLines, accounts, path);
+    }
     if (
       transactionKind === "profit-retention" ||
       transactionKind === "profit-distribution" ||
@@ -388,6 +397,10 @@ function assertValidAnnualSummary(
       totals.incomeTaxRevenueSUSD,
       `${path}.fiscalTotals.${String(countryId)}.incomeTaxRevenueSUSD`,
     );
+    const businessTax = requireFiniteNumber(
+      totals.businessTaxRevenueSUSD,
+      `${path}.fiscalTotals.${String(countryId)}.businessTaxRevenueSUSD`,
+    );
     const welfare = requireFiniteNumber(
       totals.welfareExpenseSUSD,
       `${path}.fiscalTotals.${String(countryId)}.welfareExpenseSUSD`,
@@ -400,12 +413,24 @@ function assertValidAnnualSummary(
       totals.netFiscalResultSUSD,
       `${path}.fiscalTotals.${String(countryId)}.netFiscalResultSUSD`,
     );
-    if (tax < 0 || welfare < 0 || interest < 0) {
+    if (tax < 0 || businessTax < 0 || welfare < 0 || interest < 0) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
     }
-    if (Math.abs(net - (tax - welfare - interest)) > toleranceMoney(net, tax, welfare, interest)) {
+    if (
+      Math.abs(net - (tax + businessTax - welfare - interest)) >
+      toleranceMoney(net, tax, businessTax, welfare, interest)
+    ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} net result does not reconcile`);
     }
+  }
+
+  const budget = requireRecord(record.budgetTotals, `${path}.budgetTotals`);
+  for (const key of Object.keys(budget)) {
+    const countryId = parseAccountTotalKey(key, `${path}.budgetTotals`);
+    assertValidBudgetTotals(
+      budget[key] as FinancePeriodBudgetTotals,
+      `${path}.budgetTotals.${String(countryId)}`,
+    );
   }
 
   const flows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
@@ -685,24 +710,19 @@ export function assertValidFinanceState(finance: FinanceState): void {
     }
   }
 
-  const rawWelfare = requireRecord(
-    record.welfareRequestedThisMonth,
-    "world.finance.welfareRequestedThisMonth",
+  const rawMemos = requireRecord(
+    record.budgetMemosThisMonth,
+    "world.finance.budgetMemosThisMonth",
   );
-  for (const key of Object.keys(rawWelfare)) {
+  for (const key of Object.keys(rawMemos)) {
     const countryId = parseAccountTotalKey(
       key,
-      "world.finance.welfareRequestedThisMonth",
+      "world.finance.budgetMemosThisMonth",
     );
-    const value = requireFiniteNumber(
-      rawWelfare[key],
-      `world.finance.welfareRequestedThisMonth.${key}`,
+    assertValidFinanceBudgetMemo(
+      rawMemos[key] as FinanceState["budgetMemosThisMonth"][Id],
+      `world.finance.budgetMemosThisMonth.${String(countryId)}`,
     );
-    if (value < 0) {
-      throw new RangeError(
-        `world.finance.welfareRequestedThisMonth.${String(countryId)} must be non-negative`,
-      );
-    }
   }
 
   assertValidAnnualState(finance, accounts);
@@ -772,11 +792,9 @@ export function assertValidFinancePeriodSummary(
   const compacted = record.countryFiscalTotals !== undefined;
   const totalsByAccount = new Map<number, number>();
   const countryIds = new Set<number>();
-  if (compacted) {
-    for (const account of accounts.values()) {
-      if (account.ownerKind === "country" && account.ownerId !== null) {
-        countryIds.add(account.ownerId);
-      }
+  for (const account of accounts.values()) {
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countryIds.add(account.ownerId);
     }
   }
   if (compacted) {
@@ -798,6 +816,10 @@ export function assertValidFinancePeriodSummary(
         entry.incomeTaxRevenueSUSD,
         `${path}.countryFiscalTotals.${key}.incomeTaxRevenueSUSD`,
       );
+      const businessTax = requireFiniteNumber(
+        entry.businessTaxRevenueSUSD,
+        `${path}.countryFiscalTotals.${key}.businessTaxRevenueSUSD`,
+      );
       const welfare = requireFiniteNumber(
         entry.welfareExpenseSUSD,
         `${path}.countryFiscalTotals.${key}.welfareExpenseSUSD`,
@@ -810,10 +832,10 @@ export function assertValidFinancePeriodSummary(
         entry.netFiscalResultSUSD,
         `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD`,
       );
-      if (tax < 0 || welfare < 0 || interest < 0) {
+      if (tax < 0 || businessTax < 0 || welfare < 0 || interest < 0) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
       }
-      const expectedNet = tax - welfare - interest;
+      const expectedNet = tax + businessTax - welfare - interest;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
           `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,
@@ -868,6 +890,25 @@ export function assertValidFinancePeriodSummary(
         `${path}.accountTotals violates the accounting identity: assets+expenses ${String(debitSide)} != liabilities+equity+revenues ${String(creditSide)}`,
       );
     }
+  }
+
+  const budget = requireRecord(record.countryBudgetTotals, `${path}.countryBudgetTotals`);
+  if (Object.keys(budget).length > countryIds.size) {
+    throw new RangeError(
+      `${path}.countryBudgetTotals must not contain more entries than there are countries`,
+    );
+  }
+  for (const key of Object.keys(budget)) {
+    const countryId = parseAccountTotalKey(key, `${path}.countryBudgetTotals`);
+    if (!countryIds.has(countryId)) {
+      throw new RangeError(
+        `${path}.countryBudgetTotals references unknown country ${String(countryId)}`,
+      );
+    }
+    assertValidBudgetTotals(
+      budget[key] as FinancePeriodBudgetTotals,
+      `${path}.countryBudgetTotals.${String(countryId)}`,
+    );
   }
 
   const flows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
@@ -1200,6 +1241,9 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
     ] as const) {
       index.get("building", building.id, subtype);
     }
+    if (fiscalAccountsRequired) {
+      index.get("building", building.id, "business-tax-expense");
+    }
     if (world.profitDistribution.enabled) {
       index.get("building", building.id, "retained-profit");
     }
@@ -1214,6 +1258,7 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
     for (const subtype of [
       "owner-equity",
       "income-tax-revenue",
+      "business-tax-revenue",
       "welfare-expense",
     ] as const) {
       index.get("country", country.id, subtype);

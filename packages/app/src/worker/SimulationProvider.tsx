@@ -15,7 +15,11 @@ import {
   PROTOCOL_VERSION,
   WorkerSupervisor,
   appendPlayerAction,
+  describePlayerAction,
+  type CountryActionDto,
+  type CountrySnapshot,
   type PlayerActionRecord,
+  type PlayerActionRequest,
   type SimulationSnapshot,
   type SpeedDaysPerSecond,
   type WorkerCommand,
@@ -65,8 +69,16 @@ export interface SimulationContextValue {
     countryId: number,
     incomeTaxRate: number,
     welfareBudgetSUSDPerYear: number,
+    schedule?: {
+      readonly incomeTaxAllowanceSUSDPerYear: number;
+      readonly welfareMaxWealthLevel: number;
+      readonly businessProfitTaxRate: number;
+      readonly reserveTargetSUSD: number;
+    },
   ) => void;
-  /** Confirmed fiscal actions for the current session, oldest first. */
+  /** Send any supported E2 action through the shared validated action path. */
+  readonly applyAction: (action: CountryActionDto) => void;
+  /** Confirmed fiscal and financing actions for the session, oldest first. */
   readonly actionHistory: readonly PlayerActionRecord[];
   readonly saveGame: () => void;
   readonly loadGame: () => void;
@@ -84,6 +96,38 @@ export function useSimulation(): SimulationContextValue {
 
 function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Build the confirmed applied values from the authoritative post-action
+ * snapshot. Policy values come from the country record; debt movements use the
+ * request amount because the snapshot confirms the action but does not echo the
+ * command. A rejected action never produces applied values.
+ */
+function appliedActionFromSnapshot(
+  request: PlayerActionRequest,
+  country: CountrySnapshot,
+): PlayerActionRequest {
+  switch (request.kind) {
+    case "set-fiscal-policy":
+      return {
+        kind: "set-fiscal-policy",
+        incomeTaxRate: country.fiscal.incomeTaxRate,
+        incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
+        welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+        welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
+        businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
+        reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
+      };
+    case "set-debt-policy":
+      return {
+        kind: "set-debt-policy",
+        refinanceOnMaturity: country.debtPolicy.refinanceOnMaturity,
+        maxOutstandingPrincipalSUSD: country.debtPolicy.maxOutstandingPrincipalSUSD,
+      };
+    default:
+      return { ...request };
+  }
 }
 
 export function SimulationProvider({ children }: { readonly children: ReactNode }) {
@@ -108,8 +152,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       string,
       {
         readonly countryId: number;
-        readonly incomeTaxRate: number;
-        readonly welfareBudgetSUSDPerYear: number;
+        readonly request: PlayerActionRequest;
       }
     >(),
   );
@@ -240,7 +283,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           }
           return;
         case "ACTION_RESULT": {
-          const request = pendingActionsRef.current.get(event.actionId) ?? null;
+          const pending = pendingActionsRef.current.get(event.actionId) ?? null;
           pendingActionsRef.current.delete(event.actionId);
           const supervisor = supervisorRef.current;
           if (
@@ -252,31 +295,26 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setAchievedDaysPerSecond(event.snapshot.achievedDaysPerSecond);
           }
           const country =
-            request === null
+            pending === null
               ? null
-              : (event.snapshot.countries.find((entry) => entry.id === request.countryId) ??
+              : (event.snapshot.countries.find((entry) => entry.id === pending.countryId) ??
                 null);
-          if (request !== null) {
+          if (pending !== null) {
+            const applied =
+              event.accepted && country !== null
+                ? appliedActionFromSnapshot(pending.request, country)
+                : null;
             setActionHistory((history) =>
               appendPlayerAction(history, {
                 actionId: event.actionId,
-                kind: "set-fiscal-policy",
-                countryId: request.countryId,
+                kind: pending.request.kind,
+                countryId: pending.countryId,
                 countryTag: country?.tag ?? null,
                 dayIndex: event.snapshot.dayIndex,
                 dateLabel: event.snapshot.date.label,
-                requested: {
-                  incomeTaxRate: request.incomeTaxRate,
-                  welfareBudgetSUSDPerYear: request.welfareBudgetSUSDPerYear,
-                },
+                requested: pending.request,
                 accepted: event.accepted,
-                applied:
-                  event.accepted && country !== null
-                    ? {
-                        incomeTaxRate: country.fiscal.incomeTaxRate,
-                        welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
-                      }
-                    : null,
+                applied,
                 errors: [...event.errors],
               }),
             );
@@ -284,9 +322,13 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           setBusy(false);
           if (event.accepted) {
             setError(null);
-            setSaveStatus("Fiscal policy applied");
+            setSaveStatus(
+              pending === null
+                ? "Action applied"
+                : `Applied: ${describePlayerAction(pending.request)}`,
+            );
           } else {
-            setError(event.errors.join("; ") || "The fiscal policy action was rejected.");
+            setError(event.errors.join("; ") || "The action was rejected.");
             setSaveStatus(null);
           }
           return;
@@ -460,29 +502,53 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     [nextCommandId, send],
   );
 
-  const applyFiscalPolicy = useCallback(
-    (countryId: number, incomeTaxRate: number, welfareBudgetSUSDPerYear: number) => {
+  const applyAction = useCallback(
+    (action: CountryActionDto) => {
       actionCounter.current += 1;
-      const actionId = `ui-fiscal-${String(actionCounter.current)}`;
-      pendingActionsRef.current.set(actionId, {
-        countryId,
-        incomeTaxRate,
-        welfareBudgetSUSDPerYear,
-      });
+      const actionId = `ui-action-${String(actionCounter.current)}`;
+      const request: PlayerActionRequest = action;
+      pendingActionsRef.current.set(actionId, { countryId: action.countryId, request });
       const accepted = send({
         protocolVersion: PROTOCOL_VERSION,
         type: "APPLY_ACTION",
         commandId: nextCommandId("apply"),
         actionId,
-        action: { kind: "set-fiscal-policy", countryId, incomeTaxRate, welfareBudgetSUSDPerYear },
+        action,
       });
       if (accepted) {
-        setSaveStatus("Applying fiscal policy…");
+        setBusy(true);
+        setSaveStatus(`Applying: ${describePlayerAction(request)}…`);
       } else {
         pendingActionsRef.current.delete(actionId);
       }
     },
     [nextCommandId, send],
+  );
+
+  const applyFiscalPolicy = useCallback(
+    (
+      countryId: number,
+      incomeTaxRate: number,
+      welfareBudgetSUSDPerYear: number,
+      schedule?: {
+        readonly incomeTaxAllowanceSUSDPerYear: number;
+        readonly welfareMaxWealthLevel: number;
+        readonly businessProfitTaxRate: number;
+        readonly reserveTargetSUSD: number;
+      },
+    ) => {
+      applyAction({
+        kind: "set-fiscal-policy",
+        countryId,
+        incomeTaxRate,
+        incomeTaxAllowanceSUSDPerYear: schedule?.incomeTaxAllowanceSUSDPerYear ?? 0,
+        welfareBudgetSUSDPerYear,
+        welfareMaxWealthLevel: schedule?.welfareMaxWealthLevel ?? 99,
+        businessProfitTaxRate: schedule?.businessProfitTaxRate ?? 0,
+        reserveTargetSUSD: schedule?.reserveTargetSUSD ?? 0,
+      });
+    },
+    [applyAction],
   );
 
   const doSave = useCallback(
@@ -745,6 +811,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       step,
       setSpeed,
       applyFiscalPolicy,
+      applyAction,
       actionHistory,
       saveGame,
       loadGame,
@@ -774,6 +841,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       step,
       setSpeed,
       applyFiscalPolicy,
+      applyAction,
       actionHistory,
       saveGame,
       loadGame,

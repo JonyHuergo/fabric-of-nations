@@ -15,6 +15,7 @@ import {
   debtOutstandingPrincipal,
   governmentPeriodTotals,
   populationTotal,
+  readBudgetMemo,
   workingAgePopulation,
 } from "@century/sim";
 import type {
@@ -33,11 +34,15 @@ import {
   type MarketSnapshot,
   type RegionSnapshot,
   type SimulationSnapshot,
+  type SnapshotAnnualReport,
+  type SnapshotBudgetMonthToDate,
+  type SnapshotBudgetTotals,
+  type SnapshotDebtContract,
+  type SnapshotDebtPolicy,
   type SnapshotFinancePeriod,
   type SnapshotFiscalTotals,
   type SnapshotNeedTier,
   type SnapshotProductionCapacity,
-  type SnapshotAnnualReport,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -154,19 +159,123 @@ function fiscalTotals(
   summary: FinancePeriodSummary,
   countryId: number,
   world: World,
-): SnapshotFiscalTotals | null {
+): { totals: SnapshotFiscalTotals; businessTaxRevenueSUSD: number } | null {
   const totals = governmentPeriodTotals(world.finance, summary).find(
     (entry) => entry.countryId === countryId,
   );
   if (totals === undefined) return null;
   return {
-    periodStartDay: summary.periodStartDay,
-    periodEndDay: summary.periodEndDay,
-    incomeTaxSUSD: roundDisplay(totals.incomeTaxRevenueSUSD, 6),
-    welfareExpenseSUSD: roundDisplay(totals.welfareExpenseSUSD, 6),
-    interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
-    netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
+    totals: {
+      periodStartDay: summary.periodStartDay,
+      periodEndDay: summary.periodEndDay,
+      incomeTaxSUSD: roundDisplay(totals.incomeTaxRevenueSUSD, 6),
+      welfareExpenseSUSD: roundDisplay(totals.welfareExpenseSUSD, 6),
+      interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
+      netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
+    },
+    businessTaxRevenueSUSD: roundDisplay(totals.businessTaxRevenueSUSD, 6),
   };
+}
+
+function budgetTotalsSnapshot(
+  totals: FinancePeriodSummary["countryBudgetTotals"][number],
+): SnapshotBudgetTotals {
+  return {
+    welfareRequestedSUSD: roundDisplay(totals.welfareRequestedSUSD, 6),
+    welfareShortfallSUSD: roundDisplay(totals.welfareShortfallSUSD, 6),
+    businessTaxAssessedSUSD: roundDisplay(totals.businessTaxAssessedSUSD, 6),
+    businessTaxUncollectedSUSD: roundDisplay(totals.businessTaxUncollectedSUSD, 6),
+    debtIssuedSUSD: roundDisplay(totals.debtIssuedSUSD, 6),
+    principalRepaidSUSD: roundDisplay(totals.principalRepaidSUSD, 6),
+    interestPaidSUSD: roundDisplay(totals.interestPaidSUSD, 6),
+    unfinancedRequirementSUSD: roundDisplay(totals.unfinancedRequirementSUSD, 6),
+  };
+}
+
+function emptyBudgetTotalsSnapshot(): SnapshotBudgetTotals {
+  return {
+    welfareRequestedSUSD: 0,
+    welfareShortfallSUSD: 0,
+    businessTaxAssessedSUSD: 0,
+    businessTaxUncollectedSUSD: 0,
+    debtIssuedSUSD: 0,
+    principalRepaidSUSD: 0,
+    interestPaidSUSD: 0,
+    unfinancedRequirementSUSD: 0,
+  };
+}
+
+/** Label for a debt creditor/holder that is a country or a population block. */
+function holderLabel(
+  world: World,
+  kind: "country" | "popBlock",
+  id: number,
+): string {
+  if (kind === "country") {
+    return world.countries.find((country) => country.id === id)?.tag ?? `Country ${String(id)}`;
+  }
+  const block = world.popBlocks.find((candidate) => candidate.id === id);
+  if (block === undefined) return `Pop block ${String(id)}`;
+  const region = world.regions.find((candidate) => candidate.id === block.regionId);
+  return `Pop block ${String(id)}${region === undefined ? "" : ` (${region.name})`}`;
+}
+
+/** Debt policy plus derived creditor-cash and headroom constraints. */
+function debtPolicySnapshot(
+  world: World,
+  country: World["countries"][number],
+  index: ReturnType<typeof buildFinanceIndex>,
+): SnapshotDebtPolicy {
+  const policy = country.debt;
+  const outstanding = debtOutstandingPrincipal(world.finance.debtContracts, country.id);
+  const cashAccount =
+    policy.creditorKind === "country"
+      ? index.find("country", policy.creditorId, "treasury-cash")
+      : index.find("popBlock", policy.creditorId, "household-cash");
+  const creditorCash = Math.max(0, cashAccount?.balanceSUSD ?? 0);
+  return {
+    enabled: policy.enabled,
+    refinanceOnMaturity: policy.refinanceOnMaturity,
+    maxOutstandingPrincipalSUSD: policy.maxOutstandingPrincipalSUSD,
+    creditorKind: policy.creditorKind,
+    creditorId: policy.creditorId,
+    creditorLabel: holderLabel(world, policy.creditorKind, policy.creditorId),
+    annualCouponRate: policy.annualCouponRate,
+    termDays: policy.termDays,
+    arrearsGraceDays: policy.arrearsGraceDays,
+    creditorCashSUSD: roundDisplay(creditorCash, 6),
+    headroomSUSD: roundDisplay(
+      Math.max(0, policy.maxOutstandingPrincipalSUSD - outstanding),
+      6,
+    ),
+  };
+}
+
+/** Outstanding/arrears contracts for one issuer, in ascending id order. */
+function debtContractSnapshots(
+  world: World,
+  countryId: number,
+): readonly SnapshotDebtContract[] {
+  return world.finance.debtContracts
+    .filter(
+      (contract) =>
+        contract.issuerCountryId === countryId &&
+        (contract.status === "active" || contract.status === "arrears"),
+    )
+    .sort((left, right) => left.id - right.id)
+    .map((contract) => ({
+      id: contract.id,
+      holderKind: contract.holderKind,
+      holderId: contract.holderId,
+      holderLabel: holderLabel(world, contract.holderKind, contract.holderId),
+      principalSUSD: roundDisplay(contract.principalSUSD, 6),
+      outstandingPrincipalSUSD: roundDisplay(contract.outstandingPrincipalSUSD, 6),
+      annualCouponRate: contract.annualCouponRate,
+      issueDay: contract.issueDay,
+      maturityDay: contract.maturityDay,
+      accruedInterestSUSD: roundDisplay(contract.accruedInterestSUSD, 6),
+      status: contract.status,
+    }));
 }
 
 function financeHistory(
@@ -200,8 +309,11 @@ function financeHistory(
   );
   const history: SnapshotFinancePeriod[] = [];
   for (const summary of summaries) {
-    const totals = fiscalTotals(summary, country.id, world);
-    if (totals === null) continue;
+    const periodFiscal = fiscalTotals(summary, country.id, world);
+    if (periodFiscal === null) continue;
+    const budget = summary.countryBudgetTotals[country.id];
+    // A summary is compacted exactly when it retains no account trial balance;
+    // compacted months keep fiscal and budget flows but no closing balances.
     const detailed = Object.keys(summary.accountTotals).length > 0;
     let treasury: number | null = null;
     let debt: number | null = null;
@@ -223,7 +335,9 @@ function financeHistory(
       household = roundDisplay(householdTotal, 6);
     }
     history.push({
-      ...totals,
+      ...periodFiscal.totals,
+      ...(budget === undefined ? emptyBudgetTotalsSnapshot() : budgetTotalsSnapshot(budget)),
+      businessTaxRevenueSUSD: periodFiscal.businessTaxRevenueSUSD,
       grossFlowTotals: { ...summary.flowTotalsByKind },
       periodStartLabel: dayLabel(summary.periodStartDay),
       periodEndLabel: dayLabel(summary.periodEndDay),
@@ -243,8 +357,10 @@ function annualReportSnapshots(
     .slice(-MAX_SNAPSHOT_ANNUAL_REPORTS)
     .map((summary) => {
       const totals = summary.fiscalTotals[countryId];
+      const budget = summary.budgetTotals[countryId];
       const balances = summary.closingBalances[countryId];
       return {
+        ...(budget === undefined ? emptyBudgetTotalsSnapshot() : budgetTotalsSnapshot(budget)),
         year: summary.year,
         periodStartDay: summary.periodStartDay,
         periodEndDay: summary.periodEndDay,
@@ -252,6 +368,7 @@ function annualReportSnapshots(
         periodEndLabel: dayLabel(summary.periodEndDay),
         complete: summary.complete,
         incomeTaxSUSD: roundDisplay(totals?.incomeTaxRevenueSUSD ?? 0, 6),
+        businessTaxRevenueSUSD: roundDisplay(totals?.businessTaxRevenueSUSD ?? 0, 6),
         welfareExpenseSUSD: roundDisplay(totals?.welfareExpenseSUSD ?? 0, 6),
         interestExpenseSUSD: roundDisplay(totals?.interestExpenseSUSD ?? 0, 6),
         netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
@@ -307,15 +424,43 @@ function countrySnapshot(
   const yearDays = daysInYear(dayIndexToCivilDate(world.dayIndex).year);
   let employedWorkers = 0;
   let estimatedDailyWageBase = 0;
+  const wageBaseByBlock = new Map<number, number>();
   for (const assignment of world.employment) {
     const building = buildingById.get(assignment.buildingInstanceId);
     if (building === undefined || !regionIds.has(building.regionId)) continue;
     employedWorkers += assignment.workers;
     const profession = professionById.get(assignment.professionId);
     if (profession !== undefined) {
-      estimatedDailyWageBase +=
-        (profession.baseWage1900SUSDPerYear / yearDays) * assignment.workers;
+      const wage = (profession.baseWage1900SUSDPerYear / yearDays) * assignment.workers;
+      estimatedDailyWageBase += wage;
+      wageBaseByBlock.set(
+        assignment.popBlockId,
+        (wageBaseByBlock.get(assignment.popBlockId) ?? 0) + wage,
+      );
     }
+  }
+  // Estimated taxable wage base at the current E2 exemption. This is an exact
+  // calculation over the current base-wage estimate (employment × profession base
+  // wage ÷ civil year days), not realized wages and not a forecast.
+  const dailyAllowance = country.fiscal.incomeTaxAllowanceSUSDPerYear / yearDays;
+  let estimatedDailyTaxableWageBase = 0;
+  let estimatedWageEarningBlockCount = 0;
+  for (const blockId of [...blockIds].sort((left, right) => left - right)) {
+    const wageBase = wageBaseByBlock.get(blockId) ?? 0;
+    if (!(wageBase > 0)) continue;
+    estimatedWageEarningBlockCount += 1;
+    estimatedDailyTaxableWageBase += Math.max(0, wageBase - dailyAllowance);
+  }
+  // Month-to-date enterprise profit base for the business-tax preview: the same
+  // recognized-revenue-minus-eligible-costs measure the month-end phase assesses.
+  let businessTaxBaseMonthToDate = 0;
+  for (const building of world.buildings) {
+    if (!regionIds.has(building.regionId)) continue;
+    const revenue = index.find("building", building.id, "sales-revenue")?.balanceSUSD ?? 0;
+    const input = index.find("building", building.id, "input-expense")?.balanceSUSD ?? 0;
+    const wage = index.find("building", building.id, "wage-expense")?.balanceSUSD ?? 0;
+    const upkeep = index.find("building", building.id, "upkeep-expense")?.balanceSUSD ?? 0;
+    businessTaxBaseMonthToDate += Math.max(0, revenue - input - wage - upkeep);
   }
   let householdCash = 0;
   for (const blockId of blockIds) {
@@ -323,6 +468,18 @@ function countrySnapshot(
   }
   const debtInterestPayable =
     index.find("country", country.id, "interest-payable")?.balanceSUSD ?? 0;
+  const memo = readBudgetMemo(world.finance, country.id);
+  const budgetMonthToDate: SnapshotBudgetMonthToDate = {
+    welfareRequestedSUSD: roundDisplay(memo.welfareRequestedSUSD, 6),
+    welfareShortfallSUSD: roundDisplay(memo.welfareShortfallSUSD, 6),
+    businessTaxAssessedSUSD: roundDisplay(memo.businessTaxAssessedSUSD, 6),
+    businessTaxUncollectedSUSD: roundDisplay(memo.businessTaxUncollectedSUSD, 6),
+    debtIssuedSUSD: roundDisplay(memo.debtIssuedSUSD, 6),
+    principalRepaidSUSD: roundDisplay(memo.principalRepaidSUSD, 6),
+    interestPaidSUSD: roundDisplay(memo.interestPaidSUSD, 6),
+    unfinancedRequirementSUSD: roundDisplay(memo.unfinancedRequirementSUSD, 6),
+    businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
+  };
   const latestFiscal = history.length === 0 ? null : (history[history.length - 1] ?? null);
   return {
     id: country.id,
@@ -331,7 +488,11 @@ function countrySnapshot(
     regionIds: [...country.regionIds].sort((left, right) => left - right),
     fiscal: {
       incomeTaxRate: country.fiscal.incomeTaxRate,
+      incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
       welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+      welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
+      businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
+      reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
     },
     treasuryCashSUSD: index.get("country", country.id, "treasury-cash").balanceSUSD,
     debtEnabled: country.debt.enabled,
@@ -340,11 +501,17 @@ function countrySnapshot(
       country.id,
     ),
     debtInterestPayableSUSD: roundDisplay(debtInterestPayable, 6),
+    debtPolicy: debtPolicySnapshot(world, country, index),
+    debtContracts: debtContractSnapshots(world, country.id),
     population,
     workingAgePopulation: workingAge,
     employedWorkers,
     householdCashSUSD: roundDisplay(householdCash, 6),
     estimatedDailyWageBaseSUSD: roundDisplay(estimatedDailyWageBase, 6),
+    estimatedDailyTaxableWageBaseSUSD: roundDisplay(estimatedDailyTaxableWageBase, 6),
+    estimatedWageEarningBlockCount,
+    businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
+    budgetMonthToDate,
     literacy: population > 0 ? roundDisplay(weightedLiteracy / population) : 0,
     wealthLevel: population > 0 ? roundDisplay(weightedWealth / population, 2) : 0,
     militancy: population > 0 ? roundDisplay(weightedMilitancy / population) : 0,
@@ -433,6 +600,10 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.fiscal);
     Object.freeze(country.regionIds);
     Object.freeze(country.latestFiscal);
+    Object.freeze(country.debtPolicy);
+    for (const contract of country.debtContracts) Object.freeze(contract);
+    Object.freeze(country.debtContracts);
+    Object.freeze(country.budgetMonthToDate);
     for (const entry of country.productionCapacityByGood) Object.freeze(entry);
     Object.freeze(country.productionCapacityByGood);
     for (const period of country.financeHistory) {

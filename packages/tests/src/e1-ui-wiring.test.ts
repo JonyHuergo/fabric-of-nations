@@ -37,11 +37,17 @@ describe("E1 UI wiring", () => {
     const budget = source("src/screens/BudgetScreen.tsx");
     expect(budget).toContain("previewFiscalPolicy");
     expect(budget).toContain("Before you commit");
-    expect(budget).toContain("Static estimate");
+    expect(budget).toContain("Static current-base estimates");
     expect(budget).toContain("Estimated net monthly fiscal change");
-    expect(budget).toContain("not a forecast");
-    // E1 adds no new instruments: only the existing shared action is sent.
-    expect(budget).not.toMatch(/new tax|business tax|consumption tax|tariff/i);
+    expect(budget).toContain("not forecasts");
+    // E2 exposes the implemented instruments, each through the shared action path.
+    expect(budget).toContain("Business-profit tax");
+    expect(budget).toContain("Income-tax exemption");
+    expect(budget).toContain("Treasury reserve target");
+    expect(budget).toContain("previewDebtIssuance");
+    expect(budget).toContain("previewDebtRepayment");
+    expect(budget).toContain("previewDebtPolicy");
+    expect(budget).toContain("applyAction");
   });
 
   test("the ledger exposes monthly reports and confirmed action history", () => {
@@ -60,10 +66,11 @@ describe("E1 UI wiring", () => {
     expect(provider).toContain('case "ACTION_RESULT"');
     expect(provider).toContain("appendPlayerAction");
     expect(provider).toContain("accepted: event.accepted");
-    expect(provider).toContain("applied:");
+    expect(provider).toContain("appliedActionFromSnapshot");
+    expect(provider).toContain("applied,");
     // The send path stages a pending request; it does not append history.
-    const applyStart = provider.indexOf("const applyFiscalPolicy = useCallback");
-    const applyEnd = provider.indexOf("const doSave = useCallback", applyStart);
+    const applyStart = provider.indexOf("const applyAction = useCallback");
+    const applyEnd = provider.indexOf("const applyFiscalPolicy = useCallback", applyStart);
     expect(applyStart).toBeGreaterThan(-1);
     expect(applyEnd).toBeGreaterThan(applyStart);
     const applyBody = provider.slice(applyStart, applyEnd);

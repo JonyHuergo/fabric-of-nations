@@ -26,6 +26,7 @@ import {
   assertValidCountryCurrencyState,
   copyCurrency,
   copyCurrencyValuation,
+  createFiscalPolicy,
   fiscalPolicyIsActive,
 } from "./country.js";
 import {
@@ -625,6 +626,7 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
     currencies: scenario.currencies ?? [],
     currencyValuations: scenario.currencyValuations ?? [],
     regionIds: new Set(scenario.population.regions.map((region) => region.id)),
+    allowLegacyFiscalDefaults: true,
   });
   assertFiscalRegionOwnership(scenario);
 }
@@ -667,7 +669,7 @@ export function createEconomyWorld(
         monetary: { ...initial.monetary },
         regionIds: [...initial.regionIds].sort((left, right) => left - right),
         treasuryAccountId: initial.treasuryAccountId,
-        fiscal: { ...initial.fiscal },
+        fiscal: createFiscalPolicy(initial.fiscal, `countries[${String(initial.id)}].fiscal`),
         debt: createDebtPolicy(initial.debt),
         ai: createCountryAIState(initial.id, world.startDayIndex),
         immigrationOpen: initial.immigrationOpen ?? false,
@@ -767,6 +769,7 @@ export function createEconomyWorld(
     });
     const equityId = allocate("country", country.id, "owner-equity");
     allocate("country", country.id, "income-tax-revenue");
+    allocate("country", country.id, "business-tax-revenue");
     allocate("country", country.id, "welfare-expense");
     opening.push({
       accountId: country.treasuryAccountId,
@@ -808,6 +811,11 @@ export function createEconomyWorld(
     allocate("building", instance.id, "input-expense");
     allocate("building", instance.id, "wage-expense");
     allocate("building", instance.id, "upkeep-expense");
+    if ((scenario.countries ?? []).length > 0) {
+      // E2 business-profit tax: the paying building needs an expense account and
+      // its taxing country needs a distinct revenue account.
+      allocate("building", instance.id, "business-tax-expense");
+    }
     if (profitDistribution.enabled) {
       allocate("building", instance.id, "retained-profit");
     }

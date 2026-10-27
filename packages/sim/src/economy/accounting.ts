@@ -24,6 +24,7 @@ import type { Day, Id } from "../types.js";
 import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import {
   accountNormalSide,
+  assertBusinessTaxPostingStructure,
   assertFiscalPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -157,6 +158,9 @@ function validatePostingLines(
   }
   if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
     assertFiscalPostingStructure(transactionKind, lines, accounts);
+  }
+  if (transactionKind === "business-profit-tax") {
+    assertBusinessTaxPostingStructure(lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);

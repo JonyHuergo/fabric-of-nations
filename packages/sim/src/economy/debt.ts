@@ -20,6 +20,8 @@ import { debtMaturityFor, debtOutstandingPrincipal } from "./debtPolicy.js";
 
 import { assertValidFinanceState } from "./validation.js";
 
+import { accumulateBudgetMemo, readBudgetMemo } from "./budget.js";
+
 interface HolderAccounts {
     readonly cash: ReturnType<FinanceIndex["get"]>;
     readonly bond: ReturnType<FinanceIndex["get"]>;
@@ -278,8 +280,8 @@ export interface DebtIssuanceResult {
     readonly postingIds: readonly number[];
 }
 
-/** * Issue one explicit debt contract. The issuer must have an enabled debt policy, * the holder must be its designated creditor, and the issuance must satisfy the * holder's cash and the issuer's outstanding-principal ceiling. The operation is * staged and atomic. */
-export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): DebtIssuanceResult {
+/** * Validate one explicit issuance without mutating. The issuer must have an * enabled debt policy, the holder must be its designated creditor, and the * issuance must satisfy the holder's cash and the issuer's outstanding-principal * ceiling. */
+export function validateDebtIssuance(world: World, input: DebtIssuanceInput): void {
     const issuerCountry = world.countries.find((country) => country.id === input.issuerCountryId);
     if (issuerCountry === undefined)
         throw new RangeError(`unknown issuer country ${String(input.issuerCountryId)}`);
@@ -297,25 +299,32 @@ export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): Deb
     if (coupon < MIN_DEBT_COUPON_RATE || coupon > MAX_DEBT_COUPON_RATE) {
         throw new RangeError("debt coupon must be in 0..1");
     }
-    const termDays = requireInteger(input.termDays, "debt.termDays", MIN_DEBT_TERM_DAYS, MAX_DEBT_TERM_DAYS);
-    const staged = cloneFinanceState(world.finance);
-    const index = buildFinanceIndex(staged);
+    requireInteger(input.termDays, "debt.termDays", MIN_DEBT_TERM_DAYS, MAX_DEBT_TERM_DAYS);
+    const index = buildFinanceIndex(world.finance);
     const holder = holderAccounts(index, input.holderKind, input.holderId);
     if (holder.cash.balanceSUSD < principal - MONEY_TOLERANCE_SUSD) {
         throw new RangeError("debt creditor has insufficient cash");
     }
     const ceiling = issuerCountry.debt.maxOutstandingPrincipalSUSD;
-    if (debtOutstandingPrincipal(staged.debtContracts, issuerCountry.id) + principal > ceiling + MONEY_TOLERANCE_SUSD) {
+    if (debtOutstandingPrincipal(world.finance.debtContracts, issuerCountry.id) + principal > ceiling + MONEY_TOLERANCE_SUSD) {
         throw new RangeError("debt issuance exceeds the outstanding-principal ceiling");
     }
-    if (activeDebtContractCount(staged.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
+    if (activeDebtContractCount(world.finance.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
         throw new RangeError(
             `debt issuance would exceed the active-contract cap of ${String(MAX_ACTIVE_DEBT_CONTRACTS)}`,
         );
     }
-    const contract = newContract(staged, issuerCountry.id, input.holderKind, input.holderId, principal, coupon, world.dayIndex, termDays);
+}
+
+/** * Issue one explicit debt contract. The operation is staged and atomic. */
+export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): DebtIssuanceResult {
+    validateDebtIssuance(world, input);
+    const staged = cloneFinanceState(world.finance);
+    const index = buildFinanceIndex(staged);
+    const contract = newContract(staged, input.issuerCountryId, input.holderKind, input.holderId, input.principalSUSD, input.annualCouponRate, world.dayIndex, input.termDays);
     const postings = postJournalBatch(staged, world.dayIndex, [issuanceEntry(index, contract)]);
     appendContract(staged, contract);
+    accumulateBudgetMemo(staged, input.issuerCountryId, { debtIssuedSUSD: input.principalSUSD });
     assertValidFinanceState(staged);
     const candidate: World = {
         ...world, finance: staged
@@ -324,6 +333,97 @@ export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): Deb
     world.finance = staged;
     return {
         contract, postingIds: postings.map((posting) => posting.id)
+    };
+}
+
+/** Input for one explicit early principal repayment. */
+export interface DebtRepaymentInput {
+    readonly issuerCountryId: Id;
+    readonly contractId: Id;
+    readonly amountSUSD: number;
+}
+
+/** Result of one explicit early principal repayment. */
+export interface DebtRepaymentResult {
+    readonly contract: DebtContract;
+    readonly principalPaidSUSD: number;
+    readonly postingIds: readonly number[];
+}
+
+/** * Validate one explicit early principal repayment without mutating. * * E2 rules: the contract must belong to the issuer and still be active/arrears, * the amount must be positive and no larger than the outstanding principal, * treasury cash must cover it, and the payment may not take treasury cash below * the country's reserve target. The reserve floor applies only to discretionary * repayment, never to contractual maturity, coupon, or arrears obligations. */
+export function validateDebtRepayment(world: World, input: DebtRepaymentInput): void {
+    const issuerCountry = world.countries.find((country) => country.id === input.issuerCountryId);
+    if (issuerCountry === undefined)
+        throw new RangeError(`unknown issuer country ${String(input.issuerCountryId)}`);
+    const contract = world.finance.debtContracts.find((candidate) => candidate.id === input.contractId);
+    if (contract === undefined)
+        throw new RangeError(`unknown debt contract ${String(input.contractId)}`);
+    if (contract.issuerCountryId !== issuerCountry.id) {
+        throw new RangeError(
+            `debt contract ${String(contract.id)} is not issued by country ${String(issuerCountry.id)}`,
+        );
+    }
+    if (contract.status !== "active" && contract.status !== "arrears") {
+        throw new RangeError(`debt contract ${String(contract.id)} is not outstanding`);
+    }
+    const amount = requireFiniteNumber(input.amountSUSD, "debt.repayment.amountSUSD");
+    if (!(amount > 0))
+        throw new RangeError("debt repayment amount must be positive");
+    if (amount > contract.outstandingPrincipalSUSD + MONEY_TOLERANCE_SUSD) {
+        throw new RangeError(
+            `debt repayment ${String(amount)} exceeds outstanding principal ${String(contract.outstandingPrincipalSUSD)}`,
+        );
+    }
+    const index = buildFinanceIndex(world.finance);
+    const treasury = index.get("country", issuerCountry.id, "treasury-cash");
+    if (amount > treasury.balanceSUSD + MONEY_TOLERANCE_SUSD) {
+        throw new RangeError("debt repayment exceeds available treasury cash");
+    }
+    const reserve = issuerCountry.fiscal.reserveTargetSUSD;
+    if (treasury.balanceSUSD - amount < reserve - MONEY_TOLERANCE_SUSD) {
+        throw new RangeError(
+            `debt repayment would take treasury cash below the ${String(reserve)} SUSD reserve target`,
+        );
+    }
+}
+
+/** * Repay part or all of one contract's outstanding principal early. The payment * is a financing movement, not expenditure. A fully settled contract is retired; * accrued interest remains payable through the normal month-end/maturity path. */
+export function repayGovernmentDebt(world: World, input: DebtRepaymentInput): DebtRepaymentResult {
+    validateDebtRepayment(world, input);
+    const staged = cloneFinanceState(world.finance);
+    const index = buildFinanceIndex(staged);
+    const contract = staged.debtContracts.find((candidate) => candidate.id === input.contractId);
+    if (contract === undefined)
+        throw new RangeError(`unknown debt contract ${String(input.contractId)}`);
+    const amount = Math.min(input.amountSUSD, contract.outstandingPrincipalSUSD);
+    const principalBefore = contract.outstandingPrincipalSUSD;
+    const posting = postJournalEntry(staged, world.dayIndex, "debt-principal-repayment", principalRepaymentEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
+    contract.outstandingPrincipalSUSD -= amount;
+    if (contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD)) {
+        contract.outstandingPrincipalSUSD = 0;
+    }
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidSUSD: amount });
+    if (
+        contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD) &&
+        contract.accruedInterestSUSD <= toleranceMoney(contract.accruedInterestSUSD)
+    ) {
+        contract.outstandingPrincipalSUSD = 0;
+        contract.accruedInterestSUSD = 0;
+        contract.status = "repaid";
+        contract.arrearsSinceDay = null;
+        recordRetiredContract(staged, contract, principalBefore, 0);
+    }
+    assertValidFinanceState(staged);
+    assertAccountingIdentity(staged);
+    const candidate: World = {
+        ...world, finance: staged
+    };
+    assertValidWorld(candidate);
+    world.finance = staged;
+    return {
+        contract: { ...contract },
+        principalPaidSUSD: amount,
+        postingIds: [posting.id],
     };
 }
 
@@ -388,16 +488,18 @@ function countryFinancingRequirement(
     index: FinanceIndex,
     countryId: Id,
 ): number {
-    const revenue = index.get("country", countryId, "income-tax-revenue").balanceSUSD;
-    const requestedWelfare = finance.welfareRequestedThisMonth[countryId] ?? 0;
+    const incomeTax = index.get("country", countryId, "income-tax-revenue").balanceSUSD;
+    const businessTax = index.get("country", countryId, "business-tax-revenue").balanceSUSD;
+    const requestedWelfare = readBudgetMemo(finance, countryId).welfareRequestedSUSD;
     const interest = index.get("country", countryId, "interest-expense").balanceSUSD;
     const treasuryCash = index.get("country", countryId, "treasury-cash").balanceSUSD;
     // The memo includes welfare paid and unpaid. Subtracting actual treasury
     // liquidity means a country with cash (including prior state-enterprise
     // remittances) does not borrow solely because the accounting formula is
     // narrower than its cash position. Unpaid welfare remains an unmet budget,
-    // not a liability, and borrowing never posts back-pay.
-    return Math.max(0, requestedWelfare + interest - revenue - treasuryCash);
+    // not a liability, and borrowing never posts back-pay. E2: every collected
+    // tax instrument (personal and business) reduces the requirement equally.
+    return Math.max(0, requestedWelfare + interest - incomeTax - businessTax - treasuryCash);
 }
 
 function accrueInterest(staged: FinanceState, index: FinanceIndex, contract: DebtContract, dayIndex: DayIndex): number {
@@ -431,6 +533,7 @@ function payAccruedInterest(staged: FinanceState, index: FinanceIndex, contract:
     if (contract.accruedInterestSUSD <= toleranceMoney(contract.accruedInterestSUSD)) {
         contract.accruedInterestSUSD = 0;
     }
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { interestPaidSUSD: amount });
     return amount;
 }
 
@@ -442,6 +545,7 @@ function repayPrincipal(staged: FinanceState, index: FinanceIndex, contract: Deb
     if (contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD)) {
         contract.outstandingPrincipalSUSD = 0;
     }
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidSUSD: amount });
     return amount;
 }
 
@@ -461,6 +565,10 @@ function refinanceContract(staged: FinanceState, index: FinanceIndex, contract: 
     const entries = [issuanceEntry(index, replacement), principalRepaymentEntry(index, contract, principal),];
     postJournalBatch(staged, dayIndex, entries);
     appendContract(staged, replacement);
+    accumulateBudgetMemo(staged, issuerCountry.id, {
+        debtIssuedSUSD: replacement.principalSUSD,
+        principalRepaidSUSD: principal,
+    });
     const principalBefore = contract.outstandingPrincipalSUSD;
     contract.outstandingPrincipalSUSD = 0;
     contract.status = "repaid";
@@ -550,6 +658,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             assertIssuerAndHolder(world, policy, country);
             if (activeDebtContractCount(staged.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
                 unfinanced += requirement;
+                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementSUSD: requirement });
                 continue;
             }
             const holder = holderAccounts(index, policy.creditorKind, policy.creditorId);
@@ -557,6 +666,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             const amount = Math.min(requirement, holder.cash.balanceSUSD, headroom);
             if (!(amount > 0)) {
                 unfinanced += requirement;
+                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementSUSD: requirement });
                 continue;
             }
             const contract = newContract(staged, country.id, policy.creditorKind, policy.creditorId, amount, policy.annualCouponRate, dayIndex, policy.termDays);
@@ -564,6 +674,10 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             appendContract(staged, contract);
             debtIssued += amount;
             unfinanced += Math.max(0, requirement - amount);
+            accumulateBudgetMemo(staged, country.id, {
+                debtIssuedSUSD: amount,
+                unfinancedRequirementSUSD: Math.max(0, requirement - amount),
+            });
             record(contract, {
                 debtIssuedSUSD: amount
             });

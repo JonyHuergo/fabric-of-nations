@@ -54,34 +54,97 @@ import {
   AI_WELFARE_ADJUSTMENT_RELATIVE_THRESHOLD,
   AI_WELFARE_REVENUE_SHARE,
   MAX_AI_ACTION_SUMMARY_LENGTH,
+  MAX_DEBT_PRINCIPAL_SUSD,
   MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
 } from "./constants.js";
 import { assertValidFiscalPolicy } from "./country.js";
 import { debtOutstandingPrincipal } from "./debtPolicy.js";
+import {
+  issueGovernmentDebt,
+  repayGovernmentDebt,
+  validateDebtIssuance,
+  validateDebtRepayment,
+} from "./debt.js";
 import { governmentPeriodTotals } from "./period.js";
 import type {
   Country,
   CountryAIGoalId,
   CountryAIState,
+  DebtContract,
+  DebtPolicy,
   FiscalPolicy,
   FinancialAccount,
 } from "./types.js";
 
-/** The only implemented M6 country action. */
+/**
+ * Set the complete E2 fiscal policy. Schedule, eligibility, business-tax, and
+ * reserve fields are part of the same validated action so a policy change can
+ * never silently leave a stale schedule or reserve target in place.
+ */
 export interface SetFiscalPolicyAction {
   readonly kind: "set-fiscal-policy";
   readonly countryId: Id;
   /** Day the action is offered; must equal `World.dayIndex`. */
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  /** Dimensionless flat rate on wages actually received, 0..1. */
+  /** Dimensionless flat rate on taxable realized wages, 0..1. */
   readonly incomeTaxRate: Rate;
+  /** Per-pop-block annual wage exemption in nominal SUSD. */
+  readonly incomeTaxAllowanceSUSDPerYear: MoneySUSD;
   /** Nominal annual welfare expenditure target in SUSD. */
   readonly welfareBudgetSUSDPerYear: MoneySUSD;
+  /** Inclusive block wealth ceiling for welfare eligibility, 0..99. */
+  readonly welfareMaxWealthLevel: number;
+  /** Dimensionless rate on the positive monthly building net result, 0..1. */
+  readonly businessProfitTaxRate: Rate;
+  /** Treasury liquidity floor in nominal SUSD. */
+  readonly reserveTargetSUSD: MoneySUSD;
 }
 
-/** Every M6 country action. A discriminated union keeps room for later stages. */
-export type CountryAction = SetFiscalPolicyAction;
+/**
+ * Issue one discretionary debt contract to the country's designated creditor,
+ * within the existing contract, ceiling, and creditor-cash rules.
+ */
+export interface IssueDebtAction {
+  readonly kind: "issue-debt";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  /** Principal to borrow in nominal SUSD. */
+  readonly amountSUSD: MoneySUSD;
+}
+
+/** Repay part or all of one outstanding contract's principal early. */
+export interface RepayDebtAction {
+  readonly kind: "repay-debt";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly contractId: Id;
+  /** Principal to repay in nominal SUSD. */
+  readonly amountSUSD: MoneySUSD;
+}
+
+/**
+ * Change the player-controlled debt policy within the existing M5b contract
+ * model: whether a maturing contract is refinanced, and the outstanding-principal
+ * ceiling. The creditor, coupon, and term remain scenario/contract inputs.
+ */
+export interface SetDebtPolicyAction {
+  readonly kind: "set-debt-policy";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly refinanceOnMaturity: boolean;
+  readonly maxOutstandingPrincipalSUSD: MoneySUSD;
+}
+
+/** Every implemented country action. */
+export type CountryAction =
+  | SetFiscalPolicyAction
+  | IssueDebtAction
+  | RepayDebtAction
+  | SetDebtPolicyAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -93,9 +156,16 @@ export interface CountryActionValidation {
 export interface CountryActionApplication {
   readonly countryId: Id;
   readonly dayIndex: Day;
+  readonly kind: CountryAction["kind"];
+  readonly changed: boolean;
   readonly previousFiscal: FiscalPolicy;
   readonly fiscal: FiscalPolicy;
-  readonly changed: boolean;
+  readonly previousDebt: DebtPolicy;
+  readonly debt: DebtPolicy;
+  /** New or affected contract for debt actions, else null. */
+  readonly debtContract: DebtContract | null;
+  /** Principal repaid by a `repay-debt` action, else zero. */
+  readonly principalPaidSUSD: MoneySUSD;
 }
 
 /** One observed population block. Own-country blocks only. */
@@ -406,7 +476,12 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
           dayIndex: observation.dayIndex,
           source: "ai",
           incomeTaxRate: targetTax,
+          incomeTaxAllowanceSUSDPerYear:
+            observation.fiscal.incomeTaxAllowanceSUSDPerYear,
           welfareBudgetSUSDPerYear: targetWelfare,
+          welfareMaxWealthLevel: observation.fiscal.welfareMaxWealthLevel,
+          businessProfitTaxRate: observation.fiscal.businessProfitTaxRate,
+          reserveTargetSUSD: observation.fiscal.reserveTargetSUSD,
         },
       ]
     : [];
@@ -424,7 +499,9 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
  * Validate a country action without mutating the world.
  *
  * This is the single validation path used by a player and by the AI. Invalid
- * input is reported, never clamped.
+ * input is reported, never clamped. Player-sourced actions may only target the
+ * designated player country, and AI-sourced actions may never target it, so a
+ * client cannot use the shared path to bypass the control boundary.
  */
 export function validateCountryAction(
   world: World,
@@ -434,8 +511,18 @@ export function validateCountryAction(
   if (action === null || typeof action !== "object") {
     return { valid: false, errors: ["action must be an object"] };
   }
-  if (action.kind !== "set-fiscal-policy") {
-    return { valid: false, errors: ["action.kind must be \"set-fiscal-policy\""] };
+  if (
+    action.kind !== "set-fiscal-policy" &&
+    action.kind !== "issue-debt" &&
+    action.kind !== "repay-debt" &&
+    action.kind !== "set-debt-policy"
+  ) {
+    return {
+      valid: false,
+      errors: [
+        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", or "set-debt-policy"',
+      ],
+    };
   }
   if (action.source !== "player" && action.source !== "ai") {
     errors.push('action.source must be "player" or "ai"');
@@ -457,26 +544,107 @@ export function validateCountryAction(
   if (country === undefined) {
     errors.push(`action.countryId ${String(action.countryId)} is not a registered country`);
   }
-  try {
-    assertValidFiscalPolicy(
-      {
-        incomeTaxRate: action.incomeTaxRate,
-        welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
-      },
-      "action.fiscal",
-    );
-  } catch (error) {
-    errors.push(errorMessage(error));
+  if (country !== undefined && world.playerCountryId !== null) {
+    if (action.source === "player" && action.countryId !== world.playerCountryId) {
+      errors.push(
+        `player actions may only target the designated player country ${String(world.playerCountryId)}`,
+      );
+    }
+    if (action.source === "ai" && action.countryId === world.playerCountryId) {
+      errors.push("the AI must not target the player-controlled country's policy");
+    }
+  }
+  if (country !== undefined) {
+    if (action.kind === "set-fiscal-policy") {
+      try {
+        assertValidFiscalPolicy(
+          {
+            incomeTaxRate: action.incomeTaxRate,
+            incomeTaxAllowanceSUSDPerYear: action.incomeTaxAllowanceSUSDPerYear,
+            welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
+            welfareMaxWealthLevel: action.welfareMaxWealthLevel,
+            businessProfitTaxRate: action.businessProfitTaxRate,
+            reserveTargetSUSD: action.reserveTargetSUSD,
+          },
+          "action.fiscal",
+        );
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "issue-debt") {
+      try {
+        validateDebtIssuance(world, {
+          issuerCountryId: country.id,
+          holderKind: country.debt.creditorKind,
+          holderId: country.debt.creditorId,
+          principalSUSD: action.amountSUSD,
+          annualCouponRate: country.debt.annualCouponRate,
+          termDays: country.debt.termDays,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "repay-debt") {
+      try {
+        validateDebtRepayment(world, {
+          issuerCountryId: country.id,
+          contractId: action.contractId,
+          amountSUSD: action.amountSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else {
+      try {
+        validateDebtPolicyChange(world, country, action);
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    }
   }
   return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Validate a debt-policy change against the existing M5b policy and contracts.
+ * The ceiling may not fall below the country's current outstanding principal, so
+ * a policy change cannot orphan or make existing debt non-conforming.
+ */
+function validateDebtPolicyChange(
+  world: World,
+  country: Country,
+  action: SetDebtPolicyAction,
+): void {
+  if (!country.debt.enabled) {
+    throw new RangeError(
+      `country ${String(country.id)} has no enabled debt policy to update`,
+    );
+  }
+  if (typeof action.refinanceOnMaturity !== "boolean") {
+    throw new TypeError("action.refinanceOnMaturity must be a boolean");
+  }
+  const ceiling = action.maxOutstandingPrincipalSUSD;
+  if (typeof ceiling !== "number" || !Number.isFinite(ceiling) || ceiling < 0) {
+    throw new RangeError("action.maxOutstandingPrincipalSUSD must be a finite non-negative number");
+  }
+  if (ceiling > MAX_DEBT_PRINCIPAL_SUSD) {
+    throw new RangeError(
+      `action.maxOutstandingPrincipalSUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_SUSD)}`,
+    );
+  }
+  const outstanding = debtOutstandingPrincipal(world.finance.debtContracts, country.id);
+  if (ceiling < outstanding - MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(
+      `action.maxOutstandingPrincipalSUSD ${String(ceiling)} is below the outstanding principal ${String(outstanding)}`,
+    );
+  }
 }
 
 /**
  * Apply one validated country action atomically.
  *
  * The action is validated first, then the complete candidate world is validated
- * before the replacement country object is published. A failed validation leaves
- * the original world unchanged.
+ * before publication. A failed validation leaves the original world unchanged.
  */
 export function applyCountryAction(
   world: World,
@@ -491,23 +659,123 @@ export function applyCountryAction(
   const country = world.countries[index];
   if (country === undefined) throw new RangeError(`missing country ${String(action.countryId)}`);
   const previousFiscal: FiscalPolicy = { ...country.fiscal };
-  const fiscal: FiscalPolicy = {
-    incomeTaxRate: action.incomeTaxRate,
-    welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
+  const previousDebt: DebtPolicy = { ...country.debt };
+
+  if (action.kind === "set-fiscal-policy") {
+    const fiscal: FiscalPolicy = {
+      incomeTaxRate: action.incomeTaxRate,
+      incomeTaxAllowanceSUSDPerYear: action.incomeTaxAllowanceSUSDPerYear,
+      welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
+      welfareMaxWealthLevel: action.welfareMaxWealthLevel,
+      businessProfitTaxRate: action.businessProfitTaxRate,
+      reserveTargetSUSD: action.reserveTargetSUSD,
+    };
+    const changed = (
+      Object.keys(fiscal) as (keyof FiscalPolicy)[]
+    ).some((field) => fiscal[field] !== previousFiscal[field]);
+    if (!changed) {
+      return {
+        countryId: country.id,
+        dayIndex: action.dayIndex,
+        kind: action.kind,
+        previousFiscal,
+        fiscal: previousFiscal,
+        previousDebt,
+        debt: previousDebt,
+        debtContract: null,
+        principalPaidSUSD: 0,
+        changed: false,
+      };
+    }
+    const candidateCountry: Country = { ...country, fiscal };
+    const candidateWorld: World = {
+      ...world,
+      countries: world.countries.map((entry, entryIndex) =>
+        entryIndex === index ? candidateCountry : entry,
+      ),
+    };
+    assertValidWorld(candidateWorld);
+    world.countries[index] = candidateCountry;
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...fiscal },
+      previousDebt,
+      debt: { ...candidateCountry.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "issue-debt") {
+    const issuance = issueGovernmentDebt(world, {
+      issuerCountryId: country.id,
+      holderKind: country.debt.creditorKind,
+      holderId: country.debt.creditorId,
+      principalSUSD: action.amountSUSD,
+      annualCouponRate: country.debt.annualCouponRate,
+      termDays: country.debt.termDays,
+    });
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: issuance.contract,
+      principalPaidSUSD: 0,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "repay-debt") {
+    const repayment = repayGovernmentDebt(world, {
+      issuerCountryId: country.id,
+      contractId: action.contractId,
+      amountSUSD: action.amountSUSD,
+    });
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: repayment.contract,
+      principalPaidSUSD: repayment.principalPaidSUSD,
+      changed: true,
+    };
+  }
+
+  const debt: DebtPolicy = {
+    ...country.debt,
+    refinanceOnMaturity: action.refinanceOnMaturity,
+    maxOutstandingPrincipalSUSD: action.maxOutstandingPrincipalSUSD,
   };
   const changed =
-    fiscal.incomeTaxRate !== previousFiscal.incomeTaxRate ||
-    fiscal.welfareBudgetSUSDPerYear !== previousFiscal.welfareBudgetSUSDPerYear;
+    debt.refinanceOnMaturity !== previousDebt.refinanceOnMaturity ||
+    debt.maxOutstandingPrincipalSUSD !== previousDebt.maxOutstandingPrincipalSUSD;
   if (!changed) {
     return {
       countryId: country.id,
       dayIndex: action.dayIndex,
+      kind: action.kind,
       previousFiscal,
-      fiscal: previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: previousDebt,
+      debtContract: null,
+      principalPaidSUSD: 0,
       changed: false,
     };
   }
-  const candidateCountry: Country = { ...country, fiscal };
+  const candidateCountry: Country = { ...country, debt };
   const candidateWorld: World = {
     ...world,
     countries: world.countries.map((entry, entryIndex) =>
@@ -519,8 +787,13 @@ export function applyCountryAction(
   return {
     countryId: country.id,
     dayIndex: action.dayIndex,
+    kind: action.kind,
     previousFiscal,
-    fiscal: { ...fiscal },
+    fiscal: { ...candidateCountry.fiscal },
+    previousDebt,
+    debt: { ...debt },
+    debtContract: null,
+    principalPaidSUSD: 0,
     changed: true,
   };
 }

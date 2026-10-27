@@ -51,9 +51,30 @@ export {
 } from "./debtPolicy.js";
 export {
   issueGovernmentDebt,
+  repayGovernmentDebt,
+  validateDebtIssuance,
+  validateDebtRepayment,
   runDebtPhase,
   type DebtContractResult,
   type DebtIssuanceInput,
   type DebtIssuanceResult,
   type DebtPhaseResult,
+  type DebtRepaymentInput,
+  type DebtRepaymentResult,
 } from "./debt.js";
+export {
+  runBusinessTaxPhase,
+  type BusinessTaxBuildingResult,
+  type BusinessTaxCountryResult,
+  type BusinessTaxPhaseResult,
+} from "./businessTax.js";
+export {
+  accumulateBudgetMemo,
+  addBudgetTotals,
+  assertValidBudgetTotals,
+  assertValidFinanceBudgetMemo,
+  budgetTotalsFromMemo,
+  emptyBudgetTotals,
+  emptyFinanceBudgetMemo,
+  readBudgetMemo,
+} from "./budget.js";

@@ -20,6 +20,7 @@ import {
   type World,
 } from "@century/sim";
 import { loadM5EightPolities } from "@century/data";
+import { PROTOCOL_VERSION } from "@century/sim-worker";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
 import { marketScenario } from "./fixtures/m3d.js";
 
@@ -148,7 +149,7 @@ describe("M7a annual accounting", () => {
       { sequence: 1, running: false, speedDaysPerSecond: 1, achievedDaysPerSecond: 0 },
       scenario.population.definitions,
     );
-    expect(snapshot.protocolVersion).toBe(4);
+    expect(snapshot.protocolVersion).toBe(PROTOCOL_VERSION);
     const report = snapshot.countries[0]?.annualReports[0];
     expect(report?.year).toBe(1900);
     expect(report?.complete).toBe(false);

@@ -1,4 +1,5 @@
 import {
+  WORLD_SCHEMA_VERSION,
   createEconomyWorld,
   serializeWorld,
   tick,
@@ -13,7 +14,7 @@ import {
 } from "@century/sim-worker/persistence";
 
 const SEED = 20_261_023;
-const SCHEMA = 17;
+const SCHEMA = WORLD_SCHEMA_VERSION;
 
 class MemoryBackend implements SaveStorageBackend {
   public readonly values = new Map<string, string>();

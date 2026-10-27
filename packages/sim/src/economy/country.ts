@@ -26,8 +26,13 @@ import {
   SUSD_CURRENCY_KEY,
 } from "../constants.js";
 import {
+  DEFAULT_BUSINESS_PROFIT_TAX_RATE,
+  DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR,
+  DEFAULT_RESERVE_TARGET_SUSD,
+  DEFAULT_WELFARE_MAX_WEALTH_LEVEL,
   MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
   MAX_FISCAL_TAX_RATE,
+  MAX_WELFARE_WEALTH_LEVEL,
   MIN_FISCAL_TAX_RATE,
 } from "./constants.js";
 import type { Day, Id } from "../types.js";
@@ -47,6 +52,7 @@ import type {
   CurrencyIssuer,
   CurrencyValuation,
   FiscalPolicy,
+  FiscalPolicyInput,
   MonetaryArrangement,
 } from "./types.js";
 
@@ -60,7 +66,11 @@ export interface CountryIdentityInput {
   readonly monetary: MonetaryArrangement;
   readonly regionIds: readonly Id[];
   readonly treasuryAccountId: Id;
-  readonly fiscal: FiscalPolicy;
+  /**
+   * Runtime worlds carry the complete E2 policy; scenario input may omit the E2
+   * fields, which `allowLegacyFiscalDefaults` fills with neutral defaults.
+   */
+  readonly fiscal: FiscalPolicyInput;
 }
 
 /** Typed input for the country/currency validation pass. */
@@ -71,6 +81,12 @@ export interface CountryCurrencyValidationInput {
   readonly regionIds: ReadonlySet<Id>;
   /** When provided, specified valuations must be set on this day. */
   readonly expectedStartDay?: Day;
+  /**
+   * Allow the M4c two-field scenario fiscal form, filling the E2 schedule,
+   * eligibility, business-tax, and reserve fields with neutral defaults. World
+   * state validation never sets this, so persisted policy must be complete.
+   */
+  readonly allowLegacyFiscalDefaults?: boolean;
 }
 
 /** The domestic currency id selected by a country's sole arrangement. */
@@ -104,18 +120,73 @@ export function buildRegionOwnerMap(world: World): ReadonlyMap<Id, Id> {
   return owners;
 }
 
-/** True when a country has any active M4c fiscal policy. */
-export function fiscalPolicyIsActive(fiscal: FiscalPolicy): boolean {
-  return fiscal.incomeTaxRate > 0 || fiscal.welfareBudgetSUSDPerYear > 0;
+/** True when a country has any active fiscal policy. */
+export function fiscalPolicyIsActive(fiscal: FiscalPolicyInput): boolean {
+  return (
+    fiscal.incomeTaxRate > 0 ||
+    fiscal.welfareBudgetSUSDPerYear > 0 ||
+    (fiscal.businessProfitTaxRate ?? 0) > 0
+  );
 }
 
-/** Validate one fiscal policy and return its normalized value. */
+/** Neutral defaults for the E2 fiscal-policy fields, used by scenario input. */
+export function neutralFiscalPolicyDefaults(): Pick<
+  FiscalPolicy,
+  | "incomeTaxAllowanceSUSDPerYear"
+  | "welfareMaxWealthLevel"
+  | "businessProfitTaxRate"
+  | "reserveTargetSUSD"
+> {
+  return {
+    incomeTaxAllowanceSUSDPerYear: DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR,
+    welfareMaxWealthLevel: DEFAULT_WELFARE_MAX_WEALTH_LEVEL,
+    businessProfitTaxRate: DEFAULT_BUSINESS_PROFIT_TAX_RATE,
+    reserveTargetSUSD: DEFAULT_RESERVE_TARGET_SUSD,
+  };
+}
+
+/**
+ * Create a validated runtime fiscal policy from scenario input. The M4c rate and
+ * welfare budget are required; omitted E2 fields take their neutral defaults.
+ * Omitted fields are not silently defaulted for persisted state; see
+ * `assertValidFiscalPolicy`.
+ */
+export function createFiscalPolicy(input: FiscalPolicyInput, path = "fiscal"): FiscalPolicy {
+  const defaults = neutralFiscalPolicyDefaults();
+  const record = requireRecord(input, path);
+  return assertValidFiscalPolicy(
+    {
+      incomeTaxRate: record.incomeTaxRate,
+      incomeTaxAllowanceSUSDPerYear:
+        record.incomeTaxAllowanceSUSDPerYear ?? defaults.incomeTaxAllowanceSUSDPerYear,
+      welfareBudgetSUSDPerYear: record.welfareBudgetSUSDPerYear,
+      welfareMaxWealthLevel: record.welfareMaxWealthLevel ?? defaults.welfareMaxWealthLevel,
+      businessProfitTaxRate: record.businessProfitTaxRate ?? defaults.businessProfitTaxRate,
+      reserveTargetSUSD: record.reserveTargetSUSD ?? defaults.reserveTargetSUSD,
+    },
+    path,
+  );
+}
+
+/** Validate one complete fiscal policy and return its normalized value. */
 export function assertValidFiscalPolicy(value: unknown, path: string): FiscalPolicy {
   const record = requireRecord(value, path);
   const incomeTaxRate = requireFiniteNumber(record.incomeTaxRate, `${path}.incomeTaxRate`);
   if (incomeTaxRate < MIN_FISCAL_TAX_RATE || incomeTaxRate > MAX_FISCAL_TAX_RATE) {
     throw new RangeError(
       `${path}.incomeTaxRate must be in ${MIN_FISCAL_TAX_RATE}..${MAX_FISCAL_TAX_RATE}, received ${String(incomeTaxRate)}`,
+    );
+  }
+  const incomeTaxAllowanceSUSDPerYear = requireFiniteNumber(
+    record.incomeTaxAllowanceSUSDPerYear,
+    `${path}.incomeTaxAllowanceSUSDPerYear`,
+  );
+  if (incomeTaxAllowanceSUSDPerYear < 0) {
+    throw new RangeError(`${path}.incomeTaxAllowanceSUSDPerYear must be non-negative`);
+  }
+  if (incomeTaxAllowanceSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+    throw new RangeError(
+      `${path}.incomeTaxAllowanceSUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
     );
   }
   const welfareBudgetSUSDPerYear = requireFiniteNumber(
@@ -130,7 +201,44 @@ export function assertValidFiscalPolicy(value: unknown, path: string): FiscalPol
       `${path}.welfareBudgetSUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
     );
   }
-  return { incomeTaxRate, welfareBudgetSUSDPerYear };
+  const welfareMaxWealthLevel = requireInteger(
+    record.welfareMaxWealthLevel,
+    `${path}.welfareMaxWealthLevel`,
+    0,
+    MAX_WELFARE_WEALTH_LEVEL,
+  );
+  const businessProfitTaxRate = requireFiniteNumber(
+    record.businessProfitTaxRate,
+    `${path}.businessProfitTaxRate`,
+  );
+  if (
+    businessProfitTaxRate < MIN_FISCAL_TAX_RATE ||
+    businessProfitTaxRate > MAX_FISCAL_TAX_RATE
+  ) {
+    throw new RangeError(
+      `${path}.businessProfitTaxRate must be in ${MIN_FISCAL_TAX_RATE}..${MAX_FISCAL_TAX_RATE}, received ${String(businessProfitTaxRate)}`,
+    );
+  }
+  const reserveTargetSUSD = requireFiniteNumber(
+    record.reserveTargetSUSD,
+    `${path}.reserveTargetSUSD`,
+  );
+  if (reserveTargetSUSD < 0) {
+    throw new RangeError(`${path}.reserveTargetSUSD must be non-negative`);
+  }
+  if (reserveTargetSUSD > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+    throw new RangeError(
+      `${path}.reserveTargetSUSD must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+    );
+  }
+  return {
+    incomeTaxRate,
+    incomeTaxAllowanceSUSDPerYear,
+    welfareBudgetSUSDPerYear,
+    welfareMaxWealthLevel,
+    businessProfitTaxRate,
+    reserveTargetSUSD,
+  };
 }
 
 /** Deep-copy one country record. */
@@ -240,7 +348,10 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
       );
     }
     treasuryAccountIds.add(treasuryAccountId);
-    const fiscal = assertValidFiscalPolicy(record.fiscal, `${path}.fiscal`);
+    const fiscal =
+      input.allowLegacyFiscalDefaults === true
+        ? createFiscalPolicy(record.fiscal as FiscalPolicyInput, `${path}.fiscal`)
+        : assertValidFiscalPolicy(record.fiscal, `${path}.fiscal`);
     const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
     const regionIds: Id[] = [];
     const seenRegions = new Set<Id>();
