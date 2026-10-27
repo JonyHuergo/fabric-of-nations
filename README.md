@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, and E3 public construction
+# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, and E4 industrial policy
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -34,21 +34,28 @@ treasury/debt balances, partial-year handling, and audited controlled correction
 income-tax exemption schedule, welfare eligibility and a treasury reserve floor, a
 month-end business-profit tax with its own accounts and posting kind, budget
 decomposition in monthly/annual reports, and validated player borrowing, principal
-repayment, and refinancing/ceiling actions. Consumption/excise, property/land, and
-customs taxes, broader
-government expenditure and services, construction, subsidies, procurement,
-banking/central banking, dynamic FX,
-inflation, monetary policy, reopen/reversal, politics, technology,
-diplomacy, and warfare remain unimplemented. **M7's native iOS/Android release
+repayment, and refinancing/ceiling actions. **E3 (Public Investment and Construction)**
+adds a validated project queue that hires real idle labor, pays construction wages over
+time, capitalizes work-in-progress, and completes into state-owned productive
+buildings. **E4 (Industrial and Business Policy)** adds validated building sectors,
+construction material requirements bought from actual market stock, sectoral
+production subsidies paid against verified output, and public-enterprise capital
+support, with balanced accounting and reporting. General goods/services procurement,
+private co-financing, loans, guarantees, investment tax credits, public-enterprise
+expansion/discontinuation, consumption/excise, property/land, and customs taxes,
+broader government expenditure and services, banking/central banking, dynamic FX,
+inflation, monetary policy, reopen/reversal, politics, technology, diplomacy, and
+warfare remain unimplemented. **M7's native iOS/Android release
 builds and real-device performance were not measured; M7 is delivered with that
 explicit acceptance exception, not as a passed mobile release.** The designer has
 adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0, E1, E2, and E3 are implemented in GDD v2.10 §17A**, and
-E4–E6 are planned, not implemented. The design authority is the [Century GDD
-v2.10](./Century_GDD_v2.10.md); v2.9 is retained as
+economic program; **E0, E1, E2, E3, and E4 are implemented in GDD v2.11 §17A**, and
+E5–E6 are planned, not implemented. The design authority is the [Century GDD
+v2.11](./Century_GDD_v2.11.md); v2.10 is retained as
+[historical E3 documentation](./Century_GDD_v2.10.md), v2.9 as
 [historical E2 documentation](./Century_GDD_v2.9.md), v2.8 as
 [historical M7a/E1 documentation](./Century_GDD_v2.8.md), v2.7 as
 [historical E1 documentation](./Century_GDD_v2.7.md), v2.6 as
@@ -63,7 +70,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -594,7 +601,7 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.10 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.11 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
 M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.10
 records M7a annual accounting (§17B) and the Economic Management Overhaul (§17A; E0
@@ -3029,7 +3036,7 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
-## Economic Management Overhaul — E0 design, E1/E2/E3 implementation, and M7a annual accounting
+## Economic Management Overhaul — E0 design, E1/E2/E3/E4 implementation, and M7a annual accounting
 
 GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
 (GDD §17A; D-070). **E0 is documentation/design; E1, E2, and E3 are implemented; M7a
@@ -3255,7 +3262,58 @@ measurement, campaign, profiling, or device test was run for E3 under the develo
 no-benchmark restriction; no benchmark code, thresholds, or reports were changed.
 Implementation commits: `e3b6fff5025af747f0fc78cc6941e1f93631e5ea` (core construction) and `a8c6a9edd2b400dcfd676478222c612efd7c2f1e` (state-ownership UI gate).
 
+### E4 — delivered industrial policy, materials, and public-enterprise support
+
+E4 extends the existing economy rather than creating a parallel one:
+
+- **Validated sector classification.** Every building definition carries a
+  `sector` (`agriculture`, `food-processing`, `textiles`, `manufacturing`, `storage`).
+  Subsidy eligibility is derived from this authored data.
+- **Construction material requirements and procurement.** Definitions carry a
+  construction/commissioning material bill using existing goods. Before hiring labor, a
+  project buys missing quantities from its regional market's actual stock at the current
+  price, consuming canonical stock lots and paying sellers through `sales-revenue`.
+  Purchases are capitalized into work-in-progress; delivered quantities are capped so a
+  retry/replay cannot duplicate a delivery. A project waits with `materials` when stock
+  is absent or `funds` when cash is insufficient, and resumes automatically. Completion
+  and cancellation include both labor and material cost.
+- **Sectoral production subsidy.** A validated per-country sector rate is applied to
+  verified daily physical output valued at the post-clearing market price. Payment is
+  limited by actual treasury cash, posts country `subsidy-expense` and enterprise
+  `subsidy-revenue`, and is included in the month-end business-tax base. Unpaid
+  entitlement is an explicit shortfall, never debt or a receivable.
+- **Public-enterprise capital support.** A player action contributes treasury capital to
+  an existing state enterprise's operating cash/equity. It is capital, not expense, a
+  loan, or a guarantee; it does not guarantee inputs, sales, profit, level, or continued
+  operation. Ordinary production, wages, upkeep, tax, and M5a remittance rules still
+  apply.
+- **Interface.** An Industry tab shows sector rates, current capacity-value estimates,
+  static daily subsidy exposure, month-to-date requested/paid/shortfall, and existing
+  state enterprises with capital-support controls. Construction shows material
+  requirements, delivered/remaining quantities, prices, stock/shortfalls, material
+  progress, and material stalls. Ledger reports subsidy, material, and capital-support
+  flows separately.
+- **Explicitly not implemented.** Private co-financing, government-supported private
+  projects, loans, guarantees, investment tax credits/deductions, general goods/services
+  procurement or open orders, public-enterprise expansion/discontinuation, industrial
+  program bundles, and price/production controls. They are labelled in the GDD/UI rather
+  than simulated decoratively. Procurement/delivery is immediate against actual stock;
+  no order is counted as delivered goods.
+
+Schema is **20**, simulation **0.20.0**, save format **1**, data version
+**`m3-economy-v5`**, and worker protocol **7**. Data v5 adds sectors/material bills to
+all building definitions; historical/generated artifacts were regenerated. New
+cash-neutral postings are `construction-material-purchase`, `production-subsidy`, and
+`public-enterprise-capital-contribution`; new accounts are building `subsidy-revenue`
+and country `subsidy-expense`. Schema-19 and older saves are rejected; no migration is
+authorized. Tests: `e4-industrial-policy.test.ts` plus strengthened E3, worker, UI,
+reporting, serialization, and hash tests. No benchmark, performance measurement,
+campaign, profiling, or device test was run for E4 under the no-benchmark restriction;
+no benchmark code, thresholds, or reports were changed. Implementation commit:
+`a859f2a89c8229fa12c9c57b7862307140fb721d`.
+
 ## Development workflow
+
 
 1. Read `AGENTS.md` and the relevant GDD milestone.
 2. Inspect `git status`; preserve unrelated changes.

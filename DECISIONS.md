@@ -3328,7 +3328,134 @@ round-trip and Construction tab wiring. Full tests/typecheck results are in the 
 change report. No benchmarks or performance measurements were run under the active
 no-benchmark restriction, and no benchmark code/threshold/report was modified.
 
+## D-075 — E4 industrial policy, construction materials/procurement, and public-enterprise support
+
+**Status:** accepted and implemented in code/tests/bundle commit
+`a859f2a89c8229fa12c9c57b7862307140fb721d`. GDD v2.11 §17A.20 records the delivered scope, accounting,
+limits, and acceptance evidence. This decision resolves E4's delegated instrument,
+sector-classification, procurement, and public-enterprise choices.
+
+**Context.** E4's GDD definition of done requires at least one coherent industrial
+instrument that changes actual enterprise/budget/production/investment behavior, with
+unsupported instruments labelled and fiscal cost/trade-offs visible. E3 delivered
+state-owned construction but deferred material requirements/procurement and all
+industrial instruments. E4 must extend the existing treasury, market, building, M5a
+remittance, construction, and reporting systems rather than create a parallel economy.
+
+**Decision.**
+
+1. **Implemented subset.** E4 implements: a validated building-sector taxonomy;
+   construction/commissioning material requirements and actual market procurement; an
+   ad-valorem sectoral production subsidy; and public-enterprise capital support.
+   Investment tax credits/deductions, private co-financing, government-supported private
+   projects, loans, guarantees, general goods/services procurement/open orders,
+   public-enterprise expansion/discontinuation, industrial program bundles, and
+   price/production controls are **not implemented**. They are labelled in the GDD, UI,
+   and decision record; no decorative substitute is exposed.
+2. **Sector taxonomy.** `BuildingDef.sector` is an authored, validated enum
+   (`agriculture`, `food-processing`, `textiles`, `manufacturing`, `storage`). Subsidy
+   eligibility is derived from it, not from UI labels, building keys, or ad-hoc special
+   cases. Data version `m3-economy-v5` adds it to every building definition, including
+   historical variants.
+3. **Construction materials.** Every building definition carries a validated
+   `constructionMaterials` list of existing good ids/quantities. These are provisional
+   construction/commissioning inputs (seed, breeding stock, netting/packaging, raw
+   materials), not a historical engineering bill of materials. At authorization the
+   project snapshots the requirements and zero delivered quantity.
+4. **Procurement is an actual market purchase, not an unfilled order.** Before labor,
+   the project buys missing quantities from the project region's actual market stock at
+   the current price. Lots are consumed in canonical `(goodId, sellerBuildingId)` order;
+   quantity is limited by remaining requirement, actual lot stock, and treasury cash.
+   The seller's lot decreases, seller operating cash and `sales-revenue` increase, and
+   the country capitalizes the purchase into `construction-in-progress` against treasury
+   (`construction-material-purchase`). Purchase and delivery are atomic; E4 does not
+   create a backlog or count an order as delivered stock. General services procurement,
+   open orders, and delayed delivery are deferred.
+5. **Material shortages and duplication.** No stock → project waits with `materials`;
+   insufficient cash → waits with `funds`; labor is hired only after all requirements are
+   delivered. Delivered quantities are capped by the requirement, so phase retry/replay
+   cannot duplicate a purchase or consumption. Cancellation writes off material plus
+   labor work-in-progress; completion capitalizes both.
+6. **Sectoral subsidy base and payment.** The subsidy is an ad-valorem rate per sector
+   on **verified daily physical output valued at the market's post-clearing price**, not
+   capacity, sales revenue, a target, or a score. The country's validated policy array
+   covers all sectors. Payment is limited by actual treasury cash in ascending
+   building-id order. Paid amounts post country `subsidy-expense`/treasury and building
+   `operating-cash`/`subsidy-revenue` (`production-subsidy`), cash-neutral. Unpaid
+   entitlement is a reported shortfall, never debt or a receivable.
+7. **Subsidy tax treatment.** Subsidy revenue is taxable enterprise revenue and is
+   included in the month-end business-profit tax base. The subsidy is a real country
+   expense; `subsidyExpenseSUSD` is added to fiscal totals and subtracted from
+   `netFiscalResultSUSD`.
+8. **Public-enterprise support is capital, not expense.** `support-public-enterprise`
+   is player-only for an existing state-owned building in the country's regions owned by
+   its treasury. A positive, bounded amount covered by actual treasury cash posts
+   treasury credit/country owner-equity debit and building operating-cash debit/
+   owner-equity credit (`public-enterprise-capital-contribution`). It does not change
+   ownership, level, condition, inputs, sales, wages, tax, or remittance rules, and it
+   is not a loan, guarantee, or promise of profit. Expansion/discontinuation remain
+   deferred.
+9. **Phase order.** Material purchases occur in the construction phase before labor;
+   the subsidy phase runs after market/fiscal and before business tax, so subsidy
+   revenue enters the month-end tax base while subsidy cash is subject to actual
+   treasury liquidity. Both phases are deterministic and atomic.
+10. **State and versions.** Schema 20 adds `Country.industrial`, project material state/
+    `materialsSpentSUSD`, construction material budget fields, subsidy/support budget
+    fields, and fiscal subsidy expense. Protocol 7 adds sector/material/enterprise
+    snapshot fields and `set-industrial-policy`/`support-public-enterprise` DTOs. Data
+    v5 adds sector/material definitions. Schema 20/simulation 0.20.0/protocol 7/data v5
+    reject older saves/clients; no migration under D-013.
+11. **Reporting.** Monthly/annual budget decompositions add
+    `constructionMaterialsSpentSUSD`, `subsidyRequestedSUSD`,
+    `subsidyShortfallSUSD`, and `publicEnterpriseSupportSUSD`. Fiscal totals add
+    `subsidyExpenseSUSD`; net fiscal result subtracts it. Material outlay is capital,
+    subsidy is expense, support is capital, and none is silently reclassified.
+12. **Bounded state.** Sector arrays are fixed-size, project material lists are authored
+    and small, public-enterprise snapshot lists derive from existing buildings, and no
+    new unbounded history is introduced. `nextProjectId`/`nextBuildingId` remain
+    monotonic.
+
+**Rejected alternatives.**
+
+- **Generic procurement framework with open orders.** Rejected because no
+  delivery/contract/supplier model exists; E4 buys actual stock atomically and labels
+  open orders/delayed delivery as deferred.
+- **Fictitious material goods or infinite supply.** Rejected; materials use existing
+  goods and actual market stock.
+- **Subsidy on capacity, sales, or a sector score.** Rejected; the base is verified
+  physical output at market value.
+- **Subsidy as negative tax/forgone revenue.** Rejected for clarity: E4 pays a real
+  treasury expense and recognizes enterprise revenue; unpaid entitlement is explicit.
+- **Public-enterprise support as expense or guaranteed funding.** Rejected; it is a
+  capital contribution with no profitability/input guarantee.
+- **Loans/guarantees approximated by grants or hidden exposure.** Rejected; no credit/
+  contingent-liability mechanics exist, so they are deferred rather than faked.
+- **Expansion/discontinuation via silent level changes.** Rejected; deferred until a
+  proper capital/closure model exists.
+
+**Consequences.**
+
+- Schema 20 / simulation 0.20.0 / protocol 7 / data v5 are incompatible with earlier
+  saves/clients; canonical hashes and fixtures changed intentionally.
+- Construction now requires materials and labor; a project can wait on either in
+  addition to funds, and cancellation writes off both.
+- Subsidy payments can be rationed by cash and are reported as shortfalls; subsidy
+  revenue increases enterprise profit tax.
+- Public-enterprise support injects capital but cannot guarantee operation; ordinary
+  market/tax/remittance outcomes still determine viability.
+- Private co-financing, loans, guarantees, investment tax credits, general procurement,
+  expansion/discontinuation, and price controls remain explicit dependencies.
+
+**Verification.** `packages/tests/src/e4-industrial-policy.test.ts` covers the full
+scope above, including duplicate-delivery prevention, shortage/resume, subsidy
+payment/shortfall, support capital accounting, action rejection, snapshots/previews,
+save/replay, and monthly/annual reconciliation. E3 tests were strengthened for
+material-inclusive capitalization/write-off/reporting; worker/UI wiring tests cover the
+new actions/tab. Full results are in the v2.11 change report. No benchmarks or
+performance measurements were run; no benchmark code/threshold/report was changed.
+
 ## Assumptions recorded for future review
+
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
 2. The warning buffer is capped at 32 entries of 500 characters each. No
@@ -3410,9 +3537,25 @@ no-benchmark restriction, and no benchmark code/threshold/report was modified.
 24. Construction project caps (32 non-terminal, 32 retained terminated, 256 history
     aggregates) are provisional bounded-state limits. Project ids and building ids are
     monotonic per world.
-25. E3 does not model construction materials, procurement, land/space, infrastructure
-    access, destruction/closure, or owner insolvency. These are explicit E4/E5/E6a
-    dependencies; no abstract substitute is used.
+25. E3 did not model construction materials or procurement; E4 adds them. Land/space,
+    infrastructure access, destruction/closure, and owner insolvency remain explicit
+    later-stage dependencies; no abstract substitute is used.
+26. E4 construction material bills are provisional authored inputs using existing goods
+    (seed, breeding stock, netting/packaging, raw materials), not a historical
+    engineering BOM. Purchase and delivery are atomic against actual regional market
+    stock; unfilled orders and delayed delivery are deferred.
+27. E4 sector subsidies are ad-valorem on verified daily physical output at the
+    post-clearing market price, paid only from actual treasury cash. Paid amounts are
+    taxable enterprise revenue; unpaid entitlement is a shortfall, not debt.
+28. E4 public-enterprise support is a capital contribution to operating cash/equity. It
+    does not guarantee inputs, sales, profit, level, condition, or continued operation,
+    and it is not an expense, loan, or guarantee.
+29. E4 private co-financing, government-supported private projects, loans, guarantees,
+    investment tax credits/deductions, general goods/services procurement, public-
+    enterprise expansion/discontinuation, industrial program bundles, and price/
+    production controls are not implemented.
+30. Schema 20 / simulation 0.20.0 / protocol 7 / data m3-economy-v5 are incompatible
+    with earlier saves and clients; no migration is authorized.
 
 ## Items intentionally left open
 
@@ -3428,6 +3571,10 @@ no-benchmark restriction, and no benchmark code/threshold/report was modified.
 - Source-backed 1900 age structure and pre-1950 age-specific fertility/mortality.
 - Source-backed annual sex ratio at birth and exact single-year age distributions.
 - Cross-engine floating-point determinism policy.
+- E4 private co-financing, government-supported private projects, loans, guarantees,
+  investment tax credits/deductions, general goods/services procurement/open orders,
+  public-enterprise expansion/discontinuation, and industrial program bundles await
+  their underlying ownership, credit, tax-credit, or closure models.
 - Country-AI construction, infrastructure-priority, law, debt, diplomatic, and
   military actions await their underlying systems; M6 accepts only fiscal policy
   changes.
