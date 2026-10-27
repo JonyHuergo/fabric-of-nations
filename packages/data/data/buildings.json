@@ -5,16 +5,36 @@
     "name": "Subsistence Farm",
     "referenceThroughputPerDayAtLevelOne": 1,
     "inputs": [],
-    "outputs": [{ "goodId": 0, "quantityPerThroughputUnit": 150000 }],
-    "jobs": [{ "professionId": 0, "workersPerThroughputUnit": 50000 }],
+    "outputs": [
+      {
+        "goodId": 0,
+        "quantityPerThroughputUnit": 150000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 0,
+        "workersPerThroughputUnit": 50000
+      }
+    ],
     "constructionCostSUSD": 1000,
     "constructionWorkers": 80,
     "dailyUpkeepSUSDAtLevelOne": 20,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": true
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": true,
+    "sector": "agriculture",
+    "constructionMaterials": [
+      {
+        "goodId": 0,
+        "quantity": 500
+      }
+    ]
   },
   {
     "id": 1,
@@ -23,18 +43,43 @@
     "referenceThroughputPerDayAtLevelOne": 1,
     "inputs": [],
     "outputs": [
-      { "goodId": 0, "quantityPerThroughputUnit": 250000 },
-      { "goodId": 3, "quantityPerThroughputUnit": 10000 }
+      {
+        "goodId": 0,
+        "quantityPerThroughputUnit": 250000
+      },
+      {
+        "goodId": 3,
+        "quantityPerThroughputUnit": 10000
+      }
     ],
-    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 40000 }],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 40000
+      }
+    ],
     "constructionCostSUSD": 2000,
     "constructionWorkers": 120,
     "dailyUpkeepSUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": false
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "agriculture",
+    "constructionMaterials": [
+      {
+        "goodId": 0,
+        "quantity": 2000
+      },
+      {
+        "goodId": 3,
+        "quantity": 200
+      }
+    ]
   },
   {
     "id": 2,
@@ -43,18 +88,43 @@
     "referenceThroughputPerDayAtLevelOne": 1,
     "inputs": [],
     "outputs": [
-      { "goodId": 1, "quantityPerThroughputUnit": 15000 },
-      { "goodId": 4, "quantityPerThroughputUnit": 2000 }
+      {
+        "goodId": 1,
+        "quantityPerThroughputUnit": 15000
+      },
+      {
+        "goodId": 4,
+        "quantityPerThroughputUnit": 2000
+      }
     ],
-    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 30000 }],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 30000
+      }
+    ],
     "constructionCostSUSD": 1500,
     "constructionWorkers": 60,
     "dailyUpkeepSUSDAtLevelOne": 30,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": false
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "agriculture",
+    "constructionMaterials": [
+      {
+        "goodId": 1,
+        "quantity": 100
+      },
+      {
+        "goodId": 0,
+        "quantity": 2000
+      }
+    ]
   },
   {
     "id": 3,
@@ -62,33 +132,82 @@
     "name": "Fishery",
     "referenceThroughputPerDayAtLevelOne": 1,
     "inputs": [],
-    "outputs": [{ "goodId": 2, "quantityPerThroughputUnit": 20000 }],
-    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 25000 }],
+    "outputs": [
+      {
+        "goodId": 2,
+        "quantityPerThroughputUnit": 20000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 25000
+      }
+    ],
     "constructionCostSUSD": 1200,
     "constructionWorkers": 50,
     "dailyUpkeepSUSDAtLevelOne": 25,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": false
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "agriculture",
+    "constructionMaterials": [
+      {
+        "goodId": 5,
+        "quantity": 100
+      }
+    ]
   },
   {
     "id": 4,
     "key": "food-processing",
     "name": "Food Processing Plant",
     "referenceThroughputPerDayAtLevelOne": 1,
-    "inputs": [{ "goodId": 0, "quantityPerThroughputUnit": 120000 }],
-    "outputs": [{ "goodId": 7, "quantityPerThroughputUnit": 15000 }],
-    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 20000 }],
+    "inputs": [
+      {
+        "goodId": 0,
+        "quantityPerThroughputUnit": 120000
+      }
+    ],
+    "outputs": [
+      {
+        "goodId": 7,
+        "quantityPerThroughputUnit": 15000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 20000
+      }
+    ],
     "constructionCostSUSD": 3000,
     "constructionWorkers": 100,
     "dailyUpkeepSUSDAtLevelOne": 35,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": true
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": true,
+    "sector": "food-processing",
+    "constructionMaterials": [
+      {
+        "goodId": 0,
+        "quantity": 5000
+      },
+      {
+        "goodId": 5,
+        "quantity": 100
+      }
+    ]
   },
   {
     "id": 5,
@@ -96,30 +215,76 @@
     "name": "Textile Mill",
     "referenceThroughputPerDayAtLevelOne": 1,
     "inputs": [
-      { "goodId": 3, "quantityPerThroughputUnit": 8000 },
-      { "goodId": 4, "quantityPerThroughputUnit": 1500 }
+      {
+        "goodId": 3,
+        "quantityPerThroughputUnit": 8000
+      },
+      {
+        "goodId": 4,
+        "quantityPerThroughputUnit": 1500
+      }
     ],
-    "outputs": [{ "goodId": 5, "quantityPerThroughputUnit": 6000 }],
-    "jobs": [{ "professionId": 1, "workersPerThroughputUnit": 30000 }],
+    "outputs": [
+      {
+        "goodId": 5,
+        "quantityPerThroughputUnit": 6000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 30000
+      }
+    ],
     "constructionCostSUSD": 4000,
     "constructionWorkers": 150,
     "dailyUpkeepSUSDAtLevelOne": 50,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": false
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "textiles",
+    "constructionMaterials": [
+      {
+        "goodId": 3,
+        "quantity": 3000
+      },
+      {
+        "goodId": 4,
+        "quantity": 500
+      }
+    ]
   },
   {
     "id": 6,
     "key": "workshop",
     "name": "Workshop",
     "referenceThroughputPerDayAtLevelOne": 1,
-    "inputs": [{ "goodId": 5, "quantityPerThroughputUnit": 5000 }],
-    "outputs": [{ "goodId": 6, "quantityPerThroughputUnit": 3000 }],
+    "inputs": [
+      {
+        "goodId": 5,
+        "quantityPerThroughputUnit": 5000
+      }
+    ],
+    "outputs": [
+      {
+        "goodId": 6,
+        "quantityPerThroughputUnit": 3000
+      }
+    ],
     "jobs": [
-      { "professionId": 2, "workersPerThroughputUnit": 5000 },
-      { "professionId": 1, "workersPerThroughputUnit": 10000 }
+      {
+        "professionId": 2,
+        "workersPerThroughputUnit": 5000
+      },
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 10000
+      }
     ],
     "constructionCostSUSD": 2500,
     "constructionWorkers": 80,
@@ -127,8 +292,18 @@
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": false
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "manufacturing",
+    "constructionMaterials": [
+      {
+        "goodId": 5,
+        "quantity": 1000
+      }
+    ]
   },
   {
     "id": 7,
@@ -142,18 +317,47 @@
     "constructionWorkers": 40,
     "dailyUpkeepSUSDAtLevelOne": 10,
     "storageCapacityByGood": [
-      { "goodId": 0, "quantity": 2000000 },
-      { "goodId": 1, "quantity": 2000000 },
-      { "goodId": 2, "quantity": 2000000 },
-      { "goodId": 3, "quantity": 2000000 },
-      { "goodId": 4, "quantity": 2000000 },
-      { "goodId": 5, "quantity": 2000000 },
-      { "goodId": 6, "quantity": 2000000 },
-      { "goodId": 7, "quantity": 2000000 }
+      {
+        "goodId": 0,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 1,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 2,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 3,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 4,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 5,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 6,
+        "quantity": 2000000
+      },
+      {
+        "goodId": 7,
+        "quantity": 2000000
+      }
     ],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
-    "ownershipAllowed": ["private", "state"],
-    "isEssentialInfrastructure": true
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": true,
+    "sector": "storage",
+    "constructionMaterials": []
   }
 ]

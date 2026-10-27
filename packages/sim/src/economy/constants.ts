@@ -176,6 +176,13 @@ export const MAX_CONSTRUCTION_HISTORY_AGGREGATES = 256;
 export const CONSTRUCTION_WORKING_CAPITAL_DAYS = 30;
 
 /**
+ * E4 numeric-safety bound for one discretionary public-enterprise capital
+ * contribution. This is a structural bound, not a budget target or calibrated
+ * policy value; actual affordability remains the country treasury cash balance.
+ */
+export const MAX_PUBLIC_ENTERPRISE_SUPPORT_SUSD = 1_000_000_000;
+
+/**
  * M6 country-AI v1 constants. PROVISIONAL policy rules, not calibrated
  * economics. Every rule is deterministic and uses only own-country or public
  * state.

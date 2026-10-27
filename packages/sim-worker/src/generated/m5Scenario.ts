@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v4",
+    "dataVersion": "m3-economy-v5",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3194,7 +3194,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v4",
+      "dataVersion": "m3-economy-v5",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6085,7 +6085,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v4",
+    "dataVersion": "m3-economy-v5",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6256,7 +6256,14 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": true
+        "isEssentialInfrastructure": true,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 0,
+            "quantity": 500
+          }
+        ]
       },
       {
         "id": 1,
@@ -6290,7 +6297,18 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 0,
+            "quantity": 2000
+          },
+          {
+            "goodId": 3,
+            "quantity": 200
+          }
+        ]
       },
       {
         "id": 2,
@@ -6324,7 +6342,18 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 1,
+            "quantity": 100
+          },
+          {
+            "goodId": 0,
+            "quantity": 2000
+          }
+        ]
       },
       {
         "id": 3,
@@ -6354,7 +6383,14 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 5,
+            "quantity": 100
+          }
+        ]
       },
       {
         "id": 4,
@@ -6389,7 +6425,18 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": true
+        "isEssentialInfrastructure": true,
+        "sector": "food-processing",
+        "constructionMaterials": [
+          {
+            "goodId": 0,
+            "quantity": 5000
+          },
+          {
+            "goodId": 5,
+            "quantity": 100
+          }
+        ]
       },
       {
         "id": 5,
@@ -6428,7 +6475,18 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "textiles",
+        "constructionMaterials": [
+          {
+            "goodId": 3,
+            "quantity": 3000
+          },
+          {
+            "goodId": 4,
+            "quantity": 500
+          }
+        ]
       },
       {
         "id": 6,
@@ -6467,7 +6525,14 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "manufacturing",
+        "constructionMaterials": [
+          {
+            "goodId": 5,
+            "quantity": 1000
+          }
+        ]
       },
       {
         "id": 7,
@@ -6520,7 +6585,9 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": true
+        "isEssentialInfrastructure": true,
+        "sector": "storage",
+        "constructionMaterials": []
       },
       {
         "id": 8,
@@ -6554,7 +6621,18 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 0,
+            "quantity": 2000
+          },
+          {
+            "goodId": 3,
+            "quantity": 200
+          }
+        ]
       },
       {
         "id": 9,
@@ -6593,7 +6671,14 @@ export const M5_SCENARIO = ({
           "private",
           "state"
         ],
-        "isEssentialInfrastructure": false
+        "isEssentialInfrastructure": false,
+        "sector": "manufacturing",
+        "constructionMaterials": [
+          {
+            "goodId": 5,
+            "quantity": 1000
+          }
+        ]
       }
     ]
   },

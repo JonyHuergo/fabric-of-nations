@@ -17,10 +17,11 @@
  * validated player/AI fiscal-policy actions. E2 adds the extended fiscal
  * schedule/eligibility/business-tax/reserve policy, the public-budget memo, and
  * the debt issuance/repayment/debt-policy actions. E3 adds public-construction
- * projects, idle-labor hiring, construction capitalization, and completion into
- * state-owned buildings.
+ * projects, idle-labor hiring, construction capitalization, completion into
+ * state-owned buildings, and E4 materials/procurement, sectoral subsidies, and
+ * public-enterprise capital support.
  */
-export const SIM_VERSION = "0.19.0";
+export const SIM_VERSION = "0.20.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -33,9 +34,11 @@ export const SIM_VERSION = "0.19.0";
  * policy, per-period and annual budget totals, business-tax accounts, and the
  * month-to-date budget memo (D-073). E3 adds the construction project queue,
  * work-in-progress/public-capital accounts, construction posting kinds, and the
- * construction budget memo fields (D-074).
+ * construction budget memo fields (D-074). E4 adds construction material requirements,
+ * per-country industrial policy, subsidy/support budget fields, and the new
+ * industrial posting kinds (D-075).
  */
-export const WORLD_SCHEMA_VERSION = 19;
+export const WORLD_SCHEMA_VERSION = 20;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -50,9 +53,11 @@ export const SAVE_FORMAT_VERSION = 1;
  * scenario-provided AI enable policy without changing existing definitions, so
  * it remains stable (D-058). E3 changes the authored building definitions (public
  * ownership permission and construction crew) and therefore bumps the content
- * version to `m3-economy-v4` (D-074).
+ * version to `m3-economy-v4` (D-074). E4 adds an explicit building sector and
+ * construction-material requirements, so it bumps the content version to
+ * `m3-economy-v5` (D-075).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v4";
+export const DEFAULT_DATA_VERSION = "m3-economy-v5";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

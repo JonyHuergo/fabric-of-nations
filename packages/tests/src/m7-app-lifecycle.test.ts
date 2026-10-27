@@ -37,7 +37,7 @@ describe("campaign startup and autosave wiring", () => {
   test("the storage adapter uses the current schema and replace-safe SaveStore", () => {
     const storage = source("src/storage/saveStorage.ts");
     expect(storage).toContain("SaveStore");
-    expect(storage).toContain("SUPPORTED_SAVE_SCHEMA_VERSION = 19");
+    expect(storage).toContain("SUPPORTED_SAVE_SCHEMA_VERSION = 20");
     expect(storage).toContain("readStoredCampaign");
   });
 });

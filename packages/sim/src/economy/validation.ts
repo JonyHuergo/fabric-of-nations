@@ -23,6 +23,7 @@ import {
   assertBusinessTaxPostingStructure,
   assertAccountingIdentity,
   assertConstructionPostingStructure,
+  assertIndustrialPostingStructure,
   assertFiscalPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
@@ -41,7 +42,7 @@ import {
   transactionKindChangesCash,
   type OwnerEquityTally,
 } from "./accounts.js";
-import { assertValidCountryCurrencyState, buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import { assertValidCountryCurrencyState, buildRegionOwnerMap, assertValidIndustrialPolicy, fiscalPolicyIsActive } from "./country.js";
 import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,
@@ -337,6 +338,13 @@ export function assertValidJournalPosting(
       transactionKind === "construction-working-capital"
     ) {
       assertConstructionPostingStructure(transactionKind, journalLines, accounts, path);
+    }
+    if (
+      transactionKind === "construction-material-purchase" ||
+      transactionKind === "production-subsidy" ||
+      transactionKind === "public-enterprise-capital-contribution"
+    ) {
+      assertIndustrialPostingStructure(transactionKind, journalLines, accounts, path);
     }
     if (
       transactionKind === "profit-retention" ||
@@ -1253,6 +1261,7 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
     }
     if (fiscalAccountsRequired) {
       index.get("building", building.id, "business-tax-expense");
+      index.get("building", building.id, "subsidy-revenue");
     }
     if (world.profitDistribution.enabled) {
       index.get("building", building.id, "retained-profit");
@@ -1272,6 +1281,7 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
       "construction-in-progress",
       "public-capital",
       "welfare-expense",
+      "subsidy-expense",
     ] as const) {
       index.get("country", country.id, subtype);
     }
@@ -1544,6 +1554,10 @@ export function assertValidEconomyState(
         `country ${String(country.id)} immigrationOpen must be a boolean`,
       );
     }
+    assertValidIndustrialPolicy(
+      country.industrial,
+      `country ${String(country.id)}.industrial`,
+    );
     assertValidDebtPolicy(country.debt, `country ${String(country.id)}.debt`);
     if (country.debt.enabled) {
       if (country.debt.creditorKind === "country") {

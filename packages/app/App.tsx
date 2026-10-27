@@ -22,6 +22,7 @@ import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
 import { ActionButton, Pill } from "./src/components/ui";
 import { BudgetScreen } from "./src/screens/BudgetScreen";
 import { ConstructionScreen } from "./src/screens/ConstructionScreen";
+import { IndustryScreen } from "./src/screens/IndustryScreen";
 import { CountryScreen } from "./src/screens/CountryScreen";
 import { LedgerScreen } from "./src/screens/LedgerScreen";
 import { MapScreen } from "./src/screens/MapScreen";
@@ -35,13 +36,14 @@ import {
   type ConnectionState,
 } from "./src/worker/SimulationProvider";
 
-type TabId = "map" | "country" | "budget" | "construction" | "population" | "markets" | "ledger";
+type TabId = "map" | "country" | "budget" | "construction" | "industry" | "population" | "markets" | "ledger";
 
 const TABS: readonly { readonly id: TabId; readonly label: string }[] = [
   { id: "country", label: "Overview" },
   { id: "map", label: "Map" },
   { id: "budget", label: "Budget" },
   { id: "construction", label: "Construction" },
+  { id: "industry", label: "Industry" },
   { id: "population", label: "Population" },
   { id: "markets", label: "Markets" },
   { id: "ledger", label: "Ledger" },
@@ -446,6 +448,8 @@ function Screen({
       return <BudgetScreen snapshot={snapshot} countryId={selectedCountryId} />;
     case "construction":
       return <ConstructionScreen snapshot={snapshot} countryId={selectedCountryId} />;
+    case "industry":
+      return <IndustryScreen snapshot={snapshot} countryId={selectedCountryId} />;
     case "population":
       return (
         <PopulationScreen

@@ -77,6 +77,19 @@ describe("E1 UI wiring", () => {
     expect(ledger).toContain("Construction outlay");
   });
 
+  test("the industry screen is wired to snapshot policy and enterprise actions", () => {
+    const app = source("App.tsx");
+    expect(app).toContain('{ id: "industry", label: "Industry" }');
+    const industry = source("src/screens/IndustryScreen.tsx");
+    expect(industry).toContain("previewIndustrialPolicy");
+    expect(industry).toContain("previewPublicEnterpriseSupport");
+    expect(industry).toContain("set-industrial-policy");
+    expect(industry).toContain("support-public-enterprise");
+    expect(industry).toContain("Public enterprises");
+    expect(industry).toContain("Deliberately not implemented");
+    expect(industry).not.toContain("__world");
+  });
+
   test("the provider appends action history only from confirmed results", () => {
     const provider = source("src/worker/SimulationProvider.tsx");
     expect(provider).toContain('case "ACTION_RESULT"');
@@ -99,6 +112,7 @@ describe("E1 UI wiring", () => {
       "src/screens/CountryScreen.tsx",
       "src/screens/BudgetScreen.tsx",
       "src/screens/ConstructionScreen.tsx",
+      "src/screens/IndustryScreen.tsx",
       "src/screens/LedgerScreen.tsx",
       "src/screens/MarketsScreen.tsx",
       "src/screens/PopulationScreen.tsx",

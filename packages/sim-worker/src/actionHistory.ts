@@ -42,6 +42,15 @@ export type PlayerActionRequest =
       readonly kind: "set-construction-paused";
       readonly projectId: number;
       readonly paused: boolean;
+    }
+  | {
+      readonly kind: "set-industrial-policy";
+      readonly sectorSubsidyRates: readonly number[];
+    }
+  | {
+      readonly kind: "support-public-enterprise";
+      readonly buildingId: number;
+      readonly amountSUSD: number;
     };
 
 export interface PlayerActionRecord {
@@ -97,5 +106,11 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
       return `cancel construction project ${String(action.projectId)}`;
     case "set-construction-paused":
       return `${action.paused ? "pause" : "resume"} construction project ${String(action.projectId)}`;
+    case "set-industrial-policy":
+      return `set sector subsidy rates ${action.sectorSubsidyRates
+        .map((rate) => `${(rate * 100).toFixed(1)}%`)
+        .join("/")}`;
+    case "support-public-enterprise":
+      return `support enterprise ${String(action.buildingId)} with ${action.amountSUSD.toFixed(2)} SUSD`;
   }
 }

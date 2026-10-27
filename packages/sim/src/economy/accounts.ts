@@ -80,6 +80,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "system-income": "revenue",
   "income-tax-revenue": "revenue",
   "business-tax-revenue": "revenue",
+  "subsidy-revenue": "revenue",
   "welfare-income": "revenue",
   "consumption-expense": "expense",
   "input-expense": "expense",
@@ -87,6 +88,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "upkeep-expense": "expense",
   "income-tax-expense": "expense",
   "business-tax-expense": "expense",
+  "subsidy-expense": "expense",
   "welfare-expense": "expense",
   "debt-liability": "liability",
   "interest-payable": "liability",
@@ -112,6 +114,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "system-income": ["system"],
   "income-tax-revenue": ["country"],
   "business-tax-revenue": ["country"],
+  "subsidy-revenue": ["building"],
   "welfare-income": ["popBlock"],
   "consumption-expense": ["popBlock"],
   "input-expense": ["building"],
@@ -119,6 +122,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "upkeep-expense": ["building"],
   "income-tax-expense": ["popBlock"],
   "business-tax-expense": ["building"],
+  "subsidy-expense": ["country"],
   "welfare-expense": ["country"],
   "debt-liability": ["country"],
   "interest-payable": ["country"],
@@ -249,6 +253,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "construction-capitalization": [],
   "construction-writeoff": [],
   "construction-working-capital": [],
+  "construction-material-purchase": [
+    { subtype: "sales-revenue", side: "credit" },
+  ],
+  "production-subsidy": [
+    { subtype: "subsidy-expense", side: "debit" },
+    { subtype: "subsidy-revenue", side: "credit" },
+  ],
+  "public-enterprise-capital-contribution": [],
   "migration-transfer": [],
   "profit-retention": [],
   "profit-distribution": [],
@@ -689,6 +701,101 @@ export function assertConstructionPostingStructure(
     Math.abs(amount - buildingEquityCredit) > tolerance(amount, buildingEquityCredit)
   ) {
     throw new RangeError(`${path} construction-working-capital legs do not balance`);
+  }
+}
+
+/**
+ * Enforce the required legs of E4 industrial postings.
+ *
+ * - `construction-material-purchase`: one country capitalizes materials
+ *   (`construction-in-progress` debit, treasury credit) and pays one market
+ *   seller (building operating cash debit, sales revenue credit). All four legs
+ *   carry the same purchase value.
+ * - `production-subsidy`: one country recognizes subsidy expense and pays one
+ *   enterprise (country treasury debit / subsidy expense debit; building
+ *   operating cash debit / subsidy revenue credit).
+ * - `public-enterprise-capital-contribution`: one country transfers capital to
+ *   one state enterprise (country treasury credit/equity debit; building cash
+ *   debit/equity credit).
+ */
+export function assertIndustrialPostingStructure(
+  kind:
+    | "construction-material-purchase"
+    | "production-subsidy"
+    | "public-enterprise-capital-contribution",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) throw new RangeError(`${path} must contain industrial lines`);
+  const countries = new Set<Id>();
+  const buildings = new Set<Id>();
+  const totals = new Map<string, number>();
+  const add = (key: string, amount: number): void => {
+    totals.set(key, (totals.get(key) ?? 0) + amount);
+  };
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countries.add(account.ownerId);
+    }
+    if (account.ownerKind === "building" && account.ownerId !== null) {
+      buildings.add(account.ownerId);
+    }
+    add(`${account.subtype}:${line.side}`, line.amountSUSD);
+  }
+  const tolerance = (left: number, right: number): number =>
+    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+  const value = (key: string): number => totals.get(key) ?? 0;
+  if (countries.size !== 1 || buildings.size !== 1) {
+    throw new RangeError(
+      `${path} ${kind} must reference exactly one country and one building`,
+    );
+  }
+  if (kind === "construction-material-purchase") {
+    const amount = value("construction-in-progress:debit");
+    if (
+      !(amount > 0) ||
+      Math.abs(amount - value("treasury-cash:credit")) > tolerance(amount, value("treasury-cash:credit")) ||
+      Math.abs(amount - value("operating-cash:debit")) > tolerance(amount, value("operating-cash:debit")) ||
+      Math.abs(amount - value("sales-revenue:credit")) > tolerance(amount, value("sales-revenue:credit"))
+    ) {
+      throw new RangeError(`${path} construction-material-purchase legs do not balance`);
+    }
+    return;
+  }
+  if (kind === "production-subsidy") {
+    const amount = value("subsidy-expense:debit");
+    if (
+      !(amount > 0) ||
+      Math.abs(amount - value("treasury-cash:credit")) > tolerance(amount, value("treasury-cash:credit")) ||
+      Math.abs(amount - value("operating-cash:debit")) > tolerance(amount, value("operating-cash:debit")) ||
+      Math.abs(amount - value("subsidy-revenue:credit")) > tolerance(amount, value("subsidy-revenue:credit"))
+    ) {
+      throw new RangeError(`${path} production-subsidy legs do not balance`);
+    }
+    return;
+  }
+  const amount = value("treasury-cash:credit");
+  if (
+    !(amount > 0) ||
+    Math.abs(amount - value("owner-equity:debit")) > tolerance(amount, value("owner-equity:debit")) ||
+    Math.abs(amount - value("operating-cash:debit")) > tolerance(amount, value("operating-cash:debit")) ||
+    Math.abs(amount - value("owner-equity:credit")) > tolerance(amount, value("owner-equity:credit"))
+  ) {
+    throw new RangeError(`${path} public-enterprise-capital-contribution legs do not balance`);
   }
 }
 

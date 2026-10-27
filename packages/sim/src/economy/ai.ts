@@ -68,6 +68,12 @@ import {
   validateConstructionStart,
 } from "./construction.js";
 import {
+  setIndustrialPolicy,
+  supportPublicEnterprise,
+  validateIndustrialPolicyInput,
+  validatePublicEnterpriseSupport,
+} from "./industrialPolicy.js";
+import {
   issueGovernmentDebt,
   repayGovernmentDebt,
   validateDebtIssuance,
@@ -84,6 +90,7 @@ import type {
   EconomyDefinitions,
   FiscalPolicy,
   FinancialAccount,
+  IndustrialPolicy,
 } from "./types.js";
 
 /**
@@ -178,6 +185,25 @@ export interface SetConstructionPausedAction {
   readonly paused: boolean;
 }
 
+/** Set the country's sectoral production-subsidy rates. */
+export interface SetIndustrialPolicyAction {
+  readonly kind: "set-industrial-policy";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly sectorSubsidyRates: readonly number[];
+}
+
+/** Contribute treasury capital to an existing state-owned enterprise. */
+export interface SupportPublicEnterpriseAction {
+  readonly kind: "support-public-enterprise";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly buildingId: Id;
+  readonly amountSUSD: MoneySUSD;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -186,7 +212,9 @@ export type CountryAction =
   | SetDebtPolicyAction
   | StartConstructionAction
   | CancelConstructionAction
-  | SetConstructionPausedAction;
+  | SetConstructionPausedAction
+  | SetIndustrialPolicyAction
+  | SupportPublicEnterpriseAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -210,6 +238,13 @@ export interface CountryActionApplication {
   readonly principalPaidSUSD: MoneySUSD;
   /** Started/cancelled/paused project for construction actions, else null. */
   readonly constructionProject: ConstructionProject | null;
+  /** New industrial policy for `set-industrial-policy`, else null. */
+  readonly industrialPolicy?: IndustrialPolicy | null;
+  /** Supported enterprise for `support-public-enterprise`, else null. */
+  readonly publicEnterpriseSupport?: {
+    readonly buildingId: Id;
+    readonly amountSUSD: MoneySUSD;
+  } | null;
 }
 
 /** One observed population block. Own-country blocks only. */
@@ -563,12 +598,14 @@ export function validateCountryAction(
     action.kind !== "set-debt-policy" &&
     action.kind !== "start-construction" &&
     action.kind !== "cancel-construction" &&
-    action.kind !== "set-construction-paused"
+    action.kind !== "set-construction-paused" &&
+    action.kind !== "set-industrial-policy" &&
+    action.kind !== "support-public-enterprise"
   ) {
     return {
       valid: false,
       errors: [
-        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", or "set-construction-paused"',
+        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", "set-construction-paused", "set-industrial-policy", or "support-public-enterprise"',
       ],
     };
   }
@@ -681,6 +718,28 @@ export function validateCountryAction(
           { countryId: country.id, projectId: action.projectId },
           action.paused,
         );
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-industrial-policy") {
+      if (action.source === "ai") {
+        errors.push("AI industrial policy is not implemented");
+      }
+      try {
+        validateIndustrialPolicyInput(action.sectorSubsidyRates);
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "support-public-enterprise") {
+      if (action.source === "ai") {
+        errors.push("AI public-enterprise support is not implemented");
+      }
+      try {
+        validatePublicEnterpriseSupport(world, {
+          countryId: country.id,
+          buildingId: action.buildingId,
+          amountSUSD: action.amountSUSD,
+        });
       } catch (error) {
         errors.push(errorMessage(error));
       }
@@ -910,6 +969,57 @@ export function applyCountryAction(
       debtContract: null,
       principalPaidSUSD: 0,
       constructionProject: project,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "set-industrial-policy") {
+    const updated = setIndustrialPolicy(world, country.id, action.sectorSubsidyRates);
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...updated.fiscal },
+      previousDebt,
+      debt: { ...updated.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      industrialPolicy: {
+        sectorSubsidyRates: [...updated.industrial.sectorSubsidyRates],
+      },
+      publicEnterpriseSupport: null,
+      changed: true,
+    };
+  }
+
+  if (action.kind === "support-public-enterprise") {
+    const supported = supportPublicEnterprise(
+      world,
+      {
+        countryId: country.id,
+        buildingId: action.buildingId,
+        amountSUSD: action.amountSUSD,
+      },
+      action.dayIndex,
+    );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      industrialPolicy: null,
+      publicEnterpriseSupport: {
+        buildingId: supported.building.id,
+        amountSUSD: supported.amountSUSD,
+      },
       changed: true,
     };
   }

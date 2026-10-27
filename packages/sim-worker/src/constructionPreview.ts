@@ -9,6 +9,17 @@ import {
   type SimulationSnapshot,
 } from "./protocol.js";
 
+export interface ConstructionMaterialPreview {
+  readonly goodId: number;
+  readonly goodName: string;
+  readonly unitLabel: string;
+  readonly requiredQuantity: number;
+  readonly marketStock: number;
+  readonly unitPriceSUSD: number;
+  readonly estimatedCostSUSD: number;
+  readonly shortfallQuantity: number;
+}
+
 export interface ConstructionPreview {
   readonly countryId: number;
   readonly definitionId: number;
@@ -19,6 +30,9 @@ export interface ConstructionPreview {
   readonly workingCapitalSUSD: number;
   readonly treasuryCashSUSD: number;
   readonly upfrontRequirementSUSD: number;
+  readonly materials: readonly ConstructionMaterialPreview[];
+  readonly estimatedMaterialsCostSUSD: number;
+  readonly totalInvestmentSUSD: number;
   readonly activeProjects: number;
   readonly maxActiveProjects: number;
   readonly idleWorkers: number;
@@ -79,17 +93,48 @@ export function previewConstruction(
   const dailyPayroll = desiredCrew * dailyWage;
   const estimatedDays =
     dailyPayroll > 0 && cost > 0 ? Math.ceil(cost / dailyPayroll) : null;
+  const market = snapshot.markets.find((entry) => entry.regionIds.includes(regionId));
+  const priceByGood = new Map(
+    (market?.prices ?? []).map((price) => [price.goodId, price]),
+  );
+  const materials = (projectType?.materials ?? []).map((material) => {
+    const marketPrice = priceByGood.get(material.goodId);
+    const unitPrice = marketPrice?.priceSUSD ?? 0;
+    const marketStock = marketPrice?.stockQuantity ?? 0;
+    return {
+      goodId: material.goodId,
+      goodName: material.goodName,
+      unitLabel: material.unitLabel,
+      requiredQuantity: material.quantity,
+      marketStock,
+      unitPriceSUSD: unitPrice,
+      estimatedCostSUSD: material.quantity * unitPrice,
+      shortfallQuantity: Math.max(0, material.quantity - marketStock),
+    };
+  });
+  const estimatedMaterialsCost = materials.reduce(
+    (total, material) => total + material.estimatedCostSUSD,
+    0,
+  );
+  const totalInvestment = cost + workingCapital + estimatedMaterialsCost;
+  for (const material of materials) {
+    if (material.shortfallQuantity > 0) {
+      constraints.push(
+        `Market stock of ${material.goodName} is below the required quantity; the project will wait for materials rather than receiving goods it did not buy.`,
+      );
+    }
+  }
   if (projectType !== undefined && idleWorkers === 0) {
     constraints.push(
       "No idle eligible workers are currently available; the project will wait for labor rather than take workers from production.",
     );
   }
   constraints.push(
-    "The cost is the authored construction labor budget; materials and purchased contractor inputs are not modeled in E3.",
+    "The cost is the authored construction labor budget. Materials are bought from actual regional market stock at the current price and delivered before labor starts.",
     "Projects hire only idle eligible workers and pay their profession base daily wage; the existing income tax is withheld.",
-    "Authorization requires treasury cash for the full cost plus a 30-day-upkeep working-capital target, but the money is not escrowed: later spending can stall progress.",
-    "Construction is pay-as-you-go; a project can wait for funds or labor and does not create a liability.",
-    "The duration estimate assumes today's idle crew, wage, and continuous funding; actual duration can differ.",
+    "Authorization requires treasury cash for the labor cost plus a 30-day-upkeep working-capital target; material purchases and later wages are paid as they occur and are not escrowed.",
+    "Construction is pay-as-you-go; a project can wait for funds, labor, or materials and does not create a liability.",
+    "The duration estimate assumes today's idle crew, wage, and continuous funding/materials; actual duration can differ.",
     "Completion creates a state-owned building that produces through the ordinary market and employment systems; it first produces on the next processed day.",
   );
   return {
@@ -102,6 +147,9 @@ export function previewConstruction(
     workingCapitalSUSD: workingCapital,
     treasuryCashSUSD: country.treasuryCashSUSD,
     upfrontRequirementSUSD: upfront,
+    materials,
+    estimatedMaterialsCostSUSD: estimatedMaterialsCost,
+    totalInvestmentSUSD: totalInvestment,
     activeProjects,
     maxActiveProjects: MAX_ACTIVE_CONSTRUCTION_PROJECTS,
     idleWorkers,

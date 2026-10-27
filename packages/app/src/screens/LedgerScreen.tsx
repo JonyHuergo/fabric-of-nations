@@ -141,6 +141,29 @@ export function LedgerScreen({
               </Text>
             </View>
             <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction materials (capital)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.constructionMaterialsSpentSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Production subsidies (expense)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latest.subsidyExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Subsidy requested / shortfall</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.subsidyRequestedSUSD)} /{" "}
+                {formatSUSD(latest.subsidyShortfallSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Public-enterprise capital support</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.publicEnterpriseSupportSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result</Text>
               <Text
                 style={[
@@ -283,6 +306,31 @@ export function LedgerScreen({
               <Text style={styles.reportLabel}>Construction written off (annual)</Text>
               <Text style={styles.reportValue}>
                 {formatSUSD(latestAnnual.constructionWrittenOffSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Construction materials (annual capital)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.constructionMaterialsSpentSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Production subsidies (annual expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.subsidyExpenseSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Subsidy requested / shortfall (annual)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.subsidyRequestedSUSD)} /{" "}
+                {formatSUSD(latestAnnual.subsidyShortfallSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Public-enterprise capital support (annual)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.publicEnterpriseSupportSUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>

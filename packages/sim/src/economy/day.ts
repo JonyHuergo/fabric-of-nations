@@ -41,6 +41,10 @@ import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import { runBusinessTaxPhase, type BusinessTaxPhaseResult } from "./businessTax.js";
 import {
+  runIndustrialSubsidyPhase,
+  type IndustrialSubsidyPhaseResult,
+} from "./industrial.js";
+import {
   runConstructionPhase,
   type ConstructionPhaseResult,
 } from "./construction.js";
@@ -121,6 +125,8 @@ export interface EconomyDayResult {
     readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    /** E4 sectoral production subsidies paid after verified output. */
+    readonly industrialSubsidy: IndustrialSubsidyPhaseResult;
     /** E2 month-end business-profit tax assessment and collection. */
     readonly businessTax: BusinessTaxPhaseResult;
     /** E3 public-construction labor, spending, and completion. */
@@ -196,7 +202,10 @@ export function cloneWorld(
     countryAI: { ...source.countryAI },
     construction: {
       ...source.construction,
-      projects: source.construction.projects.map((project) => ({ ...project })),
+      projects: source.construction.projects.map((project) => ({
+        ...project,
+        materials: project.materials.map((material) => ({ ...material })),
+      })),
       history: source.construction.history.map((aggregate) => ({ ...aggregate })),
     },
     diagnostics: {
@@ -901,6 +910,17 @@ export function runEconomicDay(
   // settlement result and never estimates wages from account balances.
   const fiscal = runFiscalPhase(world, settlement, dayIndex, { validateWorld: false });
 
+  // E4 sectoral production subsidy: verified physical output is valued at the
+  // post-clearing market price and paid from actual treasury cash. It runs before
+  // business tax so the recognized subsidy revenue is part of the month-end base.
+  const industrialSubsidy = runIndustrialSubsidyPhase(
+    world,
+    economyDefinitions,
+    marketResults,
+    dayIndex,
+    { validateWorld: false },
+  );
+
   // E2 business-profit tax: assessed on the just-completed civil month's
   // recognized building results. It runs before the debt phase so collected
   // revenue reduces that month's financing requirement, and before the close so
@@ -978,6 +998,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      industrialSubsidy,
       businessTax,
       construction,
       ai,

@@ -26,6 +26,7 @@ import {
   accountNormalSide,
   assertBusinessTaxPostingStructure,
   assertConstructionPostingStructure,
+  assertIndustrialPostingStructure,
   assertFiscalPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -170,6 +171,13 @@ function validatePostingLines(
     transactionKind === "construction-working-capital"
   ) {
     assertConstructionPostingStructure(transactionKind, lines, accounts);
+  }
+  if (
+    transactionKind === "construction-material-purchase" ||
+    transactionKind === "production-subsidy" ||
+    transactionKind === "public-enterprise-capital-contribution"
+  ) {
+    assertIndustrialPostingStructure(transactionKind, lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);

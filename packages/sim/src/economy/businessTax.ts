@@ -5,7 +5,11 @@
  * debt phase and the M4b close. The tax base is the building's already-recognized
  * current-period net result:
  *
- *   max(0, sales-revenue - input-expense - wage-expense - upkeep-expense)
+ *   max(0, sales-revenue + subsidy-revenue - input-expense - wage-expense - upkeep-expense)
+ *
+ * Sectoral production subsidies are taxable enterprise revenue, so they are part
+ * of the recognized current-period result. The subsidy itself remains a separate
+ * country expense; it is not netted out of the tax base.
  *
  * i.e. actual revenue minus eligible costs, not gross sales. Only positive
  * results are taxable. A loss is not refunded, not carried forward as a tax
@@ -108,10 +112,11 @@ function isLastCivilDayOfMonth(dayIndex: DayIndex): boolean {
 /** Current open-period net result of one building, from its authoritative accounts. */
 function periodNetResult(index: FinanceIndex, buildingId: Id): number {
   const revenue = index.get("building", buildingId, "sales-revenue").balanceSUSD;
+  const subsidy = index.get("building", buildingId, "subsidy-revenue").balanceSUSD;
   const input = index.get("building", buildingId, "input-expense").balanceSUSD;
   const wage = index.get("building", buildingId, "wage-expense").balanceSUSD;
   const upkeep = index.get("building", buildingId, "upkeep-expense").balanceSUSD;
-  const result = revenue - input - wage - upkeep;
+  const result = revenue + subsidy - input - wage - upkeep;
   if (!Number.isFinite(result)) {
     throw new RangeError(`building ${String(buildingId)} period net result is not finite`);
   }

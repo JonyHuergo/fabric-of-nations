@@ -123,6 +123,45 @@ describe("M7 simulation worker host", () => {
     host.handleCommand(command("PAUSE", "pause-2"));
   });
 
+  test("round-trips an industrial-policy action and rejects unaffordable enterprise support", () => {
+    const { host, events } = createHarness();
+    const before = lastSnapshot(events);
+    const country = before.countries.find((entry) => entry.id === before.playerCountryId)!;
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "industrial-set",
+      actionId: "ui-industrial-1",
+      action: {
+        kind: "set-industrial-policy",
+        countryId: country.id,
+        sectorSubsidyRates: [0.1, 0, 0, 0, 0],
+      },
+    });
+    expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(true);
+    const after = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
+    expect(after.industrialPolicy.sectors[0]?.subsidyRate).toBe(0.1);
+    expect(after.industrialPolicy.sectors).toHaveLength(5);
+
+    host.handleCommand({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "APPLY_ACTION",
+      commandId: "industrial-support-bad",
+      actionId: "ui-industrial-2",
+      action: {
+        kind: "support-public-enterprise",
+        countryId: country.id,
+        buildingId: 0,
+        amountSUSD: 100,
+      },
+    });
+    expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(false);
+    expect(
+      lastSnapshot(events).countries.find((entry) => entry.id === country.id)!
+        .treasuryCashSUSD,
+    ).toBeCloseTo(country.treasuryCashSUSD, 6);
+  });
+
   test("round-trips a construction action through the validated worker protocol", () => {
     const { host, events } = createHarness();
     const before = lastSnapshot(events);

@@ -57,11 +57,15 @@ import {
   constructionCanProgress,
   constructionDailyWage,
   constructionIdleWorkersByBlock,
+  constructionMaterialRemaining,
+  constructionMaterialsProgress,
+  constructionMaterialsReady,
   constructionProjectIsTerminal,
   constructionProjectRemaining,
   constructionWorkingCapital,
 } from "./constructionModel.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
+import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
 import type {
@@ -71,6 +75,7 @@ import type {
   EconomyDefinitions,
   FinanceState,
   FinancialAccount,
+  Market,
 } from "./types.js";
 
 function toleranceMoney(...values: number[]): number {
@@ -86,9 +91,11 @@ export interface ConstructionProjectResult {
   readonly status: ConstructionProject["status"];
   readonly workersHired: number;
   readonly spentSUSD: number;
+  readonly materialsSpentSUSD: number;
   readonly totalCostSUSD: number;
   readonly progress: number;
-  readonly blockedReason: "labor" | "funds" | null;
+  readonly materialsProgress: number;
+  readonly blockedReason: "labor" | "funds" | "materials" | null;
   readonly buildingId: Id | null;
 }
 
@@ -99,6 +106,7 @@ export interface ConstructionPhaseResult {
   readonly projects: readonly ConstructionProjectResult[];
   readonly completedProjectIds: readonly Id[];
   readonly spentSUSD: number;
+  readonly materialsSpentSUSD: number;
   readonly postingIds: readonly number[];
 }
 
@@ -109,13 +117,17 @@ function emptyResult(dayIndex: DayIndex): ConstructionPhaseResult {
     projects: [],
     completedProjectIds: [],
     spentSUSD: 0,
+    materialsSpentSUSD: 0,
     postingIds: [],
   };
 }
 
 function cloneConstructionState(state: ConstructionState): ConstructionState {
   return {
-    projects: state.projects.map((project) => ({ ...project })),
+    projects: state.projects.map((project) => ({
+      ...project,
+      materials: project.materials.map((material) => ({ ...material })),
+    })),
     history: state.history.map((aggregate) => ({ ...aggregate })),
     nextProjectId: state.nextProjectId,
     nextBuildingId: state.nextBuildingId,
@@ -152,6 +164,127 @@ function regionOwner(world: World, regionId: Id): Id | null {
   return null;
 }
 
+function projectMarket(world: World, project: ConstructionProject): Market {
+  const region = world.regions.find((candidate) => candidate.id === project.regionId);
+  if (region === undefined) {
+    throw new RangeError(`construction project region ${String(project.regionId)} is missing`);
+  }
+  if (region.marketId === null) {
+    throw new RangeError(`construction project region ${String(region.id)} has no market`);
+  }
+  const market = world.markets.find((candidate) => candidate.id === region.marketId);
+  if (market === undefined) {
+    throw new RangeError(`construction project market ${String(region.marketId)} is missing`);
+  }
+  return market;
+}
+
+/**
+ * Buy missing project materials from actual market stock and immediately deliver
+ * them to the project. Each purchase is a real seller sale: the seller's market
+ * lot shrinks, the seller receives operating cash and sales revenue, and the
+ * country capitalizes the purchase into work-in-progress. A shortage leaves the
+ * requirement unfilled and the project waits; an order is never counted as stock.
+ *
+ * Market lots are consumed in canonical (goodId, sellerBuildingId) order. The
+ * delivered counters cap every purchase, so retrying a day or replaying the phase
+ * cannot duplicate a delivery or consumption.
+ */
+function procureProjectMaterials(
+  world: World,
+  project: ConstructionProject,
+  market: Market,
+  index: ReturnType<typeof buildFinanceIndex>,
+  cash: number,
+  entries: JournalEntryInput[],
+): {
+  readonly cash: number;
+  readonly spentSUSD: number;
+  readonly blockedReason: "funds" | "materials" | null;
+} {
+  const materials = [...project.materials].sort((left, right) => left.goodId - right.goodId);
+  let remainingCash = cash;
+  let spentSUSD = 0;
+  let blockedReason: "funds" | "materials" | null = null;
+  const countryTreasury = index.get("country", project.countryId, "treasury-cash");
+  const wip = index.get("country", project.countryId, "construction-in-progress");
+  for (const material of materials) {
+    let remaining = constructionMaterialRemaining(material);
+    if (!(remaining > toleranceMoney(remaining))) continue;
+    const price = market.priceSUSD[material.goodId];
+    if (price === undefined || !Number.isFinite(price) || !(price > 0)) {
+      throw new RangeError(
+        `market ${String(market.id)} has no positive price for construction material ${String(material.goodId)}`,
+      );
+    }
+    let progressed = true;
+    while (remaining > toleranceMoney(remaining) && progressed) {
+      progressed = false;
+      const lots = market.stockLots
+        .filter((lot) => lot.goodId === material.goodId && lot.quantity > toleranceMoney(lot.quantity))
+        .sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
+      if (lots.length === 0) {
+        blockedReason = "materials";
+        break;
+      }
+      for (const lot of lots) {
+        if (remaining <= toleranceMoney(remaining)) break;
+        if (remainingCash <= toleranceMoney(remainingCash)) {
+          blockedReason = "funds";
+          break;
+        }
+        const affordable = remainingCash / price;
+        const quantity = Math.min(remaining, lot.quantity, affordable);
+        if (!(quantity > toleranceMoney(quantity))) {
+          blockedReason = remainingCash < price ? "funds" : "materials";
+          break;
+        }
+        const cost = quantity * price;
+        if (cost > remainingCash + toleranceMoney(cost, remainingCash)) {
+          blockedReason = "funds";
+          break;
+        }
+        const seller = world.buildings.find((building) => building.id === lot.ownerBuildingId);
+        if (seller === undefined) {
+          throw new RangeError(
+            `market lot ${String(material.goodId)} references unknown seller building ${String(lot.ownerBuildingId)}`,
+          );
+        }
+        const sellerCash = index.get("building", seller.id, "operating-cash");
+        const sellerRevenue = index.get("building", seller.id, "sales-revenue");
+        lot.quantity -= quantity;
+        if (lot.quantity <= toleranceMoney(lot.quantity)) {
+          market.stockLots = market.stockLots.filter((candidate) => candidate !== lot);
+        }
+        material.deliveredQuantity = Math.min(
+          material.requiredQuantity,
+          material.deliveredQuantity + quantity,
+        );
+        remaining = constructionMaterialRemaining(material);
+        remainingCash -= cost;
+        spentSUSD += cost;
+        entries.push({
+          transactionKind: "construction-material-purchase",
+          lines: [
+            { accountId: wip.id, side: "debit", amountSUSD: cost },
+            { accountId: countryTreasury.id, side: "credit", amountSUSD: cost },
+            { accountId: sellerCash.id, side: "debit", amountSUSD: cost },
+            { accountId: sellerRevenue.id, side: "credit", amountSUSD: cost },
+          ],
+          sourceEntityId: project.countryId,
+          targetEntityId: seller.id,
+        });
+        progressed = true;
+        if (blockedReason !== null) break;
+      }
+      if (blockedReason !== null) break;
+    }
+    if (blockedReason !== null) break;
+  }
+  market.stockLots = canonicalizeStockLots(market.stockLots);
+  return { cash: remainingCash, spentSUSD, blockedReason };
+}
+
 function createCompletedBuilding(
   world: World,
   definitionId: Id,
@@ -181,6 +314,7 @@ function createCompletedBuilding(
   allocateAccount(finance, "building", buildingId, "wage-expense");
   allocateAccount(finance, "building", buildingId, "upkeep-expense");
   allocateAccount(finance, "building", buildingId, "business-tax-expense");
+  allocateAccount(finance, "building", buildingId, "subsidy-revenue");
   if (world.profitDistribution.enabled) {
     allocateAccount(finance, "building", buildingId, "retained-profit");
   }
@@ -218,8 +352,11 @@ function mergeConstructionHistory(
       countryId: project.countryId,
       projectsCompleted: addCompleted,
       projectsCancelled: addCancelled,
-      totalSpentSUSD: project.spentSUSD,
-      totalWrittenOffSUSD: project.status === "cancelled" ? project.spentSUSD : 0,
+      totalSpentSUSD: project.spentSUSD + project.materialsSpentSUSD,
+      totalWrittenOffSUSD:
+        project.status === "cancelled"
+          ? project.spentSUSD + project.materialsSpentSUSD
+          : 0,
     });
   } else {
     const index = state.history.findIndex((entry) => entry.countryId === project.countryId);
@@ -227,10 +364,13 @@ function mergeConstructionHistory(
       ...existing,
       projectsCompleted: existing.projectsCompleted + addCompleted,
       projectsCancelled: existing.projectsCancelled + addCancelled,
-      totalSpentSUSD: existing.totalSpentSUSD + project.spentSUSD,
+      totalSpentSUSD:
+        existing.totalSpentSUSD + project.spentSUSD + project.materialsSpentSUSD,
       totalWrittenOffSUSD:
         existing.totalWrittenOffSUSD +
-        (project.status === "cancelled" ? project.spentSUSD : 0),
+        (project.status === "cancelled"
+          ? project.spentSUSD + project.materialsSpentSUSD
+          : 0),
     };
   }
   state.history.sort((left, right) => left.countryId - right.countryId);
@@ -303,12 +443,21 @@ export function runConstructionPhase(
     ...region,
     buildingInstanceIds: [...region.buildingInstanceIds],
   }));
+  // Material procurement is a physical market-stock mutation. Stage the markets
+  // too, so a failed construction phase cannot consume another project's goods.
+  const stagedMarkets = world.markets.map((market) => ({
+    ...market,
+    regionIds: [...market.regionIds],
+    priceSUSD: [...market.priceSUSD],
+    stockLots: market.stockLots.map((lot) => ({ ...lot })),
+  }));
   const staged: World = {
     ...world,
     finance: stagedFinance,
     construction: stagedConstruction,
     buildings: stagedBuildings,
     regions: stagedRegions,
+    markets: stagedMarkets,
   };
   const index = buildFinanceIndex(stagedFinance);
   const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
@@ -325,6 +474,7 @@ export function runConstructionPhase(
   const results: ConstructionProjectResult[] = [];
   const completions: ConstructionProject[] = [];
   let totalSpent = 0;
+  let totalMaterialsSpent = 0;
 
   for (const project of [...stagedConstruction.projects].sort((left, right) => left.id - right.id)) {
     if (!constructionCanProgress(project, dayIndex)) continue;
@@ -355,6 +505,47 @@ export function runConstructionPhase(
       cashByCountry.set(country.id, treasury.balanceSUSD);
     }
     let cash = cashByCountry.get(country.id) ?? 0;
+    const market = projectMarket(staged, project);
+    if (!constructionMaterialsReady(project)) {
+      const procurement = procureProjectMaterials(
+        staged,
+        project,
+        market,
+        index,
+        cash,
+        entries,
+      );
+      cash = procurement.cash;
+      totalMaterialsSpent += procurement.spentSUSD;
+      project.materialsSpentSUSD += procurement.spentSUSD;
+      if (procurement.spentSUSD > 0) {
+        accumulateBudgetMemo(stagedFinance, country.id, {
+          constructionSpentSUSD: procurement.spentSUSD,
+          constructionMaterialsSpentSUSD: procurement.spentSUSD,
+        });
+      }
+      if (!constructionMaterialsReady(project)) {
+        cashByCountry.set(country.id, cash);
+        project.status = "waiting";
+        project.lastWorkers = 0;
+        project.blockedReason = procurement.blockedReason ?? "materials";
+        results.push({
+          projectId: project.id,
+          countryId: project.countryId,
+          status: project.status,
+          workersHired: 0,
+          spentSUSD: project.spentSUSD,
+          materialsSpentSUSD: project.materialsSpentSUSD,
+          totalCostSUSD: project.totalCostSUSD,
+          progress:
+            project.totalCostSUSD > 0 ? project.spentSUSD / project.totalCostSUSD : 1,
+          materialsProgress: constructionMaterialsProgress(project),
+          blockedReason: project.blockedReason,
+          buildingId: project.buildingId,
+        });
+        continue;
+      }
+    }
     const remaining = constructionProjectRemaining(project);
     if (!(remaining > toleranceMoney(remaining, project.totalCostSUSD))) {
       completions.push(project);
@@ -513,9 +704,11 @@ export function runConstructionPhase(
       status: project.status,
       workersHired: hired,
       spentSUSD: project.spentSUSD,
+      materialsSpentSUSD: project.materialsSpentSUSD,
       totalCostSUSD: project.totalCostSUSD,
       progress:
         project.totalCostSUSD > 0 ? project.spentSUSD / project.totalCostSUSD : 1,
+      materialsProgress: constructionMaterialsProgress(project),
       blockedReason: project.blockedReason,
       buildingId: project.buildingId,
     });
@@ -530,6 +723,7 @@ export function runConstructionPhase(
     if (project.spentSUSD < project.totalCostSUSD - toleranceMoney(project.spentSUSD)) {
       continue;
     }
+    if (!constructionMaterialsReady(project)) continue;
     const country = staged.countries.find((entry) => entry.id === project.countryId);
     if (country === undefined) throw new RangeError("missing completion country");
     const created = createCompletedBuilding(
@@ -542,19 +736,20 @@ export function runConstructionPhase(
     const treasury = index.get("country", country.id, "treasury-cash");
     const wip = index.get("country", country.id, "construction-in-progress");
     const publicCapital = index.get("country", country.id, "public-capital");
-    if (project.spentSUSD > 0) {
+    const capitalized = project.spentSUSD + project.materialsSpentSUSD;
+    if (capitalized > 0) {
       completionEntries.push({
         transactionKind: "construction-capitalization",
         lines: [
           {
             accountId: wip.id,
             side: "credit" as const,
-            amountSUSD: project.spentSUSD,
+            amountSUSD: capitalized,
           },
           {
             accountId: publicCapital.id,
             side: "debit" as const,
-            amountSUSD: project.spentSUSD,
+            amountSUSD: capitalized,
           },
         ],
         sourceEntityId: country.id,
@@ -607,8 +802,10 @@ export function runConstructionPhase(
       status: project.status,
       workersHired: project.lastWorkers,
       spentSUSD: project.spentSUSD,
+      materialsSpentSUSD: project.materialsSpentSUSD,
       totalCostSUSD: project.totalCostSUSD,
       progress: 1,
+      materialsProgress: 1,
       blockedReason: null,
       buildingId: project.buildingId,
     };
@@ -634,6 +831,7 @@ export function runConstructionPhase(
   world.construction = staged.construction;
   world.buildings = staged.buildings;
   world.regions = staged.regions;
+  world.markets = staged.markets;
   world.employmentDirty = staged.employmentDirty;
   const postingIds = [...wagePostings, ...completionPostings].map((posting) => posting.id);
   return {
@@ -645,6 +843,7 @@ export function runConstructionPhase(
       .map((project) => project.id)
       .sort((left, right) => left - right),
     spentSUSD: totalSpent,
+    materialsSpentSUSD: totalMaterialsSpent,
     postingIds,
   };
 }
@@ -758,6 +957,14 @@ export function startConstruction(
     workingCapitalSUSD: constructionWorkingCapital(definition),
     workingCapitalPaidSUSD: 0,
     spentSUSD: 0,
+    materialsSpentSUSD: 0,
+    materials: definition.constructionMaterials
+      .map((material) => ({
+        goodId: material.goodId,
+        requiredQuantity: material.quantity,
+        deliveredQuantity: 0,
+      }))
+      .sort((left, right) => left.goodId - right.goodId),
     lastWorkers: 0,
     blockedReason: null,
     buildingId: null,
@@ -814,22 +1021,23 @@ export function cancelConstruction(
   const stagedFinance = cloneFinanceState(world.finance);
   const index = buildFinanceIndex(stagedFinance);
   let postings: { id: number }[] = [];
-  if (project.spentSUSD > toleranceMoney(project.spentSUSD)) {
+  const writtenOff = project.spentSUSD + project.materialsSpentSUSD;
+  if (writtenOff > toleranceMoney(writtenOff)) {
     const wip = index.get("country", project.countryId, "construction-in-progress");
     const equity = index.get("country", project.countryId, "owner-equity");
     postings = postJournalBatch(stagedFinance, dayIndex, [
       {
         transactionKind: "construction-writeoff",
         lines: [
-          { accountId: wip.id, side: "credit", amountSUSD: project.spentSUSD },
-          { accountId: equity.id, side: "debit", amountSUSD: project.spentSUSD },
+          { accountId: wip.id, side: "credit", amountSUSD: writtenOff },
+          { accountId: equity.id, side: "debit", amountSUSD: writtenOff },
         ],
         sourceEntityId: project.countryId,
         targetEntityId: null,
       },
     ]);
     accumulateBudgetMemo(stagedFinance, project.countryId, {
-      constructionWrittenOffSUSD: project.spentSUSD,
+      constructionWrittenOffSUSD: writtenOff,
     });
   }
   const construction: ConstructionState = cloneConstructionState(world.construction);

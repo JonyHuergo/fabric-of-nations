@@ -8,10 +8,12 @@
 
 import {
   AI_HARDSHIP_SUBSISTENCE_DAYS,
+  BUILDING_SECTORS,
   buildFinanceIndex,
   computeBuildingCapacity,
   constructionDailyWage,
   constructionIdleWorkersByBlock,
+  constructionMaterialsProgress,
   constructionPlannedJobs,
   constructionProjectProgress,
   constructionProjectRemaining,
@@ -50,9 +52,11 @@ import {
   type SnapshotDebtPolicy,
   type SnapshotFinancePeriod,
   type SnapshotFiscalTotals,
+  type SnapshotIndustrialPolicy,
   type SnapshotNeedTier,
   type SnapshotProductionCapacity,
   type SnapshotProjectType,
+  type SnapshotPublicEnterprise,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -181,6 +185,7 @@ function fiscalTotals(
       incomeTaxSUSD: roundDisplay(totals.incomeTaxRevenueSUSD, 6),
       welfareExpenseSUSD: roundDisplay(totals.welfareExpenseSUSD, 6),
       interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
+      subsidyExpenseSUSD: roundDisplay(totals.subsidyExpenseSUSD, 6),
       netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
     },
     businessTaxRevenueSUSD: roundDisplay(totals.businessTaxRevenueSUSD, 6),
@@ -201,6 +206,10 @@ function budgetTotalsSnapshot(
     unfinancedRequirementSUSD: roundDisplay(totals.unfinancedRequirementSUSD, 6),
     constructionSpentSUSD: roundDisplay(totals.constructionSpentSUSD, 6),
     constructionWrittenOffSUSD: roundDisplay(totals.constructionWrittenOffSUSD, 6),
+    constructionMaterialsSpentSUSD: roundDisplay(totals.constructionMaterialsSpentSUSD, 6),
+    subsidyRequestedSUSD: roundDisplay(totals.subsidyRequestedSUSD, 6),
+    subsidyShortfallSUSD: roundDisplay(totals.subsidyShortfallSUSD, 6),
+    publicEnterpriseSupportSUSD: roundDisplay(totals.publicEnterpriseSupportSUSD, 6),
   };
 }
 
@@ -216,6 +225,10 @@ function emptyBudgetTotalsSnapshot(): SnapshotBudgetTotals {
     unfinancedRequirementSUSD: 0,
     constructionSpentSUSD: 0,
     constructionWrittenOffSUSD: 0,
+    constructionMaterialsSpentSUSD: 0,
+    subsidyRequestedSUSD: 0,
+    subsidyShortfallSUSD: 0,
+    publicEnterpriseSupportSUSD: 0,
   };
 }
 
@@ -241,6 +254,7 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
       constructionCostSUSD: roundDisplay(definition.constructionCostSUSD, 6),
       constructionWorkers: definition.constructionWorkers,
       plannedJobs: roundDisplay(constructionPlannedJobs(definition), 2),
+      sector: definition.sector,
       dailyUpkeepSUSDAtLevelOne: roundDisplay(definition.dailyUpkeepSUSDAtLevelOne, 6),
       workingCapitalSUSD: roundDisplay(constructionWorkingCapital(definition), 6),
       outputs: definition.outputs
@@ -260,6 +274,18 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
           };
         })
         .sort((left, right) => left.goodId - right.goodId),
+      materials: [...definition.constructionMaterials]
+        .sort((left, right) => left.goodId - right.goodId)
+        .map((material) => {
+          const good = goods.get(material.goodId);
+          return {
+            goodId: material.goodId,
+            goodKey: good?.key ?? `good-${String(material.goodId)}`,
+            goodName: good?.name ?? `Good ${String(material.goodId)}`,
+            unitLabel: good?.unitLabel ?? "unit",
+            quantity: material.quantity,
+          };
+        }),
     }));
 }
 
@@ -272,11 +298,17 @@ function constructionProjectSnapshots(
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
+  const goods = new Map(definitions.goods.map((good) => [good.id, good]));
+  const marketByRegion = new Map<number, (typeof world.markets)[number]>();
+  for (const market of world.markets) {
+    for (const regionId of market.regionIds) marketByRegion.set(regionId, market);
+  }
   return [...world.construction.projects]
     .filter((project) => project.countryId === countryId)
     .sort((left, right) => left.id - right.id)
     .map((project) => {
       const definition = definitionById.get(project.definitionId);
+      const market = marketByRegion.get(project.regionId);
       return {
         id: project.id,
         countryId: project.countryId,
@@ -294,7 +326,33 @@ function constructionProjectSnapshots(
         workingCapitalSUSD: roundDisplay(project.workingCapitalSUSD, 6),
         workingCapitalPaidSUSD: roundDisplay(project.workingCapitalPaidSUSD, 6),
         spentSUSD: roundDisplay(project.spentSUSD, 6),
+        materialsSpentSUSD: roundDisplay(project.materialsSpentSUSD, 6),
+        materials: project.materials
+          .map((material) => {
+            const good = goods.get(material.goodId);
+            const unitPriceSUSD = market?.priceSUSD[material.goodId] ?? 0;
+            const remaining = Math.max(
+              0,
+              material.requiredQuantity - material.deliveredQuantity,
+            );
+            return {
+              goodId: material.goodId,
+              goodKey: good?.key ?? `good-${String(material.goodId)}`,
+              goodName: good?.name ?? `Good ${String(material.goodId)}`,
+              unitLabel: good?.unitLabel ?? "unit",
+              requiredQuantity: material.requiredQuantity,
+              deliveredQuantity: material.deliveredQuantity,
+              remainingQuantity: remaining,
+              unitPriceSUSD: roundDisplay(unitPriceSUSD, 6),
+              deliveredValueSUSD: roundDisplay(
+                material.deliveredQuantity * unitPriceSUSD,
+                6,
+              ),
+            };
+          })
+          .sort((left, right) => left.goodId - right.goodId),
         progress: roundDisplay(constructionProjectProgress(project), 6),
+        materialsProgress: roundDisplay(constructionMaterialsProgress(project), 6),
         remainingSUSD: roundDisplay(constructionProjectRemaining(project), 6),
         lastWorkers: project.lastWorkers,
         blockedReason: project.blockedReason,
@@ -508,6 +566,7 @@ function annualReportSnapshots(
         businessTaxRevenueSUSD: roundDisplay(totals?.businessTaxRevenueSUSD ?? 0, 6),
         welfareExpenseSUSD: roundDisplay(totals?.welfareExpenseSUSD ?? 0, 6),
         interestExpenseSUSD: roundDisplay(totals?.interestExpenseSUSD ?? 0, 6),
+        subsidyExpenseSUSD: roundDisplay(totals?.subsidyExpenseSUSD ?? 0, 6),
         netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
         treasuryCashEndSUSD: roundDisplay(balances?.treasuryCashSUSD ?? 0, 6),
         debtLiabilityEndSUSD: roundDisplay(balances?.debtLiabilitySUSD ?? 0, 6),
@@ -515,6 +574,37 @@ function annualReportSnapshots(
         correctionCount: summary.correctionCount,
       };
     });
+}
+
+function countrySectorValueEstimates(
+  world: World,
+  definitions: EconomyDefinitions,
+  country: World["countries"][number],
+): Map<string, number> {
+  const values = new Map<string, number>();
+  const regionIds = new Set(country.regionIds);
+  const marketByRegion = new Map<number, (typeof world.markets)[number]>();
+  for (const market of world.markets) {
+    for (const regionId of market.regionIds) marketByRegion.set(regionId, market);
+  }
+  const definitionById = new Map(
+    definitions.buildings.map((definition) => [definition.id, definition]),
+  );
+  for (const building of world.buildings) {
+    if (!regionIds.has(building.regionId)) continue;
+    const definition = definitionById.get(building.definitionId);
+    if (definition === undefined) continue;
+    const market = marketByRegion.get(building.regionId);
+    if (market === undefined) continue;
+    const capacity = computeBuildingCapacity(world, definitions, building.id);
+    let value = 0;
+    for (const output of definition.outputs) {
+      const price = market.priceSUSD[output.goodId] ?? 0;
+      value += output.quantityPerThroughputUnit * capacity.capacityTU * price;
+    }
+    values.set(definition.sector, (values.get(definition.sector) ?? 0) + value);
+  }
+  return values;
 }
 
 function countrySnapshot(
@@ -594,10 +684,11 @@ function countrySnapshot(
   for (const building of world.buildings) {
     if (!regionIds.has(building.regionId)) continue;
     const revenue = index.find("building", building.id, "sales-revenue")?.balanceSUSD ?? 0;
+    const subsidy = index.find("building", building.id, "subsidy-revenue")?.balanceSUSD ?? 0;
     const input = index.find("building", building.id, "input-expense")?.balanceSUSD ?? 0;
     const wage = index.find("building", building.id, "wage-expense")?.balanceSUSD ?? 0;
     const upkeep = index.find("building", building.id, "upkeep-expense")?.balanceSUSD ?? 0;
-    businessTaxBaseMonthToDate += Math.max(0, revenue - input - wage - upkeep);
+    businessTaxBaseMonthToDate += Math.max(0, revenue + subsidy - input - wage - upkeep);
   }
   let householdCash = 0;
   for (const blockId of blockIds) {
@@ -617,9 +708,67 @@ function countrySnapshot(
     unfinancedRequirementSUSD: roundDisplay(memo.unfinancedRequirementSUSD, 6),
     constructionSpentSUSD: roundDisplay(memo.constructionSpentSUSD, 6),
     constructionWrittenOffSUSD: roundDisplay(memo.constructionWrittenOffSUSD, 6),
+    constructionMaterialsSpentSUSD: roundDisplay(memo.constructionMaterialsSpentSUSD, 6),
+    subsidyRequestedSUSD: roundDisplay(memo.subsidyRequestedSUSD, 6),
+    subsidyShortfallSUSD: roundDisplay(memo.subsidyShortfallSUSD, 6),
+    publicEnterpriseSupportSUSD: roundDisplay(memo.publicEnterpriseSupportSUSD, 6),
     businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
   };
   const latestFiscal = history.length === 0 ? null : (history[history.length - 1] ?? null);
+  const sectorValues = countrySectorValueEstimates(world, definitions, country);
+  const sectorLabels: Record<string, string> = {
+    agriculture: "Agriculture",
+    "food-processing": "Food processing",
+    textiles: "Textiles",
+    manufacturing: "Manufacturing",
+    storage: "Storage",
+  };
+  const industrialPolicy: SnapshotIndustrialPolicy = {
+    sectors: BUILDING_SECTORS.map((key, index) => ({
+      index,
+      key,
+      label: sectorLabels[key] ?? key,
+      subsidyRate: country.industrial.sectorSubsidyRates[index] ?? 0,
+      estimatedDailyOutputValueSUSD: roundDisplay(sectorValues.get(key) ?? 0, 6),
+    })),
+    requestedMonthToDateSUSD: roundDisplay(memo.subsidyRequestedSUSD, 6),
+    paidMonthToDateSUSD: roundDisplay(
+      Math.max(0, memo.subsidyRequestedSUSD - memo.subsidyShortfallSUSD),
+      6,
+    ),
+    shortfallMonthToDateSUSD: roundDisplay(memo.subsidyShortfallSUSD, 6),
+  };
+  const regionById = new Map(world.regions.map((region) => [region.id, region]));
+  const definitionById = new Map(
+    definitions.buildings.map((definition) => [definition.id, definition]),
+  );
+  const publicEnterprises: SnapshotPublicEnterprise[] = world.buildings
+    .filter(
+      (building) =>
+        regionIds.has(building.regionId) &&
+        building.ownerKind === "state" &&
+        building.ownerAccountId === country.treasuryAccountId,
+    )
+    .sort((left, right) => left.id - right.id)
+    .map((building) => {
+      const definition = definitionById.get(building.definitionId);
+      return {
+        buildingId: building.id,
+        definitionId: building.definitionId,
+        definitionKey: definition?.key ?? `definition-${String(building.definitionId)}`,
+        definitionName: definition?.name ?? `Definition ${String(building.definitionId)}`,
+        regionId: building.regionId,
+        regionName: regionById.get(building.regionId)?.name ?? `Region ${String(building.regionId)}`,
+        sector: definition?.sector ?? "storage",
+        level: building.level,
+        condition: building.condition,
+        operatingCashSUSD: roundDisplay(
+          index.find("building", building.id, "operating-cash")?.balanceSUSD ?? 0,
+          6,
+        ),
+        ownerCountryId: country.id,
+      };
+    });
   return {
     id: country.id,
     tag: country.tag,
@@ -674,6 +823,8 @@ function countrySnapshot(
       index.find("country", country.id, "public-capital")?.balanceSUSD ?? 0,
       6,
     ),
+    industrialPolicy,
+    publicEnterprises,
   };
 }
 
@@ -754,10 +905,19 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     for (const contract of country.debtContracts) Object.freeze(contract);
     Object.freeze(country.debtContracts);
     Object.freeze(country.budgetMonthToDate);
-    for (const project of country.constructionProjects) Object.freeze(project);
+    for (const project of country.constructionProjects) {
+      for (const material of project.materials) Object.freeze(material);
+      Object.freeze(project.materials);
+      Object.freeze(project);
+    }
     Object.freeze(country.constructionProjects);
     Object.freeze(country.constructionHistory);
     Object.freeze(country.constructionLabor);
+    for (const sector of country.industrialPolicy.sectors) Object.freeze(sector);
+    Object.freeze(country.industrialPolicy.sectors);
+    Object.freeze(country.industrialPolicy);
+    for (const enterprise of country.publicEnterprises) Object.freeze(enterprise);
+    Object.freeze(country.publicEnterprises);
     for (const entry of country.productionCapacityByGood) Object.freeze(entry);
     Object.freeze(country.productionCapacityByGood);
     for (const period of country.financeHistory) {
@@ -786,6 +946,8 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   for (const projectType of snapshot.projectTypes) {
     for (const output of projectType.outputs) Object.freeze(output);
     Object.freeze(projectType.outputs);
+    for (const material of projectType.materials) Object.freeze(material);
+    Object.freeze(projectType.materials);
     Object.freeze(projectType);
   }
   Object.freeze(snapshot.projectTypes);

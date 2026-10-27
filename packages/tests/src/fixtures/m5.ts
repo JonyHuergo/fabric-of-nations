@@ -45,7 +45,7 @@ export const M5_HOUSEHOLD_ACCOUNTS: readonly Id[] = [
 
 export function m5EconomyDefinitions(): EconomyDefinitions {
   return {
-    dataVersion: "m3-economy-v4",
+    dataVersion: "m3-economy-v5",
     scenarioId: "m5-fixture",
     goods: [
       {
@@ -119,6 +119,8 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         jobs: [{ professionId: M5_PEASANTS, workersPerThroughputUnit: 1_000 }],
         constructionCostSUSD: 1000,
         constructionWorkers: 20,
+        sector: "agriculture",
+        constructionMaterials: [{ goodId: M5_GRAIN, quantity: 500 }],
         dailyUpkeepSUSDAtLevelOne: 10,
         storageCapacityByGood: [],
         resourceRequirements: [],
@@ -136,6 +138,11 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         jobs: [{ professionId: M5_LABORERS, workersPerThroughputUnit: 1_000 }],
         constructionCostSUSD: 2000,
         constructionWorkers: 30,
+        sector: "food-processing",
+        constructionMaterials: [
+          { goodId: M5_GRAIN, quantity: 5000 },
+          { goodId: M5_CLOTHING, quantity: 100 },
+        ],
         dailyUpkeepSUSDAtLevelOne: 20,
         storageCapacityByGood: [],
         resourceRequirements: [],
@@ -153,6 +160,8 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         jobs: [{ professionId: M5_LABORERS, workersPerThroughputUnit: 200 }],
         constructionCostSUSD: 1500,
         constructionWorkers: 20,
+        sector: "manufacturing",
+        constructionMaterials: [{ goodId: M5_CLOTHING, quantity: 1000 }],
         dailyUpkeepSUSDAtLevelOne: 10,
         storageCapacityByGood: [],
         resourceRequirements: [],
@@ -170,6 +179,8 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         jobs: [],
         constructionCostSUSD: 500,
         constructionWorkers: 10,
+        sector: "storage",
+        constructionMaterials: [],
         dailyUpkeepSUSDAtLevelOne: 1,
         storageCapacityByGood: [
           { goodId: M5_GRAIN, quantity: 2_000_000 },
@@ -203,7 +214,7 @@ function mortality(year: number): {
 
 export function m5PopulationDefinitions(): PopulationDefinitions {
   return {
-    dataVersion: "m3-economy-v4",
+    dataVersion: "m3-economy-v5",
     scenarioId: "m5-fixture",
     needs: [
       {
@@ -342,7 +353,7 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
   const definitions = m5EconomyDefinitions();
   return {
     population: {
-      dataVersion: "m3-economy-v4",
+      dataVersion: "m3-economy-v5",
       scenarioId: "m5-fixture",
       professions: definitions.professions.map((profession) => ({
         id: profession.id,

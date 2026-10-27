@@ -53,8 +53,11 @@ import type {
   CurrencyValuation,
   FiscalPolicy,
   FiscalPolicyInput,
+  IndustrialPolicy,
+  IndustrialPolicyInput,
   MonetaryArrangement,
 } from "./types.js";
+import { BUILDING_SECTORS } from "./types.js";
 
 const CURRENCY_KEY_PATTERN = /^[a-z][a-z0-9-]*$/;
 
@@ -129,7 +132,52 @@ export function fiscalPolicyIsActive(fiscal: FiscalPolicyInput): boolean {
   );
 }
 
-/** Neutral defaults for the E2 fiscal-policy fields, used by scenario input. */
+/** Neutral default: every sector subsidy rate is zero. */
+export function neutralIndustrialPolicy(): IndustrialPolicy {
+  return { sectorSubsidyRates: BUILDING_SECTORS.map(() => 0) };
+}
+
+/**
+ * Create a validated runtime industrial policy from scenario input. Omitted rates
+ * are neutral; the array must cover every registered sector exactly once.
+ */
+export function createIndustrialPolicy(
+  input: IndustrialPolicyInput | undefined,
+  path = "industrial",
+): IndustrialPolicy {
+  if (input === undefined) return neutralIndustrialPolicy();
+  return assertValidIndustrialPolicy(input, path);
+}
+
+/** Validate the complete E4 industrial policy and return a normalized copy. */
+export function assertValidIndustrialPolicy(
+  value: unknown,
+  path: string,
+): IndustrialPolicy {
+  const record = requireRecord(value, path);
+  const raw = requireArray(record.sectorSubsidyRates, `${path}.sectorSubsidyRates`);
+  if (raw.length !== BUILDING_SECTORS.length) {
+    throw new RangeError(
+      `${path}.sectorSubsidyRates must contain ${String(BUILDING_SECTORS.length)} entries`,
+    );
+  }
+  const rates: number[] = [];
+  for (let index = 0; index < raw.length; index += 1) {
+    const rate = requireFiniteNumber(
+      raw[index],
+      `${path}.sectorSubsidyRates[${String(index)}]`,
+    );
+    if (rate < 0 || rate > 1) {
+      throw new RangeError(
+        `${path}.sectorSubsidyRates[${String(index)}] must be in 0..1`,
+      );
+    }
+    rates.push(rate);
+  }
+  return { sectorSubsidyRates: rates };
+}
+
+/** Neutral defaults for the E2 fiscal-policy fields, used by scenario input. */
 export function neutralFiscalPolicyDefaults(): Pick<
   FiscalPolicy,
   | "incomeTaxAllowanceSUSDPerYear"
@@ -248,6 +296,9 @@ export function copyCountry(country: Country): Country {
     monetary: { ...country.monetary },
     regionIds: [...country.regionIds],
     fiscal: { ...country.fiscal },
+    industrial: {
+      sectorSubsidyRates: [...country.industrial.sectorSubsidyRates],
+    },
     debt: { ...country.debt },
     ai: { ...country.ai },
   };

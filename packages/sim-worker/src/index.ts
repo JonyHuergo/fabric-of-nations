@@ -13,5 +13,6 @@ export * from "./supervisor.js";
 export * from "./actionHistory.js";
 export * from "./fiscalPreview.js";
 export * from "./constructionPreview.js";
+export * from "./industrialPreview.js";
 export * from "./reports.js";
 export * from "./explanations.js";

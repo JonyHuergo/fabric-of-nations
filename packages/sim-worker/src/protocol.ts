@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 6 as const;
+export const PROTOCOL_VERSION = 7 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -77,11 +77,27 @@ export interface CancelConstructionActionDto {
   readonly projectId: number;
 }
 
+/** Mirror of the validated E4 sector taxonomy size; the simulation is authoritative. */
+export const SNAPSHOT_SECTOR_COUNT = 5;
+
 export interface SetConstructionPausedActionDto {
   readonly kind: "set-construction-paused";
   readonly countryId: number;
   readonly projectId: number;
   readonly paused: boolean;
+}
+
+export interface SetIndustrialPolicyActionDto {
+  readonly kind: "set-industrial-policy";
+  readonly countryId: number;
+  readonly sectorSubsidyRates: readonly number[];
+}
+
+export interface SupportPublicEnterpriseActionDto {
+  readonly kind: "support-public-enterprise";
+  readonly countryId: number;
+  readonly buildingId: number;
+  readonly amountSUSD: number;
 }
 
 /** Every action the player UI may request. */
@@ -92,7 +108,9 @@ export type CountryActionDto =
   | SetDebtPolicyActionDto
   | StartConstructionActionDto
   | CancelConstructionActionDto
-  | SetConstructionPausedActionDto;
+  | SetConstructionPausedActionDto
+  | SetIndustrialPolicyActionDto
+  | SupportPublicEnterpriseActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -159,6 +177,10 @@ export interface SnapshotBudgetTotals {
   readonly unfinancedRequirementSUSD: number;
   readonly constructionSpentSUSD: number;
   readonly constructionWrittenOffSUSD: number;
+  readonly constructionMaterialsSpentSUSD: number;
+  readonly subsidyRequestedSUSD: number;
+  readonly subsidyShortfallSUSD: number;
+  readonly publicEnterpriseSupportSUSD: number;
 }
 
 /** Current open-period budget memo. Values are flows so far this month. */
@@ -208,17 +230,41 @@ export interface SnapshotProjectOutput {
   readonly dailyCapacityAtLevelOne: number;
 }
 
+/** One authored construction/commissioning material requirement. */
+export interface SnapshotConstructionMaterialRequirement {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly unitLabel: string;
+  readonly quantity: number;
+}
+
 /** Buildable public-construction project type derived from validated data. */
 export interface SnapshotProjectType {
   readonly definitionId: number;
   readonly key: string;
   readonly name: string;
+  readonly sector: string;
   readonly constructionCostSUSD: number;
   readonly constructionWorkers: number;
   readonly plannedJobs: number;
   readonly dailyUpkeepSUSDAtLevelOne: number;
   readonly workingCapitalSUSD: number;
   readonly outputs: readonly SnapshotProjectOutput[];
+  readonly materials: readonly SnapshotConstructionMaterialRequirement[];
+}
+
+/** Current material state of a construction project. */
+export interface SnapshotProjectMaterial {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly unitLabel: string;
+  readonly requiredQuantity: number;
+  readonly deliveredQuantity: number;
+  readonly remainingQuantity: number;
+  readonly unitPriceSUSD: number;
+  readonly deliveredValueSUSD: number;
 }
 
 /** Current/persisted public-construction project. */
@@ -245,10 +291,13 @@ export interface SnapshotConstructionProject {
   readonly workingCapitalSUSD: number;
   readonly workingCapitalPaidSUSD: number;
   readonly spentSUSD: number;
+  readonly materialsSpentSUSD: number;
+  readonly materials: readonly SnapshotProjectMaterial[];
   readonly progress: number;
+  readonly materialsProgress: number;
   readonly remainingSUSD: number;
   readonly lastWorkers: number;
-  readonly blockedReason: "labor" | "funds" | null;
+  readonly blockedReason: "labor" | "funds" | "materials" | null;
   readonly buildingId: number | null;
 }
 
@@ -267,12 +316,46 @@ export interface SnapshotConstructionLabor {
   readonly dailyWageSUSD: number;
 }
 
+/** One validated building-sector row used by the industrial-policy UI. */
+export interface SnapshotSector {
+  readonly index: number;
+  readonly key: string;
+  readonly label: string;
+  readonly subsidyRate: number;
+  /** Presentation estimate: current sector capacity valued at current prices. */
+  readonly estimatedDailyOutputValueSUSD: number;
+}
+
+/** Policy state and month-to-date subsidy outcome for one country. */
+export interface SnapshotIndustrialPolicy {
+  readonly sectors: readonly SnapshotSector[];
+  readonly requestedMonthToDateSUSD: number;
+  readonly paidMonthToDateSUSD: number;
+  readonly shortfallMonthToDateSUSD: number;
+}
+
+/** A state-owned productive enterprise available for operating support. */
+export interface SnapshotPublicEnterprise {
+  readonly buildingId: number;
+  readonly definitionId: number;
+  readonly definitionKey: string;
+  readonly definitionName: string;
+  readonly regionId: number;
+  readonly regionName: string;
+  readonly sector: string;
+  readonly level: number;
+  readonly condition: number;
+  readonly operatingCashSUSD: number;
+  readonly ownerCountryId: number;
+}
+
 export interface SnapshotFiscalTotals {
   readonly periodStartDay: number;
   readonly periodEndDay: number;
   readonly incomeTaxSUSD: number;
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
+  readonly subsidyExpenseSUSD: number;
   readonly netFiscalResultSUSD: number;
 }
 
@@ -330,6 +413,7 @@ export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
   readonly businessTaxRevenueSUSD: number;
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
+  readonly subsidyExpenseSUSD: number;
   readonly netFiscalResultSUSD: number;
   readonly treasuryCashEndSUSD: number;
   readonly debtLiabilityEndSUSD: number;
@@ -397,6 +481,10 @@ export interface CountrySnapshot {
   readonly constructionInProgressSUSD: number;
   /** Country capitalized public-capital asset balance. */
   readonly publicCapitalSUSD: number;
+  /** E4 industrial policy, month-to-date subsidy outcome, and sector estimates. */
+  readonly industrialPolicy: SnapshotIndustrialPolicy;
+  /** Existing state-owned enterprises eligible for operating support. */
+  readonly publicEnterprises: readonly SnapshotPublicEnterprise[];
 }
 
 export interface RegionSnapshot {
@@ -750,6 +838,58 @@ function parseAction(value: unknown): CountryActionDto {
       paused: record.paused,
     };
   }
+  if (kind === "set-industrial-policy") {
+    if (!Array.isArray(record.sectorSubsidyRates)) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.sectorSubsidyRates must be an array",
+      );
+    }
+    if (record.sectorSubsidyRates.length !== SNAPSHOT_SECTOR_COUNT) {
+      throw new ProtocolError(
+        "invalid_action",
+        `command.action.sectorSubsidyRates must contain ${String(SNAPSHOT_SECTOR_COUNT)} entries`,
+      );
+    }
+    const rates: number[] = [];
+    for (let index = 0; index < record.sectorSubsidyRates.length; index += 1) {
+      const rate = requireFiniteNumber(
+        record.sectorSubsidyRates[index],
+        `command.action.sectorSubsidyRates[${String(index)}]`,
+      );
+      if (rate < 0 || rate > 1) {
+        throw new ProtocolError(
+          "invalid_action",
+          `command.action.sectorSubsidyRates[${String(index)}] must be in 0..1`,
+        );
+      }
+      rates.push(rate);
+    }
+    return { kind: "set-industrial-policy", countryId, sectorSubsidyRates: rates };
+  }
+  if (kind === "support-public-enterprise") {
+    const amountSUSD = requireFiniteNumber(
+      record.amountSUSD,
+      "command.action.amountSUSD",
+    );
+    if (!(amountSUSD > 0)) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.amountSUSD must be positive",
+      );
+    }
+    return {
+      kind: "support-public-enterprise",
+      countryId,
+      buildingId: requireInteger(
+        record.buildingId,
+        "command.action.buildingId",
+        0,
+        0xffff_ffff,
+      ),
+      amountSUSD,
+    };
+  }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }
 
@@ -862,6 +1002,7 @@ function isFiscalTotals(value: unknown): value is SnapshotFiscalTotals {
     isFiniteNumber(value.incomeTaxSUSD) &&
     isFiniteNumber(value.welfareExpenseSUSD) &&
     isFiniteNumber(value.interestExpenseSUSD) &&
+    isFiniteNumber(value.subsidyExpenseSUSD) &&
     isFiniteNumber(value.netFiscalResultSUSD)
   );
 }
@@ -881,6 +1022,10 @@ const BUDGET_TOTAL_FIELDS = [
   "unfinancedRequirementSUSD",
   "constructionSpentSUSD",
   "constructionWrittenOffSUSD",
+  "constructionMaterialsSpentSUSD",
+  "subsidyRequestedSUSD",
+  "subsidyShortfallSUSD",
+  "publicEnterpriseSupportSUSD",
 ] as const;
 
 function isBudgetTotals(value: unknown): value is SnapshotBudgetTotals {
@@ -1012,6 +1157,7 @@ function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
     isFiniteNumber(value.businessTaxRevenueSUSD) &&
     isFiniteNumber(value.welfareExpenseSUSD) &&
     isFiniteNumber(value.interestExpenseSUSD) &&
+    isFiniteNumber(value.subsidyExpenseSUSD) &&
     isFiniteNumber(value.netFiscalResultSUSD) &&
     isFiniteNumber(value.treasuryCashEndSUSD) &&
     isFiniteNumber(value.debtLiabilityEndSUSD) &&
@@ -1032,19 +1178,49 @@ function isProjectOutput(value: unknown): value is SnapshotProjectOutput {
   );
 }
 
+function isConstructionMaterialRequirement(
+  value: unknown,
+): value is SnapshotConstructionMaterialRequirement {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.goodId, 0, 0xffff_ffff) &&
+    isString(value.goodKey, 128) &&
+    isString(value.goodName, 256) &&
+    isString(value.unitLabel, 64) &&
+    isFiniteNumber(value.quantity)
+  );
+}
+
 function isProjectType(value: unknown): value is SnapshotProjectType {
   if (!isRecord(value)) return false;
-  if (!Array.isArray(value.outputs)) return false;
+  if (!Array.isArray(value.outputs) || !Array.isArray(value.materials)) return false;
   return (
     isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
     isString(value.key, 128) &&
     isString(value.name, 256) &&
+    isString(value.sector, 64) &&
     isFiniteNumber(value.constructionCostSUSD) &&
     isIntegerIn(value.constructionWorkers, 1, 1_000_000) &&
     isFiniteNumber(value.plannedJobs) &&
     isFiniteNumber(value.dailyUpkeepSUSDAtLevelOne) &&
     isFiniteNumber(value.workingCapitalSUSD) &&
-    value.outputs.every((output) => isProjectOutput(output))
+    value.outputs.every((output) => isProjectOutput(output)) &&
+    value.materials.every((material) => isConstructionMaterialRequirement(material))
+  );
+}
+
+function isProjectMaterial(value: unknown): value is SnapshotProjectMaterial {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.goodId, 0, 0xffff_ffff) &&
+    isString(value.goodKey, 128) &&
+    isString(value.goodName, 256) &&
+    isString(value.unitLabel, 64) &&
+    isFiniteNumber(value.requiredQuantity) &&
+    isFiniteNumber(value.deliveredQuantity) &&
+    isFiniteNumber(value.remainingQuantity) &&
+    isFiniteNumber(value.unitPriceSUSD) &&
+    isFiniteNumber(value.deliveredValueSUSD)
   );
 }
 
@@ -1064,10 +1240,13 @@ function isConstructionProject(value: unknown): value is SnapshotConstructionPro
   if (
     value.blockedReason !== null &&
     value.blockedReason !== "labor" &&
-    value.blockedReason !== "funds"
+    value.blockedReason !== "funds" &&
+    value.blockedReason !== "materials"
   ) {
     return false;
   }
+  if (!Array.isArray(value.materials)) return false;
+  if (!value.materials.every((material) => isProjectMaterial(material))) return false;
   return (
     isIntegerIn(value.id, 1, 0xffff_ffff) &&
     isIntegerIn(value.countryId, 0, 0xffff_ffff) &&
@@ -1084,7 +1263,9 @@ function isConstructionProject(value: unknown): value is SnapshotConstructionPro
     isFiniteNumber(value.workingCapitalSUSD) &&
     isFiniteNumber(value.workingCapitalPaidSUSD) &&
     isFiniteNumber(value.spentSUSD) &&
+    isFiniteNumber(value.materialsSpentSUSD) &&
     isFiniteNumber(value.progress) &&
+    isFiniteNumber(value.materialsProgress) &&
     isFiniteNumber(value.remainingSUSD) &&
     isIntegerIn(value.lastWorkers, 0, 1_000_000) &&
     (value.buildingId === null || isIntegerIn(value.buildingId, 0, 0xffff_ffff))
@@ -1104,6 +1285,43 @@ function isConstructionHistory(value: unknown): value is SnapshotConstructionHis
 function isConstructionLabor(value: unknown): value is SnapshotConstructionLabor {
   if (!isRecord(value)) return false;
   return isIntegerIn(value.idleWorkers, 0, 100_000_000) && isFiniteNumber(value.dailyWageSUSD);
+}
+
+function isIndustrialPolicy(value: unknown): value is SnapshotIndustrialPolicy {
+  if (!isRecord(value)) return false;
+  if (!Array.isArray(value.sectors)) return false;
+  return (
+    value.sectors.every((sector) => {
+      if (!isRecord(sector)) return false;
+      return (
+        isIntegerIn(sector.index, 0, SNAPSHOT_SECTOR_COUNT - 1) &&
+        isString(sector.key, 64) &&
+        isString(sector.label, 128) &&
+        isFiniteNumber(sector.subsidyRate) &&
+        isFiniteNumber(sector.estimatedDailyOutputValueSUSD)
+      );
+    }) &&
+    isFiniteNumber(value.requestedMonthToDateSUSD) &&
+    isFiniteNumber(value.paidMonthToDateSUSD) &&
+    isFiniteNumber(value.shortfallMonthToDateSUSD)
+  );
+}
+
+function isPublicEnterprise(value: unknown): value is SnapshotPublicEnterprise {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.buildingId, 0, 0xffff_ffff) &&
+    isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
+    isString(value.definitionKey, 128) &&
+    isString(value.definitionName, 256) &&
+    isIntegerIn(value.regionId, 0, 0xffff_ffff) &&
+    isString(value.regionName, 256) &&
+    isString(value.sector, 64) &&
+    isFiniteNumber(value.level) &&
+    isFiniteNumber(value.condition) &&
+    isFiniteNumber(value.operatingCashSUSD) &&
+    isIntegerIn(value.ownerCountryId, 0, 0xffff_ffff)
+  );
 }
 
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
@@ -1159,7 +1377,10 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isConstructionHistory(value.constructionHistory)) return false;
   if (!isConstructionLabor(value.constructionLabor)) return false;
   if (!isFiniteNumber(value.constructionInProgressSUSD)) return false;
-  return isFiniteNumber(value.publicCapitalSUSD);
+  if (!isFiniteNumber(value.publicCapitalSUSD)) return false;
+  if (!isIndustrialPolicy(value.industrialPolicy)) return false;
+  if (!Array.isArray(value.publicEnterprises)) return false;
+  return value.publicEnterprises.every((enterprise) => isPublicEnterprise(enterprise));
 }
 
 function isRegionSnapshot(value: unknown): value is RegionSnapshot {

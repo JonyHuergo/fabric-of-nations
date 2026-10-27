@@ -69,6 +69,19 @@ export {
   type BusinessTaxPhaseResult,
 } from "./businessTax.js";
 export {
+  runIndustrialSubsidyPhase,
+  type IndustrialSubsidyBuildingResult,
+  type IndustrialSubsidyCountryResult,
+  type IndustrialSubsidyPhaseResult,
+} from "./industrial.js";
+export {
+  setIndustrialPolicy,
+  supportPublicEnterprise,
+  validateIndustrialPolicyInput,
+  validatePublicEnterpriseSupport,
+  type PublicEnterpriseSupportInput,
+} from "./industrialPolicy.js";
+export {
   cancelConstruction,
   runConstructionPhase,
   setConstructionPaused,
@@ -87,6 +100,9 @@ export {
   constructionDailyWage,
   constructionIdleWorkers,
   constructionIdleWorkersByBlock,
+  constructionMaterialRemaining,
+  constructionMaterialsProgress,
+  constructionMaterialsReady,
   constructionPlannedJobs,
   constructionProjectIsLive,
   constructionProjectIsTerminal,

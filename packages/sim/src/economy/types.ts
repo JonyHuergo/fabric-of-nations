@@ -74,6 +74,23 @@ export interface StorageCapacityDef {
   quantity: number;
 }
 
+/** Validated E4 building-sector taxonomy used by industrial policy. */
+export const BUILDING_SECTORS = [
+  "agriculture",
+  "food-processing",
+  "textiles",
+  "manufacturing",
+  "storage",
+] as const;
+export type BuildingSector = (typeof BUILDING_SECTORS)[number];
+
+/** One authored construction/commissioning material requirement. */
+export interface ConstructionMaterialDef {
+  goodId: Id;
+  /** Physical units of the good required by the project. */
+  quantity: number;
+}
+
 export interface BuildingDef {
   id: Id;
   key: string;
@@ -83,6 +100,8 @@ export interface BuildingDef {
   inputs: GoodQuantityDef[];
   outputs: GoodQuantityDef[];
   jobs: ProfessionJobDef[];
+  /** Validated E4 sector classification used for industrial policy eligibility. */
+  sector: BuildingSector;
   constructionCostSUSD: MoneySUSD;
   /**
    * E3 maximum daily construction crew for this project type. The crew is hired
@@ -90,6 +109,11 @@ export interface BuildingDef {
    * project advances only as that gross payroll accumulates toward the cost.
    */
   constructionWorkers: number;
+  /**
+   * E4 materials/commissioning inputs bought from the regional market and consumed
+   * by construction. Empty for project types with no modeled material requirement.
+   */
+  constructionMaterials: ConstructionMaterialDef[];
   dailyUpkeepSUSDAtLevelOne: MoneySUSD;
   storageCapacityByGood: StorageCapacityDef[];
   /** M3 requires this list to be empty; regional resource limits are deferred. */
@@ -178,6 +202,7 @@ export const ACCOUNT_SUBTYPES = [
   "system-income",
   "income-tax-revenue",
   "business-tax-revenue",
+  "subsidy-revenue",
   "welfare-income",
   "consumption-expense",
   "input-expense",
@@ -185,6 +210,7 @@ export const ACCOUNT_SUBTYPES = [
   "upkeep-expense",
   "income-tax-expense",
   "business-tax-expense",
+  "subsidy-expense",
   "welfare-expense",
   "debt-liability",
   "interest-payable",
@@ -238,6 +264,9 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "construction-capitalization",
   "construction-writeoff",
   "construction-working-capital",
+  "construction-material-purchase",
+  "production-subsidy",
+  "public-enterprise-capital-contribution",
   "migration-transfer",
   "profit-retention",
   "profit-distribution",
@@ -366,7 +395,9 @@ export interface FinancePeriodFiscalTotals {
   readonly businessTaxRevenueSUSD: MoneySUSD;
   readonly welfareExpenseSUSD: MoneySUSD;
   readonly interestExpenseSUSD: MoneySUSD;
-  /** Tax revenue minus welfare and interest expense. */
+  /** E4 sectoral production-subsidy expense paid through the treasury. */
+  readonly subsidyExpenseSUSD: MoneySUSD;
+  /** Tax revenue minus welfare, interest, and subsidy expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -404,6 +435,13 @@ export interface FinancePeriodBudgetTotals {
   readonly constructionSpentSUSD: MoneySUSD;
   /** E3 work-in-progress written off on cancellation. */
   readonly constructionWrittenOffSUSD: MoneySUSD;
+  /** E4 construction/commissioning materials purchased and capitalized. */
+  readonly constructionMaterialsSpentSUSD: MoneySUSD;
+  /** E4 sectoral subsidy entitlement and unpaid shortfall. */
+  readonly subsidyRequestedSUSD: MoneySUSD;
+  readonly subsidyShortfallSUSD: MoneySUSD;
+  /** E4 public-enterprise capital contributions (capital transfer, not expense). */
+  readonly publicEnterpriseSupportSUSD: MoneySUSD;
 }
 
 /**
@@ -423,6 +461,10 @@ export interface FinanceBudgetMemo {
   readonly unfinancedRequirementSUSD: MoneySUSD;
   readonly constructionSpentSUSD: MoneySUSD;
   readonly constructionWrittenOffSUSD: MoneySUSD;
+  readonly constructionMaterialsSpentSUSD: MoneySUSD;
+  readonly subsidyRequestedSUSD: MoneySUSD;
+  readonly subsidyShortfallSUSD: MoneySUSD;
+  readonly publicEnterpriseSupportSUSD: MoneySUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
@@ -601,6 +643,18 @@ export type FiscalPolicyInput = Pick<
   Partial<FiscalPolicy>;
 
 /**
+ * E4 industrial policy. `sectorSubsidyRates` is indexed by `BUILDING_SECTORS`
+ * position and is an ad-valorem rate on verified daily gross output value at the
+ * current market price. It is not a spendable pool: entitlement must be paid from
+ * actual treasury cash and any shortfall is reported explicitly.
+ */
+export interface IndustrialPolicy {
+  sectorSubsidyRates: Rate[];
+}
+
+export type IndustrialPolicyInput = Partial<IndustrialPolicy>;
+
+/**
  * M5b provisional public-debt policy.
  *
  * When enabled, the country may issue debt to its designated simulated creditor
@@ -684,13 +738,27 @@ export const CONSTRUCTION_PROJECT_STATUSES = [
 export type ConstructionProjectStatus = (typeof CONSTRUCTION_PROJECT_STATUSES)[number];
 
 /**
+ * One project's purchased/delivered material requirement. The required quantity
+ * is snapshotted at authorization; delivered quantity increases only through real
+ * market purchases. Purchases are immediately delivered to the project and their
+ * cost is capitalized into work-in-progress.
+ */
+export interface ConstructionProjectMaterial {
+  goodId: Id;
+  requiredQuantity: number;
+  deliveredQuantity: number;
+}
+
+/**
  * One persisted public-construction project.
  *
- * `totalCostSUSD` is the building definition's construction cost snapshot at
- * authorization; construction advances by gross labor payroll until `spentSUSD`
- * reaches it. `workingCapitalSUSD` is the completion endowment target (30 days of
- * the building's daily upkeep), paid from treasury only to the extent cash is
- * available. Project ids are stable and queue order is ascending id.
+ * `totalCostSUSD` is the building definition's construction **labor** cost
+ * snapshot at authorization; construction advances by gross labor payroll until
+ * `spentSUSD` reaches it. `materialsSpentSUSD` is the actual market cost of
+ * materials purchased/delivered for the project, also capitalized in
+ * work-in-progress. `workingCapitalSUSD` is the completion endowment target
+ * (30 days of the building's daily upkeep), paid from treasury only to the extent
+ * cash is available. Project ids are stable and queue order is ascending id.
  */
 export interface ConstructionProject {
   id: Id;
@@ -705,11 +773,16 @@ export interface ConstructionProject {
   totalCostSUSD: MoneySUSD;
   workingCapitalSUSD: MoneySUSD;
   workingCapitalPaidSUSD: MoneySUSD;
+  /** Gross construction labor paid and capitalized. */
   spentSUSD: MoneySUSD;
+  /** Actual market purchases of construction/commissioning materials, capitalized. */
+  materialsSpentSUSD: MoneySUSD;
+  /** Required and delivered material quantities, snapshotted at authorization. */
+  materials: ConstructionProjectMaterial[];
   /** Workers hired on the most recent progress day (0 when waiting/paused). */
   lastWorkers: number;
   /** Why the most recent construction day made no progress, if it did not. */
-  blockedReason: "labor" | "funds" | null;
+  blockedReason: "labor" | "funds" | "materials" | null;
   /** Building created on completion; null otherwise. */
   buildingId: Id | null;
 }
@@ -811,6 +884,8 @@ export interface Country {
   treasuryAccountId: Id;
   /** M4c provisional fiscal policy state. */
   fiscal: FiscalPolicy;
+  /** E4 sectoral production-subsidy policy. */
+  industrial: IndustrialPolicy;
   /** M5b provisional public-debt policy state. */
   debt: DebtPolicy;
   /** M6 persisted country-AI schedule and goal state. */
@@ -840,6 +915,8 @@ export interface CountryInitialDef {
   treasuryAccountId: Id;
   initialTreasuryCashSUSD: MoneySUSD;
   fiscal: FiscalPolicyInput;
+  /** E4 industrial policy; omitted means all sector subsidy rates are zero. */
+  industrial?: IndustrialPolicyInput;
   /** Defaults to disabled for M0–M5a fixtures. */
   debt?: DebtPolicy;
   /** Defaults to false for M4 fixtures that predate M5. */

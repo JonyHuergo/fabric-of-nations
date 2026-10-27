@@ -39,6 +39,10 @@ export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
     unfinancedRequirementSUSD: 0,
     constructionSpentSUSD: 0,
     constructionWrittenOffSUSD: 0,
+    constructionMaterialsSpentSUSD: 0,
+    subsidyRequestedSUSD: 0,
+    subsidyShortfallSUSD: 0,
+    publicEnterpriseSupportSUSD: 0,
     businessTaxAssessedDay: null,
   };
 }
@@ -79,6 +83,10 @@ export function accumulateBudgetMemo(
     readonly unfinancedRequirementSUSD?: MoneySUSD;
     readonly constructionSpentSUSD?: MoneySUSD;
     readonly constructionWrittenOffSUSD?: MoneySUSD;
+    readonly constructionMaterialsSpentSUSD?: MoneySUSD;
+    readonly subsidyRequestedSUSD?: MoneySUSD;
+    readonly subsidyShortfallSUSD?: MoneySUSD;
+    readonly publicEnterpriseSupportSUSD?: MoneySUSD;
     readonly businessTaxAssessedDay?: Day;
   },
 ): FinanceBudgetMemo {
@@ -134,6 +142,26 @@ export function accumulateBudgetMemo(
       delta.constructionWrittenOffSUSD ?? 0,
       "constructionWrittenOffSUSD",
     ),
+    constructionMaterialsSpentSUSD: addAmount(
+      current.constructionMaterialsSpentSUSD,
+      delta.constructionMaterialsSpentSUSD ?? 0,
+      "constructionMaterialsSpentSUSD",
+    ),
+    subsidyRequestedSUSD: addAmount(
+      current.subsidyRequestedSUSD,
+      delta.subsidyRequestedSUSD ?? 0,
+      "subsidyRequestedSUSD",
+    ),
+    subsidyShortfallSUSD: addAmount(
+      current.subsidyShortfallSUSD,
+      delta.subsidyShortfallSUSD ?? 0,
+      "subsidyShortfallSUSD",
+    ),
+    publicEnterpriseSupportSUSD: addAmount(
+      current.publicEnterpriseSupportSUSD,
+      delta.publicEnterpriseSupportSUSD ?? 0,
+      "publicEnterpriseSupportSUSD",
+    ),
     businessTaxAssessedDay:
       delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
   };
@@ -154,6 +182,10 @@ export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudg
     unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
     constructionSpentSUSD: memo.constructionSpentSUSD,
     constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
+    constructionMaterialsSpentSUSD: memo.constructionMaterialsSpentSUSD,
+    subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
+    subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
+    publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
   };
 }
 
@@ -178,6 +210,14 @@ export function addBudgetTotals(
       left.constructionSpentSUSD + right.constructionSpentSUSD,
     constructionWrittenOffSUSD:
       left.constructionWrittenOffSUSD + right.constructionWrittenOffSUSD,
+    constructionMaterialsSpentSUSD:
+      left.constructionMaterialsSpentSUSD + right.constructionMaterialsSpentSUSD,
+    subsidyRequestedSUSD:
+      left.subsidyRequestedSUSD + right.subsidyRequestedSUSD,
+    subsidyShortfallSUSD:
+      left.subsidyShortfallSUSD + right.subsidyShortfallSUSD,
+    publicEnterpriseSupportSUSD:
+      left.publicEnterpriseSupportSUSD + right.publicEnterpriseSupportSUSD,
   };
 }
 
@@ -194,6 +234,10 @@ export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
     unfinancedRequirementSUSD: 0,
     constructionSpentSUSD: 0,
     constructionWrittenOffSUSD: 0,
+    constructionMaterialsSpentSUSD: 0,
+    subsidyRequestedSUSD: 0,
+    subsidyShortfallSUSD: 0,
+    publicEnterpriseSupportSUSD: 0,
   };
 }
 
@@ -223,6 +267,10 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
     "unfinancedRequirementSUSD",
     "constructionSpentSUSD",
     "constructionWrittenOffSUSD",
+    "constructionMaterialsSpentSUSD",
+    "subsidyRequestedSUSD",
+    "subsidyShortfallSUSD",
+    "publicEnterpriseSupportSUSD",
   ] as const) {
     const value = requireFiniteNumber(record[field], `${path}.${field}`);
     if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
@@ -240,6 +288,17 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
   }
   if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
     throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
+  }
+  const subsidyRequested = requireFiniteNumber(
+    record.subsidyRequestedSUSD,
+    `${path}.subsidyRequestedSUSD`,
+  );
+  const subsidyShortfall = requireFiniteNumber(
+    record.subsidyShortfallSUSD,
+    `${path}.subsidyShortfallSUSD`,
+  );
+  if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
   }
   if (record.businessTaxAssessedDay !== null) {
     requireInteger(
@@ -280,6 +339,10 @@ export function assertValidBudgetTotals(
     "unfinancedRequirementSUSD",
     "constructionSpentSUSD",
     "constructionWrittenOffSUSD",
+    "constructionMaterialsSpentSUSD",
+    "subsidyRequestedSUSD",
+    "subsidyShortfallSUSD",
+    "publicEnterpriseSupportSUSD",
   ] as const) {
     const value = requireFiniteNumber(record[field], `${path}.${field}`);
     if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
@@ -297,5 +360,16 @@ export function assertValidBudgetTotals(
   }
   if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
     throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
+  }
+  const subsidyRequested = requireFiniteNumber(
+    record.subsidyRequestedSUSD,
+    `${path}.subsidyRequestedSUSD`,
+  );
+  const subsidyShortfall = requireFiniteNumber(
+    record.subsidyShortfallSUSD,
+    `${path}.subsidyShortfallSUSD`,
+  );
+  if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
   }
 }

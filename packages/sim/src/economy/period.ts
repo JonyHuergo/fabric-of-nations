@@ -92,7 +92,9 @@ export interface GovernmentPeriodTotals {
   readonly welfareExpenseSUSD: MoneySUSD;
   /** M5b interest expense accrued in the period. */
   readonly interestExpenseSUSD: MoneySUSD;
-  /** Tax revenue minus welfare and interest expense for the period. */
+  /** E4 sectoral production-subsidy expense paid in the period. */
+  readonly subsidyExpenseSUSD: MoneySUSD;
+  /** Tax revenue minus welfare, interest, and subsidy expense for the period. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -119,6 +121,7 @@ export function governmentPeriodTotals(
           businessTaxRevenueSUSD: totals.businessTaxRevenueSUSD,
           welfareExpenseSUSD: totals.welfareExpenseSUSD,
           interestExpenseSUSD: totals.interestExpenseSUSD,
+          subsidyExpenseSUSD: totals.subsidyExpenseSUSD,
           netFiscalResultSUSD: totals.netFiscalResultSUSD,
         };
       })
@@ -128,13 +131,19 @@ export function governmentPeriodTotals(
   for (const account of finance.accounts) accounts.set(account.id, account);
   const totals = new Map<
     Id,
-    { tax: number; businessTax: number; welfare: number; interest: number }
+    { tax: number; businessTax: number; welfare: number; interest: number; subsidy: number }
   >();
   for (const account of finance.accounts) {
     if (account.ownerKind === "country" && account.ownerId !== null) {
       totals.set(
         account.ownerId,
-        totals.get(account.ownerId) ?? { tax: 0, businessTax: 0, welfare: 0, interest: 0 },
+        totals.get(account.ownerId) ?? {
+          tax: 0,
+          businessTax: 0,
+          welfare: 0,
+          interest: 0,
+          subsidy: 0,
+        },
       );
     }
   }
@@ -155,16 +164,24 @@ export function governmentPeriodTotals(
       account.subtype !== "income-tax-revenue" &&
       account.subtype !== "business-tax-revenue" &&
       account.subtype !== "welfare-expense" &&
-      account.subtype !== "interest-expense"
+      account.subtype !== "interest-expense" &&
+      account.subtype !== "subsidy-expense"
     ) {
       continue;
     }
     const current =
-      totals.get(account.ownerId) ?? { tax: 0, businessTax: 0, welfare: 0, interest: 0 };
+      totals.get(account.ownerId) ?? {
+        tax: 0,
+        businessTax: 0,
+        welfare: 0,
+        interest: 0,
+        subsidy: 0,
+      };
     if (account.subtype === "income-tax-revenue") current.tax += value;
     else if (account.subtype === "business-tax-revenue") current.businessTax += value;
     else if (account.subtype === "welfare-expense") current.welfare += value;
-    else current.interest += value;
+    else if (account.subtype === "interest-expense") current.interest += value;
+    else current.subsidy += value;
     totals.set(account.ownerId, current);
   }
   return [...totals.entries()]
@@ -174,7 +191,9 @@ export function governmentPeriodTotals(
       businessTaxRevenueSUSD: values.businessTax,
       welfareExpenseSUSD: values.welfare,
       interestExpenseSUSD: values.interest,
-      netFiscalResultSUSD: values.tax + values.businessTax - values.welfare - values.interest,
+      subsidyExpenseSUSD: values.subsidy,
+      netFiscalResultSUSD:
+        values.tax + values.businessTax - values.welfare - values.interest - values.subsidy,
     }))
     .sort((left, right) => left.countryId - right.countryId);
 }
@@ -202,6 +221,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
         businessTaxRevenueSUSD: entry.businessTaxRevenueSUSD,
         welfareExpenseSUSD: entry.welfareExpenseSUSD,
         interestExpenseSUSD: entry.interestExpenseSUSD,
+        subsidyExpenseSUSD: entry.subsidyExpenseSUSD,
         netFiscalResultSUSD: entry.netFiscalResultSUSD,
       };
     }
@@ -716,6 +736,7 @@ function buildAnnualSummary(
       businessTaxRevenueSUSD: number;
       welfareExpenseSUSD: number;
       interestExpenseSUSD: number;
+      subsidyExpenseSUSD: number;
       netFiscalResultSUSD: number;
     }
   > = {};
@@ -726,6 +747,7 @@ function buildAnnualSummary(
       businessTaxRevenueSUSD: 0,
       welfareExpenseSUSD: 0,
       interestExpenseSUSD: 0,
+      subsidyExpenseSUSD: 0,
       netFiscalResultSUSD: 0,
     };
     budgetTotals[country.id] = emptyBudgetTotals();
@@ -748,6 +770,8 @@ function buildAnnualSummary(
         welfareExpenseSUSD: current.welfareExpenseSUSD + countryTotals.welfareExpenseSUSD,
         interestExpenseSUSD:
           current.interestExpenseSUSD + countryTotals.interestExpenseSUSD,
+        subsidyExpenseSUSD:
+          current.subsidyExpenseSUSD + countryTotals.subsidyExpenseSUSD,
         netFiscalResultSUSD: 0,
       };
     }

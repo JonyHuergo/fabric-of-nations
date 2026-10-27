@@ -48,9 +48,9 @@ function cloneWorld(): World {
   return createEconomyWorld(scenario, { seed: 20_261_023 });
 }
 
-describe("M3a schema-19 serialization", () => {
+describe("M3a schema-20 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
-    expect(hashWorld(cloneWorld())).toBe("5769f4b227fbd198");
+    expect(hashWorld(cloneWorld())).toBe("ef813dff8ee70bed");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

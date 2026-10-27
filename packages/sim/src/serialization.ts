@@ -59,6 +59,7 @@ import type {
   FinancialAccountOwnerKind,
   FiscalPolicy,
   FlowTransactionKind,
+  IndustrialPolicy,
   JournalLine,
   JournalPosting,
   Market,
@@ -80,7 +81,7 @@ import {
 } from "./economy/aiState.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
-import { assertValidFiscalPolicy } from "./economy/country.js";
+import { assertValidFiscalPolicy, assertValidIndustrialPolicy } from "./economy/country.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
 import type { PopBlock, Region } from "./population/types.js";
@@ -236,6 +237,10 @@ export type SerializedFinanceBudgetMemo = {
   readonly unfinancedRequirementSUSD: number;
   readonly constructionSpentSUSD: number;
   readonly constructionWrittenOffSUSD: number;
+  readonly constructionMaterialsSpentSUSD: number;
+  readonly subsidyRequestedSUSD: number;
+  readonly subsidyShortfallSUSD: number;
+  readonly publicEnterpriseSupportSUSD: number;
   readonly businessTaxAssessedDay: number | null;
 };
 
@@ -251,6 +256,17 @@ export type SerializedFinanceBudgetTotals = {
   readonly unfinancedRequirementSUSD: number;
   readonly constructionSpentSUSD: number;
   readonly constructionWrittenOffSUSD: number;
+  readonly constructionMaterialsSpentSUSD: number;
+  readonly subsidyRequestedSUSD: number;
+  readonly subsidyShortfallSUSD: number;
+  readonly publicEnterpriseSupportSUSD: number;
+};
+
+/** Encoded E4 construction/commissioning material requirement. */
+export type SerializedConstructionMaterial = {
+  readonly goodId: number;
+  readonly requiredQuantity: number;
+  readonly deliveredQuantity: number;
 };
 
 /** Encoded E3 construction project. */
@@ -268,8 +284,10 @@ export type SerializedConstructionProject = {
   readonly workingCapitalSUSD: number;
   readonly workingCapitalPaidSUSD: number;
   readonly spentSUSD: number;
+  readonly materialsSpentSUSD: number;
+  readonly materials: readonly SerializedConstructionMaterial[];
   readonly lastWorkers: number;
-  readonly blockedReason: "labor" | "funds" | null;
+  readonly blockedReason: "labor" | "funds" | "materials" | null;
   readonly buildingId: number | null;
 };
 
@@ -296,6 +314,7 @@ export type SerializedCountryFiscalTotals = {
   readonly businessTaxRevenueSUSD: number;
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
+  readonly subsidyExpenseSUSD: number;
   readonly netFiscalResultSUSD: number;
 };
 
@@ -448,9 +467,15 @@ export type SerializedCountry = {  readonly id: number;
   readonly regionIds: readonly number[];
   readonly treasuryAccountId: number;
   readonly fiscal: SerializedFiscalPolicy;
+  readonly industrial: SerializedIndustrialPolicy;
   readonly debt: SerializedDebtPolicy;
   readonly ai: SerializedCountryAIState;
   readonly immigrationOpen: boolean;
+};
+
+/** Encoded E4 industrial policy. */
+export type SerializedIndustrialPolicy = {
+  readonly sectorSubsidyRates: readonly number[];
 };
 
 /** Encoded SUSD-relative valuation. */
@@ -730,6 +755,7 @@ function encodeCountryFiscalTotals(
       businessTaxRevenueSUSD: entry.businessTaxRevenueSUSD,
       welfareExpenseSUSD: entry.welfareExpenseSUSD,
       interestExpenseSUSD: entry.interestExpenseSUSD,
+      subsidyExpenseSUSD: entry.subsidyExpenseSUSD,
       netFiscalResultSUSD: entry.netFiscalResultSUSD,
     };
   }
@@ -758,6 +784,10 @@ function encodeBudgetTotals(
       unfinancedRequirementSUSD: entry.unfinancedRequirementSUSD,
       constructionSpentSUSD: entry.constructionSpentSUSD,
       constructionWrittenOffSUSD: entry.constructionWrittenOffSUSD,
+      constructionMaterialsSpentSUSD: entry.constructionMaterialsSpentSUSD,
+      subsidyRequestedSUSD: entry.subsidyRequestedSUSD,
+      subsidyShortfallSUSD: entry.subsidyShortfallSUSD,
+      publicEnterpriseSupportSUSD: entry.publicEnterpriseSupportSUSD,
     };
   }
   return encoded;
@@ -853,6 +883,9 @@ export function encodeWorld(world: World): SerializedWorld {
           lastActionSummary: country.ai.lastActionSummary,
         },
         immigrationOpen: country.immigrationOpen,
+        industrial: {
+          sectorSubsidyRates: [...country.industrial.sectorSubsidyRates],
+        },
       })),
     currencies: [...world.currencies]
       .sort((left, right) => left.id - right.id)
@@ -1050,6 +1083,10 @@ export function encodeWorld(world: World): SerializedWorld {
               unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
               constructionSpentSUSD: memo.constructionSpentSUSD,
               constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
+              constructionMaterialsSpentSUSD: memo.constructionMaterialsSpentSUSD,
+              subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
+              subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
+              publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
               businessTaxAssessedDay: memo.businessTaxAssessedDay,
             },
           ]),
@@ -1079,6 +1116,14 @@ export function encodeWorld(world: World): SerializedWorld {
           workingCapitalSUSD: project.workingCapitalSUSD,
           workingCapitalPaidSUSD: project.workingCapitalPaidSUSD,
           spentSUSD: project.spentSUSD,
+          materialsSpentSUSD: project.materialsSpentSUSD,
+          materials: [...project.materials]
+            .sort((left, right) => left.goodId - right.goodId)
+            .map((material) => ({
+              goodId: material.goodId,
+              requiredQuantity: material.requiredQuantity,
+              deliveredQuantity: material.deliveredQuantity,
+            })),
           lastWorkers: project.lastWorkers,
           blockedReason: project.blockedReason,
           buildingId: project.buildingId,
@@ -1191,6 +1236,14 @@ function decodeFiscalPolicy(value: unknown, path: string): FiscalPolicy {
   }
 }
 
+function decodeIndustrialPolicy(value: unknown, path: string): IndustrialPolicy {
+  try {
+    return assertValidIndustrialPolicy(value, path);
+  } catch (error) {
+    throw new SaveFormatError(`${path} is invalid: ${errorMessage(error)}`);
+  }
+}
+
 function decodeCountryFiscalTotals(
   value: unknown,
   path: string,
@@ -1222,6 +1275,10 @@ function decodeCountryFiscalTotals(
       interestExpenseSUSD: requireFiniteNumber(
         entry.interestExpenseSUSD,
         `${path}[${key}].interestExpenseSUSD`,
+      ),
+      subsidyExpenseSUSD: requireFiniteNumber(
+        entry.subsidyExpenseSUSD,
+        `${path}[${key}].subsidyExpenseSUSD`,
       ),
       netFiscalResultSUSD: requireFiniteNumber(
         entry.netFiscalResultSUSD,
@@ -1288,6 +1345,22 @@ function decodeBudgetTotals(
         entry.constructionWrittenOffSUSD,
         `${path}[${key}].constructionWrittenOffSUSD`,
       ),
+      constructionMaterialsSpentSUSD: requireFiniteNumber(
+        entry.constructionMaterialsSpentSUSD,
+        `${path}[${key}].constructionMaterialsSpentSUSD`,
+      ),
+      subsidyRequestedSUSD: requireFiniteNumber(
+        entry.subsidyRequestedSUSD,
+        `${path}[${key}].subsidyRequestedSUSD`,
+      ),
+      subsidyShortfallSUSD: requireFiniteNumber(
+        entry.subsidyShortfallSUSD,
+        `${path}[${key}].subsidyShortfallSUSD`,
+      ),
+      publicEnterpriseSupportSUSD: requireFiniteNumber(
+        entry.publicEnterpriseSupportSUSD,
+        `${path}[${key}].publicEnterpriseSupportSUSD`,
+      ),
     };
   }
   return totals;
@@ -1332,6 +1405,22 @@ function decodeBudgetMemo(
     constructionWrittenOffSUSD: requireFiniteNumber(
       record.constructionWrittenOffSUSD,
       `${path}.constructionWrittenOffSUSD`,
+    ),
+    constructionMaterialsSpentSUSD: requireFiniteNumber(
+      record.constructionMaterialsSpentSUSD,
+      `${path}.constructionMaterialsSpentSUSD`,
+    ),
+    subsidyRequestedSUSD: requireFiniteNumber(
+      record.subsidyRequestedSUSD,
+      `${path}.subsidyRequestedSUSD`,
+    ),
+    subsidyShortfallSUSD: requireFiniteNumber(
+      record.subsidyShortfallSUSD,
+      `${path}.subsidyShortfallSUSD`,
+    ),
+    publicEnterpriseSupportSUSD: requireFiniteNumber(
+      record.publicEnterpriseSupportSUSD,
+      `${path}.publicEnterpriseSupportSUSD`,
     ),
     businessTaxAssessedDay:
       record.businessTaxAssessedDay === null
@@ -1446,6 +1535,7 @@ function decodeCountry(value: unknown, path: string): Country {
     ),
     treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
     fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
+    industrial: decodeIndustrialPolicy(record.industrial, `${path}.industrial`),
     debt: decodeDebtPolicy(record.debt, `${path}.debt`),
     ai: decodeCountryAIState(record.ai, `${path}.ai`),
     immigrationOpen: record.immigrationOpen,
@@ -2043,7 +2133,12 @@ function decodeConstructionProject(
     throw new SaveFormatError(`${path}.status is invalid`);
   }
   const blockedReason = record.blockedReason;
-  if (blockedReason !== null && blockedReason !== "labor" && blockedReason !== "funds") {
+  if (
+    blockedReason !== null &&
+    blockedReason !== "labor" &&
+    blockedReason !== "funds" &&
+    blockedReason !== "materials"
+  ) {
     throw new SaveFormatError(`${path}.blockedReason is invalid`);
   }
   return {
@@ -2075,6 +2170,32 @@ function decodeConstructionProject(
       `${path}.workingCapitalPaidSUSD`,
     ),
     spentSUSD: requireFiniteNumber(record.spentSUSD, `${path}.spentSUSD`),
+    materialsSpentSUSD: requireFiniteNumber(
+      record.materialsSpentSUSD,
+      `${path}.materialsSpentSUSD`,
+    ),
+    materials: requireArray(record.materials, `${path}.materials`).map(
+      (material, index) => {
+        const entry = requireRecord(
+          material,
+          `${path}.materials[${String(index)}]`,
+        );
+        return {
+          goodId: requireUint32(
+            entry.goodId,
+            `${path}.materials[${String(index)}].goodId`,
+          ),
+          requiredQuantity: requireFiniteNumber(
+            entry.requiredQuantity,
+            `${path}.materials[${String(index)}].requiredQuantity`,
+          ),
+          deliveredQuantity: requireFiniteNumber(
+            entry.deliveredQuantity,
+            `${path}.materials[${String(index)}].deliveredQuantity`,
+          ),
+        };
+      },
+    ),
     lastWorkers: requireInteger(record.lastWorkers, `${path}.lastWorkers`, 0, 0xffff_ffff),
     blockedReason,
     buildingId:

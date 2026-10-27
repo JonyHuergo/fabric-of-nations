@@ -126,7 +126,7 @@ export function ConstructionScreen({
         <StatRow
           label="This month construction outlay"
           value={formatSUSD(country.budgetMonthToDate.constructionSpentSUSD)}
-          detail={`Written off on cancellation ${formatSUSD(country.budgetMonthToDate.constructionWrittenOffSUSD)}; capital spending is not an expense.`}
+          detail={`Materials ${formatSUSD(country.budgetMonthToDate.constructionMaterialsSpentSUSD)} · written off ${formatSUSD(country.budgetMonthToDate.constructionWrittenOffSUSD)}; capital spending is not an expense.`}
         />
         <StatRow
           label="Retained history"
@@ -177,10 +177,10 @@ export function ConstructionScreen({
             <StatRow
               label="Project type"
               value={selectedType.name}
-              detail={`${String(selectedType.constructionWorkers)} maximum crew · ${formatQuantity(selectedType.plannedJobs)} planned jobs at level 1`}
+              detail={`${selectedType.sector} · ${String(selectedType.constructionWorkers)} maximum crew · ${formatQuantity(selectedType.plannedJobs)} planned jobs at level 1`}
             />
             <StatRow
-              label="Construction cost"
+              label="Construction labor budget"
               value={formatSUSD(selectedType.constructionCostSUSD)}
               detail={`Paid as construction wages over time; working-capital target ${formatSUSD(selectedType.workingCapitalSUSD)} (30 days upkeep).`}
             />
@@ -199,8 +199,24 @@ export function ConstructionScreen({
                 <StatRow
                   label="Treasury requirement"
                   value={`${formatSUSD(preview.upfrontRequirementSUSD)} upfront`}
-                  detail={`Treasury ${formatSUSD(preview.treasuryCashSUSD)} · grant ${preview.valid ? "affordable" : "not affordable"}`}
+                  detail={`Materials estimate ${formatSUSD(preview.estimatedMaterialsCostSUSD)} · total investment estimate ${formatSUSD(preview.totalInvestmentSUSD)} · treasury ${formatSUSD(preview.treasuryCashSUSD)} · grant ${preview.valid ? "affordable" : "not affordable"}`}
                 />
+                {preview.materials.length === 0 ? null : (
+                  <View style={styles.materials}>
+                    <Text style={styles.inputLabel}>Materials bought from the regional market</Text>
+                    {preview.materials.map((material) => (
+                      <Text key={material.goodId} style={styles.projectDetail}>
+                        {material.goodName}: {formatQuantity(material.requiredQuantity)}{" "}
+                        {material.unitLabel} · price {formatSUSD(material.unitPriceSUSD)} · market
+                        stock {formatQuantity(material.marketStock)} · estimated{" "}
+                        {formatSUSD(material.estimatedCostSUSD)}
+                        {material.shortfallQuantity > 0
+                          ? ` · short ${formatQuantity(material.shortfallQuantity)}`
+                          : ""}
+                      </Text>
+                    ))}
+                  </View>
+                )}
                 <StatRow
                   label="Crew and duration estimate"
                   value={
@@ -254,15 +270,33 @@ export function ConstructionScreen({
                   <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
                 </View>
                 <Text style={styles.projectDetail}>
-                  {formatRate(project.progress)} · spent {formatSUSD(project.spentSUSD)} of{" "}
-                  {formatSUSD(project.totalCostSUSD)} · remaining{" "}
+                  Labor {formatRate(project.progress)} · materials{" "}
+                  {formatRate(project.materialsProgress)} · spent {formatSUSD(project.spentSUSD)} +{" "}
+                  {formatSUSD(project.materialsSpentSUSD)} materials · remaining{" "}
                   {formatSUSD(project.remainingSUSD)}
                 </Text>
+                {project.materials.length === 0 ? null : (
+                  <Text style={styles.projectDetail}>
+                    Materials:{" "}
+                    {project.materials
+                      .map(
+                        (material) =>
+                          `${material.goodName} ${formatQuantity(material.deliveredQuantity)}/${formatQuantity(material.requiredQuantity)} ${material.unitLabel}`,
+                      )
+                      .join(" · ")}
+                  </Text>
+                )}
                 <Text style={styles.projectDetail}>
                   Workers last day {String(project.lastWorkers)}
                   {project.blockedReason === null
                     ? ""
-                    : ` · waiting for ${project.blockedReason === "funds" ? "treasury funds" : "idle labor"}`}
+                    : ` · waiting for ${
+                        project.blockedReason === "funds"
+                          ? "treasury funds"
+                          : project.blockedReason === "materials"
+                            ? "materials"
+                            : "idle labor"
+                      }`}
                   {project.completedDay === null ? "" : ` · completed day ${String(project.completedDay)}`}
                   {project.cancelledDay === null ? "" : ` · cancelled day ${String(project.cancelledDay)}`}
                   {project.buildingId === null ? "" : ` · building #${String(project.buildingId)}`}
@@ -316,6 +350,7 @@ export function ConstructionScreen({
 const styles = StyleSheet.create({
   empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
   typeList: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.xs, marginTop: spacing.sm },
+  materials: { marginTop: spacing.sm },
   inputLabel: { color: colors.muted, fontSize: 12, marginTop: spacing.sm, marginBottom: spacing.xs },
   error: { color: colors.red, fontSize: 12, marginTop: spacing.sm },
   note: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },

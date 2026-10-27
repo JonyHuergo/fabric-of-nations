@@ -16,9 +16,11 @@ import {
 } from "../validation.js";
 import { M3_DEFERRED_GOOD_KEYS } from "./constants.js";
 import {
+  BUILDING_SECTORS,
   GOOD_CATEGORIES,
   PROFESSION_STRATA,
   type BuildingDef,
+  type BuildingSector,
   type EconomyDefinitions,
   type GoodDef,
   type ProfessionDef,
@@ -234,6 +236,43 @@ function assertBuilding(
     throw new RangeError(`${path}.ownershipAllowed must include private ownership in M3`);
   }
 
+  const sector = record.sector;
+  if (
+    typeof sector !== "string" ||
+    !(BUILDING_SECTORS as readonly string[]).includes(sector)
+  ) {
+    throw new RangeError(`${path}.sector is not a registered building sector`);
+  }
+  const materials = requireArray(record.constructionMaterials, `${path}.constructionMaterials`);
+  const materialGoods = new Set<number>();
+  for (let index = 0; index < materials.length; index += 1) {
+    const item = requireRecord(
+      materials[index],
+      `${path}.constructionMaterials[${String(index)}]`,
+    );
+    const goodId = requireInteger(
+      item.goodId,
+      `${path}.constructionMaterials[${String(index)}].goodId`,
+      0,
+      0xffff_ffff,
+    );
+    if (!goodIds.has(goodId)) {
+      throw new RangeError(
+        `${path}.constructionMaterials[${String(index)}] references unknown good ${String(goodId)}`,
+      );
+    }
+    if (materialGoods.has(goodId)) {
+      throw new RangeError(
+        `${path}.constructionMaterials contains duplicate good ${String(goodId)}`,
+      );
+    }
+    materialGoods.add(goodId);
+    assertPositive(
+      item.quantity,
+      `${path}.constructionMaterials[${String(index)}].quantity`,
+    );
+  }
+
   const building: BuildingDef = {
     id: requireInteger(record.id, `${path}.id`, 0, 0xffff_ffff),
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
@@ -245,6 +284,7 @@ function assertBuilding(
     inputs: inputs as BuildingDef["inputs"],
     outputs: outputs as BuildingDef["outputs"],
     jobs: jobs as BuildingDef["jobs"],
+    sector: sector as BuildingSector,
     constructionCostSUSD: assertNonNegative(
       record.constructionCostSUSD,
       `${path}.constructionCostSUSD`,
@@ -255,6 +295,7 @@ function assertBuilding(
       1,
       1_000_000,
     ),
+    constructionMaterials: materials as BuildingDef["constructionMaterials"],
     dailyUpkeepSUSDAtLevelOne: assertNonNegative(
       record.dailyUpkeepSUSDAtLevelOne,
       `${path}.dailyUpkeepSUSDAtLevelOne`,

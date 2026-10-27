@@ -27,6 +27,7 @@ import {
   copyCurrency,
   copyCurrencyValuation,
   createFiscalPolicy,
+  createIndustrialPolicy,
   fiscalPolicyIsActive,
 } from "./country.js";
 import {
@@ -670,6 +671,10 @@ export function createEconomyWorld(
         regionIds: [...initial.regionIds].sort((left, right) => left - right),
         treasuryAccountId: initial.treasuryAccountId,
         fiscal: createFiscalPolicy(initial.fiscal, `countries[${String(initial.id)}].fiscal`),
+        industrial: createIndustrialPolicy(
+          initial.industrial,
+          `countries[${String(initial.id)}].industrial`,
+        ),
         debt: createDebtPolicy(initial.debt),
         ai: createCountryAIState(initial.id, world.startDayIndex),
         immigrationOpen: initial.immigrationOpen ?? false,
@@ -773,6 +778,7 @@ export function createEconomyWorld(
     allocate("country", country.id, "construction-in-progress");
     allocate("country", country.id, "public-capital");
     allocate("country", country.id, "welfare-expense");
+    allocate("country", country.id, "subsidy-expense");
     opening.push({
       accountId: country.treasuryAccountId,
       balanceSUSD: initial.initialTreasuryCashSUSD,
@@ -817,6 +823,8 @@ export function createEconomyWorld(
       // E2 business-profit tax: the paying building needs an expense account and
       // its taxing country needs a distinct revenue account.
       allocate("building", instance.id, "business-tax-expense");
+      // E4 production subsidy: every enterprise can receive a sector subsidy.
+      allocate("building", instance.id, "subsidy-revenue");
     }
     if (profitDistribution.enabled) {
       allocate("building", instance.id, "retained-profit");

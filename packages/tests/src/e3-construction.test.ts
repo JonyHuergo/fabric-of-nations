@@ -319,7 +319,7 @@ describe("E3 construction progress and completion", () => {
     ).toContain(building.id);
     expect(accountBalance(f.world, "country", COUNTRY, "construction-in-progress")).toBe(0);
     expect(accountBalance(f.world, "country", COUNTRY, "public-capital")).toBeCloseTo(
-      completed.totalCostSUSD,
+      completed.totalCostSUSD + completed.materialsSpentSUSD,
       6,
     );
     expect(accountBalance(f.world, "building", building.id, "operating-cash")).toBeCloseTo(
@@ -355,6 +355,12 @@ describe("E3 construction progress and completion", () => {
     }
     f.world.employment = [];
     f.world.employmentDirty = false;
+    // Ensure the farm's authored construction material can be bought, so this
+    // test isolates the labor constraint from the material constraint.
+    const market = f.world.markets[0]!;
+    const grainLot = market.stockLots.find((lot) => lot.goodId === 0);
+    if (grainLot !== undefined) grainLot.quantity = Math.max(grainLot.quantity, 1_000_000);
+    else market.stockLots.push({ goodId: 0, ownerBuildingId: 0, quantity: 1_000_000 });
     assertValidWorld(f.world);
     const projectId = start(f);
     run(f, 2); // day 0 authorization, day 1 blocked
@@ -419,8 +425,11 @@ describe("E3 cancellation, suspension, and reporting", () => {
     const f = fixture();
     const projectId = start(f);
     run(f, 4);
-    const spent = project(f.world, projectId).spentSUSD;
-    expect(spent).toBeGreaterThan(0);
+    const laborSpent = project(f.world, projectId).spentSUSD;
+    const materialSpent = project(f.world, projectId).materialsSpentSUSD;
+    const spent = laborSpent + materialSpent;
+    expect(laborSpent).toBeGreaterThan(0);
+    expect(materialSpent).toBeGreaterThan(0);
     const equityBefore = accountBalance(f.world, "country", COUNTRY, "owner-equity");
     const wipBefore = accountBalance(f.world, "country", COUNTRY, "construction-in-progress");
     const cashBefore = designatedCashTotal(f.world.finance);
@@ -463,7 +472,11 @@ describe("E3 cancellation, suspension, and reporting", () => {
 
     // The cancelled project never progresses or spends again.
     run(f, 3);
-    expect(project(f.world, projectId).spentSUSD).toBeCloseTo(spent, 9);
+    expect(project(f.world, projectId).spentSUSD).toBeCloseTo(laborSpent, 9);
+    expect(project(f.world, projectId).materialsSpentSUSD).toBeCloseTo(
+      materialSpent,
+      9,
+    );
   });
 
   test("pause suspends hiring and resume continues from the same spend", () => {
@@ -500,7 +513,8 @@ describe("E3 cancellation, suspension, and reporting", () => {
     const monthly = f.world.finance.periodSummaries[0]!;
     const budget = monthly.countryBudgetTotals[COUNTRY]!;
     expect(budget.constructionSpentSUSD).toBeCloseTo(
-      project(f.world, projectId).spentSUSD,
+      project(f.world, projectId).spentSUSD +
+        project(f.world, projectId).materialsSpentSUSD,
       6,
     );
     const fiscal = governmentPeriodTotals(f.world.finance, monthly).find(
@@ -625,6 +639,8 @@ describe("E3 cancellation, suspension, and reporting", () => {
         workingCapitalSUSD: 600,
         workingCapitalPaidSUSD: 0,
         spentSUSD: 0,
+        materialsSpentSUSD: 0,
+        materials: [],
         lastWorkers: 0,
         blockedReason: null,
         buildingId: null,

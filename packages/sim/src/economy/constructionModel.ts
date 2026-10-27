@@ -47,6 +47,34 @@ export function constructionProjectProgress(project: ConstructionProject): numbe
   return progress;
 }
 
+/** Delivered fraction of all required materials in 0..1. */
+export function constructionMaterialsProgress(project: ConstructionProject): number {
+  let required = 0;
+  let delivered = 0;
+  for (const material of project.materials) {
+    required += material.requiredQuantity;
+    delivered += Math.min(material.requiredQuantity, material.deliveredQuantity);
+  }
+  if (required <= 0) return 1;
+  return Math.min(1, Math.max(0, delivered / required));
+}
+
+/** True when every authored material requirement has been delivered. */
+export function constructionMaterialsReady(project: ConstructionProject): boolean {
+  return project.materials.every(
+    (material) =>
+      material.deliveredQuantity >=
+      material.requiredQuantity - toleranceMoney(material.requiredQuantity),
+  );
+}
+
+/** Remaining physical quantity for one project material. */
+export function constructionMaterialRemaining(
+  material: ConstructionProject["materials"][number],
+): number {
+  return Math.max(0, material.requiredQuantity - material.deliveredQuantity);
+}
+
 /** Remaining authorized construction cost, never negative. */
 export function constructionProjectRemaining(project: ConstructionProject): number {
   return Math.max(0, project.totalCostSUSD - project.spentSUSD);
@@ -163,9 +191,37 @@ function requireProjectState(project: ConstructionProject): void {
     ["workingCapitalSUSD", project.workingCapitalSUSD],
     ["workingCapitalPaidSUSD", project.workingCapitalPaidSUSD],
     ["spentSUSD", project.spentSUSD],
+    ["materialsSpentSUSD", project.materialsSpentSUSD],
   ] as const) {
     if (!Number.isFinite(value) || value < 0) {
       throw new RangeError(`${path}.${field} must be finite and non-negative`);
+    }
+  }
+  if (!Array.isArray(project.materials)) {
+    throw new RangeError(`${path}.materials must be an array`);
+  }
+  const materialGoods = new Set<Id>();
+  for (let index = 0; index < project.materials.length; index += 1) {
+    const material = project.materials[index];
+    const materialPath = `${path}.materials[${String(index)}]`;
+    if (material === undefined) throw new RangeError(`${materialPath} is missing`);
+    if (!Number.isInteger(material.goodId) || material.goodId < 0) {
+      throw new RangeError(`${materialPath}.goodId must be a non-negative integer`);
+    }
+    if (materialGoods.has(material.goodId)) {
+      throw new RangeError(`${path}.materials contains duplicate good ${String(material.goodId)}`);
+    }
+    materialGoods.add(material.goodId);
+    if (!Number.isFinite(material.requiredQuantity) || !(material.requiredQuantity > 0)) {
+      throw new RangeError(`${materialPath}.requiredQuantity must be positive and finite`);
+    }
+    if (
+      !Number.isFinite(material.deliveredQuantity) ||
+      material.deliveredQuantity < 0 ||
+      material.deliveredQuantity >
+        material.requiredQuantity + toleranceMoney(material.requiredQuantity)
+    ) {
+      throw new RangeError(`${materialPath}.deliveredQuantity is outside its requirement`);
     }
   }
   if (
@@ -187,7 +243,8 @@ function requireProjectState(project: ConstructionProject): void {
   if (
     project.blockedReason !== null &&
     project.blockedReason !== "labor" &&
-    project.blockedReason !== "funds"
+    project.blockedReason !== "funds" &&
+    project.blockedReason !== "materials"
   ) {
     throw new RangeError(`${path}.blockedReason is invalid`);
   }
@@ -208,6 +265,12 @@ function requireProjectState(project: ConstructionProject): void {
   if (project.status === "authorized") {
     if (project.spentSUSD !== 0 || project.startedDay !== null) {
       throw new RangeError(`${path} authorized project must not have started or spent`);
+    }
+    if (
+      project.materialsSpentSUSD !== 0 ||
+      project.materials.some((material) => material.deliveredQuantity !== 0)
+    ) {
+      throw new RangeError(`${path} authorized project must not have procured materials`);
     }
     if (project.buildingId !== null || project.completedDay !== null) {
       throw new RangeError(`${path} authorized project must not be completed`);
@@ -248,6 +311,9 @@ function requireProjectState(project: ConstructionProject): void {
   } else if (project.status === "completed") {
     if (!nearComplete) {
       throw new RangeError(`${path} completed project must have spent its full cost`);
+    }
+    if (!constructionMaterialsReady(project)) {
+      throw new RangeError(`${path} completed project must have delivered all materials`);
     }
     if (project.buildingId === null || project.completedDay === null) {
       throw new RangeError(`${path} completed project must record its building and day`);
