@@ -20,6 +20,19 @@ export const MAX_PERIOD_SUMMARIES = 1200;
  */
 export const MAX_DETAILED_PERIOD_SUMMARIES = 12;
 
+/**
+ * Maximum annual summaries retained. Derivation: 1900..1999 inclusive = 100
+ * campaign years. The first year may be partial; 2000-01-01 is terminal and is
+ * never closed as a year.
+ */
+export const MAX_ANNUAL_SUMMARIES = 100;
+
+/** Maximum controlled correction records retained for audit. */
+export const MAX_FINANCE_CORRECTIONS = 64;
+
+/** Maximum accepted correction reason length. */
+export const MAX_CORRECTION_REASON_LENGTH = 500;
+
 /** M3 excludes non-storable service output; services are deferred. */
 export const M3_DEFERRED_GOOD_KEYS = ["services"] as const;
 

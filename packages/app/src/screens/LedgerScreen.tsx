@@ -5,6 +5,8 @@ import {
   countryById,
   fiscalResultLabel,
   formatSUSD,
+  latestAnnualReport,
+  recentAnnualReports,
   recentPlayerActions,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -38,6 +40,8 @@ export function LedgerScreen({
   }
   const reports = buildMonthlyReports(country);
   const latest = reports[0] ?? null;
+  const latestAnnual = latestAnnualReport(country);
+  const annualReports = recentAnnualReports(country, 5);
   const netValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
   const actions = recentPlayerActions(actionHistory, 12);
   const actionsInLatestPeriod =
@@ -153,6 +157,103 @@ export function LedgerScreen({
               changes. Older compacted months retain fiscal flows but not account-level
               balances.
             </Notice>
+          </>
+        )}
+      </Section>
+
+      <Section
+        title="Annual accounting"
+        subtitle="Closed calendar-year summaries. Annual flows are sums of that year's monthly closes; year-end balances are separate."
+      >
+        {latestAnnual === null ? (
+          <Text style={styles.empty}>
+            No year-end has closed yet. The first annual report appears after 31 December.
+          </Text>
+        ) : (
+          <>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Year</Text>
+              <Text style={styles.reportValue}>
+                {String(latestAnnual.year)} ·{" "}
+                {latestAnnual.complete ? "complete calendar year" : "partial year"}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Period</Text>
+              <Text style={styles.reportValue}>
+                {latestAnnual.periodStartLabel} → {latestAnnual.periodEndLabel}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Income tax (annual flow)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.incomeTaxSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Welfare expense (annual flow)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.welfareExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Interest expense (annual flow)</Text>
+              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.interestExpenseSUSD)}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Net fiscal result (annual flow)</Text>
+              <Text
+                style={[
+                  styles.reportValue,
+                  latestAnnual.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                ]}
+              >
+                {formatSUSD(latestAnnual.netFiscalResultSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Treasury at year-end (balance)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.treasuryCashEndSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Debt principal liability at year-end</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.debtLiabilityEndSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Interest payable at year-end</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.interestPayableEndSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>
+                Controlled corrections posted in year (world-wide)
+              </Text>
+              <Text style={styles.reportValue}>{String(latestAnnual.correctionCount)}</Text>
+            </View>
+            <Notice title="Annual versus monthly">
+              Annual flows are exact sums of the year's closed monthly summaries; they are not
+              the current month repeated. Year-end balances are closing stocks, not activity.
+              Partial years are labelled and never padded with zero months. Corrections are
+              posted in the current open period and never rewrite a closed monthly or annual
+              summary.
+            </Notice>
+            {annualReports.length > 1 ? (
+              <View style={styles.annualList}>
+                {annualReports.slice(1).map((report) => (
+                  <View key={report.year} style={styles.annualRow}>
+                    <Text style={styles.annualYear}>
+                      {String(report.year)}
+                      {report.complete ? "" : " partial"}
+                    </Text>
+                    <Text style={styles.annualNet}>
+                      Net {formatSUSD(report.netFiscalResultSUSD)} · Treasury{" "}
+                      {formatSUSD(report.treasuryCashEndSUSD)}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
           </>
         )}
       </Section>
@@ -324,4 +425,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   warning: { color: colors.faint, fontSize: 10, marginTop: 4 },
+  annualList: { marginTop: spacing.sm },
+  annualRow: {
+    borderTopColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 5,
+  },
+  annualYear: { color: colors.text, fontSize: 11, fontWeight: "600" },
+  annualNet: { color: colors.muted, fontSize: 10, marginTop: 2, fontVariant: ["tabular-nums"] },
 });

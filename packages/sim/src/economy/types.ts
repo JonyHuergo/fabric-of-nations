@@ -206,11 +206,13 @@ export interface JournalLine {
 }
 
 /**
- * Internal transaction kind available only to the M4b period-close helper. It is
- * cash-neutral by construction, so it belongs to the cash-neutral partition, but
- * the public posting APIs reject it at type and runtime boundaries (D-047).
+ * Internal transaction kinds available only to controlled close/correction
+ * helpers. The public posting APIs reject them at type and runtime boundaries
+ * (D-047, D-072). `correction` may change cash because it can reverse a prior
+ * cash posting; its dedicated API validates the result instead of imposing the
+ * normal cash-neutral rule.
  */
-export const INTERNAL_TRANSACTION_KINDS = ["period-close"] as const;
+export const INTERNAL_TRANSACTION_KINDS = ["period-close", "correction"] as const;
 export type InternalTransactionKind = (typeof INTERNAL_TRANSACTION_KINDS)[number];
 
 /** Transaction kinds that must not change aggregate designated cash. */
@@ -231,7 +233,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "interest-payment",
   "debt-default-writeoff",
   "owner-capital-injection",
-  ...INTERNAL_TRANSACTION_KINDS,
+  "period-close",
 ] as const;
 
 /**
@@ -242,6 +244,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
 export const CASH_CHANGING_TRANSACTION_KINDS = [
   "monetary-issuance",
   "monetary-redemption",
+  "correction",
 ] as const;
 
 export const TRANSACTION_KINDS = [
@@ -343,6 +346,53 @@ export interface FinancePeriodFiscalTotals {
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
+/** Year-end balance-sheet values retained by an annual summary. */
+export interface AnnualClosingBalances {
+  readonly treasuryCashSUSD: MoneySUSD;
+  /** Debt principal liability, excluding accrued interest payable. */
+  readonly debtLiabilitySUSD: MoneySUSD;
+  readonly interestPayableSUSD: MoneySUSD;
+}
+
+/**
+ * Immutable annual finance summary created immediately after the December
+ * monthly close. Flows are exact sums of that year's monthly summaries; balances
+ * are year-end account balances. No account-level trial balance is retained.
+ */
+export interface AnnualFinanceSummary {
+  /** Civil year covered; 1900..1999 for the shipped campaign. */
+  year: number;
+  /** Inclusive first processed day of the year (may be mid-year for a partial first year). */
+  periodStartDay: Day;
+  /** Inclusive last processed day, always 31 December. */
+  periodEndDay: Day;
+  /** True only when the year starts on 1 January in the campaign. */
+  complete: boolean;
+  /** Annual government flows per country. */
+  fiscalTotals: Record<Id, FinancePeriodFiscalTotals>;
+  /** Annual world-wide gross flows for the four M4b flow kinds. */
+  flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
+  /** End-of-year balances per country. */
+  closingBalances: Record<Id, AnnualClosingBalances>;
+  /** Number of controlled correction records posted during the year. */
+  correctionCount: number;
+}
+
+/**
+ * Audited controlled correction/reversal posting. The new posting is the
+ * authoritative accounting effect; monthly and annual summaries are never
+ * rewritten. `lines` duplicates the posting for audit retention after the
+ * bounded posting buffer evicts it.
+ */
+export interface FinanceCorrection {
+  id: number;
+  dayIndex: Day;
+  postingId: number;
+  originalPostingId: number;
+  reason: string;
+  lines: JournalLine[];
+}
+
 export interface FinanceState {
   accounts: FinancialAccount[];
   /** Bounded recent audit buffer; never an unbounded transaction log. */
@@ -357,6 +407,12 @@ export interface FinanceState {
    * rewrites them; long-run finance history lives here, not in `postings`.
    */
   periodSummaries: FinancePeriodSummary[];
+  /** Closed annual periods in ascending year order; bounded to the campaign. */
+  annualSummaries: AnnualFinanceSummary[];
+  /** Bounded controlled corrections, oldest first. */
+  corrections: FinanceCorrection[];
+  /** Deterministic allocator for correction records. */
+  nextCorrectionId: number;
   /**
    * Bounded debt records: all active/arrears contracts plus the most recent
    * terminated contracts. Older terminated records are aggregated in

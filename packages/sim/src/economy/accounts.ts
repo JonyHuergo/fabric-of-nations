@@ -174,7 +174,11 @@ export function categoryAllowsNegativeBalance(category: AccountCategory): boolea
 
 /** True when the transaction kind may change aggregate designated cash. */
 export function transactionKindChangesCash(kind: string): boolean {
-  return kind === "monetary-issuance" || kind === "monetary-redemption";
+  return (
+    kind === "monetary-issuance" ||
+    kind === "monetary-redemption" ||
+    kind === "correction"
+  );
 }
 
 /**
@@ -836,6 +840,12 @@ export function assertSemanticJournalLine(
   side: JournalSide,
   path: string,
 ): void {
+  if (kind === "correction") {
+    // A controlled correction is an audited administrative posting. It may
+    // affect any account category; balance/cash/affordability invariants are
+    // enforced by the correction API and the surrounding finance validation.
+    return;
+  }
   if (account.category !== "revenue" && account.category !== "expense") return;
   if (kind === "period-close") {
     const required: JournalSide = account.category === "revenue" ? "debit" : "credit";
@@ -895,6 +905,27 @@ export function cloneFinanceState(
                   ),
                 }),
           })),
+    annualSummaries: finance.annualSummaries.map((summary) => ({
+      ...summary,
+      fiscalTotals: Object.fromEntries(
+        Object.entries(summary.fiscalTotals).map(([countryId, totals]) => [
+          countryId,
+          { ...totals },
+        ]),
+      ),
+      flowTotalsByKind: { ...summary.flowTotalsByKind },
+      closingBalances: Object.fromEntries(
+        Object.entries(summary.closingBalances).map(([countryId, balances]) => [
+          countryId,
+          { ...balances },
+        ]),
+      ),
+    })),
+    corrections: finance.corrections.map((correction) => ({
+      ...correction,
+      lines: correction.lines.map((line) => ({ ...line })),
+    })),
+    nextCorrectionId: finance.nextCorrectionId,
     debtContracts: finance.debtContracts.map((contract) => ({ ...contract })),
     debtHistory: finance.debtHistory.map((aggregate) => ({ ...aggregate })),
     nextContractId: finance.nextContractId,

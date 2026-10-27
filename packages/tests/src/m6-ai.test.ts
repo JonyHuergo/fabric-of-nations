@@ -350,7 +350,7 @@ describe("M6 country AI and action validation", () => {
       schemaVersion: number;
       payload: { countryAI: { enabled: boolean }; countries: { ai: Record<string, unknown> }[] };
     };
-    expect(payload.schemaVersion).toBe(16);
+    expect(payload.schemaVersion).toBe(17);
     expect(payload.payload.countryAI.enabled).toBe(true);
     expect(payload.payload.countries[0]?.ai).toBeDefined();
     const restored = deserializeWorld(serialized);

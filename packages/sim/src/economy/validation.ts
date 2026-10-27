@@ -7,7 +7,7 @@
  * violations, and period-summary violations are.
  */
 
-import { assertValidDayIndex, dayIndexToCivilDate, daysInMonth } from "../calendar.js";
+import { assertValidDayIndex, civilDateToDayIndex, dayIndexToCivilDate, daysInMonth } from "../calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
 import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 import { workingAgePopulation } from "../population/state.js";
@@ -47,18 +47,23 @@ import {
 } from "./debtPolicy.js";
 import {
   MAX_ACTIVE_DEBT_CONTRACTS,
+  MAX_ANNUAL_SUMMARIES,
   MAX_AUDIT_POSTINGS,
+  MAX_CORRECTION_REASON_LENGTH,
   MAX_DEBT_HISTORY_AGGREGATES,
+  MAX_FINANCE_CORRECTIONS,
   MAX_PERIOD_SUMMARIES,
   MAX_RETAINED_TERMINATED_DEBT_CONTRACTS,
 } from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
+  type AnnualFinanceSummary,
   type BuildingInstance,
   type DebtContract,
   type DebtHistoryAggregate,
   type EmploymentAssignment,
+  type FinanceCorrection,
   type FinancePeriodSummary,
   type FinanceState,
   type FinancialAccount,
@@ -300,10 +305,13 @@ export function assertValidJournalPosting(
         `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
       );
     }
-    if (transactionKindChangesCash(transactionKind)) {
+    if (transactionKind !== "correction" && transactionKindChangesCash(transactionKind)) {
       throw new RangeError(`${path}.transactionKind is not implemented in M4a-1`);
     }
-    if (Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))) {
+    if (
+      transactionKind !== "correction" &&
+      Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))
+    ) {
       throw new RangeError(
         `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
       );
@@ -333,6 +341,209 @@ export function assertValidJournalPosting(
   }
   if (record.targetEntityId !== null) {
     requireInteger(record.targetEntityId, `${path}.targetEntityId`, 0, 0xffff_ffff);
+  }
+}
+
+function assertValidAnnualSummary(
+  summary: AnnualFinanceSummary,
+  finance: FinanceState,
+  path: string,
+): void {
+  const record = requireRecord(summary, path);
+  const year = requireInteger(record.year, `${path}.year`, 1900, 1999);
+  const startDay = requireInteger(
+    record.periodStartDay,
+    `${path}.periodStartDay`,
+    0,
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
+  const endDay = requireInteger(
+    record.periodEndDay,
+    `${path}.periodEndDay`,
+    0,
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
+  if (startDay > endDay) throw new RangeError(`${path}.periodStartDay must not exceed periodEndDay`);
+  const endDate = dayIndexToCivilDate(endDay as Day);
+  const startDate = dayIndexToCivilDate(startDay as Day);
+  if (endDate.year !== year || endDate.month !== 12 || endDate.day !== 31) {
+    throw new RangeError(`${path} must end on 31 December of its year`);
+  }
+  if (startDate.year !== year) {
+    throw new RangeError(`${path}.periodStartDay must belong to the annual year`);
+  }
+  if (typeof record.complete !== "boolean") {
+    throw new RangeError(`${path}.complete must be a boolean`);
+  }
+  const januaryFirst = civilDateToDayIndex(year, 1, 1);
+  if (record.complete !== (startDay === januaryFirst)) {
+    throw new RangeError(`${path}.complete does not match its period start`);
+  }
+
+  const fiscal = requireRecord(record.fiscalTotals, `${path}.fiscalTotals`);
+  for (const key of Object.keys(fiscal)) {
+    const countryId = parseAccountTotalKey(key, `${path}.fiscalTotals`);
+    const totals = requireRecord(fiscal[key], `${path}.fiscalTotals.${key}`);
+    const tax = requireFiniteNumber(
+      totals.incomeTaxRevenueSUSD,
+      `${path}.fiscalTotals.${String(countryId)}.incomeTaxRevenueSUSD`,
+    );
+    const welfare = requireFiniteNumber(
+      totals.welfareExpenseSUSD,
+      `${path}.fiscalTotals.${String(countryId)}.welfareExpenseSUSD`,
+    );
+    const interest = requireFiniteNumber(
+      totals.interestExpenseSUSD,
+      `${path}.fiscalTotals.${String(countryId)}.interestExpenseSUSD`,
+    );
+    const net = requireFiniteNumber(
+      totals.netFiscalResultSUSD,
+      `${path}.fiscalTotals.${String(countryId)}.netFiscalResultSUSD`,
+    );
+    if (tax < 0 || welfare < 0 || interest < 0) {
+      throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
+    }
+    if (Math.abs(net - (tax - welfare - interest)) > toleranceMoney(net, tax, welfare, interest)) {
+      throw new RangeError(`${path}.fiscalTotals.${String(countryId)} net result does not reconcile`);
+    }
+  }
+
+  const flows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
+  for (const kind of FLOW_TRANSACTION_KINDS) {
+    const value = requireFiniteNumber(flows[kind], `${path}.flowTotalsByKind.${kind}`);
+    if (value < 0) throw new RangeError(`${path}.flowTotalsByKind.${kind} must be non-negative`);
+  }
+
+  const balances = requireRecord(record.closingBalances, `${path}.closingBalances`);
+  for (const key of Object.keys(balances)) {
+    const countryId = parseAccountTotalKey(key, `${path}.closingBalances`);
+    const values = requireRecord(balances[key], `${path}.closingBalances.${key}`);
+    for (const field of [
+      "treasuryCashSUSD",
+      "debtLiabilitySUSD",
+      "interestPayableSUSD",
+    ] as const) {
+      const value = requireFiniteNumber(
+        values[field],
+        `${path}.closingBalances.${String(countryId)}.${field}`,
+      );
+      if (value < 0) {
+        throw new RangeError(
+          `${path}.closingBalances.${String(countryId)}.${field} must be non-negative`,
+        );
+      }
+    }
+  }
+  requireInteger(record.correctionCount, `${path}.correctionCount`, 0, 1_000_000);
+  if (finance.annualSummaries.some((entry) => entry !== summary && entry.year === year)) {
+    throw new RangeError(`${path} duplicates annual year ${String(year)}`);
+  }
+}
+
+function assertValidFinanceCorrection(
+  correction: FinanceCorrection,
+  accounts: ReadonlyMap<number, FinancialAccount>,
+  path: string,
+): void {
+  const record = requireRecord(correction, path);
+  requireInteger(record.id, `${path}.id`, 1, Number.MAX_SAFE_INTEGER);
+  requireInteger(record.dayIndex, `${path}.dayIndex`, 0, CAMPAIGN_TERMINAL_DAY_INDEX);
+  requireInteger(record.postingId, `${path}.postingId`, 1, Number.MAX_SAFE_INTEGER);
+  requireInteger(
+    record.originalPostingId,
+    `${path}.originalPostingId`,
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  if (typeof record.reason !== "string") throw new RangeError(`${path}.reason must be a string`);
+  if (record.reason.trim().length === 0 || record.reason.length > MAX_CORRECTION_REASON_LENGTH) {
+    throw new RangeError(`${path}.reason is empty or too long`);
+  }
+  const lines = requireArray(record.lines, `${path}.lines`);
+  if (lines.length === 0) throw new RangeError(`${path}.lines must not be empty`);
+  let debits = 0;
+  let credits = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const linePath = `${path}.lines[${String(index)}]`;
+    const line = requireRecord(lines[index], linePath);
+    const accountId = requireInteger(line.accountId, `${linePath}.accountId`, 0, 0xffff_ffff);
+    if (!accounts.has(accountId)) {
+      throw new RangeError(`${linePath} references unknown account ${String(accountId)}`);
+    }
+    if (line.side !== "debit" && line.side !== "credit") {
+      throw new RangeError(`${linePath}.side must be debit or credit`);
+    }
+    const amount = requireFiniteNumber(line.amountSUSD, `${linePath}.amountSUSD`);
+    if (!(amount > 0)) throw new RangeError(`${linePath}.amountSUSD must be positive`);
+    if (line.side === "debit") debits += amount;
+    else credits += amount;
+  }
+  if (Math.abs(debits - credits) > toleranceMoney(debits, credits)) {
+    throw new RangeError(`${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`);
+  }
+}
+
+function assertValidAnnualState(
+  finance: FinanceState,
+  accounts: ReadonlyMap<number, FinancialAccount>,
+): void {
+  if (finance.annualSummaries.length > MAX_ANNUAL_SUMMARIES) {
+    throw new RangeError(
+      `world.finance.annualSummaries must contain at most ${String(MAX_ANNUAL_SUMMARIES)} entries`,
+    );
+  }
+  let previousEnd: Day | null = null;
+  for (let index = 0; index < finance.annualSummaries.length; index += 1) {
+    const summary = finance.annualSummaries[index];
+    if (summary === undefined) throw new RangeError("annual summary is missing");
+    const path = `world.finance.annualSummaries[${String(index)}]`;
+    assertValidAnnualSummary(summary, finance, path);
+    if (previousEnd !== null && summary.periodStartDay !== previousEnd + 1) {
+      throw new RangeError(`${path} must start immediately after the previous annual close`);
+    }
+    previousEnd = summary.periodEndDay;
+  }
+  if (
+    finance.closedThroughDay !== null &&
+    finance.annualSummaries.length > 0 &&
+    (finance.annualSummaries[finance.annualSummaries.length - 1]?.periodEndDay ?? -1) >
+      finance.closedThroughDay
+  ) {
+    throw new RangeError("annual summaries must not extend beyond the monthly close boundary");
+  }
+
+  if (finance.corrections.length > MAX_FINANCE_CORRECTIONS) {
+    throw new RangeError(
+      `world.finance.corrections must contain at most ${String(MAX_FINANCE_CORRECTIONS)} entries`,
+    );
+  }
+  let previousCorrectionId = 0;
+  for (let index = 0; index < finance.corrections.length; index += 1) {
+    const correction = finance.corrections[index];
+    if (correction === undefined) throw new RangeError("finance correction is missing");
+    const path = `world.finance.corrections[${String(index)}]`;
+    assertValidFinanceCorrection(correction, accounts, path);
+    if (index > 0 && correction.id !== previousCorrectionId + 1) {
+      throw new RangeError(`${path}.id is not the next deterministic correction id`);
+    }
+    previousCorrectionId = correction.id;
+    const posting = finance.postings.find((entry) => entry.id === correction.postingId);
+    if (posting !== undefined) {
+      if (posting.transactionKind !== "correction" || posting.dayIndex !== correction.dayIndex) {
+        throw new RangeError(`${path} does not match its retained correction posting`);
+      }
+    }
+  }
+  const nextCorrectionId = requireInteger(
+    finance.nextCorrectionId,
+    "world.finance.nextCorrectionId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  if (nextCorrectionId <= previousCorrectionId) {
+    throw new RangeError(
+      "world.finance.nextCorrectionId must be greater than every retained correction id",
+    );
   }
 }
 
@@ -494,8 +705,9 @@ export function assertValidFinanceState(finance: FinanceState): void {
     }
   }
 
-  const opening = record.opening as FinanceState["opening"];
-  if (opening === null || opening === undefined) {
+  assertValidAnnualState(finance, accounts);
+
+  const opening = record.opening as FinanceState["opening"];  if (opening === null || opening === undefined) {
     for (const account of accounts.values()) {
       if (account.balanceSUSD !== 0) {
         throw new RangeError(

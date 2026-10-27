@@ -81,7 +81,7 @@ function actionRecord(
 describe("E1 economic clarity", () => {
   test("the snapshot exposes supported production, wage, need, and capacity data", () => {
     const { snapshot } = snapshotAt(0);
-    expect(snapshot.protocolVersion).toBe(3);
+    expect(snapshot.protocolVersion).toBe(4);
     expect(snapshot.needTiers.length).toBeGreaterThan(0);
     expect(snapshot.needTiers.some((tier) => tier.tier === "subsistence")).toBe(true);
     for (const country of snapshot.countries) {
@@ -95,13 +95,13 @@ describe("E1 economic clarity", () => {
         expect(price.dailyProductionCapacity).toBeGreaterThanOrEqual(0);
       }
     }
-    expect(() => parseWorkerEvent({ protocolVersion: 3, type: "READY", snapshot })).not.toThrow();
+    expect(() => parseWorkerEvent({ protocolVersion: 4, type: "READY", snapshot })).not.toThrow();
     const missing = {
       ...snapshot,
       needTiers: undefined,
     } as unknown as SimulationSnapshot;
     expect(() =>
-      parseWorkerEvent({ protocolVersion: 3, type: "READY", snapshot: missing }),
+      parseWorkerEvent({ protocolVersion: 4, type: "READY", snapshot: missing }),
     ).toThrow(/valid snapshot/);
   });
 

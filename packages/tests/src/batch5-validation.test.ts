@@ -50,10 +50,11 @@ import { GRAIN_ID, productionWorld, reservation } from "./fixtures/m3c.js";
 const SEED = 20_261_023;
 
 /**
- * Hash of the eight-polity sample after 22 ticks (seed 20261023), recorded from
- * the pre-Batch-5 implementation. The optimization must not change it.
+ * Hash of the eight-polity sample after 22 ticks (seed 20261023), updated for
+ * schema-17 annual/correction state. The Batch 5 validation optimization must not
+ * change simulation behavior; only the serialized state shape changed.
  */
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "914a75412ed40483";
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "38f87abc312808ca";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

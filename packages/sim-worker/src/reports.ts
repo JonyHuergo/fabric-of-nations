@@ -7,7 +7,7 @@
  * persisted, so current conditions must be shown separately and labelled.
  */
 
-import type { CountrySnapshot, SnapshotFinancePeriod } from "./protocol.js";
+import type { CountrySnapshot, SnapshotAnnualReport, SnapshotFinancePeriod } from "./protocol.js";
 
 export interface MonthlyBalanceChange {
   readonly endSUSD: number;
@@ -73,6 +73,20 @@ export function buildMonthlyReports(country: CountrySnapshot): readonly MonthlyE
     });
   }
   return reports;
+}
+
+/** Latest closed annual report, or null before the first year-end. */
+export function latestAnnualReport(country: CountrySnapshot): SnapshotAnnualReport | null {
+  return country.annualReports[country.annualReports.length - 1] ?? null;
+}
+
+/** Newest-first retained annual reports. */
+export function recentAnnualReports(
+  country: CountrySnapshot,
+  limit = 5,
+): readonly SnapshotAnnualReport[] {
+  if (limit <= 0) return [];
+  return [...country.annualReports].reverse().slice(0, limit);
 }
 
 /** Latest closed monthly report, or null before the first close. */

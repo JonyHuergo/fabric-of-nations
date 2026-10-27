@@ -93,6 +93,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         productionCapacityByGood: [],
         latestFiscal: null,
         financeHistory: [],
+        annualReports: [],
       },
     ],
     regions: [

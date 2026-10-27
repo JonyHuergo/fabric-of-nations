@@ -35,6 +35,7 @@ import { canonicalizeStockLots } from "./economy/inventory.js";
 import type {
   AccountCategory,
   AccountSubtype,
+  AnnualFinanceSummary,
   BuildingInstance,
   Country,
   CountryAIGoalId,
@@ -46,6 +47,7 @@ import type {
   DebtContract,
   DebtPolicy,
   EmploymentAssignment,
+  FinanceCorrection,
   FinancePeriodSummary,
   FinanceState,
   FinancialAccount,
@@ -205,6 +207,9 @@ export type SerializedFinanceState = {
   readonly nextAccountId: number;
   readonly opening: SerializedOpeningBalance | null;
   readonly periodSummaries: readonly SerializedFinancePeriodSummary[];
+  readonly annualSummaries: readonly SerializedAnnualFinanceSummary[];
+  readonly corrections: readonly SerializedFinanceCorrection[];
+  readonly nextCorrectionId: number;
   readonly debtContracts: readonly SerializedDebtContract[];
   readonly debtHistory: readonly SerializedDebtHistoryAggregate[];
   readonly nextContractId: number;
@@ -244,6 +249,51 @@ export type SerializedFinancePeriodSummary = {
       }
     >
   >;
+};
+
+/** Encoded annual finance summary. No account-level trial balance is stored. */
+export type SerializedAnnualFinanceSummary = {
+  readonly year: number;
+  readonly periodStartDay: number;
+  readonly periodEndDay: number;
+  readonly complete: boolean;
+  readonly fiscalTotals: Readonly<
+    Record<
+      string,
+      {
+        readonly incomeTaxRevenueSUSD: number;
+        readonly welfareExpenseSUSD: number;
+        readonly interestExpenseSUSD: number;
+        readonly netFiscalResultSUSD: number;
+      }
+    >
+  >;
+  readonly flowTotalsByKind: Readonly<Record<string, number>>;
+  readonly closingBalances: Readonly<
+    Record<
+      string,
+      {
+        readonly treasuryCashSUSD: number;
+        readonly debtLiabilitySUSD: number;
+        readonly interestPayableSUSD: number;
+      }
+    >
+  >;
+  readonly correctionCount: number;
+};
+
+/** Encoded controlled correction record. */
+export type SerializedFinanceCorrection = {
+  readonly id: number;
+  readonly dayIndex: number;
+  readonly postingId: number;
+  readonly originalPostingId: number;
+  readonly reason: string;
+  readonly lines: readonly {
+    readonly accountId: number;
+    readonly side: "debit" | "credit";
+    readonly amountSUSD: number;
+  }[];
 };
 
 /** Encoded currency issuer. */
@@ -810,6 +860,56 @@ export function encodeWorld(world: World): SerializedWorld {
       periodSummaries: [...world.finance.periodSummaries]
         .sort((left, right) => left.periodEndDay - right.periodEndDay)
         .map(encodePeriodSummary),
+      annualSummaries: [...world.finance.annualSummaries]
+        .sort((left, right) => left.year - right.year)
+        .map((summary) => ({
+          year: summary.year,
+          periodStartDay: summary.periodStartDay,
+          periodEndDay: summary.periodEndDay,
+          complete: summary.complete,
+          fiscalTotals: Object.fromEntries(
+            Object.entries(summary.fiscalTotals)
+              .sort((left, right) => Number(left[0]) - Number(right[0]))
+              .map(([countryId, totals]) => [
+                countryId,
+                {
+                  incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
+                  welfareExpenseSUSD: totals.welfareExpenseSUSD,
+                  interestExpenseSUSD: totals.interestExpenseSUSD,
+                  netFiscalResultSUSD: totals.netFiscalResultSUSD,
+                },
+              ]),
+          ),
+          flowTotalsByKind: { ...summary.flowTotalsByKind },
+          closingBalances: Object.fromEntries(
+            Object.entries(summary.closingBalances)
+              .sort((left, right) => Number(left[0]) - Number(right[0]))
+              .map(([countryId, balances]) => [
+                countryId,
+                {
+                  treasuryCashSUSD: balances.treasuryCashSUSD,
+                  debtLiabilitySUSD: balances.debtLiabilitySUSD,
+                  interestPayableSUSD: balances.interestPayableSUSD,
+                },
+              ]),
+          ),
+          correctionCount: summary.correctionCount,
+        })),
+      corrections: [...world.finance.corrections]
+        .sort((left, right) => left.id - right.id)
+        .map((correction) => ({
+          id: correction.id,
+          dayIndex: correction.dayIndex,
+          postingId: correction.postingId,
+          originalPostingId: correction.originalPostingId,
+          reason: correction.reason,
+          lines: correction.lines.map((line) => ({
+            accountId: line.accountId,
+            side: line.side,
+            amountSUSD: line.amountSUSD,
+          })),
+        })),
+      nextCorrectionId: world.finance.nextCorrectionId,
       debtContracts: [...world.finance.debtContracts]
         .sort((left, right) => left.id - right.id)
         .map((contract) => ({
@@ -1200,6 +1300,122 @@ function decodeOpeningBalance(value: unknown): OpeningBalanceRecord | null {
   };
 }
 
+function decodeAnnualSummary(value: unknown, path: string): AnnualFinanceSummary {
+  const record = requireRecord(value, path);
+  const rawFiscal = requireRecord(record.fiscalTotals, `${path}.fiscalTotals`);
+  const fiscalTotals: AnnualFinanceSummary["fiscalTotals"] = {};
+  for (const key of Object.keys(rawFiscal)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(`${path}.fiscalTotals key ${JSON.stringify(key)} is not canonical`);
+    }
+    const countryId = Number(key);
+    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+      throw new SaveFormatError(`${path}.fiscalTotals key ${JSON.stringify(key)} is out of range`);
+    }
+    const entry = requireRecord(rawFiscal[key], `${path}.fiscalTotals[${key}]`);
+    fiscalTotals[countryId] = {
+      incomeTaxRevenueSUSD: requireFiniteNumber(
+        entry.incomeTaxRevenueSUSD,
+        `${path}.fiscalTotals[${key}].incomeTaxRevenueSUSD`,
+      ),
+      welfareExpenseSUSD: requireFiniteNumber(
+        entry.welfareExpenseSUSD,
+        `${path}.fiscalTotals[${key}].welfareExpenseSUSD`,
+      ),
+      interestExpenseSUSD: requireFiniteNumber(
+        entry.interestExpenseSUSD,
+        `${path}.fiscalTotals[${key}].interestExpenseSUSD`,
+      ),
+      netFiscalResultSUSD: requireFiniteNumber(
+        entry.netFiscalResultSUSD,
+        `${path}.fiscalTotals[${key}].netFiscalResultSUSD`,
+      ),
+    };
+  }
+  const rawFlows = requireRecord(record.flowTotalsByKind, `${path}.flowTotalsByKind`);
+  const flowTotalsByKind = {} as Record<FlowTransactionKind, number>;
+  for (const kind of FLOW_TRANSACTION_KINDS) {
+    flowTotalsByKind[kind] = requireFiniteNumber(
+      rawFlows[kind],
+      `${path}.flowTotalsByKind.${kind}`,
+    );
+  }
+  const rawBalances = requireRecord(record.closingBalances, `${path}.closingBalances`);
+  const closingBalances: AnnualFinanceSummary["closingBalances"] = {};
+  for (const key of Object.keys(rawBalances)) {
+    if (!/^(0|[1-9][0-9]*)$/.test(key)) {
+      throw new SaveFormatError(`${path}.closingBalances key ${JSON.stringify(key)} is not canonical`);
+    }
+    const countryId = Number(key);
+    if (!Number.isSafeInteger(countryId) || countryId < 0 || countryId > 0xffff_ffff) {
+      throw new SaveFormatError(`${path}.closingBalances key ${JSON.stringify(key)} is out of range`);
+    }
+    const entry = requireRecord(rawBalances[key], `${path}.closingBalances[${key}]`);
+    closingBalances[countryId] = {
+      treasuryCashSUSD: requireFiniteNumber(
+        entry.treasuryCashSUSD,
+        `${path}.closingBalances[${key}].treasuryCashSUSD`,
+      ),
+      debtLiabilitySUSD: requireFiniteNumber(
+        entry.debtLiabilitySUSD,
+        `${path}.closingBalances[${key}].debtLiabilitySUSD`,
+      ),
+      interestPayableSUSD: requireFiniteNumber(
+        entry.interestPayableSUSD,
+        `${path}.closingBalances[${key}].interestPayableSUSD`,
+      ),
+    };
+  }
+  if (typeof record.complete !== "boolean") {
+    throw new SaveFormatError(`${path}.complete must be a boolean`);
+  }
+  return {
+    year: requireInteger(record.year, `${path}.year`, 1900, 1999),
+    periodStartDay: requireInteger(
+      record.periodStartDay,
+      `${path}.periodStartDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    periodEndDay: requireInteger(
+      record.periodEndDay,
+      `${path}.periodEndDay`,
+      0,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    ),
+    complete: record.complete,
+    fiscalTotals,
+    flowTotalsByKind,
+    closingBalances,
+    correctionCount: requireInteger(
+      record.correctionCount,
+      `${path}.correctionCount`,
+      0,
+      1_000_000,
+    ),
+  };
+}
+
+function decodeFinanceCorrection(value: unknown, path: string): FinanceCorrection {
+  const record = requireRecord(value, path);
+  const rawLines = requireArray(record.lines, `${path}.lines`);
+  return {
+    id: requireInteger(record.id, `${path}.id`, 1, Number.MAX_SAFE_INTEGER),
+    dayIndex: requireInteger(record.dayIndex, `${path}.dayIndex`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    postingId: requireInteger(record.postingId, `${path}.postingId`, 1, Number.MAX_SAFE_INTEGER),
+    originalPostingId: requireInteger(
+      record.originalPostingId,
+      `${path}.originalPostingId`,
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    reason: requireString(record.reason, `${path}.reason`, { minLength: 1, maxLength: 500 }),
+    lines: rawLines.map((line, index) =>
+      decodeJournalLine(line, `${path}.lines[${String(index)}]`),
+    ),
+  };
+}
+
 function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary {
   const record = requireRecord(value, path);
   const rawTotals = requireRecord(record.accountTotals, `${path}.accountTotals`);
@@ -1325,6 +1541,14 @@ function decodeFinanceState(value: unknown): FinanceState {
     record.periodSummaries,
     "save payload.finance.periodSummaries",
   );
+  const annualSummaries = requireArray(
+    record.annualSummaries,
+    "save payload.finance.annualSummaries",
+  );
+  const corrections = requireArray(
+    record.corrections,
+    "save payload.finance.corrections",
+  );
   const rawClosed = record.closedThroughDay;
   const contracts = requireArray(
     record.debtContracts,
@@ -1381,6 +1605,24 @@ function decodeFinanceState(value: unknown): FinanceState {
         summary,
         `save payload.finance.periodSummaries[${String(index)}]`,
       ),
+    ),
+    annualSummaries: annualSummaries.map((summary, index) =>
+      decodeAnnualSummary(
+        summary,
+        `save payload.finance.annualSummaries[${String(index)}]`,
+      ),
+    ),
+    corrections: corrections.map((correction, index) =>
+      decodeFinanceCorrection(
+        correction,
+        `save payload.finance.corrections[${String(index)}]`,
+      ),
+    ),
+    nextCorrectionId: requireInteger(
+      record.nextCorrectionId,
+      "save payload.finance.nextCorrectionId",
+      1,
+      Number.MAX_SAFE_INTEGER,
     ),
     debtContracts: contracts.map((contract, index) =>
       decodeDebtContract(

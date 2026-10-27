@@ -49,6 +49,8 @@ describe("E1 UI wiring", () => {
     expect(ledger).toContain("buildMonthlyReports");
     expect(ledger).toContain("Monthly economic report");
     expect(ledger).toContain("A closing balance is not a period flow");
+    expect(ledger).toContain("Annual accounting");
+    expect(ledger).toContain("Annual flows are exact sums");
     expect(ledger).toContain("Confirmed player actions");
     expect(ledger).toContain("Session-only; cleared on load or worker restart");
   });

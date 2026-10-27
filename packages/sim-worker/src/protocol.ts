@@ -6,11 +6,12 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 3 as const;
+export const PROTOCOL_VERSION = 4 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
 export const MAX_SNAPSHOT_LEDGER_MONTHS = 12;
+export const MAX_SNAPSHOT_ANNUAL_REPORTS = 12;
 
 /** Discrete speed choices exposed by the M7 UI, in simulated days per second. */
 export const SPEED_VALUES = [1, 2, 5, 10] as const;
@@ -125,6 +126,23 @@ export interface SnapshotFinancePeriod extends SnapshotFiscalTotals {
   readonly householdCashEndSUSD: number | null;
 }
 
+export interface SnapshotAnnualReport {
+  readonly year: number;
+  readonly periodStartDay: number;
+  readonly periodEndDay: number;
+  readonly periodStartLabel: string;
+  readonly periodEndLabel: string;
+  readonly complete: boolean;
+  readonly incomeTaxSUSD: number;
+  readonly welfareExpenseSUSD: number;
+  readonly interestExpenseSUSD: number;
+  readonly netFiscalResultSUSD: number;
+  readonly treasuryCashEndSUSD: number;
+  readonly debtLiabilityEndSUSD: number;
+  readonly interestPayableEndSUSD: number;
+  readonly correctionCount: number;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
@@ -157,6 +175,8 @@ export interface CountrySnapshot {
   readonly productionCapacityByGood: readonly SnapshotProductionCapacity[];
   readonly latestFiscal: SnapshotFiscalTotals | null;
   readonly financeHistory: readonly SnapshotFinancePeriod[];
+  /** Most recent closed annual reports; older annual summaries remain persisted. */
+  readonly annualReports: readonly SnapshotAnnualReport[];
 }
 
 export interface RegionSnapshot {
@@ -541,6 +561,26 @@ function isNeedTier(value: unknown): value is SnapshotNeedTier {
   );
 }
 
+function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.year, 1900, 1999) &&
+    isIntegerIn(value.periodStartDay, 0, 36_524) &&
+    isIntegerIn(value.periodEndDay, 0, 36_524) &&
+    isString(value.periodStartLabel, 10) &&
+    isString(value.periodEndLabel, 10) &&
+    typeof value.complete === "boolean" &&
+    isFiniteNumber(value.incomeTaxSUSD) &&
+    isFiniteNumber(value.welfareExpenseSUSD) &&
+    isFiniteNumber(value.interestExpenseSUSD) &&
+    isFiniteNumber(value.netFiscalResultSUSD) &&
+    isFiniteNumber(value.treasuryCashEndSUSD) &&
+    isFiniteNumber(value.debtLiabilityEndSUSD) &&
+    isFiniteNumber(value.interestPayableEndSUSD) &&
+    isIntegerIn(value.correctionCount, 0, 1_000_000)
+  );
+}
+
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
@@ -569,7 +609,9 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!value.productionCapacityByGood.every(isProductionCapacity)) return false;
   if (value.latestFiscal !== null && !isFiscalTotals(value.latestFiscal)) return false;
   if (!Array.isArray(value.financeHistory)) return false;
-  return value.financeHistory.every((period) => isFinancePeriod(period));
+  if (!value.financeHistory.every((period) => isFinancePeriod(period))) return false;
+  if (!Array.isArray(value.annualReports)) return false;
+  return value.annualReports.every((report) => isAnnualReport(report));
 }
 
 function isRegionSnapshot(value: unknown): value is RegionSnapshot {

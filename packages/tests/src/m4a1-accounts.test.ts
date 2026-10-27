@@ -2,6 +2,7 @@ import {
   CASH_CHANGING_TRANSACTION_KINDS,
   CASH_NEUTRAL_TRANSACTION_KINDS,
   CASH_SUBTYPES,
+  PUBLIC_TRANSACTION_KINDS,
   TRANSACTION_KINDS,
   accountingTotals,
   applyOpeningBalances,
@@ -93,6 +94,9 @@ function manualFinance(
     nextAccountId: entries.reduce((max, entry) => Math.max(max, entry.id), 0) + 1,
     opening: null,
     periodSummaries: [],
+    annualSummaries: [],
+    corrections: [],
+    nextCorrectionId: 1,
     debtContracts: [],
     debtHistory: [],
     nextContractId: 1,
@@ -287,8 +291,13 @@ describe("M4a-1 invariants", () => {
       expect(transactionKindChangesCash(kind)).toBe(changing.has(kind));
     }
     for (const kind of CASH_CHANGING_TRANSACTION_KINDS) {
-      expect(kind === "monetary-issuance" || kind === "monetary-redemption").toBe(true);
+      expect(
+        kind === "monetary-issuance" ||
+          kind === "monetary-redemption" ||
+          kind === "correction",
+      ).toBe(true);
     }
+    expect(PUBLIC_TRANSACTION_KINDS).not.toContain("correction");
   });
 
   test("the designated cash set is explicit and never every asset account", () => {

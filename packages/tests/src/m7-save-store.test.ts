@@ -13,7 +13,7 @@ import {
 } from "@century/sim-worker/persistence";
 
 const SEED = 20_261_023;
-const SCHEMA = 16;
+const SCHEMA = 17;
 
 class MemoryBackend implements SaveStorageBackend {
   public readonly values = new Map<string, string>();

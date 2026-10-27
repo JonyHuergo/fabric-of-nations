@@ -25,6 +25,7 @@ import type {
 } from "@century/sim";
 
 import {
+  MAX_SNAPSHOT_ANNUAL_REPORTS,
   MAX_SNAPSHOT_LEDGER_MONTHS,
   PROTOCOL_VERSION,
   type CountrySnapshot,
@@ -36,6 +37,7 @@ import {
   type SnapshotFiscalTotals,
   type SnapshotNeedTier,
   type SnapshotProductionCapacity,
+  type SnapshotAnnualReport,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -233,6 +235,34 @@ function financeHistory(
   return history;
 }
 
+function annualReportSnapshots(
+  world: World,
+  countryId: number,
+): readonly SnapshotAnnualReport[] {
+  return world.finance.annualSummaries
+    .slice(-MAX_SNAPSHOT_ANNUAL_REPORTS)
+    .map((summary) => {
+      const totals = summary.fiscalTotals[countryId];
+      const balances = summary.closingBalances[countryId];
+      return {
+        year: summary.year,
+        periodStartDay: summary.periodStartDay,
+        periodEndDay: summary.periodEndDay,
+        periodStartLabel: dayLabel(summary.periodStartDay),
+        periodEndLabel: dayLabel(summary.periodEndDay),
+        complete: summary.complete,
+        incomeTaxSUSD: roundDisplay(totals?.incomeTaxRevenueSUSD ?? 0, 6),
+        welfareExpenseSUSD: roundDisplay(totals?.welfareExpenseSUSD ?? 0, 6),
+        interestExpenseSUSD: roundDisplay(totals?.interestExpenseSUSD ?? 0, 6),
+        netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
+        treasuryCashEndSUSD: roundDisplay(balances?.treasuryCashSUSD ?? 0, 6),
+        debtLiabilityEndSUSD: roundDisplay(balances?.debtLiabilitySUSD ?? 0, 6),
+        interestPayableEndSUSD: roundDisplay(balances?.interestPayableSUSD ?? 0, 6),
+        correctionCount: summary.correctionCount,
+      };
+    });
+}
+
 function countrySnapshot(
   world: World,
   country: World["countries"][number],
@@ -326,6 +356,7 @@ function countrySnapshot(
     productionCapacityByGood: productionCapacitySnapshots(definitions, capacity),
     latestFiscal,
     financeHistory: history,
+    annualReports: annualReportSnapshots(world, country.id),
   };
 }
 
@@ -409,6 +440,8 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
       Object.freeze(period);
     }
     Object.freeze(country.financeHistory);
+    for (const report of country.annualReports) Object.freeze(report);
+    Object.freeze(country.annualReports);
     Object.freeze(country);
   }
   for (const region of snapshot.regions) Object.freeze(region);

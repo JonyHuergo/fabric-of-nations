@@ -96,14 +96,14 @@ function assertTransactionKind(value: unknown): asserts value is TransactionKind
 
 /**
  * Runtime half of the public/internal transaction-kind boundary. The public
- * posting signatures already exclude `period-close` at the type level; this
- * rejects a cast or untyped caller before any validation or mutation.
+ * posting signatures exclude internal kinds at the type level; this rejects a
+ * cast or untyped caller before any validation or mutation.
  */
 function assertPublicTransactionKind(value: unknown): asserts value is PublicTransactionKind {
   assertTransactionKind(value);
   if (isInternalTransactionKind(value)) {
     throw new RangeError(
-      `transactionKind ${JSON.stringify(value)} is internal to the period-close helper and cannot be posted through the public posting API`,
+      `transactionKind ${JSON.stringify(value)} is internal to the period-close helper (and the controlled correction helper) and cannot be posted through the public posting API`,
     );
   }
 }
@@ -230,6 +230,50 @@ export function postJournalEntry(
     id: nextId,
     dayIndex,
     transactionKind,
+    lines: lines.map((line) => ({ ...line })),
+    sourceEntityId,
+    targetEntityId,
+  };
+  finance.postings.push(posting);
+  finance.nextPostingId = nextId + 1;
+  if (finance.postings.length > MAX_AUDIT_POSTINGS) {
+    finance.postings.splice(0, finance.postings.length - MAX_AUDIT_POSTINGS);
+  }
+  return posting;
+}
+
+/**
+ * Apply a controlled correction posting. This is deliberately not a public
+ * transaction kind: only `postFinanceCorrection` can call it. The correction is
+ * balanced and affordability-checked, but may change designated cash because it
+ * can reverse a prior cash-bearing posting.
+ */
+export function postCorrectionEntry(
+  finance: FinanceState,
+  dayIndex: Day,
+  lines: readonly JournalLine[],
+  sourceEntityId: Id | null = null,
+  targetEntityId: Id | null = null,
+): JournalPosting {
+  assertValidDayIndex(dayIndex);
+  const nextId = requireInteger(
+    finance.nextPostingId,
+    "finance.nextPostingId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  const accounts = accountMap(finance);
+  const validated = validatePostingLines(lines, accounts, "correction");
+  assertBalanceConstraints(accounts, validated.deltas);
+  for (const [accountId, delta] of validated.deltas) {
+    const account = accounts.get(accountId);
+    if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
+    account.balanceSUSD += delta;
+  }
+  const posting: JournalPosting = {
+    id: nextId,
+    dayIndex,
+    transactionKind: "correction",
     lines: lines.map((line) => ({ ...line })),
     sourceEntityId,
     targetEntityId,

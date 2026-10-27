@@ -26,6 +26,7 @@
 
 import {
   assertValidDayIndex,
+  civilDateToDayIndex,
   dayIndexToCivilDate,
   daysInMonth,
   isTerminalDayIndex,
@@ -43,11 +44,14 @@ import {
   FLOW_EXPENSE_SUBTYPE,
 } from "./accounts.js";
 import {
+  MAX_ANNUAL_SUMMARIES,
   MAX_AUDIT_POSTINGS,
   MAX_DETAILED_PERIOD_SUMMARIES,
 } from "./constants.js";
 import {
   FLOW_TRANSACTION_KINDS,
+  type AnnualClosingBalances,
+  type AnnualFinanceSummary,
   type FinancePeriodFiscalTotals,
   type FinancePeriodSummary,
   type FinanceState,
@@ -606,6 +610,138 @@ function postPeriodCloseEntries(
 }
 
 /**
+ * Build the immutable annual summary immediately after the December monthly
+ * close. The monthly close has already zeroed revenue/expense into owner equity,
+ * so the annual close adds no second closing entry and cannot double-count a
+ * monthly flow. Annual flows are exact sums of that year's monthly summaries;
+ * annual balances are scanned from the post-close account registry.
+ */
+function buildAnnualSummary(
+  finance: FinanceState,
+  world: World,
+  endDay: Day,
+): AnnualFinanceSummary {
+  const date = dayIndexToCivilDate(endDay);
+  const year = date.year;
+  if (date.month !== 12 || date.day !== 31) {
+    throw new RangeError("annual summary requires 31 December");
+  }
+  if (finance.annualSummaries.some((summary) => summary.year === year)) {
+    throw new RangeError(`annual summary for ${String(year)} already exists`);
+  }
+  if (finance.annualSummaries.length >= MAX_ANNUAL_SUMMARIES) {
+    throw new RangeError(
+      `annual summaries are limited to ${String(MAX_ANNUAL_SUMMARIES)} entries`,
+    );
+  }
+  const summaries = finance.periodSummaries.filter(
+    (summary) => dayIndexToCivilDate(summary.periodEndDay).year === year,
+  );
+  if (summaries.length === 0) {
+    throw new RangeError(`no monthly summaries exist for annual period ${String(year)}`);
+  }
+  const last = summaries[summaries.length - 1];
+  if (last === undefined || last.periodEndDay !== endDay) {
+    throw new RangeError("annual summary requires the current December monthly close");
+  }
+  // The December monthly close is the year-end closing entry. It must have
+  // zeroed every revenue/expense account before an annual summary can exist.
+  for (const account of finance.accounts) {
+    if (account.category !== "revenue" && account.category !== "expense") continue;
+    if (Math.abs(account.balanceSUSD) > toleranceMoney(account.balanceSUSD)) {
+      throw new RangeError(
+        `year-end account ${String(account.id)} retains a nonzero revenue/expense balance`,
+      );
+    }
+  }
+
+  const fiscalTotals: Record<
+    Id,
+    {
+      incomeTaxRevenueSUSD: number;
+      welfareExpenseSUSD: number;
+      interestExpenseSUSD: number;
+      netFiscalResultSUSD: number;
+    }
+  > = {};
+  for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+    fiscalTotals[country.id] = {
+      incomeTaxRevenueSUSD: 0,
+      welfareExpenseSUSD: 0,
+      interestExpenseSUSD: 0,
+      netFiscalResultSUSD: 0,
+    };
+  }
+  const flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD> = {
+    "goods-purchase": 0,
+    "input-purchase": 0,
+    wages: 0,
+    upkeep: 0,
+  };
+  for (const summary of summaries) {
+    for (const countryTotals of governmentPeriodTotals(finance, summary)) {
+      const current = fiscalTotals[countryTotals.countryId];
+      if (current === undefined) continue;
+      fiscalTotals[countryTotals.countryId] = {
+        incomeTaxRevenueSUSD:
+          current.incomeTaxRevenueSUSD + countryTotals.incomeTaxRevenueSUSD,
+        welfareExpenseSUSD: current.welfareExpenseSUSD + countryTotals.welfareExpenseSUSD,
+        interestExpenseSUSD:
+          current.interestExpenseSUSD + countryTotals.interestExpenseSUSD,
+        netFiscalResultSUSD: 0,
+      };
+    }
+    for (const kind of FLOW_TRANSACTION_KINDS) {
+      flowTotalsByKind[kind] += summary.flowTotalsByKind[kind];
+    }
+  }
+  for (const totals of Object.values(fiscalTotals)) {
+    totals.netFiscalResultSUSD =
+      totals.incomeTaxRevenueSUSD - totals.welfareExpenseSUSD - totals.interestExpenseSUSD;
+  }
+
+  const closingBalances: Record<Id, AnnualClosingBalances> = {};
+  for (const country of world.countries) {
+    closingBalances[country.id] = {
+      treasuryCashSUSD: 0,
+      debtLiabilitySUSD: 0,
+      interestPayableSUSD: 0,
+    };
+  }
+  for (const account of finance.accounts) {
+    if (account.ownerKind !== "country" || account.ownerId === null) continue;
+    const balances = closingBalances[account.ownerId];
+    if (balances === undefined) continue;
+    let treasury = balances.treasuryCashSUSD;
+    let debt = balances.debtLiabilitySUSD;
+    let interest = balances.interestPayableSUSD;
+    if (account.subtype === "treasury-cash") treasury += account.balanceSUSD;
+    else if (account.subtype === "debt-liability") debt += account.balanceSUSD;
+    else if (account.subtype === "interest-payable") interest += account.balanceSUSD;
+    closingBalances[account.ownerId] = {
+      treasuryCashSUSD: treasury,
+      debtLiabilitySUSD: debt,
+      interestPayableSUSD: interest,
+    };
+  }
+
+  const correctionCount = finance.corrections.filter(
+    (correction) => dayIndexToCivilDate(correction.dayIndex).year === year,
+  ).length;
+  const periodStartDay = summaries[0]?.periodStartDay ?? endDay;
+  return {
+    year,
+    periodStartDay,
+    periodEndDay: endDay,
+    complete: periodStartDay === civilDateToDayIndex(year, 1, 1),
+    fiscalTotals,
+    flowTotalsByKind,
+    closingBalances,
+    correctionCount,
+  };
+}
+
+/**
  * Close the current month on a staged world.
  *
  * Inputs: an authoritative world whose `dayIndex` is a civil month-end.
@@ -639,6 +775,9 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
   // is not a liability and starts a new month at zero.
   staged.welfareRequestedThisMonth = {};
   compactFinanceHistory(staged);
+  if (dayIndexToCivilDate(world.dayIndex).month === 12) {
+    staged.annualSummaries.push(buildAnnualSummary(staged, world, world.dayIndex));
+  }
 
   assertOwnerEquityInvariant(staged);
   assertValidFinanceState(staged);

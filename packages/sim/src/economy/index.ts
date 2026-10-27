@@ -31,6 +31,11 @@ export {
   type GovernmentPeriodTotals,
 } from "./period.js";
 export {
+  postFinanceCorrection,
+  type FinanceCorrectionRequest,
+  type FinanceCorrectionResult,
+} from "./corrections.js";
+export {
   assertValidProfitDistributionPolicy,
   createProfitDistributionPolicy,
   runProfitDistributionPhase,
