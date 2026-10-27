@@ -2325,7 +2325,8 @@ configuration and its behavior. Storing it in the world also prevents a client
 from silently declaring a different player country after load. The field is
 nullable so legacy fixtures retain their prior all-AI behavior.
 
-**Consequences.** `WORLD_SCHEMA_VERSION` 14, `SIM_VERSION` 0.14.0. Saves from
+**Consequences.** At the Batch 1 baseline `WORLD_SCHEMA_VERSION` was 14 and
+`SIM_VERSION` 0.14.0; D-065 later raises them to 15 / 0.15.0. Saves from
 schema 13 / sim 0.13.0 / data `m3-economy-v1` are intentionally rejected. The AI
 loses one of eight sample evaluations; AI-controlled countries are unchanged. The
 UI restriction is a presentation guard; the authoritative exclusion is in the
@@ -2418,6 +2419,93 @@ reliability beyond the supervised process, and general performance optimization
 remain out of this batch. The 36,524-tick campaign, stress/soak runs, native
 release builds, and on-device measurements were not run.
 
+## D-065 — Save-size compaction, replace-safe storage, and campaign recovery
+
+**Status:** implemented in Batch 3. **Material trade-off:** account-level monthly
+trial balances older than 12 months are no longer persisted.
+
+**Measured root cause.** A representative worst-case fixture built from the current
+scenario (1,210 accounts, 863 nonzero account totals per month, 1,200 monthly
+summaries, 256 postings) serialized to **23.25 MiB** canonical and only
+**323.8 KiB** compressed. The repeated pre-close trial balance in
+`FinanceState.periodSummaries[].accountTotals` accounted for almost all of it:
+the same fixture with only 12 summaries was **604.2 KiB** canonical. Compression
+alone therefore cannot satisfy a target defined for the canonical save, and the
+early-save compression ratio does not predict late-game compression.
+
+**Target interpretation.** The GDD 4 MiB target is defined against the **canonical
+uncompressed save string**. Compressed/base64, storage-key, and native-bridge
+payload sizes are separate measurements and are not used to claim the target
+through compression.
+
+**Decision.** At each close, after appending the new summary, compact every
+summary older than the most recent **12** (`MAX_DETAILED_PERIOD_SUMMARIES`).
+A compacted summary retains:
+
+- `periodStartDay` and `periodEndDay` for all 1,200 campaign months;
+- the four exact `flowTotalsByKind` values;
+- exact per-country `incomeTaxRevenueSUSD`, `welfareExpenseSUSD`,
+  `interestExpenseSUSD`, and `netFiscalResultSUSD` values computed from the
+  pre-close trial balance;
+- `accountTotals` becomes empty.
+
+The most recent 12 summaries retain the full account trial balance, matching the
+12-month Ledger snapshot window. No simulation decision reads a historical
+`accountTotals`; the profit-allocation phase uses the newly closed full summary,
+and fiscal history/reporting use exact country totals. No values are rounded.
+This is a deterministic state transformation, so save/load hashes and future
+continuation remain equal.
+
+**Measured result on the same 1,200-summary fixture.** 23.25 MiB → **2.04 MiB**
+canonical; 105.5 KiB in the synthetic repeated-value compressed representation.
+The fixture's repeated values compress more favorably than a real century, so the
+compressed figure is illustrative only; the canonical 2.04 MiB is the target
+evidence. The fixture is bounded and uses the current schema/account counts; the
+36,524-tick campaign was not rerun.
+
+**Trade-off.** Historical monthly pages older than 12 months cannot show
+account-level trial balances. They preserve exact government fiscal totals, gross
+flows, dates, and the 1,200-month timeline. Restoring full account-level century
+history would exceed 4 MiB; the GDD's “detail needed by the Ledger UI” is the
+12-month window. This is recorded rather than hidden behind compression.
+
+**Storage decision.** `SaveStore` (in `@century/sim-worker/persistence`) uses a
+staging key, verifies the staged bytes, preserves the old readable primary under a
+previous key, writes the primary, verifies it, and only then removes staging.
+Startup candidate order is primary → staging → previous, so:
+- a failed staging/primary write leaves the previous valid primary readable;
+- an interrupted swap can recover a fully verified staging copy;
+- a corrupt primary falls back to the previous valid save;
+- incompatible schema/format candidates are rejected, not reinterpreted.
+AsyncStorage cannot provide a true cross-key transaction; the window is documented
+and the staging/previous keys make it recoverable. Storage failures are surfaced
+to the player; a failed save never reports success.
+
+**Campaign lifecycle.** On startup the app reads only envelope metadata and shows
+**Continue** or **New Game** with the saved date, scenario, sim/schema version, and
+canonical/stored size. Continue loads the saved campaign; New Game starts a fresh
+world but preserves the old save. Starting a new game over an existing save
+disables autosave until an explicit save, which asks for overwrite confirmation.
+Pausing or backgrounding requests one debounced autosave (500 ms); repeated
+requests coalesce, a pending save/load/action suppresses a new autosave, and the
+last valid save is retained. Autosave success is shown only after storage
+verification; failure is shown as `Autosave failed: …`. A worker restart still
+loses unsaved in-memory state and directs the player to a saved game.
+
+**Versioning.** `WORLD_SCHEMA_VERSION` is **15** and `SIM_VERSION` is **0.15.0**.
+`SAVE_FORMAT_VERSION` remains **1** because the envelope shape is unchanged.
+Schema-14 saves (and older data versions) are explicitly rejected; there is no
+silent migration. Data version remains `m3-economy-v2`. The app’s supported schema
+constant is explicit and must be updated with the sim schema.
+
+**Tests.** Added compaction/round-trip/hash/4 MiB/worker-LOAD tests
+(`m4b-save-compaction.test.ts`), storage atomicity/fallback/staging/incompatible
+tests (`m7-save-store.test.ts`), autosave debounce/failure-gating tests
+(`m7-autosave.test.ts`), and source-level startup/Continue/New Game/overwrite/
+autosave wiring guards. Existing save/load, checksum, player-country, and
+deterministic-continuation tests were rerun. Web/native actual storage and bridge
+behavior remain unverified on a device.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.
@@ -2454,8 +2542,9 @@ release builds, and on-device measurements were not run.
     build. iOS/Android release-build and real-device performance criteria remain
     open; Node, web, and Hermes-bundle results are not mobile acceptance.
 13. The app stores gzip-compressed canonical saves under
-    `century-save-gzip1:` in AsyncStorage. The canonical save format is unchanged;
-    schema 14 adds the player-country field and therefore rejects older saves.
+    `century-save-gzip1:` in AsyncStorage. The canonical save format is unchanged.
+    Schema 14 added the player-country field; schema 15 (D-065) adds compacted
+    period summaries, and each schema rejects older saves explicitly.
 14. The historical scenario uses a separate provisional catalog (D-062). It does
     not change the accepted M2–M4 fixture definitions. Its opening prices are the
     lower price bound, which keeps the fixed-capacity market from drifting below
@@ -2471,6 +2560,15 @@ release builds, and on-device measurements were not run.
 17. Worker protocol 2 is intentionally incompatible with protocol 1. The web and
     native bundles are built together. Native AppState/process-failure behavior is
     wired but remains unverified on a physical release build.
+18. The 4 MiB save target is evaluated on the canonical uncompressed string. The
+    late-game fixture (1,200 monthly summaries, 1,210 accounts) measures 2.04 MiB
+    after D-065 compaction; the full campaign was not rerun. Compressed and native
+    bridge sizes are separate and the repeated-value synthetic compression ratio is
+    not evidence of real-world compression.
+19. Autosave is best-effort at paused/background safe points. A platform that
+    suspends JavaScript before the debounced save runs can lose progress since the
+    last verified save; the UI does not claim otherwise. AsyncStorage cannot provide
+    a true cross-key transaction, so staged/previous keys are the recovery boundary.
 
 ## Items intentionally left open
 

@@ -1316,7 +1316,7 @@ goods/buildings/professions/needs catalog, opening intermediate stock, and openi
 prices at the lower provisional bound. The older timings and the 81-building /
 85,487,776-population campaign row are retained as history and are **not** results
 of the current scenario. The current `pnpm bench` results are recorded in
-“Post-M7 remediation batch 2” near the end of this file. The full 36,524-tick
+“Post-M7 remediation batch 3” near the end of this file. The full 36,524-tick
 campaign has not been rerun after D-062.
 
 **M4a-1 re-measurement note.** The M3b–M3f tables below are the recorded
@@ -1563,7 +1563,7 @@ is not part of `pnpm run ci`. Representative Node `v22.12.0` results:
 | State checkpoints | 986 accounts at every checkpoint; postings capped at 256; 0 → 1,200 monthly summaries; 0 debt contracts |
 | Final hash / save | `d1f5895277720e80`; 19,207.4 KiB (18.76 MiB) |
 | Bounded-state gates | constant accounts PASS, postings ≤ 256 PASS, summaries ≤ 1,200 PASS |
-| GDD 4 MiB save target | **NOT MET** (18.76 MiB); M4b retains one pre-close trial balance per month |
+| GDD 4 MiB save target | **NOT MET at the M6 baseline** (18.76 MiB); Batch 3 (D-065) changes the retained history and measures a 2.04 MiB canonical worst-case fixture. The full campaign was not rerun. |
 
 The p99 is much higher than p95, indicating occasional heavier ticks; the median
 path is about 144 ms. The benchmark reports the tail but does not decompose every
@@ -1743,12 +1743,12 @@ evidence and does not satisfy the 8 ms mobile target.
   AI randomness are not implemented. Its thresholds are provisional policy
   heuristics, not calibrated behavior; it never lowers income tax in v1, and its
   pre-close revenue basis is unknown rather than estimated.
-- M6's full-campaign measurement shows the pre-close trial balances retained for
-  every closed month dominate save size: the measured full-campaign save is
-  **18.76 MiB**, above the GDD's 4 MiB engineering target. The monthly history is
-  bounded (`MAX_PERIOD_SUMMARIES = 1200`) and is not per-day growth, but compression
-  or history compaction is not implemented. This target is reported as **NOT MET**,
-  not hidden.
+- M6's full-campaign measurement showed the pre-close trial balances retained for
+  every closed month dominating save size: 18.76 MiB at the M6 baseline. Batch 3
+  (D-065) retains 12 detailed monthly trial balances and compacts older months to
+  exact per-country fiscal/flow totals. The equivalent 1,200-summary fixture now
+  measures **2.04 MiB canonical**; the full campaign was not rerun. The M6 18.76
+  MiB row is retained as the before measurement.
 - The M6 full-campaign benchmark is a Node diagnostic and does not measure mobile
   frame rate, device memory, battery, or release-build tick time.
 - **M7 native release builds and real-device performance are not verified.** There
@@ -1761,10 +1761,10 @@ evidence and does not satisfy the 8 ms mobile target.
 - Snapshot delivery is capped at one per 100 ms and can lag when a tick takes
   longer. The Node worker-host tick+snapshot p95 was 80.46 ms; mobile FPS and
   responsiveness are unmeasured.
-- M7 compresses saves only at the AsyncStorage boundary. The canonical
-  full-campaign save is still 18.76 MiB and is not compacted; app-layer gzip was
-  tested on an early save (353.5 KiB → 72.2 KiB), not on the full campaign or a
-  device.
+- M7 compressed saves only at the AsyncStorage boundary. At the M6 baseline the
+  canonical full-campaign save was 18.76 MiB. Batch 3 (D-065) now compacts history
+  older than 12 months; the bounded 1,200-summary fixture is 2.04 MiB canonical.
+  The full campaign and a device were not rerun/tested.
 - The native WebView transport is a proof of concept; no native worker package or
   release configuration was adopted.
 
@@ -1851,12 +1851,13 @@ rejected; no migration policy changed.
 The AI is a provisional fiscal governor, not a planner; its thresholds are
 uncalibrated policy heuristics. It has no construction, law, debt, diplomatic, or
 military action and never lowers income tax in v1. The eight-polity historical
-sample is still provisional and not a world total. The full-campaign save is
-**18.76 MiB**, which exceeds the GDD 4 MiB engineering target because M4b retains
-one pre-close trial balance per month; compression/history compaction is not
-implemented. The monthly history is bounded at 1,200 summaries and is not per-day
-growth. Node benchmark timings are diagnostics; mobile performance and the mobile
-p95 ≤ 8 ms target remain **NOT EVALUATED**.
+sample is still provisional and not a world total. At the M6 baseline the
+full-campaign save was **18.76 MiB** because M4b retained one pre-close trial
+balance per month. Batch 3 compacts summaries older than 12 months to exact
+per-country fiscal/flow totals; the bounded 1,200-summary fixture measures
+**2.04 MiB canonical**. The full campaign was not rerun. Node benchmark timings are
+diagnostics; mobile performance and the mobile p95 ≤ 8 ms target remain **NOT
+EVALUATED**.
 
 ### 8. Final repository state
 
@@ -1958,9 +1959,9 @@ ReactNativeWebView bridge probe passed. These are not device results.
 
 No simulation schema/version change **at the M7 baseline**. World schema was
 **13**, simulation **0.13.0**, save format **1**, data version `m3-economy-v1`.
-**Superseded by the post-M7 remediation (D-062/D-063):** schema **14**, simulation
-**0.14.0**, data version `m3-economy-v2`, save format still **1**. Worker protocol
-version **1** is independent of the save schema. The app's gzip storage wrapper preserves the
+**Superseded by the post-M7 remediation (D-062/D-063 and D-065):** schema **15**,
+simulation **0.15.0**, data version `m3-economy-v2`, save format still **1**.
+Worker protocol version **2** is independent of the save schema. The app's gzip storage wrapper preserves the
 canonical save string and therefore its checksum, hash, validation, and
 compatibility. Older incompatible simulation saves still reject.
 
@@ -1974,8 +1975,9 @@ compatibility. Older incompatible simulation saves still reject.
   annual charts are absent.
 - Snapshot delivery is rate-limited and can lag; Node tick+snapshot p95 is far
   above the mobile 8 ms target.
-- The full 18.76 MiB canonical save is not compacted; app-layer gzip was tested on
-  an early save and not on the full campaign/device.
+- The M6 18.76 MiB canonical save is addressed by Batch 3 compaction (2.04 MiB on
+  the bounded 1,200-summary fixture); the full campaign and device storage were not
+  rerun/tested.
 - The historical sample remains provisional; AI is still a fiscal governor.
 - Node/browser results are diagnostics, not mobile evidence.
 
@@ -2114,8 +2116,8 @@ pass.
 
 ### Schema, data version, and save compatibility
 
-- `WORLD_SCHEMA_VERSION` **14** (adds `playerCountryId`).
-- `SIM_VERSION` **0.14.0** (AI behavior and scenario calibration changed).
+- Batch 1 values were `WORLD_SCHEMA_VERSION` **14** and `SIM_VERSION` **0.14.0**.
+  **Superseded by Batch 3:** schema **15** and simulation **0.15.0**.
 - `DATA_PACKAGE_VERSION` **`m3-economy-v2`**; all scenario files declare it.
 - Save format remains **1**; envelope/checksum logic is unchanged.
 - Saves from schema 13 / sim 0.13.0 / data `m3-economy-v1` are intentionally
@@ -2265,6 +2267,164 @@ claim.
 
 Implementation commit: `8bbd0ec8275f5697a408b062802b77acc39f3bc8`
 (parent `7c5463474dd553a8605bedf61b0975047aab43b9`). Documentation commit: the
+immediate child containing this section, `DECISIONS.md`, and
+`Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
+
+## Post-M7 remediation batch 3 — save size, persistence, and campaign recovery
+
+**Scope.** D-065 addresses the save-size and persistence findings only. It does
+not change simulation mechanics, public debt, worker transports, speed controls, or
+general performance. The full 36,524-tick campaign was not rerun; a bounded
+representative fixture was used.
+
+### Root cause and target
+
+The canonical save is dominated by **`FinanceState.periodSummaries[].accountTotals`**:
+M4b kept a complete pre-close trial balance for every one of up to 1,200 months.
+At the current scenario’s ~1,210 accounts, 863 nonzero totals per month, and 256
+postings, the representative 1,200-summary fixture measured:
+
+- **23.25 MiB canonical** (before compaction)
+- 323.8 KiB in the synthetic repeated-value compressed representation
+
+The GDD 4 MiB target is interpreted as the **canonical uncompressed save string**.
+Compressed/base64 storage is a separate size and is not used to claim the target.
+The early-save compression ratio is not extrapolated to late game.
+
+### Compaction policy and measured result
+
+The most recent **12** monthly summaries retain the full account trial balance
+(the same 12-month window the Ledger snapshot uses). Older summaries retain:
+
+- period start/end dates for all 1,200 months;
+- the four exact gross flow totals;
+- exact per-country income-tax, welfare, interest, and net fiscal totals.
+
+`accountTotals` is empty for compacted summaries. No values are rounded. The
+compaction is a deterministic state transformation at month close; the latest
+summary remains fully detailed for the profit-allocation phase.
+
+Equivalent 1,200-summary fixture, after compaction:
+
+| Measure | Result |
+|---|---:|
+| Detailed / compacted summaries | 12 / 1,188 |
+| Canonical save | **2.04 MiB** (2,141,048 bytes) |
+| Stored gzip+base64 representation | **105.5 KiB** (108,059 bytes; synthetic repeated values compress favorably) |
+| Base64 payload | 108,040 bytes |
+| gzip / gunzip | 55.6 ms / 23.0 ms |
+| Canonical `deserializeWorld` | 116.8 ms |
+| Round-trip | byte-equal, equal world hash |
+| Save date / schema | 2000-01-01 / 15 |
+
+This meets the canonical 4 MiB target for the bounded fixture. The full campaign
+was **not** executed, so 2.04 MiB is not presented as a measured full-campaign
+result. The trade-off is explicit: account-level monthly trial balances older than
+12 months are no longer retained; exact government fiscal totals, gross flows, and
+monthly dates are.
+
+### Replace-safe storage and recovery
+
+`SaveStore` in `@century/sim-worker/persistence` now:
+
+1. compresses the canonical save and writes a **staging** key;
+2. reads staging back and verifies it;
+3. copies the old primary to a **previous** key only if it is readable;
+4. writes and verifies the **primary** key;
+5. removes staging only after primary verification.
+
+On load, candidates are tried in order **primary → staging → previous**. A failed
+staging/primary write leaves the old primary intact; a corrupt primary can recover
+a fully written staging copy or the previous valid save; incompatible schema/format
+saves are rejected. AsyncStorage cannot provide a true cross-key transaction, so
+the staging/previous keys are the documented recovery boundary. Storage failures
+are asserted and reported; a failed save never reports success.
+
+### Campaign lifecycle and autosave
+
+- Startup reads only envelope metadata (no world) and shows **Continue** or **New
+  Game** with the saved date, scenario, sim/schema version, and canonical/stored
+  size.
+- **New Game** warns that it starts a fresh world. The old save is preserved, and
+  autosave is disarmed until an explicit save. Saving over the existing campaign
+  requires a second confirmation; the previous valid save remains as a recovery
+  copy.
+- **Continue** loads the selected saved campaign; a failed load leaves the fresh
+  world intact and the save untouched. A recovered previous/staging save is labeled
+  in the choice screen.
+- Autosave triggers at safe points: a completed Pause and app backgrounding. It is
+  debounced **500 ms**, coalesces repeated requests into at most one pending save,
+  and is suppressed while a save/load/action is already pending. It is not a
+  guarantee of background completion on a suspended runtime.
+- Autosave success is shown only after storage verification (`Autosaved <date> ·
+  …`); failure is shown as `Autosave failed: …`. The UI distinguishes these from
+  manual `Saved …` status.
+- Worker restart still loses unsaved in-memory state and directs the player to load
+  a saved game. No recovery of lost in-memory state is claimed.
+
+### Verification
+
+Commands actually executed:
+
+- `pnpm run lint` — **PASS** (132 TypeScript files, 45 in `packages/sim`).
+- `pnpm typecheck` — **PASS** (six workspace packages).
+- `pnpm test` — **PASS: 49 suites, 552 tests**.
+- `pnpm run ci` — **PASS, exit code 0**: lint, typecheck, 552 tests, standard
+  benchmark, web/iOS/Android Expo exports.
+- `git diff --check` — **PASS**.
+
+New tests:
+
+- `m4b-save-compaction.test.ts`: 12/1188 split, exact country totals, real close
+  path, canonical <4 MiB, equal round-trip hash, large compression, worker-protocol
+  LOAD, malformed compact summary rejection.
+- `m7-save-store.test.ts`: metadata/date, store/load, injected primary-write failure
+  preserving old save, corrupt-primary fallback to previous, staging recovery,
+  incompatible-schema rejection, truncated payload rejection.
+- `m7-autosave.test.ts`: 500 ms debounce/coalescing, unsafe-save suppression and
+  fire-time recheck, cancel/dispose without late saves.
+- `m7-app-lifecycle.test.ts`: source-level startup/Continue/New Game, overwrite
+  confirmation, autosave feedback, and storage-schema wiring guards.
+- Serialization/hash assertions updated for schema 15; existing save/load,
+  checksum, player-country, and deterministic-continuation tests still pass.
+
+Final CI benchmark (standard `pnpm run bench`, PASS): M5 sample p50 182.5 ms / p95
+205.7 ms, projected full campaign 1.79 h (not run); M6 sample p50 182.0 ms / p95
+197.7 ms; M7 tick+snapshot p50 180.3 ms / p95 183.7 ms, snapshot 11.8 KiB, early
+save 413.1 KiB → 80.2 KiB. These are Node diagnostics under current load, not
+mobile evidence.
+
+### Compatibility and versioning
+
+- `WORLD_SCHEMA_VERSION` **15**; `SIM_VERSION` **0.15.0**.
+- `SAVE_FORMAT_VERSION` remains **1** (envelope shape unchanged).
+- Data version remains `m3-economy-v2`; scenario data is unchanged.
+- Schema-14 and older saves are **rejected explicitly**, not silently
+  reinterpreted. There is no migration.
+- The app’s `SUPPORTED_SAVE_SCHEMA_VERSION` is 15 and must be updated with the
+  simulation schema.
+
+### Remaining limitations
+
+- Web AsyncStorage/localStorage quota behavior and native AsyncStorage/bridge
+  behavior were **not** tested on a device. The storage tests use an in-memory
+  backend with injected failures.
+- The canonical late-game save crosses the native bridge as one SAVE_RESULT string
+  (~2.14 MB in the fixture); no chunked/file-backed transfer was added because the
+  compacted payload is bounded and no device evidence justified that complexity.
+  Actual native bridge limits remain **unverified**.
+- The full campaign was not rerun; the 2.04 MiB result is from the bounded
+  representative fixture.
+- Autosave is best-effort. A runtime that suspends JavaScript before the debounced
+  save executes can lose progress since the last verified save.
+- Account-level trial balances older than 12 months are intentionally not retained.
+- Save compression/size work beyond this compaction, autosave slots, storage
+  quotas, debt, and general performance remain out of scope.
+
+### Commits
+
+Implementation commit: `3fcd18253a6b3f9bd98d0177e47d7aa96134f84e`
+(parent `d4e5488f1d44c784b4c2061897c3e3d4040d49d7`). Documentation commit: the
 immediate child containing this section, `DECISIONS.md`, and
 `Century_GDD_v2.5.md`. The final HEAD is reported in the handoff.
 

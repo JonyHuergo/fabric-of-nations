@@ -2460,7 +2460,7 @@ Initial engineering targets, to be confirmed on a named reference device:
 - UI: target 60 fps, with no persistent stutter when simulation runs.
 - Cold start: under 2.5 seconds on the reference device, subject to measurement method.
 - Peak memory: under 250 MB on the reference device.
-- Save size: target under 4 MB for the initial full-scale world; revise only after measuring real state. **Current M6 measurement:** the opt-in full-campaign save is reported in README/D-058. The 4 MiB target is not met because M4b retains one pre-close trial balance per closed month; the history is bounded at 1200 summaries but compression/history compaction is not implemented.
+- Save size: target under 4 MB for the **canonical uncompressed save string** for the initial full-scale world; compressed/base64/storage/bridge sizes are separate measurements. Revise only after measuring real state. **Current Batch 3 (D-065):** the bounded 1,200-summary fixture is 2.04 MiB canonical after retaining 12 detailed months and compacting older months to exact per-country fiscal/flow totals. The full campaign was not rerun; the prior M6 18.76 MiB measurement is the before value.
 - Sustained 10 days/second: battery drain target no more than twice measured idle drain under a controlled test.
 
 Record device model, OS, build type, world size, warm-up, test duration, p50/p95/p99 tick times, snapshot rate, memory, and battery conditions. A Node benchmark is a fast regression test, not proof of mobile performance. Validate performance on-device in a release build. Current M2.1/M3f/M4b/M4c Node benchmarks (which also exercise worlds carrying the M4a-1/M4a-2/M4b/M4c state schema) do **not** evaluate or pass the mobile p95 target; its status remains **NOT EVALUATED**. The M4b close benchmark times only the period close, and the M4c fiscal benchmark times the integrated fiscal day; world cloning, setup, and hashing are excluded from both.
@@ -2507,9 +2507,26 @@ The app may import snapshot types and protocol types. It must not import simulat
 - Reject an unadvanced staged close state: serialization and hashing require `closedThroughDay === null || closedThroughDay < dayIndex` (§5.4.2).
 - Test save/load mid-month, mid-year, after an event, after random draws, immediately after a month-end close once the day has advanced, and at the terminal boundary.
 
+**Batch 3 persistence policy (D-065).** The 4 MiB target applies to the
+**canonical uncompressed save string** (the serializer/envelope output). Compressed,
+base64-encoded, storage-key, and native-bridge payload sizes are reported separately
+and are not substitutes for the target. The canonical save now compacts historical
+monthly finance summaries: the most recent **12** months retain the full pre-close
+trial balance used by the Ledger window, while older months retain exact
+per-country fiscal totals and the four gross flow totals. All 1,200 monthly
+periods and their dates remain present. This removes repeated account-level
+trial-balance data, not economically meaningful values; no rounding is used. The
+canonical schema is **15**; schema-14 saves are explicitly rejected rather than
+silently reinterpreted. Saves are compressed at the storage boundary, written to a
+staging key, verified, copied over the primary key, and the previous valid primary
+is retained for recovery. On startup the app offers **Continue** or **New Game**,
+showing the saved date and version. Autosave is debounced to one pending request,
+runs only at safe paused/background points, and reports failure separately; a new
+game over an existing save is preserved until an explicit, confirmed replacement.
+
 ### 14.7 History and diagnostics
 
-Persist annual samples only for long-range charts; avoid per-day history buffers for all fields. Maintain monthly summaries for finance and any detail needed by the Ledger UI. **Current M4b:** each closed month stores one immutable `FinancePeriodSummary` (pre-close trial balance plus the four gross flow totals) in `FinanceState.periodSummaries`; there is no per-day chart history and no `World.history` collection yet. Keep a bounded recent event/transaction audit ring for debugging. Expose optional debug counters for conservation errors, invalid states, allocation failures, and performance metrics.
+Persist annual samples only for long-range charts; avoid per-day history buffers for all fields. Maintain monthly summaries for finance and any detail needed by the Ledger UI. **Current M4b/Batch 3:** each closed month stores one `FinancePeriodSummary` in `FinanceState.periodSummaries`. The most recent 12 retain the pre-close account trial balance plus the four gross flow totals; older summaries retain the period dates, exact per-country fiscal totals, and the four gross flow totals. There is no per-day chart history and no `World.history` collection yet. Keep a bounded recent event/transaction audit ring for debugging. Expose optional debug counters for conservation errors, invalid states, allocation failures, and performance metrics.
 
 ---
 
@@ -2890,6 +2907,17 @@ builds. Node and headless-browser results are not mobile performance evidence. T
 mobile p95 ≤ 8 ms target, 60 fps, cold start, peak memory, and battery targets
 remain **NOT EVALUATED**. This exception is explicit and must remain visible until
 a release build is run on a named device.
+
+**Post-M7 remediation batch 3 (D-065).** Canonical save history now retains 12
+detailed monthly trial balances and compact exact per-country fiscal/flow totals
+for older months; the 1,200-period history and dates remain. A representative
+1,200-summary fixture falls from 23.25 MiB canonical to 2.04 MiB, below the
+4 MiB target, with an equal load hash. Schema is 15 and schema-14 saves are
+rejected. Storage uses staged writes with previous/staging recovery; startup offers
+Continue/New Game with saved date/version; autosave is 500 ms debounced and limited
+to paused/background safe points, with visible failure feedback. Web/native
+storage/bridge behavior remains unverified on a device. The full campaign was not
+rerun.
 
 **Post-M7 remediation batch 2 (D-064).** The worker now has a bounded pump
 backlog, explicit pause/resume/speed/step/load accumulator semantics, target-vs-
