@@ -3253,7 +3253,7 @@ reporting, save/replay, terminal boundary, bounded history, snapshot/preview), p
 updated worker/UI/report/serialization/hash tests. No benchmark, performance
 measurement, campaign, profiling, or device test was run for E3 under the developer's
 no-benchmark restriction; no benchmark code, thresholds, or reports were changed.
-Implementation commit: `e3b6fff5025af747f0fc78cc6941e1f93631e5ea`.
+Implementation commits: `e3b6fff5025af747f0fc78cc6941e1f93631e5ea` (core construction) and `a8c6a9edd2b400dcfd676478222c612efd7c2f1e` (state-ownership UI gate).
 
 ## Development workflow
 

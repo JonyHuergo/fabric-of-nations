@@ -3187,7 +3187,7 @@ measurements; the repository-wide correctness suite was run instead.
 
 ## D-074 — E3 public construction: work-in-progress capitalization, idle labor, and schema 19
 
-**Status:** accepted and implemented in code/tests/bundle commit `e3b6fff5025af747f0fc78cc6941e1f93631e5ea`. GDD v2.10 §17A.19 records the delivered scope,
+**Status:** accepted and implemented in code/tests/bundle commit `e3b6fff5025af747f0fc78cc6941e1f93631e5ea` (core construction) and follow-up `a8c6a9edd2b400dcfd676478222c612efd7c2f1e` (state-ownership UI gate). GDD v2.10 §17A.19 records the delivered scope,
 accounting, limits, and acceptance evidence. This decision resolves E3's delegated
 project/accounting/labor choices and the §17A.16 open questions that E3 was allowed to
 close.

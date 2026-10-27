@@ -3,7 +3,7 @@
 - **GDD:** `Century_GDD_v2.10.md` (authoritative); v2.9 retained byte-for-byte.
 - **Revision date:** 2026-10-27
 - **Baseline:** E2 documentation commit `d3a4ac0cd3aa6f15b4b45cd563820d172d3a20c0`
-- **Implementation:** code/tests/bundle commit `e3b6fff5025af747f0fc78cc6941e1f93631e5ea`
+- **Implementation:** code/tests/bundle commits `e3b6fff5025af747f0fc78cc6941e1f93631e5ea` (core construction) and `a8c6a9edd2b400dcfd676478222c612efd7c2f1e` (state-ownership UI gate)
 - **Scope:** E3 — Public Investment and Construction only. E4–E6 and M8a are not
   implemented.
 - **Projection:** no benchmarks, performance measurements, campaigns, profiling, or

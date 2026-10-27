@@ -4861,7 +4861,7 @@ usability study or device test was run.
 ### 17A.19 E3 implementation record
 
 **Status:** implemented on branch `main` in code/tests/bundle commit
-`e3b6fff5025af747f0fc78cc6941e1f93631e5ea`, based on the E2 documentation commit
+`e3b6fff5025af747f0fc78cc6941e1f93631e5ea` (core construction) and `a8c6a9edd2b400dcfd676478222c612efd7c2f1e` (state-ownership UI gate), based on the E2 documentation commit
 `d3a4ac0cd3aa6f15b4b45cd563820d172d3a20c0`. Schema **19**, simulation **0.19.0**, save
 format **1**, data version **`m3-economy-v4`**, worker protocol **6**. The E3 scope
 and acceptance criteria are §17A.6, §17A.14, and §17A.13.2; the material decisions are
