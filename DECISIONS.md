@@ -1,4 +1,4 @@
-# Century decision register
+﻿# Century decision register
 
 This file records material implementation decisions, GDD/`AGENTS.md` conflicts,
 and provisional assumptions made in M0/M1/M2/M2.1/M3/M4a-1/M4a-2. It follows GDD §20 and
@@ -3062,6 +3062,128 @@ inflation restatement, and annual tax assessment remain unimplemented.
 `c8b2e4cd72aa049243c07dfdb413e00c708d07cf`. Commands deliberately excluded all
 benchmarks, CI (it invokes benchmarks), exports, campaigns, and device measurements;
 the repository-wide test run included the pre-existing century correctness regressions.
+
+## D-073 — E2 fiscal management, public-budget decomposition, and schema 18
+
+**Status:** accepted and implemented. GDD v2.9 §17A.18 records the delivered scope and
+limits. This decision resolves E2's delegated accounting and policy choices; it does
+not reopen D-048/D-056/D-057/D-066/D-071/D-072 and does not authorize any E3+ mechanic.
+
+**Why.** E0/E1 showed the M4c fiscal loop and the M5b debt mechanics, but the player
+could only change a flat wage tax and one welfare budget; there was no exemption, no
+welfare eligibility, no reserve policy, no business-profit tax, no player financing
+control, and no retained separation of requested/paid/shortfall or
+revenue/borrowing/principal/interest in reports. E2 was assigned to make the public
+budget consequential and explainable using only real bases and mechanisms. Consumption/
+excise, property/land, and customs taxes, and education/health/administration/
+procurement spending, remain dependency-gated and are not implemented.
+
+**Decisions.**
+
+1. **Extended fiscal policy is one validated object.** `Country.fiscal` gains
+   `incomeTaxAllowanceSUSDPerYear`, `welfareMaxWealthLevel` (integer 0..99, 99 =
+   universal), `businessProfitTaxRate` (0..1), and `reserveTargetSUSD` (nonnegative).
+   Scenario input may omit the new fields (neutral defaults) so existing authored
+   content and fixtures keep their behavior; persisted policy is validated as complete.
+   The AI proposes the complete policy, copying the fields it does not decide, so its
+   v1 target rules are unchanged and it cannot erase a player-style field.
+2. **Income-tax schedule.** The base remains actual wages received by a pop block.
+   Tax is `rate × max(0, wages − allowance / daysInYear)`; the allowance is pro-rated
+   daily. No other personal-income base exists. The statutory-bounds role remains
+   hard-bounded provisional policy until M8 can enact laws.
+3. **Welfare eligibility and reserve.** Only blocks with positive population at or
+   below the wealth ceiling receive the daily transfer; allocation remains proportional
+   to eligible population with an exact final remainder. The warrantable amount is
+   `min(requested, max(0, treasury cash after tax − reserveTarget))`. The reserve is a
+   liquidity floor, not an account or spendable pool: it never creates cash, never
+   causes borrowing, and never blocks contractual coupon/maturity/arrears payments.
+   Unpaid welfare remains an explicit shortfall; no liability, receivable, or back-pay
+   is created.
+4. **Business-profit tax.** Assessed once per civil month-end before the close and
+   before the debt phase, on each building's already-recognized current-period
+   `sales-revenue − input-expense − wage-expense − upkeep-expense`, positive part only.
+   Losses are not refunded and are not carried forward as a tax deduction: M5a retained
+   profit already absorbs losses for distribution, and inventing a second carryforward
+   would be unassigned state. Collection is limited by the building's actual operating
+   cash; the uncollected assessment is a reporting shortfall, not a receivable. New
+   account subtypes `business-tax-revenue` (country) and `business-tax-expense`
+   (building) and a new cash-neutral `business-profit-tax` posting kind prevent the
+   receipt from being misclassified as income-tax revenue or ordinary expense.
+   The M5a profit measure is after this tax, so the same profit is not distributed
+   pre-tax and no profit is taxed twice. A duplicate same-day assessment is rejected.
+5. **Budget decomposition.** A month-to-date memo
+   (`FinanceState.budgetMemosThisMonth`) accumulates welfare requested/shortfall,
+   business tax assessed/uncollected, debt issued, principal repaid, cash interest
+   paid, and the unfinanced requirement. The close freezes it into
+   `FinancePeriodSummary.countryBudgetTotals` (and annual summaries sum it), resets it,
+   and keeps paid welfare/collected business tax derivable from the recognized
+   accounts. Zero-only entries are omitted and read as zero to keep saves bounded. The
+   memo is reporting/financing input, never a liability. A controlled correction can
+   legitimately separate a memo amount from an account line; reports label both rather
+   than assuming equality.
+6. **Fiscal result.** `FinancePeriodFiscalTotals.businessTaxRevenueSUSD` is added and
+   `netFiscalResultSUSD = incomeTax + businessTax − welfare − interest`. Monthly
+   summaries still close into owner equity; annual flows remain exact sums of monthly
+   summaries and annual balances remain year-end stocks.
+7. **Player financing actions.** `issue-debt` (designated creditor, creditor cash,
+   ceiling, active-contract cap), `repay-debt` (principal only, treasury cash, reserve
+   floor), and `set-debt-policy` (refinancing flag and ceiling, never below current
+   outstanding principal) are validated through the same
+   `validateCountryAction`/`applyCountryAction` path as fiscal policy. Player actions
+   may only target `playerCountryId`; AI actions may never target it. Borrowing is
+   financing, not revenue; repayment is not expenditure. Immediate player borrowing
+   increases treasury cash, so the month-end automatic requirement is correspondingly
+   smaller and the same gap is not borrowed twice. Manual refinancing of a non-maturing
+   contract is not added; repay-then-issue is the explicit equivalent.
+8. **Ordering.** Civil month-end: AI → demography/employment/migration → market and
+   wage/upkeep settlement → fiscal (income tax, then welfare) → business tax → debt
+   (accrual, automatic financing, coupons, maturities/refinancing, arrears/default) →
+   needs/militancy/wealth → monthly close (freezing the memo) → M5a distribution using
+   the after-tax result. Player actions apply only between completed ticks at the
+   current day, before that day's phases.
+9. **Fiscal-phase posting.** Income-tax entries post as one balanced batch, then
+   welfare entries as a second balanced batch on the same staged finance clone. This is
+   still one atomic staged day (the clone is published only after full validation) and
+   lets welfare read the exact post-tax treasury balance so transferring the entire
+   available cash leaves an exact zero rather than a floating residual.
+10. **Snapshot/protocol.** Worker protocol **5** adds the action union and required
+    presentation fields: extended fiscal policy, debt policy/contracts, estimated
+    taxable wage base and wage-earning block count, month-to-date business-tax base and
+    budget memo, and budget totals in monthly/annual reports. Snapshots remain
+    immutable, bounded, and derived; they are not authoritative state.
+11. **Versions and compatibility.** World schema **18**, simulation **0.18.0**, save
+    format **1**, data version **`m3-economy-v3`** (the shipped scenario's fiscal
+    meaning is unchanged because all E2 fields default neutrally), worker protocol
+    **5**. Schema-17 and earlier saves and protocol-4 clients are rejected under the
+    existing policy; no migration is implemented (D-013). Canary hashes and
+    known-answer digests are intentionally re-baselined because schema/simulation
+    versions and the persisted fiscal/budget state are hashed.
+
+**Consequences.** The player can now change the income-tax schedule, target welfare,
+set a reserve floor, tax business profit, borrow, repay, and set refinancing/ceiling
+policy, and can read the confirmed requested/paid/shortfall and
+revenue/borrowing/principal/interest decomposition in monthly and annual reports. The
+shipped scenario's neutral E2 defaults preserve its prior economic path until the
+player acts. All existing accounting, cash-conservation, close, atomicity,
+determinism, and save-replacement rules remain binding. The test suite covers exact
+arithmetic, allocation/affordability, reserve semantics, business-tax assessment and
+collection limits, financing interactions and rejection/rollback, report
+reconciliation, deterministic replay/save-load, the player/AI boundary, and bounded
+history.
+
+**Open choices / limitations.** Collection efficiency remains fixed at 1.0 with no
+administration/enforcement machinery; business losses have no tax carryforward;
+welfare eligibility is a single wealth ceiling, not categorical law; the reserve floor
+does not influence borrowing terms or creditor willingness; the preview's
+proposed-exemption taxable base is an assumption-based estimate because per-block wage
+levels are not retained in the snapshot. Consumption/excise, property/land, and customs
+taxes and services/procurement/construction subsidies remain E5/E6a/E3/E4
+dependencies. Native/device verification remains the M7 exception.
+
+**Verification.** See GDD v2.9 §17A.18 and the v2.9 change report. Implementation
+commit is `f9aa4e0e2ea9d59dd1999d72704eb9d5261d75d2`. Commands deliberately excluded benchmarks,
+`pnpm run ci` (it invokes benchmarks), campaign/performance runs, profiling, and device
+measurements; the repository-wide correctness suite was run instead.
 
 ## Assumptions recorded for future review
 

@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design and E1 economic clarity
+﻿# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, and E2 fiscal management
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -30,8 +30,14 @@ national overview, evidence-based diagnosis, fiscal-policy previews, bounded mon
 economic reports, and a session-confirmed action history without adding an economic
 mechanic. **M7a (Annual Accounting)** adds bounded annual summaries, year-end
 treasury/debt balances, partial-year handling, and audited controlled corrections.
-Corporate/consumption/land/tariff taxes, broader
-government expenditure and services, banking/central banking, dynamic FX,
+**E2 (Fiscal Management)** extends the fiscal loop into a public budget: an
+income-tax exemption schedule, welfare eligibility and a treasury reserve floor, a
+month-end business-profit tax with its own accounts and posting kind, budget
+decomposition in monthly/annual reports, and validated player borrowing, principal
+repayment, and refinancing/ceiling actions. Consumption/excise, property/land, and
+customs taxes, broader
+government expenditure and services, construction, subsidies, procurement,
+banking/central banking, dynamic FX,
 inflation, monetary policy, reopen/reversal, politics, technology,
 diplomacy, and warfare remain unimplemented. **M7's native iOS/Android release
 builds and real-device performance were not measured; M7 is delivered with that
@@ -40,9 +46,10 @@ adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0 and E1 are implemented in GDD v2.8 §17A**, and
-E2–E6 are planned, not implemented. The design authority is the [Century GDD
-v2.8](./Century_GDD_v2.8.md); v2.7 is retained as
+economic program; **E0, E1, and E2 are implemented in GDD v2.9 §17A**, and
+E3–E6 are planned, not implemented. The design authority is the [Century GDD
+v2.9](./Century_GDD_v2.9.md); v2.8 is retained as
+[historical M7a/E1 documentation](./Century_GDD_v2.8.md), v2.7 as
 [historical E1 documentation](./Century_GDD_v2.7.md), v2.6 as
 [historical E0 documentation](./Century_GDD_v2.6.md), v2.5 as
 [historical documentation](./Century_GDD_v2.5.md), v2.4 as
@@ -55,7 +62,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -586,12 +593,12 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.8 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.9 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.8
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.9
 records M7a annual accounting (§17B) and the Economic Management Overhaul (§17A; E0
-design, E1 implementation); E2–E6 are planned, and M8a remains planned only. See the
-roadmap below.
+design, E1 and E2 implementations); E3–E6 are planned, and M8a remains planned only.
+See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -3021,12 +3028,12 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
-## Economic Management Overhaul — E0 design, E1 implementation, and M7a annual accounting
+## Economic Management Overhaul — E0 design, E1/E2 implementation, and M7a annual accounting
 
 GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
-(GDD §17A; D-070). **E0 is documentation/design; E1 is implemented; M7a annual
-accounting is implemented in GDD v2.8.** E2–E6 and M8a are planned and not
-implemented; no E2–E6 mechanic or scenario data change exists.
+(GDD §17A; D-070). **E0 is documentation/design; E1 and E2 are implemented; M7a annual
+accounting is implemented in GDD v2.8/v2.9.** E3–E6 and M8a are planned and not
+implemented; no E3–E6 mechanic or scenario data change exists.
 
 The overhaul's central goal is that the player governs a country's economy through
 consequential policy choices, public spending, investment, and institution-building:
@@ -3057,19 +3064,22 @@ adapt. The specification covers:
 - **Acceptance:** overall player questions, strategy divergence, per-stage testable
   criteria, and concrete usability tasks.
 
-The complete E0 specification is preserved in [GDD v2.8 §17A](./Century_GDD_v2.8.md);
-GDD v2.7 is retained as [historical E1 documentation](./Century_GDD_v2.7.md), and
+The complete E0 specification is preserved in [GDD v2.9 §17A](./Century_GDD_v2.9.md);
+GDD v2.8 is retained as [historical M7a/E1 documentation](./Century_GDD_v2.8.md), GDD
+v2.7 as [historical E1 documentation](./Century_GDD_v2.7.md), and
 GDD v2.6 as [historical E0 documentation](./Century_GDD_v2.6.md). The E1 change report
 is [GDD_V2.7_CHANGE_REPORT.md](./GDD_V2.7_CHANGE_REPORT.md), the M7a change report is
-[GDD_V2.8_CHANGE_REPORT.md](./GDD_V2.8_CHANGE_REPORT.md), and the planning/E1/M7a
-decisions are D-070, D-071, and D-072 in [DECISIONS.md](./DECISIONS.md). E1 resolves
-report retention for its scope (12 monthly summaries plus 48 session actions); M7a
-resolves bounded annual retention (100 annual summaries, 64 corrections, latest 12
-exposed in snapshots). The other E0 questions remain open: construction
-accounting/materials, land/property, trade counterparties, banking/credit, inflation
-measurement, health/pensions/bargaining, sector classification, action expansion, GDP
-definitions, and save/schema migration (GDD §17A.16). CEN-AUDIT-016 sovereignty
-remains unresolved.
+[GDD_V2.8_CHANGE_REPORT.md](./GDD_V2.8_CHANGE_REPORT.md), the E2 change report is
+[GDD_V2.9_CHANGE_REPORT.md](./GDD_V2.9_CHANGE_REPORT.md), and the planning/E1/M7a/E2
+decisions are D-070, D-071, D-072, and D-073 in [DECISIONS.md](./DECISIONS.md). E1
+resolves report retention for its scope (12 monthly summaries plus 48 session actions);
+M7a resolves bounded annual retention (100 annual summaries, 64 corrections, latest 12
+exposed in snapshots); E2 resolves the implemented fiscal instruments, budget
+decomposition, reserve semantics, business-tax accounting, and financing actions. The
+other E0 questions remain open: construction accounting/materials, land/property, trade
+counterparties, banking/credit, inflation measurement, health/pensions/bargaining,
+sector classification, action expansion, GDP definitions, and save/schema migration
+(GDD §17A.16). CEN-AUDIT-016 sovereignty remains unresolved.
 
 ### E1 — delivered economic clarity and monthly reports
 
@@ -3137,6 +3147,48 @@ Schema-16 saves are rejected; no migration is authorized. Tests:
 workload, or Expo export was run for M7a; the repository-wide test suite retains its
 pre-existing century correctness regressions. Implementation commit:
 `c8b2e4cd72aa049243c07dfdb413e00c708d07cf`.
+
+### E2 — delivered fiscal management
+
+E2 completes the public-budget loop on the existing M4c/M5b foundation:
+
+- **Income-tax schedule.** `incomeTaxAllowanceSUSDPerYear` is a per-pop-block annual
+  exemption pro-rated to the civil year and subtracted from the block's actual daily
+  wage receipt; `incomeTaxRate` applies to the remainder. Withholding, posting, and
+  cash limits are unchanged.
+- **Welfare eligibility and reserve.** `welfareMaxWealthLevel` restricts the daily
+  transfer to blocks at or below a wealth ceiling (99 is universal), allocated in
+  proportion to eligible population. `reserveTargetSUSD` is a treasury floor: welfare
+  may not draw cash below it, and discretionary principal repayment may not either.
+  Unpaid welfare remains an explicit shortfall, never a liability.
+- **Business-profit tax.** At each civil month-end the country assesses
+  `businessProfitTaxRate × max(0, building sales − inputs − wages − upkeep)` per
+  building, collects from the building's actual operating cash through the distinct
+  `business-profit-tax` posting kind into country `business-tax-revenue`, and reports
+  any uncollected amount. The after-tax result feeds M5a retained profit/distribution.
+- **Budget decomposition.** Monthly and annual summaries retain requested/paid/
+  shortfall welfare, assessed/collected/uncollected business tax, borrowing, principal
+  repaid, cash interest paid, and the unfinanced month-end requirement separately from
+  the accounting fiscal result.
+- **Validated financing actions.** `issue-debt`, `repay-debt`, and `set-debt-policy`
+  join the complete `set-fiscal-policy` action through the shared validator. Borrowing
+  proceeds are financing, not revenue; early repayment respects treasury cash and the
+  reserve floor; refinancing and the outstanding-principal ceiling are player policy
+  within existing contracts.
+- **Interface.** The Budget screen exposes the schedule, spending/eligibility/reserve,
+  and financing controls with static pre-commitment estimates and explicit limits; the
+  Ledger shows the confirmed monthly and annual decomposition and action history.
+- **Protection.** The AI never targets the player country, and player actions may only
+  target the designated player country; invalid or unaffordable actions are rejected
+  atomically.
+
+Schema is **18**, simulation **0.18.0**, save format **1**, data version
+**`m3-economy-v3`**, and worker protocol **5** (extended action union and required
+snapshot fields). Schema-17 and older saves are rejected; no migration is authorized.
+Tests: `e2-fiscal-management.test.ts` plus updated fiscal/debt/AI/report/worker tests.
+No benchmark, performance measurement, campaign, profiling, or device test was run for
+E2 under the developer's no-benchmark restriction. Implementation commit:
+`f9aa4e0e2ea9d59dd1999d72704eb9d5261d75d2`.
 
 ## Development workflow
 
