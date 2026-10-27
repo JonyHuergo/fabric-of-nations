@@ -20,9 +20,22 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  CAMPAIGN_START_DAY_INDEX,
+  CAMPAIGN_TERMINAL_DAY_INDEX,
+  CURRENCY_RATE_MAX,
+  CURRENCY_RATE_MIN,
+  MAX_COUNTRY_NAME_LENGTH,
+  MAX_COUNTRY_TAG_LENGTH,
+  MAX_CURRENCY_KEY_LENGTH,
+  MAX_CURRENCY_NAME_LENGTH,
+  MAX_DEBT_ARREARS_GRACE_DAYS,
+  MAX_DEBT_PRINCIPAL_SUSD,
+  MAX_DEBT_TERM_DAYS,
+  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
   asSusdPerCurrencyUnit,
   assertValidEconomyDefinitions,
   assertValidPopulationDefinitions,
+  isValidId,
   type BuildingDef,
   type BuildingInstanceInitialDef,
   type CountryInitialDef,
@@ -639,12 +652,16 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
           })();
     return {
       id: numberField(record, "id", path, errors),
-      tag: stringField(record, "tag", path, errors, { maxLength: 8 }),
-      name: stringField(record, "name", path, errors),
+      tag: stringField(record, "tag", path, errors, { maxLength: MAX_COUNTRY_TAG_LENGTH }),
+      name: stringField(record, "name", path, errors, { maxLength: MAX_COUNTRY_NAME_LENGTH }),
       regionIds: numberArrayField(record, "regionIds", path, errors),
       currency: {
-        key: stringField(currencyRecord, "key", `${path}.currency`, errors),
-        name: stringField(currencyRecord, "name", `${path}.currency`, errors),
+        key: stringField(currencyRecord, "key", `${path}.currency`, errors, {
+          maxLength: MAX_CURRENCY_KEY_LENGTH,
+        }),
+        name: stringField(currencyRecord, "name", `${path}.currency`, errors, {
+          maxLength: MAX_CURRENCY_NAME_LENGTH,
+        }),
         valuation:
           valuationStatus === "specified"
             ? {
@@ -858,28 +875,29 @@ function parseCalibration(value: unknown, errors: string[]): HistoricalCalibrati
 }
 
 function isPositiveInteger(value: number): boolean {
-  return Number.isInteger(value) && value > 0;
-}
-
-function isNonNegativeInteger(value: number): boolean {
-  return Number.isInteger(value) && value >= 0;
+  return Number.isSafeInteger(value) && value > 0;
 }
 
 export interface HistoricalDefinitionKeys {
   readonly professions: ReadonlySet<string>;
   readonly buildings: ReadonlySet<string>;
   readonly goods: ReadonlySet<string>;
+  /** Full catalogs used for employment qualification and job-slot checks. */
+  readonly professionByKey: ReadonlyMap<string, ProfessionDef>;
+  readonly buildingByKey: ReadonlyMap<string, BuildingDef>;
 }
 
 function loadDefinitionKeys(meta: HistoricalScenarioMeta): HistoricalDefinitionKeys | null {
   try {
-    const professions = readJson<readonly { key: string }[]>(meta.definitions.professions);
-    const buildings = readJson<readonly { key: string }[]>(meta.definitions.buildings);
+    const professions = readJson<readonly ProfessionDef[]>(meta.definitions.professions);
+    const buildings = readJson<readonly BuildingDef[]>(meta.definitions.buildings);
     const goods = readJson<readonly { key: string }[]>(meta.definitions.goods);
     return {
       professions: new Set(professions.map((profession) => profession.key)),
       buildings: new Set(buildings.map((building) => building.key)),
       goods: new Set(goods.map((good) => good.key)),
+      professionByKey: new Map(professions.map((profession) => [profession.key, profession])),
+      buildingByKey: new Map(buildings.map((building) => [building.key, building])),
     };
   } catch {
     return null;
@@ -905,11 +923,31 @@ export function validateM5HistoricalData(
     errors.push("could not load profession/building definitions for reference validation");
   }
   const sourceIds = new Set(data.meta.sources.map((source) => source.id));
-  for (const source of data.meta.sources) {
+  const sourceIndexById = new Map<string, number>();
+  for (let index = 0; index < data.meta.sources.length; index += 1) {
+    const source = data.meta.sources[index];
+    if (source === undefined) continue;
+    const previous = sourceIndexById.get(source.id);
+    if (previous !== undefined) {
+      errors.push(
+        `meta.sources[${String(index)}].id ${JSON.stringify(source.id)} duplicates meta.sources[${String(previous)}].id`,
+      );
+    } else {
+      sourceIndexById.set(source.id, index);
+    }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(source.accessDate)) {
       errors.push(`meta.sources[${source.id}].accessDate must be YYYY-MM-DD`);
     }
     if (source.url.length === 0) errors.push(`meta.sources[${source.id}].url must not be empty`);
+  }
+  if (
+    !Number.isInteger(data.meta.startDayIndex) ||
+    data.meta.startDayIndex < CAMPAIGN_START_DAY_INDEX ||
+    data.meta.startDayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX
+  ) {
+    errors.push(
+      `meta.startDayIndex must be an integer in ${String(CAMPAIGN_START_DAY_INDEX)}..${String(CAMPAIGN_TERMINAL_DAY_INDEX - 1)}`,
+    );
   }
   const requireSources = (ids: readonly string[], path: string): void => {
     if (ids.length === 0) errors.push(`${path} must list at least one source id`);
@@ -948,14 +986,21 @@ export function validateM5HistoricalData(
     const country = data.countries[index];
     if (country === undefined) continue;
     const path = `countries[${String(index)}]`;
-    if (!isNonNegativeInteger(country.id)) errors.push(`${path}.id must be a non-negative integer`);
+    if (!isValidId(country.id)) errors.push(`${path}.id must be an unsigned 32-bit integer`);
     if (countryById.has(country.id)) errors.push(`${path}.id ${String(country.id)} is duplicated`);
     countryById.set(country.id, country);
+    if (country.tag.length > MAX_COUNTRY_TAG_LENGTH) {
+      errors.push(`${path}.tag must be at most ${String(MAX_COUNTRY_TAG_LENGTH)} characters`);
+    }
+    if (country.name.length > MAX_COUNTRY_NAME_LENGTH) {
+      errors.push(`${path}.name must be at most ${String(MAX_COUNTRY_NAME_LENGTH)} characters`);
+    }
     if (countryTags.has(country.tag)) errors.push(`${path}.tag ${JSON.stringify(country.tag)} is duplicated`);
     countryTags.add(country.tag);
     if (country.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
     const seenRegions = new Set<number>();
     for (const regionId of country.regionIds) {
+      if (!isValidId(regionId)) errors.push(`${path}.regionIds contains an invalid region id ${String(regionId)}`);
       if (seenRegions.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
       seenRegions.add(regionId);
       const existing = regionOwner.get(regionId);
@@ -970,6 +1015,16 @@ export function validateM5HistoricalData(
     if (!/^[a-z][a-z0-9-]*$/.test(country.currency.key)) {
       errors.push(`${path}.currency.key must be a lower-case identifier`);
     }
+    if (country.currency.key.length > MAX_CURRENCY_KEY_LENGTH) {
+      errors.push(
+        `${path}.currency.key must be at most ${String(MAX_CURRENCY_KEY_LENGTH)} characters`,
+      );
+    }
+    if (country.currency.name.length > MAX_CURRENCY_NAME_LENGTH) {
+      errors.push(
+        `${path}.currency.name must be at most ${String(MAX_CURRENCY_NAME_LENGTH)} characters`,
+      );
+    }
     if (country.currency.key === "susd") errors.push(`${path}.currency.key is reserved for SUSD`);
     if (currencyKeys.has(country.currency.key)) {
       errors.push(`${path}.currency.key ${JSON.stringify(country.currency.key)} is duplicated`);
@@ -982,6 +1037,11 @@ export function validateM5HistoricalData(
     if (!(fiscal.welfareBudgetSUSDPerYear >= 0)) {
       errors.push(`${path}.fiscal.welfareBudgetSUSDPerYear must be non-negative`);
     }
+    if (fiscal.welfareBudgetSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+      errors.push(
+        `${path}.fiscal.welfareBudgetSUSDPerYear must not exceed ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      );
+    }
     if (!(country.initialTreasuryCashSUSD >= 0)) {
       errors.push(`${path}.initialTreasuryCashSUSD must be non-negative`);
     }
@@ -993,22 +1053,40 @@ export function validateM5HistoricalData(
       if (!Number.isInteger(debt.termDays) || debt.termDays < 1) {
         errors.push(`${path}.debt.termDays must be a positive integer`);
       }
+      if (debt.termDays > MAX_DEBT_TERM_DAYS) {
+        errors.push(`${path}.debt.termDays must not exceed ${String(MAX_DEBT_TERM_DAYS)}`);
+      }
       if (!(debt.maxOutstandingPrincipalSUSD >= 0)) {
         errors.push(`${path}.debt.maxOutstandingPrincipalSUSD must be non-negative`);
+      }
+      if (debt.maxOutstandingPrincipalSUSD > MAX_DEBT_PRINCIPAL_SUSD) {
+        errors.push(
+          `${path}.debt.maxOutstandingPrincipalSUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_SUSD)}`,
+        );
       }
       if (!Number.isInteger(debt.arrearsGraceDays) || debt.arrearsGraceDays < 0) {
         errors.push(`${path}.debt.arrearsGraceDays must be a non-negative integer`);
       }
-      if (!Number.isInteger(debt.creditorId) || debt.creditorId < 0) {
-        errors.push(`${path}.debt.creditorId must be a non-negative integer`);
+      if (debt.arrearsGraceDays > MAX_DEBT_ARREARS_GRACE_DAYS) {
+        errors.push(
+          `${path}.debt.arrearsGraceDays must not exceed ${String(MAX_DEBT_ARREARS_GRACE_DAYS)}`,
+        );
+      }
+      if (!isValidId(debt.creditorId)) {
+        errors.push(`${path}.debt.creditorId must be an unsigned 32-bit integer`);
       }
       if (debt.creditorKind === "country" && debt.creditorId === country.id) {
         errors.push(`${path}.debt cannot name its own country as creditor`);
       }
     }
     if (country.currency.valuation.status === "specified") {
-      if (!(country.currency.valuation.susdPerUnit > 0)) {
+      const rate = country.currency.valuation.susdPerUnit;
+      if (!(rate > 0)) {
         errors.push(`${path}.currency.valuation.susdPerUnit must be positive`);
+      } else if (rate < CURRENCY_RATE_MIN || rate > CURRENCY_RATE_MAX) {
+        errors.push(
+          `${path}.currency.valuation.susdPerUnit must be in ${String(CURRENCY_RATE_MIN)}..${String(CURRENCY_RATE_MAX)}`,
+        );
       }
       requireSources(country.currency.valuation.sourceIds, `${path}.currency.valuation.sourceIds`);
     }
@@ -1019,19 +1097,39 @@ export function validateM5HistoricalData(
       `meta.playerCountryTag ${JSON.stringify(data.meta.playerCountryTag)} is not a registered country`,
     );
   }
+  for (let index = 0; index < data.countries.length; index += 1) {
+    const country = data.countries[index];
+    if (country?.debt?.enabled === true && country.debt.creditorKind === "country") {
+      if (!countryById.has(country.debt.creditorId)) {
+        errors.push(
+          `countries[${String(index)}].debt.creditorId references unknown country ${String(country.debt.creditorId)}`,
+        );
+      }
+    }
+  }
 
   const regionCountry = new Map<number, number>();
   for (let index = 0; index < data.regions.length; index += 1) {
     const region = data.regions[index];
     if (region === undefined) continue;
     const path = `regions[${String(index)}]`;
-    if (!isPositiveInteger(region.id) && region.id !== 0) {
-      errors.push(`${path}.id must be a non-negative integer`);
+    if (!isValidId(region.id)) {
+      errors.push(`${path}.id must be an unsigned 32-bit integer`);
     }
     if (regionById.has(region.id)) errors.push(`${path}.id ${String(region.id)} is duplicated`);
     regionById.set(region.id, region);
     if (regionKeys.has(region.key)) errors.push(`${path}.key ${JSON.stringify(region.key)} is duplicated`);
     regionKeys.add(region.key);
+    if (region.resourceCapsPerDay !== undefined) {
+      for (let capIndex = 0; capIndex < region.resourceCapsPerDay.length; capIndex += 1) {
+        const cap = region.resourceCapsPerDay[capIndex];
+        if (cap !== undefined && cap < 0) {
+          errors.push(
+            `regions[${String(index)}].resourceCapsPerDay[${String(capIndex)}] must be non-negative`,
+          );
+        }
+      }
+    }
     requireSources(region.sourceIds, `${path}.sourceIds`);
     const owner = regionOwner.get(region.id);
     if (owner === undefined) {
@@ -1056,7 +1154,7 @@ export function validateM5HistoricalData(
     const market = data.markets[index];
     if (market === undefined) continue;
     const path = `markets[${String(index)}]`;
-    if (!isNonNegativeInteger(market.id)) errors.push(`${path}.id must be a non-negative integer`);
+    if (!isValidId(market.id)) errors.push(`${path}.id must be an unsigned 32-bit integer`);
     if (marketById.has(market.id)) errors.push(`${path}.id ${String(market.id)} is duplicated`);
     marketById.set(market.id, market);
     if (marketKeys.has(market.key)) errors.push(`${path}.key ${JSON.stringify(market.key)} is duplicated`);
@@ -1069,6 +1167,9 @@ export function validateM5HistoricalData(
     for (const regionId of market.regionIds) {
       if (!regionById.has(regionId)) {
         errors.push(`${path}.regionIds references unknown region ${String(regionId)}`);
+      }
+      if (!isValidId(regionId)) {
+        errors.push(`${path}.regionIds contains an invalid region id ${String(regionId)}`);
       }
       if (seen.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
       seen.add(regionId);
@@ -1156,6 +1257,9 @@ export function validateM5HistoricalData(
     if (!(population.savingsPerCapitaSUSD >= 0)) {
       errors.push(`${path}.savingsPerCapitaSUSD must be non-negative`);
     }
+    if (!Number.isFinite(population.population * population.savingsPerCapitaSUSD)) {
+      errors.push(`${path} initial savings overflow to a non-finite value`);
+    }
     if (!(population.militancy >= 0 && population.militancy <= 1)) {
       errors.push(`${path}.militancy must be in 0..1`);
     }
@@ -1191,6 +1295,17 @@ export function validateM5HistoricalData(
     if (keys !== null && !keys.buildings.has(building.definitionKey)) {
       errors.push(`${path}.definitionKey references unknown building definition ${JSON.stringify(building.definitionKey)}`);
     }
+    if (keys !== null) {
+      const definition = keys.buildingByKey.get(building.definitionKey);
+      if (
+        definition !== undefined &&
+        !definition.ownershipAllowed.includes("private")
+      ) {
+        errors.push(
+          `${path}.definitionKey ${JSON.stringify(building.definitionKey)} does not allow private ownership`,
+        );
+      }
+    }
     if (keys !== null && !keys.professions.has(building.ownerProfessionKey)) {
       errors.push(`${path}.ownerProfessionKey references unknown profession ${JSON.stringify(building.ownerProfessionKey)}`);
     }
@@ -1218,22 +1333,85 @@ export function validateM5HistoricalData(
     }
   }
 
-  const employmentKeys = new Set<string>();
   const buildingByKey = new Map(data.buildings.map((building) => [building.key, building]));
+  const employmentFirstIndex = new Map<string, number>();
+  const assignedWorkersByBlock = new Map<string, number>();
+  const eligibleCache = new Map<string, number>();
+  const profile = data.meta.ageStructures["world-1900-provisional"];
+  const eligibleWorkforce = (
+    population: HistoricalPopulationInput,
+    profession: ProfessionDef,
+    path: string,
+  ): number => {
+    const cacheKey = `${String(population.regionId)}:${population.professionKey}`;
+    const cached = eligibleCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+    if (profile === undefined) return 0;
+    const ages = expandHistoricalPopulation(population.population, profile, path);
+    let workingAge = 0;
+    for (let age = 3; age <= 12; age += 1) {
+      workingAge += ages.maleAgeGroups[age] ?? 0;
+      workingAge += ages.femaleAgeGroups[age] ?? 0;
+    }
+    const qualified =
+      population.literacy >= profession.qualificationLiteracy &&
+      population.wealthLevel >= profession.qualificationWealthLevel;
+    const eligible = qualified ? Math.floor(workingAge * profession.participationRate) : 0;
+    eligibleCache.set(cacheKey, eligible);
+    return eligible;
+  };
   for (let index = 0; index < data.employment.length; index += 1) {
     const entry = data.employment[index];
     if (entry === undefined) continue;
     const path = `employment[${String(index)}]`;
+    if (!isValidId(entry.regionId)) {
+      errors.push(`${path}.regionId must be an unsigned 32-bit integer`);
+    }
     const building = buildingByKey.get(entry.buildingKey);
     if (building === undefined) {
       errors.push(`${path}.buildingKey references unknown building ${JSON.stringify(entry.buildingKey)}`);
     } else if (building.regionId !== entry.regionId) {
       errors.push(`${path}.regionId does not match the building's region`);
     }
+    const profession =
+      keys === null ? undefined : keys.professionByKey.get(entry.professionKey);
+    if (keys !== null && profession === undefined) {
+      errors.push(
+        `${path}.professionKey references unknown profession ${JSON.stringify(entry.professionKey)}`,
+      );
+    }
+    if (building !== undefined && keys !== null && profession !== undefined) {
+      const definition = keys.buildingByKey.get(building.definitionKey);
+      if (definition !== undefined) {
+        const job = definition.jobs.find((candidate) => candidate.professionId === profession.id);
+        if (job === undefined) {
+          errors.push(
+            `${path}.professionKey ${JSON.stringify(entry.professionKey)} is not a job of building definition ${JSON.stringify(building.definitionKey)}`,
+          );
+        } else {
+          const slots = Math.floor(
+            job.workersPerThroughputUnit *
+              definition.referenceThroughputPerDayAtLevelOne *
+              building.level,
+          );
+          if (Number.isInteger(entry.workers) && entry.workers > slots) {
+            errors.push(
+              `${path}.workers ${String(entry.workers)} exceeds the ${String(slots)} job slots of ${JSON.stringify(building.key)} at level ${String(building.level)}`,
+            );
+          }
+        }
+      }
+    }
     if (!isPositiveInteger(entry.workers)) errors.push(`${path}.workers must be a positive integer`);
     const key = `${String(entry.regionId)}:${entry.professionKey}:${entry.buildingKey}`;
-    if (employmentKeys.has(key)) errors.push(`${path} duplicates employment ${key}`);
-    employmentKeys.add(key);
+    const firstIndex = employmentFirstIndex.get(key);
+    if (firstIndex !== undefined) {
+      errors.push(
+        `${path} duplicates employment ${key} first declared at employment[${String(firstIndex)}]`,
+      );
+    } else {
+      employmentFirstIndex.set(key, index);
+    }
     const block = (populationByRegion.get(entry.regionId) ?? []).find(
       (population) => population.professionKey === entry.professionKey,
     );
@@ -1241,16 +1419,47 @@ export function validateM5HistoricalData(
       errors.push(
         `${path} references unknown region/profession ${String(entry.regionId)}:${entry.professionKey}`,
       );
+    } else if (keys !== null && profession !== undefined) {
+      const blockKey = `${String(entry.regionId)}:${entry.professionKey}`;
+      if (entry.workers > 0) {
+        assignedWorkersByBlock.set(
+          blockKey,
+          (assignedWorkersByBlock.get(blockKey) ?? 0) + entry.workers,
+        );
+      }
+      if (isPositiveInteger(block.population)) {
+        eligibleWorkforce(block, profession, `employment[${String(index)}]`);
+      }
+    }
+  }
+  for (const [key, assigned] of [...assignedWorkersByBlock].sort(([left], [right]) =>
+    left < right ? -1 : left > right ? 1 : 0,
+  )) {
+    const eligible = eligibleCache.get(key) ?? 0;
+    if (assigned > eligible) {
+      errors.push(
+        `employment for ${key} assigns ${String(assigned)} workers but only ${String(eligible)} are qualified and eligible`,
+      );
     }
   }
 
   const calibrationIds = new Set<string>();
+  const calibrationTargets = new Map<string, number>();
   for (let index = 0; index < data.calibration.length; index += 1) {
     const target = data.calibration[index];
     if (target === undefined) continue;
     const path = `calibration[${String(index)}]`;
     if (calibrationIds.has(target.id)) errors.push(`${path}.id ${JSON.stringify(target.id)} is duplicated`);
     calibrationIds.add(target.id);
+    const targetKey = `${target.countryTag}:${target.metric}`;
+    const previousTarget = calibrationTargets.get(targetKey);
+    if (previousTarget !== undefined) {
+      errors.push(
+        `${path} duplicates calibration target ${JSON.stringify(targetKey)} first declared at calibration[${String(previousTarget)}]`,
+      );
+    } else {
+      calibrationTargets.set(targetKey, index);
+    }
     if (!countryTags.has(target.countryTag)) {
       errors.push(`${path}.countryTag references unknown country tag ${JSON.stringify(target.countryTag)}`);
     }
@@ -1512,8 +1721,13 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     },
   );
 
-  const employment: EmploymentAssignmentInitialDef[] = [...data.employment]
-    .map((entry, index) => {
+  // Employment ids are derived from the resolved authoritative identities, not
+  // from the authored JSON array order. Sorting by (building, pop block,
+  // profession) makes the generated ids and canonical world hash independent of
+  // record order. The composite identity is unique because validation rejects
+  // duplicate employment keys.
+  const employment: EmploymentAssignmentInitialDef[] = data.employment
+    .map((entry) => {
       const buildingId = buildingIdByKey.get(entry.buildingKey);
       const popBlockId = blockIdByKey.get(`${String(entry.regionId)}:${entry.professionKey}`);
       const profession = professionByKey.get(entry.professionKey);
@@ -1523,14 +1737,19 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         ]);
       }
       return {
-        id: index,
         popBlockId,
         buildingInstanceId: buildingId,
         professionId: profession.id,
         workers: entry.workers,
       };
     })
-    .sort((left, right) => left.id - right.id);
+    .sort(
+      (left, right) =>
+        left.buildingInstanceId - right.buildingInstanceId ||
+        left.popBlockId - right.popBlockId ||
+        left.professionId - right.professionId,
+    )
+    .map((entry, index) => ({ id: index, ...entry }));
 
   const goodByKey = new Map(goods.map((good) => [good.key, good]));
   const markets: MarketInitialDef[] = sortedMarkets.map((market) => ({

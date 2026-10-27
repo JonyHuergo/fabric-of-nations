@@ -1,5 +1,5 @@
 /**
- * Generate the browser/WebView worker bundle used by the Expo app.
+ * Generate or verify the browser/WebView worker bundle used by the Expo app.
  *
  * The worker bundle is committed as `src/generated/simWorker.ts` so a clean
  * checkout can typecheck and bundle without first building `packages/sim`.
@@ -7,13 +7,21 @@
  *
  *   pnpm -F @century/app build:worker
  *
+ * Verify that the committed artifact matches the source without overwriting it:
+ *
+ *   pnpm -F @century/app build:worker:check
+ *
+ * `--check [--output <path>]` compares the generated source with the committed
+ * (or supplied) file and exits nonzero on drift. `--output` is a test seam used
+ * to prove mismatch detection without touching the committed artifact.
+ *
  * The bundle aliases `@century/sim` to TypeScript source and maps its relative
  * `.js` imports to `.ts`, so no prior build artifact is required.
  */
 
 import { createRequire } from "node:module";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -24,7 +32,15 @@ const APP_ROOT = resolve(HERE, "..");
 const WORKSPACE_ROOT = resolve(APP_ROOT, "../..");
 const SIM_SOURCE_ROOT = resolve(WORKSPACE_ROOT, "packages/sim/src");
 const WORKER_ENTRY = resolve(WORKSPACE_ROOT, "packages/sim-worker/src/webWorkerEntry.ts");
-const OUTPUT = resolve(APP_ROOT, "src/generated/simWorker.ts");
+const DEFAULT_OUTPUT = resolve(APP_ROOT, "src/generated/simWorker.ts");
+
+const argv = process.argv.slice(2);
+const checkOnly = argv.includes("--check");
+const outputIndex = argv.indexOf("--output");
+const outputPath =
+  outputIndex >= 0 && argv[outputIndex + 1] !== undefined
+    ? resolve(argv[outputIndex + 1])
+    : DEFAULT_OUTPUT;
 
 const simSourceResolver = {
   name: "sim-source-js-to-ts",
@@ -73,9 +89,38 @@ export const SIM_WORKER_BUNDLE_BYTES = ${String(Buffer.byteLength(script, "utf8"
 export const SIM_WORKER_HTML_BYTES = ${String(Buffer.byteLength(html, "utf8"))};
 `;
 
-mkdirSync(dirname(OUTPUT), { recursive: true });
-writeFileSync(OUTPUT, source, "utf8");
-console.log(
-  `wrote ${OUTPUT}: script ${(Buffer.byteLength(script, "utf8") / 1024).toFixed(1)} KiB, ` +
-    `html ${(Buffer.byteLength(html, "utf8") / 1024).toFixed(1)} KiB`,
-);
+if (checkOnly) {
+  let current;
+  try {
+    current = readFileSync(outputPath, "utf8");
+  } catch {
+    console.error(`worker bundle check failed: cannot read ${outputPath}`);
+    process.exitCode = 1;
+  }
+  if (current !== undefined) {
+    if (current === source) {
+      console.log(`worker bundle is current: ${outputPath}`);
+    } else {
+      let differingByte = 0;
+      const limit = Math.min(current.length, source.length);
+      while (differingByte < limit && current[differingByte] === source[differingByte]) {
+        differingByte += 1;
+      }
+      console.error(
+        `worker bundle is stale: ${outputPath} does not match the source generation ` +
+          `(current ${String(Buffer.byteLength(current, "utf8"))} bytes, ` +
+          `expected ${String(Buffer.byteLength(source, "utf8"))} bytes, ` +
+          `first difference at byte ${String(differingByte)}). ` +
+          "Run pnpm -F @century/app build:worker",
+      );
+      process.exitCode = 1;
+    }
+  }
+} else {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, source, "utf8");
+  console.log(
+    `wrote ${outputPath}: script ${(Buffer.byteLength(script, "utf8") / 1024).toFixed(1)} KiB, ` +
+      `html ${(Buffer.byteLength(html, "utf8") / 1024).toFixed(1)} KiB`,
+  );
+}

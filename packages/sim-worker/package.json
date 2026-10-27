@@ -35,6 +35,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "scenario:build": "node ./scripts/generate-scenario.mjs",
+    "scenario:build:check": "node ./scripts/generate-scenario.mjs --check",
     "poc": "node ./dist/nodePoc.js"
   },
   "dependencies": {

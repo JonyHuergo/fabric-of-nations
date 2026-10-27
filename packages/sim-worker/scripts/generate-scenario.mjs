@@ -1,19 +1,29 @@
 /**
- * Regenerate the committed M7 worker scenario module.
+ * Regenerate or verify the committed M7 worker scenario module.
  *
  * Run after `pnpm -F @century/data build` when historical sample content changes.
  * The worker bundle needs the validated scenario as plain JSON-compatible data;
  * the browser must not import the Node-only `@century/data` loader.
+ *
+ * `--check [--output <path>]` compares the generated module with the committed
+ * (or supplied) file and exits nonzero on drift without overwriting it.
  */
 
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadM5EightPolities } from "../../data/dist/index.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUTPUT = join(HERE, "..", "src", "generated", "m5Scenario.ts");
+const DEFAULT_OUTPUT = resolve(HERE, "..", "src", "generated", "m5Scenario.ts");
+const argv = process.argv.slice(2);
+const checkOnly = argv.includes("--check");
+const outputIndex = argv.indexOf("--output");
+const outputPath =
+  outputIndex >= 0 && argv[outputIndex + 1] !== undefined
+    ? resolve(argv[outputIndex + 1])
+    : DEFAULT_OUTPUT;
 const scenario = loadM5EightPolities();
 
 const source = `/**
@@ -27,6 +37,27 @@ import type { EconomyScenarioDef } from "@century/sim";
 export const M5_SCENARIO = (${JSON.stringify(scenario, null, 2)}) as EconomyScenarioDef;
 `;
 
-mkdirSync(dirname(OUTPUT), { recursive: true });
-writeFileSync(OUTPUT, source, "utf8");
-console.log(`wrote ${OUTPUT} (${String(source.length)} bytes)`);
+if (checkOnly) {
+  let current;
+  try {
+    current = readFileSync(outputPath, "utf8");
+  } catch {
+    console.error(`worker scenario check failed: cannot read ${outputPath}`);
+    process.exitCode = 1;
+  }
+  if (current !== undefined) {
+    if (current === source) {
+      console.log(`worker scenario is current: ${outputPath}`);
+    } else {
+      console.error(
+        `worker scenario is stale: ${outputPath} does not match the data package. ` +
+          "Run pnpm -F @century/sim-worker scenario:build",
+      );
+      process.exitCode = 1;
+    }
+  }
+} else {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, source, "utf8");
+  console.log(`wrote ${outputPath} (${String(source.length)} bytes)`);
+}

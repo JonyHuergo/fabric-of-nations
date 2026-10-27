@@ -111,6 +111,32 @@ function stripCommentsAndStrings(source: string): string {
   return output;
 }
 
+/** Public worker subpaths the app may import. The root barrel is always allowed. */
+const APP_WORKER_PUBLIC_SUBPATHS = new Set(["@century/sim-worker", "@century/sim-worker/persistence"]);
+
+function importSpecifiers(source: string): string[] {
+  const specifiers: string[] = [];
+  const patterns = [
+    /\b(?:import|export)\s+(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/g,
+    /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+  ];
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      if (match[1] !== undefined) specifiers.push(match[1]);
+    }
+  }
+  return specifiers;
+}
+
+function appImportAllowed(specifier: string): boolean {
+  if (specifier === "@century/sim" || specifier.startsWith("@century/sim/")) return false;
+  if (specifier === "@century/data" || specifier.startsWith("@century/data/")) return false;
+  if (specifier !== "@century/sim-worker" && !specifier.startsWith("@century/sim-worker/")) {
+    return true;
+  }
+  return APP_WORKER_PUBLIC_SUBPATHS.has(specifier);
+}
+
 describe("simulation isolation", () => {
   const simSourceFiles = walk(join(SIM, "src"), (path) => path.endsWith(".ts"));
 
@@ -208,25 +234,102 @@ describe("simulation isolation", () => {
     );
     expect(appSource.length).toBeGreaterThan(0);
     let importsWorkerContract = false;
+    let importsPersistenceContract = false;
     for (const file of appSource) {
       const source = readFileSync(file, "utf8");
-      expect(source).not.toMatch(
-        /\bfrom\s+['"]@century\/(sim|data)['"]|\bimport\s*\(\s*['"]@century\/(sim|data)['"]/,
-      );
+      const specifiers = importSpecifiers(source);
+      for (const specifier of specifiers) {
+        expect({ file: relative(ROOT, file), specifier, allowed: appImportAllowed(specifier) }).toEqual({
+          file: relative(ROOT, file),
+          specifier,
+          allowed: true,
+        });
+        if (specifier === "@century/sim-worker") importsWorkerContract = true;
+        if (specifier === "@century/sim-worker/persistence") importsPersistenceContract = true;
+      }
       expect(source).not.toMatch(
         /\b(createEconomyWorld|serializeWorld|deserializeWorld|runEconomicDay|assertValidWorld)\b/,
       );
-      if (/['"]@century\/sim-worker(?:\/[a-z-]+)?['"]/.test(source)) {
-        importsWorkerContract = true;
-      }
     }
     expect(importsWorkerContract).toBe(true);
+    expect(importsPersistenceContract).toBe(true);
+
+    // The committed bundle is opaque generated worker script, not an app import
+    // escape hatch: it must expose only these bundle constants and must not
+    // import simulation/data modules itself.
+    const generatedPath = join(PACKAGES, "app", "src", "generated", "simWorker.ts");
+    const generated = readFileSync(generatedPath, "utf8");
+    const generatedExports = [...generated.matchAll(/^export const ([A-Z0-9_]+)/gm)].map(
+      (match) => match[1],
+    );
+    expect(generatedExports.sort()).toEqual([
+      "SIM_WORKER_BUNDLE_BYTES",
+      "SIM_WORKER_HTML",
+      "SIM_WORKER_HTML_BYTES",
+      "SIM_WORKER_SCRIPT",
+    ]);
+    expect(generated).not.toMatch(/@century\/(sim|data)/);
 
     const workerAppEntry = readFileSync(
       join(PACKAGES, "sim-worker", "src", "index.ts"),
       "utf8",
     );
     expect(workerAppEntry).not.toMatch(/@century\/sim|@century\/data/);
+  });
+
+  test("app import allowlist rejects internal worker and simulation subpaths", () => {
+    const allowed = [
+      "@century/sim-worker",
+      "@century/sim-worker/persistence",
+      "react",
+      "node:fs",
+      "../generated/simWorker",
+    ];
+    const denied = [
+      "@century/sim-worker/host",
+      "@century/sim-worker/snapshot",
+      "@century/sim-worker/node",
+      "@century/sim",
+      "@century/sim/economy",
+      "@century/data",
+      "@century/data/load",
+    ];
+    for (const specifier of allowed) {
+      expect({ specifier, allowed: appImportAllowed(specifier) }).toEqual({
+        specifier,
+        allowed: true,
+      });
+    }
+    for (const specifier of denied) {
+      expect({ specifier, allowed: appImportAllowed(specifier) }).toEqual({
+        specifier,
+        allowed: false,
+      });
+    }
+  });
+
+  test("app import fixtures distinguish supported contracts from privileged paths", () => {
+    const fixtureDir = join(HERE, "fixtures", "app-boundary");
+    const allowedSpecifiers = importSpecifiers(
+      readFileSync(join(fixtureDir, "allowed.txt"), "utf8"),
+    );
+    const forbiddenSpecifiers = importSpecifiers(
+      readFileSync(join(fixtureDir, "forbidden.txt"), "utf8"),
+    );
+    expect(allowedSpecifiers.length).toBeGreaterThan(0);
+    expect(forbiddenSpecifiers.length).toBeGreaterThan(0);
+    for (const specifier of allowedSpecifiers) {
+      expect({ specifier, allowed: appImportAllowed(specifier) }).toEqual({
+        specifier,
+        allowed: true,
+      });
+    }
+    for (const specifier of forbiddenSpecifiers) {
+      expect({ specifier, allowed: appImportAllowed(specifier) }).toEqual({
+        specifier,
+        allowed: false,
+      });
+    }
   });
 
   test("simulation code does not import calibration targets or the data package", () => {
