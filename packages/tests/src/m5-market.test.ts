@@ -121,7 +121,9 @@ describe("M5 multi-market clearing and conservation", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     const after = cloneWorld(world);
+    const beforeHash = hashWorld(world);
     runTicks(world, 3, context(scenario));
+    expect(hashWorld(after)).toBe(beforeHash);
     // Market 0 covers three regions but has one inventory pool. The total stock
     // must equal the sum of that market's lots, not three separate copies.
     const market0 = world.markets.find((market) => market.id === 0);
