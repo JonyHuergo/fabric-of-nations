@@ -19,8 +19,9 @@ Century's M7 Expo / React Native playable shell, updated for E1 economic clarity
 5. **Markets** — each authored market's goods, prices, stock, and estimated daily
    production capacity; essential goods are marked.
 6. **Ledger** — immutable monthly country fiscal flows and close balances, monthly
-   economic report, confirmed session action history, world gross flows, and bounded
-   diagnostics.
+   economic report, annual accounting reports (flows, year-end balances, partial-year
+   labels, correction counts), confirmed session action history, world gross flows, and
+   bounded diagnostics.
 
 Controls: start/pause, step one day, speeds 1/2/5/10 simulated days per second,
 save, and load. Actions are sent only through the versioned worker protocol. Action

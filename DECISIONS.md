@@ -3005,6 +3005,64 @@ changes no simulation source, scenario data, save schema, hashing, or version co
 only worker protocol/snapshot presentation data, selectors, app/UI, tests, generated
 worker bundle, and documentation changed.
 
+## D-072 — M7a annual accounting, controlled corrections, and schema 17
+
+**Status:** accepted and implemented. GDD v2.8 §17B records the delivered scope and
+limits. E2–E6 and M8a remain unimplemented.
+
+**Why.** The M4b monthly close zeroed revenue/expense and retained monthly summaries,
+but there was no annual period, no annual flow/balance view, and no controlled way to
+correct a ledger without editing history. M7a completes the accounting lifecycle
+without adding a player policy mechanic.
+
+**Decisions.**
+
+1. **Annual period = civil calendar year.** The annual summary is appended immediately
+   after the 31 December monthly close, before the day advances. It is ordered by year
+   and contiguous.
+2. **No second closing entry.** The December monthly close is the year-end closing
+   entry (revenue/expense zeroed into owner equity, cash-neutral, deterministic). M7a
+   verifies zero revenue/expense and does not re-run daily flows or post a duplicate
+   close.
+3. **Annual flows are sums of monthly closes.** Tax, welfare, interest, net result, and
+   the four gross flow kinds are exact yearly sums. They are not the latest month
+   repeated and are not derived by differencing balances.
+4. **Annual balances are year-end stocks.** Treasury cash, debt principal liability,
+   and interest payable are captured at 31 December. No annual account-level trial
+   balance is retained.
+5. **Partial years and terminal boundary.** A start after 1 January produces
+   `complete: false`; later years are complete. Leap years use the existing Gregorian
+   calendar. The terminal 2000-01-01 boundary creates no annual 2000 period.
+6. **Controlled corrections.** `postFinanceCorrection` posts a new balanced
+   `correction` entry with deterministic id, current day, new posting id, original
+   posting id, required reason, and retained lines. It is atomic and validates the
+   accounting identity. Closed monthly/annual summaries are immutable. A prior-period
+   correction lands in the current open period; its count appears in the next annual
+   summary. Corrections are an administrative API, not a player action.
+7. **Bounded history.** At most 100 annual summaries, 64 corrections, and latest 12
+   annual reports in the snapshot. Existing monthly compaction (1,200 summaries, 12
+   detailed) is unchanged.
+8. **Schema and protocol.** World schema **17**, simulation **0.17.0**, save format
+   **1**, data version **`m3-economy-v3`**, worker protocol **4**. New state:
+   `FinanceState.annualSummaries`, `corrections`, `nextCorrectionId`. Schema-16 saves
+   reject under existing policy; no migration is authorized.
+
+**Consequences.** Canonical hashes and known-answer fixtures change intentionally.
+E1's annual report projection gains `CountrySnapshot.annualReports`; no GDP/inflation/
+real-income/unemployment claim is added. Save growth is bounded to compact annual
+records and a small correction list; no benchmark or performance claim was made
+because benchmarks were forbidden.
+
+**Open choices.** Annual reports older than the latest 12 are persisted but not exposed
+in snapshots. Correction records may outlive the bounded original-posting audit buffer;
+provenance id/reason remain. Player-facing correction UI, reopen, audit institutions,
+inflation restatement, and annual tax assessment remain unimplemented.
+
+**Verification.** See GDD v2.8 §17B and the M7a change report. Implementation commit is
+`c8b2e4cd72aa049243c07dfdb413e00c708d07cf`. Commands deliberately excluded all
+benchmarks, CI (it invokes benchmarks), exports, campaigns, and device measurements;
+the repository-wide test run included the pre-existing century correctness regressions.
+
 ## Assumptions recorded for future review
 
 1. `scenarioId` and `dataVersion` are non-empty strings up to 128 characters.

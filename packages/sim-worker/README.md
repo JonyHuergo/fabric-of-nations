@@ -2,12 +2,13 @@
 
 Century's versioned simulation worker boundary.
 
-- `protocol` (root export) — protocol version 3 commands/events, immutable snapshot
+- `protocol` (root export) — protocol version 4 commands/events, immutable snapshot
   types, parsing/validation, and pure selectors. App-safe; no simulation import.
 - `host` — `SimulationHost`, which owns the authoritative world and applies
   commands only between complete ticks.
 - `snapshot` — snapshot builder from authoritative state. E1 adds derived production
-  capacity, need tiers, household cash/wage data, market capacity, and close balances.
+  capacity, need tiers, household cash/wage data, market capacity, close balances, and
+  monthly labels; M7a adds bounded annual reports.
 - `fiscalPreview`, `reports`, `explanations`, `actionHistory` — pure E1 selectors. They
   operate only on snapshots and never read the world.
 - `persistence` — gzip/base64 storage codec for canonical save strings.
