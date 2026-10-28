@@ -1,4 +1,4 @@
-# Century — M0/M1/M2.1/M3a–M3f/M4a-1/M4a-2/M4b/M4c/M5/M5a/M5b/M6/M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, and E4 industrial policy
+# Century — M0–M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, E4 industrial policy, and M8 laws and institutions
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -40,11 +40,18 @@ time, capitalizes work-in-progress, and completes into state-owned productive
 buildings. **E4 (Industrial and Business Policy)** adds validated building sectors,
 construction material requirements bought from actual market stock, sectoral
 production subsidies paid against verified output, and public-enterprise capital
-support, with balanced accounting and reporting. General goods/services procurement,
+support, with balanced accounting and reporting. **M8 (Laws and Institutions)** adds
+authoritative regimes, laws, elections, seven derived interest groups, regional
+unrest and crisis/revolution, clerk-staffed administration with cash-limited payroll
+and quality/overload effects, and a bounded scripted-event queue with provenance.
+Only taxation, suffrage, labor, and trade law slots expose options; education,
+health, military service, colonial policy, and currency remain later-stage
+dependencies. AI law/funding actions and player crisis-response actions are not
+implemented. General goods/services procurement,
 private co-financing, loans, guarantees, investment tax credits, public-enterprise
 expansion/discontinuation, consumption/excise, property/land, and customs taxes,
 broader government expenditure and services, banking/central banking, dynamic FX,
-inflation, monetary policy, reopen/reversal, politics, technology, diplomacy, and
+inflation, monetary policy, reopen/reversal, technology, diplomacy, and
 warfare remain unimplemented. **M7's native iOS/Android release
 builds and real-device performance were not measured; M7 is delivered with that
 explicit acceptance exception, not as a passed mobile release.** The designer has
@@ -52,9 +59,11 @@ adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0, E1, E2, E3, and E4 are implemented in GDD v2.11 §17A**, and
-E5–E6 are planned, not implemented. The design authority is the [Century GDD
-v2.11](./Century_GDD_v2.11.md); v2.10 is retained as
+economic program; **E0, E1, E2, E3, and E4 are implemented in GDD v2.12 §17A and M8
+is implemented in §17C**, and E5–E6 are planned, not implemented. The design
+authority is the [Century GDD
+v2.12](./Century_GDD_v2.12.md); v2.11 is retained as
+[historical E4 documentation](./Century_GDD_v2.11.md), v2.10 as
 [historical E3 documentation](./Century_GDD_v2.10.md), v2.9 as
 [historical E2 documentation](./Century_GDD_v2.9.md), v2.8 as
 [historical M7a/E1 documentation](./Century_GDD_v2.8.md), v2.7 as
@@ -70,7 +79,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -601,11 +610,12 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.11 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.12 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.11
-records M7a annual accounting (§17B) and the Economic Management Overhaul (§17A; E0
-design, E1/E2/E3/E4 implementations); E5–E6 are planned, and M8a remains planned only.
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.12
+records M7a annual accounting (§17B), the Economic Management Overhaul (§17A; E0
+design, E1/E2/E3/E4 implementations), and M8 laws and institutions (§17C; D-076);
+E5–E6 are planned, and M8a remains planned only.
 See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
@@ -1158,11 +1168,14 @@ M0–M6 are implemented and accepted; M7's shell/worker implementation is delive
 with an explicit native-release and real-device acceptance exception. The designer
 has adopted intermediate finance stages (recorded as D-050) for work that earlier
 revisions left unassigned, and the **Economic Management Overhaul (E0–E6)** as the
-player-facing economic program (D-070). **E0, E1, and M7a are implemented; E2–E6 and
-M8a remain planned and not implemented.** E1 is presentation/selectors, a
+player-facing economic program (D-070). **E0, E1, E2, E3, E4, M7a, and M8 are
+implemented; E5–E6 and M8a remain planned and not implemented.** E1 is
+presentation/selectors, a
 bounded monthly report, and session-confirmed action history; it adds no new
 economic mechanic. M7a adds bounded annual summaries and audited controlled
-corrections; it changes the authoritative finance schema. The later stages
+corrections; it changes the authoritative finance schema. M8 adds political
+institutions, laws, elections, interest groups, unrest/crisis, administration, and
+scripted events. The later stages
 preserve existing M0–M10 milestone identities and do not change
 M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the
 simulation schema.
@@ -1181,10 +1194,10 @@ Combined planning order with the player-facing economic program:
 | **M5b** | After M5a, before M6 | Versioned public-debt contracts, issuance with matching asset/liability entries and cash transfers, interest, maturity/principal repayment, refinancing, arrears, and explicit default; separation of deficit, financing, borrowing proceeds, interest expense, and principal repayment | Accepted |
 | **E0** | Design now | Economic Management policy framework, dependencies, authority boundaries, accounting/persistence implications, UI information architecture, acceptance criteria, E0–E6 sequence, and exclusions (GDD v2.6 §17A; preserved in v2.8) | Documented; no simulation code |
 | **E1** | After M7 | Economic clarity/dashboard, supported causal explanations, pre-commitment explanations, bounded monthly economic report/action history, focused improvements to the six M7 screens | **Implemented** (GDD v2.8 §17A.17; D-071) |
-| **E2** | After E1 (M7a recommended first) | Fiscal management: supported tax/spending instruments, budget allocation, reserves, borrowing/repayment/refinancing controls, financing constraints | Planned |
-| **E3** | After E2 | Public investment/construction: project queue, real money/labor/material/time requirements, financing, progress/completion, cancellation/failure, actual assets | Planned |
-| **E4** | After E3 | Industrial/business policy: selected subsidies, procurement, investment incentives, public-enterprise investment, sector programs | Planned |
-| **M8** | After E4 | Political institutions, laws, elections, unrest, instability, events | Planned |
+| **E2** | After E1 (M7a recommended first) | Fiscal management: supported tax/spending instruments, budget allocation, reserves, borrowing/repayment/refinancing controls, financing constraints | **Implemented** (GDD v2.12 §17A.18; D-073) |
+| **E3** | After E2 | Public investment/construction: project queue, real money/labor/material/time requirements, financing, progress/completion, cancellation/failure, actual assets | **Implemented** (GDD v2.12 §17A.19; D-074) |
+| **E4** | After E3 | Industrial/business policy: selected subsidies, procurement, investment incentives, public-enterprise investment, sector programs | **Implemented** for sectors/materials/subsidy/support (GDD v2.12 §17A.20; D-075); delayed/general procurement, private co-financing, loans/guarantees, tax credits, and expansion/discontinuation deferred |
+| **M8** | After E4 | Political institutions, laws, elections, unrest, instability, events | **Implemented** (GDD v2.12 §17C; D-076; schema 21 / sim 0.21.0 / protocol 8 / data `m3-economy-v6`) for taxation/suffrage/labor/trade laws, elections, interest groups, unrest/crisis, administration, and scripted events; other law slots deferred |
 | **M9** | After M8 | Technology, research, education/literacy mechanics | Planned |
 | **E5** | After M8/M9 | Labor/social institutions: services/transfers/training, health/education effects, labor laws, pensions/social insurance where supported | Planned |
 | **E6** | After E5 | E6a real trade/commercial policy; E6b monetary foundations (retained M8a scope) | Planned |

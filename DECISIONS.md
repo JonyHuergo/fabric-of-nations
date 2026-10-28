@@ -3454,6 +3454,173 @@ material-inclusive capitalization/write-off/reporting; worker/UI wiring tests co
 new actions/tab. Full results are in the v2.11 change report. No benchmarks or
 performance measurements were run; no benchmark code/threshold/report was changed.
 
+## D-076 — M8 political institutions: laws, elections, interest groups, unrest, and administration
+
+**Status:** adopted for M8 implementation. **Scope:** §9.1–§9.5 and the §17 M8
+definition of done only; E5, M9, E6, M10 and the retained M8a/E6b monetary scope
+are not implemented.
+
+**Why a decision is required.** M8 adds authoritative political state, a daily
+politics phase, player actions, a new fiscal expenditure, and new save/snapshot
+fields. The following choices determine ordering, authority, and accounting and
+cannot be inferred from the GDD's design prose alone.
+
+### Law model and legal path
+
+1. All nine §9.2 slots exist in `Country.laws`. Only taxation, suffrage, labor,
+   and trade are populated with proposable law definitions in M8. Education,
+   health, military service, colonial policy, and currency have no law options
+   until M9/E5/M10/E6b provide their concrete service, human-capital, military, or
+   monetary mechanisms. A slot with no implemented option is displayed as
+   "not implemented in M8", never as a disabled-but-real policy.
+2. A law definition has a stable id, one slot, prerequisites, eligible regimes,
+   a base enactment duration, typed effects (tax-rate bounds, suffrage franchise,
+   border access, labor organisation/grievance, administration load), and a
+   documented stance for each of the seven interest groups.
+3. `propose-law` names a target law id. Enacting a law, changing it, and
+   repealing it are the same operation: the target may be the slot's base law
+   (repeal). The proposal is validated at the worker/simulation boundary against
+   the current day, the designated player country, slot/option support, current
+   law, prerequisites, eligible regime, bounded transition count, and the
+   influence-weighted support threshold. No political points are spent.
+4. Support is derived from the current interest-group influence and the group
+   stances on the target law: `Σ(influence × stance) / Σ influence`, plus a
+   documented governing-group alignment term
+   (`0.3 × governing-group influence × its stance`) so an election outcome changes
+   which laws are politically feasible. Influence is derived, normalised, and never
+   spendable. Support is evaluated once at proposal; once a transition starts it runs
+   to its effective day. This matches "requires support, a legal path, and time"
+   without inventing a per-day legislative vote that the model cannot observe.
+5. A transition becomes effective at the start of its `effectiveDay` (pipeline
+   step 2). Its effects apply from that day forward. It never rewrites a closed
+   month, annual summary, prior posting, or past report. A statutory tax-rate
+   bound that conflicts with the current rate clamps that rate on the effective
+   day and records the compliance in the event log; this is a forward-looking
+   statutory compliance, not a retroactive restatement.
+6. Enactment duration is `ceil(baseDays / (0.5 + 0.5 × institutionQuality))`,
+   bounded to `baseDays .. 2 × baseDays`. It is computed at proposal and
+   persisted, so later quality changes cannot move an already-committed
+   effective day.
+
+### Regimes, elections, and government
+
+7. Regimes are `absolute-monarchy`, `constitutional-monarchy`, and `republic`.
+   The first two are scenario-authored; revolution may change a monarchy into a
+   republic. Each regime definition declares whether elections occur, the term
+   in years, and its default law set.
+8. An election runs only when: the regime enables elections, the suffrage law
+   franchise is positive, the country has population, the institution quality is
+   at or above the documented minimum, and the scheduled day is due. A timer
+   alone never creates an election. If the conditions fail, the next election is
+   rescheduled and the skip is recorded; no votes are fabricated.
+9. Franchise is derived from the suffrage law: none, property (block wealth level
+   at or above the authored threshold), adult male (age 21+), or universal
+   (age 21+). Enfranchised population is the sum of block population × the
+   block's eligibility fraction.
+10. Votes are bloc votes from the enfranchised population. Each interest group's
+    electorate is its enfranchised membership; its vote for the government is
+    `electorate × (0.5 + 0.5 × average stance on the enacted laws)`. The
+    government wins when its vote share is at least 0.5. Otherwise the group with
+    the largest opposition-weighted electorate becomes the governing group. Ties
+    are broken by group key order. This is a deterministic documented rule, not a
+    random election.
+11. Election outcomes change `RegimeState.governmentGroupKey`; they do not spend
+    money, create laws, or overwrite the player's fiscal policy. Only the last
+    election result is retained.
+
+### Interest groups
+
+12. The seven §9.1 groups are fixed. Membership is derived from each pop block's
+    profession key using authored per-profession shares; an unknown profession
+    key is assigned to labor with a diagnostic warning rather than silently
+    disappearing. Shares are authored so the weights for a known profession sum
+    to one; membership therefore sums to the owned population.
+13. Organisation and influence are derived each monthly refresh from membership,
+    literacy, wealth, laws, and franchise. Influence is normalised to a 0..1
+    share across groups; it is recomputable, cached, and not spendable.
+    `stanceByLaw` records the authored stance for every implemented law id.
+
+### Militancy, unrest, crisis, and revolution
+
+14. Pop-level militancy remains the existing daily needs-driven indicator.
+    Regional `Region.unrest` is new authoritative state updated after needs each
+    day from block militancy, unmet subsistence, exclusion, institution overload,
+    and the labor law's grievance. The two are distinct: militancy is a pop
+    attribute; unrest is a regional aggregate; the country crisis pressure uses
+    both explicitly.
+15. Crisis stages are `none → unrest → strike → crisis → revolution`. Pressure is
+    a documented weighted combination of population-weighted militancy, regional
+    unrest, unmet-subsistence population share, political exclusion, institution
+    overload, and labor-law grievance. `pressureDays` accumulates only while
+    pressure is at or above the documented threshold and decays when pressure is
+    below it. Stage transitions happen only at documented day counts; there is no
+    random roll and no hidden timer.
+16. A strike stage applies a documented regional throughput factor to production
+    in high-unrest regions. It does not delete goods, cash, or people.
+17. Revolution changes the regime to a republic, changes the governing group to
+    the largest opposition group, resets enacted laws to the regime's default law
+    set, applies an institutional disruption, and records a bounded event entry.
+    It does not change money, debt, population, buildings, or accounting periods.
+    A multi-year cooldown prevents a deterministic revolution loop.
+18. The player has no "calm unrest" button. Pressure can only be reduced by real
+    policies: funding administration, changing labor/taxation/suffrage law, and
+    the ordinary needs/employment outcomes.
+
+### Institutions and administration
+
+19. M8 models one state administration institution per country. Staff are the
+    country's clerks (the authored administration profession). The model does not
+    create government buildings or duplicate people: the clerk population is the
+    real staffing base, and the documented simplification is that public
+    administration draws on that profession's people without a separate
+    government employment assignment.
+20. Institution quality is derived from staffing ratio, funding adequacy,
+    literacy, regional infrastructure, enacted-law administrative load, and
+    recent disruption. Overload is derived from staffing/funding shortfall plus
+    law load. The coefficients are provisional and live in the constants module.
+21. `set-institution-funding` sets an annual SUSD target. The fiscal phase pays
+    `target / daysInYear` daily, limited by actual treasury cash above the
+    reserve floor, to eligible administration households in proportion to their
+    population. Posting: country `administration-expense` debit / treasury credit;
+    household `administration-income` credit / cash debit. It is a cash-neutral
+    payroll transfer, not money creation. Unpaid request is an explicit shortfall,
+    not debt or a receivable.
+22. Tax collection efficiency is `clamp(0.6 + 0.4 × quality − 0.2 ×
+    min(overload,1), 0.4, 1)`. The uncollected amount is simply not collected; it
+    is not booked as a receivable. Construction progress uses
+    `clamp(1 − 0.3 × min(overload,1) − 0.2 × (1 − quality), 0.4, 1)`. Law
+    enactment uses the quality term above. All three are documented M8 effects on
+    existing systems, not decorative modifiers.
+23. Worlds without a `politics` definitions block (legacy M2–E4 fixtures) have
+    `World.politics.enabled = false`; the politics phase and all M8 effects are
+    inert, preserving accepted behavior. The historical M5 scenario opts in.
+
+### Events
+
+24. Scripted events are authored data with a date, optional country tag, and
+    typed effects on M8 state (militancy pressure, regional unrest pressure,
+    institution disruption). At world creation they are queued as explicit
+    scheduled events with provenance. Applying an event sets its status/applied
+    day and appends one bounded log entry; a retry or replay cannot apply it
+    twice. Events do not use random draws.
+
+### Persistence and compatibility
+
+25. World schema **21**, simulation **0.21.0**, worker protocol **8**, data
+    version **`m3-economy-v6`**. Save format remains 1. Older saves and protocol-7
+    clients are rejected explicitly; no migration is implemented under D-013.
+    Period/annual `countryBudgetTotals` use sparse encoding (zero fields omitted;
+    missing decodes as zero) so the 1,200-month bounded save remains under the
+    documented 4 MiB target after the M8 administration fields are added.
+26. Bounded state: at most 4 law transitions per country; one retained election
+    result; 7 interest groups; 9 law slots; a fixed maximum event queue and a
+    bounded event log; no per-day political history.
+
+**Consequences.** M8 changes tax collection efficiency in opted-in scenarios,
+adds an administration expenditure, changes production during strikes, and adds
+political state to saves/snapshots. M8 does not implement E5 labor standards,
+M9 education/technology, E6 trade/monetary mechanics, or M10 war/diplomacy.
+
 ## Assumptions recorded for future review
 
 
