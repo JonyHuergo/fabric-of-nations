@@ -54,6 +54,8 @@ import {
   INSTITUTION_LAW_WEIGHT,
   INSTITUTION_LITERACY_WEIGHT,
   INSTITUTION_STAFFING_WEIGHT,
+  MAX_LABOR_HOURS_PER_WEEK,
+  MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR,
   MAX_LAW_ENACTMENT_DAYS,
   MAX_LAW_OPTIONS_PER_SLOT,
   MAX_LAW_SUMMARY_LENGTH,
@@ -393,6 +395,36 @@ export function assertValidPoliticsDefinitions(
     if (new Set(requiredTechnologyIds).size !== requiredTechnologyIds.length) {
       throw new RangeError(`${lawPath}.requiredTechnologyIds contains duplicates`);
     }
+    const laborMinimumWageSUSDPerYear =
+      law.laborMinimumWageSUSDPerYear === undefined
+        ? 0
+        : requireFiniteNumber(
+            law.laborMinimumWageSUSDPerYear,
+            `${lawPath}.laborMinimumWageSUSDPerYear`,
+          );
+    if (
+      laborMinimumWageSUSDPerYear < 0 ||
+      laborMinimumWageSUSDPerYear > MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR
+    ) {
+      throw new RangeError(`${lawPath}.laborMinimumWageSUSDPerYear is out of range`);
+    }
+    const laborHoursPerWeek =
+      law.laborHoursPerWeek === undefined
+        ? 0
+        : requireFiniteNumber(law.laborHoursPerWeek, `${lawPath}.laborHoursPerWeek`);
+    if (
+      laborHoursPerWeek < 0 ||
+      laborHoursPerWeek > MAX_LABOR_HOURS_PER_WEEK
+    ) {
+      throw new RangeError(`${lawPath}.laborHoursPerWeek is out of range`);
+    }
+    const healthStaffFloor =
+      law.healthStaffFloor === undefined
+        ? 0
+        : requireFiniteNumber(law.healthStaffFloor, `${lawPath}.healthStaffFloor`);
+    if (healthStaffFloor < 0 || healthStaffFloor > 1) {
+      throw new RangeError(`${lawPath}.healthStaffFloor must be in 0..1`);
+    }
     const institutionLoad = requireFiniteNumber(
       law.institutionLoad,
       `${lawPath}.institutionLoad`,
@@ -432,6 +464,9 @@ export function assertValidPoliticsDefinitions(
       educationAttendanceFloor,
       educationQualityBonus,
       requiredTechnologyIds,
+      laborMinimumWageSUSDPerYear,
+      laborHoursPerWeek,
+      healthStaffFloor,
       institutionLoad,
       groupStance,
     };
@@ -607,6 +642,7 @@ export function neutralInstitutionState(): InstitutionState {
     lastUpdateDay: null,
     fundingRequestedMonthToDateSUSD: 0,
     fundingShortfallMonthToDateSUSD: 0,
+    healthStaffShare: 0,
   };
 }
 
@@ -1038,6 +1074,7 @@ export function refreshInstitution(
   }
   const professionKey = professionKeyById(definitions);
   const adminKeys = new Set(politics.administrationProfessionKeys);
+  const healthShare = clamp(country.institutions.healthStaffShare ?? 0, 0, 1);
   const staffedByProfession: Record<Id, number> = {};
   let staff = 0;
   let population = 0;
@@ -1049,9 +1086,12 @@ export function refreshInstitution(
     population += count;
     const key = professionKey.get(block.professionId) ?? "";
     if (adminKeys.has(key)) {
+      // E5: a share of the administration clerk base is assigned to public health,
+      // so administration staffing is the remainder. Zero share preserves M8 exactly.
+      const net = count * (1 - healthShare);
       staffedByProfession[block.professionId] =
-        (staffedByProfession[block.professionId] ?? 0) + count;
-      staff += count;
+        (staffedByProfession[block.professionId] ?? 0) + net;
+      staff += net;
     }
     literacyWeighted += block.literacy * count;
   }
@@ -1852,6 +1892,13 @@ export function assertValidInstitutionState(
   );
   if (requested < 0 || shortfall < 0 || shortfall > requested + toleranceFor(requested)) {
     throw new RangeError(`${path} funding memo is inconsistent`);
+  }
+  const healthShare = requireFiniteNumber(
+    record.healthStaffShare ?? 0,
+    `${path}.healthStaffShare`,
+  );
+  if (healthShare < 0 || healthShare > 1) {
+    throw new RangeError(`${path}.healthStaffShare must be in 0..1`);
   }
 }
 

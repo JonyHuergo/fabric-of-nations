@@ -326,6 +326,7 @@ export function copyCountry(country: Country): Country {
       workByTechnology: { ...country.technology.workByTechnology },
     },
     education: { ...country.education },
+    labor: { ...country.labor },
   };
 }
 

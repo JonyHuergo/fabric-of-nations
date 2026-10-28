@@ -50,6 +50,7 @@ import type {
   DebtContract,
   DebtPolicy,
   EducationState,
+  LaborPolicyState,
   EmploymentAssignment,
   FinanceBudgetMemo,
   FinanceCorrection,
@@ -272,6 +273,8 @@ export type SerializedFinanceBudgetTotals = {
   readonly administrationShortfallSUSD?: number;
   readonly educationRequestedSUSD?: number;
   readonly educationShortfallSUSD?: number;
+  readonly trainingRequestedSUSD?: number;
+  readonly trainingShortfallSUSD?: number;
 };
 
 /** Encoded E4 construction/commissioning material requirement. */
@@ -329,6 +332,7 @@ export type SerializedCountryFiscalTotals = {
   readonly subsidyExpenseSUSD?: number;
   readonly administrationExpenseSUSD?: number;
   readonly educationExpenseSUSD?: number;
+  readonly trainingExpenseSUSD?: number;
   readonly netFiscalResultSUSD?: number;
 };
 
@@ -594,6 +598,17 @@ export type SerializedEducationState = {
   readonly fundingShortfallMonthToDateSUSD: number;
 };
 
+/** Encoded E5 per-country labor/training policy state. */
+export type SerializedLaborPolicyState = {
+  readonly trainingBudgetSUSDPerYear: number;
+  readonly trainingStipendPerTraineeSUSDPerYear: number;
+  readonly trainingStaffShare: number;
+  readonly trainingParticipation: number;
+  readonly lastUpdateDay: number | null;
+  readonly trainingRequestedMonthToDateSUSD: number;
+  readonly trainingShortfallMonthToDateSUSD: number;
+};
+
 export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
@@ -608,6 +623,7 @@ export type SerializedCountry = {  readonly id: number;
   readonly politics: SerializedCountryPolitics;
   readonly technology: SerializedCountryTechnology;
   readonly education: SerializedEducationState;
+  readonly labor: SerializedLaborPolicyState;
 };
 
 /** Encoded E4 industrial policy. */
@@ -673,6 +689,7 @@ export type SerializedPopBlock = {
   readonly femaleByAge: EncodedTypedArray;
   readonly literacy: number;
   readonly literacyByAge: readonly number[];
+  readonly qualification: number;
   readonly wealthLevel: number;
   readonly financialAccountId: number;
   readonly militancy: number;
@@ -902,6 +919,7 @@ function encodeCountryFiscalTotals(
       "subsidyExpenseSUSD",
       "administrationExpenseSUSD",
       "educationExpenseSUSD",
+      "trainingExpenseSUSD",
       "netFiscalResultSUSD",
     ] as const) {
       const value = entry[field] ?? 0;
@@ -947,6 +965,8 @@ function encodeBudgetTotals(
       "administrationShortfallSUSD",
       "educationRequestedSUSD",
       "educationShortfallSUSD",
+      "trainingRequestedSUSD",
+      "trainingShortfallSUSD",
     ] as const) {
       const value = entry[field] ?? 0;
       if (value !== 0) encodedEntry[field] = value;
@@ -1110,6 +1130,18 @@ export function encodeWorld(world: World): SerializedWorld {
           fundingShortfallMonthToDateSUSD:
             country.education.fundingShortfallMonthToDateSUSD,
         },
+        labor: {
+          trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
+          trainingStipendPerTraineeSUSDPerYear:
+            country.labor.trainingStipendPerTraineeSUSDPerYear,
+          trainingStaffShare: country.labor.trainingStaffShare,
+          trainingParticipation: country.labor.trainingParticipation,
+          lastUpdateDay: country.labor.lastUpdateDay,
+          trainingRequestedMonthToDateSUSD:
+            country.labor.trainingRequestedMonthToDateSUSD,
+          trainingShortfallMonthToDateSUSD:
+            country.labor.trainingShortfallMonthToDateSUSD,
+        },
       })),
     currencies: [...world.currencies]
       .sort((left, right) => left.id - right.id)
@@ -1140,6 +1172,7 @@ export function encodeWorld(world: World): SerializedWorld {
       femaleByAge: encodeTypedArray(block.femaleByAge),
       literacy: block.literacy,
       literacyByAge: [...block.literacyByAge],
+      qualification: block.qualification,
       wealthLevel: block.wealthLevel,
       financialAccountId: block.financialAccountId,
       militancy: block.militancy,
@@ -1316,6 +1349,8 @@ export function encodeWorld(world: World): SerializedWorld {
               administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
               educationRequestedSUSD: memo.educationRequestedSUSD ?? 0,
               educationShortfallSUSD: memo.educationShortfallSUSD ?? 0,
+              trainingRequestedSUSD: memo.trainingRequestedSUSD ?? 0,
+              trainingShortfallSUSD: memo.trainingShortfallSUSD ?? 0,
               businessTaxAssessedDay: memo.businessTaxAssessedDay,
             },
           ]),
@@ -1516,6 +1551,7 @@ function decodeCountryFiscalTotals(
       subsidyExpenseSUSD: optionalNumber("subsidyExpenseSUSD"),
       administrationExpenseSUSD: optionalNumber("administrationExpenseSUSD"),
       educationExpenseSUSD: optionalNumber("educationExpenseSUSD"),
+      trainingExpenseSUSD: optionalNumber("trainingExpenseSUSD"),
       netFiscalResultSUSD: optionalNumber("netFiscalResultSUSD"),
     };
   }
@@ -1560,6 +1596,8 @@ function decodeBudgetTotals(
       administrationShortfallSUSD: optionalNumber("administrationShortfallSUSD"),
       educationRequestedSUSD: optionalNumber("educationRequestedSUSD"),
       educationShortfallSUSD: optionalNumber("educationShortfallSUSD"),
+      trainingRequestedSUSD: optionalNumber("trainingRequestedSUSD"),
+      trainingShortfallSUSD: optionalNumber("trainingShortfallSUSD"),
     };
   }
   return totals;
@@ -1648,6 +1686,20 @@ function decodeBudgetMemo(
         : requireFiniteNumber(
             record.educationShortfallSUSD,
             `${path}.educationShortfallSUSD`,
+          ),
+    trainingRequestedSUSD:
+      record.trainingRequestedSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            record.trainingRequestedSUSD,
+            `${path}.trainingRequestedSUSD`,
+          ),
+    trainingShortfallSUSD:
+      record.trainingShortfallSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            record.trainingShortfallSUSD,
+            `${path}.trainingShortfallSUSD`,
           ),
     businessTaxAssessedDay:
       record.businessTaxAssessedDay === null
@@ -2016,6 +2068,13 @@ function decodeCountryPolitics(value: unknown, path: string) {
       institutionsRecord.fundingShortfallMonthToDateSUSD,
       `${path}.institutions.fundingShortfallMonthToDateSUSD`,
     ),
+    healthStaffShare:
+      institutionsRecord.healthStaffShare === undefined
+        ? 0
+        : requireFiniteNumber(
+            institutionsRecord.healthStaffShare,
+            `${path}.institutions.healthStaffShare`,
+          ),
   };
   return {
     regime: decodeRegimeState(record.regime, `${path}.regime`),
@@ -2108,6 +2167,45 @@ function decodeEducationState(value: unknown, path: string): EducationState {
   };
 }
 
+function decodeLaborPolicyState(value: unknown, path: string): LaborPolicyState {
+  const record = requireRecord(value, path);
+  return {
+    trainingBudgetSUSDPerYear: requireFiniteNumber(
+      record.trainingBudgetSUSDPerYear,
+      `${path}.trainingBudgetSUSDPerYear`,
+    ),
+    trainingStipendPerTraineeSUSDPerYear: requireFiniteNumber(
+      record.trainingStipendPerTraineeSUSDPerYear,
+      `${path}.trainingStipendPerTraineeSUSDPerYear`,
+    ),
+    trainingStaffShare: requireFiniteNumber(
+      record.trainingStaffShare,
+      `${path}.trainingStaffShare`,
+    ),
+    trainingParticipation: requireFiniteNumber(
+      record.trainingParticipation,
+      `${path}.trainingParticipation`,
+    ),
+    lastUpdateDay:
+      record.lastUpdateDay === null || record.lastUpdateDay === undefined
+        ? null
+        : requireInteger(
+            record.lastUpdateDay,
+            `${path}.lastUpdateDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    trainingRequestedMonthToDateSUSD: requireFiniteNumber(
+      record.trainingRequestedMonthToDateSUSD,
+      `${path}.trainingRequestedMonthToDateSUSD`,
+    ),
+    trainingShortfallMonthToDateSUSD: requireFiniteNumber(
+      record.trainingShortfallMonthToDateSUSD,
+      `${path}.trainingShortfallMonthToDateSUSD`,
+    ),
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -2131,6 +2229,7 @@ function decodeCountry(value: unknown, path: string): Country {
     ...decodeCountryPolitics(record.politics, `${path}.politics`),
     technology: decodeCountryTechnology(record.technology, `${path}.technology`),
     education: decodeEducationState(record.education, `${path}.education`),
+    labor: decodeLaborPolicyState(record.labor, `${path}.labor`),
   };
 }
 
@@ -2679,6 +2778,7 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
     femaleByAge,
     literacy: requireFiniteNumber(record.literacy, `${path}.literacy`),
     literacyByAge,
+    qualification: requireFiniteNumber(record.qualification, `${path}.qualification`),
     wealthLevel: requireFiniteNumber(record.wealthLevel, `${path}.wealthLevel`),
     financialAccountId: requireUint32(
       record.financialAccountId,

@@ -670,6 +670,7 @@ export interface EducationDerived {
   readonly availableAcademicWorkers: number;
   readonly academicLiteracy: Rate;
   readonly researchStaff: number;
+  readonly trainingStaff: number;
   readonly teacherStaff: number;
   readonly schoolAgePopulation: number;
   readonly teachingCapacityStudents: number;
@@ -717,6 +718,7 @@ export function deriveEducation(
       availableAcademicWorkers: 0,
       academicLiteracy: 0,
       researchStaff: 0,
+      trainingStaff: 0,
       teacherStaff: 0,
       schoolAgePopulation: schoolAge,
       teachingCapacityStudents: 0,
@@ -764,7 +766,13 @@ export function deriveEducation(
   const academicLiteracy =
     availableAcademicWorkers > 0 ? literacyWeighted / availableAcademicWorkers : 0;
   const researchStaff = availableAcademicWorkers * country.education.researchStaffShare;
-  const teacherStaff = availableAcademicWorkers - researchStaff;
+  // E5: vocational-training instructors are a third claim on academic staff time.
+  const trainingStaff =
+    availableAcademicWorkers * clamp(country.labor?.trainingStaffShare ?? 0, 0, 1);
+  const teacherStaff = Math.max(
+    0,
+    availableAcademicWorkers - researchStaff - trainingStaff,
+  );
   const teachingCapacityStudents = teacherStaff * EDUCATION_STUDENTS_PER_TEACHER;
   const accessRatio =
     schoolAgePopulation > 0
@@ -821,6 +829,7 @@ export function deriveEducation(
     availableAcademicWorkers: roundTo(availableAcademicWorkers, RATE_DECIMAL_PLACES),
     academicLiteracy: roundTo(academicLiteracy, TECHNOLOGY_RATE_DECIMALS),
     researchStaff: roundTo(researchStaff, RATE_DECIMAL_PLACES),
+    trainingStaff: roundTo(trainingStaff, RATE_DECIMAL_PLACES),
     teacherStaff: roundTo(teacherStaff, RATE_DECIMAL_PLACES),
     schoolAgePopulation,
     teachingCapacityStudents: roundTo(teachingCapacityStudents, RATE_DECIMAL_PLACES),

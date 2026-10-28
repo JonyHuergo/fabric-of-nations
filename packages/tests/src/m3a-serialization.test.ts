@@ -48,12 +48,12 @@ function cloneWorld(): World {
   return createEconomyWorld(scenario, { seed: 20_261_023 });
 }
 
-describe("M3a schema-22 serialization", () => {
+describe("M3a schema-23 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
     // Updated for schema 22: the world now serializes the M9 technology-system
     // flag and each pop block's authoritative age-specific literacy array. The
     // M3 fixture has technology disabled, so no behaviour changes.
-    expect(hashWorld(cloneWorld())).toBe("3423f22ce8485de2");
+    expect(hashWorld(cloneWorld())).toBe("36e45ae94f98b263");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

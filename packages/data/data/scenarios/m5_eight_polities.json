@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m5-eight-polities",
-    "dataVersion": "m3-economy-v7",
+    "dataVersion": "m3-economy-v8",
     "status": "provisional",
     "description": "Authored 1900 sample of eight polities for M5 multi-region, multi-market, migration, and labor-mobility validation, with the provisional M5a profit-allocation policy, M6 country-AI policy, and a provisional USA-only public-debt policy enabled. Population totals are rounded national estimates; occupation composition, market membership, building levels, needs, recipe productivity, prices, wages, profit-allocation rates, and AI fiscal rules are provisional authored inputs. The post-M7 feasibility calibration makes each market's subsistence/basic capacity meet its own demand and sets opening prices at the documented lower provisional bound; it is not historical calibration. This is not a complete historical reconstruction and its eight polities are not a world total.",
     "startDayIndex": 0,
@@ -59,16 +59,46 @@
     "ageStructures": {
       "world-1900-provisional": {
         "maleCounts": [
-          132394964, 107660935, 99430546, 86502648, 77669019, 64257524, 56334599,
-          47948605, 40093909, 31923550, 23700008, 17100726, 12182869, 8138272,
-          4320566, 2079627, 1249691
+          132394964,
+          107660935,
+          99430546,
+          86502648,
+          77669019,
+          64257524,
+          56334599,
+          47948605,
+          40093909,
+          31923550,
+          23700008,
+          17100726,
+          12182869,
+          8138272,
+          4320566,
+          2079627,
+          1249691
         ],
         "femaleCounts": [
-          127011002, 103106411, 95123927, 83732516, 76353272, 65445458, 57155510,
-          49328632, 40970455, 32927941, 24938610, 18567594, 13757727, 9695888,
-          5407158, 2784235, 1992884
+          127011002,
+          103106411,
+          95123927,
+          83732516,
+          76353272,
+          65445458,
+          57155510,
+          49328632,
+          40970455,
+          32927941,
+          24938610,
+          18567594,
+          13757727,
+          9695888,
+          5407158,
+          2784235,
+          1992884
         ],
-        "sourceIds": ["project-m2-1900-age-structure"],
+        "sourceIds": [
+          "project-m2-1900-age-structure"
+        ],
         "status": "provisional",
         "notes": "World 1900 five-year profile reused for every country. Country-specific age structures are not implemented and would be required for historical age-structure validation."
       }

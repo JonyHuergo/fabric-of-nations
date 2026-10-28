@@ -25,6 +25,10 @@ import {
   governmentStance,
   countryPoliticsSummary,
   deriveEducation,
+  deriveHealth,
+  deriveTraining,
+  laborHoursFactor,
+  laborMinimumWageSUSDPerYear,
   lawDefinition,
   lawPrerequisitesMet,
   lawSupport,
@@ -74,6 +78,7 @@ import {
   type SnapshotTechnology,
   type SnapshotTechnologyCatalogEntry,
   type SnapshotEducation,
+  type SnapshotLabor,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -778,6 +783,76 @@ function educationSnapshot(
   };
 }
 
+function laborSnapshot(
+  world: World,
+  country: World["countries"][number],
+  definitions: EconomyDefinitions,
+): SnapshotLabor {
+  const training = deriveTraining(world, country, definitions);
+  const health = deriveHealth(world, country, definitions);
+  const regionIds = new Set(country.regionIds);
+  let workingAgeTotal = 0;
+  let qualificationWeighted = 0;
+  for (const block of world.popBlocks) {
+    if (!regionIds.has(block.regionId)) continue;
+    const workingAge = workingAgePopulation(block);
+    workingAgeTotal += workingAge;
+    qualificationWeighted += block.qualification * workingAge;
+  }
+  const qualificationAverage =
+    workingAgeTotal > 0 ? qualificationWeighted / workingAgeTotal : 0;
+  const trainingBlockedReason =
+    country.labor.trainingBudgetSUSDPerYear <= 0
+      ? "no-funding"
+      : training.instructors <= 0
+        ? "no-academic-staff"
+        : training.eligibleWorkingAge <= 0
+          ? "no-eligible-population"
+          : null;
+  const healthBlockedReason =
+    health.clerkPopulation <= 0
+      ? "no-administration-staff"
+      : health.staffShare <= 0
+        ? "no-health-share"
+        : health.fundingRatio <= 0
+          ? "no-funding"
+          : null;
+  const law =
+    definitions.politics === undefined
+      ? null
+      : lawDefinition(definitions.politics, country.laws.labor);
+  return {
+    trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
+    trainingStipendPerTraineeSUSDPerYear:
+      country.labor.trainingStipendPerTraineeSUSDPerYear,
+    trainingStaffShare: country.labor.trainingStaffShare,
+    trainingParticipation: country.labor.trainingParticipation,
+    trainingInstructors: roundDisplay(training.instructors, 2),
+    eligibleWorkingAge: Math.round(training.eligibleWorkingAge),
+    capacityTrainees: training.capacityTrainees,
+    trainees: roundDisplay(training.trainees, 2),
+    trainingRequestedMonthToDateSUSD: roundDisplay(
+      country.labor.trainingRequestedMonthToDateSUSD,
+      6,
+    ),
+    trainingShortfallMonthToDateSUSD: roundDisplay(
+      country.labor.trainingShortfallMonthToDateSUSD,
+      6,
+    ),
+    trainingBlockedReason,
+    qualificationAverage: roundDisplay(qualificationAverage, 6),
+    healthStaffShare: health.staffShare,
+    healthStaff: roundDisplay(health.healthStaff, 2),
+    administrationStaff: roundDisplay(health.administrationStaff, 2),
+    healthServiceOutputIndex: health.serviceOutputIndex,
+    healthMortalityFactor: health.mortalityFactor,
+    healthBlockedReason,
+    minimumWageSUSDPerYear: laborMinimumWageSUSDPerYear(country, definitions),
+    hoursPerWeek: law === null ? 0 : law.laborHoursPerWeek,
+    hoursFactor: roundDisplay(laborHoursFactor(country, definitions), 6),
+  };
+}
+
 function politicsSnapshot(
   world: World,
   country: World["countries"][number],
@@ -1159,6 +1234,7 @@ function countrySnapshot(
     politics: politicsSnapshot(world, country, definitions),
     technology: technologySnapshot(world, country, definitions),
     education: educationSnapshot(world, country, definitions),
+    labor: laborSnapshot(world, country, definitions),
   };
 }
 
@@ -1262,6 +1338,7 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.technology.productivityBySector);
     Object.freeze(country.technology);
     Object.freeze(country.education);
+    Object.freeze(country.labor);
     const politics = country.politics;
     for (const group of politics.interestGroups) Object.freeze(group);
     Object.freeze(politics.interestGroups);

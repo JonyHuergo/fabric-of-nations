@@ -66,6 +66,14 @@ import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { runPoliticsDayStart, runUnrestPhase } from "./politics.js";
 import {
+  combinedMortalityFactor,
+  deriveHealth,
+  laborHoursMortalityFactor,
+  runLaborMonthStart,
+  runTrainingPhase,
+  type TrainingPhaseResult,
+} from "./labor.js";
+import {
   assertTechnologyStateMatchesDefinitions,
   countryForRegion,
   runEducationPhase,
@@ -135,6 +143,8 @@ export interface EconomyDayResult {
     readonly fiscal: FiscalPhaseResult;
     /** M9 education payroll, literacy update, and research work. */
     readonly education: EducationPhaseResult;
+    /** E5 training payroll/stipend and qualification update. */
+    readonly training: TrainingPhaseResult;
     /** E4 sectoral production subsidies paid after verified output. */
     readonly industrialSubsidy: IndustrialSubsidyPhaseResult;
     /** E2 month-end business-profit tax assessment and collection. */
@@ -863,6 +873,11 @@ export function runEconomicDay(
   // applies effects forward only; it never rewrites a closed period.
   runPoliticsDayStart(world, economyDefinitions, dayIndex);
 
+  // E5 pipeline step 2a: monthly training participation from real instructors,
+  // funding, and eligible working-age people. Part-time training does not invalidate
+  // employment assignments; its time cost is read in production.
+  runLaborMonthStart(world, economyDefinitions, dayIndex);
+
   // M6 pipeline step 2: apply effective policy changes. Country AI evaluates on
   // its staggered day and applies only validated fiscal-policy actions. The
   // staged day is already validated above, so the phase skips a duplicate full
@@ -876,17 +891,26 @@ export function runEconomicDay(
   const calendarDate = dayIndexToCivilDate(dayIndex);
   const aged = calendarDate.month === 1 && calendarDate.day === 1 && dayIndex !== world.startDayIndex;
   if (aged) applyAnnualAgeing(world);
-  // M9: demography reads the technology mortality factor as of the start of the
-  // day. A technology completed later today applies from the next civil day.
+  // M9/E5: demography reads the combined mortality factor (technology × public
+  // health × labor hours) at the start of the day. A technology completed or a law
+  // enacted later today applies from the next civil day.
   const mortalityFactorByBlock = new Map<Id, number>();
-  if (world.technology.enabled && economyDefinitions.technology !== undefined) {
-    for (const block of world.popBlocks) {
-      const country = countryForRegion(world, block.regionId);
-      mortalityFactorByBlock.set(
-        block.id,
-        country === null ? 1 : technologyMortalityFactor(country, economyDefinitions),
-      );
+  for (const block of world.popBlocks) {
+    const country = countryForRegion(world, block.regionId);
+    if (country === null) {
+      mortalityFactorByBlock.set(block.id, 1);
+      continue;
     }
+    const technologyFactor =
+      world.technology.enabled && economyDefinitions.technology !== undefined
+        ? technologyMortalityFactor(country, economyDefinitions)
+        : 1;
+    const healthFactor = deriveHealth(world, country, economyDefinitions).mortalityFactor;
+    const hoursFactor = laborHoursMortalityFactor(country, economyDefinitions);
+    mortalityFactorByBlock.set(
+      block.id,
+      combinedMortalityFactor(technologyFactor, healthFactor, hoursFactor),
+    );
   }
   const demography = applyDailyDemography(
     world,
@@ -951,6 +975,12 @@ export function runEconomicDay(
     validateWorld: false,
     economyDefinitions,
   });
+
+  // E5 training: treasury-limited provider payroll and trainee stipend, then
+  // qualification gains for participating blocks. It runs after fiscal (so it sees
+  // the same post-fiscal treasury cash as the other service payrolls) and before the
+  // education phase.
+  const training = runTrainingPhase(world, economyDefinitions, dayIndex);
 
   // M9 education and research: the payroll is paid from actual post-fiscal treasury
   // cash, age-specific literacy rises for the school-age cohort, and the active
@@ -1051,6 +1081,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      training,
       education,
       industrialSubsidy,
       businessTax,

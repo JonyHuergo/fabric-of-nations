@@ -48,6 +48,7 @@ import {
   neutralCountryTechnologyState,
   neutralEducationState,
 } from "./technology.js";
+import { createLaborPolicyState } from "./labor.js";
 import {
   assertValidCountryPoliticsInput,
   createCountryPoliticsState,
@@ -704,6 +705,10 @@ export function createEconomyWorld(
               world.startDayIndex,
               technologyPath,
             );
+      const laborState = createLaborPolicyState(
+        initial.labor,
+        `countries[${String(initial.id)}].labor`,
+      );
       const base: Country = {
         id: initial.id,
         tag: initial.tag,
@@ -724,16 +729,22 @@ export function createEconomyWorld(
         lawTransitions: [],
         interestGroups: neutralInterestGroups(),
         institutions: neutralInstitutionState(),
+        labor: laborState.labor,
         ...technologyState,
       };
+      const politicsState = createCountryPoliticsState(
+        base,
+        initial.politics,
+        scenario.definitions.politics,
+        world.startDayIndex,
+      );
       return {
         ...base,
-        ...createCountryPoliticsState(
-          base,
-          initial.politics,
-          scenario.definitions.politics,
-          world.startDayIndex,
-        ),
+        ...politicsState,
+        institutions: {
+          ...politicsState.institutions,
+          healthStaffShare: laborState.healthStaffShare,
+        },
       };
     })
     .sort((left, right) => left.id - right.id);
@@ -872,6 +883,17 @@ export function createEconomyWorld(
     }
     for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
       allocate("popBlock", block.id, "education-income");
+    }
+  }
+
+  // E5 training payroll and stipend accounts. They exist in every country world so
+  // the training policy actions are usable without a technology opt-in.
+  if (world.countries.length > 0) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      allocate("country", country.id, "training-expense");
+    }
+    for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+      allocate("popBlock", block.id, "training-income");
     }
   }
 

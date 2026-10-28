@@ -232,6 +232,8 @@ export const ACCOUNT_SUBTYPES = [
   "interest-income",
   "education-income",
   "education-expense",
+  "training-income",
+  "training-expense",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -294,6 +296,8 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "owner-capital-injection",
   "period-close",
   "education-payroll",
+  "training-payroll",
+  "training-stipend",
 ] as const;
 
 /**
@@ -420,7 +424,9 @@ export interface FinancePeriodFiscalTotals {
   readonly administrationExpenseSUSD?: MoneySUSD;
   /** M9 education/research payroll paid through the treasury. Optional pre-M9 = zero. */
   readonly educationExpenseSUSD?: MoneySUSD;
-  /** Tax revenue minus welfare, interest, subsidy, administration, and education expense. */
+  /** E5 training provider payroll and trainee stipend. Optional pre-E5 = zero. */
+  readonly trainingExpenseSUSD?: MoneySUSD;
+  /** Tax revenue minus welfare, interest, subsidy, administration, education, and training expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -471,6 +477,9 @@ export interface FinancePeriodBudgetTotals {
   /** M9 education payroll requested/paid/shortfall. Optional pre-M9 = zero. */
   readonly educationRequestedSUSD?: MoneySUSD;
   readonly educationShortfallSUSD?: MoneySUSD;
+  /** E5 training payroll+stipend requested/shortfall. Optional pre-E5 = zero. */
+  readonly trainingRequestedSUSD?: MoneySUSD;
+  readonly trainingShortfallSUSD?: MoneySUSD;
 }
 
 /**
@@ -500,6 +509,9 @@ export interface FinanceBudgetMemo {
   /** M9 education payroll requested/shortfall; optional pre-M9 = zero. */
   readonly educationRequestedSUSD?: MoneySUSD;
   readonly educationShortfallSUSD?: MoneySUSD;
+  /** E5 training requested/shortfall; optional pre-E5 = zero. */
+  readonly trainingRequestedSUSD?: MoneySUSD;
+  readonly trainingShortfallSUSD?: MoneySUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
@@ -934,6 +946,7 @@ export const IMPLEMENTED_LAW_SLOTS: readonly LawSlot[] = [
   "suffrage",
   "taxation",
   "education",
+  "health",
   "labor",
   "trade",
 ];
@@ -1013,6 +1026,23 @@ export interface LawDef {
    * researched by the country before the law is proposable.
    */
   requiredTechnologyIds: Id[];
+  /**
+   * E5 labor-slot full-time annual minimum wage floor in SUSD, or 0 when the law
+   * imposes no floor. The daily obligation is the greater of the profession base
+   * wage and this floor, prorated by the hours factor.
+   */
+  laborMinimumWageSUSDPerYear: MoneySUSD;
+  /**
+   * E5 labor-slot standard working week in hours, or 0 when the law does not set
+   * one. The provisional 60-hour baseline scales capacity and wages; shorter weeks
+   * reduce output and pay and modestly improve mortality.
+   */
+  laborHoursPerWeek: number;
+  /**
+   * E5 health-slot minimum public-health staff share of the administration clerk
+   * base, 0..1, or 0 when the law sets no floor.
+   */
+  healthStaffFloor: Rate;
   /** Administrative load subtracted from institution quality/law factor. */
   institutionLoad: Rate;
   /** Authored stance for each interest group, -1..1. */
@@ -1196,6 +1226,41 @@ export interface InstitutionState {
   /** Month-to-date payroll request and unpaid shortfall (reporting memo). */
   fundingRequestedMonthToDateSUSD: MoneySUSD;
   fundingShortfallMonthToDateSUSD: MoneySUSD;
+  /**
+   * E5 share of the administration clerk base assigned to public health, 0..1.
+   * Administration staffing is net of this share. Zero preserves M8 behaviour.
+   */
+  healthStaffShare: Rate;
+}
+
+/**
+ * E5 labor/training policy and reporting memo.
+ *
+ * `trainingParticipation` is the authoritative monthly share of eligible
+ * working-age people in part-time vocational training. It is set only by the
+ * funded/staffed training service on the first civil day, not by time alone.
+ */
+export interface LaborPolicyState {
+  /** Annual SUSD training provider payroll target. */
+  trainingBudgetSUSDPerYear: MoneySUSD;
+  /** Immediate annual stipend per trainee; zero means no stipend. */
+  trainingStipendPerTraineeSUSDPerYear: MoneySUSD;
+  /** Share of available academic staff time assigned to training, 0..1. */
+  trainingStaffShare: Rate;
+  /** Monthly training participation share of eligible working-age people, 0..1. */
+  trainingParticipation: Rate;
+  lastUpdateDay: Day | null;
+  /** Month-to-date training request and unpaid shortfall (payroll + stipend). */
+  trainingRequestedMonthToDateSUSD: MoneySUSD;
+  trainingShortfallMonthToDateSUSD: MoneySUSD;
+}
+
+/** Scenario input for one country's E5 labor policy. */
+export interface LaborPolicyInput {
+  trainingBudgetSUSDPerYear?: MoneySUSD;
+  trainingStipendPerTraineeSUSDPerYear?: MoneySUSD;
+  trainingStaffShare?: Rate;
+  healthStaffShare?: Rate;
 }
 
 export interface ElectionResult {
@@ -1310,6 +1375,8 @@ export interface Country {
   technology: CountryTechnologyState;
   /** M9 per-country education institution policy and reporting memo. */
   education: EducationState;
+  /** E5 per-country training policy and reporting memo. */
+  labor: LaborPolicyState;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -1345,6 +1412,8 @@ export interface CountryInitialDef {
   politics?: CountryPoliticsInput;
   /** M9 technology/education initial state; omitted means no researched techs and zero funding. */
   technology?: CountryTechnologyInput;
+  /** E5 labor/health initial policy; omitted means neutral zero budgets/shares. */
+  labor?: LaborPolicyInput;
 }
 
 /**

@@ -3778,6 +3778,165 @@ production/mortality/literacy only in technology-enabled worlds, and exposes fou
 new validated actions. M9 does not implement E5 health/training/social services,
 qualification promotion, E6 trade/monetary mechanics, or M10 military technology.
 
+## D-078 — E5 labor and social institutions: training, health, and labor standards
+
+**Status:** adopted for E5 implementation. **Scope:** §17A.9, §17A.13.2 E5,
+§17A.14 E5, §6.7–§6.8, and the §9.2 health/labor slots. E6 trade/monetary and M10
+military systems are not implemented.
+
+**Why a decision is required.** E5 adds persistent qualification and training state,
+a new service expenditure with two payment paths, a health-staff allocation inside
+the existing administration institution, and statutory labor/health instruments
+whose effects reach wages, capacity, and mortality. These choices determine
+authority, timing, accounting, and compatibility and cannot be inferred from the
+GDD prose alone.
+
+### Training and qualifications
+
+1. Vocational qualification is a new authoritative per-block rate
+   (`PopBlock.qualification`, 0..1) over the block's working-age people. The
+   authored data has no source-backed qualification series, so it initialises to
+   zero. It is built only by the E5 training service; it is not a renamed literacy
+   value, does not replace `literacyByAge`, and does not change profession
+   membership. Cross-profession promotion remains deferred.
+2. Training is part-time and in-service: participants remain in their existing
+   employment/education state, and the model applies a documented time cost
+   (`TRAINING_TIME_SHARE × trainingParticipation`) to their effective labor input.
+   This avoids double-assignment without inventing a separate training population or
+   duplicating people. The participation rate is country-level and updated monthly
+   from real instructors, funding, and the eligible working-age population.
+3. Instructors are actual academics. `Country.labor.trainingStaffShare` is a third
+   claim on the available academic staff time, alongside M9 research and teaching:
+   `teacherStaff = availableAcademicWorkers × max(0, 1 − researchShare −
+   trainingShare)`. A research+training share above 1 is rejected at the action
+   boundary. This is an E5 extension of the M9 institution, not a second education
+   state.
+4. Training eligibility requires block adult literacy at or above
+   `TRAINING_MIN_LITERACY`; capacity is `instructors × TRAINEES_PER_INSTRUCTOR`,
+   capped by `TRAINING_MAX_PARTICIPATION` of eligible working-age people. A zero
+   budget, zero instructors, or zero eligible population yields zero participation.
+5. Daily qualification gain is
+   `TRAINING_DAILY_QUALIFICATION_GAIN × participation × quality × (1 −
+   qualification)` for eligible blocks. Quality combines funding adequacy (budget
+   versus instructor benchmark), academic literacy, and administration quality.
+   There is no qualification gain without a funded, staffed service. Qualification
+   is retained (no decay) because the model has no source-backed depreciation rule;
+   this is recorded as a limitation.
+6. Qualification affects actual behaviour: daily wages carry
+   `1 + QUALIFICATION_WAGE_PREMIUM × qualification`, and building capacity carries
+   `1 + QUALIFICATION_PRODUCTIVITY_PREMIUM ×` the assigned workers' weighted
+   qualification. Both are causal outcomes of the funded training service, not
+   arbitrary fixed bonuses.
+
+### Training accounting
+
+7. Two cash-neutral payment paths use the same accounts
+   (`training-expense` country, `training-income` popBlock):
+   - `training-payroll`: country expense debit / treasury credit; academic
+     household cash debit / training-income credit.
+   - `training-stipend`: country expense debit / treasury credit; trainee household
+     cash debit / training-income credit.
+   The training budget is the provider payroll target; the stipend is a separate
+   per-trainee annual rate and is the immediate transfer. Both are limited by actual
+   treasury cash and the unpaid part is an explicit month-to-date shortfall, never
+   debt or a receivable.
+8. Fiscal totals add optional `trainingExpenseSUSD`; budget totals add optional
+   `trainingRequestedSUSD`/`trainingShortfallSUSD` (sparse). `netFiscalResultSUSD`
+   subtracts training expense. Sparse fiscal-total encoding is retained so the
+   bounded save remains under 4 MiB.
+
+### Health service
+
+9. Public health is delivered by the existing state-administration institution
+   rather than a new health profession or building. `InstitutionState.healthStaffShare`
+   (0..1) assigns a share of the country's clerk staffing base to public health;
+   administration staffing is the remainder. This is a documented simplification:
+   practitioner-level medical staff are not modeled, and the health service is
+   public-health/medical administration delivered by clerks. It creates no people,
+   money, or duplicate employment.
+10. Health service output is derived from the health staff share, clerk staffing
+    relative to a population benchmark, the existing administration funding
+    adequacy, and literacy. The service cost is the existing administration payroll;
+    the health share of that payroll is reported as a derived allocation, not a
+    second payment. A health law may impose a minimum staff share; the player action
+    cannot go below it.
+11. Mortality reads the health factor together with the technology factor and the
+    hours-standard factor at day start. The health effect accumulates through the
+    demographic stock, so its population consequence is slow even though the daily
+    factor is recomputed. Zero health share leaves M8 behaviour unchanged.
+
+### Labor and health law instruments
+
+12. The labor slot gains two statutory options:
+    - `labor-minimum-wage`: `LawDef.laborMinimumWageSUSDPerYear` sets a full-time
+      annual floor. The daily wage obligation is
+      `max(profession base wage, floor) × hoursFactor × (1 + qualification
+      premium)`. Employers pay from actual operating cash; unpaid wages remain the
+      existing explicit shortfall. E5 does not model a hiring/wage-elasticity
+      response; that is a recorded limitation.
+    - `labor-hours-standards`: `LawDef.laborHoursPerWeek` sets a standard week
+      relative to the provisional 60-hour baseline. The hours factor scales both
+      capacity and daily wages (hourly pay unchanged), so shorter hours reduce
+      output and household income. It also applies a bounded mortality improvement.
+      It is not a free productivity bonus.
+13. The health slot gains `health-public` with `LawDef.healthStaffFloor`; the
+    player's health staff share must be at least the enacted floor. All three laws
+    use the existing `propose-law` support/regime/prerequisite/effective-day/bounded
+    transition pathway. Their effects are read forward from the effective day and
+    never rewrite a closed period.
+14. Migration policy is not duplicated: the M8 trade law's `borderPolicy` remains
+    the legal path for cross-country migration access (it sets
+    `Country.immigrationOpen`). E5 adds tests but no second border action.
+
+### Phase ordering and atomicity
+
+15. The economic day order becomes: politics (including monthly institution
+    refresh with health netting) → **E5 labor month start** (monthly training
+    participation) → AI → demography (tech × health × hours mortality) → employment
+    → migration (M8 border policy) → market/production (hours, qualification,
+    training time cost) → settlement (minimum wage, hours, qualification wage
+    premium) → fiscal → **E5 training phase** (treasury-limited payroll and stipend,
+    qualification gains) → education/research → industrial/business-tax/
+    construction/debt → needs/unrest/wealth/close.
+16. Training participation is set only on the first civil day (and scenario start),
+    so a retried day cannot re-enrol or double-pay. Qualification gains and payments
+    apply once per processed day. The whole day remains staged and published only
+    after final validation. No formula uses `Date`, `Math.random`, wall time, or a
+    shared mutable PRNG.
+
+### Deferrals
+
+17. Pensions/social insurance are deferred: no contribution/benefit rules or
+    explicit liability model exist, and faking them as generic welfare is forbidden.
+18. Collective bargaining is deferred: M8 labour organisation/influence is an
+    aggregate political measure, not bargaining coverage; a credible coverage,
+    recognition, and negotiation model is not present.
+19. Labour-market information/enforcement and cross-profession promotion are
+    deferred; they require a distinct placement/enforcement service and promotion
+    flow model. No decorative controls are added.
+20. Public health uses clerks rather than a medical profession; practitioner
+    staffing, hospitals, and health-specific capital are limitations, not silently
+    assumed capabilities.
+
+### Persistence and compatibility
+
+21. World schema **23**, simulation **0.23.0**, worker protocol **10**, data version
+    **`m3-economy-v8`**. Save format remains 1. Older saves and protocol-9 clients
+    are rejected under D-013; no migration is implemented.
+22. Bounded state: one training participation rate and memo per country; one
+    qualification rate per block; one health staff share per country; no per-day
+    training or qualification history. Training enrollment is a rate, not an
+    unbounded list of trainees.
+23. Worlds without labor/health policy inputs default to neutral zero shares and
+    zero budgets, so M0–M9 fixtures retain their accepted behaviour except for the
+    intentional schema fields and version bump.
+
+**Consequences.** E5 adds qualification, training, and health-allocation state to
+saves, a training expenditure and two new posting kinds, statutory wage/hours/health
+effects, and four new validated actions. It does not implement E6 trade/monetary
+mechanics, M10 systems, pensions, collective bargaining, or cross-profession
+promotion.
+
 ## Assumptions recorded for future review
 
 

@@ -101,11 +101,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // this is not accepted as historical demographic validation.
     expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
 
-    // Schema 22 adds the M9 technology-system flag and age-specific literacy; the
+    // Schema 23 adds the E5 labor/health fields and block qualification; the
     // digest changes even though the M2 population behavior is unchanged.
-    expect(hashWorld(world)).toBe("8dc943a4a34ff0a6");
+    expect(hashWorld(world)).toBe("0a93df881a9c230a");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("8dc943a4a34ff0a6");
+    expect(hashWorld(restored)).toBe("0a93df881a9c230a");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -306,8 +306,8 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // interpolation shortfall.
     expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
     expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
-    // Updated for the M9 schema-22 literacy/technology fields; population flows are
+    // Updated for the E5 schema-23 labor/health/qualification fields; population flows are
     // unchanged and remain validated by the ratio checks above.
-    expect(hashWorld(world)).toBe("51247336c4d3baf0");
+    expect(hashWorld(world)).toBe("9a091538769694d2");
   });
 });

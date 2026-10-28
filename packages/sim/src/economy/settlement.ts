@@ -42,6 +42,11 @@ import {
 } from "./accounts.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { assertValidEmploymentState } from "./employment.js";
+import {
+  laborHoursFactor,
+  laborMinimumWageSUSDPerYear,
+  qualificationWageFactor,
+} from "./labor.js";
 import type {
   MarketDayResult,
   MarketTier,
@@ -366,6 +371,10 @@ function buildWageGroups(
   professions: ReadonlyMap<Id, ProfessionDef>,
   index: FinanceIndex,
   yearDays: number,
+  laborStandards: {
+    readonly minimumWageSUSDPerYear: number;
+    readonly hoursFactor: number;
+  },
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
   for (const assignment of world.employment) {
@@ -375,7 +384,16 @@ function buildWageGroups(
     const profession = professions.get(assignment.professionId);
     if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
     const account = householdCash(index, block.id);
-    const dailyWage = profession.baseWage1900SUSDPerYear / yearDays;
+    // E5: statutory floor and hours standard scale the wage obligation; the block's
+    // vocational qualification adds a premium. All three are real labor-market
+    // channels, not display modifiers.
+    const annualBase = Math.max(
+      profession.baseWage1900SUSDPerYear,
+      laborStandards.minimumWageSUSDPerYear,
+    );
+    const dailyWage =
+      (annualBase * laborStandards.hoursFactor * qualificationWageFactor(block)) /
+      yearDays;
     if (!Number.isFinite(dailyWage) || !(dailyWage > 0)) {
       throw new RangeError(`invalid daily wage for profession ${String(profession.id)}`);
     }
@@ -580,7 +598,24 @@ function settleMarketDaysInternal(
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
-      const groups = buildWageGroups(world, building, professions, index, yearDays);
+      const groups = buildWageGroups(
+        world,
+        building,
+        professions,
+        index,
+        yearDays,
+        (() => {
+          const owner = world.countries.find((country) =>
+            country.regionIds.includes(building.regionId),
+          );
+          return owner === undefined
+            ? { minimumWageSUSDPerYear: 0, hoursFactor: 1 }
+            : {
+                minimumWageSUSDPerYear: laborMinimumWageSUSDPerYear(owner, definitions),
+                hoursFactor: laborHoursFactor(owner, definitions),
+              };
+        })(),
+      );
       if (groups.length === 0) continue;
       const obligation = groups.reduce((total, group) => total + group.obligationSUSD, 0);
       const employer = operatingCash(index, building.id);

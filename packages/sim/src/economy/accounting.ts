@@ -30,6 +30,7 @@ import {
   assertFiscalPostingStructure,
   assertAdministrationPostingStructure,
   assertEducationPostingStructure,
+  assertTrainingPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
   assertSemanticJournalLine,
@@ -168,6 +169,12 @@ function validatePostingLines(
   }
   if (transactionKind === "education-payroll") {
     assertEducationPostingStructure(lines, accounts);
+  }
+  if (
+    transactionKind === "training-payroll" ||
+    transactionKind === "training-stipend"
+  ) {
+    assertTrainingPostingStructure(lines, accounts);
   }
   if (transactionKind === "business-profit-tax") {
     assertBusinessTaxPostingStructure(lines, accounts);

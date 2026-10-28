@@ -31,7 +31,7 @@ describe("determinism", () => {
     // Schema 22 adds the M9 technology-system flag and age-specific literacy; the
     // M1 empty-world behaviour is unchanged. A change here requires an intentional
     // simulation-version decision.
-    expect(hashWorld(world)).toBe("02c8df8a7f6b6ba4");
+    expect(hashWorld(world)).toBe("90db537d50ad7033");
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {

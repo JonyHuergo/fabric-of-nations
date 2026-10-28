@@ -52,6 +52,13 @@ export interface PopBlock {
    * aggregate of this array (D-077).
    */
   literacyByAge: number[];
+  /**
+   * E5 authoritative vocational qualification rate, 0..1, over the block's
+   * working-age people. It is built only by the funded training service and drives
+   * the wage and labour-productivity premiums (D-078). Initialised to zero because
+   * no source-backed qualification series exists.
+   */
+  qualification: Rate;
   wealthLevel: number;
   financialAccountId: Id;
   militancy: Rate;

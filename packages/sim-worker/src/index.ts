@@ -16,5 +16,6 @@ export * from "./constructionPreview.js";
 export * from "./industrialPreview.js";
 export * from "./politicsPreview.js";
 export * from "./educationPreview.js";
+export * from "./laborPreview.js";
 export * from "./reports.js";
 export * from "./explanations.js";

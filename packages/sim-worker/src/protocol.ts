@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 9 as const;
+export const PROTOCOL_VERSION = 10 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -141,6 +141,34 @@ export interface SetResearchStaffShareActionDto {
   readonly share: number;
 }
 
+/** E5: set the annual training provider budget. */
+export interface SetTrainingBudgetActionDto {
+  readonly kind: "set-training-budget";
+  readonly countryId: number;
+  readonly annualSUSD: number;
+}
+
+/** E5: set the annual training stipend per trainee. */
+export interface SetTrainingStipendActionDto {
+  readonly kind: "set-training-stipend";
+  readonly countryId: number;
+  readonly annualSUSD: number;
+}
+
+/** E5: set the share of academic staff time assigned to vocational training. */
+export interface SetTrainingStaffShareActionDto {
+  readonly kind: "set-training-staff-share";
+  readonly countryId: number;
+  readonly share: number;
+}
+
+/** E5: set the share of administration clerk staff assigned to public health. */
+export interface SetHealthStaffShareActionDto {
+  readonly kind: "set-health-staff-share";
+  readonly countryId: number;
+  readonly share: number;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -157,7 +185,11 @@ export type CountryActionDto =
   | StartResearchActionDto
   | CancelResearchActionDto
   | SetEducationFundingActionDto
-  | SetResearchStaffShareActionDto;
+  | SetResearchStaffShareActionDto
+  | SetTrainingBudgetActionDto
+  | SetTrainingStipendActionDto
+  | SetTrainingStaffShareActionDto
+  | SetHealthStaffShareActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -655,6 +687,33 @@ export interface SnapshotEducation {
   readonly lastUpdateDay: number | null;
 }
 
+export interface SnapshotLabor {
+  /** E5 training policy and derived service. */
+  readonly trainingBudgetSUSDPerYear: number;
+  readonly trainingStipendPerTraineeSUSDPerYear: number;
+  readonly trainingStaffShare: number;
+  readonly trainingParticipation: number;
+  readonly trainingInstructors: number;
+  readonly eligibleWorkingAge: number;
+  readonly capacityTrainees: number;
+  readonly trainees: number;
+  readonly trainingRequestedMonthToDateSUSD: number;
+  readonly trainingShortfallMonthToDateSUSD: number;
+  readonly trainingBlockedReason: string | null;
+  /** Weighted average vocational qualification of the country's working-age people. */
+  readonly qualificationAverage: number;
+  /** E5 public-health service and statutory labor readouts. */
+  readonly healthStaffShare: number;
+  readonly healthStaff: number;
+  readonly administrationStaff: number;
+  readonly healthServiceOutputIndex: number;
+  readonly healthMortalityFactor: number;
+  readonly healthBlockedReason: string | null;
+  readonly minimumWageSUSDPerYear: number;
+  readonly hoursPerWeek: number;
+  readonly hoursFactor: number;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
@@ -725,6 +784,8 @@ export interface CountrySnapshot {
   readonly technology: SnapshotTechnology;
   /** M9 education institution state and derived service indicators. */
   readonly education: SnapshotEducation;
+  /** E5 training/qualification and public-health state. */
+  readonly labor: SnapshotLabor;
 }
 
 export interface RegionSnapshot {
@@ -1194,6 +1255,32 @@ function parseAction(value: unknown): CountryActionDto {
       );
     }
     return { kind: "set-research-staff-share", countryId, share };
+  }
+  if (kind === "set-training-budget" || kind === "set-training-stipend") {
+    const annualSUSD = requireFiniteNumber(
+      record.annualSUSD,
+      "command.action.annualSUSD",
+    );
+    if (annualSUSD < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.annualSUSD must be non-negative",
+      );
+    }
+    return { kind, countryId, annualSUSD };
+  }
+  if (
+    kind === "set-training-staff-share" ||
+    kind === "set-health-staff-share"
+  ) {
+    const share = requireFiniteNumber(record.share, "command.action.share");
+    if (share < 0 || share > 1) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.share must be in 0..1",
+      );
+    }
+    return { kind, countryId, share };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }
@@ -1723,6 +1810,37 @@ function isEducationSnapshot(value: unknown): value is SnapshotEducation {
   );
 }
 
+function isLaborSnapshot(value: unknown): value is SnapshotLabor {
+  if (!isRecord(value)) return false;
+  for (const field of [
+    "trainingBudgetSUSDPerYear",
+    "trainingStipendPerTraineeSUSDPerYear",
+    "trainingStaffShare",
+    "trainingParticipation",
+    "trainingInstructors",
+    "eligibleWorkingAge",
+    "capacityTrainees",
+    "trainees",
+    "trainingRequestedMonthToDateSUSD",
+    "trainingShortfallMonthToDateSUSD",
+    "qualificationAverage",
+    "healthStaffShare",
+    "healthStaff",
+    "administrationStaff",
+    "healthServiceOutputIndex",
+    "healthMortalityFactor",
+    "minimumWageSUSDPerYear",
+    "hoursPerWeek",
+    "hoursFactor",
+  ] as const) {
+    if (!isFiniteNumber(value[field])) return false;
+  }
+  for (const field of ["trainingBlockedReason", "healthBlockedReason"] as const) {
+    if (value[field] !== null && typeof value[field] !== "string") return false;
+  }
+  return true;
+}
+
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
@@ -1783,7 +1901,9 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
     return false;
   }
   return (
-    isTechnologySnapshot(value.technology) && isEducationSnapshot(value.education)
+    isTechnologySnapshot(value.technology) &&
+    isEducationSnapshot(value.education) &&
+    isLaborSnapshot(value.labor)
   );
 }
 

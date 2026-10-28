@@ -21,9 +21,11 @@
  * state-owned buildings, and E4 materials/procurement, sectoral subsidies, and
  * public-enterprise capital support. M9 adds per-country technology/research and
  * education state, the derived age-specific literacy array, and the validated
- * research/education actions.
+ * research/education actions. E5 adds vocational qualification/training and
+ * public-health allocation state, training payroll/stipend, and the labor/health
+ * policy actions.
  */
-export const SIM_VERSION = "0.22.0";
+export const SIM_VERSION = "0.23.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -42,9 +44,11 @@ export const SIM_VERSION = "0.22.0";
  * interest-groups/institutions, regional unrest/infrastructure, world politics
  * event state, and administration payroll accounts (D-076). M9 adds per-country
  * technology/research and education state, world technology enablement, the
- * age-specific literacy array, and education payroll accounts (D-077).
+ * age-specific literacy array, and education payroll accounts (D-077). E5 adds
+ * per-country labor/training and health-share state, block qualification, the
+ * training payroll/stipend posting kinds, and the labor/health law fields (D-078).
  */
-export const WORLD_SCHEMA_VERSION = 22;
+export const WORLD_SCHEMA_VERSION = 23;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -66,9 +70,10 @@ export const SAVE_FORMAT_VERSION = 1;
  * `m3-economy-v6` (D-076). M9 adds technology content definitions, research and
  * education scenario inputs, an academics profession, and technology-gated
  * building definitions, so it bumps the content version to `m3-economy-v7`
- * (D-077).
+ * (D-077). E5 adds health/minimum-wage/hours law definitions, so it bumps the
+ * content version to `m3-economy-v8` (D-078).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v7";
+export const DEFAULT_DATA_VERSION = "m3-economy-v8";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

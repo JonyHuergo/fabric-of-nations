@@ -692,6 +692,11 @@ function applyFlow(
     Math.max(0, Math.min(1, weight(destination.militancy, source.militancy))),
     RATE_DECIMAL_PLACES,
   );
+  // E5: migrants carry their vocational qualification; merge by population weight.
+  destination.qualification = roundTo(
+    Math.max(0, Math.min(1, weight(destination.qualification, source.qualification))),
+    RATE_DECIMAL_PLACES,
+  );
 
   const sourceAfter = populationTotal(source);
   const destinationAfter = populationTotal(destination);

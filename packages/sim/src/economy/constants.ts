@@ -391,3 +391,71 @@ export const EDUCATION_DAILY_LITERACY_GAIN = 0.0015;
 
 /** Numeric-safety bound for an education funding target. */
 export const MAX_EDUCATION_FUNDING_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+
+/**
+ * E5 labor/social constants. PROVISIONAL structural rules, normalisers, and
+ * coefficients, not historical calibration (D-078).
+ */
+
+/** 1900 baseline working week used to scale the hours-standard law. PROVISIONAL. */
+export const LABOR_STANDARD_HOURS_PER_WEEK = 60;
+/** Shortest recognized statutory week; keeps the hours factor in 0.4..1. */
+export const LABOR_MIN_HOURS_PER_WEEK = 24;
+/** Numeric-safety bound for an authored minimum-wage floor. */
+export const MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+/** Numeric-safety bound for an authored working week. */
+export const MAX_LABOR_HOURS_PER_WEEK = 168;
+/** Fraction of output/income lost per hour removed from the baseline week. */
+export const LABOR_HOURS_CAPACITY_MIN = 0.4;
+/**
+ * Provisional mortality improvement at the shortest recognized week. The effect is
+ * linear in the hours reduction and bounded so it can never be a dominant bonus.
+ */
+export const LABOR_HOURS_MORTALITY_IMPROVEMENT = 0.12;
+
+/** Minimum adult literacy for vocational-training eligibility. */
+export const TRAINING_MIN_LITERACY = 0.5;
+/** Trainees one full-time academic instructor can serve. PROVISIONAL. */
+export const TRAINEES_PER_INSTRUCTOR = 20;
+/** Maximum share of eligible working-age people in part-time training. */
+export const TRAINING_MAX_PARTICIPATION = 0.05;
+/**
+ * Effective labour time lost by a participating trainee. Training is part-time and
+ * in-service, so the same people remain employed; this is the documented time cost.
+ */
+export const TRAINING_TIME_SHARE = 0.2;
+/**
+ * Qualification gain per day at full participation, quality 1. At 5% participation
+ * and quality 0.5 a block closes about 0.09 of the remaining gap per year.
+ */
+export const TRAINING_DAILY_QUALIFICATION_GAIN = 0.01;
+/** Provisional annual provider cost per academic instructor. */
+export const TRAINING_INSTRUCTOR_COST_PER_YEAR_SUSD = 1;
+/** Training-quality weights; they sum to 1. */
+export const TRAINING_QUALITY_FUNDING_WEIGHT = 0.5;
+export const TRAINING_QUALITY_LITERACY_WEIGHT = 0.3;
+export const TRAINING_QUALITY_INSTITUTION_WEIGHT = 0.2;
+/** Wage premium at qualification 1. PROVISIONAL. */
+export const QUALIFICATION_WAGE_PREMIUM = 0.25;
+/** Labour-productivity premium at qualification 1. PROVISIONAL. */
+export const QUALIFICATION_PRODUCTIVITY_PREMIUM = 0.2;
+/** Numeric-safety bounds for training/stipend policy values. */
+export const MAX_TRAINING_BUDGET_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+export const MAX_TRAINING_STIPEND_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+
+/**
+ * E5 public-health constants. Public health is a share of the existing
+ * administration clerk base; it adds no new profession or payment (D-078).
+ */
+/** Target health staff per resident at which staffing coverage reaches 1. */
+export const HEALTH_TARGET_STAFF_PER_CAPITA = 0.01;
+/** Health-quality weights; they sum to 1. */
+export const HEALTH_QUALITY_STAFFING_WEIGHT = 0.5;
+export const HEALTH_QUALITY_FUNDING_WEIGHT = 0.25;
+export const HEALTH_QUALITY_LITERACY_WEIGHT = 0.25;
+/** Maximum mortality reduction at full health service output. PROVISIONAL. */
+export const HEALTH_MAX_MORTALITY_REDUCTION = 0.25;
+/** Lower bound on the combined mortality factor (technology × health × hours). */
+export const MIN_COMBINED_MORTALITY_FACTOR = 0.25;
+/** Rate precision for E5 derived values. */
+export const E5_RATE_DECIMALS = 6;

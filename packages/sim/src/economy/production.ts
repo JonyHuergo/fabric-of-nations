@@ -15,6 +15,10 @@ import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { canonicalizeStockLots, deriveStockByGood } from "./inventory.js";
 import { productionStrikeFactor } from "./politics.js";
+import {
+  laborHoursFactor,
+  qualificationProductivityFactor,
+} from "./labor.js";
 import { technologyProductivityFactor } from "./technology.js";
 import type {
   BuildingDef,
@@ -236,16 +240,38 @@ export function computeBuildingCapacity(
     productivityFactor = weighted / assignedWorkers;
   }
 
+  const owner = world.countries.find((country) =>
+    country.regionIds.includes(building.regionId),
+  );
+  // E5: qualification raises effective labour productivity; part-time training time
+  // reduces it. Both are weighted over the building's actual assignments.
+  let e5LaborFactor = 1;
+  if (owner !== undefined && assignedWorkers > 0) {
+    let weighted = 0;
+    for (const assignment of world.employment) {
+      if (assignment.buildingInstanceId !== building.id) continue;
+      const block = world.popBlocks.find(
+        (candidate) => candidate.id === assignment.popBlockId,
+      );
+      if (block === undefined) continue;
+      weighted +=
+        assignment.workers *
+        qualificationProductivityFactor(block, owner.labor.trainingParticipation);
+    }
+    e5LaborFactor = weighted / assignedWorkers;
+  }
+  const hoursFactor =
+    owner === undefined ? 1 : laborHoursFactor(owner, definitions);
+
   const capacityTU =
     definition.referenceThroughputPerDayAtLevelOne *
     building.level *
     building.condition *
     staffingRatio *
     productivityFactor *
+    e5LaborFactor *
+    hoursFactor *
     (() => {
-      const owner = world.countries.find((country) =>
-        country.regionIds.includes(building.regionId),
-      );
       return owner === undefined
         ? 1
         : productionStrikeFactor(world, owner.id, building.regionId);

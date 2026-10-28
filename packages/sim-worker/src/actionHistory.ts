@@ -57,7 +57,11 @@ export type PlayerActionRequest =
   | { readonly kind: "start-research"; readonly technologyId: number }
   | { readonly kind: "cancel-research" }
   | { readonly kind: "set-education-funding"; readonly annualSUSD: number }
-  | { readonly kind: "set-research-staff-share"; readonly share: number };
+  | { readonly kind: "set-research-staff-share"; readonly share: number }
+  | { readonly kind: "set-training-budget"; readonly annualSUSD: number }
+  | { readonly kind: "set-training-stipend"; readonly annualSUSD: number }
+  | { readonly kind: "set-training-staff-share"; readonly share: number }
+  | { readonly kind: "set-health-staff-share"; readonly share: number };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -130,5 +134,13 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
       return `education funding ${action.annualSUSD.toFixed(2)} SUSD/year`;
     case "set-research-staff-share":
       return `research staff share ${(action.share * 100).toFixed(1)}%`;
+    case "set-training-budget":
+      return `training budget ${action.annualSUSD.toFixed(2)} SUSD/year`;
+    case "set-training-stipend":
+      return `training stipend ${action.annualSUSD.toFixed(2)} SUSD/trainee/year`;
+    case "set-training-staff-share":
+      return `training staff share ${(action.share * 100).toFixed(1)}%`;
+    case "set-health-staff-share":
+      return `public-health staff share ${(action.share * 100).toFixed(1)}%`;
   }
 }

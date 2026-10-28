@@ -173,6 +173,7 @@ export function assertValidPopBlock(block: PopBlock): void {
   }
   assertWealth(record.wealthLevel, "popBlock.wealthLevel");
   assertRate(record.militancy, "popBlock.militancy");
+  assertRate(record.qualification, "popBlock.qualification");
   requireInteger(record.unmetSubsistenceDays, "popBlock.unmetSubsistenceDays", 0, Number.MAX_SAFE_INTEGER);
   requireInteger(record.unmetBasicDays, "popBlock.unmetBasicDays", 0, Number.MAX_SAFE_INTEGER);
   requireInteger(record.comfortFulfilledDays, "popBlock.comfortFulfilledDays", 0, Number.MAX_SAFE_INTEGER);
@@ -545,6 +546,8 @@ export function createPopulationWorld(
       femaleByAge,
       literacy: initial.literacy,
       literacyByAge: initialLiteracyByAge(initial.literacy),
+      // E5: no source-backed qualification series exists; funded training builds it.
+      qualification: 0,
       wealthLevel: initial.wealthLevel,
       financialAccountId: initial.financialAccountId,
       militancy: initial.militancy,

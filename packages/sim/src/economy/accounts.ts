@@ -100,6 +100,8 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "interest-income": "revenue",
   "education-income": "revenue",
   "education-expense": "expense",
+  "training-income": "revenue",
+  "training-expense": "expense",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -138,6 +140,8 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "interest-income": ["country", "popBlock"],
   "education-income": ["popBlock"],
   "education-expense": ["country"],
+  "training-income": ["popBlock"],
+  "training-expense": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -260,6 +264,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "education-payroll": [
     { subtype: "education-expense", side: "debit" },
     { subtype: "education-income", side: "credit" },
+  ],
+  "training-payroll": [
+    { subtype: "training-expense", side: "debit" },
+    { subtype: "training-income", side: "credit" },
+  ],
+  "training-stipend": [
+    { subtype: "training-expense", side: "debit" },
+    { subtype: "training-income", side: "credit" },
   ],
   "business-profit-tax": [
     { subtype: "business-tax-expense", side: "debit" },
@@ -636,6 +648,22 @@ export function assertEducationPostingStructure(
     "education-expense",
     "education-income",
     "education payroll",
+    path,
+  );
+}
+
+/** Enforce the E5 training payroll/stipend structure. */
+export function assertTrainingPostingStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  assertPayrollPostingStructure(
+    lines,
+    accounts,
+    "training-expense",
+    "training-income",
+    "training payment",
     path,
   );
 }

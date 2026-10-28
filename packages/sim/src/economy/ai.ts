@@ -89,6 +89,12 @@ import {
   validateResearchStart,
 } from "./technology.js";
 import {
+  validateHealthStaffShare,
+  validateTrainingBudget,
+  validateTrainingStipend,
+  validateTrainingStaffShare,
+} from "./labor.js";
+import {
   issueGovernmentDebt,
   repayGovernmentDebt,
   validateDebtIssuance,
@@ -272,6 +278,42 @@ export interface SetResearchStaffShareAction {
   readonly share: Rate;
 }
 
+/** E5: set the annual training provider budget. */
+export interface SetTrainingBudgetAction {
+  readonly kind: "set-training-budget";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly annualSUSD: MoneySUSD;
+}
+
+/** E5: set the annual training stipend per trainee. */
+export interface SetTrainingStipendAction {
+  readonly kind: "set-training-stipend";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly annualSUSD: MoneySUSD;
+}
+
+/** E5: set the share of academic staff time assigned to vocational training. */
+export interface SetTrainingStaffShareAction {
+  readonly kind: "set-training-staff-share";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly share: Rate;
+}
+
+/** E5: set the share of administration clerk staff assigned to public health. */
+export interface SetHealthStaffShareAction {
+  readonly kind: "set-health-staff-share";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly share: Rate;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -288,7 +330,11 @@ export type CountryAction =
   | StartResearchAction
   | CancelResearchAction
   | SetEducationFundingAction
-  | SetResearchStaffShareAction;
+  | SetResearchStaffShareAction
+  | SetTrainingBudgetAction
+  | SetTrainingStipendAction
+  | SetTrainingStaffShareAction
+  | SetHealthStaffShareAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -345,6 +391,17 @@ export interface CountryActionApplication {
     readonly fundedAnnualSUSD: MoneySUSD;
     readonly previousResearchStaffShare: Rate;
     readonly researchStaffShare: Rate;
+  } | null;
+  /** E5 training/health policy change, else null. */
+  readonly laborAction?: {
+    readonly previousTrainingBudgetSUSDPerYear: MoneySUSD;
+    readonly trainingBudgetSUSDPerYear: MoneySUSD;
+    readonly previousTrainingStipendPerTraineeSUSDPerYear: MoneySUSD;
+    readonly trainingStipendPerTraineeSUSDPerYear: MoneySUSD;
+    readonly previousTrainingStaffShare: Rate;
+    readonly trainingStaffShare: Rate;
+    readonly previousHealthStaffShare: Rate;
+    readonly healthStaffShare: Rate;
   } | null;
 }
 
@@ -707,7 +764,11 @@ export function validateCountryAction(
     action.kind !== "start-research" &&
     action.kind !== "cancel-research" &&
     action.kind !== "set-education-funding" &&
-    action.kind !== "set-research-staff-share"
+    action.kind !== "set-research-staff-share" &&
+    action.kind !== "set-training-budget" &&
+    action.kind !== "set-training-stipend" &&
+    action.kind !== "set-training-staff-share" &&
+    action.kind !== "set-health-staff-share"
   ) {
     return {
       valid: false,
@@ -939,6 +1000,54 @@ export function validateCountryAction(
       }
       try {
         validateResearchStaffShare(world, definitions, {
+          countryId: country.id,
+          share: action.share,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-training-budget") {
+      if (action.source === "ai") {
+        errors.push("AI training policy is not implemented in E5");
+      }
+      try {
+        validateTrainingBudget(world, definitions, {
+          countryId: country.id,
+          annualSUSD: action.annualSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-training-stipend") {
+      if (action.source === "ai") {
+        errors.push("AI training policy is not implemented in E5");
+      }
+      try {
+        validateTrainingStipend(world, definitions, {
+          countryId: country.id,
+          annualSUSD: action.annualSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-training-staff-share") {
+      if (action.source === "ai") {
+        errors.push("AI training policy is not implemented in E5");
+      }
+      try {
+        validateTrainingStaffShare(world, definitions, {
+          countryId: country.id,
+          share: action.share,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-health-staff-share") {
+      if (action.source === "ai") {
+        errors.push("AI health policy is not implemented in E5");
+      }
+      try {
+        validateHealthStaffShare(world, definitions, {
           countryId: country.id,
           share: action.share,
         });
@@ -1396,6 +1505,92 @@ export function applyCountryAction(
         fundedAnnualSUSD: country.education.fundedAnnualSUSD,
         previousResearchStaffShare: previousEducation.researchStaffShare,
         researchStaffShare: country.education.researchStaffShare,
+      },
+      changed,
+    };
+  }
+
+  if (
+    action.kind === "set-training-budget" ||
+    action.kind === "set-training-stipend" ||
+    action.kind === "set-training-staff-share" ||
+    action.kind === "set-health-staff-share"
+  ) {
+    if (definitions === undefined) {
+      throw new RangeError("E5 labor policy actions require the validated economy definitions");
+    }
+    const previousLabor = { ...country.labor };
+    const previousInstitutions = { ...country.institutions };
+    if (action.kind === "set-training-budget") {
+      validateTrainingBudget(world, definitions, {
+        countryId: country.id,
+        annualSUSD: action.annualSUSD,
+      });
+      country.labor = {
+        ...country.labor,
+        trainingBudgetSUSDPerYear: action.annualSUSD,
+      };
+    } else if (action.kind === "set-training-stipend") {
+      validateTrainingStipend(world, definitions, {
+        countryId: country.id,
+        annualSUSD: action.annualSUSD,
+      });
+      country.labor = {
+        ...country.labor,
+        trainingStipendPerTraineeSUSDPerYear: action.annualSUSD,
+      };
+    } else if (action.kind === "set-training-staff-share") {
+      validateTrainingStaffShare(world, definitions, {
+        countryId: country.id,
+        share: action.share,
+      });
+      country.labor = { ...country.labor, trainingStaffShare: action.share };
+    } else {
+      validateHealthStaffShare(world, definitions, {
+        countryId: country.id,
+        share: action.share,
+      });
+      country.institutions = {
+        ...country.institutions,
+        healthStaffShare: action.share,
+      };
+    }
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      country.labor = previousLabor;
+      country.institutions = previousInstitutions;
+      throw error;
+    }
+    const changed =
+      country.labor.trainingBudgetSUSDPerYear !==
+        previousLabor.trainingBudgetSUSDPerYear ||
+      country.labor.trainingStipendPerTraineeSUSDPerYear !==
+        previousLabor.trainingStipendPerTraineeSUSDPerYear ||
+      country.labor.trainingStaffShare !== previousLabor.trainingStaffShare ||
+      country.institutions.healthStaffShare !== previousInstitutions.healthStaffShare;
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      laborAction: {
+        previousTrainingBudgetSUSDPerYear: previousLabor.trainingBudgetSUSDPerYear,
+        trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
+        previousTrainingStipendPerTraineeSUSDPerYear:
+          previousLabor.trainingStipendPerTraineeSUSDPerYear,
+        trainingStipendPerTraineeSUSDPerYear:
+          country.labor.trainingStipendPerTraineeSUSDPerYear,
+        previousTrainingStaffShare: previousLabor.trainingStaffShare,
+        trainingStaffShare: country.labor.trainingStaffShare,
+        previousHealthStaffShare: previousInstitutions.healthStaffShare,
+        healthStaffShare: country.institutions.healthStaffShare,
       },
       changed,
     };

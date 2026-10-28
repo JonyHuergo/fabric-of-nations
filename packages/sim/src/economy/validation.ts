@@ -27,6 +27,7 @@ import {
   assertFiscalPostingStructure,
   assertAdministrationPostingStructure,
   assertEducationPostingStructure,
+  assertTrainingPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -53,6 +54,7 @@ import {
   assertValidPoliticsState,
   assertValidRegimeState,
 } from "./politics.js";
+import { assertValidLaborPolicyState } from "./labor.js";
 import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,
@@ -344,6 +346,12 @@ export function assertValidJournalPosting(
     if (transactionKind === "education-payroll") {
       assertEducationPostingStructure(journalLines, accounts, path);
     }
+    if (
+      transactionKind === "training-payroll" ||
+      transactionKind === "training-stipend"
+    ) {
+      assertTrainingPostingStructure(journalLines, accounts, path);
+    }
     if (transactionKind === "business-profit-tax") {
       assertBusinessTaxPostingStructure(journalLines, accounts, path);
     }
@@ -442,6 +450,7 @@ function assertValidAnnualSummary(
     const subsidy = valueOf("subsidyExpenseSUSD");
     const administration = valueOf("administrationExpenseSUSD");
     const education = valueOf("educationExpenseSUSD");
+    const training = valueOf("trainingExpenseSUSD");
     const net = valueOf("netFiscalResultSUSD");
     if (
       tax < 0 ||
@@ -450,16 +459,34 @@ function assertValidAnnualSummary(
       interest < 0 ||
       subsidy < 0 ||
       administration < 0 ||
-      education < 0
+      education < 0 ||
+      training < 0
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
     }
     if (
       Math.abs(
         net -
-          (tax + businessTax - welfare - interest - subsidy - administration - education),
+          (tax +
+            businessTax -
+            welfare -
+            interest -
+            subsidy -
+            administration -
+            education -
+            training),
       ) >
-      toleranceMoney(net, tax, businessTax, welfare, interest, subsidy, administration, education)
+      toleranceMoney(
+        net,
+        tax,
+        businessTax,
+        welfare,
+        interest,
+        subsidy,
+        administration,
+        education,
+        training,
+      )
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} net result does not reconcile`);
     }
@@ -869,6 +896,7 @@ export function assertValidFinancePeriodSummary(
       const subsidy = valueOf("subsidyExpenseSUSD");
       const administration = valueOf("administrationExpenseSUSD");
       const education = valueOf("educationExpenseSUSD");
+      const training = valueOf("trainingExpenseSUSD");
       if (
         tax < 0 ||
         businessTax < 0 ||
@@ -876,12 +904,20 @@ export function assertValidFinancePeriodSummary(
         interest < 0 ||
         subsidy < 0 ||
         administration < 0 ||
-        education < 0
+        education < 0 ||
+        training < 0
       ) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
       }
       const expectedNet =
-        tax + businessTax - welfare - interest - subsidy - administration - education;
+        tax +
+        businessTax -
+        welfare -
+        interest -
+        subsidy -
+        administration -
+        education -
+        training;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
           `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,
@@ -1609,6 +1645,11 @@ export function assertValidEconomyState(
     assertValidInstitutionState(
       country.institutions,
       `country ${String(country.id)}.institutions`,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
+    assertValidLaborPolicyState(
+      country.labor,
+      `country ${String(country.id)}.labor`,
       CAMPAIGN_TERMINAL_DAY_INDEX,
     );
     if (country.debt.enabled) {

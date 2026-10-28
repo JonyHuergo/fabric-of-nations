@@ -67,6 +67,7 @@ import { runM5Benchmarks } from "./m5Bench.js";
 import { runM6BoundedBenchmarks } from "./m6Bench.js";
 import { runM7Benchmarks } from "./m7Bench.js";
 import { runM9Benchmarks } from "./m9Bench.js";
+import { runE5Benchmarks } from "./e5Bench.js";
 
 const SEED = 20_261_023;
 const MEASURED_RUNS_M1 = 3;
@@ -1800,6 +1801,7 @@ function main(): void {
   const m6Valid = runM6BoundedBenchmarks();
   const m7Valid = runM7Benchmarks();
   const m9Valid = runM9Benchmarks();
+  const e5Valid = runE5Benchmarks();
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1887,7 +1889,8 @@ function main(): void {
     m5Valid &&
     m6Valid &&
     m7Valid &&
-    m9Valid;
+    m9Valid &&
+    e5Valid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1968,6 +1971,7 @@ function main(): void {
   );
   console.log(`M7 worker host/snapshot/save benchmark: ${m7Valid ? "PASS" : "FAIL"}`);
   console.log(`M9 technology/education benchmark: ${m9Valid ? "PASS" : "FAIL"}`);
+  console.log(`E5 labor/social benchmark: ${e5Valid ? "PASS" : "FAIL"}`);
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +
       "NOT EVALUATED (Node harness; no device/full-scale world)",

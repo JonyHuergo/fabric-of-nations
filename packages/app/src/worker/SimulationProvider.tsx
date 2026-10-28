@@ -141,6 +141,26 @@ function appliedActionFromSnapshot(
         kind: "set-research-staff-share",
         share: country.education.researchStaffShare,
       };
+    case "set-training-budget":
+      return {
+        kind: "set-training-budget",
+        annualSUSD: country.labor.trainingBudgetSUSDPerYear,
+      };
+    case "set-training-stipend":
+      return {
+        kind: "set-training-stipend",
+        annualSUSD: country.labor.trainingStipendPerTraineeSUSDPerYear,
+      };
+    case "set-training-staff-share":
+      return {
+        kind: "set-training-staff-share",
+        share: country.labor.trainingStaffShare,
+      };
+    case "set-health-staff-share":
+      return {
+        kind: "set-health-staff-share",
+        share: country.labor.healthStaffShare,
+      };
     default:
       return { ...request };
   }

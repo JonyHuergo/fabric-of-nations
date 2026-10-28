@@ -98,7 +98,9 @@ export interface GovernmentPeriodTotals {
   readonly administrationExpenseSUSD?: MoneySUSD;
   /** M9 education/research payroll paid in the period. */
   readonly educationExpenseSUSD?: MoneySUSD;
-  /** Tax revenue minus welfare, interest, subsidy, administration, and education expense. */
+  /** E5 training provider payroll and trainee stipend paid in the period. */
+  readonly trainingExpenseSUSD?: MoneySUSD;
+  /** Tax revenue minus welfare, interest, subsidy, administration, education, and training expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -128,6 +130,7 @@ export function governmentPeriodTotals(
           subsidyExpenseSUSD: totals.subsidyExpenseSUSD,
           administrationExpenseSUSD: totals.administrationExpenseSUSD ?? 0,
           educationExpenseSUSD: totals.educationExpenseSUSD ?? 0,
+          trainingExpenseSUSD: totals.trainingExpenseSUSD ?? 0,
           netFiscalResultSUSD: totals.netFiscalResultSUSD,
         };
       })
@@ -145,6 +148,7 @@ export function governmentPeriodTotals(
       subsidy: number;
       administration: number;
       education: number;
+      training: number;
     }
   >();
   for (const account of finance.accounts) {
@@ -159,6 +163,7 @@ export function governmentPeriodTotals(
           subsidy: 0,
           administration: 0,
           education: 0,
+          training: 0,
         },
       );
     }
@@ -183,7 +188,8 @@ export function governmentPeriodTotals(
       account.subtype !== "interest-expense" &&
       account.subtype !== "subsidy-expense" &&
       account.subtype !== "administration-expense" &&
-      account.subtype !== "education-expense"
+      account.subtype !== "education-expense" &&
+      account.subtype !== "training-expense"
     ) {
       continue;
     }
@@ -196,6 +202,7 @@ export function governmentPeriodTotals(
         subsidy: 0,
         administration: 0,
         education: 0,
+        training: 0,
       };
     if (account.subtype === "income-tax-revenue") current.tax += value;
     else if (account.subtype === "business-tax-revenue") current.businessTax += value;
@@ -203,6 +210,7 @@ export function governmentPeriodTotals(
     else if (account.subtype === "interest-expense") current.interest += value;
     else if (account.subtype === "subsidy-expense") current.subsidy += value;
     else if (account.subtype === "education-expense") current.education += value;
+    else if (account.subtype === "training-expense") current.training += value;
     else current.administration += value;
     totals.set(account.ownerId, current);
   }
@@ -216,6 +224,7 @@ export function governmentPeriodTotals(
       subsidyExpenseSUSD: values.subsidy,
       administrationExpenseSUSD: values.administration,
       educationExpenseSUSD: values.education,
+      trainingExpenseSUSD: values.training,
       netFiscalResultSUSD:
         values.tax +
         values.businessTax -
@@ -223,7 +232,8 @@ export function governmentPeriodTotals(
         values.interest -
         values.subsidy -
         values.administration -
-        values.education,
+        values.education -
+        values.training,
     }))
     .sort((left, right) => left.countryId - right.countryId);
 }
@@ -254,6 +264,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
         subsidyExpenseSUSD: entry.subsidyExpenseSUSD,
         administrationExpenseSUSD: entry.administrationExpenseSUSD ?? 0,
         educationExpenseSUSD: entry.educationExpenseSUSD ?? 0,
+        trainingExpenseSUSD: entry.trainingExpenseSUSD ?? 0,
         netFiscalResultSUSD: entry.netFiscalResultSUSD,
       };
     }
@@ -771,6 +782,7 @@ function buildAnnualSummary(
       subsidyExpenseSUSD: number;
       administrationExpenseSUSD: number;
       educationExpenseSUSD: number;
+      trainingExpenseSUSD: number;
       netFiscalResultSUSD: number;
     }
   > = {};
@@ -784,6 +796,7 @@ function buildAnnualSummary(
       subsidyExpenseSUSD: 0,
       administrationExpenseSUSD: 0,
       educationExpenseSUSD: 0,
+      trainingExpenseSUSD: 0,
       netFiscalResultSUSD: 0,
     };
     budgetTotals[country.id] = emptyBudgetTotals();
@@ -813,6 +826,8 @@ function buildAnnualSummary(
           (countryTotals.administrationExpenseSUSD ?? 0),
         educationExpenseSUSD:
           current.educationExpenseSUSD + (countryTotals.educationExpenseSUSD ?? 0),
+        trainingExpenseSUSD:
+          current.trainingExpenseSUSD + (countryTotals.trainingExpenseSUSD ?? 0),
         netFiscalResultSUSD: 0,
       };
     }
@@ -834,7 +849,8 @@ function buildAnnualSummary(
       totals.interestExpenseSUSD -
       totals.subsidyExpenseSUSD -
       totals.administrationExpenseSUSD -
-      totals.educationExpenseSUSD;
+      totals.educationExpenseSUSD -
+      totals.trainingExpenseSUSD;
   }
   // Zero-only annual budget entries carry no information; omit them exactly as
   // monthly summaries do. Missing entries are treated as zero by reporting.

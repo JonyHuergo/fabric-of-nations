@@ -54,7 +54,7 @@ const SEED = 20_261_023;
  * schema-22 M9 technology/literacy state. The Batch 5 validation optimization must not
  * change simulation behavior; only the serialized state shape changed.
  */
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "a79d0d9cd8ef247e";
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "3fd929a30fff2c61";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
