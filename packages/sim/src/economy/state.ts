@@ -50,6 +50,8 @@ import {
 } from "./technology.js";
 import { createLaborPolicyState } from "./labor.js";
 import { createTradePolicyState, createTradeState } from "./trade.js";
+import { createPriceIndexState } from "./monetary.js";
+import { asSusdPerCurrencyUnit } from "./currency.js";
 import {
   assertValidCountryPoliticsInput,
   createCountryPoliticsState,
@@ -70,6 +72,7 @@ import type {
   EmploymentAssignment,
   GoodDef,
   Market,
+  MonetaryCurrencyState,
   ProfessionDef,
 } from "./types.js";
 
@@ -691,6 +694,106 @@ function assertTradePolicyInputs(scenario: EconomyScenarioDef): void {
   }
 }
 
+/**
+ * Validate the E6b monetary scenario input.
+ *
+ * A scenario may only initialize a pegged authority for a currency the country issues
+ * and uses domestically. The managed regime is a policy outcome that requires an
+ * enacted currency law, so it cannot be pre-set by scenario data. The initial reserve
+ * funding must be payable from the country's opening treasury cash, and the external
+ * counterparty's opening cash must cover the initial currency holding.
+ */
+function assertValidMonetaryInputs(scenario: EconomyScenarioDef): void {
+  if (scenario.monetary === undefined) return;
+  const currencyById = new Map((scenario.currencies ?? []).map((currency) => [currency.id, currency]));
+  const countryById = new Map((scenario.countries ?? []).map((country) => [country.id, country]));
+  const valuationByCurrency = new Map(
+    (scenario.currencyValuations ?? []).map((valuation) => [valuation.currencyId, valuation]),
+  );
+  const seenCurrencies = new Set<number>();
+  const seenCountries = new Set<number>();
+  for (const input of scenario.monetary.currencies ?? []) {
+    const path = `monetary.currencies[${String(input.currencyId)}]`;
+    const currency = currencyById.get(input.currencyId);
+    if (currency === undefined) {
+      throw new RangeError(`${path} references unknown currency ${String(input.currencyId)}`);
+    }
+    if (seenCurrencies.has(currency.id)) {
+      throw new RangeError(`${path} duplicates a currency entry`);
+    }
+    seenCurrencies.add(currency.id);
+    if (currency.issuer.kind !== "country") {
+      throw new RangeError(`${path} requires a simulated-country issuer`);
+    }
+    const country = countryById.get(currency.issuer.countryId);
+    if (country === undefined) {
+      throw new RangeError(`${path} issuer country is not registered`);
+    }
+    if (country.monetary.kind !== "own" || country.monetary.currencyId !== currency.id) {
+      throw new RangeError(`${path} requires the country's own monetary arrangement`);
+    }
+    if (seenCountries.has(country.id)) {
+      throw new RangeError(`${path} duplicates a country's monetary authority`);
+    }
+    seenCountries.add(country.id);
+    const regime = input.regime ?? "pegged";
+    if (regime !== "pegged") {
+      throw new RangeError(
+        `${path}.regime must be "pegged" in scenario data; a managed regime requires an enacted currency law`,
+      );
+    }
+    const valuation = valuationByCurrency.get(currency.id);
+    const parity =
+      input.paritySusdPerUnit ??
+      (valuation !== undefined && valuation.status === "specified"
+        ? valuation.susdPerUnit
+        : undefined);
+    if (parity === undefined) {
+      throw new RangeError(`${path} requires a specified valuation or an explicit parity`);
+    }
+    if (!Number.isFinite(parity) || !(parity > 0)) {
+      throw new RangeError(`${path}.paritySusdPerUnit must be positive`);
+    }
+    const funding = input.reserveFundingSUSD ?? 0;
+    if (!Number.isFinite(funding) || funding < 0) {
+      throw new RangeError(`${path}.reserveFundingSUSD must be finite and non-negative`);
+    }
+    if (funding > country.initialTreasuryCashSUSD + QUANTITY_TOLERANCE) {
+      throw new RangeError(
+        `${path}.reserveFundingSUSD exceeds the country's opening treasury cash`,
+      );
+    }
+    const units = input.currencyIssuedUnits ?? 0;
+    if (!Number.isFinite(units) || units < 0) {
+      throw new RangeError(`${path}.currencyIssuedUnits must be finite and non-negative`);
+    }
+    const externalCash = input.externalCashSUSD ?? units * parity;
+    if (!Number.isFinite(externalCash) || externalCash < 0) {
+      throw new RangeError(`${path}.externalCashSUSD must be finite and non-negative`);
+    }
+    if (units * parity > externalCash + QUANTITY_TOLERANCE) {
+      throw new RangeError(
+        `${path}.externalCashSUSD must cover the initial currency holding`,
+      );
+    }
+  }
+}
+
+/** Opening reserve funding per country, from the monetary scenario input. */
+function monetaryFundingByCountry(scenario: EconomyScenarioDef): Map<number, number> {
+  const funding = new Map<number, number>();
+  if (scenario.monetary === undefined) return funding;
+  const currencyById = new Map((scenario.currencies ?? []).map((currency) => [currency.id, currency]));
+  for (const input of scenario.monetary.currencies ?? []) {
+    const currency = currencyById.get(input.currencyId);
+    if (currency === undefined || currency.issuer.kind !== "country") continue;
+    const amount = input.reserveFundingSUSD ?? 0;
+    if (!(amount > 0)) continue;
+    funding.set(currency.issuer.countryId, (funding.get(currency.issuer.countryId) ?? 0) + amount);
+  }
+  return funding;
+}
+
 function pathForBlock(blockId: Id): string {
   return `popBlock ${String(blockId)}`;
 }
@@ -740,6 +843,7 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   assertInitialEmployment(scenario, definitionsById);
   assertTradeScenario(scenario);
   assertTradePolicyInputs(scenario);
+  assertValidMonetaryInputs(scenario);
   assertValidCountryCurrencyState({
     countries: scenario.countries ?? [],
     currencies: scenario.currencies ?? [],
@@ -940,6 +1044,7 @@ export function createEconomyWorld(
   // owner equity, tax revenue, and welfare expense accounts are allocated
   // deterministically. Opening treasury cash is balance-sheet state, not period
   // activity, so its equity counterpart keeps the opening set balanced.
+  const reserveFundingByCountry = monetaryFundingByCountry(scenario);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const initial = countryInitialById.get(country.id);
     if (initial === undefined) {
@@ -966,9 +1071,14 @@ export function createEconomyWorld(
     }
     opening.push({
       accountId: country.treasuryAccountId,
-      balanceSUSD: initial.initialTreasuryCashSUSD,
+      balanceSUSD:
+        initial.initialTreasuryCashSUSD - (reserveFundingByCountry.get(country.id) ?? 0),
     });
-    opening.push({ accountId: equityId, balanceSUSD: initial.initialTreasuryCashSUSD });
+    opening.push({
+      accountId: equityId,
+      balanceSUSD:
+        initial.initialTreasuryCashSUSD - (reserveFundingByCountry.get(country.id) ?? 0),
+    });
   }
 
   // M8 administration payroll accounts. Created only for politics-enabled worlds
@@ -1023,8 +1133,136 @@ export function createEconomyWorld(
     }
   }
 
-  for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {
-    world.finance.accounts.push({
+  // E6b monetary authorities and external counterparty accounts. Allocated for every
+  // own-currency country when the scenario enables the monetary system, so a dormant
+  // authority can be established later by a validated policy action.
+  if (scenario.monetary !== undefined) {
+    const inputByCurrency = new Map(
+      (scenario.monetary.currencies ?? []).map((input) => [input.currencyId, input]),
+    );
+    const currencyById = new Map(world.currencies.map((currency) => [currency.id, currency]));
+    const valuationByCurrency = new Map(
+      world.currencyValuations.map((valuation) => [valuation.currencyId, valuation]),
+    );
+    const authorityByCurrency = new Map<Id, Id>();
+    for (const country of world.countries) {
+      if (country.monetary.kind !== "own") continue;
+      const currency = currencyById.get(country.monetary.currencyId);
+      if (
+        currency === undefined ||
+        currency.issuer.kind !== "country" ||
+        currency.issuer.countryId !== country.id
+      ) {
+        continue;
+      }
+      authorityByCurrency.set(currency.id, country.id);
+    }
+    const monetaryRecords: MonetaryCurrencyState[] = [];
+    for (const currency of [...world.currencies].sort((left, right) => left.id - right.id)) {
+      const issuerCountryId = authorityByCurrency.get(currency.id);
+      if (issuerCountryId === undefined) {
+        monetaryRecords.push({
+          currencyId: currency.id,
+          issuerCountryId: null,
+          regime: "pegged",
+          paritySusdPerUnit: null,
+          referenceParitySusdPerUnit: null,
+          currencyIssuedUnits: 0,
+          active: false,
+          reserveAccountId: null,
+          liabilityAccountId: null,
+          equityAccountId: null,
+          externalCashAccountId: null,
+          externalCurrencyAccountId: null,
+          externalEquityAccountId: null,
+          lastParityChangeDay: null,
+          lastManagedUpdateDay: null,
+          lastMonthEndDay: null,
+          lastMonthExportsSUSD: 0,
+          lastMonthImportsSUSD: 0,
+        });
+        continue;
+      }
+      const reserveAccountId = allocate("country", issuerCountryId, "monetary-reserve-cash");
+      const liabilityAccountId = allocate("country", issuerCountryId, "currency-liability");
+      const equityAccountId = allocate("country", issuerCountryId, "monetary-equity");
+      const externalCashAccountId = allocate("system", null, "external-cash");
+      const externalCurrencyAccountId = allocate("system", null, "external-currency-holding");
+      const externalEquityAccountId = allocate("system", null, "external-equity");
+      const valuation = valuationByCurrency.get(currency.id);
+      const scenarioValuation =
+        valuation !== undefined && valuation.status === "specified"
+          ? valuation.susdPerUnit
+          : null;
+      const input = inputByCurrency.get(currency.id);
+      const active = input !== undefined;
+      const parity = active
+        ? (input.paritySusdPerUnit ?? scenarioValuation)
+        : scenarioValuation;
+      if (active) {
+        if (parity === null) {
+          throw new RangeError(
+            `monetary authority for currency ${String(currency.id)} requires a parity`,
+          );
+        }        const funding = input.reserveFundingSUSD ?? 0;
+        const units = input.currencyIssuedUnits ?? 0;
+        const holdingValue = units * parity;
+        const externalCash = input.externalCashSUSD ?? holdingValue;
+        // The external counterparty buys the opening circulation with SUSD, so those
+        // reserves join the treasury capitalization on the authority's balance sheet:
+        // reserves = funding + holding value; equity = funding; liability = holding value.
+        if (funding > 0 || holdingValue > 0) {
+          opening.push({
+            accountId: reserveAccountId,
+            balanceSUSD: funding + holdingValue,
+          });
+        }
+        if (funding > 0) {
+          opening.push({ accountId: equityAccountId, balanceSUSD: funding });
+        }
+        if (units > 0) {
+          opening.push({ accountId: liabilityAccountId, balanceSUSD: holdingValue });
+          opening.push({ accountId: externalCurrencyAccountId, balanceSUSD: holdingValue });
+          opening.push({
+            accountId: externalCashAccountId,
+            balanceSUSD: externalCash - holdingValue,
+          });
+          opening.push({ accountId: externalEquityAccountId, balanceSUSD: externalCash });
+        } else if (externalCash > 0) {
+          opening.push({ accountId: externalCashAccountId, balanceSUSD: externalCash });
+          opening.push({ accountId: externalEquityAccountId, balanceSUSD: externalCash });
+        }
+      }
+      const brandedParity = parity === null ? null : asSusdPerCurrencyUnit(parity);
+      monetaryRecords.push({
+        currencyId: currency.id,
+        issuerCountryId,
+        regime: "pegged",
+        paritySusdPerUnit: brandedParity,
+        referenceParitySusdPerUnit: active ? brandedParity : null,
+        currencyIssuedUnits: active ? (input.currencyIssuedUnits ?? 0) : 0,
+        active,
+        reserveAccountId,
+        liabilityAccountId,
+        equityAccountId,
+        externalCashAccountId,
+        externalCurrencyAccountId,
+        externalEquityAccountId,
+        lastParityChangeDay: null,
+        lastManagedUpdateDay: null,
+        lastMonthEndDay: null,
+        lastMonthExportsSUSD: 0,
+        lastMonthImportsSUSD: 0,
+      });
+    }
+    world.monetary = {
+      enabled: true,
+      currencies: monetaryRecords,
+      lastUpdateDay: null,
+    };
+  }
+
+  for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {    world.finance.accounts.push({
       id: instance.operatingCashAccountId,
       ownerKind: "building",
       ownerId: instance.id,
@@ -1086,6 +1324,13 @@ export function createEconomyWorld(
     world.markets.push(built);
   }
   world.markets.sort((left, right) => left.id - right.id);
+  // E6b price index: the base period is the scenario's first processed day, so the
+  // captured opening prices normalize the index to 100.
+  world.priceIndex = createPriceIndexState(
+    scenario.definitions,
+    scenario.population.definitions,
+    world.markets,
+  );
   const marketByRegion = new Map<number, number>();
   for (const market of world.markets) {
     for (const regionId of market.regionIds) marketByRegion.set(regionId, market.id);

@@ -27,7 +27,7 @@
  * authored transport routes, in-transit consignments, freight/customs postings, and
  * the trade-policy action.
  */
-export const SIM_VERSION = "0.24.0";
+export const SIM_VERSION = "0.25.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -52,7 +52,7 @@ export const SIM_VERSION = "0.24.0";
  * E6a adds `Market.customsCountryId`, `Country.trade`, `World.trade`, the freight/
  * customs posting kinds and account subtypes, and the customs fiscal total (D-079).
  */
-export const WORLD_SCHEMA_VERSION = 24;
+export const WORLD_SCHEMA_VERSION = 25;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -77,9 +77,9 @@ export const SAVE_FORMAT_VERSION = 1;
  * (D-077). E5 adds health/minimum-wage/hours law definitions, so it bumps the
  * content version to `m3-economy-v8` (D-078). E6a adds authored market customs
  * administrations, transport routes, and per-good transport costs, so it bumps the
- * content version to `m3-economy-v9` (D-079).
+ * content version to `m3-economy-v10` (D-079).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v9";
+export const DEFAULT_DATA_VERSION = "m3-economy-v10";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

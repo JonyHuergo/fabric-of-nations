@@ -525,21 +525,34 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
       CAMPAIGN_TERMINAL_DAY_INDEX,
     );
     assertValidDayIndex(setOnDay);
-    if (input.expectedStartDay !== undefined && setOnDay !== input.expectedStartDay) {
+    const source = requireString(record.source, `${path}.source`, { minLength: 1 });
+    if (source !== "scenario" && source !== "policy" && source !== "market") {
       throw new RangeError(
-        `${path}.setOnDay must equal the world start day ${String(input.expectedStartDay)}`,
+        `${path}.source must be "scenario", "policy", or "market"`,
       );
     }
-    const source = requireString(record.source, `${path}.source`, { minLength: 1 });
-    if (source !== "scenario") {
-      throw new RangeError(`${path}.source must be "scenario" in M4a-2`);
+    if (input.expectedStartDay === undefined) {
+      // Scenario validation runs before simulation, so only authored rates are valid.
+      if (source !== "scenario") {
+        throw new RangeError(`${path}.source must be "scenario" in scenario data`);
+      }
+    } else if (source === "scenario") {
+      if (setOnDay !== input.expectedStartDay) {
+        throw new RangeError(
+          `${path}.setOnDay must equal the world start day ${String(input.expectedStartDay)}`,
+        );
+      }
+    } else if (setOnDay < input.expectedStartDay) {
+      throw new RangeError(
+        `${path}.setOnDay must not precede the world start day ${String(input.expectedStartDay)}`,
+      );
     }
     valuations.set(currencyId, {
       currencyId,
       status: "specified",
       susdPerUnit,
       setOnDay,
-      source: "scenario",
+      source: source as "scenario" | "policy" | "market",
     });
   }
   for (const currency of currencies.values()) {

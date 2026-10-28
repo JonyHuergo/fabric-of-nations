@@ -62,6 +62,8 @@ export const CASH_SUBTYPES: readonly AccountSubtype[] = [
   "operating-cash",
   "system-reserve-cash",
   "treasury-cash",
+  "monetary-reserve-cash",
+  "external-cash",
 ];
 
 const CASH_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(CASH_SUBTYPES);
@@ -105,6 +107,12 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "freight-expense": "expense",
   "customs-duty-expense": "expense",
   "customs-duty-revenue": "revenue",
+  "monetary-reserve-cash": "asset",
+  "currency-liability": "liability",
+  "monetary-equity": "equity",
+  "external-cash": "asset",
+  "external-currency-holding": "asset",
+  "external-equity": "equity",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -148,6 +156,12 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "freight-expense": ["building"],
   "customs-duty-expense": ["building"],
   "customs-duty-revenue": ["country"],
+  "monetary-reserve-cash": ["country"],
+  "currency-liability": ["country"],
+  "monetary-equity": ["country"],
+  "external-cash": ["system"],
+  "external-currency-holding": ["system"],
+  "external-equity": ["system"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -301,6 +315,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "customs-duty-expense", side: "debit" },
     { subtype: "customs-duty-revenue", side: "credit" },
   ],
+  "monetary-reserve-contribution": [],
+  "fx-issuance": [],
+  "fx-redemption": [],
+  "fx-revaluation": [],
   "public-enterprise-capital-contribution": [],
   "migration-transfer": [],
   "profit-retention": [],
@@ -1010,6 +1028,109 @@ export function assertIndustrialPostingStructure(
  *   debit, building `operating-cash` credit, the country `treasury-cash` debit, and
  *   `customs-duty-revenue` credit.
  */
+/**
+ * Enforce the required legs of the E6b monetary kinds (D-080).
+ *
+ * Every kind is a four-line, equal-amount structure with explicit counterparts:
+ *
+ * - `monetary-reserve-contribution`: treasury cash and country equity exchange against
+ *   the authority's reserve cash and monetary equity (capitalization or withdrawal).
+ * - `fx-issuance`: the authority receives SUSD reserves and credits its currency
+ *   liability; the external counterparty receives currency (SUSD-measured) and pays
+ *   SUSD cash.
+ * - `fx-redemption`: the reverse.
+ * - `fx-revaluation`: a valuation change only — the currency liability and monetary
+ *   equity adjust, and the external holding and external equity adjust oppositely. No
+ *   cash line exists.
+ */
+export function assertMonetaryPostingStructure(
+  kind:
+    | "monetary-reserve-contribution"
+    | "fx-issuance"
+    | "fx-redemption"
+    | "fx-revaluation",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  const patterns: Readonly<Record<string, readonly (readonly string[])[]>> = {
+    "monetary-reserve-contribution": [
+      ["treasury-cash:credit", "owner-equity:debit", "monetary-reserve-cash:debit", "monetary-equity:credit"],
+      ["treasury-cash:debit", "owner-equity:credit", "monetary-reserve-cash:credit", "monetary-equity:debit"],
+    ],
+    "fx-issuance": [
+      ["monetary-reserve-cash:debit", "currency-liability:credit", "external-currency-holding:debit", "external-cash:credit"],
+    ],
+    "fx-redemption": [
+      ["monetary-reserve-cash:credit", "currency-liability:debit", "external-currency-holding:credit", "external-cash:debit"],
+    ],
+    "fx-revaluation": [
+      ["currency-liability:credit", "monetary-equity:debit", "external-currency-holding:debit", "external-equity:credit"],
+      ["currency-liability:debit", "monetary-equity:credit", "external-currency-holding:credit", "external-equity:debit"],
+    ],
+  };
+  if (lines.length !== 4) {
+    throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+  }
+  const totals = new Map<string, number>();
+  let amount = 0;
+  const countryIds = new Set<Id>();
+  let systemAccounts = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "system") {
+      systemAccounts += 1;
+    } else if (account.ownerKind === "country" && account.ownerId !== null) {
+      countryIds.add(account.ownerId);
+    } else {
+      throw new RangeError(`${path} ${kind} may only reference country and system accounts`);
+    }
+    if (index === 0) amount = line.amountSUSD;
+    if (Math.abs(line.amountSUSD - amount) > toleranceMoney(amount, line.amountSUSD)) {
+      throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
+    }
+    totals.set(
+      `${account.subtype}:${line.side}`,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+    );
+  }
+  if (countryIds.size !== 1) {
+    throw new RangeError(`${path} ${kind} must reference exactly one country authority`);
+  }
+  const actual = [...totals.keys()].filter((key) => (totals.get(key) ?? 0) > 0).sort();
+  const expected = patterns[kind];
+  if (expected === undefined) {
+    throw new RangeError(`${path} ${kind} is not a registered monetary kind`);
+  }
+  const matches = expected.some(
+    (pattern) =>
+      pattern.length === actual.length &&
+      pattern.slice().sort().every((key, index) => key === actual[index]),
+  );
+  if (!matches) {
+    throw new RangeError(`${path} ${kind} legs do not match the required structure`);
+  }
+  if (kind === "fx-issuance" || kind === "fx-redemption" || kind === "fx-revaluation") {
+    if (systemAccounts !== 2) {
+      throw new RangeError(`${path} ${kind} requires exactly two external system accounts`);
+    }
+  } else if (systemAccounts !== 0) {
+    throw new RangeError(`${path} ${kind} must not reference system accounts`);
+  }
+}
+
 /**
  * Enforce the required legs of an owner capital injection (D-079).
  *
@@ -1874,12 +1995,20 @@ export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
     }
     byId.set(account.id, account);
     const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
-    if (byOwner.has(key)) {
+    // E6b external-counterparty accounts are per-country system accounts addressed by
+    // their explicit monetary-state ids; they are the documented duplicate exception
+    // (D-080). They are never looked up by owner/subtype.
+    const perCountryExternalAccount =
+      account.ownerKind === "system" &&
+      (account.subtype === "external-cash" ||
+        account.subtype === "external-currency-holding" ||
+        account.subtype === "external-equity");
+    if (byOwner.has(key) && !perCountryExternalAccount) {
       throw new RangeError(
         `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
       );
     }
-    byOwner.set(key, account);
+    if (!perCountryExternalAccount) byOwner.set(key, account);
     if (isCashAccount(account)) cash.push(account);
   }
   cash.sort((left, right) => left.id - right.id);

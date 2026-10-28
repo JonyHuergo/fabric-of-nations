@@ -4108,6 +4108,152 @@ does not add FX conversion, monetary authority, inflation measurement, credit
 creation, rest-of-world endowments, infrastructure construction, trade agreements,
 or any M10 system.
 
+## D-080 — E6b monetary foundations: currency board, exchange-rate valuation, and price index
+
+**Status:** adopted for E6b implementation. **Scope:** §17A.10, §17A.10.1–§17A.10.4,
+§17A.13.2 E6b, §17A.14 E6b, §17.3 M8a scope, and the §17A.16 monetary open questions.
+M10 and E6b-external features (banking, credit, external debt) are not implemented.
+
+**Why a decision is required.** The GDD fixes the SUSD contract and the requirement for
+a documented inflation measure, exchange-rate dynamics, a law-backed monetary authority,
+and balanced money accounting, but deliberately leaves the mechanism, accounting, and
+transmission open (§17A.16). Those choices determine authority, units, timing, posting
+semantics, and compatibility.
+
+### SUSD and units
+
+1. **SUSD remains the fixed unit of measurement and accounting denomination.** No
+   account, price, wage, asset, or liability is rescaled or redenominated. The price
+   index is a derived measurement; it never changes SUSD's definition and never rewrites
+   a closed period.
+2. **`CurrencyValuation.susdPerUnit` keeps its direction: SUSD per one currency unit.**
+   It is the single authoritative valuation; there is no stored inverse rate and no
+   parity default. The `source` field extends to `scenario | policy | market` strictly
+   as provenance: `scenario` for authored input, `policy` for a declared parity, and
+   `market` for a valuation moved by the managed rule. It is not a claim that a real
+   market set the rate.
+3. **Domestic accounts remain SUSD.** E6b does not create national-currency-denominated
+   household, enterprise, or treasury ledgers. Currency amounts exist only where an
+   actual currency transaction occurs (the monetary authority's issue/redemption and the
+   external counterparty's holdings), and each carries its SUSD measurement at the
+   current valuation. This is the documented conversion boundary: conversion happens at
+   the monetary window only, once, and never inside trade or tax settlement.
+
+### Price measurement
+
+4. **One documented Laspeyres price index.** Basket weights are the reference-household
+   annual quantities from the scenario's validated need tiers (subsistence, basic,
+   comfort, luxury items), summed by good where a good appears in several tiers. The base
+   period is the scenario's first processed day; each market's opening SUSD prices are
+   captured into authoritative state at world creation, and the index is normalized to
+   **100** there. The formula is
+   `I = 100 × Σ wᵢ (pᵢ,t / pᵢ,0) / Σ wᵢ` over basket goods that have a base and a current
+   positive price. A good with a missing or non-positive current price is excluded from
+   both sums and coverage is reported; a good absent from the basket is excluded even if
+   its price is observable. Neither case fabricates a price.
+5. **Market, country, and world indices.** The market index uses that market's prices.
+   A country index is the population-weighted mean of the indices of the markets that
+   contain the country's regions (a country with no population weight uses an equal
+   weight). The world index is the population-weighted mean of market indices. All are
+   derived; only the basket, base prices, and month-end observations are stored.
+6. **Bounded observation history.** The current index is derived from current prices on
+   demand. At each civil month-end the phase appends one observation `{year, month,
+   dayIndex, world, per-country values}` and retains the most recent **24**. Older
+   observations are dropped (documented bounded retention). Month-on-month and
+   year-on-year inflation are computed from the retained observations and reported as
+   "insufficient history" when unavailable. The observation is idempotent per day.
+7. **Measurement has no behavioural effect.** The GDD does not require indexation, and
+   no price, wage, tax, contract, or account is adjusted from the index. This is recorded
+   as a deliberate limit, not an omission: index-linked policy would need its own
+   instrument and decision.
+
+### Exchange-rate regime, dynamics, and authority
+
+8. **Only own-currency countries have a monetary authority.** A country whose
+   `monetary` arrangement is `adopted` or `shared` has no independent authority and is
+   governed by the issuer's; a country with an explicitly unavailable valuation has no
+   active authority until it declares a parity. No country receives a modern fiat
+   central bank by default.
+9. **Two regimes.**
+    - **Pegged** (default): the valuation equals the declared parity. The parity changes
+      only through an explicit validated policy action, bounded to a maximum relative
+      change per action and a minimum interval between changes, and the change is
+      revalued through the accounting described below. It is not a per-tick adjustment.
+    - **Managed**: the valuation is updated by a documented bounded rule from two real
+      signals: the realized net external position of the most recently completed civil
+      month (from the authoritative E6a export/import memo), normalized by turnover as
+      the trade-pressure term, and the country-to-world price-index ratio as the relative
+      price-level term. The daily change is
+      `clamp(KAPPA_FX × (w_trade × pressure + w_price × priceGap), ±MAX_DAILY_FX_CHANGE)`
+      and the valuation is bounded to `[0.5×, 2×]` of the declared parity. The managed
+      regime requires an enacted currency law; without it the country is pegged.
+      Kappa, weights, bounds, and cadence are provisional structural choices, not
+      calibrated economics.
+10. **A currency law backs the authority.** The M8 currency slot gains a
+    `currency-managed-standard` option whose validated `currencyRegime` is `managed`.
+    The existing `propose-law` pathway (support, regime eligibility, prerequisites,
+    effective day, bounded transitions) is reused; no second institutional action is
+    added.
+11. **Authority instruments.** One validated player action, `set-monetary-policy`, sets
+    the regime, the parity, a treasury reserve transfer, and a currency conversion. The
+    AI has no monetary action. Every field is bounded and validated at the authoritative
+    boundary; an invalid or unaffordable operation leaves the world unchanged.
+
+### Money accounting and convertibility
+
+12. **Currency board accounting.** Per active authority: country `monetary-reserve-cash`
+    (SUSD cash), `currency-liability` (SUSD at the current valuation), and
+    `monetary-equity`; and an external counterparty's `external-cash`,
+    `external-currency-holding`, and `external-equity`, all system-owned and identified
+    by explicit account ids in the monetary state. `currencyIssuedUnits` is
+    authoritative; the liability and holding balances are its SUSD measurement and are
+    validated against `units × valuation`.
+13. **Reserve capitalization/withdrawal** is a real capital transfer between the country
+    treasury and the authority (`monetary-reserve-contribution`): treasury cash and
+    country equity move against authority reserves and monetary equity. It is not
+    revenue or expense and never creates cash.
+14. **Currency issue/redemption** (`fx-issuance` / `fx-redemption`) exchanges SUSD
+    reserves for currency units with the external counterparty at the current valuation.
+    Issue requires the external counterparty's SUSD cash; redemption requires the
+    authority's reserves and the external currency holding. Both are cash-neutral,
+    balanced, and bounded by existing balances; no money or currency appears without a
+    counterpart.
+15. **Revaluation** (`fx-revaluation`) applies a valuation or parity change to the
+    outstanding liability and the external holding, with the differences posted to
+    monetary equity and external equity. It is a valuation change only: no cash, no
+    goods, no rewriting of settled transactions or closed periods.
+16. **Convertibility is derived from reserve adequacy, not a slider.** The authority's
+    reserve cover is its reserves divided by the most recently completed month's realized
+    imports. Below the documented minimum (or with zero reserves) convertibility is
+    suspended. While suspended, E6a dispatch blocks imports into that country's market
+    with the reason `fx-convertibility`. Restoring cover (reserve transfer, a parity or
+    valuation change that reduces the liability, or lower imports) restores trade. This
+    is the real transaction channel of exchange-rate policy and the only FX effect on
+    trade; trade values remain SUSD and are never converted.
+17. **No double conversion.** Trade, freight, and customs remain SUSD-settled and are
+    not converted at the monetary window. The window handles only currency units and
+    reserves. Goods conservation and shipment idempotency are unaffected.
+
+### Timing, persistence, and compatibility
+
+18. The monetary phase runs after settlement, fiscal, and E6a dispatch, and before the
+    monthly close. Managed valuation updates and revaluation run daily and are
+    idempotent per day; the realized-import capture and price-index observation run at a
+    civil month-end and are idempotent per day. A repeated day cannot double-post,
+    double-capture, or double-observe.
+19. World schema **25**, simulation **0.25.0**, worker protocol **12**, data version
+    **`m3-economy-v10`**. Older saves and protocol-11 clients are rejected under D-013;
+    no migration is implemented.
+20. Bounded state: one basket, one base-price table per market, at most 24 month-end
+    observations, one authority record per currency, and no per-day FX or index history.
+    Observation and record arrays are sorted by stable ids.
+
+**Consequences.** E6b adds price-index and monetary-authority state, six account
+subtypes, four posting kinds, one validated player action, one currency law option, a
+documented index and FX rule, and an FX-driven import gate. It does not add commercial
+banks, deposits, bank credit, a policy interest rate, lender-of-last-resort, external
+debt, domestic currency-denominated ledgers, an FX order book, or M10 systems.
+
 ## Assumptions recorded for future review
 
 

@@ -42,6 +42,14 @@ import {
   marketInfrastructureQuality,
   routeCapacitySUSDPerDay,
   transitDays,
+  authorityLiabilitySUSD,
+  authorityReserveCoverMonths,
+  authorityReservesSUSD,
+  convertibilityState,
+  derivePriceIndexes,
+  monetaryCurrencyForCountry,
+  priceIndexCoverage,
+  priceIndexInflation,
   IMPLEMENTED_LAW_SLOTS,
   INTEREST_GROUP_KEYS,
   LAW_SLOTS,
@@ -86,6 +94,10 @@ import {
   type SnapshotLabor,
   type SnapshotTradeNetwork,
   type SnapshotTradePolicy,
+  type SnapshotCountryPriceIndex,
+  type SnapshotCurrency,
+  type SnapshotMonetaryAuthority,
+  type SnapshotPriceIndex,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -1243,6 +1255,8 @@ function countrySnapshot(
     education: educationSnapshot(world, country, definitions),
     labor: laborSnapshot(world, country, definitions),
     trade: tradePolicySnapshot(world, country),
+    priceIndex: countryPriceIndexSnapshot(world, country),
+    monetary: monetarySnapshot(world, country),
   };
 }
 
@@ -1356,6 +1370,173 @@ function tradeNetworkSnapshot(
             blocked,
             blockedTruncated: (lastDay.blocked.length ?? 0) > blocked.length,
           },
+  };
+}
+
+function marketPopulations(world: World): Map<number, number> {
+  const byRegion = new Map<number, number>();
+  for (const block of world.popBlocks) {
+    byRegion.set(block.regionId, (byRegion.get(block.regionId) ?? 0) + populationTotal(block));
+  }
+  const byMarket = new Map<number, number>();
+  for (const market of world.markets) {
+    let population = 0;
+    for (const regionId of market.regionIds) population += byRegion.get(regionId) ?? 0;
+    byMarket.set(market.id, population);
+  }
+  return byMarket;
+}
+
+function priceIndexSnapshot(
+  world: World,
+  definitions: EconomyDefinitions,
+): SnapshotPriceIndex {
+  const values = derivePriceIndexes(world);
+  const goodById = new Map(definitions.goods.map((good) => [good.id, good]));
+  const populations = marketPopulations(world);
+  let coverageWeighted = 0;
+  let populationTotalAll = 0;
+  for (const market of world.markets) {
+    const population = populations.get(market.id) ?? 0;
+    coverageWeighted += priceIndexCoverage(world, market.id) * population;
+    populationTotalAll += population;
+  }
+  const coverage =
+    populationTotalAll > 0
+      ? coverageWeighted / populationTotalAll
+      : world.markets.length > 0
+        ? world.markets.reduce((total, market) => total + priceIndexCoverage(world, market.id), 0) /
+          world.markets.length
+        : 0;
+  return {
+    baseDayIndex: world.startDayIndex,
+    basket: [...world.priceIndex.basket]
+      .sort((left, right) => left.goodId - right.goodId)
+      .map((item) => ({
+        goodId: item.goodId,
+        goodKey: goodById.get(item.goodId)?.key ?? String(item.goodId),
+        goodName: goodById.get(item.goodId)?.name ?? String(item.goodId),
+        weight: item.weight,
+      })),
+    worldValue: roundDisplay(values.world, 4),
+    coverage: roundDisplay(coverage, 4),
+    observations: world.priceIndex.observations.map((observation) => ({
+      year: observation.year,
+      month: observation.month,
+      dayIndex: observation.dayIndex,
+      world: roundDisplay(observation.world, 4),
+    })),
+    monthOnMonthInflation: roundOptional(priceIndexInflation(world, null, 1)),
+    yearOnYearInflation: roundOptional(priceIndexInflation(world, null, 12)),
+  };
+}
+
+function roundOptional(value: number | null): number | null {
+  return value === null ? null : roundDisplay(value, 6);
+}
+
+function countryPriceIndexSnapshot(
+  world: World,
+  country: World["countries"][number],
+): SnapshotCountryPriceIndex {
+  const values = derivePriceIndexes(world);
+  const coverageWeighted = country.regionIds.reduce((total, regionId) => {
+    const marketId = world.regions.find((region) => region.id === regionId)?.marketId;
+    return total + (marketId === null || marketId === undefined ? 0 : priceIndexCoverage(world, marketId));
+  }, 0);
+  const regionCount = Math.max(1, country.regionIds.length);
+  return {
+    baseDayIndex: world.startDayIndex,
+    value: roundDisplay(values.countries.get(country.id) ?? 100, 4),
+    coverage: roundDisplay(coverageWeighted / regionCount, 4),
+    monthOnMonthInflation: roundOptional(priceIndexInflation(world, country.id, 1)),
+    yearOnYearInflation: roundOptional(priceIndexInflation(world, country.id, 12)),
+  };
+}
+
+function currenciesSnapshot(world: World): readonly SnapshotCurrency[] {
+  return [...world.currencies]
+    .sort((left, right) => left.id - right.id)
+    .map((currency) => {
+      const valuation = world.currencyValuations.find(
+        (entry) => entry.currencyId === currency.id,
+      );
+      return {
+        id: currency.id,
+        key: currency.key,
+        name: currency.name,
+        issuerKind: currency.issuer.kind,
+        issuerCountryId:
+          currency.issuer.kind === "country" ? currency.issuer.countryId : null,
+        valuationStatus:
+          valuation === undefined || valuation.status === "unavailable"
+            ? "unavailable"
+            : "specified",
+        susdPerUnit:
+          valuation !== undefined && valuation.status === "specified"
+            ? valuation.susdPerUnit
+            : null,
+        valuationSource:
+          valuation !== undefined && valuation.status === "specified"
+            ? valuation.source
+            : null,
+      };
+    });
+}
+
+function monetarySnapshot(
+  world: World,
+  country: World["countries"][number],
+): SnapshotMonetaryAuthority {
+  const record = monetaryCurrencyForCountry(world, country.id);
+  if (record === null) {
+    return {
+      hasAuthority: false,
+      active: false,
+      regime: "pegged",
+      paritySusdPerUnit: null,
+      valuationSusdPerUnit: null,
+      reserveCashSUSD: 0,
+      currencyIssuedUnits: 0,
+      liabilitySUSD: 0,
+      reserveCoverMonths: null,
+      convertibility: "no-authority",
+      lastParityChangeDay: null,
+      lastMonthExportsSUSD: 0,
+      lastMonthImportsSUSD: 0,
+      blockedReason:
+        country.monetary.kind !== "own"
+          ? "adopted-or-shared-currency"
+          : "monetary-system-disabled",
+    };
+  }
+  const valuation = world.currencyValuations.find(
+    (entry) => entry.currencyId === record.currencyId,
+  );
+  const state = convertibilityState(world, country.id);
+  const coverMonths = authorityReserveCoverMonths(world, record);
+  return {
+    hasAuthority: true,
+    active: record.active,
+    regime: record.regime,
+    paritySusdPerUnit: record.paritySusdPerUnit,
+    valuationSusdPerUnit:
+      valuation !== undefined && valuation.status === "specified"
+        ? valuation.susdPerUnit
+        : null,
+    reserveCashSUSD: roundDisplay(authorityReservesSUSD(world, record), 2),
+    currencyIssuedUnits: roundDisplay(record.currencyIssuedUnits, 3),
+    liabilitySUSD: roundDisplay(authorityLiabilitySUSD(world, record), 2),
+    reserveCoverMonths: Number.isFinite(coverMonths) ? roundDisplay(coverMonths, 2) : null,
+    convertibility: state.state,
+    lastParityChangeDay: record.lastParityChangeDay,
+    lastMonthExportsSUSD: roundDisplay(record.lastMonthExportsSUSD, 2),
+    lastMonthImportsSUSD: roundDisplay(record.lastMonthImportsSUSD, 2),
+    blockedReason: record.active
+      ? null
+      : record.paritySusdPerUnit === null
+        ? "no-declared-parity"
+        : "not-established",
   };
 }
 
@@ -1489,6 +1670,8 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.financeHistory);
     for (const report of country.annualReports) Object.freeze(report);
     Object.freeze(country.annualReports);
+    Object.freeze(country.priceIndex);
+    Object.freeze(country.monetary);
     Object.freeze(country);
   }
   for (const region of snapshot.regions) Object.freeze(region);
@@ -1533,6 +1716,13 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(snapshot.trade.lastDay);
   }
   Object.freeze(snapshot.trade);
+  Object.freeze(snapshot.priceIndex.basket);
+  for (const item of snapshot.priceIndex.basket) Object.freeze(item);
+  for (const observation of snapshot.priceIndex.observations) Object.freeze(observation);
+  Object.freeze(snapshot.priceIndex.observations);
+  Object.freeze(snapshot.priceIndex);
+  for (const currency of snapshot.currencies) Object.freeze(currency);
+  Object.freeze(snapshot.currencies);
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
@@ -1604,6 +1794,8 @@ export function buildSimulationSnapshot(
     technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
     technologyCatalog: technologyCatalogSnapshot(definitions),
     trade: tradeNetworkSnapshot(world, definitions),
+    priceIndex: priceIndexSnapshot(world, definitions),
+    currencies: currenciesSnapshot(world),
     diagnostics,
   });
 }

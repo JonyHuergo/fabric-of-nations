@@ -104,9 +104,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // Schema 23 added the E5 labor/health fields and block qualification; E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`. The digest changes even though
     // the M2 population behavior is unchanged, so it is intentionally re-pinned.
-    expect(hashWorld(world)).toBe("9b6aba27e38ff6b9");
+    expect(hashWorld(world)).toBe("c233e1f7988985b1");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("9b6aba27e38ff6b9");
+    expect(hashWorld(restored)).toBe("c233e1f7988985b1");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -310,6 +310,6 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // Updated for the E5 schema-23 labor/health/qualification fields and the E6a
     // schema-24 trade/customs fields; population flows are unchanged and remain
     // validated by the ratio checks above.
-    expect(hashWorld(world)).toBe("55887489abbc5883");
+    expect(hashWorld(world)).toBe("46fdf30119636523");
   });
 });

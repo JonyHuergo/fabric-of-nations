@@ -35,6 +35,7 @@ import {
   assertDebtPostingStructure,
   assertTradePostingStructure,
   assertOwnerCapitalInjectionStructure,
+  assertMonetaryPostingStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
@@ -201,6 +202,14 @@ function validatePostingLines(
   }
   if (transactionKind === "owner-capital-injection") {
     assertOwnerCapitalInjectionStructure(lines, accounts);
+  }
+  if (
+    transactionKind === "monetary-reserve-contribution" ||
+    transactionKind === "fx-issuance" ||
+    transactionKind === "fx-redemption" ||
+    transactionKind === "fx-revaluation"
+  ) {
+    assertMonetaryPostingStructure(transactionKind, lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);

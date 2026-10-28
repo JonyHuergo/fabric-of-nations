@@ -660,7 +660,15 @@ export function assertValidFinanceState(finance: FinanceState): void {
     accounts.set(account.id, account);
     maxAccountId = Math.max(maxAccountId, account.id);
     const key = `${account.ownerKind}:${account.ownerId === null ? "-" : String(account.ownerId)}:${account.subtype}`;
-    if (ownerKeys.has(key)) {
+    // E6b external-counterparty accounts are per-country system accounts identified by
+    // explicit ids in `World.monetary`; they are the one documented exception to the
+    // one-account-per-owner/subtype rule (D-080).
+    const perCountryExternalAccount =
+      account.ownerKind === "system" &&
+      (account.subtype === "external-cash" ||
+        account.subtype === "external-currency-holding" ||
+        account.subtype === "external-equity");
+    if (ownerKeys.has(key) && !perCountryExternalAccount) {
       throw new RangeError(
         `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
       );

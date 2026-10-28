@@ -145,6 +145,42 @@ export const MAX_TRADE_ROUTE_CAPACITY_SUSD_PER_DAY = 1e12;
 export const MAX_TRADE_ROUTES = 10_000;
 
 /**
+ * E6b price index. The index is a Laspeyres measure over a fixed needs-derived basket,
+ * normalized to 100 at the scenario's first processed day. Only month-end observations
+ * are stored, bounded to this many; current values are derived (D-080).
+ */
+export const MAX_PRICE_INDEX_OBSERVATIONS = 24;
+
+/**
+ * E6b managed exchange-rate rule. PROVISIONAL structural parameters, not calibrated.
+ *
+ * `dailyChange = clamp(FX_KAPPA × (FX_TRADE_WEIGHT × tradePressure +
+ * FX_PRICE_WEIGHT × priceGap), ±FX_MAX_DAILY_CHANGE)`, where tradePressure is the
+ * realized net external position over turnover in [-1, 1] and priceGap is
+ * `worldIndex / countryIndex − 1`. The valuation is bounded to
+ * [FX_MIN_RATIO, FX_MAX_RATIO] × the declared parity.
+ */
+export const FX_KAPPA = 0.05;
+export const FX_TRADE_WEIGHT = 0.6;
+export const FX_PRICE_WEIGHT = 0.4;
+export const FX_MAX_DAILY_CHANGE = 0.01;
+export const FX_MIN_RATIO = 0.5;
+export const FX_MAX_RATIO = 2;
+
+/** Maximum relative parity change per policy action (devaluation or revaluation). */
+export const FX_MAX_PARITY_STEP = 0.5;
+
+/** Minimum civil days between parity changes, so a parity is a decision, not a jitter. */
+export const FX_PARITY_COOLDOWN_DAYS = 180;
+
+/**
+ * Convertibility rule: the authority must hold at least this many months of the most
+ * recently completed month's realized imports in SUSD reserves. Below it, convertibility
+ * is suspended and imports into the country's market are blocked (D-080).
+ */
+export const FX_MIN_RESERVE_COVER_MONTHS = 0.5;
+
+/**
  * M5a profit-allocation policy defaults. PROVISIONAL, not calibrated.
  *
  * Legacy M0–M5 scenarios omit the policy and therefore keep it disabled; the M5

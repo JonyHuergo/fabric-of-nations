@@ -301,11 +301,16 @@ describe("M4a-1 invariants", () => {
   });
 
   test("the designated cash set is explicit and never every asset account", () => {
+    // E6b (D-080) adds the interest-free monetary reserve and the external
+    // counterparty's settlement cash to the designated-cash set; both are real
+    // spendable SUSD assets with exact conservation rules.
     expect(CASH_SUBTYPES).toEqual([
       "household-cash",
       "operating-cash",
       "system-reserve-cash",
       "treasury-cash",
+      "monetary-reserve-cash",
+      "external-cash",
     ]);
     const world = m3World().world;
     const cashAccounts = world.finance.accounts.filter((account) =>

@@ -37,6 +37,32 @@ export {
   type TradeCapacityUse,
   type TradeDispatchResult,
 } from "./trade.js";
+export {
+  applyMonetaryPolicy,
+  assertValidMonetaryState,
+  assertValidPriceIndexState,
+  authorityLiabilitySUSD,
+  authorityReserveCoverMonths,
+  authorityReservesSUSD,
+  buildPriceIndexBasket,
+  convertibilityState,
+  createPriceIndexState,
+  derivePriceIndexes,
+  emptyMonetaryState,
+  emptyPriceIndexState,
+  externalCurrencyHoldingSUSD,
+  isConvertibilitySuspended,
+  managedRegimeEnabled,
+  monetaryCurrencyForCountry,
+  priceIndexCoverage,
+  priceIndexInflation,
+  runMonetaryPhase,
+  validateMonetaryPolicy,
+  type DerivedPriceIndexes,
+  type MonetaryPhaseResult,
+  type MonetaryPolicyInput,
+  type MonetaryPolicyResult,
+} from "./monetary.js";
 /**
  * M4b period close. Only the public close operation and its result type are
  * exported; the internal `period-close` posting helper stays module-private so

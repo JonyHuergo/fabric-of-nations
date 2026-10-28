@@ -56,6 +56,7 @@ import {
   type TradeArrivalResult,
   type TradeDispatchResult,
 } from "./trade.js";
+import { runMonetaryPhase, type MonetaryPhaseResult } from "./monetary.js";
 import {
   runProfitDistributionPhase,
   type ProfitDistributionResult,
@@ -166,6 +167,8 @@ export interface EconomyDayResult {
     readonly tradeArrivals: TradeArrivalResult;
     /** E6a profitable capacity-limited shipments dispatched after settlement. */
     readonly trade: TradeDispatchResult;
+    /** E6b managed FX valuation, revaluation, month-end capture, and price index. */
+    readonly monetary: MonetaryPhaseResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
@@ -256,6 +259,22 @@ export function cloneWorld(
               ...source.trade.lastDay,
               blocked: source.trade.lastDay.blocked.map((entry) => ({ ...entry })),
             },
+    },
+    priceIndex: {
+      ...source.priceIndex,
+      basket: source.priceIndex.basket.map((item) => ({ ...item })),
+      basePrices: source.priceIndex.basePrices.map((base) => ({
+        marketId: base.marketId,
+        prices: [...base.prices],
+      })),
+      observations: source.priceIndex.observations.map((observation) => ({
+        ...observation,
+        countries: observation.countries.map((entry) => ({ ...entry })),
+      })),
+    },
+    monetary: {
+      ...source.monetary,
+      currencies: source.monetary.currencies.map((record) => ({ ...record })),
     },
     diagnostics: {
       ...source.diagnostics,
@@ -1014,6 +1033,14 @@ export function runEconomicDay(
     validateWorld: false,
   });
 
+  // E6b monetary phase: managed exchange-rate valuation and revaluation run daily;
+  // realized-import capture and the bounded price-index observation run at a civil
+  // month-end. It follows dispatch so realized trade is known and precedes the close so
+  // no closed period is rewritten.
+  const monetary = runMonetaryPhase(world, economyDefinitions, dayIndex, {
+    validateWorld: false,
+  });
+
   // E5 training: treasury-limited provider payroll and trainee stipend, then
   // qualification gains for participating blocks. It runs after fiscal (so it sees
   // the same post-fiscal treasury cash as the other service payrolls) and before the
@@ -1129,6 +1156,7 @@ export function runEconomicDay(
       migration,
       tradeArrivals,
       trade,
+      monetary,
       employment,
       householdDemands: household.records,
       productionDemands: productionRecords,

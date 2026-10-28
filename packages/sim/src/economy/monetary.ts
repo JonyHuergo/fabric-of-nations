@@ -1,0 +1,1279 @@
+/**
+ * E6b monetary foundations: price index, exchange-rate valuation, and the currency
+ * board (D-080).
+ *
+ * Units and directions (never invert them):
+ * - `CurrencyValuation.susdPerUnit` is SUSD per ONE currency unit.
+ * - `currencyIssuedUnits` is a count of currency units; its SUSD measurement is
+ *   `units × valuation`.
+ * - All accounts and prices are SUSD. Currency amounts exist only in the monetary
+ *   window; trade and taxes are never converted.
+ *
+ * The price index is a pure measurement. It never changes SUSD's definition and never
+ * causes a price, wage, tax, or account to change.
+ */
+
+import { dayIndexToCivilDate, daysInMonth } from "../calendar.js";
+import { CURRENCY_RATE_MAX, CURRENCY_RATE_MIN } from "../constants.js";
+import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { populationTotal } from "../population/state.js";
+import type { PopulationDefinitions } from "../population/types.js";
+import type { DayIndex, Id } from "../types.js";
+import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
+import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
+import {
+  FX_KAPPA,
+  FX_MAX_DAILY_CHANGE,
+  FX_MAX_PARITY_STEP,
+  FX_MAX_RATIO,
+  FX_MIN_RATIO,
+  FX_MIN_RESERVE_COVER_MONTHS,
+  FX_PARITY_COOLDOWN_DAYS,
+  FX_PRICE_WEIGHT,
+  FX_TRADE_WEIGHT,
+  MAX_PRICE_INDEX_OBSERVATIONS,
+} from "./constants.js";
+import { assertValidEconomyDefinitions } from "./definitions.js";
+import { asSusdPerCurrencyUnit } from "./currency.js";
+import { lawDefinition } from "./politics.js";
+import type {
+  CurrencyValuation,
+  EconomyDefinitions,
+  MonetaryCurrencyState,
+  MonetaryRegime,
+  MonetaryState,
+  PriceIndexBasketItem,
+  PriceIndexState,
+  SusdPerCurrencyUnit,
+} from "./types.js";
+import { MONETARY_REGIMES } from "./types.js";
+
+/** Empty price-index state for population-only worlds. */
+export function emptyPriceIndexState(): PriceIndexState {
+  return {
+    basket: [],
+    basePrices: [],
+    observations: [],
+    lastObservationDay: null,
+  };
+}
+
+/** Empty monetary state for worlds without the E6b system. */
+export function emptyMonetaryState(): MonetaryState {
+  return { enabled: false, currencies: [], lastUpdateDay: null };
+}
+
+function rate(value: unknown, path: string): SusdPerCurrencyUnit {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new RangeError(`${path} must be a finite number`);
+  }
+  if (!(value > 0) || value < CURRENCY_RATE_MIN || value > CURRENCY_RATE_MAX) {
+    throw new RangeError(`${path} must be a positive SUSD-per-unit valuation in range`);
+  }
+  return asSusdPerCurrencyUnit(value);
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  if (value < minimum) return minimum;
+  if (value > maximum) return maximum;
+  return value;
+}
+
+// ---------------------------------------------------------------------------------
+// Price index
+// ---------------------------------------------------------------------------------
+
+/**
+ * Build the fixed Laspeyres basket from the scenario's reference-household needs.
+ *
+ * Weight = the need item's per-capita daily quantity, summed across tiers for a good.
+ * A good that appears in several need tiers is aggregated. If the scenario has no needs,
+ * every good receives an equal weight (documented fallback, never an empty basket).
+ */
+export function buildPriceIndexBasket(
+  definitions: EconomyDefinitions,
+  populationDefinitions: PopulationDefinitions,
+): PriceIndexBasketItem[] {
+  const goodIdByKey = new Map(definitions.goods.map((good) => [good.key, good.id]));
+  const weights = new Map<Id, number>();
+  for (const tier of populationDefinitions.needs) {
+    for (const item of tier.items) {
+      const goodId = goodIdByKey.get(item.goodKey);
+      if (goodId === undefined) {
+        throw new RangeError(
+          `price-index basket references unknown good ${JSON.stringify(item.goodKey)}`,
+        );
+      }
+      if (!(item.quantityPerCapitaPerDay > 0)) continue;
+      weights.set(goodId, (weights.get(goodId) ?? 0) + item.quantityPerCapitaPerDay);
+    }
+  }
+  if (weights.size === 0) {
+    const goods = [...definitions.goods].sort((left, right) => left.id - right.id);
+    if (goods.length === 0) return [];
+    for (const good of goods) weights.set(good.id, 1);
+  }
+  return [...weights.entries()]
+    .map(([goodId, weight]) => ({ goodId, weight }))
+    .sort((left, right) => left.goodId - right.goodId);
+}
+
+/** Create the price-index state from the scenario's market opening prices. */
+export function createPriceIndexState(
+  definitions: EconomyDefinitions,
+  populationDefinitions: PopulationDefinitions,
+  markets: readonly { readonly id: Id; readonly priceSUSD: readonly number[] }[],
+): PriceIndexState {
+  if (markets.length === 0) {
+    // No prices exist, so there is nothing to measure; the index stays empty.
+    return emptyPriceIndexState();
+  }
+  const basket = buildPriceIndexBasket(definitions, populationDefinitions);
+  const basePrices = [...markets]
+    .sort((left, right) => left.id - right.id)
+    .map((market) => ({
+      marketId: market.id,
+      prices: [...market.priceSUSD],
+    }));
+  return {
+    basket,
+    basePrices,
+    observations: [],
+    lastObservationDay: null,
+  };
+}
+
+export interface DerivedPriceIndexes {
+  readonly markets: ReadonlyMap<Id, number>;
+  readonly countries: ReadonlyMap<Id, number>;
+  readonly world: number;
+}
+
+/**
+ * Derive the current index values from the current market prices.
+ *
+ * Base = 100 at the captured opening prices. A basket good with a missing or
+ * non-positive base or current price is excluded from both sums; coverage is reported by
+ * the caller. A country index is the population-weighted mean of the indices of the
+ * markets containing its regions.
+ */
+export function derivePriceIndexes(world: World): DerivedPriceIndexes {
+  const basket = world.priceIndex.basket;
+  const baseByMarket = new Map(
+    world.priceIndex.basePrices.map((base) => [base.marketId, base.prices]),
+  );
+  const marketValues = new Map<Id, number>();
+  for (const market of world.markets) {
+    const base = baseByMarket.get(market.id) ?? [];
+    let numerator = 0;
+    let denominator = 0;
+    for (const item of basket) {
+      const basePrice = base[item.goodId] ?? 0;
+      const currentPrice = market.priceSUSD[item.goodId] ?? 0;
+      if (!(basePrice > 0) || !(currentPrice > 0)) continue;
+      numerator += item.weight * (currentPrice / basePrice);
+      denominator += item.weight;
+    }
+    marketValues.set(market.id, denominator > 0 ? (100 * numerator) / denominator : 100);
+  }
+
+  const populationByRegion = new Map<Id, number>();
+  for (const block of world.popBlocks) {
+    populationByRegion.set(
+      block.regionId,
+      (populationByRegion.get(block.regionId) ?? 0) + populationTotal(block),
+    );
+  }
+  const marketPopulation = new Map<Id, number>();
+  for (const market of world.markets) {
+    let population = 0;
+    for (const regionId of market.regionIds) {
+      population += populationByRegion.get(regionId) ?? 0;
+    }
+    marketPopulation.set(market.id, population);
+  }
+
+  const countryValues = new Map<Id, number>();
+  const marketById = new Map(world.markets.map((market) => [market.id, market]));
+  for (const country of world.countries) {
+    const weights: { marketId: Id; value: number; weight: number }[] = [];
+    for (const regionId of country.regionIds) {
+      const marketId = world.regions.find((region) => region.id === regionId)?.marketId;
+      if (marketId === null || marketId === undefined) continue;
+      if (!marketById.has(marketId)) continue;
+      const already = weights.find((entry) => entry.marketId === marketId);
+      const population = populationByRegion.get(regionId) ?? 0;
+      if (already === undefined) {
+        weights.push({
+          marketId,
+          value: marketValues.get(marketId) ?? 100,
+          weight: population,
+        });
+      } else {
+        already.weight += population;
+      }
+    }
+    if (weights.length === 0) {
+      countryValues.set(country.id, 100);
+      continue;
+    }
+    let totalWeight = weights.reduce((total, entry) => total + entry.weight, 0);
+    if (!(totalWeight > 0)) {
+      for (const entry of weights) entry.weight = 1;
+      totalWeight = weights.length;
+    }
+    let value = 0;
+    for (const entry of weights) value += (entry.value * entry.weight) / totalWeight;
+    countryValues.set(country.id, value);
+  }
+
+  let worldNumerator = 0;
+  let worldDenominator = 0;
+  for (const market of world.markets) {
+    const population = marketPopulation.get(market.id) ?? 0;
+    worldNumerator += (marketValues.get(market.id) ?? 100) * population;
+    worldDenominator += population;
+  }
+  let worldValue: number;
+  if (worldDenominator > 0) {
+    worldValue = worldNumerator / worldDenominator;
+  } else {
+    const values = [...marketValues.values()];
+    worldValue =
+      values.length === 0 ? 100 : values.reduce((total, value) => total + value, 0) / values.length;
+  }
+  return {
+    markets: marketValues,
+    countries: countryValues,
+    world: worldValue,
+  };
+}
+
+/** Basket coverage: share of the basket weight with usable base and current prices. */
+export function priceIndexCoverage(world: World, marketId: Id): number {
+  const basket = world.priceIndex.basket;
+  const market = world.markets.find((candidate) => candidate.id === marketId);
+  if (market === undefined) return 0;
+  const base = world.priceIndex.basePrices.find((entry) => entry.marketId === marketId)?.prices ?? [];
+  let covered = 0;
+  let total = 0;
+  for (const item of basket) {
+    total += item.weight;
+    const basePrice = base[item.goodId] ?? 0;
+    const currentPrice = market.priceSUSD[item.goodId] ?? 0;
+    if (basePrice > 0 && currentPrice > 0) covered += item.weight;
+  }
+  return total > 0 ? covered / total : 0;
+}
+
+/**
+ * Inflation between the latest retained observation and one `monthsBack` earlier.
+ * Returns null when the history is too short. Measured, never applied to behaviour.
+ */
+export function priceIndexInflation(
+  world: World,
+  countryId: Id | null,
+  monthsBack: number,
+): number | null {
+  const observations = world.priceIndex.observations;
+  const latest = observations[observations.length - 1];
+  const reference = observations[observations.length - 1 - monthsBack];
+  if (latest === undefined || reference === undefined) return null;
+  const valueOf = (
+    observation: PriceIndexState["observations"][number],
+  ): number | null => {
+    if (countryId === null) return observation.world;
+    const entry = observation.countries.find((country) => country.countryId === countryId);
+    return entry === undefined ? null : entry.value;
+  };
+  const latestValue = valueOf(latest);
+  const referenceValue = valueOf(reference);
+  if (latestValue === null || referenceValue === null || !(referenceValue > 0)) return null;
+  return latestValue / referenceValue - 1;
+}
+
+// ---------------------------------------------------------------------------------
+// Monetary authority and convertibility
+// ---------------------------------------------------------------------------------
+
+/** Find the authority record for the currency a country issues and uses domestically. */
+export function monetaryCurrencyForCountry(
+  world: World,
+  countryId: Id,
+): MonetaryCurrencyState | null {
+  const country = world.countries.find((candidate) => candidate.id === countryId);
+  if (country === undefined || country.monetary.kind !== "own") return null;
+  const currencyId = country.monetary.currencyId;
+  const record = world.monetary.currencies.find((entry) => entry.currencyId === currencyId);
+  return record === undefined || record.issuerCountryId !== countryId ? null : record;
+}
+
+function accountBalance(world: World, accountId: Id | null): number {
+  if (accountId === null) return 0;
+  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  if (account === undefined) {
+    throw new RangeError(`monetary authority references unknown account ${String(accountId)}`);
+  }
+  return account.balanceSUSD;
+}
+
+/** SUSD value of one authority's currency in circulation at the current valuation. */
+export function authorityLiabilitySUSD(
+  world: World,
+  record: MonetaryCurrencyState,
+): number {
+  if (!record.active || record.currencyIssuedUnits <= 0) return 0;
+  const valuation = currencyValuationOf(world, record.currencyId);
+  if (valuation === null) return 0;
+  return record.currencyIssuedUnits * valuation;
+}
+
+/** Authority reserve cash in SUSD. */
+export function authorityReservesSUSD(
+  world: World,
+  record: MonetaryCurrencyState,
+): number {
+  return accountBalance(world, record.reserveAccountId);
+}
+
+/** External counterparty currency holding in SUSD. */
+export function externalCurrencyHoldingSUSD(
+  world: World,
+  record: MonetaryCurrencyState,
+): number {
+  return accountBalance(world, record.externalCurrencyAccountId);
+}
+
+function currencyValuationOf(world: World, currencyId: Id): SusdPerCurrencyUnit | null {
+  const valuation = world.currencyValuations.find((entry) => entry.currencyId === currencyId);
+  if (valuation === undefined || valuation.status !== "specified") return null;
+  return valuation.susdPerUnit;
+}
+
+/** Reserve cover in months of the most recently completed month's realized imports. */
+export function authorityReserveCoverMonths(
+  world: World,
+  record: MonetaryCurrencyState,
+): number {
+  const reserves = authorityReservesSUSD(world, record);
+  if (!(record.lastMonthImportsSUSD > 0)) {
+    return reserves > 0 ? Number.POSITIVE_INFINITY : 0;
+  }
+  return reserves / record.lastMonthImportsSUSD;
+}
+
+/**
+ * Convertibility state for one country.
+ *
+ * `no-authority` when the country does not issue its own currency or the monetary system
+ * is disabled (no restriction). `suspended` when the authority's reserve cover is below
+ * the documented minimum, which blocks imports into its market (D-080).
+ */
+export function convertibilityState(
+  world: World,
+  countryId: Id,
+): {
+  readonly state: "no-authority" | "inactive" | "open" | "suspended";
+  readonly coverMonths: number;
+  readonly reservesSUSD: number;
+} {
+  const record = monetaryCurrencyForCountry(world, countryId);
+  if (record === null || !world.monetary.enabled) {
+    return { state: "no-authority", coverMonths: Number.POSITIVE_INFINITY, reservesSUSD: 0 };
+  }
+  if (!record.active) {
+    return {
+      state: "inactive",
+      coverMonths: Number.POSITIVE_INFINITY,
+      reservesSUSD: authorityReservesSUSD(world, record),
+    };
+  }
+  const reserves = authorityReservesSUSD(world, record);
+  const coverMonths = authorityReserveCoverMonths(world, record);
+  const suspended =
+    reserves <= MONEY_TOLERANCE_SUSD ||
+    coverMonths < FX_MIN_RESERVE_COVER_MONTHS;
+  return {
+    state: suspended ? "suspended" : "open",
+    coverMonths,
+    reservesSUSD: reserves,
+  };
+}
+
+/** True when imports into this country's market must be blocked by FX controls. */
+export function isConvertibilitySuspended(world: World, countryId: Id): boolean {
+  return convertibilityState(world, countryId).state === "suspended";
+}
+
+// ---------------------------------------------------------------------------------
+// Price-index and monetary phase
+// ---------------------------------------------------------------------------------
+
+export interface MonetaryPhaseResult {
+  readonly dayIndex: DayIndex;
+  readonly managedCurrenciesUpdated: readonly Id[];
+  readonly revaluationSUSD: number;
+  readonly priceObservationCaptured: boolean;
+  readonly postingIds: readonly number[];
+}
+
+function isMonthEnd(dayIndex: DayIndex): { year: number; month: number } | null {
+  const date = dayIndexToCivilDate(dayIndex);
+  return date.day === daysInMonth(date.year, date.month)
+    ? { year: date.year, month: date.month }
+    : null;
+}
+
+function appendObservation(
+  world: World,
+  dayIndex: DayIndex,
+  year: number,
+  month: number,
+  values: DerivedPriceIndexes,
+): void {
+  const observation = {
+    year,
+    month,
+    dayIndex,
+    world: values.world,
+    countries: [...values.countries.entries()]
+      .map(([countryId, value]) => ({ countryId, value }))
+      .sort((left, right) => left.countryId - right.countryId),
+  };
+  const observations = [...world.priceIndex.observations, observation];
+  world.priceIndex.observations = observations.slice(
+    Math.max(0, observations.length - MAX_PRICE_INDEX_OBSERVATIONS),
+  );
+  world.priceIndex.lastObservationDay = dayIndex;
+}
+
+/**
+ * Run the daily monetary phase: managed-valuation updates, revaluation, the month-end
+ * realized-import capture, and the bounded price-index observation.
+ *
+ * The phase is idempotent per day. It runs after settlement, fiscal, and E6a dispatch, so
+ * realized trade and current prices are known, and before the monthly close, so no closed
+ * period is rewritten.
+ */
+export function runMonetaryPhase(
+  world: World,
+  economyDefinitions: EconomyDefinitions,
+  dayIndex: DayIndex,
+  options: PhaseValidationOptions = {},
+): MonetaryPhaseResult {
+  if (options.validateWorld !== false) assertValidWorldForTick(world);
+  assertValidEconomyDefinitions(economyDefinitions);
+  const empty: MonetaryPhaseResult = {
+    dayIndex,
+    managedCurrenciesUpdated: [],
+    revaluationSUSD: 0,
+    priceObservationCaptured: false,
+    postingIds: [],
+  };
+  if (!world.monetary.enabled) return empty;
+  if (world.monetary.lastUpdateDay === dayIndex) return empty;
+
+  const monthEnd = isMonthEnd(dayIndex);
+  const values = derivePriceIndexes(world);
+  const managed: Id[] = [];
+  const entries: JournalEntryInput[] = [];
+  let revaluationSUSD = 0;
+
+  for (const record of [...world.monetary.currencies].sort(
+    (left, right) => left.currencyId - right.currencyId,
+  )) {
+    if (!record.active || record.issuerCountryId === null) continue;
+    const country = world.countries.find((candidate) => candidate.id === record.issuerCountryId);
+    if (country === undefined) continue;
+    const valuation = currencyValuationOf(world, record.currencyId);
+    if (valuation === null) continue;
+
+    // Managed exchange-rate rule: a documented, bounded response to realized trade and
+    // relative prices. Pegged valuations never drift.
+    if (
+      record.regime === "managed" &&
+      record.lastManagedUpdateDay !== dayIndex
+    ) {
+      const exports = record.lastMonthExportsSUSD;
+      const imports = record.lastMonthImportsSUSD;
+      const turnover = exports + imports;
+      const tradePressure = turnover > 0 ? (exports - imports) / turnover : 0;
+      const countryIndex = values.countries.get(country.id) ?? values.world;
+      const priceGap = clamp(
+        values.world / Math.max(countryIndex, 1e-9) - 1,
+        -1,
+        1,
+      );
+      const raw =
+        FX_KAPPA * (FX_TRADE_WEIGHT * tradePressure + FX_PRICE_WEIGHT * priceGap);
+      const change = clamp(raw, -FX_MAX_DAILY_CHANGE, FX_MAX_DAILY_CHANGE);
+      const reference = record.referenceParitySusdPerUnit ?? valuation;
+      const next = clamp(
+        valuation * (1 + change),
+        reference * FX_MIN_RATIO,
+        reference * FX_MAX_RATIO,
+      );
+      if (Math.abs(next - valuation) > Math.abs(valuation) * 1e-12) {
+        const delta = record.currencyIssuedUnits * (next - valuation);
+        revaluationSUSD += applyRevaluation(record, delta, dayIndex, entries);
+        setCurrencyValuation(world, record.currencyId, asSusdPerCurrencyUnit(next), dayIndex, "market");
+        managed.push(record.currencyId);
+      }
+      record.lastManagedUpdateDay = dayIndex;
+    }
+
+    // Month-end capture: the completed month's realized trade feeds reserve cover and the
+    // next month's managed rule. It is the only place the memo is frozen.
+    if (monthEnd !== null && record.lastMonthEndDay !== dayIndex) {
+      record.lastMonthExportsSUSD = country.trade.exportsValueMonthToDateSUSD;
+      record.lastMonthImportsSUSD = country.trade.importsValueMonthToDateSUSD;
+      record.lastMonthEndDay = dayIndex;
+    }
+  }
+
+  const postings =
+    entries.length === 0 ? [] : postJournalBatch(world.finance, dayIndex, entries);
+  let priceObservationCaptured = false;
+  if (monthEnd !== null && world.priceIndex.lastObservationDay !== dayIndex) {
+    appendObservation(world, dayIndex, monthEnd.year, monthEnd.month, values);
+    priceObservationCaptured = true;
+  }
+  world.monetary.lastUpdateDay = dayIndex;
+  return {
+    dayIndex,
+    managedCurrenciesUpdated: managed,
+    revaluationSUSD,
+    priceObservationCaptured,
+    postingIds: postings.map((posting) => posting.id),
+  };
+}
+
+/**
+ * Apply a SUSD revaluation delta to the outstanding currency liability and the external
+ * holding. Positive delta = the currency is worth more in SUSD.
+ */
+function applyRevaluation(
+  record: MonetaryCurrencyState,
+  delta: number,
+  dayIndex: DayIndex,
+  entries: JournalEntryInput[],
+): number {
+  if (Math.abs(delta) <= MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(delta))) return 0;
+  if (
+    record.liabilityAccountId === null ||
+    record.equityAccountId === null ||
+    record.externalCurrencyAccountId === null ||
+    record.externalEquityAccountId === null
+  ) {
+    throw new RangeError(
+      `monetary authority ${String(record.currencyId)} has incomplete valuation accounts`,
+    );
+  }
+  const amount = Math.abs(delta);
+  const increase = delta > 0;
+  entries.push({
+    transactionKind: "fx-revaluation",
+    lines: [
+      {
+        accountId: record.liabilityAccountId,
+        side: increase ? "credit" : "debit",
+        amountSUSD: amount,
+      },
+      {
+        accountId: record.equityAccountId,
+        side: increase ? "debit" : "credit",
+        amountSUSD: amount,
+      },
+      {
+        accountId: record.externalCurrencyAccountId,
+        side: increase ? "debit" : "credit",
+        amountSUSD: amount,
+      },
+      {
+        accountId: record.externalEquityAccountId,
+        side: increase ? "credit" : "debit",
+        amountSUSD: amount,
+      },
+    ],
+    sourceEntityId: record.issuerCountryId,
+    targetEntityId: null,
+  });
+  void dayIndex;
+  return delta;
+}
+
+function setCurrencyValuation(
+  world: World,
+  currencyId: Id,
+  value: SusdPerCurrencyUnit,
+  dayIndex: DayIndex,
+  source: "scenario" | "policy" | "market",
+): void {
+  const index = world.currencyValuations.findIndex((entry) => entry.currencyId === currencyId);
+  const record: CurrencyValuation = {
+    currencyId,
+    status: "specified",
+    susdPerUnit: value,
+    setOnDay: dayIndex,
+    source,
+  };
+  if (index < 0) {
+    world.currencyValuations.push(record);
+    world.currencyValuations.sort((left, right) => left.currencyId - right.currencyId);
+  } else {
+    world.currencyValuations[index] = record;
+  }
+}
+
+// ---------------------------------------------------------------------------------
+// Monetary policy action
+// ---------------------------------------------------------------------------------
+
+export interface MonetaryPolicyInput {
+  readonly countryId: Id;
+  readonly regime: MonetaryRegime;
+  readonly paritySusdPerUnit: number | null;
+  readonly reserveTransferSUSD: number;
+  readonly currencyConversionSUSD: number;
+}
+
+export interface MonetaryPolicyResult {
+  readonly countryId: Id;
+  readonly currencyId: Id;
+  readonly regime: MonetaryRegime;
+  readonly paritySusdPerUnit: number;
+  readonly valuationSusdPerUnit: number;
+  readonly reserveTransferSUSD: number;
+  readonly currencyConversionSUSD: number;
+  readonly currencyIssuedUnits: number;
+  readonly revaluationSUSD: number;
+  readonly postalIds: readonly number[];
+}
+
+function assertMonetaryRegime(value: unknown, path: string): asserts value is MonetaryRegime {
+  if (!(MONETARY_REGIMES as readonly string[]).includes(value as string)) {
+    throw new RangeError(`${path} must be one of ${MONETARY_REGIMES.join(", ")}`);
+  }
+}
+
+/** True when the country's enacted currency law backs a managed regime. */
+export function managedRegimeEnabled(
+  country: World["countries"][number],
+  definitions: EconomyDefinitions | undefined,
+): boolean {
+  if (definitions?.politics === undefined) return false;
+  const law = lawDefinition(definitions.politics, country.laws.currency);
+  return law !== null && law.currencyRegime === "managed";
+}
+
+/**
+ * Validate one monetary-policy operation against the world and the country's
+ * institutions. Throws a named error; never mutates.
+ */
+export function validateMonetaryPolicy(
+  world: World,
+  definitions: EconomyDefinitions | undefined,
+  input: MonetaryPolicyInput,
+  path = "monetary policy",
+): void {
+  if (!world.monetary.enabled) {
+    throw new RangeError("the monetary system is not enabled in this world");
+  }
+  const country = world.countries.find((candidate) => candidate.id === input.countryId);
+  if (country === undefined) throw new RangeError(`${path}.countryId is not a registered country`);
+  if (country.monetary.kind !== "own") {
+    throw new RangeError(
+      `${path}: a country that adopts or shares a currency has no independent monetary authority`,
+    );
+  }
+  const record = monetaryCurrencyForCountry(world, country.id);
+  if (record === null) {
+    throw new RangeError(`${path}: country ${String(country.id)} has no issued-currency authority`);
+  }
+  assertMonetaryRegime(input.regime, `${path}.regime`);
+  if (input.regime === "managed" && !managedRegimeEnabled(country, definitions)) {
+    throw new RangeError(
+      `${path}: the managed exchange-rate regime requires an enacted currency law`,
+    );
+  }
+  for (const [field, value] of [
+    ["reserveTransferSUSD", input.reserveTransferSUSD],
+    ["currencyConversionSUSD", input.currencyConversionSUSD],
+  ] as const) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new RangeError(`${path}.${field} must be a finite number`);
+    }
+  }
+  const treasuryCash =
+    accountBalance(world, country.treasuryAccountId);
+  const reserves = authorityReservesSUSD(world, record);
+  if (input.reserveTransferSUSD > 0 && input.reserveTransferSUSD > treasuryCash + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.reserveTransferSUSD exceeds the treasury's cash`);
+  }
+  if (input.reserveTransferSUSD < 0 && -input.reserveTransferSUSD > reserves + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.reserveTransferSUSD exceeds the authority's reserves`);
+  }
+
+  if (!record.active) {
+    if (input.regime === "managed") {
+      throw new RangeError(`${path}: a managed regime requires an established authority`);
+    }
+    const parity = input.paritySusdPerUnit;
+    if (parity === null) {
+      throw new RangeError(`${path}.paritySusdPerUnit is required to establish the authority`);
+    }
+    rate(parity, `${path}.paritySusdPerUnit`);
+    if (!(input.reserveTransferSUSD > 0)) {
+      throw new RangeError(
+        `${path}.reserveTransferSUSD must be positive to establish the authority`,
+      );
+    }
+    return;
+  }
+
+  const valuation = currencyValuationOf(world, record.currencyId);
+  if (valuation === null) {
+    throw new RangeError(`${path}: the currency has no specified valuation`);
+  }
+  if (input.paritySusdPerUnit !== null) {
+    const parity = rate(input.paritySusdPerUnit, `${path}.paritySusdPerUnit`);
+    const current = record.paritySusdPerUnit ?? valuation;
+    if (Math.abs(parity - current) > Math.abs(current) * 1e-12) {
+      if (input.regime !== "pegged") {
+        throw new RangeError(`${path}: a parity may only be set under a pegged regime`);
+      }
+      const relative = Math.abs(parity / current - 1);
+      if (relative > FX_MAX_PARITY_STEP + 1e-12) {
+        throw new RangeError(
+          `${path}.paritySusdPerUnit moves more than ${String(FX_MAX_PARITY_STEP)} of the current parity`,
+        );
+      }
+      if (
+        record.lastParityChangeDay !== null &&
+        world.dayIndex - record.lastParityChangeDay < FX_PARITY_COOLDOWN_DAYS
+      ) {
+        throw new RangeError(
+          `${path}: a parity change requires at least ${String(FX_PARITY_COOLDOWN_DAYS)} days since the last one`,
+        );
+      }
+    }
+  }
+  if (record.regime === "pegged" && input.paritySusdPerUnit === null && input.regime === "pegged") {
+    // Keeping the parity is valid; no error.
+  }
+  if (input.currencyConversionSUSD > 0) {
+    const externalCash = accountBalance(world, record.externalCashAccountId);
+    if (input.currencyConversionSUSD > externalCash + MONEY_TOLERANCE_SUSD) {
+      throw new RangeError(`${path}.currencyConversionSUSD exceeds the external SUSD cash`);
+    }
+  }
+  if (input.currencyConversionSUSD < 0) {
+    const requested = -input.currencyConversionSUSD;
+    if (requested > reserves + MONEY_TOLERANCE_SUSD) {
+      throw new RangeError(`${path}.currencyConversionSUSD exceeds the authority's reserves`);
+    }
+    const holding = externalCurrencyHoldingSUSD(world, record);
+    if (requested > holding + MONEY_TOLERANCE_SUSD) {
+      throw new RangeError(
+        `${path}.currencyConversionSUSD exceeds the external currency holding`,
+      );
+    }
+  }
+}
+
+function cloneMonetaryState(state: MonetaryState): MonetaryState {
+  return {
+    ...state,
+    currencies: state.currencies.map((record) => ({ ...record })),
+  };
+}
+
+function cloneValuations(valuations: readonly CurrencyValuation[]): CurrencyValuation[] {
+  return valuations.map((valuation) =>
+    valuation.status === "specified" ? { ...valuation } : { ...valuation },
+  );
+}
+
+/**
+ * Apply one validated monetary-policy operation atomically.
+ *
+ * Ordering: treasury reserve capitalization/withdrawal, currency issue/redemption, then
+ * parity/valuation revaluation. Any failure restores monetary state, valuations, and the
+ * complete finance posting boundary, so no partial money change can persist.
+ */
+/**
+ * Apply one validated monetary-policy operation atomically.
+ *
+ * Ordering: treasury reserve capitalization/withdrawal, valuation/parity change with
+ * revaluation of the existing circulation, then currency issue/redemption at the new
+ * valuation. Any failure restores monetary state, valuations, account balances, and the
+ * posting boundary, so no partial money change can persist.
+ */
+export function applyMonetaryPolicy(
+  world: World,
+  definitions: EconomyDefinitions | undefined,
+  input: MonetaryPolicyInput,
+  dayIndex: DayIndex,
+): MonetaryPolicyResult {
+  validateMonetaryPolicy(world, definitions, input);
+  const country = world.countries.find((candidate) => candidate.id === input.countryId);
+  if (country === undefined) throw new RangeError("missing country");
+  const record = monetaryCurrencyForCountry(world, country.id);
+  if (record === null) throw new RangeError("missing monetary authority");
+  const currencyId = record.currencyId;
+
+  const openingMonetary = cloneMonetaryState(world.monetary);
+  const openingValuations = cloneValuations(world.currencyValuations);
+  const openingBalances = new Map<Id, number>();
+  for (const account of world.finance.accounts) {
+    openingBalances.set(account.id, account.balanceSUSD);
+  }
+  const openingPostings = [...world.finance.postings];
+  const openingNextPostingId = world.finance.nextPostingId;
+
+  try {
+    const entries: JournalEntryInput[] = [];
+    let revaluationSUSD = 0;
+    const oldValuation = currencyValuationOf(world, currencyId);
+    const oldUnits = record.currencyIssuedUnits;
+    const oldParity = record.paritySusdPerUnit;
+    const wasActive = record.active;
+
+    // 1. Treasury reserve capitalization or withdrawal.
+    if (input.reserveTransferSUSD !== 0) {
+      if (record.reserveAccountId === null || record.equityAccountId === null) {
+        throw new RangeError("monetary authority has no reserve accounts");
+      }
+      const equityId = accountIdFor(world, "country", country.id, "owner-equity");
+      const amount = Math.abs(input.reserveTransferSUSD);
+      const deposit = input.reserveTransferSUSD > 0;
+      entries.push({
+        transactionKind: "monetary-reserve-contribution",
+        lines: [
+          { accountId: equityId, side: deposit ? "debit" : "credit", amountSUSD: amount },
+          {
+            accountId: country.treasuryAccountId,
+            side: deposit ? "credit" : "debit",
+            amountSUSD: amount,
+          },
+          {
+            accountId: record.reserveAccountId,
+            side: deposit ? "debit" : "credit",
+            amountSUSD: amount,
+          },
+          {
+            accountId: record.equityAccountId,
+            side: deposit ? "credit" : "debit",
+            amountSUSD: amount,
+          },
+        ],
+        sourceEntityId: country.id,
+        targetEntityId: null,
+      });
+    }
+
+    // 2. Resolve the next parity and valuation.
+    let nextParity = oldParity;
+    if (input.paritySusdPerUnit !== null) {
+      nextParity = rate(input.paritySusdPerUnit, "paritySusdPerUnit");
+    }
+    let nextValuation: SusdPerCurrencyUnit | null;
+    if (!wasActive) {
+      if (nextParity === null) {
+        throw new RangeError("establishing the authority requires a parity");
+      }
+      nextValuation = nextParity;
+    } else if (input.regime === "pegged") {
+      if (nextParity === null) throw new RangeError("a pegged authority requires a parity");
+      nextValuation = nextParity;
+    } else {
+      nextValuation = oldValuation ?? nextParity;
+    }
+    if (nextValuation === null) {
+      throw new RangeError("an active authority requires a specified valuation");
+    }
+
+    // 3. Revalue the circulation that existed before this operation.
+    if (oldUnits > 0 && oldValuation !== null) {
+      const delta = oldUnits * (nextValuation - oldValuation);
+      revaluationSUSD += applyRevaluation(record, delta, dayIndex, entries);
+    }
+    if (oldValuation === null || Math.abs(nextValuation - oldValuation) > Math.abs(nextValuation) * 1e-12) {
+      setCurrencyValuation(world, currencyId, nextValuation, dayIndex, "policy");
+    }
+
+    // 4. Currency issue/redemption at the resulting valuation.
+    if (input.currencyConversionSUSD !== 0) {
+      if (
+        record.reserveAccountId === null ||
+        record.liabilityAccountId === null ||
+        record.externalCashAccountId === null ||
+        record.externalCurrencyAccountId === null
+      ) {
+        throw new RangeError("monetary authority has no conversion accounts");
+      }
+      const amount = Math.abs(input.currencyConversionSUSD);
+      const issue = input.currencyConversionSUSD > 0;
+      entries.push({
+        transactionKind: issue ? "fx-issuance" : "fx-redemption",
+        lines: [
+          {
+            accountId: record.reserveAccountId,
+            side: issue ? "debit" : "credit",
+            amountSUSD: amount,
+          },
+          {
+            accountId: record.liabilityAccountId,
+            side: issue ? "credit" : "debit",
+            amountSUSD: amount,
+          },
+          {
+            accountId: record.externalCurrencyAccountId,
+            side: issue ? "debit" : "credit",
+            amountSUSD: amount,
+          },
+          {
+            accountId: record.externalCashAccountId,
+            side: issue ? "credit" : "debit",
+            amountSUSD: amount,
+          },
+        ],
+        sourceEntityId: issue ? record.externalCashAccountId : record.externalCurrencyAccountId,
+        targetEntityId: country.id,
+      });
+      record.currencyIssuedUnits += (issue ? amount : -amount) / nextValuation;
+    }
+
+    // 5. Publish the policy state.
+    record.active = true;
+    record.regime = input.regime;
+    record.paritySusdPerUnit = nextParity;
+    if (record.referenceParitySusdPerUnit === null) {
+      record.referenceParitySusdPerUnit = nextParity;
+    }
+    const parityChanged =
+      !wasActive ||
+      (oldParity !== null &&
+        nextParity !== null &&
+        Math.abs(nextParity - oldParity) > Math.abs(oldParity) * 1e-12);
+    if (parityChanged) record.lastParityChangeDay = dayIndex;
+
+    const postings =
+      entries.length === 0 ? [] : postJournalBatch(world.finance, dayIndex, entries);
+    return {
+      countryId: country.id,
+      currencyId,
+      regime: record.regime,
+      paritySusdPerUnit: record.paritySusdPerUnit ?? nextValuation,
+      valuationSusdPerUnit: currencyValuationOf(world, currencyId) ?? nextValuation,
+      reserveTransferSUSD: input.reserveTransferSUSD,
+      currencyConversionSUSD: input.currencyConversionSUSD,
+      currencyIssuedUnits: record.currencyIssuedUnits,
+      revaluationSUSD,
+      postalIds: postings.map((posting) => posting.id),
+    };
+  } catch (error) {
+    world.monetary = openingMonetary;
+    world.currencyValuations = openingValuations;
+    for (const account of world.finance.accounts) {
+      const balance = openingBalances.get(account.id);
+      if (balance === undefined) {
+        throw new RangeError(`monetary rollback lost account ${String(account.id)}`);
+      }
+      account.balanceSUSD = balance;
+    }
+    world.finance.postings = openingPostings;
+    world.finance.nextPostingId = openingNextPostingId;
+    throw error;
+  }
+}
+
+function accountIdFor(
+  world: World,
+  ownerKind: "country" | "system",
+  ownerId: Id | null,
+  subtype: string,
+): Id {
+  const account = world.finance.accounts.find(
+    (candidate) =>
+      candidate.ownerKind === ownerKind &&
+      candidate.ownerId === ownerId &&
+      candidate.subtype === subtype,
+  );
+  if (account === undefined) {
+    throw new RangeError(`missing ${ownerKind} ${subtype} account for monetary policy`);
+  }
+  return account.id;
+}
+
+// ---------------------------------------------------------------------------------
+// Validation
+// ---------------------------------------------------------------------------------
+
+/** Validate the price-index state against markets, goods, and countries. */
+export function assertValidPriceIndexState(world: World, path = "world.priceIndex"): void {
+  const state = world.priceIndex;
+  if (typeof state !== "object" || state === null) {
+    throw new TypeError(`${path} must be an object`);
+  }
+  if (!Array.isArray(state.basket)) throw new TypeError(`${path}.basket must be an array`);
+  if (world.markets.length === 0) {
+    // Population-only worlds have no prices to measure; the index is empty by design.
+    if (
+      state.basket.length !== 0 ||
+      state.basePrices.length !== 0 ||
+      state.observations.length !== 0 ||
+      state.lastObservationDay !== null
+    ) {
+      throw new RangeError(`${path} must be empty in a world without markets`);
+    }
+    return;
+  }
+  const goodCount = world.markets[0]?.priceSUSD.length ?? 0;
+  let previousGoodId = -1;
+  let totalWeight = 0;
+  for (let index = 0; index < state.basket.length; index += 1) {
+    const item = state.basket[index];
+    if (item === undefined) throw new RangeError(`${path}.basket[${String(index)}] is missing`);
+    if (!Number.isInteger(item.goodId) || item.goodId < 0 || item.goodId >= goodCount) {
+      throw new RangeError(`${path}.basket[${String(index)}].goodId is outside the catalog`);
+    }
+    if (item.goodId <= previousGoodId) {
+      throw new RangeError(`${path}.basket must be strictly ascending by goodId`);
+    }
+    previousGoodId = item.goodId;
+    if (!Number.isFinite(item.weight) || !(item.weight > 0)) {
+      throw new RangeError(`${path}.basket[${String(index)}].weight must be positive`);
+    }
+    totalWeight += item.weight;
+  }
+  if (!(totalWeight > 0)) {
+    throw new RangeError(`${path}.basket must have a positive total weight`);
+  }
+  if (!Array.isArray(state.basePrices)) {
+    throw new TypeError(`${path}.basePrices must be an array`);
+  }
+  const marketIds = new Set(world.markets.map((market) => market.id));
+  const seenMarkets = new Set<Id>();
+  for (let index = 0; index < state.basePrices.length; index += 1) {
+    const base = state.basePrices[index];
+    if (base === undefined) throw new RangeError(`${path}.basePrices[${String(index)}] is missing`);
+    if (!marketIds.has(base.marketId)) {
+      throw new RangeError(`${path}.basePrices[${String(index)}] references an unknown market`);
+    }
+    if (seenMarkets.has(base.marketId)) {
+      throw new RangeError(`${path}.basePrices has a duplicate market`);
+    }
+    seenMarkets.add(base.marketId);
+    if (!Array.isArray(base.prices) || base.prices.length !== goodCount) {
+      throw new RangeError(`${path}.basePrices[${String(index)}].prices has the wrong length`);
+    }
+    for (const price of base.prices) {
+      if (!Number.isFinite(price) || !(price > 0)) {
+        throw new RangeError(`${path}.basePrices[${String(index)}].prices must be positive`);
+      }
+    }
+  }
+  if (seenMarkets.size !== world.markets.length) {
+    throw new RangeError(`${path}.basePrices must cover every market`);
+  }
+  if (!Array.isArray(state.observations)) {
+    throw new TypeError(`${path}.observations must be an array`);
+  }
+  if (state.observations.length > MAX_PRICE_INDEX_OBSERVATIONS) {
+    throw new RangeError(
+      `${path}.observations must contain at most ${String(MAX_PRICE_INDEX_OBSERVATIONS)} entries`,
+    );
+  }
+  const countryIds = new Set(world.countries.map((country) => country.id));
+  let previousDay = -1;
+  for (let index = 0; index < state.observations.length; index += 1) {
+    const observation = state.observations[index];
+    const entryPath = `${path}.observations[${String(index)}]`;
+    if (observation === undefined) throw new RangeError(`${entryPath} is missing`);
+    if (!Number.isInteger(observation.dayIndex) || observation.dayIndex < 0) {
+      throw new RangeError(`${entryPath}.dayIndex must be a day index`);
+    }
+    if (observation.dayIndex <= previousDay) {
+      throw new RangeError(`${path}.observations must be strictly ascending by dayIndex`);
+    }
+    previousDay = observation.dayIndex;
+    if (!Number.isFinite(observation.world) || !(observation.world > 0)) {
+      throw new RangeError(`${entryPath}.world must be positive`);
+    }
+    if (!Array.isArray(observation.countries)) {
+      throw new TypeError(`${entryPath}.countries must be an array`);
+    }
+    let previousCountry = -1;
+    for (const value of observation.countries) {
+      if (!countryIds.has(value.countryId)) {
+        throw new RangeError(`${entryPath}.countries references an unknown country`);
+      }
+      if (value.countryId <= previousCountry) {
+        throw new RangeError(`${entryPath}.countries must be strictly ascending`);
+      }
+      previousCountry = value.countryId;
+      if (!Number.isFinite(value.value) || !(value.value > 0)) {
+        throw new RangeError(`${entryPath}.countries values must be positive`);
+      }
+    }
+  }
+  if (state.lastObservationDay !== null) {
+    const last = state.observations[state.observations.length - 1];
+    if (last === undefined || last.dayIndex !== state.lastObservationDay) {
+      throw new RangeError(`${path}.lastObservationDay must match the last observation`);
+    }
+  }
+}
+
+/** Validate the monetary-system state and its account/valuation relationships. */
+export function assertValidMonetaryState(world: World, path = "world.monetary"): void {
+  const state = world.monetary;
+  if (typeof state !== "object" || state === null) {
+    throw new TypeError(`${path} must be an object`);
+  }
+  if (typeof state.enabled !== "boolean") {
+    throw new TypeError(`${path}.enabled must be a boolean`);
+  }
+  if (!Array.isArray(state.currencies)) {
+    throw new TypeError(`${path}.currencies must be an array`);
+  }
+  const accountsById = new Map(world.finance.accounts.map((account) => [account.id, account]));
+  const currenciesById = new Map(world.currencies.map((currency) => [currency.id, currency]));
+  const countryIds = new Set(world.countries.map((country) => country.id));
+  const seenCurrencies = new Set<Id>();
+  for (let index = 0; index < state.currencies.length; index += 1) {
+    const record = state.currencies[index];
+    const entryPath = `${path}.currencies[${String(index)}]`;
+    if (record === undefined) throw new RangeError(`${entryPath} is missing`);
+    if (!currenciesById.has(record.currencyId)) {
+      throw new RangeError(`${entryPath}.currencyId is not a registered currency`);
+    }
+    if (seenCurrencies.has(record.currencyId)) {
+      throw new RangeError(`${entryPath} duplicates a currency record`);
+    }
+    seenCurrencies.add(record.currencyId);
+    if (index > 0 && (state.currencies[index - 1]?.currencyId ?? 0) >= record.currencyId) {
+      throw new RangeError(`${path}.currencies must be strictly ascending by currencyId`);
+    }
+    if (record.issuerCountryId !== null && !countryIds.has(record.issuerCountryId)) {
+      throw new RangeError(`${entryPath}.issuerCountryId is not a registered country`);
+    }
+    if (!(MONETARY_REGIMES as readonly string[]).includes(record.regime)) {
+      throw new RangeError(`${entryPath}.regime is invalid`);
+    }
+    if (!Number.isFinite(record.currencyIssuedUnits) || record.currencyIssuedUnits < 0) {
+      throw new RangeError(`${entryPath}.currencyIssuedUnits must be finite and non-negative`);
+    }
+    for (const field of ["paritySusdPerUnit", "referenceParitySusdPerUnit"] as const) {
+      const value = record[field];
+      if (value !== null) rate(value, `${entryPath}.${field}`);
+    }
+    if (!Number.isFinite(record.lastMonthExportsSUSD) || record.lastMonthExportsSUSD < 0) {
+      throw new RangeError(`${entryPath}.lastMonthExportsSUSD must be finite and non-negative`);
+    }
+    if (!Number.isFinite(record.lastMonthImportsSUSD) || record.lastMonthImportsSUSD < 0) {
+      throw new RangeError(`${entryPath}.lastMonthImportsSUSD must be finite and non-negative`);
+    }
+    for (const [field, value] of [
+      ["lastParityChangeDay", record.lastParityChangeDay],
+      ["lastManagedUpdateDay", record.lastManagedUpdateDay],
+      ["lastMonthEndDay", record.lastMonthEndDay],
+    ] as const) {
+      if (value !== null && (!Number.isInteger(value) || value < 0 || value > world.dayIndex)) {
+        throw new RangeError(`${entryPath}.${field} must be a past day index or null`);
+      }
+    }
+    const accountFields = [
+      ["reserveAccountId", "monetary-reserve-cash", "country"],
+      ["liabilityAccountId", "currency-liability", "country"],
+      ["equityAccountId", "monetary-equity", "country"],
+      ["externalCashAccountId", "external-cash", "system"],
+      ["externalCurrencyAccountId", "external-currency-holding", "system"],
+      ["externalEquityAccountId", "external-equity", "system"],
+    ] as const;
+    for (const [field, subtype, ownerKind] of accountFields) {
+      const accountId = record[field];
+      if (accountId === null) {
+        if (state.enabled && record.issuerCountryId !== null) {
+          throw new RangeError(`${entryPath}.${field} must be allocated when enabled`);
+        }
+        continue;
+      }
+      const account = accountsById.get(accountId);
+      if (account === undefined) {
+        throw new RangeError(`${entryPath}.${field} references an unknown account`);
+      }
+      if (account.subtype !== subtype) {
+        throw new RangeError(`${entryPath}.${field} must be a ${subtype} account`);
+      }
+      if (account.ownerKind !== ownerKind) {
+        throw new RangeError(`${entryPath}.${field} has the wrong owner kind`);
+      }
+      if (ownerKind === "country" && record.issuerCountryId !== null) {
+        if (account.ownerId !== record.issuerCountryId) {
+          throw new RangeError(`${entryPath}.${field} must belong to the issuing country`);
+        }
+      }
+    }
+    if (record.active) {
+      if (record.paritySusdPerUnit === null || record.referenceParitySusdPerUnit === null) {
+        throw new RangeError(`${entryPath} active authority requires a parity`);
+      }
+      const valuation = currencyValuationOf(world, record.currencyId);
+      if (valuation === null) {
+        throw new RangeError(`${entryPath} active authority requires a specified valuation`);
+      }
+      if (record.regime === "pegged") {
+        if (
+          Math.abs(valuation - record.paritySusdPerUnit) >
+          Math.abs(record.paritySusdPerUnit) * 1e-12
+        ) {
+          throw new RangeError(`${entryPath} pegged valuation must equal its parity`);
+        }
+      } else {
+        const reference = record.referenceParitySusdPerUnit;
+        if (
+          valuation < reference * FX_MIN_RATIO - 1e-12 ||
+          valuation > reference * FX_MAX_RATIO + 1e-12
+        ) {
+          throw new RangeError(`${entryPath} managed valuation is outside the allowed band`);
+        }
+      }
+      const liability = accountBalance(world, record.liabilityAccountId);
+      const expectedLiability = record.currencyIssuedUnits * valuation;
+      if (
+        Math.abs(liability - expectedLiability) >
+        MONEY_TOLERANCE_SUSD * Math.max(1, expectedLiability)
+      ) {
+        throw new RangeError(`${entryPath} currency liability does not match units × valuation`);
+      }
+      const holding = accountBalance(world, record.externalCurrencyAccountId);
+      if (
+        Math.abs(holding - expectedLiability) >
+        MONEY_TOLERANCE_SUSD * Math.max(1, expectedLiability)
+      ) {
+        throw new RangeError(`${entryPath} external holding does not match the liability`);
+      }
+    } else if (record.currencyIssuedUnits > 0) {
+      throw new RangeError(`${entryPath} inactive authority cannot have currency in circulation`);
+    }
+  }
+  const expectedCurrencies = state.enabled ? world.currencies.length : 0;
+  if (state.enabled && seenCurrencies.size !== expectedCurrencies) {
+    throw new RangeError(`${path}.currencies must cover every registered currency when enabled`);
+  }
+  if (state.lastUpdateDay !== null) {
+    if (!Number.isInteger(state.lastUpdateDay) || state.lastUpdateDay < 0) {
+      throw new RangeError(`${path}.lastUpdateDay must be a day index or null`);
+    }
+    if (state.lastUpdateDay > world.dayIndex) {
+      throw new RangeError(`${path}.lastUpdateDay must not be after the world day`);
+    }
+  }
+}
+
+/** True when a trade block reason is the FX-convertibility control. */
+export function isFxTradeBlockReason(value: string): boolean {
+  return value === "fx-convertibility";
+}

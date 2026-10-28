@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 11 as const;
+export const PROTOCOL_VERSION = 12 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -181,6 +181,16 @@ export interface SetTradePolicyActionDto {
   readonly exportRestricted: readonly boolean[];
 }
 
+/** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
+export interface SetMonetaryPolicyActionDto {
+  readonly kind: "set-monetary-policy";
+  readonly countryId: number;
+  readonly regime: "pegged" | "managed";
+  readonly paritySusdPerUnit: number | null;
+  readonly reserveTransferSUSD: number;
+  readonly currencyConversionSUSD: number;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -202,7 +212,8 @@ export type CountryActionDto =
   | SetTrainingStipendActionDto
   | SetTrainingStaffShareActionDto
   | SetHealthStaffShareActionDto
-  | SetTradePolicyActionDto;
+  | SetTradePolicyActionDto
+  | SetMonetaryPolicyActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -803,6 +814,78 @@ export interface SnapshotTradeNetwork {
   } | null;
 }
 
+/** One currency identity and its authoritative SUSD valuation, for the Money screen. */
+export interface SnapshotCurrency {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+  readonly issuerKind: "country" | "foreign" | "union";
+  readonly issuerCountryId: number | null;
+  readonly valuationStatus: "specified" | "unavailable";
+  /** SUSD per one currency unit; null when unavailable. Never a parity default. */
+  readonly susdPerUnit: number | null;
+  readonly valuationSource: "scenario" | "policy" | "market" | null;
+}
+
+/** One fixed basket item of the price index. */
+export interface SnapshotPriceIndexBasketItem {
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly goodName: string;
+  readonly weight: number;
+}
+
+/** One retained month-end world price-index observation. */
+export interface SnapshotPriceIndexObservation {
+  readonly year: number;
+  readonly month: number;
+  readonly dayIndex: number;
+  readonly world: number;
+}
+
+/** World price-index definition and current measurement. */
+export interface SnapshotPriceIndex {
+  /** First processed day: the base period, normalized to 100. */
+  readonly baseDayIndex: number;
+  readonly basket: readonly SnapshotPriceIndexBasketItem[];
+  readonly worldValue: number;
+  /** Population-weighted basket coverage across markets, 0..1. */
+  readonly coverage: number;
+  readonly observations: readonly SnapshotPriceIndexObservation[];
+  readonly monthOnMonthInflation: number | null;
+  readonly yearOnYearInflation: number | null;
+}
+
+/** Country price-index measurement (a derived measure, not a spendable value). */
+export interface SnapshotCountryPriceIndex {
+  readonly baseDayIndex: number;
+  readonly value: number;
+  readonly coverage: number;
+  readonly monthOnMonthInflation: number | null;
+  readonly yearOnYearInflation: number | null;
+}
+
+/** E6b monetary-authority state for one country. */
+export interface SnapshotMonetaryAuthority {
+  /** True when the country issues its own currency and the monetary system is enabled. */
+  readonly hasAuthority: boolean;
+  readonly active: boolean;
+  readonly regime: string;
+  readonly paritySusdPerUnit: number | null;
+  readonly valuationSusdPerUnit: number | null;
+  readonly reserveCashSUSD: number;
+  readonly currencyIssuedUnits: number;
+  readonly liabilitySUSD: number;
+  /** Reserves in months of the last completed month's imports; null when no imports. */
+  readonly reserveCoverMonths: number | null;
+  readonly convertibility: "no-authority" | "inactive" | "open" | "suspended";
+  readonly lastParityChangeDay: number | null;
+  readonly lastMonthExportsSUSD: number;
+  readonly lastMonthImportsSUSD: number;
+  /** Why the authority is not operating, or null. */
+  readonly blockedReason: string | null;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
@@ -877,6 +960,10 @@ export interface CountrySnapshot {
   readonly labor: SnapshotLabor;
   /** E6a tariff/quota/restriction policy and month-to-date trade memo. */
   readonly trade: SnapshotTradePolicy;
+  /** E6b price-index measurement for this country. */
+  readonly priceIndex: SnapshotCountryPriceIndex;
+  /** E6b monetary authority, exchange-rate, and convertibility state. */
+  readonly monetary: SnapshotMonetaryAuthority;
 }
 
 export interface RegionSnapshot {
@@ -966,6 +1053,10 @@ export interface SimulationSnapshot {
   readonly technologyCatalog: readonly SnapshotTechnologyCatalogEntry[];
   /** E6a transport routes, in-transit consignments, and last-day outcome. */
   readonly trade: SnapshotTradeNetwork;
+  /** E6b world price-index definition and measurement. */
+  readonly priceIndex: SnapshotPriceIndex;
+  /** E6b currency identities and authoritative SUSD valuations. */
+  readonly currencies: readonly SnapshotCurrency[];
   readonly diagnostics: SnapshotDiagnostics;
 }
 
@@ -1453,6 +1544,44 @@ function parseAction(value: unknown): CountryActionDto {
       tariffRates,
       importQuotaQuantity,
       exportRestricted,
+    };
+  }
+  if (kind === "set-monetary-policy") {
+    const regime = requireString(record.regime, "command.action.regime");
+    if (regime !== "pegged" && regime !== "managed") {
+      throw new ProtocolError(
+        "invalid_action",
+        'command.action.regime must be "pegged" or "managed"',
+      );
+    }
+    let paritySusdPerUnit: number | null = null;
+    if (record.paritySusdPerUnit !== null && record.paritySusdPerUnit !== undefined) {
+      paritySusdPerUnit = requireFiniteNumber(
+        record.paritySusdPerUnit,
+        "command.action.paritySusdPerUnit",
+      );
+      if (!(paritySusdPerUnit > 0)) {
+        throw new ProtocolError(
+          "invalid_action",
+          "command.action.paritySusdPerUnit must be positive or null",
+        );
+      }
+    }
+    const reserveTransferSUSD = requireFiniteNumber(
+      record.reserveTransferSUSD,
+      "command.action.reserveTransferSUSD",
+    );
+    const currencyConversionSUSD = requireFiniteNumber(
+      record.currencyConversionSUSD,
+      "command.action.currencyConversionSUSD",
+    );
+    return {
+      kind: "set-monetary-policy",
+      countryId,
+      regime,
+      paritySusdPerUnit,
+      reserveTransferSUSD,
+      currencyConversionSUSD,
     };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");

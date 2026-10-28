@@ -20,6 +20,8 @@
 
 import { assertValidDayIndex } from "./calendar.js";
 import {
+  CAMPAIGN_END_YEAR,
+  CAMPAIGN_START_YEAR,
   CAMPAIGN_TERMINAL_DAY_INDEX,
   DEFAULT_DATA_VERSION,
   MAX_FOREIGN_ISSUER_KEY_LENGTH,
@@ -75,6 +77,9 @@ import type {
   InterestGroupState,
   StockLot,
   SusdPerCurrencyUnit,
+  MonetaryCurrencyState,
+  MonetaryState,
+  PriceIndexState,
   TradeBlockReason,
   TradePolicyState,
   TradeState,
@@ -684,6 +689,55 @@ export type SerializedTradeState = {
   readonly lastDay: SerializedTradeDayReport | null;
 };
 
+/** Encoded E6b price-index observation. */
+export type SerializedPriceIndexObservation = {
+  readonly year: number;
+  readonly month: number;
+  readonly dayIndex: number;
+  readonly world: number;
+  readonly countries: readonly { readonly countryId: number; readonly value: number }[];
+};
+
+/** Encoded E6b price-index state. */
+export type SerializedPriceIndexState = {
+  readonly basket: readonly { readonly goodId: number; readonly weight: number }[];
+  readonly basePrices: readonly {
+    readonly marketId: number;
+    readonly prices: readonly number[];
+  }[];
+  readonly observations: readonly SerializedPriceIndexObservation[];
+  readonly lastObservationDay: number | null;
+};
+
+/** Encoded E6b per-currency monetary-authority state. */
+export type SerializedMonetaryCurrencyState = {
+  readonly currencyId: number;
+  readonly issuerCountryId: number | null;
+  readonly regime: string;
+  readonly paritySusdPerUnit: number | null;
+  readonly referenceParitySusdPerUnit: number | null;
+  readonly currencyIssuedUnits: number;
+  readonly active: boolean;
+  readonly reserveAccountId: number | null;
+  readonly liabilityAccountId: number | null;
+  readonly equityAccountId: number | null;
+  readonly externalCashAccountId: number | null;
+  readonly externalCurrencyAccountId: number | null;
+  readonly externalEquityAccountId: number | null;
+  readonly lastParityChangeDay: number | null;
+  readonly lastManagedUpdateDay: number | null;
+  readonly lastMonthEndDay: number | null;
+  readonly lastMonthExportsSUSD: number;
+  readonly lastMonthImportsSUSD: number;
+};
+
+/** Encoded E6b monetary state. */
+export type SerializedMonetaryState = {
+  readonly enabled: boolean;
+  readonly currencies: readonly SerializedMonetaryCurrencyState[];
+  readonly lastUpdateDay: number | null;
+};
+
 export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
@@ -714,7 +768,7 @@ export type SerializedCurrencyValuation =
       readonly status: "specified";
       readonly susdPerUnit: number;
       readonly setOnDay: number;
-      readonly source: "scenario";
+      readonly source: "scenario" | "policy" | "market";
     }
   | { readonly currencyId: number; readonly status: "unavailable" };
 
@@ -803,6 +857,8 @@ export type SerializedWorld = {
   readonly politics: SerializedPoliticsState;
   readonly technology: { readonly enabled: boolean };
   readonly trade: SerializedTradeState;
+  readonly priceIndex: SerializedPriceIndexState;
+  readonly monetary: SerializedMonetaryState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -1511,8 +1567,7 @@ export function encodeWorld(world: World): SerializedWorld {
     },
     technology: { enabled: world.technology.enabled },
     trade: {
-      enabled: world.trade.enabled,
-      routes: [...world.trade.routes]
+      enabled: world.trade.enabled,      routes: [...world.trade.routes]
         .sort((left, right) => left.id - right.id)
         .map((route) => ({
           id: route.id,
@@ -1558,6 +1613,52 @@ export function encodeWorld(world: World): SerializedWorld {
                 reason: entry.reason,
               })),
             },
+    },
+    priceIndex: {
+      basket: [...world.priceIndex.basket]
+        .sort((left, right) => left.goodId - right.goodId)
+        .map((item) => ({ goodId: item.goodId, weight: item.weight })),
+      basePrices: [...world.priceIndex.basePrices]
+        .sort((left, right) => left.marketId - right.marketId)
+        .map((base) => ({ marketId: base.marketId, prices: [...base.prices] })),
+      observations: [...world.priceIndex.observations]
+        .sort((left, right) => left.dayIndex - right.dayIndex)
+        .map((observation) => ({
+          year: observation.year,
+          month: observation.month,
+          dayIndex: observation.dayIndex,
+          world: observation.world,
+          countries: [...observation.countries]
+            .sort((left, right) => left.countryId - right.countryId)
+            .map((entry) => ({ countryId: entry.countryId, value: entry.value })),
+        })),
+      lastObservationDay: world.priceIndex.lastObservationDay,
+    },
+    monetary: {
+      enabled: world.monetary.enabled,
+      currencies: [...world.monetary.currencies]
+        .sort((left, right) => left.currencyId - right.currencyId)
+        .map((record) => ({
+          currencyId: record.currencyId,
+          issuerCountryId: record.issuerCountryId,
+          regime: record.regime,
+          paritySusdPerUnit: record.paritySusdPerUnit,
+          referenceParitySusdPerUnit: record.referenceParitySusdPerUnit,
+          currencyIssuedUnits: record.currencyIssuedUnits,
+          active: record.active,
+          reserveAccountId: record.reserveAccountId,
+          liabilityAccountId: record.liabilityAccountId,
+          equityAccountId: record.equityAccountId,
+          externalCashAccountId: record.externalCashAccountId,
+          externalCurrencyAccountId: record.externalCurrencyAccountId,
+          externalEquityAccountId: record.externalEquityAccountId,
+          lastParityChangeDay: record.lastParityChangeDay,
+          lastManagedUpdateDay: record.lastManagedUpdateDay,
+          lastMonthEndDay: record.lastMonthEndDay,
+          lastMonthExportsSUSD: record.lastMonthExportsSUSD,
+          lastMonthImportsSUSD: record.lastMonthImportsSUSD,
+        })),
+      lastUpdateDay: world.monetary.lastUpdateDay,
     },
     playerCountryId: world.playerCountryId,
     diagnostics: {
@@ -2558,6 +2659,158 @@ function decodeTradeState(value: unknown, path: string): TradeState {
   };
 }
 
+function decodePriceIndexState(value: unknown, path: string): PriceIndexState {
+  const record = requireRecord(value, path);
+  const basket = requireArray(record.basket, `${path}.basket`).map((entry, index) => {
+    const itemPath = `${path}.basket[${String(index)}]`;
+    const item = requireRecord(entry, itemPath);
+    return {
+      goodId: requireUint32(item.goodId, `${itemPath}.goodId`),
+      weight: requireFiniteNumber(item.weight, `${itemPath}.weight`),
+    };
+  });
+  const basePrices = requireArray(record.basePrices, `${path}.basePrices`).map(
+    (entry, index) => {
+      const basePath = `${path}.basePrices[${String(index)}]`;
+      const base = requireRecord(entry, basePath);
+      return {
+        marketId: requireUint32(base.marketId, `${basePath}.marketId`),
+        prices: requireArray(base.prices, `${basePath}.prices`).map((price, priceIndex) =>
+          requireFiniteNumber(price, `${basePath}.prices[${String(priceIndex)}]`),
+        ),
+      };
+    },
+  );
+  const observations = requireArray(record.observations, `${path}.observations`).map(
+    (entry, index) => {
+      const observationPath = `${path}.observations[${String(index)}]`;
+      const observation = requireRecord(entry, observationPath);
+      return {
+        year: requireInteger(
+          observation.year,
+          `${observationPath}.year`,
+          CAMPAIGN_START_YEAR,
+          CAMPAIGN_END_YEAR,
+        ),
+        month: requireInteger(observation.month, `${observationPath}.month`, 1, 12),
+        dayIndex: requireInteger(
+          observation.dayIndex,
+          `${observationPath}.dayIndex`,
+          0,
+          CAMPAIGN_TERMINAL_DAY_INDEX,
+        ),
+        world: requireFiniteNumber(observation.world, `${observationPath}.world`),
+        countries: requireArray(
+          observation.countries,
+          `${observationPath}.countries`,
+        ).map((value, countryIndex) => {
+          const valuePath = `${observationPath}.countries[${String(countryIndex)}]`;
+          const country = requireRecord(value, valuePath);
+          return {
+            countryId: requireUint32(country.countryId, `${valuePath}.countryId`),
+            value: requireFiniteNumber(country.value, `${valuePath}.value`),
+          };
+        }),
+      };
+    },
+  );
+  return {
+    basket,
+    basePrices,
+    observations,
+    lastObservationDay:
+      record.lastObservationDay === null || record.lastObservationDay === undefined
+        ? null
+        : requireInteger(
+            record.lastObservationDay,
+            `${path}.lastObservationDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+  };
+}
+
+function decodeMonetaryCurrencyState(
+  value: unknown,
+  path: string,
+): MonetaryCurrencyState {
+  const record = requireRecord(value, path);
+  const optionalDay = (field: string): number | null =>
+    record[field] === null || record[field] === undefined
+      ? null
+      : requireInteger(record[field], `${path}.${field}`, 0, CAMPAIGN_TERMINAL_DAY_INDEX);
+  const optionalAccount = (field: string): number | null =>
+    record[field] === null || record[field] === undefined
+      ? null
+      : requireUint32(record[field], `${path}.${field}`);
+  const optionalRate = (field: string): SusdPerCurrencyUnit | null => {
+    if (record[field] === null || record[field] === undefined) return null;
+    try {
+      return asSusdPerCurrencyUnit(requireFiniteNumber(record[field], `${path}.${field}`));
+    } catch (error) {
+      throw new SaveFormatError(`${path}.${field} is invalid: ${errorMessage(error)}`);
+    }
+  };
+  const regime = requireString(record.regime, `${path}.regime`);
+  if (regime !== "pegged" && regime !== "managed") {
+    throw new SaveFormatError(`${path}.regime is invalid`);
+  }
+  if (typeof record.active !== "boolean") {
+    throw new SaveFormatError(`${path}.active must be a boolean`);
+  }
+  return {
+    currencyId: requireUint32(record.currencyId, `${path}.currencyId`),
+    issuerCountryId: optionalAccount("issuerCountryId"),
+    regime,
+    paritySusdPerUnit: optionalRate("paritySusdPerUnit"),
+    referenceParitySusdPerUnit: optionalRate("referenceParitySusdPerUnit"),
+    currencyIssuedUnits: requireFiniteNumber(
+      record.currencyIssuedUnits,
+      `${path}.currencyIssuedUnits`,
+    ),
+    active: record.active,
+    reserveAccountId: optionalAccount("reserveAccountId"),
+    liabilityAccountId: optionalAccount("liabilityAccountId"),
+    equityAccountId: optionalAccount("equityAccountId"),
+    externalCashAccountId: optionalAccount("externalCashAccountId"),
+    externalCurrencyAccountId: optionalAccount("externalCurrencyAccountId"),
+    externalEquityAccountId: optionalAccount("externalEquityAccountId"),
+    lastParityChangeDay: optionalDay("lastParityChangeDay"),
+    lastManagedUpdateDay: optionalDay("lastManagedUpdateDay"),
+    lastMonthEndDay: optionalDay("lastMonthEndDay"),
+    lastMonthExportsSUSD: requireFiniteNumber(
+      record.lastMonthExportsSUSD,
+      `${path}.lastMonthExportsSUSD`,
+    ),
+    lastMonthImportsSUSD: requireFiniteNumber(
+      record.lastMonthImportsSUSD,
+      `${path}.lastMonthImportsSUSD`,
+    ),
+  };
+}
+
+function decodeMonetaryState(value: unknown, path: string): MonetaryState {
+  const record = requireRecord(value, path);
+  if (typeof record.enabled !== "boolean") {
+    throw new SaveFormatError(`${path}.enabled must be a boolean`);
+  }
+  return {
+    enabled: record.enabled,
+    currencies: requireArray(record.currencies, `${path}.currencies`).map((entry, index) =>
+      decodeMonetaryCurrencyState(entry, `${path}.currencies[${String(index)}]`),
+    ),
+    lastUpdateDay:
+      record.lastUpdateDay === null || record.lastUpdateDay === undefined
+        ? null
+        : requireInteger(
+            record.lastUpdateDay,
+            `${path}.lastUpdateDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -2614,8 +2867,8 @@ function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuatio
     throw new SaveFormatError(`${path}.susdPerUnit is invalid: ${errorMessage(error)}`);
   }
   const source = requireString(record.source, `${path}.source`, { minLength: 1 });
-  if (source !== "scenario") {
-    throw new SaveFormatError(`${path}.source is not supported in M4a-2`);
+  if (source !== "scenario" && source !== "policy" && source !== "market") {
+    throw new SaveFormatError(`${path}.source is not a supported valuation source`);
   }
   return {
     currencyId,
@@ -2627,7 +2880,7 @@ function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuatio
       0,
       CAMPAIGN_TERMINAL_DAY_INDEX,
     ),
-    source: "scenario",
+    source: source as "scenario" | "policy" | "market",
   };
 }
 
@@ -3477,6 +3730,8 @@ function decodeWorldPayload(value: unknown): World {
   }
   const technology = { enabled: rawTechnology.enabled };
   const trade = decodeTradeState(payload.trade, "save payload.trade");
+  const priceIndex = decodePriceIndexState(payload.priceIndex, "save payload.priceIndex");
+  const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -3506,6 +3761,8 @@ function decodeWorldPayload(value: unknown): World {
     politics,
     technology,
     trade,
+    priceIndex,
+    monetary,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,

@@ -686,6 +686,17 @@ export function createPopulationWorld(
       lastDispatchDay: null,
       lastDay: null,
     },
+    priceIndex: {
+      basket: [],
+      basePrices: [],
+      observations: [],
+      lastObservationDay: null,
+    },
+    monetary: {
+      enabled: false,
+      currencies: [],
+      lastUpdateDay: null,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

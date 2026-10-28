@@ -2133,6 +2133,10 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     ...(data.meta.countryAI === undefined
       ? {}
       : { countryAI: { ...data.meta.countryAI } }),
+    // E6b: the sample enables the monetary system so the player can establish a
+    // reserve-backed authority; its currency valuations are explicitly unavailable, so
+    // no authority is active and no historical exchange rate is invented (D-080).
+    monetary: {},
   };
 }
 

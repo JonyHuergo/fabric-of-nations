@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v9",
+    "dataVersion": "m3-economy-v10",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3984,7 +3984,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v9",
+      "dataVersion": "m3-economy-v10",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6879,7 +6879,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v9",
+    "dataVersion": "m3-economy-v10",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -7579,7 +7579,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "politics": {
-      "dataVersion": "m3-economy-v9",
+      "dataVersion": "m3-economy-v10",
       "status": "provisional",
       "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
       "regimes": [
@@ -7732,6 +7732,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.2,
@@ -7777,6 +7778,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.1,
           "groupStance": {
             "aristocrats": -0.8,
@@ -7823,6 +7825,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.6,
@@ -7862,6 +7865,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.7,
@@ -7901,6 +7905,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.5,
@@ -7939,6 +7944,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.1,
           "groupStance": {
             "aristocrats": -0.3,
@@ -7979,6 +7985,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.15,
           "groupStance": {
             "aristocrats": -0.7,
@@ -8014,6 +8021,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": -0.1,
@@ -8049,6 +8057,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0.5,
@@ -8085,6 +8094,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.15,
           "groupStance": {
             "aristocrats": -0.4,
@@ -8120,6 +8130,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0,
@@ -8155,6 +8166,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0.3,
@@ -8190,6 +8202,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.1,
@@ -8225,6 +8238,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": -0.2,
@@ -8262,6 +8276,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.15,
           "groupStance": {
             "aristocrats": -0.3,
@@ -8298,6 +8313,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.25,
           "groupStance": {
             "aristocrats": -0.5,
@@ -8333,6 +8349,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0.1,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": -0.1,
@@ -8368,6 +8385,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 300,
           "laborHoursPerWeek": 0,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": -0.3,
@@ -8403,6 +8421,7 @@ export const M5_SCENARIO = ({
           "laborMinimumWageSUSDPerYear": 0,
           "laborHoursPerWeek": 48,
           "healthStaffFloor": 0,
+          "currencyRegime": null,
           "institutionLoad": 0.1,
           "groupStance": {
             "aristocrats": -0.2,
@@ -8412,6 +8431,42 @@ export const M5_SCENARIO = ({
             "military": 0,
             "bureaucrats": 0.1,
             "rural": 0.1
+          }
+        },
+        {
+          "id": 20,
+          "slot": "currency",
+          "key": "currency-managed-standard",
+          "name": "Managed currency standard",
+          "description": "Charters a monetary authority able to manage the exchange rate within a documented band. The authority remains reserve-backed; this is not unlimited fiat issuance.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 365,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
+          "laborMinimumWageSUSDPerYear": 0,
+          "laborHoursPerWeek": 0,
+          "healthStaffFloor": 0,
+          "currencyRegime": "managed",
+          "institutionLoad": 0.1,
+          "groupStance": {
+            "aristocrats": -0.1,
+            "capitalists": 0.4,
+            "labor": -0.1,
+            "intelligentsia": 0.2,
+            "military": 0,
+            "bureaucrats": 0.3,
+            "rural": -0.2
           }
         }
       ],
@@ -8506,7 +8561,7 @@ export const M5_SCENARIO = ({
       ]
     },
     "technology": {
-      "dataVersion": "m3-economy-v9",
+      "dataVersion": "m3-economy-v10",
       "academicProfessionKeys": [
         "academics"
       ],
@@ -12871,5 +12926,6 @@ export const M5_SCENARIO = ({
   },
   "countryAI": {
     "enabled": true
-  }
+  },
+  "monetary": {}
 }) as EconomyScenarioDef;

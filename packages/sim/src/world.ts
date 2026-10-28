@@ -37,12 +37,18 @@ import type {
   FinanceState,
   Market,
   PoliticsState,
+  PriceIndexState,
   ProfitDistributionPolicy,
+  MonetaryState,
   TechnologySystemState,
   TradeState,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
 import { assertValidTradeState } from "./economy/trade.js";
+import {
+  assertValidMonetaryState,
+  assertValidPriceIndexState,
+} from "./economy/monetary.js";
 import type { PopBlock, Region } from "./population/types.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
@@ -118,6 +124,10 @@ export interface World {
   technology: TechnologySystemState;
   /** E6a authored transport routes, in-transit shipments, and last-day report (D-079). */
   trade: TradeState;
+  /** E6b price-index basket, base prices, and bounded month-end observations (D-080). */
+  priceIndex: PriceIndexState;
+  /** E6b monetary authorities and reserve-backed currency state (D-080). */
+  monetary: MonetaryState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -227,6 +237,17 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       nextShipmentId: 1,
       lastDispatchDay: null,
       lastDay: null,
+    },
+    priceIndex: {
+      basket: [],
+      basePrices: [],
+      observations: [],
+      lastObservationDay: null,
+    },
+    monetary: {
+      enabled: false,
+      currencies: [],
+      lastUpdateDay: null,
     },
     playerCountryId: null,
     diagnostics: {
@@ -343,6 +364,8 @@ export function assertValidWorld(
   assertValidEconomyState(world, options);
   assertValidTechnologyState(world);
   assertValidTradeState(world);
+  assertValidPriceIndexState(world);
+  assertValidMonetaryState(world);
 }
 
 /**

@@ -244,6 +244,12 @@ export const ACCOUNT_SUBTYPES = [
   "freight-expense",
   "customs-duty-expense",
   "customs-duty-revenue",
+  "monetary-reserve-cash",
+  "currency-liability",
+  "monetary-equity",
+  "external-cash",
+  "external-currency-holding",
+  "external-equity",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -310,6 +316,10 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "training-stipend",
   "trade-freight",
   "customs-duty",
+  "monetary-reserve-contribution",
+  "fx-issuance",
+  "fx-redemption",
+  "fx-revaluation",
 ] as const;
 
 /**
@@ -963,6 +973,7 @@ export const IMPLEMENTED_LAW_SLOTS: readonly LawSlot[] = [
   "health",
   "labor",
   "trade",
+  "currency",
 ];
 
 export const REGIME_KINDS = [
@@ -1057,6 +1068,11 @@ export interface LawDef {
    * base, 0..1, or 0 when the law sets no floor.
    */
   healthStaffFloor: Rate;
+  /**
+   * E6b currency-slot monetary regime backed by the law, or null when the law is not a
+   * currency law. The managed regime is available only through an enacted law (D-080).
+   */
+  currencyRegime: MonetaryRegime | null;
   /** Administrative load subtracted from institution quality/law factor. */
   institutionLoad: Rate;
   /** Authored stance for each interest group, -1..1. */
@@ -1377,6 +1393,7 @@ export const TRADE_BLOCK_REASONS = [
   "export-restricted",
   "margin",
   "funding",
+  "fx-convertibility",
 ] as const;
 export type TradeBlockReason = (typeof TRADE_BLOCK_REASONS)[number];
 
@@ -1588,12 +1605,125 @@ export type CurrencyValuation =
       status: "specified";
       susdPerUnit: SusdPerCurrencyUnit;
       setOnDay: Day;
-      source: "scenario";
+      source: "scenario" | "policy" | "market";
     }
   | { currencyId: Id; status: "unavailable" };
 
-export interface BuildingInstanceInitialDef {
-  id: Id;
+/** E6b exchange-rate regimes. `pegged` is the default; `managed` requires a law. */
+export const MONETARY_REGIMES = ["pegged", "managed"] as const;
+export type MonetaryRegime = (typeof MONETARY_REGIMES)[number];
+
+/**
+ * E6b per-currency monetary-authority state (D-080).
+ *
+ * The authority is a reserve-backed currency board: it holds SUSD reserves, issues its
+ * currency against them, and holds monetary equity. All balances are SUSD; the currency
+ * itself is recorded as units and measured at the authoritative `CurrencyValuation`.
+ * `currencyIssuedUnits` is authoritative; the liability and the external holding are its
+ * SUSD measurement and are validated against `units × valuation`.
+ */
+export interface MonetaryCurrencyState {
+  currencyId: Id;
+  /** Simulated country that issues the currency, or null when no authority exists. */
+  issuerCountryId: Id | null;
+  regime: MonetaryRegime;
+  /** Current policy parity in SUSD per currency unit; null until a parity is declared. */
+  paritySusdPerUnit: SusdPerCurrencyUnit | null;
+  /** The declared reference parity; managed valuations are bounded around it. */
+  referenceParitySusdPerUnit: SusdPerCurrencyUnit | null;
+  /** Currency units in circulation. */
+  currencyIssuedUnits: number;
+  /** True once the authority has been established and is operating. */
+  active: boolean;
+  /** Explicit account ids; null when the monetary system is disabled. */
+  reserveAccountId: Id | null;
+  liabilityAccountId: Id | null;
+  equityAccountId: Id | null;
+  externalCashAccountId: Id | null;
+  externalCurrencyAccountId: Id | null;
+  externalEquityAccountId: Id | null;
+  /** Day of the most recent parity change, or null. */
+  lastParityChangeDay: Day | null;
+  /** Day the managed valuation rule last ran (idempotency marker). */
+  lastManagedUpdateDay: Day | null;
+  /** Day of the last completed-mouth capture (idempotency marker). */
+  lastMonthEndDay: Day | null;
+  /** Realized exports/imports of the most recently completed month, SUSD. */
+  lastMonthExportsSUSD: MoneySUSD;
+  lastMonthImportsSUSD: MoneySUSD;
+}
+
+/** Authoritative E6b monetary-system state. */
+export interface MonetaryState {
+  /** True only when the scenario enables the monetary system. */
+  enabled: boolean;
+  /** One record per registered currency, ascending currency id. */
+  currencies: MonetaryCurrencyState[];
+  /** Last processed monetary phase day, or null before the first day. */
+  lastUpdateDay: Day | null;
+}
+
+/** Scenario input for one currency's initial monetary-authority position. */
+export interface MonetaryCurrencyInput {
+  currencyId: Id;
+  regime?: MonetaryRegime;
+  /** Declared parity; defaults to the scenario's specified valuation. */
+  paritySusdPerUnit?: number;
+  /** Opening reserves capitalized by the issuing country's treasury. */
+  reserveFundingSUSD?: MoneySUSD;
+  /** Opening currency units in circulation held by the external counterparty. */
+  currencyIssuedUnits?: number;
+  /** Opening SUSD cash of the external counterparty. Must cover its opening holding. */
+  externalCashSUSD?: MoneySUSD;
+}
+
+/** Scenario input for the E6b monetary system; omitted means disabled. */
+export interface MonetarySystemInput {
+  currencies?: MonetaryCurrencyInput[];
+}
+
+/** One fixed basket item of the E6b price index. */
+export interface PriceIndexBasketItem {
+  goodId: Id;
+  /** Fixed base-quantity weight; dimensionless after normalization. */
+  weight: number;
+}
+
+/** One market's base-period prices, captured at world creation. */
+export interface PriceIndexBasePrices {
+  marketId: Id;
+  prices: number[];
+}
+
+/** One country's index value in an observation. */
+export interface PriceIndexCountryValue {
+  countryId: Id;
+  value: number;
+}
+
+/** One bounded month-end price-index observation (base = 100 at world start). */
+export interface PriceIndexObservation {
+  year: number;
+  month: number;
+  dayIndex: Day;
+  world: number;
+  /** Ascending country id. */
+  countries: PriceIndexCountryValue[];
+}
+
+/**
+ * E6b price-index state (D-080): the fixed basket, the base-period prices, and at most
+ * `MAX_PRICE_INDEX_OBSERVATIONS` month-end observations. Current index values are
+ * derived from current prices and are not stored.
+ */
+export interface PriceIndexState {
+  basket: PriceIndexBasketItem[];
+  basePrices: PriceIndexBasePrices[];
+  observations: PriceIndexObservation[];
+  lastObservationDay: Day | null;
+}
+
+export interface BuildingInstanceInitialDef {  id: Id;
   definitionId: Id;
   regionId: Id;
   level: number;
@@ -1649,6 +1779,11 @@ export interface EconomyScenarioDef {
    * world keeps its pre-E6a behaviour (D-079).
    */
   tradeRoutes?: TradeRouteInitialDef[];
+  /**
+   * E6b monetary system. Omitted means disabled and the world keeps its pre-E6b
+   * behaviour; the price index is still derived because it is pure measurement.
+   */
+  monetary?: MonetarySystemInput;
   /**
    * Post-M7 player-control designation. The AI does not make fiscal decisions for
    * this country. Omitted or null means no designated player country (legacy

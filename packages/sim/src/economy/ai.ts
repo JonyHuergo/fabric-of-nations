@@ -60,6 +60,7 @@ import {
 } from "./constants.js";
 import { assertValidFiscalPolicy } from "./country.js";
 import { createTradePolicyState } from "./trade.js";
+import { applyMonetaryPolicy, validateMonetaryPolicy } from "./monetary.js";
 import { debtOutstandingPrincipal } from "./debtPolicy.js";
 import {
   cancelConstruction,
@@ -114,6 +115,7 @@ import type {
   FiscalPolicy,
   FinancialAccount,
   IndustrialPolicy,
+  MonetaryRegime,
 } from "./types.js";
 
 /**
@@ -327,6 +329,18 @@ export interface SetTradePolicyAction {
   readonly exportRestricted: readonly boolean[];
 }
 
+/** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
+export interface SetMonetaryPolicyAction {
+  readonly kind: "set-monetary-policy";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly regime: MonetaryRegime;
+  readonly paritySusdPerUnit: number | null;
+  readonly reserveTransferSUSD: number;
+  readonly currencyConversionSUSD: number;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -348,7 +362,8 @@ export type CountryAction =
   | SetTrainingStipendAction
   | SetTrainingStaffShareAction
   | SetHealthStaffShareAction
-  | SetTradePolicyAction;
+  | SetTradePolicyAction
+  | SetMonetaryPolicyAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -425,6 +440,17 @@ export interface CountryActionApplication {
     readonly importQuotaQuantity: readonly (number | null)[];
     readonly previousExportRestricted: readonly boolean[];
     readonly exportRestricted: readonly boolean[];
+  } | null;
+  /** E6b monetary operation applied by the action, else null. */
+  readonly monetaryAction?: {
+    readonly currencyId: Id;
+    readonly regime: MonetaryRegime;
+    readonly paritySusdPerUnit: number;
+    readonly valuationSusdPerUnit: number;
+    readonly reserveTransferSUSD: MoneySUSD;
+    readonly currencyConversionSUSD: MoneySUSD;
+    readonly currencyIssuedUnits: number;
+    readonly revaluationSUSD: MoneySUSD;
   } | null;
 }
 
@@ -792,7 +818,8 @@ export function validateCountryAction(
     action.kind !== "set-training-stipend" &&
     action.kind !== "set-training-staff-share" &&
     action.kind !== "set-health-staff-share" &&
-    action.kind !== "set-trade-policy"
+    action.kind !== "set-trade-policy" &&
+    action.kind !== "set-monetary-policy"
   ) {
     return {
       valid: false,
@@ -1099,6 +1126,24 @@ export function validateCountryAction(
         } catch (error) {
           errors.push(errorMessage(error));
         }
+      }
+    } else if (action.kind === "set-monetary-policy") {
+      if (action.source === "ai") {
+        errors.push("AI monetary policy is not implemented in E6b");
+      }
+      if (definitions === undefined) {
+        errors.push("set-monetary-policy requires the validated economy definitions");
+      }
+      try {
+        validateMonetaryPolicy(world, definitions, {
+          countryId: country.id,
+          regime: action.regime,
+          paritySusdPerUnit: action.paritySusdPerUnit,
+          reserveTransferSUSD: action.reserveTransferSUSD,
+          currencyConversionSUSD: action.currencyConversionSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
       }
     } else if (action.kind === "set-health-staff-share") {
       if (action.source === "ai") {
@@ -1711,6 +1756,47 @@ export function applyCountryAction(
         exportRestricted: [...country.trade.exportRestricted],
       },
       changed,
+    };
+  }
+
+  if (action.kind === "set-monetary-policy") {
+    if (definitions === undefined) {
+      throw new RangeError("set-monetary-policy requires the validated economy definitions");
+    }
+    const result = applyMonetaryPolicy(world, definitions, {
+      countryId: country.id,
+      regime: action.regime,
+      paritySusdPerUnit: action.paritySusdPerUnit,
+      reserveTransferSUSD: action.reserveTransferSUSD,
+      currencyConversionSUSD: action.currencyConversionSUSD,
+    }, action.dayIndex);
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      throw error;
+    }
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      monetaryAction: {
+        currencyId: result.currencyId,
+        regime: result.regime,
+        paritySusdPerUnit: result.paritySusdPerUnit,
+        valuationSusdPerUnit: result.valuationSusdPerUnit,
+        reserveTransferSUSD: result.reserveTransferSUSD,
+        currencyConversionSUSD: result.currencyConversionSUSD,
+        currencyIssuedUnits: result.currencyIssuedUnits,
+        revaluationSUSD: result.revaluationSUSD,
+      },
+      changed: true,
     };
   }
 

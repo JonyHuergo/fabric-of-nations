@@ -1,5 +1,5 @@
 {
-  "dataVersion": "m3-economy-v9",
+  "dataVersion": "m3-economy-v10",
   "status": "provisional",
   "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
   "regimes": [
@@ -748,6 +748,36 @@
         "military": 0,
         "bureaucrats": 0.1,
         "rural": 0.1
+      }
+    },
+    {
+      "id": 20,
+      "slot": "currency",
+      "key": "currency-managed-standard",
+      "name": "Managed currency standard",
+      "description": "Charters a monetary authority able to manage the exchange rate within a documented band. The authority remains reserve-backed; this is not unlimited fiat issuance.",
+      "prerequisites": [],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
+      "enactmentDays": 365,
+      "taxRateBounds": [],
+      "suffrage": null,
+      "borderPolicy": null,
+      "currencyRegime": "managed",
+      "laborOrganizationBonus": 0,
+      "laborGrievance": 0,
+      "institutionLoad": 0.1,
+      "groupStance": {
+        "aristocrats": -0.1,
+        "capitalists": 0.4,
+        "labor": -0.1,
+        "intelligentsia": 0.2,
+        "military": 0,
+        "bureaucrats": 0.3,
+        "rural": -0.2
       }
     }
   ],

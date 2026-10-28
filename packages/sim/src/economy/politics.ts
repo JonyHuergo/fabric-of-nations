@@ -425,6 +425,20 @@ export function assertValidPoliticsDefinitions(
     if (healthStaffFloor < 0 || healthStaffFloor > 1) {
       throw new RangeError(`${lawPath}.healthStaffFloor must be in 0..1`);
     }
+    const currencyRegime =
+      law.currencyRegime === undefined || law.currencyRegime === null
+        ? null
+        : law.currencyRegime;
+    if (
+      currencyRegime !== null &&
+      currencyRegime !== "pegged" &&
+      currencyRegime !== "managed"
+    ) {
+      throw new RangeError(`${lawPath}.currencyRegime must be "pegged", "managed", or null`);
+    }
+    if (currencyRegime !== null && slot !== "currency") {
+      throw new RangeError(`${lawPath}.currencyRegime is only valid in the currency slot`);
+    }
     const institutionLoad = requireFiniteNumber(
       law.institutionLoad,
       `${lawPath}.institutionLoad`,
@@ -467,6 +481,7 @@ export function assertValidPoliticsDefinitions(
       laborMinimumWageSUSDPerYear,
       laborHoursPerWeek,
       healthStaffFloor,
+      currencyRegime,
       institutionLoad,
       groupStance,
     };

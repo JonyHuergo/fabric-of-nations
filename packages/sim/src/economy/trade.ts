@@ -32,6 +32,7 @@ import {
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { buildRegionOwnerMap } from "./country.js";
 import { TRADE_BLOCK_REASONS } from "./types.js";
+import { isConvertibilitySuspended } from "./monetary.js";
 import type {
   AccountSubtype,
   EconomyDefinitions,
@@ -720,6 +721,12 @@ function dispatchTrade(
         destinationAdminId !== originAdminId;
       const destinationCountry =
         destinationAdminId === null ? undefined : countryById.get(destinationAdminId);
+      // E6b: a country whose monetary authority cannot convert (insufficient reserve
+      // cover) cannot settle external imports, so shipments crossing into its customs
+      // zone are blocked. Domestic (same-zone) allocation is unaffected.
+      const fxSuspended =
+        destinationAdminId !== null &&
+        isConvertibilitySuspended(world, destinationAdminId);
       const destinationPrices = destination.priceSUSD;
 
       for (const good of goods) {
@@ -733,6 +740,11 @@ function dispatchTrade(
           !(destinationPrice > 0)
         ) {
           throw new RangeError(`market price for good ${String(goodId)} is invalid`);
+        }
+
+        if (dutiable && fxSuspended) {
+          noteBlock(origin.id, destination.id, goodId, "fx-convertibility");
+          continue;
         }
 
         // Exportable surplus: domestic lots of this good left after today's clearing and

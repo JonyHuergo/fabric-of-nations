@@ -48,14 +48,14 @@ function cloneWorld(): World {
   return createEconomyWorld(scenario, { seed: 20_261_023 });
 }
 
-describe("M3a schema-24 serialization", () => {
+describe("M3a schema-25 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
     // Updated for schema 22: the world now serializes the M9 technology-system
     // flag and each pop block's authoritative age-specific literacy array. The
     // M3 fixture has technology disabled, so no behaviour changes. E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`, so the structural digest is
     // intentionally re-pinned; the fixture still has trade disabled.
-    expect(hashWorld(cloneWorld())).toBe("f3ca13e232b224dc");
+    expect(hashWorld(cloneWorld())).toBe("8567ad56f8e769f0");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

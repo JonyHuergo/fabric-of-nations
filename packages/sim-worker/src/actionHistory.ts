@@ -67,6 +67,13 @@ export type PlayerActionRequest =
       readonly tariffRates: readonly number[];
       readonly importQuotaQuantity: readonly (number | null)[];
       readonly exportRestricted: readonly boolean[];
+    }
+  | {
+      readonly kind: "set-monetary-policy";
+      readonly regime: "pegged" | "managed";
+      readonly paritySusdPerUnit: number | null;
+      readonly reserveTransferSUSD: number;
+      readonly currencyConversionSUSD: number;
     };
 
 export interface PlayerActionRecord {
@@ -154,5 +161,9 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
         .join("/")}, quotas ${action.importQuotaQuantity
         .map((quota) => (quota === null ? "-" : quota.toFixed(0)))
         .join("/")}, export bans ${action.exportRestricted.filter(Boolean).length}`;
+    case "set-monetary-policy":
+      return `${action.regime} monetary policy, parity ${
+        action.paritySusdPerUnit === null ? "unchanged" : action.paritySusdPerUnit.toFixed(6)
+      } SUSD/unit, reserve transfer ${action.reserveTransferSUSD.toFixed(2)} SUSD, currency conversion ${action.currencyConversionSUSD.toFixed(2)} SUSD`;
   }
 }
