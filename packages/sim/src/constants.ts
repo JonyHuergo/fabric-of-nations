@@ -21,7 +21,7 @@
  * state-owned buildings, and E4 materials/procurement, sectoral subsidies, and
  * public-enterprise capital support.
  */
-export const SIM_VERSION = "0.20.0";
+export const SIM_VERSION = "0.21.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -36,9 +36,11 @@ export const SIM_VERSION = "0.20.0";
  * work-in-progress/public-capital accounts, construction posting kinds, and the
  * construction budget memo fields (D-074). E4 adds construction material requirements,
  * per-country industrial policy, subsidy/support budget fields, and the new
- * industrial posting kinds (D-075).
+ * industrial posting kinds (D-075). M8 adds country regime/laws/transitions/
+ * interest-groups/institutions, regional unrest/infrastructure, world politics
+ * event state, and administration payroll accounts (D-076).
  */
-export const WORLD_SCHEMA_VERSION = 20;
+export const WORLD_SCHEMA_VERSION = 21;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -55,9 +57,11 @@ export const SAVE_FORMAT_VERSION = 1;
  * ownership permission and construction crew) and therefore bumps the content
  * version to `m3-economy-v4` (D-074). E4 adds an explicit building sector and
  * construction-material requirements, so it bumps the content version to
- * `m3-economy-v5` (D-075).
+ * `m3-economy-v5` (D-075). M8 adds political content definitions and scenario
+ * regime/law/funding state, so it bumps the content version to
+ * `m3-economy-v6` (D-076).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v5";
+export const DEFAULT_DATA_VERSION = "m3-economy-v6";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

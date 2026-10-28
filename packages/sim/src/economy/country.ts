@@ -301,6 +301,22 @@ export function copyCountry(country: Country): Country {
     },
     debt: { ...country.debt },
     ai: { ...country.ai },
+    regime: {
+      ...country.regime,
+      crisis: { ...country.regime.crisis },
+      lastElection:
+        country.regime.lastElection === null ? null : { ...country.regime.lastElection },
+    },
+    laws: { ...country.laws },
+    lawTransitions: country.lawTransitions.map((transition) => ({ ...transition })),
+    interestGroups: country.interestGroups.map((group) => ({
+      ...group,
+      stanceByLaw: { ...group.stanceByLaw },
+    })),
+    institutions: {
+      ...country.institutions,
+      staffedByProfession: { ...country.institutions.staffedByProfession },
+    },
   };
 }
 

@@ -34,11 +34,13 @@ import {
   MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
   asSusdPerCurrencyUnit,
   assertValidEconomyDefinitions,
+  assertValidPoliticsDefinitions,
   assertValidPopulationDefinitions,
   isValidId,
   type BuildingDef,
   type BuildingInstanceInitialDef,
   type CountryInitialDef,
+  type CountryPoliticsInput,
   type CurrencyValuation,
   type EconomyDefinitions,
   type EconomyScenarioDef,
@@ -46,6 +48,7 @@ import {
   type GoodDef,
   type MarketInitialDef,
   type NeedTierDef,
+  type PoliticsDefinitions,
   type PopulationDefinitions,
   type PopulationScenarioDef,
   type ProfessionDef,
@@ -167,6 +170,8 @@ export interface HistoricalCountryInput {
     readonly arrearsGraceDays: number;
   };
   readonly immigrationOpen: boolean;
+  /** M8 provisional regime/law/funding state. */
+  readonly politics?: CountryPoliticsInput;
   readonly sourceIds: readonly string[];
   readonly occupationSourceIds: readonly string[];
 }
@@ -176,6 +181,8 @@ export interface HistoricalRegionInput {
   readonly key: string;
   readonly name: string;
   readonly resourceCapsPerDay?: readonly number[];
+  /** M8 provisional regional infrastructure quality, 0..1. */
+  readonly infrastructure?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -650,6 +657,60 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
               arrearsGraceDays: numberField(debtor, "arrearsGraceDays", `${path}.debt`, errors),
             };
           })();
+    const politics =
+      record.politics === undefined
+        ? undefined
+        : (() => {
+            const politicsRecord = assertRecord(record.politics, `${path}.politics`, errors);
+            const laws =
+              politicsRecord.laws === undefined
+                ? undefined
+                : (() => {
+                    const rawLaws = assertRecord(
+                      politicsRecord.laws,
+                      `${path}.politics.laws`,
+                      errors,
+                    );
+                    const parsed: Record<string, string> = {};
+                    for (const [slot, lawKey] of Object.entries(rawLaws)) {
+                      if (typeof lawKey !== "string" || lawKey.length === 0) {
+                        errors.push(`${path}.politics.laws.${slot} must be a non-empty string`);
+                        continue;
+                      }
+                      parsed[slot] = lawKey;
+                    }
+                    return parsed;
+                  })();
+            return {
+              regimeKind: stringField(
+                politicsRecord,
+                "regimeKind",
+                `${path}.politics`,
+                errors,
+              ) as CountryPoliticsInput["regimeKind"],
+              ...(politicsRecord.governmentGroupKey === undefined
+                ? {}
+                : {
+                    governmentGroupKey: stringField(
+                      politicsRecord,
+                      "governmentGroupKey",
+                      `${path}.politics`,
+                      errors,
+                    ) as NonNullable<CountryPoliticsInput["governmentGroupKey"]>,
+                  }),
+              ...(laws === undefined ? {} : { laws }),
+              ...(politicsRecord.institutionFundingSUSDPerYear === undefined
+                ? {}
+                : {
+                    institutionFundingSUSDPerYear: numberField(
+                      politicsRecord,
+                      "institutionFundingSUSDPerYear",
+                      `${path}.politics`,
+                      errors,
+                    ),
+                  }),
+            } satisfies CountryPoliticsInput;
+          })();
     return {
       id: numberField(record, "id", path, errors),
       tag: stringField(record, "tag", path, errors, { maxLength: MAX_COUNTRY_TAG_LENGTH }),
@@ -692,6 +753,7 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       },
       initialTreasuryCashSUSD: numberField(record, "initialTreasuryCashSUSD", path, errors),
       ...(debt === undefined ? {} : { debt }),
+      ...(politics === undefined ? {} : { politics }),
       immigrationOpen: booleanField(record, "immigrationOpen", path, errors),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       occupationSourceIds: stringArrayField(record, "occupationSourceIds", path, errors),
@@ -712,11 +774,16 @@ function parseRegions(value: unknown, errors: string[]): HistoricalRegionInput[]
       record.resourceCapsPerDay === undefined
         ? undefined
         : numberArrayField(record, "resourceCapsPerDay", path, errors);
+    const infrastructure =
+      record.infrastructure === undefined
+        ? undefined
+        : numberField(record, "infrastructure", path, errors);
     return {
       id: numberField(record, "id", path, errors),
       key: stringField(record, "key", path, errors),
       name: stringField(record, "name", path, errors),
       ...(caps === undefined ? {} : { resourceCapsPerDay: caps }),
+      ...(infrastructure === undefined ? {} : { infrastructure }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -1600,6 +1667,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     sexRatioAtBirth: number;
     fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
   }>(data.meta.definitions.demography);
+  const politics = readJson<PoliticsDefinitions>("politics.json");
+  assertValidPoliticsDefinitions(politics, "politics");
 
   const economyDefinitions: EconomyDefinitions = {
     dataVersion: data.meta.dataVersion,
@@ -1607,6 +1676,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     goods,
     professions,
     buildings,
+    politics,
   };
   assertValidEconomyDefinitions(economyDefinitions);
 
@@ -1677,6 +1747,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(region.resourceCapsPerDay === undefined
         ? {}
         : { resourceCapsPerDay: region.resourceCapsPerDay }),
+      ...(region.infrastructure === undefined
+        ? {}
+        : { infrastructure: region.infrastructure }),
     }));
 
   const sortedMarkets = [...data.markets].sort((left, right) => left.id - right.id);
@@ -1809,6 +1882,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       initialTreasuryCashSUSD: country.initialTreasuryCashSUSD,
       fiscal: { ...country.fiscal },
       ...(country.debt === undefined ? {} : { debt: { ...country.debt } }),
+      ...(country.politics === undefined ? {} : { politics: { ...country.politics } }),
       immigrationOpen: country.immigrationOpen,
     }));
 

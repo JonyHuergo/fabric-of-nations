@@ -29,7 +29,7 @@ describe("determinism", () => {
 
     // Known-answer digest for the M1 empty-world tick driver under schema 20.
     // A change here requires an intentional simulation-version decision.
-    expect(hashWorld(world)).toBe("2b53f8541b542342");
+    expect(hashWorld(world)).toBe("f67498f3b49a5ef1");
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {

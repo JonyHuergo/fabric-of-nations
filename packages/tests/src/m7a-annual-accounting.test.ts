@@ -69,21 +69,30 @@ describe("M7a annual accounting", () => {
     expect(monthly).toHaveLength(12);
     for (const country of world.countries) {
       let tax = 0;
+      let businessTax = 0;
       let welfare = 0;
       let interest = 0;
+      let subsidy = 0;
+      let administration = 0;
       for (const summary of monthly) {
         const totals = governmentPeriodTotals(world.finance, summary).find(
           (entry) => entry.countryId === country.id,
         );
         tax += totals?.incomeTaxRevenueSUSD ?? 0;
+        businessTax += totals?.businessTaxRevenueSUSD ?? 0;
         welfare += totals?.welfareExpenseSUSD ?? 0;
         interest += totals?.interestExpenseSUSD ?? 0;
+        subsidy += totals?.subsidyExpenseSUSD ?? 0;
+        administration += totals?.administrationExpenseSUSD ?? 0;
       }
       const annualCountry = annual.fiscalTotals[country.id]!;
       expect(annualCountry.incomeTaxRevenueSUSD).toBeCloseTo(tax, 6);
       expect(annualCountry.welfareExpenseSUSD).toBeCloseTo(welfare, 6);
       expect(annualCountry.interestExpenseSUSD).toBeCloseTo(interest, 6);
-      expect(annualCountry.netFiscalResultSUSD).toBeCloseTo(tax - welfare - interest, 6);
+      expect(annualCountry.netFiscalResultSUSD).toBeCloseTo(
+        tax + businessTax - welfare - interest - subsidy - administration,
+        6,
+      );
     }
     const country = world.countries[0]!;
     expect(annual.closingBalances[country.id]?.treasuryCashSUSD).toBeCloseTo(

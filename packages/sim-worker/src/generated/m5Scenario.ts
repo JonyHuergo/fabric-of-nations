@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v5",
+    "dataVersion": "m3-economy-v6",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -41,82 +41,98 @@ export const M5_SCENARIO = ({
       {
         "id": 0,
         "key": "usa-northeast",
-        "name": "United States Northeast"
+        "name": "United States Northeast",
+        "infrastructure": 0.7
       },
       {
         "id": 1,
         "key": "usa-south",
-        "name": "United States South"
+        "name": "United States South",
+        "infrastructure": 0.45
       },
       {
         "id": 2,
         "key": "gbr-britain",
-        "name": "Great Britain"
+        "name": "Great Britain",
+        "infrastructure": 0.75
       },
       {
         "id": 3,
         "key": "gbr-ireland",
-        "name": "Ireland"
+        "name": "Ireland",
+        "infrastructure": 0.4
       },
       {
         "id": 4,
         "key": "deu-prussia",
-        "name": "Prussia"
+        "name": "Prussia",
+        "infrastructure": 0.65
       },
       {
         "id": 5,
         "key": "deu-south",
-        "name": "Southern Germany"
+        "name": "Southern Germany",
+        "infrastructure": 0.55
       },
       {
         "id": 6,
         "key": "fra-north",
-        "name": "Northern France"
+        "name": "Northern France",
+        "infrastructure": 0.7
       },
       {
         "id": 7,
         "key": "fra-south",
-        "name": "Southern France"
+        "name": "Southern France",
+        "infrastructure": 0.5
       },
       {
         "id": 8,
         "key": "rus-ukraine",
-        "name": "Russian Ukraine"
+        "name": "Russian Ukraine",
+        "infrastructure": 0.35
       },
       {
         "id": 9,
         "key": "rus-central",
-        "name": "Central Russia"
+        "name": "Central Russia",
+        "infrastructure": 0.35
       },
       {
         "id": 10,
         "key": "jpn-honshu",
-        "name": "Honshu"
+        "name": "Honshu",
+        "infrastructure": 0.55
       },
       {
         "id": 11,
         "key": "jpn-kyushu",
-        "name": "Kyushu"
+        "name": "Kyushu",
+        "infrastructure": 0.4
       },
       {
         "id": 12,
         "key": "ind-bengal",
-        "name": "Bengal"
+        "name": "Bengal",
+        "infrastructure": 0.3
       },
       {
         "id": 13,
         "key": "ind-madras",
-        "name": "Madras"
+        "name": "Madras",
+        "infrastructure": 0.25
       },
       {
         "id": 14,
         "key": "bra-southeast",
-        "name": "Brazilian Southeast"
+        "name": "Brazilian Southeast",
+        "infrastructure": 0.45
       },
       {
         "id": 15,
         "key": "bra-northeast",
-        "name": "Brazilian Northeast"
+        "name": "Brazilian Northeast",
+        "infrastructure": 0.25
       }
     ],
     "popBlocks": [
@@ -3194,7 +3210,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v5",
+      "dataVersion": "m3-economy-v6",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6085,7 +6101,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v5",
+    "dataVersion": "m3-economy-v6",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6680,7 +6696,613 @@ export const M5_SCENARIO = ({
           }
         ]
       }
-    ]
+    ],
+    "politics": {
+      "dataVersion": "m3-economy-v6",
+      "status": "provisional",
+      "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
+      "regimes": [
+        {
+          "kind": "absolute-monarchy",
+          "name": "Absolute monarchy",
+          "electionsEnabled": false,
+          "electionTermYears": 4,
+          "defaultLaws": {
+            "suffrage": 4,
+            "taxation": 1,
+            "education": 0,
+            "health": 0,
+            "labor": 9,
+            "militaryService": 0,
+            "trade": 12,
+            "colonialPolicy": 0,
+            "currency": 0
+          }
+        },
+        {
+          "kind": "constitutional-monarchy",
+          "name": "Constitutional monarchy",
+          "electionsEnabled": true,
+          "electionTermYears": 4,
+          "defaultLaws": {
+            "suffrage": 5,
+            "taxation": 1,
+            "education": 0,
+            "health": 0,
+            "labor": 8,
+            "militaryService": 0,
+            "trade": 11,
+            "colonialPolicy": 0,
+            "currency": 0
+          }
+        },
+        {
+          "kind": "republic",
+          "name": "Republic",
+          "electionsEnabled": true,
+          "electionTermYears": 4,
+          "defaultLaws": {
+            "suffrage": 6,
+            "taxation": 1,
+            "education": 0,
+            "health": 0,
+            "labor": 8,
+            "militaryService": 0,
+            "trade": 11,
+            "colonialPolicy": 0,
+            "currency": 0
+          }
+        }
+      ],
+      "interestGroups": [
+        {
+          "key": "aristocrats",
+          "name": "Aristocrats",
+          "organizationBase": 0.7,
+          "membershipByProfessionKey": {
+            "capitalists": 0.4
+          }
+        },
+        {
+          "key": "capitalists",
+          "name": "Capitalists",
+          "organizationBase": 0.6,
+          "membershipByProfessionKey": {
+            "capitalists": 0.6
+          }
+        },
+        {
+          "key": "labor",
+          "name": "Labor",
+          "organizationBase": 0.3,
+          "membershipByProfessionKey": {
+            "laborers": 0.9,
+            "clerks": 0.05
+          }
+        },
+        {
+          "key": "intelligentsia",
+          "name": "Intelligentsia",
+          "organizationBase": 0.5,
+          "membershipByProfessionKey": {
+            "clerks": 0.35
+          }
+        },
+        {
+          "key": "military",
+          "name": "Military",
+          "organizationBase": 0.6,
+          "membershipByProfessionKey": {
+            "laborers": 0.1,
+            "clerks": 0.05
+          }
+        },
+        {
+          "key": "bureaucrats",
+          "name": "Bureaucrats",
+          "organizationBase": 0.6,
+          "membershipByProfessionKey": {
+            "clerks": 0.55
+          }
+        },
+        {
+          "key": "rural",
+          "name": "Rural interests",
+          "organizationBase": 0.2,
+          "membershipByProfessionKey": {
+            "peasants": 1
+          }
+        }
+      ],
+      "laws": [
+        {
+          "id": 1,
+          "slot": "taxation",
+          "key": "taxation-flat",
+          "name": "Flat taxation",
+          "description": "Conventional flat tax schedule with a moderate statutory ceiling.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 90,
+          "taxRateBounds": [
+            {
+              "taxType": "incomeTax",
+              "min": 0,
+              "max": 0.35
+            },
+            {
+              "taxType": "businessProfitTax",
+              "min": 0,
+              "max": 0.3
+            }
+          ],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": 0.2,
+            "capitalists": 0.3,
+            "labor": -0.2,
+            "intelligentsia": 0,
+            "military": 0.1,
+            "bureaucrats": 0.1,
+            "rural": 0.1
+          }
+        },
+        {
+          "id": 2,
+          "slot": "taxation",
+          "key": "taxation-progressive",
+          "name": "Progressive taxation",
+          "description": "Raises the statutory ceiling for income and business-profit taxation, with a higher administrative burden.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [
+            {
+              "taxType": "incomeTax",
+              "min": 0,
+              "max": 0.6
+            },
+            {
+              "taxType": "businessProfitTax",
+              "min": 0,
+              "max": 0.6
+            }
+          ],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0.1,
+          "groupStance": {
+            "aristocrats": -0.8,
+            "capitalists": -0.7,
+            "labor": 0.8,
+            "intelligentsia": 0.5,
+            "military": 0,
+            "bureaucrats": 0.1,
+            "rural": 0.2
+          }
+        },
+        {
+          "id": 3,
+          "slot": "taxation",
+          "key": "taxation-restrictive",
+          "name": "Restrictive taxation",
+          "description": "Caps statutory tax rates at low levels, constraining redistribution and public revenue.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 120,
+          "taxRateBounds": [
+            {
+              "taxType": "incomeTax",
+              "min": 0,
+              "max": 0.15
+            },
+            {
+              "taxType": "businessProfitTax",
+              "min": 0,
+              "max": 0.1
+            }
+          ],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": 0.6,
+            "capitalists": 0.7,
+            "labor": -0.6,
+            "intelligentsia": -0.3,
+            "military": 0.1,
+            "bureaucrats": 0,
+            "rural": 0.1
+          }
+        },
+        {
+          "id": 4,
+          "slot": "suffrage",
+          "key": "suffrage-none",
+          "name": "No franchise",
+          "description": "No national electoral franchise; elections do not run even where an assembly exists.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 120,
+          "taxRateBounds": [],
+          "suffrage": {
+            "kind": "none",
+            "propertyWealthLevel": 99,
+            "minAge": 21
+          },
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0.05,
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": 0.7,
+            "capitalists": 0.4,
+            "labor": -0.9,
+            "intelligentsia": -0.7,
+            "military": 0.2,
+            "bureaucrats": 0,
+            "rural": -0.2
+          }
+        },
+        {
+          "id": 5,
+          "slot": "suffrage",
+          "key": "suffrage-property",
+          "name": "Property suffrage",
+          "description": "Adult suffrage limited to population blocks at or above the property wealth threshold.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [],
+          "suffrage": {
+            "kind": "property",
+            "propertyWealthLevel": 50,
+            "minAge": 21
+          },
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": 0.5,
+            "capitalists": 0.6,
+            "labor": -0.5,
+            "intelligentsia": -0.2,
+            "military": 0.1,
+            "bureaucrats": 0.1,
+            "rural": -0.4
+          }
+        },
+        {
+          "id": 6,
+          "slot": "suffrage",
+          "key": "suffrage-male",
+          "name": "Adult male suffrage",
+          "description": "All men aged 21 or over may vote; women remain excluded.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 365,
+          "taxRateBounds": [],
+          "suffrage": {
+            "kind": "male",
+            "propertyWealthLevel": 0,
+            "minAge": 21
+          },
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0.1,
+          "groupStance": {
+            "aristocrats": -0.3,
+            "capitalists": -0.1,
+            "labor": 0.6,
+            "intelligentsia": 0.5,
+            "military": 0.2,
+            "bureaucrats": 0.2,
+            "rural": 0.3
+          }
+        },
+        {
+          "id": 7,
+          "slot": "suffrage",
+          "key": "suffrage-universal",
+          "name": "Universal adult suffrage",
+          "description": "All adults aged 21 or over may vote, subject to the existing election institutions.",
+          "prerequisites": [
+            6
+          ],
+          "eligibleRegimes": [
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 730,
+          "taxRateBounds": [],
+          "suffrage": {
+            "kind": "universal",
+            "propertyWealthLevel": 0,
+            "minAge": 21
+          },
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0.15,
+          "groupStance": {
+            "aristocrats": -0.7,
+            "capitalists": -0.4,
+            "labor": 0.9,
+            "intelligentsia": 0.8,
+            "military": 0,
+            "bureaucrats": 0.2,
+            "rural": 0.5
+          }
+        },
+        {
+          "id": 8,
+          "slot": "labor",
+          "key": "labor-association",
+          "name": "Labor association",
+          "description": "Legal trade associations and worker organisation without broader collective bargaining.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0.1,
+          "laborGrievance": 0,
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": -0.1,
+            "capitalists": 0.2,
+            "labor": 0.5,
+            "intelligentsia": 0.2,
+            "military": 0,
+            "bureaucrats": 0.1,
+            "rural": 0
+          }
+        },
+        {
+          "id": 9,
+          "slot": "labor",
+          "key": "labor-repression",
+          "name": "Labor repression",
+          "description": "Restricts worker organisation; lowers organised labor influence but raises grievance and unrest pressure.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 90,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": -0.2,
+          "laborGrievance": 0.15,
+          "institutionLoad": 0.05,
+          "groupStance": {
+            "aristocrats": 0.5,
+            "capitalists": 0.4,
+            "labor": -0.8,
+            "intelligentsia": -0.4,
+            "military": 0.3,
+            "bureaucrats": 0.1,
+            "rural": 0.1
+          }
+        },
+        {
+          "id": 10,
+          "slot": "labor",
+          "key": "labor-protected",
+          "name": "Protected labor",
+          "description": "Strong legal worker organisation and inclusion; raises labor influence and reduces grievance. Wages, hours, and bargaining remain E5 work.",
+          "prerequisites": [
+            8
+          ],
+          "eligibleRegimes": [
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 365,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0.25,
+          "laborGrievance": 0,
+          "institutionLoad": 0.15,
+          "groupStance": {
+            "aristocrats": -0.4,
+            "capitalists": -0.6,
+            "labor": 0.8,
+            "intelligentsia": 0.5,
+            "military": -0.1,
+            "bureaucrats": 0.1,
+            "rural": 0.1
+          }
+        },
+        {
+          "id": 11,
+          "slot": "trade",
+          "key": "trade-open",
+          "name": "Open borders",
+          "description": "Admits foreign residents and cross-border workers. Tariff and customs mechanics remain E6a work.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": "open",
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0.05,
+          "groupStance": {
+            "aristocrats": 0,
+            "capitalists": 0.3,
+            "labor": -0.2,
+            "intelligentsia": 0.2,
+            "military": 0,
+            "bureaucrats": 0.1,
+            "rural": -0.3
+          }
+        },
+        {
+          "id": 12,
+          "slot": "trade",
+          "key": "trade-restricted",
+          "name": "Restricted borders",
+          "description": "Restricts foreign residence and cross-border work. Tariff and customs mechanics remain E6a work.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": "closed",
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "institutionLoad": 0.05,
+          "groupStance": {
+            "aristocrats": 0.3,
+            "capitalists": -0.4,
+            "labor": 0.2,
+            "intelligentsia": -0.1,
+            "military": 0.2,
+            "bureaucrats": 0.1,
+            "rural": 0.4
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "key": "rus-1905-unrest-wave",
+          "name": "1905 unrest wave",
+          "description": "A national wave of strikes and rural unrest raises militancy, regional unrest, and administrative disruption in Russia.",
+          "countryTag": "RUS",
+          "trigger": {
+            "year": 1905,
+            "month": 1,
+            "day": 22
+          },
+          "effects": [
+            {
+              "kind": "unrest-pressure",
+              "amount": 0.15
+            },
+            {
+              "kind": "militancy-pressure",
+              "amount": 0.05
+            },
+            {
+              "kind": "institution-disruption",
+              "days": 180,
+              "qualityPenalty": 0.15
+            }
+          ],
+          "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
+        },
+        {
+          "id": 2,
+          "key": "gbr-1926-general-strike",
+          "name": "1926 general strike",
+          "description": "A short general strike raises labor militancy and regional unrest in Britain.",
+          "countryTag": "GBR",
+          "trigger": {
+            "year": 1926,
+            "month": 5,
+            "day": 3
+          },
+          "effects": [
+            {
+              "kind": "unrest-pressure",
+              "amount": 0.2
+            },
+            {
+              "kind": "militancy-pressure",
+              "amount": 0.08
+            },
+            {
+              "kind": "institution-disruption",
+              "days": 30,
+              "qualityPenalty": 0.05
+            }
+          ],
+          "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
+        },
+        {
+          "id": 3,
+          "key": "fra-1936-strike-wave",
+          "name": "1936 strike wave",
+          "description": "Factory occupations and strikes raise labor militancy and regional unrest in France.",
+          "countryTag": "FRA",
+          "trigger": {
+            "year": 1936,
+            "month": 6,
+            "day": 1
+          },
+          "effects": [
+            {
+              "kind": "unrest-pressure",
+              "amount": 0.18
+            },
+            {
+              "kind": "militancy-pressure",
+              "amount": 0.06
+            },
+            {
+              "kind": "institution-disruption",
+              "days": 60,
+              "qualityPenalty": 0.05
+            }
+          ],
+          "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
+        }
+      ],
+      "administrationProfessionKeys": [
+        "clerks"
+      ]
+    }
   },
   "buildingInstances": [
     {
@@ -8393,6 +9015,17 @@ export const M5_SCENARIO = ({
         "refinanceOnMaturity": true,
         "arrearsGraceDays": 365
       },
+      "politics": {
+        "regimeKind": "republic",
+        "governmentGroupKey": "capitalists",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-male",
+          "labor": "labor-association",
+          "trade": "trade-open"
+        },
+        "institutionFundingSUSDPerYear": 120000
+      },
       "immigrationOpen": true
     },
     {
@@ -8412,6 +9045,17 @@ export const M5_SCENARIO = ({
       "fiscal": {
         "incomeTaxRate": 0.05,
         "welfareBudgetSUSDPerYear": 0
+      },
+      "politics": {
+        "regimeKind": "constitutional-monarchy",
+        "governmentGroupKey": "aristocrats",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-property",
+          "labor": "labor-association",
+          "trade": "trade-open"
+        },
+        "institutionFundingSUSDPerYear": 80000
       },
       "immigrationOpen": true
     },
@@ -8433,6 +9077,17 @@ export const M5_SCENARIO = ({
         "incomeTaxRate": 0.06,
         "welfareBudgetSUSDPerYear": 0
       },
+      "politics": {
+        "regimeKind": "constitutional-monarchy",
+        "governmentGroupKey": "aristocrats",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-male",
+          "labor": "labor-association",
+          "trade": "trade-restricted"
+        },
+        "institutionFundingSUSDPerYear": 70000
+      },
       "immigrationOpen": false
     },
     {
@@ -8452,6 +9107,17 @@ export const M5_SCENARIO = ({
       "fiscal": {
         "incomeTaxRate": 0.05,
         "welfareBudgetSUSDPerYear": 0
+      },
+      "politics": {
+        "regimeKind": "republic",
+        "governmentGroupKey": "capitalists",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-male",
+          "labor": "labor-association",
+          "trade": "trade-restricted"
+        },
+        "institutionFundingSUSDPerYear": 60000
       },
       "immigrationOpen": false
     },
@@ -8473,6 +9139,17 @@ export const M5_SCENARIO = ({
         "incomeTaxRate": 0.03,
         "welfareBudgetSUSDPerYear": 0
       },
+      "politics": {
+        "regimeKind": "absolute-monarchy",
+        "governmentGroupKey": "aristocrats",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-none",
+          "labor": "labor-repression",
+          "trade": "trade-restricted"
+        },
+        "institutionFundingSUSDPerYear": 90000
+      },
       "immigrationOpen": false
     },
     {
@@ -8492,6 +9169,17 @@ export const M5_SCENARIO = ({
       "fiscal": {
         "incomeTaxRate": 0.05,
         "welfareBudgetSUSDPerYear": 0
+      },
+      "politics": {
+        "regimeKind": "constitutional-monarchy",
+        "governmentGroupKey": "aristocrats",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-property",
+          "labor": "labor-repression",
+          "trade": "trade-restricted"
+        },
+        "institutionFundingSUSDPerYear": 50000
       },
       "immigrationOpen": false
     },
@@ -8513,6 +9201,17 @@ export const M5_SCENARIO = ({
         "incomeTaxRate": 0.02,
         "welfareBudgetSUSDPerYear": 0
       },
+      "politics": {
+        "regimeKind": "constitutional-monarchy",
+        "governmentGroupKey": "aristocrats",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-property",
+          "labor": "labor-repression",
+          "trade": "trade-open"
+        },
+        "institutionFundingSUSDPerYear": 100000
+      },
       "immigrationOpen": true
     },
     {
@@ -8532,6 +9231,17 @@ export const M5_SCENARIO = ({
       "fiscal": {
         "incomeTaxRate": 0.02,
         "welfareBudgetSUSDPerYear": 0
+      },
+      "politics": {
+        "regimeKind": "republic",
+        "governmentGroupKey": "capitalists",
+        "laws": {
+          "taxation": "taxation-flat",
+          "suffrage": "suffrage-property",
+          "labor": "labor-repression",
+          "trade": "trade-open"
+        },
+        "institutionFundingSUSDPerYear": 40000
       },
       "immigrationOpen": true
     }

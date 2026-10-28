@@ -129,6 +129,11 @@ export interface EconomyDefinitions {
   goods: GoodDef[];
   professions: ProfessionDef[];
   buildings: BuildingDef[];
+  /**
+   * M8 validated political content. Omitted for legacy fixtures, which then have
+   * `World.politics.enabled = false` and no M8 effects (D-076).
+   */
+  politics?: PoliticsDefinitions;
 }
 
 export interface BuildingInstance {
@@ -204,6 +209,7 @@ export const ACCOUNT_SUBTYPES = [
   "business-tax-revenue",
   "subsidy-revenue",
   "welfare-income",
+  "administration-income",
   "consumption-expense",
   "input-expense",
   "wage-expense",
@@ -212,6 +218,7 @@ export const ACCOUNT_SUBTYPES = [
   "business-tax-expense",
   "subsidy-expense",
   "welfare-expense",
+  "administration-expense",
   "debt-liability",
   "interest-payable",
   "interest-expense",
@@ -267,6 +274,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "construction-material-purchase",
   "production-subsidy",
   "public-enterprise-capital-contribution",
+  "administration-payroll",
   "migration-transfer",
   "profit-retention",
   "profit-distribution",
@@ -397,7 +405,12 @@ export interface FinancePeriodFiscalTotals {
   readonly interestExpenseSUSD: MoneySUSD;
   /** E4 sectoral production-subsidy expense paid through the treasury. */
   readonly subsidyExpenseSUSD: MoneySUSD;
-  /** Tax revenue minus welfare, interest, and subsidy expense. */
+  /**
+   * M8 public-administration payroll paid through the treasury. Optional for
+   * pre-M8 summaries/fixtures; absent means zero (D-076).
+   */
+  readonly administrationExpenseSUSD?: MoneySUSD;
+  /** Tax revenue minus welfare, interest, subsidy, and administration expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -442,6 +455,9 @@ export interface FinancePeriodBudgetTotals {
   readonly subsidyShortfallSUSD: MoneySUSD;
   /** E4 public-enterprise capital contributions (capital transfer, not expense). */
   readonly publicEnterpriseSupportSUSD: MoneySUSD;
+  /** M8 administration payroll requested/paid/shortfall. Optional pre-M8 = zero. */
+  readonly administrationRequestedSUSD?: MoneySUSD;
+  readonly administrationShortfallSUSD?: MoneySUSD;
 }
 
 /**
@@ -465,6 +481,9 @@ export interface FinanceBudgetMemo {
   readonly subsidyRequestedSUSD: MoneySUSD;
   readonly subsidyShortfallSUSD: MoneySUSD;
   readonly publicEnterpriseSupportSUSD: MoneySUSD;
+  /** M8 administration payroll requested/shortfall; optional pre-M8 = zero. */
+  readonly administrationRequestedSUSD?: MoneySUSD;
+  readonly administrationShortfallSUSD?: MoneySUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
@@ -873,6 +892,256 @@ export interface ProfitDistributionPolicy {
   stateRemittanceRate: Rate;
 }
 
+/**
+ * M8 political definitions (GDD §9, D-076).
+ *
+ * These are validated static content. They are optional in `EconomyDefinitions`:
+ * legacy M2–E4 fixtures carry no politics block and therefore no M8 behavior.
+ */
+
+/** The nine §9.2 law slots. Numeric ids are not slot ids; slots use these keys. */
+export const LAW_SLOTS = [
+  "suffrage",
+  "taxation",
+  "education",
+  "health",
+  "labor",
+  "militaryService",
+  "trade",
+  "colonialPolicy",
+  "currency",
+] as const;
+export type LawSlot = (typeof LAW_SLOTS)[number];
+
+/** Slots with an implemented M8 law option. Other slots are explicit deferrals. */
+export const IMPLEMENTED_LAW_SLOTS: readonly LawSlot[] = [
+  "suffrage",
+  "taxation",
+  "labor",
+  "trade",
+];
+
+export const REGIME_KINDS = [
+  "absolute-monarchy",
+  "constitutional-monarchy",
+  "republic",
+] as const;
+export type RegimeKind = (typeof REGIME_KINDS)[number];
+
+export const INTEREST_GROUP_KEYS = [
+  "aristocrats",
+  "capitalists",
+  "labor",
+  "intelligentsia",
+  "military",
+  "bureaucrats",
+  "rural",
+] as const;
+export type InterestGroupKey = (typeof INTEREST_GROUP_KEYS)[number];
+
+export const CRISIS_STAGES = ["none", "unrest", "strike", "crisis", "revolution"] as const;
+export type CrisisStage = (typeof CRISIS_STAGES)[number];
+
+export const SUFFRAGE_KINDS = ["none", "property", "male", "universal"] as const;
+export type SuffrageKind = (typeof SUFFRAGE_KINDS)[number];
+
+export type TaxType = "incomeTax" | "businessProfitTax";
+
+export interface LawTaxRateBound {
+  taxType: TaxType;
+  min: Rate;
+  max: Rate;
+}
+
+export interface LawSuffrageRule {
+  kind: SuffrageKind;
+  /** Block wealth level at or above which a property-suffrage block is enfranchised. */
+  propertyWealthLevel: number;
+  /** Minimum voting age in completed years. */
+  minAge: number;
+}
+
+/** One validated law definition. Ids are stable, positive, and slot-aware. */
+export interface LawDef {
+  id: Id;
+  slot: LawSlot;
+  key: string;
+  name: string;
+  description: string;
+  /** Law ids that must already be enacted in their slots. */
+  prerequisites: Id[];
+  eligibleRegimes: RegimeKind[];
+  /** Base enactment duration in civil days at institution quality 1. */
+  enactmentDays: number;
+  /** Statutory bounds applied to new fiscal actions and at enactment. */
+  taxRateBounds: LawTaxRateBound[];
+  /** Suffrage franchise definition for the suffrage slot, else null. */
+  suffrage: LawSuffrageRule | null;
+  /** Border access policy for the trade slot, else null. */
+  borderPolicy: "open" | "closed" | null;
+  /** Additive organisation for the labor group from the labor slot, otherwise 0. */
+  laborOrganizationBonus: number;
+  /** Additive grievance pressure from repression (0..1 scale), otherwise 0. */
+  laborGrievance: number;
+  /** Administrative load subtracted from institution quality/law factor. */
+  institutionLoad: Rate;
+  /** Authored stance for each interest group, -1..1. */
+  groupStance: Record<InterestGroupKey, number>;
+}
+
+export interface RegimeDef {
+  kind: RegimeKind;
+  name: string;
+  electionsEnabled: boolean;
+  electionTermYears: number;
+  /** Default law id per slot (0 means no enacted law). */
+  defaultLaws: Record<LawSlot, Id>;
+}
+
+export interface InterestGroupDef {
+  key: InterestGroupKey;
+  name: string;
+  /** Share of each profession's population claimed by this group, 0..1. */
+  membershipByProfessionKey: Record<string, number>;
+  /** Base organisation before literacy/wealth/law modifiers, 0..1. */
+  organizationBase: Rate;
+}
+
+export type ScriptedEventEffect =
+  | { kind: "militancy-pressure"; amount: Rate }
+  | { kind: "unrest-pressure"; amount: Rate }
+  | { kind: "institution-disruption"; days: number; qualityPenalty: Rate };
+
+export interface ScriptedEventDef {
+  id: Id;
+  key: string;
+  name: string;
+  description: string;
+  /** Country tag, or null for every country in the world. */
+  countryTag: string | null;
+  trigger: { year: number; month: number; day: number };
+  effects: ScriptedEventEffect[];
+  /** Data provenance for the event content (not a runtime claim). */
+  provenance: string;
+}
+
+export interface PoliticsDefinitions {
+  dataVersion: string;
+  regimes: RegimeDef[];
+  interestGroups: InterestGroupDef[];
+  laws: LawDef[];
+  events: ScriptedEventDef[];
+  /** Profession keys whose population staffs the state administration. */
+  administrationProfessionKeys: string[];
+}
+
+/** Derived/cached M8 interest-group state (GDD §5.5). */
+export interface InterestGroupState {
+  id: Id;
+  key: InterestGroupKey;
+  membershipPopulation: number;
+  organization: Rate;
+  influence: Rate;
+  stanceByLaw: Record<Id, number>;
+}
+
+/** Derived/cached M8 institution state (GDD §5.5, D-076). */
+export interface InstitutionState {
+  fundedAnnualSUSD: MoneySUSD;
+  staffedByProfession: Record<Id, number>;
+  serviceOutputIndex: number;
+  quality: Rate;
+  overload: Rate;
+  /** First day after the most recent disruption, or null when undisturbed. */
+  disruptionUntilDay: Day | null;
+  /** Day of the most recent derivation, or null before world creation. */
+  lastUpdateDay: Day | null;
+  /** Month-to-date payroll request and unpaid shortfall (reporting memo). */
+  fundingRequestedMonthToDateSUSD: MoneySUSD;
+  fundingShortfallMonthToDateSUSD: MoneySUSD;
+}
+
+export interface ElectionResult {
+  day: Day;
+  eligiblePopulation: number;
+  votesForGovernment: number;
+  votesForOpposition: number;
+  governmentVoteShare: Rate;
+  turnoutShare: Rate;
+  previousGovernmentGroupKey: InterestGroupKey;
+  winnerGroupKey: InterestGroupKey;
+}
+
+export interface CrisisState {
+  stage: CrisisStage;
+  sinceDay: Day;
+  /** Accumulated days at or above the pressure threshold (hysteretic). */
+  pressureDays: number;
+  lastRevolutionDay: Day | null;
+}
+
+export interface RegimeState {
+  kind: RegimeKind;
+  sinceDay: Day;
+  governmentGroupKey: InterestGroupKey;
+  nextElectionDay: Day | null;
+  lastElectionDay: Day | null;
+  lastElection: ElectionResult | null;
+  crisis: CrisisState;
+}
+
+/** One in-flight law transition. Bounded to `MAX_LAW_TRANSITIONS_PER_COUNTRY`. */
+export interface LawTransition {
+  id: Id;
+  slot: LawSlot;
+  fromLawId: Id;
+  toLawId: Id;
+  proposedDay: Day;
+  effectiveDay: Day;
+  source: "player" | "ai" | "event";
+  support: number;
+}
+
+/** A scheduled scripted M8 event. `definitionId` refers to the politics data. */
+export interface ScheduledEvent {
+  id: Id;
+  definitionId: Id;
+  key: string;
+  countryId: Id;
+  dueDay: Day;
+  appliedDay: Day | null;
+  status: "scheduled" | "applied" | "skipped";
+  provenance: string;
+}
+
+/** Bounded M8 event/decision log entry (provenance, not a second authority). */
+export interface PoliticsLogEntry {
+  id: Id;
+  day: Day;
+  kind: "event" | "election" | "law" | "crisis" | "revolution" | "warning";
+  countryId: Id | null;
+  summary: string;
+  provenance: string;
+}
+
+/** World-level M8 state. `enabled` is an authoritative scenario policy. */
+export interface PoliticsState {
+  enabled: boolean;
+  eventQueue: ScheduledEvent[];
+  eventLog: PoliticsLogEntry[];
+  nextEventId: Id;
+  nextLogId: Id;
+}
+
+/** Scenario input for one country's M8 political state. */
+export interface CountryPoliticsInput {
+  regimeKind: RegimeKind;
+  governmentGroupKey?: InterestGroupKey;
+  /** Law keys by slot; omitted slots use the regime default. */
+  laws?: Partial<Record<LawSlot, string>>;
+  institutionFundingSUSDPerYear?: MoneySUSD;
+}
+
 export interface Country {
   id: Id;
   tag: string;
@@ -890,6 +1159,16 @@ export interface Country {
   debt: DebtPolicy;
   /** M6 persisted country-AI schedule and goal state. */
   ai: CountryAIState;
+  /** M8 regime, elections, and crisis state. */
+  regime: RegimeState;
+  /** M8 enacted law id per slot; 0 means no implemented law in that slot. */
+  laws: Record<LawSlot, Id>;
+  /** M8 in-flight law transitions, ascending id, bounded. */
+  lawTransitions: LawTransition[];
+  /** M8 derived/cached interest groups, fixed seven keys. */
+  interestGroups: InterestGroupState[];
+  /** M8 derived/cached state administration. */
+  institutions: InstitutionState;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -921,6 +1200,8 @@ export interface CountryInitialDef {
   debt?: DebtPolicy;
   /** Defaults to false for M4 fixtures that predate M5. */
   immigrationOpen?: boolean;
+  /** M8 political state; omitted means the regime/definition defaults. */
+  politics?: CountryPoliticsInput;
 }
 
 /**

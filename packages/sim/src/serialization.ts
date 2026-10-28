@@ -62,9 +62,14 @@ import type {
   IndustrialPolicy,
   JournalLine,
   JournalPosting,
+  LawTransition,
   Market,
   MonetaryArrangement,
   OpeningBalanceRecord,
+  PoliticsState,
+  RegimeState,
+  InstitutionState,
+  InterestGroupState,
   StockLot,
   SusdPerCurrencyUnit,
   TransactionKind,
@@ -73,6 +78,7 @@ import {
   ACCOUNT_CATEGORIES,
   ACCOUNT_SUBTYPES,
   FLOW_TRANSACTION_KINDS,
+  LAW_SLOTS,
   TRANSACTION_KINDS,
 } from "./economy/types.js";
 import {
@@ -244,22 +250,24 @@ export type SerializedFinanceBudgetMemo = {
   readonly businessTaxAssessedDay: number | null;
 };
 
-/** Encoded E2 per-country budget decomposition. */
+/** Encoded E2 per-country budget decomposition. Zero fields may be omitted. */
 export type SerializedFinanceBudgetTotals = {
-  readonly welfareRequestedSUSD: number;
-  readonly welfareShortfallSUSD: number;
-  readonly businessTaxAssessedSUSD: number;
-  readonly businessTaxUncollectedSUSD: number;
-  readonly debtIssuedSUSD: number;
-  readonly principalRepaidSUSD: number;
-  readonly interestPaidSUSD: number;
-  readonly unfinancedRequirementSUSD: number;
-  readonly constructionSpentSUSD: number;
-  readonly constructionWrittenOffSUSD: number;
-  readonly constructionMaterialsSpentSUSD: number;
-  readonly subsidyRequestedSUSD: number;
-  readonly subsidyShortfallSUSD: number;
-  readonly publicEnterpriseSupportSUSD: number;
+  readonly welfareRequestedSUSD?: number;
+  readonly welfareShortfallSUSD?: number;
+  readonly businessTaxAssessedSUSD?: number;
+  readonly businessTaxUncollectedSUSD?: number;
+  readonly debtIssuedSUSD?: number;
+  readonly principalRepaidSUSD?: number;
+  readonly interestPaidSUSD?: number;
+  readonly unfinancedRequirementSUSD?: number;
+  readonly constructionSpentSUSD?: number;
+  readonly constructionWrittenOffSUSD?: number;
+  readonly constructionMaterialsSpentSUSD?: number;
+  readonly subsidyRequestedSUSD?: number;
+  readonly subsidyShortfallSUSD?: number;
+  readonly publicEnterpriseSupportSUSD?: number;
+  readonly administrationRequestedSUSD?: number;
+  readonly administrationShortfallSUSD?: number;
 };
 
 /** Encoded E4 construction/commissioning material requirement. */
@@ -315,6 +323,7 @@ export type SerializedCountryFiscalTotals = {
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
   readonly subsidyExpenseSUSD: number;
+  readonly administrationExpenseSUSD?: number;
   readonly netFiscalResultSUSD: number;
 };
 
@@ -460,6 +469,104 @@ export type SerializedDebtContract = {
 };
 
 /** Encoded country identity, region ownership, treasury, and fiscal policy. */
+/** Encoded M8 regime, laws, groups, institutions, and world politics state. */
+export type SerializedElectionResult = {
+  readonly day: number;
+  readonly eligiblePopulation: number;
+  readonly votesForGovernment: number;
+  readonly votesForOpposition: number;
+  readonly governmentVoteShare: number;
+  readonly turnoutShare: number;
+  readonly previousGovernmentGroupKey: string;
+  readonly winnerGroupKey: string;
+};
+
+export type SerializedCrisisState = {
+  readonly stage: string;
+  readonly sinceDay: number;
+  readonly pressureDays: number;
+  readonly lastRevolutionDay: number | null;
+};
+
+export type SerializedRegimeState = {
+  readonly kind: string;
+  readonly sinceDay: number;
+  readonly governmentGroupKey: string;
+  readonly nextElectionDay: number | null;
+  readonly lastElectionDay: number | null;
+  readonly lastElection: SerializedElectionResult | null;
+  readonly crisis: SerializedCrisisState;
+};
+
+export type SerializedInterestGroupState = {
+  readonly id: number;
+  readonly key: string;
+  readonly membershipPopulation: number;
+  readonly organization: number;
+  readonly influence: number;
+  readonly stanceByLaw: Readonly<Record<string, number>>;
+};
+
+export type SerializedInstitutionState = {
+  readonly fundedAnnualSUSD: number;
+  readonly staffedByProfession: Readonly<Record<string, number>>;
+  readonly serviceOutputIndex: number;
+  readonly quality: number;
+  readonly overload: number;
+  readonly disruptionUntilDay: number | null;
+  readonly lastUpdateDay: number | null;
+  readonly fundingRequestedMonthToDateSUSD: number;
+  readonly fundingShortfallMonthToDateSUSD: number;
+};
+
+export type SerializedLawTransition = {
+  readonly id: number;
+  readonly slot: string;
+  readonly fromLawId: number;
+  readonly toLawId: number;
+  readonly proposedDay: number;
+  readonly effectiveDay: number;
+  readonly source: "player" | "ai" | "event";
+  readonly support: number;
+};
+
+export type SerializedScheduledEvent = {
+  readonly id: number;
+  readonly definitionId: number;
+  readonly key: string;
+  readonly countryId: number;
+  readonly dueDay: number;
+  readonly appliedDay: number | null;
+  readonly status: "scheduled" | "applied" | "skipped";
+  readonly provenance: string;
+};
+
+export type SerializedPoliticsLogEntry = {
+  readonly id: number;
+  readonly day: number;
+  readonly kind: string;
+  readonly countryId: number | null;
+  readonly summary: string;
+  readonly provenance: string;
+};
+
+export type SerializedPoliticsState = {
+  readonly enabled: boolean;
+  readonly eventQueue: readonly SerializedScheduledEvent[];
+  readonly eventLog: readonly SerializedPoliticsLogEntry[];
+  readonly nextEventId: number;
+  readonly nextLogId: number;
+};
+
+/** Encoded M8 per-country politics block. */
+export type SerializedCountryPolitics = {
+  readonly regime: SerializedRegimeState;
+  readonly laws: Readonly<Record<string, number>>;
+  readonly lawTransitions: readonly SerializedLawTransition[];
+  readonly interestGroups: readonly SerializedInterestGroupState[];
+  readonly institutions: SerializedInstitutionState;
+};
+
 export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
@@ -471,6 +578,7 @@ export type SerializedCountry = {  readonly id: number;
   readonly debt: SerializedDebtPolicy;
   readonly ai: SerializedCountryAIState;
   readonly immigrationOpen: boolean;
+  readonly politics: SerializedCountryPolitics;
 };
 
 /** Encoded E4 industrial policy. */
@@ -568,6 +676,7 @@ export type SerializedWorld = {
   readonly profitDistribution: SerializedProfitDistributionPolicy;
   readonly countryAI: SerializedCountryAIPolicy;
   readonly construction: SerializedConstructionState;
+  readonly politics: SerializedPoliticsState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -756,6 +865,7 @@ function encodeCountryFiscalTotals(
       welfareExpenseSUSD: entry.welfareExpenseSUSD,
       interestExpenseSUSD: entry.interestExpenseSUSD,
       subsidyExpenseSUSD: entry.subsidyExpenseSUSD,
+      administrationExpenseSUSD: entry.administrationExpenseSUSD ?? 0,
       netFiscalResultSUSD: entry.netFiscalResultSUSD,
     };
   }
@@ -773,22 +883,33 @@ function encodeBudgetTotals(
     if (entry === undefined) {
       throw new RangeError(`summary country budget total ${String(countryId)} is missing`);
     }
-    encoded[accountTotalKey(countryId)] = {
-      welfareRequestedSUSD: entry.welfareRequestedSUSD,
-      welfareShortfallSUSD: entry.welfareShortfallSUSD,
-      businessTaxAssessedSUSD: entry.businessTaxAssessedSUSD,
-      businessTaxUncollectedSUSD: entry.businessTaxUncollectedSUSD,
-      debtIssuedSUSD: entry.debtIssuedSUSD,
-      principalRepaidSUSD: entry.principalRepaidSUSD,
-      interestPaidSUSD: entry.interestPaidSUSD,
-      unfinancedRequirementSUSD: entry.unfinancedRequirementSUSD,
-      constructionSpentSUSD: entry.constructionSpentSUSD,
-      constructionWrittenOffSUSD: entry.constructionWrittenOffSUSD,
-      constructionMaterialsSpentSUSD: entry.constructionMaterialsSpentSUSD,
-      subsidyRequestedSUSD: entry.subsidyRequestedSUSD,
-      subsidyShortfallSUSD: entry.subsidyShortfallSUSD,
-      publicEnterpriseSupportSUSD: entry.publicEnterpriseSupportSUSD,
-    };
+    // Sparse encoding: zero fields are omitted. Decode and validation treat a
+    // missing field as zero, which keeps long histories bounded without a new
+    // summary schema.
+    const encodedEntry: Record<string, number> = {};
+    for (const field of [
+      "welfareRequestedSUSD",
+      "welfareShortfallSUSD",
+      "businessTaxAssessedSUSD",
+      "businessTaxUncollectedSUSD",
+      "debtIssuedSUSD",
+      "principalRepaidSUSD",
+      "interestPaidSUSD",
+      "unfinancedRequirementSUSD",
+      "constructionSpentSUSD",
+      "constructionWrittenOffSUSD",
+      "constructionMaterialsSpentSUSD",
+      "subsidyRequestedSUSD",
+      "subsidyShortfallSUSD",
+      "publicEnterpriseSupportSUSD",
+      "administrationRequestedSUSD",
+      "administrationShortfallSUSD",
+    ] as const) {
+      const value = entry[field] ?? 0;
+      if (value !== 0) encodedEntry[field] = value;
+    }
+    encoded[accountTotalKey(countryId)] =
+      encodedEntry as SerializedFinanceBudgetTotals;
   }
   return encoded;
 }
@@ -848,6 +969,8 @@ export function encodeWorld(world: World): SerializedWorld {
       marketId: region.marketId,
       buildingInstanceIds: [...region.buildingInstanceIds].sort((left, right) => left - right),
       resourceCapsPerDay: [...region.resourceCapsPerDay],
+      unrest: region.unrest,
+      infrastructure: region.infrastructure,
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -885,6 +1008,34 @@ export function encodeWorld(world: World): SerializedWorld {
         immigrationOpen: country.immigrationOpen,
         industrial: {
           sectorSubsidyRates: [...country.industrial.sectorSubsidyRates],
+        },
+        politics: {
+          regime: {
+            kind: country.regime.kind,
+            sinceDay: country.regime.sinceDay,
+            governmentGroupKey: country.regime.governmentGroupKey,
+            nextElectionDay: country.regime.nextElectionDay,
+            lastElectionDay: country.regime.lastElectionDay,
+            lastElection:
+              country.regime.lastElection === null
+                ? null
+                : { ...country.regime.lastElection },
+            crisis: { ...country.regime.crisis },
+          },
+          laws: { ...country.laws },
+          lawTransitions: [...country.lawTransitions]
+            .sort((left, right) => left.id - right.id)
+            .map((transition) => ({ ...transition })),
+          interestGroups: [...country.interestGroups]
+            .sort((left, right) => left.id - right.id)
+            .map((group) => ({
+              ...group,
+              stanceByLaw: { ...group.stanceByLaw },
+            })),
+          institutions: {
+            ...country.institutions,
+            staffedByProfession: { ...country.institutions.staffedByProfession },
+          },
         },
       })),
     currencies: [...world.currencies]
@@ -1087,6 +1238,8 @@ export function encodeWorld(world: World): SerializedWorld {
               subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
               subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
               publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
+              administrationRequestedSUSD: memo.administrationRequestedSUSD ?? 0,
+              administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
               businessTaxAssessedDay: memo.businessTaxAssessedDay,
             },
           ]),
@@ -1140,6 +1293,19 @@ export function encodeWorld(world: World): SerializedWorld {
       nextProjectId: world.construction.nextProjectId,
       nextBuildingId: world.construction.nextBuildingId,
     },
+    politics: {
+      enabled: world.politics.enabled,
+      eventQueue: [...world.politics.eventQueue]
+        .sort((left, right) =>
+          left.dueDay !== right.dueDay ? left.dueDay - right.dueDay : left.id - right.id,
+        )
+        .map((event) => ({ ...event })),
+      eventLog: [...world.politics.eventLog]
+        .sort((left, right) => left.id - right.id)
+        .map((entry) => ({ ...entry })),
+      nextEventId: world.politics.nextEventId,
+      nextLogId: world.politics.nextLogId,
+    },
     playerCountryId: world.playerCountryId,
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1181,6 +1347,8 @@ function decodeRegion(value: unknown, path: string): Region {
     marketId,
     buildingInstanceIds: buildings,
     resourceCapsPerDay: caps,
+    unrest: requireFiniteNumber(record.unrest, `${path}.unrest`),
+    infrastructure: requireFiniteNumber(record.infrastructure, `${path}.infrastructure`),
   };
 }
 
@@ -1280,6 +1448,13 @@ function decodeCountryFiscalTotals(
         entry.subsidyExpenseSUSD,
         `${path}[${key}].subsidyExpenseSUSD`,
       ),
+      administrationExpenseSUSD:
+        entry.administrationExpenseSUSD === undefined
+          ? 0
+          : requireFiniteNumber(
+              entry.administrationExpenseSUSD,
+              `${path}[${key}].administrationExpenseSUSD`,
+            ),
       netFiscalResultSUSD: requireFiniteNumber(
         entry.netFiscalResultSUSD,
         `${path}[${key}].netFiscalResultSUSD`,
@@ -1304,63 +1479,27 @@ function decodeBudgetTotals(
       throw new SaveFormatError(`${path} key ${JSON.stringify(key)} is out of range`);
     }
     const entry = requireRecord(raw[key], `${path}[${key}]`);
+    const optionalNumber = (field: string): number =>
+      entry[field] === undefined
+        ? 0
+        : requireFiniteNumber(entry[field], `${path}[${key}].${field}`);
     totals[countryId] = {
-      welfareRequestedSUSD: requireFiniteNumber(
-        entry.welfareRequestedSUSD,
-        `${path}[${key}].welfareRequestedSUSD`,
-      ),
-      welfareShortfallSUSD: requireFiniteNumber(
-        entry.welfareShortfallSUSD,
-        `${path}[${key}].welfareShortfallSUSD`,
-      ),
-      businessTaxAssessedSUSD: requireFiniteNumber(
-        entry.businessTaxAssessedSUSD,
-        `${path}[${key}].businessTaxAssessedSUSD`,
-      ),
-      businessTaxUncollectedSUSD: requireFiniteNumber(
-        entry.businessTaxUncollectedSUSD,
-        `${path}[${key}].businessTaxUncollectedSUSD`,
-      ),
-      debtIssuedSUSD: requireFiniteNumber(
-        entry.debtIssuedSUSD,
-        `${path}[${key}].debtIssuedSUSD`,
-      ),
-      principalRepaidSUSD: requireFiniteNumber(
-        entry.principalRepaidSUSD,
-        `${path}[${key}].principalRepaidSUSD`,
-      ),
-      interestPaidSUSD: requireFiniteNumber(
-        entry.interestPaidSUSD,
-        `${path}[${key}].interestPaidSUSD`,
-      ),
-      unfinancedRequirementSUSD: requireFiniteNumber(
-        entry.unfinancedRequirementSUSD,
-        `${path}[${key}].unfinancedRequirementSUSD`,
-      ),
-      constructionSpentSUSD: requireFiniteNumber(
-        entry.constructionSpentSUSD,
-        `${path}[${key}].constructionSpentSUSD`,
-      ),
-      constructionWrittenOffSUSD: requireFiniteNumber(
-        entry.constructionWrittenOffSUSD,
-        `${path}[${key}].constructionWrittenOffSUSD`,
-      ),
-      constructionMaterialsSpentSUSD: requireFiniteNumber(
-        entry.constructionMaterialsSpentSUSD,
-        `${path}[${key}].constructionMaterialsSpentSUSD`,
-      ),
-      subsidyRequestedSUSD: requireFiniteNumber(
-        entry.subsidyRequestedSUSD,
-        `${path}[${key}].subsidyRequestedSUSD`,
-      ),
-      subsidyShortfallSUSD: requireFiniteNumber(
-        entry.subsidyShortfallSUSD,
-        `${path}[${key}].subsidyShortfallSUSD`,
-      ),
-      publicEnterpriseSupportSUSD: requireFiniteNumber(
-        entry.publicEnterpriseSupportSUSD,
-        `${path}[${key}].publicEnterpriseSupportSUSD`,
-      ),
+      welfareRequestedSUSD: optionalNumber("welfareRequestedSUSD"),
+      welfareShortfallSUSD: optionalNumber("welfareShortfallSUSD"),
+      businessTaxAssessedSUSD: optionalNumber("businessTaxAssessedSUSD"),
+      businessTaxUncollectedSUSD: optionalNumber("businessTaxUncollectedSUSD"),
+      debtIssuedSUSD: optionalNumber("debtIssuedSUSD"),
+      principalRepaidSUSD: optionalNumber("principalRepaidSUSD"),
+      interestPaidSUSD: optionalNumber("interestPaidSUSD"),
+      unfinancedRequirementSUSD: optionalNumber("unfinancedRequirementSUSD"),
+      constructionSpentSUSD: optionalNumber("constructionSpentSUSD"),
+      constructionWrittenOffSUSD: optionalNumber("constructionWrittenOffSUSD"),
+      constructionMaterialsSpentSUSD: optionalNumber("constructionMaterialsSpentSUSD"),
+      subsidyRequestedSUSD: optionalNumber("subsidyRequestedSUSD"),
+      subsidyShortfallSUSD: optionalNumber("subsidyShortfallSUSD"),
+      publicEnterpriseSupportSUSD: optionalNumber("publicEnterpriseSupportSUSD"),
+      administrationRequestedSUSD: optionalNumber("administrationRequestedSUSD"),
+      administrationShortfallSUSD: optionalNumber("administrationShortfallSUSD"),
     };
   }
   return totals;
@@ -1422,6 +1561,20 @@ function decodeBudgetMemo(
       record.publicEnterpriseSupportSUSD,
       `${path}.publicEnterpriseSupportSUSD`,
     ),
+    administrationRequestedSUSD:
+      record.administrationRequestedSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            record.administrationRequestedSUSD,
+            `${path}.administrationRequestedSUSD`,
+          ),
+    administrationShortfallSUSD:
+      record.administrationShortfallSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            record.administrationShortfallSUSD,
+            `${path}.administrationShortfallSUSD`,
+          ),
     businessTaxAssessedDay:
       record.businessTaxAssessedDay === null
         ? null
@@ -1519,6 +1672,286 @@ function decodeDebtContract(value: unknown, path: string): DebtContract {
   };
 }
 
+function decodePoliticsState(value: unknown, path: string): PoliticsState {
+  const record = requireRecord(value, path);
+  if (typeof record.enabled !== "boolean") {
+    throw new SaveFormatError(`${path}.enabled must be a boolean`);
+  }
+  const queue = requireArray(record.eventQueue, `${path}.eventQueue`).map((raw, index) => {
+    const entryPath = `${path}.eventQueue[${String(index)}]`;
+    const entry = requireRecord(raw, entryPath);
+    const status = requireString(entry.status, `${entryPath}.status`, { minLength: 1 });
+    if (status !== "scheduled" && status !== "applied" && status !== "skipped") {
+      throw new SaveFormatError(`${entryPath}.status is invalid`);
+    }
+    return {
+      id: requireUint32(entry.id, `${entryPath}.id`),
+      definitionId: requireUint32(entry.definitionId, `${entryPath}.definitionId`),
+      key: requireString(entry.key, `${entryPath}.key`, { minLength: 1 }),
+      countryId: requireUint32(entry.countryId, `${entryPath}.countryId`),
+      dueDay: requireInteger(entry.dueDay, `${entryPath}.dueDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+      appliedDay:
+        entry.appliedDay === null
+          ? null
+          : requireInteger(
+              entry.appliedDay,
+              `${entryPath}.appliedDay`,
+              0,
+              CAMPAIGN_TERMINAL_DAY_INDEX,
+            ),
+      status,
+      provenance: requireString(entry.provenance, `${entryPath}.provenance`, { minLength: 1 }),
+    } as PoliticsState["eventQueue"][number];
+  });
+  const log = requireArray(record.eventLog, `${path}.eventLog`).map((raw, index) => {
+    const entryPath = `${path}.eventLog[${String(index)}]`;
+    const entry = requireRecord(raw, entryPath);
+    const kind = requireString(entry.kind, `${entryPath}.kind`, { minLength: 1 });
+    return {
+      id: requireUint32(entry.id, `${entryPath}.id`),
+      day: requireInteger(entry.day, `${entryPath}.day`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+      kind,
+      countryId:
+        entry.countryId === null ? null : requireUint32(entry.countryId, `${entryPath}.countryId`),
+      summary: requireString(entry.summary, `${entryPath}.summary`),
+      provenance: requireString(entry.provenance, `${entryPath}.provenance`),
+    } as PoliticsState["eventLog"][number];
+  });
+  return {
+    enabled: record.enabled,
+    eventQueue: queue,
+    eventLog: log,
+    nextEventId: requireUint32(record.nextEventId, `${path}.nextEventId`),
+    nextLogId: requireUint32(record.nextLogId, `${path}.nextLogId`),
+  };
+}
+
+function decodeRegimeState(value: unknown, path: string): RegimeState {
+  const record = requireRecord(value, path);
+  const crisisRecord = requireRecord(record.crisis, `${path}.crisis`);
+  const lastElectionRecord =
+    record.lastElection === null
+      ? null
+      : requireRecord(record.lastElection, `${path}.lastElection`);
+  return {
+    kind: requireString(record.kind, `${path}.kind`, { minLength: 1 }) as RegimeState["kind"],
+    sinceDay: requireInteger(record.sinceDay, `${path}.sinceDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    governmentGroupKey: requireString(
+      record.governmentGroupKey,
+      `${path}.governmentGroupKey`,
+      { minLength: 1 },
+    ) as RegimeState["governmentGroupKey"],
+    nextElectionDay:
+      record.nextElectionDay === null
+        ? null
+        : requireInteger(
+            record.nextElectionDay,
+            `${path}.nextElectionDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    lastElectionDay:
+      record.lastElectionDay === null
+        ? null
+        : requireInteger(
+            record.lastElectionDay,
+            `${path}.lastElectionDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    lastElection:
+      lastElectionRecord === null
+        ? null
+        : {
+            day: requireInteger(
+              lastElectionRecord.day,
+              `${path}.lastElection.day`,
+              0,
+              CAMPAIGN_TERMINAL_DAY_INDEX,
+            ),
+            eligiblePopulation: requireFiniteNumber(
+              lastElectionRecord.eligiblePopulation,
+              `${path}.lastElection.eligiblePopulation`,
+            ),
+            votesForGovernment: requireFiniteNumber(
+              lastElectionRecord.votesForGovernment,
+              `${path}.lastElection.votesForGovernment`,
+            ),
+            votesForOpposition: requireFiniteNumber(
+              lastElectionRecord.votesForOpposition,
+              `${path}.lastElection.votesForOpposition`,
+            ),
+            governmentVoteShare: requireFiniteNumber(
+              lastElectionRecord.governmentVoteShare,
+              `${path}.lastElection.governmentVoteShare`,
+            ),
+            turnoutShare: requireFiniteNumber(
+              lastElectionRecord.turnoutShare,
+              `${path}.lastElection.turnoutShare`,
+            ),
+            previousGovernmentGroupKey: requireString(
+              lastElectionRecord.previousGovernmentGroupKey,
+              `${path}.lastElection.previousGovernmentGroupKey`,
+              { minLength: 1 },
+            ) as RegimeState["governmentGroupKey"],
+            winnerGroupKey: requireString(
+              lastElectionRecord.winnerGroupKey,
+              `${path}.lastElection.winnerGroupKey`,
+              { minLength: 1 },
+            ) as RegimeState["governmentGroupKey"],
+          },
+    crisis: {
+      stage: requireString(crisisRecord.stage, `${path}.crisis.stage`, {
+        minLength: 1,
+      }) as RegimeState["crisis"]["stage"],
+      sinceDay: requireInteger(
+        crisisRecord.sinceDay,
+        `${path}.crisis.sinceDay`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      pressureDays: requireInteger(crisisRecord.pressureDays, `${path}.crisis.pressureDays`, 0, 100_000),
+      lastRevolutionDay:
+        crisisRecord.lastRevolutionDay === null
+          ? null
+          : requireInteger(
+              crisisRecord.lastRevolutionDay,
+              `${path}.crisis.lastRevolutionDay`,
+              0,
+              CAMPAIGN_TERMINAL_DAY_INDEX,
+            ),
+    },
+  };
+}
+
+function decodeCountryPolitics(value: unknown, path: string) {
+  const record = requireRecord(value, path);
+  const lawsRecord = requireRecord(record.laws, `${path}.laws`);
+  const laws = {} as Record<string, number>;
+  for (const slot of LAW_SLOTS) {
+    laws[slot] = requireUint32(lawsRecord[slot], `${path}.laws.${slot}`);
+  }
+  const lawTransitions: LawTransition[] = requireArray(
+    record.lawTransitions,
+    `${path}.lawTransitions`,
+  ).map((raw, index) => {
+    const entryPath = `${path}.lawTransitions[${String(index)}]`;
+    const entry = requireRecord(raw, entryPath);
+    const source = requireString(entry.source, `${entryPath}.source`, { minLength: 1 });
+    if (source !== "player" && source !== "ai" && source !== "event") {
+      throw new SaveFormatError(`${entryPath}.source is invalid`);
+    }
+    return {
+      id: requireUint32(entry.id, `${entryPath}.id`),
+      slot: requireString(entry.slot, `${entryPath}.slot`, {
+        minLength: 1,
+      }) as LawTransition["slot"],
+      fromLawId: requireUint32(entry.fromLawId, `${entryPath}.fromLawId`),
+      toLawId: requireUint32(entry.toLawId, `${entryPath}.toLawId`),
+      proposedDay: requireInteger(
+        entry.proposedDay,
+        `${entryPath}.proposedDay`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      effectiveDay: requireInteger(
+        entry.effectiveDay,
+        `${entryPath}.effectiveDay`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      source,
+      support: requireFiniteNumber(entry.support, `${entryPath}.support`),
+    };
+  });
+  const interestGroups: InterestGroupState[] = requireArray(
+    record.interestGroups,
+    `${path}.interestGroups`,
+  ).map((raw, index) => {
+    const entryPath = `${path}.interestGroups[${String(index)}]`;
+    const entry = requireRecord(raw, entryPath);
+    const stanceRecord = requireRecord(entry.stanceByLaw, `${entryPath}.stanceByLaw`);
+    const stanceByLaw: Record<number, number> = {};
+    for (const [lawId, rawStance] of Object.entries(stanceRecord)) {
+      stanceByLaw[Number(lawId)] = requireFiniteNumber(
+        rawStance,
+        `${entryPath}.stanceByLaw.${lawId}`,
+      );
+    }
+    return {
+      id: requireUint32(entry.id, `${entryPath}.id`),
+      key: requireString(entry.key, `${entryPath}.key`, {
+        minLength: 1,
+      }) as InterestGroupState["key"],
+      membershipPopulation: requireFiniteNumber(
+        entry.membershipPopulation,
+        `${entryPath}.membershipPopulation`,
+      ),
+      organization: requireFiniteNumber(entry.organization, `${entryPath}.organization`),
+      influence: requireFiniteNumber(entry.influence, `${entryPath}.influence`),
+      stanceByLaw,
+    };
+  });
+  const institutionsRecord = requireRecord(record.institutions, `${path}.institutions`);
+  const staffRecord = requireRecord(
+    institutionsRecord.staffedByProfession,
+    `${path}.institutions.staffedByProfession`,
+  );
+  const staffedByProfession: Record<number, number> = {};
+  for (const [professionId, rawCount] of Object.entries(staffRecord)) {
+    staffedByProfession[Number(professionId)] = requireFiniteNumber(
+      rawCount,
+      `${path}.institutions.staffedByProfession.${professionId}`,
+    );
+  }
+  const institutions: InstitutionState = {
+    fundedAnnualSUSD: requireFiniteNumber(
+      institutionsRecord.fundedAnnualSUSD,
+      `${path}.institutions.fundedAnnualSUSD`,
+    ),
+    staffedByProfession,
+    serviceOutputIndex: requireFiniteNumber(
+      institutionsRecord.serviceOutputIndex,
+      `${path}.institutions.serviceOutputIndex`,
+    ),
+    quality: requireFiniteNumber(institutionsRecord.quality, `${path}.institutions.quality`),
+    overload: requireFiniteNumber(institutionsRecord.overload, `${path}.institutions.overload`),
+    disruptionUntilDay:
+      institutionsRecord.disruptionUntilDay === null
+        ? null
+        : requireInteger(
+            institutionsRecord.disruptionUntilDay,
+            `${path}.institutions.disruptionUntilDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    lastUpdateDay:
+      institutionsRecord.lastUpdateDay === null
+        ? null
+        : requireInteger(
+            institutionsRecord.lastUpdateDay,
+            `${path}.institutions.lastUpdateDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    fundingRequestedMonthToDateSUSD: requireFiniteNumber(
+      institutionsRecord.fundingRequestedMonthToDateSUSD,
+      `${path}.institutions.fundingRequestedMonthToDateSUSD`,
+    ),
+    fundingShortfallMonthToDateSUSD: requireFiniteNumber(
+      institutionsRecord.fundingShortfallMonthToDateSUSD,
+      `${path}.institutions.fundingShortfallMonthToDateSUSD`,
+    ),
+  };
+  return {
+    regime: decodeRegimeState(record.regime, `${path}.regime`),
+    laws: laws as Country["laws"],
+    lawTransitions,
+    interestGroups,
+    institutions,
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -1539,6 +1972,7 @@ function decodeCountry(value: unknown, path: string): Country {
     debt: decodeDebtPolicy(record.debt, `${path}.debt`),
     ai: decodeCountryAIState(record.ai, `${path}.ai`),
     immigrationOpen: record.immigrationOpen,
+    ...decodeCountryPolitics(record.politics, `${path}.politics`),
   };
 }
 
@@ -2411,6 +2845,7 @@ function decodeWorldPayload(value: unknown): World {
     "save payload.countryAI",
   );
   const construction = decodeConstructionState(payload.construction);
+  const politics = decodePoliticsState(payload.politics, "save payload.politics");
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -2437,6 +2872,7 @@ function decodeWorldPayload(value: unknown): World {
     profitDistribution,
     countryAI,
     construction,
+    politics,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,

@@ -50,7 +50,7 @@ function cloneWorld(): World {
 
 describe("M3a schema-20 serialization", () => {
   test("matches the fixed M3a structural-world digest", () => {
-    expect(hashWorld(cloneWorld())).toBe("ef813dff8ee70bed");
+    expect(hashWorld(cloneWorld())).toBe("db84afbb0b9a306d");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

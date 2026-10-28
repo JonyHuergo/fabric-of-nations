@@ -3,9 +3,21 @@
     "id": 0,
     "tag": "USA",
     "name": "United States",
-    "regionIds": [0, 1],
-    "currency": { "key": "usd", "name": "United States dollar", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.0, "welfareBudgetSUSDPerYear": 2000000 },
+    "regionIds": [
+      0,
+      1
+    ],
+    "currency": {
+      "key": "usd",
+      "name": "United States dollar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0,
+      "welfareBudgetSUSDPerYear": 2000000
+    },
     "initialTreasuryCashSUSD": 100000,
     "debt": {
       "enabled": true,
@@ -18,91 +30,303 @@
       "arrearsGraceDays": 365
     },
     "immigrationOpen": true,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 120000
+    }
   },
   {
     "id": 1,
     "tag": "GBR",
     "name": "United Kingdom",
-    "regionIds": [2, 3],
-    "currency": { "key": "gbp", "name": "Pound sterling", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.05, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      2,
+      3
+    ],
+    "currency": {
+      "key": "gbp",
+      "name": "Pound sterling",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 2075000,
     "immigrationOpen": true,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 80000
+    }
   },
   {
     "id": 2,
     "tag": "DEU",
     "name": "German Empire",
-    "regionIds": [4, 5],
-    "currency": { "key": "dem", "name": "German mark", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.06, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      4,
+      5
+    ],
+    "currency": {
+      "key": "dem",
+      "name": "German mark",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 2800000,
     "immigrationOpen": false,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 70000
+    }
   },
   {
     "id": 3,
     "tag": "FRA",
     "name": "France",
-    "regionIds": [6, 7],
-    "currency": { "key": "frf", "name": "French franc", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.05, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      6,
+      7
+    ],
+    "currency": {
+      "key": "frf",
+      "name": "French franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 1945000,
     "immigrationOpen": false,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 60000
+    }
   },
   {
     "id": 4,
     "tag": "RUS",
     "name": "Russian Empire",
-    "regionIds": [8, 9],
-    "currency": { "key": "rub", "name": "Russian ruble", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.03, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      8,
+      9
+    ],
+    "currency": {
+      "key": "rub",
+      "name": "Russian ruble",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 6800000,
     "immigrationOpen": false,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 90000
+    }
   },
   {
     "id": 5,
     "tag": "JPN",
     "name": "Empire of Japan",
-    "regionIds": [10, 11],
-    "currency": { "key": "jpy", "name": "Japanese yen", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.05, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      10,
+      11
+    ],
+    "currency": {
+      "key": "jpy",
+      "name": "Japanese yen",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 2200000,
     "immigrationOpen": false,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 50000
+    }
   },
   {
     "id": 6,
     "tag": "IND",
     "name": "British India",
-    "regionIds": [12, 13],
-    "currency": { "key": "inr", "name": "Indian rupee", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.02, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      12,
+      13
+    ],
+    "currency": {
+      "key": "inr",
+      "name": "Indian rupee",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.02,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 11900000,
     "immigrationOpen": true,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-repression",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 100000
+    }
   },
   {
     "id": 7,
     "tag": "BRA",
     "name": "Brazil",
-    "regionIds": [14, 15],
-    "currency": { "key": "brl", "name": "Brazilian milreis", "valuation": { "status": "unavailable" } },
-    "fiscal": { "incomeTaxRate": 0.02, "welfareBudgetSUSDPerYear": 0 },
+    "regionIds": [
+      14,
+      15
+    ],
+    "currency": {
+      "key": "brl",
+      "name": "Brazilian milreis",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.02,
+      "welfareBudgetSUSDPerYear": 0
+    },
     "initialTreasuryCashSUSD": 880000,
     "immigrationOpen": true,
-    "sourceIds": ["owid-population", "maddison-2023"],
-    "occupationSourceIds": ["owid-employment-by-sector"]
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector"
+    ],
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-repression",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 40000
+    }
   }
 ]

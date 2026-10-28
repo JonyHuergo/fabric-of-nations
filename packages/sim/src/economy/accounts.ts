@@ -82,6 +82,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "business-tax-revenue": "revenue",
   "subsidy-revenue": "revenue",
   "welfare-income": "revenue",
+  "administration-income": "revenue",
   "consumption-expense": "expense",
   "input-expense": "expense",
   "wage-expense": "expense",
@@ -90,6 +91,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "business-tax-expense": "expense",
   "subsidy-expense": "expense",
   "welfare-expense": "expense",
+  "administration-expense": "expense",
   "debt-liability": "liability",
   "interest-payable": "liability",
   "interest-expense": "expense",
@@ -116,6 +118,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "business-tax-revenue": ["country"],
   "subsidy-revenue": ["building"],
   "welfare-income": ["popBlock"],
+  "administration-income": ["popBlock"],
   "consumption-expense": ["popBlock"],
   "input-expense": ["building"],
   "wage-expense": ["building"],
@@ -124,6 +127,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "business-tax-expense": ["building"],
   "subsidy-expense": ["country"],
   "welfare-expense": ["country"],
+  "administration-expense": ["country"],
   "debt-liability": ["country"],
   "interest-payable": ["country"],
   "interest-expense": ["country"],
@@ -244,6 +248,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "welfare-transfer": [
     { subtype: "welfare-expense", side: "debit" },
     { subtype: "welfare-income", side: "credit" },
+  ],
+  "administration-payroll": [
+    { subtype: "administration-expense", side: "debit" },
+    { subtype: "administration-income", side: "credit" },
   ],
   "business-profit-tax": [
     { subtype: "business-tax-expense", side: "debit" },
@@ -479,6 +487,112 @@ export function assertFiscalPostingStructure(
     ) {
       throw new RangeError(`${path} welfare-transfer block totals do not match country totals`);
     }
+  }
+}
+
+/**
+ * Enforce the required legs of the M8 administration-payroll kind.
+ *
+ * One entry moves cash from exactly one country treasury to one or more
+ * administration households: country administration-expense debit / treasury
+ * credit; household cash debit / administration-income credit. The per-block
+ * income and cash legs must match and sum to the country totals.
+ */
+export function assertAdministrationPostingStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length === 0) throw new RangeError(`${path} must contain administration lines`);
+  const countryOwners = new Set<Id>();
+  const countryDebits = new Map<Id, number>();
+  const countryCredits = new Map<Id, number>();
+  const blockIncome = new Map<Id, number>();
+  const blockCash = new Map<Id, number>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    if (account.subtype === "administration-expense" && line.side === "debit") {
+      if (account.ownerKind !== "country" || account.ownerId === null) {
+        throw new RangeError(`${path} administration-expense must belong to a country`);
+      }
+      countryOwners.add(account.ownerId);
+      countryDebits.set(
+        account.ownerId,
+        (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+      );
+    } else if (account.subtype === "treasury-cash" && line.side === "credit") {
+      if (account.ownerKind !== "country" || account.ownerId === null) {
+        throw new RangeError(`${path} treasury-cash must belong to a country`);
+      }
+      countryOwners.add(account.ownerId);
+      countryCredits.set(
+        account.ownerId,
+        (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+      );
+    } else if (account.subtype === "administration-income" && line.side === "credit") {
+      if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+        throw new RangeError(`${path} administration-income must belong to a popBlock`);
+      }
+      blockIncome.set(
+        account.ownerId,
+        (blockIncome.get(account.ownerId) ?? 0) + line.amountSUSD,
+      );
+    } else if (account.subtype === "household-cash" && line.side === "debit") {
+      if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+        throw new RangeError(`${path} household-cash must belong to a popBlock`);
+      }
+      blockCash.set(
+        account.ownerId,
+        (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+      );
+    } else {
+      throw new RangeError(
+        `${path} has an invalid administration-payroll line for ${account.subtype} on the ${line.side} side`,
+      );
+    }
+  }
+  if (countryOwners.size !== 1) {
+    throw new RangeError(`${path} administration payroll must reference exactly one country`);
+  }
+  const owner = [...countryOwners][0];
+  if (owner === undefined) throw new RangeError(`${path} administration payroll has no country`);
+  const tolerance = (left: number, right: number): number =>
+    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+  const countryDebitTotal = countryDebits.get(owner) ?? 0;
+  const countryCreditTotal = countryCredits.get(owner) ?? 0;
+  if (!(countryDebitTotal > 0) || !(countryCreditTotal > 0)) {
+    throw new RangeError(`${path} administration payroll has no positive country total`);
+  }
+  if (blockIncome.size === 0 || blockCash.size === 0 || blockIncome.size !== blockCash.size) {
+    throw new RangeError(`${path} administration payroll requires matching block legs`);
+  }
+  let total = 0;
+  for (const [popBlockId, income] of blockIncome) {
+    const cash = blockCash.get(popBlockId);
+    if (cash === undefined || Math.abs(income - cash) > tolerance(income, cash)) {
+      throw new RangeError(
+        `${path} administration payroll block ${String(popBlockId)} income and cash legs do not match`,
+      );
+    }
+    total += income;
+  }
+  if (
+    Math.abs(total - countryDebitTotal) > tolerance(total, countryDebitTotal) ||
+    Math.abs(total - countryCreditTotal) > tolerance(total, countryCreditTotal)
+  ) {
+    throw new RangeError(`${path} administration payroll block totals do not match country totals`);
   }
 }
 

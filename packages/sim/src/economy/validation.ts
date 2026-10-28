@@ -25,6 +25,7 @@ import {
   assertConstructionPostingStructure,
   assertIndustrialPostingStructure,
   assertFiscalPostingStructure,
+  assertAdministrationPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -43,6 +44,14 @@ import {
   type OwnerEquityTally,
 } from "./accounts.js";
 import { assertValidCountryCurrencyState, buildRegionOwnerMap, assertValidIndustrialPolicy, fiscalPolicyIsActive } from "./country.js";
+import {
+  assertValidCountryLaws,
+  assertValidInstitutionState,
+  assertValidInterestGroupStates,
+  assertValidLawTransitions,
+  assertValidPoliticsState,
+  assertValidRegimeState,
+} from "./politics.js";
 import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,
@@ -328,6 +337,9 @@ export function assertValidJournalPosting(
     if (transactionKind === "income-tax" || transactionKind === "welfare-transfer") {
       assertFiscalPostingStructure(transactionKind, journalLines, accounts, path);
     }
+    if (transactionKind === "administration-payroll") {
+      assertAdministrationPostingStructure(journalLines, accounts, path);
+    }
     if (transactionKind === "business-profit-tax") {
       assertBusinessTaxPostingStructure(journalLines, accounts, path);
     }
@@ -427,16 +439,39 @@ function assertValidAnnualSummary(
       totals.interestExpenseSUSD,
       `${path}.fiscalTotals.${String(countryId)}.interestExpenseSUSD`,
     );
+    const subsidy =
+      totals.subsidyExpenseSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            totals.subsidyExpenseSUSD,
+            `${path}.fiscalTotals.${String(countryId)}.subsidyExpenseSUSD`,
+          );
+    const administration =
+      totals.administrationExpenseSUSD === undefined
+        ? 0
+        : requireFiniteNumber(
+            totals.administrationExpenseSUSD,
+            `${path}.fiscalTotals.${String(countryId)}.administrationExpenseSUSD`,
+          );
     const net = requireFiniteNumber(
       totals.netFiscalResultSUSD,
       `${path}.fiscalTotals.${String(countryId)}.netFiscalResultSUSD`,
     );
-    if (tax < 0 || businessTax < 0 || welfare < 0 || interest < 0) {
+    if (
+      tax < 0 ||
+      businessTax < 0 ||
+      welfare < 0 ||
+      interest < 0 ||
+      subsidy < 0 ||
+      administration < 0
+    ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
     }
     if (
-      Math.abs(net - (tax + businessTax - welfare - interest)) >
-      toleranceMoney(net, tax, businessTax, welfare, interest)
+      Math.abs(
+        net - (tax + businessTax - welfare - interest - subsidy - administration),
+      ) >
+      toleranceMoney(net, tax, businessTax, welfare, interest, subsidy, administration)
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} net result does not reconcile`);
     }
@@ -850,10 +885,32 @@ export function assertValidFinancePeriodSummary(
         entry.netFiscalResultSUSD,
         `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD`,
       );
-      if (tax < 0 || businessTax < 0 || welfare < 0 || interest < 0) {
+      const subsidy =
+        entry.subsidyExpenseSUSD === undefined
+          ? 0
+          : requireFiniteNumber(
+              entry.subsidyExpenseSUSD,
+              `${path}.countryFiscalTotals.${key}.subsidyExpenseSUSD`,
+            );
+      const administration =
+        entry.administrationExpenseSUSD === undefined
+          ? 0
+          : requireFiniteNumber(
+              entry.administrationExpenseSUSD,
+              `${path}.countryFiscalTotals.${key}.administrationExpenseSUSD`,
+            );
+      if (
+        tax < 0 ||
+        businessTax < 0 ||
+        welfare < 0 ||
+        interest < 0 ||
+        subsidy < 0 ||
+        administration < 0
+      ) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
       }
-      const expectedNet = tax + businessTax - welfare - interest;
+      const expectedNet =
+        tax + businessTax - welfare - interest - subsidy - administration;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
           `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,
@@ -1559,6 +1616,30 @@ export function assertValidEconomyState(
       `country ${String(country.id)}.industrial`,
     );
     assertValidDebtPolicy(country.debt, `country ${String(country.id)}.debt`);
+    assertValidRegimeState(
+      country.regime,
+      `country ${String(country.id)}.regime`,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
+    assertValidCountryLaws(
+      country,
+      undefined,
+      `country ${String(country.id)}.laws`,
+    );
+    assertValidLawTransitions(
+      country.lawTransitions,
+      `country ${String(country.id)}.lawTransitions`,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
+    assertValidInterestGroupStates(
+      country.interestGroups,
+      `country ${String(country.id)}.interestGroups`,
+    );
+    assertValidInstitutionState(
+      country.institutions,
+      `country ${String(country.id)}.institutions`,
+      CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
     if (country.debt.enabled) {
       if (country.debt.creditorKind === "country") {
         if (country.debt.creditorId === country.id) {
@@ -1730,6 +1811,11 @@ export function assertValidEconomyState(
 
   assertOwnerAccountSets(world, accounts);
   assertValidConstructionState(world);
+  assertValidPoliticsState(
+    world.politics,
+    "world.politics",
+    CAMPAIGN_TERMINAL_DAY_INDEX,
+  );
   assertValidCountryCurrencyState({
     countries: world.countries,
     currencies: world.currencies,

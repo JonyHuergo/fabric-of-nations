@@ -51,7 +51,9 @@ export type PlayerActionRequest =
       readonly kind: "support-public-enterprise";
       readonly buildingId: number;
       readonly amountSUSD: number;
-    };
+    }
+  | { readonly kind: "propose-law"; readonly lawId: number }
+  | { readonly kind: "set-institution-funding"; readonly annualSUSD: number };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -112,5 +114,9 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
         .join("/")}`;
     case "support-public-enterprise":
       return `support enterprise ${String(action.buildingId)} with ${action.amountSUSD.toFixed(2)} SUSD`;
+    case "propose-law":
+      return `propose law ${String(action.lawId)}`;
+    case "set-institution-funding":
+      return `administration funding ${action.annualSUSD.toFixed(2)} SUSD/year`;
   }
 }

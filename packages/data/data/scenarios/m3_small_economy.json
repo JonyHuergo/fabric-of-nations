@@ -1,6 +1,6 @@
 {
   "scenarioId": "m3-small-economy",
-  "dataVersion": "m3-economy-v5",
+  "dataVersion": "m3-economy-v6",
   "status": "provisional",
   "description": "Synthetic single-region, single-market M3 structural fixture. Population and recipe values are provisional test inputs, not historical observations.",
   "professionsFile": "professions.json",

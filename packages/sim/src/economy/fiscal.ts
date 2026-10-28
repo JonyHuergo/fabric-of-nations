@@ -48,7 +48,8 @@ import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import { buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
 import type { MarketSettlementResult } from "./settlement.js";
-import type { Country, FinanceState, JournalLine } from "./types.js";
+import type { Country, EconomyDefinitions, FinanceState, JournalLine } from "./types.js";
+import { taxCollectionEfficiency } from "./politics.js";
 
 /** Per-block fiscal result for one processed day. */
 export interface FiscalBlockResult {
@@ -76,6 +77,10 @@ export interface FiscalCountryResult {
   /** Blocks that were eligible for the transfer under the current policy. */
   readonly welfareEligibleBlocks: number;
   readonly welfareEligiblePopulation: number;
+  /** M8 administration payroll request/paid/shortfall. */
+  readonly administrationRequestedSUSD: number;
+  readonly administrationPaidSUSD: number;
+  readonly administrationShortfallSUSD: number;
   readonly treasuryCashStartSUSD: number;
   readonly reserveTargetSUSD: number;
   /** Treasury cash read from the authoritative staged account after posting. */
@@ -88,6 +93,9 @@ export interface FiscalTotals {
   readonly welfareRequestedSUSD: number;
   readonly welfarePaidSUSD: number;
   readonly welfareShortfallSUSD: number;
+  readonly administrationRequestedSUSD: number;
+  readonly administrationPaidSUSD: number;
+  readonly administrationShortfallSUSD: number;
 }
 
 /** Transient result of one fiscal phase. Never persisted as duplicate state. */
@@ -106,6 +114,11 @@ export interface FiscalPhaseResult {
  */
 export interface FiscalPhaseTestHooks {
   readonly afterStagedPostings?: (staged: FinanceState) => void;
+}
+
+/** M8-aware fiscal phase options. `economyDefinitions` is needed for payroll. */
+export interface FiscalPhaseOptions extends PhaseValidationOptions {
+  readonly economyDefinitions?: EconomyDefinitions;
 }
 
 /**
@@ -177,6 +190,7 @@ interface CountryBlockGroup {
     popBlockId: Id;
     population: number;
     wealthLevel: number;
+    professionId: Id;
   }[];
 }
 
@@ -247,7 +261,7 @@ function executeFiscalPhase(
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
   hooks?: FiscalPhaseTestHooks,
-  options: PhaseValidationOptions = {},
+  options: FiscalPhaseOptions = {},
 ): FiscalPhaseResult {
   assertFiscalPreconditions(world, settlement, dayIndex, options);
 
@@ -259,6 +273,16 @@ function executeFiscalPhase(
   );
   const owners = buildRegionOwnerMap(world);
   const countries = [...world.countries].sort((left, right) => left.id - right.id);
+  const politics = options.economyDefinitions?.politics;
+  const administrationProfessionKeys = new Set(
+    politics?.administrationProfessionKeys ?? [],
+  );
+  const professionKeyById = new Map(
+    (options.economyDefinitions?.professions ?? []).map((profession) => [
+      profession.id,
+      profession.key,
+    ]),
+  );
 
   const groups: CountryBlockGroup[] = countries.map((country) => ({
     country,
@@ -280,6 +304,7 @@ function executeFiscalPhase(
       popBlockId: block.id,
       population: populationTotal(block),
       wealthLevel: block.wealthLevel,
+      professionId: block.professionId,
     });
   }
   const anyActive = countries.some((country) => fiscalPolicyIsActive(country.fiscal));
@@ -291,6 +316,7 @@ function executeFiscalPhase(
 
   const taxEntries: JournalEntryInput[] = [];
   const welfareEntries: JournalEntryInput[] = [];
+  const administrationEntries: JournalEntryInput[] = [];
   const blockDrafts: BlockFiscalDraft[] = [];
   const countryDrafts: {
     countryId: Id;
@@ -300,6 +326,9 @@ function executeFiscalPhase(
     welfareShortfallSUSD: number;
     welfareEligibleBlocks: number;
     welfareEligiblePopulation: number;
+    administrationRequestedSUSD: number;
+    administrationPaidSUSD: number;
+    administrationShortfallSUSD: number;
     treasuryCashStartSUSD: number;
     reserveTargetSUSD: number;
   }[] = [];
@@ -339,6 +368,7 @@ function executeFiscalPhase(
     const taxLines: JournalLine[] = [];
     const taxByBlock = new Map<Id, number>();
     let taxTotal = 0;
+    const collectionEfficiency = taxCollectionEfficiency(country);
     if (rate > 0) {
       for (const block of group.blocks) {
         const wages = wagesByBlock.get(block.popBlockId) ?? 0;
@@ -346,7 +376,7 @@ function executeFiscalPhase(
           throw new RangeError(`invalid settled wages for popBlock ${String(block.popBlockId)}`);
         }
         const taxable = Math.max(0, wages - dailyAllowance);
-        const tax = rate * taxable;
+        const tax = rate * taxable * collectionEfficiency;
         if (!Number.isFinite(tax) || tax < 0) {
           throw new RangeError(`invalid income tax for popBlock ${String(block.popBlockId)}`);
         }
@@ -469,13 +499,79 @@ function executeFiscalPhase(
       welfareShortfallSUSD: shortfall,
       welfareEligibleBlocks: eligible.length,
       welfareEligiblePopulation: eligiblePopulation,
+      administrationRequestedSUSD: 0,
+      administrationPaidSUSD: 0,
+      administrationShortfallSUSD: 0,
       treasuryCashStartSUSD: plan.treasuryCashStartSUSD,
       reserveTargetSUSD: plan.reserveTargetSUSD,
     });
   }
 
+  // Pass 3 (M8): administration payroll. Welfare is posted first so the payroll
+  // reads the same post-welfare treasury balance and cannot overdraw.
   const welfarePostings = postJournalBatch(stagedFinance, dayIndex, welfareEntries);
-  const postings = [...taxPostings, ...welfarePostings];
+  const administrationByCountry = new Map<
+    Id,
+    { requested: number; paid: number; shortfall: number }
+  >();
+  if (politics !== undefined && world.politics.enabled) {
+    for (const plan of plans) {
+      const country = plan.group.country;
+      const requested = country.institutions.fundedAnnualSUSD / yearDays;
+      if (!Number.isFinite(requested) || requested < 0) {
+        throw new RangeError(`invalid administration funding for country ${String(country.id)}`);
+      }
+      if (!(requested > 0)) continue;
+      const eligible = plan.group.blocks.filter((block) => {
+        if (!(block.population > 0)) return false;
+        const key = professionKeyById.get(block.professionId) ?? "";
+        return administrationProfessionKeys.has(key);
+      });
+      const available = index.get("country", country.id, "treasury-cash").balanceSUSD;
+      const payableCeiling = Math.max(0, available - plan.reserveTargetSUSD);
+      const payable = eligible.length > 0 ? Math.min(requested, payableCeiling) : 0;
+      const allocations =
+        payable > 0 ? allocateProportionally(payable, eligible) : new Map<Id, number>();
+      if (payable > 0) {
+        const lines: JournalLine[] = [];
+        for (const block of eligible) {
+          const amount = allocations.get(block.popBlockId) ?? 0;
+          if (!(amount > 0)) continue;
+          const cash = index.get("popBlock", block.popBlockId, "household-cash");
+          const income = index.get("popBlock", block.popBlockId, "administration-income");
+          lines.push({ accountId: cash.id, side: "debit", amountSUSD: amount });
+          lines.push({ accountId: income.id, side: "credit", amountSUSD: amount });
+        }
+        const treasury = index.get("country", country.id, "treasury-cash");
+        const expense = index.get("country", country.id, "administration-expense");
+        lines.push({ accountId: expense.id, side: "debit", amountSUSD: payable });
+        lines.push({ accountId: treasury.id, side: "credit", amountSUSD: payable });
+        administrationEntries.push({
+          transactionKind: "administration-payroll",
+          lines,
+          sourceEntityId: country.id,
+          targetEntityId: null,
+        });
+      }
+      const shortfall = Math.max(0, requested - payable);
+      administrationByCountry.set(country.id, {
+        requested,
+        paid: payable,
+        shortfall,
+      });
+      accumulateBudgetMemo(stagedFinance, country.id, {
+        administrationRequestedSUSD: requested,
+        administrationShortfallSUSD: shortfall,
+      });
+    }
+  }
+
+  const administrationPostings = postJournalBatch(
+    stagedFinance,
+    dayIndex,
+    administrationEntries,
+  );
+  const postings = [...taxPostings, ...welfarePostings, ...administrationPostings];
   hooks?.afterStagedPostings?.(stagedFinance);
 
   // Full staged-world validation covers balances, owner references, treasury
@@ -488,13 +584,25 @@ function executeFiscalPhase(
     ...draft,
     endingCashAfterFiscalSUSD: index.get("popBlock", draft.popBlockId, "household-cash").balanceSUSD,
   }));
-  const countryResults: FiscalCountryResult[] = countryDrafts.map((draft) => ({
-    ...draft,
-    treasuryCashEndSUSD: index.get("country", draft.countryId, "treasury-cash").balanceSUSD,
-  }));
+  const countryResults: FiscalCountryResult[] = countryDrafts.map((draft) => {
+    const administration = administrationByCountry.get(draft.countryId);
+    return {
+      ...draft,
+      administrationRequestedSUSD: administration?.requested ?? 0,
+      administrationPaidSUSD: administration?.paid ?? 0,
+      administrationShortfallSUSD: administration?.shortfall ?? 0,
+      treasuryCashEndSUSD: index.get("country", draft.countryId, "treasury-cash").balanceSUSD,
+    };
+  });
   for (const result of countryResults) {
     if (
-      Math.abs(result.treasuryCashEndSUSD - (result.treasuryCashStartSUSD + result.incomeTaxSUSD - result.welfarePaidSUSD)) >
+      Math.abs(
+        result.treasuryCashEndSUSD -
+          (result.treasuryCashStartSUSD +
+            result.incomeTaxSUSD -
+            result.welfarePaidSUSD -
+            result.administrationPaidSUSD),
+      ) >
       toleranceMoney(result.treasuryCashEndSUSD, result.treasuryCashStartSUSD)
     ) {
       throw new RangeError(
@@ -515,10 +623,33 @@ function executeFiscalPhase(
       (total, result) => total + result.welfareShortfallSUSD,
       0,
     ),
+    administrationRequestedSUSD: countryResults.reduce(
+      (total, result) => total + result.administrationRequestedSUSD,
+      0,
+    ),
+    administrationPaidSUSD: countryResults.reduce(
+      (total, result) => total + result.administrationPaidSUSD,
+      0,
+    ),
+    administrationShortfallSUSD: countryResults.reduce(
+      (total, result) => total + result.administrationShortfallSUSD,
+      0,
+    ),
   };
 
   // Publish only after every staged postcondition has passed.
   world.finance = stagedFinance;
+  for (const [countryId, memo] of administrationByCountry) {
+    const country = world.countries.find((candidate) => candidate.id === countryId);
+    if (country === undefined) continue;
+    country.institutions = {
+      ...country.institutions,
+      fundingRequestedMonthToDateSUSD:
+        country.institutions.fundingRequestedMonthToDateSUSD + memo.requested,
+      fundingShortfallMonthToDateSUSD:
+        country.institutions.fundingShortfallMonthToDateSUSD + memo.shortfall,
+    };
+  }
   settlement.fiscalApplied = true;
   return {
     dayIndex,
@@ -538,7 +669,7 @@ export function runFiscalPhase(
   world: World,
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
-  options: PhaseValidationOptions = {},
+  options: FiscalPhaseOptions = {},
 ): FiscalPhaseResult {
   return executeFiscalPhase(world, settlement, dayIndex, undefined, options);
 }
@@ -549,7 +680,7 @@ export function __runFiscalPhaseWithHooks(
   settlement: MarketSettlementResult,
   dayIndex: DayIndex,
   hooks: FiscalPhaseTestHooks,
-  options: PhaseValidationOptions = {},
+  options: FiscalPhaseOptions = {},
 ): FiscalPhaseResult {
   return executeFiscalPhase(world, settlement, dayIndex, hooks, options);
 }

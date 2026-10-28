@@ -35,6 +35,7 @@ import type {
   EmploymentAssignment,
   FinanceState,
   Market,
+  PoliticsState,
   ProfitDistributionPolicy,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
@@ -102,6 +103,12 @@ export interface World {
   countryAI: CountryAIPolicy;
   /** E3 public-construction project queue and bounded history. */
   construction: ConstructionState;
+  /**
+   * M8 political state and bounded scripted-event queue/log. A world whose
+   * economy definitions carry no politics block has `enabled: false` and no M8
+   * effects (D-076).
+   */
+  politics: PoliticsState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -195,6 +202,13 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       history: [],
       nextProjectId: 1,
       nextBuildingId: 1,
+    },
+    politics: {
+      enabled: false,
+      eventQueue: [],
+      eventLog: [],
+      nextEventId: 1,
+      nextLogId: 1,
     },
     playerCountryId: null,
     diagnostics: {

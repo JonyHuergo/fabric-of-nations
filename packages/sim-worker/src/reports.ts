@@ -39,6 +39,9 @@ export interface MonthlyEconomicReport {
   readonly subsidyShortfallSUSD: number;
   readonly publicEnterpriseSupportSUSD: number;
   readonly subsidyExpenseSUSD: number;
+  readonly administrationRequestedSUSD: number;
+  readonly administrationExpenseSUSD: number;
+  readonly administrationShortfallSUSD: number;
   readonly netFiscalResultSUSD: number;
   readonly grossFlowTotals: Readonly<Record<string, number>>;
   readonly detailedBalances: boolean;
@@ -90,6 +93,9 @@ export function buildMonthlyReports(country: CountrySnapshot): readonly MonthlyE
       subsidyShortfallSUSD: period.subsidyShortfallSUSD,
       publicEnterpriseSupportSUSD: period.publicEnterpriseSupportSUSD,
       subsidyExpenseSUSD: period.subsidyExpenseSUSD,
+      administrationRequestedSUSD: period.administrationRequestedSUSD ?? 0,
+      administrationExpenseSUSD: period.administrationExpenseSUSD ?? 0,
+      administrationShortfallSUSD: period.administrationShortfallSUSD ?? 0,
       netFiscalResultSUSD: period.netFiscalResultSUSD,
       grossFlowTotals: period.grossFlowTotals,
       detailedBalances: period.treasuryCashEndSUSD !== null,

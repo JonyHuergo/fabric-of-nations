@@ -103,9 +103,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
 
     // Schema 20 adds E4 industrial/material state; the digest changes even though the
     // M2 population behavior is unchanged.
-    expect(hashWorld(world)).toBe("a7a6825edd60e87c");
+    expect(hashWorld(world)).toBe("c86880f6f5b1abc0");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("a7a6825edd60e87c");
+    expect(hashWorld(restored)).toBe("c86880f6f5b1abc0");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -306,6 +306,6 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // interpolation shortfall.
     expect(Math.abs(births / 6_089_003_488 - 1)).toBeLessThanOrEqual(0.02);
     expect(Math.abs(deaths / 2_430_494_039 - 1)).toBeLessThanOrEqual(0.03);
-    expect(hashWorld(world)).toBe("2502fddace5560ec");
+    expect(hashWorld(world)).toBe("006ab8d4dc576ca2");
   });
 });

@@ -14,6 +14,7 @@ import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { canonicalizeStockLots, deriveStockByGood } from "./inventory.js";
+import { productionStrikeFactor } from "./politics.js";
 import type {
   BuildingDef,
   BuildingInstance,
@@ -239,7 +240,15 @@ export function computeBuildingCapacity(
     building.level *
     building.condition *
     staffingRatio *
-    productivityFactor;
+    productivityFactor *
+    (() => {
+      const owner = world.countries.find((country) =>
+        country.regionIds.includes(building.regionId),
+      );
+      return owner === undefined
+        ? 1
+        : productionStrikeFactor(world, owner.id, building.regionId);
+    })();
   if (!Number.isFinite(capacityTU) || capacityTU < 0) {
     throw new RangeError(`building ${String(building.id)} has invalid capacity`);
   }

@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 7 as const;
+export const PROTOCOL_VERSION = 8 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -100,6 +100,20 @@ export interface SupportPublicEnterpriseActionDto {
   readonly amountSUSD: number;
 }
 
+/** M8: propose, change, or repeal a law by target law id. */
+export interface ProposeLawActionDto {
+  readonly kind: "propose-law";
+  readonly countryId: number;
+  readonly lawId: number;
+}
+
+/** M8: set the annual administration funding target. */
+export interface SetInstitutionFundingActionDto {
+  readonly kind: "set-institution-funding";
+  readonly countryId: number;
+  readonly annualSUSD: number;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -110,7 +124,9 @@ export type CountryActionDto =
   | CancelConstructionActionDto
   | SetConstructionPausedActionDto
   | SetIndustrialPolicyActionDto
-  | SupportPublicEnterpriseActionDto;
+  | SupportPublicEnterpriseActionDto
+  | ProposeLawActionDto
+  | SetInstitutionFundingActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -181,6 +197,8 @@ export interface SnapshotBudgetTotals {
   readonly subsidyRequestedSUSD: number;
   readonly subsidyShortfallSUSD: number;
   readonly publicEnterpriseSupportSUSD: number;
+  readonly administrationRequestedSUSD?: number;
+  readonly administrationShortfallSUSD?: number;
 }
 
 /** Current open-period budget memo. Values are flows so far this month. */
@@ -356,6 +374,7 @@ export interface SnapshotFiscalTotals {
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
   readonly subsidyExpenseSUSD: number;
+  readonly administrationExpenseSUSD?: number;
   readonly netFiscalResultSUSD: number;
 }
 
@@ -414,11 +433,123 @@ export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
   readonly welfareExpenseSUSD: number;
   readonly interestExpenseSUSD: number;
   readonly subsidyExpenseSUSD: number;
+  readonly administrationExpenseSUSD?: number;
   readonly netFiscalResultSUSD: number;
   readonly treasuryCashEndSUSD: number;
   readonly debtLiabilityEndSUSD: number;
   readonly interestPayableEndSUSD: number;
   readonly correctionCount: number;
+}
+
+/** M8 interest-group view: derived, unspendable influence. */
+export interface SnapshotInterestGroup {
+  readonly key: string;
+  readonly name: string;
+  readonly membershipPopulation: number;
+  readonly organization: number;
+  readonly influence: number;
+  readonly governmentStance: number;
+}
+
+/** M8 institution view: derived quality/overload and actual funding memo. */
+export interface SnapshotInstitution {
+  readonly fundedAnnualSUSD: number;
+  readonly quality: number;
+  readonly overload: number;
+  readonly serviceOutputIndex: number;
+  readonly staffedPopulation: number;
+  readonly fundingRequestedMonthToDateSUSD: number;
+  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly disruptionUntilDay: number | null;
+}
+
+/** M8 one proposable law option and its current support/eligibility. */
+export interface SnapshotLawOption {
+  readonly lawId: number;
+  readonly slot: string;
+  readonly key: string;
+  readonly name: string;
+  readonly description: string;
+  readonly enactmentDays: number;
+  readonly support: number;
+  readonly eligible: boolean;
+  readonly prerequisitesMet: boolean;
+  readonly alreadyEnacted: boolean;
+  readonly transitionInProgress: boolean;
+  readonly isBaseLaw: boolean;
+}
+
+/** M8 law slot view. */
+export interface SnapshotLawSlot {
+  readonly slot: string;
+  readonly enactedLawId: number;
+  readonly enactedLawName: string;
+  readonly options: readonly SnapshotLawOption[];
+}
+
+/** M8 in-flight law transition view. */
+export interface SnapshotLawTransition {
+  readonly id: number;
+  readonly slot: string;
+  readonly fromLawName: string;
+  readonly toLawName: string;
+  readonly proposedDay: number;
+  readonly effectiveDay: number;
+  readonly support: number;
+}
+
+/** M8 election result view (last election only). */
+export interface SnapshotElection {
+  readonly day: number;
+  readonly eligiblePopulation: number;
+  readonly votesForGovernment: number;
+  readonly votesForOpposition: number;
+  readonly governmentVoteShare: number;
+  readonly turnoutShare: number;
+  readonly previousGovernmentGroupKey: string;
+  readonly winnerGroupKey: string;
+}
+
+/** M8 crisis stage view. */
+export interface SnapshotCrisis {
+  readonly stage: string;
+  readonly sinceDay: number;
+  readonly pressureDays: number;
+  readonly pressure: number;
+}
+
+/** M8 country politics snapshot. */
+export interface SnapshotPolitics {
+  readonly enabled: boolean;
+  readonly regimeKind: string;
+  readonly regimeName: string;
+  readonly governmentGroupKey: string;
+  readonly governmentGroupName: string;
+  readonly nextElectionDay: number | null;
+  readonly lastElectionDay: number | null;
+  readonly lastElection: SnapshotElection | null;
+  readonly crisis: SnapshotCrisis;
+  readonly franchiseShare: number;
+  readonly eligiblePopulation: number;
+  readonly supportForGovernment: number;
+  readonly taxCollectionEfficiency: number;
+  readonly constructionProgressFactor: number;
+  readonly interestGroups: readonly SnapshotInterestGroup[];
+  readonly institution: SnapshotInstitution;
+  readonly lawSlots: readonly SnapshotLawSlot[];
+  readonly lawTransitions: readonly SnapshotLawTransition[];
+  /** Every implemented law option in a flat list for proposal selection. */
+  readonly lawOptions: readonly SnapshotLawOption[];
+  /** Slots whose mechanics are deliberately not implemented in M8. */
+  readonly deferredLawSlots: readonly string[];
+  /** Bounded recent political/event log entries, oldest first. */
+  readonly recentLog: readonly {
+    readonly id: number;
+    readonly day: number;
+    readonly kind: string;
+    readonly summary: string;
+    readonly provenance: string;
+  }[];
 }
 
 export interface CountrySnapshot {
@@ -485,6 +616,8 @@ export interface CountrySnapshot {
   readonly industrialPolicy: SnapshotIndustrialPolicy;
   /** Existing state-owned enterprises eligible for operating support. */
   readonly publicEnterprises: readonly SnapshotPublicEnterprise[];
+  /** M8 political institutions, laws, groups, crisis, and event log. */
+  readonly politics: SnapshotPolitics;
 }
 
 export interface RegionSnapshot {
@@ -495,6 +628,9 @@ export interface RegionSnapshot {
   readonly marketId: number | null;
   readonly population: number;
   readonly buildingCount: number;
+  /** M8 regional militancy aggregate and provisional infrastructure quality. */
+  readonly unrest: number;
+  readonly infrastructure: number;
 }
 
 export interface GoodSnapshot {
@@ -889,6 +1025,26 @@ function parseAction(value: unknown): CountryActionDto {
       ),
       amountSUSD,
     };
+  }
+  if (kind === "propose-law") {
+    return {
+      kind: "propose-law",
+      countryId,
+      lawId: requireInteger(record.lawId, "command.action.lawId", 1, 0xffff_ffff),
+    };
+  }
+  if (kind === "set-institution-funding") {
+    const annualSUSD = requireFiniteNumber(
+      record.annualSUSD,
+      "command.action.annualSUSD",
+    );
+    if (annualSUSD < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.annualSUSD must be non-negative",
+      );
+    }
+    return { kind: "set-institution-funding", countryId, annualSUSD };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }

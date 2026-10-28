@@ -65,6 +65,7 @@ import {
   constructionWorkingCapital,
 } from "./constructionModel.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
+import { constructionProgressFactor } from "./politics.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
@@ -568,8 +569,12 @@ export function runConstructionPhase(
     let gross = 0;
     let blocked: "labor" | "funds" | null = null;
     let minimumWage = Number.POSITIVE_INFINITY;
+    const crewCap = Math.max(
+      1,
+      Math.floor(definition.constructionWorkers * constructionProgressFactor(country)),
+    );
     for (const block of blocks) {
-      if (hired >= definition.constructionWorkers) break;
+      if (hired >= crewCap) break;
       const profession = professionById.get(block.professionId);
       if (profession === undefined) continue;
       const wage = constructionDailyWage(profession, yearDays);
@@ -580,7 +585,7 @@ export function runConstructionPhase(
       const available = Math.max(0, totalIdle - alreadyClaimed);
       const blockHired = Math.min(
         available,
-        definition.constructionWorkers - hired,
+        crewCap - hired,
         Math.ceil(remaining / wage) + 1,
       );
       for (let indexInBlock = 0; indexInBlock < blockHired; indexInBlock += 1) {

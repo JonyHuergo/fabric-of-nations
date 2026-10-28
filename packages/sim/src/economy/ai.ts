@@ -74,6 +74,13 @@ import {
   validatePublicEnterpriseSupport,
 } from "./industrialPolicy.js";
 import {
+  proposeLaw,
+  setInstitutionFunding,
+  validateInstitutionFunding,
+  validateLawProposal,
+} from "./politicsActions.js";
+import { effectiveTaxRateBounds } from "./politics.js";
+import {
   issueGovernmentDebt,
   repayGovernmentDebt,
   validateDebtIssuance,
@@ -204,6 +211,24 @@ export interface SupportPublicEnterpriseAction {
   readonly amountSUSD: MoneySUSD;
 }
 
+/** M8: propose, change, or repeal a law (target may be the slot's base law). */
+export interface ProposeLawAction {
+  readonly kind: "propose-law";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly lawId: Id;
+}
+
+/** M8: set the annual state-administration funding target. */
+export interface SetInstitutionFundingAction {
+  readonly kind: "set-institution-funding";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly annualSUSD: MoneySUSD;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -214,7 +239,9 @@ export type CountryAction =
   | CancelConstructionAction
   | SetConstructionPausedAction
   | SetIndustrialPolicyAction
-  | SupportPublicEnterpriseAction;
+  | SupportPublicEnterpriseAction
+  | ProposeLawAction
+  | SetInstitutionFundingAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -244,6 +271,19 @@ export interface CountryActionApplication {
   readonly publicEnterpriseSupport?: {
     readonly buildingId: Id;
     readonly amountSUSD: MoneySUSD;
+  } | null;
+  /** Law transition for `propose-law`, else null. */
+  readonly lawAction?: {
+    readonly lawId: Id;
+    readonly transitionId: Id;
+    readonly effectiveDay: Day;
+    readonly support: number;
+  } | null;
+  /** Institution funding change for `set-institution-funding`, else null. */
+  readonly institutionFunding?: {
+    readonly previousAnnualSUSD: MoneySUSD;
+    readonly annualSUSD: MoneySUSD;
+    readonly changed: boolean;
   } | null;
 }
 
@@ -600,12 +640,14 @@ export function validateCountryAction(
     action.kind !== "cancel-construction" &&
     action.kind !== "set-construction-paused" &&
     action.kind !== "set-industrial-policy" &&
-    action.kind !== "support-public-enterprise"
+    action.kind !== "support-public-enterprise" &&
+    action.kind !== "propose-law" &&
+    action.kind !== "set-institution-funding"
   ) {
     return {
       valid: false,
       errors: [
-        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", "set-construction-paused", "set-industrial-policy", or "support-public-enterprise"',
+        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", "set-construction-paused", "set-industrial-policy", "support-public-enterprise", "propose-law", or "set-institution-funding"',
       ],
     };
   }
@@ -655,6 +697,28 @@ export function validateCountryAction(
         );
       } catch (error) {
         errors.push(errorMessage(error));
+      }
+      const incomeBounds = effectiveTaxRateBounds(country, definitions, "incomeTax");
+      if (
+        action.incomeTaxRate < incomeBounds.min ||
+        action.incomeTaxRate > incomeBounds.max
+      ) {
+        errors.push(
+          `action.incomeTaxRate must be in the statutory range ${String(incomeBounds.min)}..${String(incomeBounds.max)}`,
+        );
+      }
+      const businessBounds = effectiveTaxRateBounds(
+        country,
+        definitions,
+        "businessProfitTax",
+      );
+      if (
+        action.businessProfitTaxRate < businessBounds.min ||
+        action.businessProfitTaxRate > businessBounds.max
+      ) {
+        errors.push(
+          `action.businessProfitTaxRate must be in the statutory range ${String(businessBounds.min)}..${String(businessBounds.max)}`,
+        );
       }
     } else if (action.kind === "issue-debt") {
       try {
@@ -739,6 +803,34 @@ export function validateCountryAction(
           countryId: country.id,
           buildingId: action.buildingId,
           amountSUSD: action.amountSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "propose-law") {
+      if (action.source === "ai") {
+        errors.push("AI law proposals are not implemented in M8");
+      }
+      if (definitions === undefined) {
+        errors.push("propose-law requires the validated economy definitions");
+      } else {
+        try {
+          validateLawProposal(world, definitions, {
+            countryId: country.id,
+            lawId: action.lawId,
+          });
+        } catch (error) {
+          errors.push(errorMessage(error));
+        }
+      }
+    } else if (action.kind === "set-institution-funding") {
+      if (action.source === "ai") {
+        errors.push("AI institution funding is not implemented in M8");
+      }
+      try {
+        validateInstitutionFunding(world, definitions, {
+          countryId: country.id,
+          annualSUSD: action.annualSUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1021,6 +1113,65 @@ export function applyCountryAction(
         amountSUSD: supported.amountSUSD,
       },
       changed: true,
+    };
+  }
+
+  if (action.kind === "propose-law") {
+    if (definitions === undefined) {
+      throw new RangeError("propose-law requires the validated economy definitions");
+    }
+    const proposal = proposeLaw(
+      world,
+      definitions,
+      { countryId: country.id, lawId: action.lawId },
+      action.dayIndex,
+      action.source,
+    );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...proposal.country.fiscal },
+      previousDebt,
+      debt: { ...proposal.country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      lawAction: {
+        lawId: proposal.law.id,
+        transitionId: proposal.transition.id,
+        effectiveDay: proposal.transition.effectiveDay,
+        support: proposal.support,
+      },
+      changed: true,
+    };
+  }
+
+  if (action.kind === "set-institution-funding") {
+    const result = setInstitutionFunding(
+      world,
+      definitions,
+      { countryId: country.id, annualSUSD: action.annualSUSD },
+      action.dayIndex,
+    );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...result.country.fiscal },
+      previousDebt,
+      debt: { ...result.country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      institutionFunding: {
+        previousAnnualSUSD: result.previousAnnualSUSD,
+        annualSUSD: result.annualSUSD,
+        changed: result.changed,
+      },
+      changed: result.changed,
     };
   }
 

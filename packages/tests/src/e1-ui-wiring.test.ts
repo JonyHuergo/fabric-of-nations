@@ -90,6 +90,21 @@ describe("E1 UI wiring", () => {
     expect(industry).not.toContain("__world");
   });
 
+  test("the politics screen is wired to snapshot previews and validated actions", () => {
+    const app = source("App.tsx");
+    expect(app).toContain('{ id: "politics", label: "Politics" }');
+    const politics = source("src/screens/PoliticsScreen.tsx");
+    expect(politics).toContain("previewLawProposal");
+    expect(politics).toContain("previewInstitutionFunding");
+    expect(politics).toContain("propose-law");
+    expect(politics).toContain("set-institution-funding");
+    expect(politics).toContain("Interest groups");
+    expect(politics).toContain("State administration");
+    expect(politics).toContain("Regional unrest");
+    expect(politics).toContain("Not implemented in M8");
+    expect(politics).not.toContain("__world");
+  });
+
   test("the provider appends action history only from confirmed results", () => {
     const provider = source("src/worker/SimulationProvider.tsx");
     expect(provider).toContain('case "ACTION_RESULT"');
@@ -113,6 +128,7 @@ describe("E1 UI wiring", () => {
       "src/screens/BudgetScreen.tsx",
       "src/screens/ConstructionScreen.tsx",
       "src/screens/IndustryScreen.tsx",
+      "src/screens/PoliticsScreen.tsx",
       "src/screens/LedgerScreen.tsx",
       "src/screens/MarketsScreen.tsx",
       "src/screens/PopulationScreen.tsx",

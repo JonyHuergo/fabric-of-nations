@@ -232,3 +232,105 @@ export const AI_TAX_RATE_DECIMALS = 6;
 export const AI_MONEY_DECIMALS = 2;
 export const MAX_AI_ACTION_SUMMARY_LENGTH = 500;
 export const DEFAULT_COUNTRY_AI_ENABLED = false;
+
+/**
+ * M8 political-institution constants. PROVISIONAL structural rules and
+ * coefficients, not historical calibration. All rates are dimensionless 0..1 or
+ * documented SUSD amounts; no value is a spendable political pool.
+ */
+export const MAX_LAW_TRANSITIONS_PER_COUNTRY = 4;
+export const MAX_SCRIPTED_EVENTS = 256;
+export const MAX_POLITICS_LOG_ENTRIES = 64;
+export const MAX_LAW_SUMMARY_LENGTH = 500;
+export const MIN_LAW_ENACTMENT_DAYS = 1;
+export const MAX_LAW_ENACTMENT_DAYS = 20 * 365;
+
+/** Influence-weighted support required to begin a law transition, -1..1 scale. */
+export const LAW_SUPPORT_THRESHOLD = 0.05;
+
+/**
+ * Extra weight on the governing group's own stance when computing law support.
+ * This is what makes an election outcome affect policy choices: a law favoured by
+ * the governing group is easier to pass and one it opposes is harder, without
+ * creating a spendable political resource. Provisional.
+ */
+export const GOVERNING_GROUP_SUPPORT_WEIGHT = 0.3;
+
+/** Minimum institution quality for an election; below it the election is skipped. */
+export const ELECTION_MIN_INSTITUTION_QUALITY = 0.25;
+
+/** Voting age used by the male/universal franchise criteria. */
+export const SUFFRAGE_MIN_AGE = 21;
+
+/**
+ * Provisional monthly administration-funding benchmark per person per year. The
+ * funding-adequacy ratio is `fundedAnnual / (population * benchmark)`, clamped to
+ * 1. This is a structural normaliser, not a claim about historical budgets.
+ */
+export const ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD = 0.002;
+
+/**
+ * Provisional target share of clerks in the population. The staffing ratio is
+ * `clerkShare / targetShare`, clamped to 1. Not calibrated.
+ */
+export const ADMIN_TARGET_CLERK_SHARE = 0.2;
+
+/** Institution-quality component weights; documented in D-076 and must sum to 1. */
+export const INSTITUTION_STAFFING_WEIGHT = 0.35;
+export const INSTITUTION_FUNDING_WEIGHT = 0.2;
+export const INSTITUTION_LITERACY_WEIGHT = 0.15;
+export const INSTITUTION_INFRASTRUCTURE_WEIGHT = 0.15;
+export const INSTITUTION_LAW_WEIGHT = 0.15;
+
+/** Daily disruption penalty decay: quality penalty multiplier until the end day. */
+export const INSTITUTION_DISRUPTION_QUALITY_PENALTY = 0.2;
+
+/**
+ * Quality penalty from the previous month's unpaid administration request. The
+ * memo is read before the new month's reset, so actual cash constraints affect
+ * institutional quality rather than only being reported.
+ */
+export const INSTITUTION_FUNDING_SHORTFALL_PENALTY = 0.1;
+
+/** Derived-effect coefficients (D-076). */
+export const TAX_COLLECTION_BASE_EFFICIENCY = 0.6;
+export const TAX_COLLECTION_QUALITY_WEIGHT = 0.4;
+export const TAX_COLLECTION_OVERLOAD_PENALTY = 0.2;
+export const TAX_COLLECTION_MIN_EFFICIENCY = 0.4;
+export const CONSTRUCTION_OVERLOAD_PENALTY = 0.3;
+export const CONSTRUCTION_QUALITY_PENALTY = 0.2;
+export const CONSTRUCTION_MIN_FACTOR = 0.4;
+export const STRIKE_OUTPUT_FACTOR = 0.5;
+export const STRIKE_UNREST_THRESHOLD = 0.6;
+
+/** Unrest smoothing and pressure coefficients (D-076). */
+export const UNREST_DAILY_SMOOTHING = 0.1;
+export const UNREST_MILITANCY_WEIGHT = 0.5;
+export const UNREST_UNMET_WEIGHT = 0.3;
+export const UNREST_UNEMPLOYMENT_WEIGHT = 0.15;
+export const UNREST_OVERLOAD_WEIGHT = 0.3;
+export const UNREST_INSTITUTION_RELIEF = 0.2;
+export const UNREST_GRIEVANCE_WEIGHT = 0.5;
+
+/** Country crisis-pressure weights (documented in D-076; must sum to 1). */
+export const CRISIS_MILITANCY_WEIGHT = 0.35;
+export const CRISIS_UNREST_WEIGHT = 0.25;
+export const CRISIS_UNMET_WEIGHT = 0.2;
+export const CRISIS_EXCLUSION_WEIGHT = 0.15;
+export const CRISIS_OVERLOAD_WEIGHT = 0.05;
+export const CRISIS_PRESSURE_THRESHOLD = 0.55;
+export const CRISIS_PRESSURE_DECAY = 2;
+export const CRISIS_UNREST_DAYS = 30;
+export const CRISIS_STRIKE_DAYS = 90;
+export const CRISIS_CRISIS_DAYS = 180;
+export const CRISIS_REVOLUTION_DAYS = 360;
+export const CRISIS_REVOLUTION_COOLDOWN_DAYS = 5 * 365;
+export const CRISIS_DISRUPTION_DAYS = 365;
+
+/** Election result rounding. */
+export const POLITICS_RATE_DECIMALS = 6;
+export const MAX_ELECTION_TERM_YEARS = 12;
+export const MIN_ELECTION_TERM_YEARS = 1;
+export const MAX_LAW_OPTIONS_PER_SLOT = 16;
+export const MAX_SCRIPTED_EVENT_EFFECTS = 8;
+export const MAX_INTEREST_GROUP_PROFESSION_WEIGHTS = 64;

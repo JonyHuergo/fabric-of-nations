@@ -23,8 +23,10 @@ import {
   type BuildingSector,
   type EconomyDefinitions,
   type GoodDef,
+  type PoliticsDefinitions,
   type ProfessionDef,
 } from "./types.js";
+import { assertValidPoliticsDefinitions } from "./politics.js";
 
 function assertNonNegative(value: unknown, path: string): number {
   const number = requireFiniteNumber(value, path);
@@ -371,4 +373,14 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
     assertBuilding(value, `economyDefinitions.buildings[${String(index)}]`, goodIds, professionIds),
   );
   assertUniqueIdsAndKeys(buildings, "economyDefinitions.buildings");
+
+  if (record.politics !== undefined && record.politics !== null) {
+    assertValidPoliticsDefinitions(record.politics, "economyDefinitions.politics");
+    const politics = record.politics as PoliticsDefinitions;
+    if (politics.dataVersion !== definitions.dataVersion) {
+      throw new RangeError(
+        "economyDefinitions.politics.dataVersion must match economyDefinitions.dataVersion",
+      );
+    }
+  }
 }

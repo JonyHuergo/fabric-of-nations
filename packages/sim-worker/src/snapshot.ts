@@ -22,9 +22,18 @@ import {
   daysInYear,
   debtOutstandingPrincipal,
   governmentPeriodTotals,
+  governmentStance,
+  countryPoliticsSummary,
+  lawDefinition,
+  lawPrerequisitesMet,
+  lawSupport,
   populationTotal,
   readBudgetMemo,
+  regimeDefinition,
   workingAgePopulation,
+  IMPLEMENTED_LAW_SLOTS,
+  INTEREST_GROUP_KEYS,
+  LAW_SLOTS,
 } from "@century/sim";
 import type {
   EconomyDefinitions,
@@ -57,6 +66,7 @@ import {
   type SnapshotProductionCapacity,
   type SnapshotProjectType,
   type SnapshotPublicEnterprise,
+  type SnapshotPolitics,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -186,6 +196,7 @@ function fiscalTotals(
       welfareExpenseSUSD: roundDisplay(totals.welfareExpenseSUSD, 6),
       interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
       subsidyExpenseSUSD: roundDisplay(totals.subsidyExpenseSUSD, 6),
+      administrationExpenseSUSD: roundDisplay(totals.administrationExpenseSUSD ?? 0, 6),
       netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
     },
     businessTaxRevenueSUSD: roundDisplay(totals.businessTaxRevenueSUSD, 6),
@@ -210,6 +221,8 @@ function budgetTotalsSnapshot(
     subsidyRequestedSUSD: roundDisplay(totals.subsidyRequestedSUSD, 6),
     subsidyShortfallSUSD: roundDisplay(totals.subsidyShortfallSUSD, 6),
     publicEnterpriseSupportSUSD: roundDisplay(totals.publicEnterpriseSupportSUSD, 6),
+    administrationRequestedSUSD: roundDisplay(totals.administrationRequestedSUSD ?? 0, 6),
+    administrationShortfallSUSD: roundDisplay(totals.administrationShortfallSUSD ?? 0, 6),
   };
 }
 
@@ -229,6 +242,8 @@ function emptyBudgetTotalsSnapshot(): SnapshotBudgetTotals {
     subsidyRequestedSUSD: 0,
     subsidyShortfallSUSD: 0,
     publicEnterpriseSupportSUSD: 0,
+    administrationRequestedSUSD: 0,
+    administrationShortfallSUSD: 0,
   };
 }
 
@@ -567,6 +582,10 @@ function annualReportSnapshots(
         welfareExpenseSUSD: roundDisplay(totals?.welfareExpenseSUSD ?? 0, 6),
         interestExpenseSUSD: roundDisplay(totals?.interestExpenseSUSD ?? 0, 6),
         subsidyExpenseSUSD: roundDisplay(totals?.subsidyExpenseSUSD ?? 0, 6),
+        administrationExpenseSUSD: roundDisplay(
+          totals?.administrationExpenseSUSD ?? 0,
+          6,
+        ),
         netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
         treasuryCashEndSUSD: roundDisplay(balances?.treasuryCashSUSD ?? 0, 6),
         debtLiabilityEndSUSD: roundDisplay(balances?.debtLiabilitySUSD ?? 0, 6),
@@ -605,6 +624,154 @@ function countrySectorValueEstimates(
     values.set(definition.sector, (values.get(definition.sector) ?? 0) + value);
   }
   return values;
+}
+
+function politicsSnapshot(
+  world: World,
+  country: World["countries"][number],
+  definitions: EconomyDefinitions,
+): SnapshotPolitics {
+  const politics = definitions.politics;
+  const empty: SnapshotPolitics = {
+    enabled: false,
+    regimeKind: country.regime.kind,
+    regimeName: country.regime.kind,
+    governmentGroupKey: country.regime.governmentGroupKey,
+    governmentGroupName: country.regime.governmentGroupKey,
+    nextElectionDay: country.regime.nextElectionDay,
+    lastElectionDay: country.regime.lastElectionDay,
+    lastElection:
+      country.regime.lastElection === null ? null : { ...country.regime.lastElection },
+    crisis: {
+      stage: country.regime.crisis.stage,
+      sinceDay: country.regime.crisis.sinceDay,
+      pressureDays: country.regime.crisis.pressureDays,
+      pressure: 0,
+    },
+    franchiseShare: 0,
+    eligiblePopulation: 0,
+    supportForGovernment: 0,
+    taxCollectionEfficiency: 1,
+    constructionProgressFactor: 1,
+    interestGroups: [],
+    institution: {
+      fundedAnnualSUSD: country.institutions.fundedAnnualSUSD,
+      quality: country.institutions.quality,
+      overload: country.institutions.overload,
+      serviceOutputIndex: country.institutions.serviceOutputIndex,
+      staffedPopulation: Object.values(country.institutions.staffedByProfession).reduce(
+        (total, value) => total + value,
+        0,
+      ),
+      fundingRequestedMonthToDateSUSD: country.institutions.fundingRequestedMonthToDateSUSD,
+      fundingShortfallMonthToDateSUSD: country.institutions.fundingShortfallMonthToDateSUSD,
+      disruptionUntilDay: country.institutions.disruptionUntilDay,
+    },
+    lawSlots: [],
+    lawTransitions: [],
+    lawOptions: [],
+    deferredLawSlots: [...LAW_SLOTS],
+    recentLog: [],
+  };
+  if (politics === undefined || !world.politics.enabled) return empty;
+  const regime = regimeDefinition(politics, country.regime.kind);
+  const groupName = (key: string): string =>
+    politics.interestGroups.find((group) => group.key === key)?.name ?? key;
+  const summary = countryPoliticsSummary(world, country, definitions);
+  const stances = governmentStance(country, politics);
+  const transitionBySlot = new Map(
+    country.lawTransitions.map((transition) => [transition.slot, transition] as const),
+  );
+  const lawName = (lawId: number): string =>
+    lawId === 0 ? "No implemented law" : (lawDefinition(politics, lawId)?.name ?? `Law ${String(lawId)}`);
+  const lawOptions = [...politics.laws]
+    .sort((left, right) => left.id - right.id)
+    .map((law) => {
+      const alreadyEnacted = country.laws[law.slot] === law.id;
+      const transition = transitionBySlot.get(law.slot);
+      return {
+        lawId: law.id,
+        slot: law.slot,
+        key: law.key,
+        name: law.name,
+        description: law.description,
+        enactmentDays: law.enactmentDays,
+        support: lawSupport(country, law, politics),
+        eligible: law.eligibleRegimes.includes(country.regime.kind),
+        prerequisitesMet: lawPrerequisitesMet(country, law, politics),
+        alreadyEnacted,
+        transitionInProgress:
+          transition !== undefined && transition.toLawId === law.id,
+        isBaseLaw: law.prerequisites.length === 0,
+      };
+    });
+  const lawSlots = LAW_SLOTS.map((slot) => ({
+    slot,
+    enactedLawId: country.laws[slot],
+    enactedLawName: lawName(country.laws[slot]),
+    options: lawOptions.filter((option) => option.slot === slot),
+  }));
+  const recentLog = [...world.politics.eventLog]
+    .filter((entry) => entry.countryId === country.id || entry.countryId === null)
+    .sort((left, right) => left.id - right.id)
+    .slice(-8)
+    .map((entry) => ({
+      id: entry.id,
+      day: entry.day,
+      kind: entry.kind,
+      summary: entry.summary,
+      provenance: entry.provenance,
+    }));
+  return {
+    ...empty,
+    enabled: true,
+    regimeKind: regime.kind,
+    regimeName: regime.name,
+    governmentGroupName: groupName(country.regime.governmentGroupKey),
+    nextElectionDay: country.regime.nextElectionDay,
+    lastElectionDay: country.regime.lastElectionDay,
+    lastElection:
+      country.regime.lastElection === null ? null : { ...country.regime.lastElection },
+    crisis: {
+      stage: country.regime.crisis.stage,
+      sinceDay: country.regime.crisis.sinceDay,
+      pressureDays: country.regime.crisis.pressureDays,
+      pressure: summary.crisisPressure,
+    },
+    franchiseShare: summary.franchiseShare,
+    eligiblePopulation: summary.eligiblePopulation,
+    supportForGovernment: summary.supportForGovernment,
+    taxCollectionEfficiency: summary.taxCollectionEfficiency,
+    constructionProgressFactor: summary.constructionProgressFactor,
+    interestGroups: [...country.interestGroups]
+      .sort(
+        (left, right) =>
+          INTEREST_GROUP_KEYS.indexOf(left.key) - INTEREST_GROUP_KEYS.indexOf(right.key),
+      )
+      .map((group) => ({
+        key: group.key,
+        name: groupName(group.key),
+        membershipPopulation: group.membershipPopulation,
+        organization: group.organization,
+        influence: group.influence,
+        governmentStance: stances.get(group.key) ?? 0,
+      })),
+    lawSlots,
+    lawTransitions: [...country.lawTransitions]
+      .sort((left, right) => left.id - right.id)
+      .map((transition) => ({
+        id: transition.id,
+        slot: transition.slot,
+        fromLawName: lawName(transition.fromLawId),
+        toLawName: lawName(transition.toLawId),
+        proposedDay: transition.proposedDay,
+        effectiveDay: transition.effectiveDay,
+        support: transition.support,
+      })),
+    lawOptions,
+    deferredLawSlots: LAW_SLOTS.filter((slot) => !IMPLEMENTED_LAW_SLOTS.includes(slot)),
+    recentLog,
+  };
 }
 
 function countrySnapshot(
@@ -712,6 +879,8 @@ function countrySnapshot(
     subsidyRequestedSUSD: roundDisplay(memo.subsidyRequestedSUSD, 6),
     subsidyShortfallSUSD: roundDisplay(memo.subsidyShortfallSUSD, 6),
     publicEnterpriseSupportSUSD: roundDisplay(memo.publicEnterpriseSupportSUSD, 6),
+    administrationRequestedSUSD: roundDisplay(memo.administrationRequestedSUSD ?? 0, 6),
+    administrationShortfallSUSD: roundDisplay(memo.administrationShortfallSUSD ?? 0, 6),
     businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
   };
   const latestFiscal = history.length === 0 ? null : (history[history.length - 1] ?? null);
@@ -825,6 +994,7 @@ function countrySnapshot(
     ),
     industrialPolicy,
     publicEnterprises,
+    politics: politicsSnapshot(world, country, definitions),
   };
 }
 
@@ -850,6 +1020,8 @@ function regionSnapshots(world: World): readonly RegionSnapshot[] {
       marketId: region.marketId,
       population: blockPopulation.get(region.id) ?? 0,
       buildingCount: region.buildingInstanceIds.length,
+      unrest: region.unrest,
+      infrastructure: region.infrastructure,
     }));
 }
 
@@ -920,6 +1092,26 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.publicEnterprises);
     for (const entry of country.productionCapacityByGood) Object.freeze(entry);
     Object.freeze(country.productionCapacityByGood);
+    const politics = country.politics;
+    for (const group of politics.interestGroups) Object.freeze(group);
+    Object.freeze(politics.interestGroups);
+    for (const option of politics.lawOptions) Object.freeze(option);
+    Object.freeze(politics.lawOptions);
+    for (const slot of politics.lawSlots) {
+      for (const option of slot.options) Object.freeze(option);
+      Object.freeze(slot.options);
+      Object.freeze(slot);
+    }
+    Object.freeze(politics.lawSlots);
+    for (const transition of politics.lawTransitions) Object.freeze(transition);
+    Object.freeze(politics.lawTransitions);
+    Object.freeze(politics.deferredLawSlots);
+    for (const entry of politics.recentLog) Object.freeze(entry);
+    Object.freeze(politics.recentLog);
+    Object.freeze(politics.institution);
+    Object.freeze(politics.crisis);
+    if (politics.lastElection !== null) Object.freeze(politics.lastElection);
+    Object.freeze(politics);
     for (const period of country.financeHistory) {
       Object.freeze(period.grossFlowTotals);
       Object.freeze(period);

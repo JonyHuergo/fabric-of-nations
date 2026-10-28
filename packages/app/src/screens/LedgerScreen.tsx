@@ -164,6 +164,19 @@ export function LedgerScreen({
               </Text>
             </View>
             <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Administration payroll (expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.administrationExpenseSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Administration requested / shortfall</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.administrationRequestedSUSD ?? 0)} /{" "}
+                {formatSUSD(latest.administrationShortfallSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result</Text>
               <Text
                 style={[
@@ -331,6 +344,21 @@ export function LedgerScreen({
               <Text style={styles.reportLabel}>Public-enterprise capital support (annual)</Text>
               <Text style={styles.reportValue}>
                 {formatSUSD(latestAnnual.publicEnterpriseSupportSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Administration payroll (annual expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.administrationExpenseSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>
+                Administration requested / shortfall (annual)
+              </Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.administrationRequestedSUSD ?? 0)} /{" "}
+                {formatSUSD(latestAnnual.administrationShortfallSUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>

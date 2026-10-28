@@ -43,6 +43,8 @@ export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
     subsidyRequestedSUSD: 0,
     subsidyShortfallSUSD: 0,
     publicEnterpriseSupportSUSD: 0,
+    administrationRequestedSUSD: 0,
+    administrationShortfallSUSD: 0,
     businessTaxAssessedDay: null,
   };
 }
@@ -87,6 +89,8 @@ export function accumulateBudgetMemo(
     readonly subsidyRequestedSUSD?: MoneySUSD;
     readonly subsidyShortfallSUSD?: MoneySUSD;
     readonly publicEnterpriseSupportSUSD?: MoneySUSD;
+    readonly administrationRequestedSUSD?: MoneySUSD;
+    readonly administrationShortfallSUSD?: MoneySUSD;
     readonly businessTaxAssessedDay?: Day;
   },
 ): FinanceBudgetMemo {
@@ -162,6 +166,16 @@ export function accumulateBudgetMemo(
       delta.publicEnterpriseSupportSUSD ?? 0,
       "publicEnterpriseSupportSUSD",
     ),
+    administrationRequestedSUSD: addAmount(
+      current.administrationRequestedSUSD ?? 0,
+      delta.administrationRequestedSUSD ?? 0,
+      "administrationRequestedSUSD",
+    ),
+    administrationShortfallSUSD: addAmount(
+      current.administrationShortfallSUSD ?? 0,
+      delta.administrationShortfallSUSD ?? 0,
+      "administrationShortfallSUSD",
+    ),
     businessTaxAssessedDay:
       delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
   };
@@ -186,6 +200,8 @@ export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudg
     subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
     subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
     publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
+    administrationRequestedSUSD: memo.administrationRequestedSUSD ?? 0,
+    administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
   };
 }
 
@@ -218,6 +234,12 @@ export function addBudgetTotals(
       left.subsidyShortfallSUSD + right.subsidyShortfallSUSD,
     publicEnterpriseSupportSUSD:
       left.publicEnterpriseSupportSUSD + right.publicEnterpriseSupportSUSD,
+    administrationRequestedSUSD:
+      (left.administrationRequestedSUSD ?? 0) +
+      (right.administrationRequestedSUSD ?? 0),
+    administrationShortfallSUSD:
+      (left.administrationShortfallSUSD ?? 0) +
+      (right.administrationShortfallSUSD ?? 0),
   };
 }
 
@@ -238,6 +260,8 @@ export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
     subsidyRequestedSUSD: 0,
     subsidyShortfallSUSD: 0,
     publicEnterpriseSupportSUSD: 0,
+    administrationRequestedSUSD: 0,
+    administrationShortfallSUSD: 0,
   };
 }
 
@@ -300,6 +324,28 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
   if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_SUSD) {
     throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
   }
+  const administrationRequested =
+    record.administrationRequestedSUSD === undefined
+      ? 0
+      : requireFiniteNumber(
+          record.administrationRequestedSUSD,
+          `${path}.administrationRequestedSUSD`,
+        );
+  const administrationShortfall =
+    record.administrationShortfallSUSD === undefined
+      ? 0
+      : requireFiniteNumber(
+          record.administrationShortfallSUSD,
+          `${path}.administrationShortfallSUSD`,
+        );
+  if (administrationRequested < 0 || administrationShortfall < 0) {
+    throw new RangeError(`${path} administration memo must be non-negative`);
+  }
+  if (administrationShortfall > administrationRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(
+      `${path}.administrationShortfallSUSD must not exceed the request`,
+    );
+  }
   if (record.businessTaxAssessedDay !== null) {
     requireInteger(
       record.businessTaxAssessedDay,
@@ -310,29 +356,25 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
   }
 }
 
-/** Validate one frozen period budget total record. */
+/** Validate one frozen period budget total record. Missing (sparse) fields are zero. */
 export function assertValidBudgetTotals(
   totals: FinancePeriodBudgetTotals,
   path: string,
 ): void {
   const record = requireRecord(totals, path);
-  const welfareRequested = requireFiniteNumber(
-    record.welfareRequestedSUSD,
-    `${path}.welfareRequestedSUSD`,
-  );
-  const welfareShortfall = requireFiniteNumber(
-    record.welfareShortfallSUSD,
-    `${path}.welfareShortfallSUSD`,
-  );
-  const businessTaxAssessed = requireFiniteNumber(
-    record.businessTaxAssessedSUSD,
-    `${path}.businessTaxAssessedSUSD`,
-  );
-  const businessTaxUncollected = requireFiniteNumber(
-    record.businessTaxUncollectedSUSD,
-    `${path}.businessTaxUncollectedSUSD`,
-  );
+  const valueOf = (field: string): number =>
+    record[field] === undefined
+      ? 0
+      : requireFiniteNumber(record[field], `${path}.${field}`);
+  const welfareRequested = valueOf("welfareRequestedSUSD");
+  const welfareShortfall = valueOf("welfareShortfallSUSD");
+  const businessTaxAssessed = valueOf("businessTaxAssessedSUSD");
+  const businessTaxUncollected = valueOf("businessTaxUncollectedSUSD");
   for (const field of [
+    "welfareRequestedSUSD",
+    "welfareShortfallSUSD",
+    "businessTaxAssessedSUSD",
+    "businessTaxUncollectedSUSD",
     "debtIssuedSUSD",
     "principalRepaidSUSD",
     "interestPaidSUSD",
@@ -343,17 +385,12 @@ export function assertValidBudgetTotals(
     "subsidyRequestedSUSD",
     "subsidyShortfallSUSD",
     "publicEnterpriseSupportSUSD",
+    "administrationRequestedSUSD",
+    "administrationShortfallSUSD",
   ] as const) {
-    const value = requireFiniteNumber(record[field], `${path}.${field}`);
-    if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
-  }
-  for (const [label, value] of [
-    ["welfareRequestedSUSD", welfareRequested],
-    ["welfareShortfallSUSD", welfareShortfall],
-    ["businessTaxAssessedSUSD", businessTaxAssessed],
-    ["businessTaxUncollectedSUSD", businessTaxUncollected],
-  ] as const) {
-    if (value < 0) throw new RangeError(`${path}.${label} must be non-negative`);
+    if (valueOf(field) < 0) {
+      throw new RangeError(`${path}.${field} must be non-negative`);
+    }
   }
   if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_SUSD) {
     throw new RangeError(`${path}.welfareShortfallSUSD must not exceed the request`);
@@ -361,15 +398,16 @@ export function assertValidBudgetTotals(
   if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
     throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
   }
-  const subsidyRequested = requireFiniteNumber(
-    record.subsidyRequestedSUSD,
-    `${path}.subsidyRequestedSUSD`,
-  );
-  const subsidyShortfall = requireFiniteNumber(
-    record.subsidyShortfallSUSD,
-    `${path}.subsidyShortfallSUSD`,
-  );
-  if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_SUSD) {
+  if (
+    valueOf("subsidyShortfallSUSD") >
+    valueOf("subsidyRequestedSUSD") + MONEY_TOLERANCE_SUSD
+  ) {
     throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
+  }
+  if (
+    valueOf("administrationShortfallSUSD") >
+    valueOf("administrationRequestedSUSD") + MONEY_TOLERANCE_SUSD
+  ) {
+    throw new RangeError(`${path}.administrationShortfallSUSD must not exceed the request`);
   }
 }

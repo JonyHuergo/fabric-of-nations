@@ -64,6 +64,7 @@ import {
 } from "./market.js";
 import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
+import { runPoliticsDayStart, runUnrestPhase } from "./politics.js";
 import { assertValidEmploymentState, refreshEmploymentIfDue } from "./employment.js";
 import type {
   BuildingDef,
@@ -200,6 +201,11 @@ export function cloneWorld(
     ),
     profitDistribution: { ...source.profitDistribution },
     countryAI: { ...source.countryAI },
+    politics: {
+      ...source.politics,
+      eventQueue: source.politics.eventQueue.map((event) => ({ ...event })),
+      eventLog: source.politics.eventLog.map((entry) => ({ ...entry })),
+    },
     construction: {
       ...source.construction,
       projects: source.construction.projects.map((project) => ({
@@ -837,6 +843,11 @@ export function runEconomicDay(
   }
   if (world.markets.length === 0) throw new RangeError("economic day requires a market");
 
+  // M8 pipeline step 2: due scripted events and effective law transitions, plus
+  // the monthly institution/interest-group/election/crisis refresh. The phase
+  // applies effects forward only; it never rewrites a closed period.
+  runPoliticsDayStart(world, economyDefinitions, dayIndex);
+
   // M6 pipeline step 2: apply effective policy changes. Country AI evaluates on
   // its staggered day and applies only validated fiscal-policy actions. The
   // staged day is already validated above, so the phase skips a duplicate full
@@ -908,7 +919,10 @@ export function runEconomicDay(
   // M4c fiscal phase (GDD §4.2 step 12, fiscal part): after market/wage/upkeep
   // settlement and before needs/militancy and wealth. It uses the same day's
   // settlement result and never estimates wages from account balances.
-  const fiscal = runFiscalPhase(world, settlement, dayIndex, { validateWorld: false });
+  const fiscal = runFiscalPhase(world, settlement, dayIndex, {
+    validateWorld: false,
+    economyDefinitions,
+  });
 
   // E4 sectoral production subsidy: verified physical output is valued at the
   // post-clearing market price and paid from actual treasury cash. It runs before
@@ -951,6 +965,9 @@ export function runEconomicDay(
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);
+  // M8: regional unrest is updated after the day's needs/militancy and before
+  // the close. Its tax/construction effects are read on the next civil day.
+  runUnrestPhase(world, economyDefinitions, dayIndex);
   const wealthUpdates = updateEconomicWealth(
     world,
     economyDefinitions,

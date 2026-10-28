@@ -42,6 +42,17 @@ import {
   createProfitDistributionPolicy,
 } from "./profit.js";
 import { createDebtPolicy } from "./debtPolicy.js";
+import {
+  assertValidCountryPoliticsInput,
+  createCountryPoliticsState,
+  createWorldPoliticsState,
+  neutralInstitutionState,
+  neutralInterestGroups,
+  neutralLaws,
+  neutralRegimeState,
+  refreshInstitution,
+  refreshInterestGroups,
+} from "./politics.js";
 import type {
   AccountSubtype,
   BuildingDef,
@@ -130,6 +141,11 @@ function assertCountryInitialDefs(
     if (!declaredAccountIds.has(country.treasuryAccountId)) {
       throw new RangeError(`${path}.treasuryAccountId was not registered as a declared account`);
     }
+    assertValidCountryPoliticsInput(
+      country.politics,
+      scenario.definitions.politics,
+      `${path}.politics`,
+    );
   }
 }
 
@@ -662,8 +678,8 @@ export function createEconomyWorld(
     (scenario.countries ?? []).map((country) => [country.id, country]),
   );
   world.countries = (scenario.countries ?? [])
-    .map(
-      (initial): Country => ({
+    .map((initial): Country => {
+      const base: Country = {
         id: initial.id,
         tag: initial.tag,
         name: initial.name,
@@ -678,9 +694,34 @@ export function createEconomyWorld(
         debt: createDebtPolicy(initial.debt),
         ai: createCountryAIState(initial.id, world.startDayIndex),
         immigrationOpen: initial.immigrationOpen ?? false,
-      }),
-    )
+        regime: neutralRegimeState(world.startDayIndex),
+        laws: neutralLaws(),
+        lawTransitions: [],
+        interestGroups: neutralInterestGroups(),
+        institutions: neutralInstitutionState(),
+      };
+      return {
+        ...base,
+        ...createCountryPoliticsState(
+          base,
+          initial.politics,
+          scenario.definitions.politics,
+          world.startDayIndex,
+        ),
+      };
+    })
     .sort((left, right) => left.id - right.id);
+  world.politics = createWorldPoliticsState(
+    world.startDayIndex,
+    scenario.definitions.politics,
+    world.countries,
+  );
+  if (scenario.definitions.politics !== undefined && world.countries.length > 0) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      refreshInstitution(world, country, scenario.definitions, world.startDayIndex);
+      refreshInterestGroups(world, country, scenario.definitions);
+    }
+  }
   world.currencies = (scenario.currencies ?? [])
     .map(copyCurrency)
     .sort((left, right) => left.id - right.id);
@@ -784,6 +825,17 @@ export function createEconomyWorld(
       balanceSUSD: initial.initialTreasuryCashSUSD,
     });
     opening.push({ accountId: equityId, balanceSUSD: initial.initialTreasuryCashSUSD });
+  }
+
+  // M8 administration payroll accounts. Created only for politics-enabled worlds
+  // so legacy fixtures keep their accepted account sets.
+  if (scenario.definitions.politics !== undefined && world.countries.length > 0) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      allocate("country", country.id, "administration-expense");
+    }
+    for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+      allocate("popBlock", block.id, "administration-income");
+    }
   }
 
   // M5b public-debt accounts. They are created only when at least one country has

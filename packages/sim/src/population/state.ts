@@ -109,6 +109,12 @@ export function assertValidRegion(region: Region): void {
       throw new RangeError(`region.resourceCapsPerDay[${String(index)}] must be non-negative`);
     }
   }
+  for (const field of ["unrest", "infrastructure"] as const) {
+    const rate = requireFiniteNumber(record[field], `region.${field}`);
+    if (rate < 0 || rate > 1) {
+      throw new RangeError(`region.${field} must be in 0..1`);
+    }
+  }
 }
 
 /** Validate one pop block's dense and scalar state. */
@@ -520,6 +526,8 @@ export function createPopulationWorld(
       marketId: null,
       buildingInstanceIds: [],
       resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
+      unrest: 0,
+      infrastructure: region.infrastructure ?? 0.5,
     }));
 
   const world: World = {
@@ -568,6 +576,13 @@ export function createPopulationWorld(
       nextBuildingId: 1,
     },
     playerCountryId: null,
+    politics: {
+      enabled: false,
+      eventQueue: [],
+      eventLog: [],
+      nextEventId: 1,
+      nextLogId: 1,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

@@ -28,6 +28,10 @@ export interface Region {
   buildingInstanceIds: Id[];
   /** Reserved for future regional resource limits; M3 does not read or apply it. */
   resourceCapsPerDay: number[];
+  /** M8 regional unrest, 0..1; updated daily by the politics phase. */
+  unrest: Rate;
+  /** M8 provisional regional infrastructure quality, 0..1. */
+  infrastructure: Rate;
 }
 
 /** Authoritative population block state. */
@@ -133,6 +137,8 @@ export interface RegionInitialDef {
   name: string;
   /** Optional future regional resource caps. M3 does not read them. */
   resourceCapsPerDay?: readonly number[];
+  /** M8 provisional infrastructure quality, 0..1; defaults to 0.5. */
+  infrastructure?: Rate;
 }
 
 export interface PopulationScenarioDef {
