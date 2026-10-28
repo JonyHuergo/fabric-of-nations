@@ -54,7 +54,10 @@ const SEED = 20_261_023;
  * schema-22 M9 technology/literacy state. The Batch 5 validation optimization must not
  * change simulation behavior; only the serialized state shape changed.
  */
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "3fd929a30fff2c61";
+// E6a (schema 24) adds `World.trade` and `Market.customsCountryId` to the encoded
+// state shape, so this earlier-run digest is intentionally re-pinned. The Batch 5
+// validation optimization must not change simulation behavior.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "310836ceb5119fa4";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

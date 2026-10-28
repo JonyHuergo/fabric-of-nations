@@ -31,6 +31,7 @@ import { PopulationScreen } from "./src/screens/PopulationScreen";
 import { PoliticsScreen } from "./src/screens/PoliticsScreen";
 import { TechnologyScreen } from "./src/screens/TechnologyScreen";
 import { LaborScreen } from "./src/screens/LaborScreen";
+import { TradeScreen } from "./src/screens/TradeScreen";
 import { colors, radii, spacing } from "./src/theme";
 import type { StoredCampaign } from "./src/storage/saveStorage";
 import {
@@ -39,7 +40,7 @@ import {
   type ConnectionState,
 } from "./src/worker/SimulationProvider";
 
-type TabId = "map" | "country" | "budget" | "construction" | "industry" | "politics" | "technology" | "labor" | "population" | "markets" | "ledger";
+type TabId = "map" | "country" | "budget" | "construction" | "industry" | "politics" | "technology" | "labor" | "trade" | "population" | "markets" | "ledger";
 
 const TABS: readonly { readonly id: TabId; readonly label: string }[] = [
   { id: "country", label: "Overview" },
@@ -50,6 +51,7 @@ const TABS: readonly { readonly id: TabId; readonly label: string }[] = [
   { id: "politics", label: "Politics" },
   { id: "technology", label: "Technology" },
   { id: "labor", label: "Labor" },
+  { id: "trade", label: "Trade" },
   { id: "population", label: "Population" },
   { id: "markets", label: "Markets" },
   { id: "ledger", label: "Ledger" },
@@ -462,6 +464,8 @@ function Screen({
       return <TechnologyScreen snapshot={snapshot} countryId={selectedCountryId} />;
     case "labor":
       return <LaborScreen snapshot={snapshot} countryId={selectedCountryId} />;
+    case "trade":
+      return <TradeScreen snapshot={snapshot} countryId={selectedCountryId} />;
     case "population":
       return (
         <PopulationScreen

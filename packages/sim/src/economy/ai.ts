@@ -56,8 +56,10 @@ import {
   MAX_AI_ACTION_SUMMARY_LENGTH,
   MAX_DEBT_PRINCIPAL_SUSD,
   MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+  MAX_TRADE_QUOTA_QUANTITY,
 } from "./constants.js";
 import { assertValidFiscalPolicy } from "./country.js";
+import { createTradePolicyState } from "./trade.js";
 import { debtOutstandingPrincipal } from "./debtPolicy.js";
 import {
   cancelConstruction,
@@ -314,6 +316,17 @@ export interface SetHealthStaffShareAction {
   readonly share: Rate;
 }
 
+/** E6a: set the country's tariff schedule, monthly import quotas, and export restrictions. */
+export interface SetTradePolicyAction {
+  readonly kind: "set-trade-policy";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly tariffRates: readonly Rate[];
+  readonly importQuotaQuantity: readonly (number | null)[];
+  readonly exportRestricted: readonly boolean[];
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -334,7 +347,8 @@ export type CountryAction =
   | SetTrainingBudgetAction
   | SetTrainingStipendAction
   | SetTrainingStaffShareAction
-  | SetHealthStaffShareAction;
+  | SetHealthStaffShareAction
+  | SetTradePolicyAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -402,6 +416,15 @@ export interface CountryActionApplication {
     readonly trainingStaffShare: Rate;
     readonly previousHealthStaffShare: Rate;
     readonly healthStaffShare: Rate;
+  } | null;
+  /** E6a trade-policy change, else null. */
+  readonly tradeAction?: {
+    readonly previousTariffRates: readonly Rate[];
+    readonly tariffRates: readonly Rate[];
+    readonly previousImportQuotaQuantity: readonly (number | null)[];
+    readonly importQuotaQuantity: readonly (number | null)[];
+    readonly previousExportRestricted: readonly boolean[];
+    readonly exportRestricted: readonly boolean[];
   } | null;
 }
 
@@ -768,7 +791,8 @@ export function validateCountryAction(
     action.kind !== "set-training-budget" &&
     action.kind !== "set-training-stipend" &&
     action.kind !== "set-training-staff-share" &&
-    action.kind !== "set-health-staff-share"
+    action.kind !== "set-health-staff-share" &&
+    action.kind !== "set-trade-policy"
   ) {
     return {
       valid: false,
@@ -1041,6 +1065,40 @@ export function validateCountryAction(
         });
       } catch (error) {
         errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-trade-policy") {
+      if (action.source === "ai") {
+        errors.push("AI trade policy is not implemented in E6a");
+      }
+      if (definitions === undefined) {
+        errors.push("set-trade-policy requires the validated economy definitions");
+      } else {
+        if (!world.trade.enabled) {
+          errors.push(
+            "this world has no authored transport routes, so trade policy would have no effect",
+          );
+        }
+        try {
+          const state = createTradePolicyState(
+            {
+              tariffRates: [...action.tariffRates],
+              importQuotaQuantity: [...action.importQuotaQuantity],
+              exportRestricted: [...action.exportRestricted],
+            },
+            definitions.goods.length,
+            "action.trade",
+          );
+          for (let goodId = 0; goodId < state.importQuotaQuantity.length; goodId += 1) {
+            const quota = state.importQuotaQuantity[goodId] ?? null;
+            if (quota !== null && quota > MAX_TRADE_QUOTA_QUANTITY) {
+              errors.push(
+                `action.importQuotaQuantity[${String(goodId)}] must not exceed ${String(MAX_TRADE_QUOTA_QUANTITY)}`,
+              );
+            }
+          }
+        } catch (error) {
+          errors.push(errorMessage(error));
+        }
       }
     } else if (action.kind === "set-health-staff-share") {
       if (action.source === "ai") {
@@ -1591,6 +1649,66 @@ export function applyCountryAction(
         trainingStaffShare: country.labor.trainingStaffShare,
         previousHealthStaffShare: previousInstitutions.healthStaffShare,
         healthStaffShare: country.institutions.healthStaffShare,
+      },
+      changed,
+    };
+  }
+
+  if (action.kind === "set-trade-policy") {
+    if (definitions === undefined) {
+      throw new RangeError("set-trade-policy requires the validated economy definitions");
+    }
+    const previousTrade = { ...country.trade };
+    const updated = createTradePolicyState(
+      {
+        tariffRates: [...action.tariffRates],
+        importQuotaQuantity: [...action.importQuotaQuantity],
+        exportRestricted: [...action.exportRestricted],
+      },
+      definitions.goods.length,
+      "action.trade",
+    );
+    country.trade = {
+      ...country.trade,
+      tariffRates: updated.tariffRates,
+      importQuotaQuantity: updated.importQuotaQuantity,
+      exportRestricted: updated.exportRestricted,
+      lastUpdateDay: action.dayIndex,
+    };
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      country.trade = previousTrade;
+      throw error;
+    }
+    const changed =
+      previousTrade.tariffRates.some(
+        (rate, index) => rate !== country.trade.tariffRates[index],
+      ) ||
+      previousTrade.importQuotaQuantity.some(
+        (quota, index) => quota !== country.trade.importQuotaQuantity[index],
+      ) ||
+      previousTrade.exportRestricted.some(
+        (restricted, index) => restricted !== country.trade.exportRestricted[index],
+      );
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      tradeAction: {
+        previousTariffRates: [...previousTrade.tariffRates],
+        tariffRates: [...country.trade.tariffRates],
+        previousImportQuotaQuantity: [...previousTrade.importQuotaQuantity],
+        importQuotaQuantity: [...country.trade.importQuotaQuantity],
+        previousExportRestricted: [...previousTrade.exportRestricted],
+        exportRestricted: [...country.trade.exportRestricted],
       },
       changed,
     };

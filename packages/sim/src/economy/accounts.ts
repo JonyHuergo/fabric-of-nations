@@ -102,6 +102,9 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "education-expense": "expense",
   "training-income": "revenue",
   "training-expense": "expense",
+  "freight-expense": "expense",
+  "customs-duty-expense": "expense",
+  "customs-duty-revenue": "revenue",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -142,6 +145,9 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "education-expense": ["country"],
   "training-income": ["popBlock"],
   "training-expense": ["country"],
+  "freight-expense": ["building"],
+  "customs-duty-expense": ["building"],
+  "customs-duty-revenue": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -277,8 +283,7 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "business-tax-expense", side: "debit" },
     { subtype: "business-tax-revenue", side: "credit" },
   ],
-  "construction-wage": [{ subtype: "wage-income", side: "credit" }],
-  "construction-capitalization": [],
+  "construction-wage": [{ subtype: "wage-income", side: "credit" }],  "construction-capitalization": [],
   "construction-writeoff": [],
   "construction-working-capital": [],
   "construction-material-purchase": [
@@ -287,6 +292,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "production-subsidy": [
     { subtype: "subsidy-expense", side: "debit" },
     { subtype: "subsidy-revenue", side: "credit" },
+  ],
+  "trade-freight": [
+    { subtype: "freight-expense", side: "debit" },
+    { subtype: "system-income", side: "credit" },
+  ],
+  "customs-duty": [
+    { subtype: "customs-duty-expense", side: "debit" },
+    { subtype: "customs-duty-revenue", side: "credit" },
   ],
   "public-enterprise-capital-contribution": [],
   "migration-transfer": [],
@@ -982,6 +995,189 @@ export function assertIndustrialPostingStructure(
     Math.abs(amount - value("owner-equity:credit")) > tolerance(amount, value("owner-equity:credit"))
   ) {
     throw new RangeError(`${path} public-enterprise-capital-contribution legs do not balance`);
+  }
+}
+
+/**
+ * Enforce the required legs of the E6a trade kinds (D-079).
+ *
+ * - `trade-freight`: one building pays freight from operating cash to the existing
+ *   system transport provider. Four equal legs: building `freight-expense` debit,
+ *   building `operating-cash` credit, a `system-reserve-cash` debit, and
+ *   `system-income` credit.
+ * - `customs-duty`: one building pays an import duty to the destination customs
+ *   administration's treasury. Four equal legs: building `customs-duty-expense`
+ *   debit, building `operating-cash` credit, the country `treasury-cash` debit, and
+ *   `customs-duty-revenue` credit.
+ */
+/**
+ * Enforce the required legs of an owner capital injection (D-079).
+ *
+ * Two accepted forms:
+ *
+ * - **Cash transfer (pre-E6a contract, two lines):** building `operating-cash` debit /
+ *   owner cash credit. This is the documented M3a posting for an owner moving cash into
+ *   its enterprise and is preserved unchanged.
+ * - **Full equity injection (E6a trade working capital, four lines):** the two cash legs
+ *   above plus building `owner-equity` credit and owner `owner-equity` debit. The
+ *   building credits its owner equity; the owner debits its own. No money is created,
+ *   and the flow is not a loan or a receivable.
+ */
+export function assertOwnerCapitalInjectionStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length !== 2 && lines.length !== 4) {
+    throw new RangeError(
+      `${path} owner-capital-injection must contain two (cash) or four (equity) lines`,
+    );
+  }
+  const totals = new Map<string, number>();
+  const buildingIds = new Set<Id>();
+  const ownerKinds = new Set<string>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "building" && account.ownerId !== null) {
+      buildingIds.add(account.ownerId);
+    } else if (account.ownerId !== null) {
+      ownerKinds.add(`${account.ownerKind}:${String(account.ownerId)}`);
+    }
+    totals.set(
+      `${account.subtype}:${line.side}`,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+    );
+  }
+  const value = (key: string): number => totals.get(key) ?? 0;
+  if (buildingIds.size !== 1) {
+    throw new RangeError(`${path} owner-capital-injection must reference exactly one building`);
+  }
+  if (ownerKinds.size !== 1) {
+    throw new RangeError(`${path} owner-capital-injection must reference exactly one owner`);
+  }
+  if (lines.length === 2) {
+    // Pre-E6a cash-transfer contract: one building operating-cash line and one owner
+    // cash line on opposite sides, equal amounts. Both directions have existing
+    // callers (an injection into the enterprise and a withdrawal to its owner), so the
+    // cash-form direction is not constrained here.
+    const buildingCash = value("operating-cash:debit") + value("operating-cash:credit");
+    const ownerCash =
+      value("household-cash:debit") +
+      value("household-cash:credit") +
+      value("treasury-cash:debit") +
+      value("treasury-cash:credit");
+    if (
+      !(buildingCash > 0) ||
+      Math.abs(buildingCash - ownerCash) > toleranceMoney(buildingCash, ownerCash)
+    ) {
+      throw new RangeError(`${path} owner-capital-injection cash legs do not balance`);
+    }
+    return;
+  }
+  const amount = value("operating-cash:debit");
+  if (!(amount > 0)) {
+    throw new RangeError(`${path} owner-capital-injection requires a positive operating-cash debit`);
+  }
+  const ownerCash =
+    value("household-cash:credit") + value("treasury-cash:credit");
+  if (Math.abs(ownerCash - amount) > toleranceMoney(ownerCash, amount)) {
+    throw new RangeError(`${path} owner-capital-injection requires matching owner cash`);
+  }
+  // Full equity form: the building credits equity, the owner debits it. Their amounts
+  // must equal the cash legs; they are distinguished by owner kind.
+  let buildingEquity = 0;
+  let ownerEquity = 0;
+  for (const line of lines) {
+    const account = accounts.get(line.accountId);
+    if (account === undefined || account.subtype !== "owner-equity") continue;
+    if (line.side !== "credit" && line.side !== "debit") continue;
+    if (account.ownerKind === "building" && line.side === "credit") {
+      buildingEquity += line.amountSUSD;
+    } else if (account.ownerKind !== "building" && line.side === "debit") {
+      ownerEquity += line.amountSUSD;
+    }
+  }
+  if (
+    Math.abs(buildingEquity - amount) > toleranceMoney(buildingEquity, amount) ||
+    Math.abs(ownerEquity - amount) > toleranceMoney(ownerEquity, amount)
+  ) {
+    throw new RangeError(`${path} owner-capital-injection equity legs do not balance`);
+  }
+}
+
+export function assertTradePostingStructure(
+  kind: "trade-freight" | "customs-duty",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length !== 4) {
+    throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+  }
+  const totals = new Map<string, number>();
+  const buildingIds = new Set<Id>();
+  const countryIds = new Set<Id>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "building" && account.ownerId !== null) {
+      buildingIds.add(account.ownerId);
+    }
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countryIds.add(account.ownerId);
+    }
+    totals.set(
+      `${account.subtype}:${line.side}`,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+    );
+  }
+  const value = (key: string): number => totals.get(key) ?? 0;
+  const expenseSubtype = kind === "trade-freight" ? "freight-expense" : "customs-duty-expense";
+  const revenueSubtype = kind === "trade-freight" ? "system-income" : "customs-duty-revenue";
+  const providerCashSubtype = kind === "trade-freight" ? "system-reserve-cash" : "treasury-cash";
+  const amount = value(`${expenseSubtype}:debit`);
+  const legs = [
+    `${expenseSubtype}:debit`,
+    "operating-cash:credit",
+    `${providerCashSubtype}:debit`,
+    `${revenueSubtype}:credit`,
+  ];
+  if (!(amount > 0)) {
+    throw new RangeError(`${path} ${kind} requires a positive ${expenseSubtype} debit`);
+  }
+  for (const leg of legs) {
+    if (Math.abs(amount - value(leg)) > toleranceMoney(amount, value(leg))) {
+      throw new RangeError(`${path} ${kind} legs do not balance (${leg})`);
+    }
+  }
+  if (buildingIds.size !== 1) {
+    throw new RangeError(`${path} ${kind} must reference exactly one paying building`);
+  }
+  if (kind === "customs-duty" && countryIds.size !== 1) {
+    throw new RangeError(`${path} customs-duty must reference exactly one destination country`);
   }
 }
 

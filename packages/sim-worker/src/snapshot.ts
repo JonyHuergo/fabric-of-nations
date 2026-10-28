@@ -39,6 +39,9 @@ import {
   technologyMortalityFactor,
   technologyProductivityFactor,
   workingAgePopulation,
+  marketInfrastructureQuality,
+  routeCapacitySUSDPerDay,
+  transitDays,
   IMPLEMENTED_LAW_SLOTS,
   INTEREST_GROUP_KEYS,
   LAW_SLOTS,
@@ -53,6 +56,8 @@ import type {
 import {
   MAX_SNAPSHOT_ANNUAL_REPORTS,
   MAX_SNAPSHOT_LEDGER_MONTHS,
+  MAX_SNAPSHOT_TRADE_BLOCKED,
+  MAX_SNAPSHOT_TRADE_SHIPMENTS,
   PROTOCOL_VERSION,
   type CountrySnapshot,
   type GoodSnapshot,
@@ -79,6 +84,8 @@ import {
   type SnapshotTechnologyCatalogEntry,
   type SnapshotEducation,
   type SnapshotLabor,
+  type SnapshotTradeNetwork,
+  type SnapshotTradePolicy,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -1235,6 +1242,120 @@ function countrySnapshot(
     technology: technologySnapshot(world, country, definitions),
     education: educationSnapshot(world, country, definitions),
     labor: laborSnapshot(world, country, definitions),
+    trade: tradePolicySnapshot(world, country),
+  };
+}
+
+function tradePolicySnapshot(
+  world: World,
+  country: World["countries"][number],
+): SnapshotTradePolicy {
+  const customsMarketIds = [...world.markets]
+    .filter((market) => market.customsCountryId === country.id)
+    .map((market) => market.id)
+    .sort((left, right) => left - right);
+  return {
+    tariffRates: [...country.trade.tariffRates],
+    importQuotaQuantity: [...country.trade.importQuotaQuantity],
+    importQuotaUsedQuantity: country.trade.importQuotaUsedQuantity.map((value) =>
+      roundDisplay(value, 3),
+    ),
+    exportRestricted: [...country.trade.exportRestricted],
+    customsMarketIds,
+    lastUpdateDay: country.trade.lastUpdateDay,
+    exportsValueMonthToDateSUSD: roundDisplay(
+      country.trade.exportsValueMonthToDateSUSD,
+      2,
+    ),
+    importsValueMonthToDateSUSD: roundDisplay(
+      country.trade.importsValueMonthToDateSUSD,
+      2,
+    ),
+    dutyReceivedMonthToDateSUSD: roundDisplay(
+      country.trade.dutyReceivedMonthToDateSUSD,
+      2,
+    ),
+    dutyPaidMonthToDateSUSD: roundDisplay(country.trade.dutyPaidMonthToDateSUSD, 2),
+    freightPaidMonthToDateSUSD: roundDisplay(
+      country.trade.freightPaidMonthToDateSUSD,
+      2,
+    ),
+  };
+}
+
+function tradeNetworkSnapshot(
+  world: World,
+  definitions: EconomyDefinitions,
+): SnapshotTradeNetwork {
+  const goodByKey = new Map(definitions.goods.map((good) => [good.id, good]));
+  const infrastructureByMarket = new Map<number, number>();
+  for (const market of world.markets) {
+    infrastructureByMarket.set(market.id, marketInfrastructureQuality(world, market));
+  }
+  const routes = [...world.trade.routes]
+    .sort((left, right) => left.id - right.id)
+    .map((route) => ({
+      id: route.id,
+      marketAId: route.marketAId,
+      marketBId: route.marketBId,
+      distanceUnits: route.distanceUnits,
+      transitDays: transitDays(route),
+      baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
+      capacitySUSDPerDay: roundDisplay(
+        routeCapacitySUSDPerDay(
+          route,
+          infrastructureByMarket.get(route.marketAId) ?? 0,
+          infrastructureByMarket.get(route.marketBId) ?? 0,
+        ),
+        2,
+      ),
+    }));
+  const sortedShipments = [...world.trade.shipments].sort((left, right) => left.id - right.id);
+  const retained = sortedShipments.slice(-MAX_SNAPSHOT_TRADE_SHIPMENTS);
+  const shipments = retained.map((shipment) => ({
+    id: shipment.id,
+    goodId: shipment.goodId,
+    goodKey: goodByKey.get(shipment.goodId)?.key ?? String(shipment.goodId),
+    quantity: roundDisplay(shipment.quantity, 3),
+    sellerBuildingId: shipment.sellerBuildingId,
+    originMarketId: shipment.originMarketId,
+    destinationMarketId: shipment.destinationMarketId,
+    originCountryId: shipment.originCountryId,
+    destinationCountryId: shipment.destinationCountryId,
+    dispatchDay: shipment.dispatchDay,
+    arrivalDay: shipment.arrivalDay,
+    cargoValueSUSD: roundDisplay(shipment.cargoValueSUSD, 2),
+    freightCostSUSD: roundDisplay(shipment.freightCostSUSD, 2),
+    dutySUSD: roundDisplay(shipment.dutySUSD, 2),
+    dutyRate: shipment.dutyRate,
+  }));
+  const lastDay = world.trade.lastDay;
+  const blocked = (lastDay?.blocked ?? []).slice(0, MAX_SNAPSHOT_TRADE_BLOCKED).map((entry) => ({
+    originMarketId: entry.originMarketId,
+    destinationMarketId: entry.destinationMarketId,
+    goodId: entry.goodId,
+    goodKey: goodByKey.get(entry.goodId)?.key ?? String(entry.goodId),
+    reason: entry.reason,
+  }));
+  return {
+    enabled: world.trade.enabled,
+    routes,
+    shipments,
+    inTransitShipmentCount: sortedShipments.length,
+    shipmentsTruncated: sortedShipments.length > shipments.length,
+    lastDay:
+      lastDay === null
+        ? null
+        : {
+            dayIndex: lastDay.dayIndex,
+            dispatchedShipments: lastDay.dispatchedShipments,
+            arrivedShipments: lastDay.arrivedShipments,
+            freightPaidSUSD: roundDisplay(lastDay.freightPaidSUSD, 2),
+            dutyPaidSUSD: roundDisplay(lastDay.dutyPaidSUSD, 2),
+            ownerFundedSUSD: roundDisplay(lastDay.ownerFundedSUSD, 2),
+            blocked,
+            blockedTruncated: (lastDay.blocked.length ?? 0) > blocked.length,
+          },
   };
 }
 
@@ -1304,6 +1425,8 @@ function marketSnapshots(
           stockQuantity: stockByGood.get(good.id) ?? 0,
           dailyProductionCapacity: roundDisplay(capacity?.get(good.id) ?? 0, 3),
         })),
+        customsCountryId: market.customsCountryId,
+        infrastructure: roundDisplay(marketInfrastructureQuality(world, market), 3),
       };
     });
 }
@@ -1400,6 +1523,16 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   }
   Object.freeze(snapshot.technologyCatalog);
   Object.freeze(snapshot.technologyEraNames);
+  for (const route of snapshot.trade.routes) Object.freeze(route);
+  Object.freeze(snapshot.trade.routes);
+  for (const shipment of snapshot.trade.shipments) Object.freeze(shipment);
+  Object.freeze(snapshot.trade.shipments);
+  if (snapshot.trade.lastDay !== null) {
+    for (const entry of snapshot.trade.lastDay.blocked) Object.freeze(entry);
+    Object.freeze(snapshot.trade.lastDay.blocked);
+    Object.freeze(snapshot.trade.lastDay);
+  }
+  Object.freeze(snapshot.trade);
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
@@ -1470,6 +1603,7 @@ export function buildSimulationSnapshot(
     projectTypes: projectTypeSnapshots(definitions),
     technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
     technologyCatalog: technologyCatalogSnapshot(definitions),
+    trade: tradeNetworkSnapshot(world, definitions),
     diagnostics,
   });
 }

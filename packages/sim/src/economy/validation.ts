@@ -55,6 +55,7 @@ import {
   assertValidRegimeState,
 } from "./politics.js";
 import { assertValidLaborPolicyState } from "./labor.js";
+import { assertValidTradePolicyState } from "./trade.js";
 import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,
@@ -451,6 +452,7 @@ function assertValidAnnualSummary(
     const administration = valueOf("administrationExpenseSUSD");
     const education = valueOf("educationExpenseSUSD");
     const training = valueOf("trainingExpenseSUSD");
+    const customs = valueOf("customsDutyRevenueSUSD");
     const net = valueOf("netFiscalResultSUSD");
     if (
       tax < 0 ||
@@ -460,7 +462,8 @@ function assertValidAnnualSummary(
       subsidy < 0 ||
       administration < 0 ||
       education < 0 ||
-      training < 0
+      training < 0 ||
+      customs < 0
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
     }
@@ -468,7 +471,8 @@ function assertValidAnnualSummary(
       Math.abs(
         net -
           (tax +
-            businessTax -
+            businessTax +
+            customs -
             welfare -
             interest -
             subsidy -
@@ -480,6 +484,7 @@ function assertValidAnnualSummary(
         net,
         tax,
         businessTax,
+        customs,
         welfare,
         interest,
         subsidy,
@@ -897,6 +902,7 @@ export function assertValidFinancePeriodSummary(
       const administration = valueOf("administrationExpenseSUSD");
       const education = valueOf("educationExpenseSUSD");
       const training = valueOf("trainingExpenseSUSD");
+      const customs = valueOf("customsDutyRevenueSUSD");
       if (
         tax < 0 ||
         businessTax < 0 ||
@@ -905,13 +911,15 @@ export function assertValidFinancePeriodSummary(
         subsidy < 0 ||
         administration < 0 ||
         education < 0 ||
-        training < 0
+        training < 0 ||
+        customs < 0
       ) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
       }
       const expectedNet =
         tax +
-        businessTax -
+        businessTax +
+        customs -
         welfare -
         interest -
         subsidy -
@@ -1559,11 +1567,56 @@ export function assertValidEconomyState(
           );
         }
         if (!market.regionIds.includes(owner.regionId)) {
+          // E6a: a lot owned by a building outside the market is an imported good
+          // delivered by the trade arrivals phase. Only trade-enabled worlds may hold
+          // them, and the owner must still be a real operational building (D-079 §8).
+          if (!world.trade.enabled) {
+            throw new RangeError(
+              `market ${String(market.id)} lot owner building ${String(owner.id)} is outside the market`,
+            );
+          }
+          if (!owner.operational) {
+            throw new RangeError(
+              `market ${String(market.id)} imported lot owner building ${String(owner.id)} is not operational`,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // E6a customs administration: null only in a world with no countries, otherwise a
+  // country that owns at least one of the market's regions.
+  const regionOwnerById = buildRegionOwnerMap(world);
+  const countryIdSet = new Set(world.countries.map((country) => country.id));
+  for (const market of marketById.values()) {
+    const declared = market.customsCountryId;
+    if (declared === null) {
+      for (const regionId of market.regionIds) {
+        if (regionOwnerById.get(regionId) !== undefined) {
           throw new RangeError(
-            `market ${String(market.id)} lot owner building ${String(owner.id)} is outside the market`,
+            `market ${String(market.id)} has owned regions and therefore requires a customsCountryId`,
           );
         }
       }
+      continue;
+    }
+    if (!countryIdSet.has(declared)) {
+      throw new RangeError(
+        `market ${String(market.id)} customsCountryId ${String(declared)} is not a registered country`,
+      );
+    }
+    let ownsRegion = false;
+    for (const regionId of market.regionIds) {
+      if (regionOwnerById.get(regionId) === declared) {
+        ownsRegion = true;
+        break;
+      }
+    }
+    if (!ownsRegion) {
+      throw new RangeError(
+        `market ${String(market.id)} customsCountryId ${String(declared)} owns no region of the market`,
+      );
     }
   }
 
@@ -1651,6 +1704,11 @@ export function assertValidEconomyState(
       country.labor,
       `country ${String(country.id)}.labor`,
       CAMPAIGN_TERMINAL_DAY_INDEX,
+    );
+    assertValidTradePolicyState(
+      country.trade,
+      world.markets[0]?.priceSUSD.length ?? 0,
+      `country ${String(country.id)}.trade`,
     );
     if (country.debt.enabled) {
       if (country.debt.creditorKind === "country") {

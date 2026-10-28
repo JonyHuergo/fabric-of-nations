@@ -33,6 +33,8 @@ import {
   assertTrainingPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
+  assertTradePostingStructure,
+  assertOwnerCapitalInjectionStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
@@ -193,6 +195,12 @@ function validatePostingLines(
     transactionKind === "public-enterprise-capital-contribution"
   ) {
     assertIndustrialPostingStructure(transactionKind, lines, accounts);
+  }
+  if (transactionKind === "trade-freight" || transactionKind === "customs-duty") {
+    assertTradePostingStructure(transactionKind, lines, accounts);
+  }
+  if (transactionKind === "owner-capital-injection") {
+    assertOwnerCapitalInjectionStructure(lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);

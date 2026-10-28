@@ -61,7 +61,13 @@ export type PlayerActionRequest =
   | { readonly kind: "set-training-budget"; readonly annualSUSD: number }
   | { readonly kind: "set-training-stipend"; readonly annualSUSD: number }
   | { readonly kind: "set-training-staff-share"; readonly share: number }
-  | { readonly kind: "set-health-staff-share"; readonly share: number };
+  | { readonly kind: "set-health-staff-share"; readonly share: number }
+  | {
+      readonly kind: "set-trade-policy";
+      readonly tariffRates: readonly number[];
+      readonly importQuotaQuantity: readonly (number | null)[];
+      readonly exportRestricted: readonly boolean[];
+    };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -142,5 +148,11 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
       return `training staff share ${(action.share * 100).toFixed(1)}%`;
     case "set-health-staff-share":
       return `public-health staff share ${(action.share * 100).toFixed(1)}%`;
+    case "set-trade-policy":
+      return `tariffs ${action.tariffRates
+        .map((rate) => `${(rate * 100).toFixed(1)}%`)
+        .join("/")}, quotas ${action.importQuotaQuantity
+        .map((quota) => (quota === null ? "-" : quota.toFixed(0)))
+        .join("/")}, export bans ${action.exportRestricted.filter(Boolean).length}`;
   }
 }

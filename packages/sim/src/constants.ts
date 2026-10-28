@@ -23,9 +23,11 @@
  * education state, the derived age-specific literacy array, and the validated
  * research/education actions. E5 adds vocational qualification/training and
  * public-health allocation state, training payroll/stipend, and the labor/health
- * policy actions.
+ * policy actions. E6a adds per-country trade policy, market customs administration,
+ * authored transport routes, in-transit consignments, freight/customs postings, and
+ * the trade-policy action.
  */
-export const SIM_VERSION = "0.23.0";
+export const SIM_VERSION = "0.24.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -47,8 +49,10 @@ export const SIM_VERSION = "0.23.0";
  * age-specific literacy array, and education payroll accounts (D-077). E5 adds
  * per-country labor/training and health-share state, block qualification, the
  * training payroll/stipend posting kinds, and the labor/health law fields (D-078).
+ * E6a adds `Market.customsCountryId`, `Country.trade`, `World.trade`, the freight/
+ * customs posting kinds and account subtypes, and the customs fiscal total (D-079).
  */
-export const WORLD_SCHEMA_VERSION = 23;
+export const WORLD_SCHEMA_VERSION = 24;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -71,9 +75,11 @@ export const SAVE_FORMAT_VERSION = 1;
  * education scenario inputs, an academics profession, and technology-gated
  * building definitions, so it bumps the content version to `m3-economy-v7`
  * (D-077). E5 adds health/minimum-wage/hours law definitions, so it bumps the
- * content version to `m3-economy-v8` (D-078).
+ * content version to `m3-economy-v8` (D-078). E6a adds authored market customs
+ * administrations, transport routes, and per-good transport costs, so it bumps the
+ * content version to `m3-economy-v9` (D-079).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v8";
+export const DEFAULT_DATA_VERSION = "m3-economy-v9";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

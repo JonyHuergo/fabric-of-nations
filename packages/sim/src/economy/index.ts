@@ -20,6 +20,23 @@ export * from "./ai.js";
 export * from "./day.js";
 export * from "./technology.js";
 export * from "./labor.js";
+export {
+  assertValidTradePolicyState,
+  assertValidTradeState,
+  createTradePolicyState,
+  createTradeState,
+  freightCostPerUnit,
+  isFirstCivilDayOfMonth,
+  marketInfrastructureQuality,
+  neutralTradePolicyState,
+  routeCapacitySUSDPerDay,
+  runTradeArrivals,
+  runTradeDispatchPhase,
+  transitDays,
+  type TradeArrivalResult,
+  type TradeCapacityUse,
+  type TradeDispatchResult,
+} from "./trade.js";
 /**
  * M4b period close. Only the public close operation and its result type are
  * exported; the internal `period-close` posting helper stays module-private so

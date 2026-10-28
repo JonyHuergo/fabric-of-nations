@@ -6,12 +6,15 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 10 as const;
+export const PROTOCOL_VERSION = 11 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
 export const MAX_SNAPSHOT_LEDGER_MONTHS = 12;
 export const MAX_SNAPSHOT_ANNUAL_REPORTS = 12;
+/** E6a: bounded in-transit consignments and blocked diagnostics per snapshot. */
+export const MAX_SNAPSHOT_TRADE_SHIPMENTS = 24;
+export const MAX_SNAPSHOT_TRADE_BLOCKED = 24;
 /**
  * Presentation bound matching the simulation's active-contract cap. The UI uses
  * it only to disable an obviously impossible issuance; the simulation remains the
@@ -169,6 +172,15 @@ export interface SetHealthStaffShareActionDto {
   readonly share: number;
 }
 
+/** E6a: set the country's tariff schedule, monthly import quotas, and export restrictions. */
+export interface SetTradePolicyActionDto {
+  readonly kind: "set-trade-policy";
+  readonly countryId: number;
+  readonly tariffRates: readonly number[];
+  readonly importQuotaQuantity: readonly (number | null)[];
+  readonly exportRestricted: readonly boolean[];
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -189,7 +201,8 @@ export type CountryActionDto =
   | SetTrainingBudgetActionDto
   | SetTrainingStipendActionDto
   | SetTrainingStaffShareActionDto
-  | SetHealthStaffShareActionDto;
+  | SetHealthStaffShareActionDto
+  | SetTradePolicyActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -714,6 +727,82 @@ export interface SnapshotLabor {
   readonly hoursFactor: number;
 }
 
+/** E6a per-country trade policy, quota usage, and month-to-date trade memo. */
+export interface SnapshotTradePolicy {
+  readonly tariffRates: readonly number[];
+  readonly importQuotaQuantity: readonly (number | null)[];
+  readonly importQuotaUsedQuantity: readonly number[];
+  readonly exportRestricted: readonly boolean[];
+  /** Customs markets this country administers; empty when it administers none. */
+  readonly customsMarketIds: readonly number[];
+  readonly lastUpdateDay: number | null;
+  readonly exportsValueMonthToDateSUSD: number;
+  readonly importsValueMonthToDateSUSD: number;
+  readonly dutyReceivedMonthToDateSUSD: number;
+  readonly dutyPaidMonthToDateSUSD: number;
+  readonly freightPaidMonthToDateSUSD: number;
+}
+
+/** One observed transport route and its derived daily capacity. */
+export interface SnapshotTradeRoute {
+  readonly id: number;
+  readonly marketAId: number;
+  readonly marketBId: number;
+  readonly distanceUnits: number;
+  readonly transitDays: number;
+  readonly baseCapacitySUSDPerDay: number;
+  /** Derived capacity at the current market infrastructure, per direction per day. */
+  readonly capacitySUSDPerDay: number;
+}
+
+/** One observed in-transit consignment. */
+export interface SnapshotTradeShipment {
+  readonly id: number;
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly quantity: number;
+  readonly sellerBuildingId: number;
+  readonly originMarketId: number;
+  readonly destinationMarketId: number;
+  readonly originCountryId: number | null;
+  readonly destinationCountryId: number | null;
+  readonly dispatchDay: number;
+  readonly arrivalDay: number;
+  readonly cargoValueSUSD: number;
+  readonly freightCostSUSD: number;
+  readonly dutySUSD: number;
+  readonly dutyRate: number;
+}
+
+/** One blocked-shipment diagnostic for the most recent processed day. */
+export interface SnapshotTradeBlockedReason {
+  readonly originMarketId: number;
+  readonly destinationMarketId: number;
+  readonly goodId: number;
+  readonly goodKey: string;
+  readonly reason: string;
+}
+
+/** E6a trade network and last-day outcome. */
+export interface SnapshotTradeNetwork {
+  readonly enabled: boolean;
+  readonly routes: readonly SnapshotTradeRoute[];
+  /** Newest in-transit consignments, ascending id, bounded. */
+  readonly shipments: readonly SnapshotTradeShipment[];
+  readonly inTransitShipmentCount: number;
+  readonly shipmentsTruncated: boolean;
+  readonly lastDay: {
+    readonly dayIndex: number;
+    readonly dispatchedShipments: number;
+    readonly arrivedShipments: number;
+    readonly freightPaidSUSD: number;
+    readonly dutyPaidSUSD: number;
+    readonly ownerFundedSUSD: number;
+    readonly blocked: readonly SnapshotTradeBlockedReason[];
+    readonly blockedTruncated: boolean;
+  } | null;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
@@ -786,6 +875,8 @@ export interface CountrySnapshot {
   readonly education: SnapshotEducation;
   /** E5 training/qualification and public-health state. */
   readonly labor: SnapshotLabor;
+  /** E6a tariff/quota/restriction policy and month-to-date trade memo. */
+  readonly trade: SnapshotTradePolicy;
 }
 
 export interface RegionSnapshot {
@@ -825,6 +916,10 @@ export interface MarketSnapshot {
   readonly label: string;
   readonly regionIds: readonly number[];
   readonly prices: readonly MarketPriceSnapshot[];
+  /** E6a customs administration of this market, or null. */
+  readonly customsCountryId: number | null;
+  /** Derived mean infrastructure quality of the market's regions, 0..1. */
+  readonly infrastructure: number;
 }
 
 export interface SnapshotDiagnostics {
@@ -869,6 +964,8 @@ export interface SimulationSnapshot {
   readonly technologyEraNames: readonly string[];
   /** M9 validated technology catalog; sent once, not per country. */
   readonly technologyCatalog: readonly SnapshotTechnologyCatalogEntry[];
+  /** E6a transport routes, in-transit consignments, and last-day outcome. */
+  readonly trade: SnapshotTradeNetwork;
   readonly diagnostics: SnapshotDiagnostics;
 }
 
@@ -964,6 +1061,17 @@ function requireString(
 function requireFiniteNumber(value: unknown, path: string): number {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new ProtocolError("invalid_message", `${path} must be a finite number`);
+  }
+  return value;
+}
+
+/** Bounded array guard for action payload arrays (E6a trade policy). */
+function requireActionArray(value: unknown, path: string): readonly unknown[] {
+  if (!Array.isArray(value)) {
+    throw new ProtocolError("invalid_action", `${path} must be an array`);
+  }
+  if (value.length > 256) {
+    throw new ProtocolError("invalid_action", `${path} must contain at most 256 entries`);
   }
   return value;
 }
@@ -1281,6 +1389,71 @@ function parseAction(value: unknown): CountryActionDto {
       );
     }
     return { kind, countryId, share };
+  }
+  if (kind === "set-trade-policy") {
+    const rawRates = requireActionArray(record.tariffRates, "command.action.tariffRates");
+    const tariffRates: number[] = [];
+    for (let index = 0; index < rawRates.length; index += 1) {
+      const rate = requireFiniteNumber(
+        rawRates[index],
+        `command.action.tariffRates[${String(index)}]`,
+      );
+      if (rate < 0 || rate > 1) {
+        throw new ProtocolError(
+          "invalid_action",
+          `command.action.tariffRates[${String(index)}] must be in 0..1`,
+        );
+      }
+      tariffRates.push(rate);
+    }
+    const rawQuotas = requireActionArray(record.importQuotaQuantity, "command.action.importQuotaQuantity");
+    const importQuotaQuantity: (number | null)[] = [];
+    for (let index = 0; index < rawQuotas.length; index += 1) {
+      const value = rawQuotas[index];
+      if (value === null || value === undefined) {
+        importQuotaQuantity.push(null);
+        continue;
+      }
+      const quota = requireFiniteNumber(
+        value,
+        `command.action.importQuotaQuantity[${String(index)}]`,
+      );
+      if (quota < 0) {
+        throw new ProtocolError(
+          "invalid_action",
+          `command.action.importQuotaQuantity[${String(index)}] must be non-negative or null`,
+        );
+      }
+      importQuotaQuantity.push(quota);
+    }
+    const rawRestricted = requireActionArray(record.exportRestricted, "command.action.exportRestricted");
+    const exportRestricted: boolean[] = [];
+    for (let index = 0; index < rawRestricted.length; index += 1) {
+      const value = rawRestricted[index];
+      if (typeof value !== "boolean") {
+        throw new ProtocolError(
+          "invalid_action",
+          `command.action.exportRestricted[${String(index)}] must be a boolean`,
+        );
+      }
+      exportRestricted.push(value);
+    }
+    if (
+      tariffRates.length !== importQuotaQuantity.length ||
+      tariffRates.length !== exportRestricted.length
+    ) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action trade arrays must all have the same length",
+      );
+    }
+    return {
+      kind: "set-trade-policy",
+      countryId,
+      tariffRates,
+      importQuotaQuantity,
+      exportRestricted,
+    };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }

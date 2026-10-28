@@ -5,7 +5,7 @@
     "name": "Grain",
     "category": "food",
     "basePrice1900SUSD": 0.25,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.00125,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -16,7 +16,7 @@
     "name": "Livestock",
     "category": "food",
     "basePrice1900SUSD": 0.5,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.0025,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -27,7 +27,7 @@
     "name": "Fish",
     "category": "food",
     "basePrice1900SUSD": 0.5,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.0025,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -38,7 +38,7 @@
     "name": "Cotton",
     "category": "raw",
     "basePrice1900SUSD": 0.15,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.00075,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -49,7 +49,7 @@
     "name": "Wool",
     "category": "raw",
     "basePrice1900SUSD": 0.25,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.00125,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -60,7 +60,7 @@
     "name": "Textiles",
     "category": "industrial",
     "basePrice1900SUSD": 2.8,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.014,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"
@@ -71,7 +71,7 @@
     "name": "Clothing",
     "category": "industrial",
     "basePrice1900SUSD": 4,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.02,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "garment"
@@ -82,7 +82,7 @@
     "name": "Food Products",
     "category": "food",
     "basePrice1900SUSD": 1,
-    "transportCostPerUnit": 0,
+    "transportCostPerUnit": 0.005,
     "priceElasticity": 1,
     "spoilageRateAnnual": 0,
     "unitLabel": "kg"

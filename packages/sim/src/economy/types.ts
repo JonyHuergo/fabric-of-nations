@@ -181,6 +181,13 @@ export interface Market {
   priceSUSD: number[];
   /** Sole authoritative inventory representation. */
   stockLots: StockLot[];
+  /**
+   * E6a customs administration of this market (its customs zone), or null in a
+   * countryless legacy world. A shipment between two markets is dutiable only when
+   * their administrations differ. The M5 sample's multi-polity markets share one
+   * administration; intra-market pooled allocation is never dutiable (D-079).
+   */
+  customsCountryId: Id | null;
 }
 
 export type FinancialAccountOwnerKind = "popBlock" | "building" | "country" | "system";
@@ -234,6 +241,9 @@ export const ACCOUNT_SUBTYPES = [
   "education-expense",
   "training-income",
   "training-expense",
+  "freight-expense",
+  "customs-duty-expense",
+  "customs-duty-revenue",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -298,6 +308,8 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "education-payroll",
   "training-payroll",
   "training-stipend",
+  "trade-freight",
+  "customs-duty",
 ] as const;
 
 /**
@@ -426,7 +438,9 @@ export interface FinancePeriodFiscalTotals {
   readonly educationExpenseSUSD?: MoneySUSD;
   /** E5 training provider payroll and trainee stipend. Optional pre-E5 = zero. */
   readonly trainingExpenseSUSD?: MoneySUSD;
-  /** Tax revenue minus welfare, interest, subsidy, administration, education, and training expense. */
+  /** E6a customs duty actually collected on dutiable shipments. Optional pre-E6a = zero. */
+  readonly customsDutyRevenueSUSD?: MoneySUSD;
+  /** Tax revenue minus welfare, interest, subsidy, administration, education, training, and customs is not subtracted (customs is revenue). */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -1263,6 +1277,149 @@ export interface LaborPolicyInput {
   healthStaffShare?: Rate;
 }
 
+/**
+ * E6a per-country trade policy and month-to-date trade memo (D-079).
+ *
+ * Every array is indexed by good id and therefore bounded by the validated good
+ * catalog. None is a spendable pool: `tariffRates` is an ad-valorem rate applied to
+ * an actual dutiable shipment, `importQuotaQuantity` is a monthly physical quantity
+ * ceiling with a deterministic month-to-date counter, and `exportRestricted` is a
+ * per-good prohibition. The memo fields are reporting only and reset on the first
+ * civil day of each month.
+ */
+export interface TradePolicyState {
+  /** Ad-valorem import duty rate per good, 0..1, applied at the customs boundary. */
+  tariffRates: Rate[];
+  /** Monthly import quantity ceiling per good in physical units, or null for none. */
+  importQuotaQuantity: (number | null)[];
+  /** Month-to-date imported physical quantity per good. */
+  importQuotaUsedQuantity: number[];
+  /** Per-good prohibition on exports by this country's buildings. */
+  exportRestricted: boolean[];
+  /** Day of the most recent trade-policy change, or null before any change. */
+  lastUpdateDay: Day | null;
+  /** Month-to-date cargo value exported by this country's buildings. */
+  exportsValueMonthToDateSUSD: MoneySUSD;
+  /** Month-to-date cargo value imported into this country's customs zone. */
+  importsValueMonthToDateSUSD: MoneySUSD;
+  /** Month-to-date duty received as the importing administration. */
+  dutyReceivedMonthToDateSUSD: MoneySUSD;
+  /** Month-to-date duty paid by this country's buildings as exporters. */
+  dutyPaidMonthToDateSUSD: MoneySUSD;
+  /** Month-to-date freight paid by this country's buildings. */
+  freightPaidMonthToDateSUSD: MoneySUSD;
+}
+
+/** Scenario input for one country's E6a trade policy; omitted fields are neutral. */
+export interface TradePolicyInput {
+  tariffRates?: Rate[];
+  importQuotaQuantity?: (number | null)[];
+  exportRestricted?: boolean[];
+}
+
+/**
+ * One authored, validated transport connection between two markets (D-079).
+ *
+ * `marketAId` is always the lower market id so the pair has one canonical identity.
+ * Distance and base capacity are provisional sample content, not measurements. The
+ * usable capacity is derived from these values and the two markets' infrastructure;
+ * it is a daily flow limit, never accumulated.
+ */
+export interface TradeRoute {
+  id: Id;
+  marketAId: Id;
+  marketBId: Id;
+  /** Route distance in provisional distance units; transit days = ceil(distance). */
+  distanceUnits: number;
+  /** Unscaled daily cargo-value capacity in SUSD at infrastructure 1. */
+  baseCapacitySUSDPerDay: MoneySUSD;
+}
+
+/** Scenario input for one component route; ids are assigned deterministically. */
+export interface TradeRouteInitialDef {
+  marketAId: Id;
+  marketBId: Id;
+  distanceUnits: number;
+  baseCapacitySUSDPerDay: MoneySUSD;
+}
+
+/**
+ * One in-transit consignment (D-079).
+ *
+ * The seller keeps ownership while the goods are in transit. The goods are not part
+ * of any market's stock until arrival, so they are never double-counted. Freight and
+ * duty were paid and posted at dispatch; `cargoValueSUSD` is the origin-price value
+ * used for capacity, duty, and reporting.
+ */
+export interface TradeShipment {
+  id: Id;
+  goodId: Id;
+  /** Physical units in transit. */
+  quantity: number;
+  sellerBuildingId: Id;
+  originMarketId: Id;
+  destinationMarketId: Id;
+  originCountryId: Id | null;
+  destinationCountryId: Id | null;
+  dispatchDay: Day;
+  arrivalDay: Day;
+  cargoValueSUSD: MoneySUSD;
+  freightCostSUSD: MoneySUSD;
+  dutySUSD: MoneySUSD;
+  dutyRate: Rate;
+}
+
+/** Why a would-be shipment did not happen. Diagnostic only, never an authority. */
+export const TRADE_BLOCK_REASONS = [
+  "stock",
+  "capacity",
+  "quota",
+  "export-restricted",
+  "margin",
+  "funding",
+] as const;
+export type TradeBlockReason = (typeof TRADE_BLOCK_REASONS)[number];
+
+/** One bounded, deterministic blocked-shipment diagnostic. */
+export interface TradeBlockedDiagnostic {
+  originMarketId: Id;
+  destinationMarketId: Id;
+  goodId: Id;
+  reason: TradeBlockReason;
+}
+
+/** Last processed day's trade outcome, retained for explanation. */
+export interface TradeDayReport {
+  dayIndex: Day;
+  dispatchedShipments: number;
+  freightPaidSUSD: MoneySUSD;
+  dutyPaidSUSD: MoneySUSD;
+  /** Freight/duty funded by the shipping building's owner as a capital injection. */
+  ownerFundedSUSD: MoneySUSD;
+  arrivedShipments: number;
+  /** Ascending (origin, destination, good, reason) order; bounded. */
+  blocked: TradeBlockedDiagnostic[];
+}
+
+/** Authoritative E6a trade state. */
+export interface TradeState {
+  /** True only when the scenario authored at least one route. */
+  enabled: boolean;
+  /** Authored component routes, ascending id. */
+  routes: TradeRoute[];
+  /** Bounded in-transit consignments, ascending id. */
+  shipments: TradeShipment[];
+  /** Deterministic allocator for shipment ids. */
+  nextShipmentId: Id;
+  /**
+   * Day of the most recent dispatch phase, used to reject a repeated dispatch for
+   * the same day. `null` before the first processed day.
+   */
+  lastDispatchDay: Day | null;
+  /** Last processed day's summary, or null before the first processed day. */
+  lastDay: TradeDayReport | null;
+}
+
 export interface ElectionResult {
   day: Day;
   eligiblePopulation: number;
@@ -1377,6 +1534,8 @@ export interface Country {
   education: EducationState;
   /** E5 per-country training policy and reporting memo. */
   labor: LaborPolicyState;
+  /** E6a per-country trade policy, quota usage, and reporting memo. */
+  trade: TradePolicyState;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -1414,6 +1573,8 @@ export interface CountryInitialDef {
   technology?: CountryTechnologyInput;
   /** E5 labor/health initial policy; omitted means neutral zero budgets/shares. */
   labor?: LaborPolicyInput;
+  /** E6a trade policy; omitted means zero tariffs, no quota, no export restriction. */
+  trade?: TradePolicyInput;
 }
 
 /**
@@ -1450,6 +1611,8 @@ export interface MarketInitialDef {
   regionIds: Id[];
   priceSUSD: number[];
   stockLots: StockLot[];
+  /** E6a customs administration; omitted means the country owning the lowest region id. */
+  customsCountryId?: Id | null;
 }
 
 export interface SystemAccountInitialDef {
@@ -1481,6 +1644,11 @@ export interface EconomyScenarioDef {
   profitDistribution?: ProfitDistributionPolicy;
   /** M6 country-AI enable policy. Omitted means disabled defaults. */
   countryAI?: CountryAIPolicy;
+  /**
+   * E6a authored transport routes. Omitted or empty means trade is disabled and the
+   * world keeps its pre-E6a behaviour (D-079).
+   */
+  tradeRoutes?: TradeRouteInitialDef[];
   /**
    * Post-M7 player-control designation. The AI does not make fiscal decisions for
    * this country. Omitted or null means no designated player country (legacy

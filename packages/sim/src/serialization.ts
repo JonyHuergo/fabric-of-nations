@@ -75,6 +75,9 @@ import type {
   InterestGroupState,
   StockLot,
   SusdPerCurrencyUnit,
+  TradeBlockReason,
+  TradePolicyState,
+  TradeState,
   TransactionKind,
 } from "./economy/types.js";
 import {
@@ -82,6 +85,7 @@ import {
   ACCOUNT_SUBTYPES,
   FLOW_TRANSACTION_KINDS,
   LAW_SLOTS,
+  TRADE_BLOCK_REASONS,
   TRANSACTION_KINDS,
 } from "./economy/types.js";
 import {
@@ -333,6 +337,7 @@ export type SerializedCountryFiscalTotals = {
   readonly administrationExpenseSUSD?: number;
   readonly educationExpenseSUSD?: number;
   readonly trainingExpenseSUSD?: number;
+  readonly customsDutyRevenueSUSD?: number;
   readonly netFiscalResultSUSD?: number;
 };
 
@@ -609,6 +614,76 @@ export type SerializedLaborPolicyState = {
   readonly trainingShortfallMonthToDateSUSD: number;
 };
 
+/** Encoded E6a per-country trade policy and month-to-date memo. */
+export type SerializedTradePolicyState = {
+  readonly tariffRates: readonly number[];
+  readonly importQuotaQuantity: readonly (number | null)[];
+  readonly importQuotaUsedQuantity: readonly number[];
+  readonly exportRestricted: readonly boolean[];
+  readonly lastUpdateDay: number | null;
+  readonly exportsValueMonthToDateSUSD: number;
+  readonly importsValueMonthToDateSUSD: number;
+  readonly dutyReceivedMonthToDateSUSD: number;
+  readonly dutyPaidMonthToDateSUSD: number;
+  readonly freightPaidMonthToDateSUSD: number;
+};
+
+/** Encoded E6a transport route. */
+export type SerializedTradeRoute = {
+  readonly id: number;
+  readonly marketAId: number;
+  readonly marketBId: number;
+  readonly distanceUnits: number;
+  readonly baseCapacitySUSDPerDay: number;
+};
+
+/** Encoded E6a in-transit consignment. */
+export type SerializedTradeShipment = {
+  readonly id: number;
+  readonly goodId: number;
+  readonly quantity: number;
+  readonly sellerBuildingId: number;
+  readonly originMarketId: number;
+  readonly destinationMarketId: number;
+  readonly originCountryId: number | null;
+  readonly destinationCountryId: number | null;
+  readonly dispatchDay: number;
+  readonly arrivalDay: number;
+  readonly cargoValueSUSD: number;
+  readonly freightCostSUSD: number;
+  readonly dutySUSD: number;
+  readonly dutyRate: number;
+};
+
+/** Encoded E6a blocked-shipment diagnostic. */
+export type SerializedTradeBlockedDiagnostic = {
+  readonly originMarketId: number;
+  readonly destinationMarketId: number;
+  readonly goodId: number;
+  readonly reason: string;
+};
+
+/** Encoded E6a last-day trade report. */
+export type SerializedTradeDayReport = {
+  readonly dayIndex: number;
+  readonly dispatchedShipments: number;
+  readonly freightPaidSUSD: number;
+  readonly dutyPaidSUSD: number;
+  readonly ownerFundedSUSD: number;
+  readonly arrivedShipments: number;
+  readonly blocked: readonly SerializedTradeBlockedDiagnostic[];
+};
+
+/** Encoded E6a trade state. */
+export type SerializedTradeState = {
+  readonly enabled: boolean;
+  readonly routes: readonly SerializedTradeRoute[];
+  readonly shipments: readonly SerializedTradeShipment[];
+  readonly nextShipmentId: number;
+  readonly lastDispatchDay: number | null;
+  readonly lastDay: SerializedTradeDayReport | null;
+};
+
 export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
@@ -624,6 +699,7 @@ export type SerializedCountry = {  readonly id: number;
   readonly technology: SerializedCountryTechnology;
   readonly education: SerializedEducationState;
   readonly labor: SerializedLaborPolicyState;
+  readonly trade: SerializedTradePolicyState;
 };
 
 /** Encoded E4 industrial policy. */
@@ -678,6 +754,7 @@ export type SerializedMarket = {
   readonly regionIds: readonly number[];
   readonly priceSUSD: readonly number[];
   readonly stockLots: readonly SerializedStockLot[];
+  readonly customsCountryId: number | null;
 };
 
 /** Encoded population block with explicit typed-array tags. */
@@ -725,6 +802,7 @@ export type SerializedWorld = {
   readonly construction: SerializedConstructionState;
   readonly politics: SerializedPoliticsState;
   readonly technology: { readonly enabled: boolean };
+  readonly trade: SerializedTradeState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -920,6 +998,7 @@ function encodeCountryFiscalTotals(
       "administrationExpenseSUSD",
       "educationExpenseSUSD",
       "trainingExpenseSUSD",
+      "customsDutyRevenueSUSD",
       "netFiscalResultSUSD",
     ] as const) {
       const value = entry[field] ?? 0;
@@ -1142,6 +1221,18 @@ export function encodeWorld(world: World): SerializedWorld {
           trainingShortfallMonthToDateSUSD:
             country.labor.trainingShortfallMonthToDateSUSD,
         },
+        trade: {
+          tariffRates: [...country.trade.tariffRates],
+          importQuotaQuantity: [...country.trade.importQuotaQuantity],
+          importQuotaUsedQuantity: [...country.trade.importQuotaUsedQuantity],
+          exportRestricted: [...country.trade.exportRestricted],
+          lastUpdateDay: country.trade.lastUpdateDay,
+          exportsValueMonthToDateSUSD: country.trade.exportsValueMonthToDateSUSD,
+          importsValueMonthToDateSUSD: country.trade.importsValueMonthToDateSUSD,
+          dutyReceivedMonthToDateSUSD: country.trade.dutyReceivedMonthToDateSUSD,
+          dutyPaidMonthToDateSUSD: country.trade.dutyPaidMonthToDateSUSD,
+          freightPaidMonthToDateSUSD: country.trade.freightPaidMonthToDateSUSD,
+        },
       })),
     currencies: [...world.currencies]
       .sort((left, right) => left.id - right.id)
@@ -1218,6 +1309,7 @@ export function encodeWorld(world: World): SerializedWorld {
           ownerBuildingId: lot.ownerBuildingId,
           quantity: lot.quantity,
         })),
+        customsCountryId: market.customsCountryId,
       })),
     finance: {
       accounts: [...world.finance.accounts]
@@ -1418,6 +1510,55 @@ export function encodeWorld(world: World): SerializedWorld {
       nextLogId: world.politics.nextLogId,
     },
     technology: { enabled: world.technology.enabled },
+    trade: {
+      enabled: world.trade.enabled,
+      routes: [...world.trade.routes]
+        .sort((left, right) => left.id - right.id)
+        .map((route) => ({
+          id: route.id,
+          marketAId: route.marketAId,
+          marketBId: route.marketBId,
+          distanceUnits: route.distanceUnits,
+          baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
+        })),
+      shipments: [...world.trade.shipments]
+        .sort((left, right) => left.id - right.id)
+        .map((shipment) => ({
+          id: shipment.id,
+          goodId: shipment.goodId,
+          quantity: shipment.quantity,
+          sellerBuildingId: shipment.sellerBuildingId,
+          originMarketId: shipment.originMarketId,
+          destinationMarketId: shipment.destinationMarketId,
+          originCountryId: shipment.originCountryId,
+          destinationCountryId: shipment.destinationCountryId,
+          dispatchDay: shipment.dispatchDay,
+          arrivalDay: shipment.arrivalDay,
+          cargoValueSUSD: shipment.cargoValueSUSD,
+          freightCostSUSD: shipment.freightCostSUSD,
+          dutySUSD: shipment.dutySUSD,
+          dutyRate: shipment.dutyRate,
+        })),
+      nextShipmentId: world.trade.nextShipmentId,
+      lastDispatchDay: world.trade.lastDispatchDay,
+      lastDay:
+        world.trade.lastDay === null
+          ? null
+          : {
+              dayIndex: world.trade.lastDay.dayIndex,
+              dispatchedShipments: world.trade.lastDay.dispatchedShipments,
+              freightPaidSUSD: world.trade.lastDay.freightPaidSUSD,
+              dutyPaidSUSD: world.trade.lastDay.dutyPaidSUSD,
+              ownerFundedSUSD: world.trade.lastDay.ownerFundedSUSD,
+              arrivedShipments: world.trade.lastDay.arrivedShipments,
+              blocked: world.trade.lastDay.blocked.map((entry) => ({
+                originMarketId: entry.originMarketId,
+                destinationMarketId: entry.destinationMarketId,
+                goodId: entry.goodId,
+                reason: entry.reason,
+              })),
+            },
+    },
     playerCountryId: world.playerCountryId,
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1552,6 +1693,7 @@ function decodeCountryFiscalTotals(
       administrationExpenseSUSD: optionalNumber("administrationExpenseSUSD"),
       educationExpenseSUSD: optionalNumber("educationExpenseSUSD"),
       trainingExpenseSUSD: optionalNumber("trainingExpenseSUSD"),
+      customsDutyRevenueSUSD: optionalNumber("customsDutyRevenueSUSD"),
       netFiscalResultSUSD: optionalNumber("netFiscalResultSUSD"),
     };
   }
@@ -2206,6 +2348,216 @@ function decodeLaborPolicyState(value: unknown, path: string): LaborPolicyState 
   };
 }
 
+function decodeTradePolicyState(value: unknown, path: string): TradePolicyState {
+  const record = requireRecord(value, path);
+  const tariffRates = requireArray(record.tariffRates, `${path}.tariffRates`).map(
+    (entry, index) => requireFiniteNumber(entry, `${path}.tariffRates[${String(index)}]`),
+  );
+  const importQuotaQuantity = requireArray(
+    record.importQuotaQuantity,
+    `${path}.importQuotaQuantity`,
+  ).map((entry, index) => {
+    if (entry === null || entry === undefined) return null;
+    return requireFiniteNumber(entry, `${path}.importQuotaQuantity[${String(index)}]`);
+  });
+  const importQuotaUsedQuantity = requireArray(
+    record.importQuotaUsedQuantity,
+    `${path}.importQuotaUsedQuantity`,
+  ).map((entry, index) =>
+    requireFiniteNumber(entry, `${path}.importQuotaUsedQuantity[${String(index)}]`),
+  );
+  const exportRestricted = requireArray(record.exportRestricted, `${path}.exportRestricted`).map(
+    (entry, index) => {
+      if (typeof entry !== "boolean") {
+        throw new SaveFormatError(`${path}.exportRestricted[${String(index)}] must be a boolean`);
+      }
+      return entry;
+    },
+  );
+  const lastUpdateDay =
+    record.lastUpdateDay === null || record.lastUpdateDay === undefined
+      ? null
+      : requireInteger(
+          record.lastUpdateDay,
+          `${path}.lastUpdateDay`,
+          0,
+          CAMPAIGN_TERMINAL_DAY_INDEX,
+        );
+  return {
+    tariffRates,
+    importQuotaQuantity,
+    importQuotaUsedQuantity,
+    exportRestricted,
+    lastUpdateDay,
+    exportsValueMonthToDateSUSD: requireFiniteNumber(
+      record.exportsValueMonthToDateSUSD,
+      `${path}.exportsValueMonthToDateSUSD`,
+    ),
+    importsValueMonthToDateSUSD: requireFiniteNumber(
+      record.importsValueMonthToDateSUSD,
+      `${path}.importsValueMonthToDateSUSD`,
+    ),
+    dutyReceivedMonthToDateSUSD: requireFiniteNumber(
+      record.dutyReceivedMonthToDateSUSD,
+      `${path}.dutyReceivedMonthToDateSUSD`,
+    ),
+    dutyPaidMonthToDateSUSD: requireFiniteNumber(
+      record.dutyPaidMonthToDateSUSD,
+      `${path}.dutyPaidMonthToDateSUSD`,
+    ),
+    freightPaidMonthToDateSUSD: requireFiniteNumber(
+      record.freightPaidMonthToDateSUSD,
+      `${path}.freightPaidMonthToDateSUSD`,
+    ),
+  };
+}
+
+function decodeTradeState(value: unknown, path: string): TradeState {
+  const record = requireRecord(value, path);
+  if (typeof record.enabled !== "boolean") {
+    throw new SaveFormatError(`${path}.enabled must be a boolean`);
+  }
+  const routes = requireArray(record.routes, `${path}.routes`).map((entry, index) => {
+    const routePath = `${path}.routes[${String(index)}]`;
+    const route = requireRecord(entry, routePath);
+    return {
+      id: requireInteger(route.id, `${routePath}.id`, 0, Number.MAX_SAFE_INTEGER),
+      marketAId: requireUint32(route.marketAId, `${routePath}.marketAId`),
+      marketBId: requireUint32(route.marketBId, `${routePath}.marketBId`),
+      distanceUnits: requireFiniteNumber(route.distanceUnits, `${routePath}.distanceUnits`),
+      baseCapacitySUSDPerDay: requireFiniteNumber(
+        route.baseCapacitySUSDPerDay,
+        `${routePath}.baseCapacitySUSDPerDay`,
+      ),
+    };
+  });
+  const shipments = requireArray(record.shipments, `${path}.shipments`).map((entry, index) => {
+    const shipmentPath = `${path}.shipments[${String(index)}]`;
+    const shipment = requireRecord(entry, shipmentPath);
+    const optionalCountry = (raw: unknown, fieldPath: string): number | null =>
+      raw === null || raw === undefined ? null : requireUint32(raw, fieldPath);
+    return {
+      id: requireInteger(shipment.id, `${shipmentPath}.id`, 1, Number.MAX_SAFE_INTEGER),
+      goodId: requireUint32(shipment.goodId, `${shipmentPath}.goodId`),
+      quantity: requireFiniteNumber(shipment.quantity, `${shipmentPath}.quantity`),
+      sellerBuildingId: requireUint32(
+        shipment.sellerBuildingId,
+        `${shipmentPath}.sellerBuildingId`,
+      ),
+      originMarketId: requireUint32(shipment.originMarketId, `${shipmentPath}.originMarketId`),
+      destinationMarketId: requireUint32(
+        shipment.destinationMarketId,
+        `${shipmentPath}.destinationMarketId`,
+      ),
+      originCountryId: optionalCountry(
+        shipment.originCountryId,
+        `${shipmentPath}.originCountryId`,
+      ),
+      destinationCountryId: optionalCountry(
+        shipment.destinationCountryId,
+        `${shipmentPath}.destinationCountryId`,
+      ),
+      dispatchDay: requireInteger(
+        shipment.dispatchDay,
+        `${shipmentPath}.dispatchDay`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      arrivalDay: requireInteger(
+        shipment.arrivalDay,
+        `${shipmentPath}.arrivalDay`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      cargoValueSUSD: requireFiniteNumber(
+        shipment.cargoValueSUSD,
+        `${shipmentPath}.cargoValueSUSD`,
+      ),
+      freightCostSUSD: requireFiniteNumber(
+        shipment.freightCostSUSD,
+        `${shipmentPath}.freightCostSUSD`,
+      ),
+      dutySUSD: requireFiniteNumber(shipment.dutySUSD, `${shipmentPath}.dutySUSD`),
+      dutyRate: requireFiniteNumber(shipment.dutyRate, `${shipmentPath}.dutyRate`),
+    };
+  });
+  let lastDay: TradeState["lastDay"] = null;
+  if (record.lastDay !== null && record.lastDay !== undefined) {
+    const reportPath = `${path}.lastDay`;
+    const report = requireRecord(record.lastDay, reportPath);
+    const blocked = requireArray(report.blocked, `${reportPath}.blocked`).map(
+      (entry, index) => {
+        const blockPath = `${reportPath}.blocked[${String(index)}]`;
+        const block = requireRecord(entry, blockPath);
+        const reason = requireString(block.reason, `${blockPath}.reason`);
+        if (!(TRADE_BLOCK_REASONS as readonly string[]).includes(reason)) {
+          throw new SaveFormatError(`${blockPath}.reason is not a registered trade block reason`);
+        }
+        return {
+          originMarketId: requireUint32(block.originMarketId, `${blockPath}.originMarketId`),
+          destinationMarketId: requireUint32(
+            block.destinationMarketId,
+            `${blockPath}.destinationMarketId`,
+          ),
+          goodId: requireUint32(block.goodId, `${blockPath}.goodId`),
+          reason: reason as TradeBlockReason,
+        };
+      },
+    );
+    lastDay = {
+      dayIndex: requireInteger(
+        report.dayIndex,
+        `${reportPath}.dayIndex`,
+        0,
+        CAMPAIGN_TERMINAL_DAY_INDEX,
+      ),
+      dispatchedShipments: requireInteger(
+        report.dispatchedShipments,
+        `${reportPath}.dispatchedShipments`,
+        0,
+        Number.MAX_SAFE_INTEGER,
+      ),
+      freightPaidSUSD: requireFiniteNumber(
+        report.freightPaidSUSD,
+        `${reportPath}.freightPaidSUSD`,
+      ),
+      dutyPaidSUSD: requireFiniteNumber(report.dutyPaidSUSD, `${reportPath}.dutyPaidSUSD`),
+      ownerFundedSUSD: requireFiniteNumber(
+        report.ownerFundedSUSD,
+        `${reportPath}.ownerFundedSUSD`,
+      ),
+      arrivedShipments: requireInteger(
+        report.arrivedShipments,
+        `${reportPath}.arrivedShipments`,
+        0,
+        Number.MAX_SAFE_INTEGER,
+      ),
+      blocked,
+    };
+  }
+  return {
+    enabled: record.enabled,
+    routes,
+    shipments,
+    nextShipmentId: requireInteger(
+      record.nextShipmentId,
+      `${path}.nextShipmentId`,
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+    lastDispatchDay:
+      record.lastDispatchDay === null || record.lastDispatchDay === undefined
+        ? null
+        : requireInteger(
+            record.lastDispatchDay,
+            `${path}.lastDispatchDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+    lastDay,
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -2230,6 +2582,7 @@ function decodeCountry(value: unknown, path: string): Country {
     technology: decodeCountryTechnology(record.technology, `${path}.technology`),
     education: decodeEducationState(record.education, `${path}.education`),
     labor: decodeLaborPolicyState(record.labor, `${path}.labor`),
+    trade: decodeTradePolicyState(record.trade, `${path}.trade`),
   };
 }
 
@@ -2702,6 +3055,10 @@ function decodeMarket(value: unknown, path: string): Market {
     regionIds,
     priceSUSD: prices,
     stockLots: canonicalizeStockLots(lots),
+    customsCountryId:
+      record.customsCountryId === null || record.customsCountryId === undefined
+        ? null
+        : requireUint32(record.customsCountryId, `${path}.customsCountryId`),
   };
 }
 
@@ -3119,6 +3476,7 @@ function decodeWorldPayload(value: unknown): World {
     throw new SaveFormatError("save payload.technology.enabled must be a boolean");
   }
   const technology = { enabled: rawTechnology.enabled };
+  const trade = decodeTradeState(payload.trade, "save payload.trade");
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -3147,6 +3505,7 @@ function decodeWorldPayload(value: unknown): World {
     construction,
     politics,
     technology,
+    trade,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,

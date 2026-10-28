@@ -317,6 +317,11 @@ function createCompletedBuilding(
   allocateAccount(finance, "building", buildingId, "upkeep-expense");
   allocateAccount(finance, "building", buildingId, "business-tax-expense");
   allocateAccount(finance, "building", buildingId, "subsidy-revenue");
+  if (world.trade.enabled) {
+    // E6a: a completed asset may ship goods and pay import duty like any enterprise.
+    allocateAccount(finance, "building", buildingId, "freight-expense");
+    allocateAccount(finance, "building", buildingId, "customs-duty-expense");
+  }
   if (world.profitDistribution.enabled) {
     allocateAccount(finance, "building", buildingId, "retained-profit");
   }

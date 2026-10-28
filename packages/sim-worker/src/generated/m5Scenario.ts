@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v8",
+    "dataVersion": "m3-economy-v9",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3984,7 +3984,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v8",
+      "dataVersion": "m3-economy-v9",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6879,7 +6879,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v8",
+    "dataVersion": "m3-economy-v9",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6888,7 +6888,7 @@ export const M5_SCENARIO = ({
         "name": "Grain",
         "category": "food",
         "basePrice1900SUSD": 0.25,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.00125,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6899,7 +6899,7 @@ export const M5_SCENARIO = ({
         "name": "Livestock",
         "category": "food",
         "basePrice1900SUSD": 0.5,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.0025,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6910,7 +6910,7 @@ export const M5_SCENARIO = ({
         "name": "Fish",
         "category": "food",
         "basePrice1900SUSD": 0.5,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.0025,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6921,7 +6921,7 @@ export const M5_SCENARIO = ({
         "name": "Cotton",
         "category": "raw",
         "basePrice1900SUSD": 0.15,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.00075,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6932,7 +6932,7 @@ export const M5_SCENARIO = ({
         "name": "Wool",
         "category": "raw",
         "basePrice1900SUSD": 0.25,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.00125,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6943,7 +6943,7 @@ export const M5_SCENARIO = ({
         "name": "Textiles",
         "category": "industrial",
         "basePrice1900SUSD": 2.8,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.014,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -6954,7 +6954,7 @@ export const M5_SCENARIO = ({
         "name": "Clothing",
         "category": "industrial",
         "basePrice1900SUSD": 4,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.02,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "garment"
@@ -6965,7 +6965,7 @@ export const M5_SCENARIO = ({
         "name": "Food Products",
         "category": "food",
         "basePrice1900SUSD": 1,
-        "transportCostPerUnit": 0,
+        "transportCostPerUnit": 0.005,
         "priceElasticity": 1,
         "spoilageRateAnnual": 0,
         "unitLabel": "kg"
@@ -7579,7 +7579,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "politics": {
-      "dataVersion": "m3-economy-v8",
+      "dataVersion": "m3-economy-v9",
       "status": "provisional",
       "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
       "regimes": [
@@ -8506,7 +8506,7 @@ export const M5_SCENARIO = ({
       ]
     },
     "technology": {
-      "dataVersion": "m3-economy-v8",
+      "dataVersion": "m3-economy-v9",
       "academicProfessionKeys": [
         "academics"
       ],
@@ -12172,7 +12172,8 @@ export const M5_SCENARIO = ({
           "ownerBuildingId": 5,
           "quantity": 715000
         }
-      ]
+      ],
+      "customsCountryId": 0
     },
     {
       "id": 1,
@@ -12213,7 +12214,8 @@ export const M5_SCENARIO = ({
           "ownerBuildingId": 33,
           "quantity": 572000
         }
-      ]
+      ],
+      "customsCountryId": 2
     },
     {
       "id": 2,
@@ -12252,7 +12254,8 @@ export const M5_SCENARIO = ({
           "ownerBuildingId": 68,
           "quantity": 819000
         }
-      ]
+      ],
+      "customsCountryId": 4
     },
     {
       "id": 3,
@@ -12293,7 +12296,8 @@ export const M5_SCENARIO = ({
           "ownerBuildingId": 76,
           "quantity": 1703000
         }
-      ]
+      ],
+      "customsCountryId": 5
     },
     {
       "id": 4,
@@ -12332,7 +12336,70 @@ export const M5_SCENARIO = ({
           "ownerBuildingId": 104,
           "quantity": 117000
         }
-      ]
+      ],
+      "customsCountryId": 7
+    }
+  ],
+  "tradeRoutes": [
+    {
+      "marketAId": 0,
+      "marketBId": 1,
+      "distanceUnits": 1.5,
+      "baseCapacitySUSDPerDay": 250000
+    },
+    {
+      "marketAId": 0,
+      "marketBId": 2,
+      "distanceUnits": 2.5,
+      "baseCapacitySUSDPerDay": 120000
+    },
+    {
+      "marketAId": 0,
+      "marketBId": 3,
+      "distanceUnits": 3,
+      "baseCapacitySUSDPerDay": 150000
+    },
+    {
+      "marketAId": 0,
+      "marketBId": 4,
+      "distanceUnits": 2,
+      "baseCapacitySUSDPerDay": 180000
+    },
+    {
+      "marketAId": 1,
+      "marketBId": 2,
+      "distanceUnits": 1.5,
+      "baseCapacitySUSDPerDay": 140000
+    },
+    {
+      "marketAId": 1,
+      "marketBId": 3,
+      "distanceUnits": 3,
+      "baseCapacitySUSDPerDay": 130000
+    },
+    {
+      "marketAId": 1,
+      "marketBId": 4,
+      "distanceUnits": 2,
+      "baseCapacitySUSDPerDay": 110000
+    },
+    {
+      "marketAId": 2,
+      "marketBId": 3,
+      "distanceUnits": 2,
+      "baseCapacitySUSDPerDay": 90000
+    },
+    {
+      "marketAId": 2,
+      "marketBId": 4,
+      "distanceUnits": 3,
+      "baseCapacitySUSDPerDay": 60000
+    },
+    {
+      "marketAId": 3,
+      "marketBId": 4,
+      "distanceUnits": 3,
+      "baseCapacitySUSDPerDay": 70000
     }
   ],
   "systemAccounts": [

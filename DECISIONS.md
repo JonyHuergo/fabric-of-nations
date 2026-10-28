@@ -3937,6 +3937,177 @@ effects, and four new validated actions. It does not implement E6 trade/monetary
 mechanics, M10 systems, pensions, collective bargaining, or cross-profession
 promotion.
 
+## D-079 — E6a transport, access, inter-market trade, and customs
+
+**Status:** adopted for E6a implementation. **Scope:** §17A.8, §17A.8.1, §17A.13.2
+E6a, §17A.14 E6a, §17.5, and the §17A.16 "infrastructure transport/access model" and
+"trade counterparty/rest-of-world" questions. E6b monetary foundations, FX
+settlement, and M10 systems are **not** implemented.
+
+**Why a decision is required.** E6a must add real inter-market goods flows, a
+transport/access capacity model, a customs boundary with a dutiable event, balanced
+trade postings, trade-policy state, and a foreign counterparty. The GDD fixes the
+prerequisites and the non-goals but deliberately leaves the transport model, the
+trade mechanism, the customs jurisdiction, and the counterparty unresolved (§17A.16).
+Those choices determine authority, timing, accounting, and compatibility.
+
+### Transport, access, and capacity
+
+1. **The existing `Region.infrastructure` rate (M8, 0..1) is the only
+   infrastructure authority.** E6a adds no parallel infrastructure state and does
+   not create a "transport score". A market's infrastructure quality is the mean of
+   the `Region.infrastructure` values of its member regions, a derived value that is
+   recomputed from authoritative state and never stored.
+2. **Routes are authored, validated geography, not a general graph.** A
+   `TradeRoute` is an unordered market pair with a positive `distanceUnits` and a
+   positive `baseCapacitySUSDPerDay`. There is one direct route per authored pair
+   and no multi-hop routing; a pair with no route cannot trade. Route records are
+   persisted world state (like market membership) so saves are self-contained and
+   validation is local. Distances and capacities are provisional authored sample
+   content, not historical measurements.
+3. **Effective route capacity is**
+   `baseCapacitySUSDPerDay × (0.5 × originInfrastructure + 0.5 ×
+   destinationInfrastructure)`. Capacity is a **daily flow limit measured in SUSD of
+   cargo value at the origin market price**, because the model has no per-good
+   weight/volume data. It is recomputed from infrastructure and prices each day and
+   is never accumulated, banked, or spent; it is a constraint, not a resource. A
+   zero-infrastructure route has zero usable capacity.
+4. **Freight cost is**
+   `quantity × GoodDef.transportCostPerUnit × route.distanceUnits`, charged at
+   dispatch from the shipping building's operating cash to the existing
+   `system-reserve` transport provider. `transportCostPerUnit` was authored as 0 for
+   the single-market M3 fixtures; E6a populates it as a provisional fraction of each
+   good's base price. Transit time is `max(1, ceil(distanceUnits))` civil days.
+   Freight is a real cash cost, not a price adjustment and not a source of goods or
+   money.
+5. **Infrastructure construction/investment is deferred.** §17A.8.1 requires
+   transport cost and capacity; §17A.13.2/§17A.14 E6a do not require building new
+   infrastructure, and §17A.6.2 keeps infrastructure outside E3. E6a therefore uses
+   the existing validated infrastructure values and adds no construction shortcut.
+   Improving infrastructure remains the recorded E6a-adjacent extension; the
+   transport model it must feed now exists.
+
+### Trade mechanism and physical movement
+
+6. **Trade is producer consignment, not pooled re-clearing.** After a market has
+   cleared and settled, a producing building holding surplus stock may ship some of
+   its own goods to another market when the destination price covers origin price +
+   freight + duty + a provisional minimum margin. It keeps ownership in transit and
+   sells at the destination market price when the goods arrive. This adds no
+   merchant entity, no purchase of goods the shipper does not own, and no money
+   creation: freight and duty are the only dispatch-time cash flows.
+7. **Phases.** Arrivals run before that day's market clearing (imported lots become
+   sellable stock); dispatch runs after settlement (post-clearing surplus, prices,
+   and cash are known) and before the fiscal phase. Goods in transit are held in
+   `TradeState.shipments` and are **not** counted in any market's stock, so they are
+   never counted twice. Arrival removes the shipment and adds exactly one
+   destination lot owned by the shipping building.
+8. **Cross-market lots are legitimate only through trade.** Scenario-authored stock
+   must still belong to a building inside its market. Runtime validation permits a
+   lot owned by a building outside the market only when trade is enabled, because
+   such lots are created solely by the arrivals phase. Overflow losses, market
+   clearing, settlement, and ownership rules apply to imported lots unchanged; no
+   new inventory authority is introduced.
+9. **A market is a customs zone.** Each market carries a validated
+   `customsCountryId` (its customs administration). The M5 sample's markets are
+   multi-polity trade markets, so a member polity that is not the administration
+   shares the zone's external tariff — the documented customs-union behaviour of the
+   sample (GDD §20.1.8 permits a shared market/customs zone). Intra-market pooled
+   allocation stays shared-market clearing and is **not** dutiable (§17A.8.3); only a
+   shipment between markets can be a dutiable event, so tariffs are never attached
+   to shared-market clearing.
+10. **No separate rest-of-world entity is invented.** The §17A.8.1.7 "rest-of-world
+    or foreign counterparty" is satisfied by the real foreign counterparty: a
+    building of another simulated country, its operating account, its country
+    treasury, and the bilateral origin/destination country recorded on every
+    shipment. A non-simulated RoW sector would have to own goods and cash without a
+    modeled source, which §17A.8.1.4 forbids. External accounts, currency conversion,
+    and FX settlement are E6b.
+
+### Customs, tariffs, quotas, and policy
+
+11. **Dutiable event.** A shipment leaving a market whose customs administration
+    differs from the destination market's administration. Dutiable value is the
+    cargo value at the origin market price; the duty rate is the destination
+    administration's ad-valorem rate for the shipped good. Same-administration trade
+    is not dutiable.
+12. **Who pays and who receives.** The shipper (the foreign seller of record) pays
+    the duty from its operating cash at dispatch to the destination administration's
+    treasury: `customs-duty-expense` (building) / `operating-cash` credit and
+    `treasury-cash` debit / `customs-duty-revenue` (country). The charge is
+    cash-neutral and posted once per shipment. A shipper that cannot fund freight
+    plus duty ships less or not at all; no receivable, payable, or debt is created.
+    Revenue appears in `customsDutyRevenueSUSD` and reduces the net fiscal result.
+    Freight is charged the same way (per shipment, at dispatch) with
+    `freight-expense` / `system-income` and the existing system transport provider.
+12a. **Working-capital funding rule.** The shipped sample's enterprises distribute all
+    profit at each month-end and therefore often hold too little cash to prepay
+    freight and duty. A shipment's charges are paid first from the enterprise's own
+    operating cash. Any shortfall is funded by the building's declared owner (the
+    owner household for private ownership, the owning country treasury for state
+    ownership) as an explicit capital injection posted as `owner-capital-injection`
+    (building `operating-cash` debit / building `owner-equity` credit / owner cash
+    credit / owner `owner-equity` debit). It is equity, not a loan, receivable, or
+    negative balance. If neither the enterprise nor the owner has the cash, the
+    shipment is blocked with reason `funding`. This completes the already-registered
+    but previously unused `owner-capital-injection` kind for trade working capital
+    only; no other automatic owner funding is added.
+12b. **Dispatch timing and repeat guard.** Dispatch runs after the fiscal phase, not
+    before it, because the fiscal phase requires the settlement posting boundary to be
+    unchanged. It is still in the open period and before the monthly close, so duty is
+    in the fiscal report. `TradeState.lastDispatchDay` makes a repeated dispatch for the
+    same day an idempotent no-op (it cannot double-post freight/duty or double-ship),
+    and the phase restores trade state, country policy/memos, and market lots if any
+    step throws.
+13. **Instrument set.** E6a exposes a per-country tariff schedule (ad-valorem by
+    good), a monthly physical import quota by good, and a per-good export
+    restriction. Quota usage is a bounded per-country month-to-date counter reset on
+    the first civil day; an export restriction blocks exports of goods owned by that
+    country's buildings. Instruments use one validated `set-trade-policy` action with
+    the existing player/AI validation boundary.
+14. **Deferred instruments.** Trade agreements/market access require partner
+    identity and a diplomacy/foreign-relations interface (M8/M10) and are not
+    implemented. Export incentives require the E4 investment/incentive machinery and
+    are not implemented. "Protection" is not a separate score: it is what the tariff
+    and quota instruments actually do. The M8 trade law remains the migration
+    border-policy path and is **not** reused as a customs instrument.
+15. **Failure and observability.** Insufficient stock, capacity, quota, cash,
+    profitability, or an export restriction each block a shipment; the phase records
+    a bounded per-day blocked-reason list and the snapshot exposes route capacity,
+    shipments in transit, duty/freight month-to-date, and per-country policy so the
+    player can see why goods are not moving. Estimates (previews) are labelled and
+    never imply delivery.
+
+### Accounting, determinism, and compatibility
+
+16. Trade postings are balanced and cash-neutral. Physical quantity is conserved:
+    stock leaves the origin market at dispatch, exists only as in-transit quantity,
+    and enters the destination market once on arrival. No goods or money are created;
+    no duty is recognized without a shipment that actually incurred it.
+17. Bounded state: at most `MAX_TRADE_SHIPMENTS` (512) in-transit shipments and
+    `MAX_TRADE_BLOCKED_DIAGNOSTICS` (64) per-day diagnostics; routes are bounded by
+    the authored market-pair count (hard guard 10,000); there is no per-day trade
+    history or order book. The transport margin threshold is 5% over landed cost
+    (`TRADE_MIN_MARGIN_RATE`), a provisional commercial-risk allowance.
+18. Ordering is explicit and deterministic: ascending origin market id, destination
+    market id, good id, seller lot id; no random draw and no `Date`/wall clock.
+    A retried or replayed day cannot duplicate a shipment, delivery, duty, or freight
+    posting because every effect is derived from the staged pre-day state.
+19. Construction-material procurement (E4) still buys only from the project's own
+    market, so it cannot bypass transport or customs: goods in that market have
+    already cleared any import duty. E6a adds a test that procurement never posts
+    duty and cannot purchase across markets.
+20. World schema **24**, simulation **0.24.0**, worker protocol **11**, data version
+    **`m3-economy-v9`**. Older saves and protocol-10 clients are rejected under
+    D-013; no migration is implemented.
+
+**Consequences.** E6a adds authoritative trade policy, route, shipment, and
+customs-administration state; two posting kinds and three account subtypes; a daily
+arrival and dispatch phase; a new validated action; and new snapshot/report data. It
+does not add FX conversion, monetary authority, inflation measurement, credit
+creation, rest-of-world endowments, infrastructure construction, trade agreements,
+or any M10 system.
+
 ## Assumptions recorded for future review
 
 

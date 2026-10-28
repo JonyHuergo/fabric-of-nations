@@ -245,6 +245,19 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
           hoursPerWeek: 0,
           hoursFactor: 1,
         },
+        trade: {
+          tariffRates: [0],
+          importQuotaQuantity: [null],
+          importQuotaUsedQuantity: [0],
+          exportRestricted: [false],
+          customsMarketIds: [0],
+          lastUpdateDay: null,
+          exportsValueMonthToDateSUSD: 0,
+          importsValueMonthToDateSUSD: 0,
+          dutyReceivedMonthToDateSUSD: 0,
+          dutyPaidMonthToDateSUSD: 0,
+          freightPaidMonthToDateSUSD: 0,
+        },
       },
     ],
     regions: [
@@ -266,6 +279,8 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
             dailyProductionCapacity: 5,
           },
         ],
+        customsCountryId: 0,
+        infrastructure: 0.5,
       },
     ],
     goods: [{ id: 0, key: "grain", name: "Grain", unitLabel: "kg", category: "food" }],
@@ -273,6 +288,14 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     projectTypes: [],
     technologyEraNames: [],
     technologyCatalog: [],
+    trade: {
+      enabled: false,
+      routes: [],
+      shipments: [],
+      inTransitShipmentCount: 0,
+      shipmentsTruncated: false,
+      lastDay: null,
+    },
     diagnostics: { invalidActionCount: 0, invariantFailureCount: 0, recentWarnings: [] },
   };
 }

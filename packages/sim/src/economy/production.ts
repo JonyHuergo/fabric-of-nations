@@ -543,7 +543,15 @@ export function runProductionPhase(
       throw new RangeError(`${path} references an unknown seller building`);
     }
     if (!market.regionIds.includes(seller.regionId)) {
-      throw new RangeError(`${path} seller building is outside the market`);
+      // E6a: an imported lot is owned by a building in another market. The opening
+      // lot existence check below is the real guard; a foreign owner is legitimate
+      // only when trade is enabled (D-079 §8).
+      if (!world.trade.enabled) {
+        throw new RangeError(`${path} seller building is outside the market`);
+      }
+      if (!seller.operational) {
+        throw new RangeError(`${path} seller building is not operational`);
+      }
     }
     const sellerLotKey = lotKey(reservation.goodId, reservation.sellerBuildingId);
     const lotQuantity = openingLots.get(sellerLotKey);

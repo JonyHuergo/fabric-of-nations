@@ -49,6 +49,7 @@ import {
   neutralEducationState,
 } from "./technology.js";
 import { createLaborPolicyState } from "./labor.js";
+import { createTradePolicyState, createTradeState } from "./trade.js";
 import {
   assertValidCountryPoliticsInput,
   createCountryPoliticsState,
@@ -598,6 +599,98 @@ function assertInitialEmployment(
   }
 }
 
+/**
+ * Resolve each market's E6a customs administration.
+ *
+ * An authored `customsCountryId` must be a country that owns at least one region of
+ * the market. When omitted, the country owning the market's lowest region id is the
+ * administration; a countryless market has no customs administration. The same rule
+ * is used for validation and construction so the two cannot disagree.
+ */
+function resolveMarketCustomsCountries(
+  scenario: EconomyScenarioDef,
+): Map<number, Id | null> {
+  const countryByRegion = countryByRegionId(scenario);
+  const result = new Map<number, Id | null>();
+  for (const market of scenario.markets) {
+    const owners = new Set<number>();
+    for (const regionId of market.regionIds) {
+      const countryId = countryByRegion.get(regionId);
+      if (countryId !== undefined) owners.add(countryId);
+    }
+    const declared = market.customsCountryId;
+    if (declared !== undefined && declared !== null) {
+      if (!owners.has(declared)) {
+        throw new RangeError(
+          `market ${String(market.id)} customsCountryId ${String(declared)} must own at least one of its regions`,
+        );
+      }
+      result.set(market.id, declared);
+      continue;
+    }
+    if (owners.size === 0) {
+      result.set(market.id, null);
+      continue;
+    }
+    let lowestRegion: number | undefined;
+    for (const regionId of market.regionIds) {
+      if (countryByRegion.get(regionId) === undefined) continue;
+      if (lowestRegion === undefined || regionId < lowestRegion) lowestRegion = regionId;
+    }
+    result.set(
+      market.id,
+      lowestRegion === undefined ? null : (countryByRegion.get(lowestRegion) ?? null),
+    );
+  }
+  return result;
+}
+
+function assertTradeScenario(scenario: EconomyScenarioDef): void {
+  const trade = createTradeState(scenario.tradeRoutes);
+  if (trade.routes.length > 0) {
+    const marketIds = new Set(scenario.markets.map((market) => market.id));
+    for (const route of trade.routes) {
+      for (const marketId of [route.marketAId, route.marketBId]) {
+        if (!marketIds.has(marketId)) {
+          throw new RangeError(
+            `trade route ${String(route.id)} references unknown market ${String(marketId)}`,
+          );
+        }
+      }
+    }
+  }
+  for (const market of scenario.markets) {
+    if (
+      market.customsCountryId !== undefined &&
+      market.customsCountryId !== null &&
+      !Number.isInteger(market.customsCountryId)
+    ) {
+      throw new RangeError(
+        `market ${String(market.id)} customsCountryId must be an unsigned integer or null`,
+      );
+    }
+  }
+  resolveMarketCustomsCountries(scenario);
+  if (scenario.countries !== undefined) {
+    for (const market of scenario.markets) {
+      const customs = market.customsCountryId;
+      if (customs === null || customs === undefined) continue;
+      if (!scenario.countries.some((country) => country.id === customs)) {
+        throw new RangeError(
+          `market ${String(market.id)} customsCountryId ${String(customs)} is not a registered country`,
+        );
+      }
+    }
+  }
+}
+
+function assertTradePolicyInputs(scenario: EconomyScenarioDef): void {
+  const goodCount = scenario.definitions.goods.length;
+  for (const country of scenario.countries ?? []) {
+    createTradePolicyState(country.trade, goodCount, `countries[${String(country.id)}].trade`);
+  }
+}
+
 function pathForBlock(blockId: Id): string {
   return `popBlock ${String(blockId)}`;
 }
@@ -645,6 +738,8 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   assertBuildingOwnershipGeography(scenario);
   const definitionsById = buildingDefinitions(scenario);
   assertInitialEmployment(scenario, definitionsById);
+  assertTradeScenario(scenario);
+  assertTradePolicyInputs(scenario);
   assertValidCountryCurrencyState({
     countries: scenario.countries ?? [],
     currencies: scenario.currencies ?? [],
@@ -681,6 +776,8 @@ export function createEconomyWorld(
   world.countryAI = countryAI;
   world.playerCountryId = scenario.playerCountryId ?? null;
   world.technology = { enabled: scenario.definitions.technology !== undefined };
+  world.trade = createTradeState(scenario.tradeRoutes);
+  const customsCountryByMarket = resolveMarketCustomsCountries(scenario);
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
     (scenario.countries ?? []).map((country) => [country.id, country]),
@@ -709,6 +806,11 @@ export function createEconomyWorld(
         initial.labor,
         `countries[${String(initial.id)}].labor`,
       );
+      const tradeState = createTradePolicyState(
+        initial.trade,
+        scenario.definitions.goods.length,
+        `countries[${String(initial.id)}].trade`,
+      );
       const base: Country = {
         id: initial.id,
         tag: initial.tag,
@@ -730,6 +832,7 @@ export function createEconomyWorld(
         interestGroups: neutralInterestGroups(),
         institutions: neutralInstitutionState(),
         labor: laborState.labor,
+        trade: tradeState,
         ...technologyState,
       };
       const politicsState = createCountryPoliticsState(
@@ -857,6 +960,10 @@ export function createEconomyWorld(
     allocate("country", country.id, "public-capital");
     allocate("country", country.id, "welfare-expense");
     allocate("country", country.id, "subsidy-expense");
+    if (world.trade.enabled) {
+      // E6a customs: each country may administer a customs zone and collect duty.
+      allocate("country", country.id, "customs-duty-revenue");
+    }
     opening.push({
       accountId: country.treasuryAccountId,
       balanceSUSD: initial.initialTreasuryCashSUSD,
@@ -930,6 +1037,11 @@ export function createEconomyWorld(
     allocate("building", instance.id, "input-expense");
     allocate("building", instance.id, "wage-expense");
     allocate("building", instance.id, "upkeep-expense");
+    if (world.trade.enabled) {
+      // E6a trade: a shipping building pays freight and any import duty.
+      allocate("building", instance.id, "freight-expense");
+      allocate("building", instance.id, "customs-duty-expense");
+    }
     if ((scenario.countries ?? []).length > 0) {
       // E2 business-profit tax: the paying building needs an expense account and
       // its taxing country needs a distinct revenue account.
@@ -969,6 +1081,7 @@ export function createEconomyWorld(
       regionIds: [...market.regionIds].sort((left, right) => left - right),
       priceSUSD: [...market.priceSUSD],
       stockLots: canonicalizeStockLots(market.stockLots),
+      customsCountryId: customsCountryByMarket.get(market.id) ?? null,
     };
     world.markets.push(built);
   }

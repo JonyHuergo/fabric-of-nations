@@ -51,6 +51,12 @@ import {
 import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
 import {
+  runTradeArrivals,
+  runTradeDispatchPhase,
+  type TradeArrivalResult,
+  type TradeDispatchResult,
+} from "./trade.js";
+import {
   runProfitDistributionPhase,
   type ProfitDistributionResult,
 } from "./profit.js";
@@ -156,6 +162,10 @@ export interface EconomyDayResult {
     /** M5b daily debt service and month-end deficit financing. */
     readonly debt: DebtPhaseResult;
     readonly migration: MigrationDayResult;
+    /** E6a consignments delivered into destination markets before clearing. */
+    readonly tradeArrivals: TradeArrivalResult;
+    /** E6a profitable capacity-limited shipments dispatched after settlement. */
+    readonly trade: TradeDispatchResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
@@ -234,6 +244,18 @@ export function cloneWorld(
         materials: project.materials.map((material) => ({ ...material })),
       })),
       history: source.construction.history.map((aggregate) => ({ ...aggregate })),
+    },
+    trade: {
+      ...source.trade,
+      routes: source.trade.routes.map((route) => ({ ...route })),
+      shipments: source.trade.shipments.map((shipment) => ({ ...shipment })),
+      lastDay:
+        source.trade.lastDay === null
+          ? null
+          : {
+              ...source.trade.lastDay,
+              blocked: source.trade.lastDay.blocked.map((entry) => ({ ...entry })),
+            },
     },
     diagnostics: {
       ...source.diagnostics,
@@ -938,6 +960,13 @@ export function runEconomicDay(
   }
   assertValidEmploymentState(world, economyDefinitions);
 
+  // E6a pipeline step 2b: consignments whose transit time has elapsed are delivered
+  // into their destination markets before that market clears. Delivery is exact-once
+  // and the goods are not part of any market's stock while in transit.
+  const tradeArrivals = runTradeArrivals(world, economyDefinitions, dayIndex, {
+    validateWorld: false,
+  });
+
   const afterPopulation = cloneWorldForTick(world);
   let fallbackUsed = false;
   let attempt: MarketAttempt;
@@ -974,6 +1003,15 @@ export function runEconomicDay(
   const fiscal = runFiscalPhase(world, settlement, dayIndex, {
     validateWorld: false,
     economyDefinitions,
+  });
+
+  // E6a pipeline step 12b: after settlement and fiscal (the fiscal phase requires the
+  // settlement posting boundary to be unchanged), the remaining domestic stock is real
+  // surplus and shipper cash is known, so the day's consignments can be dispatched with
+  // their freight and import-duty postings. They are still in the open period and before
+  // the month-end close.
+  const trade = runTradeDispatchPhase(world, economyDefinitions, dayIndex, {
+    validateWorld: false,
   });
 
   // E5 training: treasury-limited provider payroll and trainee stipend, then
@@ -1089,6 +1127,8 @@ export function runEconomicDay(
       ai,
       debt,
       migration,
+      tradeArrivals,
+      trade,
       employment,
       householdDemands: household.records,
       productionDemands: productionRecords,

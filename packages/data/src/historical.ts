@@ -57,6 +57,7 @@ import {
   type RegionInitialDef,
   type SystemAccountInitialDef,
   type TechnologyDefinitions,
+  type TradeRouteInitialDef,
 } from "@century/sim";
 
 import { DATA_PACKAGE_VERSION } from "./version.js";
@@ -95,6 +96,7 @@ export interface HistoricalScenarioFiles {
   readonly countries: string;
   readonly regions: string;
   readonly markets: string;
+  readonly tradeRoutes: string;
   readonly populations: string;
   readonly buildings: string;
   readonly employment: string;
@@ -204,10 +206,28 @@ export interface HistoricalMarketInput {
   readonly key: string;
   readonly name: string;
   readonly regionIds: readonly number[];
+  /** E6a customs administration tag; defaults to the lowest-region owner. */
+  readonly customsCountryTag?: string;
   readonly priceBasis: "base-1900";
   /** Provisional multiplier applied to base-1900 prices for the opening price. */
   readonly initialPriceMultiplier: number;
   readonly stockLots: readonly HistoricalStockLotInput[];
+  readonly status: "provisional" | "calibrated";
+  readonly sourceIds: readonly string[];
+}
+
+/**
+ * One authored E6a market-to-market transport route.
+ *
+ * Distances are provisional distance units (freight = per-unit cost × distance,
+ * transit days = ceil(distance)); capacities are provisional daily cargo-value
+ * limits at infrastructure 1. Neither is a historical measurement.
+ */
+export interface HistoricalTradeRouteInput {
+  readonly marketAKey: string;
+  readonly marketBKey: string;
+  readonly distanceUnits: number;
+  readonly baseCapacitySUSDPerDay: number;
   readonly status: "provisional" | "calibrated";
   readonly sourceIds: readonly string[];
 }
@@ -264,6 +284,7 @@ export interface HistoricalData {
   readonly countries: readonly HistoricalCountryInput[];
   readonly regions: readonly HistoricalRegionInput[];
   readonly markets: readonly HistoricalMarketInput[];
+  readonly tradeRoutes: readonly HistoricalTradeRouteInput[];
   readonly populations: readonly HistoricalPopulationInput[];
   readonly buildings: readonly HistoricalBuildingInput[];
   readonly employment: readonly HistoricalEmploymentInput[];
@@ -522,6 +543,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
       countries: stringField(files, "countries", "meta.files", errors),
       regions: stringField(files, "regions", "meta.files", errors),
       markets: stringField(files, "markets", "meta.files", errors),
+      tradeRoutes: stringField(files, "tradeRoutes", "meta.files", errors),
       populations: stringField(files, "populations", "meta.files", errors),
       buildings: stringField(files, "buildings", "meta.files", errors),
       employment: stringField(files, "employment", "meta.files", errors),
@@ -551,6 +573,7 @@ export function loadM5HistoricalData(): HistoricalData {
   const countries = readJson<unknown>(meta.files.countries);
   const regions = readJson<unknown>(meta.files.regions);
   const markets = readJson<unknown>(meta.files.markets);
+  const tradeRoutes = readJson<unknown>(meta.files.tradeRoutes);
   const populations = readJson<unknown>(meta.files.populations);
   const buildings = readJson<unknown>(meta.files.buildings);
   const employment = readJson<unknown>(meta.files.employment);
@@ -559,6 +582,7 @@ export function loadM5HistoricalData(): HistoricalData {
     ["countries", countries],
     ["regions", regions],
     ["markets", markets],
+    ["tradeRoutes", tradeRoutes],
     ["populations", populations],
     ["buildings", buildings],
     ["employment", employment],
@@ -574,6 +598,7 @@ export function loadM5HistoricalData(): HistoricalData {
     countries,
     regions,
     markets,
+    tradeRoutes,
     populations,
     buildings,
     employment,
@@ -588,6 +613,7 @@ interface RawTables {
   readonly countries: unknown;
   readonly regions: unknown;
   readonly markets: unknown;
+  readonly tradeRoutes: unknown;
   readonly populations: unknown;
   readonly buildings: unknown;
   readonly employment: unknown;
@@ -600,12 +626,23 @@ function parseHistoricalTables(tables: RawTables): HistoricalData {
   const countries = parseCountries(tables.countries, errors);
   const regions = parseRegions(tables.regions, errors);
   const markets = parseMarkets(tables.markets, errors);
+  const tradeRoutes = parseTradeRoutes(tables.tradeRoutes, errors);
   const populations = parsePopulations(tables.populations, errors);
   const buildings = parseBuildings(tables.buildings, errors);
   const employment = parseEmployment(tables.employment, errors);
   const calibration = parseCalibration(tables.calibration, errors);
   if (errors.length > 0) throw new HistoricalDataError([...errors].sort());
-  return { meta, countries, regions, markets, populations, buildings, employment, calibration };
+  return {
+    meta,
+    countries,
+    regions,
+    markets,
+    tradeRoutes,
+    populations,
+    buildings,
+    employment,
+    calibration,
+  };
 }
 
 function parseCountries(value: unknown, errors: string[]): HistoricalCountryInput[] {
@@ -859,6 +896,10 @@ function parseMarkets(value: unknown, errors: string[]): HistoricalMarketInput[]
       record.initialPriceMultiplier === undefined
         ? 1
         : numberField(record, "initialPriceMultiplier", path, errors);
+    const customsCountryTag =
+      record.customsCountryTag === undefined
+        ? undefined
+        : stringField(record, "customsCountryTag", path, errors);
     const rawLots = record.stockLots === undefined ? [] : record.stockLots;
     const stockLots = Array.isArray(rawLots)
       ? rawLots.map((lot, lotIndex) => {
@@ -879,9 +920,30 @@ function parseMarkets(value: unknown, errors: string[]): HistoricalMarketInput[]
       key: stringField(record, "key", path, errors),
       name: stringField(record, "name", path, errors),
       regionIds: numberArrayField(record, "regionIds", path, errors),
+      ...(customsCountryTag === undefined ? {} : { customsCountryTag }),
       priceBasis: "base-1900",
       initialPriceMultiplier,
       stockLots,
+      status: status === "calibrated" ? "calibrated" : "provisional",
+      sourceIds: stringArrayField(record, "sourceIds", path, errors),
+    };
+  });
+}
+
+function parseTradeRoutes(value: unknown, errors: string[]): HistoricalTradeRouteInput[] {
+  const values = value as readonly unknown[];
+  return values.map((raw, index) => {
+    const path = `tradeRoutes[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "status", path, errors);
+    if (status !== "provisional" && status !== "calibrated") {
+      errors.push(`${path}.status must be "provisional" or "calibrated"`);
+    }
+    return {
+      marketAKey: stringField(record, "marketAKey", path, errors),
+      marketBKey: stringField(record, "marketBKey", path, errors),
+      distanceUnits: numberField(record, "distanceUnits", path, errors),
+      baseCapacitySUSDPerDay: numberField(record, "baseCapacitySUSDPerDay", path, errors),
       status: status === "calibrated" ? "calibrated" : "provisional",
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
     };
@@ -1343,6 +1405,54 @@ export function validateM5HistoricalData(
     if (countryMarket === undefined) {
       errors.push(`country ${JSON.stringify(country.tag)} has no region in a market`);
     }
+  }
+
+  // E6a: each market declares (or defaults) a customs administration, and every
+  // authored transport route must connect two distinct, known markets with positive
+  // distance and capacity.
+  const countryByTag = new Map(data.countries.map((country) => [country.tag, country]));
+  for (const market of data.markets) {
+    const path = `markets[${String(market.id)}]`;
+    const tag = market.customsCountryTag;
+    if (tag === undefined) continue;
+    const country = countryByTag.get(tag);
+    if (country === undefined) {
+      errors.push(`${path}.customsCountryTag references unknown country ${JSON.stringify(tag)}`);
+      continue;
+    }
+    if (!country.regionIds.some((regionId) => market.regionIds.includes(regionId))) {
+      errors.push(
+        `${path}.customsCountryTag ${JSON.stringify(tag)} owns no region of the market`,
+      );
+    }
+  }
+  const marketByKey = new Map(data.markets.map((market) => [market.key, market]));
+  const routePairs = new Set<string>();
+  for (let index = 0; index < data.tradeRoutes.length; index += 1) {
+    const route = data.tradeRoutes[index];
+    if (route === undefined) continue;
+    const path = `tradeRoutes[${String(index)}]`;
+    const marketA = marketByKey.get(route.marketAKey);
+    const marketB = marketByKey.get(route.marketBKey);
+    if (marketA === undefined) {
+      errors.push(`${path}.marketAKey references unknown market ${JSON.stringify(route.marketAKey)}`);
+    }
+    if (marketB === undefined) {
+      errors.push(`${path}.marketBKey references unknown market ${JSON.stringify(route.marketBKey)}`);
+    }
+    if (marketA !== undefined && marketB !== undefined) {
+      if (marketA.id === marketB.id) {
+        errors.push(`${path} must connect two different markets`);
+      }
+      const pair = `${String(Math.min(marketA.id, marketB.id))}:${String(Math.max(marketA.id, marketB.id))}`;
+      if (routePairs.has(pair)) errors.push(`${path} duplicates a market pair`);
+      routePairs.add(pair);
+    }
+    if (!(route.distanceUnits > 0)) errors.push(`${path}.distanceUnits must be positive`);
+    if (!(route.baseCapacitySUSDPerDay > 0)) {
+      errors.push(`${path}.baseCapacitySUSDPerDay must be positive`);
+    }
+    requireSources(route.sourceIds, `${path}.sourceIds`);
   }
 
   const populationKeys = new Set<string>();
@@ -1880,25 +1990,56 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     .map((entry, index) => ({ id: index, ...entry }));
 
   const goodByKey = new Map(goods.map((good) => [good.key, good]));
-  const markets: MarketInitialDef[] = sortedMarkets.map((market) => ({
-    id: market.id,
-    regionIds: [...market.regionIds].sort((left, right) => left - right),
-    priceSUSD: goods.map((good) => good.basePrice1900SUSD * market.initialPriceMultiplier),
-    stockLots: market.stockLots.map((lot) => {
-      const good = goodByKey.get(lot.goodKey);
-      const ownerBuildingId = buildingIdByKey.get(lot.ownerBuildingKey);
-      if (good === undefined || ownerBuildingId === undefined) {
-        throw new HistoricalDataError([
-          `market ${String(market.id)} stock lot ${lot.goodKey}:${lot.ownerBuildingKey} could not be resolved`,
-        ]);
-      }
-      return {
-        goodId: good.id,
-        ownerBuildingId,
-        quantity: lot.quantity,
-      };
-    }),
-  }));
+  const countryByTag = new Map(data.countries.map((country) => [country.tag, country]));
+  const markets: MarketInitialDef[] = sortedMarkets.map((market) => {
+    const customs =
+      market.customsCountryTag === undefined
+        ? undefined
+        : countryByTag.get(market.customsCountryTag);
+    if (market.customsCountryTag !== undefined && customs === undefined) {
+      throw new HistoricalDataError([
+        `market ${String(market.id)} references unknown customs country ${JSON.stringify(market.customsCountryTag)}`,
+      ]);
+    }
+    return {
+      id: market.id,
+      regionIds: [...market.regionIds].sort((left, right) => left - right),
+      priceSUSD: goods.map((good) => good.basePrice1900SUSD * market.initialPriceMultiplier),
+      stockLots: market.stockLots.map((lot) => {
+        const good = goodByKey.get(lot.goodKey);
+        const ownerBuildingId = buildingIdByKey.get(lot.ownerBuildingKey);
+        if (good === undefined || ownerBuildingId === undefined) {
+          throw new HistoricalDataError([
+            `market ${String(market.id)} stock lot ${lot.goodKey}:${lot.ownerBuildingKey} could not be resolved`,
+          ]);
+        }
+        return {
+          goodId: good.id,
+          ownerBuildingId,
+          quantity: lot.quantity,
+        };
+      }),
+      ...(customs === undefined ? {} : { customsCountryId: customs.id }),
+    };
+  });
+
+  // E6a transport routes: market keys resolve to the validated market ids.
+  const marketIdByKey = new Map(sortedMarkets.map((market) => [market.key, market.id]));
+  const tradeRoutes: TradeRouteInitialDef[] = data.tradeRoutes.map((route) => {
+    const marketAId = marketIdByKey.get(route.marketAKey);
+    const marketBId = marketIdByKey.get(route.marketBKey);
+    if (marketAId === undefined || marketBId === undefined) {
+      throw new HistoricalDataError([
+        `trade route ${route.marketAKey}->${route.marketBKey} could not be resolved`,
+      ]);
+    }
+    return {
+      marketAId,
+      marketBId,
+      distanceUnits: route.distanceUnits,
+      baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
+    };
+  });
 
   const currencies = data.countries
     .slice()
@@ -1979,6 +2120,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     definitions: economyDefinitions,
     buildingInstances,
     markets,
+    tradeRoutes,
     systemAccounts,
     employment,
     countries,

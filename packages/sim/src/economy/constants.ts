@@ -102,6 +102,49 @@ export const MIGRATION_MONTHLY_MAX_FRACTION = 0.01;
 export const MIGRATION_MONTHLY_INFLOW_CAP_FRACTION = 0.01;
 
 /**
+ * E6a trade and transport constants. PROVISIONAL structural limits, not calibration.
+ *
+ * Route capacity, freight, and transit time are derived from authored route data and
+ * existing infrastructure; these constants only bound the derived rules and the
+ * persisted state.
+ */
+
+/** Hard cap on in-transit consignments retained in authoritative state. */
+export const MAX_TRADE_SHIPMENTS = 512;
+
+/** Hard cap on the per-day blocked-shipment diagnostics retained for explanation. */
+export const MAX_TRADE_BLOCKED_DIAGNOSTICS = 64;
+
+/**
+ * Minimum expected margin over landed cost before a shipment is dispatched. It
+ * covers the model's unrepresented commercial risk and stops zero-profit churn.
+ * PROVISIONAL.
+ */
+export const TRADE_MIN_MARGIN_RATE = 0.05;
+
+/** Ad-valorem tariff bounds; a rate is dimensionless in [0, 1]. */
+export const MIN_TRADE_TARIFF_RATE = 0;
+export const MAX_TRADE_TARIFF_RATE = 1;
+
+/** Neutral per-country trade policy: free trade, no quota, no export restriction. */
+export const DEFAULT_TRADE_TARIFF_RATE = 0;
+
+/** Numeric-safety bound for a monthly physical import quota, in good units. */
+export const MAX_TRADE_QUOTA_QUANTITY = 1e15;
+
+/** Bounds for authored route content. Distances and capacities must be positive. */
+export const MIN_TRADE_ROUTE_DISTANCE = 0.1;
+export const MAX_TRADE_ROUTE_DISTANCE = 100;
+export const MAX_TRADE_ROUTE_CAPACITY_SUSD_PER_DAY = 1e12;
+
+/**
+ * Trade uses only direct authored market pairs, so the route count is bounded by the
+ * market-pair count. This guard keeps a malformed scenario from creating an
+ * unbounded persisted array.
+ */
+export const MAX_TRADE_ROUTES = 10_000;
+
+/**
  * M5a profit-allocation policy defaults. PROVISIONAL, not calibrated.
  *
  * Legacy M0–M5 scenarios omit the policy and therefore keep it disabled; the M5

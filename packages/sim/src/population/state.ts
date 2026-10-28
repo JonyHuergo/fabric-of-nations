@@ -678,6 +678,14 @@ export function createPopulationWorld(
       nextLogId: 1,
     },
     technology: { enabled: false },
+    trade: {
+      enabled: false,
+      routes: [],
+      shipments: [],
+      nextShipmentId: 1,
+      lastDispatchDay: null,
+      lastDay: null,
+    },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

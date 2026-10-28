@@ -100,7 +100,9 @@ export interface GovernmentPeriodTotals {
   readonly educationExpenseSUSD?: MoneySUSD;
   /** E5 training provider payroll and trainee stipend paid in the period. */
   readonly trainingExpenseSUSD?: MoneySUSD;
-  /** Tax revenue minus welfare, interest, subsidy, administration, education, and training expense. */
+  /** E6a customs duty collected by this country's customs administration. */
+  readonly customsDutyRevenueSUSD?: MoneySUSD;
+  /** Tax and customs revenue minus welfare, interest, subsidy, administration, education, and training expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -131,6 +133,7 @@ export function governmentPeriodTotals(
           administrationExpenseSUSD: totals.administrationExpenseSUSD ?? 0,
           educationExpenseSUSD: totals.educationExpenseSUSD ?? 0,
           trainingExpenseSUSD: totals.trainingExpenseSUSD ?? 0,
+          customsDutyRevenueSUSD: totals.customsDutyRevenueSUSD ?? 0,
           netFiscalResultSUSD: totals.netFiscalResultSUSD,
         };
       })
@@ -149,6 +152,7 @@ export function governmentPeriodTotals(
       administration: number;
       education: number;
       training: number;
+      customs: number;
     }
   >();
   for (const account of finance.accounts) {
@@ -164,6 +168,7 @@ export function governmentPeriodTotals(
           administration: 0,
           education: 0,
           training: 0,
+          customs: 0,
         },
       );
     }
@@ -189,7 +194,8 @@ export function governmentPeriodTotals(
       account.subtype !== "subsidy-expense" &&
       account.subtype !== "administration-expense" &&
       account.subtype !== "education-expense" &&
-      account.subtype !== "training-expense"
+      account.subtype !== "training-expense" &&
+      account.subtype !== "customs-duty-revenue"
     ) {
       continue;
     }
@@ -203,6 +209,7 @@ export function governmentPeriodTotals(
         administration: 0,
         education: 0,
         training: 0,
+        customs: 0,
       };
     if (account.subtype === "income-tax-revenue") current.tax += value;
     else if (account.subtype === "business-tax-revenue") current.businessTax += value;
@@ -211,6 +218,7 @@ export function governmentPeriodTotals(
     else if (account.subtype === "subsidy-expense") current.subsidy += value;
     else if (account.subtype === "education-expense") current.education += value;
     else if (account.subtype === "training-expense") current.training += value;
+    else if (account.subtype === "customs-duty-revenue") current.customs += value;
     else current.administration += value;
     totals.set(account.ownerId, current);
   }
@@ -225,9 +233,11 @@ export function governmentPeriodTotals(
       administrationExpenseSUSD: values.administration,
       educationExpenseSUSD: values.education,
       trainingExpenseSUSD: values.training,
+      customsDutyRevenueSUSD: values.customs,
       netFiscalResultSUSD:
         values.tax +
-        values.businessTax -
+        values.businessTax +
+        values.customs -
         values.welfare -
         values.interest -
         values.subsidy -
@@ -265,6 +275,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
         administrationExpenseSUSD: entry.administrationExpenseSUSD ?? 0,
         educationExpenseSUSD: entry.educationExpenseSUSD ?? 0,
         trainingExpenseSUSD: entry.trainingExpenseSUSD ?? 0,
+        customsDutyRevenueSUSD: entry.customsDutyRevenueSUSD ?? 0,
         netFiscalResultSUSD: entry.netFiscalResultSUSD,
       };
     }
@@ -783,6 +794,7 @@ function buildAnnualSummary(
       administrationExpenseSUSD: number;
       educationExpenseSUSD: number;
       trainingExpenseSUSD: number;
+      customsDutyRevenueSUSD: number;
       netFiscalResultSUSD: number;
     }
   > = {};
@@ -797,6 +809,7 @@ function buildAnnualSummary(
       administrationExpenseSUSD: 0,
       educationExpenseSUSD: 0,
       trainingExpenseSUSD: 0,
+      customsDutyRevenueSUSD: 0,
       netFiscalResultSUSD: 0,
     };
     budgetTotals[country.id] = emptyBudgetTotals();
@@ -828,6 +841,8 @@ function buildAnnualSummary(
           current.educationExpenseSUSD + (countryTotals.educationExpenseSUSD ?? 0),
         trainingExpenseSUSD:
           current.trainingExpenseSUSD + (countryTotals.trainingExpenseSUSD ?? 0),
+        customsDutyRevenueSUSD:
+          current.customsDutyRevenueSUSD + (countryTotals.customsDutyRevenueSUSD ?? 0),
         netFiscalResultSUSD: 0,
       };
     }
@@ -844,7 +859,8 @@ function buildAnnualSummary(
   for (const totals of Object.values(fiscalTotals)) {
     totals.netFiscalResultSUSD =
       totals.incomeTaxRevenueSUSD +
-      totals.businessTaxRevenueSUSD -
+      totals.businessTaxRevenueSUSD +
+      totals.customsDutyRevenueSUSD -
       totals.welfareExpenseSUSD -
       totals.interestExpenseSUSD -
       totals.subsidyExpenseSUSD -

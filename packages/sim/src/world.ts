@@ -39,8 +39,10 @@ import type {
   PoliticsState,
   ProfitDistributionPolicy,
   TechnologySystemState,
+  TradeState,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
+import { assertValidTradeState } from "./economy/trade.js";
 import type { PopBlock, Region } from "./population/types.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
@@ -111,11 +113,11 @@ export interface World {
    * effects (D-076).
    */
   politics: PoliticsState;
-  /**
-   * M9 technology-system policy. A world whose economy definitions carry no
-   * technology block has `enabled: false` and no M9 effects (D-077).
-   */
+  /** M9 technology-system policy. A world whose economy definitions carry no
+   * technology block has `enabled: false` and no M9 effects (D-077). */
   technology: TechnologySystemState;
+  /** E6a authored transport routes, in-transit shipments, and last-day report (D-079). */
+  trade: TradeState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -218,6 +220,14 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       nextLogId: 1,
     },
     technology: { enabled: false },
+    trade: {
+      enabled: false,
+      routes: [],
+      shipments: [],
+      nextShipmentId: 1,
+      lastDispatchDay: null,
+      lastDay: null,
+    },
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
@@ -332,6 +342,7 @@ export function assertValidWorld(
   assertValidPopulationState(world);
   assertValidEconomyState(world, options);
   assertValidTechnologyState(world);
+  assertValidTradeState(world);
 }
 
 /**

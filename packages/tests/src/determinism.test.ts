@@ -27,11 +27,13 @@ describe("determinism", () => {
     const world = createInitialWorld({ seed: 123_456_789, scenarioId: "m1-determinism" });
     runCampaign(world);
 
-    // Known-answer digest for the M1 empty-world tick driver under schema 22.
-    // Schema 22 adds the M9 technology-system flag and age-specific literacy; the
-    // M1 empty-world behaviour is unchanged. A change here requires an intentional
+    // Known-answer digest for the M1 empty-world tick driver under schema 24.
+    // Schema 22 added the M9 technology-system flag and age-specific literacy; E6a
+    // (schema 24) adds `World.trade` and `Market.customsCountryId`. The M1 empty-world
+    // *behaviour* is unchanged; only the encoded state shape changed, so this digest is
+    // intentionally re-pinned. A change here requires an intentional
     // simulation-version decision.
-    expect(hashWorld(world)).toBe("90db537d50ad7033");
+    expect(hashWorld(world)).toBe("53bab05072b2abfe");
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {
