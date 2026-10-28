@@ -1,4 +1,4 @@
-# Century — M0–M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, E4 industrial policy, M8 laws and institutions, and M9 technology and education
+# Century — M0–M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, E4 industrial policy, M8 laws and institutions, M9 technology and education, and E5 labor and social institutions
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -44,20 +44,27 @@ support, with balanced accounting and reporting. **M8 (Laws and Institutions)** 
 authoritative regimes, laws, elections, seven derived interest groups, regional
 unrest and crisis/revolution, clerk-staffed administration with cash-limited payroll
 and quality/overload effects, and a bounded scripted-event queue with provenance.
-Only taxation, suffrage, education (added by M9), labor, and trade law slots expose
-options; health, military service, colonial policy, and currency remain later-stage
-dependencies. AI law/funding actions and player crisis-response actions are not
-implemented. **M9 (Technology and Education)** adds a validated 120-technology,
+Only taxation, suffrage, education (added by M9), labor, health (added by E5), and
+trade law slots expose options; military service, colonial policy, and currency remain
+later-stage dependencies. AI law/funding actions and player crisis-response actions
+are not implemented. **M9 (Technology and Education)** adds a validated 120-technology,
 six-era acyclic tree; per-country research projects whose work comes only from
 funded academic labour; technology effects on sector output, mortality, education
 quality, building unlocks, and law enables; a cash-limited education/research
 institution; and authoritative age-specific literacy updated by schooling and
-shifted by ageing and migration. General goods/services procurement,
-private co-financing, loans, guarantees, investment tax credits, public-enterprise
-expansion/discontinuation, consumption/excise, property/land, and customs taxes,
-broader government expenditure and services, banking/central banking, dynamic FX,
-inflation, monetary policy, reopen/reversal, qualification promotion, health and
-training services, diplomacy, and warfare remain unimplemented. **M7's native
+shifted by ageing and migration. **E5 (Labor and Social Institutions)** adds a funded
+vocational-training service with real academic instructors and a treasury-limited
+trainee stipend, a new authoritative block qualification rate that drives actual
+wages and labour productivity, a public-health service delivered by a share of the
+existing administration clerk base with a derived mortality effect, and M8
+minimum-wage, working-hours, and public-health laws. Pensions/social insurance,
+collective bargaining, labour-market enforcement, cross-profession promotion, and
+practitioner-level medical staffing remain deferred. General goods/services
+procurement, private co-financing, loans, guarantees, investment tax credits,
+public-enterprise expansion/discontinuation, consumption/excise, property/land, and
+customs taxes, broader government expenditure and services, banking/central banking,
+dynamic FX, inflation, monetary policy, reopen/reversal, diplomacy, and warfare remain
+unimplemented. **M7's native
 iOS/Android release
 builds and real-device performance were not measured; M7 is delivered with that
 explicit acceptance exception, not as a passed mobile release.** The designer has
@@ -65,11 +72,12 @@ adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0, E1, E2, E3, and E4 are implemented in GDD v2.13 §17A, M8
-is implemented in §17C, and M9 is implemented in §17D**, and E5–E6 are planned, not
+economic program; **E0, E1, E2, E3, E4, and E5 are implemented in GDD v2.14 §17A/§17E,
+M8 is implemented in §17C, and M9 is implemented in §17D**, and E6 is planned, not
 implemented. The design
 authority is the [Century GDD
-v2.13](./Century_GDD_v2.13.md); v2.12 is retained as
+v2.14](./Century_GDD_v2.14.md); v2.13 is retained as
+[historical M9 documentation](./Century_GDD_v2.13.md), v2.12 as
 [historical M8 documentation](./Century_GDD_v2.12.md), v2.11 as
 [historical E4 documentation](./Century_GDD_v2.11.md), v2.10 as
 [historical E3 documentation](./Century_GDD_v2.10.md), v2.9 as
@@ -87,7 +95,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, M9 technology graph/research/education/age-specific literacy, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, M9 technology graph/research/education/age-specific literacy, E5 vocational training/qualification/public health/labor standards, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -1176,15 +1184,17 @@ M0–M6 are implemented and accepted; M7's shell/worker implementation is delive
 with an explicit native-release and real-device acceptance exception. The designer
 has adopted intermediate finance stages (recorded as D-050) for work that earlier
 revisions left unassigned, and the **Economic Management Overhaul (E0–E6)** as the
-player-facing economic program (D-070). **E0, E1, E2, E3, E4, M7a, M8, and M9 are
-implemented; E5–E6 and M8a remain planned and not implemented.** E1 is
+player-facing economic program (D-070). **E0, E1, E2, E3, E4, M7a, M8, M9, and E5 are
+implemented; E6 and M8a remain planned and not implemented.** E1 is
 presentation/selectors, a
 bounded monthly report, and session-confirmed action history; it adds no new
 economic mechanic. M7a adds bounded annual summaries and audited controlled
 corrections; it changes the authoritative finance schema. M8 adds political
 institutions, laws, elections, interest groups, unrest/crisis, administration, and
 scripted events. M9 adds validated technology content, funded research, technology
-effects, education staffing/payroll, and age-specific literacy. The later stages
+effects, education staffing/payroll, and age-specific literacy. E5 adds funded
+vocational training and qualification, a staffed public-health service, a training
+stipend, and minimum-wage/hours/health laws. The later stages
 preserve existing M0–M10 milestone identities and do not change
 M4a/M4b/M4c/M5/M5a/M5b/M6. M7 adds the worker protocol and UI outside the
 simulation schema.
@@ -1208,7 +1218,7 @@ Combined planning order with the player-facing economic program:
 | **E4** | After E3 | Industrial/business policy: selected subsidies, procurement, investment incentives, public-enterprise investment, sector programs | **Implemented** for sectors/materials/subsidy/support (GDD v2.12 §17A.20; D-075); delayed/general procurement, private co-financing, loans/guarantees, tax credits, and expansion/discontinuation deferred |
 | **M8** | After E4 | Political institutions, laws, elections, unrest, instability, events | **Implemented** (GDD v2.12 §17C; D-076; schema 21 / sim 0.21.0 / protocol 8 / data `m3-economy-v6`) for taxation/suffrage/labor/trade laws, elections, interest groups, unrest/crisis, administration, and scripted events; other law slots deferred |
 | **M9** | After M8 | Technology, research, education/literacy mechanics | **Implemented** (GDD v2.13 §17D; D-077; schema 22 / sim 0.22.0 / protocol 9 / data `m3-economy-v7`) for the 120-technology tree, funded research work, effects, education institution, age-specific literacy, and technology-gated education laws; military technology deferred to M10 |
-| **E5** | After M8/M9 | Labor/social institutions: services/transfers/training, health/education effects, labor laws, pensions/social insurance where supported | Planned |
+| **E5** | After M8/M9 | Labor/social institutions: services/transfers/training, health effects, labor laws, pensions/social insurance where supported | **Implemented** for funded vocational training/qualification, a training stipend, public health via the administration clerk base, minimum wage, working hours/standards, and the public-health staff floor (GDD v2.14 §17E; D-078; schema 23 / sim 0.23.0 / protocol 10 / data `m3-economy-v8`); pensions, collective bargaining, labour-market enforcement, and cross-profession promotion deferred |
 | **E6** | After E5 | E6a real trade/commercial policy; E6b monetary foundations (retained M8a scope) | Planned |
 | **M7a** | After M7, before M8; recommended before E2 | Annual finance summaries/periods, year-end close consistent with M4b, partial years, audited controlled correction/reversal | **Implemented** (GDD v2.8 §17B; D-072; schema 17 / sim 0.17.0) |
 | **M8a** | Retained as E6b | Inflation/price-level measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | Planned |
