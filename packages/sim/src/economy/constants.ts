@@ -334,3 +334,60 @@ export const MIN_ELECTION_TERM_YEARS = 1;
 export const MAX_LAW_OPTIONS_PER_SLOT = 16;
 export const MAX_SCRIPTED_EVENT_EFFECTS = 8;
 export const MAX_INTEREST_GROUP_PROFESSION_WEIGHTS = 64;
+
+/**
+ * M9 technology/education constants. PROVISIONAL structural rules, normalisers,
+ * and coefficients, not historical calibration (D-077). Research work is measured
+ * in researcher-days; education rates are dimensionless. All SUSD values are
+ * nominal and use the same synthetic fiscal scale as the other policy normalisers.
+ */
+
+/** Defensive upper bound on authored technology definitions. */
+export const MAX_TECHNOLOGY_DEFINITIONS = 256;
+/** Defensive upper bound on one technology's required researcher-days. */
+export const MAX_TECHNOLOGY_RESEARCH_WORK = 1e12;
+/** Dimensionless safety bounds for the derived effect factors. */
+export const MAX_TECHNOLOGY_PRODUCTIVITY_BONUS = 2;
+export const MIN_TECHNOLOGY_MORTALITY_FACTOR = 0.25;
+export const MAX_TECHNOLOGY_EDUCATION_BONUS = 1;
+export const TECHNOLOGY_RATE_DECIMALS = 6;
+
+/** Inclusive school-age band used by the M9 literacy model. */
+export const EDUCATION_SCHOOL_AGE_MIN = 5;
+export const EDUCATION_SCHOOL_AGE_MAX = 14;
+
+/**
+ * Students one full-time teacher can serve. A structural capacity normaliser, not
+ * a historical classroom-size claim.
+ */
+export const EDUCATION_STUDENTS_PER_TEACHER = 25;
+
+/**
+ * Provisional annual SUSD funding benchmark per academic staff member. Funding
+ * adequacy is `fundedAnnual / (academicStaff × benchmark)`, clamped to 1. The
+ * authored scenario's nominal fiscal scale is synthetic, so this normalises
+ * funding to staff size rather than claiming a historical teacher salary.
+ */
+export const EDUCATION_FUNDING_PER_STAFF_PER_YEAR_SUSD = 1;
+
+/** Household attendance from wealth: base + weight × (wealthLevel / 99). */
+export const EDUCATION_ATTENDANCE_BASE = 0.45;
+export const EDUCATION_ATTENDANCE_WEALTH_WEIGHT = 0.55;
+
+/**
+ * Education-quality weights over staffing coverage and academic literacy. They
+ * sum to 1. Funding adequacy is applied multiplicatively to service output and
+ * research work, not added here, so zero funding yields zero service.
+ */
+export const EDUCATION_QUALITY_COVERAGE_WEIGHT = 0.6;
+export const EDUCATION_QUALITY_LITERACY_WEIGHT = 0.4;
+
+/**
+ * Maximum literacy share of the remaining gap one fully-schooled person can close
+ * per day. At full access and quality 1, a ten-year schooling span closes about
+ * 0.997 of the initial gap; at realistic access it closes a fraction, not all.
+ */
+export const EDUCATION_DAILY_LITERACY_GAIN = 0.0015;
+
+/** Numeric-safety bound for an education funding target. */
+export const MAX_EDUCATION_FUNDING_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;

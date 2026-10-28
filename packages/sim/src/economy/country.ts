@@ -317,6 +317,15 @@ export function copyCountry(country: Country): Country {
       ...country.institutions,
       staffedByProfession: { ...country.institutions.staffedByProfession },
     },
+    technology: {
+      researched: country.technology.researched.map((entry) => ({ ...entry })),
+      activeProject:
+        country.technology.activeProject === null
+          ? null
+          : { ...country.technology.activeProject },
+      workByTechnology: { ...country.technology.workByTechnology },
+    },
+    education: { ...country.education },
   };
 }
 

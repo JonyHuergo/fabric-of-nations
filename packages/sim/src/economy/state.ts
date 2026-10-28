@@ -43,6 +43,12 @@ import {
 } from "./profit.js";
 import { createDebtPolicy } from "./debtPolicy.js";
 import {
+  assertValidCountryTechnologyInput,
+  createCountryTechnologyState,
+  neutralCountryTechnologyState,
+  neutralEducationState,
+} from "./technology.js";
+import {
   assertValidCountryPoliticsInput,
   createCountryPoliticsState,
   createWorldPoliticsState,
@@ -673,12 +679,31 @@ export function createEconomyWorld(
   const countryAI = createCountryAIPolicy(scenario.countryAI);
   world.countryAI = countryAI;
   world.playerCountryId = scenario.playerCountryId ?? null;
+  world.technology = { enabled: scenario.definitions.technology !== undefined };
 
   const countryInitialById = new Map<Id, CountryInitialDef>(
     (scenario.countries ?? []).map((country) => [country.id, country]),
   );
   world.countries = (scenario.countries ?? [])
     .map((initial): Country => {
+      const technologyPath = `countries[${String(initial.id)}].technology`;
+      assertValidCountryTechnologyInput(
+        initial.technology,
+        scenario.definitions.technology,
+        technologyPath,
+      );
+      const technologyState =
+        scenario.definitions.technology === undefined
+          ? {
+              technology: neutralCountryTechnologyState(),
+              education: neutralEducationState(),
+            }
+          : createCountryTechnologyState(
+              initial.technology,
+              scenario.definitions.technology,
+              world.startDayIndex,
+              technologyPath,
+            );
       const base: Country = {
         id: initial.id,
         tag: initial.tag,
@@ -699,6 +724,7 @@ export function createEconomyWorld(
         lawTransitions: [],
         interestGroups: neutralInterestGroups(),
         institutions: neutralInstitutionState(),
+        ...technologyState,
       };
       return {
         ...base,
@@ -835,6 +861,17 @@ export function createEconomyWorld(
     }
     for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
       allocate("popBlock", block.id, "administration-income");
+    }
+  }
+
+  // M9 education payroll accounts. Created only for technology-enabled worlds so
+  // legacy fixtures keep their accepted account sets.
+  if (world.technology.enabled && world.countries.length > 0) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      allocate("country", country.id, "education-expense");
+    }
+    for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+      allocate("popBlock", block.id, "education-income");
     }
   }
 

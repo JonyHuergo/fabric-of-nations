@@ -29,6 +29,7 @@ import {
   assertIndustrialPostingStructure,
   assertFiscalPostingStructure,
   assertAdministrationPostingStructure,
+  assertEducationPostingStructure,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
   assertSemanticJournalLine,
@@ -164,6 +165,9 @@ function validatePostingLines(
   }
   if (transactionKind === "administration-payroll") {
     assertAdministrationPostingStructure(lines, accounts);
+  }
+  if (transactionKind === "education-payroll") {
+    assertEducationPostingStructure(lines, accounts);
   }
   if (transactionKind === "business-profit-tax") {
     assertBusinessTaxPostingStructure(lines, accounts);

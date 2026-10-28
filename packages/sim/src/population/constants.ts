@@ -23,6 +23,13 @@ export const TERMINAL_AGE_INDEX = SINGLE_AGE_COUNT - 1;
 export const WORKING_AGE_START = 15;
 export const WORKING_AGE_END = 64;
 
+/**
+ * First age counted in the derived adult literacy aggregate (15+). Literacy is
+ * authoritative by single year of age in `PopBlock.literacyByAge`; the scalar
+ * `PopBlock.literacy` is this aggregate (D-077, M9).
+ */
+export const ADULT_LITERACY_MIN_AGE = 15;
+
 /** Female reproductive ages 15-49, split into seven five-year maternal bands. */
 export const REPRODUCTIVE_AGE_START = 15;
 export const REPRODUCTIVE_AGE_END = 49;
@@ -51,6 +58,13 @@ export const WEALTH_DECIMAL_PLACES = 6;
 
 /** Stored rate precision; used to stabilize repeated updates. */
 export const RATE_DECIMAL_PLACES = 9;
+
+/**
+ * Tolerance for the derived 15+ literacy aggregate. Stored rates are rounded to
+ * `RATE_DECIMAL_PLACES`, so the aggregate check allows one rounding unit with
+ * margin; it is never used to clamp or repair a value.
+ */
+export const LITERACY_AGGREGATE_TOLERANCE = 1e-8;
 
 /** Wealth target formula: intercept, in wealth points. PROVISIONAL. */
 export const WEALTH_INTERCEPT = 10;

@@ -7,6 +7,7 @@ import {
   createPopulationWorld,
   femaleFiveYearAgeGroups,
   fiveYearAgeGroups,
+  initialLiteracyByAge,
   maleFiveYearAgeGroups,
   populationTotal,
   workingAgePopulation,
@@ -118,6 +119,9 @@ describe("M2.1 population state and validation", () => {
 
     block.literacy = 1.5;
     expect(() => assertValidWorld(world)).toThrow(/literacy/);
+    // M9: literacy is derived from the authoritative age-specific array, so both
+    // the scalar and the array must be consistent.
+    block.literacyByAge = initialLiteracyByAge(0.5);
     block.literacy = 0.5;
 
     block.wealthLevel = -1;

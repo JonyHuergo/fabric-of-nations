@@ -27,7 +27,7 @@ import {
   mortalityRatePer1000,
   saturate,
 } from "./definitions.js";
-import { populationTotal } from "./state.js";
+import { populationTotal, syncBlockLiteracy } from "./state.js";
 import { selectDeathBands } from "./deathAllocationSelection.js";
 import type {
   DemographyBlockResult,
@@ -183,6 +183,13 @@ export function applyDailyDemography(
   definitions: PopulationDefinitions,
   dayIndex: DayIndex,
   aged: boolean = false,
+  options: {
+    /**
+     * M9 per-block technology mortality multiplier. Absent for the M2-only path and
+     * for worlds without technology definitions, where the factor is 1.
+     */
+    readonly mortalityFactorByBlock?: ReadonlyMap<Id, number>;
+  } = {},
 ): DemographyDayResult {
   const date = dayIndexToCivilDate(dayIndex);
   const year = date.year;
@@ -227,7 +234,9 @@ export function applyDailyDemography(
 
     const male = block.maleByAge;
     const female = block.femaleByAge;
-    const mortalityMultiplier = needMortalityMultiplier(block);
+    const mortalityMultiplier =
+      needMortalityMultiplier(block) *
+      (options.mortalityFactorByBlock?.get(block.id) ?? 1);
     for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
       const band = ageBandForAge(age);
       const maleEffective = Math.min(
@@ -337,6 +346,8 @@ export function applyDailyDemography(
     if (end < 0) {
       throw new RangeError(`popBlock ${String(block.id)} population became negative`);
     }
+    // Deaths and births change the age weighting of the adult literacy aggregate.
+    syncBlockLiteracy(block);
 
     totalBirths += births;
     totalMaleBirths += maleBirths;

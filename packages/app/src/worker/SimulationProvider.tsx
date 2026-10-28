@@ -125,6 +125,22 @@ function appliedActionFromSnapshot(
         refinanceOnMaturity: country.debtPolicy.refinanceOnMaturity,
         maxOutstandingPrincipalSUSD: country.debtPolicy.maxOutstandingPrincipalSUSD,
       };
+    case "start-research":
+      return {
+        kind: "start-research",
+        technologyId:
+          country.technology.activeProjectTechnologyId ?? request.technologyId,
+      };
+    case "set-education-funding":
+      return {
+        kind: "set-education-funding",
+        annualSUSD: country.education.fundedAnnualSUSD,
+      };
+    case "set-research-staff-share":
+      return {
+        kind: "set-research-staff-share",
+        share: country.education.researchStaffShare,
+      };
     default:
       return { ...request };
   }

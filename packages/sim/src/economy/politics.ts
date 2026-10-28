@@ -361,6 +361,38 @@ export function assertValidPoliticsDefinitions(
     if (laborGrievance < 0 || laborGrievance > 1) {
       throw new RangeError(`${lawPath}.laborGrievance must be in 0..1`);
     }
+    const educationAttendanceFloor =
+      law.educationAttendanceFloor === undefined
+        ? 0
+        : requireFiniteNumber(
+            law.educationAttendanceFloor,
+            `${lawPath}.educationAttendanceFloor`,
+          );
+    if (educationAttendanceFloor < 0 || educationAttendanceFloor > 1) {
+      throw new RangeError(`${lawPath}.educationAttendanceFloor must be in 0..1`);
+    }
+    const educationQualityBonus =
+      law.educationQualityBonus === undefined
+        ? 0
+        : requireFiniteNumber(law.educationQualityBonus, `${lawPath}.educationQualityBonus`);
+    if (educationQualityBonus < 0 || educationQualityBonus > 1) {
+      throw new RangeError(`${lawPath}.educationQualityBonus must be in 0..1`);
+    }
+    const requiredTechnologyIdsRaw =
+      law.requiredTechnologyIds === undefined
+        ? []
+        : requireArray(law.requiredTechnologyIds, `${lawPath}.requiredTechnologyIds`);
+    const requiredTechnologyIds = requiredTechnologyIdsRaw.map((entry, technologyIndex) =>
+      requireInteger(
+        entry,
+        `${lawPath}.requiredTechnologyIds[${String(technologyIndex)}]`,
+        0,
+        0xffff_ffff,
+      ),
+    );
+    if (new Set(requiredTechnologyIds).size !== requiredTechnologyIds.length) {
+      throw new RangeError(`${lawPath}.requiredTechnologyIds contains duplicates`);
+    }
     const institutionLoad = requireFiniteNumber(
       law.institutionLoad,
       `${lawPath}.institutionLoad`,
@@ -397,6 +429,9 @@ export function assertValidPoliticsDefinitions(
       borderPolicy,
       laborOrganizationBonus,
       laborGrievance,
+      educationAttendanceFloor,
+      educationQualityBonus,
+      requiredTechnologyIds,
       institutionLoad,
       groupStance,
     };
@@ -429,6 +464,11 @@ export function assertValidPoliticsDefinitions(
       }
     }
   }
+  // Normalise the validated law records back onto the definitions object so
+  // optional M9 fields (technology prerequisites, education policy) are present
+  // as the asserted `LawDef` contract requires, rather than leaving the raw input
+  // shape behind.
+  record.laws = [...lawsBySlot.values()].flat().sort((left, right) => left.id - right.id);
   for (const regime of regimeByKind.values()) {
     for (const slot of LAW_SLOTS) {
       const lawId = regime.defaultLaws[slot];

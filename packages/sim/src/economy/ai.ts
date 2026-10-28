@@ -81,6 +81,14 @@ import {
 } from "./politicsActions.js";
 import { effectiveTaxRateBounds } from "./politics.js";
 import {
+  cancelResearch,
+  startResearch,
+  validateEducationFunding,
+  validateResearchCancel,
+  validateResearchStaffShare,
+  validateResearchStart,
+} from "./technology.js";
+import {
   issueGovernmentDebt,
   repayGovernmentDebt,
   validateDebtIssuance,
@@ -229,6 +237,41 @@ export interface SetInstitutionFundingAction {
   readonly annualSUSD: MoneySUSD;
 }
 
+/** M9: set the active research project. */
+export interface StartResearchAction {
+  readonly kind: "start-research";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly technologyId: Id;
+}
+
+/** M9: cancel the active research project, retaining its accumulated work. */
+export interface CancelResearchAction {
+  readonly kind: "cancel-research";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+}
+
+/** M9: set the annual education/research payroll target. */
+export interface SetEducationFundingAction {
+  readonly kind: "set-education-funding";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly annualSUSD: MoneySUSD;
+}
+
+/** M9: set the share of academic staff time assigned to research. */
+export interface SetResearchStaffShareAction {
+  readonly kind: "set-research-staff-share";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly share: Rate;
+}
+
 /** Every implemented country action. */
 export type CountryAction =
   | SetFiscalPolicyAction
@@ -241,7 +284,11 @@ export type CountryAction =
   | SetIndustrialPolicyAction
   | SupportPublicEnterpriseAction
   | ProposeLawAction
-  | SetInstitutionFundingAction;
+  | SetInstitutionFundingAction
+  | StartResearchAction
+  | CancelResearchAction
+  | SetEducationFundingAction
+  | SetResearchStaffShareAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -284,6 +331,20 @@ export interface CountryActionApplication {
     readonly previousAnnualSUSD: MoneySUSD;
     readonly annualSUSD: MoneySUSD;
     readonly changed: boolean;
+  } | null;
+  /** Started research technology for `start-research`, else null. */
+  readonly researchAction?: {
+    readonly technologyId: Id;
+    readonly startedDay: Day;
+  } | null;
+  /** Cancelled research technology for `cancel-research`, else null. */
+  readonly cancelledResearchTechnologyId?: Id | null;
+  /** Education funding/share change for the M9 policy actions, else null. */
+  readonly educationAction?: {
+    readonly previousFundedAnnualSUSD: MoneySUSD;
+    readonly fundedAnnualSUSD: MoneySUSD;
+    readonly previousResearchStaffShare: Rate;
+    readonly researchStaffShare: Rate;
   } | null;
 }
 
@@ -642,12 +703,16 @@ export function validateCountryAction(
     action.kind !== "set-industrial-policy" &&
     action.kind !== "support-public-enterprise" &&
     action.kind !== "propose-law" &&
-    action.kind !== "set-institution-funding"
+    action.kind !== "set-institution-funding" &&
+    action.kind !== "start-research" &&
+    action.kind !== "cancel-research" &&
+    action.kind !== "set-education-funding" &&
+    action.kind !== "set-research-staff-share"
   ) {
     return {
       valid: false,
       errors: [
-        'action.kind must be "set-fiscal-policy", "issue-debt", "repay-debt", "set-debt-policy", "start-construction", "cancel-construction", "set-construction-paused", "set-industrial-policy", "support-public-enterprise", "propose-law", or "set-institution-funding"',
+        'action.kind must be one of the implemented country actions',
       ],
     };
   }
@@ -831,6 +896,51 @@ export function validateCountryAction(
         validateInstitutionFunding(world, definitions, {
           countryId: country.id,
           annualSUSD: action.annualSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "start-research") {
+      if (action.source === "ai") {
+        errors.push("AI research selection is not implemented in M9");
+      }
+      try {
+        validateResearchStart(world, definitions, {
+          countryId: country.id,
+          technologyId: action.technologyId,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "cancel-research") {
+      if (action.source === "ai") {
+        errors.push("AI research selection is not implemented in M9");
+      }
+      try {
+        validateResearchCancel(world, definitions, { countryId: country.id });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-education-funding") {
+      if (action.source === "ai") {
+        errors.push("AI education funding is not implemented in M9");
+      }
+      try {
+        validateEducationFunding(world, definitions, {
+          countryId: country.id,
+          annualSUSD: action.annualSUSD,
+        });
+      } catch (error) {
+        errors.push(errorMessage(error));
+      }
+    } else if (action.kind === "set-research-staff-share") {
+      if (action.source === "ai") {
+        errors.push("AI research staffing is not implemented in M9");
+      }
+      try {
+        validateResearchStaffShare(world, definitions, {
+          countryId: country.id,
+          share: action.share,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1172,6 +1282,122 @@ export function applyCountryAction(
         changed: result.changed,
       },
       changed: result.changed,
+    };
+  }
+
+  if (action.kind === "start-research") {
+    if (definitions === undefined) {
+      throw new RangeError("start-research requires the validated economy definitions");
+    }
+    const previousTechnology = { ...country.technology };
+    const definition = startResearch(
+      world,
+      definitions,
+      { countryId: country.id, technologyId: action.technologyId },
+      action.dayIndex,
+    );
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      country.technology = previousTechnology;
+      throw error;
+    }
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      researchAction: {
+        technologyId: definition.id,
+        startedDay: action.dayIndex,
+      },
+      changed: true,
+    };
+  }
+
+  if (action.kind === "cancel-research") {
+    if (definitions === undefined) {
+      throw new RangeError("cancel-research requires the validated economy definitions");
+    }
+    const cancelled = country.technology.activeProject?.technologyId ?? null;
+    const previousTechnology = { ...country.technology };
+    cancelResearch(world, definitions, { countryId: country.id });
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      country.technology = previousTechnology;
+      throw error;
+    }
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      cancelledResearchTechnologyId: cancelled,
+      changed: true,
+    };
+  }
+
+  if (
+    action.kind === "set-education-funding" ||
+    action.kind === "set-research-staff-share"
+  ) {
+    if (definitions === undefined) {
+      throw new RangeError("education policy actions require the validated economy definitions");
+    }
+    const previousEducation = { ...country.education };
+    if (action.kind === "set-education-funding") {
+      validateEducationFunding(world, definitions, {
+        countryId: country.id,
+        annualSUSD: action.annualSUSD,
+      });
+      country.education = { ...country.education, fundedAnnualSUSD: action.annualSUSD };
+    } else {
+      validateResearchStaffShare(world, definitions, {
+        countryId: country.id,
+        share: action.share,
+      });
+      country.education = { ...country.education, researchStaffShare: action.share };
+    }
+    try {
+      assertValidWorld(world);
+    } catch (error) {
+      country.education = previousEducation;
+      throw error;
+    }
+    const changed =
+      country.education.fundedAnnualSUSD !== previousEducation.fundedAnnualSUSD ||
+      country.education.researchStaffShare !== previousEducation.researchStaffShare;
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      educationAction: {
+        previousFundedAnnualSUSD: previousEducation.fundedAnnualSUSD,
+        fundedAnnualSUSD: country.education.fundedAnnualSUSD,
+        previousResearchStaffShare: previousEducation.researchStaffShare,
+        researchStaffShare: country.education.researchStaffShare,
+      },
+      changed,
     };
   }
 

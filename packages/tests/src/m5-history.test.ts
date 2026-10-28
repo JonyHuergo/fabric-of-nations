@@ -27,7 +27,9 @@ describe("M5 historical data pipeline", () => {
     expect(data.countries).toHaveLength(8);
     expect(data.regions).toHaveLength(16);
     expect(data.markets).toHaveLength(5);
-    expect(data.populations).toHaveLength(64);
+    // M9 adds one academics block per region (population moved from the clerks
+    // block, so country totals are unchanged): 64 + 16 = 80.
+    expect(data.populations).toHaveLength(80);
     expect(data.buildings).toHaveLength(113);
     expect(data.employment).toHaveLength(0);
     expect(data.calibration).toHaveLength(16);
@@ -40,7 +42,7 @@ describe("M5 historical data pipeline", () => {
     expect(world.countries).toHaveLength(8);
     expect(world.regions).toHaveLength(16);
     expect(world.markets).toHaveLength(5);
-    expect(world.popBlocks).toHaveLength(64);
+    expect(world.popBlocks).toHaveLength(80);
     expect(world.buildings).toHaveLength(113);
     assertValidWorld(world);
     const populationBefore = world.popBlocks.reduce(

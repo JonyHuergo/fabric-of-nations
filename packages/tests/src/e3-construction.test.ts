@@ -19,6 +19,7 @@ import {
   deserializeWorld,
   governmentPeriodTotals,
   hashWorld,
+  initialLiteracyByAge,
   runConstructionPhase,
   serializeWorld,
   tick,
@@ -351,6 +352,7 @@ describe("E3 construction progress and completion", () => {
     // there is no idle construction labor at all.
     for (const block of f.world.popBlocks) {
       block.professionId = 1; // laborers
+      block.literacyByAge = initialLiteracyByAge(0);
       block.literacy = 0;
     }
     f.world.employment = [];
@@ -372,6 +374,7 @@ describe("E3 construction progress and completion", () => {
     // so the construction queue sees it as idle and resumes.
     const block = f.world.popBlocks[0]!;
     block.professionId = 0;
+    block.literacyByAge = initialLiteracyByAge(0.5);
     block.literacy = 0.5;
     assertValidWorld(f.world);
     run(f, 1);

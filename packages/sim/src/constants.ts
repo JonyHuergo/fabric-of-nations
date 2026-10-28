@@ -19,9 +19,11 @@
  * the debt issuance/repayment/debt-policy actions. E3 adds public-construction
  * projects, idle-labor hiring, construction capitalization, completion into
  * state-owned buildings, and E4 materials/procurement, sectoral subsidies, and
- * public-enterprise capital support.
+ * public-enterprise capital support. M9 adds per-country technology/research and
+ * education state, the derived age-specific literacy array, and the validated
+ * research/education actions.
  */
-export const SIM_VERSION = "0.21.0";
+export const SIM_VERSION = "0.22.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -38,9 +40,11 @@ export const SIM_VERSION = "0.21.0";
  * per-country industrial policy, subsidy/support budget fields, and the new
  * industrial posting kinds (D-075). M8 adds country regime/laws/transitions/
  * interest-groups/institutions, regional unrest/infrastructure, world politics
- * event state, and administration payroll accounts (D-076).
+ * event state, and administration payroll accounts (D-076). M9 adds per-country
+ * technology/research and education state, world technology enablement, the
+ * age-specific literacy array, and education payroll accounts (D-077).
  */
-export const WORLD_SCHEMA_VERSION = 21;
+export const WORLD_SCHEMA_VERSION = 22;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -59,9 +63,12 @@ export const SAVE_FORMAT_VERSION = 1;
  * construction-material requirements, so it bumps the content version to
  * `m3-economy-v5` (D-075). M8 adds political content definitions and scenario
  * regime/law/funding state, so it bumps the content version to
- * `m3-economy-v6` (D-076).
+ * `m3-economy-v6` (D-076). M9 adds technology content definitions, research and
+ * education scenario inputs, an academics profession, and technology-gated
+ * building definitions, so it bumps the content version to `m3-economy-v7`
+ * (D-077).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v6";
+export const DEFAULT_DATA_VERSION = "m3-economy-v7";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

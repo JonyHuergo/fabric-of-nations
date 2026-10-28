@@ -1,0 +1,2155 @@
+{
+  "dataVersion": "m3-economy-v7",
+  "academicProfessionKeys": [
+    "academics"
+  ],
+  "eraNames": [
+    "Steam and Steel",
+    "Electric Age",
+    "Postwar Boom",
+    "Information Age",
+    "Digital Age",
+    "Network Age"
+  ],
+  "technologies": [
+    {
+      "id": 0,
+      "key": "steam-power",
+      "name": "Steam power",
+      "era": 1,
+      "description": "Steam power: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "key": "mechanized-agriculture",
+      "name": "Mechanized agriculture",
+      "era": 1,
+      "description": "Mechanized agriculture: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "key": "railway-logistics",
+      "name": "Railway logistics",
+      "era": 1,
+      "description": "Railway logistics: provisional M9 research content for era 1.",
+      "prerequisites": [
+        0
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "key": "basic-sanitation",
+      "name": "Basic sanitation",
+      "era": 1,
+      "description": "Basic sanitation: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.02
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "key": "primary-schooling",
+      "name": "Primary schooling",
+      "era": 1,
+      "description": "Primary schooling: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "key": "printing-industry",
+      "name": "Printing industry",
+      "era": 1,
+      "description": "Printing industry: provisional M9 research content for era 1.",
+      "prerequisites": [
+        4
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "key": "steelmaking",
+      "name": "Steelmaking",
+      "era": 1,
+      "description": "Steelmaking: provisional M9 research content for era 1.",
+      "prerequisites": [
+        0
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "key": "chemical-fertilizer",
+      "name": "Chemical fertilizer",
+      "era": 1,
+      "description": "Chemical fertilizer: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "key": "canning",
+      "name": "Canning",
+      "era": 1,
+      "description": "Canning: provisional M9 research content for era 1.",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "key": "power-loom",
+      "name": "Power loom",
+      "era": 1,
+      "description": "Power loom: provisional M9 research content for era 1.",
+      "prerequisites": [
+        0
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "key": "telegraph",
+      "name": "Telegraph",
+      "era": 1,
+      "description": "Telegraph: provisional M9 research content for era 1.",
+      "prerequisites": [
+        0
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.01
+        },
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.01
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "key": "germ-theory",
+      "name": "Germ theory",
+      "era": 1,
+      "description": "Germ theory: provisional M9 research content for era 1.",
+      "prerequisites": [
+        3
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "key": "public-health-administration",
+      "name": "Public health administration",
+      "era": 1,
+      "description": "Public health administration: provisional M9 research content for era 1.",
+      "prerequisites": [
+        3
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.02
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "key": "accounting-standards",
+      "name": "Accounting standards",
+      "era": 1,
+      "description": "Accounting standards: provisional M9 research content for era 1.",
+      "prerequisites": [
+        2
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "key": "vocational-schools",
+      "name": "Vocational schools",
+      "era": 1,
+      "description": "Vocational schools: provisional M9 research content for era 1.",
+      "prerequisites": [
+        4
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "key": "electrical-generation",
+      "name": "Electrical generation",
+      "era": 1,
+      "description": "Electrical generation: provisional M9 research content for era 1.",
+      "prerequisites": [
+        0
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "key": "internal-combustion",
+      "name": "Internal combustion",
+      "era": 1,
+      "description": "Internal combustion: provisional M9 research content for era 1.",
+      "prerequisites": [
+        6
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "key": "refrigeration",
+      "name": "Refrigeration",
+      "era": 1,
+      "description": "Refrigeration: provisional M9 research content for era 1.",
+      "prerequisites": [
+        8
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "key": "synthetic-dyes",
+      "name": "Synthetic dyes",
+      "era": 1,
+      "description": "Synthetic dyes: provisional M9 research content for era 1.",
+      "prerequisites": [
+        7
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "key": "university-system",
+      "name": "University system",
+      "era": 1,
+      "description": "University system: provisional M9 research content for era 1.",
+      "prerequisites": [
+        4
+      ],
+      "researchWork": 200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "key": "scientific-management",
+      "name": "Scientific management",
+      "era": 2,
+      "description": "Scientific management: provisional M9 research content for era 2.",
+      "prerequisites": [
+        13
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "key": "assembly-line",
+      "name": "Assembly line",
+      "era": 2,
+      "description": "Assembly line: provisional M9 research content for era 2.",
+      "prerequisites": [
+        16,
+        20
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "key": "mass-production",
+      "name": "Mass production",
+      "era": 2,
+      "description": "Mass production: provisional M9 research content for era 2.",
+      "prerequisites": [
+        21
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "key": "radio",
+      "name": "Radio",
+      "era": 2,
+      "description": "Radio: provisional M9 research content for era 2.",
+      "prerequisites": [
+        10
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "key": "antibiotics",
+      "name": "Antibiotics",
+      "era": 2,
+      "description": "Antibiotics: provisional M9 research content for era 2.",
+      "prerequisites": [
+        11
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.05
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "key": "electrification",
+      "name": "Electrification",
+      "era": 2,
+      "description": "Electrification: provisional M9 research content for era 2.",
+      "prerequisites": [
+        15
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "key": "nitrogen-fixation",
+      "name": "Nitrogen fixation",
+      "era": 2,
+      "description": "Nitrogen fixation: provisional M9 research content for era 2.",
+      "prerequisites": [
+        7
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.05
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "key": "air-transport",
+      "name": "Air transport",
+      "era": 2,
+      "description": "Air transport: provisional M9 research content for era 2.",
+      "prerequisites": [
+        16
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "key": "trucking",
+      "name": "Trucking",
+      "era": 2,
+      "description": "Trucking: provisional M9 research content for era 2.",
+      "prerequisites": [
+        16
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "key": "compulsory-education-systems",
+      "name": "Compulsory education systems",
+      "era": 2,
+      "description": "Compulsory education systems: provisional M9 research content for era 2.",
+      "prerequisites": [
+        4
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "key": "applied-psychology",
+      "name": "Applied psychology",
+      "era": 2,
+      "description": "Applied psychology: provisional M9 research content for era 2.",
+      "prerequisites": [
+        19
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "key": "plastics",
+      "name": "Plastics",
+      "era": 2,
+      "description": "Plastics: provisional M9 research content for era 2.",
+      "prerequisites": [
+        7
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "key": "continuous-processing",
+      "name": "Continuous processing",
+      "era": 2,
+      "description": "Continuous processing: provisional M9 research content for era 2.",
+      "prerequisites": [
+        8
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "key": "quality-control",
+      "name": "Quality control",
+      "era": 2,
+      "description": "Quality control: provisional M9 research content for era 2.",
+      "prerequisites": [
+        20
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "key": "agricultural-extension",
+      "name": "Agricultural extension",
+      "era": 2,
+      "description": "Agricultural extension: provisional M9 research content for era 2.",
+      "prerequisites": [
+        7
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "key": "statistical-methods",
+      "name": "Statistical methods",
+      "era": 2,
+      "description": "Statistical methods: provisional M9 research content for era 2.",
+      "prerequisites": [
+        19
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "key": "telephone-networks",
+      "name": "Telephone networks",
+      "era": 2,
+      "description": "Telephone networks: provisional M9 research content for era 2.",
+      "prerequisites": [
+        10
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "key": "water-treatment",
+      "name": "Water treatment",
+      "era": 2,
+      "description": "Water treatment: provisional M9 research content for era 2.",
+      "prerequisites": [
+        12
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "key": "motion-pictures",
+      "name": "Motion pictures",
+      "era": 2,
+      "description": "Motion pictures: provisional M9 research content for era 2.",
+      "prerequisites": [
+        23
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.01
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "key": "industrial-laboratories",
+      "name": "Industrial laboratories",
+      "era": 2,
+      "description": "Industrial laboratories: provisional M9 research content for era 2.",
+      "prerequisites": [
+        19,
+        20
+      ],
+      "researchWork": 400000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "key": "computers",
+      "name": "Computers",
+      "era": 3,
+      "description": "Computers: provisional M9 research content for era 3.",
+      "prerequisites": [
+        15,
+        35
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "key": "transistors",
+      "name": "Transistors",
+      "era": 3,
+      "description": "Transistors: provisional M9 research content for era 3.",
+      "prerequisites": [
+        40
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "key": "jet-engines",
+      "name": "Jet engines",
+      "era": 3,
+      "description": "Jet engines: provisional M9 research content for era 3.",
+      "prerequisites": [
+        27
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "key": "green-revolution",
+      "name": "Green revolution",
+      "era": 3,
+      "description": "Green revolution: provisional M9 research content for era 3.",
+      "prerequisites": [
+        26,
+        34
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.06
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "key": "vaccines",
+      "name": "Vaccines",
+      "era": 3,
+      "description": "Vaccines: provisional M9 research content for era 3.",
+      "prerequisites": [
+        24
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.06
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "key": "mass-higher-education",
+      "name": "Mass higher education",
+      "era": 3,
+      "description": "Mass higher education: provisional M9 research content for era 3.",
+      "prerequisites": [
+        29
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.05
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "key": "television",
+      "name": "Television",
+      "era": 3,
+      "description": "Television: provisional M9 research content for era 3.",
+      "prerequisites": [
+        23
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "key": "petrochemicals",
+      "name": "Petrochemicals",
+      "era": 3,
+      "description": "Petrochemicals: provisional M9 research content for era 3.",
+      "prerequisites": [
+        31
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "key": "automation",
+      "name": "Automation",
+      "era": 3,
+      "description": "Automation: provisional M9 research content for era 3.",
+      "prerequisites": [
+        21,
+        40
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "key": "operations-research",
+      "name": "Operations research",
+      "era": 3,
+      "description": "Operations research: provisional M9 research content for era 3.",
+      "prerequisites": [
+        35,
+        20
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "key": "food-preservation",
+      "name": "Food preservation",
+      "era": 3,
+      "description": "Food preservation: provisional M9 research content for era 3.",
+      "prerequisites": [
+        32,
+        17
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "key": "synthetic-fibers",
+      "name": "Synthetic fibers",
+      "era": 3,
+      "description": "Synthetic fibers: provisional M9 research content for era 3.",
+      "prerequisites": [
+        31
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "key": "modern-statistics",
+      "name": "Modern statistics",
+      "era": 3,
+      "description": "Modern statistics: provisional M9 research content for era 3.",
+      "prerequisites": [
+        35
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "key": "antibiotics-production",
+      "name": "Antibiotics production",
+      "era": 3,
+      "description": "Antibiotics production: provisional M9 research content for era 3.",
+      "prerequisites": [
+        24
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "key": "highway-systems",
+      "name": "Highway systems",
+      "era": 3,
+      "description": "Highway systems: provisional M9 research content for era 3.",
+      "prerequisites": [
+        28
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "key": "containerization",
+      "name": "Containerization",
+      "era": 3,
+      "description": "Containerization: provisional M9 research content for era 3.",
+      "prerequisites": [
+        28,
+        2
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "key": "agricultural-machinery",
+      "name": "Agricultural machinery",
+      "era": 3,
+      "description": "Agricultural machinery: provisional M9 research content for era 3.",
+      "prerequisites": [
+        28
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "key": "cancer-screening",
+      "name": "Cancer screening",
+      "era": 3,
+      "description": "Cancer screening: provisional M9 research content for era 3.",
+      "prerequisites": [
+        12
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "key": "educational-testing",
+      "name": "Educational testing",
+      "era": 3,
+      "description": "Educational testing: provisional M9 research content for era 3.",
+      "prerequisites": [
+        30
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "key": "industrial-design",
+      "name": "Industrial design",
+      "era": 3,
+      "description": "Industrial design: provisional M9 research content for era 3.",
+      "prerequisites": [
+        33
+      ],
+      "researchWork": 650000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "key": "integrated-circuits",
+      "name": "Integrated circuits",
+      "era": 4,
+      "description": "Integrated circuits: provisional M9 research content for era 4.",
+      "prerequisites": [
+        41
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "key": "microprocessors",
+      "name": "Microprocessors",
+      "era": 4,
+      "description": "Microprocessors: provisional M9 research content for era 4.",
+      "prerequisites": [
+        60
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "key": "software-engineering",
+      "name": "Software engineering",
+      "era": 4,
+      "description": "Software engineering: provisional M9 research content for era 4.",
+      "prerequisites": [
+        40
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "key": "satellite-communications",
+      "name": "Satellite communications",
+      "era": 4,
+      "description": "Satellite communications: provisional M9 research content for era 4.",
+      "prerequisites": [
+        41,
+        46
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "key": "oral-rehydration",
+      "name": "Oral rehydration",
+      "era": 4,
+      "description": "Oral rehydration: provisional M9 research content for era 4.",
+      "prerequisites": [
+        44
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "key": "family-planning-programs",
+      "name": "Family planning programs",
+      "era": 4,
+      "description": "Family planning programs: provisional M9 research content for era 4.",
+      "prerequisites": [
+        45
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "key": "agricultural-extension-modern",
+      "name": "Modern agricultural extension",
+      "era": 4,
+      "description": "Modern agricultural extension: provisional M9 research content for era 4.",
+      "prerequisites": [
+        43
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "key": "food-processing-automation",
+      "name": "Food processing automation",
+      "era": 4,
+      "description": "Food processing automation: provisional M9 research content for era 4.",
+      "prerequisites": [
+        48,
+        50
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "key": "advanced-synthetic-fibers",
+      "name": "Advanced synthetic fibers",
+      "era": 4,
+      "description": "Advanced synthetic fibers: provisional M9 research content for era 4.",
+      "prerequisites": [
+        51
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "key": "computer-aided-design",
+      "name": "Computer-aided design",
+      "era": 4,
+      "description": "Computer-aided design: provisional M9 research content for era 4.",
+      "prerequisites": [
+        61
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "key": "distance-education",
+      "name": "Distance education",
+      "era": 4,
+      "description": "Distance education: provisional M9 research content for era 4.",
+      "prerequisites": [
+        46,
+        45
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "key": "medical-imaging",
+      "name": "Medical imaging",
+      "era": 4,
+      "description": "Medical imaging: provisional M9 research content for era 4.",
+      "prerequisites": [
+        57
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "key": "environmental-health",
+      "name": "Environmental health",
+      "era": 4,
+      "description": "Environmental health: provisional M9 research content for era 4.",
+      "prerequisites": [
+        37
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "key": "agricultural-biotechnology",
+      "name": "Agricultural biotechnology",
+      "era": 4,
+      "description": "Agricultural biotechnology: provisional M9 research content for era 4.",
+      "prerequisites": [
+        43
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "key": "industrial-robotics",
+      "name": "Industrial robotics",
+      "era": 4,
+      "description": "Industrial robotics: provisional M9 research content for era 4.",
+      "prerequisites": [
+        48,
+        61
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "key": "quality-management",
+      "name": "Quality management",
+      "era": 4,
+      "description": "Quality management: provisional M9 research content for era 4.",
+      "prerequisites": [
+        33
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "key": "adult-literacy-programs",
+      "name": "Adult literacy programs",
+      "era": 4,
+      "description": "Adult literacy programs: provisional M9 research content for era 4.",
+      "prerequisites": [
+        29
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "key": "telecommunications-networks",
+      "name": "Telecommunications networks",
+      "era": 4,
+      "description": "Telecommunications networks: provisional M9 research content for era 4.",
+      "prerequisites": [
+        63
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "key": "refrigeration-chain",
+      "name": "Refrigeration chain",
+      "era": 4,
+      "description": "Refrigeration chain: provisional M9 research content for era 4.",
+      "prerequisites": [
+        50
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "key": "statistical-computing",
+      "name": "Statistical computing",
+      "era": 4,
+      "description": "Statistical computing: provisional M9 research content for era 4.",
+      "prerequisites": [
+        52,
+        61
+      ],
+      "researchWork": 900000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "key": "personal-computers",
+      "name": "Personal computers",
+      "era": 5,
+      "description": "Personal computers: provisional M9 research content for era 5.",
+      "prerequisites": [
+        61
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "key": "mobile-telephony",
+      "name": "Mobile telephony",
+      "era": 5,
+      "description": "Mobile telephony: provisional M9 research content for era 5.",
+      "prerequisites": [
+        77
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "key": "internet",
+      "name": "Internet",
+      "era": 5,
+      "description": "Internet: provisional M9 research content for era 5.",
+      "prerequisites": [
+        80,
+        77
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "key": "biotechnology-medicine",
+      "name": "Biotechnology medicine",
+      "era": 5,
+      "description": "Biotechnology medicine: provisional M9 research content for era 5.",
+      "prerequisites": [
+        71,
+        73
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "key": "gps-navigation",
+      "name": "GPS navigation",
+      "era": 5,
+      "description": "GPS navigation: provisional M9 research content for era 5.",
+      "prerequisites": [
+        63
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "key": "lean-manufacturing",
+      "name": "Lean manufacturing",
+      "era": 5,
+      "description": "Lean manufacturing: provisional M9 research content for era 5.",
+      "prerequisites": [
+        75,
+        74
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "key": "just-in-time-logistics",
+      "name": "Just-in-time logistics",
+      "era": 5,
+      "description": "Just-in-time logistics: provisional M9 research content for era 5.",
+      "prerequisites": [
+        55,
+        85
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "key": "precision-agriculture",
+      "name": "Precision agriculture",
+      "era": 5,
+      "description": "Precision agriculture: provisional M9 research content for era 5.",
+      "prerequisites": [
+        73,
+        84
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "key": "genomics",
+      "name": "Genomics",
+      "era": 5,
+      "description": "Genomics: provisional M9 research content for era 5.",
+      "prerequisites": [
+        83
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "key": "e-learning",
+      "name": "E-learning",
+      "era": 5,
+      "description": "E-learning: provisional M9 research content for era 5.",
+      "prerequisites": [
+        82,
+        70
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "key": "automation-controls",
+      "name": "Automation controls",
+      "era": 5,
+      "description": "Automation controls: provisional M9 research content for era 5.",
+      "prerequisites": [
+        74
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "key": "advanced-materials",
+      "name": "Advanced materials",
+      "era": 5,
+      "description": "Advanced materials: provisional M9 research content for era 5.",
+      "prerequisites": [
+        61
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "key": "food-safety-systems",
+      "name": "Food safety systems",
+      "era": 5,
+      "description": "Food safety systems: provisional M9 research content for era 5.",
+      "prerequisites": [
+        78
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "key": "technical-textiles",
+      "name": "Technical textiles",
+      "era": 5,
+      "description": "Technical textiles: provisional M9 research content for era 5.",
+      "prerequisites": [
+        68
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "key": "evidence-based-medicine",
+      "name": "Evidence-based medicine",
+      "era": 5,
+      "description": "Evidence-based medicine: provisional M9 research content for era 5.",
+      "prerequisites": [
+        71
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "key": "public-health-surveillance",
+      "name": "Public health surveillance",
+      "era": 5,
+      "description": "Public health surveillance: provisional M9 research content for era 5.",
+      "prerequisites": [
+        72
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.02
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "key": "science-curricula",
+      "name": "Science curricula",
+      "era": 5,
+      "description": "Science curricula: provisional M9 research content for era 5.",
+      "prerequisites": [
+        76
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "key": "computer-networks",
+      "name": "Computer networks",
+      "era": 5,
+      "description": "Computer networks: provisional M9 research content for era 5.",
+      "prerequisites": [
+        77
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "key": "supply-chain-management",
+      "name": "Supply chain management",
+      "era": 5,
+      "description": "Supply chain management: provisional M9 research content for era 5.",
+      "prerequisites": [
+        86
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "key": "agricultural-irrigation-systems",
+      "name": "Agricultural irrigation systems",
+      "era": 5,
+      "description": "Agricultural irrigation systems: provisional M9 research content for era 5.",
+      "prerequisites": [
+        87
+      ],
+      "researchWork": 1200000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "key": "broadband",
+      "name": "Broadband",
+      "era": 6,
+      "description": "Broadband: provisional M9 research content for era 6.",
+      "prerequisites": [
+        82
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 101,
+      "key": "mobile-internet",
+      "name": "Mobile internet",
+      "era": 6,
+      "description": "Mobile internet: provisional M9 research content for era 6.",
+      "prerequisites": [
+        81,
+        82
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "key": "cloud-computing",
+      "name": "Cloud computing",
+      "era": 6,
+      "description": "Cloud computing: provisional M9 research content for era 6.",
+      "prerequisites": [
+        82,
+        97
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "key": "genome-sequencing",
+      "name": "Genome sequencing",
+      "era": 6,
+      "description": "Genome sequencing: provisional M9 research content for era 6.",
+      "prerequisites": [
+        88
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "key": "renewable-energy",
+      "name": "Renewable energy",
+      "era": 6,
+      "description": "Renewable energy: provisional M9 research content for era 6.",
+      "prerequisites": [
+        91
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "key": "electric-vehicles",
+      "name": "Electric vehicles",
+      "era": 6,
+      "description": "Electric vehicles: provisional M9 research content for era 6.",
+      "prerequisites": [
+        104,
+        90
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "key": "advanced-robotics",
+      "name": "Advanced robotics",
+      "era": 6,
+      "description": "Advanced robotics: provisional M9 research content for era 6.",
+      "prerequisites": [
+        90,
+        91
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "key": "precision-medicine",
+      "name": "Precision medicine",
+      "era": 6,
+      "description": "Precision medicine: provisional M9 research content for era 6.",
+      "prerequisites": [
+        103,
+        94
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.04
+        }
+      ]
+    },
+    {
+      "id": 108,
+      "key": "digital-education-platforms",
+      "name": "Digital education platforms",
+      "era": 6,
+      "description": "Digital education platforms: provisional M9 research content for era 6.",
+      "prerequisites": [
+        89,
+        100
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 109,
+      "key": "global-supply-chains",
+      "name": "Global supply chains",
+      "era": 6,
+      "description": "Global supply chains: provisional M9 research content for era 6.",
+      "prerequisites": [
+        98,
+        102
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 110,
+      "key": "smart-agriculture",
+      "name": "Smart agriculture",
+      "era": 6,
+      "description": "Smart agriculture: provisional M9 research content for era 6.",
+      "prerequisites": [
+        87,
+        102
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "agriculture",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "key": "industrial-internet",
+      "name": "Industrial internet",
+      "era": 6,
+      "description": "Industrial internet: provisional M9 research content for era 6.",
+      "prerequisites": [
+        102,
+        90
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 112,
+      "key": "food-biotechnology",
+      "name": "Food biotechnology",
+      "era": 6,
+      "description": "Food biotechnology: provisional M9 research content for era 6.",
+      "prerequisites": [
+        92,
+        88
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "food-processing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 113,
+      "key": "advanced-textiles",
+      "name": "Advanced textiles",
+      "era": 6,
+      "description": "Advanced textiles: provisional M9 research content for era 6.",
+      "prerequisites": [
+        93,
+        91
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "textiles",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "key": "telemedicine",
+      "name": "Telemedicine",
+      "era": 6,
+      "description": "Telemedicine: provisional M9 research content for era 6.",
+      "prerequisites": [
+        101,
+        94
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.03
+        }
+      ]
+    },
+    {
+      "id": 115,
+      "key": "distance-learning-networks",
+      "name": "Distance learning networks",
+      "era": 6,
+      "description": "Distance learning networks: provisional M9 research content for era 6.",
+      "prerequisites": [
+        108
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "key": "artificial-intelligence",
+      "name": "Artificial intelligence",
+      "era": 6,
+      "description": "Artificial intelligence: provisional M9 research content for era 6.",
+      "prerequisites": [
+        102,
+        79
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.04
+        }
+      ]
+    },
+    {
+      "id": 117,
+      "key": "machine-learning",
+      "name": "Machine learning",
+      "era": 6,
+      "description": "Machine learning: provisional M9 research content for era 6.",
+      "prerequisites": [
+        116
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "education-effectiveness",
+          "bonus": 0.02
+        }
+      ]
+    },
+    {
+      "id": 118,
+      "key": "quantum-computing",
+      "name": "Quantum computing",
+      "era": 6,
+      "description": "Quantum computing: provisional M9 research content for era 6.",
+      "prerequisites": [
+        116,
+        91
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "sector-productivity",
+          "sector": "manufacturing",
+          "bonus": 0.03
+        }
+      ]
+    },
+    {
+      "id": 119,
+      "key": "systems-biology",
+      "name": "Systems biology",
+      "era": 6,
+      "description": "Systems biology: provisional M9 research content for era 6.",
+      "prerequisites": [
+        103
+      ],
+      "researchWork": 1600000,
+      "effects": [
+        {
+          "kind": "mortality-reduction",
+          "reduction": 0.02
+        }
+      ]
+    }
+  ]
+}

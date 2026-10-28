@@ -98,6 +98,8 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "bond-asset": "asset",
   "interest-receivable": "asset",
   "interest-income": "revenue",
+  "education-income": "revenue",
+  "education-expense": "expense",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -134,6 +136,8 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "bond-asset": ["country", "popBlock"],
   "interest-receivable": ["country", "popBlock"],
   "interest-income": ["country", "popBlock"],
+  "education-income": ["popBlock"],
+  "education-expense": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -252,6 +256,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "administration-payroll": [
     { subtype: "administration-expense", side: "debit" },
     { subtype: "administration-income", side: "credit" },
+  ],
+  "education-payroll": [
+    { subtype: "education-expense", side: "debit" },
+    { subtype: "education-income", side: "credit" },
   ],
   "business-profit-tax": [
     { subtype: "business-tax-expense", side: "debit" },
@@ -491,19 +499,23 @@ export function assertFiscalPostingStructure(
 }
 
 /**
- * Enforce the required legs of the M8 administration-payroll kind.
+ * Enforce the required legs of a country-to-household payroll transfer.
  *
  * One entry moves cash from exactly one country treasury to one or more
- * administration households: country administration-expense debit / treasury
- * credit; household cash debit / administration-income credit. The per-block
- * income and cash legs must match and sum to the country totals.
+ * households: country `<expense>` debit / treasury credit; household cash debit /
+ * `<income>` credit. The per-block income and cash legs must match and sum to the
+ * country totals. Used by the M8 administration payroll and the M9 education
+ * payroll, which share the same structure with different account subtypes.
  */
-export function assertAdministrationPostingStructure(
+function assertPayrollPostingStructure(
   lines: readonly JournalLine[],
   accounts: ReadonlyMap<Id, FinancialAccount>,
-  path = "journal posting",
+  expenseSubtype: AccountSubtype,
+  incomeSubtype: AccountSubtype,
+  label: string,
+  path: string,
 ): void {
-  if (lines.length === 0) throw new RangeError(`${path} must contain administration lines`);
+  if (lines.length === 0) throw new RangeError(`${path} must contain ${label} lines`);
   const countryOwners = new Set<Id>();
   const countryDebits = new Map<Id, number>();
   const countryCredits = new Map<Id, number>();
@@ -523,9 +535,9 @@ export function assertAdministrationPostingStructure(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
     }
-    if (account.subtype === "administration-expense" && line.side === "debit") {
+    if (account.subtype === expenseSubtype && line.side === "debit") {
       if (account.ownerKind !== "country" || account.ownerId === null) {
-        throw new RangeError(`${path} administration-expense must belong to a country`);
+        throw new RangeError(`${path} ${expenseSubtype} must belong to a country`);
       }
       countryOwners.add(account.ownerId);
       countryDebits.set(
@@ -541,9 +553,9 @@ export function assertAdministrationPostingStructure(
         account.ownerId,
         (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
       );
-    } else if (account.subtype === "administration-income" && line.side === "credit") {
+    } else if (account.subtype === incomeSubtype && line.side === "credit") {
       if (account.ownerKind !== "popBlock" || account.ownerId === null) {
-        throw new RangeError(`${path} administration-income must belong to a popBlock`);
+        throw new RangeError(`${path} ${incomeSubtype} must belong to a popBlock`);
       }
       blockIncome.set(
         account.ownerId,
@@ -559,31 +571,31 @@ export function assertAdministrationPostingStructure(
       );
     } else {
       throw new RangeError(
-        `${path} has an invalid administration-payroll line for ${account.subtype} on the ${line.side} side`,
+        `${path} has an invalid ${label} line for ${account.subtype} on the ${line.side} side`,
       );
     }
   }
   if (countryOwners.size !== 1) {
-    throw new RangeError(`${path} administration payroll must reference exactly one country`);
+    throw new RangeError(`${path} ${label} must reference exactly one country`);
   }
   const owner = [...countryOwners][0];
-  if (owner === undefined) throw new RangeError(`${path} administration payroll has no country`);
+  if (owner === undefined) throw new RangeError(`${path} ${label} has no country`);
   const tolerance = (left: number, right: number): number =>
     MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
   const countryDebitTotal = countryDebits.get(owner) ?? 0;
   const countryCreditTotal = countryCredits.get(owner) ?? 0;
   if (!(countryDebitTotal > 0) || !(countryCreditTotal > 0)) {
-    throw new RangeError(`${path} administration payroll has no positive country total`);
+    throw new RangeError(`${path} ${label} has no positive country total`);
   }
   if (blockIncome.size === 0 || blockCash.size === 0 || blockIncome.size !== blockCash.size) {
-    throw new RangeError(`${path} administration payroll requires matching block legs`);
+    throw new RangeError(`${path} ${label} requires matching block legs`);
   }
   let total = 0;
   for (const [popBlockId, income] of blockIncome) {
     const cash = blockCash.get(popBlockId);
     if (cash === undefined || Math.abs(income - cash) > tolerance(income, cash)) {
       throw new RangeError(
-        `${path} administration payroll block ${String(popBlockId)} income and cash legs do not match`,
+        `${path} ${label} block ${String(popBlockId)} income and cash legs do not match`,
       );
     }
     total += income;
@@ -592,8 +604,40 @@ export function assertAdministrationPostingStructure(
     Math.abs(total - countryDebitTotal) > tolerance(total, countryDebitTotal) ||
     Math.abs(total - countryCreditTotal) > tolerance(total, countryCreditTotal)
   ) {
-    throw new RangeError(`${path} administration payroll block totals do not match country totals`);
+    throw new RangeError(`${path} ${label} block totals do not match country totals`);
   }
+}
+
+/** Enforce the M8 administration-payroll structure. */
+export function assertAdministrationPostingStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  assertPayrollPostingStructure(
+    lines,
+    accounts,
+    "administration-expense",
+    "administration-income",
+    "administration payroll",
+    path,
+  );
+}
+
+/** Enforce the M9 education-payroll structure. */
+export function assertEducationPostingStructure(
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  assertPayrollPostingStructure(
+    lines,
+    accounts,
+    "education-expense",
+    "education-income",
+    "education payroll",
+    path,
+  );
 }
 
 /**

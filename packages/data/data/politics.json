@@ -1,5 +1,5 @@
 {
-  "dataVersion": "m3-economy-v6",
+  "dataVersion": "m3-economy-v7",
   "status": "provisional",
   "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
   "regimes": [
@@ -11,7 +11,7 @@
       "defaultLaws": {
         "suffrage": 4,
         "taxation": 1,
-        "education": 0,
+        "education": 13,
         "health": 0,
         "labor": 9,
         "militaryService": 0,
@@ -28,7 +28,7 @@
       "defaultLaws": {
         "suffrage": 5,
         "taxation": 1,
-        "education": 0,
+        "education": 13,
         "health": 0,
         "labor": 8,
         "militaryService": 0,
@@ -45,7 +45,7 @@
       "defaultLaws": {
         "suffrage": 6,
         "taxation": 1,
-        "education": 0,
+        "education": 13,
         "health": 0,
         "labor": 8,
         "militaryService": 0,
@@ -60,43 +60,60 @@
       "key": "aristocrats",
       "name": "Aristocrats",
       "organizationBase": 0.7,
-      "membershipByProfessionKey": { "capitalists": 0.4 }
+      "membershipByProfessionKey": {
+        "capitalists": 0.4
+      }
     },
     {
       "key": "capitalists",
       "name": "Capitalists",
       "organizationBase": 0.6,
-      "membershipByProfessionKey": { "capitalists": 0.6 }
+      "membershipByProfessionKey": {
+        "capitalists": 0.6
+      }
     },
     {
       "key": "labor",
       "name": "Labor",
       "organizationBase": 0.3,
-      "membershipByProfessionKey": { "laborers": 0.9, "clerks": 0.05 }
+      "membershipByProfessionKey": {
+        "laborers": 0.9,
+        "clerks": 0.05
+      }
     },
     {
       "key": "intelligentsia",
       "name": "Intelligentsia",
       "organizationBase": 0.5,
-      "membershipByProfessionKey": { "clerks": 0.35 }
+      "membershipByProfessionKey": {
+        "clerks": 0.35,
+        "academics": 1
+      }
     },
     {
       "key": "military",
       "name": "Military",
       "organizationBase": 0.6,
-      "membershipByProfessionKey": { "laborers": 0.1, "clerks": 0.05 }
+      "membershipByProfessionKey": {
+        "laborers": 0.1,
+        "clerks": 0.05
+      }
     },
     {
       "key": "bureaucrats",
       "name": "Bureaucrats",
       "organizationBase": 0.6,
-      "membershipByProfessionKey": { "clerks": 0.55 }
+      "membershipByProfessionKey": {
+        "clerks": 0.55
+      }
     },
     {
       "key": "rural",
       "name": "Rural interests",
       "organizationBase": 0.2,
-      "membershipByProfessionKey": { "peasants": 1.0 }
+      "membershipByProfessionKey": {
+        "peasants": 1
+      }
     }
   ],
   "laws": [
@@ -107,11 +124,23 @@
       "name": "Flat taxation",
       "description": "Conventional flat tax schedule with a moderate statutory ceiling.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 90,
       "taxRateBounds": [
-        { "taxType": "incomeTax", "min": 0, "max": 0.35 },
-        { "taxType": "businessProfitTax", "min": 0, "max": 0.3 }
+        {
+          "taxType": "incomeTax",
+          "min": 0,
+          "max": 0.35
+        },
+        {
+          "taxType": "businessProfitTax",
+          "min": 0,
+          "max": 0.3
+        }
       ],
       "suffrage": null,
       "borderPolicy": null,
@@ -135,11 +164,22 @@
       "name": "Progressive taxation",
       "description": "Raises the statutory ceiling for income and business-profit taxation, with a higher administrative burden.",
       "prerequisites": [],
-      "eligibleRegimes": ["constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 180,
       "taxRateBounds": [
-        { "taxType": "incomeTax", "min": 0, "max": 0.6 },
-        { "taxType": "businessProfitTax", "min": 0, "max": 0.6 }
+        {
+          "taxType": "incomeTax",
+          "min": 0,
+          "max": 0.6
+        },
+        {
+          "taxType": "businessProfitTax",
+          "min": 0,
+          "max": 0.6
+        }
       ],
       "suffrage": null,
       "borderPolicy": null,
@@ -163,11 +203,23 @@
       "name": "Restrictive taxation",
       "description": "Caps statutory tax rates at low levels, constraining redistribution and public revenue.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 120,
       "taxRateBounds": [
-        { "taxType": "incomeTax", "min": 0, "max": 0.15 },
-        { "taxType": "businessProfitTax", "min": 0, "max": 0.1 }
+        {
+          "taxType": "incomeTax",
+          "min": 0,
+          "max": 0.15
+        },
+        {
+          "taxType": "businessProfitTax",
+          "min": 0,
+          "max": 0.1
+        }
       ],
       "suffrage": null,
       "borderPolicy": null,
@@ -191,10 +243,18 @@
       "name": "No franchise",
       "description": "No national electoral franchise; elections do not run even where an assembly exists.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 120,
       "taxRateBounds": [],
-      "suffrage": { "kind": "none", "propertyWealthLevel": 99, "minAge": 21 },
+      "suffrage": {
+        "kind": "none",
+        "propertyWealthLevel": 99,
+        "minAge": 21
+      },
       "borderPolicy": null,
       "laborOrganizationBonus": 0,
       "laborGrievance": 0.05,
@@ -216,10 +276,18 @@
       "name": "Property suffrage",
       "description": "Adult suffrage limited to population blocks at or above the property wealth threshold.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 180,
       "taxRateBounds": [],
-      "suffrage": { "kind": "property", "propertyWealthLevel": 50, "minAge": 21 },
+      "suffrage": {
+        "kind": "property",
+        "propertyWealthLevel": 50,
+        "minAge": 21
+      },
       "borderPolicy": null,
       "laborOrganizationBonus": 0,
       "laborGrievance": 0,
@@ -241,10 +309,17 @@
       "name": "Adult male suffrage",
       "description": "All men aged 21 or over may vote; women remain excluded.",
       "prerequisites": [],
-      "eligibleRegimes": ["constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 365,
       "taxRateBounds": [],
-      "suffrage": { "kind": "male", "propertyWealthLevel": 0, "minAge": 21 },
+      "suffrage": {
+        "kind": "male",
+        "propertyWealthLevel": 0,
+        "minAge": 21
+      },
       "borderPolicy": null,
       "laborOrganizationBonus": 0,
       "laborGrievance": 0,
@@ -265,11 +340,20 @@
       "key": "suffrage-universal",
       "name": "Universal adult suffrage",
       "description": "All adults aged 21 or over may vote, subject to the existing election institutions.",
-      "prerequisites": [6],
-      "eligibleRegimes": ["constitutional-monarchy", "republic"],
+      "prerequisites": [
+        6
+      ],
+      "eligibleRegimes": [
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 730,
       "taxRateBounds": [],
-      "suffrage": { "kind": "universal", "propertyWealthLevel": 0, "minAge": 21 },
+      "suffrage": {
+        "kind": "universal",
+        "propertyWealthLevel": 0,
+        "minAge": 21
+      },
       "borderPolicy": null,
       "laborOrganizationBonus": 0,
       "laborGrievance": 0,
@@ -291,7 +375,11 @@
       "name": "Labor association",
       "description": "Legal trade associations and worker organisation without broader collective bargaining.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 180,
       "taxRateBounds": [],
       "suffrage": null,
@@ -316,7 +404,11 @@
       "name": "Labor repression",
       "description": "Restricts worker organisation; lowers organised labor influence but raises grievance and unrest pressure.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 90,
       "taxRateBounds": [],
       "suffrage": null,
@@ -340,8 +432,13 @@
       "key": "labor-protected",
       "name": "Protected labor",
       "description": "Strong legal worker organisation and inclusion; raises labor influence and reduces grievance. Wages, hours, and bargaining remain E5 work.",
-      "prerequisites": [8],
-      "eligibleRegimes": ["constitutional-monarchy", "republic"],
+      "prerequisites": [
+        8
+      ],
+      "eligibleRegimes": [
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 365,
       "taxRateBounds": [],
       "suffrage": null,
@@ -366,7 +463,11 @@
       "name": "Open borders",
       "description": "Admits foreign residents and cross-border workers. Tariff and customs mechanics remain E6a work.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 180,
       "taxRateBounds": [],
       "suffrage": null,
@@ -391,7 +492,11 @@
       "name": "Restricted borders",
       "description": "Restricts foreign residence and cross-border work. Tariff and customs mechanics remain E6a work.",
       "prerequisites": [],
-      "eligibleRegimes": ["absolute-monarchy", "constitutional-monarchy", "republic"],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
       "enactmentDays": 180,
       "taxRateBounds": [],
       "suffrage": null,
@@ -408,6 +513,137 @@
         "bureaucrats": 0.1,
         "rural": 0.4
       }
+    },
+    {
+      "slot": "education",
+      "prerequisites": [],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
+      "enactmentDays": 30,
+      "taxRateBounds": [],
+      "suffrage": null,
+      "borderPolicy": null,
+      "laborOrganizationBonus": 0,
+      "laborGrievance": 0,
+      "institutionLoad": 0,
+      "educationAttendanceFloor": 0,
+      "educationQualityBonus": 0,
+      "requiredTechnologyIds": [],
+      "id": 13,
+      "key": "education-none",
+      "name": "No public education",
+      "description": "The state provides no general education service. Attendance is limited to household resources.",
+      "groupStance": {
+        "aristocrats": 0.1,
+        "capitalists": 0.2,
+        "labor": -0.3,
+        "intelligentsia": -0.5,
+        "military": -0.1,
+        "bureaucrats": 0,
+        "rural": 0.1
+      }
+    },
+    {
+      "slot": "education",
+      "prerequisites": [],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
+      "enactmentDays": 90,
+      "taxRateBounds": [],
+      "suffrage": null,
+      "borderPolicy": null,
+      "laborOrganizationBonus": 0,
+      "laborGrievance": 0,
+      "institutionLoad": 0.05,
+      "educationAttendanceFloor": 0.1,
+      "educationQualityBonus": 0.05,
+      "requiredTechnologyIds": [],
+      "id": 14,
+      "key": "education-voluntary",
+      "name": "Voluntary public schooling",
+      "description": "Public schools are funded and open to families that choose to attend. Modest attendance floor and quality bonus.",
+      "groupStance": {
+        "aristocrats": -0.2,
+        "capitalists": -0.1,
+        "labor": 0.2,
+        "intelligentsia": 0.4,
+        "military": 0,
+        "bureaucrats": 0.1,
+        "rural": 0
+      }
+    },
+    {
+      "slot": "education",
+      "prerequisites": [],
+      "eligibleRegimes": [
+        "absolute-monarchy",
+        "constitutional-monarchy",
+        "republic"
+      ],
+      "enactmentDays": 180,
+      "taxRateBounds": [],
+      "suffrage": null,
+      "borderPolicy": null,
+      "laborOrganizationBonus": 0,
+      "laborGrievance": 0,
+      "institutionLoad": 0.15,
+      "educationAttendanceFloor": 0.5,
+      "educationQualityBonus": 0.1,
+      "requiredTechnologyIds": [
+        4
+      ],
+      "id": 15,
+      "key": "education-compulsory-primary",
+      "name": "Compulsory primary schooling",
+      "description": "Attendance is compulsory up to the primary leaving age. Requires researched primary schooling and raises the attendance floor materially; capacity still limits actual attendance.",
+      "groupStance": {
+        "aristocrats": -0.3,
+        "capitalists": -0.2,
+        "labor": 0.5,
+        "intelligentsia": 0.6,
+        "military": 0,
+        "bureaucrats": 0.2,
+        "rural": -0.2
+      }
+    },
+    {
+      "slot": "education",
+      "prerequisites": [],
+      "eligibleRegimes": [
+        "constitutional-monarchy",
+        "republic"
+      ],
+      "enactmentDays": 365,
+      "taxRateBounds": [],
+      "suffrage": null,
+      "borderPolicy": null,
+      "laborOrganizationBonus": 0,
+      "laborGrievance": 0,
+      "institutionLoad": 0.25,
+      "educationAttendanceFloor": 0.85,
+      "educationQualityBonus": 0.15,
+      "requiredTechnologyIds": [
+        29
+      ],
+      "id": 16,
+      "key": "education-universal",
+      "name": "Universal public education",
+      "description": "Universal schooling with a high attendance floor and a stronger quality bonus. Requires compulsory education systems research and is limited by teaching capacity.",
+      "groupStance": {
+        "aristocrats": -0.5,
+        "capitalists": -0.4,
+        "labor": 0.7,
+        "intelligentsia": 0.8,
+        "military": 0,
+        "bureaucrats": 0.3,
+        "rural": -0.3
+      }
     }
   ],
   "events": [
@@ -417,11 +653,25 @@
       "name": "1905 unrest wave",
       "description": "A national wave of strikes and rural unrest raises militancy, regional unrest, and administrative disruption in Russia.",
       "countryTag": "RUS",
-      "trigger": { "year": 1905, "month": 1, "day": 22 },
+      "trigger": {
+        "year": 1905,
+        "month": 1,
+        "day": 22
+      },
       "effects": [
-        { "kind": "unrest-pressure", "amount": 0.15 },
-        { "kind": "militancy-pressure", "amount": 0.05 },
-        { "kind": "institution-disruption", "days": 180, "qualityPenalty": 0.15 }
+        {
+          "kind": "unrest-pressure",
+          "amount": 0.15
+        },
+        {
+          "kind": "militancy-pressure",
+          "amount": 0.05
+        },
+        {
+          "kind": "institution-disruption",
+          "days": 180,
+          "qualityPenalty": 0.15
+        }
       ],
       "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
     },
@@ -431,11 +681,25 @@
       "name": "1926 general strike",
       "description": "A short general strike raises labor militancy and regional unrest in Britain.",
       "countryTag": "GBR",
-      "trigger": { "year": 1926, "month": 5, "day": 3 },
+      "trigger": {
+        "year": 1926,
+        "month": 5,
+        "day": 3
+      },
       "effects": [
-        { "kind": "unrest-pressure", "amount": 0.2 },
-        { "kind": "militancy-pressure", "amount": 0.08 },
-        { "kind": "institution-disruption", "days": 30, "qualityPenalty": 0.05 }
+        {
+          "kind": "unrest-pressure",
+          "amount": 0.2
+        },
+        {
+          "kind": "militancy-pressure",
+          "amount": 0.08
+        },
+        {
+          "kind": "institution-disruption",
+          "days": 30,
+          "qualityPenalty": 0.05
+        }
       ],
       "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
     },
@@ -445,14 +709,30 @@
       "name": "1936 strike wave",
       "description": "Factory occupations and strikes raise labor militancy and regional unrest in France.",
       "countryTag": "FRA",
-      "trigger": { "year": 1936, "month": 6, "day": 1 },
+      "trigger": {
+        "year": 1936,
+        "month": 6,
+        "day": 1
+      },
       "effects": [
-        { "kind": "unrest-pressure", "amount": 0.18 },
-        { "kind": "militancy-pressure", "amount": 0.06 },
-        { "kind": "institution-disruption", "days": 60, "qualityPenalty": 0.05 }
+        {
+          "kind": "unrest-pressure",
+          "amount": 0.18
+        },
+        {
+          "kind": "militancy-pressure",
+          "amount": 0.06
+        },
+        {
+          "kind": "institution-disruption",
+          "days": 60,
+          "qualityPenalty": 0.05
+        }
       ],
       "provenance": "Authored M8 historical-shock content. Provisional and explicitly not a full historical reconstruction."
     }
   ],
-  "administrationProfessionKeys": ["clerks"]
+  "administrationProfessionKeys": [
+    "clerks"
+  ]
 }

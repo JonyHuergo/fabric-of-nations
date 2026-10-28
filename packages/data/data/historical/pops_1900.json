@@ -30,11 +30,25 @@
   {
     "regionId": 0,
     "professionKey": "clerks",
-    "population": 11735000,
+    "population": 10796200,
     "literacy": 0.95,
     "wealthLevel": 58,
     "savingsPerCapitaSUSD": 8,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 0,
+    "professionKey": "academics",
+    "population": 938800,
+    "literacy": 0.97,
+    "wealthLevel": 60,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -86,11 +100,25 @@
   {
     "regionId": 1,
     "professionKey": "clerks",
-    "population": 9601000,
+    "population": 8832920,
     "literacy": 0.95,
     "wealthLevel": 58,
     "savingsPerCapitaSUSD": 8,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 1,
+    "professionKey": "academics",
+    "population": 768080,
+    "literacy": 0.97,
+    "wealthLevel": 60,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -142,11 +170,25 @@
   {
     "regionId": 2,
     "professionKey": "clerks",
-    "population": 14940000,
+    "population": 13744800,
     "literacy": 0.97,
     "wealthLevel": 60,
     "savingsPerCapitaSUSD": 9,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 2,
+    "professionKey": "academics",
+    "population": 1195200,
+    "literacy": 0.99,
+    "wealthLevel": 62,
+    "savingsPerCapitaSUSD": 9,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -198,11 +240,25 @@
   {
     "regionId": 3,
     "professionKey": "clerks",
-    "population": 1660000,
+    "population": 1527200,
     "literacy": 0.97,
     "wealthLevel": 60,
     "savingsPerCapitaSUSD": 9,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 3,
+    "professionKey": "academics",
+    "population": 132800,
+    "literacy": 0.99,
+    "wealthLevel": 62,
+    "savingsPerCapitaSUSD": 9,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -254,11 +310,25 @@
   {
     "regionId": 4,
     "professionKey": "clerks",
-    "population": 8064000,
+    "population": 7418880,
     "literacy": 0.96,
     "wealthLevel": 56,
     "savingsPerCapitaSUSD": 7,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 4,
+    "professionKey": "academics",
+    "population": 645120,
+    "literacy": 0.98,
+    "wealthLevel": 58,
+    "savingsPerCapitaSUSD": 7,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -310,11 +380,25 @@
   {
     "regionId": 5,
     "professionKey": "clerks",
-    "population": 5376000,
+    "population": 4945920,
     "literacy": 0.96,
     "wealthLevel": 56,
     "savingsPerCapitaSUSD": 7,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 5,
+    "professionKey": "academics",
+    "population": 430080,
+    "literacy": 0.98,
+    "wealthLevel": 58,
+    "savingsPerCapitaSUSD": 7,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -366,11 +450,25 @@
   {
     "regionId": 6,
     "professionKey": "clerks",
-    "population": 4706900,
+    "population": 4330348,
     "literacy": 0.94,
     "wealthLevel": 54,
     "savingsPerCapitaSUSD": 6,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 6,
+    "professionKey": "academics",
+    "population": 376552,
+    "literacy": 0.96,
+    "wealthLevel": 56,
+    "savingsPerCapitaSUSD": 6,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -422,11 +520,25 @@
   {
     "regionId": 7,
     "professionKey": "clerks",
-    "population": 3851100,
+    "population": 3543012,
     "literacy": 0.94,
     "wealthLevel": 54,
     "savingsPerCapitaSUSD": 6,
     "militancy": 0.04,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 7,
+    "professionKey": "academics",
+    "population": 308088,
+    "literacy": 0.96,
+    "wealthLevel": 56,
+    "savingsPerCapitaSUSD": 6,
+    "militancy": 0.03,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -478,11 +590,25 @@
   {
     "regionId": 8,
     "professionKey": "clerks",
-    "population": 4188800,
+    "population": 3853696,
     "literacy": 0.7,
     "wealthLevel": 46,
     "savingsPerCapitaSUSD": 1.5,
     "militancy": 0.06,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 8,
+    "professionKey": "academics",
+    "population": 335104,
+    "literacy": 0.72,
+    "wealthLevel": 48,
+    "savingsPerCapitaSUSD": 1.5,
+    "militancy": 0.05,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -534,11 +660,25 @@
   {
     "regionId": 9,
     "professionKey": "clerks",
-    "population": 5331200,
+    "population": 4904704,
     "literacy": 0.7,
     "wealthLevel": 46,
     "savingsPerCapitaSUSD": 1.5,
     "militancy": 0.06,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 9,
+    "professionKey": "academics",
+    "population": 426496,
+    "literacy": 0.72,
+    "wealthLevel": 48,
+    "savingsPerCapitaSUSD": 1.5,
+    "militancy": 0.05,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -590,11 +730,25 @@
   {
     "regionId": 10,
     "professionKey": "clerks",
-    "population": 3889600,
+    "population": 3578432,
     "literacy": 0.86,
     "wealthLevel": 48,
     "savingsPerCapitaSUSD": 2.5,
     "militancy": 0.05,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 10,
+    "professionKey": "academics",
+    "population": 311168,
+    "literacy": 0.88,
+    "wealthLevel": 50,
+    "savingsPerCapitaSUSD": 2.5,
+    "militancy": 0.04,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -646,11 +800,25 @@
   {
     "regionId": 11,
     "professionKey": "clerks",
-    "population": 1830400,
+    "population": 1683968,
     "literacy": 0.86,
     "wealthLevel": 48,
     "savingsPerCapitaSUSD": 2.5,
     "militancy": 0.05,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 11,
+    "professionKey": "academics",
+    "population": 146432,
+    "literacy": 0.88,
+    "wealthLevel": 50,
+    "savingsPerCapitaSUSD": 2.5,
+    "militancy": 0.04,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -702,11 +870,25 @@
   {
     "regionId": 12,
     "professionKey": "clerks",
-    "population": 11781000,
+    "population": 10838520,
     "literacy": 0.5,
     "wealthLevel": 40,
     "savingsPerCapitaSUSD": 1,
     "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 12,
+    "professionKey": "academics",
+    "population": 942480,
+    "literacy": 0.52,
+    "wealthLevel": 42,
+    "savingsPerCapitaSUSD": 1,
+    "militancy": 0.06,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -758,11 +940,25 @@
   {
     "regionId": 13,
     "professionKey": "clerks",
-    "population": 9639000,
+    "population": 8867880,
     "literacy": 0.5,
     "wealthLevel": 40,
     "savingsPerCapitaSUSD": 1,
     "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 13,
+    "professionKey": "academics",
+    "population": 771120,
+    "literacy": 0.52,
+    "wealthLevel": 42,
+    "savingsPerCapitaSUSD": 1,
+    "militancy": 0.06,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -814,11 +1010,25 @@
   {
     "regionId": 14,
     "professionKey": "clerks",
-    "population": 1436160,
+    "population": 1321267,
     "literacy": 0.6,
     "wealthLevel": 42,
     "savingsPerCapitaSUSD": 1.5,
     "militancy": 0.05,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 14,
+    "professionKey": "academics",
+    "population": 114893,
+    "literacy": 0.62,
+    "wealthLevel": 44,
+    "savingsPerCapitaSUSD": 1.5,
+    "militancy": 0.04,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"
@@ -870,11 +1080,25 @@
   {
     "regionId": 15,
     "professionKey": "clerks",
-    "population": 675840,
+    "population": 621773,
     "literacy": 0.6,
     "wealthLevel": 42,
     "savingsPerCapitaSUSD": 1.5,
     "militancy": 0.05,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-sample"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 15,
+    "professionKey": "academics",
+    "population": 54067,
+    "literacy": 0.62,
+    "wealthLevel": 44,
+    "savingsPerCapitaSUSD": 1.5,
+    "militancy": 0.04,
     "sourceIds": [
       "owid-population",
       "project-authored-sample"

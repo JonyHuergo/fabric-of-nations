@@ -18,6 +18,7 @@ export * from "./migration.js";
 export * from "./aiState.js";
 export * from "./ai.js";
 export * from "./day.js";
+export * from "./technology.js";
 /**
  * M4b period close. Only the public close operation and its result type are
  * exported; the internal `period-close` posting helper stays module-private so

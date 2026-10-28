@@ -1,6 +1,6 @@
 {
   "scenarioId": "m3-small-economy",
-  "dataVersion": "m3-economy-v6",
+  "dataVersion": "m3-economy-v7",
   "status": "provisional",
   "description": "Synthetic single-region, single-market M3 structural fixture. Population and recipe values are provisional test inputs, not historical observations.",
   "professionsFile": "professions.json",
@@ -319,18 +319,65 @@
   "markets": [
     {
       "id": 0,
-      "regionIds": [0],
-      "priceSUSD": [0.05, 0.2, 0.1, 0.15, 0.25, 1, 1, 0.1],
+      "regionIds": [
+        0
+      ],
+      "priceSUSD": [
+        0.05,
+        0.2,
+        0.1,
+        0.15,
+        0.25,
+        1,
+        1,
+        0.1
+      ],
       "stockLots": [
-        { "goodId": 0, "ownerBuildingId": 0, "quantity": 20000 },
-        { "goodId": 0, "ownerBuildingId": 1, "quantity": 30000 },
-        { "goodId": 1, "ownerBuildingId": 2, "quantity": 2000 },
-        { "goodId": 2, "ownerBuildingId": 3, "quantity": 2000 },
-        { "goodId": 3, "ownerBuildingId": 1, "quantity": 1000 },
-        { "goodId": 4, "ownerBuildingId": 2, "quantity": 200 },
-        { "goodId": 5, "ownerBuildingId": 5, "quantity": 500 },
-        { "goodId": 6, "ownerBuildingId": 6, "quantity": 200 },
-        { "goodId": 7, "ownerBuildingId": 4, "quantity": 2000 }
+        {
+          "goodId": 0,
+          "ownerBuildingId": 0,
+          "quantity": 20000
+        },
+        {
+          "goodId": 0,
+          "ownerBuildingId": 1,
+          "quantity": 30000
+        },
+        {
+          "goodId": 1,
+          "ownerBuildingId": 2,
+          "quantity": 2000
+        },
+        {
+          "goodId": 2,
+          "ownerBuildingId": 3,
+          "quantity": 2000
+        },
+        {
+          "goodId": 3,
+          "ownerBuildingId": 1,
+          "quantity": 1000
+        },
+        {
+          "goodId": 4,
+          "ownerBuildingId": 2,
+          "quantity": 200
+        },
+        {
+          "goodId": 5,
+          "ownerBuildingId": 5,
+          "quantity": 500
+        },
+        {
+          "goodId": 6,
+          "ownerBuildingId": 6,
+          "quantity": 200
+        },
+        {
+          "goodId": 7,
+          "ownerBuildingId": 4,
+          "quantity": 2000
+        }
       ]
     }
   ],
@@ -342,9 +389,27 @@
     }
   ],
   "employment": [
-    { "id": 0, "popBlockId": 0, "buildingInstanceId": 0, "professionId": 0, "workers": 1000 },
-    { "id": 1, "popBlockId": 1, "buildingInstanceId": 1, "professionId": 1, "workers": 1000 },
-    { "id": 2, "popBlockId": 2, "buildingInstanceId": 6, "professionId": 2, "workers": 500 }
+    {
+      "id": 0,
+      "popBlockId": 0,
+      "buildingInstanceId": 0,
+      "professionId": 0,
+      "workers": 1000
+    },
+    {
+      "id": 1,
+      "popBlockId": 1,
+      "buildingInstanceId": 1,
+      "professionId": 1,
+      "workers": 1000
+    },
+    {
+      "id": 2,
+      "popBlockId": 2,
+      "buildingInstanceId": 6,
+      "professionId": 2,
+      "workers": 500
+    }
   ],
   "notes": "Synthetic structural fixture. Recipe, wage, and population values are provisional and not historically calibrated."
 }

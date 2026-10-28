@@ -45,6 +45,8 @@ export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
     publicEnterpriseSupportSUSD: 0,
     administrationRequestedSUSD: 0,
     administrationShortfallSUSD: 0,
+    educationRequestedSUSD: 0,
+    educationShortfallSUSD: 0,
     businessTaxAssessedDay: null,
   };
 }
@@ -91,6 +93,8 @@ export function accumulateBudgetMemo(
     readonly publicEnterpriseSupportSUSD?: MoneySUSD;
     readonly administrationRequestedSUSD?: MoneySUSD;
     readonly administrationShortfallSUSD?: MoneySUSD;
+    readonly educationRequestedSUSD?: MoneySUSD;
+    readonly educationShortfallSUSD?: MoneySUSD;
     readonly businessTaxAssessedDay?: Day;
   },
 ): FinanceBudgetMemo {
@@ -176,6 +180,16 @@ export function accumulateBudgetMemo(
       delta.administrationShortfallSUSD ?? 0,
       "administrationShortfallSUSD",
     ),
+    educationRequestedSUSD: addAmount(
+      current.educationRequestedSUSD ?? 0,
+      delta.educationRequestedSUSD ?? 0,
+      "educationRequestedSUSD",
+    ),
+    educationShortfallSUSD: addAmount(
+      current.educationShortfallSUSD ?? 0,
+      delta.educationShortfallSUSD ?? 0,
+      "educationShortfallSUSD",
+    ),
     businessTaxAssessedDay:
       delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
   };
@@ -202,6 +216,8 @@ export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudg
     publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
     administrationRequestedSUSD: memo.administrationRequestedSUSD ?? 0,
     administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
+    educationRequestedSUSD: memo.educationRequestedSUSD ?? 0,
+    educationShortfallSUSD: memo.educationShortfallSUSD ?? 0,
   };
 }
 
@@ -240,6 +256,10 @@ export function addBudgetTotals(
     administrationShortfallSUSD:
       (left.administrationShortfallSUSD ?? 0) +
       (right.administrationShortfallSUSD ?? 0),
+    educationRequestedSUSD:
+      (left.educationRequestedSUSD ?? 0) + (right.educationRequestedSUSD ?? 0),
+    educationShortfallSUSD:
+      (left.educationShortfallSUSD ?? 0) + (right.educationShortfallSUSD ?? 0),
   };
 }
 
@@ -262,6 +282,8 @@ export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
     publicEnterpriseSupportSUSD: 0,
     administrationRequestedSUSD: 0,
     administrationShortfallSUSD: 0,
+    educationRequestedSUSD: 0,
+    educationShortfallSUSD: 0,
   };
 }
 
@@ -346,6 +368,26 @@ export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: stri
       `${path}.administrationShortfallSUSD must not exceed the request`,
     );
   }
+  const educationRequested =
+    record.educationRequestedSUSD === undefined
+      ? 0
+      : requireFiniteNumber(
+          record.educationRequestedSUSD,
+          `${path}.educationRequestedSUSD`,
+        );
+  const educationShortfall =
+    record.educationShortfallSUSD === undefined
+      ? 0
+      : requireFiniteNumber(
+          record.educationShortfallSUSD,
+          `${path}.educationShortfallSUSD`,
+        );
+  if (educationRequested < 0 || educationShortfall < 0) {
+    throw new RangeError(`${path} education memo must be non-negative`);
+  }
+  if (educationShortfall > educationRequested + MONEY_TOLERANCE_SUSD) {
+    throw new RangeError(`${path}.educationShortfallSUSD must not exceed the request`);
+  }
   if (record.businessTaxAssessedDay !== null) {
     requireInteger(
       record.businessTaxAssessedDay,
@@ -387,6 +429,8 @@ export function assertValidBudgetTotals(
     "publicEnterpriseSupportSUSD",
     "administrationRequestedSUSD",
     "administrationShortfallSUSD",
+    "educationRequestedSUSD",
+    "educationShortfallSUSD",
   ] as const) {
     if (valueOf(field) < 0) {
       throw new RangeError(`${path}.${field} must be non-negative`);
@@ -409,5 +453,11 @@ export function assertValidBudgetTotals(
     valueOf("administrationRequestedSUSD") + MONEY_TOLERANCE_SUSD
   ) {
     throw new RangeError(`${path}.administrationShortfallSUSD must not exceed the request`);
+  }
+  if (
+    valueOf("educationShortfallSUSD") >
+    valueOf("educationRequestedSUSD") + MONEY_TOLERANCE_SUSD
+  ) {
+    throw new RangeError(`${path}.educationShortfallSUSD must not exceed the request`);
   }
 }

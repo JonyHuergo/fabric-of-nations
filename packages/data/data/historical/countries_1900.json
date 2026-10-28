@@ -47,6 +47,18 @@
         "trade": "trade-open"
       },
       "institutionFundingSUSDPerYear": 120000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 60000,
+      "researchStaffShare": 0.2
     }
   },
   {
@@ -87,6 +99,18 @@
         "trade": "trade-open"
       },
       "institutionFundingSUSDPerYear": 80000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "printing-industry",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 30000,
+      "researchStaffShare": 0.2
     }
   },
   {
@@ -127,6 +151,18 @@
         "trade": "trade-restricted"
       },
       "institutionFundingSUSDPerYear": 70000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "chemical-fertilizer",
+        "university-system"
+      ],
+      "educationFundingSUSDPerYear": 40000,
+      "researchStaffShare": 0.25
     }
   },
   {
@@ -167,6 +203,18 @@
         "trade": "trade-restricted"
       },
       "institutionFundingSUSDPerYear": 60000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "chemical-fertilizer",
+        "university-system",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 30000,
+      "researchStaffShare": 0.2
     }
   },
   {
@@ -207,6 +255,16 @@
         "trade": "trade-restricted"
       },
       "institutionFundingSUSDPerYear": 90000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 40000,
+      "researchStaffShare": 0.1
     }
   },
   {
@@ -247,6 +305,16 @@
         "trade": "trade-restricted"
       },
       "institutionFundingSUSDPerYear": 50000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 25000,
+      "researchStaffShare": 0.2
     }
   },
   {
@@ -287,6 +355,14 @@
         "trade": "trade-open"
       },
       "institutionFundingSUSDPerYear": 100000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 30000,
+      "researchStaffShare": 0.1
     }
   },
   {
@@ -327,6 +403,15 @@
         "trade": "trade-open"
       },
       "institutionFundingSUSDPerYear": 40000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling",
+        "basic-sanitation"
+      ],
+      "educationFundingSUSDPerYear": 10000,
+      "researchStaffShare": 0.1
     }
   }
 ]

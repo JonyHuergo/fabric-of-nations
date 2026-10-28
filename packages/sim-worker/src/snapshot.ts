@@ -24,12 +24,16 @@ import {
   governmentPeriodTotals,
   governmentStance,
   countryPoliticsSummary,
+  deriveEducation,
   lawDefinition,
   lawPrerequisitesMet,
   lawSupport,
   populationTotal,
   readBudgetMemo,
   regimeDefinition,
+  technologyEducationBonus,
+  technologyMortalityFactor,
+  technologyProductivityFactor,
   workingAgePopulation,
   IMPLEMENTED_LAW_SLOTS,
   INTEREST_GROUP_KEYS,
@@ -67,6 +71,9 @@ import {
   type SnapshotProjectType,
   type SnapshotPublicEnterprise,
   type SnapshotPolitics,
+  type SnapshotTechnology,
+  type SnapshotTechnologyCatalogEntry,
+  type SnapshotEducation,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -626,6 +633,151 @@ function countrySectorValueEstimates(
   return values;
 }
 
+function technologyCatalogSnapshot(
+  definitions: EconomyDefinitions,
+): readonly SnapshotTechnologyCatalogEntry[] {
+  const content = definitions.technology;
+  if (content === undefined) return [];
+  return [...content.technologies]
+    .sort((left, right) => left.id - right.id)
+    .map((technology) => ({
+      technologyId: technology.id,
+      key: technology.key,
+      name: technology.name,
+      era: technology.era,
+      eraName: content.eraNames[technology.era - 1] ?? `Era ${String(technology.era)}`,
+      description: technology.description,
+      prerequisites: [...technology.prerequisites].sort((left, right) => left - right),
+      prerequisiteKeys: technology.prerequisites
+        .map((prerequisite) => technologyKeyOf(content, prerequisite))
+        .sort(),
+      researchWork: technology.researchWork,
+      effects: technology.effects.map((effect) => {
+        if (effect.kind === "sector-productivity") {
+          return `+${(effect.bonus * 100).toFixed(1)}% ${effect.sector} output`;
+        }
+        if (effect.kind === "mortality-reduction") {
+          return `-${(effect.reduction * 100).toFixed(1)}% mortality`;
+        }
+        return `+${(effect.bonus * 100).toFixed(1)}% education quality`;
+      }),
+      unlockedBuildingKeys: definitions.buildings
+        .filter((building) => building.requiredTechnologyId === technology.id)
+        .map((building) => building.key)
+        .sort(),
+      requiredByLawKeys: (definitions.politics?.laws ?? [])
+        .filter((law) => law.requiredTechnologyIds.includes(technology.id))
+        .map((law) => law.key)
+        .sort(),
+    }));
+}
+
+function technologySnapshot(
+  world: World,
+  country: World["countries"][number],
+  definitions: EconomyDefinitions,
+): SnapshotTechnology {
+  const content = definitions.technology;
+  const researchedIds = new Set(
+    country.technology.researched.map((entry) => entry.technologyId),
+  );
+  const activeId = country.technology.activeProject?.technologyId ?? null;
+  const productivityBySector = BUILDING_SECTORS.map((sector) => ({
+    sector,
+    factor: roundDisplay(technologyProductivityFactor(country, definitions, sector), 6),
+  }));
+  if (content === undefined || !world.technology.enabled) {
+    return {
+      enabled: false,
+      statuses: [],
+      researchedCount: 0,
+      activeProjectTechnologyId: null,
+      researchBlockedReason: "no-technology-definitions",
+      productivityBySector,
+      mortalityFactor: 1,
+      educationBonus: 0,
+    };
+  }
+  const derived = deriveEducation(world, country, definitions);
+  const completedById = new Map(
+    country.technology.researched.map((entry) => [entry.technologyId, entry.completedDay]),
+  );
+  const statuses = [...content.technologies]
+    .sort((left, right) => left.id - right.id)
+    .map((technology) => {
+      const prerequisitesResearched = technology.prerequisites.every((prerequisite) =>
+        researchedIds.has(prerequisite),
+      );
+      const status: "researched" | "active" | "available" | "locked" = researchedIds.has(
+        technology.id,
+      )
+        ? "researched"
+        : activeId === technology.id
+          ? "active"
+          : prerequisitesResearched
+            ? "available"
+            : "locked";
+      return {
+        technologyId: technology.id,
+        status,
+        workCompleted: roundDisplay(
+          country.technology.workByTechnology[technology.id] ?? 0,
+          4,
+        ),
+        completedDay: completedById.get(technology.id) ?? null,
+      };
+    });
+  return {
+    enabled: true,
+    statuses,
+    researchedCount: country.technology.researched.length,
+    activeProjectTechnologyId: activeId,
+    researchBlockedReason: derived.researchBlockedReason,
+    productivityBySector,
+    mortalityFactor: roundDisplay(technologyMortalityFactor(country, definitions), 6),
+    educationBonus: roundDisplay(technologyEducationBonus(country, definitions), 6),
+  };
+}
+
+function technologyKeyOf(content: { technologies: readonly { id: number; key: string }[] }, id: number): string {
+  return content.technologies.find((entry) => entry.id === id)?.key ?? String(id);
+}
+
+function educationSnapshot(
+  world: World,
+  country: World["countries"][number],
+  definitions: EconomyDefinitions,
+): SnapshotEducation {
+  const derived = deriveEducation(world, country, definitions);
+  return {
+    enabled: definitions.technology !== undefined && world.technology.enabled,
+    fundedAnnualSUSD: country.education.fundedAnnualSUSD,
+    researchStaffShare: country.education.researchStaffShare,
+    academicPopulation: derived.academicPopulation,
+    availableAcademicWorkers: derived.availableAcademicWorkers,
+    researchStaff: derived.researchStaff,
+    teacherStaff: derived.teacherStaff,
+    schoolAgePopulation: derived.schoolAgePopulation,
+    teachingCapacityStudents: derived.teachingCapacityStudents,
+    enrolledStudents: derived.enrolledStudents,
+    attendanceRate: derived.attendanceRate,
+    fundingAdequacy: derived.fundingAdequacy,
+    quality: derived.quality,
+    serviceOutputIndex: derived.serviceOutputIndex,
+    fundingRequestedMonthToDateSUSD: roundDisplay(
+      country.education.fundingRequestedMonthToDateSUSD,
+      6,
+    ),
+    fundingShortfallMonthToDateSUSD: roundDisplay(
+      country.education.fundingShortfallMonthToDateSUSD,
+      6,
+    ),
+    researchBlockedReason: derived.researchBlockedReason,
+    educationBlockedReason: derived.educationBlockedReason,
+    lastUpdateDay: country.education.lastUpdateDay,
+  };
+}
+
 function politicsSnapshot(
   world: World,
   country: World["countries"][number],
@@ -684,6 +836,10 @@ function politicsSnapshot(
   );
   const lawName = (lawId: number): string =>
     lawId === 0 ? "No implemented law" : (lawDefinition(politics, lawId)?.name ?? `Law ${String(lawId)}`);
+  const technologyContent = definitions.technology;
+  const technologyKey = (technologyId: number): string =>
+    technologyContent?.technologies.find((entry) => entry.id === technologyId)?.key ??
+    String(technologyId);
   const lawOptions = [...politics.laws]
     .sort((left, right) => left.id - right.id)
     .map((law) => {
@@ -703,6 +859,12 @@ function politicsSnapshot(
         transitionInProgress:
           transition !== undefined && transition.toLawId === law.id,
         isBaseLaw: law.prerequisites.length === 0,
+        requiredTechnologyKeys: law.requiredTechnologyIds.map(technologyKey),
+        technologyPrerequisitesMet: law.requiredTechnologyIds.every((technologyId) =>
+          country.technology.researched.some(
+            (entry) => entry.technologyId === technologyId,
+          ),
+        ),
       };
     });
   const lawSlots = LAW_SLOTS.map((slot) => ({
@@ -995,6 +1157,8 @@ function countrySnapshot(
     industrialPolicy,
     publicEnterprises,
     politics: politicsSnapshot(world, country, definitions),
+    technology: technologySnapshot(world, country, definitions),
+    education: educationSnapshot(world, country, definitions),
   };
 }
 
@@ -1092,6 +1256,12 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.publicEnterprises);
     for (const entry of country.productionCapacityByGood) Object.freeze(entry);
     Object.freeze(country.productionCapacityByGood);
+    for (const status of country.technology.statuses) Object.freeze(status);
+    Object.freeze(country.technology.statuses);
+    for (const sector of country.technology.productivityBySector) Object.freeze(sector);
+    Object.freeze(country.technology.productivityBySector);
+    Object.freeze(country.technology);
+    Object.freeze(country.education);
     const politics = country.politics;
     for (const group of politics.interestGroups) Object.freeze(group);
     Object.freeze(politics.interestGroups);
@@ -1143,6 +1313,16 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(projectType);
   }
   Object.freeze(snapshot.projectTypes);
+  for (const entry of snapshot.technologyCatalog) {
+    Object.freeze(entry.prerequisites);
+    Object.freeze(entry.prerequisiteKeys);
+    Object.freeze(entry.effects);
+    Object.freeze(entry.unlockedBuildingKeys);
+    Object.freeze(entry.requiredByLawKeys);
+    Object.freeze(entry);
+  }
+  Object.freeze(snapshot.technologyCatalog);
+  Object.freeze(snapshot.technologyEraNames);
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
@@ -1211,6 +1391,8 @@ export function buildSimulationSnapshot(
     goods: goodsSnapshots(definitions),
     needTiers: needTierSnapshots(populationDefinitions, definitions),
     projectTypes: projectTypeSnapshots(definitions),
+    technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
+    technologyCatalog: technologyCatalogSnapshot(definitions),
     diagnostics,
   });
 }

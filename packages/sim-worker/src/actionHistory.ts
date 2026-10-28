@@ -53,7 +53,11 @@ export type PlayerActionRequest =
       readonly amountSUSD: number;
     }
   | { readonly kind: "propose-law"; readonly lawId: number }
-  | { readonly kind: "set-institution-funding"; readonly annualSUSD: number };
+  | { readonly kind: "set-institution-funding"; readonly annualSUSD: number }
+  | { readonly kind: "start-research"; readonly technologyId: number }
+  | { readonly kind: "cancel-research" }
+  | { readonly kind: "set-education-funding"; readonly annualSUSD: number }
+  | { readonly kind: "set-research-staff-share"; readonly share: number };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -118,5 +122,13 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
       return `propose law ${String(action.lawId)}`;
     case "set-institution-funding":
       return `administration funding ${action.annualSUSD.toFixed(2)} SUSD/year`;
+    case "start-research":
+      return `start research on technology ${String(action.technologyId)}`;
+    case "cancel-research":
+      return "cancel the active research project";
+    case "set-education-funding":
+      return `education funding ${action.annualSUSD.toFixed(2)} SUSD/year`;
+    case "set-research-staff-share":
+      return `research staff share ${(action.share * 100).toFixed(1)}%`;
   }
 }

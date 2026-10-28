@@ -19,6 +19,7 @@ import {
   LAW_SUPPORT_THRESHOLD,
 } from "./constants.js";
 import { lawDefinition, lawSupport, refreshInstitution } from "./politics.js";
+import { lawTechnologyPrerequisitesMet } from "./technology.js";
 import type {
   Country,
   EconomyDefinitions,
@@ -54,6 +55,10 @@ export function lawPrerequisitesMet(
     } else if (country.laws[prerequisite.slot] !== prerequisiteId) {
       return false;
     }
+  }
+  // M9: technology prerequisites are part of the legal path, not UI metadata.
+  if (!lawTechnologyPrerequisitesMet(country, law.requiredTechnologyIds)) {
+    return false;
   }
   return true;
 }

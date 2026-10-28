@@ -15,6 +15,7 @@ import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { canonicalizeStockLots, deriveStockByGood } from "./inventory.js";
 import { productionStrikeFactor } from "./politics.js";
+import { technologyProductivityFactor } from "./technology.js";
 import type {
   BuildingDef,
   BuildingInstance,
@@ -631,8 +632,18 @@ export function runProductionPhase(
 
     const outputResults: BuildingProductionResult["outputs"][number][] = [];
     const sortedOutputs = [...definition.outputs].sort((left, right) => left.goodId - right.goodId);
+    // M9 technology: researched sector productivity increases physical output from
+    // the same executed throughput (and therefore the same inputs). It does not
+    // change capacity, prices, or the input recipe.
+    const owner = world.countries.find((country) =>
+      country.regionIds.includes(building.regionId),
+    );
+    const technologyFactor =
+      owner === undefined
+        ? 1
+        : technologyProductivityFactor(owner, definitions, definition.sector);
     for (const output of sortedOutputs) {
-      const quantity = output.quantityPerThroughputUnit * executedTU;
+      const quantity = output.quantityPerThroughputUnit * executedTU * technologyFactor;
       if (!Number.isFinite(quantity) || quantity < 0) {
         throw new RangeError(`building ${String(building.id)} produced an invalid output quantity`);
       }

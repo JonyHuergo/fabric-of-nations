@@ -74,6 +74,7 @@ describe("M7a annual accounting", () => {
       let interest = 0;
       let subsidy = 0;
       let administration = 0;
+      let education = 0;
       for (const summary of monthly) {
         const totals = governmentPeriodTotals(world.finance, summary).find(
           (entry) => entry.countryId === country.id,
@@ -84,13 +85,15 @@ describe("M7a annual accounting", () => {
         interest += totals?.interestExpenseSUSD ?? 0;
         subsidy += totals?.subsidyExpenseSUSD ?? 0;
         administration += totals?.administrationExpenseSUSD ?? 0;
+        education += totals?.educationExpenseSUSD ?? 0;
       }
       const annualCountry = annual.fiscalTotals[country.id]!;
       expect(annualCountry.incomeTaxRevenueSUSD).toBeCloseTo(tax, 6);
       expect(annualCountry.welfareExpenseSUSD).toBeCloseTo(welfare, 6);
       expect(annualCountry.interestExpenseSUSD).toBeCloseTo(interest, 6);
+      expect(annualCountry.educationExpenseSUSD ?? 0).toBeCloseTo(education, 6);
       expect(annualCountry.netFiscalResultSUSD).toBeCloseTo(
-        tax + businessTax - welfare - interest - subsidy - administration,
+        tax + businessTax - welfare - interest - subsidy - administration - education,
         6,
       );
     }

@@ -134,6 +134,11 @@ export interface EconomyDefinitions {
    * `World.politics.enabled = false` and no M8 effects (D-076).
    */
   politics?: PoliticsDefinitions;
+  /**
+   * M9 validated technology content. Omitted for legacy fixtures, which then have
+   * `World.technology.enabled = false` and no M9 effects (D-077).
+   */
+  technology?: TechnologyDefinitions;
 }
 
 export interface BuildingInstance {
@@ -225,6 +230,8 @@ export const ACCOUNT_SUBTYPES = [
   "bond-asset",
   "interest-receivable",
   "interest-income",
+  "education-income",
+  "education-expense",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -286,6 +293,7 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "debt-default-writeoff",
   "owner-capital-injection",
   "period-close",
+  "education-payroll",
 ] as const;
 
 /**
@@ -410,7 +418,9 @@ export interface FinancePeriodFiscalTotals {
    * pre-M8 summaries/fixtures; absent means zero (D-076).
    */
   readonly administrationExpenseSUSD?: MoneySUSD;
-  /** Tax revenue minus welfare, interest, subsidy, and administration expense. */
+  /** M9 education/research payroll paid through the treasury. Optional pre-M9 = zero. */
+  readonly educationExpenseSUSD?: MoneySUSD;
+  /** Tax revenue minus welfare, interest, subsidy, administration, and education expense. */
   readonly netFiscalResultSUSD: MoneySUSD;
 }
 
@@ -458,6 +468,9 @@ export interface FinancePeriodBudgetTotals {
   /** M8 administration payroll requested/paid/shortfall. Optional pre-M8 = zero. */
   readonly administrationRequestedSUSD?: MoneySUSD;
   readonly administrationShortfallSUSD?: MoneySUSD;
+  /** M9 education payroll requested/paid/shortfall. Optional pre-M9 = zero. */
+  readonly educationRequestedSUSD?: MoneySUSD;
+  readonly educationShortfallSUSD?: MoneySUSD;
 }
 
 /**
@@ -484,6 +497,9 @@ export interface FinanceBudgetMemo {
   /** M8 administration payroll requested/shortfall; optional pre-M8 = zero. */
   readonly administrationRequestedSUSD?: MoneySUSD;
   readonly administrationShortfallSUSD?: MoneySUSD;
+  /** M9 education payroll requested/shortfall; optional pre-M9 = zero. */
+  readonly educationRequestedSUSD?: MoneySUSD;
+  readonly educationShortfallSUSD?: MoneySUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
@@ -913,10 +929,11 @@ export const LAW_SLOTS = [
 ] as const;
 export type LawSlot = (typeof LAW_SLOTS)[number];
 
-/** Slots with an implemented M8 law option. Other slots are explicit deferrals. */
+/** Slots with an implemented law option. Other slots are explicit deferrals. */
 export const IMPLEMENTED_LAW_SLOTS: readonly LawSlot[] = [
   "suffrage",
   "taxation",
+  "education",
   "labor",
   "trade",
 ];
@@ -983,6 +1000,19 @@ export interface LawDef {
   laborOrganizationBonus: number;
   /** Additive grievance pressure from repression (0..1 scale), otherwise 0. */
   laborGrievance: number;
+  /**
+   * M9 education-slot attendance floor, 0..1. The effective floor is the
+   * maximum with household attendance; actual attendance is still limited by
+   * teaching capacity. Zero for every non-education law.
+   */
+  educationAttendanceFloor: Rate;
+  /** M9 additive education-quality bonus, 0..1. Zero for non-education laws. */
+  educationQualityBonus: Rate;
+  /**
+   * M9 technology prerequisites for this law. Every listed technology must be
+   * researched by the country before the law is proposable.
+   */
+  requiredTechnologyIds: Id[];
   /** Administrative load subtracted from institution quality/law factor. */
   institutionLoad: Rate;
   /** Authored stance for each interest group, -1..1. */
@@ -1033,6 +1063,113 @@ export interface PoliticsDefinitions {
   events: ScriptedEventDef[];
   /** Profession keys whose population staffs the state administration. */
   administrationProfessionKeys: string[];
+}
+
+/**
+ * M9 technology era ordinal. Era 1 is the earliest; a prerequisite may not come
+ * from a later era than the technology it enables.
+ */
+export const MIN_TECHNOLOGY_ERA = 1;
+export const MAX_TECHNOLOGY_ERA = 6;
+export type TechnologyEra = 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * One validated technology effect (GDD §10.1, D-077).
+ *
+ * Building unlocks and law enables are declared on `BuildingDef.requiredTechnologyId`
+ * and `LawDef.requiredTechnologyIds` so each has one source of truth; they are not
+ * duplicated here. Military-capability effects belong to M10 and are not authored.
+ */
+export type TechnologyEffect =
+  /**
+   * Additive share applied to produced physical output for one building sector.
+   * It increases output from the same executed throughput (and therefore the same
+   * inputs); it is not a capacity or price modifier.
+   */
+  | { kind: "sector-productivity"; sector: BuildingSector; bonus: number }
+  /** Multiplicative reduction of age/sex mortality (0..0.95). */
+  | { kind: "mortality-reduction"; reduction: number }
+  /** Additive education-quality term used by the literacy model (0..0.5). */
+  | { kind: "education-effectiveness"; bonus: number };
+
+/** One validated technology definition. */
+export interface TechnologyDef {
+  id: Id;
+  key: string;
+  name: string;
+  era: TechnologyEra;
+  description: string;
+  /** Technology ids that must already be researched. */
+  prerequisites: Id[];
+  /** Required research work in researcher-days. Provisional content, not calibrated. */
+  researchWork: number;
+  effects: TechnologyEffect[];
+}
+
+/** Validated M9 technology content. Optional for legacy M2–M8 fixtures. */
+export interface TechnologyDefinitions {
+  dataVersion: string;
+  /** Six human-readable era names, indexed from era 1. */
+  eraNames: string[];
+  technologies: TechnologyDef[];
+  /** Profession keys whose people staff teaching and research. */
+  academicProfessionKeys: string[];
+}
+
+/** One completed research result. */
+export interface ResearchedTechnology {
+  technologyId: Id;
+  completedDay: Day;
+}
+
+/** The single active research project. Work lives in `workByTechnology`. */
+export interface ResearchProject {
+  technologyId: Id;
+  startedDay: Day;
+}
+
+/**
+ * Authoritative per-country technology state (D-077).
+ *
+ * `researched` is ascending by technology id and bounded by the definition count.
+ * `workByTechnology` holds project-specific accumulated researcher-days for
+ * started, incomplete projects only; work is never transferred between projects.
+ */
+export interface CountryTechnologyState {
+  researched: ResearchedTechnology[];
+  activeProject: ResearchProject | null;
+  workByTechnology: Record<Id, number>;
+}
+
+/**
+ * Authoritative per-country education institution state (D-077).
+ *
+ * Only the player's funding target, research staff share, and reporting memo are
+ * stored. Staffing, capacity, enrollment, attendance, quality, and derived
+ * productivity/mortality/education factors are recomputed from authoritative
+ * population, technology, law, and finance state.
+ */
+export interface EducationState {
+  /** Annual SUSD education/research payroll target. */
+  fundedAnnualSUSD: MoneySUSD;
+  /** Share of available academic workers assigned to research time, 0..1. */
+  researchStaffShare: Rate;
+  lastUpdateDay: Day | null;
+  fundingRequestedMonthToDateSUSD: MoneySUSD;
+  fundingShortfallMonthToDateSUSD: MoneySUSD;
+}
+
+/** Scenario input for one country's M9 technology and education state. */
+export interface CountryTechnologyInput {
+  /** Research technology keys that start completed. */
+  researchedTechnologyKeys?: string[];
+  educationFundingSUSDPerYear?: MoneySUSD;
+  researchStaffShare?: Rate;
+}
+
+/** World-level M9 policy. `enabled` is authoritative scenario state. */
+export interface TechnologySystemState {
+  enabled: boolean;
 }
 
 /** Derived/cached M8 interest-group state (GDD §5.5). */
@@ -1169,6 +1306,10 @@ export interface Country {
   interestGroups: InterestGroupState[];
   /** M8 derived/cached state administration. */
   institutions: InstitutionState;
+  /** M9 per-country technology and research state. */
+  technology: CountryTechnologyState;
+  /** M9 per-country education institution policy and reporting memo. */
+  education: EducationState;
   /**
    * M5: whether this country admits foreign residents and cross-border workers.
    *
@@ -1202,6 +1343,8 @@ export interface CountryInitialDef {
   immigrationOpen?: boolean;
   /** M8 political state; omitted means the regime/definition defaults. */
   politics?: CountryPoliticsInput;
+  /** M9 technology/education initial state; omitted means no researched techs and zero funding. */
+  technology?: CountryTechnologyInput;
 }
 
 /**

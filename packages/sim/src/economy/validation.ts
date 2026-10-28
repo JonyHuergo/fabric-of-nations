@@ -26,6 +26,7 @@ import {
   assertIndustrialPostingStructure,
   assertFiscalPostingStructure,
   assertAdministrationPostingStructure,
+  assertEducationPostingStructure,
   assertOwnerEquityTallies,
   assertProfitAllocationStructure,
   assertDebtPostingStructure,
@@ -340,6 +341,9 @@ export function assertValidJournalPosting(
     if (transactionKind === "administration-payroll") {
       assertAdministrationPostingStructure(journalLines, accounts, path);
     }
+    if (transactionKind === "education-payroll") {
+      assertEducationPostingStructure(journalLines, accounts, path);
+    }
     if (transactionKind === "business-profit-tax") {
       assertBusinessTaxPostingStructure(journalLines, accounts, path);
     }
@@ -423,55 +427,39 @@ function assertValidAnnualSummary(
   for (const key of Object.keys(fiscal)) {
     const countryId = parseAccountTotalKey(key, `${path}.fiscalTotals`);
     const totals = requireRecord(fiscal[key], `${path}.fiscalTotals.${key}`);
-    const tax = requireFiniteNumber(
-      totals.incomeTaxRevenueSUSD,
-      `${path}.fiscalTotals.${String(countryId)}.incomeTaxRevenueSUSD`,
-    );
-    const businessTax = requireFiniteNumber(
-      totals.businessTaxRevenueSUSD,
-      `${path}.fiscalTotals.${String(countryId)}.businessTaxRevenueSUSD`,
-    );
-    const welfare = requireFiniteNumber(
-      totals.welfareExpenseSUSD,
-      `${path}.fiscalTotals.${String(countryId)}.welfareExpenseSUSD`,
-    );
-    const interest = requireFiniteNumber(
-      totals.interestExpenseSUSD,
-      `${path}.fiscalTotals.${String(countryId)}.interestExpenseSUSD`,
-    );
-    const subsidy =
-      totals.subsidyExpenseSUSD === undefined
+    // Sparse encoding: a missing field decodes as zero.
+    const valueOf = (field: string): number =>
+      totals[field] === undefined
         ? 0
         : requireFiniteNumber(
-            totals.subsidyExpenseSUSD,
-            `${path}.fiscalTotals.${String(countryId)}.subsidyExpenseSUSD`,
+            totals[field],
+            `${path}.fiscalTotals.${String(countryId)}.${field}`,
           );
-    const administration =
-      totals.administrationExpenseSUSD === undefined
-        ? 0
-        : requireFiniteNumber(
-            totals.administrationExpenseSUSD,
-            `${path}.fiscalTotals.${String(countryId)}.administrationExpenseSUSD`,
-          );
-    const net = requireFiniteNumber(
-      totals.netFiscalResultSUSD,
-      `${path}.fiscalTotals.${String(countryId)}.netFiscalResultSUSD`,
-    );
+    const tax = valueOf("incomeTaxRevenueSUSD");
+    const businessTax = valueOf("businessTaxRevenueSUSD");
+    const welfare = valueOf("welfareExpenseSUSD");
+    const interest = valueOf("interestExpenseSUSD");
+    const subsidy = valueOf("subsidyExpenseSUSD");
+    const administration = valueOf("administrationExpenseSUSD");
+    const education = valueOf("educationExpenseSUSD");
+    const net = valueOf("netFiscalResultSUSD");
     if (
       tax < 0 ||
       businessTax < 0 ||
       welfare < 0 ||
       interest < 0 ||
       subsidy < 0 ||
-      administration < 0
+      administration < 0 ||
+      education < 0
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
     }
     if (
       Math.abs(
-        net - (tax + businessTax - welfare - interest - subsidy - administration),
+        net -
+          (tax + businessTax - welfare - interest - subsidy - administration - education),
       ) >
-      toleranceMoney(net, tax, businessTax, welfare, interest, subsidy, administration)
+      toleranceMoney(net, tax, businessTax, welfare, interest, subsidy, administration, education)
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} net result does not reconcile`);
     }
@@ -865,52 +853,35 @@ export function assertValidFinancePeriodSummary(
         );
       }
       const entry = requireRecord(fiscal[key], `${path}.countryFiscalTotals.${key}`);
-      const tax = requireFiniteNumber(
-        entry.incomeTaxRevenueSUSD,
-        `${path}.countryFiscalTotals.${key}.incomeTaxRevenueSUSD`,
-      );
-      const businessTax = requireFiniteNumber(
-        entry.businessTaxRevenueSUSD,
-        `${path}.countryFiscalTotals.${key}.businessTaxRevenueSUSD`,
-      );
-      const welfare = requireFiniteNumber(
-        entry.welfareExpenseSUSD,
-        `${path}.countryFiscalTotals.${key}.welfareExpenseSUSD`,
-      );
-      const interest = requireFiniteNumber(
-        entry.interestExpenseSUSD,
-        `${path}.countryFiscalTotals.${key}.interestExpenseSUSD`,
-      );
-      const net = requireFiniteNumber(
-        entry.netFiscalResultSUSD,
-        `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD`,
-      );
-      const subsidy =
-        entry.subsidyExpenseSUSD === undefined
+      // Sparse encoding: a missing fiscal field decodes as zero.
+      const valueOf = (field: string): number =>
+        entry[field] === undefined
           ? 0
           : requireFiniteNumber(
-              entry.subsidyExpenseSUSD,
-              `${path}.countryFiscalTotals.${key}.subsidyExpenseSUSD`,
+              entry[field],
+              `${path}.countryFiscalTotals.${key}.${field}`,
             );
-      const administration =
-        entry.administrationExpenseSUSD === undefined
-          ? 0
-          : requireFiniteNumber(
-              entry.administrationExpenseSUSD,
-              `${path}.countryFiscalTotals.${key}.administrationExpenseSUSD`,
-            );
+      const tax = valueOf("incomeTaxRevenueSUSD");
+      const businessTax = valueOf("businessTaxRevenueSUSD");
+      const welfare = valueOf("welfareExpenseSUSD");
+      const interest = valueOf("interestExpenseSUSD");
+      const net = valueOf("netFiscalResultSUSD");
+      const subsidy = valueOf("subsidyExpenseSUSD");
+      const administration = valueOf("administrationExpenseSUSD");
+      const education = valueOf("educationExpenseSUSD");
       if (
         tax < 0 ||
         businessTax < 0 ||
         welfare < 0 ||
         interest < 0 ||
         subsidy < 0 ||
-        administration < 0
+        administration < 0 ||
+        education < 0
       ) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
       }
       const expectedNet =
-        tax + businessTax - welfare - interest - subsidy - administration;
+        tax + businessTax - welfare - interest - subsidy - administration - education;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
           `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,

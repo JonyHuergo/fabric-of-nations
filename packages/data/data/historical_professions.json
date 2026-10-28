@@ -46,5 +46,17 @@
     "baseWage1900SUSDPerYear": 600,
     "trainingCostSUSD": 0,
     "laborProductivityModifier": 1
+  },
+  {
+    "id": 4,
+    "key": "academics",
+    "name": "Academics",
+    "stratum": "middle",
+    "participationRate": 0.6,
+    "qualificationLiteracy": 0.85,
+    "qualificationWealthLevel": 40,
+    "baseWage1900SUSDPerYear": 320,
+    "trainingCostSUSD": 0,
+    "laborProductivityModifier": 1.15
   }
 ]

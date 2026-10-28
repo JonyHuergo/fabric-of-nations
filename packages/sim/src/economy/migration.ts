@@ -22,7 +22,11 @@
 
 import { assertValidDayIndex, dayIndexToCivilDate, isTerminalDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_SUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from "../population/constants.js";
-import { populationTotal, regionPopulation } from "../population/state.js";
+import {
+  mergeBlockLiteracyByAge,
+  populationTotal,
+  regionPopulation,
+} from "../population/state.js";
 import { roundTo } from "../population/definitions.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
@@ -658,6 +662,11 @@ function applyFlow(
     ]);
   }
 
+  // M9: capture the destination's pre-flow population by age so the migrating
+  // cohort's age-specific literacy can be merged with the correct weights.
+  const destinationMaleBefore = [...destination.maleByAge];
+  const destinationFemaleBefore = [...destination.femaleByAge];
+
   subtractCells(source, cells.male, cells.female);
   addCells(destination, cells.male, cells.female);
 
@@ -665,12 +674,16 @@ function applyFlow(
   if (destinationPopulationAfter <= 0) {
     throw new RangeError("migration destination population must stay positive");
   }
+  mergeBlockLiteracyByAge(
+    destination,
+    source,
+    destinationMaleBefore,
+    destinationFemaleBefore,
+    cells.male,
+    cells.female,
+  );
   const weight = (value: number, base: number): number =>
     (value * destinationPopulationBefore + base * people) / destinationPopulationAfter;
-  destination.literacy = roundTo(
-    Math.max(0, Math.min(1, weight(destination.literacy, source.literacy))),
-    RATE_DECIMAL_PLACES,
-  );
   destination.wealthLevel = roundTo(
     Math.max(0, Math.min(99, weight(destination.wealthLevel, source.wealthLevel))),
     WEALTH_DECIMAL_PLACES,

@@ -1,6 +1,6 @@
 {
   "scenarioId": "m2-world-aggregate",
-  "dataVersion": "m3-economy-v6",
+  "dataVersion": "m3-economy-v7",
   "status": "source-backed total; provisional 1900 age structure",
   "description": "Single-region world aggregate with source-backed 1900 total and provisional 1900 age/sex structure for M2.1 mechanics and total-population calibration. Not a source-verified 1900 age distribution.",
   "professions": [

@@ -25,8 +25,10 @@ import {
   type GoodDef,
   type PoliticsDefinitions,
   type ProfessionDef,
+  type TechnologyDefinitions,
 } from "./types.js";
 import { assertValidPoliticsDefinitions } from "./politics.js";
+import { assertValidTechnologyDefinitions } from "./technology.js";
 
 function assertNonNegative(value: unknown, path: string): number {
   const number = requireFiniteNumber(value, path);
@@ -140,6 +142,7 @@ function assertBuilding(
   path: string,
   goodIds: ReadonlySet<number>,
   professionIds: ReadonlySet<number>,
+  technologyIds: ReadonlySet<number> | null,
 ): BuildingDef {
   const record = requireRecord(value, path);
   const inputs = requireArray(record.inputs, `${path}.inputs`);
@@ -221,8 +224,24 @@ function assertBuilding(
       `${path}.resourceRequirements must be empty in M3; resource-limited recipes are deferred`,
     );
   }
-  if (record.requiredTechnologyId !== null) {
-    throw new RangeError(`${path}.requiredTechnologyId must be null in M3`);
+  let requiredTechnologyId: number | null = null;
+  if (record.requiredTechnologyId !== null && record.requiredTechnologyId !== undefined) {
+    if (technologyIds === null) {
+      throw new RangeError(
+        `${path}.requiredTechnologyId requires technology definitions in this world`,
+      );
+    }
+    requiredTechnologyId = requireInteger(
+      record.requiredTechnologyId,
+      `${path}.requiredTechnologyId`,
+      0,
+      0xffff_ffff,
+    );
+    if (!technologyIds.has(requiredTechnologyId)) {
+      throw new RangeError(
+        `${path}.requiredTechnologyId references unknown technology ${String(requiredTechnologyId)}`,
+      );
+    }
   }
 
   const ownership = requireArray(record.ownershipAllowed, `${path}.ownershipAllowed`);
@@ -304,7 +323,7 @@ function assertBuilding(
     ),
     storageCapacityByGood: storage as BuildingDef["storageCapacityByGood"],
     resourceRequirements: [],
-    requiredTechnologyId: null,
+    requiredTechnologyId,
     ownershipAllowed: ownership as BuildingDef["ownershipAllowed"],
     isEssentialInfrastructure: record.isEssentialInfrastructure === true,
   };
@@ -345,6 +364,21 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
     maxLength: MAX_SCENARIO_ID_LENGTH,
   });
 
+  // M9 technology content is validated before buildings so a building's required
+  // technology can be checked against the same authoritative definition set.
+  let technology: TechnologyDefinitions | undefined;
+  let technologyIds: ReadonlySet<number> | null = null;
+  if (record.technology !== undefined && record.technology !== null) {
+    assertValidTechnologyDefinitions(record.technology, "economyDefinitions.technology");
+    technology = record.technology as TechnologyDefinitions;
+    if (technology.dataVersion !== definitions.dataVersion) {
+      throw new RangeError(
+        "economyDefinitions.technology.dataVersion must match economyDefinitions.dataVersion",
+      );
+    }
+    technologyIds = new Set(technology.technologies.map((entry) => entry.id));
+  }
+
   const rawGoods = requireArray(record.goods, "economyDefinitions.goods");
   if (rawGoods.length === 0) throw new RangeError("economyDefinitions.goods must not be empty");
   const goods = rawGoods.map((value, index) =>
@@ -370,9 +404,26 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
   const goodIds = new Set(goods.map((good) => good.id));
   const professionIds = new Set(professions.map((profession) => profession.id));
   const buildings = rawBuildings.map((value, index) =>
-    assertBuilding(value, `economyDefinitions.buildings[${String(index)}]`, goodIds, professionIds),
+    assertBuilding(
+      value,
+      `economyDefinitions.buildings[${String(index)}]`,
+      goodIds,
+      professionIds,
+      technologyIds,
+    ),
   );
   assertUniqueIdsAndKeys(buildings, "economyDefinitions.buildings");
+
+  if (technology !== undefined) {
+    const professionKeys = new Set(professions.map((profession) => profession.key));
+    for (const key of technology.academicProfessionKeys) {
+      if (!professionKeys.has(key)) {
+        throw new RangeError(
+          `economyDefinitions.technology.academicProfessionKeys references unknown profession ${JSON.stringify(key)}`,
+        );
+      }
+    }
+  }
 
   if (record.politics !== undefined && record.politics !== null) {
     assertValidPoliticsDefinitions(record.politics, "economyDefinitions.politics");
@@ -381,6 +432,20 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
       throw new RangeError(
         "economyDefinitions.politics.dataVersion must match economyDefinitions.dataVersion",
       );
+    }
+    for (const law of politics.laws) {
+      for (const technologyId of law.requiredTechnologyIds) {
+        if (technologyIds === null) {
+          throw new RangeError(
+            `economyDefinitions.politics law ${law.key} requires technology ${String(technologyId)} but the world has no technology definitions`,
+          );
+        }
+        if (!technologyIds.has(technologyId)) {
+          throw new RangeError(
+            `economyDefinitions.politics law ${law.key} references unknown technology ${String(technologyId)}`,
+          );
+        }
+      }
     }
   }
 }

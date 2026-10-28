@@ -46,6 +46,12 @@ export interface PopBlock {
   femaleByAge: Uint32Array;
 
   literacy: Rate;
+  /**
+   * M9 authoritative single-year literacy, 81 slots (0..79 plus 80+). `literacy`
+   * is the derived population-weighted rate of ages 15+ and must equal the
+   * aggregate of this array (D-077).
+   */
+  literacyByAge: number[];
   wealthLevel: number;
   financialAccountId: Id;
   militancy: Rate;

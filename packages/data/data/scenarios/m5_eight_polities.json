@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m5-eight-polities",
-    "dataVersion": "m3-economy-v6",
+    "dataVersion": "m3-economy-v7",
     "status": "provisional",
     "description": "Authored 1900 sample of eight polities for M5 multi-region, multi-market, migration, and labor-mobility validation, with the provisional M5a profit-allocation policy, M6 country-AI policy, and a provisional USA-only public-debt policy enabled. Population totals are rounded national estimates; occupation composition, market membership, building levels, needs, recipe productivity, prices, wages, profit-allocation rates, and AI fiscal rules are provisional authored inputs. The post-M7 feasibility calibration makes each market's subsistence/basic capacity meet its own demand and sets opening prices at the documented lower provisional bound; it is not historical calibration. This is not a complete historical reconstruction and its eight polities are not a world total.",
     "startDayIndex": 0,
@@ -87,7 +87,8 @@
       "professions": "historical_professions.json",
       "buildings": "historical_buildings.json",
       "needs": "historical_needs.json",
-      "demography": "demography.json"
+      "demography": "demography.json",
+      "technology": "technology.json"
     }
   }
 }

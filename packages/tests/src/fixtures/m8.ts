@@ -6,7 +6,11 @@
  * days without the eight-polity historical load.
  */
 
-import type { EconomyScenarioDef, PoliticsDefinitions } from "@century/sim";
+import type {
+  EconomyScenarioDef,
+  PoliticsDefinitions,
+  TechnologyDefinitions,
+} from "@century/sim";
 import { loadM5EightPolities } from "@century/data";
 
 import {
@@ -33,6 +37,21 @@ export function m8PoliticsDefinitions(): PoliticsDefinitions {
   return scenario.definitions.politics;
 }
 
+/**
+ * M9 validated technology content. The M8 fixture carries it because the
+ * education law options declare technology prerequisites; the fixture has no
+ * academics population, so research and schooling are inert.
+ */
+export function m8TechnologyDefinitions(): TechnologyDefinitions {
+  const scenario = loadM5EightPolities();
+  if (scenario.definitions.technology === undefined) {
+    throw new Error("M5 historical scenario does not carry M9 technology definitions");
+  }
+  return scenario.definitions.technology;
+}
+
+export const M8_ACADEMICS_ID = 4;
+
 export interface M8FixtureOptions {
   /** Override country A's administration funding target. */
   readonly fundingA?: number;
@@ -55,22 +74,42 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
     trainingCostSUSD: 0,
     laborProductivityModifier: 1.1,
   };
+  const academics = {
+    id: M8_ACADEMICS_ID,
+    key: "academics",
+    name: "Academics",
+    stratum: "middle" as const,
+    participationRate: 0.6,
+    qualificationLiteracy: 0.85,
+    qualificationWealthLevel: 40,
+    baseWage1900SUSDPerYear: 320,
+    trainingCostSUSD: 0,
+    laborProductivityModifier: 1.15,
+  };
   scenario.definitions = {
     ...scenario.definitions,
-    professions: [...scenario.definitions.professions, clerks],
+    professions: [...scenario.definitions.professions, clerks, academics],
     politics: m8PoliticsDefinitions(),
+    technology: m8TechnologyDefinitions(),
   };
   scenario.population = {
     ...scenario.population,
     professions: [
       ...scenario.population.professions,
       { id: clerks.id, key: clerks.key, name: clerks.name, stratum: clerks.stratum },
+      {
+        id: academics.id,
+        key: academics.key,
+        name: academics.name,
+        stratum: academics.stratum,
+      },
     ],
     definitions: {
       ...scenario.population.definitions,
       fertilityMultipliers: [
         ...scenario.population.definitions.fertilityMultipliers,
         { professionId: clerks.id, multiplier: 0.8 },
+        { professionId: academics.id, multiplier: 0.8 },
       ],
     },
     popBlocks: [

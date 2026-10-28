@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v6",
+    "dataVersion": "m3-economy-v7",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -35,6 +35,12 @@ export const M5_SCENARIO = ({
         "key": "capitalists",
         "name": "Capitalists",
         "stratum": "upper"
+      },
+      {
+        "id": 4,
+        "key": "academics",
+        "name": "Academics",
+        "stratum": "middle"
       }
     ],
     "regions": [
@@ -139,8 +145,56 @@ export const M5_SCENARIO = ({
       {
         "id": 0,
         "regionId": 0,
-        "professionId": 3,
+        "professionId": 4,
         "financialAccountId": 1000,
+        "maleAgeGroups": [
+          76663,
+          62341,
+          57575,
+          50089,
+          44974,
+          37208,
+          32620,
+          27765,
+          23216,
+          18485,
+          13723,
+          9902,
+          7054,
+          4712,
+          2502,
+          1204,
+          724
+        ],
+        "femaleAgeGroups": [
+          73545,
+          59703,
+          55081,
+          48485,
+          44212,
+          37896,
+          33096,
+          28564,
+          23724,
+          19067,
+          14441,
+          10752,
+          7966,
+          5614,
+          3131,
+          1612,
+          1154
+        ],
+        "literacy": 0.97,
+        "wealthLevel": 60,
+        "initialSavingsSUSD": 7510400,
+        "militancy": 0.03
+      },
+      {
+        "id": 1,
+        "regionId": 0,
+        "professionId": 3,
+        "financialAccountId": 1001,
         "maleAgeGroups": [
           136863,
           111294,
@@ -185,58 +239,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 1,
+        "id": 2,
         "regionId": 0,
         "professionId": 2,
-        "financialAccountId": 1001,
+        "financialAccountId": 1002,
         "maleAgeGroups": [
-          958285,
-          779258,
-          719686,
-          626113,
-          562174,
-          465101,
-          407754,
-          347056,
-          290203,
-          231065,
-          171542,
-          123776,
-          88181,
-          58905,
-          31273,
-          15052,
-          9045
+          881622,
+          716917,
+          662111,
+          576024,
+          517200,
+          427893,
+          375134,
+          319291,
+          266987,
+          212580,
+          157819,
+          113874,
+          81126,
+          54193,
+          28771,
+          13848,
+          8322
         ],
         "femaleAgeGroups": [
-          919315,
-          746292,
-          688514,
-          606062,
-          552651,
-          473699,
-          413696,
-          357044,
-          296547,
-          238335,
-          180508,
-          134394,
-          99579,
-          70180,
-          39137,
-          20153,
-          14425
+          845770,
+          686589,
+          633433,
+          557577,
+          508439,
+          435803,
+          380600,
+          328481,
+          272824,
+          219268,
+          166067,
+          123642,
+          91613,
+          64565,
+          36006,
+          18540,
+          13271
         ],
         "literacy": 0.95,
         "wealthLevel": 58,
-        "initialSavingsSUSD": 93880000,
+        "initialSavingsSUSD": 86369600,
         "militancy": 0.04
       },
       {
-        "id": 2,
+        "id": 3,
         "regionId": 0,
         "professionId": 1,
-        "financialAccountId": 1002,
+        "financialAccountId": 1003,
         "maleAgeGroups": [
           1026716,
           834905,
@@ -281,10 +335,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 3,
+        "id": 4,
         "regionId": 0,
         "professionId": 0,
-        "financialAccountId": 1003,
+        "financialAccountId": 1004,
         "maleAgeGroups": [
           1300523,
           1057560,
@@ -329,10 +383,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.05
       },
       {
-        "id": 4,
+        "id": 5,
+        "regionId": 1,
+        "professionId": 4,
+        "financialAccountId": 1005,
+        "maleAgeGroups": [
+          62722,
+          51004,
+          47105,
+          40980,
+          36795,
+          30442,
+          26688,
+          22716,
+          18994,
+          15124,
+          11228,
+          8101,
+          5772,
+          3855,
+          2047,
+          985,
+          592
+        ],
+        "femaleAgeGroups": [
+          60171,
+          48846,
+          45065,
+          39668,
+          36172,
+          31005,
+          27077,
+          23369,
+          19410,
+          15600,
+          11815,
+          8796,
+          6518,
+          4593,
+          2562,
+          1319,
+          944
+        ],
+        "literacy": 0.97,
+        "wealthLevel": 60,
+        "initialSavingsSUSD": 6144640,
+        "militancy": 0.03
+      },
+      {
+        "id": 6,
         "regionId": 1,
         "professionId": 3,
-        "financialAccountId": 1004,
+        "financialAccountId": 1006,
         "maleAgeGroups": [
           112038,
           91107,
@@ -377,58 +479,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 5,
+        "id": 7,
         "regionId": 1,
         "professionId": 2,
-        "financialAccountId": 1005,
+        "financialAccountId": 1007,
         "maleAgeGroups": [
-          784021,
-          637551,
-          588812,
-          512255,
-          459943,
-          380523,
-          333604,
-          283944,
-          237430,
-          189046,
-          140348,
-          101268,
-          72145,
-          48194,
-          25586,
-          12315,
-          7400
+          721300,
+          586547,
+          541707,
+          471274,
+          423148,
+          350081,
+          306916,
+          261228,
+          218435,
+          173922,
+          129120,
+          93166,
+          66373,
+          44338,
+          23539,
+          11330,
+          6808
         ],
         "femaleAgeGroups": [
-          752139,
-          610579,
-          563308,
-          495850,
-          452152,
-          387557,
-          338466,
-          292116,
-          242620,
-          194994,
-          147682,
-          109954,
-          81471,
-          57417,
-          32020,
-          16488,
-          11802
+          691968,
+          561733,
+          518244,
+          456182,
+          415980,
+          356553,
+          311388,
+          268747,
+          223211,
+          179394,
+          135868,
+          101158,
+          74953,
+          52824,
+          29459,
+          15169,
+          10857
         ],
         "literacy": 0.95,
         "wealthLevel": 58,
-        "initialSavingsSUSD": 76808000,
+        "initialSavingsSUSD": 70663360,
         "militancy": 0.04
       },
       {
-        "id": 6,
+        "id": 8,
         "regionId": 1,
         "professionId": 1,
-        "financialAccountId": 1006,
+        "financialAccountId": 1008,
         "maleAgeGroups": [
           840041,
           683104,
@@ -473,10 +575,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 7,
+        "id": 9,
         "regionId": 1,
         "professionId": 0,
-        "financialAccountId": 1007,
+        "financialAccountId": 1009,
         "maleAgeGroups": [
           1064035,
           865252,
@@ -521,10 +623,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.05
       },
       {
-        "id": 8,
+        "id": 10,
+        "regionId": 2,
+        "professionId": 4,
+        "financialAccountId": 1010,
+        "maleAgeGroups": [
+          97601,
+          79367,
+          73299,
+          63769,
+          57257,
+          47370,
+          41529,
+          35347,
+          29557,
+          23534,
+          17471,
+          12607,
+          8981,
+          5999,
+          3185,
+          1533,
+          921
+        ],
+        "femaleAgeGroups": [
+          93631,
+          76009,
+          70125,
+          61727,
+          56287,
+          48246,
+          42135,
+          36365,
+          30203,
+          24274,
+          18385,
+          13688,
+          10142,
+          7148,
+          3986,
+          2053,
+          1469
+        ],
+        "literacy": 0.99,
+        "wealthLevel": 62,
+        "initialSavingsSUSD": 10756800,
+        "militancy": 0.03
+      },
+      {
+        "id": 11,
         "regionId": 2,
         "professionId": 3,
-        "financialAccountId": 1008,
+        "financialAccountId": 1011,
         "maleAgeGroups": [
           244001,
           198417,
@@ -569,58 +719,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 9,
+        "id": 12,
         "regionId": 2,
         "professionId": 2,
-        "financialAccountId": 1009,
+        "financialAccountId": 1012,
         "maleAgeGroups": [
-          1220006,
-          992085,
-          916243,
-          797113,
-          715712,
-          592127,
-          519118,
-          441842,
-          369461,
-          294172,
-          218393,
-          157581,
-          112264,
-          74993,
-          39814,
-          19164,
-          11516
+          1122406,
+          912718,
+          842943,
+          733344,
+          658455,
+          544757,
+          477588,
+          406494,
+          339904,
+          270639,
+          200922,
+          144975,
+          103283,
+          68994,
+          36628,
+          17630,
+          10595
         ],
         "femaleAgeGroups": [
-          1170394,
-          950115,
-          876557,
-          771587,
-          703588,
-          603073,
-          526682,
-          454558,
-          377539,
-          303428,
-          229807,
-          171099,
-          126776,
-          89347,
-          49826,
-          25656,
-          18364
+          1076762,
+          874106,
+          806433,
+          709860,
+          647301,
+          554827,
+          484548,
+          418194,
+          347336,
+          279153,
+          211422,
+          157411,
+          116634,
+          82199,
+          45840,
+          23604,
+          16895
         ],
         "literacy": 0.97,
         "wealthLevel": 60,
-        "initialSavingsSUSD": 134460000,
+        "initialSavingsSUSD": 123703200,
         "militancy": 0.04
       },
       {
-        "id": 10,
+        "id": 13,
         "regionId": 2,
         "professionId": 1,
-        "financialAccountId": 1010,
+        "financialAccountId": 1013,
         "maleAgeGroups": [
           1220006,
           992085,
@@ -665,10 +815,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 11,
+        "id": 14,
         "regionId": 2,
         "professionId": 0,
-        "financialAccountId": 1011,
+        "financialAccountId": 1014,
         "maleAgeGroups": [
           366002,
           297625,
@@ -713,10 +863,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.05
       },
       {
-        "id": 12,
+        "id": 15,
+        "regionId": 3,
+        "professionId": 4,
+        "financialAccountId": 1015,
+        "maleAgeGroups": [
+          10845,
+          8819,
+          8144,
+          7085,
+          6362,
+          5263,
+          4614,
+          3927,
+          3284,
+          2615,
+          1941,
+          1401,
+          998,
+          667,
+          354,
+          170,
+          102
+        ],
+        "femaleAgeGroups": [
+          10403,
+          8445,
+          7792,
+          6859,
+          6254,
+          5361,
+          4682,
+          4041,
+          3356,
+          2697,
+          2043,
+          1521,
+          1127,
+          794,
+          443,
+          228,
+          163
+        ],
+        "literacy": 0.99,
+        "wealthLevel": 62,
+        "initialSavingsSUSD": 1195200,
+        "militancy": 0.03
+      },
+      {
+        "id": 16,
         "regionId": 3,
         "professionId": 3,
-        "financialAccountId": 1012,
+        "financialAccountId": 1016,
         "maleAgeGroups": [
           27111,
           22046,
@@ -761,58 +959,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 13,
+        "id": 17,
         "regionId": 3,
         "professionId": 2,
-        "financialAccountId": 1013,
+        "financialAccountId": 1017,
         "maleAgeGroups": [
-          135556,
-          110232,
-          101805,
-          88568,
-          79524,
-          65792,
-          57680,
-          49094,
-          41051,
-          32686,
-          24266,
-          17509,
-          12474,
-          8333,
-          4424,
-          2129,
-          1280
+          124712,
+          101413,
+          93660,
+          81483,
+          73162,
+          60529,
+          53065,
+          45166,
+          37767,
+          30071,
+          22325,
+          16108,
+          11476,
+          7666,
+          4070,
+          1959,
+          1177
         ],
         "femaleAgeGroups": [
-          130044,
-          105568,
-          97395,
-          85732,
-          78176,
-          67008,
-          58520,
-          50506,
-          41949,
-          33714,
-          25534,
-          19011,
-          14086,
-          9927,
-          5536,
-          2851,
-          2040
+          119640,
+          97123,
+          89604,
+          78873,
+          71922,
+          61648,
+          53839,
+          46466,
+          38593,
+          31017,
+          23491,
+          17490,
+          12959,
+          9133,
+          5093,
+          2623,
+          1877
         ],
         "literacy": 0.97,
         "wealthLevel": 60,
-        "initialSavingsSUSD": 14940000,
+        "initialSavingsSUSD": 13744800,
         "militancy": 0.04
       },
       {
-        "id": 14,
+        "id": 18,
         "regionId": 3,
         "professionId": 1,
-        "financialAccountId": 1014,
+        "financialAccountId": 1018,
         "maleAgeGroups": [
           135556,
           110232,
@@ -857,10 +1055,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 15,
+        "id": 19,
         "regionId": 3,
         "professionId": 0,
-        "financialAccountId": 1015,
+        "financialAccountId": 1019,
         "maleAgeGroups": [
           40667,
           33069,
@@ -905,10 +1103,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.05
       },
       {
-        "id": 16,
+        "id": 20,
+        "regionId": 4,
+        "professionId": 4,
+        "financialAccountId": 1020,
+        "maleAgeGroups": [
+          52681,
+          42839,
+          39564,
+          34420,
+          30905,
+          25568,
+          22416,
+          19079,
+          15954,
+          12703,
+          9430,
+          6805,
+          4848,
+          3238,
+          1719,
+          828,
+          497
+        ],
+        "femaleAgeGroups": [
+          50538,
+          41027,
+          37850,
+          33318,
+          30381,
+          26041,
+          22743,
+          19628,
+          16302,
+          13102,
+          9923,
+          7388,
+          5474,
+          3858,
+          2152,
+          1108,
+          793
+        ],
+        "literacy": 0.98,
+        "wealthLevel": 58,
+        "initialSavingsSUSD": 4515840,
+        "militancy": 0.03
+      },
+      {
+        "id": 21,
         "regionId": 4,
         "professionId": 3,
-        "financialAccountId": 1016,
+        "financialAccountId": 1021,
         "maleAgeGroups": [
           109752,
           89248,
@@ -953,58 +1199,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 17,
+        "id": 22,
         "regionId": 4,
         "professionId": 2,
-        "financialAccountId": 1017,
+        "financialAccountId": 1022,
         "maleAgeGroups": [
-          658509,
-          535487,
-          494550,
-          430249,
-          386312,
-          319606,
-          280198,
-          238488,
-          199420,
-          158782,
-          117880,
-          85056,
-          60595,
-          40478,
-          21490,
-          10344,
-          6216
+          605829,
+          492648,
+          454986,
+          395829,
+          355407,
+          294037,
+          257783,
+          219409,
+          183466,
+          146080,
+          108449,
+          78252,
+          55748,
+          37240,
+          19771,
+          9516,
+          5718
         ],
         "femaleAgeGroups": [
-          631731,
-          512833,
-          473130,
-          416471,
-          379768,
-          325514,
-          284282,
-          245352,
-          203780,
-          163778,
-          124040,
-          92352,
-          68429,
-          48226,
-          26894,
-          13848,
-          9912
+          581192,
+          471807,
+          435279,
+          383153,
+          349386,
+          299473,
+          261539,
+          225724,
+          187478,
+          150676,
+          114117,
+          84964,
+          62954,
+          44368,
+          24743,
+          12740,
+          9119
         ],
         "literacy": 0.96,
         "wealthLevel": 56,
-        "initialSavingsSUSD": 56448000,
+        "initialSavingsSUSD": 51932160,
         "militancy": 0.04
       },
       {
-        "id": 18,
+        "id": 23,
         "regionId": 4,
         "professionId": 1,
-        "financialAccountId": 1018,
+        "financialAccountId": 1023,
         "maleAgeGroups": [
           878013,
           713982,
@@ -1049,10 +1295,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.07
       },
       {
-        "id": 19,
+        "id": 24,
         "regionId": 4,
         "professionId": 0,
-        "financialAccountId": 1019,
+        "financialAccountId": 1024,
         "maleAgeGroups": [
           1097516,
           892478,
@@ -1097,10 +1343,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 20,
+        "id": 25,
+        "regionId": 5,
+        "professionId": 4,
+        "financialAccountId": 1025,
+        "maleAgeGroups": [
+          35120,
+          28559,
+          26376,
+          22947,
+          20603,
+          17046,
+          14944,
+          12719,
+          10636,
+          8468,
+          6287,
+          4536,
+          3232,
+          2159,
+          1146,
+          552,
+          332
+        ],
+        "femaleAgeGroups": [
+          33692,
+          27351,
+          25234,
+          22212,
+          20254,
+          17361,
+          15162,
+          13085,
+          10868,
+          8735,
+          6615,
+          4925,
+          3650,
+          2572,
+          1434,
+          739,
+          529
+        ],
+        "literacy": 0.98,
+        "wealthLevel": 58,
+        "initialSavingsSUSD": 3010560,
+        "militancy": 0.03
+      },
+      {
+        "id": 26,
         "regionId": 5,
         "professionId": 3,
-        "financialAccountId": 1020,
+        "financialAccountId": 1026,
         "maleAgeGroups": [
           73168,
           59499,
@@ -1145,58 +1439,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 21,
+        "id": 27,
         "regionId": 5,
         "professionId": 2,
-        "financialAccountId": 1021,
+        "financialAccountId": 1027,
         "maleAgeGroups": [
-          439006,
-          356991,
-          329700,
-          286833,
-          257541,
-          213070,
-          186799,
-          158992,
-          132947,
-          105855,
-          78586,
-          56704,
-          40397,
-          26986,
-          14326,
-          6896,
-          4144
+          403886,
+          328432,
+          303324,
+          263886,
+          236938,
+          196025,
+          171855,
+          146273,
+          122311,
+          97386,
+          72300,
+          52168,
+          37165,
+          24827,
+          13180,
+          6344,
+          3812
         ],
         "femaleAgeGroups": [
-          421154,
-          341889,
-          315420,
-          277647,
-          253179,
-          217010,
-          189521,
-          163568,
-          135853,
-          109185,
-          82694,
-          61568,
-          45619,
-          32150,
-          17930,
-          9232,
-          6608
+          387461,
+          314538,
+          290186,
+          255435,
+          232924,
+          199649,
+          174359,
+          150483,
+          124985,
+          100450,
+          76078,
+          56643,
+          41970,
+          29578,
+          16495,
+          8494,
+          6080
         ],
         "literacy": 0.96,
         "wealthLevel": 56,
-        "initialSavingsSUSD": 37632000,
+        "initialSavingsSUSD": 34621440,
         "militancy": 0.04
       },
       {
-        "id": 22,
+        "id": 28,
         "regionId": 5,
         "professionId": 1,
-        "financialAccountId": 1022,
+        "financialAccountId": 1028,
         "maleAgeGroups": [
           585342,
           475988,
@@ -1241,10 +1535,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.07
       },
       {
-        "id": 23,
+        "id": 29,
         "regionId": 5,
         "professionId": 0,
-        "financialAccountId": 1023,
+        "financialAccountId": 1029,
         "maleAgeGroups": [
           731677,
           594985,
@@ -1289,10 +1583,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 24,
+        "id": 30,
+        "regionId": 6,
+        "professionId": 4,
+        "financialAccountId": 1030,
+        "maleAgeGroups": [
+          30749,
+          25005,
+          23093,
+          20091,
+          18039,
+          14924,
+          13084,
+          11136,
+          9312,
+          7414,
+          5504,
+          3972,
+          2830,
+          1890,
+          1004,
+          483,
+          290
+        ],
+        "femaleAgeGroups": [
+          29499,
+          23947,
+          22093,
+          19447,
+          17733,
+          15200,
+          13275,
+          11457,
+          9516,
+          7648,
+          5792,
+          4312,
+          3195,
+          2252,
+          1256,
+          647,
+          463
+        ],
+        "literacy": 0.96,
+        "wealthLevel": 56,
+        "initialSavingsSUSD": 2259312,
+        "militancy": 0.03
+      },
+      {
+        "id": 31,
         "regionId": 6,
         "professionId": 3,
-        "financialAccountId": 1024,
+        "financialAccountId": 1031,
         "maleAgeGroups": [
           69885,
           56829,
@@ -1337,58 +1679,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 25,
+        "id": 32,
         "regionId": 6,
         "professionId": 2,
-        "financialAccountId": 1025,
+        "financialAccountId": 1032,
         "maleAgeGroups": [
-          384367,
-          312560,
-          288665,
-          251133,
-          225488,
-          186552,
-          163550,
-          139204,
-          116400,
-          92680,
-          68806,
-          49647,
-          35369,
-          23627,
-          12543,
-          6038,
-          3628
+          353618,
+          287555,
+          265572,
+          231043,
+          207449,
+          171627,
+          150466,
+          128067,
+          107088,
+          85266,
+          63301,
+          45675,
+          32540,
+          21737,
+          11540,
+          5555,
+          3338
         ],
         "femaleAgeGroups": [
-          368737,
-          299337,
-          276163,
-          243091,
-          221668,
-          190000,
-          165933,
-          143210,
-          118945,
-          95596,
-          72401,
-          53905,
-          39941,
-          28149,
-          15698,
-          8083,
-          5786
+          339238,
+          275390,
+          254070,
+          223644,
+          203934,
+          174800,
+          152658,
+          131753,
+          109429,
+          87948,
+          66609,
+          49593,
+          36746,
+          25897,
+          14442,
+          7437,
+          5323
         ],
         "literacy": 0.94,
         "wealthLevel": 54,
-        "initialSavingsSUSD": 28241400,
+        "initialSavingsSUSD": 25982088,
         "militancy": 0.04
       },
       {
-        "id": 26,
+        "id": 33,
         "regionId": 6,
         "professionId": 1,
-        "financialAccountId": 1026,
+        "financialAccountId": 1033,
         "maleAgeGroups": [
           489195,
           397803,
@@ -1433,10 +1775,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.07
       },
       {
-        "id": 27,
+        "id": 34,
         "regionId": 6,
         "professionId": 0,
-        "financialAccountId": 1027,
+        "financialAccountId": 1034,
         "maleAgeGroups": [
           803677,
           653534,
@@ -1481,10 +1823,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 28,
+        "id": 35,
+        "regionId": 7,
+        "professionId": 4,
+        "financialAccountId": 1035,
+        "maleAgeGroups": [
+          25159,
+          20458,
+          18894,
+          16438,
+          14759,
+          12211,
+          10705,
+          9112,
+          7619,
+          6066,
+          4504,
+          3250,
+          2315,
+          1547,
+          821,
+          395,
+          237
+        ],
+        "femaleAgeGroups": [
+          24136,
+          19593,
+          18076,
+          15911,
+          14509,
+          12436,
+          10861,
+          9374,
+          7786,
+          6257,
+          4739,
+          3528,
+          2614,
+          1842,
+          1028,
+          529,
+          379
+        ],
+        "literacy": 0.96,
+        "wealthLevel": 56,
+        "initialSavingsSUSD": 1848528,
+        "militancy": 0.03
+      },
+      {
+        "id": 36,
         "regionId": 7,
         "professionId": 3,
-        "financialAccountId": 1028,
+        "financialAccountId": 1036,
         "maleAgeGroups": [
           57179,
           46497,
@@ -1529,58 +1919,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 29,
+        "id": 37,
         "regionId": 7,
         "professionId": 2,
-        "financialAccountId": 1029,
+        "financialAccountId": 1037,
         "maleAgeGroups": [
-          314482,
-          255731,
-          236181,
-          205473,
-          184490,
-          152633,
-          133814,
-          113894,
-          95236,
-          75829,
-          56295,
-          40620,
-          28938,
-          19331,
-          10263,
-          4940,
-          2968
+          289324,
+          235272,
+          217286,
+          189035,
+          169731,
+          140423,
+          123108,
+          104782,
+          87618,
+          69763,
+          51792,
+          37370,
+          26623,
+          17785,
+          9442,
+          4545,
+          2731
         ],
         "femaleAgeGroups": [
-          301694,
-          244912,
-          225951,
-          198893,
-          181365,
-          155455,
-          135763,
-          117172,
-          97319,
-          78215,
-          59238,
-          44104,
-          32679,
-          23031,
-          12844,
-          6613,
-          4734
+          277558,
+          225319,
+          207875,
+          182981,
+          166855,
+          143019,
+          124902,
+          107798,
+          89533,
+          71958,
+          54499,
+          40576,
+          30065,
+          21189,
+          11816,
+          6084,
+          4355
         ],
         "literacy": 0.94,
         "wealthLevel": 54,
-        "initialSavingsSUSD": 23106600,
+        "initialSavingsSUSD": 21258072,
         "militancy": 0.04
       },
       {
-        "id": 30,
+        "id": 38,
         "regionId": 7,
         "professionId": 1,
-        "financialAccountId": 1030,
+        "financialAccountId": 1038,
         "maleAgeGroups": [
           400250,
           325475,
@@ -1625,10 +2015,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.07
       },
       {
-        "id": 31,
+        "id": 39,
         "regionId": 7,
         "professionId": 0,
-        "financialAccountId": 1031,
+        "financialAccountId": 1039,
         "maleAgeGroups": [
           657554,
           534710,
@@ -1673,10 +2063,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.06
       },
       {
-        "id": 32,
+        "id": 40,
+        "regionId": 8,
+        "professionId": 4,
+        "financialAccountId": 1040,
+        "maleAgeGroups": [
+          27365,
+          22252,
+          20551,
+          17879,
+          16053,
+          13281,
+          11644,
+          9911,
+          8287,
+          6598,
+          4899,
+          3535,
+          2518,
+          1682,
+          893,
+          430,
+          258
+        ],
+        "femaleAgeGroups": [
+          26252,
+          21311,
+          19661,
+          17307,
+          15781,
+          13527,
+          11813,
+          10196,
+          8468,
+          6806,
+          5155,
+          3838,
+          2844,
+          2004,
+          1118,
+          575,
+          412
+        ],
+        "literacy": 0.72,
+        "wealthLevel": 48,
+        "initialSavingsSUSD": 502656,
+        "militancy": 0.05
+      },
+      {
+        "id": 41,
         "regionId": 8,
         "professionId": 3,
-        "financialAccountId": 1032,
+        "financialAccountId": 1041,
         "maleAgeGroups": [
           48866,
           39736,
@@ -1721,58 +2159,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.03
       },
       {
-        "id": 33,
+        "id": 42,
         "regionId": 8,
         "professionId": 2,
-        "financialAccountId": 1033,
+        "financialAccountId": 1042,
         "maleAgeGroups": [
-          342059,
-          278156,
-          256891,
-          223490,
-          200668,
-          166017,
-          145548,
-          123881,
-          103588,
-          82479,
-          61232,
-          44182,
-          31476,
-          21026,
-          11163,
-          5373,
-          3229
+          314694,
+          255903,
+          236340,
+          205611,
+          184614,
+          152736,
+          133904,
+          113971,
+          95301,
+          75880,
+          56333,
+          40647,
+          28958,
+          19344,
+          10270,
+          4943,
+          2970
         ],
         "femaleAgeGroups": [
-          328149,
-          266388,
-          245765,
-          216333,
-          197268,
-          169087,
-          147668,
-          127447,
-          105852,
-          85073,
-          64432,
-          47972,
-          35545,
-          25051,
-          13970,
-          7193,
-          5149
+          301897,
+          245077,
+          226104,
+          199027,
+          181487,
+          155560,
+          135855,
+          117251,
+          97384,
+          78268,
+          59278,
+          44134,
+          32701,
+          23047,
+          12852,
+          6618,
+          4737
         ],
         "literacy": 0.7,
         "wealthLevel": 46,
-        "initialSavingsSUSD": 6283200,
+        "initialSavingsSUSD": 5780544,
         "militancy": 0.06
       },
       {
-        "id": 34,
+        "id": 43,
         "regionId": 8,
         "professionId": 1,
-        "financialAccountId": 1034,
+        "financialAccountId": 1043,
         "maleAgeGroups": [
           586387,
           476838,
@@ -1817,10 +2255,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.14
       },
       {
-        "id": 35,
+        "id": 44,
         "regionId": 8,
         "professionId": 0,
-        "financialAccountId": 1035,
+        "financialAccountId": 1044,
         "maleAgeGroups": [
           3909247,
           3178921,
@@ -1865,10 +2303,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.12
       },
       {
-        "id": 36,
+        "id": 45,
+        "regionId": 9,
+        "professionId": 4,
+        "financialAccountId": 1045,
+        "maleAgeGroups": [
+          34828,
+          28321,
+          26156,
+          22755,
+          20432,
+          16904,
+          14819,
+          12613,
+          10547,
+          8398,
+          6235,
+          4499,
+          3205,
+          2141,
+          1137,
+          547,
+          329
+        ],
+        "femaleAgeGroups": [
+          33412,
+          27123,
+          25023,
+          22027,
+          20086,
+          17216,
+          15035,
+          12976,
+          10778,
+          8662,
+          6560,
+          4884,
+          3619,
+          2551,
+          1422,
+          732,
+          524
+        ],
+        "literacy": 0.72,
+        "wealthLevel": 48,
+        "initialSavingsSUSD": 639744,
+        "militancy": 0.05
+      },
+      {
+        "id": 46,
         "regionId": 9,
         "professionId": 3,
-        "financialAccountId": 1036,
+        "financialAccountId": 1046,
         "maleAgeGroups": [
           62193,
           50574,
@@ -1913,58 +2399,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.03
       },
       {
-        "id": 37,
+        "id": 47,
         "regionId": 9,
         "professionId": 2,
-        "financialAccountId": 1037,
+        "financialAccountId": 1047,
         "maleAgeGroups": [
-          435348,
-          354016,
-          326953,
-          284442,
-          255395,
-          211295,
-          185242,
-          157667,
-          131839,
-          104973,
-          77932,
-          56232,
-          40060,
-          26761,
-          14207,
-          6838,
-          4109
+          400520,
+          325695,
+          300796,
+          261687,
+          234964,
+          194391,
+          170423,
+          145054,
+          121292,
+          96575,
+          71697,
+          51733,
+          36855,
+          24620,
+          13070,
+          6291,
+          3781
         ],
         "femaleAgeGroups": [
-          417644,
-          339040,
-          312791,
-          275334,
-          251069,
-          215201,
-          187942,
-          162205,
-          134721,
-          108275,
-          82004,
-          61055,
-          45239,
-          31883,
-          17780,
-          9155,
-          6553
+          384233,
+          311917,
+          287768,
+          253307,
+          230983,
+          197985,
+          172906,
+          149229,
+          123943,
+          99613,
+          75444,
+          56170,
+          41620,
+          29332,
+          16358,
+          8423,
+          6029
         ],
         "literacy": 0.7,
         "wealthLevel": 46,
-        "initialSavingsSUSD": 7996800,
+        "initialSavingsSUSD": 7357056,
         "militancy": 0.06
       },
       {
-        "id": 38,
+        "id": 48,
         "regionId": 9,
         "professionId": 1,
-        "financialAccountId": 1038,
+        "financialAccountId": 1048,
         "maleAgeGroups": [
           746311,
           606885,
@@ -2009,10 +2495,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.14
       },
       {
-        "id": 39,
+        "id": 49,
         "regionId": 9,
         "professionId": 0,
-        "financialAccountId": 1039,
+        "financialAccountId": 1049,
         "maleAgeGroups": [
           4975405,
           4045900,
@@ -2057,10 +2543,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.12
       },
       {
-        "id": 40,
+        "id": 50,
+        "regionId": 10,
+        "professionId": 4,
+        "financialAccountId": 1050,
+        "maleAgeGroups": [
+          25410,
+          20663,
+          19083,
+          16602,
+          14907,
+          12333,
+          10812,
+          9203,
+          7695,
+          6127,
+          4549,
+          3282,
+          2338,
+          1562,
+          829,
+          399,
+          240
+        ],
+        "femaleAgeGroups": [
+          24377,
+          19789,
+          18257,
+          16071,
+          14654,
+          12561,
+          10970,
+          9467,
+          7863,
+          6320,
+          4786,
+          3564,
+          2640,
+          1861,
+          1038,
+          534,
+          382
+        ],
+        "literacy": 0.88,
+        "wealthLevel": 50,
+        "initialSavingsSUSD": 777920,
+        "militancy": 0.04
+      },
+      {
+        "id": 51,
         "regionId": 10,
         "professionId": 3,
-        "financialAccountId": 1040,
+        "financialAccountId": 1051,
         "maleAgeGroups": [
           48866,
           39736,
@@ -2105,58 +2639,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 41,
+        "id": 52,
         "regionId": 10,
         "professionId": 2,
-        "financialAccountId": 1041,
+        "financialAccountId": 1052,
         "maleAgeGroups": [
-          317626,
-          258287,
-          238542,
-          207527,
-          186334,
-          154159,
-          135151,
-          115033,
-          96189,
-          76587,
-          56858,
-          41026,
-          29228,
-          19524,
-          10365,
-          4989,
-          2998
+          292216,
+          237624,
+          219459,
+          190925,
+          171428,
+          141826,
+          124339,
+          105830,
+          88494,
+          70460,
+          52310,
+          37744,
+          26890,
+          17962,
+          9536,
+          4590,
+          2758
         ],
         "femaleAgeGroups": [
-          304710,
-          247361,
-          228210,
-          200881,
-          183178,
-          157009,
-          137121,
-          118343,
-          98292,
-          78997,
-          59830,
-          44545,
-          33006,
-          23261,
-          12972,
-          6680,
-          4781
+          280333,
+          227572,
+          209953,
+          184811,
+          168524,
+          144448,
+          126151,
+          108876,
+          90428,
+          72677,
+          55043,
+          40982,
+          30365,
+          21400,
+          11934,
+          6145,
+          4399
         ],
         "literacy": 0.86,
         "wealthLevel": 48,
-        "initialSavingsSUSD": 9724000,
+        "initialSavingsSUSD": 8946080,
         "militancy": 0.05
       },
       {
-        "id": 42,
+        "id": 53,
         "regionId": 10,
         "professionId": 1,
-        "financialAccountId": 1042,
+        "financialAccountId": 1053,
         "maleAgeGroups": [
           488656,
           397365,
@@ -2201,10 +2735,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.09
       },
       {
-        "id": 43,
+        "id": 54,
         "regionId": 10,
         "professionId": 0,
-        "financialAccountId": 1043,
+        "financialAccountId": 1054,
         "maleAgeGroups": [
           1588131,
           1291437,
@@ -2249,10 +2783,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.08
       },
       {
-        "id": 44,
+        "id": 55,
+        "regionId": 11,
+        "professionId": 4,
+        "financialAccountId": 1055,
+        "maleAgeGroups": [
+          11958,
+          9724,
+          8980,
+          7813,
+          7015,
+          5804,
+          5088,
+          4331,
+          3621,
+          2883,
+          2141,
+          1545,
+          1100,
+          735,
+          390,
+          188,
+          113
+        ],
+        "femaleAgeGroups": [
+          11471,
+          9312,
+          8591,
+          7563,
+          6896,
+          5911,
+          5162,
+          4455,
+          3700,
+          2974,
+          2252,
+          1677,
+          1243,
+          876,
+          488,
+          252,
+          180
+        ],
+        "literacy": 0.88,
+        "wealthLevel": 50,
+        "initialSavingsSUSD": 366080,
+        "militancy": 0.04
+      },
+      {
+        "id": 56,
         "regionId": 11,
         "professionId": 3,
-        "financialAccountId": 1044,
+        "financialAccountId": 1056,
         "maleAgeGroups": [
           22996,
           18700,
@@ -2297,58 +2879,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 45,
+        "id": 57,
         "regionId": 11,
         "professionId": 2,
-        "financialAccountId": 1045,
+        "financialAccountId": 1057,
         "maleAgeGroups": [
-          149471,
-          121547,
-          112255,
-          97660,
-          87687,
-          72545,
-          63601,
-          54133,
-          45265,
-          36041,
-          26757,
-          19306,
-          13754,
-          9188,
-          4878,
-          2348,
-          1411
+          137513,
+          111823,
+          103275,
+          89847,
+          80672,
+          66742,
+          58512,
+          49802,
+          41644,
+          33158,
+          24616,
+          17762,
+          12654,
+          8453,
+          4488,
+          2160,
+          1298
         ],
         "femaleAgeGroups": [
-          143393,
-          116405,
-          107393,
-          94532,
-          86201,
-          73887,
-          64527,
-          55691,
-          46255,
-          37175,
-          28155,
-          20962,
-          15532,
-          10947,
-          6105,
-          3143,
-          2250
+          131921,
+          107093,
+          98801,
+          86970,
+          79305,
+          67976,
+          59365,
+          51236,
+          42554,
+          34201,
+          25903,
+          19285,
+          14290,
+          10071,
+          5616,
+          2892,
+          2070
         ],
         "literacy": 0.86,
         "wealthLevel": 48,
-        "initialSavingsSUSD": 4576000,
+        "initialSavingsSUSD": 4209920,
         "militancy": 0.05
       },
       {
-        "id": 46,
+        "id": 58,
         "regionId": 11,
         "professionId": 1,
-        "financialAccountId": 1046,
+        "financialAccountId": 1058,
         "maleAgeGroups": [
           229956,
           186995,
@@ -2393,10 +2975,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.09
       },
       {
-        "id": 47,
+        "id": 59,
         "regionId": 11,
         "professionId": 0,
-        "financialAccountId": 1047,
+        "financialAccountId": 1059,
         "maleAgeGroups": [
           747356,
           607735,
@@ -2441,10 +3023,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.08
       },
       {
-        "id": 48,
+        "id": 60,
+        "regionId": 12,
+        "professionId": 4,
+        "financialAccountId": 1060,
+        "maleAgeGroups": [
+          76963,
+          62585,
+          57801,
+          50285,
+          45150,
+          37354,
+          32748,
+          27873,
+          23307,
+          18558,
+          13777,
+          9941,
+          7082,
+          4731,
+          2512,
+          1209,
+          726
+        ],
+        "femaleAgeGroups": [
+          73834,
+          59937,
+          55297,
+          48675,
+          44385,
+          38044,
+          33225,
+          28676,
+          23817,
+          19142,
+          14497,
+          10794,
+          7998,
+          5636,
+          3143,
+          1619,
+          1159
+        ],
+        "literacy": 0.52,
+        "wealthLevel": 42,
+        "initialSavingsSUSD": 942480,
+        "militancy": 0.06
+      },
+      {
+        "id": 61,
         "regionId": 12,
         "professionId": 3,
-        "financialAccountId": 1048,
+        "financialAccountId": 1061,
         "maleAgeGroups": [
           106893,
           86924,
@@ -2489,58 +3119,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.03
       },
       {
-        "id": 49,
+        "id": 62,
         "regionId": 12,
         "professionId": 2,
-        "financialAccountId": 1049,
+        "financialAccountId": 1062,
         "maleAgeGroups": [
-          962041,
-          782313,
-          722507,
-          628567,
-          564378,
-          466924,
-          409352,
-          348416,
-          291340,
-          231971,
-          172215,
-          124262,
-          88526,
-          59136,
-          31395,
-          15112,
-          9081
+          885078,
+          719728,
+          664706,
+          578282,
+          519228,
+          429570,
+          376604,
+          320543,
+          268033,
+          213413,
+          158438,
+          114321,
+          81444,
+          54405,
+          28883,
+          13903,
+          8354
         ],
         "femaleAgeGroups": [
-          922919,
-          749217,
-          691213,
-          608438,
-          554817,
-          475556,
-          415318,
-          358444,
-          297710,
-          239269,
-          181215,
-          134920,
-          99970,
-          70455,
-          39291,
-          20231,
-          14481
+          849085,
+          689280,
+          635916,
+          559763,
+          510432,
+          437511,
+          382092,
+          329768,
+          273893,
+          220128,
+          166718,
+          124127,
+          91972,
+          64818,
+          36148,
+          18613,
+          13323
         ],
         "literacy": 0.5,
         "wealthLevel": 40,
-        "initialSavingsSUSD": 11781000,
+        "initialSavingsSUSD": 10838520,
         "militancy": 0.07
       },
       {
-        "id": 50,
+        "id": 63,
         "regionId": 12,
         "professionId": 1,
-        "financialAccountId": 1050,
+        "financialAccountId": 1063,
         "maleAgeGroups": [
           1924082,
           1564625,
@@ -2585,10 +3215,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.16
       },
       {
-        "id": 51,
+        "id": 64,
         "regionId": 12,
         "professionId": 0,
-        "financialAccountId": 1051,
+        "financialAccountId": 1064,
         "maleAgeGroups": [
           7696329,
           6258501,
@@ -2633,10 +3263,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.14
       },
       {
-        "id": 52,
+        "id": 65,
+        "regionId": 13,
+        "professionId": 4,
+        "financialAccountId": 1065,
+        "maleAgeGroups": [
+          62970,
+          51206,
+          47291,
+          41143,
+          36941,
+          30562,
+          26794,
+          22805,
+          19070,
+          15184,
+          11272,
+          8134,
+          5794,
+          3871,
+          2055,
+          989,
+          594
+        ],
+        "femaleAgeGroups": [
+          60409,
+          49040,
+          45243,
+          39825,
+          36315,
+          31127,
+          27184,
+          23462,
+          19487,
+          15661,
+          11861,
+          8831,
+          6544,
+          4612,
+          2572,
+          1324,
+          948
+        ],
+        "literacy": 0.52,
+        "wealthLevel": 42,
+        "initialSavingsSUSD": 771120,
+        "militancy": 0.06
+      },
+      {
+        "id": 66,
         "regionId": 13,
         "professionId": 3,
-        "financialAccountId": 1052,
+        "financialAccountId": 1066,
         "maleAgeGroups": [
           87458,
           71119,
@@ -2681,58 +3359,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.03
       },
       {
-        "id": 53,
+        "id": 67,
         "regionId": 13,
         "professionId": 2,
-        "financialAccountId": 1053,
+        "financialAccountId": 1067,
         "maleAgeGroups": [
-          787125,
-          640074,
-          591142,
-          514282,
-          461764,
-          382029,
-          334925,
-          285068,
-          238369,
-          189794,
-          140903,
-          101669,
-          72431,
-          48384,
-          25687,
-          12364,
-          7430
+          724155,
+          588868,
+          543851,
+          473140,
+          424823,
+          351466,
+          308131,
+          262262,
+          219300,
+          174611,
+          129631,
+          93535,
+          66636,
+          44513,
+          23632,
+          11375,
+          6835
         ],
         "femaleAgeGroups": [
-          755115,
-          612996,
-          565538,
-          497813,
-          453941,
-          389091,
-          339805,
-          293272,
-          243581,
-          195766,
-          148267,
-          110389,
-          81793,
-          57645,
-          32147,
-          16553,
-          11848
+          694706,
+          563956,
+          520295,
+          457988,
+          417626,
+          357964,
+          312621,
+          269811,
+          224094,
+          180104,
+          136406,
+          101558,
+          75250,
+          53033,
+          29575,
+          15229,
+          10900
         ],
         "literacy": 0.5,
         "wealthLevel": 40,
-        "initialSavingsSUSD": 9639000,
+        "initialSavingsSUSD": 8867880,
         "militancy": 0.07
       },
       {
-        "id": 54,
+        "id": 68,
         "regionId": 13,
         "professionId": 1,
-        "financialAccountId": 1054,
+        "financialAccountId": 1068,
         "maleAgeGroups": [
           1574249,
           1280148,
@@ -2777,10 +3455,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.16
       },
       {
-        "id": 55,
+        "id": 69,
         "regionId": 13,
         "professionId": 0,
-        "financialAccountId": 1055,
+        "financialAccountId": 1069,
         "maleAgeGroups": [
           6296997,
           5120592,
@@ -2825,10 +3503,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.14
       },
       {
-        "id": 56,
+        "id": 70,
+        "regionId": 14,
+        "professionId": 4,
+        "financialAccountId": 1070,
+        "maleAgeGroups": [
+          9382,
+          7629,
+          7046,
+          6130,
+          5504,
+          4554,
+          3992,
+          3398,
+          2841,
+          2262,
+          1680,
+          1212,
+          863,
+          577,
+          306,
+          147,
+          89
+        ],
+        "femaleAgeGroups": [
+          9001,
+          7307,
+          6741,
+          5934,
+          5411,
+          4638,
+          4050,
+          3496,
+          2903,
+          2334,
+          1767,
+          1316,
+          975,
+          687,
+          383,
+          197,
+          141
+        ],
+        "literacy": 0.62,
+        "wealthLevel": 44,
+        "initialSavingsSUSD": 172339.5,
+        "militancy": 0.04
+      },
+      {
+        "id": 71,
         "regionId": 14,
         "professionId": 3,
-        "financialAccountId": 1056,
+        "financialAccountId": 1071,
         "maleAgeGroups": [
           19546,
           15895,
@@ -2873,58 +3599,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 57,
+        "id": 72,
         "regionId": 14,
         "professionId": 2,
-        "financialAccountId": 1057,
+        "financialAccountId": 1072,
         "maleAgeGroups": [
-          117277,
-          95368,
-          88077,
-          76625,
-          68800,
-          56920,
-          49902,
-          42474,
-          35516,
-          28278,
-          20994,
-          15148,
-          10792,
-          7209,
-          3827,
-          1842,
-          1107
+          107895,
+          87738,
+          81031,
+          70495,
+          63296,
+          52367,
+          45910,
+          39076,
+          32674,
+          26016,
+          19314,
+          13936,
+          9928,
+          6632,
+          3521,
+          1695,
+          1018
         ],
         "femaleAgeGroups": [
-          112508,
-          91333,
-          84262,
-          74172,
-          67635,
-          57973,
-          50629,
-          43696,
-          36292,
-          29168,
-          22091,
-          16448,
-          12187,
-          8589,
-          4790,
-          2466,
-          1765
+          103508,
+          84026,
+          77521,
+          68238,
+          62224,
+          53335,
+          46579,
+          40200,
+          33389,
+          26835,
+          20324,
+          15132,
+          11212,
+          7902,
+          4407,
+          2269,
+          1624
         ],
         "literacy": 0.6,
         "wealthLevel": 42,
-        "initialSavingsSUSD": 2154240,
+        "initialSavingsSUSD": 1981900.5,
         "militancy": 0.05
       },
       {
-        "id": 58,
+        "id": 73,
         "regionId": 14,
         "professionId": 1,
-        "financialAccountId": 1058,
+        "financialAccountId": 1073,
         "maleAgeGroups": [
           234555,
           190735,
@@ -2969,10 +3695,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.12
       },
       {
-        "id": 59,
+        "id": 74,
         "regionId": 14,
         "professionId": 0,
-        "financialAccountId": 1059,
+        "financialAccountId": 1074,
         "maleAgeGroups": [
           605933,
           492733,
@@ -3017,10 +3743,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.1
       },
       {
-        "id": 60,
+        "id": 75,
+        "regionId": 15,
+        "professionId": 4,
+        "financialAccountId": 1075,
+        "maleAgeGroups": [
+          4415,
+          3590,
+          3316,
+          2885,
+          2590,
+          2143,
+          1879,
+          1599,
+          1337,
+          1065,
+          790,
+          570,
+          406,
+          271,
+          144,
+          69,
+          42
+        ],
+        "femaleAgeGroups": [
+          4236,
+          3439,
+          3172,
+          2792,
+          2546,
+          2183,
+          1906,
+          1645,
+          1366,
+          1098,
+          832,
+          619,
+          459,
+          323,
+          180,
+          93,
+          67
+        ],
+        "literacy": 0.62,
+        "wealthLevel": 44,
+        "initialSavingsSUSD": 81100.5,
+        "militancy": 0.04
+      },
+      {
+        "id": 76,
         "regionId": 15,
         "professionId": 3,
-        "financialAccountId": 1060,
+        "financialAccountId": 1076,
         "maleAgeGroups": [
           9198,
           7480,
@@ -3065,58 +3839,58 @@ export const M5_SCENARIO = ({
         "militancy": 0.02
       },
       {
-        "id": 61,
+        "id": 77,
         "regionId": 15,
         "professionId": 2,
-        "financialAccountId": 1061,
+        "financialAccountId": 1077,
         "maleAgeGroups": [
-          55189,
-          44879,
-          41448,
-          36059,
-          32377,
-          26786,
-          23483,
-          19988,
-          16713,
-          13307,
-          9879,
-          7129,
-          5078,
-          3392,
-          1801,
-          867,
-          521
+          50774,
+          41289,
+          38132,
+          33174,
+          29787,
+          24643,
+          21605,
+          18389,
+          15376,
+          12243,
+          9089,
+          6558,
+          4672,
+          3121,
+          1657,
+          798,
+          479
         ],
         "femaleAgeGroups": [
-          52945,
-          42980,
-          39653,
-          34904,
-          31828,
-          27281,
-          23826,
-          20563,
-          17079,
-          13726,
-          10396,
-          7740,
-          5735,
-          4042,
-          2254,
-          1161,
-          831
+          48709,
+          39542,
+          36481,
+          32112,
+          29282,
+          25099,
+          21919,
+          18918,
+          15712,
+          12628,
+          9564,
+          7121,
+          5276,
+          3718,
+          2074,
+          1068,
+          764
         ],
         "literacy": 0.6,
         "wealthLevel": 42,
-        "initialSavingsSUSD": 1013760,
+        "initialSavingsSUSD": 932659.5,
         "militancy": 0.05
       },
       {
-        "id": 62,
+        "id": 78,
         "regionId": 15,
         "professionId": 1,
-        "financialAccountId": 1062,
+        "financialAccountId": 1078,
         "maleAgeGroups": [
           110379,
           89758,
@@ -3161,10 +3935,10 @@ export const M5_SCENARIO = ({
         "militancy": 0.12
       },
       {
-        "id": 63,
+        "id": 79,
         "regionId": 15,
         "professionId": 0,
-        "financialAccountId": 1063,
+        "financialAccountId": 1079,
         "maleAgeGroups": [
           285145,
           231874,
@@ -3210,7 +3984,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v6",
+      "dataVersion": "m3-economy-v7",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6096,12 +6870,16 @@ export const M5_SCENARIO = ({
         {
           "professionId": 3,
           "multiplier": 1
+        },
+        {
+          "professionId": 4,
+          "multiplier": 1
         }
       ]
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v6",
+    "dataVersion": "m3-economy-v7",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -6241,6 +7019,18 @@ export const M5_SCENARIO = ({
         "baseWage1900SUSDPerYear": 600,
         "trainingCostSUSD": 0,
         "laborProductivityModifier": 1
+      },
+      {
+        "id": 4,
+        "key": "academics",
+        "name": "Academics",
+        "stratum": "middle",
+        "participationRate": 0.6,
+        "qualificationLiteracy": 0.85,
+        "qualificationWealthLevel": 40,
+        "baseWage1900SUSDPerYear": 320,
+        "trainingCostSUSD": 0,
+        "laborProductivityModifier": 1.15
       }
     ],
     "buildings": [
@@ -6695,10 +7485,101 @@ export const M5_SCENARIO = ({
             "quantity": 1000
           }
         ]
+      },
+      {
+        "id": 10,
+        "key": "mechanized-farm",
+        "name": "Mechanized Farm",
+        "referenceThroughputPerDayAtLevelOne": 1,
+        "inputs": [],
+        "outputs": [
+          {
+            "goodId": 0,
+            "quantityPerThroughputUnit": 600000
+          }
+        ],
+        "jobs": [
+          {
+            "professionId": 1,
+            "workersPerThroughputUnit": 15000
+          }
+        ],
+        "constructionCostSUSD": 8000,
+        "constructionWorkers": 200,
+        "dailyUpkeepSUSDAtLevelOne": 120,
+        "storageCapacityByGood": [],
+        "resourceRequirements": [],
+        "requiredTechnologyId": 1,
+        "ownershipAllowed": [
+          "private",
+          "state"
+        ],
+        "isEssentialInfrastructure": false,
+        "sector": "agriculture",
+        "constructionMaterials": [
+          {
+            "goodId": 0,
+            "quantity": 6000
+          },
+          {
+            "goodId": 3,
+            "quantity": 400
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "key": "power-loom-mill",
+        "name": "Power Loom Mill",
+        "referenceThroughputPerDayAtLevelOne": 1,
+        "inputs": [
+          {
+            "goodId": 3,
+            "quantityPerThroughputUnit": 6000
+          },
+          {
+            "goodId": 4,
+            "quantityPerThroughputUnit": 2000
+          }
+        ],
+        "outputs": [
+          {
+            "goodId": 5,
+            "quantityPerThroughputUnit": 45000
+          }
+        ],
+        "jobs": [
+          {
+            "professionId": 1,
+            "workersPerThroughputUnit": 20000
+          }
+        ],
+        "constructionCostSUSD": 10000,
+        "constructionWorkers": 240,
+        "dailyUpkeepSUSDAtLevelOne": 150,
+        "storageCapacityByGood": [],
+        "resourceRequirements": [],
+        "requiredTechnologyId": 9,
+        "ownershipAllowed": [
+          "private",
+          "state"
+        ],
+        "isEssentialInfrastructure": false,
+        "sector": "textiles",
+        "constructionMaterials": [
+          {
+            "goodId": 3,
+            "quantity": 3000
+          },
+          {
+            "goodId": 4,
+            "quantity": 1000
+          }
+        ]
       }
     ],
     "politics": {
-      "dataVersion": "m3-economy-v6",
+      "dataVersion": "m3-economy-v7",
       "status": "provisional",
       "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
       "regimes": [
@@ -6710,7 +7591,7 @@ export const M5_SCENARIO = ({
           "defaultLaws": {
             "suffrage": 4,
             "taxation": 1,
-            "education": 0,
+            "education": 13,
             "health": 0,
             "labor": 9,
             "militaryService": 0,
@@ -6727,7 +7608,7 @@ export const M5_SCENARIO = ({
           "defaultLaws": {
             "suffrage": 5,
             "taxation": 1,
-            "education": 0,
+            "education": 13,
             "health": 0,
             "labor": 8,
             "militaryService": 0,
@@ -6744,7 +7625,7 @@ export const M5_SCENARIO = ({
           "defaultLaws": {
             "suffrage": 6,
             "taxation": 1,
-            "education": 0,
+            "education": 13,
             "health": 0,
             "labor": 8,
             "militaryService": 0,
@@ -6785,7 +7666,8 @@ export const M5_SCENARIO = ({
           "name": "Intelligentsia",
           "organizationBase": 0.5,
           "membershipByProfessionKey": {
-            "clerks": 0.35
+            "clerks": 0.35,
+            "academics": 1
           }
         },
         {
@@ -6844,6 +7726,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.2,
@@ -6883,6 +7768,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.1,
           "groupStance": {
             "aristocrats": -0.8,
@@ -6923,6 +7811,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.6,
@@ -6956,6 +7847,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0.05,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.7,
@@ -6989,6 +7883,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": 0.5,
@@ -7021,6 +7918,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.1,
           "groupStance": {
             "aristocrats": -0.3,
@@ -7055,6 +7955,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.15,
           "groupStance": {
             "aristocrats": -0.7,
@@ -7084,6 +7987,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0.1,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0,
           "groupStance": {
             "aristocrats": -0.1,
@@ -7113,6 +8019,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": -0.2,
           "laborGrievance": 0.15,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0.5,
@@ -7143,6 +8052,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": null,
           "laborOrganizationBonus": 0.25,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.15,
           "groupStance": {
             "aristocrats": -0.4,
@@ -7172,6 +8084,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": "open",
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0,
@@ -7201,6 +8116,9 @@ export const M5_SCENARIO = ({
           "borderPolicy": "closed",
           "laborOrganizationBonus": 0,
           "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
           "institutionLoad": 0.05,
           "groupStance": {
             "aristocrats": 0.3,
@@ -7210,6 +8128,137 @@ export const M5_SCENARIO = ({
             "military": 0.2,
             "bureaucrats": 0.1,
             "rural": 0.4
+          }
+        },
+        {
+          "id": 13,
+          "slot": "education",
+          "key": "education-none",
+          "name": "No public education",
+          "description": "The state provides no general education service. Attendance is limited to household resources.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 30,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "educationAttendanceFloor": 0,
+          "educationQualityBonus": 0,
+          "requiredTechnologyIds": [],
+          "institutionLoad": 0,
+          "groupStance": {
+            "aristocrats": 0.1,
+            "capitalists": 0.2,
+            "labor": -0.3,
+            "intelligentsia": -0.5,
+            "military": -0.1,
+            "bureaucrats": 0,
+            "rural": 0.1
+          }
+        },
+        {
+          "id": 14,
+          "slot": "education",
+          "key": "education-voluntary",
+          "name": "Voluntary public schooling",
+          "description": "Public schools are funded and open to families that choose to attend. Modest attendance floor and quality bonus.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 90,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "educationAttendanceFloor": 0.1,
+          "educationQualityBonus": 0.05,
+          "requiredTechnologyIds": [],
+          "institutionLoad": 0.05,
+          "groupStance": {
+            "aristocrats": -0.2,
+            "capitalists": -0.1,
+            "labor": 0.2,
+            "intelligentsia": 0.4,
+            "military": 0,
+            "bureaucrats": 0.1,
+            "rural": 0
+          }
+        },
+        {
+          "id": 15,
+          "slot": "education",
+          "key": "education-compulsory-primary",
+          "name": "Compulsory primary schooling",
+          "description": "Attendance is compulsory up to the primary leaving age. Requires researched primary schooling and raises the attendance floor materially; capacity still limits actual attendance.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "absolute-monarchy",
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 180,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "educationAttendanceFloor": 0.5,
+          "educationQualityBonus": 0.1,
+          "requiredTechnologyIds": [
+            4
+          ],
+          "institutionLoad": 0.15,
+          "groupStance": {
+            "aristocrats": -0.3,
+            "capitalists": -0.2,
+            "labor": 0.5,
+            "intelligentsia": 0.6,
+            "military": 0,
+            "bureaucrats": 0.2,
+            "rural": -0.2
+          }
+        },
+        {
+          "id": 16,
+          "slot": "education",
+          "key": "education-universal",
+          "name": "Universal public education",
+          "description": "Universal schooling with a high attendance floor and a stronger quality bonus. Requires compulsory education systems research and is limited by teaching capacity.",
+          "prerequisites": [],
+          "eligibleRegimes": [
+            "constitutional-monarchy",
+            "republic"
+          ],
+          "enactmentDays": 365,
+          "taxRateBounds": [],
+          "suffrage": null,
+          "borderPolicy": null,
+          "laborOrganizationBonus": 0,
+          "laborGrievance": 0,
+          "educationAttendanceFloor": 0.85,
+          "educationQualityBonus": 0.15,
+          "requiredTechnologyIds": [
+            29
+          ],
+          "institutionLoad": 0.25,
+          "groupStance": {
+            "aristocrats": -0.5,
+            "capitalists": -0.4,
+            "labor": 0.7,
+            "intelligentsia": 0.8,
+            "military": 0,
+            "bureaucrats": 0.3,
+            "rural": -0.3
           }
         }
       ],
@@ -7302,6 +8351,2161 @@ export const M5_SCENARIO = ({
       "administrationProfessionKeys": [
         "clerks"
       ]
+    },
+    "technology": {
+      "dataVersion": "m3-economy-v7",
+      "academicProfessionKeys": [
+        "academics"
+      ],
+      "eraNames": [
+        "Steam and Steel",
+        "Electric Age",
+        "Postwar Boom",
+        "Information Age",
+        "Digital Age",
+        "Network Age"
+      ],
+      "technologies": [
+        {
+          "id": 0,
+          "key": "steam-power",
+          "name": "Steam power",
+          "era": 1,
+          "description": "Steam power: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "key": "mechanized-agriculture",
+          "name": "Mechanized agriculture",
+          "era": 1,
+          "description": "Mechanized agriculture: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "key": "railway-logistics",
+          "name": "Railway logistics",
+          "era": 1,
+          "description": "Railway logistics: provisional M9 research content for era 1.",
+          "prerequisites": [
+            0
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "key": "basic-sanitation",
+          "name": "Basic sanitation",
+          "era": 1,
+          "description": "Basic sanitation: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.02
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "key": "primary-schooling",
+          "name": "Primary schooling",
+          "era": 1,
+          "description": "Primary schooling: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "key": "printing-industry",
+          "name": "Printing industry",
+          "era": 1,
+          "description": "Printing industry: provisional M9 research content for era 1.",
+          "prerequisites": [
+            4
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "key": "steelmaking",
+          "name": "Steelmaking",
+          "era": 1,
+          "description": "Steelmaking: provisional M9 research content for era 1.",
+          "prerequisites": [
+            0
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "key": "chemical-fertilizer",
+          "name": "Chemical fertilizer",
+          "era": 1,
+          "description": "Chemical fertilizer: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "key": "canning",
+          "name": "Canning",
+          "era": 1,
+          "description": "Canning: provisional M9 research content for era 1.",
+          "prerequisites": [],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "key": "power-loom",
+          "name": "Power loom",
+          "era": 1,
+          "description": "Power loom: provisional M9 research content for era 1.",
+          "prerequisites": [
+            0
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "key": "telegraph",
+          "name": "Telegraph",
+          "era": 1,
+          "description": "Telegraph: provisional M9 research content for era 1.",
+          "prerequisites": [
+            0
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.01
+            },
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.01
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "key": "germ-theory",
+          "name": "Germ theory",
+          "era": 1,
+          "description": "Germ theory: provisional M9 research content for era 1.",
+          "prerequisites": [
+            3
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "key": "public-health-administration",
+          "name": "Public health administration",
+          "era": 1,
+          "description": "Public health administration: provisional M9 research content for era 1.",
+          "prerequisites": [
+            3
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.02
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "key": "accounting-standards",
+          "name": "Accounting standards",
+          "era": 1,
+          "description": "Accounting standards: provisional M9 research content for era 1.",
+          "prerequisites": [
+            2
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "key": "vocational-schools",
+          "name": "Vocational schools",
+          "era": 1,
+          "description": "Vocational schools: provisional M9 research content for era 1.",
+          "prerequisites": [
+            4
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "key": "electrical-generation",
+          "name": "Electrical generation",
+          "era": 1,
+          "description": "Electrical generation: provisional M9 research content for era 1.",
+          "prerequisites": [
+            0
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "key": "internal-combustion",
+          "name": "Internal combustion",
+          "era": 1,
+          "description": "Internal combustion: provisional M9 research content for era 1.",
+          "prerequisites": [
+            6
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "key": "refrigeration",
+          "name": "Refrigeration",
+          "era": 1,
+          "description": "Refrigeration: provisional M9 research content for era 1.",
+          "prerequisites": [
+            8
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "key": "synthetic-dyes",
+          "name": "Synthetic dyes",
+          "era": 1,
+          "description": "Synthetic dyes: provisional M9 research content for era 1.",
+          "prerequisites": [
+            7
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "key": "university-system",
+          "name": "University system",
+          "era": 1,
+          "description": "University system: provisional M9 research content for era 1.",
+          "prerequisites": [
+            4
+          ],
+          "researchWork": 200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "key": "scientific-management",
+          "name": "Scientific management",
+          "era": 2,
+          "description": "Scientific management: provisional M9 research content for era 2.",
+          "prerequisites": [
+            13
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "key": "assembly-line",
+          "name": "Assembly line",
+          "era": 2,
+          "description": "Assembly line: provisional M9 research content for era 2.",
+          "prerequisites": [
+            16,
+            20
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "key": "mass-production",
+          "name": "Mass production",
+          "era": 2,
+          "description": "Mass production: provisional M9 research content for era 2.",
+          "prerequisites": [
+            21
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "key": "radio",
+          "name": "Radio",
+          "era": 2,
+          "description": "Radio: provisional M9 research content for era 2.",
+          "prerequisites": [
+            10
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "key": "antibiotics",
+          "name": "Antibiotics",
+          "era": 2,
+          "description": "Antibiotics: provisional M9 research content for era 2.",
+          "prerequisites": [
+            11
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.05
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "key": "electrification",
+          "name": "Electrification",
+          "era": 2,
+          "description": "Electrification: provisional M9 research content for era 2.",
+          "prerequisites": [
+            15
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "key": "nitrogen-fixation",
+          "name": "Nitrogen fixation",
+          "era": 2,
+          "description": "Nitrogen fixation: provisional M9 research content for era 2.",
+          "prerequisites": [
+            7
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.05
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "key": "air-transport",
+          "name": "Air transport",
+          "era": 2,
+          "description": "Air transport: provisional M9 research content for era 2.",
+          "prerequisites": [
+            16
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 28,
+          "key": "trucking",
+          "name": "Trucking",
+          "era": 2,
+          "description": "Trucking: provisional M9 research content for era 2.",
+          "prerequisites": [
+            16
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 29,
+          "key": "compulsory-education-systems",
+          "name": "Compulsory education systems",
+          "era": 2,
+          "description": "Compulsory education systems: provisional M9 research content for era 2.",
+          "prerequisites": [
+            4
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "key": "applied-psychology",
+          "name": "Applied psychology",
+          "era": 2,
+          "description": "Applied psychology: provisional M9 research content for era 2.",
+          "prerequisites": [
+            19
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 31,
+          "key": "plastics",
+          "name": "Plastics",
+          "era": 2,
+          "description": "Plastics: provisional M9 research content for era 2.",
+          "prerequisites": [
+            7
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 32,
+          "key": "continuous-processing",
+          "name": "Continuous processing",
+          "era": 2,
+          "description": "Continuous processing: provisional M9 research content for era 2.",
+          "prerequisites": [
+            8
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "key": "quality-control",
+          "name": "Quality control",
+          "era": 2,
+          "description": "Quality control: provisional M9 research content for era 2.",
+          "prerequisites": [
+            20
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 34,
+          "key": "agricultural-extension",
+          "name": "Agricultural extension",
+          "era": 2,
+          "description": "Agricultural extension: provisional M9 research content for era 2.",
+          "prerequisites": [
+            7
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 35,
+          "key": "statistical-methods",
+          "name": "Statistical methods",
+          "era": 2,
+          "description": "Statistical methods: provisional M9 research content for era 2.",
+          "prerequisites": [
+            19
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 36,
+          "key": "telephone-networks",
+          "name": "Telephone networks",
+          "era": 2,
+          "description": "Telephone networks: provisional M9 research content for era 2.",
+          "prerequisites": [
+            10
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 37,
+          "key": "water-treatment",
+          "name": "Water treatment",
+          "era": 2,
+          "description": "Water treatment: provisional M9 research content for era 2.",
+          "prerequisites": [
+            12
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "key": "motion-pictures",
+          "name": "Motion pictures",
+          "era": 2,
+          "description": "Motion pictures: provisional M9 research content for era 2.",
+          "prerequisites": [
+            23
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.01
+            }
+          ]
+        },
+        {
+          "id": 39,
+          "key": "industrial-laboratories",
+          "name": "Industrial laboratories",
+          "era": 2,
+          "description": "Industrial laboratories: provisional M9 research content for era 2.",
+          "prerequisites": [
+            19,
+            20
+          ],
+          "researchWork": 400000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 40,
+          "key": "computers",
+          "name": "Computers",
+          "era": 3,
+          "description": "Computers: provisional M9 research content for era 3.",
+          "prerequisites": [
+            15,
+            35
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 41,
+          "key": "transistors",
+          "name": "Transistors",
+          "era": 3,
+          "description": "Transistors: provisional M9 research content for era 3.",
+          "prerequisites": [
+            40
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 42,
+          "key": "jet-engines",
+          "name": "Jet engines",
+          "era": 3,
+          "description": "Jet engines: provisional M9 research content for era 3.",
+          "prerequisites": [
+            27
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 43,
+          "key": "green-revolution",
+          "name": "Green revolution",
+          "era": 3,
+          "description": "Green revolution: provisional M9 research content for era 3.",
+          "prerequisites": [
+            26,
+            34
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.06
+            }
+          ]
+        },
+        {
+          "id": 44,
+          "key": "vaccines",
+          "name": "Vaccines",
+          "era": 3,
+          "description": "Vaccines: provisional M9 research content for era 3.",
+          "prerequisites": [
+            24
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.06
+            }
+          ]
+        },
+        {
+          "id": 45,
+          "key": "mass-higher-education",
+          "name": "Mass higher education",
+          "era": 3,
+          "description": "Mass higher education: provisional M9 research content for era 3.",
+          "prerequisites": [
+            29
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.05
+            }
+          ]
+        },
+        {
+          "id": 46,
+          "key": "television",
+          "name": "Television",
+          "era": 3,
+          "description": "Television: provisional M9 research content for era 3.",
+          "prerequisites": [
+            23
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 47,
+          "key": "petrochemicals",
+          "name": "Petrochemicals",
+          "era": 3,
+          "description": "Petrochemicals: provisional M9 research content for era 3.",
+          "prerequisites": [
+            31
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 48,
+          "key": "automation",
+          "name": "Automation",
+          "era": 3,
+          "description": "Automation: provisional M9 research content for era 3.",
+          "prerequisites": [
+            21,
+            40
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 49,
+          "key": "operations-research",
+          "name": "Operations research",
+          "era": 3,
+          "description": "Operations research: provisional M9 research content for era 3.",
+          "prerequisites": [
+            35,
+            20
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 50,
+          "key": "food-preservation",
+          "name": "Food preservation",
+          "era": 3,
+          "description": "Food preservation: provisional M9 research content for era 3.",
+          "prerequisites": [
+            32,
+            17
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 51,
+          "key": "synthetic-fibers",
+          "name": "Synthetic fibers",
+          "era": 3,
+          "description": "Synthetic fibers: provisional M9 research content for era 3.",
+          "prerequisites": [
+            31
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "key": "modern-statistics",
+          "name": "Modern statistics",
+          "era": 3,
+          "description": "Modern statistics: provisional M9 research content for era 3.",
+          "prerequisites": [
+            35
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 53,
+          "key": "antibiotics-production",
+          "name": "Antibiotics production",
+          "era": 3,
+          "description": "Antibiotics production: provisional M9 research content for era 3.",
+          "prerequisites": [
+            24
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 54,
+          "key": "highway-systems",
+          "name": "Highway systems",
+          "era": 3,
+          "description": "Highway systems: provisional M9 research content for era 3.",
+          "prerequisites": [
+            28
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 55,
+          "key": "containerization",
+          "name": "Containerization",
+          "era": 3,
+          "description": "Containerization: provisional M9 research content for era 3.",
+          "prerequisites": [
+            28,
+            2
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 56,
+          "key": "agricultural-machinery",
+          "name": "Agricultural machinery",
+          "era": 3,
+          "description": "Agricultural machinery: provisional M9 research content for era 3.",
+          "prerequisites": [
+            28
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 57,
+          "key": "cancer-screening",
+          "name": "Cancer screening",
+          "era": 3,
+          "description": "Cancer screening: provisional M9 research content for era 3.",
+          "prerequisites": [
+            12
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "key": "educational-testing",
+          "name": "Educational testing",
+          "era": 3,
+          "description": "Educational testing: provisional M9 research content for era 3.",
+          "prerequisites": [
+            30
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 59,
+          "key": "industrial-design",
+          "name": "Industrial design",
+          "era": 3,
+          "description": "Industrial design: provisional M9 research content for era 3.",
+          "prerequisites": [
+            33
+          ],
+          "researchWork": 650000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 60,
+          "key": "integrated-circuits",
+          "name": "Integrated circuits",
+          "era": 4,
+          "description": "Integrated circuits: provisional M9 research content for era 4.",
+          "prerequisites": [
+            41
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 61,
+          "key": "microprocessors",
+          "name": "Microprocessors",
+          "era": 4,
+          "description": "Microprocessors: provisional M9 research content for era 4.",
+          "prerequisites": [
+            60
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 62,
+          "key": "software-engineering",
+          "name": "Software engineering",
+          "era": 4,
+          "description": "Software engineering: provisional M9 research content for era 4.",
+          "prerequisites": [
+            40
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 63,
+          "key": "satellite-communications",
+          "name": "Satellite communications",
+          "era": 4,
+          "description": "Satellite communications: provisional M9 research content for era 4.",
+          "prerequisites": [
+            41,
+            46
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 64,
+          "key": "oral-rehydration",
+          "name": "Oral rehydration",
+          "era": 4,
+          "description": "Oral rehydration: provisional M9 research content for era 4.",
+          "prerequisites": [
+            44
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "key": "family-planning-programs",
+          "name": "Family planning programs",
+          "era": 4,
+          "description": "Family planning programs: provisional M9 research content for era 4.",
+          "prerequisites": [
+            45
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 66,
+          "key": "agricultural-extension-modern",
+          "name": "Modern agricultural extension",
+          "era": 4,
+          "description": "Modern agricultural extension: provisional M9 research content for era 4.",
+          "prerequisites": [
+            43
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 67,
+          "key": "food-processing-automation",
+          "name": "Food processing automation",
+          "era": 4,
+          "description": "Food processing automation: provisional M9 research content for era 4.",
+          "prerequisites": [
+            48,
+            50
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 68,
+          "key": "advanced-synthetic-fibers",
+          "name": "Advanced synthetic fibers",
+          "era": 4,
+          "description": "Advanced synthetic fibers: provisional M9 research content for era 4.",
+          "prerequisites": [
+            51
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 69,
+          "key": "computer-aided-design",
+          "name": "Computer-aided design",
+          "era": 4,
+          "description": "Computer-aided design: provisional M9 research content for era 4.",
+          "prerequisites": [
+            61
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 70,
+          "key": "distance-education",
+          "name": "Distance education",
+          "era": 4,
+          "description": "Distance education: provisional M9 research content for era 4.",
+          "prerequisites": [
+            46,
+            45
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 71,
+          "key": "medical-imaging",
+          "name": "Medical imaging",
+          "era": 4,
+          "description": "Medical imaging: provisional M9 research content for era 4.",
+          "prerequisites": [
+            57
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 72,
+          "key": "environmental-health",
+          "name": "Environmental health",
+          "era": 4,
+          "description": "Environmental health: provisional M9 research content for era 4.",
+          "prerequisites": [
+            37
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 73,
+          "key": "agricultural-biotechnology",
+          "name": "Agricultural biotechnology",
+          "era": 4,
+          "description": "Agricultural biotechnology: provisional M9 research content for era 4.",
+          "prerequisites": [
+            43
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 74,
+          "key": "industrial-robotics",
+          "name": "Industrial robotics",
+          "era": 4,
+          "description": "Industrial robotics: provisional M9 research content for era 4.",
+          "prerequisites": [
+            48,
+            61
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 75,
+          "key": "quality-management",
+          "name": "Quality management",
+          "era": 4,
+          "description": "Quality management: provisional M9 research content for era 4.",
+          "prerequisites": [
+            33
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 76,
+          "key": "adult-literacy-programs",
+          "name": "Adult literacy programs",
+          "era": 4,
+          "description": "Adult literacy programs: provisional M9 research content for era 4.",
+          "prerequisites": [
+            29
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 77,
+          "key": "telecommunications-networks",
+          "name": "Telecommunications networks",
+          "era": 4,
+          "description": "Telecommunications networks: provisional M9 research content for era 4.",
+          "prerequisites": [
+            63
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 78,
+          "key": "refrigeration-chain",
+          "name": "Refrigeration chain",
+          "era": 4,
+          "description": "Refrigeration chain: provisional M9 research content for era 4.",
+          "prerequisites": [
+            50
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 79,
+          "key": "statistical-computing",
+          "name": "Statistical computing",
+          "era": 4,
+          "description": "Statistical computing: provisional M9 research content for era 4.",
+          "prerequisites": [
+            52,
+            61
+          ],
+          "researchWork": 900000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 80,
+          "key": "personal-computers",
+          "name": "Personal computers",
+          "era": 5,
+          "description": "Personal computers: provisional M9 research content for era 5.",
+          "prerequisites": [
+            61
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 81,
+          "key": "mobile-telephony",
+          "name": "Mobile telephony",
+          "era": 5,
+          "description": "Mobile telephony: provisional M9 research content for era 5.",
+          "prerequisites": [
+            77
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 82,
+          "key": "internet",
+          "name": "Internet",
+          "era": 5,
+          "description": "Internet: provisional M9 research content for era 5.",
+          "prerequisites": [
+            80,
+            77
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 83,
+          "key": "biotechnology-medicine",
+          "name": "Biotechnology medicine",
+          "era": 5,
+          "description": "Biotechnology medicine: provisional M9 research content for era 5.",
+          "prerequisites": [
+            71,
+            73
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 84,
+          "key": "gps-navigation",
+          "name": "GPS navigation",
+          "era": 5,
+          "description": "GPS navigation: provisional M9 research content for era 5.",
+          "prerequisites": [
+            63
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 85,
+          "key": "lean-manufacturing",
+          "name": "Lean manufacturing",
+          "era": 5,
+          "description": "Lean manufacturing: provisional M9 research content for era 5.",
+          "prerequisites": [
+            75,
+            74
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 86,
+          "key": "just-in-time-logistics",
+          "name": "Just-in-time logistics",
+          "era": 5,
+          "description": "Just-in-time logistics: provisional M9 research content for era 5.",
+          "prerequisites": [
+            55,
+            85
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 87,
+          "key": "precision-agriculture",
+          "name": "Precision agriculture",
+          "era": 5,
+          "description": "Precision agriculture: provisional M9 research content for era 5.",
+          "prerequisites": [
+            73,
+            84
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 88,
+          "key": "genomics",
+          "name": "Genomics",
+          "era": 5,
+          "description": "Genomics: provisional M9 research content for era 5.",
+          "prerequisites": [
+            83
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 89,
+          "key": "e-learning",
+          "name": "E-learning",
+          "era": 5,
+          "description": "E-learning: provisional M9 research content for era 5.",
+          "prerequisites": [
+            82,
+            70
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 90,
+          "key": "automation-controls",
+          "name": "Automation controls",
+          "era": 5,
+          "description": "Automation controls: provisional M9 research content for era 5.",
+          "prerequisites": [
+            74
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 91,
+          "key": "advanced-materials",
+          "name": "Advanced materials",
+          "era": 5,
+          "description": "Advanced materials: provisional M9 research content for era 5.",
+          "prerequisites": [
+            61
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 92,
+          "key": "food-safety-systems",
+          "name": "Food safety systems",
+          "era": 5,
+          "description": "Food safety systems: provisional M9 research content for era 5.",
+          "prerequisites": [
+            78
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 93,
+          "key": "technical-textiles",
+          "name": "Technical textiles",
+          "era": 5,
+          "description": "Technical textiles: provisional M9 research content for era 5.",
+          "prerequisites": [
+            68
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 94,
+          "key": "evidence-based-medicine",
+          "name": "Evidence-based medicine",
+          "era": 5,
+          "description": "Evidence-based medicine: provisional M9 research content for era 5.",
+          "prerequisites": [
+            71
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 95,
+          "key": "public-health-surveillance",
+          "name": "Public health surveillance",
+          "era": 5,
+          "description": "Public health surveillance: provisional M9 research content for era 5.",
+          "prerequisites": [
+            72
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.02
+            }
+          ]
+        },
+        {
+          "id": 96,
+          "key": "science-curricula",
+          "name": "Science curricula",
+          "era": 5,
+          "description": "Science curricula: provisional M9 research content for era 5.",
+          "prerequisites": [
+            76
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 97,
+          "key": "computer-networks",
+          "name": "Computer networks",
+          "era": 5,
+          "description": "Computer networks: provisional M9 research content for era 5.",
+          "prerequisites": [
+            77
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "key": "supply-chain-management",
+          "name": "Supply chain management",
+          "era": 5,
+          "description": "Supply chain management: provisional M9 research content for era 5.",
+          "prerequisites": [
+            86
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 99,
+          "key": "agricultural-irrigation-systems",
+          "name": "Agricultural irrigation systems",
+          "era": 5,
+          "description": "Agricultural irrigation systems: provisional M9 research content for era 5.",
+          "prerequisites": [
+            87
+          ],
+          "researchWork": 1200000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 100,
+          "key": "broadband",
+          "name": "Broadband",
+          "era": 6,
+          "description": "Broadband: provisional M9 research content for era 6.",
+          "prerequisites": [
+            82
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 101,
+          "key": "mobile-internet",
+          "name": "Mobile internet",
+          "era": 6,
+          "description": "Mobile internet: provisional M9 research content for era 6.",
+          "prerequisites": [
+            81,
+            82
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "key": "cloud-computing",
+          "name": "Cloud computing",
+          "era": 6,
+          "description": "Cloud computing: provisional M9 research content for era 6.",
+          "prerequisites": [
+            82,
+            97
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "key": "genome-sequencing",
+          "name": "Genome sequencing",
+          "era": 6,
+          "description": "Genome sequencing: provisional M9 research content for era 6.",
+          "prerequisites": [
+            88
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "key": "renewable-energy",
+          "name": "Renewable energy",
+          "era": 6,
+          "description": "Renewable energy: provisional M9 research content for era 6.",
+          "prerequisites": [
+            91
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 105,
+          "key": "electric-vehicles",
+          "name": "Electric vehicles",
+          "era": 6,
+          "description": "Electric vehicles: provisional M9 research content for era 6.",
+          "prerequisites": [
+            104,
+            90
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "key": "advanced-robotics",
+          "name": "Advanced robotics",
+          "era": 6,
+          "description": "Advanced robotics: provisional M9 research content for era 6.",
+          "prerequisites": [
+            90,
+            91
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 107,
+          "key": "precision-medicine",
+          "name": "Precision medicine",
+          "era": 6,
+          "description": "Precision medicine: provisional M9 research content for era 6.",
+          "prerequisites": [
+            103,
+            94
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.04
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "key": "digital-education-platforms",
+          "name": "Digital education platforms",
+          "era": 6,
+          "description": "Digital education platforms: provisional M9 research content for era 6.",
+          "prerequisites": [
+            89,
+            100
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 109,
+          "key": "global-supply-chains",
+          "name": "Global supply chains",
+          "era": 6,
+          "description": "Global supply chains: provisional M9 research content for era 6.",
+          "prerequisites": [
+            98,
+            102
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 110,
+          "key": "smart-agriculture",
+          "name": "Smart agriculture",
+          "era": 6,
+          "description": "Smart agriculture: provisional M9 research content for era 6.",
+          "prerequisites": [
+            87,
+            102
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "agriculture",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 111,
+          "key": "industrial-internet",
+          "name": "Industrial internet",
+          "era": 6,
+          "description": "Industrial internet: provisional M9 research content for era 6.",
+          "prerequisites": [
+            102,
+            90
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 112,
+          "key": "food-biotechnology",
+          "name": "Food biotechnology",
+          "era": 6,
+          "description": "Food biotechnology: provisional M9 research content for era 6.",
+          "prerequisites": [
+            92,
+            88
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "food-processing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 113,
+          "key": "advanced-textiles",
+          "name": "Advanced textiles",
+          "era": 6,
+          "description": "Advanced textiles: provisional M9 research content for era 6.",
+          "prerequisites": [
+            93,
+            91
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "textiles",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 114,
+          "key": "telemedicine",
+          "name": "Telemedicine",
+          "era": 6,
+          "description": "Telemedicine: provisional M9 research content for era 6.",
+          "prerequisites": [
+            101,
+            94
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.03
+            }
+          ]
+        },
+        {
+          "id": 115,
+          "key": "distance-learning-networks",
+          "name": "Distance learning networks",
+          "era": 6,
+          "description": "Distance learning networks: provisional M9 research content for era 6.",
+          "prerequisites": [
+            108
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 116,
+          "key": "artificial-intelligence",
+          "name": "Artificial intelligence",
+          "era": 6,
+          "description": "Artificial intelligence: provisional M9 research content for era 6.",
+          "prerequisites": [
+            102,
+            79
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.04
+            }
+          ]
+        },
+        {
+          "id": 117,
+          "key": "machine-learning",
+          "name": "Machine learning",
+          "era": 6,
+          "description": "Machine learning: provisional M9 research content for era 6.",
+          "prerequisites": [
+            116
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "education-effectiveness",
+              "bonus": 0.02
+            }
+          ]
+        },
+        {
+          "id": 118,
+          "key": "quantum-computing",
+          "name": "Quantum computing",
+          "era": 6,
+          "description": "Quantum computing: provisional M9 research content for era 6.",
+          "prerequisites": [
+            116,
+            91
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "sector-productivity",
+              "sector": "manufacturing",
+              "bonus": 0.03
+            }
+          ]
+        },
+        {
+          "id": 119,
+          "key": "systems-biology",
+          "name": "Systems biology",
+          "era": 6,
+          "description": "Systems biology: provisional M9 research content for era 6.",
+          "prerequisites": [
+            103
+          ],
+          "researchWork": 1600000,
+          "effects": [
+            {
+              "kind": "mortality-reduction",
+              "reduction": 0.02
+            }
+          ]
+        }
+      ]
     }
   },
   "buildingInstances": [
@@ -7312,7 +10516,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1003,
+      "ownerAccountId": 1004,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100000,
@@ -7325,7 +10529,7 @@ export const M5_SCENARIO = ({
       "level": 21,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1003,
+      "ownerAccountId": 1004,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100001,
@@ -7338,7 +10542,7 @@ export const M5_SCENARIO = ({
       "level": 20,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1001,
+      "ownerAccountId": 1002,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100002,
@@ -7351,7 +10555,7 @@ export const M5_SCENARIO = ({
       "level": 21,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1003,
+      "ownerAccountId": 1004,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100003,
@@ -7364,7 +10568,7 @@ export const M5_SCENARIO = ({
       "level": 137,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1003,
+      "ownerAccountId": 1004,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100004,
@@ -7377,7 +10581,7 @@ export const M5_SCENARIO = ({
       "level": 31,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1001,
+      "ownerAccountId": 1002,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100005,
@@ -7390,7 +10594,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1003,
+      "ownerAccountId": 1004,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100006,
@@ -7403,7 +10607,7 @@ export const M5_SCENARIO = ({
       "level": 29,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1001,
+      "ownerAccountId": 1002,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100007,
@@ -7416,7 +10620,7 @@ export const M5_SCENARIO = ({
       "level": 14,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100008,
@@ -7429,7 +10633,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100009,
@@ -7442,7 +10646,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1005,
+      "ownerAccountId": 1007,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100010,
@@ -7455,7 +10659,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100011,
@@ -7468,7 +10672,7 @@ export const M5_SCENARIO = ({
       "level": 112,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100012,
@@ -7481,7 +10685,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1007,
+      "ownerAccountId": 1009,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100013,
@@ -7494,7 +10698,7 @@ export const M5_SCENARIO = ({
       "level": 15,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1014,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100014,
@@ -7507,7 +10711,7 @@ export const M5_SCENARIO = ({
       "level": 19,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1014,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100015,
@@ -7520,7 +10724,7 @@ export const M5_SCENARIO = ({
       "level": 18,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1009,
+      "ownerAccountId": 1012,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100016,
@@ -7533,7 +10737,7 @@ export const M5_SCENARIO = ({
       "level": 19,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1014,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100017,
@@ -7546,7 +10750,7 @@ export const M5_SCENARIO = ({
       "level": 122,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1014,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100018,
@@ -7559,7 +10763,7 @@ export const M5_SCENARIO = ({
       "level": 27,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1009,
+      "ownerAccountId": 1012,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100019,
@@ -7572,7 +10776,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1011,
+      "ownerAccountId": 1014,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100020,
@@ -7585,7 +10789,7 @@ export const M5_SCENARIO = ({
       "level": 26,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1009,
+      "ownerAccountId": 1012,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100021,
@@ -7598,7 +10802,7 @@ export const M5_SCENARIO = ({
       "level": 1,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1015,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100022,
@@ -7611,7 +10815,7 @@ export const M5_SCENARIO = ({
       "level": 2,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1015,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100023,
@@ -7624,7 +10828,7 @@ export const M5_SCENARIO = ({
       "level": 2,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1013,
+      "ownerAccountId": 1017,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100024,
@@ -7637,7 +10841,7 @@ export const M5_SCENARIO = ({
       "level": 2,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1015,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100025,
@@ -7650,7 +10854,7 @@ export const M5_SCENARIO = ({
       "level": 13,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1015,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100026,
@@ -7663,7 +10867,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1015,
+      "ownerAccountId": 1019,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100027,
@@ -7676,7 +10880,7 @@ export const M5_SCENARIO = ({
       "level": 13,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1019,
+      "ownerAccountId": 1024,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100028,
@@ -7689,7 +10893,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1019,
+      "ownerAccountId": 1024,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100029,
@@ -7702,7 +10906,7 @@ export const M5_SCENARIO = ({
       "level": 16,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1017,
+      "ownerAccountId": 1022,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100030,
@@ -7715,7 +10919,7 @@ export const M5_SCENARIO = ({
       "level": 17,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1019,
+      "ownerAccountId": 1024,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100031,
@@ -7728,7 +10932,7 @@ export const M5_SCENARIO = ({
       "level": 110,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1019,
+      "ownerAccountId": 1024,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100032,
@@ -7741,7 +10945,7 @@ export const M5_SCENARIO = ({
       "level": 28,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1017,
+      "ownerAccountId": 1022,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100033,
@@ -7754,7 +10958,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1019,
+      "ownerAccountId": 1024,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100034,
@@ -7767,7 +10971,7 @@ export const M5_SCENARIO = ({
       "level": 19,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1017,
+      "ownerAccountId": 1022,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100035,
@@ -7780,7 +10984,7 @@ export const M5_SCENARIO = ({
       "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100036,
@@ -7793,7 +10997,7 @@ export const M5_SCENARIO = ({
       "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100037,
@@ -7806,7 +11010,7 @@ export const M5_SCENARIO = ({
       "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1021,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100038,
@@ -7819,7 +11023,7 @@ export const M5_SCENARIO = ({
       "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100039,
@@ -7832,7 +11036,7 @@ export const M5_SCENARIO = ({
       "level": 74,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100040,
@@ -7845,7 +11049,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1023,
+      "ownerAccountId": 1029,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100041,
@@ -7858,7 +11062,7 @@ export const M5_SCENARIO = ({
       "level": 13,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1021,
+      "ownerAccountId": 1027,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100042,
@@ -7871,7 +11075,7 @@ export const M5_SCENARIO = ({
       "level": 8,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1034,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100043,
@@ -7884,7 +11088,7 @@ export const M5_SCENARIO = ({
       "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1034,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100044,
@@ -7897,7 +11101,7 @@ export const M5_SCENARIO = ({
       "level": 10,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1025,
+      "ownerAccountId": 1032,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100045,
@@ -7910,7 +11114,7 @@ export const M5_SCENARIO = ({
       "level": 11,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1034,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100046,
@@ -7923,7 +11127,7 @@ export const M5_SCENARIO = ({
       "level": 70,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1034,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100047,
@@ -7936,7 +11140,7 @@ export const M5_SCENARIO = ({
       "level": 18,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1025,
+      "ownerAccountId": 1032,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100048,
@@ -7949,7 +11153,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1027,
+      "ownerAccountId": 1034,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100049,
@@ -7962,7 +11166,7 @@ export const M5_SCENARIO = ({
       "level": 12,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1025,
+      "ownerAccountId": 1032,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100050,
@@ -7975,7 +11179,7 @@ export const M5_SCENARIO = ({
       "level": 7,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100051,
@@ -7988,7 +11192,7 @@ export const M5_SCENARIO = ({
       "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100052,
@@ -8001,7 +11205,7 @@ export const M5_SCENARIO = ({
       "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1029,
+      "ownerAccountId": 1037,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100053,
@@ -8014,7 +11218,7 @@ export const M5_SCENARIO = ({
       "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100054,
@@ -8027,7 +11231,7 @@ export const M5_SCENARIO = ({
       "level": 57,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100055,
@@ -8040,7 +11244,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1031,
+      "ownerAccountId": 1039,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100056,
@@ -8053,7 +11257,7 @@ export const M5_SCENARIO = ({
       "level": 23,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1044,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100057,
@@ -8066,7 +11270,7 @@ export const M5_SCENARIO = ({
       "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1044,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100058,
@@ -8079,7 +11283,7 @@ export const M5_SCENARIO = ({
       "level": 29,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1033,
+      "ownerAccountId": 1042,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100059,
@@ -8092,7 +11296,7 @@ export const M5_SCENARIO = ({
       "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1044,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100060,
@@ -8105,7 +11309,7 @@ export const M5_SCENARIO = ({
       "level": 196,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1044,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100061,
@@ -8118,7 +11322,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1035,
+      "ownerAccountId": 1044,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100062,
@@ -8131,7 +11335,7 @@ export const M5_SCENARIO = ({
       "level": 30,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1049,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100063,
@@ -8144,7 +11348,7 @@ export const M5_SCENARIO = ({
       "level": 38,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1049,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100064,
@@ -8157,7 +11361,7 @@ export const M5_SCENARIO = ({
       "level": 36,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1037,
+      "ownerAccountId": 1047,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100065,
@@ -8170,7 +11374,7 @@ export const M5_SCENARIO = ({
       "level": 38,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1049,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100066,
@@ -8183,7 +11387,7 @@ export const M5_SCENARIO = ({
       "level": 249,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1049,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100067,
@@ -8196,7 +11400,7 @@ export const M5_SCENARIO = ({
       "level": 66,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1037,
+      "ownerAccountId": 1047,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100068,
@@ -8209,7 +11413,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1039,
+      "ownerAccountId": 1049,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100069,
@@ -8222,7 +11426,7 @@ export const M5_SCENARIO = ({
       "level": 63,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1037,
+      "ownerAccountId": 1047,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100070,
@@ -8235,7 +11439,7 @@ export const M5_SCENARIO = ({
       "level": 12,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1054,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100071,
@@ -8248,7 +11452,7 @@ export const M5_SCENARIO = ({
       "level": 15,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1054,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100072,
@@ -8261,7 +11465,7 @@ export const M5_SCENARIO = ({
       "level": 14,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1041,
+      "ownerAccountId": 1052,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100073,
@@ -8274,7 +11478,7 @@ export const M5_SCENARIO = ({
       "level": 15,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1054,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100074,
@@ -8287,7 +11491,7 @@ export const M5_SCENARIO = ({
       "level": 98,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1054,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100075,
@@ -8300,7 +11504,7 @@ export const M5_SCENARIO = ({
       "level": 25,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1041,
+      "ownerAccountId": 1052,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100076,
@@ -8313,7 +11517,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1043,
+      "ownerAccountId": 1054,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100077,
@@ -8326,7 +11530,7 @@ export const M5_SCENARIO = ({
       "level": 24,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1040,
+      "ownerAccountId": 1051,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100078,
@@ -8339,7 +11543,7 @@ export const M5_SCENARIO = ({
       "level": 5,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1059,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100079,
@@ -8352,7 +11556,7 @@ export const M5_SCENARIO = ({
       "level": 7,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1059,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100080,
@@ -8365,7 +11569,7 @@ export const M5_SCENARIO = ({
       "level": 7,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1045,
+      "ownerAccountId": 1057,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100081,
@@ -8378,7 +11582,7 @@ export const M5_SCENARIO = ({
       "level": 7,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1059,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100082,
@@ -8391,7 +11595,7 @@ export const M5_SCENARIO = ({
       "level": 46,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1059,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100083,
@@ -8404,7 +11608,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1047,
+      "ownerAccountId": 1059,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100084,
@@ -8417,7 +11621,7 @@ export const M5_SCENARIO = ({
       "level": 51,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1064,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100085,
@@ -8430,7 +11634,7 @@ export const M5_SCENARIO = ({
       "level": 65,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1064,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100086,
@@ -8443,7 +11647,7 @@ export const M5_SCENARIO = ({
       "level": 63,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1049,
+      "ownerAccountId": 1062,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100087,
@@ -8456,7 +11660,7 @@ export const M5_SCENARIO = ({
       "level": 65,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1064,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100088,
@@ -8469,7 +11673,7 @@ export const M5_SCENARIO = ({
       "level": 427,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1064,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100089,
@@ -8482,7 +11686,7 @@ export const M5_SCENARIO = ({
       "level": 112,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1049,
+      "ownerAccountId": 1062,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100090,
@@ -8495,7 +11699,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1051,
+      "ownerAccountId": 1064,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100091,
@@ -8508,7 +11712,7 @@ export const M5_SCENARIO = ({
       "level": 107,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1048,
+      "ownerAccountId": 1061,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100092,
@@ -8521,7 +11725,7 @@ export const M5_SCENARIO = ({
       "level": 42,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1069,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100093,
@@ -8534,7 +11738,7 @@ export const M5_SCENARIO = ({
       "level": 54,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1069,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100094,
@@ -8547,7 +11751,7 @@ export const M5_SCENARIO = ({
       "level": 51,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1053,
+      "ownerAccountId": 1067,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100095,
@@ -8560,7 +11764,7 @@ export const M5_SCENARIO = ({
       "level": 54,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1069,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100096,
@@ -8573,7 +11777,7 @@ export const M5_SCENARIO = ({
       "level": 350,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1069,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100097,
@@ -8586,7 +11790,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1055,
+      "ownerAccountId": 1069,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100098,
@@ -8599,7 +11803,7 @@ export const M5_SCENARIO = ({
       "level": 5,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1074,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100099,
@@ -8612,7 +11816,7 @@ export const M5_SCENARIO = ({
       "level": 6,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1074,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100100,
@@ -8625,7 +11829,7 @@ export const M5_SCENARIO = ({
       "level": 6,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1057,
+      "ownerAccountId": 1072,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100101,
@@ -8638,7 +11842,7 @@ export const M5_SCENARIO = ({
       "level": 6,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1074,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100102,
@@ -8651,7 +11855,7 @@ export const M5_SCENARIO = ({
       "level": 39,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1074,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100103,
@@ -8664,7 +11868,7 @@ export const M5_SCENARIO = ({
       "level": 10,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1057,
+      "ownerAccountId": 1072,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100104,
@@ -8677,7 +11881,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1059,
+      "ownerAccountId": 1074,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100105,
@@ -8690,7 +11894,7 @@ export const M5_SCENARIO = ({
       "level": 9,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1056,
+      "ownerAccountId": 1071,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100106,
@@ -8703,7 +11907,7 @@ export const M5_SCENARIO = ({
       "level": 3,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1079,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100107,
@@ -8716,7 +11920,7 @@ export const M5_SCENARIO = ({
       "level": 3,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1079,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100108,
@@ -8729,7 +11933,7 @@ export const M5_SCENARIO = ({
       "level": 3,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1061,
+      "ownerAccountId": 1077,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100109,
@@ -8742,7 +11946,7 @@ export const M5_SCENARIO = ({
       "level": 3,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1079,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100110,
@@ -8755,7 +11959,7 @@ export const M5_SCENARIO = ({
       "level": 18,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1079,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100111,
@@ -8768,7 +11972,7 @@ export const M5_SCENARIO = ({
       "level": 100,
       "condition": 1,
       "ownerKind": "private",
-      "ownerAccountId": 1063,
+      "ownerAccountId": 1079,
       "builtOnDay": 0,
       "operational": true,
       "operatingCashAccountId": 100112,
@@ -9026,6 +12230,18 @@ export const M5_SCENARIO = ({
         },
         "institutionFundingSUSDPerYear": 120000
       },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "steelmaking",
+          "electrical-generation",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 60000,
+        "researchStaffShare": 0.2
+      },
       "immigrationOpen": true
     },
     {
@@ -9056,6 +12272,18 @@ export const M5_SCENARIO = ({
           "trade": "trade-open"
         },
         "institutionFundingSUSDPerYear": 80000
+      },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "steelmaking",
+          "printing-industry",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 30000,
+        "researchStaffShare": 0.2
       },
       "immigrationOpen": true
     },
@@ -9088,6 +12316,18 @@ export const M5_SCENARIO = ({
         },
         "institutionFundingSUSDPerYear": 70000
       },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "steelmaking",
+          "chemical-fertilizer",
+          "university-system"
+        ],
+        "educationFundingSUSDPerYear": 40000,
+        "researchStaffShare": 0.25
+      },
       "immigrationOpen": false
     },
     {
@@ -9118,6 +12358,18 @@ export const M5_SCENARIO = ({
           "trade": "trade-restricted"
         },
         "institutionFundingSUSDPerYear": 60000
+      },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "chemical-fertilizer",
+          "university-system",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 30000,
+        "researchStaffShare": 0.2
       },
       "immigrationOpen": false
     },
@@ -9150,6 +12402,16 @@ export const M5_SCENARIO = ({
         },
         "institutionFundingSUSDPerYear": 90000
       },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 40000,
+        "researchStaffShare": 0.1
+      },
       "immigrationOpen": false
     },
     {
@@ -9180,6 +12442,16 @@ export const M5_SCENARIO = ({
           "trade": "trade-restricted"
         },
         "institutionFundingSUSDPerYear": 50000
+      },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "railway-logistics",
+          "primary-schooling",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 25000,
+        "researchStaffShare": 0.2
       },
       "immigrationOpen": false
     },
@@ -9212,6 +12484,14 @@ export const M5_SCENARIO = ({
         },
         "institutionFundingSUSDPerYear": 100000
       },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "primary-schooling"
+        ],
+        "educationFundingSUSDPerYear": 30000,
+        "researchStaffShare": 0.1
+      },
       "immigrationOpen": true
     },
     {
@@ -9242,6 +12522,15 @@ export const M5_SCENARIO = ({
           "trade": "trade-open"
         },
         "institutionFundingSUSDPerYear": 40000
+      },
+      "technology": {
+        "researchedTechnologyKeys": [
+          "steam-power",
+          "primary-schooling",
+          "basic-sanitation"
+        ],
+        "educationFundingSUSDPerYear": 10000,
+        "researchStaffShare": 0.1
       },
       "immigrationOpen": true
     }

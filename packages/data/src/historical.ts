@@ -36,11 +36,13 @@ import {
   assertValidEconomyDefinitions,
   assertValidPoliticsDefinitions,
   assertValidPopulationDefinitions,
+  assertValidTechnologyDefinitions,
   isValidId,
   type BuildingDef,
   type BuildingInstanceInitialDef,
   type CountryInitialDef,
   type CountryPoliticsInput,
+  type CountryTechnologyInput,
   type CurrencyValuation,
   type EconomyDefinitions,
   type EconomyScenarioDef,
@@ -54,6 +56,7 @@ import {
   type ProfessionDef,
   type RegionInitialDef,
   type SystemAccountInitialDef,
+  type TechnologyDefinitions,
 } from "@century/sim";
 
 import { DATA_PACKAGE_VERSION } from "./version.js";
@@ -104,6 +107,7 @@ export interface HistoricalScenarioDefinitions {
   readonly buildings: string;
   readonly needs: string;
   readonly demography: string;
+  readonly technology: string;
 }
 
 export interface HistoricalProfitDistributionInput {
@@ -172,6 +176,8 @@ export interface HistoricalCountryInput {
   readonly immigrationOpen: boolean;
   /** M8 provisional regime/law/funding state. */
   readonly politics?: CountryPoliticsInput;
+  /** M9 provisional researched technologies and education funding. */
+  readonly technology?: CountryTechnologyInput;
   readonly sourceIds: readonly string[];
   readonly occupationSourceIds: readonly string[];
 }
@@ -527,6 +533,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
       buildings: stringField(definitions, "buildings", "meta.definitions", errors),
       needs: stringField(definitions, "needs", "meta.definitions", errors),
       demography: stringField(definitions, "demography", "meta.definitions", errors),
+      technology: stringField(definitions, "technology", "meta.definitions", errors),
     },
     ...(profitDistribution === undefined ? {} : { profitDistribution }),
     ...(countryAI === undefined ? {} : { countryAI }),
@@ -711,6 +718,50 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
                   }),
             } satisfies CountryPoliticsInput;
           })();
+    const technology =
+      record.technology === undefined
+        ? undefined
+        : (() => {
+            const technologyRecord = assertRecord(
+              record.technology,
+              `${path}.technology`,
+              errors,
+            );
+            const researchedTechnologyKeys =
+              technologyRecord.researchedTechnologyKeys === undefined
+                ? undefined
+                : stringArrayField(
+                    technologyRecord,
+                    "researchedTechnologyKeys",
+                    `${path}.technology`,
+                    errors,
+                  );
+            return {
+              ...(researchedTechnologyKeys === undefined
+                ? {}
+                : { researchedTechnologyKeys }),
+              ...(technologyRecord.educationFundingSUSDPerYear === undefined
+                ? {}
+                : {
+                    educationFundingSUSDPerYear: numberField(
+                      technologyRecord,
+                      "educationFundingSUSDPerYear",
+                      `${path}.technology`,
+                      errors,
+                    ),
+                  }),
+              ...(technologyRecord.researchStaffShare === undefined
+                ? {}
+                : {
+                    researchStaffShare: numberField(
+                      technologyRecord,
+                      "researchStaffShare",
+                      `${path}.technology`,
+                      errors,
+                    ),
+                  }),
+            } satisfies CountryTechnologyInput;
+          })();
     return {
       id: numberField(record, "id", path, errors),
       tag: stringField(record, "tag", path, errors, { maxLength: MAX_COUNTRY_TAG_LENGTH }),
@@ -754,6 +805,7 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       initialTreasuryCashSUSD: numberField(record, "initialTreasuryCashSUSD", path, errors),
       ...(debt === undefined ? {} : { debt }),
       ...(politics === undefined ? {} : { politics }),
+      ...(technology === undefined ? {} : { technology }),
       immigrationOpen: booleanField(record, "immigrationOpen", path, errors),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       occupationSourceIds: stringArrayField(record, "occupationSourceIds", path, errors),
@@ -1669,6 +1721,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
   }>(data.meta.definitions.demography);
   const politics = readJson<PoliticsDefinitions>("politics.json");
   assertValidPoliticsDefinitions(politics, "politics");
+  const technology = readJson<TechnologyDefinitions>(data.meta.definitions.technology);
+  assertValidTechnologyDefinitions(technology, "technology");
 
   const economyDefinitions: EconomyDefinitions = {
     dataVersion: data.meta.dataVersion,
@@ -1677,6 +1731,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     professions,
     buildings,
     politics,
+    technology,
   };
   assertValidEconomyDefinitions(economyDefinitions);
 
@@ -1883,6 +1938,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       fiscal: { ...country.fiscal },
       ...(country.debt === undefined ? {} : { debt: { ...country.debt } }),
       ...(country.politics === undefined ? {} : { politics: { ...country.politics } }),
+      ...(country.technology === undefined ? {} : { technology: { ...country.technology } }),
       immigrationOpen: country.immigrationOpen,
     }));
 

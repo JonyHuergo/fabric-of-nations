@@ -66,6 +66,7 @@ import {
 } from "./constructionModel.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { constructionProgressFactor } from "./politics.js";
+import { hasResearchedTechnology } from "./technology.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
@@ -882,11 +883,6 @@ function assertBuildableDefinition(
   if (!Number.isInteger(definition.constructionWorkers) || definition.constructionWorkers < 1) {
     throw new RangeError(`definition ${String(definitionId)} has no construction crew`);
   }
-  if (definition.requiredTechnologyId !== null) {
-    throw new RangeError(
-      `definition ${String(definitionId)} requires a technology system that E3 does not have`,
-    );
-  }
   if (definition.resourceRequirements.length > 0) {
     throw new RangeError(
       `definition ${String(definitionId)} requires resource inputs that E3 does not model`,
@@ -904,6 +900,14 @@ export function validateConstructionStart(
   if (country === undefined) throw new RangeError(`unknown country ${String(input.countryId)}`);
   const definition = definitions.buildings.find((entry) => entry.id === input.definitionId);
   assertBuildableDefinition(definition, input.definitionId);
+  if (
+    definition.requiredTechnologyId !== null &&
+    !hasResearchedTechnology(country, definition.requiredTechnologyId)
+  ) {
+    throw new RangeError(
+      `definition ${String(definition.id)} requires un-researched technology ${String(definition.requiredTechnologyId)}`,
+    );
+  }
   const region = world.regions.find((entry) => entry.id === input.regionId);
   if (region === undefined) throw new RangeError(`unknown region ${String(input.regionId)}`);
   if (regionOwner(world, region.id) !== country.id) {

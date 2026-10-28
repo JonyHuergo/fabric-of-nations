@@ -51,10 +51,10 @@ const SEED = 20_261_023;
 
 /**
  * Hash of the eight-polity sample after 22 ticks (seed 20261023), updated for
- * schema-20 E4 industrial/material state. The Batch 5 validation optimization must not
+ * schema-22 M9 technology/literacy state. The Batch 5 validation optimization must not
  * change simulation behavior; only the serialized state shape changed.
  */
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "4763a6c545958cc7";
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "a79d0d9cd8ef247e";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

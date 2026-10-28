@@ -22,6 +22,7 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { assertValidEconomyState } from "./economy/validation.js";
+import { assertValidTechnologyState } from "./economy/technology.js";
 import type { EconomyValidationOptions } from "./economy/validation.js";
 import { assertValidCountryAIPolicy, assertValidCountryAIStates } from "./economy/aiState.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
@@ -37,6 +38,7 @@ import type {
   Market,
   PoliticsState,
   ProfitDistributionPolicy,
+  TechnologySystemState,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
 import type { PopBlock, Region } from "./population/types.js";
@@ -109,6 +111,11 @@ export interface World {
    * effects (D-076).
    */
   politics: PoliticsState;
+  /**
+   * M9 technology-system policy. A world whose economy definitions carry no
+   * technology block has `enabled: false` and no M9 effects (D-077).
+   */
+  technology: TechnologySystemState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -210,6 +217,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       nextEventId: 1,
       nextLogId: 1,
     },
+    technology: { enabled: false },
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
@@ -323,6 +331,7 @@ export function assertValidWorld(
 
   assertValidPopulationState(world);
   assertValidEconomyState(world, options);
+  assertValidTechnologyState(world);
 }
 
 /**

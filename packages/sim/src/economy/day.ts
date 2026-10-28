@@ -65,6 +65,13 @@ import {
 import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { runPoliticsDayStart, runUnrestPhase } from "./politics.js";
+import {
+  assertTechnologyStateMatchesDefinitions,
+  countryForRegion,
+  runEducationPhase,
+  technologyMortalityFactor,
+  type EducationPhaseResult,
+} from "./technology.js";
 import { assertValidEmploymentState, refreshEmploymentIfDue } from "./employment.js";
 import type {
   BuildingDef,
@@ -126,6 +133,8 @@ export interface EconomyDayResult {
     readonly markets: readonly MarketDayResult[];
     readonly settlement: MarketSettlementResult;
     readonly fiscal: FiscalPhaseResult;
+    /** M9 education payroll, literacy update, and research work. */
+    readonly education: EducationPhaseResult;
     /** E4 sectoral production subsidies paid after verified output. */
     readonly industrialSubsidy: IndustrialSubsidyPhaseResult;
     /** E2 month-end business-profit tax assessment and collection. */
@@ -184,6 +193,7 @@ export function cloneWorld(
       ...block,
       maleByAge: block.maleByAge.slice(),
       femaleByAge: block.femaleByAge.slice(),
+      literacyByAge: [...block.literacyByAge],
     })),
     buildings: source.buildings.map((building) => ({ ...building })),
     employment: source.employment.map((assignment) => ({ ...assignment })),
@@ -201,6 +211,7 @@ export function cloneWorld(
     ),
     profitDistribution: { ...source.profitDistribution },
     countryAI: { ...source.countryAI },
+    technology: { ...source.technology },
     politics: {
       ...source.politics,
       eventQueue: source.politics.eventQueue.map((event) => ({ ...event })),
@@ -842,6 +853,10 @@ export function runEconomicDay(
     throw new RangeError("economic day requires pop blocks");
   }
   if (world.markets.length === 0) throw new RangeError("economic day requires a market");
+  if (world.technology.enabled && economyDefinitions.technology === undefined) {
+    throw new RangeError("world technology is enabled but no technology definitions were supplied");
+  }
+  assertTechnologyStateMatchesDefinitions(world, economyDefinitions);
 
   // M8 pipeline step 2: due scripted events and effective law transitions, plus
   // the monthly institution/interest-group/election/crisis refresh. The phase
@@ -861,11 +876,24 @@ export function runEconomicDay(
   const calendarDate = dayIndexToCivilDate(dayIndex);
   const aged = calendarDate.month === 1 && calendarDate.day === 1 && dayIndex !== world.startDayIndex;
   if (aged) applyAnnualAgeing(world);
+  // M9: demography reads the technology mortality factor as of the start of the
+  // day. A technology completed later today applies from the next civil day.
+  const mortalityFactorByBlock = new Map<Id, number>();
+  if (world.technology.enabled && economyDefinitions.technology !== undefined) {
+    for (const block of world.popBlocks) {
+      const country = countryForRegion(world, block.regionId);
+      mortalityFactorByBlock.set(
+        block.id,
+        country === null ? 1 : technologyMortalityFactor(country, economyDefinitions),
+      );
+    }
+  }
   const demography = applyDailyDemography(
     world,
     populationDefinitions,
     dayIndex,
     aged,
+    { mortalityFactorByBlock },
   );
   // Population decline can invalidate assignments before the next monthly
   // refresh. The existing dirty marker is the intended immediate-repair path.
@@ -922,6 +950,13 @@ export function runEconomicDay(
   const fiscal = runFiscalPhase(world, settlement, dayIndex, {
     validateWorld: false,
     economyDefinitions,
+  });
+
+  // M9 education and research: the payroll is paid from actual post-fiscal treasury
+  // cash, age-specific literacy rises for the school-age cohort, and the active
+  // project advances. A technology completed today applies from the next day.
+  const education = runEducationPhase(world, economyDefinitions, dayIndex, {
+    validateWorld: false,
   });
 
   // E4 sectoral production subsidy: verified physical output is valued at the
@@ -1005,6 +1040,7 @@ export function runEconomicDay(
   // `validateWorld: false` because it validates the complete staged world again
   // before publication, after advancing the day (D-067).
   if (options.validateWorld !== false) {
+    assertTechnologyStateMatchesDefinitions(world, economyDefinitions);
     assertValidWorldForTick(world, { allowUnadvancedClose: true });
   }
 
@@ -1015,6 +1051,7 @@ export function runEconomicDay(
       markets: marketResults,
       settlement,
       fiscal,
+      education,
       industrialSubsidy,
       businessTax,
       construction,

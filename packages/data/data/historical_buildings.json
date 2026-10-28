@@ -450,5 +450,96 @@
         "quantity": 1000
       }
     ]
+  },
+  {
+    "id": 10,
+    "key": "mechanized-farm",
+    "name": "Mechanized Farm",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [],
+    "outputs": [
+      {
+        "goodId": 0,
+        "quantityPerThroughputUnit": 600000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 15000
+      }
+    ],
+    "constructionCostSUSD": 8000,
+    "constructionWorkers": 200,
+    "dailyUpkeepSUSDAtLevelOne": 120,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": 1,
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "agriculture",
+    "constructionMaterials": [
+      {
+        "goodId": 0,
+        "quantity": 6000
+      },
+      {
+        "goodId": 3,
+        "quantity": 400
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "key": "power-loom-mill",
+    "name": "Power Loom Mill",
+    "referenceThroughputPerDayAtLevelOne": 1,
+    "inputs": [
+      {
+        "goodId": 3,
+        "quantityPerThroughputUnit": 6000
+      },
+      {
+        "goodId": 4,
+        "quantityPerThroughputUnit": 2000
+      }
+    ],
+    "outputs": [
+      {
+        "goodId": 5,
+        "quantityPerThroughputUnit": 45000
+      }
+    ],
+    "jobs": [
+      {
+        "professionId": 1,
+        "workersPerThroughputUnit": 20000
+      }
+    ],
+    "constructionCostSUSD": 10000,
+    "constructionWorkers": 240,
+    "dailyUpkeepSUSDAtLevelOne": 150,
+    "storageCapacityByGood": [],
+    "resourceRequirements": [],
+    "requiredTechnologyId": 9,
+    "ownershipAllowed": [
+      "private",
+      "state"
+    ],
+    "isEssentialInfrastructure": false,
+    "sector": "textiles",
+    "constructionMaterials": [
+      {
+        "goodId": 3,
+        "quantity": 3000
+      },
+      {
+        "goodId": 4,
+        "quantity": 1000
+      }
+    ]
   }
 ]

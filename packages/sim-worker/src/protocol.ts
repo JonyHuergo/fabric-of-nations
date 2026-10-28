@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 8 as const;
+export const PROTOCOL_VERSION = 9 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -114,6 +114,33 @@ export interface SetInstitutionFundingActionDto {
   readonly annualSUSD: number;
 }
 
+/** M9: start researching one technology. */
+export interface StartResearchActionDto {
+  readonly kind: "start-research";
+  readonly countryId: number;
+  readonly technologyId: number;
+}
+
+/** M9: cancel the active research project. */
+export interface CancelResearchActionDto {
+  readonly kind: "cancel-research";
+  readonly countryId: number;
+}
+
+/** M9: set the annual education/research payroll target. */
+export interface SetEducationFundingActionDto {
+  readonly kind: "set-education-funding";
+  readonly countryId: number;
+  readonly annualSUSD: number;
+}
+
+/** M9: set the share of academic staff time assigned to research. */
+export interface SetResearchStaffShareActionDto {
+  readonly kind: "set-research-staff-share";
+  readonly countryId: number;
+  readonly share: number;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -126,7 +153,11 @@ export type CountryActionDto =
   | SetIndustrialPolicyActionDto
   | SupportPublicEnterpriseActionDto
   | ProposeLawActionDto
-  | SetInstitutionFundingActionDto;
+  | SetInstitutionFundingActionDto
+  | StartResearchActionDto
+  | CancelResearchActionDto
+  | SetEducationFundingActionDto
+  | SetResearchStaffShareActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -477,6 +508,10 @@ export interface SnapshotLawOption {
   readonly alreadyEnacted: boolean;
   readonly transitionInProgress: boolean;
   readonly isBaseLaw: boolean;
+  /** M9 research technologies required before this law is proposable. */
+  readonly requiredTechnologyKeys: readonly string[];
+  /** True when every required technology is researched. */
+  readonly technologyPrerequisitesMet: boolean;
 }
 
 /** M8 law slot view. */
@@ -552,6 +587,74 @@ export interface SnapshotPolitics {
   }[];
 }
 
+/**
+ * One validated technology definition. The catalog is immutable global content and
+ * is sent once per snapshot, not duplicated per country.
+ */
+export interface SnapshotTechnologyCatalogEntry {
+  readonly technologyId: number;
+  readonly key: string;
+  readonly name: string;
+  readonly era: number;
+  readonly eraName: string;
+  readonly description: string;
+  readonly prerequisites: readonly number[];
+  readonly prerequisiteKeys: readonly string[];
+  readonly researchWork: number;
+  /** Human-readable effect descriptions derived from the validated effect data. */
+  readonly effects: readonly string[];
+  /** Building definition keys unlocked by this technology. */
+  readonly unlockedBuildingKeys: readonly string[];
+  /** Law keys enabled by this technology. */
+  readonly requiredByLawKeys: readonly string[];
+}
+
+/** One country's research status for a catalog technology. */
+export interface SnapshotTechnologyStatus {
+  readonly technologyId: number;
+  readonly status: "researched" | "active" | "available" | "locked";
+  readonly workCompleted: number;
+  readonly completedDay: number | null;
+}
+
+/** M9 country technology snapshot. Static catalog content lives at the snapshot root. */
+export interface SnapshotTechnology {
+  readonly enabled: boolean;
+  readonly statuses: readonly SnapshotTechnologyStatus[];
+  readonly researchedCount: number;
+  readonly activeProjectTechnologyId: number | null;
+  readonly researchBlockedReason: string | null;
+  readonly productivityBySector: readonly {
+    readonly sector: string;
+    readonly factor: number;
+  }[];
+  readonly mortalityFactor: number;
+  readonly educationBonus: number;
+}
+
+/** M9 country education institution snapshot (derived values labelled as such). */
+export interface SnapshotEducation {
+  readonly enabled: boolean;
+  readonly fundedAnnualSUSD: number;
+  readonly researchStaffShare: number;
+  readonly academicPopulation: number;
+  readonly availableAcademicWorkers: number;
+  readonly researchStaff: number;
+  readonly teacherStaff: number;
+  readonly schoolAgePopulation: number;
+  readonly teachingCapacityStudents: number;
+  readonly enrolledStudents: number;
+  readonly attendanceRate: number;
+  readonly fundingAdequacy: number;
+  readonly quality: number;
+  readonly serviceOutputIndex: number;
+  readonly fundingRequestedMonthToDateSUSD: number;
+  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly researchBlockedReason: string | null;
+  readonly educationBlockedReason: string | null;
+  readonly lastUpdateDay: number | null;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
@@ -618,6 +721,10 @@ export interface CountrySnapshot {
   readonly publicEnterprises: readonly SnapshotPublicEnterprise[];
   /** M8 political institutions, laws, groups, crisis, and event log. */
   readonly politics: SnapshotPolitics;
+  /** M9 technology catalog, research status, and derived effects. */
+  readonly technology: SnapshotTechnology;
+  /** M9 education institution state and derived service indicators. */
+  readonly education: SnapshotEducation;
 }
 
 export interface RegionSnapshot {
@@ -697,6 +804,10 @@ export interface SimulationSnapshot {
   readonly needTiers: readonly SnapshotNeedTier[];
   /** Validated buildable public-construction project types. */
   readonly projectTypes: readonly SnapshotProjectType[];
+  /** M9 technology era names, indexed from era 1. Empty when technology is disabled. */
+  readonly technologyEraNames: readonly string[];
+  /** M9 validated technology catalog; sent once, not per country. */
+  readonly technologyCatalog: readonly SnapshotTechnologyCatalogEntry[];
   readonly diagnostics: SnapshotDiagnostics;
 }
 
@@ -1045,6 +1156,44 @@ function parseAction(value: unknown): CountryActionDto {
       );
     }
     return { kind: "set-institution-funding", countryId, annualSUSD };
+  }
+  if (kind === "start-research") {
+    return {
+      kind: "start-research",
+      countryId,
+      technologyId: requireInteger(
+        record.technologyId,
+        "command.action.technologyId",
+        0,
+        0xffff_ffff,
+      ),
+    };
+  }
+  if (kind === "cancel-research") {
+    return { kind: "cancel-research", countryId };
+  }
+  if (kind === "set-education-funding") {
+    const annualSUSD = requireFiniteNumber(
+      record.annualSUSD,
+      "command.action.annualSUSD",
+    );
+    if (annualSUSD < 0) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.annualSUSD must be non-negative",
+      );
+    }
+    return { kind: "set-education-funding", countryId, annualSUSD };
+  }
+  if (kind === "set-research-staff-share") {
+    const share = requireFiniteNumber(record.share, "command.action.share");
+    if (share < 0 || share > 1) {
+      throw new ProtocolError(
+        "invalid_action",
+        "command.action.share must be in 0..1",
+      );
+    }
+    return { kind: "set-research-staff-share", countryId, share };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
 }
@@ -1480,6 +1629,100 @@ function isPublicEnterprise(value: unknown): value is SnapshotPublicEnterprise {
   );
 }
 
+function isTechnologyCatalogEntry(value: unknown): value is SnapshotTechnologyCatalogEntry {
+  if (!isRecord(value)) return false;
+  return (
+    isIntegerIn(value.technologyId, 0, 0xffff_ffff) &&
+    isString(value.key, 128) &&
+    isString(value.name, 256) &&
+    isIntegerIn(value.era, 1, 6) &&
+    isString(value.eraName, 128) &&
+    isString(value.description, 1_000) &&
+    Array.isArray(value.prerequisites) &&
+    value.prerequisites.every((id) => isIntegerIn(id, 0, 0xffff_ffff)) &&
+    Array.isArray(value.prerequisiteKeys) &&
+    value.prerequisiteKeys.every((key) => typeof key === "string") &&
+    isFiniteNumber(value.researchWork) &&
+    Array.isArray(value.effects) &&
+    value.effects.every((effect) => typeof effect === "string") &&
+    Array.isArray(value.unlockedBuildingKeys) &&
+    value.unlockedBuildingKeys.every((key) => typeof key === "string") &&
+    Array.isArray(value.requiredByLawKeys) &&
+    value.requiredByLawKeys.every((key) => typeof key === "string")
+  );
+}
+
+function isTechnologySnapshot(value: unknown): value is SnapshotTechnology {
+  if (!isRecord(value)) return false;
+  if (typeof value.enabled !== "boolean") return false;
+  if (!isIntegerIn(value.researchedCount, 0, 1_000_000)) return false;
+  if (
+    value.activeProjectTechnologyId !== null &&
+    !isIntegerIn(value.activeProjectTechnologyId, 0, 0xffff_ffff)
+  ) {
+    return false;
+  }
+  if (value.researchBlockedReason !== null && typeof value.researchBlockedReason !== "string") {
+    return false;
+  }
+  if (!isFiniteNumber(value.mortalityFactor)) return false;
+  if (!isFiniteNumber(value.educationBonus)) return false;
+  if (!Array.isArray(value.productivityBySector)) return false;
+  if (
+    !value.productivityBySector.every(
+      (entry) =>
+        isRecord(entry) &&
+        isString(entry.sector, 64) &&
+        isFiniteNumber(entry.factor),
+    )
+  ) {
+    return false;
+  }
+  if (!Array.isArray(value.statuses)) return false;
+  return value.statuses.every((entry) => {
+    if (!isRecord(entry)) return false;
+    return (
+      isIntegerIn(entry.technologyId, 0, 0xffff_ffff) &&
+      (entry.status === "researched" ||
+        entry.status === "active" ||
+        entry.status === "available" ||
+        entry.status === "locked") &&
+      isFiniteNumber(entry.workCompleted) &&
+      (entry.completedDay === null || isIntegerIn(entry.completedDay, 0, 36_524))
+    );
+  });
+}
+
+function isEducationSnapshot(value: unknown): value is SnapshotEducation {
+  if (!isRecord(value)) return false;
+  if (typeof value.enabled !== "boolean") return false;
+  for (const field of [
+    "fundedAnnualSUSD",
+    "researchStaffShare",
+    "academicPopulation",
+    "availableAcademicWorkers",
+    "researchStaff",
+    "teacherStaff",
+    "schoolAgePopulation",
+    "teachingCapacityStudents",
+    "enrolledStudents",
+    "attendanceRate",
+    "fundingAdequacy",
+    "quality",
+    "serviceOutputIndex",
+    "fundingRequestedMonthToDateSUSD",
+    "fundingShortfallMonthToDateSUSD",
+  ] as const) {
+    if (!isFiniteNumber(value[field])) return false;
+  }
+  for (const field of ["researchBlockedReason", "educationBlockedReason"] as const) {
+    if (value[field] !== null && typeof value[field] !== "string") return false;
+  }
+  return (
+    value.lastUpdateDay === null || isIntegerIn(value.lastUpdateDay, 0, 36_524)
+  );
+}
+
 function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
@@ -1536,7 +1779,12 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isFiniteNumber(value.publicCapitalSUSD)) return false;
   if (!isIndustrialPolicy(value.industrialPolicy)) return false;
   if (!Array.isArray(value.publicEnterprises)) return false;
-  return value.publicEnterprises.every((enterprise) => isPublicEnterprise(enterprise));
+  if (!value.publicEnterprises.every((enterprise) => isPublicEnterprise(enterprise))) {
+    return false;
+  }
+  return (
+    isTechnologySnapshot(value.technology) && isEducationSnapshot(value.education)
+  );
 }
 
 function isRegionSnapshot(value: unknown): value is RegionSnapshot {
@@ -1634,6 +1882,18 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!Array.isArray(value.goods) || !value.goods.every(isGoodSnapshot)) return false;
   if (!Array.isArray(value.needTiers) || !value.needTiers.every(isNeedTier)) return false;
   if (!Array.isArray(value.projectTypes) || !value.projectTypes.every(isProjectType)) {
+    return false;
+  }
+  if (
+    !Array.isArray(value.technologyEraNames) ||
+    !value.technologyEraNames.every((name) => typeof name === "string")
+  ) {
+    return false;
+  }
+  if (
+    !Array.isArray(value.technologyCatalog) ||
+    !value.technologyCatalog.every(isTechnologyCatalogEntry)
+  ) {
     return false;
   }
   return isDiagnostics(value.diagnostics);

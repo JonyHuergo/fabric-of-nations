@@ -22,8 +22,11 @@ import {
 } from "../validation.js";
 import type { World, CreateWorldOptions } from "../world.js";
 import {
+  ADULT_LITERACY_MIN_AGE,
   AGE_BAND_WIDTH,
   AGE_COHORT_COUNT,
+  LITERACY_AGGREGATE_TOLERANCE,
+  RATE_DECIMAL_PLACES,
   SINGLE_AGE_COUNT,
   TERMINAL_AGE_INDEX,
   WORKING_AGE_END,
@@ -153,6 +156,21 @@ export function assertValidPopBlock(block: PopBlock): void {
   }
 
   assertRate(record.literacy, "popBlock.literacy");
+  const literacyByAge = requireArray(record.literacyByAge, "popBlock.literacyByAge");
+  if (literacyByAge.length !== SINGLE_AGE_COUNT) {
+    throw new RangeError(
+      `popBlock.literacyByAge must have length ${String(SINGLE_AGE_COUNT)}`,
+    );
+  }
+  for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
+    assertRate(literacyByAge[age], `popBlock.literacyByAge[${String(age)}]`);
+  }
+  const derived = adultLiteracy(block);
+  if (Math.abs(derived - record.literacy) > LITERACY_AGGREGATE_TOLERANCE) {
+    throw new RangeError(
+      `popBlock.literacy ${String(record.literacy)} does not match the 15+ aggregate ${String(derived)}`,
+    );
+  }
   assertWealth(record.wealthLevel, "popBlock.wealthLevel");
   assertRate(record.militancy, "popBlock.militancy");
   requireInteger(record.unmetSubsistenceDays, "popBlock.unmetSubsistenceDays", 0, Number.MAX_SAFE_INTEGER);
@@ -263,6 +281,78 @@ export function populationTotal(block: PopBlock): number {
     total += block.femaleByAge[index] ?? 0;
   }
   return total;
+}
+
+/**
+ * Build the provisional initial age-specific literacy array from one adult rate.
+ *
+ * The authored scenarios supply a single adult literacy rate per pop block and no
+ * source-backed age-specific series. M9 therefore initialises every age at or
+ * above `ADULT_LITERACY_MIN_AGE` to that rate and every younger age to zero, so the
+ * derived aggregate equals the authored rate exactly at world creation. This is a
+ * documented provisional initialisation, not a historical observation (D-077).
+ */
+export function initialLiteracyByAge(rate: Rate): number[] {
+  assertRate(rate, "literacy rate");
+  const values = new Array<number>(SINGLE_AGE_COUNT).fill(0);
+  for (let age = ADULT_LITERACY_MIN_AGE; age < SINGLE_AGE_COUNT; age += 1) {
+    values[age] = rate;
+  }
+  return values;
+}
+
+/** Population-weighted adult (15+) literacy derived from the age-specific array. */
+export function adultLiteracy(block: PopBlock): number {
+  let people = 0;
+  let weighted = 0;
+  for (let age = ADULT_LITERACY_MIN_AGE; age < SINGLE_AGE_COUNT; age += 1) {
+    const count = (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
+    people += count;
+    weighted += count * (block.literacyByAge[age] ?? 0);
+  }
+  // A block with no adult population has no meaningful adult literacy aggregate.
+  // Keep the authored scalar rather than fabricating a zero rate; such a block has
+  // no working-age people, so this cannot affect employment or qualification.
+  if (people <= 0) return block.literacy;
+  const factor = 10 ** RATE_DECIMAL_PLACES;
+  return Math.round((weighted / people) * factor) / factor;
+}
+
+/** Recompute `block.literacy` from the authoritative age-specific array. */
+export function syncBlockLiteracy(block: PopBlock): void {
+  block.literacy = adultLiteracy(block);
+}
+
+/**
+ * Merge migrants' age-specific literacy into the destination block.
+ *
+ * `maleMoved`/`femaleMoved` are the per-age counts moved by the migration phase.
+ * The destination's pre-flow cell counts must be supplied so the incoming cohort is
+ * weighted correctly. Source literacy values are read from `source` and are not
+ * modified: a rate does not change when people leave.
+ */
+export function mergeBlockLiteracyByAge(
+  destination: PopBlock,
+  source: PopBlock,
+  destinationMaleBefore: ArrayLike<number>,
+  destinationFemaleBefore: ArrayLike<number>,
+  maleMoved: ArrayLike<number>,
+  femaleMoved: ArrayLike<number>,
+): void {
+  for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
+    const incoming = (maleMoved[age] ?? 0) + (femaleMoved[age] ?? 0);
+    if (incoming <= 0) continue;
+    const existing =
+      (destinationMaleBefore[age] ?? 0) + (destinationFemaleBefore[age] ?? 0);
+    const total = incoming + existing;
+    const existingLiteracy = destination.literacyByAge[age] ?? 0;
+    const incomingLiteracy = source.literacyByAge[age] ?? 0;
+    destination.literacyByAge[age] =
+      total > 0
+        ? (existingLiteracy * existing + incomingLiteracy * incoming) / total
+        : existingLiteracy;
+  }
+  syncBlockLiteracy(destination);
 }
 
 /** Derive male five-year age-group totals without storing duplicate state. */
@@ -454,6 +544,7 @@ export function createPopulationWorld(
       maleByAge,
       femaleByAge,
       literacy: initial.literacy,
+      literacyByAge: initialLiteracyByAge(initial.literacy),
       wealthLevel: initial.wealthLevel,
       financialAccountId: initial.financialAccountId,
       militancy: initial.militancy,
@@ -583,6 +674,7 @@ export function createPopulationWorld(
       nextEventId: 1,
       nextLogId: 1,
     },
+    technology: { enabled: false },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
