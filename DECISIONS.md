@@ -3621,6 +3621,163 @@ adds an administration expenditure, changes production during strikes, and adds
 political state to saves/snapshots. M8 does not implement E5 labor standards,
 M9 education/technology, E6 trade/monetary mechanics, or M10 war/diplomacy.
 
+## D-077 — M9 technology, research work, and age-specific literacy
+
+**Status:** adopted for M9 implementation. **Scope:** §10.1–§10.3, §6.3, §6.8,
+§9.2 (education slot), and the §17 M9 definition of done only. E5a/E5b labor and
+social services, E6a/E6b trade and monetary mechanics, and M10 war/diplomacy are
+not implemented.
+
+**Why a decision is required.** M9 adds authoritative technology and education
+state, a daily education/research phase, new player actions, a new fiscal
+expenditure, age-specific literacy, and new save/snapshot fields. The following
+choices determine ordering, authority, and accounting and cannot be inferred from
+the GDD's design prose alone.
+
+### Technology graph and effects
+
+1. `TechnologyDefinitions` is validated static data: six era names and a
+   technology list with stable integer id, key, era (1..6), prerequisites, required
+   research work, and typed effects. Load-time validation rejects duplicate or
+   non-contiguous ids, duplicate keys, unknown/self/cyclic prerequisites, a
+   prerequisite from a later era, non-positive work, and invalid effects. The
+   graph is acyclic by explicit depth-first validation, not by convention.
+2. M9 implements five effect channels. Three are technology effects: sector
+   productivity (a multiplicative share added to produced physical output, not to
+   capacity or inputs), mortality reduction (a multiplier on age/sex death rates),
+   and education effectiveness (an additive education-quality term). The other two
+   are declared where the affected content lives, so each has a single source of
+   truth: a building unlock is `BuildingDef.requiredTechnologyId`, and a law
+   enable is `LawDef.requiredTechnologyIds`. A technology entry does not duplicate
+   those declarations.
+3. Military-capability effects are deferred to M10. No military technology effect
+   is authored and no inert placeholder field is added.
+4. Effects are derived from the researched set on every read. No cached
+   productivity/mortality/education scalar is authoritative state; the factors are
+   recomputed from `researched` and the validated definitions. This avoids a second
+   authority and makes save/load and replay trivially equal.
+5. A technology is researched per country. `Country.technology.researched` is an
+   ascending-id bounded list with the completion day. `activeProject` is at most
+   one project. `workByTechnology` stores project-specific accumulated work for
+   started, incomplete projects and is bounded by the technology count. Work is
+   never transferred between technologies.
+
+### Research work
+
+6. Research labour is the country's academic population (the authored `academics`
+   profession), assigned a documented share of research time by
+   `Country.education.researchStaffShare`. Available academic workers are the
+   profession's participating working-age people minus any academic employment
+   assignments. The model does not create government research buildings or
+   duplicate people; as in M8's administration, the profession's people are the
+   real staffing base and the institution is a service organisation drawing on
+   them. This is a documented simplification, not a hidden free input.
+7. Daily work is
+   `researchStaff × academicLiteracy × educationQuality × fundingAdequacy`
+   researcher-days. `researchStaff = availableAcademicWorkers × researchStaffShare`.
+   Zero staff, zero share, or zero funding yields zero work, so a technology can
+   never advance from time alone. `researchWork` is measured in researcher-days and
+   is authoritative content (provisional, not calibrated).
+8. The active project's work is updated once per processed day. When accumulated
+   work reaches `researchWork` the technology is appended to `researched` with
+   `completedDay = day`, its work entry is removed, and the project is cleared. The
+   completion is applied after the market/fiscal phases, so its effects are read
+   from the next civil day. It never rewrites a closed month, annual summary, prior
+   posting, or report.
+9. Starting a project requires the technology to exist, be unresearched, have all
+   prerequisites researched, and have no active project. Cancelling clears the
+   active project but retains its accumulated work. Both actions validate the
+   complete candidate world before publication. AI research actions are rejected
+   explicitly rather than faked.
+
+### Education and literacy
+
+10. Literacy is age-specific and authoritative. `PopBlock.literacyByAge` has 81
+    entries (ages 0..79 and the open-ended 80+ slot). `PopBlock.literacy` is the
+    derived population-weighted rate of ages 15+ (adult literacy); it is
+    recomputed after any change and validated for consistency. Ages under 15 start
+    at zero because the historical scenario supplies only one adult literacy rate
+    per block and no source-backed age-specific series exists; this is a
+    documented provisional initialization, not a historical observation.
+11. The daily education phase pays the institution, updates the literacy of the
+    school-age cohort (5..14), and recomputes the adult aggregate. Gain per age cell
+    is
+    `LITERACY_DAILY_GAIN × blockAttendance × quality × fundingAdequacy ×
+    (1 − literacy[age])`.
+    `blockAttendance = min(accessRatio, familyAttendance)` where
+    `accessRatio = teachingCapacity / schoolAgePopulation` and `familyAttendance`
+    is a documented provisional function of household wealth plus the enacted
+    education law's attendance floor. Neither capacity, funding, nor household
+    resources can be bypassed. No universal daily literacy increment exists.
+12. Education quality is a weighted combination of teacher coverage (`0.6`) and
+    academic literacy (`0.4`) plus the education law's quality bonus and the
+    researched technology's education-effectiveness bonus. Funding adequacy is
+    applied multiplicatively to service output and research work, so zero funding
+    yields zero schooling service and zero research work. Coefficients are
+    provisional and live in the constants module with documented units.
+13. Ageing shifts literacy with the people (oldest-to-youngest; age 79 blends into
+    the 80+ slot), so national aggregates follow the actual age structure.
+    Migration merges literacy by age using the same moved cells as population.
+    Births enter at age 0 with zero literacy. Deaths remove people and do not
+    change a rate.
+14. The education phase runs after the fiscal phase and before the
+    industrial/business-tax/construction/debt phases. It applies exactly once per
+    processed day; the staged day is published only after final validation, so a
+    retry cannot duplicate the change.
+
+### Laws and institutions
+
+15. The M8 education law slot gains proposable options. The base option is
+    neutral; higher options add an attendance floor, a quality bonus, an
+    administrative load, and technology prerequisites. Education law uses the
+    existing `propose-law` validator, support rule, regime eligibility, effective
+    day, and bounded transition state, and contributes to institution load exactly
+    like the M8 law slots. This is the required M8 integration; there is no
+    separate education-policy action that bypasses the law pathway.
+16. `LawDef` gains `requiredTechnologyIds`, `educationAttendanceFloor`, and
+    `educationQualityBonus`. They default to empty/zero for every non-education
+    law, so previously authored M8 laws are unchanged.
+
+### Accounting
+
+17. Education payroll is paid daily from actual treasury cash above the reserve
+    floor: treasury `education-expense` debit / `treasury-cash` credit; academic
+    household `household-cash` debit / `education-income` credit (transaction kind
+    `education-payroll`). It is cash-neutral. The unpaid part is an explicit
+    month-to-date shortfall, never debt or a receivable. No research input goods
+    are consumed in M9 because the model has no research material recipe; that is
+    recorded as a limitation, not simulated as free goods.
+18. Fiscal totals add optional `educationExpenseSUSD`; budget totals add optional
+    `educationRequestedSUSD`/`educationShortfallSUSD` (sparse, default zero).
+    `netFiscalResultSUSD` subtracts education expense. To preserve the 4 MiB
+    canonical-save target after the M9 fields were added, per-country fiscal totals
+    in compacted monthly and annual summaries now use sparse encoding too: a zero
+    field is omitted and a missing field decodes as zero. Values are exact, not
+    approximated; the change is a save-format encoding change under schema 22, and
+    the 1,200-month save test remains below the target.
+
+### Persistence and compatibility
+
+19. World schema **22**, simulation **0.22.0**, worker protocol **9**, data
+    version **`m3-economy-v7`**. Save format remains 1. Older saves and protocol-8
+    clients are rejected explicitly under D-013; no migration is implemented.
+20. Bounded state: at most one active research project per country; researched
+    entries bounded by the technology definition count; work entries bounded by
+    the technology definition count and only for started incomplete projects; no
+    per-day technology or literacy history. The technology catalog itself is
+    definitions, not saved state.
+21. Worlds without a `technology` definitions block (legacy M2–M8 fixtures) have
+    `World.technology.enabled = false`, no education/research phase, no education
+    payroll, and technology/education effects are inert. `literacyByAge` is still
+    initialized from the block's literacy rate so the population state is
+    uniform and serializable; it does not change those fixtures' outcomes.
+
+**Consequences.** M9 adds per-country technology/education state and the
+age-specific literacy array to saves, adds an education expenditure, changes
+production/mortality/literacy only in technology-enabled worlds, and exposes four
+new validated actions. M9 does not implement E5 health/training/social services,
+qualification promotion, E6 trade/monetary mechanics, or M10 military technology.
+
 ## Assumptions recorded for future review
 
 
