@@ -80,11 +80,11 @@ adopted the M7a accounting stage (now implemented) and the planned inflation/FX/
 monetary-policy foundations (M8a); M8a remains planned only (see
 [the roadmap](#planned-development-roadmap-economic-management-overhaul-and-intermediate-finance-stages)).
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
-economic program; **E0, E1, E2, E3, E4, E5, and E6a are implemented in GDD v2.15
-§17A/§17E/§17F, M8 is implemented in §17C, and M9 is implemented in §17D**, and E6b
-(monetary foundations) is planned, not implemented. The design
+economic program; **E0, E1, E2, E3, E4, E5, E6a, and E6b are implemented in GDD v2.16
+§17A/§17E/§17F/§17G, M8 is implemented in §17C, and M9 is implemented in §17D**. The design
 authority is the [Century GDD
-v2.15](./Century_GDD_v2.15.md); v2.14 is retained as
+v2.16](./Century_GDD_v2.16.md); v2.15 is retained as
+[historical E6a documentation](./Century_GDD_v2.15.md), v2.14 as
 [historical E5 documentation](./Century_GDD_v2.14.md), v2.13 as
 [historical M8 documentation](./Century_GDD_v2.12.md), v2.11 as
 [historical E4 documentation](./Century_GDD_v2.11.md), v2.10 as
@@ -103,7 +103,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
-| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, M9 technology graph/research/education/age-specific literacy, E5 vocational training/qualification/public health/labor standards, E6a transport routes/access capacity/inter-market trade/customs/tariffs/quotas, save codec, state digest | none |
+| [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, M9 technology graph/research/education/age-specific literacy, E5 vocational training/qualification/public health/labor standards, E6a transport routes/access capacity/inter-market trade/customs/tariffs/quotas, E6b price index/currency board/exchange-rate valuation/convertibility, save codec, state digest | none |
 | [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
 | [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
@@ -634,13 +634,13 @@ milestone; the current M4c build uses schema `9` and simulation version `0.9.0`
 - M4a-2 uses inline test fixtures; no synthetic country, currency, or rate data
   is added to shipped scenarios.
 
-GDD v2.15 is the current design authority. At the time of this M4a-2 section, v2.5
+GDD v2.16 is the current design authority. At the time of this M4a-2 section, v2.5
 recorded the M4c government fiscal loop (D-048) alongside the M4b close (D-047), the
-M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.15
+M4a-2 model (D-044/D-045), M5 (D-051–D-055), M5a (D-056), and M5b (D-057). GDD v2.16
 records M7a annual accounting (§17B), the Economic Management Overhaul (§17A; E0
-design, E1/E2/E3/E4/E5/E6a implementations), M8 laws and institutions (§17C; D-076),
-and E6a transport/trade/customs (§17F; D-079); E6b monetary foundations remain
-planned. See the roadmap below.
+design, E1/E2/E3/E4/E5/E6a/E6b implementations), M8 laws and institutions (§17C; D-076),
+E6a transport/trade/customs (§17F; D-079), and E6b monetary/price measurement (§17G;
+D-080). See the roadmap below.
 GDD v2.4 is preserved as [historical documentation](./Century_GDD_v2.4.md), GDD
 v2.3 remains available as [earlier historical documentation](./Century_GDD_v2.3.md),
 and GDD v2.2's `CurrencyState`/`fxToUSD` target is superseded and is not current
@@ -1192,8 +1192,8 @@ M0–M6 are implemented and accepted; M7's shell/worker implementation is delive
 with an explicit native-release and real-device acceptance exception. The designer
 has adopted intermediate finance stages (recorded as D-050) for work that earlier
 revisions left unassigned, and the **Economic Management Overhaul (E0–E6)** as the
-player-facing economic program (D-070). **E0, E1, E2, E3, E4, E5, E6a, M7a, M8, and M9
-are implemented; E6b and M8a remain planned and not implemented.** E1 is
+player-facing economic program (D-070). **E0, E1, E2, E3, E4, E5, E6a, E6b, M7a, M8, and M9
+are implemented; M10 remains planned and not implemented.** E1 is
 presentation/selectors, a
 bounded monthly report, and session-confirmed action history; it adds no new
 economic mechanic. M7a adds bounded annual summaries and audited controlled
@@ -1231,13 +1231,13 @@ Combined planning order with the player-facing economic program:
 | **M9** | After M8 | Technology, research, education/literacy mechanics | **Implemented** (GDD v2.13 §17D; D-077; schema 22 / sim 0.22.0 / protocol 9 / data `m3-economy-v7`) for the 120-technology tree, funded research work, effects, education institution, age-specific literacy, and technology-gated education laws; military technology deferred to M10 |
 | **E5** | After M8/M9 | Labor/social institutions: services/transfers/training, health effects, labor laws, pensions/social insurance where supported | **Implemented** for funded vocational training/qualification, a training stipend, public health via the administration clerk base, minimum wage, working hours/standards, and the public-health staff floor (GDD v2.14 §17E; D-078; schema 23 / sim 0.23.0 / protocol 10 / data `m3-economy-v8`); pensions, collective bargaining, labour-market enforcement, and cross-profession promotion deferred |
 | **E6a** | After E5 | Transport/access and inter-market trade: real goods flows, transport cost/capacity, customs boundary, balanced postings, foreign counterparty, tariffs/quotas/restrictions | **Implemented** (GDD v2.15 §17F; D-079; schema 24 / sim 0.24.0 / protocol 11 / data `m3-economy-v9`); trade agreements, export incentives, rest-of-world endowments, FX/external accounts, and infrastructure construction deferred |
-| **E6b** | After E6a | Monetary foundations (retained M8a scope): inflation measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | Planned |
+| **E6b** | After E6a | Monetary foundations (retained M8a scope): inflation measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | **Implemented** (GDD v2.16 §17G; D-080; schema 25 / sim 0.25.0 / protocol 12 / data `m3-economy-v10`); banking, bank credit, a policy interest rate, external debt, and an FX order book deferred as recorded missing prerequisites |
 | **M7a** | After M7, before M8; recommended before E2 | Annual finance summaries/periods, year-end close consistent with M4b, partial years, audited controlled correction/reversal | **Implemented** (GDD v2.8 §17B; D-072; schema 17 / sim 0.17.0) |
-| **M8a** | Retained as E6b | Inflation/price-level measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | Planned |
+| **M8a** | Retained as E6b | Inflation/price-level measure, exchange-rate dynamics, monetary authority/controls, balanced money/credit accounting | **Implemented as E6b** (D-080) |
 
 Key boundaries:
 
-- **The playable vertical slice remains M0–M7.** M7a and E1–E6a are implemented; M8a/E6b
+- **The playable vertical slice remains M0–M7.** M7a and E1–E6b are implemented; M10
   and any remaining E stages are post-slice stages and are not prerequisites for the
   initial playable release. M5–M7 are not blocked on the later monetary systems.
 - **M5a depends on M5** for the multi-country foundation and the
@@ -3080,12 +3080,13 @@ Implementation commit: `7a8358fdcea456088e1def838072f0ccfb7c1581`
 immediate child containing this section and `DECISIONS.md`. The final HEAD is
 reported in the handoff.
 
-## Economic Management Overhaul — E0 design, E1/E2/E3/E4/E5/E6a implementation, and M7a annual accounting
+## Economic Management Overhaul — E0 design, E1–E6b implementation, and M7a annual accounting
 
 GDD v2.6 added the **Economic Management Overhaul** as a first-class design program
-(GDD §17A; D-070). **E0 is documentation/design; E1, E2, E3, E4, E5, and E6a are
-implemented; M7a annual accounting is implemented in GDD v2.8/v2.9.** E6b monetary
-foundations remain planned and not implemented. Private co-financing, loans,
+(GDD §17A; D-070). **E0 is documentation/design; E1, E2, E3, E4, E5, E6a, and E6b are
+implemented; M7a annual accounting is implemented in GDD v2.8/v2.9.** Commercial
+banking, bank credit, a policy interest rate, and external debt remain recorded missing
+prerequisites. Private co-financing, loans,
 guarantees, investment tax credits, general goods/services procurement,
 public-enterprise expansion/discontinuation, infrastructure construction, and
 land/space remain explicit later-stage dependencies.
