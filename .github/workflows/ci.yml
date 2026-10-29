@@ -7,9 +7,14 @@ on:
 
 jobs:
   verify:
-    name: Verify workspace
+    name: Verify correctness
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # The post-M10 audit measured the ordinary `pnpm test` suite at about
+    # 22.1 minutes on GitHub-hosted runners. This job also installs, lints,
+    # builds the workspace libraries needed by typecheck, and typechecks, so its
+    # expected runtime is roughly 27 minutes. 45 minutes leaves about 18 minutes
+    # of headroom for runner variance without masking a genuine hang.
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -31,11 +36,46 @@ jobs:
       - name: Boundary checks
         run: pnpm run lint
 
+      - name: Generated artifact checks
+        # Runs before typecheck and before the benchmark job's build so a stale
+        # committed worker bundle or scenario module fails the correctness job.
+        run: pnpm run check:worker
+
       - name: Typecheck
+        # `pnpm run typecheck` first builds @century/sim, @century/data, and
+        # @century/sim-worker in dependency order, so a clean checkout never
+        # resolves workspace dependencies to ignored dist declarations.
         run: pnpm run typecheck
 
       - name: Test
         run: pnpm test
+
+  benchmark:
+    name: Benchmark workspace
+    runs-on: ubuntu-latest
+    # Benchmarking stays in CI and on the existing `pnpm run bench` contract.
+    # It is a separate job so its time budget is explicit and so it runs only
+    # after the correctness job passes. The bounded harness plus `pnpm build`
+    # is a few minutes locally; 30 minutes covers a cold hosted runner.
+    timeout-minutes: 30
+    needs: verify
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Benchmark
         run: pnpm run bench
