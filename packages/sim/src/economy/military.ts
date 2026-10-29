@@ -8,7 +8,9 @@
  *
  * This module owns the military state, the five player/AI actions, and the daily
  * military phase. All randomness is keyed by the world seed and day; iteration is
- * by stable ids; no wall clock or ambient randomness is used.
+ * by stable ids. Population and payment allocations are proportional to eligible
+ * or household-population weights, never pop-block array order or numeric-id
+ * order (GDD §4.3).
  */
 
 import { assertValidWorld, type World } from "../world.js";
@@ -57,16 +59,47 @@ import {
   MAX_PEACE_OFFERS,
   MAX_WARS,
 } from "./constants.js";
-import { postJournalBatch } from "./accounting.js";
+import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { cloneFinanceState } from "./accounts.js";
 import { drawUint32 } from "../rng.js";
 import { requireInteger } from "../validation.js";
 import { assertValidDayIndex } from "../calendar.js";
+import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
 
 /** Minimum working age for recruitment. */
 const RECRUIT_MIN_AGE = 18;
 /** Maximum working age for recruitment. */
 const RECRUIT_MAX_AGE = 45;
+
+/**
+ * Purpose identifiers for the keyed tie-break draws used by military
+ * apportionment. They are stable, deterministic, and independent of storage
+ * order; the block id is only an entity key, never an ordering rule.
+ */
+const M10_RECRUITMENT_REMAINDER_PURPOSE = "m10-recruitment-remainder";
+const M10_MILITARY_PAY_REMAINDER_PURPOSE = "m10-military-pay-remainder";
+const M10_RETURN_REMAINDER_PURPOSE = "m10-return-remainder";
+
+/** One block's share of a recruitment action. */
+interface RecruitmentRemoval {
+  readonly popBlockId: Id;
+  readonly males: number;
+  readonly females: number;
+}
+
+/** A candidate block for a population-weighted military payment. */
+interface PayRecipient {
+  readonly popBlockId: Id;
+  readonly weight: number;
+  readonly totalPopulation: number;
+  readonly tie: number;
+}
+
+/** One block's share of a military payment. */
+interface MilitaryPayShare {
+  readonly popBlockId: Id;
+  readonly amountSUSD: number;
+}
 
 /** Outcome of one military action. */
 export interface MilitaryActionResult {
@@ -349,7 +382,7 @@ function createInitialArmy(
   if (input.personnel > available) {
     throw new RangeError("military army personnel exceeds the region's recruitable people");
   }
-  removePeople(world, input.regionId, input.personnel);
+  removePeople(world, input.regionId, input.personnel, dayIndex);
   const equipmentUnits =
     input.equipmentUnits ??
     Math.ceil(input.personnel / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
@@ -395,39 +428,230 @@ function recordCasualty(state: MilitaryState, countryId: Id): MilitaryCasualtyRe
 // Population helpers
 // ---------------------------------------------------------------------------
 
+/** People aged 18..45 in one sex array. */
+function eligibleAgeCount(ages: Uint32Array): number {
+  let total = 0;
+  for (let age = RECRUIT_MIN_AGE; age <= RECRUIT_MAX_AGE; age += 1) {
+    total += ages[age] ?? 0;
+  }
+  return total;
+}
+
+/** Total civilian population of a block, all ages and both sexes. */
+function blockPopulation(block: PopBlock): number {
+  let total = 0;
+  for (const value of block.maleByAge) total += value;
+  for (const value of block.femaleByAge) total += value;
+  return total;
+}
+
 /** People aged 18..45 in the region, the recruitment pool. */
 export function recruitablePeople(world: World, regionId: Id): number {
   let total = 0;
   for (const block of world.popBlocks) {
     if (block.regionId !== regionId) continue;
-    for (let age = RECRUIT_MIN_AGE; age <= RECRUIT_MAX_AGE; age += 1) {
-      total += (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
-    }
+    total += eligibleAgeCount(block.maleByAge) + eligibleAgeCount(block.femaleByAge);
   }
   return total;
 }
 
 /**
- * Remove people from the region's blocks: males 18..45 first, then females 18..45,
- * youngest first, blocks in ascending id. Returns the number removed.
+ * Largest-remainder apportionment of `total` integer units across integer
+ * `weights`.
+ *
+ * Ranking order is explicit and deterministic:
+ * 1. larger fractional remainder;
+ * 2. larger weight (the larger cohort absorbs a rounding unit first);
+ * 3. larger total block population;
+ * 4. the caller's keyed tie draw (stable entity/day/purpose, never array order);
+ * 5. the input index only as a final collision fallback.
+ *
+ * With `capacityCapped`, each recipient receives at most its weight (used for
+ * removing people). Without it, weights are shares only and the total may exceed
+ * their sum (used for returning people to a region). Exact BigInt remainders
+ * avoid floating-point drift in the largest-remainder comparison.
  */
-function removePeople(world: World, regionId: Id, count: number): number {
-  let remaining = count;
-  const blocks = world.popBlocks
-    .filter((block) => block.regionId === regionId)
-    .sort((left, right) => left.id - right.id);
-  for (const block of blocks) {
-    if (remaining <= 0) break;
-    remaining -= removeFromArray(block.maleByAge, remaining);
+function apportionLargestRemainder(
+  total: number,
+  weights: readonly number[],
+  tieKeys: readonly number[],
+  totalPopulations: readonly number[],
+  capacityCapped: boolean,
+): number[] {
+  if (!Number.isSafeInteger(total) || total < 0) {
+    throw new RangeError("apportionment total must be a non-negative safe integer");
   }
-  for (const block of blocks) {
-    if (remaining <= 0) break;
-    remaining -= removeFromArray(block.femaleByAge, remaining);
+  const allocations = new Array<number>(weights.length).fill(0);
+  if (total === 0 || weights.length === 0) return allocations;
+
+  let totalWeight = 0;
+  for (let index = 0; index < weights.length; index += 1) {
+    const weight = weights[index] ?? 0;
+    if (!Number.isSafeInteger(weight) || weight < 0) {
+      throw new RangeError("apportionment weights must be non-negative safe integers");
+    }
+    totalWeight += weight;
   }
-  if (remaining > 0) {
-    throw new RangeError(`region ${String(regionId)} lacks ${String(remaining)} recruitable people`);
+  if (totalWeight === 0) {
+    if (capacityCapped) {
+      throw new RangeError("apportionment requires at least one eligible person");
+    }
+    return allocations;
   }
-  return count;
+  if (capacityCapped && total > totalWeight) {
+    throw new RangeError("apportionment total cannot exceed the sum of weights");
+  }
+
+  const totalBig = BigInt(total);
+  const totalWeightBig = BigInt(totalWeight);
+  let allocated = 0;
+  const candidates: Array<{
+    index: number;
+    remainder: bigint;
+    weight: number;
+    totalPopulation: number;
+    tie: number;
+  }> = [];
+  for (let index = 0; index < weights.length; index += 1) {
+    const weight = weights[index] ?? 0;
+    if (weight === 0) continue;
+    const numerator = totalBig * BigInt(weight);
+    const whole = Number(numerator / totalWeightBig);
+    allocations[index] = whole;
+    allocated += whole;
+    if (capacityCapped && whole >= weight) continue;
+    candidates.push({
+      index,
+      remainder: numerator % totalWeightBig,
+      weight,
+      totalPopulation: totalPopulations[index] ?? 0,
+      tie: tieKeys[index] ?? 0,
+    });
+  }
+
+  const leftover = total - allocated;
+  if (leftover < 0 || leftover > candidates.length) {
+    throw new RangeError("largest-remainder apportionment ran out of capacity");
+  }
+  candidates.sort((left, right) => {
+    if (left.remainder !== right.remainder) return left.remainder > right.remainder ? -1 : 1;
+    if (left.weight !== right.weight) return right.weight - left.weight;
+    if (left.totalPopulation !== right.totalPopulation) {
+      return right.totalPopulation - left.totalPopulation;
+    }
+    if (left.tie !== right.tie) return left.tie - right.tie;
+    return left.index - right.index;
+  });
+  for (let index = 0; index < leftover; index += 1) {
+    const candidate = candidates[index];
+    if (candidate === undefined) {
+      throw new RangeError("largest-remainder apportionment ran out of capacity");
+    }
+    allocations[candidate.index] = (allocations[candidate.index] ?? 0) + 1;
+  }
+  return allocations;
+}
+
+/** The recipient with the largest weight, using the documented tie order. */
+function bestRecipient<T extends PayRecipient>(recipients: readonly T[]): T {
+  const first = recipients[0];
+  if (first === undefined) throw new RangeError("military pay allocation has no recipient");
+  let best = first;
+  for (const candidate of recipients) {
+    if (
+      candidate.weight > best.weight ||
+      (candidate.weight === best.weight &&
+        (candidate.totalPopulation > best.totalPopulation ||
+          (candidate.totalPopulation === best.totalPopulation &&
+            (candidate.tie < best.tie ||
+              (candidate.tie === best.tie && candidate.popBlockId < best.popBlockId)))))
+    ) {
+      best = candidate;
+    }
+  }
+  return best;
+}
+
+/**
+ * Remove `count` people from a region's blocks, preserving the documented
+ * "males 18..45 first, then females 18..45" eligibility rule. Within each sex,
+ * recruitment is apportioned across blocks in proportion to that block's
+ * available eligible people, so no block can supply more than it has.
+ */
+function removePeople(
+  world: World,
+  regionId: Id,
+  count: number,
+  dayIndex: Day,
+): RecruitmentRemoval[] {
+  const blocks = world.popBlocks.filter((block) => block.regionId === regionId);
+  if (blocks.length === 0) {
+    throw new RangeError(`region ${String(regionId)} has no pop block`);
+  }
+  const totalPopulations = blocks.map(blockPopulation);
+  const maleWeights = blocks.map((block) => eligibleAgeCount(block.maleByAge));
+  const femaleWeights = blocks.map((block) => eligibleAgeCount(block.femaleByAge));
+  const malePool = maleWeights.reduce((total, value) => total + value, 0);
+  const femalePool = femaleWeights.reduce((total, value) => total + value, 0);
+  if (count > malePool + femalePool) {
+    throw new RangeError(`region ${String(regionId)} lacks ${String(count)} recruitable people`);
+  }
+  const maleTake = Math.min(count, malePool);
+  const femaleTake = count - maleTake;
+  const maleTies = blocks.map((block) => {
+    return drawUint32({
+      seed: world.seed,
+      day: dayIndex,
+      entityId: block.id,
+      purpose: M10_RECRUITMENT_REMAINDER_PURPOSE,
+      drawIndex: 0,
+    });
+  });
+  const femaleTies = blocks.map((block) => {
+    return drawUint32({
+      seed: world.seed,
+      day: dayIndex,
+      entityId: block.id,
+      purpose: M10_RECRUITMENT_REMAINDER_PURPOSE,
+      drawIndex: 1,
+    });
+  });
+  const maleAllocations = apportionLargestRemainder(
+    maleTake,
+    maleWeights,
+    maleTies,
+    totalPopulations,
+    true,
+  );
+  const femaleAllocations = apportionLargestRemainder(
+    femaleTake,
+    femaleWeights,
+    femaleTies,
+    totalPopulations,
+    true,
+  );
+
+  const removals: RecruitmentRemoval[] = [];
+  let totalRemoved = 0;
+  for (let index = 0; index < blocks.length; index += 1) {
+    const block = blocks[index];
+    if (block === undefined) throw new RangeError("missing recruitment pop block");
+    const males = maleAllocations[index] ?? 0;
+    const females = femaleAllocations[index] ?? 0;
+    const removedMales = removeFromArray(block.maleByAge, males);
+    const removedFemales = removeFromArray(block.femaleByAge, females);
+    if (removedMales !== males || removedFemales !== females) {
+      throw new RangeError(
+        `pop block ${String(block.id)} could not supply its recruitment allocation`,
+      );
+    }
+    totalRemoved += males + females;
+    removals.push({ popBlockId: block.id, males, females });
+  }
+  if (totalRemoved !== count) {
+    throw new RangeError("recruitment did not remove exactly the requested personnel");
+  }
+  return removals;
 }
 
 function removeFromArray(ages: Uint32Array, count: number): number {
@@ -472,43 +696,55 @@ function treasuryCash(world: World, countryId: Id): number {
   return account?.balanceSUSD ?? 0;
 }
 
+/**
+ * Post a military payment from the treasury to one or more pop-block households.
+ *
+ * Each recipient receives its own balanced four-line `military-pay` entry, so the
+ * existing posting contract (one country, one pop block, four legs) is preserved
+ * while the payment is distributed. Entries are emitted in ascending recipient
+ * id solely as a canonical serialization order; the amounts are decided by the
+ * documented allocation rule, not by that order.
+ */
 function postMilitaryPay(
   world: World,
   dayIndex: Day,
   countryId: Id,
-  popBlockId: Id,
-  amount: number,
+  shares: readonly MilitaryPayShare[],
 ): void {
-  if (!(amount > 0)) return;
-  postJournalBatch(world.finance, dayIndex, [
-    {
+  const ordered = [...shares].sort((left, right) => left.popBlockId - right.popBlockId);
+  const entries: JournalEntryInput[] = [];
+  for (const share of ordered) {
+    if (!(share.amountSUSD > 0)) continue;
+    entries.push({
       transactionKind: "military-pay",
       sourceEntityId: countryId,
-      targetEntityId: popBlockId,
+      targetEntityId: share.popBlockId,
       lines: [
         {
           accountId: accountId(world, "country", countryId, "military-expense"),
           side: "debit",
-          amountSUSD: amount,
+          amountSUSD: share.amountSUSD,
         },
         {
           accountId: accountId(world, "country", countryId, "treasury-cash"),
           side: "credit",
-          amountSUSD: amount,
+          amountSUSD: share.amountSUSD,
         },
         {
-          accountId: accountId(world, "popBlock", popBlockId, "household-cash"),
+          accountId: accountId(world, "popBlock", share.popBlockId, "household-cash"),
           side: "debit",
-          amountSUSD: amount,
+          amountSUSD: share.amountSUSD,
         },
         {
-          accountId: accountId(world, "popBlock", popBlockId, "military-income"),
+          accountId: accountId(world, "popBlock", share.popBlockId, "military-income"),
           side: "credit",
-          amountSUSD: amount,
+          amountSUSD: share.amountSUSD,
         },
       ],
-    },
-  ]);
+    });
+  }
+  if (entries.length === 0) return;
+  postJournalBatch(world.finance, dayIndex, entries);
 }
 
 function postMilitaryProcurement(
@@ -549,11 +785,83 @@ function postMilitaryProcurement(
   ]);
 }
 
-/** A pop block in the army's region, used for pay and garrison procurement. */
-function regionPopBlock(world: World, regionId: Id): PopBlock | undefined {
-  return world.popBlocks
-    .filter((block) => block.regionId === regionId)
-    .sort((left, right) => left.id - right.id)[0];
+/**
+ * Population-weighted recipients for daily pay or a garrison payment.
+ *
+ * Weights are the region's recruitment-eligible people when any exist, otherwise
+ * its total civilian population. No formation-source record is persisted, so a
+ * coherent household-population rule is used instead of tracking every soldier's
+ * original block.
+ */
+function payRecipients(
+  world: World,
+  regionId: Id,
+  dayIndex: Day,
+): PayRecipient[] {
+  const blocks = world.popBlocks.filter((block) => block.regionId === regionId);
+  if (blocks.length === 0) return [];
+  const totalPopulations = blocks.map(blockPopulation);
+  const eligible = blocks.map(
+    (block) => eligibleAgeCount(block.maleByAge) + eligibleAgeCount(block.femaleByAge),
+  );
+  const eligibleTotal = eligible.reduce((total, value) => total + value, 0);
+  const weights = eligibleTotal > 0 ? eligible : totalPopulations;
+  const weightTotal = weights.reduce((total, value) => total + value, 0);
+  if (weightTotal === 0) return [];
+  return blocks.map((block, index) => ({
+    popBlockId: block.id,
+    weight: weights[index] ?? 0,
+    totalPopulation: totalPopulations[index] ?? 0,
+    tie: drawUint32({
+      seed: world.seed,
+      day: dayIndex,
+      entityId: block.id,
+      purpose: M10_MILITARY_PAY_REMAINDER_PURPOSE,
+      drawIndex: 0,
+    }),
+  }));
+}
+
+/**
+ * Split a money total across weighted pop blocks. Exact shares are proportional;
+ * the floating remainder is assigned to the documented best recipient so the
+ * posted amounts always sum to the payable total.
+ */
+function allocateMoneyAcrossBlocks(
+  total: number,
+  recipients: readonly PayRecipient[],
+): MilitaryPayShare[] {
+  if (!(total > 0)) return [];
+  const usable = recipients.filter((recipient) => recipient.weight > 0);
+  if (usable.length === 0) return [];
+  const totalWeight = usable.reduce((sum, recipient) => sum + recipient.weight, 0);
+  if (!(totalWeight > 0)) return [];
+  const shares = usable.map((recipient) => ({
+    ...recipient,
+    amountSUSD: (total * recipient.weight) / totalWeight,
+  }));
+  const positive = shares.filter((share) => share.amountSUSD > 0);
+  if (positive.length === 0) {
+    const best = bestRecipient(usable);
+    return [{ popBlockId: best.popBlockId, amountSUSD: total }];
+  }
+  const allocated = positive.reduce((sum, share) => sum + share.amountSUSD, 0);
+  const residual = total - allocated;
+  const tolerance = MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(total));
+  if (Math.abs(residual) > tolerance) {
+    throw new RangeError("military pay allocation did not sum to the payable total");
+  }
+  if (residual !== 0) {
+    const target = bestRecipient(positive);
+    target.amountSUSD += residual;
+    if (!(target.amountSUSD > 0)) {
+      throw new RangeError("military pay allocation produced a non-positive share");
+    }
+  }
+  return positive.map((share) => ({
+    popBlockId: share.popBlockId,
+    amountSUSD: share.amountSUSD,
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -770,33 +1078,64 @@ function relationForUpdate(
 }
 
 /** Remove a destroyed formation from the roster; casualties were already recorded. */
-function removeDestroyedArmies(world: World): void {
+function removeDestroyedArmies(world: World, dayIndex: Day): void {
   for (const army of world.military.armies) {
     if (army.personnel > 0) continue;
     if (army.wounded > 0) {
-      returnPeople(world, army.homeRegionId, army.wounded);
+      returnPeople(world, army.homeRegionId, army.wounded, dayIndex);
       recordCasualty(world.military, army.countryId).woundedReturned += army.wounded;
     }
   }
   world.military.armies = world.military.armies.filter((army) => army.personnel > 0);
 }
 
-/** Return wounded or demobilised people to a region's population. */
-function returnPeople(world: World, regionId: Id, count: number): void {
+/**
+ * Return wounded or demobilised people to a region's population.
+ *
+ * No source block is persisted for a formation, so returns follow the same
+ * documented population rule as recruitment: proportional to the region's
+ * current eligible people, falling back to total population and finally to an
+ * even split when a region is fully depopulated. People return into male
+ * 18..45 cells, matching the existing M10 convention.
+ */
+function returnPeople(world: World, regionId: Id, count: number, dayIndex: Day): void {
   if (!(count > 0)) return;
-  const block = world.popBlocks
-    .filter((candidate) => candidate.regionId === regionId)
-    .sort((left, right) => left.id - right.id)[0];
-  if (block === undefined) {
+  const blocks = world.popBlocks.filter((candidate) => candidate.regionId === regionId);
+  if (blocks.length === 0) {
     throw new RangeError(`region ${String(regionId)} has no pop block for returning people`);
   }
-  let remaining = count;
-  let age = RECRUIT_MIN_AGE;
-  while (remaining > 0) {
-    block.maleByAge[age] = (block.maleByAge[age] ?? 0) + 1;
-    remaining -= 1;
-    age += 1;
-    if (age > RECRUIT_MAX_AGE) age = RECRUIT_MIN_AGE;
+  const totalPopulations = blocks.map(blockPopulation);
+  const eligible = blocks.map(
+    (block) => eligibleAgeCount(block.maleByAge) + eligibleAgeCount(block.femaleByAge),
+  );
+  let weights = eligible;
+  if (weights.reduce((total, value) => total + value, 0) === 0) {
+    weights = totalPopulations;
+  }
+  if (weights.reduce((total, value) => total + value, 0) === 0) {
+    weights = blocks.map(() => 1);
+  }
+  const tieKeys = blocks.map((block) => {
+    return drawUint32({
+      seed: world.seed,
+      day: dayIndex,
+      entityId: block.id,
+      purpose: M10_RETURN_REMAINDER_PURPOSE,
+      drawIndex: 0,
+    });
+  });
+  const allocations = apportionLargestRemainder(count, weights, tieKeys, totalPopulations, false);
+  for (let index = 0; index < blocks.length; index += 1) {
+    const block = blocks[index];
+    if (block === undefined) throw new RangeError("missing pop block for returning people");
+    let remaining = allocations[index] ?? 0;
+    let age = RECRUIT_MIN_AGE;
+    while (remaining > 0) {
+      block.maleByAge[age] = (block.maleByAge[age] ?? 0) + 1;
+      remaining -= 1;
+      age += 1;
+      if (age > RECRUIT_MAX_AGE) age = RECRUIT_MIN_AGE;
+    }
   }
 }
 
@@ -1059,10 +1398,20 @@ function executeMilitaryAction(
       const equipmentCost = equipmentUnits * M10_EQUIPMENT_PRICE_SUSD;
       const region = regionById(world, action.regionId);
       if (region === undefined) throw new RangeError("missing recruitment region");
-      const popBlock = regionPopBlock(world, region.id);
-      if (popBlock === undefined) throw new RangeError("recruitment region has no pop block");
-      removePeople(world, region.id, action.personnel);
-      postMilitaryPay(world, dayIndex, action.countryId, popBlock.id, recruitmentCost);
+      const removals = removePeople(world, region.id, action.personnel, dayIndex);
+      // Signing costs follow the actual supplier blocks: each block is paid for
+      // exactly the recruits it supplied. This is a real treasury-to-household
+      // transfer and needs no persisted source record.
+      const signingShares: MilitaryPayShare[] = [];
+      for (const removal of removals) {
+        const recruits = removal.males + removal.females;
+        if (recruits <= 0) continue;
+        signingShares.push({
+          popBlockId: removal.popBlockId,
+          amountSUSD: recruits * M10_RECRUITMENT_COST_PER_SOLDIER_SUSD,
+        });
+      }
+      postMilitaryPay(world, dayIndex, action.countryId, signingShares);
       postMilitaryProcurement(world, dayIndex, action.countryId, equipmentCost);
       const armyId = world.military.nextArmyId;
       world.military.nextArmyId += 1;
@@ -1244,8 +1593,12 @@ function payUpkeep(
   const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_SUSD;
   const required = payRequired + equipmentRequired;
   if (!(required > 0)) return { paid: 0, shortfall: 0 };
+  const recipients = payRecipients(world, army.regionId, dayIndex);
+  // Soldiers' pay needs a household recipient. If the region has none, only the
+  // equipment supplier can be paid; the unpaid pay remains an honest shortfall.
+  const payable = recipients.length > 0 ? required : equipmentRequired;
   const available = treasuryCash(world, army.countryId);
-  const paid = Math.min(required, Math.max(0, available));
+  const paid = payable > 0 ? Math.min(payable, Math.max(0, available)) : 0;
   const ratio = paid / required;
   if (ratio >= 1 - 1e-9) {
     army.supply = Math.min(1, army.supply + M10_SUPPLY_RECOVERY_PER_DAY);
@@ -1256,11 +1609,22 @@ function payUpkeep(
       army.organization - M10_UNPAID_ORGANIZATION_LOSS,
     );
   }
-  const paidPay = payRequired * ratio;
-  const paidEquipment = equipmentRequired * ratio;
-  const popBlock = regionPopBlock(world, army.regionId);
-  if (popBlock !== undefined) {
-    postMilitaryPay(world, dayIndex, army.countryId, popBlock.id, paidPay);
+  let paidPay = 0;
+  let paidEquipment = 0;
+  if (recipients.length > 0) {
+    const paidRatio = paid / required;
+    paidPay = payRequired * paidRatio;
+    paidEquipment = equipmentRequired * paidRatio;
+    if (paidPay > 0) {
+      postMilitaryPay(
+        world,
+        dayIndex,
+        army.countryId,
+        allocateMoneyAcrossBlocks(paidPay, recipients),
+      );
+    }
+  } else {
+    paidEquipment = paid;
   }
   postMilitaryProcurement(world, dayIndex, army.countryId, paidEquipment);
   return { paid, shortfall: required - paid };
@@ -1348,7 +1712,7 @@ export function runMilitaryPhase(
       }
     }
   }
-  removeDestroyedArmies(world);
+  removeDestroyedArmies(world, dayIndex);
 
   // 3. Occupation and liberation.
   for (const region of [...world.regions].sort((left, right) => left.id - right.id)) {
@@ -1393,11 +1757,22 @@ export function runMilitaryPhase(
       .sort((left, right) => left.id - right.id)[0];
     if (occupier === undefined) continue;
     const requested = occupier.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD;
+    const recipients = payRecipients(world, region.id, dayIndex);
+    if (recipients.length === 0) {
+      // No occupied-region household can receive the payment, so no treasury
+      // cash moves and the full amount is an honest shortfall.
+      result.shortfallSUSD += requested;
+      continue;
+    }
     const available = treasuryCash(world, controller);
     const paid = Math.min(requested, Math.max(0, available));
-    const popBlock = regionPopBlock(world, region.id);
-    if (popBlock !== undefined && paid > 0) {
-      postMilitaryPay(world, dayIndex, controller, popBlock.id, paid);
+    if (paid > 0) {
+      postMilitaryPay(
+        world,
+        dayIndex,
+        controller,
+        allocateMoneyAcrossBlocks(paid, recipients),
+      );
     }
     result.paidSUSD += paid;
     result.shortfallSUSD += requested - paid;
