@@ -4487,3 +4487,46 @@ declare wars or recruit in M10, which is recorded as a limitation rather than fa
 **Versions:** world schema **26**, simulation **0.26.0**, worker protocol **13**, data
 **`m3-economy-v11`**; older saves and protocol-12 clients are rejected under D-013 with
 no migration.
+
+## D-082 — Audit remediation batch 1: compaction, save schema, staging isolation, fiscal reporting, and casualty semantics
+
+**Status:** implemented. Fixes AUDIT-001 through AUDIT-005 from the post-M10 audit. World
+schema, simulation version, worker protocol, and data version are unchanged.
+
+### Decisions
+
+1. **Monthly compaction retains military expense.** `compactFinanceHistory` now copies
+   `militaryExpenseSUSD` alongside the other retained fiscal categories. The frozen
+   `netFiscalResultSUSD` already includes military expense, so omitting the component made
+   the compacted summary unreconcilable and wedged the monthly close at the 13th close.
+2. **The app save adapter uses the current schema.** `SUPPORTED_SAVE_SCHEMA_VERSION` is
+   synchronized to the current world schema (26) and guarded by a test that compares the
+   app literal with `WORLD_SCHEMA_VERSION`. The app adapter itself is exercised through
+   its real `SaveStore` and the worker `LOAD` validator; incompatible old saves still
+   fail explicitly (no migration).
+3. **Staged-day cloning is complete.** `cloneWorld` deep-copies `World.military` and
+   `copyCountry` deep-copies `Country.trade`, restoring the GDD §4.2 whole-day atomicity
+   guarantee. A late-phase failure no longer leaves military or trade mutations on the
+   caller's world.
+4. **Fiscal snapshots carry every implemented category.** `SnapshotFiscalTotals` and
+   `SnapshotAnnualReport` gain optional `educationExpenseSUSD`, `trainingExpenseSUSD`,
+   `customsDutyRevenueSUSD`, and `militaryExpenseSUSD` fields; current snapshots always
+   populate them. The fields are additive and optional, so protocol 13 remains compatible
+   with older snapshots that omit them (reports show zero). The budget and ledger screens
+   display the components and describe the actual net formula.
+5. **Country casualty snapshots use cumulative records.** `CountrySnapshot.military.deaths`
+   and `captured` derive from the authoritative cumulative casualty records rather than
+   summing surviving formations; `wounded` remains the current roster count. Labels state
+   the distinction.
+
+### Consequences
+
+- A campaign with military spending can pass the 13th and later monthly closes; compacted
+  history remains valid.
+- App save/load works for schema-26 saves; old schemas are still rejected.
+- Failed ticks leave the original world, hash, and serialized representation unchanged for
+  military and trade state as well as the previously staged systems.
+- The player-facing monthly/annual reports reconcile with their displayed components and
+  show military expenditure.
+- The generated worker bundle was regenerated. No save schema, simulation, protocol, or
+  data version bump was required.
