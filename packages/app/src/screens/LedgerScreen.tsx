@@ -177,6 +177,30 @@ export function LedgerScreen({
               </Text>
             </View>
             <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Customs duty revenue</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.customsDutyRevenueSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Education and research payroll (expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.educationExpenseSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Training payroll and stipend (expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.trainingExpenseSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Military pay and procurement (expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latest.militaryExpenseSUSD)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Net fiscal result</Text>
               <Text
                 style={[
@@ -359,6 +383,30 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>
                 {formatSUSD(latestAnnual.administrationRequestedSUSD ?? 0)} /{" "}
                 {formatSUSD(latestAnnual.administrationShortfallSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Customs duty revenue (annual flow)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.customsDutyRevenueSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Education and research payroll (annual expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.educationExpenseSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Training payroll and stipend (annual expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.trainingExpenseSUSD ?? 0)}
+              </Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Military pay and procurement (annual expense)</Text>
+              <Text style={styles.reportValue}>
+                {formatSUSD(latestAnnual.militaryExpenseSUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>

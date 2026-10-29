@@ -217,7 +217,7 @@ export function BudgetScreen({
           detail={
             latest === null
               ? "No closed period yet"
-              : `${formatSUSD(latest.netFiscalResultSUSD)} · tax + business tax − welfare − interest`
+              : `${formatSUSD(latest.netFiscalResultSUSD)} · all recorded revenue − all recorded expense`
           }
         />
         <StatRow
@@ -307,7 +307,7 @@ export function BudgetScreen({
 
       <Section
         title="Spending and reserve"
-        subtitle="Welfare is the only spending category with a complete delivery mechanism in E2. Education, health, administration, subsidies, procurement, and public investment are deferred to the stages that create their real mechanics."
+        subtitle="Welfare is paid daily from treasury cash subject to the reserve floor and wealth eligibility ceiling. Other implemented spending categories are set by their own policy screens and reported in Budget execution."
       >
         <Text style={styles.inputLabel}>Welfare budget (SUSD per year)</Text>
         <TextInput
@@ -601,6 +601,11 @@ export function BudgetScreen({
               detail={`Assessed ${formatSUSD(latestMonthly.businessTaxAssessedSUSD)} · uncollected ${formatSUSD(latestMonthly.businessTaxUncollectedSUSD)}`}
             />
             <StatRow
+              label="Customs duty (revenue)"
+              value={formatSUSD(latestMonthly.customsDutyRevenueSUSD)}
+              detail="Duty collected by this country's customs administration."
+            />
+            <StatRow
               label="Welfare"
               value={`${formatSUSD(latestMonthly.welfareExpenseSUSD)} paid`}
               detail={`Requested ${formatSUSD(latestMonthly.welfareRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.welfareShortfallSUSD)}`}
@@ -611,9 +616,32 @@ export function BudgetScreen({
               detail={`Cash interest paid ${formatSUSD(latestMonthly.interestPaidSUSD)} (accrual and payment are distinct).`}
             />
             <StatRow
+              label="Production subsidies"
+              value={formatSUSD(latestMonthly.subsidyExpenseSUSD)}
+              detail={`Requested ${formatSUSD(latestMonthly.subsidyRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.subsidyShortfallSUSD)}`}
+            />
+            <StatRow
+              label="Administration payroll"
+              value={formatSUSD(latestMonthly.administrationExpenseSUSD)}
+              detail={`Requested ${formatSUSD(latestMonthly.administrationRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.administrationShortfallSUSD)}`}
+            />
+            <StatRow
+              label="Education and research payroll"
+              value={formatSUSD(latestMonthly.educationExpenseSUSD)}
+            />
+            <StatRow
+              label="Training payroll and stipend"
+              value={formatSUSD(latestMonthly.trainingExpenseSUSD)}
+            />
+            <StatRow
+              label="Military pay and procurement"
+              value={formatSUSD(latestMonthly.militaryExpenseSUSD)}
+              detail="Daily army pay, equipment upkeep, garrison cost, and recruitment equipment purchases."
+            />
+            <StatRow
               label="Net fiscal result"
               value={formatSUSD(latestMonthly.netFiscalResultSUSD)}
-              detail="Tax revenue minus welfare and interest expense; financing is excluded."
+              detail="Income tax + business tax + customs duty − welfare − interest − subsidies − administration − education − training − military; financing is excluded."
             />
             <StatRow
               label="Financing"

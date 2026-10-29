@@ -33,6 +33,7 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
+import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
 import { loadM5EightPolities } from "@century/data";
 
 import {
@@ -690,6 +691,56 @@ describe("M10 determinism, persistence, and worker contract", () => {
         action: { kind: "recruit-army", countryId: 0, regionId: 0, personnel: 0 },
       }),
     ).toThrow();
+  });
+
+  test("a destroyed formation keeps its cumulative casualties in the country snapshot", () => {
+    const { scenario, world } = buildMilitary();
+    declare(world, M5_COUNTRY_A, M5_COUNTRY_B);
+    recruit(world, M5_COUNTRY_A, M5_REGION_A1, 400);
+    recruit(world, M5_COUNTRY_B, M5_REGION_B1, 60);
+    advanceMilitary(world, 14);
+    const attackerArmyId = world.military.armies.find(
+      (army) => army.countryId === M5_COUNTRY_A,
+    )?.id;
+    if (attackerArmyId === undefined) throw new Error("missing attacker army");
+    act(world, {
+      kind: "deploy-army",
+      countryId: M5_COUNTRY_A,
+      dayIndex: world.dayIndex,
+      source: "player",
+      armyId: attackerArmyId,
+      targetRegionId: M5_REGION_B1,
+    });
+    // Fight until the smaller defender formation is removed from the roster.
+    for (
+      let day = 0;
+      day < 90 && world.military.armies.some((army) => army.countryId === M5_COUNTRY_B);
+      day += 1
+    ) {
+      advanceMilitary(world, 1);
+    }
+    expect(world.military.armies.some((army) => army.countryId === M5_COUNTRY_B)).toBe(false);
+    const record = world.military.casualties.find(
+      (entry) => entry.countryId === M5_COUNTRY_B,
+    );
+    if (record === undefined) throw new Error("missing casualty record");
+    expect(record.deaths + record.captured).toBeGreaterThan(0);
+
+    const snapshot = buildSimulationSnapshot(
+      world,
+      scenario.definitions,
+      { sequence: 1, running: false, speedDaysPerSecond: 1, achievedDaysPerSecond: 0 },
+      scenario.population.definitions,
+    );
+    const country = snapshot.countries.find((entry) => entry.id === M5_COUNTRY_B);
+    if (country === undefined) throw new Error("missing country snapshot");
+    expect(country.military.deaths).toBe(record.deaths);
+    expect(country.military.captured).toBe(record.captured);
+    expect(country.military.wounded).toBe(
+      world.military.armies
+        .filter((army) => army.countryId === M5_COUNTRY_B)
+        .reduce((total, army) => total + army.wounded, 0),
+    );
   });
 
   test("military spending is reported in the fiscal accounts and monthly totals", () => {

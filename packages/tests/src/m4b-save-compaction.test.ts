@@ -1,4 +1,6 @@
 import {
+  applyMilitaryAction,
+  assertValidWorld,
   civilDateToDayIndex,
   cloneWorld,
   closeFinancePeriod,
@@ -135,6 +137,111 @@ describe("monthly finance history compaction (D-065)", () => {
     const stored = compressSaveForStorage(save);
     expect(stored.length).toBeLessThan(save.length);
     expect(decompressSaveFromStorage(stored)).toBe(save);
+  });
+
+  test("compaction preserves military expense and the stored net reconciles", () => {
+    const scenario = loadM5EightPolities();
+    const context = {
+      population: { definitions: scenario.population.definitions },
+      economy: { definitions: scenario.definitions },
+    };
+    const world = createEconomyWorld(scenario, { seed: SEED });
+    applyMilitaryAction(
+      world,
+      {
+        kind: "recruit-army",
+        countryId: 0,
+        dayIndex: 0,
+        source: "player",
+        regionId: 0,
+        personnel: 500,
+      },
+      0,
+    );
+    for (let index = 0; index < 31; index += 1) tick(world, context);
+    const baseSummary = world.finance.periodSummaries[0];
+    if (baseSummary === undefined) throw new Error("fixture did not close a month");
+    const before = governmentPeriodTotals(world.finance, baseSummary).find(
+      (entry) => entry.countryId === 0,
+    );
+    expect(before?.militaryExpenseSUSD ?? 0).toBeGreaterThan(0);
+
+    // Reproduce the 13th-close boundary: thirteen detailed periods become one
+    // compacted period plus the retained detailed window.
+    const periods = monthlyPeriods(13).map((period) => ({
+      ...period,
+      accountTotals: { ...baseSummary.accountTotals },
+      flowTotalsByKind: { ...baseSummary.flowTotalsByKind },
+      countryBudgetTotals: Object.fromEntries(
+        Object.entries(baseSummary.countryBudgetTotals).map(([countryId, totals]) => [
+          countryId,
+          { ...totals },
+        ]),
+      ),
+    }));
+    world.finance.periodSummaries = periods;
+    world.finance.closedThroughDay = periods.at(-1)?.periodEndDay ?? null;
+    world.dayIndex = (periods.at(-1)?.periodEndDay ?? 0) + 1;
+    assertValidWorld(world);
+
+    expect(compactFinanceHistory(world.finance)).toBe(1);
+    const compacted = world.finance.periodSummaries[0];
+    const totals = compacted?.countryFiscalTotals?.[0];
+    if (totals === undefined) throw new Error("fixture did not compact a country");
+    expect(totals.militaryExpenseSUSD).toBeCloseTo(before?.militaryExpenseSUSD ?? -1, 6);
+    expect(totals.netFiscalResultSUSD).toBeCloseTo(
+      totals.incomeTaxRevenueSUSD +
+        totals.businessTaxRevenueSUSD +
+        (totals.customsDutyRevenueSUSD ?? 0) -
+        totals.welfareExpenseSUSD -
+        totals.interestExpenseSUSD -
+        (totals.subsidyExpenseSUSD ?? 0) -
+        (totals.administrationExpenseSUSD ?? 0) -
+        (totals.educationExpenseSUSD ?? 0) -
+        (totals.trainingExpenseSUSD ?? 0) -
+        (totals.militaryExpenseSUSD ?? 0),
+      6,
+    );
+    assertValidWorld(world);
+    expect(() => serializeWorld(world)).not.toThrow();
+  });
+
+  test("the real 13th monthly close succeeds with military expense in the compacted month", () => {
+    const scenario = loadM5EightPolities();
+    const context = {
+      population: { definitions: scenario.population.definitions },
+      economy: { definitions: scenario.definitions },
+    };
+    const world = createEconomyWorld(scenario, { seed: SEED });
+    applyMilitaryAction(
+      world,
+      {
+        kind: "recruit-army",
+        countryId: 0,
+        dayIndex: 0,
+        source: "player",
+        regionId: 0,
+        personnel: 500,
+      },
+      0,
+    );
+    for (let index = 0; index < 31; index += 1) tick(world, context);
+    expect(world.finance.periodSummaries).toHaveLength(1);
+    for (let index = 1; index < 13; index += 1) {
+      const year = 1900 + Math.floor(index / 12);
+      const month = ((index % 12) + 1) as Month;
+      world.dayIndex = civilDateToDayIndex(year, month, daysInMonth(year, month));
+      closeFinancePeriod(world);
+    }
+    expect(world.finance.periodSummaries).toHaveLength(13);
+    const first = world.finance.periodSummaries[0];
+    expect(first?.countryFiscalTotals).toBeDefined();
+    expect(
+      first?.countryFiscalTotals?.[0]?.militaryExpenseSUSD ?? 0,
+    ).toBeGreaterThan(0);
+    // The tick pipeline advances the day before publishing a closed world.
+    world.dayIndex += 1;
+    assertValidWorld(world);
   });
 
   test("the real close path compacts only after the detailed window", () => {

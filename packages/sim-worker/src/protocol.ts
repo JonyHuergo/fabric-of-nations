@@ -508,6 +508,14 @@ export interface SnapshotFiscalTotals {
   readonly interestExpenseSUSD: number;
   readonly subsidyExpenseSUSD: number;
   readonly administrationExpenseSUSD?: number;
+  /**
+   * Additive, optional categories. Current snapshots always populate them; an
+   * older protocol-13 snapshot may omit them, in which case reports show zero.
+   */
+  readonly educationExpenseSUSD?: number;
+  readonly trainingExpenseSUSD?: number;
+  readonly customsDutyRevenueSUSD?: number;
+  readonly militaryExpenseSUSD?: number;
   readonly netFiscalResultSUSD: number;
 }
 
@@ -567,6 +575,10 @@ export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
   readonly interestExpenseSUSD: number;
   readonly subsidyExpenseSUSD: number;
   readonly administrationExpenseSUSD?: number;
+  readonly educationExpenseSUSD?: number;
+  readonly trainingExpenseSUSD?: number;
+  readonly customsDutyRevenueSUSD?: number;
+  readonly militaryExpenseSUSD?: number;
   readonly netFiscalResultSUSD: number;
   readonly treasuryCashEndSUSD: number;
   readonly debtLiabilityEndSUSD: number;
@@ -1010,7 +1022,11 @@ export interface CountrySnapshot {
   readonly priceIndex: SnapshotCountryPriceIndex;
   /** E6b monetary authority, exchange-rate, and convertibility state. */
   readonly monetary: SnapshotMonetaryAuthority;
-  /** M10 armies and cumulative casualties for this country. */
+  /**
+   * M10 armies and casualties for this country. `deaths` and `captured` are
+   * cumulative (authoritative casualty records); `wounded` is the current roster
+   * count, not a historical total.
+   */
   readonly military: {
     readonly armies: readonly SnapshotArmy[];
     readonly deaths: number;
@@ -1874,9 +1890,24 @@ function isNumberArray(value: unknown): value is readonly number[] {
   return Array.isArray(value) && value.every((entry) => isIntegerIn(entry, 0, 0xffff_ffff));
 }
 
+const OPTIONAL_FISCAL_TOTAL_FIELDS = [
+  "administrationExpenseSUSD",
+  "educationExpenseSUSD",
+  "trainingExpenseSUSD",
+  "customsDutyRevenueSUSD",
+  "militaryExpenseSUSD",
+] as const;
+
+function optionalFiscalFieldsAreValid(value: Record<string, unknown>): boolean {
+  return OPTIONAL_FISCAL_TOTAL_FIELDS.every(
+    (field) => value[field] === undefined || isFiniteNumber(value[field]),
+  );
+}
+
 function isFiscalTotals(value: unknown): value is SnapshotFiscalTotals {
   if (!isRecord(value)) return false;
   return (
+    optionalFiscalFieldsAreValid(value) &&
     isIntegerIn(value.periodStartDay, 0, 36_524) &&
     isIntegerIn(value.periodEndDay, 0, 36_524) &&
     isFiniteNumber(value.incomeTaxSUSD) &&
@@ -2026,6 +2057,7 @@ function isNeedTier(value: unknown): value is SnapshotNeedTier {
 function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
   if (!isRecord(value)) return false;
   if (!isBudgetTotals(value)) return false;
+  if (!optionalFiscalFieldsAreValid(value)) return false;
   return (
     isIntegerIn(value.year, 1900, 1999) &&
     isIntegerIn(value.periodStartDay, 0, 36_524) &&

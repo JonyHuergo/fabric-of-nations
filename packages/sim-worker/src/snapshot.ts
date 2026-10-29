@@ -233,6 +233,10 @@ function fiscalTotals(
       interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
       subsidyExpenseSUSD: roundDisplay(totals.subsidyExpenseSUSD, 6),
       administrationExpenseSUSD: roundDisplay(totals.administrationExpenseSUSD ?? 0, 6),
+      educationExpenseSUSD: roundDisplay(totals.educationExpenseSUSD ?? 0, 6),
+      trainingExpenseSUSD: roundDisplay(totals.trainingExpenseSUSD ?? 0, 6),
+      customsDutyRevenueSUSD: roundDisplay(totals.customsDutyRevenueSUSD ?? 0, 6),
+      militaryExpenseSUSD: roundDisplay(totals.militaryExpenseSUSD ?? 0, 6),
       netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
     },
     businessTaxRevenueSUSD: roundDisplay(totals.businessTaxRevenueSUSD, 6),
@@ -622,6 +626,10 @@ function annualReportSnapshots(
           totals?.administrationExpenseSUSD ?? 0,
           6,
         ),
+        educationExpenseSUSD: roundDisplay(totals?.educationExpenseSUSD ?? 0, 6),
+        trainingExpenseSUSD: roundDisplay(totals?.trainingExpenseSUSD ?? 0, 6),
+        customsDutyRevenueSUSD: roundDisplay(totals?.customsDutyRevenueSUSD ?? 0, 6),
+        militaryExpenseSUSD: roundDisplay(totals?.militaryExpenseSUSD ?? 0, 6),
         netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
         treasuryCashEndSUSD: roundDisplay(balances?.treasuryCashSUSD ?? 0, 6),
         debtLiabilityEndSUSD: roundDisplay(balances?.debtLiabilitySUSD ?? 0, 6),
@@ -1571,14 +1579,21 @@ function countryMilitarySnapshot(
   const armies = armiesOfCountry(world, country.id)
     .sort((left, right) => left.id - right.id)
     .map(armySnapshot);
-  let deaths = 0;
+  // Deaths and captures are cumulative and live in the authoritative casualty
+  // record, not in the surviving roster: a destroyed formation is removed from
+  // `world.military.armies`, and its losses must not disappear from the country
+  // total. `wounded` remains the current roster count (wounded personnel return
+  // to the roster after recovery), so it is deliberately not summed with the
+  // cumulative `woundedReturned` memo.
+  const casualtyRecord = world.military.casualties.find(
+    (entry) => entry.countryId === country.id,
+  );
+  const deaths = casualtyRecord?.deaths ?? 0;
+  const captured = casualtyRecord?.captured ?? 0;
   let wounded = 0;
-  let captured = 0;
   for (const army of world.military.armies) {
     if (army.countryId !== country.id) continue;
-    deaths += army.deaths;
     wounded += army.wounded;
-    captured += army.captured;
   }
   const relations = world.countries
     .filter((other) => other.id !== country.id)

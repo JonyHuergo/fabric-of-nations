@@ -12,7 +12,7 @@ import {
  * can reject an incompatible startup save before offering Continue; the worker
  * remains the authoritative validator when the save is loaded.
  */
-export const SUPPORTED_SAVE_SCHEMA_VERSION = 20;
+export const SUPPORTED_SAVE_SCHEMA_VERSION = 26;
 
 const store = new SaveStore(AsyncStorage, {
   expectedSchemaVersion: SUPPORTED_SAVE_SCHEMA_VERSION,

@@ -1,4 +1,5 @@
 import {
+  applyMilitaryAction,
   cloneWorld,
   createEconomyWorld,
   createInitialWorld,
@@ -11,6 +12,7 @@ import {
   type TickContext,
   type World,
 } from "@century/sim";
+import { loadM5EightPolities } from "@century/data";
 import {
   accountBalance,
   buildingAccountId,
@@ -555,5 +557,96 @@ describe("M3f integrated economic day", () => {
     expect(result.advanced).toBe(true);
     expect(result.economy).toBeUndefined();
     expect(world.dayIndex).toBe(1);
+  });
+
+  test("staging isolates military and country trade subtrees", () => {
+    const scenario = loadM5EightPolities();
+    const world = createEconomyWorld(scenario, { seed: 20_261_107 });
+    applyMilitaryAction(
+      world,
+      {
+        kind: "recruit-army",
+        countryId: 0,
+        dayIndex: world.dayIndex,
+        source: "player",
+        regionId: 0,
+        personnel: 100,
+      },
+      world.dayIndex,
+    );
+    const clone = cloneWorld(world);
+    expect(clone.military).not.toBe(world.military);
+    expect(clone.military.armies).not.toBe(world.military.armies);
+    expect(clone.military.armies[0]).not.toBe(world.military.armies[0]);
+    expect(clone.military.wars).not.toBe(world.military.wars);
+    expect(clone.military.relations).not.toBe(world.military.relations);
+    expect(clone.military.peaceOffers).not.toBe(world.military.peaceOffers);
+    expect(clone.military.casualties).not.toBe(world.military.casualties);
+    for (let index = 0; index < world.countries.length; index += 1) {
+      const original = world.countries[index];
+      const copy = clone.countries[index];
+      if (original === undefined || copy === undefined) throw new Error("missing country");
+      expect(copy.trade).not.toBe(original.trade);
+      expect(copy.trade.tariffRates).not.toBe(original.trade.tariffRates);
+      expect(copy.trade.importQuotaQuantity).not.toBe(original.trade.importQuotaQuantity);
+      expect(copy.trade.importQuotaUsedQuantity).not.toBe(
+        original.trade.importQuotaUsedQuantity,
+      );
+      expect(copy.trade.exportRestricted).not.toBe(original.trade.exportRestricted);
+    }
+  });
+
+  test("a late-phase failure leaves the complete original world unchanged", () => {
+    const scenario = loadM5EightPolities();
+    const world = createEconomyWorld(scenario, { seed: 20_261_107 });
+    applyMilitaryAction(
+      world,
+      {
+        kind: "recruit-army",
+        countryId: 0,
+        dayIndex: world.dayIndex,
+        source: "player",
+        regionId: 0,
+        personnel: 500,
+      },
+      world.dayIndex,
+    );
+    // Force a failure after the military phase. The day starts from this exact
+    // state, so the comparison below measures only the failed tick's side effects.
+    world.finance.accounts = world.finance.accounts.filter(
+      (account) =>
+        !(
+          account.ownerKind === "country" &&
+          account.ownerId === 0 &&
+          account.subtype === "education-expense"
+        ),
+    );
+    const beforeHash = hashWorld(world);
+    const beforeSerialized = serializeWorld(world);
+    const beforeDay = world.dayIndex;
+    const beforePhase = world.military.lastPhaseDay;
+    const armyBefore = world.military.armies[0];
+    if (armyBefore === undefined) throw new Error("military fixture has no army");
+    const beforeSupply = armyBefore.supply;
+    const beforeImports = world.countries.map(
+      (country) => country.trade.importsValueMonthToDateSUSD,
+    );
+    const beforeQuota = world.countries.map((country) => [
+      ...country.trade.importQuotaUsedQuantity,
+    ]);
+
+    expect(() => tick(world, contextFor(scenario))).toThrow(/education-expense/);
+
+    expect(world.dayIndex).toBe(beforeDay);
+    expect(world.military.lastPhaseDay).toBe(beforePhase);
+    expect(armyBefore.supply).toBe(beforeSupply);
+    expect(world.countries.map((country) => country.trade.importsValueMonthToDateSUSD)).toEqual(
+      beforeImports,
+    );
+    expect(world.countries.map((country) => [...country.trade.importQuotaUsedQuantity])).toEqual(
+      beforeQuota,
+    );
+    expect(hashWorld(world)).toBe(beforeHash);
+    expect(serializeWorld(world)).toBe(beforeSerialized);
   });
 });

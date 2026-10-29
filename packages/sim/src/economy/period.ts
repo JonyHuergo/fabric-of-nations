@@ -285,6 +285,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
         administrationExpenseSUSD: entry.administrationExpenseSUSD ?? 0,
         educationExpenseSUSD: entry.educationExpenseSUSD ?? 0,
         trainingExpenseSUSD: entry.trainingExpenseSUSD ?? 0,
+        militaryExpenseSUSD: entry.militaryExpenseSUSD ?? 0,
         customsDutyRevenueSUSD: entry.customsDutyRevenueSUSD ?? 0,
         netFiscalResultSUSD: entry.netFiscalResultSUSD,
       };

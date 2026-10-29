@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { WORLD_SCHEMA_VERSION } from "@century/sim";
+
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP = resolve(HERE, "../../app");
 
@@ -37,8 +39,12 @@ describe("campaign startup and autosave wiring", () => {
   test("the storage adapter uses the current schema and replace-safe SaveStore", () => {
     const storage = source("src/storage/saveStorage.ts");
     expect(storage).toContain("SaveStore");
-    expect(storage).toContain("SUPPORTED_SAVE_SCHEMA_VERSION = 20");
     expect(storage).toContain("readStoredCampaign");
+    // The app cannot import simulation internals, so its schema literal must be
+    // checked against the authoritative constant instead of pinning an old value.
+    const match = /SUPPORTED_SAVE_SCHEMA_VERSION\s*=\s*(\d+)/.exec(storage);
+    expect(match).not.toBeNull();
+    expect(Number(match?.[1])).toBe(WORLD_SCHEMA_VERSION);
   });
 });
 

@@ -279,6 +279,14 @@ export function cloneWorld(
       ...source.monetary,
       currencies: source.monetary.currencies.map((record) => ({ ...record })),
     },
+    military: {
+      ...source.military,
+      armies: source.military.armies.map((army) => ({ ...army })),
+      wars: source.military.wars.map((war) => ({ ...war })),
+      relations: source.military.relations.map((relation) => ({ ...relation })),
+      peaceOffers: source.military.peaceOffers.map((offer) => ({ ...offer })),
+      casualties: source.military.casualties.map((record) => ({ ...record })),
+    },
     diagnostics: {
       ...source.diagnostics,
       recentWarnings: [...source.diagnostics.recentWarnings],

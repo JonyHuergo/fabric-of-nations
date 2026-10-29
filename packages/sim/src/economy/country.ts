@@ -327,6 +327,13 @@ export function copyCountry(country: Country): Country {
     },
     education: { ...country.education },
     labor: { ...country.labor },
+    trade: {
+      ...country.trade,
+      tariffRates: [...country.trade.tariffRates],
+      importQuotaQuantity: [...country.trade.importQuotaQuantity],
+      importQuotaUsedQuantity: [...country.trade.importQuotaUsedQuantity],
+      exportRestricted: [...country.trade.exportRestricted],
+    },
   };
 }
 

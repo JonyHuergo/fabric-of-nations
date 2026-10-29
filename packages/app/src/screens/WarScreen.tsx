@@ -279,7 +279,7 @@ export function WarScreen({
               value={`${(army.organization * 100).toFixed(0)}% / ${(army.supply * 100).toFixed(0)}%`}
             />
             <StatRow
-              label="Casualties"
+              label="Casualties (dead/captured cumulative; wounded current)"
               value={`${army.deaths} dead, ${army.wounded} wounded, ${army.captured} captured`}
             />
             <StatRow
@@ -293,9 +293,15 @@ export function WarScreen({
           </View>
         ))
       )}
-      <StatRow label="Military deaths" value={String(country.military.deaths)} />
-      <StatRow label="Wounded" value={String(country.military.wounded)} />
-      <StatRow label="Captured" value={String(country.military.captured)} />
+      <StatRow
+        label="Military deaths (cumulative)"
+        value={String(country.military.deaths)}
+      />
+      <StatRow label="Wounded (current roster)" value={String(country.military.wounded)} />
+      <StatRow
+        label="Captured (cumulative)"
+        value={String(country.military.captured)}
+      />
 
       <Text style={styles.heading}>Recruit an army</Text>
       <Text style={styles.label}>Region</Text>
