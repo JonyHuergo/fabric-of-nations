@@ -250,6 +250,8 @@ export const ACCOUNT_SUBTYPES = [
   "external-cash",
   "external-currency-holding",
   "external-equity",
+  "military-income",
+  "military-expense",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -320,6 +322,8 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "fx-issuance",
   "fx-redemption",
   "fx-revaluation",
+  "military-pay",
+  "military-procurement",
 ] as const;
 
 /**
@@ -448,6 +452,8 @@ export interface FinancePeriodFiscalTotals {
   readonly educationExpenseSUSD?: MoneySUSD;
   /** E5 training provider payroll and trainee stipend. Optional pre-E5 = zero. */
   readonly trainingExpenseSUSD?: MoneySUSD;
+  /** M10 military pay, equipment, and garrison procurement. Optional pre-M10 = zero. */
+  readonly militaryExpenseSUSD?: MoneySUSD;
   /** E6a customs duty actually collected on dutiable shipments. Optional pre-E6a = zero. */
   readonly customsDutyRevenueSUSD?: MoneySUSD;
   /** Tax revenue minus welfare, interest, subsidy, administration, education, training, and customs is not subtracted (customs is revenue). */
@@ -1759,6 +1765,131 @@ export interface EmploymentAssignmentInitialDef {
   workers: number;
 }
 
+/** M10 documented war justifications. No diplomatic-point resource exists. */
+export const CASUS_BELLI = [
+  "border-dispute",
+  "trade-dispute",
+  "alliance-obligation",
+] as const;
+export type CasusBelli = (typeof CASUS_BELLI)[number];
+
+/** M10 supported peace terms. */
+export const PEACE_TERMS = ["white-peace", "cede-occupied"] as const;
+export type PeaceTermKind = (typeof PEACE_TERMS)[number];
+
+/**
+ * M10 bilateral diplomatic relation. `countryA < countryB` is canonical. An absent
+ * pair has score 0 and no truce; only relations changed by an action are stored.
+ */
+export interface DiplomaticRelation {
+  countryA: Id;
+  countryB: Id;
+  /** −100 (hostile) .. 100 (friendly), dimensionless. */
+  score: Rate;
+  truceUntilDay: Day | null;
+}
+
+/** M10 war between two countries. A pair has at most one active war. */
+export interface WarState {
+  id: Id;
+  attackerCountryId: Id;
+  defenderCountryId: Id;
+  casusBelli: CasusBelli;
+  startedDay: Day;
+  endedDay: Day | null;
+  /** Set on the peace that ended the war. */
+  truceUntilDay: Day | null;
+}
+
+/** M10 pending peace offer. Only a belligerent may offer or accept. */
+export interface PeaceOffer {
+  id: Id;
+  warId: Id;
+  fromCountryId: Id;
+  toCountryId: Id;
+  terms: PeaceTermKind;
+  proposedDay: Day;
+}
+
+/**
+ * M10 army formation. People are drawn from pop blocks by recruitment and are no
+ * longer civilians while serving; `deaths` and `captured` are cumulative and are
+ * outside the roster. `wounded` people are outside the roster until they recover.
+ */
+export interface Army {
+  id: Id;
+  countryId: Id;
+  regionId: Id;
+  /** Region the formation was raised in; retreat destination. */
+  homeRegionId: Id;
+  personnel: number;
+  equipmentUnits: number;
+  /** 0..1 organization/cohesion. */
+  organization: Rate;
+  /** 0..1 supply status from the last paid upkeep. */
+  supply: Rate;
+  wounded: number;
+  woundedReturnDay: Day | null;
+  deaths: number;
+  captured: number;
+  /** Formation delay: no movement before this day. */
+  readyDay: Day;
+  destinationRegionId: Id | null;
+  arrivalDay: Day | null;
+  lastBattleDay: Day | null;
+}
+
+/** Cumulative per-country military casualties and recoveries. */
+export interface MilitaryCasualtyRecord {
+  countryId: Id;
+  deaths: number;
+  woundedReturned: number;
+  captured: number;
+}
+
+/**
+ * M10 diplomacy and war state. Empty and disabled for worlds whose scenario omits
+ * the military block (D-081). Region-specific control lives on `Region`.
+ */
+export interface MilitaryState {
+  enabled: boolean;
+  /** Ascending by id. */
+  armies: Army[];
+  wars: WarState[];
+  relations: DiplomaticRelation[];
+  peaceOffers: PeaceOffer[];
+  /** One record per country that has fielded an army; ascending by country id. */
+  casualties: MilitaryCasualtyRecord[];
+  nextArmyId: Id;
+  nextWarId: Id;
+  nextOfferId: Id;
+  /** Last day the military phase ran; the phase is idempotent per day. */
+  lastPhaseDay: Day | null;
+}
+
+/** Scenario input for one initial army. */
+export interface MilitaryArmyInput {
+  countryId: Id;
+  regionId: Id;
+  personnel: number;
+  equipmentUnits?: number;
+  organization?: Rate;
+  supply?: Rate;
+}
+
+/** Scenario input for one initial bilateral relation. */
+export interface MilitaryRelationInput {
+  countryA: Id;
+  countryB: Id;
+  score?: Rate;
+}
+
+/** M10 scenario input. Omitted means the military system is disabled. */
+export interface MilitarySystemInput {
+  armies?: readonly MilitaryArmyInput[];
+  relations?: readonly MilitaryRelationInput[];
+}
+
 export interface EconomyScenarioDef {
   population: PopulationScenarioDef;
   definitions: EconomyDefinitions;
@@ -1784,6 +1915,11 @@ export interface EconomyScenarioDef {
    * behaviour; the price index is still derived because it is pure measurement.
    */
   monetary?: MonetarySystemInput;
+  /**
+   * M10 diplomacy and warfare. Omitted means disabled and the world keeps its
+   * pre-M10 behaviour (D-081).
+   */
+  military?: MilitarySystemInput;
   /**
    * Post-M7 player-control designation. The AI does not make fiscal decisions for
    * this country. Omitted or null means no designated player country (legacy

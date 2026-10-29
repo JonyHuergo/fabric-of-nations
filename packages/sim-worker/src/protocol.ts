@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 12 as const;
+export const PROTOCOL_VERSION = 13 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -181,6 +181,47 @@ export interface SetTradePolicyActionDto {
   readonly exportRestricted: readonly boolean[];
 }
 
+/** M10: declare war. */
+export interface DeclareWarActionDto {
+  readonly kind: "declare-war";
+  readonly countryId: number;
+  readonly targetCountryId: number;
+  readonly casusBelli: "border-dispute" | "trade-dispute" | "alliance-obligation";
+}
+
+/** M10: offer peace. */
+export interface OfferPeaceActionDto {
+  readonly kind: "offer-peace";
+  readonly countryId: number;
+  readonly warId: number;
+  readonly terms: "white-peace" | "cede-occupied";
+}
+
+/** M10: accept a peace offer. */
+export interface AcceptPeaceActionDto {
+  readonly kind: "accept-peace";
+  readonly countryId: number;
+  readonly warId: number;
+  readonly offerId: number;
+}
+
+/** M10: recruit an army. */
+export interface RecruitArmyActionDto {
+  readonly kind: "recruit-army";
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly personnel: number;
+  readonly equipmentUnits?: number;
+}
+
+/** M10: deploy an army. */
+export interface DeployArmyActionDto {
+  readonly kind: "deploy-army";
+  readonly countryId: number;
+  readonly armyId: number;
+  readonly targetRegionId: number;
+}
+
 /** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
 export interface SetMonetaryPolicyActionDto {
   readonly kind: "set-monetary-policy";
@@ -213,7 +254,12 @@ export type CountryActionDto =
   | SetTrainingStaffShareActionDto
   | SetHealthStaffShareActionDto
   | SetTradePolicyActionDto
-  | SetMonetaryPolicyActionDto;
+  | SetMonetaryPolicyActionDto
+  | DeclareWarActionDto
+  | OfferPeaceActionDto
+  | AcceptPeaceActionDto
+  | RecruitArmyActionDto
+  | DeployArmyActionDto;
 
 export type WorkerCommand =
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "START"; readonly commandId: string }
@@ -964,6 +1010,68 @@ export interface CountrySnapshot {
   readonly priceIndex: SnapshotCountryPriceIndex;
   /** E6b monetary authority, exchange-rate, and convertibility state. */
   readonly monetary: SnapshotMonetaryAuthority;
+  /** M10 armies and cumulative casualties for this country. */
+  readonly military: {
+    readonly armies: readonly SnapshotArmy[];
+    readonly deaths: number;
+    readonly wounded: number;
+    readonly captured: number;
+    readonly relations: readonly SnapshotDiplomaticRelation[];
+    readonly occupiedRegionIds: readonly number[];
+    readonly controlledRegionIds: readonly number[];
+  };
+}
+
+export interface SnapshotArmy {
+  readonly id: number;
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly personnel: number;
+  readonly equipmentUnits: number;
+  readonly organization: number;
+  readonly supply: number;
+  readonly wounded: number;
+  readonly deaths: number;
+  readonly captured: number;
+  readonly readyDay: number;
+  readonly destinationRegionId: number | null;
+  readonly arrivalDay: number | null;
+}
+
+export interface SnapshotWar {
+  readonly id: number;
+  readonly attackerCountryId: number;
+  readonly defenderCountryId: number;
+  readonly casusBelli: string;
+  readonly startedDay: number;
+  readonly endedDay: number | null;
+  readonly truceUntilDay: number | null;
+  readonly attackerPersonnel: number;
+  readonly defenderPersonnel: number;
+}
+
+export interface SnapshotPeaceOffer {
+  readonly id: number;
+  readonly warId: number;
+  readonly fromCountryId: number;
+  readonly toCountryId: number;
+  readonly terms: string;
+  readonly proposedDay: number;
+}
+
+export interface SnapshotDiplomaticRelation {
+  readonly countryId: number;
+  readonly score: number;
+  readonly truceUntilDay: number | null;
+  readonly atWar: boolean;
+  readonly warId: number | null;
+}
+
+export interface SnapshotOccupation {
+  readonly regionId: number;
+  readonly sovereignCountryId: number | null;
+  readonly controllerCountryId: number | null;
+  readonly occupiedSinceDay: number | null;
 }
 
 export interface RegionSnapshot {
@@ -977,6 +1085,11 @@ export interface RegionSnapshot {
   /** M8 regional militancy aggregate and provisional infrastructure quality. */
   readonly unrest: number;
   readonly infrastructure: number;
+  /** M10 sovereign owner; equal to countryId and never changes on occupation. */
+  readonly sovereignCountryId: number | null;
+  /** M10 temporary military controller; null means the sovereign controls it. */
+  readonly controllerCountryId: number | null;
+  readonly occupiedSinceDay: number | null;
 }
 
 export interface GoodSnapshot {
@@ -1057,6 +1170,14 @@ export interface SimulationSnapshot {
   readonly priceIndex: SnapshotPriceIndex;
   /** E6b currency identities and authoritative SUSD valuations. */
   readonly currencies: readonly SnapshotCurrency[];
+  /** M10 wars, pending peace offers, and the enabled flag. */
+  readonly military: {
+    readonly enabled: boolean;
+    readonly wars: readonly SnapshotWar[];
+    readonly peaceOffers: readonly SnapshotPeaceOffer[];
+    readonly armies: readonly SnapshotArmy[];
+    readonly occupations: readonly SnapshotOccupation[];
+  };
   readonly diagnostics: SnapshotDiagnostics;
 }
 
@@ -1165,6 +1286,10 @@ function requireActionArray(value: unknown, path: string): readonly unknown[] {
     throw new ProtocolError("invalid_action", `${path} must contain at most 256 entries`);
   }
   return value;
+}
+
+function requireUint32(value: unknown, path: string): number {
+  return requireInteger(value, path, 0, 0xffff_ffff);
 }
 
 function requireInteger(
@@ -1582,6 +1707,67 @@ function parseAction(value: unknown): CountryActionDto {
       paritySusdPerUnit,
       reserveTransferSUSD,
       currencyConversionSUSD,
+    };
+  }
+  if (kind === "declare-war") {
+    const targetCountryId = requireUint32(
+      record.targetCountryId,
+      "command.action.targetCountryId",
+    );
+    const casusBelli = requireString(record.casusBelli, "command.action.casusBelli");
+    if (
+      casusBelli !== "border-dispute" &&
+      casusBelli !== "trade-dispute" &&
+      casusBelli !== "alliance-obligation"
+    ) {
+      throw new ProtocolError("invalid_action", "command.action.casusBelli is invalid");
+    }
+    return { kind, countryId, targetCountryId, casusBelli };
+  }
+  if (kind === "offer-peace") {
+    const warId = requireUint32(record.warId, "command.action.warId");
+    const terms = requireString(record.terms, "command.action.terms");
+    if (terms !== "white-peace" && terms !== "cede-occupied") {
+      throw new ProtocolError("invalid_action", "command.action.terms is invalid");
+    }
+    return { kind, countryId, warId, terms };
+  }
+  if (kind === "accept-peace") {
+    return {
+      kind,
+      countryId,
+      warId: requireUint32(record.warId, "command.action.warId"),
+      offerId: requireUint32(record.offerId, "command.action.offerId"),
+    };
+  }
+  if (kind === "recruit-army") {
+    const regionId = requireUint32(record.regionId, "command.action.regionId");
+    const personnel = requireInteger(
+      record.personnel,
+      "command.action.personnel",
+      1,
+      0xffff_ffff,
+    );
+    let equipmentUnits: number | undefined;
+    if (record.equipmentUnits !== undefined && record.equipmentUnits !== null) {
+      equipmentUnits = requireInteger(
+        record.equipmentUnits,
+        "command.action.equipmentUnits",
+        0,
+        0xffff_ffff,
+      );
+    }
+    if (equipmentUnits === undefined) {
+      return { kind, countryId, regionId, personnel };
+    }
+    return { kind, countryId, regionId, personnel, equipmentUnits };
+  }
+  if (kind === "deploy-army") {
+    return {
+      kind,
+      countryId,
+      armyId: requireUint32(record.armyId, "command.action.armyId"),
+      targetRegionId: requireUint32(record.targetRegionId, "command.action.targetRegionId"),
     };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");

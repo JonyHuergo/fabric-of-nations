@@ -34,6 +34,7 @@ import {
 } from "./constants.js";
 import { checksumOfJson, stableStringify } from "./hash.js";
 import { canonicalizeStockLots } from "./economy/inventory.js";
+import { CASUS_BELLI, PEACE_TERMS } from "./economy/types.js";
 import type {
   AccountCategory,
   AccountSubtype,
@@ -77,6 +78,11 @@ import type {
   InterestGroupState,
   StockLot,
   SusdPerCurrencyUnit,
+  Army,
+  CasusBelli,
+  MilitaryState,
+  PeaceTermKind,
+  WarState,
   MonetaryCurrencyState,
   MonetaryState,
   PriceIndexState,
@@ -189,6 +195,10 @@ export type SerializedRegion = {
   readonly marketId: number | null;
   readonly buildingInstanceIds: readonly number[];
   readonly resourceCapsPerDay: readonly number[];
+  /** M10 temporary military controller; null means the sovereign controls the region. */
+  readonly controllerCountryId: number | null;
+  /** M10 occupation start day; null when not occupied. */
+  readonly occupiedSinceDay: number | null;
 };
 
 /** Encoded financial account. */
@@ -342,6 +352,7 @@ export type SerializedCountryFiscalTotals = {
   readonly administrationExpenseSUSD?: number;
   readonly educationExpenseSUSD?: number;
   readonly trainingExpenseSUSD?: number;
+  readonly militaryExpenseSUSD?: number;
   readonly customsDutyRevenueSUSD?: number;
   readonly netFiscalResultSUSD?: number;
 };
@@ -731,6 +742,73 @@ export type SerializedMonetaryCurrencyState = {
   readonly lastMonthImportsSUSD: number;
 };
 
+/** Encoded M10 army. */
+export type SerializedArmy = {
+  readonly id: number;
+  readonly countryId: number;
+  readonly regionId: number;
+  readonly homeRegionId: number;
+  readonly personnel: number;
+  readonly equipmentUnits: number;
+  readonly organization: number;
+  readonly supply: number;
+  readonly wounded: number;
+  readonly woundedReturnDay: number | null;
+  readonly deaths: number;
+  readonly captured: number;
+  readonly readyDay: number;
+  readonly destinationRegionId: number | null;
+  readonly arrivalDay: number | null;
+  readonly lastBattleDay: number | null;
+};
+
+export type SerializedWar = {
+  readonly id: number;
+  readonly attackerCountryId: number;
+  readonly defenderCountryId: number;
+  readonly casusBelli: string;
+  readonly startedDay: number;
+  readonly endedDay: number | null;
+  readonly truceUntilDay: number | null;
+};
+
+export type SerializedDiplomaticRelation = {
+  readonly countryA: number;
+  readonly countryB: number;
+  readonly score: number;
+  readonly truceUntilDay: number | null;
+};
+
+export type SerializedPeaceOffer = {
+  readonly id: number;
+  readonly warId: number;
+  readonly fromCountryId: number;
+  readonly toCountryId: number;
+  readonly terms: string;
+  readonly proposedDay: number;
+};
+
+export type SerializedMilitaryCasualty = {
+  readonly countryId: number;
+  readonly deaths: number;
+  readonly woundedReturned: number;
+  readonly captured: number;
+};
+
+/** Encoded M10 military state. */
+export type SerializedMilitaryState = {
+  readonly enabled: boolean;
+  readonly armies: readonly SerializedArmy[];
+  readonly wars: readonly SerializedWar[];
+  readonly relations: readonly SerializedDiplomaticRelation[];
+  readonly peaceOffers: readonly SerializedPeaceOffer[];
+  readonly casualties: readonly SerializedMilitaryCasualty[];
+  readonly nextArmyId: number;
+  readonly nextWarId: number;
+  readonly nextOfferId: number;
+  readonly lastPhaseDay: number | null;
+};
+
 /** Encoded E6b monetary state. */
 export type SerializedMonetaryState = {
   readonly enabled: boolean;
@@ -859,6 +937,7 @@ export type SerializedWorld = {
   readonly trade: SerializedTradeState;
   readonly priceIndex: SerializedPriceIndexState;
   readonly monetary: SerializedMonetaryState;
+  readonly military: SerializedMilitaryState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -1054,6 +1133,7 @@ function encodeCountryFiscalTotals(
       "administrationExpenseSUSD",
       "educationExpenseSUSD",
       "trainingExpenseSUSD",
+      "militaryExpenseSUSD",
       "customsDutyRevenueSUSD",
       "netFiscalResultSUSD",
     ] as const) {
@@ -1169,6 +1249,8 @@ export function encodeWorld(world: World): SerializedWorld {
       resourceCapsPerDay: [...region.resourceCapsPerDay],
       unrest: region.unrest,
       infrastructure: region.infrastructure,
+      controllerCountryId: region.controllerCountryId,
+      occupiedSinceDay: region.occupiedSinceDay,
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1660,6 +1742,31 @@ export function encodeWorld(world: World): SerializedWorld {
         })),
       lastUpdateDay: world.monetary.lastUpdateDay,
     },
+    military: {
+      enabled: world.military.enabled,
+      armies: [...world.military.armies]
+        .sort((left, right) => left.id - right.id)
+        .map((army) => ({ ...army })),
+      wars: [...world.military.wars]
+        .sort((left, right) => left.id - right.id)
+        .map((war) => ({ ...war })),
+      relations: [...world.military.relations]
+        .sort(
+          (left, right) =>
+            left.countryA - right.countryA || left.countryB - right.countryB,
+        )
+        .map((relation) => ({ ...relation })),
+      peaceOffers: [...world.military.peaceOffers]
+        .sort((left, right) => left.id - right.id)
+        .map((offer) => ({ ...offer })),
+      casualties: [...world.military.casualties]
+        .sort((left, right) => left.countryId - right.countryId)
+        .map((record) => ({ ...record })),
+      nextArmyId: world.military.nextArmyId,
+      nextWarId: world.military.nextWarId,
+      nextOfferId: world.military.nextOfferId,
+      lastPhaseDay: world.military.lastPhaseDay,
+    },
     playerCountryId: world.playerCountryId,
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1703,6 +1810,14 @@ function decodeRegion(value: unknown, path: string): Region {
     resourceCapsPerDay: caps,
     unrest: requireFiniteNumber(record.unrest, `${path}.unrest`),
     infrastructure: requireFiniteNumber(record.infrastructure, `${path}.infrastructure`),
+    controllerCountryId:
+      record.controllerCountryId === null || record.controllerCountryId === undefined
+        ? null
+        : requireUint32(record.controllerCountryId, `${path}.controllerCountryId`),
+    occupiedSinceDay:
+      record.occupiedSinceDay === null || record.occupiedSinceDay === undefined
+        ? null
+        : requireInteger(record.occupiedSinceDay, `${path}.occupiedSinceDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
   };
 }
 
@@ -1794,6 +1909,7 @@ function decodeCountryFiscalTotals(
       administrationExpenseSUSD: optionalNumber("administrationExpenseSUSD"),
       educationExpenseSUSD: optionalNumber("educationExpenseSUSD"),
       trainingExpenseSUSD: optionalNumber("trainingExpenseSUSD"),
+      militaryExpenseSUSD: optionalNumber("militaryExpenseSUSD"),
       customsDutyRevenueSUSD: optionalNumber("customsDutyRevenueSUSD"),
       netFiscalResultSUSD: optionalNumber("netFiscalResultSUSD"),
     };
@@ -2811,6 +2927,146 @@ function decodeMonetaryState(value: unknown, path: string): MonetaryState {
   };
 }
 
+function decodeArmy(value: unknown, path: string): Army {
+  const record = requireRecord(value, path);
+  const optionalDay = (field: string): number | null =>
+    record[field] === null || record[field] === undefined
+      ? null
+      : requireInteger(record[field], `${path}.${field}`, 0, CAMPAIGN_TERMINAL_DAY_INDEX);
+  const integerField = (field: string): number =>
+    requireInteger(record[field], `${path}.${field}`, 0, 0xffff_ffff);
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    countryId: requireUint32(record.countryId, `${path}.countryId`),
+    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    homeRegionId: requireUint32(record.homeRegionId, `${path}.homeRegionId`),
+    personnel: integerField("personnel"),
+    equipmentUnits: integerField("equipmentUnits"),
+    organization: requireFiniteNumber(record.organization, `${path}.organization`),
+    supply: requireFiniteNumber(record.supply, `${path}.supply`),
+    wounded: integerField("wounded"),
+    woundedReturnDay: optionalDay("woundedReturnDay"),
+    deaths: integerField("deaths"),
+    captured: integerField("captured"),
+    readyDay: requireInteger(record.readyDay, `${path}.readyDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    destinationRegionId:
+      record.destinationRegionId === null || record.destinationRegionId === undefined
+        ? null
+        : requireUint32(record.destinationRegionId, `${path}.destinationRegionId`),
+    arrivalDay: optionalDay("arrivalDay"),
+    lastBattleDay: optionalDay("lastBattleDay"),
+  };
+}
+
+function decodeWar(value: unknown, path: string): WarState {
+  const record = requireRecord(value, path);
+  const casusBelli = requireString(record.casusBelli, `${path}.casusBelli`);
+  if (!(CASUS_BELLI as readonly string[]).includes(casusBelli)) {
+    throw new SaveFormatError(`${path}.casusBelli is invalid`);
+  }
+  const optionalDay = (field: string): number | null =>
+    record[field] === null || record[field] === undefined
+      ? null
+      : requireInteger(record[field], `${path}.${field}`, 0, CAMPAIGN_TERMINAL_DAY_INDEX);
+  return {
+    id: requireUint32(record.id, `${path}.id`),
+    attackerCountryId: requireUint32(record.attackerCountryId, `${path}.attackerCountryId`),
+    defenderCountryId: requireUint32(record.defenderCountryId, `${path}.defenderCountryId`),
+    casusBelli: casusBelli as CasusBelli,
+    startedDay: requireInteger(record.startedDay, `${path}.startedDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    endedDay: optionalDay("endedDay"),
+    truceUntilDay: optionalDay("truceUntilDay"),
+  };
+}
+
+function decodeMilitaryState(value: unknown, path: string): MilitaryState {
+  const record = requireRecord(value, path);
+  if (typeof record.enabled !== "boolean") {
+    throw new SaveFormatError(`${path}.enabled must be a boolean`);
+  }
+  const arrays = ["armies", "wars", "relations", "peaceOffers", "casualties"] as const;
+  for (const field of arrays) {
+    if (!Array.isArray(record[field])) {
+      throw new SaveFormatError(`${path}.${field} must be an array`);
+    }
+  }
+  return {
+    enabled: record.enabled,
+    armies: requireArray(record.armies, `${path}.armies`).map((entry, index) =>
+      decodeArmy(entry, `${path}.armies[${String(index)}]`),
+    ),
+    wars: requireArray(record.wars, `${path}.wars`).map((entry, index) =>
+      decodeWar(entry, `${path}.wars[${String(index)}]`),
+    ),
+    relations: requireArray(record.relations, `${path}.relations`).map((entry, index) => {
+      const relationPath = `${path}.relations[${String(index)}]`;
+      const relation = requireRecord(entry, relationPath);
+      return {
+        countryA: requireUint32(relation.countryA, `${relationPath}.countryA`),
+        countryB: requireUint32(relation.countryB, `${relationPath}.countryB`),
+        score: requireFiniteNumber(relation.score, `${relationPath}.score`),
+        truceUntilDay:
+          relation.truceUntilDay === null || relation.truceUntilDay === undefined
+            ? null
+            : requireInteger(
+                relation.truceUntilDay,
+                `${relationPath}.truceUntilDay`,
+                0,
+                CAMPAIGN_TERMINAL_DAY_INDEX,
+              ),
+      };
+    }),
+    peaceOffers: requireArray(record.peaceOffers, `${path}.peaceOffers`).map((entry, index) => {
+      const offerPath = `${path}.peaceOffers[${String(index)}]`;
+      const offer = requireRecord(entry, offerPath);
+      const terms = requireString(offer.terms, `${offerPath}.terms`);
+      if (!(PEACE_TERMS as readonly string[]).includes(terms)) {
+        throw new SaveFormatError(`${offerPath}.terms is invalid`);
+      }
+      return {
+        id: requireUint32(offer.id, `${offerPath}.id`),
+        warId: requireUint32(offer.warId, `${offerPath}.warId`),
+        fromCountryId: requireUint32(offer.fromCountryId, `${offerPath}.fromCountryId`),
+        toCountryId: requireUint32(offer.toCountryId, `${offerPath}.toCountryId`),
+        terms: terms as PeaceTermKind,
+        proposedDay: requireInteger(
+          offer.proposedDay,
+          `${offerPath}.proposedDay`,
+          0,
+          CAMPAIGN_TERMINAL_DAY_INDEX,
+        ),
+      };
+    }),
+    casualties: requireArray(record.casualties, `${path}.casualties`).map((entry, index) => {
+      const casualtyPath = `${path}.casualties[${String(index)}]`;
+      const casualty = requireRecord(entry, casualtyPath);
+      return {
+        countryId: requireUint32(casualty.countryId, `${casualtyPath}.countryId`),
+        deaths: requireInteger(casualty.deaths, `${casualtyPath}.deaths`, 0, 0xffff_ffff),
+        woundedReturned: requireInteger(
+          casualty.woundedReturned,
+          `${casualtyPath}.woundedReturned`,
+          0,
+          0xffff_ffff,
+        ),
+        captured: requireInteger(casualty.captured, `${casualtyPath}.captured`, 0, 0xffff_ffff),
+      };
+    }),
+    nextArmyId: requireInteger(record.nextArmyId, `${path}.nextArmyId`, 1, 0xffff_ffff),
+    nextWarId: requireInteger(record.nextWarId, `${path}.nextWarId`, 1, 0xffff_ffff),
+    nextOfferId: requireInteger(record.nextOfferId, `${path}.nextOfferId`, 1, 0xffff_ffff),
+    lastPhaseDay:
+      record.lastPhaseDay === null || record.lastPhaseDay === undefined
+        ? null
+        : requireInteger(
+            record.lastPhaseDay,
+            `${path}.lastPhaseDay`,
+            0,
+            CAMPAIGN_TERMINAL_DAY_INDEX,
+          ),
+  };
+}
+
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
   const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
@@ -3732,6 +3988,7 @@ function decodeWorldPayload(value: unknown): World {
   const trade = decodeTradeState(payload.trade, "save payload.trade");
   const priceIndex = decodePriceIndexState(payload.priceIndex, "save payload.priceIndex");
   const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
+  const military = decodeMilitaryState(payload.military, "save payload.military");
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -3763,6 +4020,7 @@ function decodeWorldPayload(value: unknown): World {
     trade,
     priceIndex,
     monetary,
+    military,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,

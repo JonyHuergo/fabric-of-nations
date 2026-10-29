@@ -36,6 +36,7 @@ import type {
   EmploymentAssignment,
   FinanceState,
   Market,
+  MilitaryState,
   PoliticsState,
   PriceIndexState,
   ProfitDistributionPolicy,
@@ -49,7 +50,9 @@ import {
   assertValidMonetaryState,
   assertValidPriceIndexState,
 } from "./economy/monetary.js";
+import { assertValidMilitaryState } from "./economy/military.js";
 import type { PopBlock, Region } from "./population/types.js";
+import { emptyMilitaryState } from "./economy/military.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
   requireArray,
@@ -128,6 +131,8 @@ export interface World {
   priceIndex: PriceIndexState;
   /** E6b monetary authorities and reserve-backed currency state (D-080). */
   monetary: MonetaryState;
+  /** M10 diplomacy, armies, wars, and occupation (D-081). */
+  military: MilitaryState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -249,6 +254,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       currencies: [],
       lastUpdateDay: null,
     },
+    military: emptyMilitaryState(),
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
@@ -366,6 +372,7 @@ export function assertValidWorld(
   assertValidTradeState(world);
   assertValidPriceIndexState(world);
   assertValidMonetaryState(world);
+  assertValidMilitaryState(world);
 }
 
 /**

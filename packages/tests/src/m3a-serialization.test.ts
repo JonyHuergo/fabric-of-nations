@@ -55,7 +55,7 @@ describe("M3a schema-25 serialization", () => {
     // M3 fixture has technology disabled, so no behaviour changes. E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`, so the structural digest is
     // intentionally re-pinned; the fixture still has trade disabled.
-    expect(hashWorld(cloneWorld())).toBe("8567ad56f8e769f0");
+    expect(hashWorld(cloneWorld())).toBe("9fb09ba715ca44c9");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

@@ -51,6 +51,7 @@ import {
 import { createLaborPolicyState } from "./labor.js";
 import { createTradePolicyState, createTradeState } from "./trade.js";
 import { createPriceIndexState } from "./monetary.js";
+import { createMilitaryState } from "./military.js";
 import { asSusdPerCurrencyUnit } from "./currency.js";
 import {
   assertValidCountryPoliticsInput,
@@ -1131,6 +1132,18 @@ export function createEconomyWorld(
       allocate("popBlock", block.id, "interest-receivable");
       allocate("popBlock", block.id, "interest-income");
     }
+  }
+
+  // M10 military accounts and state. Allocated only when the scenario enables the
+  // military system so legacy fixtures keep their accepted account sets (D-081).
+  if (scenario.military !== undefined) {
+    for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
+      allocate("country", country.id, "military-expense");
+    }
+    for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+      allocate("popBlock", block.id, "military-income");
+    }
+    world.military = createMilitaryState(world, scenario.military, world.startDayIndex);
   }
 
   // E6b monetary authorities and external counterparty accounts. Allocated for every

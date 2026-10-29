@@ -100,6 +100,8 @@ export interface GovernmentPeriodTotals {
   readonly educationExpenseSUSD?: MoneySUSD;
   /** E5 training provider payroll and trainee stipend paid in the period. */
   readonly trainingExpenseSUSD?: MoneySUSD;
+  /** M10 military pay, equipment, and garrison procurement paid in the period. */
+  readonly militaryExpenseSUSD?: MoneySUSD;
   /** E6a customs duty collected by this country's customs administration. */
   readonly customsDutyRevenueSUSD?: MoneySUSD;
   /** Tax and customs revenue minus welfare, interest, subsidy, administration, education, and training expense. */
@@ -133,6 +135,7 @@ export function governmentPeriodTotals(
           administrationExpenseSUSD: totals.administrationExpenseSUSD ?? 0,
           educationExpenseSUSD: totals.educationExpenseSUSD ?? 0,
           trainingExpenseSUSD: totals.trainingExpenseSUSD ?? 0,
+          militaryExpenseSUSD: totals.militaryExpenseSUSD ?? 0,
           customsDutyRevenueSUSD: totals.customsDutyRevenueSUSD ?? 0,
           netFiscalResultSUSD: totals.netFiscalResultSUSD,
         };
@@ -152,6 +155,7 @@ export function governmentPeriodTotals(
       administration: number;
       education: number;
       training: number;
+      military: number;
       customs: number;
     }
   >();
@@ -168,6 +172,7 @@ export function governmentPeriodTotals(
           administration: 0,
           education: 0,
           training: 0,
+          military: 0,
           customs: 0,
         },
       );
@@ -195,6 +200,7 @@ export function governmentPeriodTotals(
       account.subtype !== "administration-expense" &&
       account.subtype !== "education-expense" &&
       account.subtype !== "training-expense" &&
+      account.subtype !== "military-expense" &&
       account.subtype !== "customs-duty-revenue"
     ) {
       continue;
@@ -209,6 +215,7 @@ export function governmentPeriodTotals(
         administration: 0,
         education: 0,
         training: 0,
+        military: 0,
         customs: 0,
       };
     if (account.subtype === "income-tax-revenue") current.tax += value;
@@ -218,6 +225,7 @@ export function governmentPeriodTotals(
     else if (account.subtype === "subsidy-expense") current.subsidy += value;
     else if (account.subtype === "education-expense") current.education += value;
     else if (account.subtype === "training-expense") current.training += value;
+    else if (account.subtype === "military-expense") current.military += value;
     else if (account.subtype === "customs-duty-revenue") current.customs += value;
     else current.administration += value;
     totals.set(account.ownerId, current);
@@ -233,6 +241,7 @@ export function governmentPeriodTotals(
       administrationExpenseSUSD: values.administration,
       educationExpenseSUSD: values.education,
       trainingExpenseSUSD: values.training,
+      militaryExpenseSUSD: values.military,
       customsDutyRevenueSUSD: values.customs,
       netFiscalResultSUSD:
         values.tax +
@@ -243,7 +252,8 @@ export function governmentPeriodTotals(
         values.subsidy -
         values.administration -
         values.education -
-        values.training,
+        values.training -
+        values.military,
     }))
     .sort((left, right) => left.countryId - right.countryId);
 }
@@ -794,6 +804,7 @@ function buildAnnualSummary(
       administrationExpenseSUSD: number;
       educationExpenseSUSD: number;
       trainingExpenseSUSD: number;
+      militaryExpenseSUSD: number;
       customsDutyRevenueSUSD: number;
       netFiscalResultSUSD: number;
     }
@@ -809,6 +820,7 @@ function buildAnnualSummary(
       administrationExpenseSUSD: 0,
       educationExpenseSUSD: 0,
       trainingExpenseSUSD: 0,
+      militaryExpenseSUSD: 0,
       customsDutyRevenueSUSD: 0,
       netFiscalResultSUSD: 0,
     };
@@ -841,6 +853,8 @@ function buildAnnualSummary(
           current.educationExpenseSUSD + (countryTotals.educationExpenseSUSD ?? 0),
         trainingExpenseSUSD:
           current.trainingExpenseSUSD + (countryTotals.trainingExpenseSUSD ?? 0),
+        militaryExpenseSUSD:
+          current.militaryExpenseSUSD + (countryTotals.militaryExpenseSUSD ?? 0),
         customsDutyRevenueSUSD:
           current.customsDutyRevenueSUSD + (countryTotals.customsDutyRevenueSUSD ?? 0),
         netFiscalResultSUSD: 0,
@@ -866,7 +880,8 @@ function buildAnnualSummary(
       totals.subsidyExpenseSUSD -
       totals.administrationExpenseSUSD -
       totals.educationExpenseSUSD -
-      totals.trainingExpenseSUSD;
+      totals.trainingExpenseSUSD -
+      totals.militaryExpenseSUSD;
   }
   // Zero-only annual budget entries carry no information; omit them exactly as
   // monthly summaries do. Missing entries are treated as zero by reporting.

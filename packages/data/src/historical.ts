@@ -2137,6 +2137,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     // reserve-backed authority; its currency valuations are explicitly unavailable, so
     // no authority is active and no historical exchange rate is invented (D-080).
     monetary: {},
+    // M10: the sample enables the military system with no initial armies, wars, or
+    // occupations, so the player can recruit, declare war, and negotiate (D-081).
+    military: {},
   };
 }
 

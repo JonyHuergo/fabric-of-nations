@@ -40,6 +40,10 @@ import {
   technologyProductivityFactor,
   workingAgePopulation,
   marketInfrastructureQuality,
+  activeWarBetween,
+  armiesOfCountry,
+  regionSovereignCountryId,
+  relationBetween,
   routeCapacitySUSDPerDay,
   transitDays,
   authorityLiabilitySUSD,
@@ -98,6 +102,7 @@ import {
   type SnapshotCurrency,
   type SnapshotMonetaryAuthority,
   type SnapshotPriceIndex,
+  type SnapshotArmy,
 } from "./protocol.js";
 
 export interface SnapshotRuntimeState {
@@ -1257,6 +1262,7 @@ function countrySnapshot(
     trade: tradePolicySnapshot(world, country),
     priceIndex: countryPriceIndexSnapshot(world, country),
     monetary: monetarySnapshot(world, country),
+    military: countryMilitarySnapshot(world, country),
   };
 }
 
@@ -1540,6 +1546,110 @@ function monetarySnapshot(
   };
 }
 
+function armySnapshot(army: World["military"]["armies"][number]): SnapshotArmy {
+  return {
+    id: army.id,
+    countryId: army.countryId,
+    regionId: army.regionId,
+    personnel: army.personnel,
+    equipmentUnits: army.equipmentUnits,
+    organization: roundDisplay(army.organization, 4),
+    supply: roundDisplay(army.supply, 4),
+    wounded: army.wounded,
+    deaths: army.deaths,
+    captured: army.captured,
+    readyDay: army.readyDay,
+    destinationRegionId: army.destinationRegionId,
+    arrivalDay: army.arrivalDay,
+  };
+}
+
+function countryMilitarySnapshot(
+  world: World,
+  country: World["countries"][number],
+): CountrySnapshot["military"] {
+  const armies = armiesOfCountry(world, country.id)
+    .sort((left, right) => left.id - right.id)
+    .map(armySnapshot);
+  let deaths = 0;
+  let wounded = 0;
+  let captured = 0;
+  for (const army of world.military.armies) {
+    if (army.countryId !== country.id) continue;
+    deaths += army.deaths;
+    wounded += army.wounded;
+    captured += army.captured;
+  }
+  const relations = world.countries
+    .filter((other) => other.id !== country.id)
+    .sort((left, right) => left.id - right.id)
+    .map((other) => {
+      const relation = relationBetween(world, country.id, other.id);
+      const war = activeWarBetween(world, country.id, other.id);
+      return {
+        countryId: other.id,
+        score: relation === undefined ? 0 : roundDisplay(relation.score, 2),
+        truceUntilDay: relation?.truceUntilDay ?? null,
+        atWar: war !== null,
+        warId: war?.id ?? null,
+      };
+    });
+  const occupiedRegionIds = world.regions
+    .filter((region) => region.controllerCountryId === country.id)
+    .map((region) => region.id)
+    .sort((left, right) => left - right);
+  return {
+    armies,
+    deaths,
+    wounded,
+    captured,
+    relations,
+    occupiedRegionIds,
+    controlledRegionIds: [...occupiedRegionIds],
+  };
+}
+
+function militarySnapshot(world: World): SimulationSnapshot["military"] {
+  const personnelByCountry = new Map<number, number>();
+  for (const army of world.military.armies) {
+    personnelByCountry.set(
+      army.countryId,
+      (personnelByCountry.get(army.countryId) ?? 0) + army.personnel,
+    );
+  }
+  return {
+    enabled: world.military.enabled,
+    wars: [...world.military.wars]
+      .sort((left, right) => left.id - right.id)
+      .map((war) => ({
+        id: war.id,
+        attackerCountryId: war.attackerCountryId,
+        defenderCountryId: war.defenderCountryId,
+        casusBelli: war.casusBelli,
+        startedDay: war.startedDay,
+        endedDay: war.endedDay,
+        truceUntilDay: war.truceUntilDay,
+        attackerPersonnel: personnelByCountry.get(war.attackerCountryId) ?? 0,
+        defenderPersonnel: personnelByCountry.get(war.defenderCountryId) ?? 0,
+      })),
+    peaceOffers: [...world.military.peaceOffers]
+      .sort((left, right) => left.id - right.id)
+      .map((offer) => ({ ...offer })),
+    armies: [...world.military.armies]
+      .sort((left, right) => left.id - right.id)
+      .map(armySnapshot),
+    occupations: world.regions
+      .filter((region) => region.controllerCountryId !== null)
+      .sort((left, right) => left.id - right.id)
+      .map((region) => ({
+        regionId: region.id,
+        sovereignCountryId: regionSovereignCountryId(world, region.id),
+        controllerCountryId: region.controllerCountryId,
+        occupiedSinceDay: region.occupiedSinceDay,
+      })),
+  };
+}
+
 function regionSnapshots(world: World): readonly RegionSnapshot[] {
   const ownerByRegion = new Map<number, number>();
   for (const country of world.countries) {
@@ -1564,6 +1674,9 @@ function regionSnapshots(world: World): readonly RegionSnapshot[] {
       buildingCount: region.buildingInstanceIds.length,
       unrest: region.unrest,
       infrastructure: region.infrastructure,
+      sovereignCountryId: ownerByRegion.get(region.id) ?? null,
+      controllerCountryId: region.controllerCountryId,
+      occupiedSinceDay: region.occupiedSinceDay,
     }));
 }
 
@@ -1723,6 +1836,15 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   Object.freeze(snapshot.priceIndex);
   for (const currency of snapshot.currencies) Object.freeze(currency);
   Object.freeze(snapshot.currencies);
+  for (const war of snapshot.military.wars) Object.freeze(war);
+  Object.freeze(snapshot.military.wars);
+  for (const offer of snapshot.military.peaceOffers) Object.freeze(offer);
+  Object.freeze(snapshot.military.peaceOffers);
+  for (const army of snapshot.military.armies) Object.freeze(army);
+  Object.freeze(snapshot.military.armies);
+  for (const occupation of snapshot.military.occupations) Object.freeze(occupation);
+  Object.freeze(snapshot.military.occupations);
+  Object.freeze(snapshot.military);
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
@@ -1796,6 +1918,7 @@ export function buildSimulationSnapshot(
     trade: tradeNetworkSnapshot(world, definitions),
     priceIndex: priceIndexSnapshot(world, definitions),
     currencies: currenciesSnapshot(world),
+    military: militarySnapshot(world),
     diagnostics,
   });
 }

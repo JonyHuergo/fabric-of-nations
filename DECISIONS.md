@@ -4378,3 +4378,112 @@ debt, domestic currency-denominated ledgers, an FX order book, or M10 systems.
 - Country-AI construction, infrastructure-priority, law, debt, diplomatic, and
   military actions await their underlying systems; M6 accepts only fiscal policy
   changes.
+
+## D-081 — M10 diplomacy, warfare, and territorial control
+
+**Status:** adopted for M10 implementation. **Scope:** GDD §11, §11.1–§11.5, the M10
+definition of done in §17.2f ("two-country conflict resolves end-to-end; casualties and
+mobilization reconcile with population/workforce; equipment and finance are consumed
+correctly; peace/territorial changes update all affected systems"), and CEN-AUDIT-016.
+M10 adds no M11 scope.
+
+**Why a decision is required.** The GDD fixes the sovereignty/control distinction at a
+high level and leaves government identity, markets, occupations, and war termination to
+the implementation. The repository previously had no sovereignty field at all: a region
+belonged to a country only through `Country.regionIds`, and market membership, customs,
+currency, and building/pop ownership were already independent relationships. CEN-AUDIT-016
+therefore cannot be resolved by adding a second "owner" concept; it must be resolved by
+naming the existing relationship and separating temporary military control from it.
+
+### Sovereignty and military control (CEN-AUDIT-016)
+
+- **Sovereignty** is `Country.regionIds`: the country that legally owns the region under
+  the simulation's territorial model. It changes only through an explicit, validated
+  political transition (a peace-treaty cession in M10). There is no duplicate
+  `Region.sovereignCountryId`; the country-to-region mapping remains the single
+  authoritative sovereignty record.
+- **Military control** is `Region.controllerCountryId` plus `Region.occupiedSinceDay`.
+  `null` means the sovereign controls its own region. A non-null controller is a country
+  exercising temporary military control over a region it does not own. It never changes
+  `Country.regionIds`.
+- **Market membership** stays `Region.marketId` and never changes on occupation or
+  cession in M10. The market's customs administration stays with its authored country.
+- **Buildings, accounts, treasuries, pop blocks, and monetary authorities are untouched
+  by occupation and by cession.** Occupation transfers no cash, building, inventory,
+  person, market, currency, or historical record. Taxes continue to accrue to the
+  sovereign, because fiscal assessment reads sovereign regions and their pop blocks;
+  the occupying power pays its own garrison cost.
+- **Population location and identity** stay in the pop block's `regionId`; no one moves
+  because a region is occupied. Soldiers are the one exception: recruiting moves people
+  from a pop block into an army roster (they are no longer civilians), and casualties are
+  recorded against the army, so total people reconcile across pop blocks, armies,
+  wounded, captured, and military deaths.
+- **Legal jurisdiction, laws, government, and country identity** never change on
+  occupation. A region has no separate government identity in this model; the sovereign's
+  `Country.laws`, `Country.regime`, and institutions apply. Cession changes the sovereign
+  only, so the receiving country's laws then apply through the existing country model.
+- **Diplomacy and treaty eligibility** read sovereignty and war state, never the
+  controller. Peace cession transfers only regions the offering side actually controls.
+
+### State and actions
+
+`World.military` is authoritative plain data: `enabled`, bounded `armies`, `wars`,
+`relations`, `peaceOffers`, id counters, `lastPhaseDay`, and per-country casualty
+records. Region control lives on `Region` because it is a per-region fact. Military
+accounts are `military-expense` (country) and `military-income` (pop block); postings are
+`military-pay` (treasury to the soldiers' region households) and `military-procurement`
+(treasury to the system supplier for equipment), both cash-conserving and structurally
+validated like E6a freight/customs.
+
+Five player/AI actions, all validated against world state and sharing the same rules:
+`declare-war`, `offer-peace`, `accept-peace`, `recruit-army`, `deploy-army`. No diplomatic
+or war points exist. AI keeps its existing fiscal behavior and gains only a bounded
+peace-acceptance rule (accept a pending white peace after a documented minimum war
+duration or when it controls no enemy region and has lost more personnel); AI does not
+declare wars or recruit in M10, which is recorded as a limitation rather than faked.
+
+### Military model
+
+- Recruitment is a real transfer of people: eligible working-age people (males 18–45
+  first, then females) are removed from the region's pop blocks into an army roster.
+  Recruitment and equipment have real treasury costs and require an army formation delay
+  before deployment. Equipment is a physical stock bought from a non-simulated system
+  supplier at a documented SUSD unit price (domestic arms production is deferred).
+- Daily upkeep is paid from actual treasury cash. A shortfall pays pro rata and lowers
+  supply/organization; it never creates money or negative balances.
+- Combat occurs when hostile armies are in the same region. Strength derives from
+  personnel, equipment ratio, organization, and supply. Casualties are allocated to
+  deaths, wounded, and captured; the split is deterministic from the keyed RNG. Wounded
+  return to the roster after a recovery window; deaths and captures are permanently
+  removed and recorded. Equipment is lost with casualties. There is no abstract
+  war-score.
+- Movement is a strategic abstraction without a region-adjacency graph: deployment takes
+  a documented number of days to any region the country may legally enter (its own or
+  controlled regions, or an at-war country's region). A region is occupied when a hostile
+  army is present, the region is sovereign territory of an at-war country, and no army of
+  that sovereign is present. A sovereign army entering an occupied region fights the
+  occupier and liberates it if it wins. Occupation applies a daily unrest increment and a
+  daily garrison cost to the controller; these use existing unrest and treasury channels.
+- Peace offers are white peace or cession of regions the offerer controls. Acceptance
+  ends the war, clears both sides' occupations, sets a truce, and, for cession, moves
+  sovereignty and `Country.regionIds` only. Market membership, buildings, people, cash,
+  inventories, and monetary authorities are unchanged. Unsupported permanent changes
+  (independence, partition, regime change, annexation without a treaty, border adjustment
+  outside occupation) are rejected and documented.
+
+### Deferrals and limits
+
+- No tactical combat, terrain/weather model, fortifications, supply lines, navies,
+  allies, sanctions, recognition, subject relationships, war exhaustion meter, or
+  negotiated multi-term peace. The GDD's listed concepts are implemented only where M10's
+  end-to-end conflict and the sovereignty mandate require them; the rest are recorded
+  missing prerequisites, not decorative controls.
+- No AI war strategy, recruitment, or deployment; no alliance obligations.
+- No wartime trade/customs changes beyond existing systems; occupation does not alter
+  market membership, customs administration, currency, or convertibility.
+- Movement distance is a constant strategic delay, not a geographic path.
+- The model is provisional and uncalibrated.
+
+**Versions:** world schema **26**, simulation **0.26.0**, worker protocol **13**, data
+**`m3-economy-v11`**; older saves and protocol-12 clients are rejected under D-013 with
+no migration.

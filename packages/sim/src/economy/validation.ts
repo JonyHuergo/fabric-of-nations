@@ -452,7 +452,8 @@ function assertValidAnnualSummary(
     const administration = valueOf("administrationExpenseSUSD");
     const education = valueOf("educationExpenseSUSD");
     const training = valueOf("trainingExpenseSUSD");
-    const customs = valueOf("customsDutyRevenueSUSD");
+    const military = valueOf("militaryExpenseSUSD");
+const customs = valueOf("customsDutyRevenueSUSD");
     const net = valueOf("netFiscalResultSUSD");
     if (
       tax < 0 ||
@@ -463,6 +464,7 @@ function assertValidAnnualSummary(
       administration < 0 ||
       education < 0 ||
       training < 0 ||
+      military < 0 ||
       customs < 0
     ) {
       throw new RangeError(`${path}.fiscalTotals.${String(countryId)} components must be non-negative`);
@@ -478,7 +480,8 @@ function assertValidAnnualSummary(
             subsidy -
             administration -
             education -
-            training),
+            training -
+        military),
       ) >
       toleranceMoney(
         net,
@@ -910,7 +913,8 @@ export function assertValidFinancePeriodSummary(
       const administration = valueOf("administrationExpenseSUSD");
       const education = valueOf("educationExpenseSUSD");
       const training = valueOf("trainingExpenseSUSD");
-      const customs = valueOf("customsDutyRevenueSUSD");
+      const military = valueOf("militaryExpenseSUSD");
+const customs = valueOf("customsDutyRevenueSUSD");
       if (
         tax < 0 ||
         businessTax < 0 ||
@@ -920,6 +924,7 @@ export function assertValidFinancePeriodSummary(
         administration < 0 ||
         education < 0 ||
         training < 0 ||
+        military < 0 ||
         customs < 0
       ) {
         throw new RangeError(`${path}.countryFiscalTotals.${key} revenue/expense must be nonnegative`);
@@ -933,7 +938,8 @@ export function assertValidFinancePeriodSummary(
         subsidy -
         administration -
         education -
-        training;
+        training -
+        military;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
           `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,

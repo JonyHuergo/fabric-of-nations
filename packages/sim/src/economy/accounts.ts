@@ -113,6 +113,8 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "external-cash": "asset",
   "external-currency-holding": "asset",
   "external-equity": "equity",
+  "military-income": "revenue",
+  "military-expense": "expense",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -162,6 +164,8 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "external-cash": ["system"],
   "external-currency-holding": ["system"],
   "external-equity": ["system"],
+  "military-income": ["popBlock"],
+  "military-expense": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -319,6 +323,14 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "fx-issuance": [],
   "fx-redemption": [],
   "fx-revaluation": [],
+  "military-pay": [
+    { subtype: "military-expense", side: "debit" },
+    { subtype: "military-income", side: "credit" },
+  ],
+  "military-procurement": [
+    { subtype: "military-expense", side: "debit" },
+    { subtype: "system-income", side: "credit" },
+  ],
   "public-enterprise-capital-contribution": [],
   "migration-transfer": [],
   "profit-retention": [],
@@ -1299,6 +1311,83 @@ export function assertTradePostingStructure(
   }
   if (kind === "customs-duty" && countryIds.size !== 1) {
     throw new RangeError(`${path} customs-duty must reference exactly one destination country`);
+  }
+}
+
+/**
+ * Enforce the required legs of the M10 military kinds (D-081).
+ *
+ * - `military-pay`: treasury cash moves to the soldiers' region households, so the
+ *   country `military-expense` and the pop block `military-income` are the P&L legs.
+ * - `military-procurement`: treasury cash moves to the system supplier for equipment.
+ * Both are cash-conserving.
+ */
+export function assertMilitaryPostingStructure(
+  kind: "military-pay" | "military-procurement",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  if (lines.length !== 4) {
+    throw new RangeError(`${path} ${kind} must contain exactly four lines`);
+  }
+  const totals = new Map<string, number>();
+  const countryIds = new Set<Id>();
+  const popBlockIds = new Set<Id>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
+      );
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(
+        `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
+      );
+    }
+    if (account.ownerKind === "country" && account.ownerId !== null) {
+      countryIds.add(account.ownerId);
+    }
+    if (account.ownerKind === "popBlock" && account.ownerId !== null) {
+      popBlockIds.add(account.ownerId);
+    }
+    totals.set(
+      `${account.subtype}:${line.side}`,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+    );
+  }
+  const value = (key: string): number => totals.get(key) ?? 0;
+  const amount = value("military-expense:debit");
+  if (!(amount > 0)) {
+    throw new RangeError(`${path} ${kind} requires a positive military-expense debit`);
+  }
+  const legs =
+    kind === "military-pay"
+      ? [
+          "military-expense:debit",
+          "treasury-cash:credit",
+          "household-cash:debit",
+          "military-income:credit",
+        ]
+      : [
+          "military-expense:debit",
+          "treasury-cash:credit",
+          "system-reserve-cash:debit",
+          "system-income:credit",
+        ];
+  for (const leg of legs) {
+    if (Math.abs(amount - value(leg)) > toleranceMoney(amount, value(leg))) {
+      throw new RangeError(`${path} ${kind} legs do not balance (${leg})`);
+    }
+  }
+  if (countryIds.size !== 1) {
+    throw new RangeError(`${path} ${kind} must reference exactly one paying country`);
+  }
+  if (kind === "military-pay" && popBlockIds.size !== 1) {
+    throw new RangeError(`${path} military-pay must reference exactly one pop block`);
   }
 }
 

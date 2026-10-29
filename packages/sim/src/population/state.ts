@@ -622,6 +622,8 @@ export function createPopulationWorld(
       resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
       unrest: 0,
       infrastructure: region.infrastructure ?? 0.5,
+      controllerCountryId: null,
+      occupiedSinceDay: null,
     }));
 
   const world: World = {
@@ -696,6 +698,18 @@ export function createPopulationWorld(
       enabled: false,
       currencies: [],
       lastUpdateDay: null,
+    },
+    military: {
+      enabled: false,
+      armies: [],
+      wars: [],
+      relations: [],
+      peaceOffers: [],
+      casualties: [],
+      nextArmyId: 1,
+      nextWarId: 1,
+      nextOfferId: 1,
+      lastPhaseDay: null,
     },
     diagnostics: {
       invariantFailureCount: 0,

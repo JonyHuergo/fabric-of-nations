@@ -33,7 +33,7 @@ describe("determinism", () => {
     // *behaviour* is unchanged; only the encoded state shape changed, so this digest is
     // intentionally re-pinned. A change here requires an intentional
     // simulation-version decision.
-    expect(hashWorld(world)).toBe("fb6ee97a4a1b8a70");
+    expect(hashWorld(world)).toBe("c12de75e045ad0b0");
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {

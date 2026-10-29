@@ -70,6 +70,7 @@ import { runM9Benchmarks } from "./m9Bench.js";
 import { runE5Benchmarks } from "./e5Bench.js";
 import { runE6aBenchmarks } from "./e6aBench.js";
 import { runE6bBenchmarks } from "./e6bBench.js";
+import { runM10Benchmarks } from "./m10Bench.js";
 
 const SEED = 20_261_023;
 const MEASURED_RUNS_M1 = 3;
@@ -1806,6 +1807,7 @@ function main(): void {
   const e5Valid = runE5Benchmarks();
   const e6aValid = runE6aBenchmarks();
   const e6bValid = runE6bBenchmarks();
+  const m10Valid = runM10Benchmarks();
 
   const m1Hashes = new Set(m1Results.map((result) => result.hash));
   const aggregateHashes = new Set(m2AggregateResults.map((result) => result.hash));
@@ -1896,7 +1898,8 @@ function main(): void {
     m9Valid &&
     e5Valid &&
     e6aValid &&
-    e6bValid;
+    e6bValid &&
+    m10Valid;
 
   console.log("");
   console.log(`M1 tick count ${String(CAMPAIGN_TICKS)}: ${m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) ? "PASS" : "FAIL"}`);
@@ -1980,6 +1983,7 @@ function main(): void {
   console.log(`E5 labor/social benchmark: ${e5Valid ? "PASS" : "FAIL"}`);
   console.log(`E6a transport/trade/customs benchmark: ${e6aValid ? "PASS" : "FAIL"}`);
   console.log(`E6b monetary/price benchmark: ${e6bValid ? "PASS" : "FAIL"}`);
+  console.log(`M10 diplomacy/warfare benchmark: ${m10Valid ? "PASS" : "FAIL"}`);
   console.log(
     `GDD §14.4 mobile p95 target (<= ${String(GDD_MOBILE_P95_TARGET_MS)} ms, full reference world): ` +
       "NOT EVALUATED (Node harness; no device/full-scale world)",

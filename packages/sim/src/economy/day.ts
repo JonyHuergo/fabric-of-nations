@@ -57,6 +57,7 @@ import {
   type TradeDispatchResult,
 } from "./trade.js";
 import { runMonetaryPhase, type MonetaryPhaseResult } from "./monetary.js";
+import { runMilitaryPhase, type MilitaryPhaseResult } from "./military.js";
 import {
   runProfitDistributionPhase,
   type ProfitDistributionResult,
@@ -169,6 +170,8 @@ export interface EconomyDayResult {
     readonly trade: TradeDispatchResult;
     /** E6b managed FX valuation, revaluation, month-end capture, and price index. */
     readonly monetary: MonetaryPhaseResult;
+    /** M10 movement, combat, occupation, upkeep, and peace acceptance. */
+    readonly military: MilitaryPhaseResult;
     readonly employment: ReturnType<typeof refreshEmploymentIfDue>;
     readonly householdDemands: readonly HouseholdDemandRecord[];
     readonly productionDemands: readonly ProductionDemandRecord[];
@@ -1041,6 +1044,11 @@ export function runEconomicDay(
     validateWorld: false,
   });
 
+  // M10 military phase: movement arrivals, battles, occupation/liberation, garrison and
+  // upkeep payments, wounded recovery, and the bounded AI peace rule. It follows fiscal
+  // so pay uses post-tax treasury cash and precedes the close so outlays are in-period.
+  const military = runMilitaryPhase(world, dayIndex, { validateWorld: false });
+
   // E5 training: treasury-limited provider payroll and trainee stipend, then
   // qualification gains for participating blocks. It runs after fiscal (so it sees
   // the same post-fiscal treasury cash as the other service payrolls) and before the
@@ -1157,6 +1165,7 @@ export function runEconomicDay(
       tradeArrivals,
       trade,
       monetary,
+      military,
       employment,
       householdDemands: household.records,
       productionDemands: productionRecords,

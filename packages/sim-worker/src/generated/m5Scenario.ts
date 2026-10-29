@@ -8,7 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 export const M5_SCENARIO = ({
   "population": {
-    "dataVersion": "m3-economy-v10",
+    "dataVersion": "m3-economy-v11",
     "scenarioId": "m5-eight-polities",
     "startDayIndex": 0,
     "professions": [
@@ -3984,7 +3984,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "definitions": {
-      "dataVersion": "m3-economy-v10",
+      "dataVersion": "m3-economy-v11",
       "scenarioId": "m5-eight-polities",
       "needs": [
         {
@@ -6879,7 +6879,7 @@ export const M5_SCENARIO = ({
     }
   },
   "definitions": {
-    "dataVersion": "m3-economy-v10",
+    "dataVersion": "m3-economy-v11",
     "scenarioId": "m5-eight-polities",
     "goods": [
       {
@@ -7579,7 +7579,7 @@ export const M5_SCENARIO = ({
       }
     ],
     "politics": {
-      "dataVersion": "m3-economy-v10",
+      "dataVersion": "m3-economy-v11",
       "status": "provisional",
       "description": "M8 political-institution content: three regime templates, seven derived interest groups, four implemented law slots (taxation, suffrage, labor, trade), and three authored historical-shock events. Values are provisional structural/authored content, not historical calibration. Education, health, military-service, colonial-policy, and currency law mechanics are deliberately absent until M9/E5/M10/E6b.",
       "regimes": [
@@ -8561,7 +8561,7 @@ export const M5_SCENARIO = ({
       ]
     },
     "technology": {
-      "dataVersion": "m3-economy-v10",
+      "dataVersion": "m3-economy-v11",
       "academicProfessionKeys": [
         "academics"
       ],
@@ -12927,5 +12927,6 @@ export const M5_SCENARIO = ({
   "countryAI": {
     "enabled": true
   },
-  "monetary": {}
+  "monetary": {},
+  "military": {}
 }) as EconomyScenarioDef;

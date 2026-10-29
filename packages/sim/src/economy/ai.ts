@@ -61,6 +61,7 @@ import {
 import { assertValidFiscalPolicy } from "./country.js";
 import { createTradePolicyState } from "./trade.js";
 import { applyMonetaryPolicy, validateMonetaryPolicy } from "./monetary.js";
+import { applyMilitaryAction, validateMilitaryAction } from "./military.js";
 import { debtOutstandingPrincipal } from "./debtPolicy.js";
 import {
   cancelConstruction,
@@ -116,6 +117,8 @@ import type {
   FinancialAccount,
   IndustrialPolicy,
   MonetaryRegime,
+  CasusBelli,
+  PeaceTermKind,
 } from "./types.js";
 
 /**
@@ -329,6 +332,57 @@ export interface SetTradePolicyAction {
   readonly exportRestricted: readonly boolean[];
 }
 
+/** M10: declare war with a documented casus belli. */
+export interface DeclareWarAction {
+  readonly kind: "declare-war";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly targetCountryId: Id;
+  readonly casusBelli: CasusBelli;
+}
+
+/** M10: offer peace terms to the other belligerent. */
+export interface OfferPeaceAction {
+  readonly kind: "offer-peace";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly warId: Id;
+  readonly terms: PeaceTermKind;
+}
+
+/** M10: accept a pending peace offer addressed to this country. */
+export interface AcceptPeaceAction {
+  readonly kind: "accept-peace";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly warId: Id;
+  readonly offerId: Id;
+}
+
+/** M10: recruit an army from a region's people and treasury. */
+export interface RecruitArmyAction {
+  readonly kind: "recruit-army";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly regionId: Id;
+  readonly personnel: number;
+  readonly equipmentUnits?: number;
+}
+
+/** M10: deploy a ready army to a legal target region. */
+export interface DeployArmyAction {
+  readonly kind: "deploy-army";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly armyId: Id;
+  readonly targetRegionId: Id;
+}
+
 /** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
 export interface SetMonetaryPolicyAction {
   readonly kind: "set-monetary-policy";
@@ -363,7 +417,12 @@ export type CountryAction =
   | SetTrainingStaffShareAction
   | SetHealthStaffShareAction
   | SetTradePolicyAction
-  | SetMonetaryPolicyAction;
+  | SetMonetaryPolicyAction
+  | DeclareWarAction
+  | OfferPeaceAction
+  | AcceptPeaceAction
+  | RecruitArmyAction
+  | DeployArmyAction;
 
 /** Explicit validation result. Invalid actions never mutate the world. */
 export interface CountryActionValidation {
@@ -440,6 +499,17 @@ export interface CountryActionApplication {
     readonly importQuotaQuantity: readonly (number | null)[];
     readonly previousExportRestricted: readonly boolean[];
     readonly exportRestricted: readonly boolean[];
+  } | null;
+  /** M10 military/diplomatic action result, else null. */
+  readonly militaryAction?: {
+    readonly kind: string;
+    readonly warId: Id | null;
+    readonly offerId: Id | null;
+    readonly armyId: Id | null;
+    readonly regionId: Id | null;
+    readonly personnel: number;
+    readonly equipmentUnits: number;
+    readonly spentSUSD: MoneySUSD;
   } | null;
   /** E6b monetary operation applied by the action, else null. */
   readonly monetaryAction?: {
@@ -819,7 +889,12 @@ export function validateCountryAction(
     action.kind !== "set-training-staff-share" &&
     action.kind !== "set-health-staff-share" &&
     action.kind !== "set-trade-policy" &&
-    action.kind !== "set-monetary-policy"
+    action.kind !== "set-monetary-policy" &&
+    action.kind !== "declare-war" &&
+    action.kind !== "offer-peace" &&
+    action.kind !== "accept-peace" &&
+    action.kind !== "recruit-army" &&
+    action.kind !== "deploy-army"
   ) {
     return {
       valid: false,
@@ -1127,6 +1202,15 @@ export function validateCountryAction(
           errors.push(errorMessage(error));
         }
       }
+    } else if (
+      action.kind === "declare-war" ||
+      action.kind === "offer-peace" ||
+      action.kind === "accept-peace" ||
+      action.kind === "recruit-army" ||
+      action.kind === "deploy-army"
+    ) {
+      const militaryValidation = validateMilitaryAction(world, action);
+      for (const error of militaryValidation.errors) errors.push(error);
     } else if (action.kind === "set-monetary-policy") {
       if (action.source === "ai") {
         errors.push("AI monetary policy is not implemented in E6b");
@@ -1756,6 +1840,39 @@ export function applyCountryAction(
         exportRestricted: [...country.trade.exportRestricted],
       },
       changed,
+    };
+  }
+
+  if (
+    action.kind === "declare-war" ||
+    action.kind === "offer-peace" ||
+    action.kind === "accept-peace" ||
+    action.kind === "recruit-army" ||
+    action.kind === "deploy-army"
+  ) {
+    const result = applyMilitaryAction(world, action, action.dayIndex);
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidSUSD: 0,
+      constructionProject: null,
+      militaryAction: {
+        kind: result.kind,
+        warId: result.warId,
+        offerId: result.offerId,
+        armyId: result.armyId,
+        regionId: result.regionId,
+        personnel: result.personnel,
+        equipmentUnits: result.equipmentUnits,
+        spentSUSD: result.spentSUSD,
+      },
+      changed: true,
     };
   }
 

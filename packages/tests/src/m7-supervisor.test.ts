@@ -265,6 +265,15 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
           monthOnMonthInflation: null,
           yearOnYearInflation: null,
         },
+        military: {
+          armies: [],
+          deaths: 0,
+          wounded: 0,
+          captured: 0,
+          relations: [],
+          occupiedRegionIds: [],
+          controlledRegionIds: [],
+        },
         monetary: {
           hasAuthority: false,
           active: false,
@@ -284,7 +293,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
       },
     ],
     regions: [
-      { id: 0, key: "r0", name: "Region", countryId: 0, marketId: 0, population: 100, buildingCount: 1, unrest: 0, infrastructure: 0.5 },
+      { id: 0, key: "r0", name: "Region", countryId: 0, marketId: 0, population: 100, buildingCount: 1, unrest: 0, infrastructure: 0.5, sovereignCountryId: 0, controllerCountryId: null, occupiedSinceDay: null },
     ],
     markets: [
       {
@@ -329,6 +338,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
       yearOnYearInflation: null,
     },
     currencies: [],
+    military: { enabled: false, wars: [], peaceOffers: [], armies: [], occupations: [] },
     diagnostics: { invalidActionCount: 0, invariantFailureCount: 0, recentWarnings: [] },
   };
 }

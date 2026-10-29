@@ -32,6 +32,13 @@ export interface Region {
   unrest: Rate;
   /** M8 provisional regional infrastructure quality, 0..1. */
   infrastructure: Rate;
+  /**
+   * M10 temporary military controller. Null means the sovereign controls the region.
+   * This never changes `Country.regionIds`, which is the sovereignty record (D-081).
+   */
+  controllerCountryId: Id | null;
+  /** Day the current occupation began; null when not occupied. */
+  occupiedSinceDay: Day | null;
 }
 
 /** Authoritative population block state. */

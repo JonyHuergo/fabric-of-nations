@@ -180,6 +180,64 @@ export const FX_PARITY_COOLDOWN_DAYS = 180;
  */
 export const FX_MIN_RESERVE_COVER_MONTHS = 0.5;
 
+// M10 (D-081). Provisional strategic constants; none is calibrated.
+/** Maximum army formations in one world. */
+export const MAX_ARMIES = 200;
+/** Maximum retained war records (active and ended). */
+export const MAX_WARS = 100;
+/** Maximum retained diplomatic relation records. */
+export const MAX_MILITARY_RELATIONS = 256;
+/** Maximum pending peace offers across all wars. */
+export const MAX_PEACE_OFFERS = 100;
+/** Recruitment signing cost per soldier, paid to the soldiers' region households. */
+export const M10_RECRUITMENT_COST_PER_SOLDIER_SUSD = 5;
+/** Imported equipment price per equipment unit, paid to the system supplier. */
+export const M10_EQUIPMENT_PRICE_SUSD = 20;
+/** Soldiers supported by one equipment unit. */
+export const M10_SOLDIERS_PER_EQUIPMENT_UNIT = 50;
+/** Daily pay per soldier while the formation exists. */
+export const M10_SOLDIER_DAILY_PAY_SUSD = 0.05;
+/** Daily equipment upkeep per equipment unit. */
+export const M10_EQUIPMENT_DAILY_UPKEEP_SUSD = 0.02;
+/** Formation delay after recruitment before deployment is allowed. */
+export const M10_ARMY_FORMATION_DAYS = 14;
+/** Strategic deployment delay to any legal target region. */
+export const M10_DEPLOYMENT_DAYS = 10;
+/** Days before wounded soldiers return to the roster. */
+export const M10_WOUND_RECOVERY_DAYS = 30;
+/** Daily garrison procurement per occupying soldier, paid in the occupied region. */
+export const M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD = 0.02;
+/** Daily unrest increment in an occupied region. */
+export const M10_OCCUPATION_UNREST_PER_DAY = 0.002;
+/** Minimum organization when unpaid supply erodes cohesion. */
+export const M10_MIN_ORGANIZATION = 0.2;
+/** Organization loss per day of unpaid upkeep. */
+export const M10_UNPAID_ORGANIZATION_LOSS = 0.01;
+/** Supply recovery per fully paid day. */
+export const M10_SUPPLY_RECOVERY_PER_DAY = 0.05;
+/** Supply loss per unpaid day. */
+export const M10_SUPPLY_LOSS_PER_DAY = 0.1;
+/** Base daily casualty fraction at parity strength. */
+export const M10_BASE_CASUALTY_FRACTION = 0.006;
+/** Extra casualty fraction at maximum enemy strength advantage. */
+export const M10_CASUALTY_STRENGTH_SCALE = 0.06;
+/** Maximum daily casualty fraction. */
+export const M10_MAX_CASUALTY_FRACTION = 0.1;
+/** Share of battle losses that are deaths. */
+export const M10_DEATH_SHARE = 0.4;
+/** Share of battle losses that are wounded (return after recovery). */
+export const M10_WOUNDED_SHARE = 0.45;
+/** Share of battle losses that are captured (permanent removal). */
+export const M10_CAPTURED_SHARE = 0.15;
+/** Truce duration after a peace. */
+export const M10_TRUCE_DAYS = 365;
+/** Relation score set when war is declared. */
+export const M10_WAR_RELATION_SCORE = -80;
+/** Relation score floor after peace. */
+export const M10_PEACE_RELATION_SCORE = -30;
+/** Minimum war duration before a deterministic AI accepts a white peace. */
+export const M10_AI_PEACE_MIN_WAR_DAYS = 120;
+
 /**
  * M5a profit-allocation policy defaults. PROVISIONAL, not calibrated.
  *

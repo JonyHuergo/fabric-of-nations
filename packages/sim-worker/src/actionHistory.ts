@@ -74,7 +74,17 @@ export type PlayerActionRequest =
       readonly paritySusdPerUnit: number | null;
       readonly reserveTransferSUSD: number;
       readonly currencyConversionSUSD: number;
-    };
+    }
+  | { readonly kind: "declare-war"; readonly targetCountryId: number; readonly casusBelli: string }
+  | { readonly kind: "offer-peace"; readonly warId: number; readonly terms: string }
+  | { readonly kind: "accept-peace"; readonly warId: number; readonly offerId: number }
+  | {
+      readonly kind: "recruit-army";
+      readonly regionId: number;
+      readonly personnel: number;
+      readonly equipmentUnits?: number;
+    }
+  | { readonly kind: "deploy-army"; readonly armyId: number; readonly targetRegionId: number };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -161,6 +171,16 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
         .join("/")}, quotas ${action.importQuotaQuantity
         .map((quota) => (quota === null ? "-" : quota.toFixed(0)))
         .join("/")}, export bans ${action.exportRestricted.filter(Boolean).length}`;
+    case "declare-war":
+      return `declare war on country ${action.targetCountryId} (${action.casusBelli})`;
+    case "offer-peace":
+      return `offer ${action.terms} in war ${action.warId}`;
+    case "accept-peace":
+      return `accept peace offer ${action.offerId} in war ${action.warId}`;
+    case "recruit-army":
+      return `recruit ${action.personnel} soldiers in region ${action.regionId}`;
+    case "deploy-army":
+      return `deploy army ${action.armyId} to region ${action.targetRegionId}`;
     case "set-monetary-policy":
       return `${action.regime} monetary policy, parity ${
         action.paritySusdPerUnit === null ? "unchanged" : action.paritySusdPerUnit.toFixed(6)

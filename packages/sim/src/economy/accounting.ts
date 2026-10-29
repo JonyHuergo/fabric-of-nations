@@ -36,6 +36,7 @@ import {
   assertTradePostingStructure,
   assertOwnerCapitalInjectionStructure,
   assertMonetaryPostingStructure,
+  assertMilitaryPostingStructure,
   assertSemanticJournalLine,
   categoryAllowsNegativeBalance,
   isCashAccount,
@@ -210,6 +211,9 @@ function validatePostingLines(
     transactionKind === "fx-revaluation"
   ) {
     assertMonetaryPostingStructure(transactionKind, lines, accounts);
+  }
+  if (transactionKind === "military-pay" || transactionKind === "military-procurement") {
+    assertMilitaryPostingStructure(transactionKind, lines, accounts);
   }
   if (isProfitAllocationKind(transactionKind)) {
     assertProfitAllocationStructure(transactionKind, lines, accounts);
