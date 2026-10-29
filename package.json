@@ -8,9 +8,10 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present build",
+    "build:libs": "pnpm -F @century/sim build && pnpm -F @century/data build && pnpm -F @century/sim-worker build",
     "lint": "node scripts/check-boundaries.mjs",
-    "check:worker": "pnpm -F @century/data build && pnpm -F @century/sim-worker scenario:build:check && pnpm -F @century/app build:worker:check",
-    "typecheck": "pnpm -r --if-present typecheck",
+    "check:worker": "pnpm run build:libs && pnpm -F @century/sim-worker scenario:build:check && pnpm -F @century/app build:worker:check",
+    "typecheck": "pnpm run build:libs && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "bench": "pnpm build && pnpm -F @century/bench start",
     "bench:campaign": "pnpm build && pnpm -F @century/bench campaign",
