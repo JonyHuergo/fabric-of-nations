@@ -193,6 +193,47 @@ function shippedScenario(): {
 }
 
 describe("AUDIT-006 explicit military allocation", () => {
+  test("scenario-provided initial armies use the same proportional removal", () => {
+    const scenario = loadM5EightPolities();
+    const country = scenario.countries?.[0];
+    if (country === undefined) throw new Error("shipped scenario has no country");
+    const regionId = country.regionIds[0];
+    if (regionId === undefined) throw new Error("shipped country has no region");
+    scenario.military = {
+      armies: [
+        {
+          countryId: country.id,
+          regionId,
+          personnel: 500,
+          equipmentUnits: 10,
+        },
+      ],
+    };
+    const baselineScenario = loadM5EightPolities();
+    const baselineWorld = createEconomyWorld(baselineScenario, { seed: SEED });
+    const baseline = snapshots(baselineWorld, regionId);
+    const world = createEconomyWorld(scenario, { seed: SEED });
+    expect(world.military.armies).toHaveLength(1);
+    expect(world.military.armies[0]?.personnel).toBe(500);
+    expect(militaryPeopleOutsideCivilian(world)).toBe(500);
+    const after = snapshots(world, regionId);
+    let removed = 0;
+    let changedBlocks = 0;
+    for (const [blockId, prior] of baseline) {
+      const next = after.get(blockId);
+      if (next === undefined) throw new Error("missing snapshot");
+      const delta =
+        prior.maleEligible - next.maleEligible + (prior.femaleEligible - next.femaleEligible);
+      expect(delta).toBeGreaterThanOrEqual(0);
+      removed += delta;
+      if (delta > 0) changedBlocks += 1;
+    }
+    expect(removed).toBe(500);
+    // A lowest-id rule would change exactly one block.
+    expect(changedBlocks).toBeGreaterThan(1);
+    assertValidWorld(world);
+  });
+
   test("the shipped scenario recruits proportionally, not from its lowest-id academics block", () => {
     const { scenario, countryId, regionId, world } = shippedScenario();
     const blocks = regionBlocks(world, regionId).sort((left, right) => left.id - right.id);
