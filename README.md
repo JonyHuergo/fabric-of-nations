@@ -130,8 +130,10 @@ through `TickContext`; they are not serialized into `World`.
 |---|---|
 | `pnpm install` | Install the workspace reproducibly from `pnpm-lock.yaml`. |
 | `pnpm run build` | Compile every package in dependency order and regenerate the app worker bundle. |
+| `pnpm run build:libs` | Compile `@century/sim`, `@century/data`, and `@century/sim-worker` in dependency order. |
 | `pnpm run lint` | Boundary checks: no ambient RNG, no forbidden APIs in `sim`, ES2022-only config, no runtime deps in `sim`. |
-| `pnpm run typecheck` | Typecheck every package in strict mode, including the app and worker. |
+| `pnpm run typecheck` | Build the workspace libraries in dependency order, then typecheck every package in strict mode, including the app and worker. |
+| `pnpm run check:worker` | Build the workspace libraries, then verify the committed worker scenario and app worker bundle without overwriting them. |
 | `pnpm test` | Run the Jest suite, including M7 worker/protocol/snapshot/save tests. |
 | `pnpm run bench` | Build all benchmark cases (M1 through M7) and report timings, hashes, and invariant gates. |
 | `pnpm run bench:campaign` | Opt-in M6 full 36,524-tick campaign benchmark with per-tick p50/p95/p99, AI counts, bounded-state checkpoints, and final save size. Long-running; part of `pnpm run ci` only indirectly through M6/M7 bounded benchmarks. |
@@ -139,10 +141,12 @@ through `TickContext`; they are not serialized into `World`.
 | `pnpm -F @century/app export:web` | Produce the static Expo web export. |
 | `pnpm -F @century/app export:ios` / `export:android` | Produce iOS/Android Hermes JS bundles (not native release builds). |
 | `pnpm run app:export` | Export web, iOS, and Android JS bundles; included in `pnpm run ci`. |
-| `pnpm run ci` | Local CI path: lint, typecheck, test, benchmark, and web/iOS/Android app exports. |
+| `pnpm run ci` | Local CI path: lint, worker checks, typecheck, test, benchmark, and web/iOS/Android app exports. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
-runs the same verification with a frozen lockfile.
+runs boundary checks, generated-artifact checks, typechecking, and the test suite in a
+correctness job, then the bounded benchmark in a separate job that depends on it, with a
+frozen lockfile.
 
 ## M1 semantics preserved
 
@@ -3029,11 +3033,13 @@ messages report byte lengths and the first differing byte.
 
 - Explicit regeneration: `pnpm -F @century/app build:worker` and
   `pnpm -F @century/sim-worker scenario:build`.
-- Check-only path: `pnpm run check:worker` builds the data package once, then runs
-  both `--check` commands. It does not overwrite either artifact.
-- CI runs `check:worker` **before** `pnpm bench`, because the bench build regenerates
-  the committed artifacts. The check therefore detects stale commits rather than
-  validating output produced earlier in the same pipeline.
+- Check-only path: `pnpm run check:worker` builds the required workspace libraries
+  in dependency order, then runs both `--check` commands. It does not overwrite
+  either artifact.
+- The CI correctness job runs `check:worker` **before** typecheck; the benchmark job
+  runs later and its build may regenerate the committed artifacts. The check
+  therefore detects stale commits rather than validating output produced earlier
+  in the same pipeline.
 - A test proves the current bundle passes, two independent generations are
   byte-identical, and a stale copy fails without being overwritten.
 

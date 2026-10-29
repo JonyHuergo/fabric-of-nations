@@ -4530,3 +4530,70 @@ schema, simulation version, worker protocol, and data version are unchanged.
   show military expenditure.
 - The generated worker bundle was regenerated. No save schema, simulation, protocol, or
   data version bump was required.
+
+## D-083 — Audit remediation batch 2: explicit military allocation, clean-checkout typecheck, and CI time budget
+
+**Status:** implemented. Fixes AUDIT-006, AUDIT-007, and AUDIT-008 from the post-M10
+audit. World schema **26**, simulation **0.26.0**, worker protocol **13**, and data
+version **`m3-economy-v11`** are unchanged; no authoritative state shape changed.
+
+### Decisions
+
+1. **Military recruitment uses two-stage largest-remainder apportionment.** Eligibility
+   is unchanged: people aged 18–45, males before females, youngest ages first within a
+   block. For the male stage, `min(requested, regional male pool)` is apportioned across
+   blocks in proportion to each block's available male 18–45 population. If the request
+   exceeds the male pool, the remaining female recruitment is apportioned the same way
+   over the female 18–45 pools. Exact BigInt remainders are ranked by (1) remainder,
+   (2) eligible weight, (3) total block population, (4) a keyed `drawUint32` tie using
+   the block, seed, day, and stage, and (5) the input index only for an exact tie-draw
+   collision. Capacity is enforced per block, so no block supplies more people than it
+   has. This satisfies GDD §4.3: the allocation is proportional to eligible population,
+   not pop-array order or numeric id.
+2. **Signing costs follow the suppliers.** Each block is paid exactly
+   `recruits supplied * M10_RECRUITMENT_COST_PER_SOLDIER_SUSD`, so the
+   treasury-to-household transfer reflects the people actually removed. No source block
+   is stored on the army.
+3. **Daily pay and garrison payments are population-weighted.** No formation-source
+   record is persisted, so the smallest coherent rule is used: the region's
+   recruitment-eligible people (fallback: total civilian population) are the weights,
+   and the payable amount is split proportionally. The floating remainder goes to the
+   largest-weight recipient under the same deterministic tie order. Signing, pay, and
+   garrison each post one existing four-line `military-pay` entry per recipient block;
+   the posting contract, account set, and cash-conservation rules are unchanged.
+4. **Returning wounded follows the same population rule.** A destroyed formation returns
+   wounded to its home region proportional to current eligible people (fallbacks: total
+   population, then an even split), still into male 18–45 cells. This removes the last
+   ascending-id pop-block allocation from `military.ts`; the remaining army/occupier
+   selection is a stable entity ordering, not a population allocation rule.
+5. **Clean-checkout typechecking is build-first.** `build:libs` compiles `@century/sim`,
+   then `@century/data`, then `@century/sim-worker` in dependency order. Root `typecheck`
+   and `check:worker` invoke it before resolving package exports, so a clean checkout
+   generates the real `dist/*.d.ts` declarations instead of relying on ignored local
+   files. No path aliases bypass package export contracts and no build output is
+   committed. Data follows sim because it consumes sim's public API; sim-worker also
+   consumes sim's declarations, and the data build is required by the scenario check.
+   The CI correctness job now runs `check:worker` before typecheck.
+6. **CI separates correctness from benchmarking.** The correctness job runs install,
+   lint, generated-artifact checks, typecheck, and tests with a **45-minute** timeout.
+   The post-M10 audit measured `pnpm test` alone at about 22.1 minutes; the other steps
+   add a few minutes, so 45 minutes leaves a realistic margin. The benchmark job retains
+   `pnpm run bench` unchanged, runs after correctness via `needs: verify`, and has a
+   **30-minute** timeout. The benchmark step was neither removed nor weakened.
+
+### Consequences
+
+- Recruitment, signing pay, daily pay, and garrison spending no longer concentrate in
+  the lowest-id block. In the shipped eight-polity scenario that block is the small
+  academics block, so the pre-fix behavior distorted that profession's population,
+  household cash, and demand.
+- Population, employment, and accounting invariants are preserved: people removed equal
+  people added to the roster, every posting is balanced, and no money or people are
+  created. Military balance parameters (signing cost, daily pay, garrison cost,
+  equipment price, casualties) are unchanged.
+- Determinism is preserved through explicit keyed draws and order-independent
+  apportionment; reversing pop-block storage order does not change per-block
+  allocations.
+- The committed app worker bundle was regenerated because the simulation source
+  changed. No schema, simulation, protocol, or data version bump was required: the
+  authoritative state shape and protocol are unchanged.
