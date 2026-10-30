@@ -64,8 +64,12 @@ import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { cloneFinanceState } from "./accounts.js";
 import { drawUint32 } from "../rng.js";
 import { requireInteger } from "../validation.js";
-import { assertValidDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
+import {
+  MONEY_TOLERANCE_SUSD,
+  WORKING_AGE_END,
+  WORKING_AGE_START,
+} from "../population/constants.js";
 
 /** Minimum working age for recruitment. */
 const RECRUIT_MIN_AGE = 18;
@@ -666,6 +670,58 @@ function removeFromArray(ages: Uint32Array, count: number): number {
   return count - remaining;
 }
 
+/** Civilian working-age population used by employment validation. */
+function workingAgeCount(block: PopBlock): number {
+  let total = 0;
+  for (let age = WORKING_AGE_START; age <= WORKING_AGE_END; age += 1) {
+    total += block.maleByAge[age] ?? 0;
+    total += block.femaleByAge[age] ?? 0;
+  }
+  return total;
+}
+
+/**
+ * Keep civilian employment consistent with a recruitment removal.
+ *
+ * Recruits are people aged 18..45, so they necessarily reduce the working-age
+ * population. Existing assignments are retained where the remaining population
+ * still supports them; any excess is released deterministically in ascending
+ * assignment-id order, and the employment system is marked dirty so the next
+ * refresh can reassign the remaining civilians. This avoids an immediate
+ * whole-world validation failure while preserving explicit employment state.
+ */
+function reconcileRecruitmentEmployment(
+  world: World,
+  removals: readonly RecruitmentRemoval[],
+): void {
+  let removedAny = false;
+  for (const removal of removals) {
+    const removed = removal.males + removal.females;
+    if (removed <= 0) continue;
+    removedAny = true;
+    const block = world.popBlocks.find((candidate) => candidate.id === removal.popBlockId);
+    if (block === undefined) continue;
+    const availableWorkingAge = workingAgeCount(block);
+    let assigned = 0;
+    for (const assignment of world.employment) {
+      if (assignment.popBlockId === block.id) assigned += assignment.workers;
+    }
+    let excess = assigned - availableWorkingAge;
+    if (excess <= 0) continue;
+    const assignments = world.employment
+      .filter((assignment) => assignment.popBlockId === block.id)
+      .sort((left, right) => left.id - right.id);
+    for (const assignment of assignments) {
+      if (excess <= 0) break;
+      const release = Math.min(assignment.workers, excess);
+      assignment.workers -= release;
+      excess -= release;
+    }
+    world.employment = world.employment.filter((assignment) => assignment.workers > 0);
+  }
+  if (removedAny) world.employmentDirty = true;
+}
+
 // ---------------------------------------------------------------------------
 // Accounting helpers
 // ---------------------------------------------------------------------------
@@ -879,6 +935,26 @@ function validateCountry(world: World, countryId: Id, errors: string[]): void {
   }
 }
 
+/** Validate a military action's day against the world and open accounting period. */
+function militaryActionDayError(world: World, dayIndex: Day): string | null {
+  if (!Number.isInteger(dayIndex) || dayIndex < 0) {
+    return "the military action day must be a non-negative integer";
+  }
+  if (dayIndex !== world.dayIndex) {
+    return `military action day ${String(dayIndex)} does not match world day ${String(world.dayIndex)}`;
+  }
+  if (isTerminalDayIndex(dayIndex)) {
+    return "the terminal 2000-01-01 boundary cannot apply a military action";
+  }
+  if (
+    world.finance.closedThroughDay !== null &&
+    dayIndex <= world.finance.closedThroughDay
+  ) {
+    return `the accounting period through day ${String(world.finance.closedThroughDay)} is closed`;
+  }
+  return null;
+}
+
 /** True when the two countries are the two belligerents of one war. */
 function isWarPair(war: WarState, firstCountryId: Id, secondCountryId: Id): boolean {
   return (
@@ -1084,18 +1160,28 @@ export function validateMilitaryAction(
   world: World,
   action: MilitaryActionInput,
 ): MilitaryValidation {
+  let validation: MilitaryValidation;
   switch (action.kind) {
     case "declare-war":
-      return validateDeclareWar(world, action);
+      validation = validateDeclareWar(world, action);
+      break;
     case "offer-peace":
-      return validateOfferPeace(world, action);
+      validation = validateOfferPeace(world, action);
+      break;
     case "accept-peace":
-      return validateAcceptPeace(world, action);
+      validation = validateAcceptPeace(world, action);
+      break;
     case "recruit-army":
-      return validateRecruitArmy(world, action);
+      validation = validateRecruitArmy(world, action);
+      break;
     case "deploy-army":
-      return validateDeployArmy(world, action);
+      validation = validateDeployArmy(world, action);
+      break;
   }
+  const dayError =
+    action.dayIndex === undefined ? null : militaryActionDayError(world, action.dayIndex);
+  if (dayError === null) return validation;
+  return { valid: false, errors: [dayError, ...validation.errors] };
 }
 
 // ---------------------------------------------------------------------------
@@ -1287,6 +1373,8 @@ function snapshotForAction(world: World): {
   regionIdsByCountry: Map<Id, Id[]>;
   finance: World["finance"];
   popBlocks: PopBlock[];
+  employment: World["employment"];
+  employmentDirty: boolean;
 } {
   return {
     military: {
@@ -1315,6 +1403,8 @@ function snapshotForAction(world: World): {
       maleByAge: block.maleByAge.slice(),
       femaleByAge: block.femaleByAge.slice(),
     })),
+    employment: world.employment.map((assignment) => ({ ...assignment })),
+    employmentDirty: world.employmentDirty,
   };
 }
 
@@ -1335,6 +1425,8 @@ function restoreActionSnapshot(
   }
   world.finance = snapshot.finance;
   world.popBlocks = snapshot.popBlocks;
+  world.employment = snapshot.employment;
+  world.employmentDirty = snapshot.employmentDirty;
 }
 
 export function applyMilitaryAction(
@@ -1342,6 +1434,10 @@ export function applyMilitaryAction(
   action: MilitaryActionInput,
   dayIndex: Day,
 ): MilitaryActionResult {
+  const dayError = militaryActionDayError(world, dayIndex);
+  if (dayError !== null) {
+    throw new RangeError(`invalid military action: ${dayError}`);
+  }
   const validation = validateMilitaryAction(world, action);
   if (!validation.valid) {
     throw new RangeError(`invalid military action: ${validation.errors.join("; ")}`);
@@ -1457,6 +1553,7 @@ function executeMilitaryAction(
       const region = regionById(world, action.regionId);
       if (region === undefined) throw new RangeError("missing recruitment region");
       const removals = removePeople(world, region.id, action.personnel, dayIndex);
+      reconcileRecruitmentEmployment(world, removals);
       // Signing costs follow the actual supplier blocks: each block is paid for
       // exactly the recruits it supplied. This is a real treasury-to-household
       // transfer and needs no persisted source record.
