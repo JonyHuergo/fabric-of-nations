@@ -18,8 +18,10 @@ then checked against the catalog:
   Crete, Tonga, Tibet, Khiva, Bukhara, Sarawak and the other states.
 - **Our World in Data** long-run population series and the **Maddison Project
   Database 2023** for rounded 1900 population totals.
-- **Natural Earth 1:50m** cultural vectors for map geometry, with an explicit
-  1900 crosswalk; historical boundary limitations are recorded below.
+- **Natural Earth 1:50m and 1:10m** cultural vectors for map geometry, with an
+  explicit 1900 crosswalk and the M11c historical transfers; boundary
+  provenance, confidence and residual limitations are recorded in
+  `docs/HISTORICAL_MAP_PROVENANCE.md`.
 - Modern country lists were used only to check that no region had been skipped.
   They were never used to define 1900 statehood.
 
@@ -177,17 +179,17 @@ non-selectable dominion territory.
 
 | Polity (tag) | ID | Kind | Status | Sovereign | Capital | Map integration |
 |---|---:|---|---|---|---|---|
-| Austria-Hungary (AUT) | 60 | state | independent | — | Vienna / Budapest | Polygon: modern Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina; core-unit approximation documented |
-| Tonga (TON) | 61 | state | independent | — | Nuku'alofa | Marker-only at Nuku'alofa; historical polygon unavailable |
-| Sokoto Caliphate (SOK) | 62 | state | independent | — | Sokoto | Marker-only at Sokoto; historical polygon unavailable |
-| Sultanate of Wadai (WAD) | 63 | state | independent | — | Abéché | Marker-only at Abéché; historical polygon unavailable |
-| Sultanate of Darfur (DAR) | 64 | state | independent | — | El Fasher | Marker-only at El Fasher; historical polygon unavailable |
-| Jabal Shammar (SHM) | 65 | state | independent | — | Ha'il | Marker-only at Ha'il; historical polygon unavailable |
-| Cretan State (CRT) | 66 | state | autonomous-vassal | Ottoman suzerainty (not modelled as sovereignTag) | Chania | Marker-only at Chania; historical polygon unavailable |
-| Tibet (TIB) | 162 | territory | autonomous-province | CHN | Lhasa | Marker-only at Lhasa; Qing flag plus status badge |
-| Khanate of Khiva (KHI) | 163 | territory | protectorate | RUS | Khiva | Marker-only at Khiva; Russian flag plus status badge |
-| Emirate of Bukhara (BUK) | 164 | territory | protectorate | RUS | Bukhara | Marker-only at Bukhara; Russian flag plus status badge |
-| Raj of Sarawak (SAR) | 165 | territory | protectorate | GBR | Kuching | Marker-only at Kuching; Union Jack plus status badge |
+| Austria-Hungary (AUT) | 60 | state | independent | — | Vienna / Budapest | Polygon: modern Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia and Bosnia plus reconstructed Galicia, Bukovina, Transylvania, Banat, Vojvodina, South Tyrol, Trieste/Gorizia, Kotor and Cieszyn Silesia |
+| Tonga (TON) | 61 | state | independent | — | Nuku'alofa | Polygon from the modern Tongan archipelago; the islands are not disputed |
+| Sokoto Caliphate (SOK) | 62 | state | independent | — | Sokoto | Reconstructed core from ten modern northern Nigerian states; LOW confidence, shifting military frontier |
+| Sultanate of Wadai (WAD) | 63 | state | independent | — | Abéché | Reconstructed core from six modern Chadian regions; LOW confidence, no surveyed 1900 border |
+| Sultanate of Darfur (DAR) | 64 | state | independent | — | El Fasher | Reconstructed from the five modern Darfur states; MEDIUM confidence, conservative core |
+| Jabal Shammar (SHM) | 65 | state | independent | — | Ha'il | Reconstructed from Ha'il, Qassim, Riyadh, Northern Borders and al-Jowf; MEDIUM confidence |
+| Cretan State (CRT) | 66 | state | autonomous-vassal | Ottoman suzerainty (not modelled as sovereignTag) | Chania | Polygon: modern Crete region, separated from Greece |
+| Tibet (TIB) | 162 | territory | autonomous-province | CHN | Lhasa | Polygon: modern Tibet Autonomous Region as a conservative core; LOW confidence, Amdo/Kham not separated |
+| Khanate of Khiva (KHI) | 163 | territory | protectorate | RUS | Khiva | Polygon: Xorazm, Karakalpakstan and Daşoguz; LOW confidence |
+| Emirate of Bukhara (BUK) | 164 | territory | protectorate | RUS | Bukhara | Polygon: Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and Republican Subordination districts; LOW confidence |
+| Raj of Sarawak (SAR) | 165 | territory | protectorate | GBR | Kuching | Polygon: modern Malaysian state of Sarawak, separated from British Malaya |
 
 Every new state is selectable and has a simulation country with its own home
 region, population, buildings, treasury, government, technology, market and
@@ -228,23 +230,43 @@ oversight.
 | Khiva, Bukhara, Sarawak | Protectorates | Added as non-selectable territories with their sovereign flag and status badge. |
 | Native American nations, African chiefdoms | Not states in this model | They lacked the sovereign-state institutions and recognised 1900 boundaries the catalog models. This is a scope decision, not a denial of their historical existence. |
 
-## 7. Map and boundary limitations
+## 7. Map and boundary limitations (M11c)
 
-- **Austria-Hungary** uses a core polygon of modern Austria, Hungary, Czechia,
-  Slovakia, Slovenia, Croatia and Bosnia and Herzegovina. Galicia (modern
-  Poland/Ukraine), Transylvania (Romania), Vojvodina (Serbia) and South Tyrol
-  (Italy) are not separable at the Natural Earth 1:50m admin-0 resolution. The
-  population total includes them; the polygon does not. This is recorded in the
-  catalog notes and is the best-supported reconstruction available without
-  redistributing restricted historical boundary data.
-- The other new polities use **marker-only** map integration at their capitals.
-  They are fully selectable, labelled and represented in the picker, but no
-  reliable 1900 polygon is available at the map source. The map data marks them
-  with an explicit `markerOnly`/`approximate` note. This avoids inventing
-  precise borders and avoids overlapping their neighbours' polygons.
-- Existing map limitations (Alsace-Lorraine, Congress Poland, South African
-  provinces, Newfoundland) remain as documented in
-  `docs/HISTORICAL_DATA_PROVENANCE.md`.
+M11c completed a systematic geographical and political audit of the entire map.
+The detailed method, per-polity table and sources are in
+`docs/HISTORICAL_MAP_PROVENANCE.md`; the machine-readable audit is
+`packages/data/data/map/world_map_1900_audit.json`.
+
+- **No marker-only polities remain.** Tonga, Sokoto, Wadai, Darfur, Jabal
+  Shammar, Crete, Tibet, Khiva, Bukhara and Sarawak now have reconstructed
+  polygons. The M11b marker fallback was removed because a defensible
+  historical extent exists for every one of them.
+- **Libya is represented.** The territory is assigned to the Ottoman Empire
+  (OTT) as Tripolitania, Cyrenaica and Fezzan, with the three components
+  recorded in the map provenance. No modern Libyan sovereign state was added.
+- **Germany is the German Empire.** Alsace-Lorraine, the Prussian eastern
+  provinces, North Schleswig, Eupen-Malmedy, Memel and East Prussia are
+  included. The eastern frontier is a reconstructed line with MEDIUM
+  confidence; the surrounding provinces are HIGH confidence.
+- **Austria-Hungary, Russia, the Ottoman Empire, Romania, Bulgaria, Serbia,
+  Montenegro, Greece, Italy, Denmark, Belgium, France, Siam, British India,
+  China/Tibet, the Central Asian protectorates, the African colonies and the
+  Americas/Oceania entries** have explicit transfers or verified modern
+  matches; see the audit table.
+- **Residual generalization artefacts.** The audit finds two overlaps above
+  0.001 deg²: Canada/Newfoundland (0.249 deg²) and Bolivia/Brazil around Acre
+  (0.016 deg²). These are independently simplified coastline slivers, not
+  deliberate political claims. The audit also finds 24 single-sample
+  coastal/island gaps at 1° resolution; there is no multi-sample terrestrial
+  void. Both are documented in `docs/HISTORICAL_MAP_PROVENANCE.md` §6.
+- **South Africa** remains the documented admin-1 approximation: the Cape
+  Colony, Natal, the Transvaal and the Orange Free State use modern province
+  proxies; the 1900 republican borders differed from the modern provinces.
+- **Svalbard** is included in the modern Norwegian outline although it was
+  terra nullius until 1920; this is a known small over-assignment recorded in
+  the Norwegian provenance note.
+- **Antarctica and genuinely unclaimed territory** remain on the neutral land
+  layer and are not assigned to a sovereign state.
 
 ## 8. Flag coverage
 
@@ -265,12 +287,25 @@ Flag provenance is documented in `docs/FLAG_PROVENANCE.md`. Summary:
 
 ## 9. Remaining uncertainties
 
-- **Austria-Hungary's exact 1900 borders** in Galicia, Transylvania, Vojvodina
-  and South Tyrol are not represented geometrically. The frontier with Serbia,
-  Romania and Italy is therefore approximate.
-- **Sokoto, Wadai, Darfur and Ha'il** have low-confidence population totals and
-  no polygon boundaries. Their capitals and political status are documented;
-  their territorial extent is described in the notes rather than drawn.
+- **Austria-Hungary's exact 1900 borders** in Galicia, Transylvania, Vojvodina,
+  South Tyrol and the Littoral are reconstructed from modern administrative
+  proxies. The internal crown-land borders are not drawn; the external frontier
+  is MEDIUM/HIGH confidence depending on the segment.
+- **Sokoto, Wadai, Darfur and Jabal Shammar** now have reconstructed polygons,
+  but their 1900 frontiers were military/administrative zones rather than
+  surveyed lines. Their populations remain low-confidence rounded estimates and
+  their polygons are LOW/MEDIUM confidence. The flag monograms remain because
+  no defensible historical national flag design was established.
+- **Tibet, Khiva, Bukhara and Sarawak** have conservative reconstructed cores;
+  their historical extent was larger or less sharply defined than the modern
+  administrative proxies. The notes record the missing Amdo/Kham, Pamir and
+  Borneo frontier detail.
+- **Germany's eastern frontier strip** is generalized to about 10–20 km. The
+  provinces are HIGH confidence; the exact line between the German Empire and
+  Congress Poland/Austria-Hungary is MEDIUM confidence.
+- **Libya's Ottoman provincial limits** and the southern Fezzan/Aouzou limit
+  are approximate. Ottoman sovereignty, local Senussi/tribal authority and
+  limited effective control are distinguished in the provenance notes.
 - **Crete's** autonomy was internationally guaranteed but its constitutional
   future was contested; it is classified `autonomous-vassal`, not independent.
 - **Tonga's** protectorate began on 18 May 1900, after the reference date; it is

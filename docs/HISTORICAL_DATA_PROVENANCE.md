@@ -73,12 +73,13 @@ values are described as documented approximations.
 | Maddison Project Database 2023 | cross-checks for population totals | CC BY 4.0 | values only |
 | Our World in Data — Employment by sector | broad occupation-structure ranges | CC BY 4.0 | values only |
 | Century M2 1900 world age structure | age/sex expansion for every block | project data | yes (project) |
-| Century M11 authored catalog | status, capitals, markets, geometry crosswalk, fiscal/technology/building starts | project data | yes (project) |
-| Natural Earth 1:50m cultural vectors | map geometry | public domain | yes, derived |
+| Century M11/M11c authored catalog and boundary transfers | status, capitals, markets, geometry crosswalk, 1900 transfers, boundary provenance, fiscal/technology/building starts | project data | yes (project) |
+| Natural Earth 1:50m cultural vectors | map base geometry | public domain | yes, derived |
+| Natural Earth 1:10m admin-0/admin-1 | historical reconstruction blocks and clipping | public domain | yes, derived |
 | world-atlas 2.0.2 | TopoJSON encoding of Natural Earth | ISC | yes, derived |
-| polygon-clipping 0.15.7 | build-time polygon union | MIT | build tool only |
+| polygon-clipping 0.15.7 | build-time polygon union/intersection/difference | MIT | build tool only |
 | CShapes 2.0 | classification reference | CC BY-NC-SA 4.0 | **no** |
-| historical-basemaps | reviewed, not used | GPL-3.0 | **no** |
+| historical-basemaps | visual/topological cross-check only | GPL-3.0 | **no** (no coordinate ring redistributed) |
 
 CShapes 2.0 is credited in the app's provenance dialog and in this document. Its
 non-commercial share-alike licence is not compatible with redistributing a
@@ -111,24 +112,24 @@ derived map in this project, so no CShapes geometry is included.
 
 ## 5. Known omissions and approximations
 
-- Congress Poland is assigned to the Russian Empire; the German and Austrian
-  partitions of modern Poland are not separable at the map source's resolution.
-- Alsace-Lorraine is not separated from France.
-- Xinjiang and Mongolia remain inside Qing China; Tibet is now a marker-only
-  autonomous-province territory of China.
-- Austria-Hungary is a core-modern-unit polygon (Austria, Hungary, Czechia,
-  Slovakia, Slovenia, Croatia, Bosnia and Herzegovina); Galicia, Transylvania,
-  Vojvodina and South Tyrol are not separable at admin-0 resolution, although
-  the population total includes them.
+- M11c reconstructs the 1900 external borders from explicit transfers; see
+  [`HISTORICAL_MAP_PROVENANCE.md`](./HISTORICAL_MAP_PROVENANCE.md). Congress
+  Poland remains Russian and is separated from the German Empire; Alsace-Lorraine
+  is separated from France; Austria-Hungary includes reconstructed Galicia,
+  Transylvania, Vojvodina, South Tyrol and the Littoral; Tibet is separated from
+  Qing China; and the former marker-only polities have reconstructed polygons.
+- Xinjiang and Mongolia remain inside Qing China at this resolution; Tibet is a
+  separately drawn autonomous-province territory of China.
 - South Africa is split into the Cape Colony, Natal, the Transvaal and the Orange
   Free State using modern admin-1 provinces as an approximation.
-- Newfoundland is a marker territory inside the modern Canada polygon.
+- Newfoundland is separated from the modern Canada polygon.
 - Several small dependencies are grouped (for example British West Africa,
   British Pacific islands, French West Africa). The grouping is documented in
   each territory's notes.
 - Sokoto, Wadai, Darfur, Jabal Shammar, Crete, Tonga, Tibet, Khiva, Bukhara and
-  Sarawak use marker-only map integration because no reliable 1900 polygon is
-  available at the map source.
+  Sarawak have reconstructed 1900 polygons with explicit LOW/MEDIUM confidence;
+  no marker-only map entry remains. Their frontier approximations are documented
+  in [`HISTORICAL_MAP_PROVENANCE.md`](./HISTORICAL_MAP_PROVENANCE.md).
 - Ashanti, Bornu (Rabih), the Somali Dervish state, Zanzibar, Sikkim and the
   smaller Arabian and Pacific polities are deliberately not separate state
   entries; the precise reasons are recorded in
@@ -136,12 +137,16 @@ derived map in this project, so no CShapes geometry is included.
 
 ## 6. Updating the data
 
-1. Edit `polities_1900.json` (the canonical authored catalog).
+1. Edit `polities_1900.json` (the canonical authored catalog) or the boundary
+   transfers in `scripts/m11/boundaries-1900-source.mjs`.
 2. Run `node scripts/m11/build-world-data.mjs`.
-3. Run `node scripts/m11/build-map.mjs` if geometry changed.
+3. If geography changed, run `node scripts/m11/build-boundaries.mjs`,
+   `node scripts/m11/build-map.mjs`, `node scripts/m11/audit-map.mjs` and
+   `node scripts/m11/generate-provenance-doc.mjs`.
 4. Rebuild the libraries and the worker bundle:
    `pnpm -F @century/sim build && pnpm -F @century/data build && pnpm -F @century/sim-worker build && pnpm -F @century/app build:worker`.
-5. Run `pnpm -F @century/tests test -- m11-world` and the ordinary checks.
+5. Run `pnpm -F @century/tests test -- m11-world m11b-coverage m11c-geography`
+   and the ordinary checks.
 
 Every population, region, market and country entry must reference a registered
 source id. The loader rejects unknown sources, missing calibration targets,

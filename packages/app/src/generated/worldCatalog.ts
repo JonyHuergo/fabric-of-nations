@@ -20,7 +20,7 @@ export const WORLD_CATALOG = ({
         "autonomous-vassal",
         "dominion"
       ],
-      "description": "States are coded by their constitutional position on 1 January 1900. Independent states and the documented semi-sovereign polities selected for play are selectable; colonies, protectorates, occupied and autonomous provinces are territories of their sovereign or administering power. M11b adds the Austro-Hungarian Monarchy and documented de facto or autonomous polities, with marker-only map approximations where reliable 1900 boundaries are unavailable."
+      "description": "States are coded by their constitutional position on 1 January 1900. Independent states and the documented semi-sovereign polities selected for play are selectable; colonies, protectorates, occupied and autonomous provinces are territories of their sovereign or administering power. M11b adds the Austro-Hungarian Monarchy and documented de facto or autonomous polities. M11c replaces marker-only entries with reconstructed 1900 polygons where a defensible extent exists, and records boundary provenance, confidence and uncertainty for every polity."
     },
     "sources": [
       {
@@ -1756,8 +1756,10 @@ export const WORLD_CATALOG = ({
       "market": "pacific",
       "description": "Independent Polynesian kingdom under the 1875 constitution, in personal rule of King George Tupou II in 1900.",
       "confidence": "medium",
-      "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). The map source cannot give a reliable 1900 land boundary at this scale, so the kingdom is represented by a marker at Nuku'alofa.",
-      "geometry": []
+      "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). M11c reconstructs its territory from the modern Tongan archipelago; the archipelago's extent is not disputed.",
+      "geometry": [
+        "TON"
+      ]
     },
     {
       "id": 62,
@@ -1778,8 +1780,19 @@ export const WORLD_CATALOG = ({
       "market": "african-independent",
       "description": "Fulani-led Islamic caliphate in the central Sudan, the largest independent state in West Africa in 1900.",
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. The 1900 boundary is not available as a reliable polygon at the map source, so the caliphate is represented by a marker at Sokoto. Population is a rounded order-of-magnitude estimate.",
-      "geometry": []
+      "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. M11c reconstructs the caliphate's core from ten modern northern Nigerian states. Population is a rounded order-of-magnitude estimate.",
+      "geometry": [
+        "adm1:NG-SO",
+        "adm1:NG-KE",
+        "adm1:NG-ZA",
+        "adm1:NG-KT",
+        "adm1:NG-KN",
+        "adm1:NG-JI",
+        "adm1:NG-KD",
+        "adm1:NG-AD",
+        "adm1:NG-BA",
+        "adm1:NG-GO"
+      ]
     },
     {
       "id": 63,
@@ -1800,8 +1813,15 @@ export const WORLD_CATALOG = ({
       "market": "african-independent",
       "description": "Sahelian sultanate east of Lake Chad, independent until the French conquest of 1909–1911.",
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at Abéché and a documented monogram fallback. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:TD-OD",
+        "adm1:TD-WF",
+        "adm1:TD-BA",
+        "adm1:TD-BO",
+        "adm1:TD-X01~",
+        "adm1:TD-SA"
+      ]
     },
     {
       "id": 64,
@@ -1822,8 +1842,13 @@ export const WORLD_CATALOG = ({
       "market": "african-independent",
       "description": "Independent sultanate in the western Sudan, conquered by Britain only in 1916.",
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at El Fasher and a documented monogram fallback. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:SD-DE",
+        "adm1:SD-DN",
+        "adm1:SD-DS",
+        "adm1:SD-DW"
+      ]
     },
     {
       "id": 65,
@@ -1844,8 +1869,14 @@ export const WORLD_CATALOG = ({
       "market": "ottoman-egyptian",
       "description": "Rashidi emirate in central Arabia, the dominant state in Najd in 1900 and a rival of the Saudis.",
       "confidence": "low",
-      "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. The 1900 boundary is not available as a reliable polygon at the map source, so the emirate is represented by a marker at Ha'il. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. M11c reconstructs the emirate from Ha'il, Qassim, Riyadh, the Northern Borders and al-Jowf; Ottoman sovereignty over Najd was nominal. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:SA-01",
+        "adm1:SA-05",
+        "adm1:SA-06",
+        "adm1:SA-08",
+        "adm1:SA-12"
+      ]
     },
     {
       "id": 66,
@@ -1866,8 +1897,10 @@ export const WORLD_CATALOG = ({
       "market": "ottoman-egyptian",
       "description": "Autonomous Cretan state established in 1898 under Ottoman suzerainty and Great Power guarantee, with a Greek high commissioner.",
       "confidence": "medium",
-      "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). Represented by a marker at Chania because the map source cannot separate Crete from modern Greece without an admin-1 split. The flag combines the Greek cross with a red canton and white star.",
-      "geometry": []
+      "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). M11c separates Crete from modern Greece using the modern Crete region. The flag combines the Greek cross with a red canton and white star.",
+      "geometry": [
+        "adm1:GR-M"
+      ]
     },
     {
       "id": 100,
@@ -2416,8 +2449,10 @@ export const WORLD_CATALOG = ({
       "market": null,
       "description": "Separate self-governing dominion of the British Empire.",
       "confidence": "medium",
-      "notes": "Not part of Canada in 1900. The map source cannot separate Newfoundland from modern Canada, so it is shown as a marker territory over Canadian territory.",
-      "geometry": []
+      "notes": "Not part of Canada in 1900. M11c separates Newfoundland and Labrador from modern Canada using the modern province boundary.",
+      "geometry": [
+        "adm1:CA-NL"
+      ]
     },
     {
       "id": 121,
@@ -3451,8 +3486,10 @@ export const WORLD_CATALOG = ({
       "market": null,
       "description": "Tibetan Buddhist polity under Qing suzerainty, administered through the Dalai Lama and Qing ambans in 1900.",
       "confidence": "low",
-      "notes": "Not an independent state in 1900. Shown as a marker territory of Qing China because the map source cannot separate Tibet at admin-0 resolution. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "Not an independent state in 1900. M11c separates the modern Tibet Autonomous Region as a conservative core; Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:CN-XZ"
+      ]
     },
     {
       "id": 163,
@@ -3473,8 +3510,12 @@ export const WORLD_CATALOG = ({
       "market": null,
       "description": "Central Asian khanate under Russian protectorate after 1873, retaining its own ruler and internal administration.",
       "confidence": "low",
-      "notes": "Russian protectorate, not independent. Represented by a marker at Khiva inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "Russian protectorate, not independent. M11c reconstructs the khanate's irrigated core from Xorazm, Karakalpakstan and Daşoguz. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:UZ-XO",
+        "adm1:UZ-QR",
+        "adm1:TM-D"
+      ]
     },
     {
       "id": 164,
@@ -3495,8 +3536,16 @@ export const WORLD_CATALOG = ({
       "market": null,
       "description": "Central Asian emirate under Russian protectorate after 1868, retaining its own ruler and internal administration.",
       "confidence": "low",
-      "notes": "Russian protectorate, not independent. Represented by a marker at Bukhara inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "Russian protectorate, not independent. M11c reconstructs the emirate from Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:UZ-BU",
+        "adm1:UZ-NW",
+        "adm1:UZ-QA",
+        "adm1:UZ-SU",
+        "adm1:TJ-KT",
+        "adm1:TJ-X01~",
+        "adm1:TJ-DU"
+      ]
     },
     {
       "id": 165,
@@ -3517,8 +3566,10 @@ export const WORLD_CATALOG = ({
       "market": null,
       "description": "Independent Raj of Sarawak under British protection after 1888, ruled by the Brooke dynasty.",
       "confidence": "low",
-      "notes": "British protectorate, not independent. Represented by a marker at Kuching inside the British imperial market; the map source aggregates Borneo into British Malaya. Population is a rounded estimate.",
-      "geometry": []
+      "notes": "British protectorate, not independent. M11c separates Sarawak from British Malaya using the modern Malaysian state boundary. Population is a rounded estimate.",
+      "geometry": [
+        "adm1:MY-13"
+      ]
     }
   ]
 }) as unknown as WorldCatalogData;

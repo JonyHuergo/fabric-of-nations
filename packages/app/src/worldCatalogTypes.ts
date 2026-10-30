@@ -74,6 +74,47 @@ export interface WorldCatalogData {
   readonly entries: readonly WorldCatalogEntry[];
 }
 
+export interface WorldMapBoundarySource {
+  readonly id: string;
+  readonly title: string;
+  readonly url: string;
+  readonly license: string;
+  readonly date: string;
+}
+
+export type BoundaryGeometryClass =
+  | "direct-modern-verified"
+  | "aggregate-modern-verified"
+  | "reconstructed"
+  | "approximate"
+  | "marker-only";
+
+export type BoundaryConfidence = "low" | "medium" | "high";
+
+export interface WorldMapComponent {
+  readonly name: string;
+  readonly adminStatus: string;
+  readonly confidence: BoundaryConfidence;
+  readonly notes: string;
+}
+
+/** Historical provenance attached to every map polity (M11c). */
+export interface WorldMapProvenance {
+  readonly polityId: number;
+  readonly tag: string;
+  readonly historicalName: string;
+  readonly referenceDate: string;
+  readonly boundarySources: readonly WorldMapBoundarySource[];
+  readonly geometryClass: BoundaryGeometryClass;
+  readonly confidence: BoundaryConfidence;
+  readonly underlyingBoundaryDate: string;
+  readonly deviationsFromModern: string;
+  readonly knownUncertainties: string;
+  readonly notes: string;
+  readonly transferIds: readonly string[];
+  readonly components?: readonly WorldMapComponent[];
+}
+
 export interface WorldMapPolity {
   readonly tag: string;
   readonly kind: "state" | "territory";
@@ -87,6 +128,7 @@ export interface WorldMapPolity {
   readonly small: boolean;
   readonly markerOnly?: boolean;
   readonly approximate?: string;
+  readonly provenance: WorldMapProvenance;
 }
 
 export interface WorldMapData {
@@ -99,7 +141,14 @@ export interface WorldMapData {
     readonly simplificationToleranceDegrees: number;
     readonly generatedBy: string;
     readonly notes: string;
+    readonly referenceDate: string;
+    readonly boundaryDataset: string;
+    readonly boundaryVersion: string;
+    readonly provenanceCount: number;
+    readonly transferCount: number;
+    readonly resolvedOverlaps: number;
   };
+  readonly boundarySources: readonly (WorldMapBoundarySource & { readonly notes: string })[];
   readonly land: readonly (readonly number[])[];
   readonly polities: readonly WorldMapPolity[];
 }

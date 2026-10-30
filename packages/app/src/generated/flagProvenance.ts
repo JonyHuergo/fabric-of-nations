@@ -923,11 +923,11 @@ export const FLAG_FALLBACKS: readonly { polityId: number; tag: string; reason: s
   {
     polityId: 63,
     tag: "WAD",
-    reason: "No verified historical national or state flag design for the Sultanate of Wadai could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag.",
+    reason: "No verified historical national or state flag design could be established. FOTW has no Wadai national-flag entry; Wikimedia Commons holds only modern user-made flags (a DeviantArt-derived 'Sultanate of Wadai' image and a CC BY-SA 4.0 'Wadai' upload), neither of which is a contemporary source. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent or mislabel a flag.",
   },
   {
     polityId: 64,
     tag: "DAR",
-    reason: "No verified historical national or state flag design for the Sultanate of Darfur could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag.",
+    reason: "No verified historical national or state flag design could be established. The FOTW page for the Sultanate of Darfur (1603-1874, 1898-1916) records no state flag and only discusses a 1910 illustrated red flag with a white frame carried by Masalit rebels, a military/conflict standard rather than a national flag. Modern Darfur liberation/regional flags are post-1900 and are not used. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent a flag.",
   },
 ];

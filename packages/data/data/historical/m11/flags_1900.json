@@ -10,7 +10,7 @@
     "attributionPolicy": "Public-domain and CC0 files do not legally require attribution; author, source, licence and retrieval date are nevertheless recorded for every file and shown in the in-game Sources and Licensing dialog. Project-authored reconstructions record Century's authorship separately from their historical sources.",
     "datePolicy": "validFrom/validTo are ISO 8601 dates where the record fixes a day or month; year-only values are used when the historical record does not. Null validTo means the flag design was still in use after 1900.",
     "fallbackPolicy": "A monogram is used instead of a flag whenever the correct 1900 design or a PD/CC0 artwork could not be verified. Existing political-status badges are unchanged.",
-    "notes": "M11b expands the catalog to 67 states and 66 dependent territories. The five M11 monogram cases (Spain, Spanish Sahara, Spanish Guinea, Montenegro and the Transvaal) are resolved. Wadai and Darfur remain documented monogram exceptions because no verified historical flag design could be established. Austria-Hungary uses its common civil ensign because no single unified national flag existed. Flags are presentation-only and keyed by stable numeric polity IDs.",
+    "notes": "M11b expands the catalog to 67 states and 66 dependent territories. The five M11 monogram cases (Spain, Spanish Sahara, Spanish Guinea, Montenegro and the Transvaal) are resolved. Wadai and Darfur remain documented monogram exceptions: M11c research found only modern reconstructions, military standards or post-1900 movement flags, not a defensible 1900 national/state flag. Their territories now have reconstructed map polygons. Austria-Hungary uses its common civil ensign because no single unified national flag existed. Flags are presentation-only and keyed by stable numeric polity IDs.",
     "flagKinds": {
       "canada-red-ensign-1868": "de-facto-national",
       "sweden-1844": "national-with-union-badge",
@@ -1605,13 +1605,13 @@
       "tag": "WAD",
       "flag": null,
       "basis": "fallback",
-      "fallbackReason": "No verified historical national or state flag design for the Sultanate of Wadai could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag."
+      "fallbackReason": "No verified historical national or state flag design could be established. FOTW has no Wadai national-flag entry; Wikimedia Commons holds only modern user-made flags (a DeviantArt-derived 'Sultanate of Wadai' image and a CC BY-SA 4.0 'Wadai' upload), neither of which is a contemporary source. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent or mislabel a flag."
     },
     "64": {
       "tag": "DAR",
       "flag": null,
       "basis": "fallback",
-      "fallbackReason": "No verified historical national or state flag design for the Sultanate of Darfur could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag."
+      "fallbackReason": "No verified historical national or state flag design could be established. The FOTW page for the Sultanate of Darfur (1603-1874, 1898-1916) records no state flag and only discusses a 1910 illustrated red flag with a white frame carried by Masalit rebels, a military/conflict standard rather than a national flag. Modern Darfur liberation/regional flags are post-1900 and are not used. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent a flag."
     },
     "65": {
       "tag": "SHM",

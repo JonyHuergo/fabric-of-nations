@@ -51,6 +51,7 @@ const map = JSON.parse(
     label: [number, number];
     markerOnly?: boolean;
     approximate?: string;
+    provenance?: { referenceDate: string; geometryClass: string };
   }[];
 };
 const oldCatalog = JSON.parse(
@@ -184,18 +185,18 @@ describe("M11b catalog coverage — map and picker integration", () => {
     }
   });
 
-  test("Austria-Hungary has a real polygon and the new small polities are markers", () => {
+  test("Austria-Hungary and the M11b small polities have reconstructed polygons", () => {
     const austria = mapByTag.get("AUT");
     expect(austria?.rings.length ?? 0).toBeGreaterThan(0);
     expect(austria?.markerOnly).toBeUndefined();
     for (const tag of ["TON", "SOK", "WAD", "DAR", "SHM", "CRT", "TIB", "KHI", "BUK", "SAR"]) {
-      const entry = byTag.get(tag);
       const mapEntry = mapByTag.get(tag);
-      expect(mapEntry?.markerOnly).toBe(true);
-      expect(mapEntry?.rings).toEqual([]);
-      expect(mapEntry?.label[0]).toBeCloseTo(entry?.capital.lon ?? 0, 3);
-      expect(mapEntry?.label[1]).toBeCloseTo(entry?.capital.lat ?? 0, 3);
-      expect(mapEntry?.approximate).toMatch(/marker-only approximation/);
+      expect(mapEntry?.markerOnly).toBeUndefined();
+      expect(mapEntry?.rings.length ?? 0).toBeGreaterThan(0);
+      expect(mapEntry?.provenance?.referenceDate).toBe("1900-01-01");
+      expect(mapEntry?.provenance?.geometryClass).not.toBe("marker-only");
+      expect(Number.isFinite(mapEntry?.label[0])).toBe(true);
+      expect(Number.isFinite(mapEntry?.label[1])).toBe(true);
     }
   });
 

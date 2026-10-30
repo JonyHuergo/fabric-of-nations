@@ -1108,6 +1108,10 @@ function buildDoc(manifest, catalog) {
     );
   }
   lines.push("");
+  lines.push(
+    "M11c re-checked both cases against FOTW and the Wikimedia Commons file search. The evidence supports retaining the monograms: the only available designs are modern reconstructions, military standards or post-1900 movement flags. The map now gives both polities real territorial polygons, so the monogram is the only remaining representation fallback, not a marker-only map entry.",
+  );
+  lines.push("");
   lines.push("## Dependencies: sovereign flag plus status badge");
   lines.push("");
   lines.push(
@@ -1191,13 +1195,13 @@ function buildDoc(manifest, catalog) {
   lines.push("## Remaining limitations and unresolved questions");
   lines.push("");
   lines.push(
-    "- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established from the available sources, and no PD/CC0 artwork documents one. Their independence and marker locations are still represented.",
+    "- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established, and no PD/CC0 artwork documents one. Their independence and reconstructed territories are represented on the map; the flag monogram is a representation fallback only.",
   );
   lines.push(
-    "- Austria-Hungary's map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina). Galicia, Transylvania, Vojvodina and South Tyrol are not separable at Natural Earth 1:50m admin-0 resolution; the limitation is recorded in the catalog notes.",
+    "- Austria-Hungary's M11c map geometry now includes reconstructed Galicia, Bukovina, Transylvania, Banat, Vojvodina, South Tyrol, Trieste/Gorizia, Kotor and Cieszyn Silesia; the external frontier is documented in `docs/HISTORICAL_MAP_PROVENANCE.md`.",
   );
   lines.push(
-    "- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak use marker-only map integration because reliable 1900 polygon boundaries are not available at the map source. Their capitals, labels, statuses and picker entries are fully integrated; the marker approximation is recorded in the map data and the coverage audit.",
+    "- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak no longer use marker-only map integration. M11c gives every one a reconstructed 1900 polygon with provenance and confidence; no marker-only polity remains.",
   );
   lines.push(
     "- Several states used a plain civil/national tricolour while the state flag carried a coat of arms available only under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.",

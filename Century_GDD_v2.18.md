@@ -6310,15 +6310,18 @@ member countries.
 
 The map is bundled, offline and interactive:
 
-- Geometry source: **Natural Earth 1:50m** cultural vectors, public domain,
-  through **world-atlas 2.0.2** TopoJSON (ISC). Modern units are aggregated into
-  1900 polities with the catalog crosswalk. South Africa is split into the Cape
-  Colony, Natal, the Transvaal and the Orange Free State using Natural Earth
-  admin-1 provinces. Canada's modern polygon is used for the Dominion of Canada;
-  Newfoundland is a marker territory because the source cannot separate it.
+- Geometry source: **Natural Earth 1:50m/1:10m** cultural vectors, public
+  domain, through **world-atlas 2.0.2** TopoJSON (ISC) and 1:10m admin-1
+  reconstruction blocks. Modern units are only building blocks; the authored
+  M11c transfers in `boundaries_1900.json` reconstruct the 1900 external
+  borders. South Africa is split into the Cape Colony, Natal, the Transvaal and
+  the Orange Free State using admin-1 provinces. Newfoundland is separated from
+  Canada. Every polity carries boundary provenance, confidence and a reference
+  date. See §17I.14 and `docs/HISTORICAL_MAP_PROVENANCE.md`.
 - CShapes 2.0 is **not redistributed**: it is CC BY-NC-SA 4.0 and is cited only
   as a classification reference. historical-basemaps (GPL-3.0) was reviewed and
-  not used.
+  is used only as a visual/topological cross-check; no coordinate ring from it
+  is redistributed.
 - Polygons are unioned with `polygon-clipping` (MIT) at build time, simplified to
   a 0.02° tolerance, quantized to 0.001°, delta encoded, and unwrapped at the
   antimeridian. The renderer draws each ring at −360/0/+360 offsets.
@@ -6429,16 +6432,14 @@ in this milestone; web export is the verified target.
 
 ### 17I.12 Deliberate limits
 
-- The map aggregates modern source units into 1900 polities. Sub-national 1900
-  borders are not available for every case: Congress Poland is inside the
-  Russian Empire, Alsace-Lorraine cannot be separated from France, Austria-
-  Hungary's Galicia/Transylvania/Vojvodina/South Tyrol are not separable at
-  admin-0 resolution, and Tibet, Xinjiang and Mongolia are inside Qing China.
-  South Africa and Newfoundland are the documented exceptions handled with
-  admin-1 geometry/markers.
-- Sokoto, Wadai, Darfur, Jabal Shammar, Crete, Tonga, Tibet, Khiva, Bukhara and
-  Sarawak use marker-only map integration because reliable 1900 polygons are not
-  available at the map source.
+- The M11 map aggregated modern source units into 1900 polities. **M11c (§17I.14)
+  supersedes those limits:** Congress Poland is separated from the German Empire
+  and remains Russian; Alsace-Lorraine is separated from France; Austria-Hungary
+  includes reconstructed Galicia, Transylvania, Vojvodina and South Tyrol;
+  Tibet is separated from Qing China; and Sokoto, Wadai, Darfur, Jabal Shammar,
+  Crete, Tonga, Khiva, Bukhara and Sarawak have reconstructed polygons. The
+  remaining limits are the documented frontier approximations in
+  `docs/HISTORICAL_MAP_PROVENANCE.md`, not the original admin-0 aggregation.
 - The world population total is about 1.59 billion, closer to but still below the
   1.62 billion M2 estimate; it is not a claim of census completeness.
 - The one-market-per-country rule means imperial markets include dependent
@@ -6470,6 +6471,45 @@ independent-state inventory and closes the known coverage gaps:
   boundary uncertainties are recorded in `docs/1900_CATALOG_COVERAGE.md`. Flag
   provenance and the project-authored reconstruction audit are in
   `docs/FLAG_PROVENANCE.md`.
+
+### 17I.14 M11c historical geography and border-reconstruction addendum
+
+**Status:** implemented. M11c replaces the "modern units only" map assumption
+with an explicit historical reconstruction and a documented audit:
+
+- **No modern border by default.** Modern Natural Earth units are building
+  blocks only. Every 1900 difference is an authored transfer in
+  `packages/data/data/historical/m11/boundaries_1900.json` with dated sources,
+  confidence, geometry class and uncertainty. Transfers are clipped to their
+  source polities and applied with `polygon-clipping`; residual overlaps are
+  resolved deterministically.
+- **Germany is the German Empire.** Alsace-Lorraine, North Schleswig,
+  Eupen-Malmedy, Memel, East Prussia/Kaliningrad and the Prussian eastern
+  provinces are added; Congress Poland and Austrian Galicia are excluded. The
+  eastern frontier strip is MEDIUM confidence.
+- **Libya is Ottoman.** The modern Libyan outer frame is assigned to the
+  Ottoman Empire (OTT) minus the Aouzou strip. The provenance records
+  Tripolitania, Cyrenaica and Fezzan as separate components with the limits of
+  Ottoman administration and effective control. No independent `LBY` state is
+  added.
+- **No marker-only polities remain.** Tonga, Sokoto, Wadai, Darfur, Jabal
+  Shammar, Crete, Tibet, Khiva, Bukhara and Sarawak have reconstructed polygons;
+  their stable IDs and simulation entries are unchanged.
+- **Provenance is part of the map.** Every map polity carries its reference
+  date, sources with URLs/licences, geometry class, confidence, deviations from
+  the modern map, known uncertainties and transfer ids.
+- **Audit and tests.** `scripts/m11/audit-map.mjs` generates
+  `world_map_1900_audit.json`; `m11c-geography.test.ts` verifies catalog/map/
+  provenance coverage, Germany, Libya, the global historical test points, ring
+  validity, the two documented coastline slivers and the absence of
+  multi-sample land voids. The detailed table is
+  `docs/HISTORICAL_MAP_PROVENANCE.md`; the map pipeline is `docs/MAP_DATA.md`;
+  the material decision is D-096.
+- **Residual uncertainty.** Two overlaps above 0.001 deg² remain
+  (Canada/Newfoundland 0.249 deg², Bolivia/Brazil 0.016 deg²) and 24
+  single-sample 1° coastal/island samples remain unassigned. These are
+  generalization artefacts, not missing polities. No multi-sample terrestrial
+  void remains; the Libyan void is gone.
 
 ## 18. Code-agent execution contract
 

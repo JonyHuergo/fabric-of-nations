@@ -38502,7 +38502,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 20000,
       "confidence": "medium",
-      "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). The map source cannot give a reliable 1900 land boundary at this scale, so the kingdom is represented by a marker at Nuku'alofa."
+      "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). M11c reconstructs its territory from the modern Tongan archipelago; the archipelago's extent is not disputed."
     },
     {
       "countryId": 62,
@@ -38514,7 +38514,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 10000000,
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. The 1900 boundary is not available as a reliable polygon at the map source, so the caliphate is represented by a marker at Sokoto. Population is a rounded order-of-magnitude estimate."
+      "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. M11c reconstructs the caliphate's core from ten modern northern Nigerian states. Population is a rounded order-of-magnitude estimate."
     },
     {
       "countryId": 63,
@@ -38526,7 +38526,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 2000000,
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at Abéché and a documented monogram fallback. Population is a rounded estimate."
+      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate."
     },
     {
       "countryId": 64,
@@ -38538,7 +38538,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 2000000,
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at El Fasher and a documented monogram fallback. Population is a rounded estimate."
+      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate."
     },
     {
       "countryId": 65,
@@ -38550,7 +38550,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 1000000,
       "confidence": "low",
-      "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. The 1900 boundary is not available as a reliable polygon at the map source, so the emirate is represented by a marker at Ha'il. Population is a rounded estimate."
+      "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. M11c reconstructs the emirate from Ha'il, Qassim, Riyadh, the Northern Borders and al-Jowf; Ottoman sovereignty over Najd was nominal. Population is a rounded estimate."
     },
     {
       "countryId": 66,
@@ -38562,7 +38562,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 300000,
       "confidence": "medium",
-      "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). Represented by a marker at Chania because the map source cannot separate Crete from modern Greece without an admin-1 split. The flag combines the Greek cross with a red canton and white star."
+      "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). M11c separates Crete from modern Greece using the modern Crete region. The flag combines the Greek cross with a red canton and white star."
     }
   ],
   "marketMeta": [
@@ -38957,7 +38957,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "St. John's",
       "selectable": false,
       "confidence": "medium",
-      "notes": "Not part of Canada in 1900. The map source cannot separate Newfoundland from modern Canada, so it is shown as a marker territory over Canadian territory."
+      "notes": "Not part of Canada in 1900. M11c separates Newfoundland and Labrador from modern Canada using the modern province boundary."
     },
     {
       "regionId": 121,
@@ -39419,7 +39419,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "Lhasa",
       "selectable": false,
       "confidence": "low",
-      "notes": "Not an independent state in 1900. Shown as a marker territory of Qing China because the map source cannot separate Tibet at admin-0 resolution. Population is a rounded estimate."
+      "notes": "Not an independent state in 1900. M11c separates the modern Tibet Autonomous Region as a conservative core; Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated. Population is a rounded estimate."
     },
     {
       "regionId": 163,
@@ -39430,7 +39430,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "Khiva",
       "selectable": false,
       "confidence": "low",
-      "notes": "Russian protectorate, not independent. Represented by a marker at Khiva inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate."
+      "notes": "Russian protectorate, not independent. M11c reconstructs the khanate's irrigated core from Xorazm, Karakalpakstan and Daşoguz. Population is a rounded estimate."
     },
     {
       "regionId": 164,
@@ -39441,7 +39441,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "Bukhara",
       "selectable": false,
       "confidence": "low",
-      "notes": "Russian protectorate, not independent. Represented by a marker at Bukhara inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate."
+      "notes": "Russian protectorate, not independent. M11c reconstructs the emirate from Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. Population is a rounded estimate."
     },
     {
       "regionId": 165,
@@ -39452,7 +39452,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "Kuching",
       "selectable": false,
       "confidence": "low",
-      "notes": "British protectorate, not independent. Represented by a marker at Kuching inside the British imperial market; the map source aggregates Borneo into British Malaya. Population is a rounded estimate."
+      "notes": "British protectorate, not independent. M11c separates Sarawak from British Malaya using the modern Malaysian state boundary. Population is a rounded estimate."
     }
   ]
 }) as EconomyScenarioDef;

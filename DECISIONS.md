@@ -5106,3 +5106,72 @@ integration, full flag artwork and a formal coverage audit.
 - New marker-only polities are fully selectable and picker-integrated but not
   drawn as territories until reliable 1900 polygons are available.
 
+## D-096 — M11c historical geography, border reconstruction and representation audit
+
+**Status:** implemented (M11c).
+
+### Context
+
+M11/M11b aggregated modern Natural Earth units into 1900 polities. That left
+Libya as an unassigned void, kept modern German borders, and preserved many
+post-1900 borders (Alsace-Lorraine inside France, Congress Poland inside Russia,
+Austria-Hungary's lost provinces outside its polygon, Siam's ceded provinces
+outside Siam, the African sultanates as markers, etc.). M11c requires a
+systematic historical-border audit of every catalogued polity, not a modern
+border with a few fragments added.
+
+### Decision
+
+1. **Modern units are building blocks only.** Base geometry remains Natural
+   Earth 1:50m/world-atlas; 1:10m admin-1/admin-0 units are added as
+   reconstruction blocks. No modern unit is accepted as a 1900 border without
+   an explicit transfer or a documented verification.
+2. **Explicit, sourced transfers.** Every territorial change is an authored
+   record in `boundaries_1900.json` (destination, source polities, source units
+   or polygon, optional clip/subtract, dated sources, confidence and notes).
+   The build clips each transfer to its source polity, applies additions and
+   removals with `polygon-clipping`, and resolves residual overlaps
+   deterministically (destination beats source; otherwise the smaller polity
+   keeps the sliver).
+3. **Germany is the German Empire (1900), not the Federal Republic.** The
+   reconstruction includes Alsace-Lorraine, North Schleswig, Eupen-Malmedy,
+   Memel, East Prussia/Kaliningrad, and the Prussian eastern provinces clipped
+   to the authored 1900 Russian/Austrian frontier. The frontier strip is MEDIUM
+   confidence; the provinces are HIGH.
+4. **Libya is Ottoman, not a modern Libyan state.** The modern Libyan outer
+   frame is assigned to OTT, minus the Aouzou strip (left with Chad). The map
+   provenance records Tripolitania, Cyrenaica and Fezzan separately, including
+   the limits of effective control. No `LBY` polity is added.
+5. **No marker-only polities remain.** Tonga, Sokoto, Wadai, Darfur, Jabal
+   Shammar, Crete, Tibet, Khiva, Bukhara and Sarawak receive reconstructed
+   polygons with explicit LOW/MEDIUM confidence. They remain simulation
+   entries with unchanged IDs.
+6. **Provenance is part of the map artifact.** Every polity entry carries the
+   reference date, sources with URLs/licences, geometry class, confidence,
+   underlying boundary date, deviations from the modern map, known
+   uncertainties, transfer ids and optional composite components.
+7. **Audit is generated and tested.** `audit-map.mjs` writes
+   `world_map_1900_audit.json`; `m11c-geography.test.ts` checks validity,
+   point-in-polygon history, provenance completeness, German/Libyan coverage,
+   the absence of marker-only entries, the two documented residual coastline
+   slivers and the absence of multi-sample land voids.
+8. **No authoritative simulation change.** Polity IDs, tags, populations,
+   markets, schema, save format and deterministic behavior are unchanged. The
+   M11c work is scenario/map presentation plus provenance documentation.
+
+### Consequences
+
+- The map now shows a historically bounded German Empire, an Ottoman Libya and
+  reconstructed borders across Europe, Asia, Africa, the Americas and Oceania.
+- Residual generalization artefacts are documented, not hidden: the audit
+  reports Canada/Newfoundland (0.249 deg²) and Bolivia/Brazil (0.016 deg²)
+  coastline slivers, and 24 single-sample 1° coastal/island gaps. There is no
+  multi-sample terrestrial void.
+- Wadai and Darfur retain monogram flags: the M11c research found no defensible
+  1900 national/state flag, only modern reconstructions, military standards or
+  post-1900 movement flags. Their territories are now drawn.
+- The full per-polity audit table and sources are in
+  `docs/HISTORICAL_MAP_PROVENANCE.md`; the coverage reconciliation is updated in
+  `docs/1900_CATALOG_COVERAGE.md`; the flag investigation is in
+  `docs/FLAG_PROVENANCE.md`.
+

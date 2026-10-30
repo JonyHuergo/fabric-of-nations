@@ -840,8 +840,10 @@ A monogram is retained when no historically correct flag artwork can be establis
 
 | Polity | ID | Status | Reason |
 | --- | ---: | --- | --- |
-| Sultanate of Wadai (`WAD`) | 63 | independent | No verified historical national or state flag design for the Sultanate of Wadai could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag. |
-| Sultanate of Darfur (`DAR`) | 64 | independent | No verified historical national or state flag design for the Sultanate of Darfur could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag. |
+| Sultanate of Wadai (`WAD`) | 63 | independent | No verified historical national or state flag design could be established. FOTW has no Wadai national-flag entry; Wikimedia Commons holds only modern user-made flags (a DeviantArt-derived 'Sultanate of Wadai' image and a CC BY-SA 4.0 'Wadai' upload), neither of which is a contemporary source. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent or mislabel a flag. |
+| Sultanate of Darfur (`DAR`) | 64 | independent | No verified historical national or state flag design could be established. The FOTW page for the Sultanate of Darfur (1603-1874, 1898-1916) records no state flag and only discusses a 1910 illustrated red flag with a white frame carried by Masalit rebels, a military/conflict standard rather than a national flag. Modern Darfur liberation/regional flags are post-1900 and are not used. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent a flag. |
+
+M11c re-checked both cases against FOTW and the Wikimedia Commons file search. The evidence supports retaining the monograms: the only available designs are modern reconstructions, military standards or post-1900 movement flags. The map now gives both polities real territorial polygons, so the monogram is the only remaining representation fallback, not a marker-only map entry.
 
 ## Dependencies: sovereign flag plus status badge
 
@@ -948,9 +950,9 @@ pnpm flags:update   # network: deliberately accept a changed rendition and rewri
 
 ## Remaining limitations and unresolved questions
 
-- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established from the available sources, and no PD/CC0 artwork documents one. Their independence and marker locations are still represented.
-- Austria-Hungary's map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina). Galicia, Transylvania, Vojvodina and South Tyrol are not separable at Natural Earth 1:50m admin-0 resolution; the limitation is recorded in the catalog notes.
-- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak use marker-only map integration because reliable 1900 polygon boundaries are not available at the map source. Their capitals, labels, statuses and picker entries are fully integrated; the marker approximation is recorded in the map data and the coverage audit.
+- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established, and no PD/CC0 artwork documents one. Their independence and reconstructed territories are represented on the map; the flag monogram is a representation fallback only.
+- Austria-Hungary's M11c map geometry now includes reconstructed Galicia, Bukovina, Transylvania, Banat, Vojvodina, South Tyrol, Trieste/Gorizia, Kotor and Cieszyn Silesia; the external frontier is documented in `docs/HISTORICAL_MAP_PROVENANCE.md`.
+- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak no longer use marker-only map integration. M11c gives every one a reconstructed 1900 polygon with provenance and confidence; no marker-only polity remains.
 - Several states used a plain civil/national tricolour while the state flag carried a coat of arms available only under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.
 - Ecuador's plain tricolour is shown because the coat of arms became mandatory for the state flag only on 5 December 1900, after the reference date.
 - Brazil's star field changed as states were admitted; the bundled 1889–1960 rendition follows the period design rather than a star-by-star 1900 reconstruction.
