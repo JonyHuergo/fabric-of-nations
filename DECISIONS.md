@@ -4676,3 +4676,60 @@ changed.
 - The committed worker bundle was regenerated. No GDD file, schema, simulation,
   protocol, or data version was changed: the GDD already specified the corrected speed
   set, last-region rule, 365-day truce, and settlement-wage wealth convention.
+
+## D-085 — Audit remediation batch 4: determinism evidence, documentation, UI copy, and final validation
+
+**Status:** implemented. Closes AUDIT-016 through AUDIT-022 from the post-M10 audit.
+World schema **26**, simulation **0.26.0**, worker protocol **13**, and data version
+**`m3-economy-v11`** remain unchanged.
+
+### Decisions
+
+1. **Determinism evidence distinguishes the driver digest from economic simulation.**
+   The existing known-answer digest is retained as an explicitly empty-world M1 tick-driver
+   vector (no pop blocks, buildings, or markets) and its stale schema-25 comment is
+   corrected to schema 26. A new bounded one-year test runs the m5 multi-block/multi-market
+   fixture for 365 ticks twice, compares summaries/hash/serialization, and verifies
+   save/resume at day 180 produces the same final state. It does not measure performance.
+2. **GDD implementation record is reconciled with Batches 2–4.** §17H.3 now states the
+   proportional recruitment/allocation and payment rules, the active casualty shares, the
+   cession last-region check, and the elapsed-time truce boundary. §17H.5 now lists the
+   additional keyed allocation tie-breaks and the required enabled-military accounts. This
+   is a correction of the existing v2.17 implementation record, not a new mechanic or a
+   new GDD version.
+3. **Stale UI copy is corrected.** The app status export is `playable-shell` rather than a
+   pre-M7 placeholder; the Politics law-slot fallback describes the current scenario rather
+   than claiming M9/E5/M10/E6b dependencies; and the War help text states the 18–45
+   recruitment age rather than generic working age.
+4. **Fiscal validation formatting is repaired.** A run-together declaration and `if` in
+   `assertValidFinanceState`, and a run-together construction-wage/capitalization entry in
+   the account semantic matrix, are split onto separate lines; no validation logic changed.
+5. **Military actions validate their day and accounting period.** `applyMilitaryAction`
+   rejects a day different from `world.dayIndex`, the terminal boundary, and a day at or
+   before `finance.closedThroughDay`. `validateMilitaryAction` reports the same errors when
+   the action carries a day. This prevents direct API callers from posting military
+   entries into the wrong or closed period.
+6. **Worker events always pass through the supervisor.** The native transport no longer
+   has a direct `handleEvent` fallback when no supervisor exists. Every READY/SNAPSHOT and
+   command reply is therefore subject to the supervisor's sequence gating and late-reply
+   checks; teardown-time events are dropped rather than applied out of order.
+7. **Recruitment reconciles civilian employment.** Recruits are removed from working-age
+   population, so existing assignments that would exceed the remaining working-age
+   population are reduced deterministically in ascending assignment-id order and the
+   employment system is marked dirty for the next refresh. The action snapshot now includes
+   employment and `employmentDirty`, so a later failure restores both atomically. This keeps
+   population/employment invariants intact without inventing a new labor model.
+
+### Consequences
+
+- Determinism coverage now includes real population, buildings, markets, wages, needs,
+  migration, and fiscal flows, while the empty-world digest remains a precise driver
+  regression vector.
+- The GDD and decision records describe the behavior actually implemented by Batches 2–4.
+- Player-facing text no longer advertises obsolete milestone limitations.
+- Military actions cannot silently post into a stale or closed accounting period.
+- Stale worker snapshots cannot bypass supervisor sequencing through the native fallback.
+- Recruitment no longer leaves civilian assignments above the remaining working-age
+  population, and failed recruitment leaves employment unchanged.
+- No schema, simulation, protocol, data, or save-format change was required. The committed
+  worker bundle was regenerated because the simulation source changed.
