@@ -1,5 +1,6 @@
 import {
   PROTOCOL_VERSION,
+  SPEED_VALUES,
   countryById,
   fiscalResultLabel,
   formatRate,
@@ -121,6 +122,50 @@ describe("M7 simulation worker host", () => {
     // The driver caps one pump at four complete ticks; it does not skip state.
     expect(lastSnapshot(events).dayIndex).toBe(8);
     host.handleCommand(command("PAUSE", "pause-2"));
+  });
+
+  test("advertises the documented speed set and rejects unsupported values", () => {
+    expect(SPEED_VALUES).toEqual([1, 3, 10, 30]);
+    const { host, events } = createHarness();
+    for (const speed of SPEED_VALUES) {
+      host.handleCommand(command("SET_SPEED", `speed-${String(speed)}`, { daysPerSecond: speed }));
+      expect(lastSnapshot(events).speedDaysPerSecond).toBe(speed);
+    }
+    for (const unsupported of [0, 2, 5, 11, 30.5, -1]) {
+      host.handleCommand({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SET_SPEED",
+        commandId: `bad-speed-${String(unsupported)}`,
+        daysPerSecond: unsupported,
+      } as unknown as WorkerCommand);
+      const error = lastEvent(events, "ERROR");
+      expect(error?.code).toBe("invalid_speed");
+      expect(error?.message).toContain("must be one of 1, 3, 10, 30");
+      expect(lastSnapshot(events).speedDaysPerSecond).toBe(30);
+    }
+  });
+
+  test("schedules 3x and 30x with complete ticks only", () => {
+    const slow = createHarness();
+    slow.host.handleCommand(command("SET_SPEED", "speed-3", { daysPerSecond: 3 }));
+    slow.host.handleCommand(command("START", "start-3"));
+    for (let index = 1; index <= 10; index += 1) {
+      slow.advanceClock(100);
+      slow.host.pump(1_000 + index * 100);
+    }
+    // Ten 100 ms pumps at 3x produce exactly three complete ticks.
+    expect(lastSnapshot(slow.events).dayIndex).toBe(3);
+
+    const fast = createHarness();
+    fast.host.handleCommand(command("SET_SPEED", "speed-30", { daysPerSecond: 30 }));
+    fast.host.handleCommand(command("START", "start-30"));
+    for (let index = 1; index <= 4; index += 1) {
+      fast.advanceClock(100);
+      fast.host.pump(1_000 + index * 100);
+    }
+    // The normal 100 ms pump cadence yields three ticks per pump at 30x; the
+    // four-tick pump cap remains the bounded catch-up policy for stalls.
+    expect(lastSnapshot(fast.events).dayIndex).toBe(12);
   });
 
   test("round-trips an industrial-policy action and rejects unaffordable enterprise support", () => {

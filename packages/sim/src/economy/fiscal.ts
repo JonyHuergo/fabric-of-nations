@@ -9,6 +9,10 @@
  *    by each pop block that day. The tax moves existing household cash to the
  *    country treasury and recognizes household tax expense and country tax
  *    revenue. Gross wage income and employer wage expense are untouched.
+ *    Government payroll paid in this phase after withholding (administration) or
+ *    in later phases (education, training, military) is not part of this
+ *    withholding pass; construction wages are the documented E3 exception and
+ *    are taxed at their separate payment path. See D-084.
  * 2. Welfare transfer: the country's daily budget share
  *    (`welfareBudgetSUSDPerYear / daysInYear(civil year)`) is paid from treasury
  *    cash to the country's population blocks in proportion to population. If the

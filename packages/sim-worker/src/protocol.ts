@@ -30,7 +30,7 @@ export const MAX_ACTIVE_DEBT_CONTRACTS = 64;
 export const MAX_ACTIVE_CONSTRUCTION_PROJECTS = 32;
 
 /** Discrete speed choices exposed by the M7 UI, in simulated days per second. */
-export const SPEED_VALUES = [1, 2, 5, 10] as const;
+export const SPEED_VALUES = [1, 3, 10, 30] as const;
 export type SpeedDaysPerSecond = (typeof SPEED_VALUES)[number];
 
 export const DEFAULT_SPEED_DAYS_PER_SECOND: SpeedDaysPerSecond = 1;

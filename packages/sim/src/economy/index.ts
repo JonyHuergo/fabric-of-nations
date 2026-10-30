@@ -221,6 +221,7 @@ export {
   regionSovereignCountryId,
   relationBetween,
   runMilitaryPhase,
+  splitMilitaryCasualties,
   transferRegionSovereignty,
   validateMilitaryAction,
   type AcceptPeaceInput,

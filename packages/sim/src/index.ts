@@ -24,6 +24,7 @@ export * from "./types.js";
 export * from "./constants.js";
 export * from "./calendar.js";
 export * from "./rng.js";
+export { checksumOfJson } from "./hash.js";
 export * from "./world.js";
 export * from "./validationStats.js";
 export * from "./population/index.js";

@@ -34,6 +34,7 @@ import {
   M10_AI_PEACE_MIN_WAR_DAYS,
   M10_ARMY_FORMATION_DAYS,
   M10_BASE_CASUALTY_FRACTION,
+  M10_CAPTURED_SHARE,
   M10_CASUALTY_STRENGTH_SCALE,
   M10_DEATH_SHARE,
   M10_DEPLOYMENT_DAYS,
@@ -878,6 +879,43 @@ function validateCountry(world: World, countryId: Id, errors: string[]): void {
   }
 }
 
+/** True when the two countries are the two belligerents of one war. */
+function isWarPair(war: WarState, firstCountryId: Id, secondCountryId: Id): boolean {
+  return (
+    (firstCountryId === war.attackerCountryId && secondCountryId === war.defenderCountryId) ||
+    (firstCountryId === war.defenderCountryId && secondCountryId === war.attackerCountryId)
+  );
+}
+
+/**
+ * Validate a `cede-occupied` term against the current world.
+ *
+ * The ceding country is the opponent of the offerer. Cession transfers every
+ * region of that opponent that the offerer currently controls, so the opponent
+ * must retain at least one sovereign region after all transfers.
+ */
+function cessionError(
+  world: World,
+  offererCountryId: Id,
+  cedingCountryId: Id,
+): string | null {
+  const cedingCountry = countryById(world, cedingCountryId);
+  if (cedingCountry === undefined) {
+    return `unknown country ${String(cedingCountryId)}`;
+  }
+  if (cedingCountry.id === offererCountryId) {
+    return "cession requires two distinct belligerents";
+  }
+  const transferred = controlledRegionsOf(world, offererCountryId, cedingCountryId);
+  if (transferred.length === 0) {
+    return "cession requires control of at least one enemy region";
+  }
+  if (cedingCountry.regionIds.length - transferred.length < 1) {
+    return `cession would remove the last region of country ${String(cedingCountry.id)}`;
+  }
+  return null;
+}
+
 export function validateDeclareWar(world: World, input: DeclareWarInput): MilitaryValidation {
   const errors: string[] = [];
   if (!world.military.enabled) fail(errors, "the military system is not enabled");
@@ -893,6 +931,9 @@ export function validateDeclareWar(world: World, input: DeclareWarInput): Milita
     fail(errors, "the countries are already at war");
   }
   const relation = relationBetween(world, input.countryId, input.targetCountryId);
+  // Inclusive last prohibited day: a peace on P sets this to P+365, so full
+  // truce days are P+1..P+365 and the first legal declaration is P+366. The
+  // peace day itself is also prohibited by the inclusive comparison.
   if (
     relation !== undefined &&
     relation.truceUntilDay !== null &&
@@ -920,10 +961,8 @@ export function validateOfferPeace(world: World, input: OfferPeaceInput): Milita
         : war.attackerCountryId;
     if ((PEACE_TERMS as readonly string[]).includes(input.terms)) {
       if (input.terms === "cede-occupied") {
-        const controlled = controlledRegionsOf(world, input.countryId, other);
-        if (controlled.length === 0) {
-          fail(errors, "cession requires control of at least one enemy region");
-        }
+        const cession = cessionError(world, input.countryId, other);
+        if (cession !== null) fail(errors, cession);
       }
       if (
         world.military.peaceOffers.some(
@@ -957,10 +996,16 @@ export function validateAcceptPeace(world: World, input: AcceptPeaceInput): Mili
     fail(errors, "only the offer's recipient may accept it");
   } else if (
     war !== undefined &&
-    offer.fromCountryId !== war.attackerCountryId &&
-    offer.fromCountryId !== war.defenderCountryId
+    !isWarPair(war, offer.fromCountryId, offer.toCountryId)
   ) {
-    fail(errors, "the offerer is not a belligerent");
+    fail(errors, "the peace offer parties do not match the war's belligerents");
+  } else if (!(PEACE_TERMS as readonly string[]).includes(offer.terms)) {
+    fail(errors, "unknown peace terms");
+  } else if (war !== undefined && offer.terms === "cede-occupied") {
+    // Re-validate cession against the current world: occupations may have
+    // changed since the offer was created.
+    const cession = cessionError(world, offer.fromCountryId, offer.toCountryId);
+    if (cession !== null) fail(errors, cession);
   }
   return { valid: errors.length === 0, errors };
 }
@@ -1173,9 +1218,15 @@ export function transferRegionSovereignty(
   if (fromCountryId === toCountryId) return;
   if (fromCountryId !== null) {
     const fromCountry = countryById(world, fromCountryId);
-    if (fromCountry !== undefined) {
-      fromCountry.regionIds = fromCountry.regionIds.filter((id) => id !== regionId);
+    if (fromCountry === undefined) {
+      throw new RangeError(`region ${String(regionId)} has an unknown sovereign`);
     }
+    if (fromCountry.regionIds.length <= 1) {
+      throw new RangeError(
+        `country ${String(fromCountryId)} cannot cede its last region`,
+      );
+    }
+    fromCountry.regionIds = fromCountry.regionIds.filter((id) => id !== regionId);
   }
   if (!toCountry.regionIds.includes(regionId)) {
     toCountry.regionIds = [...toCountry.regionIds, regionId].sort((left, right) => left - right);
@@ -1193,16 +1244,23 @@ function applyPeace(
 ): void {
   const winnerSide = war.attackerCountryId;
   const loserSide = war.defenderCountryId;
+  let cessionRegions: Id[] = [];
+  if (terms === "cede-occupied") {
+    const other = fromCountryId === winnerSide ? loserSide : winnerSide;
+    const cession = cessionError(world, fromCountryId, other);
+    if (cession !== null) throw new RangeError(cession);
+    cessionRegions = controlledRegionsOf(world, fromCountryId, other);
+  }
   war.endedDay = dayIndex;
+  // `truceUntilDay` is the last prohibited day. A peace on day P is followed by
+  // 365 full truce days P+1..P+365; a new declaration is first legal on P+366.
+  // The peace day P itself is also rejected defensively.
   war.truceUntilDay = dayIndex + M10_TRUCE_DAYS;
   const relation = relationForUpdate(world.military, winnerSide, loserSide);
   relation.truceUntilDay = dayIndex + M10_TRUCE_DAYS;
   relation.score = Math.min(relation.score, M10_PEACE_RELATION_SCORE);
-  if (terms === "cede-occupied") {
-    const other = fromCountryId === winnerSide ? loserSide : winnerSide;
-    for (const regionId of controlledRegionsOf(world, fromCountryId, other)) {
-      transferRegionSovereignty(world, regionId, fromCountryId);
-    }
+  for (const regionId of cessionRegions) {
+    transferRegionSovereignty(world, regionId, fromCountryId);
   }
   // Every remaining occupation between the two belligerents is cleared on peace.
   for (const region of [...world.regions].sort((left, right) => left.id - right.id)) {
@@ -1506,15 +1564,74 @@ interface BattleApplication {
   readonly result: MilitaryBattleResult;
 }
 
+/** Scale used to convert the configured casualty shares to exact integer weights. */
+const CASUALTY_SHARE_SCALE = 1_000;
+
+/**
+ * Split integer battle losses across deaths, wounded, and captured using the
+ * configured shares and deterministic largest-remainder apportionment.
+ *
+ * Deaths, wounded, and captured always sum exactly to `losses`. Equal fractional
+ * remainders are broken in category order (deaths, then wounded, then captured),
+ * which keeps the result independent of randomness and guarantees that every
+ * configured share, including `M10_CAPTURED_SHARE`, actually controls behavior.
+ */
+export function splitMilitaryCasualties(losses: number): {
+  readonly deaths: number;
+  readonly wounded: number;
+  readonly captured: number;
+} {
+  if (!Number.isSafeInteger(losses) || losses < 0) {
+    throw new RangeError("casualty losses must be a non-negative safe integer");
+  }
+  const weights = [M10_DEATH_SHARE, M10_WOUNDED_SHARE, M10_CAPTURED_SHARE].map(
+    (share) => Math.round(share * CASUALTY_SHARE_SCALE),
+  );
+  const totalWeight = weights.reduce((total, weight) => total + weight, 0);
+  if (totalWeight !== CASUALTY_SHARE_SCALE) {
+    throw new RangeError("casualty shares must sum to exactly one");
+  }
+  if (losses === 0) return { deaths: 0, wounded: 0, captured: 0 };
+  const allocations = weights.map((weight) => Math.floor((losses * weight) / totalWeight));
+  let allocated = allocations.reduce((total, value) => total + value, 0);
+  const remainders = weights
+    .map((weight, index) => ({
+      index,
+      remainder: (losses * weight) % totalWeight,
+    }))
+    .sort((left, right) => right.remainder - left.remainder || left.index - right.index);
+  const leftover = losses - allocated;
+  if (leftover > remainders.length) {
+    throw new RangeError("casualty apportionment ran out of capacity");
+  }
+  for (let index = 0; index < leftover; index += 1) {
+    const candidate = remainders[index];
+    if (candidate === undefined) {
+      throw new RangeError("casualty apportionment ran out of capacity");
+    }
+    allocations[candidate.index] = (allocations[candidate.index] ?? 0) + 1;
+  }
+  allocated = allocations.reduce((total, value) => total + value, 0);
+  if (allocated !== losses) {
+    throw new RangeError("casualty apportionment did not conserve losses");
+  }
+  return {
+    deaths: allocations[0] ?? 0,
+    wounded: allocations[1] ?? 0,
+    captured: allocations[2] ?? 0,
+  };
+}
+
 function applyCasualties(
   state: MilitaryState,
   army: Army,
   losses: number,
   dayIndex: Day,
 ): number {
-  const deaths = Math.round(losses * M10_DEATH_SHARE);
-  const wounded = Math.round(losses * M10_WOUNDED_SHARE);
-  const captured = Math.max(0, losses - deaths - wounded);
+  const split = splitMilitaryCasualties(losses);
+  const deaths = split.deaths;
+  const wounded = split.wounded;
+  const captured = split.captured;
   army.personnel = Math.max(0, army.personnel - (deaths + wounded + captured));
   army.deaths += deaths;
   army.captured += captured;
@@ -1810,6 +1927,53 @@ export function runMilitaryPhase(
 // Validation
 // ---------------------------------------------------------------------------
 
+/** Required military accounts for an enabled military system. */
+function assertMilitaryAccounts(world: World, path: string): void {
+  const countryIds = new Set<Id>(world.countries.map((country) => country.id));
+  const blockIds = new Set<Id>(world.popBlocks.map((block) => block.id));
+  const expenseCounts = new Map<Id, number>();
+  const incomeCounts = new Map<Id, number>();
+  for (const account of world.finance.accounts) {
+    if (account.subtype === "military-expense") {
+      if (account.ownerKind !== "country" || account.ownerId === null) {
+        throw new RangeError(`${path} military-expense account must be owned by a country`);
+      }
+      if (!countryIds.has(account.ownerId)) {
+        throw new RangeError(`${path} military-expense account references an unknown country`);
+      }
+      if (account.category !== "expense") {
+        throw new RangeError(`${path} military-expense account must be an expense account`);
+      }
+      expenseCounts.set(account.ownerId, (expenseCounts.get(account.ownerId) ?? 0) + 1);
+    } else if (account.subtype === "military-income") {
+      if (account.ownerKind !== "popBlock" || account.ownerId === null) {
+        throw new RangeError(`${path} military-income account must be owned by a pop block`);
+      }
+      if (!blockIds.has(account.ownerId)) {
+        throw new RangeError(`${path} military-income account references an unknown pop block`);
+      }
+      if (account.category !== "revenue") {
+        throw new RangeError(`${path} military-income account must be a revenue account`);
+      }
+      incomeCounts.set(account.ownerId, (incomeCounts.get(account.ownerId) ?? 0) + 1);
+    }
+  }
+  for (const country of world.countries) {
+    if ((expenseCounts.get(country.id) ?? 0) !== 1) {
+      throw new RangeError(
+        `${path} requires exactly one military-expense account for country ${String(country.id)}`,
+      );
+    }
+  }
+  for (const block of world.popBlocks) {
+    if ((incomeCounts.get(block.id) ?? 0) !== 1) {
+      throw new RangeError(
+        `${path} requires exactly one military-income account for pop block ${String(block.id)}`,
+      );
+    }
+  }
+}
+
 export function assertValidMilitaryState(world: World, path = "world.military"): void {
   const state = world.military;
   if (typeof state !== "object" || state === null) {
@@ -1849,6 +2013,24 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
       state.lastPhaseDay > world.dayIndex)
   ) {
     throw new RangeError(`${path}.lastPhaseDay must be a past day or null`);
+  }
+  if (!state.enabled) {
+    if (
+      state.armies.length > 0 ||
+      state.wars.length > 0 ||
+      state.relations.length > 0 ||
+      state.peaceOffers.length > 0 ||
+      state.casualties.length > 0
+    ) {
+      throw new RangeError(
+        `${path} is disabled but contains active military state`,
+      );
+    }
+    if (state.lastPhaseDay !== null) {
+      throw new RangeError(`${path} is disabled but has a last phase day`);
+    }
+  } else {
+    assertMilitaryAccounts(world, path);
   }
   for (const id of [state.nextArmyId, state.nextWarId, state.nextOfferId]) {
     requireInteger(id, `${path}.nextId`, 1, 0xffff_ffff);
@@ -1951,12 +2133,19 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
       );
     }
   }
+  const warById = new Map<Id, WarState>(
+    state.wars.map((war) => [war.id, war] as const),
+  );
   const offerIds = new Set<Id>();
   for (const offer of state.peaceOffers) {
     if (offerIds.has(offer.id)) throw new RangeError(`${path}.peaceOffers duplicates an id`);
     offerIds.add(offer.id);
-    if (!warIds.has(offer.warId)) {
+    const war = warById.get(offer.warId);
+    if (war === undefined) {
       throw new RangeError(`${path}.peaceOffers references an unknown war`);
+    }
+    if (war.endedDay !== null) {
+      throw new RangeError(`${path}.peaceOffers references a war that has ended`);
     }
     if (!countryIds.has(offer.fromCountryId) || !countryIds.has(offer.toCountryId)) {
       throw new RangeError(`${path}.peaceOffers references an unknown country`);
@@ -1964,10 +2153,27 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
     if (offer.fromCountryId === offer.toCountryId) {
       throw new RangeError(`${path}.peaceOffers requires two distinct countries`);
     }
+    if (!isWarPair(war, offer.fromCountryId, offer.toCountryId)) {
+      throw new RangeError(
+        `${path}.peaceOffers parties do not match the associated war's belligerents`,
+      );
+    }
     if (!(PEACE_TERMS as readonly string[]).includes(offer.terms)) {
       throw new RangeError(`${path}.peaceOffers.terms is invalid`);
     }
     requireInteger(offer.proposedDay, `${path}.peaceOffers.proposedDay`, 0, world.dayIndex);
+  }
+  const maxArmyId = state.armies.reduce((max, army) => Math.max(max, army.id), 0);
+  const maxWarId = state.wars.reduce((max, war) => Math.max(max, war.id), 0);
+  const maxOfferId = state.peaceOffers.reduce((max, offer) => Math.max(max, offer.id), 0);
+  if (state.nextArmyId <= maxArmyId) {
+    throw new RangeError(`${path}.nextArmyId must be after every retained army`);
+  }
+  if (state.nextWarId <= maxWarId) {
+    throw new RangeError(`${path}.nextWarId must be after every retained war`);
+  }
+  if (state.nextOfferId <= maxOfferId) {
+    throw new RangeError(`${path}.nextOfferId must be after every retained offer`);
   }
   let previousCasualty = -1;
   for (const record of state.casualties) {

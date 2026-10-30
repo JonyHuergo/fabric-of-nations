@@ -701,6 +701,13 @@ function isLastDayOfMonth(dayIndex: DayIndex): boolean {
  * actual settled household income (wages plus welfare received) is annualized
  * by the civil year. Household cash assets are deliberately not treated as
  * income. M4c mandatory payments are the income tax actually withheld that day.
+ *
+ * This is the GDD §6.5 convention exactly: settlement wages plus welfare. Government
+ * payroll paid outside settlement (administration, education, training, military)
+ * is deliberately excluded from this wealth input; it is never treated as received
+ * before its payment posting. Construction wages are taxed at their own payment
+ * path under the E3 rule but are likewise outside this settlement-based wealth
+ * input. See D-084.
  */
 function economicWealthInputs(
   world: World,
