@@ -88,8 +88,8 @@ App:
   and protocol changes.
 - `pnpm -F @century/app export:web` — static web export succeeded (Expo).
 - `pnpm -F @century/tests test -- m11-world` — **21 tests pass**: catalog
-  completeness, 122-region world validation, AI exclusion, six-region country
-  creation, rejection of dependencies/unknown ids, focus bounds, save/load
+  completeness, all-59-selectable-country initialization, 122-region world validation,
+  AI exclusion, six-region host creation, rejection of dependencies/unknown ids, focus bounds, save/load
   persistence, snapshot size, market identity/membership, map geometry, action
   ranges, and protocol/supervisor handling of `CREATE_GAME`/`NEW_GAME_RESULT`.
 - Full Jest suite: **822 of 823 tests passed** on the first M11 run. The single

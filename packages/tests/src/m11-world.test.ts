@@ -184,6 +184,18 @@ describe("M11 world initialization", () => {
     }
   });
 
+  test("every selectable country can initialize a campaign", () => {
+    const base = loadM11World();
+    const selectable = (base.countryMeta ?? []).filter((meta) => meta.selectable);
+    expect(selectable.length).toBe(59);
+    for (const meta of selectable) {
+      const scenario = { ...base, playerCountryId: meta.countryId };
+      const world = createEconomyWorld(scenario, { seed: 3 });
+      assertValidWorld(world);
+      expect(world.playerCountryId).toBe(meta.countryId);
+    }
+  });
+
   test("the authoritative world passes all ordinary state validators", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     assertValidWorld(world);
