@@ -237,7 +237,7 @@ export function PoliticsScreen({
             </Text>
             {slot.options.length === 0 ? (
               <Text style={styles.deferred}>
-                Not implemented in M8. The slot exists, but its mechanics depend on M9/E5/M10/E6b.
+                No law options are defined for this slot in the current scenario.
               </Text>
             ) : (
               slot.options.map((option) => (

@@ -1,10 +1,9 @@
 /**
- * Century application package placeholder.
+ * Century application package status.
  *
- * M0/M1 intentionally contain no React Native, Expo, DOM, worker, or UI code.
- * The mobile worker proof of concept and the playable shell arrive in M7. This
- * package must never be imported by `packages/sim`.
+ * The playable Expo/React Native shell lives in `App.tsx` and `src/`. This
+ * module is a small status export; it contains no UI or simulation logic.
  */
 
-/** Marks the application as intentionally incomplete until M7. */
-export const APP_PACKAGE_STATUS = "placeholder" as const;
+/** Marks the application as the implemented M7+ playable shell. */
+export const APP_PACKAGE_STATUS = "playable-shell" as const;

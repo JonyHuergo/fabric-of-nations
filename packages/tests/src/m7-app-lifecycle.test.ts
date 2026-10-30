@@ -73,6 +73,23 @@ describe("app lifecycle wiring", () => {
     expect(provider).toContain('setSaveStatus(null)');
   });
 
+  test("every worker event is sequenced through the supervisor", () => {
+    const provider = source("src/worker/SimulationProvider.tsx");
+    expect(provider).toContain("supervisor.receive(event)");
+    expect(provider).not.toContain("handleEvent(event)");
+  });
+
+  test("player-facing copy does not retain obsolete milestone placeholders", () => {
+    const status = source("src/index.ts");
+    expect(status).toContain("playable-shell");
+    expect(status).not.toContain("placeholder");
+    expect(status).not.toContain("arrive in M7");
+    const politics = source("src/screens/PoliticsScreen.tsx");
+    expect(politics).not.toContain("depend on M9");
+    const war = source("src/screens/WarScreen.tsx");
+    expect(war).toContain("aged 18–45");
+  });
+
   test("the app has a contained rendering-error fallback with retry", () => {
     const app = source("App.tsx");
     const boundary = source("src/components/AppErrorBoundary.tsx");

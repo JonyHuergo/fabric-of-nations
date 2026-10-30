@@ -101,7 +101,7 @@ describe("E1 UI wiring", () => {
     expect(politics).toContain("Interest groups");
     expect(politics).toContain("State administration");
     expect(politics).toContain("Regional unrest");
-    expect(politics).toContain("Not implemented in M8");
+    expect(politics).toContain("No law options are defined for this slot in the current scenario.");
     expect(politics).not.toContain("__world");
   });
 

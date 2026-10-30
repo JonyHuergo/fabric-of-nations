@@ -892,9 +892,11 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
         <NativeWorkerHost
           ref={nativeRef}
           onEvent={(event) => {
-            const supervisor = supervisorRef.current;
-            if (supervisor === null) handleEvent(event);
-            else supervisor.receive(event);
+            // Every transport event must pass through the supervisor so stale
+            // READY/SNAPSHOT sequences and late command replies are gated in one
+            // place. During teardown there is no live supervisor; drop the event
+            // rather than letting it bypass sequencing.
+            supervisorRef.current?.receive(event);
           }}
           onReady={() => {
             const supervisor = supervisorRef.current;

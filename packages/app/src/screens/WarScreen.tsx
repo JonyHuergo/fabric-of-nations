@@ -406,9 +406,9 @@ export function WarScreen({
         action that changes sovereignty, and only for regions the offering side controls.
       </Text>
       <Text style={styles.help}>
-        Army personnel are drawn from the region's working-age people and paid from the
-        treasury. Combat casualties reduce the roster and are recorded as deaths, wounded,
-        or captured; no abstract war score exists.
+        Army personnel are drawn from the region's people aged 18–45 and paid from
+        the treasury. Combat casualties reduce the roster and are recorded as deaths,
+        wounded, or captured; no abstract war score exists.
       </Text>
     </Section>
   );
