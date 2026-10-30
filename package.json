@@ -19,6 +19,7 @@
     "ci": "pnpm lint && pnpm run check:worker && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
   "devDependencies": {
+    "polygon-clipping": "0.15.7",
     "typescript": "5.9.3"
   }
 }

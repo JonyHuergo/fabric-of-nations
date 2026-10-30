@@ -1,0 +1,1466 @@
+[
+  {
+    "id": 0,
+    "key": "usa-home",
+    "name": "United States (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 1,
+    "key": "gbr-home",
+    "name": "United Kingdom (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 2,
+    "key": "deu-home",
+    "name": "Germany (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 3,
+    "key": "fra-home",
+    "name": "France (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 4,
+    "key": "rus-home",
+    "name": "Russian Empire (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 5,
+    "key": "jpn-home",
+    "name": "Japan (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 6,
+    "key": "ita-home",
+    "name": "Italy (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 7,
+    "key": "esp-home",
+    "name": "Spain (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 8,
+    "key": "prt-home",
+    "name": "Portugal (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 9,
+    "key": "nld-home",
+    "name": "Netherlands (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 10,
+    "key": "bel-home",
+    "name": "Belgium (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 11,
+    "key": "che-home",
+    "name": "Switzerland (home territory)",
+    "infrastructure": 0.68,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 12,
+    "key": "swe-home",
+    "name": "Sweden (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 13,
+    "key": "nor-home",
+    "name": "Norway (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 14,
+    "key": "dnk-home",
+    "name": "Denmark (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 15,
+    "key": "grc-home",
+    "name": "Greece (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 16,
+    "key": "srb-home",
+    "name": "Serbia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 17,
+    "key": "mnt-home",
+    "name": "Montenegro (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 18,
+    "key": "rom-home",
+    "name": "Romania (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 19,
+    "key": "bgr-home",
+    "name": "Bulgaria (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 20,
+    "key": "ott-home",
+    "name": "Ottoman Empire (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 21,
+    "key": "lux-home",
+    "name": "Luxembourg (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 22,
+    "key": "mco-home",
+    "name": "Monaco (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 23,
+    "key": "smr-home",
+    "name": "San Marino (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 24,
+    "key": "and-home",
+    "name": "Andorra (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 25,
+    "key": "lie-home",
+    "name": "Liechtenstein (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 26,
+    "key": "chn-home",
+    "name": "China (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 27,
+    "key": "kor-home",
+    "name": "Korea (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 28,
+    "key": "per-home",
+    "name": "Persia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 29,
+    "key": "afg-home",
+    "name": "Afghanistan (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 30,
+    "key": "npl-home",
+    "name": "Nepal (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 31,
+    "key": "tha-home",
+    "name": "Siam (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 32,
+    "key": "omn-home",
+    "name": "Oman (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 33,
+    "key": "eth-home",
+    "name": "Ethiopia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 34,
+    "key": "lbr-home",
+    "name": "Liberia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 35,
+    "key": "mar-home",
+    "name": "Morocco (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 36,
+    "key": "zar-home",
+    "name": "Transvaal (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 37,
+    "key": "orf-home",
+    "name": "Orange Free State (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 38,
+    "key": "mex-home",
+    "name": "Mexico (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 39,
+    "key": "gua-home",
+    "name": "Guatemala (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 40,
+    "key": "hon-home",
+    "name": "Honduras (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 41,
+    "key": "sal-home",
+    "name": "El Salvador (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 42,
+    "key": "nic-home",
+    "name": "Nicaragua (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 43,
+    "key": "cos-home",
+    "name": "Costa Rica (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 44,
+    "key": "col-home",
+    "name": "Colombia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 45,
+    "key": "ven-home",
+    "name": "Venezuela (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 46,
+    "key": "ecu-home",
+    "name": "Ecuador (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 47,
+    "key": "pru-home",
+    "name": "Peru (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 48,
+    "key": "bol-home",
+    "name": "Bolivia (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 49,
+    "key": "chl-home",
+    "name": "Chile (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 50,
+    "key": "arg-home",
+    "name": "Argentina (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 51,
+    "key": "ury-home",
+    "name": "Uruguay (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 52,
+    "key": "pry-home",
+    "name": "Paraguay (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 53,
+    "key": "bra-home",
+    "name": "Brazil (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 54,
+    "key": "hti-home",
+    "name": "Haiti (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 55,
+    "key": "dom-home",
+    "name": "Dominican Republic (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 56,
+    "key": "can-home",
+    "name": "Canada (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 57,
+    "key": "aus-home",
+    "name": "Australia (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 58,
+    "key": "nzl-home",
+    "name": "New Zealand (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 59,
+    "key": "cub-home",
+    "name": "Cuba (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 100,
+    "key": "bin",
+    "name": "British India",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 101,
+    "key": "cey",
+    "name": "Ceylon",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 102,
+    "key": "mal",
+    "name": "British Malaya and Singapore",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 103,
+    "key": "hkg",
+    "name": "Hong Kong",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 104,
+    "key": "kuw",
+    "name": "Kuwait",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 105,
+    "key": "tru",
+    "name": "Trucial States",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 106,
+    "key": "cyp",
+    "name": "Cyprus",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 107,
+    "key": "mlt",
+    "name": "Malta",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 108,
+    "key": "bwi",
+    "name": "British West Indies",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 109,
+    "key": "bsa",
+    "name": "British South Atlantic and Pacific islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 110,
+    "key": "bwa",
+    "name": "British West Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 111,
+    "key": "bea",
+    "name": "British East Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 112,
+    "key": "sud",
+    "name": "Anglo-Egyptian Sudan",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 113,
+    "key": "bso",
+    "name": "British Somaliland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 114,
+    "key": "cra",
+    "name": "British Central Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 115,
+    "key": "hct",
+    "name": "High Commission Territories",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 116,
+    "key": "fji",
+    "name": "Fiji",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 117,
+    "key": "bpo",
+    "name": "British Pacific and Indian Ocean islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 118,
+    "key": "cap",
+    "name": "Cape Colony",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 119,
+    "key": "nat",
+    "name": "Natal",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 120,
+    "key": "nfd",
+    "name": "Newfoundland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 121,
+    "key": "alg",
+    "name": "Algeria",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 122,
+    "key": "tun",
+    "name": "Tunisia",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 123,
+    "key": "fwa",
+    "name": "French West Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 124,
+    "key": "fea",
+    "name": "French Equatorial Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 125,
+    "key": "fic",
+    "name": "French Indochina",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 126,
+    "key": "mad",
+    "name": "French Madagascar",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 127,
+    "key": "fso",
+    "name": "French Somaliland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 128,
+    "key": "fca",
+    "name": "French Caribbean",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 129,
+    "key": "fpo",
+    "name": "French Pacific",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 130,
+    "key": "gea",
+    "name": "German East Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 131,
+    "key": "gsw",
+    "name": "German South West Africa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 132,
+    "key": "kam",
+    "name": "Kamerun",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 133,
+    "key": "tog",
+    "name": "Togo",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 134,
+    "key": "gng",
+    "name": "German New Guinea",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 135,
+    "key": "gsa",
+    "name": "German Samoa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 136,
+    "key": "gpn",
+    "name": "German Pacific islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 137,
+    "key": "cfs",
+    "name": "Congo Free State",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 138,
+    "key": "ang",
+    "name": "Portuguese Angola",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 139,
+    "key": "moz",
+    "name": "Portuguese Mozambique",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 140,
+    "key": "pai",
+    "name": "Portuguese Atlantic islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 141,
+    "key": "ptm",
+    "name": "Portuguese Timor",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 142,
+    "key": "mac",
+    "name": "Macao",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 143,
+    "key": "eri",
+    "name": "Italian Eritrea",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 144,
+    "key": "its",
+    "name": "Italian Somaliland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 145,
+    "key": "dei",
+    "name": "Dutch East Indies",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 146,
+    "key": "sur",
+    "name": "Suriname",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 147,
+    "key": "dgc",
+    "name": "Dutch Caribbean",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 148,
+    "key": "sah",
+    "name": "Spanish Sahara",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 149,
+    "key": "sgg",
+    "name": "Spanish Guinea",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 150,
+    "key": "phl",
+    "name": "Philippine Islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 151,
+    "key": "pri",
+    "name": "Puerto Rico",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 152,
+    "key": "gum",
+    "name": "Guam",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 153,
+    "key": "asm",
+    "name": "American Samoa",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 154,
+    "key": "isl",
+    "name": "Iceland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 155,
+    "key": "grl",
+    "name": "Greenland",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 156,
+    "key": "fro",
+    "name": "Faroe Islands",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 157,
+    "key": "dwi",
+    "name": "Danish West Indies",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 158,
+    "key": "egy",
+    "name": "Egypt",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 159,
+    "key": "bhu",
+    "name": "Bhutan",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 160,
+    "key": "fin",
+    "name": "Grand Duchy of Finland",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 161,
+    "key": "twn",
+    "name": "Taiwan (Formosa)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  }
+]

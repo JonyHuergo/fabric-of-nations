@@ -10,7 +10,7 @@
  */
 
 import { SimulationHost } from "./host.js";
-import { M5_SCENARIO } from "./generated/m5Scenario.js";
+import { WORLD_SCENARIO } from "./generated/worldScenario.js";
 import { PROTOCOL_VERSION, type WorkerEvent } from "./protocol.js";
 
 interface ReactNativeBridge {
@@ -51,7 +51,7 @@ function sendProtocolError(message: string): void {
 }
 
 const host = new SimulationHost({
-  scenario: M5_SCENARIO,
+  scenario: WORLD_SCENARIO,
   seed: 20_261_023,
   emit: send,
 });

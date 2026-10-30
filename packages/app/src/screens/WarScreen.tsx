@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Notice, Pill, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
@@ -47,6 +48,52 @@ export function WarScreen({
     setTargetRegionId(country.regionIds[0] ?? null);
   }, [countryId, country?.regionIds, country?.military.armies.length]);
 
+  const isPlayerCountry =
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
+  const requirePlayer = (): boolean => {
+    if (!isPlayerCountry) {
+      setLocalError("Only the player-controlled country may make diplomatic or military decisions.");
+      return false;
+    }
+    return true;
+  };
+  const submit = (action: Parameters<typeof applyAction>[0]): void => {
+    if (!requirePlayer()) return;
+    setLocalError(null);
+    clearError();
+    applyAction(action);
+  };
+  const applyRecruit = (personnelOverride?: number): void => {
+    if (country === null) return;
+    if (!requirePlayer()) return;
+    const personnel = personnelOverride ?? Number(personnelText);
+    if (recruitRegionId === null) {
+      setLocalError("Choose a recruitment region.");
+      return;
+    }
+    if (!Number.isInteger(personnel) || personnel <= 0) {
+      setLocalError("Personnel must be a positive integer.");
+      return;
+    }
+    setLocalError(null);
+    clearError();
+    applyAction({
+      kind: "recruit-army",
+      countryId: country.id,
+      regionId: recruitRegionId,
+      personnel,
+    });
+  };
+
+  // Unconditional hook before the country guard. applyRecruit narrows country and
+  // sends the recruit-army action immediately on release.
+  const personnelCommit = useDeferredCommit(
+    (value) => applyRecruit(Math.round(value)),
+    busy,
+  );
+
   if (country === null) {
     return (
       <Section title="War & diplomacy">
@@ -54,7 +101,6 @@ export function WarScreen({
       </Section>
     );
   }
-  const isPlayerCountry = snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
   const canAct = isPlayerCountry && !busy && connection === "ready";
   const enemies = snapshot.military.wars
     .filter(
@@ -86,25 +132,28 @@ export function WarScreen({
     );
     return war !== undefined;
   });
-  const requirePlayer = (): boolean => {
-    if (!isPlayerCountry) {
-      setLocalError("Only the player-controlled country may make diplomatic or military decisions.");
-      return false;
-    }
-    return true;
-  };
-  const submit = (action: Parameters<typeof applyAction>[0]): void => {
-    if (!requirePlayer()) return;
-    setLocalError(null);
-    clearError();
-    applyAction(action);
-  };
   const declareTargets = snapshot.countries.filter((candidate) => candidate.id !== country.id);
   const parsedPersonnel = Number(personnelText);
   const recruitError =
     !Number.isInteger(parsedPersonnel) || parsedPersonnel <= 0
       ? "Personnel must be a positive integer."
       : null;
+  const recruitRegion =
+    recruitRegionId === null
+      ? null
+      : (snapshot.regions.find((region) => region.id === recruitRegionId) ?? null);
+  // The snapshot exposes region population, an upper bound on the authoritative
+  // 18-45 recruitable pool; the worker enforces the exact recruitable and cost limits.
+  const personnelMin = 1000;
+  // A conservative fraction of the region population: the authoritative pool is
+  // the eligible 18-45 population, so the slider must not invite impossible sizes.
+  const personnelMax = Math.max(
+    personnelMin,
+    Math.round((recruitRegion?.population ?? 0) * 0.25),
+  );
+  const personnelSliderValue = Number.isFinite(parsedPersonnel)
+    ? Math.min(personnelMax, Math.max(personnelMin, parsedPersonnel))
+    : personnelMin;
 
   return (
     <Section title="War & diplomacy">
@@ -317,27 +366,25 @@ export function WarScreen({
         ))}
       </View>
       <Text style={styles.label}>Personnel</Text>
-      <TextInput
-        style={styles.input}
-        value={personnelText}
-        onChangeText={setPersonnelText}
-        keyboardType="number-pad"
-        placeholder="1000"
-        placeholderTextColor={colors.faint}
+      <SliderField
+        label="Recruitment personnel"
+        value={personnelSliderValue}
+        min={personnelMin}
+        max={personnelMax}
+        step={1000}
+        precision={0}
+        unit="soldiers"
+        disabled={!canAct}
+        pending={personnelCommit.hasPending}
+        onChange={(value) => setPersonnelText(String(Math.round(value)))}
+        onCommit={(value) => personnelCommit.submit(Math.round(value))}
+        hint="Whole soldiers drawn from the region's 18-45 population and paid by the treasury."
       />
       {recruitError !== null ? <Text style={styles.warning}>{recruitError}</Text> : null}
       <ActionButton
         label="Recruit"
         disabled={!canAct || recruitRegionId === null || recruitError !== null}
-        onPress={() => {
-          if (recruitRegionId === null || recruitError !== null) return;
-          submit({
-            kind: "recruit-army",
-            countryId: country.id,
-            regionId: recruitRegionId,
-            personnel: parsedPersonnel,
-          });
-        }}
+        onPress={() => applyRecruit()}
       />
 
       <Text style={styles.heading}>Deploy an army</Text>
@@ -464,15 +511,5 @@ const styles = StyleSheet.create({
   offerText: {
     flexShrink: 1,
     color: colors.text,
-  },
-  input: {
-    marginTop: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    color: colors.text,
-    backgroundColor: colors.surface,
   },
 });

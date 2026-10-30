@@ -78,9 +78,13 @@ export class SimulationHost {
   private readonly emitEvent: (event: WorkerEvent) => void;
   private readonly clock: () => number;
   private readonly autoPump: boolean;
-  private readonly scenario: EconomyScenarioDef;
+  private readonly seed: number;
+  /** Scenario content, including M11 static polity/market metadata. */
+  private readonly baseScenario: EconomyScenarioDef;
+  private scenario: EconomyScenarioDef;
   private readonly context: TickContext;
   private world: World;
+  private focusCountryId: number | null = null;
   private running = false;
   private speed: SpeedDaysPerSecond = DEFAULT_SPEED_DAYS_PER_SECOND;
   private sequence = 0;
@@ -97,6 +101,8 @@ export class SimulationHost {
     this.emitEvent = options.emit;
     this.clock = options.clock ?? (() => Date.now());
     this.autoPump = options.autoPump !== false;
+    this.seed = options.seed;
+    this.baseScenario = options.scenario;
     this.scenario = options.scenario;
     this.context = {
       population: { definitions: options.scenario.population.definitions },
@@ -121,6 +127,10 @@ export class SimulationHost {
       running: this.running,
       speedDaysPerSecond: this.speed,
       achievedDaysPerSecond: this.achievedDaysPerSecond,
+      focusCountryId: this.focusCountryId,
+      ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
+      ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
+      ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
     }, this.scenario.population.definitions);
   }
 
@@ -191,6 +201,12 @@ export class SimulationHost {
         return;
       case "REQUEST_SNAPSHOT":
         this.emitSnapshot("SNAPSHOT", command.commandId);
+        return;
+      case "SET_FOCUS":
+        this.setFocus(command.commandId, command.countryId);
+        return;
+      case "CREATE_GAME":
+        this.createGame(command.commandId, command.playerCountryId);
         return;
       case "SAVE":
         this.emitEvent({
@@ -352,6 +368,73 @@ export class SimulationHost {
       type: "ACTION_RESULT",
       commandId,
       actionId,
+      accepted: true,
+      errors: [],
+      snapshot: this.snapshot(),
+    });
+  }
+
+  /**
+   * Presentation-only focus selection. It never mutates simulation state; it
+   * only decides which country's full record is included in snapshots.
+   */
+  private setFocus(commandId: string, countryId: number): void {
+    if (!this.world.countries.some((country) => country.id === countryId)) {
+      this.emitError(commandId, "invalid_focus", `country ${String(countryId)} is not registered`);
+      return;
+    }
+    this.focusCountryId = countryId;
+    this.emitSnapshot("SNAPSHOT", commandId);
+  }
+
+  /**
+   * Start a fresh 1900 world with an explicitly selected player country. The
+   * selection is validated against the scenario catalog: unknown countries and
+   * non-selectable dependencies are rejected, never silently defaulted.
+   */
+  private createGame(commandId: string, playerCountryId: number): void {
+    const reject = (errors: string[]): void => {
+      this.emitEvent({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "NEW_GAME_RESULT",
+        commandId,
+        accepted: false,
+        errors,
+        snapshot: this.snapshot(),
+      });
+    };
+    const countries = this.baseScenario.countries ?? [];
+    if (!countries.some((country) => country.id === playerCountryId)) {
+      reject([`country ${String(playerCountryId)} is not part of this scenario`]);
+      return;
+    }
+    const meta = this.baseScenario.countryMeta?.find(
+      (entry) => entry.countryId === playerCountryId,
+    );
+    if (meta !== undefined && !meta.selectable) {
+      reject([
+        `${meta.historicalName} is a ${meta.status.replaceAll("-", " ")} and cannot be selected as a player country`,
+      ]);
+      return;
+    }
+    let scenario: EconomyScenarioDef;
+    let world: World;
+    try {
+      scenario = { ...this.baseScenario, playerCountryId };
+      world = createEconomyWorld(scenario, { seed: this.seed });
+    } catch (error) {
+      reject([`new campaign could not be created: ${errorMessage(error)}`]);
+      return;
+    }
+    this.pause();
+    this.scenario = scenario;
+    this.world = world;
+    this.focusCountryId = null;
+    this.lastSnapshotMs = this.clock();
+    this.emitEvent({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "NEW_GAME_RESULT",
+      commandId,
       accepted: true,
       errors: [],
       snapshot: this.snapshot(),

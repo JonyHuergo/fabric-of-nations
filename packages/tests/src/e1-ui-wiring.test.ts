@@ -19,10 +19,12 @@ function source(relativePath: string): string {
 }
 
 describe("E1 UI wiring", () => {
-  test("the overview is the default tab and uses the explanation selector", () => {
-    const app = source("App.tsx");
-    expect(app).toMatch(/\{ id: "country", label: "Overview" \}/);
-    expect(app).toMatch(/useState<TabId>\("country"\)/);
+  test("the M11 shell is map-first and the overview uses the explanation selector", () => {
+    const shell = source("src/screens/GameShell.tsx");
+    expect(shell).toMatch(/id: "world", label: "World"/);
+    expect(shell).toMatch(/id: "overview", label: "Overview"/);
+    expect(shell).toMatch(/useState<TabId>\("world"\)/);
+    expect(shell).toContain("<WorldMap");
 
     const overview = source("src/screens/CountryScreen.tsx");
     expect(overview).toContain("buildEconomicExplanations");
@@ -62,8 +64,8 @@ describe("E1 UI wiring", () => {
   });
 
   test("the construction screen is wired to snapshots and the shared action path", () => {
-    const app = source("App.tsx");
-    expect(app).toContain('{ id: "construction", label: "Construction" }');
+    const shell = source("src/screens/GameShell.tsx");
+    expect(shell).toContain('id: "construction", label: "Construction"');
     const construction = source("src/screens/ConstructionScreen.tsx");
     expect(construction).toContain("previewConstruction");
     expect(construction).toContain("start-construction");
@@ -78,8 +80,8 @@ describe("E1 UI wiring", () => {
   });
 
   test("the industry screen is wired to snapshot policy and enterprise actions", () => {
-    const app = source("App.tsx");
-    expect(app).toContain('{ id: "industry", label: "Industry" }');
+    const shell = source("src/screens/GameShell.tsx");
+    expect(shell).toContain('id: "industry", label: "Industry"');
     const industry = source("src/screens/IndustryScreen.tsx");
     expect(industry).toContain("previewIndustrialPolicy");
     expect(industry).toContain("previewPublicEnterpriseSupport");
@@ -91,8 +93,8 @@ describe("E1 UI wiring", () => {
   });
 
   test("the politics screen is wired to snapshot previews and validated actions", () => {
-    const app = source("App.tsx");
-    expect(app).toContain('{ id: "politics", label: "Politics" }');
+    const shell = source("src/screens/GameShell.tsx");
+    expect(shell).toContain('id: "politics", label: "Politics"');
     const politics = source("src/screens/PoliticsScreen.tsx");
     expect(politics).toContain("previewLawProposal");
     expect(politics).toContain("previewInstitutionFunding");

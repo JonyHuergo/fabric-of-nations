@@ -59,9 +59,12 @@ import {
   LAW_SLOTS,
 } from "@century/sim";
 import type {
+  CountryMetaDef,
   EconomyDefinitions,
   FinancePeriodSummary,
+  MarketMetaDef,
   PopulationDefinitions,
+  RegionMetaDef,
   World,
 } from "@century/sim";
 
@@ -72,6 +75,7 @@ import {
   MAX_SNAPSHOT_TRADE_SHIPMENTS,
   PROTOCOL_VERSION,
   type CountrySnapshot,
+  type CountrySummarySnapshot,
   type GoodSnapshot,
   type MarketSnapshot,
   type RegionSnapshot,
@@ -111,6 +115,12 @@ export interface SnapshotRuntimeState {
   readonly speedDaysPerSecond: number;
   /** Presentation-only measured throughput; never feeds simulation state. */
   readonly achievedDaysPerSecond: number;
+  /** Presentation-only focused country whose full record is included. */
+  readonly focusCountryId?: number | null;
+  /** M11 static polity/market metadata from the scenario. */
+  readonly countryMeta?: readonly CountryMetaDef[];
+  readonly marketMeta?: readonly MarketMetaDef[];
+  readonly regionMeta?: readonly RegionMetaDef[];
 }
 
 function roundDisplay(value: number, decimals = 4): number {
@@ -1050,6 +1060,7 @@ function countrySnapshot(
   history: readonly SnapshotFinancePeriod[],
   capacity: ReadonlyMap<number, number> | undefined,
   definitions: EconomyDefinitions,
+  meta: CountryMetaDef | undefined,
 ): CountrySnapshot {
   const regionIds = new Set(country.regionIds);
   const blockIds = new Set<number>();
@@ -1211,6 +1222,19 @@ function countrySnapshot(
     id: country.id,
     tag: country.tag,
     name: country.name,
+    meta:
+      meta === undefined
+        ? null
+        : {
+            historicalName: meta.historicalName,
+            status: meta.status,
+            sovereignCountryId: meta.sovereignCountryId,
+            capitalName: meta.capitalName,
+            selectable: meta.selectable,
+            population1900Estimate: meta.population1900Estimate,
+            confidence: meta.confidence,
+            notes: meta.notes,
+          },
     regionIds: [...country.regionIds].sort((left, right) => left - right),
     fiscal: {
       incomeTaxRate: country.fiscal.incomeTaxRate,
@@ -1665,34 +1689,49 @@ function militarySnapshot(world: World): SimulationSnapshot["military"] {
   };
 }
 
-function regionSnapshots(world: World): readonly RegionSnapshot[] {
+function regionSnapshots(
+  world: World,
+  regionMeta: ReadonlyMap<number, RegionMetaDef>,
+): readonly RegionSnapshot[] {
   const ownerByRegion = new Map<number, number>();
   for (const country of world.countries) {
     for (const regionId of country.regionIds) ownerByRegion.set(regionId, country.id);
   }
   const blockPopulation = new Map<number, number>();
   for (const block of world.popBlocks) {
-    blockPopulation.set(
-      block.regionId,
-      (blockPopulation.get(block.regionId) ?? 0) + populationTotal(block),
-    );
+    blockPopulation.set(block.regionId, (blockPopulation.get(block.regionId) ?? 0) + populationTotal(block));
   }
   return [...world.regions]
     .sort((left, right) => left.id - right.id)
-    .map((region) => ({
-      id: region.id,
-      key: region.key,
-      name: region.name,
-      countryId: ownerByRegion.get(region.id) ?? null,
-      marketId: region.marketId,
-      population: blockPopulation.get(region.id) ?? 0,
-      buildingCount: region.buildingInstanceIds.length,
-      unrest: region.unrest,
-      infrastructure: region.infrastructure,
-      sovereignCountryId: ownerByRegion.get(region.id) ?? null,
-      controllerCountryId: region.controllerCountryId,
-      occupiedSinceDay: region.occupiedSinceDay,
-    }));
+    .map((region) => {
+      const meta = regionMeta.get(region.id);
+      return {
+        id: region.id,
+        key: region.key,
+        name: region.name,
+        countryId: ownerByRegion.get(region.id) ?? null,
+        marketId: region.marketId,
+        population: blockPopulation.get(region.id) ?? 0,
+        buildingCount: region.buildingInstanceIds.length,
+        unrest: region.unrest,
+        infrastructure: region.infrastructure,
+        sovereignCountryId: ownerByRegion.get(region.id) ?? null,
+        controllerCountryId: region.controllerCountryId,
+        occupiedSinceDay: region.occupiedSinceDay,
+        meta:
+          meta === undefined
+            ? null
+            : {
+                polityTag: meta.polityTag,
+                historicalName: meta.historicalName,
+                status: meta.status,
+                sovereignCountryId: meta.sovereignCountryId,
+                capitalName: meta.capitalName,
+                confidence: meta.confidence,
+                notes: meta.notes,
+              },
+      };
+    });
 }
 
 function goodsSnapshots(definitions: EconomyDefinitions): readonly GoodSnapshot[] {
@@ -1711,8 +1750,14 @@ function marketSnapshots(
   world: World,
   definitions: EconomyDefinitions,
   capacityByMarket: CapacityMaps["byMarket"],
+  marketMeta: ReadonlyMap<number, MarketMetaDef>,
 ): readonly MarketSnapshot[] {
   const goods = [...definitions.goods].sort((left, right) => left.id - right.id);
+  const countryByRegion = new Map<number, number>();
+  for (const country of world.countries) {
+    for (const regionId of country.regionIds) countryByRegion.set(regionId, country.id);
+  }
+  const countryName = new Map(world.countries.map((country) => [country.id, country.name]));
   return [...world.markets]
     .sort((left, right) => left.id - right.id)
     .map((market) => {
@@ -1721,10 +1766,35 @@ function marketSnapshots(
         stockByGood.set(lot.goodId, (stockByGood.get(lot.goodId) ?? 0) + lot.quantity);
       }
       const capacity = capacityByMarket.get(market.id);
+      const memberCountryIds = new Set<number>();
+      for (const regionId of market.regionIds) {
+        const countryId = countryByRegion.get(regionId);
+        if (countryId !== undefined) memberCountryIds.add(countryId);
+      }
+      const members = [...memberCountryIds].sort((left, right) => left - right);
+      const meta = marketMeta.get(market.id);
+      // A market is never presented as "Market N". Without authored metadata the
+      // name is derived from the member countries, and the numeric id stays a
+      // secondary diagnostic only.
+      const memberNames = members
+        .map((id) => countryName.get(id) ?? `Country ${String(id)}`)
+        .filter((name) => name.length > 0);
+      const derivedName =
+        memberNames.length === 0
+          ? "Unnamed trade area"
+          : memberNames.length === 1
+            ? `${memberNames[0]} national market`
+            : `${memberNames[0]} and ${String(memberNames.length - 1)} other${memberNames.length === 2 ? "" : "s"} market`;
       return {
         id: market.id,
-        label: `Market ${String(market.id)}`,
+        label: meta?.name ?? derivedName,
+        name: meta?.name ?? derivedName,
+        description:
+          meta?.description ??
+          `Trade area covering ${String(members.length)} ${members.length === 1 ? "country" : "countries"}.`,
+        kind: meta?.kind ?? "unspecified",
         regionIds: [...market.regionIds].sort((left, right) => left - right),
+        memberCountryIds: members,
         prices: goods.map((good) => ({
           goodId: good.id,
           goodKey: good.key,
@@ -1736,6 +1806,114 @@ function marketSnapshots(
         })),
         customsCountryId: market.customsCountryId,
         infrastructure: roundDisplay(marketInfrastructureQuality(world, market), 3),
+      };
+    });
+}
+
+/**
+ * Compact per-country records. These carry the map/list identity and headline
+ * indicators for every country; full detail is bounded to the player and focus
+ * countries. Values use the same aggregate definitions as `countrySnapshot`.
+ */
+function countrySummarySnapshots(
+  world: World,
+  countryMeta: ReadonlyMap<number, CountryMetaDef>,
+  index: ReturnType<typeof buildFinanceIndex>,
+  playerCountryId: number | null,
+  focusCountryId: number | null,
+): readonly CountrySummarySnapshot[] {
+  const regionIdsByCountry = new Map<number, Set<number>>();
+  const marketIdsByRegion = new Map(world.regions.map((region) => [region.id, region.marketId]));
+  for (const country of world.countries) {
+    regionIdsByCountry.set(country.id, new Set(country.regionIds));
+  }
+  const blocksByCountry = new Map<number, World["popBlocks"][number][]>();
+  for (const block of world.popBlocks) {
+    for (const country of world.countries) {
+      if (!country.regionIds.includes(block.regionId)) continue;
+      const list = blocksByCountry.get(country.id) ?? [];
+      list.push(block);
+      blocksByCountry.set(country.id, list);
+    }
+  }
+  const employedByCountry = new Map<number, number>();
+  const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
+  for (const assignment of world.employment) {
+    const building = buildingById.get(assignment.buildingInstanceId);
+    if (building === undefined) continue;
+    for (const country of world.countries) {
+      if (!country.regionIds.includes(building.regionId)) continue;
+      employedByCountry.set(country.id, (employedByCountry.get(country.id) ?? 0) + assignment.workers);
+    }
+  }
+  const lastPeriod =
+    world.finance.periodSummaries.length === 0
+      ? null
+      : world.finance.periodSummaries[world.finance.periodSummaries.length - 1];
+  return [...world.countries]
+    .sort((left, right) => left.id - right.id)
+    .map((country) => {
+      const meta = countryMeta.get(country.id);
+      const blocks = blocksByCountry.get(country.id) ?? [];
+      let population = 0;
+      let hardshipPopulation = 0;
+      let weightedLiteracy = 0;
+      let weightedWealth = 0;
+      let weightedMilitancy = 0;
+      for (const block of blocks) {
+        const blockPopulation = populationTotal(block);
+        population += blockPopulation;
+        if (block.unmetSubsistenceDays >= AI_HARDSHIP_SUBSISTENCE_DAYS) {
+          hardshipPopulation += blockPopulation;
+        }
+        weightedLiteracy += block.literacy * blockPopulation;
+        weightedWealth += block.wealthLevel * blockPopulation;
+        weightedMilitancy += block.militancy * blockPopulation;
+      }
+      const regionIds = [...(regionIdsByCountry.get(country.id) ?? new Set<number>())].sort(
+        (left, right) => left - right,
+      );
+      const marketIds = [
+        ...new Set(
+          regionIds
+            .map((regionId) => marketIdsByRegion.get(regionId))
+            .filter((marketId): marketId is number => marketId !== undefined && marketId !== null),
+        ),
+      ].sort((left, right) => left - right);
+      const armyPersonnel = armiesOfCountry(world, country.id).reduce(
+        (sum, army) => sum + army.personnel,
+        0,
+      );
+      const fiscal =
+        lastPeriod == null
+          ? undefined
+          : lastPeriod.countryFiscalTotals?.[country.id];
+      return {
+        id: country.id,
+        tag: country.tag,
+        name: country.name,
+        historicalName: meta?.historicalName ?? country.name,
+        status: meta?.status ?? "independent",
+        sovereignCountryId: meta?.sovereignCountryId ?? country.id,
+        capitalName: meta?.capitalName ?? country.name,
+        selectable: meta?.selectable ?? true,
+        isPlayer: country.id === playerCountryId,
+        isFocused: country.id === focusCountryId,
+        regionIds,
+        marketIds,
+        population,
+        employedWorkers: employedByCountry.get(country.id) ?? 0,
+        treasuryCashSUSD: roundDisplay(
+          index.find("country", country.id, "treasury-cash")?.balanceSUSD ?? 0,
+          6,
+        ),
+        hardshipPopulationShare: population > 0 ? hardshipPopulation / population : 0,
+        literacy: population > 0 ? weightedLiteracy / population : 0,
+        wealthLevel: population > 0 ? weightedWealth / population : 0,
+        militancy: population > 0 ? weightedMilitancy / population : 0,
+        militaryPersonnel: armyPersonnel,
+        latestNetFiscalResultSUSD:
+          fiscal === undefined ? null : roundDisplay(fiscal.netFiscalResultSUSD, 6),
       };
     });
 }
@@ -1863,6 +2041,19 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   Object.freeze(snapshot.diagnostics.recentWarnings);
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
+  for (const summary of snapshot.countrySummaries) {
+    Object.freeze(summary.regionIds);
+    Object.freeze(summary.marketIds);
+    Object.freeze(summary);
+  }
+  Object.freeze(snapshot.countrySummaries);
+  for (const region of snapshot.regions) {
+    if (region.meta !== null) Object.freeze(region.meta);
+  }
+  for (const market of snapshot.markets) {
+    Object.freeze(market.regionIds);
+    Object.freeze(market.memberCountryIds);
+  }
   Object.freeze(snapshot.countries);
   Object.freeze(snapshot.regions);
   Object.freeze(snapshot.markets);
@@ -1880,7 +2071,34 @@ export function buildSimulationSnapshot(
   const civil = dayIndexToCivilDate(world.dayIndex);
   const index = buildFinanceIndex(world.finance);
   const capacities = productionCapacities(world, definitions);
+  const countryMetaById = new Map(
+    (runtime.countryMeta ?? []).map((meta) => [meta.countryId, meta] as const),
+  );
+  const marketMetaById = new Map(
+    (runtime.marketMeta ?? []).map((meta) => [meta.marketId, meta] as const),
+  );
+  const regionMetaById = new Map(
+    (runtime.regionMeta ?? []).map((meta) => [meta.regionId, meta] as const),
+  );
+  const playerCountryId = world.playerCountryId;
+  let focusCountryId = runtime.focusCountryId ?? null;
+  if (
+    focusCountryId !== null &&
+    !world.countries.some((country) => country.id === focusCountryId)
+  ) {
+    focusCountryId = null;
+  }
+  // M11 bounds full country detail to the player and focus countries. Legacy
+  // scenarios without static metadata keep the pre-M11 "all countries" behavior
+  // used by existing fixtures and tests.
+  const boundedDetail = (runtime.countryMeta?.length ?? 0) > 0;
+  const detailCountryIds = new Set<number>();
+  if (boundedDetail) {
+    if (playerCountryId !== null) detailCountryIds.add(playerCountryId);
+    if (focusCountryId !== null) detailCountryIds.add(focusCountryId);
+  }
   const countries = [...world.countries]
+    .filter((country) => !boundedDetail || detailCountryIds.has(country.id))
     .sort((left, right) => left.id - right.id)
     .map((country) => {
       const blockIds = new Set(
@@ -1895,8 +2113,16 @@ export function buildSimulationSnapshot(
         financeHistory(world, country, index, blockIds),
         capacities.byCountry.get(country.id),
         definitions,
+        countryMetaById.get(country.id),
       );
     });
+  const countrySummaries = countrySummarySnapshots(
+    world,
+    countryMetaById,
+    index,
+    playerCountryId,
+    focusCountryId,
+  );
   const diagnostics = {
     invalidActionCount: world.diagnostics.invalidActionCount,
     invariantFailureCount: world.diagnostics.invariantFailureCount,
@@ -1920,11 +2146,13 @@ export function buildSimulationSnapshot(
     scenarioId: world.scenarioId,
     dataVersion: world.dataVersion,
     simVersion: world.simVersion,
-    playerCountryId: world.playerCountryId,
+    playerCountryId,
+    focusCountryId,
     constructionEnabled: world.profitDistribution.enabled,
     countries,
-    regions: regionSnapshots(world),
-    markets: marketSnapshots(world, definitions, capacities.byMarket),
+    countrySummaries,
+    regions: regionSnapshots(world, regionMetaById),
+    markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
     goods: goodsSnapshots(definitions),
     needTiers: needTierSnapshots(populationDefinitions, definitions),
     projectTypes: projectTypeSnapshots(definitions),

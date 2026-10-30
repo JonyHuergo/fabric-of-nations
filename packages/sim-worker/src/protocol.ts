@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 13 as const;
+export const PROTOCOL_VERSION = 14 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -282,6 +282,18 @@ export type WorkerCommand =
       readonly commandId: string;
       readonly actionId: string;
       readonly action: CountryActionDto;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "CREATE_GAME";
+      readonly commandId: string;
+      readonly playerCountryId: number;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "SET_FOCUS";
+      readonly commandId: string;
+      readonly countryId: number;
     }
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
@@ -944,10 +956,77 @@ export interface SnapshotMonetaryAuthority {
   readonly blockedReason: string | null;
 }
 
+/** M11 constitutional status exposed to the app. */
+export type CountryStatusDto =
+  | "independent"
+  | "personal-union"
+  | "autonomous-vassal"
+  | "dominion"
+  | "self-governing-colony"
+  | "protectorate"
+  | "colony"
+  | "occupation"
+  | "autonomous-province"
+  | "dependency";
+
+/** M11 static polity metadata attached to a full country record. */
+export interface CountryMetaSnapshot {
+  readonly historicalName: string;
+  readonly status: CountryStatusDto;
+  readonly sovereignCountryId: number;
+  readonly capitalName: string;
+  readonly selectable: boolean;
+  readonly population1900Estimate: number | null;
+  readonly confidence: "low" | "medium" | "high";
+  readonly notes: string;
+}
+
+/** M11 static metadata attached to a dependent-territory region. */
+export interface RegionMetaSnapshot {
+  readonly polityTag: string;
+  readonly historicalName: string;
+  readonly status: CountryStatusDto;
+  readonly sovereignCountryId: number;
+  readonly capitalName: string;
+  readonly confidence: "low" | "medium" | "high";
+  readonly notes: string;
+}
+
+/**
+ * Compact per-country record carried for every country on every snapshot.
+ * Full detail is bounded to the player country and the focused country so a
+ * world with dozens of countries stays within a practical snapshot size.
+ */
+export interface CountrySummarySnapshot {
+  readonly id: number;
+  readonly tag: string;
+  readonly name: string;
+  readonly historicalName: string;
+  readonly status: CountryStatusDto;
+  readonly sovereignCountryId: number;
+  readonly capitalName: string;
+  readonly selectable: boolean;
+  readonly isPlayer: boolean;
+  readonly isFocused: boolean;
+  readonly regionIds: readonly number[];
+  readonly marketIds: readonly number[];
+  readonly population: number;
+  readonly employedWorkers: number;
+  readonly treasuryCashSUSD: number;
+  readonly hardshipPopulationShare: number;
+  readonly literacy: number;
+  readonly wealthLevel: number;
+  readonly militancy: number;
+  readonly militaryPersonnel: number;
+  readonly latestNetFiscalResultSUSD: number | null;
+}
+
 export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
   readonly name: string;
+  /** M11 static polity metadata; null for legacy scenarios without a catalog. */
+  readonly meta: CountryMetaSnapshot | null;
   readonly regionIds: readonly number[];
   readonly fiscal: SnapshotFiscalPolicy;
   readonly treasuryCashSUSD: number;
@@ -1106,6 +1185,8 @@ export interface RegionSnapshot {
   /** M10 temporary military controller; null means the sovereign controls it. */
   readonly controllerCountryId: number | null;
   readonly occupiedSinceDay: number | null;
+  /** M11 dependent-territory metadata; null for a sovereign home region. */
+  readonly meta: RegionMetaSnapshot | null;
 }
 
 export interface GoodSnapshot {
@@ -1129,8 +1210,14 @@ export interface MarketPriceSnapshot {
 
 export interface MarketSnapshot {
   readonly id: number;
+  /** Player-facing market name. Never the bare numeric id. */
   readonly label: string;
+  readonly name: string;
+  readonly description: string;
+  readonly kind: "national" | "imperial" | "shared" | "unspecified";
   readonly regionIds: readonly number[];
+  /** Countries with at least one region in this market, ascending. */
+  readonly memberCountryIds: readonly number[];
   readonly prices: readonly MarketPriceSnapshot[];
   /** E6a customs administration of this market, or null. */
   readonly customsCountryId: number | null;
@@ -1166,9 +1253,14 @@ export interface SimulationSnapshot {
   readonly simVersion: string;
   /** Designated player country, or null when no player control is configured. */
   readonly playerCountryId: number | null;
+  /** Presentation focus country whose full record is included; null when none. */
+  readonly focusCountryId: number | null;
   /** State-enterprise ownership/remittance policy required by public construction. */
   readonly constructionEnabled: boolean;
+  /** Full detail for the player country and the focused country only. */
   readonly countries: readonly CountrySnapshot[];
+  /** Compact record for every country in the world. */
+  readonly countrySummaries: readonly CountrySummarySnapshot[];
   readonly regions: readonly RegionSnapshot[];
   readonly markets: readonly MarketSnapshot[];
   readonly goods: readonly GoodSnapshot[];
@@ -1231,6 +1323,14 @@ export type WorkerEvent =
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "LOAD_RESULT";
+      readonly commandId: string;
+      readonly accepted: boolean;
+      readonly errors: readonly string[];
+      readonly snapshot: SimulationSnapshot;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "NEW_GAME_RESULT";
       readonly commandId: string;
       readonly accepted: boolean;
       readonly errors: readonly string[];
@@ -1851,6 +1951,25 @@ export function parseWorkerCommand(value: unknown): WorkerCommand {
     }
     case "SAVE":
       return { protocolVersion: PROTOCOL_VERSION, type, commandId };
+    case "CREATE_GAME":
+      return {
+        protocolVersion: PROTOCOL_VERSION,
+        type,
+        commandId,
+        playerCountryId: requireInteger(
+          record.playerCountryId,
+          "command.playerCountryId",
+          0,
+          0xffff_ffff,
+        ),
+      };
+    case "SET_FOCUS":
+      return {
+        protocolVersion: PROTOCOL_VERSION,
+        type,
+        commandId,
+        countryId: requireInteger(record.countryId, "command.countryId", 0, 0xffff_ffff),
+      };
     case "LOAD":
       return {
         protocolVersion: PROTOCOL_VERSION,
@@ -2482,6 +2601,42 @@ function isDiagnostics(value: unknown): value is SnapshotDiagnostics {
   );
 }
 
+function isCountrySummary(value: unknown): value is CountrySummarySnapshot {
+  if (!isRecord(value)) return false;
+  if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
+  if (!isString(value.tag, 8) || !isString(value.name, 200)) return false;
+  if (!isString(value.historicalName, 200) || !isString(value.capitalName, 200)) return false;
+  if (typeof value.status !== "string") return false;
+  if (!isIntegerIn(value.sovereignCountryId, 0, 0xffff_ffff)) return false;
+  if (
+    typeof value.selectable !== "boolean" ||
+    typeof value.isPlayer !== "boolean" ||
+    typeof value.isFocused !== "boolean"
+  ) {
+    return false;
+  }
+  if (!isNumberArray(value.regionIds) || !isNumberArray(value.marketIds)) return false;
+  for (const key of [
+    "population",
+    "employedWorkers",
+    "treasuryCashSUSD",
+    "hardshipPopulationShare",
+    "literacy",
+    "wealthLevel",
+    "militancy",
+    "militaryPersonnel",
+  ] as const) {
+    if (!isFiniteNumber(value[key])) return false;
+  }
+  if (
+    value.latestNetFiscalResultSUSD !== null &&
+    !isFiniteNumber(value.latestNetFiscalResultSUSD)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isRecord(value)) return false;
   if (value.protocolVersion !== PROTOCOL_VERSION) return false;
@@ -2509,11 +2664,30 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isString(value.dataVersion, 128)) return false;
   if (!isString(value.simVersion, 128)) return false;
   if (!isNullableId(value.playerCountryId)) return false;
+  if (!isNullableId(value.focusCountryId)) return false;
   if (typeof value.constructionEnabled !== "boolean") return false;
   if (!Array.isArray(value.countries) || !value.countries.every(isCountrySnapshot)) return false;
   if (
     value.playerCountryId !== null &&
     !value.countries.some((country) => country.id === value.playerCountryId)
+  ) {
+    return false;
+  }
+  if (
+    value.focusCountryId !== null &&
+    !value.countries.some((country) => country.id === value.focusCountryId)
+  ) {
+    return false;
+  }
+  if (
+    !Array.isArray(value.countrySummaries) ||
+    !value.countrySummaries.every(isCountrySummary)
+  ) {
+    return false;
+  }
+  if (
+    value.playerCountryId !== null &&
+    !value.countrySummaries.some((country) => country.id === value.playerCountryId)
   ) {
     return false;
   }
@@ -2620,7 +2794,8 @@ export function parseWorkerEvent(value: unknown): WorkerEvent {
           maxLength: MAX_LOAD_SAVE_LENGTH,
         }),
       };
-    case "LOAD_RESULT": {
+    case "LOAD_RESULT":
+    case "NEW_GAME_RESULT": {
       if (!isSnapshot(record.snapshot)) {
         throw new ProtocolError("invalid_snapshot", "event.snapshot is not a valid snapshot");
       }
@@ -2631,7 +2806,7 @@ export function parseWorkerEvent(value: unknown): WorkerEvent {
           })();
       return {
         protocolVersion: PROTOCOL_VERSION,
-        type,
+        type: type as "LOAD_RESULT" | "NEW_GAME_RESULT",
         commandId: requireString(record.commandId, "event.commandId", { minLength: 1 }),
         accepted: record.accepted === true,
         errors,

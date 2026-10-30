@@ -1,0 +1,2042 @@
+[
+  {
+    "id": "usa-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "USA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 84662000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "usa-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "USA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.2986974085185798,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "gbr-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "GBR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 379880000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "gbr-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "GBR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.7555325365905022,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "deu-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "DEU",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 67167000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "deu-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "DEU",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.3332600830765108,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "fra-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "FRA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 77650000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "fra-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "FRA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.529439793947199,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "rus-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "RUS",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 136000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "rus-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "RUS",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34754411764705884,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "jpn-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "JPN",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 47103000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "jpn-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "JPN",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.37057130119100695,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "ita-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ITA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 33175000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "ita-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ITA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.3501281085154484,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "esp-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ESP",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 18800000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "esp-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ESP",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.3451063829787234,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "prt-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "PRT",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 12880000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "prt-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "PRT",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.6181366459627329,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "nld-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "NLD",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 47230000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "nld-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "NLD",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.7573703154774508,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "bel-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "BEL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 15700000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "bel-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "BEL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.572484076433121,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "che-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "CHE",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 3300000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "che-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "CHE",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.24,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "swe-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "SWE",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 5100000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "swe-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "SWE",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "nor-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "NOR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 2200000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "nor-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "NOR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "dnk-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "DNK",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 2537000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "dnk-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "DNK",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.36592037839968466,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "grc-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "GRC",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 2400000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "grc-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "GRC",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "srb-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "SRB",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 2500000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "srb-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "SRB",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "mnt-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "MNT",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 300000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "mnt-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "MNT",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "rom-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ROM",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 6000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "rom-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ROM",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "bgr-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "BGR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 3700000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "bgr-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "BGR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "ott-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "OTT",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 33700000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "ott-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "OTT",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.6063501483679525,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "lux-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "LUX",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 240000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "high",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "lux-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "LUX",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "mco-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "MCO",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 15000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "mco-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "MCO",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "smr-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "SMR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 11000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "smr-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "SMR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "and-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "AND",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 5000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "and-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "AND",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "lie-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "LIE",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 7500,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "lie-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "LIE",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "chn-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "CHN",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 400000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "chn-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "CHN",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.52,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "kor-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "KOR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 17000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "kor-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "KOR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "per-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "PER",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 9900000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "per-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "PER",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.52,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "afg-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "AFG",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 4500000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "afg-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "AFG",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "npl-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "NPL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 5000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "npl-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "NPL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "tha-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "THA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 7300000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "tha-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "THA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "omn-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "OMN",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 500000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "omn-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "OMN",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "eth-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ETH",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 11000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "eth-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ETH",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.52,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "lbr-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "LBR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "lbr-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "LBR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "mar-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "MAR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 5000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "mar-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "MAR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "zar-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ZAR",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1200000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "zar-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ZAR",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.52,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "orf-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ORF",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 300000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "orf-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ORF",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "mex-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "MEX",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 13600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "mex-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "MEX",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "gua-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "GUA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1400000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "gua-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "GUA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "hon-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "HON",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 500000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "hon-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "HON",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "sal-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "SAL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 900000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "sal-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "SAL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "nic-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "NIC",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 400000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "nic-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "NIC",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "cos-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "COS",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 300000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "cos-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "COS",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "col-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "COL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 4000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "col-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "COL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "ven-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "VEN",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 2400000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "ven-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "VEN",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "ecu-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ECU",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1400000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "ecu-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ECU",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "pru-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "PRU",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 3700000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "pru-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "PRU",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "bol-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "BOL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1800000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "bol-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "BOL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "chl-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "CHL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 3000000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "chl-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "CHL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "arg-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "ARG",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 4700000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "arg-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "ARG",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "ury-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "URY",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 900000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "ury-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "URY",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "pry-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "PRY",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "pry-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "PRY",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "bra-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "BRA",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 17600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "bra-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "BRA",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "hti-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "HTI",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1500000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "hti-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "HTI",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "dom-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "DOM",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "dom-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "DOM",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "can-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "CAN",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 5180000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "can-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "CAN",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "aus-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "AUS",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 3800000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "aus-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "AUS",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "nzl-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "NZL",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 800000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "nzl-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "NZL",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.34,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  },
+  {
+    "id": "cub-population-1900",
+    "metric": "totalPopulation",
+    "countryTag": "CUB",
+    "year": 1900,
+    "units": "people",
+    "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
+    "target": 1600000,
+    "toleranceRelative": 0.000001,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023"
+    ],
+    "confidence": "medium",
+    "status": "provisional",
+    "notes": "Rounded historical estimate; regional and profession allocation is authored."
+  },
+  {
+    "id": "cub-peasant-share-1900",
+    "metric": "peasantPopulationShare",
+    "countryTag": "CUB",
+    "year": 1900,
+    "units": "share of population",
+    "definition": "Share of the country's modelled population in the peasant profession.",
+    "target": 0.82,
+    "toleranceAbsolute": 0.000001,
+    "sourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ],
+    "confidence": "low",
+    "status": "provisional",
+    "notes": "Authored occupation structure, not an observed 1900 statistic."
+  }
+]

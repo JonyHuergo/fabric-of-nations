@@ -16,13 +16,14 @@ describe("campaign startup and autosave wiring", () => {
     const provider = source("src/worker/SimulationProvider.tsx");
     const app = source("App.tsx");
     expect(provider).toContain("readStoredCampaign");
-    expect(provider).toContain('setStartup("choice")');
+    expect(provider).toContain('setStartup("menu")');
     expect(provider).toContain("resumeSavedGame");
-    expect(provider).toContain("startNewGame");
-    expect(app).toContain("CampaignChoiceScreen");
-    expect(app).toContain("Continue");
-    expect(app).toContain("New Game");
-    expect(app).toContain("ConfirmDialog");
+    expect(provider).toContain("createGame");
+    expect(app).toContain("MainMenuScreen");
+    expect(app).toContain("CountrySelectionScreen");
+    expect(app).toContain("onNewGame");
+    expect(app).toContain("onContinue");
+    expect(app).toContain("Replace the saved campaign?");
   });
 
   test("overwrite confirmation, autosave debounce, and failure feedback are present", () => {

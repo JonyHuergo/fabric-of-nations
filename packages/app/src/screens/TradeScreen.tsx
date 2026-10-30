@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
@@ -8,9 +8,39 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { ActionButton, Notice, Section, StatRow } from "../components/ui";
+import { SliderField } from "../components/Slider";
+import { ActionButton, Chip, Notice, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+
+/** Mirrors the simulation's numeric-safety bound for a monthly import quota. */
+const MAX_TRADE_QUOTA_QUANTITY = 1e15;
+
+/**
+ * A practical per-good ceiling for the quota slider, derived from observed market
+ * stock plus one month of production capacity. The authoritative bound is
+ * MAX_TRADE_QUOTA_QUANTITY; this only keeps the control in a useful observed range.
+ */
+function quotaCeiling(
+  snapshot: SimulationSnapshot,
+  customsMarketIds: readonly number[],
+  goodId: number,
+  currentQuota: number | null,
+): number {
+  const administered = new Set(customsMarketIds);
+  let observed = 0;
+  for (const market of snapshot.markets) {
+    if (administered.size > 0 && !administered.has(market.id)) continue;
+    const price = market.prices.find((entry) => entry.goodId === goodId);
+    if (price === undefined) continue;
+    observed +=
+      Math.max(0, price.stockQuantity) + Math.max(0, price.dailyProductionCapacity) * 30;
+  }
+  return Math.min(
+    MAX_TRADE_QUOTA_QUANTITY,
+    Math.max(100, observed, currentQuota ?? 0),
+  );
+}
 
 function percent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -39,6 +69,24 @@ export function TradeScreen({
   const [bans, setBans] = useState<boolean[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
 
+  // The snapshot rebuilds the policy arrays every tick. Key the draft-reset effect on
+  // the policy contents rather than array identity so a running simulation does not
+  // erase an in-progress slider drag.
+  const policySignature =
+    country === null
+      ? ""
+      : country.trade.tariffRates
+          .map((rate) => rate.toFixed(6))
+          .concat(
+            country.trade.importQuotaQuantity.map((quota) =>
+              quota === null ? "none" : quota.toFixed(6),
+            ),
+            country.trade.exportRestricted.map((restricted) =>
+              restricted ? "1" : "0",
+            ),
+          )
+          .join("|");
+
   useEffect(() => {
     if (country === null) return;
     setTariffs(
@@ -51,12 +99,8 @@ export function TradeScreen({
     );
     setBans([...country.trade.exportRestricted]);
     setLocalError(null);
-  }, [
-    countryId,
-    country?.trade.tariffRates,
-    country?.trade.importQuotaQuantity,
-    country?.trade.exportRestricted,
-  ]);
+    // `policySignature` captures the contents of all three authoritative arrays.
+  }, [countryId, policySignature]);
 
   if (country === null) {
     return (
@@ -68,50 +112,72 @@ export function TradeScreen({
   const isPlayerCountry =
     snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
   const canAct = isPlayerCountry && !busy && connection === "ready";
-  const parsedTariffs = tariffs.map((value) => {
-    const numeric = Number(value);
+  // Align the drafts with the snapshot's good list even on the first render, before
+  // the effect above has filled the arrays.
+  const parsedTariffs = goods.map((_good, index) => {
+    const numeric = Number(tariffs[index] ?? "0");
     return Number.isFinite(numeric) ? numeric / 100 : Number.NaN;
   });
-  const parsedQuotas = quotas.map((value) => {
-    const trimmed = value.trim();
+  const parsedQuotas = goods.map((_good, index) => {
+    const trimmed = (quotas[index] ?? "").trim();
     if (trimmed === "" || trimmed === "-") return null;
     const numeric = Number(trimmed);
     return Number.isFinite(numeric) ? numeric : Number.NaN;
   });
-  const policyError =
-    parsedTariffs.some((rate) => Number.isNaN(rate)) ||
-    parsedQuotas.some((quota) => quota !== null && Number.isNaN(quota))
-      ? "Enter numeric tariff percentages and quota quantities (blank means no quota)."
-      : null;
+  const parsedBans = goods.map((_good, index) => bans[index] ?? false);
   const preview = previewTradePolicy(snapshot, country, {
     tariffRates: parsedTariffs.map((rate) => (Number.isNaN(rate) ? 0 : rate)),
     importQuotaQuantity: parsedQuotas.map((quota) =>
       quota === null || Number.isNaN(quota) ? null : quota,
     ),
-    exportRestricted: bans,
+    exportRestricted: parsedBans,
   });
-  const submit = (): void => {
+  const applyPolicy = (overrides?: {
+    readonly tariffs?: readonly number[];
+    readonly quotas?: readonly (number | null)[];
+  }): void => {
+    const rates = overrides?.tariffs ?? parsedTariffs;
+    const quotaValues = overrides?.quotas ?? parsedQuotas;
     if (!isPlayerCountry) {
       setLocalError("Only the player-controlled country may change trade policy.");
       return;
     }
-    if (policyError !== null) {
-      setLocalError(policyError);
+    if (
+      rates.some((rate) => Number.isNaN(rate)) ||
+      quotaValues.some((quota) => quota !== null && Number.isNaN(quota))
+    ) {
+      setLocalError(
+        "Enter numeric tariff percentages and quota quantities (unset means no quota).",
+      );
       return;
     }
-    if (preview.errors.length > 0) {
-      setLocalError(preview.errors.join(" "));
+    const validated = previewTradePolicy(snapshot, country, {
+      tariffRates: rates.map((rate) => (Number.isNaN(rate) ? 0 : rate)),
+      importQuotaQuantity: quotaValues.map((quota) =>
+        quota === null || Number.isNaN(quota) ? null : quota,
+      ),
+      exportRestricted: parsedBans,
+    });
+    if (validated.errors.length > 0) {
+      setLocalError(validated.errors.join(" "));
       return;
     }
     setLocalError(null);
     applyAction({
       kind: "set-trade-policy",
       countryId: country.id,
-      tariffRates: parsedTariffs,
-      importQuotaQuantity: parsedQuotas.map((quota) =>
+      tariffRates: rates,
+      importQuotaQuantity: quotaValues.map((quota) =>
         quota === null || Number.isNaN(quota) ? null : quota,
       ),
-      exportRestricted: bans,
+      exportRestricted: parsedBans,
+    });
+  };
+  const setQuotaDraft = (index: number, value: string): void => {
+    setQuotas((current) => {
+      const next = [...current];
+      next[index] = value;
+      return next;
     });
   };
 
@@ -255,57 +321,127 @@ export function TradeScreen({
       <Text style={styles.heading}>Policy (per good)</Text>
       <Text style={styles.help}>
         Tariff is an ad-valorem duty on the origin-market cargo value of imports entering a
-        market you administer. Quota is a monthly physical import ceiling; blank means no
-        quota. Export ban stops your own buildings exporting that good.
+        market you administer. Quota is a monthly physical import ceiling; the No quota control
+        leaves it uncapped. Export ban stops your own buildings exporting that good.
       </Text>
-      {goods.map((good, index) => (
-        <View key={good.id} style={styles.goodRow}>
-          <Text style={styles.goodName}>{good.name}</Text>
-          <View style={styles.goodInputs}>
-            <TextInput
-              style={styles.input}
-              value={tariffs[index] ?? "0"}
-              onChangeText={(value) =>
+      {/*
+        Trade slider commits go straight through applyPolicy rather than a deferred
+        hook: this screen has one numeric pair per good, so a single coalescing slot
+        cannot identify which good changed. `canAct` includes `!busy`, and the worker
+        supervisor allows only one critical action at a time, so a second commit is
+        impossible while an action is in flight. The Apply button remains for edits
+        that span several goods.
+      */}
+      {goods.map((good, index) => {
+        const tariffRate = parsedTariffs[index];
+        const tariffPercent =
+          tariffRate !== undefined && Number.isFinite(tariffRate)
+            ? Math.min(100, Math.max(0, tariffRate * 100))
+            : 0;
+        const quotaDraft = parsedQuotas[index];
+        const quota =
+          typeof quotaDraft === "number" && Number.isFinite(quotaDraft)
+            ? quotaDraft
+            : null;
+        const quotaValue = quota === null ? 0 : Math.max(0, quota);
+        const quotaLimit = quotaCeiling(
+          snapshot,
+          country.trade.customsMarketIds,
+          good.id,
+          quota,
+        );
+        const quotaStep = Math.max(1, Math.round(quotaLimit / 100));
+        return (
+          <View key={good.id} style={styles.goodRow}>
+            <Text style={styles.goodName}>{good.name}</Text>
+            <SliderField
+              label={`${good.name} tariff rate`}
+              value={tariffPercent}
+              min={0}
+              max={100}
+              step={0.5}
+              precision={1}
+              unit="%"
+              disabled={!canAct}
+              onChange={(value) =>
                 setTariffs((current) => {
                   const next = [...current];
-                  next[index] = value;
+                  next[index] = value.toFixed(1);
                   return next;
                 })
               }
-              keyboardType="decimal-pad"
-              placeholder="tariff %"
-              placeholderTextColor={colors.faint}
+              onCommit={(value) =>
+                applyPolicy({
+                  tariffs: parsedTariffs.map((rate, entryIndex) =>
+                    entryIndex === index ? value / 100 : rate,
+                  ),
+                })
+              }
+              hint="Ad-valorem duty on the origin-market cargo value of imports entering a market this country administers."
             />
-            <TextInput
-              style={styles.input}
-              value={quotas[index] ?? ""}
-              onChangeText={(value) =>
-                setQuotas((current) => {
-                  const next = [...current];
-                  next[index] = value;
-                  return next;
+            <SliderField
+              label={`${good.name} monthly import quota`}
+              value={quotaValue}
+              min={0}
+              max={quotaLimit}
+              step={quotaStep}
+              precision={0}
+              unit={good.unitLabel}
+              disabled={!canAct || quota === null}
+              onChange={(value) => setQuotaDraft(index, value.toFixed(0))}
+              onCommit={(value) =>
+                applyPolicy({
+                  quotas: parsedQuotas.map((entry, entryIndex) =>
+                    entryIndex === index ? value : entry,
+                  ),
                 })
               }
-              keyboardType="decimal-pad"
-              placeholder="quota"
-              placeholderTextColor={colors.faint}
+              hint={
+                quota === null
+                  ? "No quota is set. Toggle No quota off to enter a monthly ceiling."
+                  : "Monthly physical ceiling on imports of this good into markets this country administers."
+              }
             />
-            <Pressable
-              accessibilityRole="button"
-              onPress={() =>
-                setBans((current) => {
-                  const next = [...current];
-                  next[index] = !next[index];
-                  return next;
-                })
-              }
-              style={[styles.banButton, bans[index] ? styles.banButtonActive : null]}
-            >
-              <Text style={styles.banText}>{bans[index] ? "Export banned" : "Export allowed"}</Text>
-            </Pressable>
+            <View style={styles.goodToggles}>
+              <Chip
+                label="No quota"
+                active={quota === null}
+                onPress={() => {
+                  if (quota === null) {
+                    // Enable a draft quota at the observed scale; the player must
+                    // still choose a value, so nothing is sent yet.
+                    setQuotaDraft(index, String(Math.round(quotaLimit)));
+                    return;
+                  }
+                  setQuotaDraft(index, "");
+                  // Removing a cap is a discrete policy change; send it at once.
+                  applyPolicy({
+                    quotas: parsedQuotas.map((entry, entryIndex) =>
+                      entryIndex === index ? null : entry,
+                    ),
+                  });
+                }}
+                disabled={!canAct}
+              />
+              <Pressable
+                accessibilityRole="button"
+                onPress={() =>
+                  setBans((current) => {
+                    const next = [...current];
+                    next[index] = !next[index];
+                    return next;
+                  })
+                }
+                style={[styles.banButton, parsedBans[index] ? styles.banButtonActive : null]}
+              >
+                <Text style={styles.banText}>
+                  {parsedBans[index] ? "Export banned" : "Export allowed"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
 
       <View style={styles.estimate}>
         <Text style={styles.estimateTitle}>Estimate (not a delivery promise)</Text>
@@ -331,7 +467,11 @@ export function TradeScreen({
           </Text>
         ))}
       </View>
-      <ActionButton label="Apply trade policy" disabled={!canAct} onPress={submit} />
+      <ActionButton
+        label="Apply trade policy"
+        disabled={!canAct}
+        onPress={() => applyPolicy()}
+      />
       <Text style={styles.help}>
         The worker validates the complete policy and recomputes trade from live stock,
         capacity, quota, and cash. Nothing here guarantees that a shipment will be dispatched
@@ -379,21 +519,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontWeight: "600",
   },
-  goodInputs: {
+  goodToggles: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.xs,
-    marginTop: 4,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    color: colors.text,
-    backgroundColor: colors.surface,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   banButton: {
     flex: 1,

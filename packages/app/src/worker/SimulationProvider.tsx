@@ -42,7 +42,7 @@ import {
 } from "./webWorkerClient";
 
 export type ConnectionState = "connecting" | "ready" | "error" | "closed";
-export type CampaignStartup = "checking" | "choice" | "playing";
+export type CampaignStartup = "checking" | "menu" | "playing";
 
 export interface SimulationContextValue {
   readonly snapshot: SimulationSnapshot | null;
@@ -57,8 +57,13 @@ export interface SimulationContextValue {
   readonly startup: CampaignStartup;
   readonly savedCampaign: StoredCampaign | null;
   readonly overwritePrompt: boolean;
+  /** Presentation focus whose full country record is in the snapshot. */
+  readonly focusCountryId: number | null;
   readonly resumeSavedGame: () => void;
-  readonly startNewGame: () => void;
+  /** Create a fresh 1900 world with an explicitly selected player country. */
+  readonly createGame: (playerCountryId: number) => void;
+  /** Ask the worker to include another country's full record in snapshots. */
+  readonly setFocus: (countryId: number) => void;
   readonly confirmOverwrite: () => void;
   readonly cancelOverwrite: () => void;
   readonly start: () => void;
@@ -183,6 +188,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const saveKindRef = useRef<"manual" | "autosave" | null>(null);
   const startupRef = useRef<CampaignStartup>("checking");
   const autosaveRequestRef = useRef<() => void>(() => {});
+  const focusRequestRef = useRef<number | null>(null);
+  const activePlayerCountryIdRef = useRef<number | null>(null);
   const pendingActionsRef = useRef(
     new Map<
       string,
@@ -235,21 +242,21 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
         if (cancelled) return;
         if (campaign === null) {
           setSavedCampaign(null);
-          setStartup("playing");
-          startupRef.current = "playing";
-          autosaveArmedRef.current = true;
+          setStartup("menu");
+          startupRef.current = "menu";
+          autosaveArmedRef.current = false;
           return;
         }
         setSavedCampaign(campaign);
-        setStartup("choice");
-        startupRef.current = "choice";
+        setStartup("menu");
+        startupRef.current = "menu";
         autosaveArmedRef.current = false;
       })
       .catch((storageError: unknown) => {
         if (cancelled) return;
         setError(`Saved game could not be read: ${messageOf(storageError)}`);
-        setStartup("playing");
-        startupRef.current = "playing";
+        setStartup("menu");
+        startupRef.current = "menu";
         // Preserve any existing file; a fresh autosave must not replace it.
         autosaveArmedRef.current = false;
       });
@@ -420,6 +427,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setStartup("playing");
             startupRef.current = "playing";
             autosaveArmedRef.current = true;
+            activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
+            focusRequestRef.current = null;
             setError(null);
             setSaveStatus("Saved game loaded");
             setActionHistory([]);
@@ -431,6 +440,43 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             autosaveArmedRef.current = false;
           }
           saveKindRef.current = null;
+          setBusy(false);
+          return;
+        }
+        case "NEW_GAME_RESULT": {
+          if (event.accepted) {
+            const supervisor = supervisorRef.current;
+            if (
+              supervisor === null ||
+              supervisor.acceptSnapshotSequence(event.snapshot.sequence)
+            ) {
+              setSnapshot(event.snapshot);
+            }
+            setRunningState(false);
+            setSpeedDaysPerSecond(event.snapshot.speedDaysPerSecond as SpeedDaysPerSecond);
+            setAchievedDaysPerSecond(event.snapshot.achievedDaysPerSecond);
+            setConnection("ready");
+            connectionRef.current = "ready";
+            setStartup("playing");
+            startupRef.current = "playing";
+            setActionHistory([]);
+            pendingActionsRef.current.clear();
+            focusRequestRef.current = null;
+            activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
+            if (savedCampaign === null) {
+              autosaveArmedRef.current = true;
+              setSaveStatus("New 1900 campaign started.");
+            } else {
+              autosaveArmedRef.current = false;
+              setSaveStatus(
+                "New campaign started. The previous saved game is preserved until you explicitly save.",
+              );
+            }
+            setError(null);
+          } else {
+            setError(event.errors.join("; ") || "The campaign could not be created.");
+            setSaveStatus(null);
+          }
           setBusy(false);
           return;
         }
@@ -472,7 +518,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           return;
       }
     },
-    [setRunningState],
+    [savedCampaign, setRunningState],
   );
 
   const send = useCallback(
@@ -485,7 +531,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       const critical =
         command.type === "SAVE" ||
         command.type === "LOAD" ||
-        command.type === "APPLY_ACTION";
+        command.type === "APPLY_ACTION" ||
+        command.type === "CREATE_GAME";
       const accepted = supervisor.send(command);
       if (accepted && critical) setBusy(true);
       return accepted;
@@ -664,20 +711,37 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     setSaveStatus(accepted ? "Loading saved game…" : null);
   }, [nextCommandId, savedCampaign, send]);
 
-  const startNewGame = useCallback(() => {
-    setStartup("playing");
-    startupRef.current = "playing";
-    if (savedCampaign === null) {
-      autosaveArmedRef.current = true;
-      return;
-    }
-    // Do not silently overwrite the existing campaign with a fresh world. The
-    // player must explicitly confirm a later save.
-    autosaveArmedRef.current = false;
-    setSaveStatus(
-      "New campaign started. The previous saved game is preserved until you explicitly save.",
-    );
-  }, [savedCampaign]);
+  const createGame = useCallback(
+    (playerCountryId: number) => {
+      const accepted = send({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "CREATE_GAME",
+        commandId: nextCommandId("new-game"),
+        playerCountryId,
+      });
+      if (accepted) {
+        activePlayerCountryIdRef.current = playerCountryId;
+        setSaveStatus("Preparing the 1900 world…");
+      } else {
+        setError("The simulation worker is not connected. Restart it and try again.");
+      }
+    },
+    [nextCommandId, send],
+  );
+
+  const setFocus = useCallback(
+    (countryId: number) => {
+      if (focusRequestRef.current === countryId) return;
+      focusRequestRef.current = countryId;
+      send({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SET_FOCUS",
+        commandId: nextCommandId("focus"),
+        countryId,
+      });
+    },
+    [nextCommandId, send],
+  );
 
   const loadGame = useCallback(async () => {
     const generation = sessionRef.current;
@@ -706,6 +770,27 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       setSaveStatus(null);
     }
   }, [nextCommandId, send]);
+
+  // Re-create the remembered campaign after a worker restart. Player identity is
+  // never silently replaced by the scenario's default country.
+  const recreateGuardRef = useRef(false);
+  useEffect(() => {
+    if (connection !== "ready" || startup !== "playing") return;
+    const desired = activePlayerCountryIdRef.current;
+    if (desired === null) return;
+    if (snapshot !== null && snapshot.playerCountryId === desired) {
+      recreateGuardRef.current = false;
+      return;
+    }
+    if (recreateGuardRef.current) return;
+    recreateGuardRef.current = true;
+    send({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "CREATE_GAME",
+      commandId: nextCommandId("restore-country"),
+      playerCountryId: desired,
+    });
+  }, [connection, startup, snapshot, send, nextCommandId]);
 
   const restartWorker = useCallback(() => {
     sessionRef.current += 1;
@@ -838,8 +923,10 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       startup,
       savedCampaign,
       overwritePrompt,
+      focusCountryId: snapshot?.focusCountryId ?? null,
       resumeSavedGame,
-      startNewGame,
+      createGame,
+      setFocus,
       confirmOverwrite,
       cancelOverwrite,
       start,
@@ -869,7 +956,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       savedCampaign,
       overwritePrompt,
       resumeSavedGame,
-      startNewGame,
+      createGame,
+      setFocus,
       confirmOverwrite,
       cancelOverwrite,
       start,

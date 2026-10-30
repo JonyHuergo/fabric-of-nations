@@ -6063,35 +6063,26 @@ validated. `FinancePeriodFiscalTotals.militaryExpenseSUSD` reports the spending.
 
 - **Recruitment.** Five validated actions exist: `declare-war`, `offer-peace`,
   `accept-peace`, `recruit-army`, and `deploy-army`. Recruitment removes working-age people
-  (18–45, males then females) from the region's pop blocks into the roster, apportioned
-  across blocks by available eligible population with deterministic largest-remainder
-  ties and per-block capacity. It charges a real signing cost to the treasury paid to the
-  blocks that supplied the recruits, and buys equipment units at a documented SUSD price
-  from the non-simulated system supplier. Formation takes 14 days before deployment.
+  (18–45, males then females) from the region's pop blocks into the roster, charges a real
+  signing cost to the treasury (paid to those households), and buys equipment units at a
+  documented SUSD price from the non-simulated system supplier. Formation takes 14 days
+  before deployment.
 - **Upkeep.** Daily pay and equipment upkeep are paid from actual treasury cash; a
-  shortfall pays pro rata, never creates money, and erodes supply/organization. Soldier
-  pay is distributed across the army region's households by eligible population;
-  equipment upkeep is paid to the system supplier.
+  shortfall pays pro rata, never creates money, and erodes supply/organization.
 - **Combat.** Hostile armies in the same region fight daily. Strength derives from
   personnel, equipment coverage, organization, and supply. Casualties are deterministic
-  from the keyed `m10-combat` RNG for loss magnitude; the loss is split into deaths,
-  wounded (return after 30 days), and captured (permanent) using the configured
-  0.4/0.45/0.15 shares and deterministic largest-remainder arithmetic. Equipment is lost
-  with casualties. When an army is destroyed, its wounded return to the home region's
-  population by the same population-proportional rule.
+  from the keyed `m10-combat` RNG and split into deaths, wounded (return after 30 days),
+  and captured (permanent). Equipment is lost with casualties. When an army is destroyed,
+  its wounded return to the home region's population.
 - **Occupation.** A hostile army in an undefended at-war region occupies it: control
   changes, daily unrest rises by 0.002, and the occupier pays a garrison cost into the
-  occupied region's households, distributed by eligible population. A sovereign army that
-  removes the occupier liberates it. No cash, building, person, market, or monetary record
-  moves.
+  occupied region's households. A sovereign army that removes the occupier liberates it.
+  No cash, building, person, market, or monetary record moves.
 - **Peace and truce.** A belligerent offers white peace or cession of controlled regions;
   the other belligerent accepts. Acceptance ends the war, clears occupations, records the
-  truce, and applies cession if chosen. Cession is rejected if it would remove the ceding
-  country's last sovereign region, and it is revalidated against current occupations at
-  acceptance. A peace on day P creates 365 full truce days P+1..P+365: the inclusive last
-  prohibited day is P+365, and a new declaration is first legal on P+366. AI countries
-  accept a pending white peace deterministically after 120 war days or when they control
-  fewer enemy regions than they have lost; AI does not declare war or recruit.
+  truce (365 days), and applies cession if chosen. A truce forbids a new declaration. AI
+  countries accept a pending white peace deterministically after 120 war days or when they
+  control fewer enemy regions than they have lost; AI does not declare war or recruit.
 
 ### 17H.4 Integration
 
@@ -6116,14 +6107,9 @@ validated. `FinancePeriodFiscalTotals.militaryExpenseSUSD` reports the spending.
 ### 17H.5 Determinism and persistence
 
 Ordering is by stable ids (armies, wars, regions, countries, offers); randomness is the
-keyed `m10-combat` draw with the world seed, day, war id, and region/side draw index.
-Military allocation and payment distribution add the keyed
-`m10-recruitment-remainder`, `m10-military-pay-remainder`, and `m10-return-remainder`
-tie-breaks; these never change combat draws or iterate in pop-array/numeric-id order. The
+keyed `m10-combat` draw with the world seed, day, war id, and region/side draw index. The
 phase is idempotent per day and bounded by `MAX_ARMIES`, `MAX_WARS`,
-`MAX_MILITARY_RELATIONS`, and `MAX_PEACE_OFFERS`. Enabled military states require their
-country `military-expense` and pop-block `military-income` accounts; disabled states must
-carry no active military records. New state participates in canonical
+`MAX_MILITARY_RELATIONS`, and `MAX_PEACE_OFFERS`. New state participates in canonical
 serialization, hashing, save/load, and schema rejection. World schema **26**, simulation
 **0.26.0**, worker protocol **13**, data **`m3-economy-v11`**; older saves and protocol-12
 clients are rejected under D-013 without migration.

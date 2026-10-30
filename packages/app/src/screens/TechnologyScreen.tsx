@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
@@ -10,9 +10,32 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Notice, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+
+/** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
+const MAX_ANNUAL_FUNDING_SUSD = 1e15;
+
+/**
+ * The worker rejects education funding only for non-finite/negative values or the
+ * numeric-safety bound, while the preview also rejects a daily request above current
+ * treasury cash. This ceiling keeps the slider inside the cash-limited range (and
+ * always includes the current policy value so it remains representable).
+ */
+function annualFundingCeiling(
+  currentAnnualSUSD: number,
+  treasuryCashSUSD: number,
+): number {
+  const affordable = Number.isFinite(treasuryCashSUSD)
+    ? Math.max(0, treasuryCashSUSD) * 365
+    : 0;
+  return Math.min(
+    MAX_ANNUAL_FUNDING_SUSD,
+    Math.max(1_000, currentAnnualSUSD, affordable),
+  );
+}
 
 type ResearchStatus = "researched" | "active" | "available" | "locked";
 
@@ -48,6 +71,60 @@ export function TechnologyScreen({
     country?.education.researchStaffShare,
   ]);
 
+  const isPlayerCountry =
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
+  const parsedFunding = Number(fundingText);
+  const parsedShare = Number(shareText);
+
+  const applyFunding = (annualSUSD?: number): void => {
+    if (country === null) return;
+    if (!isPlayerCountry) {
+      setLocalError("Only the player-controlled country may set education funding.");
+      return;
+    }
+    if (!country.technology.enabled) return;
+    const target = annualSUSD ?? parsedFunding;
+    const preview = previewEducationFunding(snapshot, country, target);
+    if (!preview.valid) {
+      setLocalError(preview.errors.join(" "));
+      return;
+    }
+    setLocalError(null);
+    applyAction({
+      kind: "set-education-funding",
+      countryId: country.id,
+      annualSUSD: target,
+    });
+  };
+
+  const applyShare = (share?: number): void => {
+    if (country === null) return;
+    if (!isPlayerCountry) {
+      setLocalError("Only the player-controlled country may set research staffing.");
+      return;
+    }
+    if (!country.technology.enabled) return;
+    const target = share ?? parsedShare;
+    const preview = previewResearchStaffShare(snapshot, country, target);
+    if (!preview.valid) {
+      setLocalError(preview.errors.join(" "));
+      return;
+    }
+    setLocalError(null);
+    applyAction({
+      kind: "set-research-staff-share",
+      countryId: country.id,
+      share: target,
+    });
+  };
+  // Unconditional hooks: coalesce rapid slider commits so only one validated action
+  // is in flight and the latest released value wins. They must run before the
+  // early returns below so the hook order never changes.
+  const fundingCommit = useDeferredCommit((value) => applyFunding(value), busy);
+  const shareCommit = useDeferredCommit((value) => applyShare(value), busy);
+
   if (country === null) {
     return (
       <Section title="Technology">
@@ -66,13 +143,14 @@ export function TechnologyScreen({
       </Section>
     );
   }
-  const isPlayerCountry =
-    snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
   const canAct = isPlayerCountry && !busy && connection === "ready";
-  const parsedFunding = Number(fundingText);
-  const parsedShare = Number(shareText);
   const fundingPreview = previewEducationFunding(snapshot, country, parsedFunding);
   const sharePreview = previewResearchStaffShare(snapshot, country, parsedShare);
+  const fundingLimit = annualFundingCeiling(
+    country.education.fundedAnnualSUSD,
+    country.treasuryCashSUSD,
+  );
+  const fundingStep = Math.max(1, Math.round(fundingLimit / 100));
   const statusById = new Map(
     technology.statuses.map((status) => [status.technologyId, status] as const),
   );
@@ -85,40 +163,6 @@ export function TechnologyScreen({
     selectedTechnologyId === null
       ? null
       : previewResearchStart(snapshot, country, selectedTechnologyId);
-
-  const setFunding = (): void => {
-    if (!isPlayerCountry) {
-      setLocalError("Only the player-controlled country may set education funding.");
-      return;
-    }
-    if (!fundingPreview.valid) {
-      setLocalError(fundingPreview.errors.join(" "));
-      return;
-    }
-    setLocalError(null);
-    applyAction({
-      kind: "set-education-funding",
-      countryId: country.id,
-      annualSUSD: parsedFunding,
-    });
-  };
-
-  const setShare = (): void => {
-    if (!isPlayerCountry) {
-      setLocalError("Only the player-controlled country may set research staffing.");
-      return;
-    }
-    if (!sharePreview.valid) {
-      setLocalError(sharePreview.errors.join(" "));
-      return;
-    }
-    setLocalError(null);
-    applyAction({
-      kind: "set-research-staff-share",
-      countryId: country.id,
-      share: parsedShare,
-    });
-  };
 
   const startResearch = (): void => {
     if (!isPlayerCountry) {
@@ -225,20 +269,29 @@ export function TechnologyScreen({
             Schooling constrained: {country.education.educationBlockedReason}.
           </Text>
         )}
-        <View style={styles.row}>
-          <TextInput
-            value={fundingText}
-            onChangeText={setFundingText}
-            keyboardType="decimal-pad"
-            editable={canAct}
-            style={styles.input}
-            accessibilityLabel="Education funding SUSD per year"
-          />
-          <Text style={styles.unit}>SUSD/yr</Text>
+        <SliderField
+          label="Education funding"
+          value={
+            Number.isFinite(parsedFunding)
+              ? Math.max(0, Math.min(fundingLimit, parsedFunding))
+              : 0
+          }
+          min={0}
+          max={fundingLimit}
+          step={fundingStep}
+          precision={0}
+          unit="SUSD/yr"
+          disabled={!isPlayerCountry || connection !== "ready"}
+          pending={fundingCommit.hasPending}
+          onChange={(value) => setFundingText(value.toFixed(0))}
+          onCommit={(value) => fundingCommit.submit(value)}
+          hint="Daily request is cash-limited; the worker validates the action against live treasury cash."
+        />
+        <View style={styles.actionRow}>
           <ActionButton
             label="Set funding"
             tone="accent"
-            onPress={setFunding}
+            onPress={() => applyFunding()}
             disabled={!canAct || !fundingPreview.valid}
           />
         </View>
@@ -246,20 +299,34 @@ export function TechnologyScreen({
           Daily request {formatSUSD(fundingPreview.dailyRequestSUSD)}; treasury cash{" "}
           {formatSUSD(country.treasuryCashSUSD)}. Funding also pays research staff.
         </Text>
-        <View style={styles.row}>
-          <TextInput
-            value={shareText}
-            onChangeText={setShareText}
-            keyboardType="decimal-pad"
-            editable={canAct}
-            style={styles.input}
-            accessibilityLabel="Research staff share 0 to 1"
-          />
-          <Text style={styles.unit}>research share</Text>
+        <SliderField
+          label="Research staff share"
+          value={
+            Number.isFinite(parsedShare)
+              ? Math.max(0, Math.min(1, parsedShare))
+              : 0
+          }
+          min={0}
+          max={1}
+          step={0.01}
+          precision={2}
+          unit="share"
+          ticks={[
+            { value: 0, label: "0%" },
+            { value: 0.5, label: "50%" },
+            { value: 1, label: "100%" },
+          ]}
+          disabled={!isPlayerCountry || connection !== "ready"}
+          pending={shareCommit.hasPending}
+          onChange={(value) => setShareText(value.toFixed(2))}
+          onCommit={(value) => shareCommit.submit(value)}
+          hint="Research and teaching draw on the same academic staff pool."
+        />
+        <View style={styles.actionRow}>
           <ActionButton
             label="Set share"
             tone="accent"
-            onPress={setShare}
+            onPress={() => applyShare()}
             disabled={!canAct || !sharePreview.valid}
           />
         </View>
@@ -357,7 +424,7 @@ export function TechnologyScreen({
 
 const styles = StyleSheet.create({
   empty: { color: colors.muted, fontSize: 12 },
-  row: {
+  actionRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
@@ -366,18 +433,6 @@ const styles = StyleSheet.create({
   rowText: { flex: 1 },
   label: { color: colors.text, fontSize: 13, fontWeight: "600" },
   detail: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 2 },
-  input: {
-    minWidth: 100,
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 6,
-    color: colors.text,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    fontSize: 13,
-    textAlign: "right",
-  },
-  unit: { color: colors.faint, fontSize: 11 },
   error: { color: colors.red, fontSize: 11, lineHeight: 16, marginTop: spacing.xs },
   era: { marginTop: spacing.md, gap: spacing.xs },
   eraTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },

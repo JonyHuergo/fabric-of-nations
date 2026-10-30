@@ -1,0 +1,412 @@
+[
+  {
+    "marketAKey": "british-empire",
+    "marketBKey": "alpine",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 43621,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "british-empire",
+    "marketBKey": "french-empire",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 52463,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "british-empire",
+    "marketBKey": "mediterranean",
+    "distanceUnits": 0.8,
+    "baseCapacitySUSDPerDay": 54580,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "united-states",
+    "marketBKey": "latin-america",
+    "distanceUnits": 5,
+    "baseCapacitySUSDPerDay": 64249,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "united-states",
+    "marketBKey": "iberian-empire",
+    "distanceUnits": 6,
+    "baseCapacitySUSDPerDay": 55025,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "united-states",
+    "marketBKey": "french-empire",
+    "distanceUnits": 6.2,
+    "baseCapacitySUSDPerDay": 58752,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "german-empire",
+    "marketBKey": "dutch-empire",
+    "distanceUnits": 0.6,
+    "baseCapacitySUSDPerDay": 45367,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "german-empire",
+    "marketBKey": "belgian-congo",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 45767,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "german-empire",
+    "marketBKey": "northern-european",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 46517,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "french-empire",
+    "marketBKey": "belgian-congo",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 41404,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "french-empire",
+    "marketBKey": "alpine",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 40616,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "french-empire",
+    "marketBKey": "dutch-empire",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 41004,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "russian-empire",
+    "marketBKey": "northern-european",
+    "distanceUnits": 0.9,
+    "baseCapacitySUSDPerDay": 65750,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "russian-empire",
+    "marketBKey": "german-empire",
+    "distanceUnits": 1.3,
+    "baseCapacitySUSDPerDay": 77417,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "russian-empire",
+    "marketBKey": "dutch-empire",
+    "distanceUnits": 1.8,
+    "baseCapacitySUSDPerDay": 64600,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "iberian-empire",
+    "marketBKey": "british-empire",
+    "distanceUnits": 0.9,
+    "baseCapacitySUSDPerDay": 48735,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "iberian-empire",
+    "marketBKey": "french-empire",
+    "distanceUnits": 1.1,
+    "baseCapacitySUSDPerDay": 45730,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "iberian-empire",
+    "marketBKey": "alpine",
+    "distanceUnits": 1.3,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "dutch-empire",
+    "marketBKey": "belgian-congo",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "belgian-congo",
+    "marketBKey": "alpine",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "northern-european",
+    "marketBKey": "dutch-empire",
+    "distanceUnits": 0.9,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "mediterranean",
+    "marketBKey": "alpine",
+    "distanceUnits": 0.9,
+    "baseCapacitySUSDPerDay": 42733,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "mediterranean",
+    "marketBKey": "ottoman-egyptian",
+    "distanceUnits": 1.1,
+    "baseCapacitySUSDPerDay": 47847,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "ottoman-egyptian",
+    "marketBKey": "german-empire",
+    "distanceUnits": 1.7,
+    "baseCapacitySUSDPerDay": 50092,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "ottoman-egyptian",
+    "marketBKey": "alpine",
+    "distanceUnits": 1.8,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "japanese-empire",
+    "marketBKey": "east-asian",
+    "distanceUnits": 2.1,
+    "baseCapacitySUSDPerDay": 147101,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "japanese-empire",
+    "marketBKey": "persian-gulf",
+    "distanceUnits": 6.8,
+    "baseCapacitySUSDPerDay": 46001,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "japanese-empire",
+    "marketBKey": "russian-empire",
+    "distanceUnits": 7.6,
+    "baseCapacitySUSDPerDay": 74351,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "east-asian",
+    "marketBKey": "persian-gulf",
+    "distanceUnits": 4.7,
+    "baseCapacitySUSDPerDay": 141050,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "east-asian",
+    "marketBKey": "russian-empire",
+    "distanceUnits": 6.1,
+    "baseCapacitySUSDPerDay": 169400,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "persian-gulf",
+    "marketBKey": "ottoman-egyptian",
+    "distanceUnits": 3.2,
+    "baseCapacitySUSDPerDay": 40975,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "persian-gulf",
+    "marketBKey": "russian-empire",
+    "distanceUnits": 3.9,
+    "baseCapacitySUSDPerDay": 68300,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "persian-gulf",
+    "marketBKey": "mediterranean",
+    "distanceUnits": 4.3,
+    "baseCapacitySUSDPerDay": 46822,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "african-independent",
+    "marketBKey": "ottoman-egyptian",
+    "distanceUnits": 2.8,
+    "baseCapacitySUSDPerDay": 40150,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "african-independent",
+    "marketBKey": "mediterranean",
+    "distanceUnits": 3,
+    "baseCapacitySUSDPerDay": 45997,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "african-independent",
+    "marketBKey": "british-empire",
+    "distanceUnits": 3.4,
+    "baseCapacitySUSDPerDay": 46884,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "southern-african",
+    "marketBKey": "african-independent",
+    "distanceUnits": 4.8,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "southern-african",
+    "marketBKey": "ottoman-egyptian",
+    "distanceUnits": 7.5,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "southern-african",
+    "marketBKey": "persian-gulf",
+    "distanceUnits": 7.7,
+    "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "latin-america",
+    "marketBKey": "iberian-empire",
+    "distanceUnits": 8.3,
+    "baseCapacitySUSDPerDay": 51226,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "latin-america",
+    "marketBKey": "french-empire",
+    "distanceUnits": 9.2,
+    "baseCapacitySUSDPerDay": 54954,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  }
+]

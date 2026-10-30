@@ -1,0 +1,1107 @@
+[
+  {
+    "id": 0,
+    "key": "british-empire",
+    "customsCountryTag": "GBR",
+    "name": "British Empire and Sterling Area",
+    "regionIds": [
+      1,
+      56,
+      57,
+      58,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      159
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "bin-subsistence-farm",
+        "quantity": 53685490
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "gbr-home-food-processing",
+        "quantity": 630000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "gbr-home-ranch",
+        "quantity": 648000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "gbr-home-fishery",
+        "quantity": 648000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "gbr-home-textile-mill",
+        "quantity": 101870
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "gbr-home-workshop",
+        "quantity": 384800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "bin-commercial-farm-peasant",
+        "quantity": 101870
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "gbr-home-ranch",
+        "quantity": 86400
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 1,
+    "key": "united-states",
+    "customsCountryTag": "USA",
+    "name": "United States and Insular Possessions",
+    "regionIds": [
+      0,
+      150,
+      151,
+      152,
+      153
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "usa-home-subsistence-farm",
+        "quantity": 20440000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "usa-home-food-processing",
+        "quantity": 907200
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "usa-home-ranch",
+        "quantity": 912000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "usa-home-fishery",
+        "quantity": 912000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "usa-home-textile-mill",
+        "quantity": 152188
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "usa-home-workshop",
+        "quantity": 551200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "usa-home-commercial-farm",
+        "quantity": 148000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "usa-home-ranch",
+        "quantity": 121600
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 2,
+    "key": "german-empire",
+    "customsCountryTag": "DEU",
+    "name": "German Empire and Colonial Market",
+    "regionIds": [
+      2,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "deu-home-subsistence-farm",
+        "quantity": 16580000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "deu-home-food-processing",
+        "quantity": 680400
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "deu-home-ranch",
+        "quantity": 672000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "deu-home-fishery",
+        "quantity": 672000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "deu-home-textile-mill",
+        "quantity": 112734
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "deu-home-workshop",
+        "quantity": 405600
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "deu-home-commercial-farm",
+        "quantity": 112734
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "deu-home-ranch",
+        "quantity": 89600
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 3,
+    "key": "french-empire",
+    "customsCountryTag": "FRA",
+    "name": "French Empire and Colonial Union",
+    "regionIds": [
+      3,
+      22,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "fra-home-subsistence-farm",
+        "quantity": 18860000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "fra-home-food-processing",
+        "quantity": 504000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "fra-home-ranch",
+        "quantity": 480000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "fra-home-fishery",
+        "quantity": 480000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "fra-home-textile-mill",
+        "quantity": 77830
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "fra-home-workshop",
+        "quantity": 291200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "fra-home-commercial-farm",
+        "quantity": 77830
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "fra-home-ranch",
+        "quantity": 64000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 4,
+    "key": "russian-empire",
+    "customsCountryTag": "RUS",
+    "name": "Russian Imperial Market",
+    "regionIds": [
+      4,
+      160
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "rus-home-subsistence-farm",
+        "quantity": 32260000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "rus-home-food-processing",
+        "quantity": 1587600
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "rus-home-ranch",
+        "quantity": 1608000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "rus-home-fishery",
+        "quantity": 1608000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "rus-home-textile-mill",
+        "quantity": 266600
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "rus-home-workshop",
+        "quantity": 967200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "rus-home-commercial-farm",
+        "quantity": 220000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "rus-home-ranch",
+        "quantity": 214400
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 5,
+    "key": "iberian-empire",
+    "customsCountryTag": "ESP",
+    "name": "Iberian and Colonial Market",
+    "regionIds": [
+      7,
+      8,
+      24,
+      138,
+      139,
+      140,
+      141,
+      142,
+      148,
+      149
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "esp-home-subsistence-farm",
+        "quantity": 8380000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "esp-home-food-processing",
+        "quantity": 302400
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "esp-home-ranch",
+        "quantity": 288000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "esp-home-fishery",
+        "quantity": 288000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "esp-home-textile-mill",
+        "quantity": 48010
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "esp-home-workshop",
+        "quantity": 176800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "esp-home-commercial-farm",
+        "quantity": 48010
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "esp-home-ranch",
+        "quantity": 38400
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 6,
+    "key": "dutch-empire",
+    "customsCountryTag": "NLD",
+    "name": "Dutch Empire Market",
+    "regionIds": [
+      9,
+      145,
+      146,
+      147
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "dei-subsistence-farm",
+        "quantity": 5375400
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "nld-home-food-processing",
+        "quantity": 50400
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "nld-home-ranch",
+        "quantity": 72000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "nld-home-fishery",
+        "quantity": 72000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "nld-home-textile-mill",
+        "quantity": 10200
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "nld-home-workshop",
+        "quantity": 41600
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "dei-commercial-farm-peasant",
+        "quantity": 10200
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "nld-home-ranch",
+        "quantity": 9600
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 7,
+    "key": "belgian-congo",
+    "customsCountryTag": "BEL",
+    "name": "Belgian and Congo Market",
+    "regionIds": [
+      10,
+      137
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "cfs-subsistence-farm",
+        "quantity": 3820000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "bel-home-food-processing",
+        "quantity": 75600
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "bel-home-ranch",
+        "quantity": 72000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "bel-home-fishery",
+        "quantity": 72000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "bel-home-textile-mill",
+        "quantity": 13400
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "bel-home-workshop",
+        "quantity": 52000
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "cfs-commercial-farm-peasant",
+        "quantity": 13400
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "bel-home-ranch",
+        "quantity": 9600
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 8,
+    "key": "alpine",
+    "customsCountryTag": "CHE",
+    "name": "Alpine Customs Union",
+    "regionIds": [
+      11,
+      21,
+      25
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "che-home-subsistence-farm",
+        "quantity": 1080000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "che-home-food-processing",
+        "quantity": 100800
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "che-home-ranch",
+        "quantity": 96000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "che-home-fishery",
+        "quantity": 96000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "che-home-textile-mill",
+        "quantity": 7095
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "che-home-workshop",
+        "quantity": 35475
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "che-home-commercial-farm",
+        "quantity": 7095
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "che-home-ranch",
+        "quantity": 7095
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 9,
+    "key": "northern-european",
+    "customsCountryTag": "SWE",
+    "name": "Northern European Market",
+    "regionIds": [
+      12,
+      13,
+      14,
+      154,
+      155,
+      156,
+      157
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "swe-home-subsistence-farm",
+        "quantity": 2960000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "swe-home-food-processing",
+        "quantity": 100800
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "swe-home-ranch",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "swe-home-fishery",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "swe-home-textile-mill",
+        "quantity": 19400
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "swe-home-workshop",
+        "quantity": 72800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "swe-home-commercial-farm",
+        "quantity": 19400
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "swe-home-ranch",
+        "quantity": 16000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 10,
+    "key": "mediterranean",
+    "customsCountryTag": "ITA",
+    "name": "Mediterranean and Colonial Market",
+    "regionIds": [
+      6,
+      15,
+      16,
+      17,
+      18,
+      19,
+      23,
+      143,
+      144
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "ita-home-subsistence-farm",
+        "quantity": 11680000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "ita-home-food-processing",
+        "quantity": 378000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "ita-home-ranch",
+        "quantity": 384000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "ita-home-fishery",
+        "quantity": 384000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "ita-home-textile-mill",
+        "quantity": 94772
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "ita-home-workshop",
+        "quantity": 228800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "ita-home-commercial-farm",
+        "quantity": 88000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "ita-home-ranch",
+        "quantity": 51200
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 11,
+    "key": "ottoman-egyptian",
+    "customsCountryTag": "OTT",
+    "name": "Ottoman-Egyptian Market",
+    "regionIds": [
+      20,
+      158
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "ott-home-subsistence-farm",
+        "quantity": 8060000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "ott-home-food-processing",
+        "quantity": 277200
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "ott-home-ranch",
+        "quantity": 288000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "ott-home-fishery",
+        "quantity": 288000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "ott-home-workshop-peasant",
+        "quantity": 176800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "ott-home-commercial-farm-peasant",
+        "quantity": 48000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "ott-home-ranch",
+        "quantity": 38400
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 12,
+    "key": "japanese-empire",
+    "customsCountryTag": "JPN",
+    "name": "Japanese Empire Market",
+    "regionIds": [
+      5,
+      161
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "jpn-home-subsistence-farm",
+        "quantity": 11200000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "jpn-home-food-processing",
+        "quantity": 529200
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "jpn-home-ranch",
+        "quantity": 528000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "jpn-home-fishery",
+        "quantity": 528000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "jpn-home-textile-mill",
+        "quantity": 88206
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "jpn-home-workshop",
+        "quantity": 322400
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "jpn-home-commercial-farm",
+        "quantity": 76000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "jpn-home-ranch",
+        "quantity": 70400
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 13,
+    "key": "east-asian",
+    "customsCountryTag": "CHN",
+    "name": "East Asian Treaty Port Market",
+    "regionIds": [
+      26,
+      27,
+      31
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "chn-home-subsistence-farm",
+        "quantity": 100760000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "chn-home-food-processing",
+        "quantity": 4788000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "chn-home-ranch",
+        "quantity": 4800000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "chn-home-fishery",
+        "quantity": 4800000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "chn-home-workshop-peasant",
+        "quantity": 2891200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "chn-home-commercial-farm-peasant",
+        "quantity": 692000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "chn-home-ranch",
+        "quantity": 640000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 14,
+    "key": "persian-gulf",
+    "customsCountryTag": "PER",
+    "name": "Persian Gulf and Himalayan Market",
+    "regionIds": [
+      28,
+      29,
+      30,
+      32
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "per-home-subsistence-farm",
+        "quantity": 4800000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "per-home-food-processing",
+        "quantity": 126000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "per-home-ranch",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "per-home-fishery",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "per-home-workshop-peasant",
+        "quantity": 72800
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "per-home-commercial-farm-peasant",
+        "quantity": 36000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "per-home-ranch",
+        "quantity": 16000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 15,
+    "key": "african-independent",
+    "customsCountryTag": "ETH",
+    "name": "African Independent States Trade Area",
+    "regionIds": [
+      33,
+      34,
+      35
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "eth-home-subsistence-farm",
+        "quantity": 3940000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "eth-home-food-processing",
+        "quantity": 126000
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "eth-home-ranch",
+        "quantity": 144000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "eth-home-fishery",
+        "quantity": 144000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "eth-home-workshop-peasant",
+        "quantity": 83200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "eth-home-commercial-farm-peasant",
+        "quantity": 28000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "eth-home-ranch",
+        "quantity": 19200
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 16,
+    "key": "southern-african",
+    "customsCountryTag": "ZAR",
+    "name": "Southern African Market",
+    "regionIds": [
+      36,
+      37
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "zar-home-subsistence-farm",
+        "quantity": 500000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "zar-home-food-processing",
+        "quantity": 25200
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "zar-home-ranch",
+        "quantity": 24000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "zar-home-fishery",
+        "quantity": 24000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "zar-home-workshop-peasant",
+        "quantity": 10400
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "zar-home-commercial-farm-peasant",
+        "quantity": 3000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "zar-home-ranch",
+        "quantity": 3000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 17,
+    "key": "latin-america",
+    "customsCountryTag": "ARG",
+    "name": "Latin American Trade Area",
+    "regionIds": [
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      59
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "bra-home-subsistence-farm",
+        "quantity": 15260000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "arg-home-food-processing",
+        "quantity": 100800
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "chl-home-ranch",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "chl-home-fishery",
+        "quantity": 120000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "arg-home-textile-mill",
+        "quantity": 39840
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "arg-home-workshop",
+        "quantity": 62400
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "bra-home-commercial-farm-peasant",
+        "quantity": 121800
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "chl-home-ranch",
+        "quantity": 16000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  }
+]

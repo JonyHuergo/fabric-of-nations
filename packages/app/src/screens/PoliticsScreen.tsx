@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
@@ -9,9 +9,32 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Notice, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+
+/** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
+const MAX_ANNUAL_FUNDING_SUSD = 1e15;
+
+/**
+ * The worker rejects a funding target only for non-finite/negative values or the
+ * numeric-safety bound, while the preview also rejects a daily request above current
+ * treasury cash. This ceiling keeps the slider inside the cash-limited range (and
+ * always includes the current policy value so it remains representable).
+ */
+function annualFundingCeiling(
+  currentAnnualSUSD: number,
+  treasuryCashSUSD: number,
+): number {
+  const affordable = Number.isFinite(treasuryCashSUSD)
+    ? Math.max(0, treasuryCashSUSD) * 365
+    : 0;
+  return Math.min(
+    MAX_ANNUAL_FUNDING_SUSD,
+    Math.max(1_000, currentAnnualSUSD, affordable),
+  );
+}
 
 const SLOT_LABELS: Record<string, string> = {
   suffrage: "Suffrage",
@@ -68,6 +91,36 @@ export function PoliticsScreen({
     setSelectedLawId(null);
   }, [countryId, country?.politics.institution.fundedAnnualSUSD]);
 
+  const isPlayerCountry =
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
+  const parsedFunding = Number(fundingText);
+
+  const applyFunding = (annualSUSD?: number): void => {
+    if (country === null) return;
+    if (!isPlayerCountry) {
+      setLocalError("Only the player-controlled country may set administration funding.");
+      return;
+    }
+    if (!country.politics.enabled) return;
+    const target = annualSUSD ?? parsedFunding;
+    const preview = previewInstitutionFunding(snapshot, country, target);
+    if (!preview.valid) {
+      setLocalError(preview.errors.join(" "));
+      return;
+    }
+    setLocalError(null);
+    applyAction({
+      kind: "set-institution-funding",
+      countryId: country.id,
+      annualSUSD: target,
+    });
+  };
+  // Unconditional hook: coalesces rapid slider commits so only one validated action
+  // is in flight and the latest released value wins.
+  const fundingCommit = useDeferredCommit((value) => applyFunding(value), busy);
+
   if (country === null) {
     return (
       <Section title="Politics">
@@ -86,11 +139,13 @@ export function PoliticsScreen({
       </Section>
     );
   }
-  const isPlayerCountry =
-    snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
   const canAct = isPlayerCountry && !busy && connection === "ready";
-  const parsedFunding = Number(fundingText);
   const fundingPreview = previewInstitutionFunding(snapshot, country, parsedFunding);
+  const fundingLimit = annualFundingCeiling(
+    politics.institution.fundedAnnualSUSD,
+    country.treasuryCashSUSD,
+  );
+  const fundingStep = Math.max(1, Math.round(fundingLimit / 100));
   const selectedLaw =
     selectedLawId === null
       ? null
@@ -109,23 +164,6 @@ export function PoliticsScreen({
     }
     setLocalError(null);
     applyAction({ kind: "propose-law", countryId: country.id, lawId: selectedLawId });
-  };
-
-  const setFunding = (): void => {
-    if (!isPlayerCountry) {
-      setLocalError("Only the player-controlled country may set administration funding.");
-      return;
-    }
-    if (!fundingPreview.valid) {
-      setLocalError(fundingPreview.errors.join(" "));
-      return;
-    }
-    setLocalError(null);
-    applyAction({
-      kind: "set-institution-funding",
-      countryId: country.id,
-      annualSUSD: parsedFunding,
-    });
   };
 
   return (
@@ -198,20 +236,29 @@ export function PoliticsScreen({
           value={`${formatSUSD(politics.institution.fundedAnnualSUSD)}/yr`}
           detail={`Requested ${formatSUSD(politics.institution.fundingRequestedMonthToDateSUSD)} · shortfall ${formatSUSD(politics.institution.fundingShortfallMonthToDateSUSD)}`}
         />
+        <SliderField
+          label="Administration funding"
+          value={
+            Number.isFinite(parsedFunding)
+              ? Math.max(0, Math.min(fundingLimit, parsedFunding))
+              : 0
+          }
+          min={0}
+          max={fundingLimit}
+          step={fundingStep}
+          precision={0}
+          unit="SUSD/yr"
+          disabled={!isPlayerCountry || connection !== "ready"}
+          pending={fundingCommit.hasPending}
+          onChange={(value) => setFundingText(value.toFixed(0))}
+          onCommit={(value) => fundingCommit.submit(value)}
+          hint="Daily request is cash-limited; the worker validates the action against live treasury cash."
+        />
         <View style={styles.row}>
-          <TextInput
-            value={fundingText}
-            onChangeText={setFundingText}
-            keyboardType="decimal-pad"
-            editable={canAct}
-            style={styles.input}
-            accessibilityLabel="Administration funding SUSD per year"
-          />
-          <Text style={styles.unit}>SUSD/yr</Text>
           <ActionButton
             label="Set funding"
             tone="accent"
-            onPress={setFunding}
+            onPress={() => applyFunding()}
             disabled={!canAct || !fundingPreview.valid}
           />
         </View>
@@ -346,18 +393,6 @@ const styles = StyleSheet.create({
   label: { color: colors.text, fontSize: 13, fontWeight: "600" },
   detail: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 2 },
   stance: { color: colors.accent, fontSize: 12, fontVariant: ["tabular-nums"] },
-  input: {
-    minWidth: 100,
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 6,
-    color: colors.text,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    fontSize: 13,
-    textAlign: "right",
-  },
-  unit: { color: colors.faint, fontSize: 11 },
   error: { color: colors.red, fontSize: 11, lineHeight: 16, marginTop: spacing.xs },
   slot: { marginTop: spacing.md, gap: spacing.xs },
   slotTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },

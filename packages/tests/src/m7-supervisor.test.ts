@@ -67,12 +67,14 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     dataVersion: "test",
     simVersion: "test",
     playerCountryId: null,
+    focusCountryId: null,
     constructionEnabled: false,
     countries: [
       {
         id: 0,
         tag: "USA",
         name: "United States",
+        meta: null,
         regionIds: [0],
         fiscal: {
           incomeTaxRate: 0.1,
@@ -293,12 +295,41 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
       },
     ],
     regions: [
-      { id: 0, key: "r0", name: "Region", countryId: 0, marketId: 0, population: 100, buildingCount: 1, unrest: 0, infrastructure: 0.5, sovereignCountryId: 0, controllerCountryId: null, occupiedSinceDay: null },
+      { id: 0, key: "r0", name: "Region", countryId: 0, marketId: 0, population: 100, buildingCount: 1, unrest: 0, infrastructure: 0.5, sovereignCountryId: 0, controllerCountryId: null, occupiedSinceDay: null, meta: null },
+    ],
+    countrySummaries: [
+      {
+        id: 0,
+        tag: "USA",
+        name: "United States",
+        historicalName: "United States",
+        status: "independent",
+        sovereignCountryId: 0,
+        capitalName: "Washington",
+        selectable: true,
+        isPlayer: false,
+        isFocused: false,
+        regionIds: [0],
+        marketIds: [0],
+        population: 100,
+        employedWorkers: 0,
+        treasuryCashSUSD: 100,
+        hardshipPopulationShare: 0,
+        literacy: 0.5,
+        wealthLevel: 1,
+        militancy: 0,
+        militaryPersonnel: 0,
+        latestNetFiscalResultSUSD: null,
+      },
     ],
     markets: [
       {
         id: 0,
-        label: "Market",
+        label: "Test Market",
+        name: "Test Market",
+        description: "A test market.",
+        kind: "national",
+        memberCountryIds: [0],
         regionIds: [0],
         prices: [
           {

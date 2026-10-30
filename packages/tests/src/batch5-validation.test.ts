@@ -57,7 +57,7 @@ const SEED = 20_261_023;
 // E6a (schema 24) adds `World.trade` and `Market.customsCountryId` to the encoded
 // state shape, so this earlier-run digest is intentionally re-pinned. The Batch 5
 // validation optimization must not change simulation behavior.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "a24e97d36f211515";
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "7ae63aaf089f2a15";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

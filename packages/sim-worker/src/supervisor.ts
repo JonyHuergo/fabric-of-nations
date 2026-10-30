@@ -32,6 +32,7 @@ const CRITICAL_COMMANDS: ReadonlySet<WorkerCommand["type"]> = new Set([
   "SAVE",
   "LOAD",
   "APPLY_ACTION",
+  "CREATE_GAME",
 ]);
 
 export interface WorkerSupervisorOptions {
@@ -187,7 +188,7 @@ export class WorkerSupervisor {
       this.options.onEvent(event);
       return;
     }
-    if (event.type === "LOAD_RESULT") {
+    if (event.type === "LOAD_RESULT" || event.type === "NEW_GAME_RESULT") {
       if (!this.settle(event.commandId)) return;
       this.options.onEvent(event);
       return;

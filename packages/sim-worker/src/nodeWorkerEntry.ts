@@ -8,7 +8,7 @@
 import { parentPort } from "node:worker_threads";
 
 import { SimulationHost } from "./host.js";
-import { M5_SCENARIO } from "./generated/m5Scenario.js";
+import { WORLD_SCENARIO } from "./generated/worldScenario.js";
 
 const port = parentPort;
 if (port === null) {
@@ -16,7 +16,7 @@ if (port === null) {
 }
 
 const host = new SimulationHost({
-  scenario: M5_SCENARIO,
+  scenario: WORLD_SCENARIO,
   seed: 20_261_023,
   emit: (event) => port.postMessage(event),
 });

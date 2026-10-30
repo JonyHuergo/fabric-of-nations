@@ -54,8 +54,8 @@ describe("M3a schema-25 serialization", () => {
     // flag and each pop block's authoritative age-specific literacy array. The
     // M3 fixture has technology disabled, so no behaviour changes. E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`, so the structural digest is
-    // intentionally re-pinned; the fixture still has trade disabled.
-    expect(hashWorld(cloneWorld())).toBe("9fb09ba715ca44c9");
+    // intentionally re-pinned; the fixture still has trade disabled. M11 (simulation 0.27.0, data m3-economy-v12) changes the encoded version metadata, so the digest is re-pinned again without changing the fixture's behaviour.
+    expect(hashWorld(cloneWorld())).toBe("3bbc8d9dee6d0e6b");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

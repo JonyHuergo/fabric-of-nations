@@ -1,0 +1,4228 @@
+{
+  "meta": {
+    "version": "m11-1900-v1",
+    "startDate": "1900-01-01",
+    "title": "Century historical polity catalog, 1 January 1900",
+    "classification": {
+      "source": "Gleditsch-Ward / Correlates of War independent-state tradition as documented by CShapes 2.0",
+      "selectableStatuses": [
+        "independent",
+        "personal-union",
+        "autonomous-vassal",
+        "dominion"
+      ],
+      "description": "States are coded by their constitutional position on 1 January 1900. Independent states and the documented semi-sovereign polities selected for play are selectable; colonies, protectorates, occupied and autonomous provinces are territories of their sovereign or administering power."
+    },
+    "sources": [
+      {
+        "id": "owid-population",
+        "title": "Our World in Data - Population, long-run series",
+        "license": "CC BY 4.0",
+        "notes": "Rounded national population estimates for 1900."
+      },
+      {
+        "id": "maddison-2023",
+        "title": "Maddison Project Database 2023",
+        "license": "CC BY 4.0",
+        "notes": "Cross-checks for rounded 1900 population totals."
+      },
+      {
+        "id": "owid-employment-by-sector",
+        "title": "Our World in Data - Employment by sector reconstructions",
+        "license": "CC BY 4.0",
+        "notes": "Broad 1900 agricultural-employment ranges; used only to set provisional occupation shares."
+      },
+      {
+        "id": "cshapes-2.0",
+        "title": "CShapes 2.0 (Schvitz et al. 2022), classification reference",
+        "license": "CC BY-NC-SA 4.0",
+        "notes": "Consulted for the independence/status coding only. Not redistributed."
+      },
+      {
+        "id": "natural-earth-50m",
+        "title": "Natural Earth 1:50m cultural vectors",
+        "license": "Public domain",
+        "notes": "Map geometry source (admin-0 countries and admin-1 provinces)."
+      },
+      {
+        "id": "project-authored-1900",
+        "title": "Century M11 authored 1900 world content",
+        "license": "Project data",
+        "notes": "Status, capitals, market grouping, geometry crosswalk, fiscal, technology and building starts are authored provisional inputs."
+      }
+    ],
+    "geometry": {
+      "dataset": "Natural Earth 1:50m admin-0 countries, with admin-1 provinces for South Africa, Canada and Australia overrides",
+      "license": "Public domain",
+      "note": "Modern source units are aggregated into 1900 polities with an explicit crosswalk. Borders inside a polity are administrative source boundaries, not 1900 borders."
+    }
+  },
+  "markets": [
+    {
+      "id": 0,
+      "key": "british-empire",
+      "name": "British Empire and Sterling Area",
+      "kind": "imperial",
+      "customsTag": "GBR",
+      "description": "The United Kingdom, the self-governing dominions and the crown colonies, treated as one preferential customs area."
+    },
+    {
+      "id": 1,
+      "key": "united-states",
+      "name": "United States and Insular Possessions",
+      "kind": "imperial",
+      "customsTag": "USA",
+      "description": "The United States and its Caribbean and Pacific dependencies."
+    },
+    {
+      "id": 2,
+      "key": "german-empire",
+      "name": "German Empire and Colonial Market",
+      "kind": "imperial",
+      "customsTag": "DEU",
+      "description": "The German customs area and the African and Pacific colonies."
+    },
+    {
+      "id": 3,
+      "key": "french-empire",
+      "name": "French Empire and Colonial Union",
+      "kind": "imperial",
+      "customsTag": "FRA",
+      "description": "Metropolitan France, Algeria, the African federations and Indochina."
+    },
+    {
+      "id": 4,
+      "key": "russian-empire",
+      "name": "Russian Imperial Market",
+      "kind": "imperial",
+      "customsTag": "RUS",
+      "description": "The Russian Empire and the autonomous Grand Duchy of Finland."
+    },
+    {
+      "id": 5,
+      "key": "iberian-empire",
+      "name": "Iberian and Colonial Market",
+      "kind": "shared",
+      "customsTag": "ESP",
+      "description": "Spain, Portugal, Andorra and their African and Asian possessions, cleared together for this model."
+    },
+    {
+      "id": 6,
+      "key": "dutch-empire",
+      "name": "Dutch Empire Market",
+      "kind": "imperial",
+      "customsTag": "NLD",
+      "description": "The Netherlands and the East Indian, Surinamese and Caribbean possessions."
+    },
+    {
+      "id": 7,
+      "key": "belgian-congo",
+      "name": "Belgian and Congo Market",
+      "kind": "imperial",
+      "customsTag": "BEL",
+      "description": "Belgium and the Congo Free State, linked by the personal union of the crown."
+    },
+    {
+      "id": 8,
+      "key": "alpine",
+      "name": "Alpine Customs Union",
+      "kind": "shared",
+      "customsTag": "CHE",
+      "description": "Switzerland, Luxembourg and Liechtenstein; a documented simplification of their customs arrangements."
+    },
+    {
+      "id": 9,
+      "key": "northern-european",
+      "name": "Northern European Market",
+      "kind": "shared",
+      "customsTag": "SWE",
+      "description": "Sweden, Norway and the Danish realm, including Iceland, Greenland, the Faroes and the Danish West Indies."
+    },
+    {
+      "id": 10,
+      "key": "mediterranean",
+      "name": "Mediterranean and Colonial Market",
+      "kind": "shared",
+      "customsTag": "ITA",
+      "description": "Italy, the Balkan states and the Italian colonies, cleared as one Mediterranean trade area."
+    },
+    {
+      "id": 11,
+      "key": "ottoman-egyptian",
+      "name": "Ottoman-Egyptian Market",
+      "kind": "imperial",
+      "customsTag": "OTT",
+      "description": "The Ottoman Empire and the autonomous province of Egypt."
+    },
+    {
+      "id": 12,
+      "key": "japanese-empire",
+      "name": "Japanese Empire Market",
+      "kind": "imperial",
+      "customsTag": "JPN",
+      "description": "Japan and its Formosan colony."
+    },
+    {
+      "id": 13,
+      "key": "east-asian",
+      "name": "East Asian Treaty Port Market",
+      "kind": "shared",
+      "customsTag": "CHN",
+      "description": "China, Korea and Siam, grouped as the East Asian trade area of the treaty ports."
+    },
+    {
+      "id": 14,
+      "key": "persian-gulf",
+      "name": "Persian Gulf and Himalayan Market",
+      "kind": "shared",
+      "customsTag": "PER",
+      "description": "Persia, Afghanistan, Oman and Nepal; a thin shared market of independent states outside the colonial empires."
+    },
+    {
+      "id": 15,
+      "key": "african-independent",
+      "name": "African Independent States Trade Area",
+      "kind": "shared",
+      "customsTag": "ETH",
+      "description": "Ethiopia, Liberia and Morocco, grouped as a shared clearing area."
+    },
+    {
+      "id": 16,
+      "key": "southern-african",
+      "name": "Southern African Market",
+      "kind": "shared",
+      "customsTag": "ZAR",
+      "description": "The Transvaal and the Orange Free State at the outbreak of the South African War."
+    },
+    {
+      "id": 17,
+      "key": "latin-america",
+      "name": "Latin American Trade Area",
+      "kind": "shared",
+      "customsTag": "ARG",
+      "description": "The independent Latin American republics, grouped as one shared trade area; national tariffs are not modelled."
+    }
+  ],
+  "states": [
+    {
+      "id": 0,
+      "tag": "USA",
+      "name": "United States of America",
+      "commonName": "United States",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Washington, D.C.",
+        "lat": 38.9,
+        "lon": -77.04
+      },
+      "population1900": 76094000,
+      "tier": "industrial",
+      "literacy": 0.89,
+      "peasantShare": 0.38,
+      "market": "united-states",
+      "geometry": [
+        "USA"
+      ],
+      "description": "Federal republic and the largest industrial economy in the Americas.",
+      "confidence": "high",
+      "notes": "Includes Alaska and the annexed Hawaiian Islands.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 1,
+      "tag": "GBR",
+      "name": "United Kingdom of Great Britain and Ireland",
+      "commonName": "United Kingdom",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "London",
+        "lat": 51.5,
+        "lon": -0.13
+      },
+      "population1900": 41155000,
+      "tier": "industrial",
+      "literacy": 0.97,
+      "peasantShare": 0.22,
+      "market": "british-empire",
+      "geometry": [
+        "GBR",
+        "IRL",
+        "IMN",
+        "JEY",
+        "GGY"
+      ],
+      "description": "Parliamentary monarchy ruling the largest empire in the world.",
+      "confidence": "high",
+      "notes": "Ireland is part of the United Kingdom in 1900.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 2,
+      "tag": "DEU",
+      "name": "German Empire",
+      "commonName": "Germany",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Berlin",
+        "lat": 52.52,
+        "lon": 13.4
+      },
+      "population1900": 56367000,
+      "tier": "industrial",
+      "literacy": 0.9,
+      "peasantShare": 0.35,
+      "market": "german-empire",
+      "geometry": [
+        "DEU"
+      ],
+      "description": "Federal empire under the Hohenzollern crown; Europe's fastest-growing industrial power.",
+      "confidence": "high",
+      "notes": "Alsace-Lorraine is administered within the Empire but not separable at this map resolution.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 3,
+      "tag": "FRA",
+      "name": "French Republic",
+      "commonName": "France",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Paris",
+        "lat": 48.86,
+        "lon": 2.35
+      },
+      "population1900": 38900000,
+      "tier": "industrial",
+      "literacy": 0.83,
+      "peasantShare": 0.42,
+      "market": "french-empire",
+      "geometry": [
+        "FRA"
+      ],
+      "description": "Third Republic with a vast colonial empire in Africa and Indochina.",
+      "confidence": "medium",
+      "notes": "Metropolitan France excludes Algeria, which is administered separately.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 4,
+      "tag": "RUS",
+      "name": "Russian Empire",
+      "commonName": "Russian Empire",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Saint Petersburg",
+        "lat": 59.93,
+        "lon": 30.34
+      },
+      "population1900": 133300000,
+      "tier": "mixed",
+      "literacy": 0.28,
+      "peasantShare": 0.8,
+      "market": "russian-empire",
+      "geometry": [
+        "RUS",
+        "EST",
+        "LVA",
+        "LTU",
+        "BLR",
+        "UKR",
+        "MDA",
+        "GEO",
+        "ARM",
+        "AZE",
+        "KAZ",
+        "UZB",
+        "TKM",
+        "TJK",
+        "KGZ",
+        "POL"
+      ],
+      "description": "Autocracy spanning eastern Europe and northern Asia.",
+      "confidence": "medium",
+      "notes": "Congress Poland is assigned to the Empire; the German and Austrian partitions of modern Poland are not separable at this resolution. Finland is a separate autonomous province.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 5,
+      "tag": "JPN",
+      "name": "Empire of Japan",
+      "commonName": "Japan",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Tokyo",
+        "lat": 35.68,
+        "lon": 139.69
+      },
+      "population1900": 44103000,
+      "tier": "mixed",
+      "literacy": 0.6,
+      "peasantShare": 0.62,
+      "market": "japanese-empire",
+      "geometry": [
+        "JPN"
+      ],
+      "description": "Constitutional monarchy completing its Meiji industrial transformation.",
+      "confidence": "medium",
+      "notes": "Taiwan (Formosa) is a separate colonial territory of the Empire.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 6,
+      "tag": "ITA",
+      "name": "Kingdom of Italy",
+      "commonName": "Italy",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Rome",
+        "lat": 41.9,
+        "lon": 12.5
+      },
+      "population1900": 32475000,
+      "tier": "mixed",
+      "literacy": 0.55,
+      "peasantShare": 0.58,
+      "market": "mediterranean",
+      "geometry": [
+        "ITA",
+        "VAT"
+      ],
+      "description": "Parliamentary monarchy with a young African colonial empire.",
+      "confidence": "high",
+      "notes": "Vatican City did not exist as a sovereign state in 1900; Rome is the Italian capital.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 7,
+      "tag": "ESP",
+      "name": "Kingdom of Spain",
+      "commonName": "Spain",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Madrid",
+        "lat": 40.42,
+        "lon": -3.7
+      },
+      "population1900": 18600000,
+      "tier": "mixed",
+      "literacy": 0.5,
+      "peasantShare": 0.62,
+      "market": "iberian-empire",
+      "geometry": [
+        "ESP"
+      ],
+      "description": "Restoration monarchy recovering from the loss of Cuba and the Philippines in 1898.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 8,
+      "tag": "PRT",
+      "name": "Kingdom of Portugal",
+      "commonName": "Portugal",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Lisbon",
+        "lat": 38.72,
+        "lon": -9.14
+      },
+      "population1900": 5400000,
+      "tier": "mixed",
+      "literacy": 0.35,
+      "peasantShare": 0.68,
+      "market": "iberian-empire",
+      "geometry": [
+        "PRT"
+      ],
+      "description": "Constitutional monarchy with African and Asian colonies.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 9,
+      "tag": "NLD",
+      "name": "Kingdom of the Netherlands",
+      "commonName": "Netherlands",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Amsterdam",
+        "lat": 52.37,
+        "lon": 4.9
+      },
+      "population1900": 5100000,
+      "tier": "industrial",
+      "literacy": 0.85,
+      "peasantShare": 0.3,
+      "market": "dutch-empire",
+      "geometry": [
+        "NLD"
+      ],
+      "description": "Constitutional monarchy whose East Indies colony dominates its imperial economy.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 10,
+      "tag": "BEL",
+      "name": "Kingdom of Belgium",
+      "commonName": "Belgium",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Brussels",
+        "lat": 50.85,
+        "lon": 4.35
+      },
+      "population1900": 6700000,
+      "tier": "industrial",
+      "literacy": 0.85,
+      "peasantShare": 0.32,
+      "market": "belgian-congo",
+      "geometry": [
+        "BEL"
+      ],
+      "description": "Constitutional monarchy and early industrialiser; the Congo Free State is in personal union with its king.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 11,
+      "tag": "CHE",
+      "name": "Swiss Confederation",
+      "commonName": "Switzerland",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Bern",
+        "lat": 46.95,
+        "lon": 7.45
+      },
+      "population1900": 3300000,
+      "tier": "industrial",
+      "literacy": 0.9,
+      "peasantShare": 0.3,
+      "market": "alpine",
+      "geometry": [
+        "CHE"
+      ],
+      "description": "Federal republic of cantons with a customs union in the Alpine region.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 12,
+      "tag": "SWE",
+      "name": "Kingdom of Sweden",
+      "commonName": "Sweden",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Stockholm",
+        "lat": 59.33,
+        "lon": 18.07
+      },
+      "population1900": 5100000,
+      "tier": "mixed",
+      "literacy": 0.9,
+      "peasantShare": 0.55,
+      "market": "northern-european",
+      "geometry": [
+        "SWE"
+      ],
+      "description": "Constitutional monarchy in personal union with Norway.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 13,
+      "tag": "NOR",
+      "name": "Kingdom of Norway",
+      "commonName": "Norway",
+      "kind": "state",
+      "status": "personal-union",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Christiania",
+        "lat": 59.91,
+        "lon": 10.75
+      },
+      "population1900": 2200000,
+      "tier": "mixed",
+      "literacy": 0.9,
+      "peasantShare": 0.5,
+      "market": "northern-european",
+      "geometry": [
+        "NOR"
+      ],
+      "description": "Separate kingdom, constitution and government under the Swedish crown.",
+      "confidence": "high",
+      "notes": "Personal union with Sweden until 1905; selectable as its own polity.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 14,
+      "tag": "DNK",
+      "name": "Kingdom of Denmark",
+      "commonName": "Denmark",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Copenhagen",
+        "lat": 55.68,
+        "lon": 12.57
+      },
+      "population1900": 2400000,
+      "tier": "mixed",
+      "literacy": 0.92,
+      "peasantShare": 0.42,
+      "market": "northern-european",
+      "geometry": [
+        "DNK"
+      ],
+      "description": "Constitutional monarchy with Iceland, Greenland, the Faroes and the Danish West Indies.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 15,
+      "tag": "GRC",
+      "name": "Kingdom of Greece",
+      "commonName": "Greece",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Athens",
+        "lat": 37.98,
+        "lon": 23.73
+      },
+      "population1900": 2400000,
+      "tier": "agrarian",
+      "literacy": 0.45,
+      "peasantShare": 0.65,
+      "market": "mediterranean",
+      "geometry": [
+        "GRC"
+      ],
+      "description": "Constitutional monarchy expanding toward its 1912 borders.",
+      "confidence": "medium",
+      "notes": "Crete is autonomous under Ottoman suzerainty but not separable at this map resolution.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 16,
+      "tag": "SRB",
+      "name": "Kingdom of Serbia",
+      "commonName": "Serbia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Belgrade",
+        "lat": 44.82,
+        "lon": 20.46
+      },
+      "population1900": 2500000,
+      "tier": "agrarian",
+      "literacy": 0.3,
+      "peasantShare": 0.78,
+      "market": "mediterranean",
+      "geometry": [
+        "SRB"
+      ],
+      "description": "Independent Balkan kingdom pressing for South Slav unification.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 17,
+      "tag": "MNT",
+      "name": "Principality of Montenegro",
+      "commonName": "Montenegro",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Cetinje",
+        "lat": 42.39,
+        "lon": 18.92
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.82,
+      "market": "mediterranean",
+      "geometry": [
+        "MNE"
+      ],
+      "description": "Small independent Balkan principality.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 18,
+      "tag": "ROM",
+      "name": "Kingdom of Romania",
+      "commonName": "Romania",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Bucharest",
+        "lat": 44.43,
+        "lon": 26.1
+      },
+      "population1900": 6000000,
+      "tier": "agrarian",
+      "literacy": 0.35,
+      "peasantShare": 0.78,
+      "market": "mediterranean",
+      "geometry": [
+        "ROU"
+      ],
+      "description": "Independent kingdom with a large peasant population and growing oil industry.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 19,
+      "tag": "BGR",
+      "name": "Principality of Bulgaria",
+      "commonName": "Bulgaria",
+      "kind": "state",
+      "status": "autonomous-vassal",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Sofia",
+        "lat": 42.7,
+        "lon": 23.32
+      },
+      "population1900": 3700000,
+      "tier": "agrarian",
+      "literacy": 0.3,
+      "peasantShare": 0.8,
+      "market": "mediterranean",
+      "geometry": [
+        "BGR"
+      ],
+      "description": "Self-governing principality tributary to the Ottoman Empire.",
+      "confidence": "medium",
+      "notes": "Autonomous under Ottoman suzerainty; selectable as a separate polity.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 20,
+      "tag": "OTT",
+      "name": "Ottoman Empire",
+      "commonName": "Ottoman Empire",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Constantinople",
+        "lat": 41.01,
+        "lon": 28.98
+      },
+      "population1900": 24000000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.82,
+      "market": "ottoman-egyptian",
+      "geometry": [
+        "TUR",
+        "SYR",
+        "LBN",
+        "ISR",
+        "PSX",
+        "JOR",
+        "IRQ",
+        "SAU",
+        "YEM",
+        "QAT",
+        "ALB",
+        "MKD",
+        "KOS"
+      ],
+      "description": "Multi-ethnic empire across Anatolia, the Arab provinces and the Balkans.",
+      "confidence": "low",
+      "notes": "Egypt is an autonomous province under British occupation. The Nejd emirate and British Aden are not separable at this resolution.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 21,
+      "tag": "LUX",
+      "name": "Grand Duchy of Luxembourg",
+      "commonName": "Luxembourg",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Luxembourg",
+        "lat": 49.61,
+        "lon": 6.13
+      },
+      "population1900": 240000,
+      "tier": "mixed",
+      "literacy": 0.8,
+      "peasantShare": 0.4,
+      "market": "alpine",
+      "geometry": [
+        "LUX"
+      ],
+      "description": "Neutral grand duchy in a customs union with its neighbours.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 22,
+      "tag": "MCO",
+      "name": "Principality of Monaco",
+      "commonName": "Monaco",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Monaco",
+        "lat": 43.73,
+        "lon": 7.42
+      },
+      "population1900": 15000,
+      "tier": "mixed",
+      "literacy": 0.85,
+      "peasantShare": 0.3,
+      "market": "french-empire",
+      "geometry": [
+        "MCO"
+      ],
+      "description": "Microstate on the French Riviera in customs union with France.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 23,
+      "tag": "SMR",
+      "name": "Most Serene Republic of San Marino",
+      "commonName": "San Marino",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "San Marino",
+        "lat": 43.94,
+        "lon": 12.45
+      },
+      "population1900": 11000,
+      "tier": "agrarian",
+      "literacy": 0.5,
+      "peasantShare": 0.65,
+      "market": "mediterranean",
+      "geometry": [
+        "SMR"
+      ],
+      "description": "Ancient republic enclaved within Italy.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 24,
+      "tag": "AND",
+      "name": "Co-Principality of Andorra",
+      "commonName": "Andorra",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Andorra la Vella",
+        "lat": 42.55,
+        "lon": 1.58
+      },
+      "population1900": 5000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.75,
+      "market": "iberian-empire",
+      "geometry": [
+        "AND"
+      ],
+      "description": "Pyrenean co-principality under French and Spanish episcopal suzerainty.",
+      "confidence": "low",
+      "notes": "Very small polity; economic values are modelled proportionally.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 25,
+      "tag": "LIE",
+      "name": "Principality of Liechtenstein",
+      "commonName": "Liechtenstein",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Vaduz",
+        "lat": 47.14,
+        "lon": 9.52
+      },
+      "population1900": 7500,
+      "tier": "mixed",
+      "literacy": 0.85,
+      "peasantShare": 0.4,
+      "market": "alpine",
+      "geometry": [
+        "LIE"
+      ],
+      "description": "Small Alpine principality in a customs union with Austria-Hungary.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 26,
+      "tag": "CHN",
+      "name": "Qing Empire",
+      "commonName": "China",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Beijing",
+        "lat": 39.9,
+        "lon": 116.4
+      },
+      "population1900": 400000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": "east-asian",
+      "geometry": [
+        "CHN",
+        "MNG"
+      ],
+      "description": "Qing dynasty empire under foreign pressure after 1895 and the Boxer crisis.",
+      "confidence": "low",
+      "notes": "Tibet, Xinjiang and Mongolia are administered within the Qing realm and are not separable at this map resolution.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 27,
+      "tag": "KOR",
+      "name": "Korean Empire",
+      "commonName": "Korea",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Hanseong",
+        "lat": 37.57,
+        "lon": 126.98
+      },
+      "population1900": 17000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.82,
+      "market": "east-asian",
+      "geometry": [
+        "KOR",
+        "PRK"
+      ],
+      "description": "Empire proclaimed in 1897, increasingly constrained by Japanese influence.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 28,
+      "tag": "PER",
+      "name": "Sublime State of Persia",
+      "commonName": "Persia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Tehran",
+        "lat": 35.69,
+        "lon": 51.39
+      },
+      "population1900": 9900000,
+      "tier": "agrarian",
+      "literacy": 0.08,
+      "peasantShare": 0.82,
+      "market": "persian-gulf",
+      "geometry": [
+        "IRN"
+      ],
+      "description": "Qajar monarchy balancing Russian and British influence.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 29,
+      "tag": "AFG",
+      "name": "Emirate of Afghanistan",
+      "commonName": "Afghanistan",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Kabul",
+        "lat": 34.53,
+        "lon": 69.17
+      },
+      "population1900": 4500000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": "persian-gulf",
+      "geometry": [
+        "AFG"
+      ],
+      "description": "Buffer emirate between the Russian and British empires.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 30,
+      "tag": "NPL",
+      "name": "Kingdom of Nepal",
+      "commonName": "Nepal",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Kathmandu",
+        "lat": 27.72,
+        "lon": 85.32
+      },
+      "population1900": 5000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": "persian-gulf",
+      "geometry": [
+        "NPL"
+      ],
+      "description": "Himalayan kingdom with a British residency but no colonial administration.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 31,
+      "tag": "THA",
+      "name": "Kingdom of Siam",
+      "commonName": "Siam",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Bangkok",
+        "lat": 13.75,
+        "lon": 100.5
+      },
+      "population1900": 7300000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.8,
+      "market": "east-asian",
+      "geometry": [
+        "THA"
+      ],
+      "description": "Independent Southeast Asian kingdom modernising under royal reform.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 32,
+      "tag": "OMN",
+      "name": "Sultanate of Muscat and Oman",
+      "commonName": "Oman",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Muscat",
+        "lat": 23.59,
+        "lon": 58.41
+      },
+      "population1900": 500000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": "persian-gulf",
+      "geometry": [
+        "OMN"
+      ],
+      "description": "Independent sultanate on the Arabian Sea.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 33,
+      "tag": "ETH",
+      "name": "Ethiopian Empire",
+      "commonName": "Ethiopia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Addis Ababa",
+        "lat": 9.03,
+        "lon": 38.74
+      },
+      "population1900": 11000000,
+      "tier": "agrarian",
+      "literacy": 0.03,
+      "peasantShare": 0.88,
+      "market": "african-independent",
+      "geometry": [
+        "ETH"
+      ],
+      "description": "Ancient empire that preserved independence through the Scramble for Africa.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 34,
+      "tag": "LBR",
+      "name": "Republic of Liberia",
+      "commonName": "Liberia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Monrovia",
+        "lat": 6.3,
+        "lon": -10.8
+      },
+      "population1900": 600000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": "african-independent",
+      "geometry": [
+        "LBR"
+      ],
+      "description": "Independent West African republic founded by freed African Americans.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 35,
+      "tag": "MAR",
+      "name": "Sultanate of Morocco",
+      "commonName": "Morocco",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Fez",
+        "lat": 34.03,
+        "lon": -5
+      },
+      "population1900": 5000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": "african-independent",
+      "geometry": [
+        "MAR"
+      ],
+      "description": "Independent North African sultanate, still outside European colonial control in 1900.",
+      "confidence": "low",
+      "notes": "Spanish Sahara is a separate Spanish colonial territory.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 36,
+      "tag": "ZAR",
+      "name": "South African Republic (Transvaal)",
+      "commonName": "Transvaal",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Pretoria",
+        "lat": -25.75,
+        "lon": 28.19
+      },
+      "population1900": 1200000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.8,
+      "market": "southern-african",
+      "geometry": [
+        "adm1:ZA-GT",
+        "adm1:ZA-NW",
+        "adm1:ZA-MP",
+        "adm1:ZA-LP"
+      ],
+      "description": "Boer republic at war with the British Empire in January 1900.",
+      "confidence": "low",
+      "notes": "Province geometry is a modern-administrative approximation of the 1900 republic.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 37,
+      "tag": "ORF",
+      "name": "Orange Free State",
+      "commonName": "Orange Free State",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Bloemfontein",
+        "lat": -29.12,
+        "lon": 26.21
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.8,
+      "market": "southern-african",
+      "geometry": [
+        "adm1:ZA-FS"
+      ],
+      "description": "Boer republic allied with the Transvaal in the South African War.",
+      "confidence": "low",
+      "notes": "Province geometry is a modern-administrative approximation of the 1900 republic.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 38,
+      "tag": "MEX",
+      "name": "United Mexican States",
+      "commonName": "Mexico",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Mexico City",
+        "lat": 19.43,
+        "lon": -99.13
+      },
+      "population1900": 13600000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "MEX"
+      ],
+      "description": "Federal republic under the Porfiriato, open to foreign capital.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 39,
+      "tag": "GUA",
+      "name": "Republic of Guatemala",
+      "commonName": "Guatemala",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Guatemala City",
+        "lat": 14.63,
+        "lon": -90.51
+      },
+      "population1900": 1400000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.8,
+      "market": "latin-america",
+      "geometry": [
+        "GTM"
+      ],
+      "description": "Coffee republic under long-lived Liberal caudillo rule.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 40,
+      "tag": "HON",
+      "name": "Republic of Honduras",
+      "commonName": "Honduras",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Tegucigalpa",
+        "lat": 14.07,
+        "lon": -87.19
+      },
+      "population1900": 500000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.82,
+      "market": "latin-america",
+      "geometry": [
+        "HND"
+      ],
+      "description": "Banana and mining republic on the Central American isthmus.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 41,
+      "tag": "SAL",
+      "name": "Republic of El Salvador",
+      "commonName": "El Salvador",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "San Salvador",
+        "lat": 13.69,
+        "lon": -89.19
+      },
+      "population1900": 900000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "SLV"
+      ],
+      "description": "Coffee-exporting republic with a dense peasant population.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 42,
+      "tag": "NIC",
+      "name": "Republic of Nicaragua",
+      "commonName": "Nicaragua",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Managua",
+        "lat": 12.11,
+        "lon": -86.24
+      },
+      "population1900": 400000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.82,
+      "market": "latin-america",
+      "geometry": [
+        "NIC"
+      ],
+      "description": "Central American republic of lakes and coffee estates.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 43,
+      "tag": "COS",
+      "name": "Republic of Costa Rica",
+      "commonName": "Costa Rica",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "San Jose",
+        "lat": 9.93,
+        "lon": -84.08
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "CRI"
+      ],
+      "description": "Stable coffee republic with comparatively broad schooling.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 44,
+      "tag": "COL",
+      "name": "Republic of Colombia",
+      "commonName": "Colombia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Bogota",
+        "lat": 4.71,
+        "lon": -74.07
+      },
+      "population1900": 4000000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.75,
+      "market": "latin-america",
+      "geometry": [
+        "COL",
+        "PAN"
+      ],
+      "description": "Republic recovering from the Thousand Days' War; Panama still a province.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 45,
+      "tag": "VEN",
+      "name": "United States of Venezuela",
+      "commonName": "Venezuela",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Caracas",
+        "lat": 10.48,
+        "lon": -66.9
+      },
+      "population1900": 2400000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "VEN"
+      ],
+      "description": "Cacao and coffee republic under the Castro restoration.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 46,
+      "tag": "ECU",
+      "name": "Republic of Ecuador",
+      "commonName": "Ecuador",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Quito",
+        "lat": -0.18,
+        "lon": -78.47
+      },
+      "population1900": 1400000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.8,
+      "market": "latin-america",
+      "geometry": [
+        "ECU"
+      ],
+      "description": "Andean republic of cacao planters and highland peasants.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 47,
+      "tag": "PRU",
+      "name": "Republic of Peru",
+      "commonName": "Peru",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Lima",
+        "lat": -12.05,
+        "lon": -77.04
+      },
+      "population1900": 3700000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "PER"
+      ],
+      "description": "Andean republic recovering from the War of the Pacific.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 48,
+      "tag": "BOL",
+      "name": "Republic of Bolivia",
+      "commonName": "Bolivia",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Sucre",
+        "lat": -19.03,
+        "lon": -65.26
+      },
+      "population1900": 1800000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.82,
+      "market": "latin-america",
+      "geometry": [
+        "BOL"
+      ],
+      "description": "Landlocked Andean republic of tin mines and haciendas.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 49,
+      "tag": "CHL",
+      "name": "Republic of Chile",
+      "commonName": "Chile",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Santiago",
+        "lat": -33.45,
+        "lon": -70.67
+      },
+      "population1900": 3000000,
+      "tier": "mixed",
+      "literacy": 0.3,
+      "peasantShare": 0.72,
+      "market": "latin-america",
+      "geometry": [
+        "CHL"
+      ],
+      "description": "Nitrate-exporting republic with a powerful Congress and navy.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 50,
+      "tag": "ARG",
+      "name": "Argentine Republic",
+      "commonName": "Argentina",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Buenos Aires",
+        "lat": -34.6,
+        "lon": -58.38
+      },
+      "population1900": 4700000,
+      "tier": "mixed",
+      "literacy": 0.45,
+      "peasantShare": 0.65,
+      "market": "latin-america",
+      "geometry": [
+        "ARG"
+      ],
+      "description": "Export economy of beef, grain and European immigration.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 51,
+      "tag": "URY",
+      "name": "Oriental Republic of Uruguay",
+      "commonName": "Uruguay",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Montevideo",
+        "lat": -34.9,
+        "lon": -56.16
+      },
+      "population1900": 900000,
+      "tier": "mixed",
+      "literacy": 0.4,
+      "peasantShare": 0.68,
+      "market": "latin-america",
+      "geometry": [
+        "URY"
+      ],
+      "description": "Small pastoral republic with an advanced welfare state for its era.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 52,
+      "tag": "PRY",
+      "name": "Republic of Paraguay",
+      "commonName": "Paraguay",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Asuncion",
+        "lat": -25.26,
+        "lon": -57.58
+      },
+      "population1900": 600000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.82,
+      "market": "latin-america",
+      "geometry": [
+        "PRY"
+      ],
+      "description": "Landlocked republic slowly recovering from the War of the Triple Alliance.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 53,
+      "tag": "BRA",
+      "name": "Republic of the United States of Brazil",
+      "commonName": "Brazil",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Rio de Janeiro",
+        "lat": -22.91,
+        "lon": -43.17
+      },
+      "population1900": 17600000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": "latin-america",
+      "geometry": [
+        "BRA"
+      ],
+      "description": "Coffee-exporting federal republic in its Old Republic.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 54,
+      "tag": "HTI",
+      "name": "Republic of Haiti",
+      "commonName": "Haiti",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Port-au-Prince",
+        "lat": 18.54,
+        "lon": -72.34
+      },
+      "population1900": 1500000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.85,
+      "market": "latin-america",
+      "geometry": [
+        "HTI"
+      ],
+      "description": "Caribbean republic with a rural peasant economy.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 55,
+      "tag": "DOM",
+      "name": "Dominican Republic",
+      "commonName": "Dominican Republic",
+      "kind": "state",
+      "status": "independent",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Santo Domingo",
+        "lat": 18.47,
+        "lon": -69.9
+      },
+      "population1900": 600000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.82,
+      "market": "latin-america",
+      "geometry": [
+        "DOM"
+      ],
+      "description": "Caribbean republic under recurring caudillo rule.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 56,
+      "tag": "CAN",
+      "name": "Dominion of Canada",
+      "commonName": "Canada",
+      "kind": "state",
+      "status": "dominion",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Ottawa",
+        "lat": 45.42,
+        "lon": -75.7
+      },
+      "population1900": 5180000,
+      "tier": "mixed",
+      "literacy": 0.85,
+      "peasantShare": 0.45,
+      "market": "british-empire",
+      "geometry": [
+        "CAN"
+      ],
+      "description": "Self-governing dominion of British North America.",
+      "confidence": "medium",
+      "notes": "Newfoundland is a separate dominion. Selectable as a semi-sovereign dominion, not an independent state. The map source cannot separate Newfoundland within the modern Canada polygon; it is shown as a marker within Canada.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 57,
+      "tag": "AUS",
+      "name": "Australian colonies",
+      "commonName": "Australia",
+      "kind": "state",
+      "status": "dominion",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Melbourne",
+        "lat": -37.81,
+        "lon": 144.96
+      },
+      "population1900": 3800000,
+      "tier": "mixed",
+      "literacy": 0.9,
+      "peasantShare": 0.4,
+      "market": "british-empire",
+      "geometry": [
+        "AUS"
+      ],
+      "description": "Six self-governing British colonies federating on 1 January 1901.",
+      "confidence": "medium",
+      "notes": "In January 1900 Australia is not yet a federal state; selectable as a semi-sovereign dominion.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 58,
+      "tag": "NZL",
+      "name": "Colony of New Zealand",
+      "commonName": "New Zealand",
+      "kind": "state",
+      "status": "dominion",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Wellington",
+        "lat": -41.29,
+        "lon": 174.78
+      },
+      "population1900": 800000,
+      "tier": "mixed",
+      "literacy": 0.9,
+      "peasantShare": 0.42,
+      "market": "british-empire",
+      "geometry": [
+        "NZL"
+      ],
+      "description": "Self-governing British colony with a pioneering welfare settlement.",
+      "confidence": "medium",
+      "notes": "Selectable as a semi-sovereign dominion, not an independent state.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 59,
+      "tag": "CUB",
+      "name": "Republic of Cuba under United States occupation",
+      "commonName": "Cuba",
+      "kind": "state",
+      "status": "occupation",
+      "sovereignTag": null,
+      "selectable": false,
+      "capital": {
+        "name": "Havana",
+        "lat": 23.11,
+        "lon": -82.37
+      },
+      "population1900": 1600000,
+      "tier": "agrarian",
+      "literacy": 0.4,
+      "peasantShare": 0.7,
+      "market": "latin-america",
+      "geometry": [
+        "CUB"
+      ],
+      "description": "Cuban republic occupied by the United States after the 1898 war.",
+      "confidence": "medium",
+      "notes": "Not selectable: sovereignty is contested and administration is under US military occupation.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    }
+  ],
+  "territories": [
+    {
+      "id": 100,
+      "tag": "BIN",
+      "name": "British India",
+      "commonName": "British India",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Calcutta",
+        "lat": 22.57,
+        "lon": 88.36
+      },
+      "population1900": 294000000,
+      "tier": "agrarian",
+      "literacy": 0.06,
+      "peasantShare": 0.72,
+      "market": null,
+      "geometry": [
+        "IND",
+        "PAK",
+        "BGD",
+        "MMR"
+      ],
+      "description": "Crown rule over the Indian subcontinent, including Burma.",
+      "confidence": "low",
+      "notes": "Burma was administered as part of British India until 1937.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 101,
+      "tag": "CEY",
+      "name": "Ceylon",
+      "commonName": "Ceylon",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Colombo",
+        "lat": 6.93,
+        "lon": 79.85
+      },
+      "population1900": 3900000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.7,
+      "market": null,
+      "geometry": [
+        "LKA",
+        "MDV"
+      ],
+      "description": "Crown colony of tea and rubber plantations.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 102,
+      "tag": "MAL",
+      "name": "British Malaya and Singapore",
+      "commonName": "British Malaya",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Singapore",
+        "lat": 1.35,
+        "lon": 103.82
+      },
+      "population1900": 3300000,
+      "tier": "mixed",
+      "literacy": 0.25,
+      "peasantShare": 0.62,
+      "market": null,
+      "geometry": [
+        "MYS",
+        "SGP",
+        "BRN"
+      ],
+      "description": "Federated and unfederated Malay states with the Straits Settlements.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 103,
+      "tag": "HKG",
+      "name": "Hong Kong",
+      "commonName": "Hong Kong",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Victoria",
+        "lat": 22.28,
+        "lon": 114.16
+      },
+      "population1900": 300000,
+      "tier": "mixed",
+      "literacy": 0.45,
+      "peasantShare": 0.5,
+      "market": null,
+      "geometry": [
+        "HKG"
+      ],
+      "description": "British crown colony and entrepot on the China coast.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 104,
+      "tag": "KUW",
+      "name": "Kuwait",
+      "commonName": "Kuwait",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Kuwait City",
+        "lat": 29.38,
+        "lon": 47.99
+      },
+      "population1900": 50000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "KWT"
+      ],
+      "description": "Sheikhdom under a British protectorate from 1899.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 105,
+      "tag": "TRU",
+      "name": "Trucial States",
+      "commonName": "Trucial States",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Abu Dhabi",
+        "lat": 24.45,
+        "lon": 54.38
+      },
+      "population1900": 80000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "ARE",
+        "BHR"
+      ],
+      "description": "Pearl-fishing sheikhdoms under British maritime protection.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 106,
+      "tag": "CYP",
+      "name": "Cyprus",
+      "commonName": "Cyprus",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Nicosia",
+        "lat": 35.17,
+        "lon": 33.36
+      },
+      "population1900": 240000,
+      "tier": "agrarian",
+      "literacy": 0.3,
+      "peasantShare": 0.7,
+      "market": null,
+      "geometry": [
+        "CYP",
+        "CYN"
+      ],
+      "description": "British-administered island leased from the Ottoman Empire.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 107,
+      "tag": "MLT",
+      "name": "Malta",
+      "commonName": "Malta",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Valletta",
+        "lat": 35.9,
+        "lon": 14.51
+      },
+      "population1900": 200000,
+      "tier": "mixed",
+      "literacy": 0.5,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "MLT"
+      ],
+      "description": "Mediterranean naval base and crown colony.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 108,
+      "tag": "BWI",
+      "name": "British West Indies",
+      "commonName": "British West Indies",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Kingston",
+        "lat": 17.97,
+        "lon": -76.79
+      },
+      "population1900": 2000000,
+      "tier": "agrarian",
+      "literacy": 0.45,
+      "peasantShare": 0.68,
+      "market": null,
+      "geometry": [
+        "JAM",
+        "TTO",
+        "BRB",
+        "BHS",
+        "BLZ",
+        "GUY",
+        "GRD",
+        "LCA",
+        "VCT",
+        "KNA",
+        "ATG",
+        "DMA",
+        "MSR",
+        "VGB",
+        "TCA",
+        "CYM",
+        "AIA",
+        "BMU"
+      ],
+      "description": "Sugar islands, British Guiana and British Honduras.",
+      "confidence": "low",
+      "notes": "Several small crown colonies are grouped for simulation granularity.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 109,
+      "tag": "BSA",
+      "name": "British South Atlantic and Pacific islands",
+      "commonName": "British South Atlantic islands",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Stanley",
+        "lat": -51.7,
+        "lon": -57.85
+      },
+      "population1900": 15000,
+      "tier": "agrarian",
+      "literacy": 0.7,
+      "peasantShare": 0.45,
+      "market": null,
+      "geometry": [
+        "FLK",
+        "SGS",
+        "SHN",
+        "PCN",
+        "IOT"
+      ],
+      "description": "Falklands, St Helena, Pitcairn and the British Indian Ocean Territory.",
+      "confidence": "low",
+      "notes": "Grouped tiny dependencies; populations are rough.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 110,
+      "tag": "BWA",
+      "name": "British West Africa",
+      "commonName": "British West Africa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Lagos",
+        "lat": 6.45,
+        "lon": 3.39
+      },
+      "population1900": 20000000,
+      "tier": "agrarian",
+      "literacy": 0.12,
+      "peasantShare": 0.78,
+      "market": null,
+      "geometry": [
+        "GMB",
+        "SLE",
+        "GHA",
+        "NGA"
+      ],
+      "description": "Nigerian, Gold Coast, Sierra Leone and Gambian administrations.",
+      "confidence": "low",
+      "notes": "Several separate colonies are grouped for simulation granularity.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 111,
+      "tag": "BEA",
+      "name": "British East Africa",
+      "commonName": "British East Africa",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Nairobi",
+        "lat": -1.29,
+        "lon": 36.82
+      },
+      "population1900": 4000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.82,
+      "market": null,
+      "geometry": [
+        "KEN",
+        "UGA"
+      ],
+      "description": "East Africa Protectorate and Uganda Protectorate.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 112,
+      "tag": "SUD",
+      "name": "Anglo-Egyptian Sudan",
+      "commonName": "Sudan",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Khartoum",
+        "lat": 15.5,
+        "lon": 32.56
+      },
+      "population1900": 2000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "SDN",
+        "SDS"
+      ],
+      "description": "Condominium administered jointly with Egypt after 1899.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 113,
+      "tag": "BSO",
+      "name": "British Somaliland",
+      "commonName": "British Somaliland",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Berbera",
+        "lat": 10.44,
+        "lon": 45.01
+      },
+      "population1900": 200000,
+      "tier": "agrarian",
+      "literacy": 0.03,
+      "peasantShare": 0.87,
+      "market": null,
+      "geometry": [
+        "SOL"
+      ],
+      "description": "Coastal protectorate on the Gulf of Aden.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 114,
+      "tag": "CRA",
+      "name": "British Central Africa",
+      "commonName": "British Central Africa",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Zomba",
+        "lat": -15.38,
+        "lon": 35.33
+      },
+      "population1900": 3000000,
+      "tier": "agrarian",
+      "literacy": 0.08,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "ZWE",
+        "ZMB",
+        "MWI"
+      ],
+      "description": "Rhodesias and Nyasaland under chartered and crown administration.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 115,
+      "tag": "HCT",
+      "name": "High Commission Territories",
+      "commonName": "High Commission Territories",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Mafeteng",
+        "lat": -29.82,
+        "lon": 27.24
+      },
+      "population1900": 1000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "LSO",
+        "SWZ",
+        "BWA"
+      ],
+      "description": "Basutoland, Swaziland and Bechuanaland.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 116,
+      "tag": "FJI",
+      "name": "Fiji",
+      "commonName": "Fiji",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Suva",
+        "lat": -18.14,
+        "lon": 178.44
+      },
+      "population1900": 120000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.7,
+      "market": null,
+      "geometry": [
+        "FJI"
+      ],
+      "description": "Crown colony of sugar plantations and chiefly administration.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 117,
+      "tag": "BPO",
+      "name": "British Pacific and Indian Ocean islands",
+      "commonName": "British Pacific islands",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Honiara",
+        "lat": -9.43,
+        "lon": 159.95
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.7,
+      "market": null,
+      "geometry": [
+        "SLB",
+        "TON",
+        "KIR",
+        "TUV",
+        "COK",
+        "NFK",
+        "VUT",
+        "MUS",
+        "SYC"
+      ],
+      "description": "Solomons, Tonga, Gilberts, Cooks, Mauritius, Seychelles and the New Hebrides.",
+      "confidence": "low",
+      "notes": "Grouped dependencies, including the Anglo-French New Hebrides condominium.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 118,
+      "tag": "CAP",
+      "name": "Cape Colony",
+      "commonName": "Cape Colony",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Cape Town",
+        "lat": -33.93,
+        "lon": 18.42
+      },
+      "population1900": 2400000,
+      "tier": "mixed",
+      "literacy": 0.3,
+      "peasantShare": 0.72,
+      "market": null,
+      "geometry": [
+        "adm1:ZA-NC",
+        "adm1:ZA-WC",
+        "adm1:ZA-EC"
+      ],
+      "description": "Self-governing British colony in southern Africa.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 119,
+      "tag": "NAT",
+      "name": "Natal",
+      "commonName": "Natal",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Pietermaritzburg",
+        "lat": -29.6,
+        "lon": 30.38
+      },
+      "population1900": 1100000,
+      "tier": "agrarian",
+      "literacy": 0.25,
+      "peasantShare": 0.75,
+      "market": null,
+      "geometry": [
+        "adm1:ZA-NL"
+      ],
+      "description": "Self-governing British colony on the Indian Ocean coast.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 120,
+      "tag": "NFD",
+      "name": "Newfoundland",
+      "commonName": "Newfoundland",
+      "kind": "territory",
+      "status": "dominion",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "St. John's",
+        "lat": 47.56,
+        "lon": -52.71
+      },
+      "population1900": 220000,
+      "tier": "agrarian",
+      "literacy": 0.75,
+      "peasantShare": 0.5,
+      "market": null,
+      "geometry": [],
+      "description": "Separate self-governing dominion of the British Empire.",
+      "confidence": "medium",
+      "notes": "Not part of Canada in 1900. The map source cannot separate Newfoundland from modern Canada, so it is shown as a marker territory over Canadian territory.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "markerOnly": true,
+      "continent": "Americas"
+    },
+    {
+      "id": 121,
+      "tag": "ALG",
+      "name": "Algeria",
+      "commonName": "Algeria",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Algiers",
+        "lat": 36.75,
+        "lon": 3.06
+      },
+      "population1900": 4700000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.78,
+      "market": null,
+      "geometry": [
+        "DZA"
+      ],
+      "description": "French colony administered as three departments.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 122,
+      "tag": "TUN",
+      "name": "Tunisia",
+      "commonName": "Tunisia",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Tunis",
+        "lat": 36.8,
+        "lon": 10.18
+      },
+      "population1900": 1900000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.78,
+      "market": null,
+      "geometry": [
+        "TUN"
+      ],
+      "description": "French protectorate with a nominal Bey.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 123,
+      "tag": "FWA",
+      "name": "French West Africa",
+      "commonName": "French West Africa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Saint-Louis",
+        "lat": 16.02,
+        "lon": -16.49
+      },
+      "population1900": 10000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "MRT",
+        "SEN",
+        "MLI",
+        "GIN",
+        "CIV",
+        "BFA",
+        "NER",
+        "BEN"
+      ],
+      "description": "Federation of French West African colonies.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 124,
+      "tag": "FEA",
+      "name": "French Equatorial Africa",
+      "commonName": "French Equatorial Africa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Brazzaville",
+        "lat": -4.26,
+        "lon": 15.24
+      },
+      "population1900": 3000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "TCD",
+        "CAF",
+        "COG",
+        "GAB"
+      ],
+      "description": "Federation of French Congo, Ubangi-Shari, Chad and Gabon.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 125,
+      "tag": "FIC",
+      "name": "French Indochina",
+      "commonName": "French Indochina",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Hanoi",
+        "lat": 21.03,
+        "lon": 105.85
+      },
+      "population1900": 15000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.82,
+      "market": null,
+      "geometry": [
+        "VNM",
+        "LAO",
+        "KHM"
+      ],
+      "description": "Union of Tonkin, Annam, Cochinchina, Laos and Cambodia.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 126,
+      "tag": "MAD",
+      "name": "French Madagascar",
+      "commonName": "Madagascar",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Tananarive",
+        "lat": -18.88,
+        "lon": 47.51
+      },
+      "population1900": 3500000,
+      "tier": "agrarian",
+      "literacy": 0.08,
+      "peasantShare": 0.84,
+      "market": null,
+      "geometry": [
+        "MDG",
+        "COM"
+      ],
+      "description": "Island colony and the Comoros.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 127,
+      "tag": "FSO",
+      "name": "French Somaliland",
+      "commonName": "French Somaliland",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Djibouti",
+        "lat": 11.59,
+        "lon": 43.15
+      },
+      "population1900": 50000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "DJI"
+      ],
+      "description": "Red Sea port colony.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 128,
+      "tag": "FCA",
+      "name": "French Caribbean",
+      "commonName": "French Caribbean",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Fort-de-France",
+        "lat": 14.6,
+        "lon": -61.07
+      },
+      "population1900": 400000,
+      "tier": "agrarian",
+      "literacy": 0.45,
+      "peasantShare": 0.65,
+      "market": null,
+      "geometry": [
+        "GUF",
+        "SPM",
+        "BLM",
+        "MAF"
+      ],
+      "description": "French Guiana and the French Antilles.",
+      "confidence": "low",
+      "notes": "Martinique and Guadeloupe are not separately present in the map source.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 129,
+      "tag": "FPO",
+      "name": "French Pacific",
+      "commonName": "French Pacific",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "FRA",
+      "selectable": false,
+      "capital": {
+        "name": "Papeete",
+        "lat": -17.54,
+        "lon": -149.57
+      },
+      "population1900": 200000,
+      "tier": "agrarian",
+      "literacy": 0.4,
+      "peasantShare": 0.65,
+      "market": null,
+      "geometry": [
+        "PYF",
+        "NCL",
+        "WLF"
+      ],
+      "description": "Tahiti, New Caledonia and Wallis and Futuna.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 130,
+      "tag": "GEA",
+      "name": "German East Africa",
+      "commonName": "German East Africa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Dar es Salaam",
+        "lat": -6.79,
+        "lon": 39.21
+      },
+      "population1900": 7000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "TZA",
+        "RWA",
+        "BDI"
+      ],
+      "description": "Tanganyika, Ruanda and Urundi.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 131,
+      "tag": "GSW",
+      "name": "German South West Africa",
+      "commonName": "German South West Africa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Windhoek",
+        "lat": -22.56,
+        "lon": 17.08
+      },
+      "population1900": 200000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.82,
+      "market": null,
+      "geometry": [
+        "NAM"
+      ],
+      "description": "Settler colony on the Atlantic coast.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 132,
+      "tag": "KAM",
+      "name": "Kamerun",
+      "commonName": "Kamerun",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Yaounde",
+        "lat": 3.87,
+        "lon": 11.52
+      },
+      "population1900": 2000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "CMR"
+      ],
+      "description": "German colony in the Gulf of Guinea.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 133,
+      "tag": "TOG",
+      "name": "Togo",
+      "commonName": "Togo",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Lome",
+        "lat": 6.13,
+        "lon": 1.22
+      },
+      "population1900": 1000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "TGO"
+      ],
+      "description": "German protectorate on the Slave Coast.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 134,
+      "tag": "GNG",
+      "name": "German New Guinea",
+      "commonName": "German New Guinea",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Herbertshohe",
+        "lat": -4.35,
+        "lon": 152.27
+      },
+      "population1900": 500000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "PNG"
+      ],
+      "description": "Northern New Guinea and the Bismarck Archipelago.",
+      "confidence": "low",
+      "notes": "British Papua is not separable in the map source; the whole island is shown as one territory.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 135,
+      "tag": "GSA",
+      "name": "German Samoa",
+      "commonName": "German Samoa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Apia",
+        "lat": -13.83,
+        "lon": -171.76
+      },
+      "population1900": 40000,
+      "tier": "agrarian",
+      "literacy": 0.15,
+      "peasantShare": 0.75,
+      "market": null,
+      "geometry": [
+        "WSM"
+      ],
+      "description": "Western Samoa under German administration.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 136,
+      "tag": "GPN",
+      "name": "German Pacific islands",
+      "commonName": "German Pacific islands",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DEU",
+      "selectable": false,
+      "capital": {
+        "name": "Jaluit",
+        "lat": 5.63,
+        "lon": 169.64
+      },
+      "population1900": 60000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "MHL",
+        "FSM",
+        "PLW",
+        "MNP",
+        "NRU"
+      ],
+      "description": "Marshall, Caroline, Palau, Mariana and Nauru possessions.",
+      "confidence": "low",
+      "notes": "Grouped for simulation granularity.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 137,
+      "tag": "CFS",
+      "name": "Congo Free State",
+      "commonName": "Congo Free State",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "BEL",
+      "selectable": false,
+      "capital": {
+        "name": "Boma",
+        "lat": -5.85,
+        "lon": 13.05
+      },
+      "population1900": 9000000,
+      "tier": "agrarian",
+      "literacy": 0.03,
+      "peasantShare": 0.88,
+      "market": null,
+      "geometry": [
+        "COD"
+      ],
+      "description": "Rubber and ivory concession state in personal union with King Leopold II.",
+      "confidence": "low",
+      "notes": "Formally not a Belgian colony until 1908; shown separately from Belgium.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 138,
+      "tag": "ANG",
+      "name": "Portuguese Angola",
+      "commonName": "Angola",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "PRT",
+      "selectable": false,
+      "capital": {
+        "name": "Luanda",
+        "lat": -8.84,
+        "lon": 13.23
+      },
+      "population1900": 4000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "AGO"
+      ],
+      "description": "Portuguese colony in south-west Africa.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 139,
+      "tag": "MOZ",
+      "name": "Portuguese Mozambique",
+      "commonName": "Mozambique",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "PRT",
+      "selectable": false,
+      "capital": {
+        "name": "Lourenco Marques",
+        "lat": -25.97,
+        "lon": 32.57
+      },
+      "population1900": 3000000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.86,
+      "market": null,
+      "geometry": [
+        "MOZ"
+      ],
+      "description": "Portuguese colony on the Indian Ocean coast.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 140,
+      "tag": "PAI",
+      "name": "Portuguese Atlantic islands",
+      "commonName": "Portuguese Atlantic islands",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "PRT",
+      "selectable": false,
+      "capital": {
+        "name": "Praia",
+        "lat": 14.93,
+        "lon": -23.51
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "CPV",
+        "STP",
+        "GNB"
+      ],
+      "description": "Cape Verde, Sao Tome and Portuguese Guinea.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 141,
+      "tag": "PTM",
+      "name": "Portuguese Timor",
+      "commonName": "Portuguese Timor",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "PRT",
+      "selectable": false,
+      "capital": {
+        "name": "Dili",
+        "lat": -8.56,
+        "lon": 125.57
+      },
+      "population1900": 100000,
+      "tier": "agrarian",
+      "literacy": 0.08,
+      "peasantShare": 0.82,
+      "market": null,
+      "geometry": [
+        "TLS"
+      ],
+      "description": "Eastern half of Timor under Portuguese rule.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 142,
+      "tag": "MAC",
+      "name": "Macao",
+      "commonName": "Macao",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "PRT",
+      "selectable": false,
+      "capital": {
+        "name": "Macao",
+        "lat": 22.2,
+        "lon": 113.55
+      },
+      "population1900": 80000,
+      "tier": "mixed",
+      "literacy": 0.3,
+      "peasantShare": 0.6,
+      "market": null,
+      "geometry": [
+        "MAC"
+      ],
+      "description": "Portuguese trading settlement on the China coast.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 143,
+      "tag": "ERI",
+      "name": "Italian Eritrea",
+      "commonName": "Eritrea",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "ITA",
+      "selectable": false,
+      "capital": {
+        "name": "Asmara",
+        "lat": 15.34,
+        "lon": 38.93
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "ERI"
+      ],
+      "description": "Italy's first African colony.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 144,
+      "tag": "ITS",
+      "name": "Italian Somaliland",
+      "commonName": "Italian Somaliland",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "ITA",
+      "selectable": false,
+      "capital": {
+        "name": "Mogadishu",
+        "lat": 2.05,
+        "lon": 45.32
+      },
+      "population1900": 400000,
+      "tier": "agrarian",
+      "literacy": 0.03,
+      "peasantShare": 0.88,
+      "market": null,
+      "geometry": [
+        "SOM"
+      ],
+      "description": "Italian protectorate on the Horn of Africa.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 145,
+      "tag": "DEI",
+      "name": "Dutch East Indies",
+      "commonName": "Dutch East Indies",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "NLD",
+      "selectable": false,
+      "capital": {
+        "name": "Batavia",
+        "lat": -6.21,
+        "lon": 106.85
+      },
+      "population1900": 42000000,
+      "tier": "agrarian",
+      "literacy": 0.08,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "IDN"
+      ],
+      "description": "Netherlands Indies, the most populous colonial possession in the world.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 146,
+      "tag": "SUR",
+      "name": "Suriname",
+      "commonName": "Suriname",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "NLD",
+      "selectable": false,
+      "capital": {
+        "name": "Paramaribo",
+        "lat": 5.85,
+        "lon": -55.2
+      },
+      "population1900": 80000,
+      "tier": "agrarian",
+      "literacy": 0.35,
+      "peasantShare": 0.6,
+      "market": null,
+      "geometry": [
+        "SUR"
+      ],
+      "description": "Dutch plantation colony in South America.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 147,
+      "tag": "DGC",
+      "name": "Dutch Caribbean",
+      "commonName": "Dutch Caribbean",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "NLD",
+      "selectable": false,
+      "capital": {
+        "name": "Willemstad",
+        "lat": 12.11,
+        "lon": -68.93
+      },
+      "population1900": 50000,
+      "tier": "agrarian",
+      "literacy": 0.4,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "ABW",
+        "CUW",
+        "SXM"
+      ],
+      "description": "Curacao, Aruba, Sint Maarten and Bonaire.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 148,
+      "tag": "SAH",
+      "name": "Spanish Sahara",
+      "commonName": "Spanish Sahara",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "ESP",
+      "selectable": false,
+      "capital": {
+        "name": "Villa Cisneros",
+        "lat": 23.68,
+        "lon": -15.94
+      },
+      "population1900": 50000,
+      "tier": "agrarian",
+      "literacy": 0.02,
+      "peasantShare": 0.9,
+      "market": null,
+      "geometry": [
+        "SAH"
+      ],
+      "description": "Spanish claims on the Atlantic Sahara.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 149,
+      "tag": "SGG",
+      "name": "Spanish Guinea",
+      "commonName": "Spanish Guinea",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "ESP",
+      "selectable": false,
+      "capital": {
+        "name": "Santa Isabel",
+        "lat": 3.75,
+        "lon": 8.78
+      },
+      "population1900": 150000,
+      "tier": "agrarian",
+      "literacy": 0.05,
+      "peasantShare": 0.85,
+      "market": null,
+      "geometry": [
+        "GNQ"
+      ],
+      "description": "Rio Muni and Fernando Po.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 150,
+      "tag": "PHL",
+      "name": "Philippine Islands",
+      "commonName": "Philippines",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "USA",
+      "selectable": false,
+      "capital": {
+        "name": "Manila",
+        "lat": 14.6,
+        "lon": 120.98
+      },
+      "population1900": 7600000,
+      "tier": "agrarian",
+      "literacy": 0.2,
+      "peasantShare": 0.78,
+      "market": null,
+      "geometry": [
+        "PHL"
+      ],
+      "description": "American colonial administration after the 1898 Treaty of Paris.",
+      "confidence": "medium",
+      "notes": "Filipino resistance continued after the declaration of the First Republic.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 151,
+      "tag": "PRI",
+      "name": "Puerto Rico",
+      "commonName": "Puerto Rico",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "USA",
+      "selectable": false,
+      "capital": {
+        "name": "San Juan",
+        "lat": 18.47,
+        "lon": -66.11
+      },
+      "population1900": 950000,
+      "tier": "agrarian",
+      "literacy": 0.35,
+      "peasantShare": 0.68,
+      "market": null,
+      "geometry": [
+        "PRI"
+      ],
+      "description": "Caribbean island ceded by Spain in 1898.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 152,
+      "tag": "GUM",
+      "name": "Guam",
+      "commonName": "Guam",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "USA",
+      "selectable": false,
+      "capital": {
+        "name": "Agana",
+        "lat": 13.47,
+        "lon": 144.75
+      },
+      "population1900": 12000,
+      "tier": "agrarian",
+      "literacy": 0.4,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "GUM"
+      ],
+      "description": "Pacific coaling station ceded by Spain.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 153,
+      "tag": "ASM",
+      "name": "American Samoa",
+      "commonName": "American Samoa",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "USA",
+      "selectable": false,
+      "capital": {
+        "name": "Pago Pago",
+        "lat": -14.27,
+        "lon": -170.7
+      },
+      "population1900": 6000,
+      "tier": "agrarian",
+      "literacy": 0.35,
+      "peasantShare": 0.6,
+      "market": null,
+      "geometry": [
+        "ASM"
+      ],
+      "description": "Eastern Samoan islands under US naval administration.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Oceania"
+    },
+    {
+      "id": 154,
+      "tag": "ISL",
+      "name": "Iceland",
+      "commonName": "Iceland",
+      "kind": "territory",
+      "status": "dependency",
+      "sovereignTag": "DNK",
+      "selectable": false,
+      "capital": {
+        "name": "Reykjavik",
+        "lat": 64.15,
+        "lon": -21.94
+      },
+      "population1900": 80000,
+      "tier": "agrarian",
+      "literacy": 0.85,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "ISL"
+      ],
+      "description": "Danish dependency with home rule and a fishing economy.",
+      "confidence": "high",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 155,
+      "tag": "GRL",
+      "name": "Greenland",
+      "commonName": "Greenland",
+      "kind": "territory",
+      "status": "dependency",
+      "sovereignTag": "DNK",
+      "selectable": false,
+      "capital": {
+        "name": "Godthaab",
+        "lat": 64.18,
+        "lon": -51.72
+      },
+      "population1900": 12000,
+      "tier": "agrarian",
+      "literacy": 0.4,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "GRL"
+      ],
+      "description": "Danish Arctic dependency.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 156,
+      "tag": "FRO",
+      "name": "Faroe Islands",
+      "commonName": "Faroe Islands",
+      "kind": "territory",
+      "status": "dependency",
+      "sovereignTag": "DNK",
+      "selectable": false,
+      "capital": {
+        "name": "Torshavn",
+        "lat": 62.01,
+        "lon": -6.77
+      },
+      "population1900": 15000,
+      "tier": "agrarian",
+      "literacy": 0.8,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "FRO"
+      ],
+      "description": "Danish North Atlantic dependency.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 157,
+      "tag": "DWI",
+      "name": "Danish West Indies",
+      "commonName": "Danish West Indies",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "DNK",
+      "selectable": false,
+      "capital": {
+        "name": "Charlotte Amalie",
+        "lat": 18.34,
+        "lon": -64.93
+      },
+      "population1900": 30000,
+      "tier": "agrarian",
+      "literacy": 0.35,
+      "peasantShare": 0.65,
+      "market": null,
+      "geometry": [
+        "VIR"
+      ],
+      "description": "Sugar islands sold to the United States in 1917.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Americas"
+    },
+    {
+      "id": 158,
+      "tag": "EGY",
+      "name": "Egypt",
+      "commonName": "Egypt",
+      "kind": "territory",
+      "status": "autonomous-province",
+      "sovereignTag": "OTT",
+      "selectable": false,
+      "capital": {
+        "name": "Cairo",
+        "lat": 30.04,
+        "lon": 31.24
+      },
+      "population1900": 9700000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "EGY"
+      ],
+      "description": "Autonomous khedivate under Ottoman suzerainty and British military occupation.",
+      "confidence": "medium",
+      "notes": "Not selectable: sovereignty is Ottoman and administration is under British occupation.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Africa"
+    },
+    {
+      "id": 159,
+      "tag": "BHU",
+      "name": "Bhutan",
+      "commonName": "Bhutan",
+      "kind": "territory",
+      "status": "protectorate",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Punakha",
+        "lat": 27.59,
+        "lon": 89.86
+      },
+      "population1900": 300000,
+      "tier": "agrarian",
+      "literacy": 0.02,
+      "peasantShare": 0.9,
+      "market": null,
+      "geometry": [
+        "BTN"
+      ],
+      "description": "Himalayan monarchy under British suzerainty in foreign affairs.",
+      "confidence": "low",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    },
+    {
+      "id": 160,
+      "tag": "FIN",
+      "name": "Grand Duchy of Finland",
+      "commonName": "Finland",
+      "kind": "territory",
+      "status": "autonomous-province",
+      "sovereignTag": "RUS",
+      "selectable": false,
+      "capital": {
+        "name": "Helsinki",
+        "lat": 60.17,
+        "lon": 24.94
+      },
+      "population1900": 2700000,
+      "tier": "mixed",
+      "literacy": 0.8,
+      "peasantShare": 0.55,
+      "market": null,
+      "geometry": [
+        "FIN",
+        "ALD"
+      ],
+      "description": "Autonomous grand duchy with its own diet and administration.",
+      "confidence": "high",
+      "notes": "Not selectable: part of the Russian Empire in 1900.",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Europe"
+    },
+    {
+      "id": 161,
+      "tag": "TWN",
+      "name": "Taiwan (Formosa)",
+      "commonName": "Taiwan",
+      "kind": "territory",
+      "status": "colony",
+      "sovereignTag": "JPN",
+      "selectable": false,
+      "capital": {
+        "name": "Taihoku",
+        "lat": 25.03,
+        "lon": 121.57
+      },
+      "population1900": 3000000,
+      "tier": "agrarian",
+      "literacy": 0.1,
+      "peasantShare": 0.8,
+      "market": null,
+      "geometry": [
+        "TWN"
+      ],
+      "description": "Japanese colony ceded in 1895.",
+      "confidence": "medium",
+      "notes": "",
+      "sources": [
+        "owid-population",
+        "maddison-2023",
+        "project-authored-1900"
+      ],
+      "continent": "Asia"
+    }
+  ]
+}

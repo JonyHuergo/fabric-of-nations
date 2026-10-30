@@ -8,6 +8,7 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Notice, Pill, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
@@ -38,10 +39,14 @@ export function MoneyScreen({
   useEffect(() => {
     if (country === null) return;
     setRegime(country.monetary.regime === "managed" ? "managed" : "pegged");
+    // The slider is always numeric; when no reference rate exists use the
+    // documented placeholder default so both the slider and Apply agree.
     setParityText(
-      country.monetary.paritySusdPerUnit === null
-        ? ""
-        : country.monetary.paritySusdPerUnit.toFixed(6),
+      (
+        country.monetary.paritySusdPerUnit ??
+        country.monetary.valuationSusdPerUnit ??
+        0.2
+      ).toFixed(6),
     );
     setReserveText("0");
     setConversionText("0");
@@ -53,36 +58,43 @@ export function MoneyScreen({
     country?.monetary.active,
   ]);
 
-  if (country === null) {
-    return (
-      <Section title="Money & prices">
-        <Text style={styles.empty}>Select a country on the map.</Text>
-      </Section>
-    );
-  }
   const isPlayerCountry =
-    snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
-  const canAct = isPlayerCountry && !busy && connection === "ready";
-  const parsedParity = parityText.trim() === "" ? null : Number(parityText);
-  const parsedReserve = Number(reserveText);
-  const parsedConversion = Number(conversionText);
-  const inputError =
-    (parsedParity !== null && !Number.isFinite(parsedParity)) ||
-    !Number.isFinite(parsedReserve) ||
-    !Number.isFinite(parsedConversion)
-      ? "Enter numeric parity, reserve transfer, and currency conversion values."
-      : null;
-  const preview = previewMonetaryPolicy(snapshot, country, {
-    regime,
-    paritySusdPerUnit: parsedParity,
-    reserveTransferSUSD: Number.isFinite(parsedReserve) ? parsedReserve : 0,
-    currencyConversionSUSD: Number.isFinite(parsedConversion) ? parsedConversion : 0,
-  });
-  const submit = (): void => {
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
+
+  const applyMonetaryPolicy = (overrides?: {
+    readonly parity?: number | null;
+    readonly reserve?: number;
+    readonly conversion?: number;
+  }): void => {
+    if (country === null) return;
+    const parsedParity =
+      overrides?.parity !== undefined
+        ? overrides.parity
+        : parityText.trim() === ""
+          ? null
+          : Number(parityText);
+    const reserve = overrides?.reserve ?? Number(reserveText);
+    const conversion = overrides?.conversion ?? Number(conversionText);
+    // A managed regime's rate is rule-driven, so parity must be sent as unchanged.
+    const parity = regime === "managed" ? null : parsedParity;
+    const preview = previewMonetaryPolicy(snapshot, country, {
+      regime,
+      paritySusdPerUnit: parity,
+      reserveTransferSUSD: Number.isFinite(reserve) ? reserve : 0,
+      currencyConversionSUSD: Number.isFinite(conversion) ? conversion : 0,
+    });
     if (!isPlayerCountry) {
       setLocalError("Only the player-controlled country may change monetary policy.");
       return;
     }
+    const inputError =
+      (parity !== null && !Number.isFinite(parity)) ||
+      !Number.isFinite(reserve) ||
+      !Number.isFinite(conversion)
+        ? "Enter numeric parity, reserve transfer, and currency conversion values."
+        : null;
     if (inputError !== null) {
       setLocalError(inputError);
       return;
@@ -96,11 +108,65 @@ export function MoneyScreen({
       kind: "set-monetary-policy",
       countryId: country.id,
       regime,
-      paritySusdPerUnit: parsedParity,
-      reserveTransferSUSD: parsedReserve,
-      currencyConversionSUSD: parsedConversion,
+      paritySusdPerUnit: parity,
+      reserveTransferSUSD: reserve,
+      currencyConversionSUSD: conversion,
     });
   };
+
+  // Unconditional hooks before the country guard. The parity hook is disabled in
+  // the managed regime, where the worker requires a null parity.
+  const parityCommit = useDeferredCommit(
+    (value) => applyMonetaryPolicy({ parity: value }),
+    busy,
+  );
+  const reserveCommit = useDeferredCommit(
+    (value) => applyMonetaryPolicy({ reserve: value }),
+    busy,
+  );
+
+  if (country === null) {
+    return (
+      <Section title="Money & prices">
+        <Text style={styles.empty}>Select a country on the map.</Text>
+      </Section>
+    );
+  }
+  const canAct = isPlayerCountry && !busy && connection === "ready";
+  const parsedParity = parityText.trim() === "" ? null : Number(parityText);
+  const parsedReserve = Number(reserveText);
+  const parsedConversion = Number(conversionText);
+  const previewParity = regime === "managed" ? null : parsedParity;
+  const preview = previewMonetaryPolicy(snapshot, country, {
+    regime,
+    paritySusdPerUnit: previewParity,
+    reserveTransferSUSD: Number.isFinite(parsedReserve) ? parsedReserve : 0,
+    currencyConversionSUSD: Number.isFinite(parsedConversion) ? parsedConversion : 0,
+  });
+
+  // The authoritative parity move is limited to 50% of the current parity, so the
+  // slider spans half to one-and-a-half times the reference rate.
+  const referenceParity =
+    country.monetary.paritySusdPerUnit ??
+    country.monetary.valuationSusdPerUnit ??
+    0.2;
+  const parityMin = Math.max(0.000001, referenceParity * 0.5);
+  const parityMax = Math.max(parityMin, referenceParity * 1.5);
+  const parityStep = Math.max(0.000001, referenceParity * 0.01);
+  const paritySliderValue =
+    parsedParity !== null && Number.isFinite(parsedParity)
+      ? parsedParity
+      : referenceParity;
+  // Reserve transfers are bounded by treasury cash (deposit) and authority
+  // reserves (withdrawal), the limits enforced by the worker.
+  const reserveCeiling = Math.max(0, Math.floor(country.treasuryCashSUSD));
+  const reserveFloor = country.monetary.active
+    ? -Math.max(0, Math.floor(country.monetary.reserveCashSUSD))
+    : 0;
+  const reserveStep = Math.max(
+    1,
+    Math.round(Math.max(Math.abs(reserveFloor), reserveCeiling) / 100),
+  );
 
   const index = country.priceIndex;
   const monetary = country.monetary;
@@ -246,7 +312,7 @@ export function MoneyScreen({
         moves treasury cash into the authority; a negative transfer withdraws reserves. A
         positive currency conversion sells currency to the external counterparty for
         reserves; negative redeems it. The managed regime requires an enacted currency law
-        (Politics) and its rate is rule-driven, so the parity field must be blank.
+        (Politics) and its rate is rule-driven, so parity is sent as unchanged.
       </Text>
       <View style={styles.row}>
         <Text style={styles.label}>Regime</Text>
@@ -263,23 +329,41 @@ export function MoneyScreen({
           disabled={!canAct}
         />
       </View>
-      <Text style={styles.label}>Parity (SUSD per unit; blank = unchanged)</Text>
-      <TextInput
-        style={styles.input}
-        value={parityText}
-        onChangeText={setParityText}
-        keyboardType="decimal-pad"
-        placeholder="e.g. 0.200000"
-        placeholderTextColor={colors.faint}
+      <SliderField
+        label="Parity"
+        value={paritySliderValue}
+        min={parityMin}
+        max={parityMax}
+        step={parityStep}
+        precision={6}
+        unit="SUSD/unit"
+        disabled={!canAct || regime === "managed"}
+        pending={parityCommit.hasPending}
+        onChange={(value) => setParityText(value.toFixed(6))}
+        onCommit={(value) => parityCommit.submit(value)}
+        hint={
+          regime === "managed"
+            ? "Managed rates are rule-driven; parity is sent as unchanged."
+            : "SUSD per unit. A change may move at most 50% from the current parity."
+        }
       />
-      <Text style={styles.label}>Reserve transfer (SUSD; signed)</Text>
-      <TextInput
-        style={styles.input}
-        value={reserveText}
-        onChangeText={setReserveText}
-        keyboardType="decimal-pad"
-        placeholder="0"
-        placeholderTextColor={colors.faint}
+      <SliderField
+        label="Reserve transfer"
+        value={Number.isFinite(parsedReserve) ? parsedReserve : 0}
+        min={reserveFloor}
+        max={reserveCeiling}
+        step={reserveStep}
+        precision={0}
+        unit="SUSD"
+        disabled={!canAct}
+        pending={reserveCommit.hasPending}
+        onChange={(value) => setReserveText(value.toFixed(0))}
+        onCommit={(value) => reserveCommit.submit(value)}
+        hint={
+          country.monetary.active
+            ? "Signed: positive deposits treasury cash into reserves; negative withdraws reserves."
+            : "A positive transfer is required to establish the authority."
+        }
       />
       <Text style={styles.label}>Currency conversion (SUSD; signed)</Text>
       <TextInput
@@ -321,7 +405,11 @@ export function MoneyScreen({
           </Text>
         ))}
       </View>
-      <ActionButton label="Apply monetary policy" disabled={!canAct} onPress={submit} />
+      <ActionButton
+        label="Apply monetary policy"
+        disabled={!canAct}
+        onPress={() => applyMonetaryPolicy()}
+      />
       <Text style={styles.help}>
         The worker validates the complete operation at the authoritative boundary and
         posts its balanced entries atomically. No money or currency appears without a

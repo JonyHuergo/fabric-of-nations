@@ -1,0 +1,4556 @@
+[
+  {
+    "key": "usa-home-subsistence-farm",
+    "regionId": 0,
+    "definitionKey": "subsistence-farm",
+    "level": 249,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-commercial-farm",
+    "regionId": 0,
+    "definitionKey": "commercial-farm",
+    "level": 31,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-warehouse",
+    "regionId": 0,
+    "definitionKey": "warehouse",
+    "level": 152,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-ranch",
+    "regionId": 0,
+    "definitionKey": "ranch",
+    "level": 38,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-fishery",
+    "regionId": 0,
+    "definitionKey": "fishery",
+    "level": 38,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-food-processing",
+    "regionId": 0,
+    "definitionKey": "food-processing",
+    "level": 36,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-workshop",
+    "regionId": 0,
+    "definitionKey": "workshop",
+    "level": 53,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "usa-home-textile-mill",
+    "regionId": 0,
+    "definitionKey": "textile-mill",
+    "level": 46,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-subsistence-farm",
+    "regionId": 1,
+    "definitionKey": "subsistence-farm",
+    "level": 135,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-commercial-farm",
+    "regionId": 1,
+    "definitionKey": "commercial-farm",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-warehouse",
+    "regionId": 1,
+    "definitionKey": "warehouse",
+    "level": 82,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-ranch",
+    "regionId": 1,
+    "definitionKey": "ranch",
+    "level": 21,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-fishery",
+    "regionId": 1,
+    "definitionKey": "fishery",
+    "level": 21,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-food-processing",
+    "regionId": 1,
+    "definitionKey": "food-processing",
+    "level": 20,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-workshop",
+    "regionId": 1,
+    "definitionKey": "workshop",
+    "level": 29,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gbr-home-textile-mill",
+    "regionId": 1,
+    "definitionKey": "textile-mill",
+    "level": 25,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-subsistence-farm",
+    "regionId": 2,
+    "definitionKey": "subsistence-farm",
+    "level": 185,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-commercial-farm",
+    "regionId": 2,
+    "definitionKey": "commercial-farm",
+    "level": 23,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-warehouse",
+    "regionId": 2,
+    "definitionKey": "warehouse",
+    "level": 113,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-ranch",
+    "regionId": 2,
+    "definitionKey": "ranch",
+    "level": 28,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-fishery",
+    "regionId": 2,
+    "definitionKey": "fishery",
+    "level": 28,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-food-processing",
+    "regionId": 2,
+    "definitionKey": "food-processing",
+    "level": 27,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-workshop",
+    "regionId": 2,
+    "definitionKey": "workshop",
+    "level": 39,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "deu-home-textile-mill",
+    "regionId": 2,
+    "definitionKey": "textile-mill",
+    "level": 34,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-subsistence-farm",
+    "regionId": 3,
+    "definitionKey": "subsistence-farm",
+    "level": 128,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-commercial-farm",
+    "regionId": 3,
+    "definitionKey": "commercial-farm",
+    "level": 16,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-warehouse",
+    "regionId": 3,
+    "definitionKey": "warehouse",
+    "level": 78,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-ranch",
+    "regionId": 3,
+    "definitionKey": "ranch",
+    "level": 19,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-fishery",
+    "regionId": 3,
+    "definitionKey": "fishery",
+    "level": 19,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-food-processing",
+    "regionId": 3,
+    "definitionKey": "food-processing",
+    "level": 19,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-workshop",
+    "regionId": 3,
+    "definitionKey": "workshop",
+    "level": 27,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fra-home-textile-mill",
+    "regionId": 3,
+    "definitionKey": "textile-mill",
+    "level": 23,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-subsistence-farm",
+    "regionId": 4,
+    "definitionKey": "subsistence-farm",
+    "level": 437,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-commercial-farm",
+    "regionId": 4,
+    "definitionKey": "commercial-farm",
+    "level": 54,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-warehouse",
+    "regionId": 4,
+    "definitionKey": "warehouse",
+    "level": 267,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-ranch",
+    "regionId": 4,
+    "definitionKey": "ranch",
+    "level": 67,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-fishery",
+    "regionId": 4,
+    "definitionKey": "fishery",
+    "level": 67,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-food-processing",
+    "regionId": 4,
+    "definitionKey": "food-processing",
+    "level": 63,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-workshop",
+    "regionId": 4,
+    "definitionKey": "workshop",
+    "level": 93,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rus-home-textile-mill",
+    "regionId": 4,
+    "definitionKey": "textile-mill",
+    "level": 80,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-subsistence-farm",
+    "regionId": 5,
+    "definitionKey": "subsistence-farm",
+    "level": 145,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-commercial-farm",
+    "regionId": 5,
+    "definitionKey": "commercial-farm",
+    "level": 18,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-warehouse",
+    "regionId": 5,
+    "definitionKey": "warehouse",
+    "level": 88,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-ranch",
+    "regionId": 5,
+    "definitionKey": "ranch",
+    "level": 22,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-fishery",
+    "regionId": 5,
+    "definitionKey": "fishery",
+    "level": 22,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-food-processing",
+    "regionId": 5,
+    "definitionKey": "food-processing",
+    "level": 21,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-workshop",
+    "regionId": 5,
+    "definitionKey": "workshop",
+    "level": 31,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "jpn-home-textile-mill",
+    "regionId": 5,
+    "definitionKey": "textile-mill",
+    "level": 27,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-subsistence-farm",
+    "regionId": 6,
+    "definitionKey": "subsistence-farm",
+    "level": 106,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-commercial-farm",
+    "regionId": 6,
+    "definitionKey": "commercial-farm",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-warehouse",
+    "regionId": 6,
+    "definitionKey": "warehouse",
+    "level": 65,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-ranch",
+    "regionId": 6,
+    "definitionKey": "ranch",
+    "level": 16,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-fishery",
+    "regionId": 6,
+    "definitionKey": "fishery",
+    "level": 16,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-food-processing",
+    "regionId": 6,
+    "definitionKey": "food-processing",
+    "level": 15,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-workshop",
+    "regionId": 6,
+    "definitionKey": "workshop",
+    "level": 22,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ita-home-textile-mill",
+    "regionId": 6,
+    "definitionKey": "textile-mill",
+    "level": 20,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-subsistence-farm",
+    "regionId": 7,
+    "definitionKey": "subsistence-farm",
+    "level": 61,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-commercial-farm",
+    "regionId": 7,
+    "definitionKey": "commercial-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-warehouse",
+    "regionId": 7,
+    "definitionKey": "warehouse",
+    "level": 37,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-ranch",
+    "regionId": 7,
+    "definitionKey": "ranch",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-fishery",
+    "regionId": 7,
+    "definitionKey": "fishery",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-food-processing",
+    "regionId": 7,
+    "definitionKey": "food-processing",
+    "level": 9,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-workshop",
+    "regionId": 7,
+    "definitionKey": "workshop",
+    "level": 13,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "esp-home-textile-mill",
+    "regionId": 7,
+    "definitionKey": "textile-mill",
+    "level": 11,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-subsistence-farm",
+    "regionId": 8,
+    "definitionKey": "subsistence-farm",
+    "level": 18,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-commercial-farm",
+    "regionId": 8,
+    "definitionKey": "commercial-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-warehouse",
+    "regionId": 8,
+    "definitionKey": "warehouse",
+    "level": 11,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-ranch",
+    "regionId": 8,
+    "definitionKey": "ranch",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-fishery",
+    "regionId": 8,
+    "definitionKey": "fishery",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-food-processing",
+    "regionId": 8,
+    "definitionKey": "food-processing",
+    "level": 3,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-workshop",
+    "regionId": 8,
+    "definitionKey": "workshop",
+    "level": 4,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "prt-home-textile-mill",
+    "regionId": 8,
+    "definitionKey": "textile-mill",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-subsistence-farm",
+    "regionId": 9,
+    "definitionKey": "subsistence-farm",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-commercial-farm",
+    "regionId": 9,
+    "definitionKey": "commercial-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-warehouse",
+    "regionId": 9,
+    "definitionKey": "warehouse",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-ranch",
+    "regionId": 9,
+    "definitionKey": "ranch",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-fishery",
+    "regionId": 9,
+    "definitionKey": "fishery",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-food-processing",
+    "regionId": 9,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-workshop",
+    "regionId": 9,
+    "definitionKey": "workshop",
+    "level": 4,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nld-home-textile-mill",
+    "regionId": 9,
+    "definitionKey": "textile-mill",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-subsistence-farm",
+    "regionId": 10,
+    "definitionKey": "subsistence-farm",
+    "level": 22,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-commercial-farm",
+    "regionId": 10,
+    "definitionKey": "commercial-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-warehouse",
+    "regionId": 10,
+    "definitionKey": "warehouse",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-ranch",
+    "regionId": 10,
+    "definitionKey": "ranch",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-fishery",
+    "regionId": 10,
+    "definitionKey": "fishery",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-food-processing",
+    "regionId": 10,
+    "definitionKey": "food-processing",
+    "level": 3,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-workshop",
+    "regionId": 10,
+    "definitionKey": "workshop",
+    "level": 5,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bel-home-textile-mill",
+    "regionId": 10,
+    "definitionKey": "textile-mill",
+    "level": 4,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-subsistence-farm",
+    "regionId": 11,
+    "definitionKey": "subsistence-farm",
+    "level": 11,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-commercial-farm",
+    "regionId": 11,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-warehouse",
+    "regionId": 11,
+    "definitionKey": "warehouse",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-ranch",
+    "regionId": 11,
+    "definitionKey": "ranch",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-fishery",
+    "regionId": 11,
+    "definitionKey": "fishery",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-food-processing",
+    "regionId": 11,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-workshop",
+    "regionId": 11,
+    "definitionKey": "workshop",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "che-home-textile-mill",
+    "regionId": 11,
+    "definitionKey": "textile-mill",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-subsistence-farm",
+    "regionId": 12,
+    "definitionKey": "subsistence-farm",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-commercial-farm",
+    "regionId": 12,
+    "definitionKey": "commercial-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-warehouse",
+    "regionId": 12,
+    "definitionKey": "warehouse",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-ranch",
+    "regionId": 12,
+    "definitionKey": "ranch",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-fishery",
+    "regionId": 12,
+    "definitionKey": "fishery",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-food-processing",
+    "regionId": 12,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-workshop",
+    "regionId": 12,
+    "definitionKey": "workshop",
+    "level": 4,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "swe-home-textile-mill",
+    "regionId": 12,
+    "definitionKey": "textile-mill",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-subsistence-farm",
+    "regionId": 13,
+    "definitionKey": "subsistence-farm",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-commercial-farm",
+    "regionId": 13,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-warehouse",
+    "regionId": 13,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-ranch",
+    "regionId": 13,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-fishery",
+    "regionId": 13,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-food-processing",
+    "regionId": 13,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-workshop",
+    "regionId": 13,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nor-home-textile-mill",
+    "regionId": 13,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-subsistence-farm",
+    "regionId": 14,
+    "definitionKey": "subsistence-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-commercial-farm",
+    "regionId": 14,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-warehouse",
+    "regionId": 14,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-ranch",
+    "regionId": 14,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-fishery",
+    "regionId": 14,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-food-processing",
+    "regionId": 14,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-workshop",
+    "regionId": 14,
+    "definitionKey": "workshop",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dnk-home-textile-mill",
+    "regionId": 14,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grc-home-subsistence-farm",
+    "regionId": 15,
+    "definitionKey": "subsistence-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grc-home-commercial-farm-peasant",
+    "regionId": 15,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grc-home-warehouse",
+    "regionId": 15,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "srb-home-subsistence-farm",
+    "regionId": 16,
+    "definitionKey": "subsistence-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "srb-home-commercial-farm-peasant",
+    "regionId": 16,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "srb-home-warehouse",
+    "regionId": 16,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mnt-home-subsistence-farm",
+    "regionId": 17,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mnt-home-commercial-farm-peasant",
+    "regionId": 17,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mnt-home-warehouse",
+    "regionId": 17,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "rom-home-subsistence-farm",
+    "regionId": 18,
+    "definitionKey": "subsistence-farm",
+    "level": 20,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rom-home-commercial-farm-peasant",
+    "regionId": 18,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "rom-home-warehouse",
+    "regionId": 18,
+    "definitionKey": "warehouse",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bgr-home-subsistence-farm",
+    "regionId": 19,
+    "definitionKey": "subsistence-farm",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bgr-home-commercial-farm-peasant",
+    "regionId": 19,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bgr-home-warehouse",
+    "regionId": 19,
+    "definitionKey": "warehouse",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-subsistence-farm",
+    "regionId": 20,
+    "definitionKey": "subsistence-farm",
+    "level": 79,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-commercial-farm-peasant",
+    "regionId": 20,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-warehouse",
+    "regionId": 20,
+    "definitionKey": "warehouse",
+    "level": 48,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-ranch",
+    "regionId": 20,
+    "definitionKey": "ranch",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-fishery",
+    "regionId": 20,
+    "definitionKey": "fishery",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-food-processing",
+    "regionId": 20,
+    "definitionKey": "food-processing",
+    "level": 11,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ott-home-workshop-peasant",
+    "regionId": 20,
+    "definitionKey": "workshop-peasant",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-subsistence-farm",
+    "regionId": 21,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-commercial-farm",
+    "regionId": 21,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-warehouse",
+    "regionId": 21,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-ranch",
+    "regionId": 21,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-fishery",
+    "regionId": 21,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-food-processing",
+    "regionId": 21,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-workshop",
+    "regionId": 21,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lux-home-textile-mill",
+    "regionId": 21,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-subsistence-farm",
+    "regionId": 22,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-commercial-farm",
+    "regionId": 22,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-warehouse",
+    "regionId": 22,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-ranch",
+    "regionId": 22,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-fishery",
+    "regionId": 22,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-food-processing",
+    "regionId": 22,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-workshop",
+    "regionId": 22,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mco-home-textile-mill",
+    "regionId": 22,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "smr-home-subsistence-farm",
+    "regionId": 23,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "smr-home-commercial-farm-peasant",
+    "regionId": 23,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "smr-home-warehouse",
+    "regionId": 23,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "and-home-subsistence-farm",
+    "regionId": 24,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "and-home-commercial-farm-peasant",
+    "regionId": 24,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "and-home-warehouse",
+    "regionId": 24,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-subsistence-farm",
+    "regionId": 25,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-commercial-farm",
+    "regionId": 25,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-warehouse",
+    "regionId": 25,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-ranch",
+    "regionId": 25,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-fishery",
+    "regionId": 25,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-food-processing",
+    "regionId": 25,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-workshop",
+    "regionId": 25,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lie-home-textile-mill",
+    "regionId": 25,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-subsistence-farm",
+    "regionId": 26,
+    "definitionKey": "subsistence-farm",
+    "level": 1311,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-commercial-farm-peasant",
+    "regionId": 26,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 163,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-warehouse",
+    "regionId": 26,
+    "definitionKey": "warehouse",
+    "level": 800,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-ranch",
+    "regionId": 26,
+    "definitionKey": "ranch",
+    "level": 200,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-fishery",
+    "regionId": 26,
+    "definitionKey": "fishery",
+    "level": 200,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-food-processing",
+    "regionId": 26,
+    "definitionKey": "food-processing",
+    "level": 190,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "chn-home-workshop-peasant",
+    "regionId": 26,
+    "definitionKey": "workshop-peasant",
+    "level": 278,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "kor-home-subsistence-farm",
+    "regionId": 27,
+    "definitionKey": "subsistence-farm",
+    "level": 56,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "kor-home-commercial-farm-peasant",
+    "regionId": 27,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "kor-home-warehouse",
+    "regionId": 27,
+    "definitionKey": "warehouse",
+    "level": 34,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-subsistence-farm",
+    "regionId": 28,
+    "definitionKey": "subsistence-farm",
+    "level": 32,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-commercial-farm-peasant",
+    "regionId": 28,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-warehouse",
+    "regionId": 28,
+    "definitionKey": "warehouse",
+    "level": 20,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-ranch",
+    "regionId": 28,
+    "definitionKey": "ranch",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-fishery",
+    "regionId": 28,
+    "definitionKey": "fishery",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-food-processing",
+    "regionId": 28,
+    "definitionKey": "food-processing",
+    "level": 5,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "per-home-workshop-peasant",
+    "regionId": 28,
+    "definitionKey": "workshop-peasant",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "afg-home-subsistence-farm",
+    "regionId": 29,
+    "definitionKey": "subsistence-farm",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "afg-home-commercial-farm-peasant",
+    "regionId": 29,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "afg-home-warehouse",
+    "regionId": 29,
+    "definitionKey": "warehouse",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "npl-home-subsistence-farm",
+    "regionId": 30,
+    "definitionKey": "subsistence-farm",
+    "level": 16,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "npl-home-commercial-farm-peasant",
+    "regionId": 30,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "npl-home-warehouse",
+    "regionId": 30,
+    "definitionKey": "warehouse",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tha-home-subsistence-farm",
+    "regionId": 31,
+    "definitionKey": "subsistence-farm",
+    "level": 24,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "tha-home-commercial-farm-peasant",
+    "regionId": 31,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "tha-home-warehouse",
+    "regionId": 31,
+    "definitionKey": "warehouse",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "omn-home-subsistence-farm",
+    "regionId": 32,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "omn-home-commercial-farm-peasant",
+    "regionId": 32,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "omn-home-warehouse",
+    "regionId": 32,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-subsistence-farm",
+    "regionId": 33,
+    "definitionKey": "subsistence-farm",
+    "level": 36,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-commercial-farm-peasant",
+    "regionId": 33,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-warehouse",
+    "regionId": 33,
+    "definitionKey": "warehouse",
+    "level": 22,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-ranch",
+    "regionId": 33,
+    "definitionKey": "ranch",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-fishery",
+    "regionId": 33,
+    "definitionKey": "fishery",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-food-processing",
+    "regionId": 33,
+    "definitionKey": "food-processing",
+    "level": 5,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "eth-home-workshop-peasant",
+    "regionId": 33,
+    "definitionKey": "workshop-peasant",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "lbr-home-subsistence-farm",
+    "regionId": 34,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lbr-home-commercial-farm-peasant",
+    "regionId": 34,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "lbr-home-warehouse",
+    "regionId": 34,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mar-home-subsistence-farm",
+    "regionId": 35,
+    "definitionKey": "subsistence-farm",
+    "level": 16,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mar-home-commercial-farm-peasant",
+    "regionId": 35,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mar-home-warehouse",
+    "regionId": 35,
+    "definitionKey": "warehouse",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-subsistence-farm",
+    "regionId": 36,
+    "definitionKey": "subsistence-farm",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-commercial-farm-peasant",
+    "regionId": 36,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-warehouse",
+    "regionId": 36,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-ranch",
+    "regionId": 36,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-fishery",
+    "regionId": 36,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-food-processing",
+    "regionId": 36,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "zar-home-workshop-peasant",
+    "regionId": 36,
+    "definitionKey": "workshop-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "orf-home-subsistence-farm",
+    "regionId": 37,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "orf-home-commercial-farm-peasant",
+    "regionId": 37,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "orf-home-warehouse",
+    "regionId": 37,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mex-home-subsistence-farm",
+    "regionId": 38,
+    "definitionKey": "subsistence-farm",
+    "level": 45,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "mex-home-commercial-farm-peasant",
+    "regionId": 38,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "mex-home-warehouse",
+    "regionId": 38,
+    "definitionKey": "warehouse",
+    "level": 27,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gua-home-subsistence-farm",
+    "regionId": 39,
+    "definitionKey": "subsistence-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gua-home-commercial-farm-peasant",
+    "regionId": 39,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gua-home-warehouse",
+    "regionId": 39,
+    "definitionKey": "warehouse",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hon-home-subsistence-farm",
+    "regionId": 40,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hon-home-commercial-farm-peasant",
+    "regionId": 40,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hon-home-warehouse",
+    "regionId": 40,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sal-home-subsistence-farm",
+    "regionId": 41,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sal-home-commercial-farm-peasant",
+    "regionId": 41,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sal-home-warehouse",
+    "regionId": 41,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nic-home-subsistence-farm",
+    "regionId": 42,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nic-home-commercial-farm-peasant",
+    "regionId": 42,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nic-home-warehouse",
+    "regionId": 42,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cos-home-subsistence-farm",
+    "regionId": 43,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cos-home-commercial-farm-peasant",
+    "regionId": 43,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cos-home-warehouse",
+    "regionId": 43,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "col-home-subsistence-farm",
+    "regionId": 44,
+    "definitionKey": "subsistence-farm",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "col-home-commercial-farm-peasant",
+    "regionId": 44,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "col-home-warehouse",
+    "regionId": 44,
+    "definitionKey": "warehouse",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ven-home-subsistence-farm",
+    "regionId": 45,
+    "definitionKey": "subsistence-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ven-home-commercial-farm-peasant",
+    "regionId": 45,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ven-home-warehouse",
+    "regionId": 45,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ecu-home-subsistence-farm",
+    "regionId": 46,
+    "definitionKey": "subsistence-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ecu-home-commercial-farm-peasant",
+    "regionId": 46,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ecu-home-warehouse",
+    "regionId": 46,
+    "definitionKey": "warehouse",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pru-home-subsistence-farm",
+    "regionId": 47,
+    "definitionKey": "subsistence-farm",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pru-home-commercial-farm-peasant",
+    "regionId": 47,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pru-home-warehouse",
+    "regionId": 47,
+    "definitionKey": "warehouse",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bol-home-subsistence-farm",
+    "regionId": 48,
+    "definitionKey": "subsistence-farm",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bol-home-commercial-farm-peasant",
+    "regionId": 48,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bol-home-warehouse",
+    "regionId": 48,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-subsistence-farm",
+    "regionId": 49,
+    "definitionKey": "subsistence-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-commercial-farm",
+    "regionId": 49,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-warehouse",
+    "regionId": 49,
+    "definitionKey": "warehouse",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-ranch",
+    "regionId": 49,
+    "definitionKey": "ranch",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-fishery",
+    "regionId": 49,
+    "definitionKey": "fishery",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-food-processing",
+    "regionId": 49,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-workshop",
+    "regionId": 49,
+    "definitionKey": "workshop",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "chl-home-textile-mill",
+    "regionId": 49,
+    "definitionKey": "textile-mill",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-subsistence-farm",
+    "regionId": 50,
+    "definitionKey": "subsistence-farm",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-commercial-farm",
+    "regionId": 50,
+    "definitionKey": "commercial-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-warehouse",
+    "regionId": 50,
+    "definitionKey": "warehouse",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-ranch",
+    "regionId": 50,
+    "definitionKey": "ranch",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-fishery",
+    "regionId": 50,
+    "definitionKey": "fishery",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-food-processing",
+    "regionId": 50,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-workshop",
+    "regionId": 50,
+    "definitionKey": "workshop",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "arg-home-textile-mill",
+    "regionId": 50,
+    "definitionKey": "textile-mill",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-subsistence-farm",
+    "regionId": 51,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-commercial-farm",
+    "regionId": 51,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-warehouse",
+    "regionId": 51,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-ranch",
+    "regionId": 51,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-fishery",
+    "regionId": 51,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-food-processing",
+    "regionId": 51,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-workshop",
+    "regionId": 51,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ury-home-textile-mill",
+    "regionId": 51,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pry-home-subsistence-farm",
+    "regionId": 52,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pry-home-commercial-farm-peasant",
+    "regionId": 52,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pry-home-warehouse",
+    "regionId": 52,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-home-subsistence-farm",
+    "regionId": 53,
+    "definitionKey": "subsistence-farm",
+    "level": 58,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-home-commercial-farm-peasant",
+    "regionId": 53,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bra-home-warehouse",
+    "regionId": 53,
+    "definitionKey": "warehouse",
+    "level": 35,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "hti-home-subsistence-farm",
+    "regionId": 54,
+    "definitionKey": "subsistence-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hti-home-commercial-farm-peasant",
+    "regionId": 54,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hti-home-warehouse",
+    "regionId": 54,
+    "definitionKey": "warehouse",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dom-home-subsistence-farm",
+    "regionId": 55,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dom-home-commercial-farm-peasant",
+    "regionId": 55,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dom-home-warehouse",
+    "regionId": 55,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-subsistence-farm",
+    "regionId": 56,
+    "definitionKey": "subsistence-farm",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-commercial-farm",
+    "regionId": 56,
+    "definitionKey": "commercial-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-warehouse",
+    "regionId": 56,
+    "definitionKey": "warehouse",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-ranch",
+    "regionId": 56,
+    "definitionKey": "ranch",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-fishery",
+    "regionId": 56,
+    "definitionKey": "fishery",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-food-processing",
+    "regionId": 56,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-workshop",
+    "regionId": 56,
+    "definitionKey": "workshop",
+    "level": 4,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "can-home-textile-mill",
+    "regionId": 56,
+    "definitionKey": "textile-mill",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-subsistence-farm",
+    "regionId": 57,
+    "definitionKey": "subsistence-farm",
+    "level": 12,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-commercial-farm",
+    "regionId": 57,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-warehouse",
+    "regionId": 57,
+    "definitionKey": "warehouse",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-ranch",
+    "regionId": 57,
+    "definitionKey": "ranch",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-fishery",
+    "regionId": 57,
+    "definitionKey": "fishery",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-food-processing",
+    "regionId": 57,
+    "definitionKey": "food-processing",
+    "level": 2,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-workshop",
+    "regionId": 57,
+    "definitionKey": "workshop",
+    "level": 3,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "aus-home-textile-mill",
+    "regionId": 57,
+    "definitionKey": "textile-mill",
+    "level": 2,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-subsistence-farm",
+    "regionId": 58,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-commercial-farm",
+    "regionId": 58,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-warehouse",
+    "regionId": 58,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-ranch",
+    "regionId": 58,
+    "definitionKey": "ranch",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-fishery",
+    "regionId": 58,
+    "definitionKey": "fishery",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-food-processing",
+    "regionId": 58,
+    "definitionKey": "food-processing",
+    "level": 1,
+    "ownerProfessionKey": "clerks",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-workshop",
+    "regionId": 58,
+    "definitionKey": "workshop",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nzl-home-textile-mill",
+    "regionId": 58,
+    "definitionKey": "textile-mill",
+    "level": 1,
+    "ownerProfessionKey": "capitalists",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cub-home-subsistence-farm",
+    "regionId": 59,
+    "definitionKey": "subsistence-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cub-home-commercial-farm-peasant",
+    "regionId": 59,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cub-home-warehouse",
+    "regionId": 59,
+    "definitionKey": "warehouse",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bin-subsistence-farm",
+    "regionId": 100,
+    "definitionKey": "subsistence-farm",
+    "level": 964,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bin-commercial-farm-peasant",
+    "regionId": 100,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 120,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bin-warehouse",
+    "regionId": 100,
+    "definitionKey": "warehouse",
+    "level": 588,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "cey-subsistence-farm",
+    "regionId": 101,
+    "definitionKey": "subsistence-farm",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cey-commercial-farm-peasant",
+    "regionId": 101,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cey-warehouse",
+    "regionId": 101,
+    "definitionKey": "warehouse",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mal-subsistence-farm",
+    "regionId": 102,
+    "definitionKey": "subsistence-farm",
+    "level": 11,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mal-commercial-farm",
+    "regionId": 102,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mal-warehouse",
+    "regionId": 102,
+    "definitionKey": "warehouse",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hkg-subsistence-farm",
+    "regionId": 103,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hkg-commercial-farm",
+    "regionId": 103,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hkg-warehouse",
+    "regionId": 103,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kuw-subsistence-farm",
+    "regionId": 104,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kuw-commercial-farm-peasant",
+    "regionId": 104,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kuw-warehouse",
+    "regionId": 104,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tru-subsistence-farm",
+    "regionId": 105,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tru-commercial-farm-peasant",
+    "regionId": 105,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tru-warehouse",
+    "regionId": 105,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cyp-subsistence-farm",
+    "regionId": 106,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cyp-commercial-farm-peasant",
+    "regionId": 106,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cyp-warehouse",
+    "regionId": 106,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mlt-subsistence-farm",
+    "regionId": 107,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mlt-commercial-farm",
+    "regionId": 107,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mlt-warehouse",
+    "regionId": 107,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwi-subsistence-farm",
+    "regionId": 108,
+    "definitionKey": "subsistence-farm",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwi-commercial-farm-peasant",
+    "regionId": 108,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwi-warehouse",
+    "regionId": 108,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bsa-subsistence-farm",
+    "regionId": 109,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bsa-commercial-farm-peasant",
+    "regionId": 109,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bsa-warehouse",
+    "regionId": 109,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwa-subsistence-farm",
+    "regionId": 110,
+    "definitionKey": "subsistence-farm",
+    "level": 66,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwa-commercial-farm-peasant",
+    "regionId": 110,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bwa-warehouse",
+    "regionId": 110,
+    "definitionKey": "warehouse",
+    "level": 40,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bea-subsistence-farm",
+    "regionId": 111,
+    "definitionKey": "subsistence-farm",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bea-commercial-farm-peasant",
+    "regionId": 111,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bea-warehouse",
+    "regionId": 111,
+    "definitionKey": "warehouse",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sud-subsistence-farm",
+    "regionId": 112,
+    "definitionKey": "subsistence-farm",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sud-commercial-farm-peasant",
+    "regionId": 112,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sud-warehouse",
+    "regionId": 112,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bso-subsistence-farm",
+    "regionId": 113,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bso-commercial-farm-peasant",
+    "regionId": 113,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bso-warehouse",
+    "regionId": 113,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cra-subsistence-farm",
+    "regionId": 114,
+    "definitionKey": "subsistence-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cra-commercial-farm-peasant",
+    "regionId": 114,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cra-warehouse",
+    "regionId": 114,
+    "definitionKey": "warehouse",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hct-subsistence-farm",
+    "regionId": 115,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hct-commercial-farm-peasant",
+    "regionId": 115,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "hct-warehouse",
+    "regionId": 115,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fji-subsistence-farm",
+    "regionId": 116,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fji-commercial-farm-peasant",
+    "regionId": 116,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fji-warehouse",
+    "regionId": 116,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bpo-subsistence-farm",
+    "regionId": 117,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bpo-commercial-farm-peasant",
+    "regionId": 117,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bpo-warehouse",
+    "regionId": 117,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cap-subsistence-farm",
+    "regionId": 118,
+    "definitionKey": "subsistence-farm",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cap-commercial-farm",
+    "regionId": 118,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cap-warehouse",
+    "regionId": 118,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nat-subsistence-farm",
+    "regionId": 119,
+    "definitionKey": "subsistence-farm",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nat-commercial-farm-peasant",
+    "regionId": 119,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nat-warehouse",
+    "regionId": 119,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nfd-subsistence-farm",
+    "regionId": 120,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nfd-commercial-farm-peasant",
+    "regionId": 120,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "nfd-warehouse",
+    "regionId": 120,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "alg-subsistence-farm",
+    "regionId": 121,
+    "definitionKey": "subsistence-farm",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "alg-commercial-farm-peasant",
+    "regionId": 121,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "alg-warehouse",
+    "regionId": 121,
+    "definitionKey": "warehouse",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tun-subsistence-farm",
+    "regionId": 122,
+    "definitionKey": "subsistence-farm",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tun-commercial-farm-peasant",
+    "regionId": 122,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tun-warehouse",
+    "regionId": 122,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fwa-subsistence-farm",
+    "regionId": 123,
+    "definitionKey": "subsistence-farm",
+    "level": 33,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fwa-commercial-farm-peasant",
+    "regionId": 123,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fwa-warehouse",
+    "regionId": 123,
+    "definitionKey": "warehouse",
+    "level": 20,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fea-subsistence-farm",
+    "regionId": 124,
+    "definitionKey": "subsistence-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fea-commercial-farm-peasant",
+    "regionId": 124,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fea-warehouse",
+    "regionId": 124,
+    "definitionKey": "warehouse",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fic-subsistence-farm",
+    "regionId": 125,
+    "definitionKey": "subsistence-farm",
+    "level": 49,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fic-commercial-farm-peasant",
+    "regionId": 125,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "fic-warehouse",
+    "regionId": 125,
+    "definitionKey": "warehouse",
+    "level": 30,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "mad-subsistence-farm",
+    "regionId": 126,
+    "definitionKey": "subsistence-farm",
+    "level": 11,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mad-commercial-farm-peasant",
+    "regionId": 126,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mad-warehouse",
+    "regionId": 126,
+    "definitionKey": "warehouse",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fso-subsistence-farm",
+    "regionId": 127,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fso-commercial-farm-peasant",
+    "regionId": 127,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fso-warehouse",
+    "regionId": 127,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fca-subsistence-farm",
+    "regionId": 128,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fca-commercial-farm-peasant",
+    "regionId": 128,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fca-warehouse",
+    "regionId": 128,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fpo-subsistence-farm",
+    "regionId": 129,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fpo-commercial-farm-peasant",
+    "regionId": 129,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fpo-warehouse",
+    "regionId": 129,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gea-subsistence-farm",
+    "regionId": 130,
+    "definitionKey": "subsistence-farm",
+    "level": 23,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gea-commercial-farm-peasant",
+    "regionId": 130,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gea-warehouse",
+    "regionId": 130,
+    "definitionKey": "warehouse",
+    "level": 14,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsw-subsistence-farm",
+    "regionId": 131,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsw-commercial-farm-peasant",
+    "regionId": 131,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsw-warehouse",
+    "regionId": 131,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kam-subsistence-farm",
+    "regionId": 132,
+    "definitionKey": "subsistence-farm",
+    "level": 7,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kam-commercial-farm-peasant",
+    "regionId": 132,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "kam-warehouse",
+    "regionId": 132,
+    "definitionKey": "warehouse",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tog-subsistence-farm",
+    "regionId": 133,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tog-commercial-farm-peasant",
+    "regionId": 133,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "tog-warehouse",
+    "regionId": 133,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gng-subsistence-farm",
+    "regionId": 134,
+    "definitionKey": "subsistence-farm",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gng-commercial-farm-peasant",
+    "regionId": 134,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gng-warehouse",
+    "regionId": 134,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsa-subsistence-farm",
+    "regionId": 135,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsa-commercial-farm-peasant",
+    "regionId": 135,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gsa-warehouse",
+    "regionId": 135,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gpn-subsistence-farm",
+    "regionId": 136,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gpn-commercial-farm-peasant",
+    "regionId": 136,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gpn-warehouse",
+    "regionId": 136,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "cfs-subsistence-farm",
+    "regionId": 137,
+    "definitionKey": "subsistence-farm",
+    "level": 30,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "cfs-commercial-farm-peasant",
+    "regionId": 137,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "cfs-warehouse",
+    "regionId": 137,
+    "definitionKey": "warehouse",
+    "level": 18,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "ang-subsistence-farm",
+    "regionId": 138,
+    "definitionKey": "subsistence-farm",
+    "level": 13,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ang-commercial-farm-peasant",
+    "regionId": 138,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ang-warehouse",
+    "regionId": 138,
+    "definitionKey": "warehouse",
+    "level": 8,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "moz-subsistence-farm",
+    "regionId": 139,
+    "definitionKey": "subsistence-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "moz-commercial-farm-peasant",
+    "regionId": 139,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "moz-warehouse",
+    "regionId": 139,
+    "definitionKey": "warehouse",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pai-subsistence-farm",
+    "regionId": 140,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pai-commercial-farm-peasant",
+    "regionId": 140,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pai-warehouse",
+    "regionId": 140,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ptm-subsistence-farm",
+    "regionId": 141,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ptm-commercial-farm-peasant",
+    "regionId": 141,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "ptm-warehouse",
+    "regionId": 141,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mac-subsistence-farm",
+    "regionId": 142,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mac-commercial-farm",
+    "regionId": 142,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "mac-warehouse",
+    "regionId": 142,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "eri-subsistence-farm",
+    "regionId": 143,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "eri-commercial-farm-peasant",
+    "regionId": 143,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "eri-warehouse",
+    "regionId": 143,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "its-subsistence-farm",
+    "regionId": 144,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "its-commercial-farm-peasant",
+    "regionId": 144,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "its-warehouse",
+    "regionId": 144,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dei-subsistence-farm",
+    "regionId": 145,
+    "definitionKey": "subsistence-farm",
+    "level": 138,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "dei-commercial-farm-peasant",
+    "regionId": 145,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 17,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "dei-warehouse",
+    "regionId": 145,
+    "definitionKey": "warehouse",
+    "level": 84,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "sur-subsistence-farm",
+    "regionId": 146,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sur-commercial-farm-peasant",
+    "regionId": 146,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sur-warehouse",
+    "regionId": 146,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dgc-subsistence-farm",
+    "regionId": 147,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dgc-commercial-farm-peasant",
+    "regionId": 147,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dgc-warehouse",
+    "regionId": 147,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sah-subsistence-farm",
+    "regionId": 148,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sah-commercial-farm-peasant",
+    "regionId": 148,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sah-warehouse",
+    "regionId": 148,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sgg-subsistence-farm",
+    "regionId": 149,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sgg-commercial-farm-peasant",
+    "regionId": 149,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "sgg-warehouse",
+    "regionId": 149,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "phl-subsistence-farm",
+    "regionId": 150,
+    "definitionKey": "subsistence-farm",
+    "level": 25,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "phl-commercial-farm-peasant",
+    "regionId": 150,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "phl-warehouse",
+    "regionId": 150,
+    "definitionKey": "warehouse",
+    "level": 15,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "pri-subsistence-farm",
+    "regionId": 151,
+    "definitionKey": "subsistence-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pri-commercial-farm-peasant",
+    "regionId": 151,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "pri-warehouse",
+    "regionId": 151,
+    "definitionKey": "warehouse",
+    "level": 2,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gum-subsistence-farm",
+    "regionId": 152,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gum-commercial-farm-peasant",
+    "regionId": 152,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "gum-warehouse",
+    "regionId": 152,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "asm-subsistence-farm",
+    "regionId": 153,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "asm-commercial-farm-peasant",
+    "regionId": 153,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "asm-warehouse",
+    "regionId": 153,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "isl-subsistence-farm",
+    "regionId": 154,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "isl-commercial-farm-peasant",
+    "regionId": 154,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "isl-warehouse",
+    "regionId": 154,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grl-subsistence-farm",
+    "regionId": 155,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grl-commercial-farm-peasant",
+    "regionId": 155,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "grl-warehouse",
+    "regionId": 155,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fro-subsistence-farm",
+    "regionId": 156,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fro-commercial-farm-peasant",
+    "regionId": 156,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fro-warehouse",
+    "regionId": 156,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dwi-subsistence-farm",
+    "regionId": 157,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dwi-commercial-farm-peasant",
+    "regionId": 157,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "dwi-warehouse",
+    "regionId": 157,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "egy-subsistence-farm",
+    "regionId": 158,
+    "definitionKey": "subsistence-farm",
+    "level": 32,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "egy-commercial-farm-peasant",
+    "regionId": 158,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 4,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "egy-warehouse",
+    "regionId": 158,
+    "definitionKey": "warehouse",
+    "level": 19,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 200000,
+    "status": "provisional"
+  },
+  {
+    "key": "bhu-subsistence-farm",
+    "regionId": 159,
+    "definitionKey": "subsistence-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bhu-commercial-farm-peasant",
+    "regionId": 159,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "bhu-warehouse",
+    "regionId": 159,
+    "definitionKey": "warehouse",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fin-subsistence-farm",
+    "regionId": 160,
+    "definitionKey": "subsistence-farm",
+    "level": 9,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fin-commercial-farm",
+    "regionId": 160,
+    "definitionKey": "commercial-farm",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "fin-warehouse",
+    "regionId": 160,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "twn-subsistence-farm",
+    "regionId": 161,
+    "definitionKey": "subsistence-farm",
+    "level": 10,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "twn-commercial-farm-peasant",
+    "regionId": 161,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 1,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "twn-warehouse",
+    "regionId": 161,
+    "definitionKey": "warehouse",
+    "level": 6,
+    "ownerProfessionKey": "peasants",
+    "operatingCashSUSD": 50000,
+    "status": "provisional"
+  }
+]

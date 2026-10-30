@@ -4733,3 +4733,250 @@ World schema **26**, simulation **0.26.0**, worker protocol **13**, and data ver
   population, and failed recruitment leaves employment unchanged.
 - No schema, simulation, protocol, data, or save-format change was required. The committed
   worker bundle was regenerated because the simulation source changed.
+
+## D-086 — Historical classification and the 1900 polity catalog
+
+**Status:** implemented (M11). World schema 26, simulation 0.27.0, protocol 14,
+data `m3-economy-v12`.
+
+### Context
+
+The game began from an eight-polity sample. M11 requires every independent
+sovereign state on 1 January 1900 to be playable, with dependencies represented
+accurately rather than flattened into independent countries.
+
+### Decision
+
+1. The classification follows the Gleditsch–Ward / Correlates of War independent-
+   state tradition documented by CShapes 2.0. It distinguishes `independent`,
+   `personal-union`, `autonomous-vassal`, `dominion`, `self-governing-colony`,
+   `protectorate`, `colony`, `occupation`, `autonomous-province` and `dependency`.
+2. Selectable statuses are `independent`, `personal-union`, `autonomous-vassal`
+   and `dominion`. The four semi-sovereign statuses are selectable only because
+   the catalog records a separate government that the simulation can represent;
+   their non-sovereign status remains visible.
+3. The catalog (`polities_1900.json`) records stable id, historical name, common
+   name, status, parent, capital, population estimate and confidence, continent,
+   market, description, notes, sources and a geometry crosswalk.
+4. Every independent state in the documented classification is present and
+   selectable. The catalog contains 60 states (59 selectable) and 62 dependent
+   territories.
+
+### Consequences
+
+- The playable world is 122 regions and 60 countries, not an eight-country sample.
+- The legacy eight-polity scenario is retained only as a validated test fixture.
+- Catalog completeness is enforced by `m11-world.test.ts` and by the loader's
+  metadata cross-reference validation.
+
+## D-087 — Dependent territories are regions of their sovereign country
+
+**Status:** implemented (M11).
+
+### Context
+
+A colony could be modelled as a separate simulation country, or as a region of
+the metropole. Separate countries would either double the country count or force
+multi-market countries; the sim's M5 invariant permits one market per country.
+
+### Decision
+
+1. A state entry becomes one `Country` and its home region.
+2. A territory entry becomes one `Region` owned by its sovereign country.
+3. A country's home and dependent regions share one market. Imperial markets are
+   customs areas, not claims that colonies are the metropole.
+4. Territory status/parent/capital are exposed as static region metadata, not
+   mutable authoritative state and not a sovereignty transfer.
+
+### Consequences
+
+- D-081 is preserved: ownership remains `Country.regionIds`; occupation remains
+  `Region.controllerCountryId`.
+- A territory is clickable and resolves to a real `regionId`.
+- Multi-market countries remain unsupported; this is recorded as a deliberate
+  limit for M11.
+
+## D-088 — Proportional historical world initialization
+
+**Status:** implemented (M11), provisional calibration.
+
+### Context
+
+Authoring 122 detailed regional economies by hand is not feasible, and cloning
+one existing country would violate the requirement not to fabricate distinct
+economies by renaming.
+
+### Decision
+
+1. Every region has a documented archetype (industrial, mixed, agrarian) derived
+   from its 1900 population, occupation structure and urbanization.
+2. Population blocks are split from the authored total and peasant share, with
+   tier-dependent shares for laborers, clerks, academics and capitalists.
+3. Buildings are initialized from calibrated sample ratios: rural regions carry
+   grain and storage; the customs core and higher-tier countries carry
+   processing, textiles, protein and workshops for the market.
+4. Fiscal, technology, law and debt starts are tier/status-driven authored
+   parameters.
+5. All coefficients are labelled provisional; historical facts, estimates,
+   model assumptions and balancing parameters are kept separate in the source
+   notes.
+
+### Consequences
+
+- Every selectable country starts with valid accounts, population, buildings,
+  market membership, laws, technology and AI assignment.
+- The world is a structural historical abstraction, not a measured 1900 economy.
+- Full-world tick cost is higher than the sample; high simulation speeds remain
+  best-effort and are displayed as such.
+
+## D-089 — Explicit player-country selection through the worker protocol
+
+**Status:** implemented (M11). Protocol 14.
+
+### Context
+
+The old shell defaulted to a fixed scenario player and had no way to choose a
+country. Implicit first-array defaults are forbidden.
+
+### Decision
+
+1. `CREATE_GAME { playerCountryId }` rebuilds a fresh world with the selected
+   `World.playerCountryId`.
+2. The host rejects unknown ids and non-selectable catalog entries; it never
+   falls back to a default country.
+3. The app's flow is main menu → new-game brief → map/list selection → confirm →
+   `CREATE_GAME` → game. The game view appears only after `NEW_GAME_RESULT`.
+4. Player identity is authoritative world state, serialized in saves, validated
+   on load, and re-created after a worker restart for the remembered country.
+5. The AI phase skips `world.playerCountryId`.
+
+### Consequences
+
+- No implicit "country 0".
+- A save from another scenario is rejected by the scenario-id check.
+- A rejected selection leaves the previous world intact and reports the error.
+
+## D-090 — Bounded country detail in snapshots
+
+**Status:** implemented (M11). Protocol 14.
+
+### Context
+
+A full `CountrySnapshot` is about 35–40 KiB. Sixty full records exceed 2 MiB per
+snapshot, which is impractical for a 10 Hz presentation bus.
+
+### Decision
+
+1. `SimulationSnapshot.countries` carries full detail only for the player country
+   and the focused country.
+2. `countrySummaries` carries a compact record for every country: identity,
+   status, sovereign, capital, region/market ids, population, employment,
+   treasury, hardship, literacy, wealth, militancy, military personnel and the
+   last closed net fiscal result.
+3. `SET_FOCUS` is presentation-only and changes which country's full record is
+   included. It is validated against the world but never mutates simulation
+   state.
+4. Legacy scenarios without catalog metadata keep the pre-M11 all-countries
+   behavior so existing fixtures and tests remain meaningful.
+
+### Consequences
+
+- The M11 snapshot is about 200 KiB instead of about 2.5 MiB.
+- Screens that inspect an AI country rely on the focus round-trip; the map/list
+  always has summary data and never blocks on focus.
+- No serialized world field changed, so world schema remains 26.
+
+## D-091 — Market identity is authored from actual membership
+
+**Status:** implemented (M11).
+
+### Context
+
+The snapshot previously labelled markets `Market 1`, `Market 2`, …; this is an
+opaque id, not a player-facing identity, and it hid multi-country membership.
+
+### Decision
+
+1. The catalog authors 18 markets with display name, kind and description
+   derived from their real member countries and regions.
+2. `MarketSnapshot` exposes `name`, `description`, `kind`, `memberCountryIds`,
+   `regionIds`, customs administration and prices.
+3. The snapshot builder never falls back to `Market N`: without authored metadata
+   it derives a name from the member countries.
+4. Market screens list every member country and region and distinguish customs
+   administration from sovereignty. The numeric id is secondary diagnostic text.
+5. Market membership is not assumed to equal one country. Imperial markets
+   include dependent territories; shared markets include several countries.
+
+### Consequences
+
+- A market is discoverable from the map, the country panel and the Markets
+  screen.
+- The one-market-per-country invariant is preserved; see D-087.
+
+## D-092 — Offline map geometry, licensing and projection
+
+**Status:** implemented (M11).
+
+### Context
+
+M11 requires a real historical map that works offline. Historical vector
+datasets were reviewed for licensing and compatibility.
+
+### Decision
+
+1. Geometry is Natural Earth 1:50m (public domain) via world-atlas 2.0.2 TopoJSON
+   (ISC), aggregated into 1900 polities by the catalog crosswalk.
+2. CShapes 2.0 (CC BY-NC-SA 4.0) is consulted only for classification and is not
+   redistributed. historical-basemaps (GPL-3.0, copyleft) is not used.
+3. Build-time union uses `polygon-clipping` 0.15.7 (MIT). Source polygons are
+   simplified to 0.02°, quantized to 0.001°, delta encoded, and unwrapped at the
+   antimeridian.
+4. South Africa is split using Natural Earth admin-1 provinces; Newfoundland is a
+   marker territory because the source cannot separate it from Canada.
+5. The renderer uses a Miller cylindrical projection with linear longitude, so
+   each ring can be drawn at −360/0/+360 offsets for the seam.
+6. The map is bundled. The game never fetches map data or map tiles at runtime;
+   no API keys or proprietary services are used.
+7. `react-native-svg` 15.16.0 (MIT), the Expo 58 bundled version, renders the
+   map on web and native.
+
+### Consequences
+
+- The map works offline and the licence permits redistribution.
+- 1900 borders are a crosswalk aggregation, not a historical GIS dataset; the
+  limits are documented in §17I.12.
+- Build scripts download the sources once into `.cache-m11`; the committed
+  bundles are the runtime artifacts.
+
+## D-093 — Slider-first continuous controls with coalesced commits
+
+**Status:** implemented (M11).
+
+### Context
+
+The pre-M11 screens used text fields and quick-set buttons for continuous policy
+values, which is imprecise, inaccessible and easy to race against the worker.
+
+### Decision
+
+1. Continuous numeric player controls use `SliderField`: visible value, min/max,
+   step, unit, ticks, live preview and a paired numeric input.
+2. Sliders support mouse, touch, keyboard step buttons, the platform's
+   accessible increment/decrement actions, and typed precision.
+3. Commits are coalesced by `useDeferredCommit`: one authoritative action is in
+   flight at a time and the latest value wins. Sliders are disabled while the
+   worker is unavailable.
+4. Categorical, boolean, date, speed, market/country and confirmation inputs are
+   explicitly excluded; the inventory is `docs/M11_SLIDER_INVENTORY.md`.
+5. Every slider value maps to a validated action through the existing
+   `APPLY_ACTION` boundary; the UI never mutates simulation internals.
+
+### Consequences
+
+- Policy changes are always authoritative actions, with previews remaining
+  local.
+- The slider ranges are constrained to values the authoritative validator
+  accepts; endpoints and out-of-range cases are covered by tests.
+- Some low-level derived values (for example contract ids) remain read-only.
+

@@ -27,7 +27,7 @@
  * authored transport routes, in-transit consignments, freight/customs postings, and
  * the trade-policy action.
  */
-export const SIM_VERSION = "0.26.0";
+export const SIM_VERSION = "0.27.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -77,9 +77,13 @@ export const SAVE_FORMAT_VERSION = 1;
  * (D-077). E5 adds health/minimum-wage/hours law definitions, so it bumps the
  * content version to `m3-economy-v8` (D-078). E6a adds authored market customs
  * administrations, transport routes, and per-good transport costs, so it bumps the
- * content version to `m3-economy-v11` (D-079).
+ * content version to `m3-economy-v11` (D-079). M11 replaces the playable world
+ * content (1900 catalog, markets, regions, populations) and changes the
+ * scenario-level metadata contract; the existing definitions' meanings are
+ * unchanged, but the world content is incompatible with v11 saves, so it bumps
+ * the content version to `m3-economy-v12` (D-086/D-088).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v11";
+export const DEFAULT_DATA_VERSION = "m3-economy-v12";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

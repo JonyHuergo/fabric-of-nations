@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import {
   CAMPAIGN_START_DAY_INDEX,
   CAMPAIGN_TERMINAL_DAY_INDEX,
+  COUNTRY_STATUSES,
   CURRENCY_RATE_MAX,
   CURRENCY_RATE_MIN,
   MAX_COUNTRY_NAME_LENGTH,
@@ -40,8 +41,10 @@ import {
   isValidId,
   type BuildingDef,
   type BuildingInstanceInitialDef,
+  type CountryMetaDef,
   type CountryInitialDef,
   type CountryPoliticsInput,
+  type CountryStatus,
   type CountryTechnologyInput,
   type CurrencyValuation,
   type EconomyDefinitions,
@@ -49,12 +52,14 @@ import {
   type EmploymentAssignmentInitialDef,
   type GoodDef,
   type MarketInitialDef,
+  type MarketMetaDef,
   type NeedTierDef,
   type PoliticsDefinitions,
   type PopulationDefinitions,
   type PopulationScenarioDef,
   type ProfessionDef,
   type RegionInitialDef,
+  type RegionMetaDef,
   type SystemAccountInitialDef,
   type TechnologyDefinitions,
   type TradeRouteInitialDef,
@@ -65,6 +70,8 @@ import { DATA_PACKAGE_VERSION } from "./version.js";
 const DATA_ROOT = fileURLToPath(new URL("../data/", import.meta.url));
 
 export const HISTORICAL_SCENARIO_FILE = "scenarios/m5_eight_polities.json";
+/** M11 world scenario: all selectable 1900 polities and their territories. */
+export const WORLD_SCENARIO_FILE = "scenarios/m11_world_1900.json";
 
 /** Household account-id floor used by the historical loader. */
 export const HISTORICAL_HOUSEHOLD_ACCOUNT_BASE = 1_000;
@@ -136,6 +143,10 @@ export interface HistoricalScenarioMeta {
   readonly definitions: HistoricalScenarioDefinitions;
   readonly profitDistribution?: HistoricalProfitDistributionInput;
   readonly countryAI?: HistoricalCountryAIInput;
+  /** M11 static polity metadata; optional for the pre-M11 sample. */
+  readonly countryMeta?: readonly CountryMetaDef[];
+  readonly marketMeta?: readonly MarketMetaDef[];
+  readonly regionMeta?: readonly RegionMetaDef[];
 }
 
 export interface HistoricalCurrencyInput {
@@ -490,8 +501,102 @@ function readAgeStructures(
   return output;
 }
 
-function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
-  const record = assertRecord(value, "meta", errors);
+const COUNTRY_STATUS_SET = new Set<string>(COUNTRY_STATUSES);
+const CONFIDENCE_SET = new Set<string>(["low", "medium", "high"]);
+
+function readConfidence(
+  record: Record<string, unknown>,
+  path: string,
+  errors: string[],
+): "low" | "medium" | "high" {
+  const value = stringField(record, "confidence", path, errors);
+  if (!CONFIDENCE_SET.has(value)) {
+    errors.push(`${path}.confidence must be low, medium or high`);
+    return "low";
+  }
+  return value as "low" | "medium" | "high";
+}
+
+function readCountryMeta(value: unknown, errors: string[]): CountryMetaDef[] {
+  if (!Array.isArray(value)) {
+    errors.push("meta.countryMeta must be an array");
+    return [];
+  }
+  return value.map((raw, index) => {
+    const path = `meta.countryMeta[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "status", path, errors);
+    if (!COUNTRY_STATUS_SET.has(status)) {
+      errors.push(`${path}.status ${JSON.stringify(status)} is not a supported country status`);
+    }
+    return {
+      countryId: numberField(record, "countryId", path, errors),
+      historicalName: stringField(record, "historicalName", path, errors),
+      status: status as CountryStatus,
+      sovereignCountryId: numberField(record, "sovereignCountryId", path, errors),
+      capitalName: stringField(record, "capitalName", path, errors),
+      regionName: stringField(record, "regionName", path, errors),
+      selectable: booleanField(record, "selectable", path, errors),
+      population1900Estimate: numberField(record, "population1900Estimate", path, errors),
+      confidence: readConfidence(record, path, errors),
+      notes: stringField(record, "notes", path, errors, { minLength: 0 }),
+    };
+  });
+}
+
+function readMarketMeta(value: unknown, errors: string[]): MarketMetaDef[] {
+  if (!Array.isArray(value)) {
+    errors.push("meta.marketMeta must be an array");
+    return [];
+  }
+  return value.map((raw, index) => {
+    const path = `meta.marketMeta[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const kind = stringField(record, "kind", path, errors);
+    if (kind !== "national" && kind !== "imperial" && kind !== "shared") {
+      errors.push(`${path}.kind must be national, imperial or shared`);
+    }
+    return {
+      marketId: numberField(record, "marketId", path, errors),
+      key: stringField(record, "key", path, errors),
+      name: stringField(record, "name", path, errors),
+      kind: (kind === "national" || kind === "imperial" ? kind : "shared") as
+        | "national"
+        | "imperial"
+        | "shared",
+      description: stringField(record, "description", path, errors),
+      customsCountryId: numberField(record, "customsCountryId", path, errors),
+    };
+  });
+}
+
+function readRegionMeta(value: unknown, errors: string[]): RegionMetaDef[] {
+  if (!Array.isArray(value)) {
+    errors.push("meta.regionMeta must be an array");
+    return [];
+  }
+  return value.map((raw, index) => {
+    const path = `meta.regionMeta[${String(index)}]`;
+    const record = assertRecord(raw, path, errors);
+    const status = stringField(record, "status", path, errors);
+    if (!COUNTRY_STATUS_SET.has(status)) {
+      errors.push(`${path}.status ${JSON.stringify(status)} is not a supported country status`);
+    }
+    return {
+      regionId: numberField(record, "regionId", path, errors),
+      polityTag: stringField(record, "polityTag", path, errors),
+      historicalName: stringField(record, "historicalName", path, errors),
+      status: status as CountryStatus,
+      sovereignCountryId: numberField(record, "sovereignCountryId", path, errors),
+      capitalName: stringField(record, "capitalName", path, errors),
+      selectable: booleanField(record, "selectable", path, errors),
+      confidence: readConfidence(record, path, errors),
+      notes: stringField(record, "notes", path, errors, { minLength: 0 }),
+    };
+  });
+}
+
+function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  const record = assertRecord(value, "meta", errors);
   const files = assertRecord(record.files, "meta.files", errors);
   const definitions = assertRecord(record.definitions, "meta.definitions", errors);
   const status = stringField(record, "status", "meta", errors);
@@ -559,12 +664,23 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {
     },
     ...(profitDistribution === undefined ? {} : { profitDistribution }),
     ...(countryAI === undefined ? {} : { countryAI }),
+    ...(record.countryMeta === undefined
+      ? {}
+      : { countryMeta: readCountryMeta(record.countryMeta, errors) }),
+    ...(record.marketMeta === undefined
+      ? {}
+      : { marketMeta: readMarketMeta(record.marketMeta, errors) }),
+    ...(record.regionMeta === undefined
+      ? {}
+      : { regionMeta: readRegionMeta(record.regionMeta, errors) }),
   };
 }
 
-/** Load the raw M5 historical tables from the data package. */
-export function loadM5HistoricalData(): HistoricalData {
-  const rawScenario = readJson<unknown>(HISTORICAL_SCENARIO_FILE);
+/** Load the raw historical tables for one scenario file from the data package. */
+export function loadHistoricalData(
+  scenarioFile: string = HISTORICAL_SCENARIO_FILE,
+): HistoricalData {
+  const rawScenario = readJson<unknown>(scenarioFile);
   const errors: string[] = [];
   const metaRecord = assertRecord(rawScenario, "scenario", errors);
   const meta = readMeta(metaRecord.meta, errors);
@@ -606,6 +722,11 @@ export function loadM5HistoricalData(): HistoricalData {
   });
   assertValidM5HistoricalData(data);
   return data;
+}
+
+/** Load the original eight-polity M5 sample (test fixture and compatibility). */
+export function loadM5HistoricalData(): HistoricalData {
+  return loadHistoricalData(HISTORICAL_SCENARIO_FILE);
 }
 
 interface RawTables {
@@ -1753,10 +1874,101 @@ export function validateM5HistoricalData(
     }
   }
 
+  // M11 static metadata: identifiers must resolve, every country must be
+  // described, and selectable countries must carry a selectable status.
+  const selectableStatuses = new Set<string>(["independent", "personal-union", "autonomous-vassal", "dominion"]);
+  if (data.meta.countryMeta !== undefined) {
+    const described = new Set<number>();
+    for (let index = 0; index < data.meta.countryMeta.length; index += 1) {
+      const meta = data.meta.countryMeta[index];
+      if (meta === undefined) continue;
+      const path = `meta.countryMeta[${String(index)}]`;
+      if (!countryById.has(meta.countryId)) {
+        errors.push(`${path}.countryId references unknown country ${String(meta.countryId)}`);
+      }
+      if (described.has(meta.countryId)) {
+        errors.push(`${path}.countryId ${String(meta.countryId)} is described twice`);
+      }
+      described.add(meta.countryId);
+      if (!countryById.has(meta.sovereignCountryId)) {
+        errors.push(`${path}.sovereignCountryId references unknown country ${String(meta.sovereignCountryId)}`);
+      }
+      if (meta.selectable && !selectableStatuses.has(meta.status)) {
+        errors.push(`${path} is selectable but has non-selectable status ${JSON.stringify(meta.status)}`);
+      }
+      if (!COUNTRY_STATUS_SET.has(meta.status)) {
+        errors.push(`${path}.status ${JSON.stringify(meta.status)} is not a supported country status`);
+      }
+      if (!CONFIDENCE_SET.has(meta.confidence)) {
+        errors.push(`${path}.confidence must be low, medium or high`);
+      }
+    }
+    for (const country of data.countries) {
+      if (!described.has(country.id)) {
+        errors.push(`country ${JSON.stringify(country.tag)} has no countryMeta record`);
+      }
+    }
+    if (!data.meta.countryMeta.some((meta) => meta.selectable)) {
+      errors.push("meta.countryMeta must mark at least one country selectable");
+    }
+  }
+  if (data.meta.marketMeta !== undefined) {
+    const described = new Set<number>();
+    for (let index = 0; index < data.meta.marketMeta.length; index += 1) {
+      const meta = data.meta.marketMeta[index];
+      if (meta === undefined) continue;
+      const path = `meta.marketMeta[${String(index)}]`;
+      const market = marketById.get(meta.marketId);
+      if (market === undefined) {
+        errors.push(`${path}.marketId references unknown market ${String(meta.marketId)}`);
+      } else if (market.customsCountryTag !== undefined) {
+        const customs = countryByTag.get(market.customsCountryTag);
+        if (customs !== undefined && customs.id !== meta.customsCountryId) {
+          errors.push(`${path}.customsCountryId disagrees with the market customs administration`);
+        }
+      }
+      if (described.has(meta.marketId)) {
+        errors.push(`${path}.marketId ${String(meta.marketId)} is described twice`);
+      }
+      described.add(meta.marketId);
+      if (meta.name.length < 3) {
+        errors.push(`${path}.name must be a meaningful player-facing market name`);
+      }
+    }
+    for (const market of data.markets) {
+      if (!described.has(market.id)) {
+        errors.push(`market ${JSON.stringify(market.key)} has no marketMeta record`);
+      }
+    }
+  }
+  if (data.meta.regionMeta !== undefined) {
+    const described = new Set<number>();
+    for (let index = 0; index < data.meta.regionMeta.length; index += 1) {
+      const meta = data.meta.regionMeta[index];
+      if (meta === undefined) continue;
+      const path = `meta.regionMeta[${String(index)}]`;
+      if (!regionById.has(meta.regionId)) {
+        errors.push(`${path}.regionId references unknown region ${String(meta.regionId)}`);
+      }
+      if (described.has(meta.regionId)) {
+        errors.push(`${path}.regionId ${String(meta.regionId)} is described twice`);
+      }
+      described.add(meta.regionId);
+      const sovereign = countryById.get(meta.sovereignCountryId);
+      if (sovereign === undefined) {
+        errors.push(`${path}.sovereignCountryId references unknown country`);
+      } else if (!sovereign.regionIds.includes(meta.regionId)) {
+        errors.push(`${path}.regionId is not owned by its declared sovereign country`);
+      }
+      if (meta.selectable) {
+        errors.push(`${path} describes a dependent territory but is marked selectable`);
+      }
+    }
+  }
+
   if (data.meta.ageStructures["world-1900-provisional"]?.status === "provisional") {
     warnings.push("age structure is provisional and not country-specific");
-  }
-  if (data.countries.every((country) => country.currency.valuation.status === "unavailable")) {
+  }  if (data.countries.every((country) => country.currency.valuation.status === "unavailable")) {
     warnings.push("all historical currency valuations are unavailable; M5 performs no FX conversion");
   }
   return { errors: [...errors].sort(), warnings: [...warnings].sort() };
@@ -2140,10 +2352,19 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     // M10: the sample enables the military system with no initial armies, wars, or
     // occupations, so the player can recruit, declare war, and negotiate (D-081).
     military: {},
+    ...(data.meta.countryMeta === undefined ? {} : { countryMeta: [...data.meta.countryMeta] }),
+    ...(data.meta.marketMeta === undefined ? {} : { marketMeta: [...data.meta.marketMeta] }),
+    ...(data.meta.regionMeta === undefined ? {} : { regionMeta: [...data.meta.regionMeta] }),
   };
 }
 
 /** Load and build the eight-polity M5 scenario. */
 export function loadM5EightPolities(): EconomyScenarioDef {
   return buildM5HistoricalScenario(loadM5HistoricalData());
+}
+
+/** Load and build the M11 1900 world used by the playable game. */
+export function loadM11World(): EconomyScenarioDef {
+  const data = loadHistoricalData(WORLD_SCENARIO_FILE);
+  return buildM5HistoricalScenario(data);
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
@@ -15,7 +15,8 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { ActionButton, MiniBars, Pill, Section, StatRow } from "../components/ui";
+import { ActionButton, Chip, MiniBars, Section, StatRow } from "../components/ui";
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { colors, radii, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
@@ -109,54 +110,66 @@ export function BudgetScreen({
     },
   );
 
-  const guard = (): boolean => {
+  const applyFiscal = (overrides?: {
+    tax?: number;
+    allowance?: number;
+    welfare?: number;
+    wealth?: number;
+    business?: number;
+    reserve?: number;
+  }) => {
+    const tax = overrides?.tax ?? proposedTax;
+    const allowance = overrides?.allowance ?? proposedAllowance;
+    const welfare = overrides?.welfare ?? proposedWelfare;
+    const wealth = overrides?.wealth ?? proposedWealth;
+    const business = overrides?.business ?? proposedBusiness;
+    const reserve = overrides?.reserve ?? proposedReserve;
     if (!isPlayerCountry) {
-      setLocalError(
-        "This is an AI-controlled country. Policy can only be changed for the player country.",
-      );
-      return false;
+      setLocalError("This is an AI-controlled country. Policy can only be changed for the player country.");
+      return;
     }
-    if (!Number.isFinite(proposedTax) || proposedTax < 0 || proposedTax > 1) {
+    if (!Number.isFinite(tax) || tax < 0 || tax > 1) {
       setLocalError("Income tax must be between 0% and 100%.");
-      return false;
+      return;
     }
-    if (!Number.isFinite(proposedAllowance) || proposedAllowance < 0) {
+    if (!Number.isFinite(allowance) || allowance < 0) {
       setLocalError("The income-tax exemption must be a non-negative annual SUSD amount.");
-      return false;
+      return;
     }
-    if (!Number.isFinite(proposedWelfare) || proposedWelfare < 0) {
+    if (!Number.isFinite(welfare) || welfare < 0) {
       setLocalError("Welfare budget must be a non-negative annual SUSD amount.");
-      return false;
+      return;
     }
-    if (!Number.isInteger(proposedWealth) || proposedWealth < 0 || proposedWealth > 99) {
+    if (!Number.isInteger(wealth) || wealth < 0 || wealth > 99) {
       setLocalError("The welfare eligibility ceiling must be a whole wealth level from 0 to 99.");
-      return false;
+      return;
     }
-    if (!Number.isFinite(proposedBusiness) || proposedBusiness < 0 || proposedBusiness > 1) {
+    if (!Number.isFinite(business) || business < 0 || business > 1) {
       setLocalError("The business-profit tax must be between 0% and 100%.");
-      return false;
+      return;
     }
-    if (!Number.isFinite(proposedReserve) || proposedReserve < 0) {
+    if (!Number.isFinite(reserve) || reserve < 0) {
       setLocalError("The reserve target must be a non-negative SUSD amount.");
-      return false;
+      return;
     }
     setLocalError(null);
-    return true;
-  };
-
-  const applyFiscal = () => {
-    if (!guard()) return;
     applyAction({
       kind: "set-fiscal-policy",
       countryId: country.id,
-      incomeTaxRate: proposedTax,
-      incomeTaxAllowanceSUSDPerYear: proposedAllowance,
-      welfareBudgetSUSDPerYear: proposedWelfare,
-      welfareMaxWealthLevel: proposedWealth,
-      businessProfitTaxRate: proposedBusiness,
-      reserveTargetSUSD: proposedReserve,
+      incomeTaxRate: tax,
+      incomeTaxAllowanceSUSDPerYear: allowance,
+      welfareBudgetSUSDPerYear: welfare,
+      welfareMaxWealthLevel: wealth,
+      businessProfitTaxRate: business,
+      reserveTargetSUSD: reserve,
     });
   };
+  const taxCommit = useDeferredCommit((value) => applyFiscal({ tax: value / 100 }), busy);
+  const allowanceCommit = useDeferredCommit((value) => applyFiscal({ allowance: value }), busy);
+  const businessCommit = useDeferredCommit((value) => applyFiscal({ business: value / 100 }), busy);
+  const welfareCommit = useDeferredCommit((value) => applyFiscal({ welfare: value }), busy);
+  const wealthCommit = useDeferredCommit((value) => applyFiscal({ wealth: Math.round(value) }), busy);
+  const reserveCommit = useDeferredCommit((value) => applyFiscal({ reserve: value }), busy);
 
   const proposedCeiling = parseNumber(ceilingText);
   const debtPolicyPreview = previewDebtPolicy(
@@ -165,7 +178,7 @@ export function BudgetScreen({
     refinanceOn,
     proposedCeiling,
   );
-  const applyDebtPolicy = () => {
+  const applyDebtPolicy = (overrides?: { ceiling?: number; refinance?: boolean }) => {
     if (!isPlayerCountry) {
       setLocalError("Only the player country may change debt policy.");
       return;
@@ -178,24 +191,26 @@ export function BudgetScreen({
     applyAction({
       kind: "set-debt-policy",
       countryId: country.id,
-      refinanceOnMaturity: refinanceOn,
-      maxOutstandingPrincipalSUSD: proposedCeiling,
+      refinanceOnMaturity: overrides?.refinance ?? refinanceOn,
+      maxOutstandingPrincipalSUSD: overrides?.ceiling ?? proposedCeiling,
     });
   };
 
   const borrowAmount = parseNumber(borrowText);
   const borrowPreview = previewDebtIssuance(snapshot, country, borrowAmount);
-  const applyBorrow = () => {
+  const applyBorrow = (overrides?: number) => {
     if (!isPlayerCountry) {
       setLocalError("Only the player country may borrow.");
       return;
     }
-    if (!borrowPreview.valid) {
-      setLocalError(borrowPreview.errors.join(" "));
+    const amount = overrides ?? borrowAmount;
+    const preview = previewDebtIssuance(snapshot, country, amount);
+    if (!preview.valid) {
+      setLocalError(preview.errors.join(" "));
       return;
     }
     setLocalError(null);
-    applyAction({ kind: "issue-debt", countryId: country.id, amountSUSD: borrowAmount });
+    applyAction({ kind: "issue-debt", countryId: country.id, amountSUSD: amount });
   };
 
   const mtd = country.budgetMonthToDate;
@@ -240,59 +255,54 @@ export function BudgetScreen({
         title="Taxation"
         subtitle="Every instrument below uses a modeled base. Rates and amounts are provisional policy, not enacted law."
       >
-        <Text style={styles.inputLabel}>Personal income tax rate (%)</Text>
-        <TextInput
-          value={taxText}
-          onChangeText={setTaxText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Income tax rate percent"
+        <SliderField
+          label="Personal income tax rate"
+          value={Number.isFinite(proposedTax) ? proposedTax * 100 : 0}
+          min={0}
+          max={60}
+          step={0.5}
+          precision={2}
+          unit="%"
+          disabled={!canAct}
+          pending={taxCommit.hasPending}
+          ticks={[{ value: 0, label: "0%" }, { value: 15, label: "15%" }, { value: 30, label: "30%" }]}
+          onChange={(value) => setTaxText(value.toFixed(2))}
+          onCommit={(value) => taxCommit.submit(value)}
+          hint="Applies to the estimated current wage base. Released values are sent as a validated fiscal action."
         />
-        <View style={styles.quickRow}>
-          {[0, 5, 10, 15, 25].map((value) => (
-            <Pill
-              key={value}
-              label={`${String(value)}%`}
-              active={Math.abs(parseNumber(taxText) - value) < 0.001}
-              onPress={() => setTaxText(String(value))}
-              disabled={!canAct}
-            />
-          ))}
-        </View>
-        <Text style={styles.inputLabel}>Income-tax exemption (SUSD per household per year)</Text>
-        <TextInput
-          value={allowanceText}
-          onChangeText={setAllowanceText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Annual income tax exemption in SUSD"
+        <SliderField
+          label="Income-tax exemption"
+          value={Number.isFinite(proposedAllowance) ? proposedAllowance : 0}
+          min={0}
+          max={Math.max(
+            1000,
+            Math.round(country.treasuryCashSUSD),
+            Math.round(preview.estimatedDailyTaxableWageBaseSUSD * 365),
+          )}
+          step={100}
+          precision={0}
+          unit="SUSD/yr"
+          disabled={!canAct}
+          pending={allowanceCommit.hasPending}
+          onChange={(value) => setAllowanceText(value.toFixed(0))}
+          onCommit={(value) => allowanceCommit.submit(value)}
+          hint="Subtracted from each household's annual wage receipt before the rate applies."
         />
-        <Text style={styles.hint}>
-          Subtracted from each household&apos;s actual daily wage receipt before the rate applies.
-        </Text>
-        <Text style={styles.inputLabel}>Business-profit tax rate (%)</Text>
-        <TextInput
-          value={businessText}
-          onChangeText={setBusinessText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Business profit tax rate percent"
+        <SliderField
+          label="Business-profit tax rate"
+          value={Number.isFinite(proposedBusiness) ? proposedBusiness * 100 : 0}
+          min={0}
+          max={50}
+          step={0.5}
+          precision={2}
+          unit="%"
+          disabled={!canAct}
+          pending={businessCommit.hasPending}
+          ticks={[{ value: 0, label: "0%" }, { value: 10, label: "10%" }, { value: 25, label: "25%" }]}
+          onChange={(value) => setBusinessText(value.toFixed(2))}
+          onCommit={(value) => businessCommit.submit(value)}
+          hint="Assessed at each month-end on positive recognized building profit. Losses are not refunded."
         />
-        <View style={styles.quickRow}>
-          {[0, 5, 10, 20].map((value) => (
-            <Pill
-              key={value}
-              label={`${String(value)}%`}
-              active={Math.abs(parseNumber(businessText) - value) < 0.001}
-              onPress={() => setBusinessText(String(value))}
-              disabled={!canAct}
-            />
-          ))}
-        </View>
-        <Text style={styles.hint}>
-          Assessed once at each month-end on a building&apos;s positive recognized period result
-          (sales − inputs − wages − upkeep). Losses are not refunded or carried forward for tax.
-        </Text>
         <StatRow
           label="Current-base income-tax base"
           value={formatSUSD(preview.estimatedDailyTaxableWageBaseSUSD)}
@@ -309,60 +319,49 @@ export function BudgetScreen({
         title="Spending and reserve"
         subtitle="Welfare is paid daily from treasury cash subject to the reserve floor and wealth eligibility ceiling. Other implemented spending categories are set by their own policy screens and reported in Budget execution."
       >
-        <Text style={styles.inputLabel}>Welfare budget (SUSD per year)</Text>
-        <TextInput
-          value={welfareText}
-          onChangeText={setWelfareText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Annual welfare budget in SUSD"
+        <SliderField
+          label="Welfare budget"
+          value={Number.isFinite(proposedWelfare) ? proposedWelfare : 0}
+          min={0}
+          max={Math.max(10_000_000, Math.round(country.treasuryCashSUSD * 0.5))}
+          step={100_000}
+          precision={0}
+          unit="SUSD/yr"
+          disabled={!canAct}
+          pending={welfareCommit.hasPending}
+          onChange={(value) => setWelfareText(value.toFixed(0))}
+          onCommit={(value) => welfareCommit.submit(value)}
+          hint="Paid daily from treasury cash above the reserve target, subject to the eligibility ceiling."
         />
-        <View style={styles.quickRow}>
-          {[0, 1_000_000, 10_000_000].map((value) => (
-            <Pill
-              key={value}
-              label={value === 0 ? "0" : formatSUSD(value)}
-              active={Math.abs(parseNumber(welfareText) - value) < 0.5}
-              onPress={() => setWelfareText(String(value))}
-              disabled={!canAct}
-            />
-          ))}
-        </View>
-        <Text style={styles.inputLabel}>Welfare eligibility ceiling (wealth level 0–99)</Text>
-        <TextInput
-          value={wealthText}
-          onChangeText={setWealthText}
-          keyboardType="number-pad"
-          style={styles.input}
-          accessibilityLabel="Welfare eligibility wealth ceiling"
+        <SliderField
+          label="Welfare eligibility ceiling"
+          value={Number.isFinite(proposedWealth) ? proposedWealth : 99}
+          min={0}
+          max={99}
+          step={1}
+          precision={0}
+          unit="wealth level"
+          disabled={!canAct}
+          pending={wealthCommit.hasPending}
+          ticks={[{ value: 10, label: "10" }, { value: 50, label: "50" }, { value: 99, label: "99" }]}
+          onChange={(value) => setWealthText(String(Math.round(value)))}
+          onCommit={(value) => wealthCommit.submit(value)}
+          hint="Only blocks at or below this wealth level receive the daily transfer."
         />
-        <View style={styles.quickRow}>
-          {[99, 50, 25, 10].map((value) => (
-            <Pill
-              key={value}
-              label={value === 99 ? "Universal (99)" : String(value)}
-              active={parseNumber(wealthText) === value}
-              onPress={() => setWealthText(String(value))}
-              disabled={!canAct}
-            />
-          ))}
-        </View>
-        <Text style={styles.hint}>
-          Only blocks at or below the ceiling receive the daily transfer, shared in proportion to
-          their population. Unpaid welfare is a shortfall, never a liability.
-        </Text>
-        <Text style={styles.inputLabel}>Treasury reserve target (SUSD)</Text>
-        <TextInput
-          value={reserveText}
-          onChangeText={setReserveText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Treasury reserve target in SUSD"
+        <SliderField
+          label="Treasury reserve target"
+          value={Number.isFinite(proposedReserve) ? proposedReserve : 0}
+          min={0}
+          max={Math.max(1000, Math.round(country.treasuryCashSUSD))}
+          step={1000}
+          precision={0}
+          unit="SUSD"
+          disabled={!canAct}
+          pending={reserveCommit.hasPending}
+          onChange={(value) => setReserveText(value.toFixed(0))}
+          onCommit={(value) => reserveCommit.submit(value)}
+          hint="A liquidity floor, not a spendable pool. It never causes borrowing."
         />
-        <Text style={styles.hint}>
-          A liquidity floor, not a spendable pool: daily welfare may not draw treasury cash below
-          it, and discretionary principal repayment may not either. It never causes borrowing.
-        </Text>
       </Section>
 
       <Section
@@ -440,13 +439,18 @@ export function BudgetScreen({
           detail={`Annual coupon ${formatRate(debtPolicy.annualCouponRate)}; interest accrues daily and pays at month-end.`}
         />
 
-        <Text style={styles.inputLabel}>Borrow principal (SUSD)</Text>
-        <TextInput
-          value={borrowText}
-          onChangeText={setBorrowText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Borrow principal in SUSD"
+        <SliderField
+          label="Borrow principal"
+          value={Number.isFinite(borrowAmount) ? borrowAmount : 0}
+          min={0}
+          max={Math.max(1000, Math.round(debtPolicy.headroomSUSD))}
+          step={1000}
+          precision={0}
+          unit="SUSD"
+          disabled={!canAct || !debtPolicy.enabled}
+          onChange={(value) => setBorrowText(value.toFixed(0))}
+          onCommit={(value) => applyBorrow(value)}
+          hint="Financing, not revenue: treasury cash and debt principal change together."
         />
         {borrowPreview.valid ? (
           <Text style={styles.hint}>
@@ -486,14 +490,34 @@ export function BudgetScreen({
                   {formatSUSD(contract.accruedInterestSUSD)} · matures day{" "}
                   {String(contract.maturityDay)}
                 </Text>
-                <TextInput
-                  value={repayTexts[contract.id] ?? ""}
-                  onChangeText={(text) =>
-                    setRepayTexts((current) => ({ ...current, [contract.id]: text }))
+                <SliderField
+                  label="Repay principal"
+                  value={Number.isFinite(amount) ? Math.max(0, amount) : 0}
+                  min={0}
+                  max={Math.max(1, Math.round(contract.outstandingPrincipalSUSD))}
+                  step={100}
+                  precision={0}
+                  unit="SUSD"
+                  disabled={!canAct}
+                  onChange={(value) =>
+                    setRepayTexts((current) => ({ ...current, [contract.id]: value.toFixed(0) }))
                   }
-                  keyboardType="decimal-pad"
-                  style={styles.input}
-                  accessibilityLabel={`Repay principal for contract ${String(contract.id)}`}
+                  onCommit={(value) => {
+                    setRepayTexts((current) => ({ ...current, [contract.id]: value.toFixed(0) }));
+                    const preview = previewDebtRepayment(snapshot, country, contract.id, value);
+                    if (preview === null || !preview.valid) {
+                      setLocalError(preview?.errors.join(" ") ?? "Enter a valid repayment.");
+                      return;
+                    }
+                    setLocalError(null);
+                    applyAction({
+                      kind: "repay-debt",
+                      countryId: country.id,
+                      contractId: contract.id,
+                      amountSUSD: value,
+                    });
+                  }}
+                  hint="Principal repayment is a financing movement, not an expense."
                 />
                 {repayment === null ? null : repayment.valid ? (
                   <Text style={styles.hint}>
@@ -533,36 +557,27 @@ export function BudgetScreen({
           })
         )}
 
-        <Text style={styles.inputLabel}>Outstanding-principal ceiling (SUSD)</Text>
-        <TextInput
-          value={ceilingText}
-          onChangeText={setCeilingText}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Debt ceiling in SUSD"
+        <SliderField
+          label="Outstanding-principal ceiling"
+          value={Number.isFinite(proposedCeiling) ? proposedCeiling : 0}
+          min={0}
+          max={Math.max(1_000_000, Math.round(debtPolicy.maxOutstandingPrincipalSUSD * 2))}
+          step={100_000}
+          precision={0}
+          unit="SUSD"
+          disabled={!canAct || !debtPolicy.enabled}
+          onChange={(value) => setCeilingText(value.toFixed(0))}
+          onCommit={(value) => applyDebtPolicy({ ceiling: value })}
+          hint="A ceiling, not an authorisation. Issuance is also limited by the creditor's cash."
         />
         <View style={styles.quickRow}>
-          <Pill
+          <Chip
             label="Refinance on maturity"
             active={refinanceOn}
             onPress={() => setRefinanceOn((current) => !current)}
             disabled={!canAct || !debtPolicy.enabled}
           />
         </View>
-        {debtPolicyPreview.valid ? (
-          <Text style={styles.hint}>
-            Headroom {formatSUSD(debtPolicyPreview.currentHeadroomSUSD)} →{" "}
-            {formatSUSD(debtPolicyPreview.proposedHeadroomSUSD)}; refinancing{" "}
-            {debtPolicyPreview.currentRefinanceOnMaturity ? "on" : "off"} →{" "}
-            {debtPolicyPreview.proposedRefinanceOnMaturity ? "on" : "off"}.
-          </Text>
-        ) : (
-          debtPolicyPreview.errors.map((error) => (
-            <Text key={error} style={styles.previewNote}>
-              • {error}
-            </Text>
-          ))
-        )}
         <View style={styles.applyRow}>
           <ActionButton
             label="Apply debt policy"

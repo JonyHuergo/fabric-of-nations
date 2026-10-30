@@ -1,0 +1,3697 @@
+[
+  {
+    "id": 0,
+    "tag": "USA",
+    "name": "United States of America",
+    "regionIds": [
+      0,
+      150,
+      151,
+      152,
+      153
+    ],
+    "currency": {
+      "key": "usd",
+      "name": "United States dollar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 338648,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 1693240,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 50797
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 29632,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 1,
+    "tag": "GBR",
+    "name": "United Kingdom of Great Britain and Ireland",
+    "regionIds": [
+      1,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      159
+    ],
+    "currency": {
+      "key": "gbp",
+      "name": "Pound sterling",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 1519520,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 0,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 7597600,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-protected",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 227928
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 132958,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 2,
+    "tag": "DEU",
+    "name": "German Empire",
+    "regionIds": [
+      2,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136
+    ],
+    "currency": {
+      "key": "dem",
+      "name": "German mark",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 268668,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 1343340,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 40300
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 23508,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 3,
+    "tag": "FRA",
+    "name": "French Republic",
+    "regionIds": [
+      3,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129
+    ],
+    "currency": {
+      "key": "frf",
+      "name": "French franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 310600,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 1553000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 46590
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 27178,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 4,
+    "tag": "RUS",
+    "name": "Russian Empire",
+    "regionIds": [
+      4,
+      160
+    ],
+    "currency": {
+      "key": "rub",
+      "name": "Russian ruble",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 544000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 2720000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 81600
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 27200,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 5,
+    "tag": "JPN",
+    "name": "Empire of Japan",
+    "regionIds": [
+      5,
+      161
+    ],
+    "currency": {
+      "key": "jpy",
+      "name": "Japanese yen",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 188412,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 942060,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 28262
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 9421,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 6,
+    "tag": "ITA",
+    "name": "Kingdom of Italy",
+    "regionIds": [
+      6,
+      143,
+      144
+    ],
+    "currency": {
+      "key": "itl",
+      "name": "Italian lira",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 132700,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 663500,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 19905
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 6635,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 7,
+    "tag": "ESP",
+    "name": "Kingdom of Spain",
+    "regionIds": [
+      7,
+      148,
+      149
+    ],
+    "currency": {
+      "key": "esp",
+      "name": "Spanish peseta",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 75200,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 376000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 11280
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 3760,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 8,
+    "tag": "PRT",
+    "name": "Kingdom of Portugal",
+    "regionIds": [
+      8,
+      138,
+      139,
+      140,
+      141,
+      142
+    ],
+    "currency": {
+      "key": "pte",
+      "name": "Portuguese escudo",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 51520,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 257600,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 7728
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 2576,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 9,
+    "tag": "NLD",
+    "name": "Kingdom of the Netherlands",
+    "regionIds": [
+      9,
+      145,
+      146,
+      147
+    ],
+    "currency": {
+      "key": "nlg",
+      "name": "Dutch guilder",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 188920,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 944600,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 28338
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 16531,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 10,
+    "tag": "BEL",
+    "name": "Kingdom of Belgium",
+    "regionIds": [
+      10,
+      137
+    ],
+    "currency": {
+      "key": "bef",
+      "name": "Belgian franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 62800,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 314000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 9420
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 5495,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 11,
+    "tag": "CHE",
+    "name": "Swiss Confederation",
+    "regionIds": [
+      11
+    ],
+    "currency": {
+      "key": "chf",
+      "name": "Swiss franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.06,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 1980
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "steelmaking",
+        "electrical-generation",
+        "basic-sanitation",
+        "printing-industry",
+        "chemical-fertilizer"
+      ],
+      "educationFundingSUSDPerYear": 1155,
+      "researchStaffShare": 0.18
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 12,
+    "tag": "SWE",
+    "name": "Kingdom of Sweden",
+    "regionIds": [
+      12
+    ],
+    "currency": {
+      "key": "sek",
+      "name": "Swedish krona",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 102000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 3060
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 1020,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 13,
+    "tag": "NOR",
+    "name": "Kingdom of Norway",
+    "regionIds": [
+      13
+    ],
+    "currency": {
+      "key": "nok",
+      "name": "Norwegian krone",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1320
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 14,
+    "tag": "DNK",
+    "name": "Kingdom of Denmark",
+    "regionIds": [
+      14,
+      154,
+      155,
+      156,
+      157
+    ],
+    "currency": {
+      "key": "dkk",
+      "name": "Danish krone",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-progressive",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 1522
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 507,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 15,
+    "tag": "GRC",
+    "name": "Kingdom of Greece",
+    "regionIds": [
+      15
+    ],
+    "currency": {
+      "key": "grx",
+      "name": "Greek drachma",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1440
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 16,
+    "tag": "SRB",
+    "name": "Kingdom of Serbia",
+    "regionIds": [
+      16
+    ],
+    "currency": {
+      "key": "rsd",
+      "name": "Serbian dinar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1500
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 17,
+    "tag": "MNT",
+    "name": "Principality of Montenegro",
+    "regionIds": [
+      17
+    ],
+    "currency": {
+      "key": "mep",
+      "name": "Montenegrin perper",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 18,
+    "tag": "ROM",
+    "name": "Kingdom of Romania",
+    "regionIds": [
+      18
+    ],
+    "currency": {
+      "key": "rol",
+      "name": "Romanian leu",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 120000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 3600
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 19,
+    "tag": "BGR",
+    "name": "Principality of Bulgaria",
+    "regionIds": [
+      19
+    ],
+    "currency": {
+      "key": "bgl",
+      "name": "Bulgarian lev",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 2220
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 20,
+    "tag": "OTT",
+    "name": "Ottoman Empire",
+    "regionIds": [
+      20,
+      158
+    ],
+    "currency": {
+      "key": "otl",
+      "name": "Ottoman lira",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 134800,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 674000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 20220
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 2696,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 21,
+    "tag": "LUX",
+    "name": "Grand Duchy of Luxembourg",
+    "regionIds": [
+      21
+    ],
+    "currency": {
+      "key": "luf",
+      "name": "Luxembourg franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 22,
+    "tag": "MCO",
+    "name": "Principality of Monaco",
+    "regionIds": [
+      22
+    ],
+    "currency": {
+      "key": "mcf",
+      "name": "Monegasque franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 23,
+    "tag": "SMR",
+    "name": "Most Serene Republic of San Marino",
+    "regionIds": [
+      23
+    ],
+    "currency": {
+      "key": "sml",
+      "name": "Sammarinese lira",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 24,
+    "tag": "AND",
+    "name": "Co-Principality of Andorra",
+    "regionIds": [
+      24
+    ],
+    "currency": {
+      "key": "adf",
+      "name": "Andorran franc",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 25,
+    "tag": "LIE",
+    "name": "Principality of Liechtenstein",
+    "regionIds": [
+      25
+    ],
+    "currency": {
+      "key": "lie",
+      "name": "Liechtenstein krone",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 26,
+    "tag": "CHN",
+    "name": "Qing Empire",
+    "regionIds": [
+      26
+    ],
+    "currency": {
+      "key": "cnx",
+      "name": "Qing tael",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 1600000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 8000000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 240000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 32000,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 27,
+    "tag": "KOR",
+    "name": "Korean Empire",
+    "regionIds": [
+      27
+    ],
+    "currency": {
+      "key": "krw",
+      "name": "Korean won",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 68000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 340000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 10200
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 1360,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 28,
+    "tag": "PER",
+    "name": "Sublime State of Persia",
+    "regionIds": [
+      28
+    ],
+    "currency": {
+      "key": "irq",
+      "name": "Persian qiran",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 39600,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 198000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 5940
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 792,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 29,
+    "tag": "AFG",
+    "name": "Emirate of Afghanistan",
+    "regionIds": [
+      29
+    ],
+    "currency": {
+      "key": "afr",
+      "name": "Afghan rupee",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 2700
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 30,
+    "tag": "NPL",
+    "name": "Kingdom of Nepal",
+    "regionIds": [
+      30
+    ],
+    "currency": {
+      "key": "npr",
+      "name": "Nepalese rupee",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 3000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 31,
+    "tag": "THA",
+    "name": "Kingdom of Siam",
+    "regionIds": [
+      31
+    ],
+    "currency": {
+      "key": "thb",
+      "name": "Siamese baht",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 29200,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 146000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 4380
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 584,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 32,
+    "tag": "OMN",
+    "name": "Sultanate of Muscat and Oman",
+    "regionIds": [
+      32
+    ],
+    "currency": {
+      "key": "omr",
+      "name": "Omani rial",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 33,
+    "tag": "ETH",
+    "name": "Ethiopian Empire",
+    "regionIds": [
+      33
+    ],
+    "currency": {
+      "key": "etb",
+      "name": "Ethiopian birr",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 44000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 220000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 6600
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 880,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 34,
+    "tag": "LBR",
+    "name": "Republic of Liberia",
+    "regionIds": [
+      34
+    ],
+    "currency": {
+      "key": "lbd",
+      "name": "Liberian dollar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 35,
+    "tag": "MAR",
+    "name": "Sultanate of Morocco",
+    "regionIds": [
+      35
+    ],
+    "currency": {
+      "key": "mah",
+      "name": "Moroccan rial",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 3000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 36,
+    "tag": "ZAR",
+    "name": "South African Republic (Transvaal)",
+    "regionIds": [
+      36
+    ],
+    "currency": {
+      "key": "zar",
+      "name": "Transvaal pound",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 37,
+    "tag": "ORF",
+    "name": "Orange Free State",
+    "regionIds": [
+      37
+    ],
+    "currency": {
+      "key": "ofs",
+      "name": "Orange Free State pound",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 38,
+    "tag": "MEX",
+    "name": "United Mexican States",
+    "regionIds": [
+      38
+    ],
+    "currency": {
+      "key": "mxp",
+      "name": "Mexican peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 54400,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 272000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 8160
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 1088,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 39,
+    "tag": "GUA",
+    "name": "Republic of Guatemala",
+    "regionIds": [
+      39
+    ],
+    "currency": {
+      "key": "gtq",
+      "name": "Guatemalan peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 40,
+    "tag": "HON",
+    "name": "Republic of Honduras",
+    "regionIds": [
+      40
+    ],
+    "currency": {
+      "key": "hnl",
+      "name": "Honduran lempira",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 41,
+    "tag": "SAL",
+    "name": "Republic of El Salvador",
+    "regionIds": [
+      41
+    ],
+    "currency": {
+      "key": "svc",
+      "name": "Salvadoran colon",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 42,
+    "tag": "NIC",
+    "name": "Republic of Nicaragua",
+    "regionIds": [
+      42
+    ],
+    "currency": {
+      "key": "nio",
+      "name": "Nicaraguan cordoba",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 43,
+    "tag": "COS",
+    "name": "Republic of Costa Rica",
+    "regionIds": [
+      43
+    ],
+    "currency": {
+      "key": "crc",
+      "name": "Costa Rican colon",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 44,
+    "tag": "COL",
+    "name": "Republic of Colombia",
+    "regionIds": [
+      44
+    ],
+    "currency": {
+      "key": "cop",
+      "name": "Colombian peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 2400
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 45,
+    "tag": "VEN",
+    "name": "United States of Venezuela",
+    "regionIds": [
+      45
+    ],
+    "currency": {
+      "key": "veb",
+      "name": "Venezuelan bolivar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1440
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 46,
+    "tag": "ECU",
+    "name": "Republic of Ecuador",
+    "regionIds": [
+      46
+    ],
+    "currency": {
+      "key": "ecs",
+      "name": "Ecuadorian sucre",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 47,
+    "tag": "PRU",
+    "name": "Republic of Peru",
+    "regionIds": [
+      47
+    ],
+    "currency": {
+      "key": "pes",
+      "name": "Peruvian sol",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 2220
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 48,
+    "tag": "BOL",
+    "name": "Republic of Bolivia",
+    "regionIds": [
+      48
+    ],
+    "currency": {
+      "key": "bob",
+      "name": "Bolivian boliviano",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1080
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 49,
+    "tag": "CHL",
+    "name": "Republic of Chile",
+    "regionIds": [
+      49
+    ],
+    "currency": {
+      "key": "clp",
+      "name": "Chilean peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 1800
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 600,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 50,
+    "tag": "ARG",
+    "name": "Argentine Republic",
+    "regionIds": [
+      50
+    ],
+    "currency": {
+      "key": "arp",
+      "name": "Argentine peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-open"
+      },
+      "institutionFundingSUSDPerYear": 2820
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 940,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 51,
+    "tag": "URY",
+    "name": "Oriental Republic of Uruguay",
+    "regionIds": [
+      51
+    ],
+    "currency": {
+      "key": "uyu",
+      "name": "Uruguayan peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 52,
+    "tag": "PRY",
+    "name": "Republic of Paraguay",
+    "regionIds": [
+      52
+    ],
+    "currency": {
+      "key": "pyg",
+      "name": "Paraguayan guarani",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 53,
+    "tag": "BRA",
+    "name": "Republic of the United States of Brazil",
+    "regionIds": [
+      53
+    ],
+    "currency": {
+      "key": "brl",
+      "name": "Brazilian milreis",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 70400,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 352000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 10560
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 1408,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 54,
+    "tag": "HTI",
+    "name": "Republic of Haiti",
+    "regionIds": [
+      54
+    ],
+    "currency": {
+      "key": "htg",
+      "name": "Haitian gourde",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 55,
+    "tag": "DOM",
+    "name": "Dominican Republic",
+    "regionIds": [
+      55
+    ],
+    "currency": {
+      "key": "dop",
+      "name": "Dominican peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 56,
+    "tag": "CAN",
+    "name": "Dominion of Canada",
+    "regionIds": [
+      56
+    ],
+    "currency": {
+      "key": "cad",
+      "name": "Canadian dollar",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 103600,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 3108
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 1036,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 57,
+    "tag": "AUS",
+    "name": "Australian colonies",
+    "regionIds": [
+      57
+    ],
+    "currency": {
+      "key": "aup",
+      "name": "Australian pound",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-universal",
+        "labor": "labor-protected",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 2280
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 760,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 58,
+    "tag": "NZL",
+    "name": "Colony of New Zealand",
+    "regionIds": [
+      58
+    ],
+    "currency": {
+      "key": "nzp",
+      "name": "New Zealand pound",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": true,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-universal",
+        "labor": "labor-protected",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 59,
+    "tag": "CUB",
+    "name": "Republic of Cuba under United States occupation",
+    "regionIds": [
+      59
+    ],
+    "currency": {
+      "key": "cup",
+      "name": "Cuban peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  }
+]

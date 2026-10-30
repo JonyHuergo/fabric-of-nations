@@ -1,4 +1,4 @@
-# Century — M0–M7 shell, M7a annual accounting, E0 design, E1 economic clarity, E2 fiscal management, E3 public construction, E4 industrial policy, M8 laws and institutions, M9 technology and education, E5 labor and social institutions, E6a transport and inter-market trade, E6b monetary foundations, and M10 diplomacy and warfare
+# Century — M0–M10 plus M11 historical world, country selection, map, sliders, and UI overhaul
 
 Century is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
@@ -103,14 +103,68 @@ v2.17](./Century_GDD_v2.17.md); v2.16 is retained as
 rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 [`DECISIONS.md`](./DECISIONS.md).
 
+## M11 historical world, country selection, map, and UI
+
+M11 turns Century into a map-driven grand-strategy game. The playable world is an
+authored 1900 catalog of **60 states** and **62 dependent territories** in
+**122 regions**, grouped into **18 documented markets**; **59 states are
+selectable** and every one can start a valid campaign. The previous eight-polity
+sample remains a validated test fixture.
+
+- **Historical catalog and classification:** independence is coded in the
+  Gleditsch–Ward / Correlates of War tradition documented by CShapes 2.0.
+  Colonies, protectorates, dominions, occupied polities and autonomous provinces
+  are distinguished. Dependencies are modelled as regions of their sovereign and
+  are never presented as independent countries. See
+  [`docs/HISTORICAL_DATA_PROVENANCE.md`](./docs/HISTORICAL_DATA_PROVENANCE.md).
+- **Country selection:** main menu → new-game date confirmation → interactive
+  map/list picker with search, continent and status filters, detail panel and
+  explicit confirm → validated `CREATE_GAME` → game. The selected country is
+  authoritative `World.playerCountryId`, survives save/load and worker restart,
+  and is excluded from AI decisions.
+- **Offline historical map:** Natural Earth 1:50m/world-atlas geometry,
+  aggregated into 1900 polities with a documented crosswalk, dissolved at build
+  time, simplified and bundled. Pan/zoom/touch/hover, political/control/market
+  layers, occupation as a control overlay, capital and small-state markers. No
+  runtime tiles or API keys. See [`docs/MAP_DATA.md`](./docs/MAP_DATA.md).
+- **Market identity:** authored display names, kinds, descriptions and complete
+  country/region membership; customs administration is distinct from sovereignty;
+  no player surface uses an opaque `Market N`.
+- **Sliders:** continuous policy controls use a reusable accessible slider with a
+  paired precise numeric field, units, ranges, ticks, preview and coalesced
+  authoritative commits. The inventory is
+  [`docs/M11_SLIDER_INVENTORY.md`](./docs/M11_SLIDER_INVENTORY.md).
+- **Redesigned shell:** main menu, new-game brief, three-pane country selection,
+  map-first game shell with a country identity bar, grouped navigation,
+  contextual polity/market panels, centralized design system and responsive
+  desktop/narrow layouts.
+
+Contracts: `EconomyScenarioDef.countryMeta/marketMeta/regionMeta`; bounded
+snapshots (full player + focus country, compact summaries for all others);
+worker protocol **14** (`CREATE_GAME`, `SET_FOCUS`, `NEW_GAME_RESULT`). World
+schema stays **26**, save format **1**, simulation **0.27.0**, data
+**`m3-economy-v12`**. The GDD is [`Century_GDD_v2.18.md`](./Century_GDD_v2.18.md);
+decisions are D-086–D-093.
+
+### Regenerating the M11 data
+
+```bash
+node scripts/m11/build-world-data.mjs   # catalog -> tables, scenario, app catalog
+node scripts/m11/build-map.mjs          # cached Natural Earth -> map bundle
+pnpm -F @century/sim build
+pnpm -F @century/data build
+pnpm -F @century/sim-worker build
+pnpm -F @century/app build:worker       # regenerate the committed worker bundle
+```
+
 ## Workspace
 
 | Package | Purpose | Runtime dependencies |
 |---|---|---|
 | [`packages/sim`](./packages/sim) | Pure deterministic simulation: calendar, keyed randomness, world, population, demography, needs, wealth, M3a economy state/ledger, M3b employment, M3c production/inventory, M3d market clearing, M3e settlement, M3f integrated economic tick, M4a account/country model, M4b monthly period close, M4c government fiscal loop, M5 multi-market/migration/labor access, M5a profit allocation, M5b public debt/deficit financing, M6 country AI/action validation, E2 fiscal schedule/budget/business-tax/reserve/financing actions, E3 construction queue/idle-labor capitalization/state-owned completion, E4 sectors/material procurement/subsidies/public-enterprise support, M8 regimes/laws/elections/interest groups/unrest/institutions/events, M9 technology graph/research/education/age-specific literacy, E5 vocational training/qualification/public health/labor standards, E6a transport routes/access capacity/inter-market trade/customs/tariffs/quotas, E6b price index/currency board/exchange-rate valuation/convertibility, M10 sovereignty/military control/armies/wars/occupation/recruitment/combat/peace, save codec, state digest | none |
-| [`packages/data`](./packages/data) | Canonical JSON static definitions (population, goods, professions, buildings, M3 scenario), calibration/source references, M5 historical pipeline and eight-polity sample (with M5a profit and M6 AI policies enabled), and validated loader | `@century/sim` |
+| [`packages/data`](./packages/data) | Canonical JSON static definitions, calibration/source references, the M5 historical pipeline (retained fixture), the M11 1900 world tables/catalog, offline map JSON, and validated loaders | `@century/sim` |
 | [`packages/sim-worker`](./packages/sim-worker) | Versioned M7 worker protocol, bounded immutable snapshots, simulation host, save-storage codec, and Node/Web/WebView entries | `@century/sim`, `fflate` |
-| [`packages/app`](./packages/app) | M7 Expo/React Native playable shell: six screens, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker` |
+| [`packages/app`](./packages/app) | M11 Expo/React Native map-first game shell: main menu, country selection, design system, sliders, interactive offline map, Web Worker/WebView transports, snapshot-only UI, compressed save/load | Expo, React Native, `@century/sim-worker`, `react-native-svg` |
 | [`packages/bench`](./packages/bench) | Headless M1–M7 benchmark harness, including the opt-in full-campaign mode and M7 worker-host benchmark | `@century/sim`, `@century/sim-worker`, `@century/data` |
 | [`packages/tests`](./packages/tests) | Jest unit, integration, conservation, determinism, serialization, calibration, worker, and UI-boundary tests | `@century/sim`, `@century/sim-worker`, `@century/data` |
 
@@ -1845,13 +1899,14 @@ evidence and does not satisfy the 8 ms mobile target.
   coefficients. It does not implement profession promotion/demotion, a free
   migration pool, remittances, or border-law enactment. `immigrationOpen` is a
   scenario policy flag, not an M8 law.
-- M5 historical data is a provisional eight-polity sample, not a world total or a
-  full historical reconstruction. Population targets are rounded source-referenced
-  estimates; occupation structure, age structure, regional splits, literacy/
-  wealth, fiscal settings, building levels, and market groupings are provisional.
+- M5 historical data remains a provisional eight-polity **test fixture**. The
+  playable M11 world is a separate authored 1900 catalog: 60 states, 62 dependent
+  territories, 122 regions, 18 markets. Its population is a rounded estimate
+  (~1.52 bn, not a world total); occupation structure, literacy/wealth, building
+  levels, fiscal settings, and market groupings are provisional.
   Century-scale population/occupation-trend calibration is **not claimed** because
   the M3 recipes/needs are not historically calibrated and profession transition
-  is not implemented.
+  is not implemented. See [`docs/HISTORICAL_DATA_PROVENANCE.md`](./docs/HISTORICAL_DATA_PROVENANCE.md).
 - M5's full 36,524-tick economic campaign was projected from a measured sample in
   the M5 benchmark; M6 executes it only in the opt-in
   `pnpm run bench:campaign` mode, not in `pnpm run ci`. Mobile performance remains

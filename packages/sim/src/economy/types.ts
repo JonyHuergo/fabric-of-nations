@@ -1890,6 +1890,63 @@ export interface MilitarySystemInput {
   relations?: readonly MilitaryRelationInput[];
 }
 
+/**
+ * M11 constitutional status of a 1900 polity. The value is static scenario
+ * content, not mutable authoritative state; it is never transferred by warfare
+ * or occupation (D-081).
+ */
+export const COUNTRY_STATUSES = [
+  "independent",
+  "personal-union",
+  "autonomous-vassal",
+  "dominion",
+  "self-governing-colony",
+  "protectorate",
+  "colony",
+  "occupation",
+  "autonomous-province",
+  "dependency",
+] as const;
+export type CountryStatus = (typeof COUNTRY_STATUSES)[number];
+
+/** M11 static metadata for one simulation country. */
+export interface CountryMetaDef {
+  readonly countryId: Id;
+  readonly historicalName: string;
+  readonly status: CountryStatus;
+  /** Sovereign country id; the country itself for an independent state. */
+  readonly sovereignCountryId: Id;
+  readonly capitalName: string;
+  readonly regionName: string;
+  readonly selectable: boolean;
+  readonly population1900Estimate: number | null;
+  readonly confidence: "low" | "medium" | "high";
+  readonly notes: string;
+}
+
+/** M11 static metadata for one market's player-facing identity. */
+export interface MarketMetaDef {
+  readonly marketId: Id;
+  readonly key: string;
+  readonly name: string;
+  readonly kind: "national" | "imperial" | "shared";
+  readonly description: string;
+  readonly customsCountryId: Id | null;
+}
+
+/** M11 static metadata for a dependent territory region. */
+export interface RegionMetaDef {
+  readonly regionId: Id;
+  readonly polityTag: string;
+  readonly historicalName: string;
+  readonly status: CountryStatus;
+  readonly sovereignCountryId: Id;
+  readonly capitalName: string;
+  readonly selectable: boolean;
+  readonly confidence: "low" | "medium" | "high";
+  readonly notes: string;
+}
+
 export interface EconomyScenarioDef {
   population: PopulationScenarioDef;
   definitions: EconomyDefinitions;
@@ -1899,6 +1956,13 @@ export interface EconomyScenarioDef {
   employment: EmploymentAssignmentInitialDef[];
   /** M4a-2 country identity plus M4c treasury/fiscal initial state. */
   countries?: CountryInitialDef[];
+  /**
+   * M11 static polity metadata. Optional so pre-M11 fixtures keep working.
+   * These records are scenario content: they are not serialized with the world.
+   */
+  countryMeta?: CountryMetaDef[];
+  marketMeta?: MarketMetaDef[];
+  regionMeta?: RegionMetaDef[];
   currencies?: Currency[];
   currencyValuations?: CurrencyValuation[];
   /** M5a profit-allocation policy. Omitted means disabled defaults. */

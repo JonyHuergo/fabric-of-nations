@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
@@ -9,6 +9,7 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Notice, Section, StatRow } from "../components/ui";
 import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
@@ -47,26 +48,10 @@ export function LaborScreen({
     country?.labor.healthStaffShare,
   ]);
 
-  if (country === null) {
-    return (
-      <Section title="Labor & society">
-        <Text style={styles.empty}>Select a country on the map.</Text>
-      </Section>
-    );
-  }
   const isPlayerCountry =
-    snapshot.playerCountryId !== null && country.id === snapshot.playerCountryId;
-  const canAct = isPlayerCountry && !busy && connection === "ready";
-  const parsedBudget = Number(budgetText);
-  const parsedStipend = Number(stipendText);
-  const parsedTrainingShare = Number(trainingShareText);
-  const parsedHealthShare = Number(healthShareText);
-  const trainingPreview = previewTrainingPolicy(snapshot, country, {
-    trainingBudgetSUSDPerYear: parsedBudget,
-    trainingStipendPerTraineeSUSDPerYear: parsedStipend,
-    trainingStaffShare: parsedTrainingShare,
-  });
-  const healthPreview = previewHealthPolicy(snapshot, country, parsedHealthShare);
+    country !== null &&
+    snapshot.playerCountryId !== null &&
+    country.id === snapshot.playerCountryId;
 
   const submit = (action: Parameters<typeof applyAction>[0], error: string | null): void => {
     if (!isPlayerCountry) {
@@ -80,6 +65,106 @@ export function LaborScreen({
     setLocalError(null);
     applyAction(action);
   };
+
+  // Recompute the same estimate the screen displays, with one draft value replaced
+  // by the slider's commit value. The worker still validates the action.
+  const trainingPreviewFor = (overrides: {
+    readonly budget?: number;
+    readonly stipend?: number;
+    readonly share?: number;
+  }) => {
+    if (country === null) return null;
+    return previewTrainingPolicy(snapshot, country, {
+      trainingBudgetSUSDPerYear: overrides.budget ?? Number(budgetText),
+      trainingStipendPerTraineeSUSDPerYear: overrides.stipend ?? Number(stipendText),
+      trainingStaffShare: overrides.share ?? Number(trainingShareText),
+    });
+  };
+
+  const applyTrainingBudget = (annualSUSDOverride?: number): void => {
+    if (country === null) return;
+    const annualSUSD = annualSUSDOverride ?? Number(budgetText);
+    const preview = trainingPreviewFor({ budget: annualSUSD });
+    submit(
+      { kind: "set-training-budget", countryId: country.id, annualSUSD },
+      preview !== null && preview.errors.length > 0 ? preview.errors.join(" ") : null,
+    );
+  };
+
+  const applyTrainingStipend = (annualSUSDOverride?: number): void => {
+    if (country === null) return;
+    const annualSUSD = annualSUSDOverride ?? Number(stipendText);
+    const preview = trainingPreviewFor({ stipend: annualSUSD });
+    submit(
+      { kind: "set-training-stipend", countryId: country.id, annualSUSD },
+      preview !== null && preview.errors.length > 0 ? preview.errors.join(" ") : null,
+    );
+  };
+
+  const applyTrainingShare = (shareOverride?: number): void => {
+    if (country === null) return;
+    const share = shareOverride ?? Number(trainingShareText);
+    const preview = trainingPreviewFor({ share });
+    submit(
+      { kind: "set-training-staff-share", countryId: country.id, share },
+      preview !== null && preview.errors.length > 0 ? preview.errors.join(" ") : null,
+    );
+  };
+
+  const applyHealthShare = (shareOverride?: number): void => {
+    if (country === null) return;
+    const share = shareOverride ?? Number(healthShareText);
+    const preview = previewHealthPolicy(snapshot, country, share);
+    submit(
+      { kind: "set-health-staff-share", countryId: country.id, share },
+      preview.errors.length > 0 ? preview.errors.join(" ") : null,
+    );
+  };
+
+  // Hooks are unconditional and precede the country guard. The callbacks guard
+  // country themselves, so every slider commit sends the authoritative action.
+  const budgetCommit = useDeferredCommit((value) => applyTrainingBudget(value), busy);
+  const stipendCommit = useDeferredCommit((value) => applyTrainingStipend(value), busy);
+  const trainingShareCommit = useDeferredCommit((value) => applyTrainingShare(value), busy);
+  const healthShareCommit = useDeferredCommit((value) => applyHealthShare(value), busy);
+
+  if (country === null) {
+    return (
+      <Section title="Labor & society">
+        <Text style={styles.empty}>Select a country on the map.</Text>
+      </Section>
+    );
+  }
+  const canAct = isPlayerCountry && !busy && connection === "ready";
+  const parsedBudget = Number(budgetText);
+  const parsedStipend = Number(stipendText);
+  const parsedTrainingShare = Number(trainingShareText);
+  const parsedHealthShare = Number(healthShareText);
+  const trainingPreview = previewTrainingPolicy(snapshot, country, {
+    trainingBudgetSUSDPerYear: parsedBudget,
+    trainingStipendPerTraineeSUSDPerYear: parsedStipend,
+    trainingStaffShare: parsedTrainingShare,
+  });
+  const healthPreview = previewHealthPolicy(snapshot, country, parsedHealthShare);
+
+  // Practical slider ranges inside the authoritative 0..MAX_FISCAL_BUDGET bounds.
+  // The annual step is 1% of the slider maximum; share steps are 0.01.
+  const budgetMax = Math.max(
+    1_000_000,
+    Math.round(country.treasuryCashSUSD * 0.5),
+    Math.round(country.labor.trainingBudgetSUSDPerYear * 2),
+  );
+  const budgetStep = Math.max(1_000, Math.round(budgetMax / 100));
+  const stipendMax = Math.max(
+    10_000,
+    Math.round(country.labor.trainingStipendPerTraineeSUSDPerYear * 2),
+  );
+  const stipendStep = Math.max(100, Math.round(stipendMax / 100));
+  // Authoritative validation also caps training at 1 - researchStaffShare.
+  const trainingShareMax = Math.max(
+    0.01,
+    Math.min(1, 1 - country.education.researchStaffShare),
+  );
 
   return (
     <Section title="Labor & society">
@@ -145,26 +230,46 @@ export function LaborScreen({
         participation from live state. Stipends are immediate cash transfers;
         qualification gains are slow and require funded training.
       </Text>
-      <Text style={styles.label}>Annual training budget (SUSD)</Text>
-      <TextInput
-        style={styles.input}
-        value={budgetText}
-        onChangeText={setBudgetText}
-        keyboardType="decimal-pad"
+      <SliderField
+        label="Annual training budget"
+        value={Number.isFinite(parsedBudget) ? parsedBudget : 0}
+        min={0}
+        max={budgetMax}
+        step={budgetStep}
+        precision={0}
+        unit="SUSD/yr"
+        disabled={!canAct}
+        pending={budgetCommit.hasPending}
+        onChange={(value) => setBudgetText(value.toFixed(0))}
+        onCommit={(value) => budgetCommit.submit(value)}
+        hint="Annual funding for instructors; stipends are paid separately from treasury cash."
       />
-      <Text style={styles.label}>Annual stipend per trainee (SUSD)</Text>
-      <TextInput
-        style={styles.input}
-        value={stipendText}
-        onChangeText={setStipendText}
-        keyboardType="decimal-pad"
+      <SliderField
+        label="Annual stipend per trainee"
+        value={Number.isFinite(parsedStipend) ? parsedStipend : 0}
+        min={0}
+        max={stipendMax}
+        step={stipendStep}
+        precision={0}
+        unit="SUSD/yr"
+        disabled={!canAct}
+        pending={stipendCommit.hasPending}
+        onChange={(value) => setStipendText(value.toFixed(2))}
+        onCommit={(value) => stipendCommit.submit(value)}
+        hint="An immediate cash transfer per trainee; it does not fund instructors by itself."
       />
-      <Text style={styles.label}>Academic staff share for training (0..1)</Text>
-      <TextInput
-        style={styles.input}
-        value={trainingShareText}
-        onChangeText={setTrainingShareText}
-        keyboardType="decimal-pad"
+      <SliderField
+        label="Academic staff share for training"
+        value={Number.isFinite(parsedTrainingShare) ? parsedTrainingShare : 0}
+        min={0}
+        max={trainingShareMax}
+        step={0.01}
+        precision={2}
+        disabled={!canAct}
+        pending={trainingShareCommit.hasPending}
+        onChange={(value) => setTrainingShareText(value.toFixed(2))}
+        onCommit={(value) => trainingShareCommit.submit(value)}
+        hint="0 to 1. Research and training academic staff shares must not exceed 100%."
       />
       <View style={styles.estimate}>
         <Text style={styles.estimateTitle}>Estimate</Text>
@@ -202,44 +307,17 @@ export function LaborScreen({
       <ActionButton
         label="Set training budget"
         disabled={!canAct}
-        onPress={() =>
-          submit(
-            {
-              kind: "set-training-budget",
-              countryId: country.id,
-              annualSUSD: parsedBudget,
-            },
-            trainingPreview.errors.length > 0 ? trainingPreview.errors.join(" ") : null,
-          )
-        }
+        onPress={() => applyTrainingBudget()}
       />
       <ActionButton
         label="Set training stipend"
         disabled={!canAct}
-        onPress={() =>
-          submit(
-            {
-              kind: "set-training-stipend",
-              countryId: country.id,
-              annualSUSD: parsedStipend,
-            },
-            trainingPreview.errors.length > 0 ? trainingPreview.errors.join(" ") : null,
-          )
-        }
+        onPress={() => applyTrainingStipend()}
       />
       <ActionButton
         label="Set training staff share"
         disabled={!canAct}
-        onPress={() =>
-          submit(
-            {
-              kind: "set-training-staff-share",
-              countryId: country.id,
-              share: parsedTrainingShare,
-            },
-            trainingPreview.errors.length > 0 ? trainingPreview.errors.join(" ") : null,
-          )
-        }
+        onPress={() => applyTrainingShare()}
       />
 
       <Text style={styles.heading}>Public health — actual state</Text>
@@ -271,12 +349,18 @@ export function LaborScreen({
       ) : null}
 
       <Text style={styles.heading}>Health policy</Text>
-      <Text style={styles.label}>Health staff share of administration (0..1)</Text>
-      <TextInput
-        style={styles.input}
-        value={healthShareText}
-        onChangeText={setHealthShareText}
-        keyboardType="decimal-pad"
+      <SliderField
+        label="Health staff share of administration"
+        value={Number.isFinite(parsedHealthShare) ? parsedHealthShare : 0}
+        min={0}
+        max={1}
+        step={0.01}
+        precision={2}
+        disabled={!canAct}
+        pending={healthShareCommit.hasPending}
+        onChange={(value) => setHealthShareText(value.toFixed(2))}
+        onCommit={(value) => healthShareCommit.submit(value)}
+        hint="0 to 1. Any statutory health-law floor is enforced by the worker."
       />
       <View style={styles.estimate}>
         <Text style={styles.estimateTitle}>Estimate</Text>
@@ -301,16 +385,7 @@ export function LaborScreen({
       <ActionButton
         label="Set health staff share"
         disabled={!canAct}
-        onPress={() =>
-          submit(
-            {
-              kind: "set-health-staff-share",
-              countryId: country.id,
-              share: parsedHealthShare,
-            },
-            healthPreview.errors.length > 0 ? healthPreview.errors.join(" ") : null,
-          )
-        }
+        onPress={() => applyHealthShare()}
       />
 
       <Text style={styles.heading}>Labor standards</Text>
@@ -355,21 +430,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: colors.text,
-  },
-  label: {
-    marginTop: spacing.sm,
-    fontSize: 12,
-    color: colors.muted,
-  },
-  input: {
-    marginTop: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    color: colors.text,
-    backgroundColor: colors.surface,
   },
   help: {
     fontSize: 12,

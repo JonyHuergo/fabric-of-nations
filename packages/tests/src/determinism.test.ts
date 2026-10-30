@@ -37,8 +37,8 @@ describe("determinism", () => {
     // (schema 24) added `World.trade` and `Market.customsCountryId`, and M10
     // (schema 26) added military state. The M1 empty-world *behaviour* is unchanged;
     // only the encoded state shape changed, so this digest is intentionally
-    // re-pinned. A change here requires an intentional simulation-version decision.
-    expect(hashWorld(world)).toBe("c12de75e045ad0b0");
+    // re-pinned. M11 (simulation 0.27.0, data m3-economy-v12) changes the version metadata encoded in the world, so the digest is re-pinned again; the empty world's behaviour is unchanged. A change here requires an intentional simulation-version decision.
+    expect(hashWorld(world)).toBe("7a4faf72d011ee30");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {
