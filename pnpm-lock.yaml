@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      jimp-compact:
+        specifier: 0.16.1
+        version: 0.16.1
       polygon-clipping:
         specifier: 0.15.7
         version: 0.15.7

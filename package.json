@@ -10,6 +10,10 @@
     "build": "pnpm -r --if-present build",
     "build:libs": "pnpm -F @century/sim build && pnpm -F @century/data build && pnpm -F @century/sim-worker build",
     "lint": "node scripts/check-boundaries.mjs",
+    "flags:build": "node scripts/m11/build-flags.mjs",
+    "flags:check": "node scripts/m11/build-flags.mjs --check",
+    "flags:audit": "node scripts/m11/build-flags.mjs --audit",
+    "flags:update": "node scripts/m11/build-flags.mjs --update",
     "check:worker": "pnpm run build:libs && pnpm -F @century/sim-worker scenario:build:check && pnpm -F @century/app build:worker:check",
     "typecheck": "pnpm run build:libs && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
@@ -19,6 +23,7 @@
     "ci": "pnpm lint && pnpm run check:worker && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
   "devDependencies": {
+    "jimp-compact": "0.16.1",
     "polygon-clipping": "0.15.7",
     "typescript": "5.9.3"
   }

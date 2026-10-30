@@ -4980,3 +4980,66 @@ values, which is imprecise, inaccessible and easy to race against the worker.
   accepts; endpoints and out-of-range cases are covered by tests.
 - Some low-level derived values (for example contract ids) remain read-only.
 
+## D-094 — Curated historical flag system keyed by polity ID
+
+**Status:** implemented (M11 flag feature).
+
+### Context
+
+The 1900 catalog had no flag artwork: every polity was represented by the
+existing monogram (national colour plus two-letter tag). The flag feature
+requires historically correct 1 January 1900 flags, PD/CC0-only artwork,
+offline runtime behaviour, and no change to simulation behaviour or the
+political definitions of the catalog.
+
+### Decision
+
+1. The curated approval list is
+   `packages/data/data/historical/m11/flags_1900.json`. It records, per flag,
+   the Commons file, licence and licence code, author, source URLs, source
+   SHA-1 and dimensions, validity window, retrieval date and historical notes;
+   and per polity, a flag ID or an explicit fallback reason plus a basis
+   (`national`, `sovereign-flag`, `documented-exception`, `fallback`).
+2. Flags are resolved only through stable numeric polity IDs
+   (`POLITY_FLAG`), never display names. `CountryFlag` takes `polityId` and
+   renders the monogram when the mapping has no asset.
+3. Every file was checked individually through the Wikimedia Commons API.
+   Only licence code `pd` (Public Domain, including PD-old/PD-self/PD-ineligible)
+   or `cc0` is accepted by the pipeline; CC BY, CC BY-SA and GFDL are rejected.
+4. `scripts/m11/build-flags.mjs` retrieves the approved Commons renditions at a
+   normalized 500 px width (preserving each flag's own ratio), converts the one
+   approved JPEG source to PNG, validates the PNG structure and writes the
+   committed assets, ledger, generated mapping, generated provenance module and
+   `docs/FLAG_PROVENANCE.md`. `pnpm flags:check` is offline and verifies the
+   committed hashes and generated outputs; `pnpm flags:audit` re-verifies the
+   live Commons licences. Normal builds never run the network path.
+5. `jimp-compact@0.16.1` is added as a root **devDependency** solely for the
+   build-time JPEG-to-PNG conversion of the CC0 1886 Qajar flag. It has no
+   runtime or bundle impact.
+6. Monogram fallbacks: Spain (ESP) and its colonies SAH/SGG (no PD/CC0 artwork
+   of the 1875–1931 state flag with the Restoration arms), Montenegro (MNT;
+   national flag not standardised in 1900 and the only PD file is the war
+   ensign) and the Transvaal (ZAR; the Vierkleur artwork is CC BY-SA).
+7. Canada uses the 1868–1921 Red Ensign as the distinctive de facto flag, with
+   the Union Jack's continuing official status documented. Australia and New
+   Zealand use the Union Jack (federation on 1 January 1901; New Zealand's own
+   ensign dates from 1902).
+8. Dependent territories use the sovereign's flag plus the existing status
+   badge. Egypt is the single documented exception (its own khedival flag,
+   because it was an autonomous Ottoman province with a recognised flag, not a
+   colony).
+9. Austria-Hungary is absent from the existing 1900 catalog. The catalog was
+   deliberately not changed; the absence and the correct civil-ensign nuance
+   are recorded in `docs/FLAG_PROVENANCE.md`.
+
+### Consequences
+
+- The feature is presentation-only: no simulation state, data version,
+  simulation version, determinism or snapshot contract changes.
+- The app bundle carries committed PNG assets; displaying a flag never touches
+  the network.
+- 56 flags are bundled and 5 polities use the documented monogram fallback
+  (ESP, MNT, ZAR, SAH, SGG).
+- Adding an Austria-Hungary polity later requires a flag manifest and
+  provenance regeneration.
+

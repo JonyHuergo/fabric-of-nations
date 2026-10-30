@@ -18,8 +18,9 @@ import {
 
 import { WORLD_CATALOG } from "../generated/worldCatalog";
 import { WORLD_MAP_1900 } from "../generated/worldMap1900";
-import { colors, nationColor, radii, spacing, type } from "../theme";
+import { colors, radii, spacing, type } from "../theme";
 import type { WorldCatalogEntry } from "../worldCatalogTypes";
+import { CountryFlag } from "../components/CountryFlag";
 import { statusLabel, WorldMap, type MapLayer } from "../components/WorldMap";
 import { Badge, Button, Chip, Divider, Metric, Panel } from "../components/ui";
 import { useSimulation } from "../worker/SimulationProvider";
@@ -268,6 +269,7 @@ export function GameShell() {
         playerName={playerSummary?.name ?? "No player country"}
         playerHistoricalName={playerEntry?.name ?? ""}
         playerTag={playerSummary?.tag ?? ""}
+        playerId={playerSummary?.id ?? null}
         status={playerEntry?.status ?? null}
         capital={playerEntry?.capital.name ?? ""}
         subtitle={headerSubtitle}
@@ -512,9 +514,12 @@ function SelectedPolityPanel({
       actions={<Badge label={entry.tag} tone="muted" />}
     >
       <View style={styles.polityHeader}>
-        <View style={[styles.emblem, { backgroundColor: nationColor(entry.sovereignTag ?? entry.tag) }]}>
-          <Text style={styles.emblemText}>{entry.tag.slice(0, 2)}</Text>
-        </View>
+        <CountryFlag
+          polityId={entry.id}
+          tag={entry.tag}
+          monogramTag={entry.sovereignTag ?? entry.tag}
+          size="detail"
+        />
         <View style={styles.polityHeaderText}>
           <Text style={styles.polityCommon}>{entry.commonName}</Text>
           <Text style={styles.polityMeta}>Capital {entry.capital.name}</Text>
@@ -601,6 +606,7 @@ function TopBar({
   playerName,
   playerHistoricalName,
   playerTag,
+  playerId,
   status,
   capital,
   subtitle,
@@ -626,6 +632,7 @@ function TopBar({
   readonly playerName: string;
   readonly playerHistoricalName: string;
   readonly playerTag: string;
+  readonly playerId: number | null;
   readonly status: string | null;
   readonly capital: string;
   readonly subtitle: string;
@@ -651,9 +658,7 @@ function TopBar({
   return (
     <View style={styles.topBar}>
       <View style={styles.topIdentity}>
-        <View style={[styles.emblemSmall, { backgroundColor: nationColor(playerTag) }]}>
-          <Text style={styles.emblemSmallText}>{playerTag.slice(0, 2)}</Text>
-        </View>
+        <CountryFlag polityId={playerId} tag={playerTag} size="topBar" />
         <View style={styles.topIdentityText}>
           <Text style={styles.playerName} numberOfLines={1}>
             {playerName}
@@ -735,26 +740,6 @@ const styles = StyleSheet.create({
   },
   topIdentity: { flexDirection: "row", alignItems: "center", gap: spacing.sm, minWidth: 240 },
   topIdentityText: { flexShrink: 1 },
-  emblem: {
-    width: 44,
-    height: 50,
-    borderRadius: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.35)",
-  },
-  emblemText: { color: "#f7f1e1", fontSize: 15, fontWeight: "800", letterSpacing: 1 },
-  emblemSmall: {
-    width: 32,
-    height: 38,
-    borderRadius: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.35)",
-  },
-  emblemSmallText: { color: "#f7f1e1", fontSize: 11, fontWeight: "800", letterSpacing: 0.5 },
   playerName: { ...type.title, fontSize: 16, lineHeight: 20 },
   playerMeta: { ...type.tiny },
   topMetrics: { flexDirection: "row", flexWrap: "wrap", flex: 1, gap: spacing.sm },

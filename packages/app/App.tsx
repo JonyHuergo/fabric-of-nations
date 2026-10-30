@@ -15,7 +15,10 @@ import { StatusBar } from "expo-status-bar";
 
 import { WORLD_CATALOG } from "./src/generated/worldCatalog";
 import { WORLD_MAP_1900 } from "./src/generated/worldMap1900";
+import { FLAG_FALLBACKS, FLAG_PROVENANCE } from "./src/generated/flagProvenance";
 import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
+import { CountryFlag } from "./src/components/CountryFlag";
+import { BRIEFING_FLAG_POLITIES } from "./src/flags/flagRegistry";
 import { Badge, Button, Divider, Panel } from "./src/components/ui";
 import { GameShell } from "./src/screens/GameShell";
 import { CountrySelectionScreen } from "./src/screens/CountrySelectionScreen";
@@ -210,6 +213,33 @@ function CenturyRoot() {
                   CShapes 2.0 is CC BY-NC-SA 4.0 and is cited only as a classification reference; it
                   is not redistributed. historical-basemaps (GPL-3.0) was reviewed and not used.
                 </Text>
+                <Divider />
+                <Text style={styles.sourceTitle}>Historical flags of 1 January 1900</Text>
+                <Text style={styles.sourceNote}>
+                  {String(FLAG_PROVENANCE.length)} flag images come from Wikimedia Commons and were
+                  individually verified as Public Domain or CC0 through the Commons API. No CC BY-SA
+                  or other share-alike artwork is bundled. Author, licence, validity dates, retrieval
+                  date and historical caveats are recorded for every file below and in
+                  docs/FLAG_PROVENANCE.md. The game reads only the bundled PNG assets; it makes no
+                  network request to display a flag.
+                </Text>
+                <Text style={styles.sourceNote}>
+                  Monogram fallbacks (no verified PD/CC0 1900 artwork):{" "}
+                  {FLAG_FALLBACKS.map((entry) => entry.tag).join(", ")}.
+                </Text>
+                {FLAG_PROVENANCE.map((flag) => (
+                  <View key={flag.id} style={styles.sourceRow}>
+                    <Text style={styles.sourceTitle}>
+                      {flag.description} · {flag.polityTags.join(", ")}
+                    </Text>
+                    <Badge label={flag.license} tone="muted" />
+                    <Text style={styles.sourceNote}>
+                      {flag.author} · {flag.validFrom}–
+                      {flag.validTo ?? "no end date recorded"} · retrieved {flag.retrievedAt}
+                    </Text>
+                    <Text style={styles.sourceNote}>{flag.sourcePageUrl}</Text>
+                  </View>
+                ))}
                 <View style={styles.modalActions}>
                   <Button label="Close" onPress={() => setProvenance(false)} />
                 </View>
@@ -297,6 +327,24 @@ function NewGameBriefScreen({
             Political geography around 1900: sovereign states, empires and their dependent
             territories. The next step lets you inspect and choose any playable state.
           </Text>
+          <View style={styles.briefFlagPanel}>
+            <Text style={type.label}>Historical flags · 1 January 1900</Text>
+            <View style={styles.briefFlagRow}>
+              {BRIEFING_FLAG_POLITIES.map((entry) => (
+                <CountryFlag
+                  key={entry.polityId}
+                  polityId={entry.polityId}
+                  tag={entry.tag}
+                  size="briefing"
+                  accessibilityLabel={`${entry.tag} historical flag of 1900`}
+                />
+              ))}
+            </View>
+            <Text style={styles.briefCaption}>
+              Bundled Wikimedia Commons artwork, Public Domain or CC0 only. A monogram is used where
+              no historically verified 1900 flag is available.
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -343,6 +391,16 @@ const styles = StyleSheet.create({
   briefSide: { width: 460 },
   briefSideNarrow: { width: "100%" },
   briefCaption: { ...type.tiny, marginTop: 4 },
+  briefFlagPanel: {
+    marginTop: spacing.md,
+    padding: spacing.sm,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 4,
+    backgroundColor: colors.backgroundAlt,
+    gap: 5,
+  },
+  briefFlagRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   briefFact: { paddingVertical: 6, borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth },
   briefFactValue: { ...type.body, color: colors.textStrong, marginTop: 1 },
   briefFactDetail: { ...type.tiny },

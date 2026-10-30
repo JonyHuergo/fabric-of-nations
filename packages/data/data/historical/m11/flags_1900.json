@@ -1,0 +1,1705 @@
+{
+  "meta": {
+    "version": "m11-1900-flags-v1",
+    "referenceDate": "1900-01-01",
+    "title": "Historical flags of the 1900 Century polity catalog",
+    "source": "Wikimedia Commons",
+    "retrievalDate": "2026-10-30",
+    "rasterWidth": 500,
+    "licensePolicy": "Only files individually verified through the Wikimedia Commons API as Public Domain (License code 'pd', including PD-old, PD-self and PD-ineligible) or CC0 ('cc0') are bundled. CC BY, CC BY-SA, GFDL and other licences are rejected.",
+    "attributionPolicy": "Public-domain and CC0 files do not legally require attribution; author, source, licence and retrieval date are nevertheless recorded for every file and shown in the in-game Sources and Licensing dialog.",
+    "datePolicy": "validFrom/validTo are ISO 8601 dates where the record fixes a day or month; year-only values are used when the historical record does not. Null validTo means the flag design was still in use after 1900.",
+    "fallbackPolicy": "A monogram is used instead of a flag whenever the correct 1900 design or a PD/CC0 artwork could not be verified. Existing political-status badges are unchanged.",
+    "notes": "The catalog does not contain an Austria-Hungary entry; see docs/FLAG_PROVENANCE.md. Flags are presentation-only: the asset mapping is keyed by stable numeric polity IDs and has no effect on simulation version, data version or deterministic behaviour."
+  },
+  "flags": {
+    "usa-45-star": {
+      "id": "usa-45-star",
+      "description": "United States flag with 45 stars",
+      "sourceTitle": "File:Flag of the United States (1896-1908).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_States_(1896%E2%80%931908).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Flag_of_the_United_States_%281896%E2%80%931908%29.svg",
+      "sourceSha1": "8dd50c30ba488dbfe420c33adfe92f4d172f9571",
+      "sourceWidth": 1235,
+      "sourceHeight": 650,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Jacobolus (per the file description; Commons' author field is auto-assumed)",
+      "validFrom": "1896-07-04",
+      "validTo": "1908-07-03",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Forty-five-star flag after Utah's admission (4 July 1896) until Oklahoma's star (46 stars) took effect on 4 July 1908. The 1818 Flag Act did not prescribe a star arrangement; this rendition uses a period-appropriate star field. Not the modern 50-star flag."
+    },
+    "uk-union-1801": {
+      "id": "uk-union-1801",
+      "description": "Union Flag of Great Britain and Ireland",
+      "sourceTitle": "File:Flag of the United Kingdom.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Kingdom_(3-5).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg",
+      "sourceSha1": "18b6a6db1e9d736dbf26182edbe63b299134fd7c",
+      "sourceWidth": 1000,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: Acts of Union 1800 Vector: Yaddah",
+      "validFrom": "1801-01-01",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "The Union Flag after the Act of Union 1800. In 1900 it was the official national flag of the United Kingdom and the Empire, and the national flag of Australia (federation on 1 January 1901) and New Zealand (which adopted its own ensign in 1902). It is also the sovereign flag used for British colonies and protectorates in this catalog."
+    },
+    "germany-1867": {
+      "id": "germany-1867",
+      "description": "Black-white-red flag of the German Empire",
+      "sourceTitle": "File:Flag of Germany (1867–1918).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Germany_(1867%E2%80%931918).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Germany_%281867%E2%80%931918%29.svg",
+      "sourceSha1": "59fe0e22197ef0fa883aeb99f3122f686633d350",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: Adolf Soetbeer , Otto von Bismarck Vector: B1mbo , Madden",
+      "validFrom": "1867-07-01",
+      "validTo": "1918-11-09",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Black-white-red tricolour of the North German Confederation and, from 1871, the German Empire. It is not the modern black-red-gold flag."
+    },
+    "france-tricolour": {
+      "id": "france-tricolour",
+      "description": "French tricolour",
+      "sourceTitle": "File:Flag of France.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_France.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg",
+      "sourceSha1": "66bdc8e9edf0515a0742b58a4f04fa1103084d56",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: Unknown Vector: SKopp",
+      "validFrom": "1830-08-01",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue-white-red vertical tricolour of the French Third Republic. The same design was in use with interruptions from 1794 and continuously from 1830."
+    },
+    "russia-1896": {
+      "id": "russia-1896",
+      "description": "White-blue-red flag of the Russian Empire",
+      "sourceTitle": "File:Flag of Russia.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Russia.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Russia.svg",
+      "sourceSha1": "82d5af67d5fa23efd124d8a24941f7cc615907d4",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Peter the Great",
+      "validFrom": "1896-05-29",
+      "validTo": "1917-11-07",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "White-blue-red horizontal tricolour, confirmed as the Russian national flag by Nicholas II's decree of 1896 and used until the revolution of 1917."
+    },
+    "japan-1870": {
+      "id": "japan-1870",
+      "description": "Hinomaru, civil and state flag of the Empire of Japan",
+      "sourceTitle": "File:Flag of Japan (1870–1999).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Japan_(1870%E2%80%931999).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Japan_%281870%E2%80%931999%29.svg",
+      "sourceSha1": "032e27bda4cb886bb6080f293d77f51a0eb9fa19",
+      "sourceWidth": 1000,
+      "sourceHeight": 700,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "kahusi - (Talk)",
+      "validFrom": "1870-02-27",
+      "validTo": "1999-08-13",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red sun disc on white, proclaimed in 1870 and the national flag of the Empire of Japan in 1900. The 1870–1999 proportions were 7:10; the design itself was unchanged when the modern 2:3 law took effect in 1999."
+    },
+    "italy-1861": {
+      "id": "italy-1861",
+      "description": "Flag of the Kingdom of Italy with the Savoy shield",
+      "sourceTitle": "File:Flag of Italy (1861–1946).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Italy_(1861%E2%80%931946).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Italy_%281861%E2%80%931946%29.svg",
+      "sourceSha1": "ff060347b1116848ade2b000e617fb1f13ffa279",
+      "sourceWidth": 1500,
+      "sourceHeight": 1000,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "F l a n k e r",
+      "validFrom": "1861-03-17",
+      "validTo": "1946-06-18",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Green-white-red vertical tricolour charged with the Savoy shield and crown, the flag of the Kingdom of Italy from 1861 until the 1946 republic. The modern flag without the shield is not the 1900 flag."
+    },
+    "portugal-1830": {
+      "id": "portugal-1830",
+      "description": "Blue-white flag of the Kingdom of Portugal with the royal arms",
+      "sourceTitle": "File:Flag of Portugal (1830–1910).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Portugal_(1830%E2%80%931910).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/2/24/Flag_of_Portugal_%281830%E2%80%931910%29.svg",
+      "sourceSha1": "0bcc922cc3305450c34a0e13238c7f03d16fd6f4",
+      "sourceWidth": 2100,
+      "sourceHeight": 1400,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Tonyjeff , based on ancient national symbol.",
+      "validFrom": "1830-07-01",
+      "validTo": "1910-10-05",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue and white vertical bicolour with the royal arms, used by the constitutional monarchy from 1830 until the republic was proclaimed on 5 October 1910. Not the modern green-red flag."
+    },
+    "netherlands": {
+      "id": "netherlands",
+      "description": "Red-white-blue flag of the Kingdom of the Netherlands",
+      "sourceTitle": "File:Flag of the Netherlands.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg",
+      "sourceSha1": "e9d6d9f2ffe57c6a8109651ecccb442e14e9a2fd",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Zscout370",
+      "validFrom": "1813-11-20",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Horizontal red-white-blue tricolour, the Dutch national flag throughout the nineteenth century. The official colour specification was only fixed in 1937; the design was unchanged in 1900."
+    },
+    "belgium": {
+      "id": "belgium",
+      "description": "Black-yellow-red flag of Belgium",
+      "sourceTitle": "File:Flag of Belgium (civil).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Belgium_(civil).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Belgium_%28civil%29.svg",
+      "sourceSha1": "6a49004d51c767581802fcc2b320304f203fef60",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Dbenbenn",
+      "validFrom": "1831-01-23",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Vertical black-yellow-red tricolour, adopted in 1831 and in use in 1900. The civil version is shown at the 2:3 ratio."
+    },
+    "switzerland": {
+      "id": "switzerland",
+      "description": "Square red flag with the white Swiss cross",
+      "sourceTitle": "File:Flag of Switzerland.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Switzerland.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg",
+      "sourceSha1": "b59554bc284833d9f890531c537d862210d2215f",
+      "sourceWidth": 512,
+      "sourceHeight": 512,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: Unknown Vector: User:Marc Mongenet Credits: User:-xfi- User:Zscout370",
+      "validFrom": "1848-09-12",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Federal flag of Switzerland: a white cross on red. The Swiss national flag is square (1:1), unlike most national flags. The design was confirmed by the federal constitution of 1848."
+    },
+    "sweden-1844": {
+      "id": "sweden-1844",
+      "description": "Swedish union flag with the Norway-Sweden union badge",
+      "sourceTitle": "File:Swedish civil ensign (1844–1905).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Swedish_civil_ensign_(1844%E2%80%931905).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Swedish_civil_ensign_%281844%E2%80%931905%29.svg",
+      "sourceSha1": "0997787cecec903a557ce84d33e63acd8703e435",
+      "sourceWidth": 1200,
+      "sourceHeight": 750,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Jeltz",
+      "validFrom": "1844-06-20",
+      "validTo": "1905-11-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue flag with a yellow Nordic cross and the union badge in the canton, used by Sweden from 1844 until the dissolution of the union. Sweden retained the badge in all flags until 1 November 1905; Norway had already removed it from its national flag."
+    },
+    "norway-1899": {
+      "id": "norway-1899",
+      "description": "Norwegian national flag without the union badge",
+      "sourceTitle": "File:Flag of Norway.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Norway.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg",
+      "sourceSha1": "905b385ab20e146fbec17b14187c999d03970b30",
+      "sourceWidth": 512,
+      "sourceHeight": 372,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: Fredrik Meltzer Vector: Gutten på Hemsen",
+      "validFrom": "1899-01-01",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red flag with a white-bordered blue Nordic cross. The union badge was removed from the Norwegian national, merchant and state flags by the flag law of 1898; the pure flag was first flown in 1899 and was the national flag on 1 January 1900. The naval war flag retained the badge until 1905. The start date is year-level because the first hoisting date is recorded only as 1899."
+    },
+    "denmark": {
+      "id": "denmark",
+      "description": "Dannebrog, the Danish national flag",
+      "sourceTitle": "File:Flag of Denmark.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Denmark.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg",
+      "sourceSha1": "f22f7a2eb507e529f963ad514a03e0ca1bfd6cc6",
+      "sourceWidth": 512,
+      "sourceHeight": 387,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Madden and others",
+      "validFrom": "1748-06-11",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red flag with a white Nordic cross. The Dannebrog was the Danish national flag throughout the nineteenth century."
+    },
+    "greece-1822": {
+      "id": "greece-1822",
+      "description": "National flag of the Kingdom of Greece",
+      "sourceTitle": "File:Flag of Greece (1822-1978).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Greece_(1822-1978).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Flag_of_Greece_%281822-1978%29.svg",
+      "sourceSha1": "464feedccaff45457749c286ab174ae5cb6e104c",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "(of code) User:Makaristos",
+      "validFrom": "1822-01-15",
+      "validTo": "1978-12-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue and white flag with a white cross and nine stripes, adopted during the Greek War of Independence and used as the national flag. The plain national flag is shown; a royal state variant with the crown was used from 1863 to 1922."
+    },
+    "serbia-civil": {
+      "id": "serbia-civil",
+      "description": "Civil flag of the Kingdom of Serbia",
+      "sourceTitle": "File:Civil flag of Serbia.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Civil_flag_of_Serbia.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/3/36/Civil_flag_of_Serbia.svg",
+      "sourceSha1": "eaa2cb46de4f5918cdb2a7aa9ac8b7ebc6a4b315",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "National Assembly of the Republic of Serbia (Serbian Parliament)",
+      "validFrom": "1882-03-06",
+      "validTo": "1918-12-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red-blue-white horizontal tricolour, the Serbian civil/national flag. The state flag of the Kingdom of Serbia (1882–1918) additionally bore the royal coat of arms; that artwork is CC BY-SA on Commons and is not bundled."
+    },
+    "romania-1867": {
+      "id": "romania-1867",
+      "description": "Blue-yellow-red flag of Romania",
+      "sourceTitle": "File:Flag of Romania (1867–1948).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Romania_(1867%E2%80%931948).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/2/28/Flag_of_Romania_%281867%E2%80%931948%29.svg",
+      "sourceSha1": "8d4c8818d80668ba707b9ecb7ccb79d8c4373a4c",
+      "sourceWidth": 450,
+      "sourceHeight": 300,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Flag_of_Romania.svg : AdiJapan derivative work: Anime Addict AA ( talk )",
+      "validFrom": "1867-04-22",
+      "validTo": "1948-01-03",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Vertical blue-yellow-red tricolour, the Romanian national flag from 1867 until the republic. The plain tricolour is shown; the state flag carried the coat of arms."
+    },
+    "bulgaria-1879": {
+      "id": "bulgaria-1879",
+      "description": "White-green-red flag of the Principality of Bulgaria",
+      "sourceTitle": "File:Flag of Bulgaria.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Bulgaria.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Bulgaria.svg",
+      "sourceSha1": "b976f224d05a6732c4b31f4593418ce4dc09d652",
+      "sourceWidth": 1000,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "SKopp",
+      "validFrom": "1879-04-16",
+      "validTo": "1946-09-15",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Horizontal white-green-red tricolour adopted with the Tarnovo Constitution. The plain national/civil flag is shown; separate state and naval ensigns carried the princely/royal arms."
+    },
+    "ottoman-1844": {
+      "id": "ottoman-1844",
+      "description": "Ottoman crescent and star flag",
+      "sourceTitle": "File:Flag of the Ottoman Empire (1844–1922).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Ottoman_Empire_(1844%E2%80%931922).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Flag_of_the_Ottoman_Empire_%281844%E2%80%931922%29.svg",
+      "sourceSha1": "f94cd07a56e664ec196965335687620a62f6ca3c",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "User:Orwellianist",
+      "validFrom": "1844-01-01",
+      "validTo": "1922-11-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red field with a white crescent and five-pointed star, the Ottoman national flag from the Tanzimat reforms until the abolition of the sultanate. The 1844 design is the one in use in 1900."
+    },
+    "luxembourg": {
+      "id": "luxembourg",
+      "description": "Red-white-blue flag of Luxembourg",
+      "sourceTitle": "File:Flag of Luxembourg.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Luxembourg.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/d/da/Flag_of_Luxembourg.svg",
+      "sourceSha1": "82b0809e9809ce0ed139451900d498814ff9ccd1",
+      "sourceWidth": 512,
+      "sourceHeight": 307,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Drawn by User:SKopp",
+      "validFrom": "1845-06-12",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Horizontal red-white-blue tricolour. It was Luxembourg's national flag in 1900."
+    },
+    "monaco": {
+      "id": "monaco",
+      "description": "Red and white flag of Monaco",
+      "sourceTitle": "File:Flag of Monaco.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Monaco.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Flag_of_Monaco.svg",
+      "sourceSha1": "9ef05499283f6841cbd8d04d6c1b80d53f4198f4",
+      "sourceWidth": 1000,
+      "sourceHeight": 800,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Drawn by User:SKopp",
+      "validFrom": "1881-04-04",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Horizontal red over white bicolour, established by the princely decree of 1881."
+    },
+    "san-marino-1862": {
+      "id": "san-marino-1862",
+      "description": "White and blue flag of San Marino with the coat of arms",
+      "sourceTitle": "File:Flag of San Marino (pre–2011).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_San_Marino_(pre%E2%80%932011).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Flag_of_San_Marino_%28pre%E2%80%932011%29.svg",
+      "sourceSha1": "2c668e88f8e0dc14859de6a82d891818e2100dcd",
+      "sourceWidth": 1280,
+      "sourceHeight": 960,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Flag_of_San_Marino.svg : derivative work: Fry1989 eh? 02:30, 10 September 2011 (UTC)",
+      "validFrom": "1862-01-01",
+      "validTo": "2011-07-22",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "White over light-blue bicolour charged with the Sammarinese coat of arms, the flag in use from the nineteenth century until the 2011 revision. The pre-2011 arms are the period-appropriate representation for 1900."
+    },
+    "andorra-1866": {
+      "id": "andorra-1866",
+      "description": "Blue-yellow-red flag of Andorra with the princely crown",
+      "sourceTitle": "File:Flag of Andorra (end of the 19th century-c. 1930s).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Andorra_(end_of_the_19th_century-c._1930s).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_Andorra_%28end_of_the_19th_century-c._1930s%29.svg",
+      "sourceSha1": "648e42ed3b5b76fb17945fd9656cf556253b353d",
+      "sourceWidth": 450,
+      "sourceHeight": 300,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Esprit04",
+      "validFrom": "1866-01-01",
+      "validTo": "1934-12-31",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Vertical blue-yellow-red tricolour with a crown, the Andorran flag used from the later nineteenth century until the 1930s. The file's documented range is 'end of the 19th century-c. 1930s'; the start is therefore year-level and approximate."
+    },
+    "liechtenstein-1852": {
+      "id": "liechtenstein-1852",
+      "description": "Blue and red flag of Liechtenstein",
+      "sourceTitle": "File:Flag of Liechtenstein (1852–1921).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Liechtenstein_(1852%E2%80%931921).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Flag_of_Liechtenstein_%281852%E2%80%931921%29.svg",
+      "sourceSha1": "42783525f255e564c0453ad299e3cf8cb4407581",
+      "sourceWidth": 1000,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "arz",
+      "validFrom": "1852-01-01",
+      "validTo": "1921-10-05",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Horizontal blue over red bicolour. The princely crown was added in 1937, so the plain bicolour is correct for 1900."
+    },
+    "qing-1889": {
+      "id": "qing-1889",
+      "description": "Yellow dragon flag of the Qing Empire",
+      "sourceTitle": "File:Flag of China (1889–1912).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_China_(1889%E2%80%931912).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Flag_of_China_%281889%E2%80%931912%29.svg",
+      "sourceSha1": "1fa7ab71045f183034233831f5c3bab78dd69694",
+      "sourceWidth": 512,
+      "sourceHeight": 341,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Original: zh:清朝政府 Vector: Sodacan",
+      "validFrom": "1889-01-01",
+      "validTo": "1912-02-12",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Yellow field with the blue five-clawed dragon and red flaming pearl, the Qing national flag from 1889 until the abdication of 1912. Not the modern flag of China."
+    },
+    "korea-1882": {
+      "id": "korea-1882",
+      "description": "Taegeukgi of the Korean Empire",
+      "sourceTitle": "File:Flag of Korea (1882–1910).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Korea_(1882%E2%80%931910).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Korea_%281882%E2%80%931910%29.svg",
+      "sourceSha1": "356168a4d9a98e62e357c4ddb7396c2f9b287ccf",
+      "sourceWidth": 600,
+      "sourceHeight": 400,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Daniil Ivanov",
+      "validFrom": "1882-01-01",
+      "validTo": "1910-08-29",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "White field with the red-blue taegeuk and four black trigrams, used from 1882 and as the flag of the Korean Empire (1897–1910). Korea was annexed by Japan on 29 August 1910."
+    },
+    "persia-qajar": {
+      "id": "persia-qajar",
+      "description": "Qajar Persian tricolour with the lion and sun",
+      "sourceTitle": "File:Qajar Persia Flag.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Qajar_Persia_Flag.jpg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/0/03/Qajar_Persia_Flag.jpg",
+      "sourceSha1": "6b0e2ddac28c45c6101fc13419d41965cacd96c8",
+      "sourceWidth": 1668,
+      "sourceHeight": 554,
+      "license": "CC0",
+      "licenseCode": "cc0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "author": "Weirdsongs",
+      "validFrom": "1850-01-01",
+      "validTo": "1907-10-07",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Green-white-red tricolour with the lion and sun, the Qajar state flag. The 1907 flag law standardised the design; in 1900 the same elements were in use without a detailed legal specification. The start date is a conservative year-level approximation for the mid-nineteenth-century Qajar tricolour."
+    },
+    "afghanistan-1880": {
+      "id": "afghanistan-1880",
+      "description": "Black flag of the Emirate of Afghanistan",
+      "sourceTitle": "File:Flag of Afghanistan (1880–1901).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Afghanistan_(1880%E2%80%931901).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Flag_of_Afghanistan_%281880%E2%80%931901%29.svg",
+      "sourceSha1": "5dc2095a25564132ac9003386174f122fa2d0d40",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "PaD and Indolences .",
+      "validFrom": "1880-01-01",
+      "validTo": "1901-10-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Plain black flag used by the Emirate of Afghanistan under Abdur Rahman Khan (1880–1901). The file's documented range ends in 1901, so it covers 1 January 1900."
+    },
+    "nepal": {
+      "id": "nepal",
+      "description": "Double pennant flag of the Kingdom of Nepal",
+      "sourceTitle": "File:Flag of Nepal.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
+      "sourceSha1": "9ac8959c438341344230134b748f5ec57d9603c6",
+      "sourceWidth": 726,
+      "sourceHeight": 885,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Drawn by Pumbaa80 , Achim1999",
+      "validFrom": "1900-01-01",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "The traditional double pennant with the sun and moon, in use in 1900. The current geometric specification was fixed by the 1962 constitution; the 1900 flag was the same traditional emblem. The non-rectangular shape is preserved by the asset pipeline."
+    },
+    "siam-1855": {
+      "id": "siam-1855",
+      "description": "Red flag of Siam with the white elephant",
+      "sourceTitle": "File:Flag of Siam (1855).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Siam_(1855).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Siam_%281855%29.svg",
+      "sourceSha1": "0e1868fa287cb94bd082caa5a5a9974a3131b551",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Xiengyod & Sodacan i",
+      "validFrom": "1855-01-01",
+      "validTo": "1916-01-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red field with a white elephant, adopted by King Mongkut (Rama IV) in 1855 and used until the 1916 change to the elephant in royal regalia. This is the flag of Siam on 1 January 1900."
+    },
+    "oman": {
+      "id": "oman",
+      "description": "Plain red flag of the Sultanate of Muscat and Oman",
+      "sourceTitle": "File:Flag of Muscat.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Muscat.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_Muscat.svg",
+      "sourceSha1": "b267cf01af631bc57110aebca0052a0237b191e9",
+      "sourceWidth": 600,
+      "sourceHeight": 400,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1856-01-01",
+      "validTo": "1970-07-23",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Plain red flag used by Muscat and Oman in the nineteenth and early twentieth centuries. The modern flag with the khanjar was adopted in 1970."
+    },
+    "ethiopia-1897": {
+      "id": "ethiopia-1897",
+      "description": "Green-yellow-red flag of the Ethiopian Empire with the Lion of Judah",
+      "sourceTitle": "File:Flag of Ethiopia (1897–1974).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia_(1897%E2%80%931974).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Ethiopia_%281897%E2%80%931974%29.svg",
+      "sourceSha1": "ee414b9e8090013c8fb790db90f2a790809ea37a",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Oren neu dag",
+      "validFrom": "1897-01-01",
+      "validTo": "1936-05-05",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Green-yellow-red tricolour bearing the crowned Lion of Judah with the crossed staff and flag. The tricolour was adopted in 1897; this imperial/state form with the lion is the period representation. The plain tricolour was the civil flag."
+    },
+    "liberia": {
+      "id": "liberia",
+      "description": "Flag of the Republic of Liberia",
+      "sourceTitle": "File:Flag of Liberia.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Liberia.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Flag_of_Liberia.svg",
+      "sourceSha1": "3eb8d20b0e144a48bd9e7bd80a054a8d7cc84483",
+      "sourceWidth": 1140,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Government of Liberia",
+      "validFrom": "1847-08-24",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Eleven horizontal red and white stripes with a blue canton and a single white star, modelled on the United States flag but with one star. In use since independence in 1847."
+    },
+    "morocco-1666": {
+      "id": "morocco-1666",
+      "description": "Plain red flag of the Sultanate of Morocco",
+      "sourceTitle": "File:Flag of Morocco (1666–1915).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Morocco_(1666%E2%80%931915).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Morocco_%281666%E2%80%931915%29.svg",
+      "sourceSha1": "d2d19146823f7aad34582263ff66de50cd8c3e96",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Flad",
+      "validFrom": "1666-01-01",
+      "validTo": "1915-11-17",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Plain red flag used by Morocco from the Alaouite dynasty until the French protectorate introduced the green pentagram in 1915. In 1900 Morocco was an independent sultanate with a plain red flag."
+    },
+    "orange-free-state": {
+      "id": "orange-free-state",
+      "description": "Flag of the Orange Free State",
+      "sourceTitle": "File:Flag of the Orange Free State.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Orange_Free_State.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Flag_of_the_Orange_Free_State.svg",
+      "sourceSha1": "f8e1baa5b204847eadc8962dc09f6fc98ea685ed",
+      "sourceWidth": 420,
+      "sourceHeight": 280,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "David Benbennick wrote this file",
+      "validFrom": "1857-02-28",
+      "validTo": "1902-05-31",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Orange and white horizontal stripes with the Netherlands flag in the canton, the flag of the Orange Free State from 1857 until the Treaty of Vereeniging in 1902. The Boer republics were at war with Britain on 1 January 1900 but the flag remained the state's flag."
+    },
+    "mexico-1893": {
+      "id": "mexico-1893",
+      "description": "Flag of Mexico with the Porfirian coat of arms",
+      "sourceTitle": "File:Flag of Mexico (1893–1916).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Mexico_(1893%E2%80%931916).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Flag_of_Mexico_%281893%E2%80%931916%29.svg",
+      "sourceSha1": "5a6f66cf4bdf4bfec0d301ed6c60f2234650bc48",
+      "sourceWidth": 980,
+      "sourceHeight": 560,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "TownDown",
+      "validFrom": "1893-01-01",
+      "validTo": "1916-09-30",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Green-white-red vertical tricolour with the 1893 coat of arms (the eagle on a nopal with the serpent), used during the Porfiriato and until 1916. Not the modern coat of arms."
+    },
+    "guatemala-1871": {
+      "id": "guatemala-1871",
+      "description": "Flag of Guatemala with the 1871 coat of arms",
+      "sourceTitle": "File:Flag of Guatemala (1871–1968).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Guatemala_(1871%E2%80%931968).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Flag_of_Guatemala_%281871%E2%80%931968%29.svg",
+      "sourceSha1": "b09245de9fc3c043c3f038a3e6785fba41a72cce",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "SVG-image-maker",
+      "validFrom": "1871-08-17",
+      "validTo": "1968-09-15",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Vertical blue-white-blue tricolour with the 1871 coat of arms, in use from the Liberal Revolution until 1968."
+    },
+    "honduras-1866": {
+      "id": "honduras-1866",
+      "description": "Flag of Honduras with five blue stars",
+      "sourceTitle": "File:Flag of Honduras (1866–1949).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Honduras_(1866%E2%80%931949).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Flag_of_Honduras_%281866%E2%80%931949%29.svg",
+      "sourceSha1": "06f31d9d256bb4f84de2bc8866e7f0fcb9e44c14",
+      "sourceWidth": 1200,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "AquaVacation",
+      "validFrom": "1866-02-16",
+      "validTo": "1949-01-18",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue-white-blue horizontal triband with five blue stars in quincunx, introduced by decree on 16 February 1866. The 1949 decree regulated the shade of blue and confirmed the star arrangement; the 1866 design was the flag in use on 1 January 1900."
+    },
+    "el-salvador-1875": {
+      "id": "el-salvador-1875",
+      "description": "Flag of El Salvador with the 1875 coat of arms",
+      "sourceTitle": "File:Flag of El Salvador (1875–1912).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_El_Salvador_(1875%E2%80%931912).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_El_Salvador_%281875%E2%80%931912%29.svg",
+      "sourceSha1": "de02f9300134c29190a8311f6467941862e25b42",
+      "sourceWidth": 1116,
+      "sourceHeight": 638,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Legislative Assembly of El Salvador",
+      "validFrom": "1875-05-17",
+      "validTo": "1912-05-17",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue-white-blue tricolour with the 1875 coat of arms, used until the 1912 reform."
+    },
+    "nicaragua-1896": {
+      "id": "nicaragua-1896",
+      "description": "Flag of Nicaragua with the 1896 coat of arms",
+      "sourceTitle": "File:Flag of Nicaragua (1896–1908).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Nicaragua_(1896%E2%80%931908).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Nicaragua_%281896%E2%80%931908%29.svg",
+      "sourceSha1": "f9308c0049708683cb5edc509110e89cc047229f",
+      "sourceWidth": 1772,
+      "sourceHeight": 1063,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Fornax (Commons author field; public-domain flag design)",
+      "validFrom": "1896-09-04",
+      "validTo": "1908-09-04",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue-white-blue tricolour with the 1896 coat of arms, in use from 1896 to 1908."
+    },
+    "costa-rica-1848": {
+      "id": "costa-rica-1848",
+      "description": "Flag of Costa Rica with the 1848 coat of arms",
+      "sourceTitle": "File:Flag of Costa Rica (1848–1906).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Costa_Rica_(1848%E2%80%931906).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Costa_Rica_%281848%E2%80%931906%29.svg",
+      "sourceSha1": "763ea03ff09077e1bb85465d41ff29b8d2dbc576",
+      "sourceWidth": 750,
+      "sourceHeight": 500,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "HansenBCN",
+      "validFrom": "1848-09-29",
+      "validTo": "1906-06-27",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue-white-red horizontal stripes with the 1848 coat of arms, in use until the 1906 reform."
+    },
+    "colombia": {
+      "id": "colombia",
+      "description": "Flag of Colombia",
+      "sourceTitle": "File:Flag of Colombia.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Colombia.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg",
+      "sourceSha1": "a3c233df324c01babf5085147da5987767d72aac",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1861-11-26",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Yellow-blue-red horizontal tricolour with yellow at half the height, adopted in 1861 and unchanged in 1900."
+    },
+    "venezuela-1863": {
+      "id": "venezuela-1863",
+      "description": "Flag of the United States of Venezuela with seven stars",
+      "sourceTitle": "File:Flag of Venezuela (1863–1905).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Venezuela_(1863%E2%80%931905).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Venezuela_%281863%E2%80%931905%29.svg",
+      "sourceSha1": "7ab5ea8731128165a2c25aa62a0550e159a20ed1",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1863-03-29",
+      "validTo": "1905-03-28",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Yellow-blue-red tricolour with seven white stars, the national flag of the United States of Venezuela from 1863 until 1905. The state flag of the period additionally bore the coat of arms; this file shows the national form."
+    },
+    "ecuador-civil": {
+      "id": "ecuador-civil",
+      "description": "Civil flag of Ecuador (plain yellow-blue-red tricolour)",
+      "sourceTitle": "File:Civil flag and ensign of Ecuador (1900–2009).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Civil_flag_and_ensign_of_Ecuador_(1900%E2%80%932009).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/78/Civil_flag_and_ensign_of_Ecuador_%281900%E2%80%932009%29.svg",
+      "sourceSha1": "7a6c11310ef5b6f185916dd4057d90a0e893255f",
+      "sourceWidth": 1600,
+      "sourceHeight": 800,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Tcfc2349",
+      "validFrom": "1860-09-26",
+      "validTo": "2009-11-05",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Yellow (double-width), blue and red horizontal tricolour. The coat of arms was made mandatory for the state flag only by the decree of 5 December 1900, after the reference date, so the plain civil flag is the correct 1 January 1900 form. The file's own title dates the plain design to 1900–2009; the plain tricolour itself dates from 1860."
+    },
+    "peru-1884": {
+      "id": "peru-1884",
+      "description": "State flag of Peru with the coat of arms",
+      "sourceTitle": "File:Flag of Peru (1884–1950).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Peru_(1884%E2%80%931950).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/99/Flag_of_Peru_%281884%E2%80%931950%29.svg",
+      "sourceSha1": "50688f9e1cb018198fc6bf88c8bc3e3db4e39747",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Huhsunqu",
+      "validFrom": "1884-01-01",
+      "validTo": "1950-07-31",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red-white-red vertical triband with the Peruvian coat of arms, the state flag from 1884 to 1950."
+    },
+    "bolivia": {
+      "id": "bolivia",
+      "description": "State flag of Bolivia",
+      "sourceTitle": "File:Flag of Bolivia (state).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Bolivia_(state).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/d/de/Flag_of_Bolivia_%28state%29.svg",
+      "sourceSha1": "f41feb0ea1af213fbb5fd3b9fe6924f8cedb7394",
+      "sourceWidth": 1100,
+      "sourceHeight": 750,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1851-10-31",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red-yellow-green horizontal tricolour with the Bolivian coat of arms, adopted in 1851 and unchanged in 1900."
+    },
+    "chile": {
+      "id": "chile",
+      "description": "Flag of Chile",
+      "sourceTitle": "File:Flag of Chile.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Chile.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Chile.svg",
+      "sourceSha1": "22a43c801d3d9f56988f6d9947e5a03e1fc59c4b",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1817-10-18",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "White and red horizontal bands with a blue canton bearing a white five-pointed star, the Chilean national flag since 1817."
+    },
+    "argentina": {
+      "id": "argentina",
+      "description": "Flag of Argentina with the Sun of May",
+      "sourceTitle": "File:Flag of Argentina.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Argentina.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg",
+      "sourceSha1": "b54fa14d4d27a1dc3f763d650f9e5afe155e376b",
+      "sourceWidth": 800,
+      "sourceHeight": 500,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Manuel Belgrano",
+      "validFrom": "1818-02-25",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Light blue and white horizontal bands with the Sun of May in the centre; the sun was added in 1818. The flag was unchanged in 1900."
+    },
+    "uruguay": {
+      "id": "uruguay",
+      "description": "Flag of Uruguay",
+      "sourceTitle": "File:Flag of Uruguay.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Uruguay.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Uruguay.svg",
+      "sourceSha1": "61484b40376000c504e8ba273d4d521727c78749",
+      "sourceWidth": 512,
+      "sourceHeight": 341,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Not stated on the source file (public-domain flag design)",
+      "validFrom": "1830-07-11",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Nine white and blue horizontal stripes with a white canton bearing the Sun of May, adopted in 1830."
+    },
+    "paraguay-1842": {
+      "id": "paraguay-1842",
+      "description": "Flag of Paraguay with the 1842 coat of arms",
+      "sourceTitle": "File:Flag of Paraguay (1842–1954).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Paraguay_(1842%E2%80%931954).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Flag_of_Paraguay_%281842%E2%80%931954%29.svg",
+      "sourceSha1": "14c9e1f420dac960682811152ae0e92325085b2b",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Kaiser Torikka",
+      "validFrom": "1842-11-25",
+      "validTo": "1954-07-15",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red-white-blue horizontal tricolour with the Paraguayan coat of arms, in use from 1842 until 1954. The obverse is shown; the reverse traditionally carried a different emblem."
+    },
+    "brazil-1889": {
+      "id": "brazil-1889",
+      "description": "Flag of the United States of Brazil",
+      "sourceTitle": "File:Flag of Brazil (1889–1960).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Brazil_(1889%E2%80%931960).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Brazil_%281889%E2%80%931960%29.svg",
+      "sourceSha1": "312c5b9cbc40d7c4957d020f514f3b5803ddfe9b",
+      "sourceWidth": 1000,
+      "sourceHeight": 700,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Raimundo Teixeira Mendes",
+      "validFrom": "1889-11-19",
+      "validTo": "1960-04-21",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Green field with a yellow rhombus and a blue celestial globe, adopted by the republic in 1889. The star field was updated as new states were admitted; this rendition represents the 1889–1960 design."
+    },
+    "haiti-1859": {
+      "id": "haiti-1859",
+      "description": "Flag of Haiti",
+      "sourceTitle": "File:Flag of Haiti (1820–1849, 1859–1964).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Haiti_(1820%E2%80%931849,_1859%E2%80%931964).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Flag_of_Haiti_%281820%E2%80%931849%2C_1859%E2%80%931964%29.svg",
+      "sourceSha1": "a09f01e75d5c0ec612afcf0b18ddb8ad791127d0",
+      "sourceWidth": 1000,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Wrestlingring",
+      "validFrom": "1859-01-01",
+      "validTo": "1964-05-25",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue and red horizontal bicolour with the coat of arms, restored in 1859 and used until 1964."
+    },
+    "dominican-republic": {
+      "id": "dominican-republic",
+      "description": "Flag of the Dominican Republic",
+      "sourceTitle": "File:Flag of the Dominican Republic.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_the_Dominican_Republic.svg",
+      "sourceSha1": "1593746a787f6d9d7e95068c14949a4cae211616",
+      "sourceWidth": 900,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Juan Pablo Duarte",
+      "validFrom": "1863-09-24",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Blue and red quarters divided by a white cross, with the Dominican coat of arms, in use in 1900."
+    },
+    "canada-red-ensign-1868": {
+      "id": "canada-red-ensign-1868",
+      "description": "Canadian Red Ensign with the 1868 provincial shield",
+      "sourceTitle": "File:Flag of Canada (1868–1921).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(1868%E2%80%931921).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Flag_of_Canada_%281868%E2%80%931921%29.svg",
+      "sourceSha1": "f23587fdde56429d2d5eb73057127c51225a6672",
+      "sourceWidth": 1200,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Greentubing~commonswiki",
+      "validFrom": "1868-01-01",
+      "validTo": "1921-01-01",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "The Red Ensign with the Canadian shield, used unofficially on land and sea from 1870 and approved by the British Admiralty for Canadian use at sea in 1892. The Union Jack remained Canada's official national flag in 1900; the Red Ensign was the distinctive de facto Canadian flag. This is not the modern maple-leaf flag."
+    },
+    "cuba": {
+      "id": "cuba",
+      "description": "Flag of Cuba",
+      "sourceTitle": "File:Flag of Cuba.svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Cuba.svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg",
+      "sourceSha1": "7602a27f1a47b84f621ed7fab13ed2451f31f7f8",
+      "sourceWidth": 1200,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Miguel Teurbe Tolón and Narciso López",
+      "validFrom": "1849-06-26",
+      "validTo": null,
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "The Lone Star flag, designed in 1849 and used by the Cuban independence movement. Cuba was under United States military occupation on 1 January 1900; the Cuban flag was the national flag of the future republic (1902) and was flown by Cuban civil authorities alongside the occupying power's flag. The catalog records the occupation through the OCC status badge."
+    },
+    "egypt-1882": {
+      "id": "egypt-1882",
+      "description": "Flag of the Khedivate of Egypt",
+      "sourceTitle": "File:Flag of Egypt (1882–1922).svg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt_(1882%E2%80%931922).svg",
+      "sourceFileUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Flag_of_Egypt_%281882%E2%80%931922%29.svg",
+      "sourceSha1": "28f8221ff9de2e85fa2c68e213f8f717c699ccce",
+      "sourceWidth": 1200,
+      "sourceHeight": 600,
+      "license": "Public domain",
+      "licenseCode": "pd",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain",
+      "author": "Converted to svg by Daniel78",
+      "validFrom": "1882-01-01",
+      "validTo": "1922-02-28",
+      "retrievedAt": "2026-10-30",
+      "historicalNotes": "Red field with three white crescents and three white stars. Egypt was an autonomous Ottoman province under British occupation in 1900; this distinct khedival flag is a documented exception to the sovereign-flag rule because Egypt had its own recognised flag and was not a colony in the catalog's sense. The AUT status badge remains visible."
+    }
+  },
+  "polities": {
+    "0": {
+      "tag": "USA",
+      "flag": "usa-45-star",
+      "basis": "national"
+    },
+    "1": {
+      "tag": "GBR",
+      "flag": "uk-union-1801",
+      "basis": "national"
+    },
+    "2": {
+      "tag": "DEU",
+      "flag": "germany-1867",
+      "basis": "national"
+    },
+    "3": {
+      "tag": "FRA",
+      "flag": "france-tricolour",
+      "basis": "national"
+    },
+    "4": {
+      "tag": "RUS",
+      "flag": "russia-1896",
+      "basis": "national"
+    },
+    "5": {
+      "tag": "JPN",
+      "flag": "japan-1870",
+      "basis": "national"
+    },
+    "6": {
+      "tag": "ITA",
+      "flag": "italy-1861",
+      "basis": "national"
+    },
+    "7": {
+      "tag": "ESP",
+      "flag": null,
+      "basis": "fallback",
+      "fallbackReason": "No Public Domain or CC0 artwork of the 1875–1931 Spanish state flag (red–yellow–red with the Restoration coat of arms) was identified on Wikimedia Commons. The verified PD file for the period is the five-stripe 1785 merchant ensign, which was not Spain's national/state flag in 1900; the plain red–yellow–red triband became the merchant flag only in 1927. A CC0 photograph of a surviving 1898 Spanish flag ('Flag of Spain (1898).png') was also reviewed, but it is a plain red–yellow–red flag without the Restoration coat of arms and was rejected as the state flag. A monogram is retained rather than bundle a historically incomplete or share-alike image."
+    },
+    "8": {
+      "tag": "PRT",
+      "flag": "portugal-1830",
+      "basis": "national"
+    },
+    "9": {
+      "tag": "NLD",
+      "flag": "netherlands",
+      "basis": "national"
+    },
+    "10": {
+      "tag": "BEL",
+      "flag": "belgium",
+      "basis": "national"
+    },
+    "11": {
+      "tag": "CHE",
+      "flag": "switzerland",
+      "basis": "national"
+    },
+    "12": {
+      "tag": "SWE",
+      "flag": "sweden-1844",
+      "basis": "national"
+    },
+    "13": {
+      "tag": "NOR",
+      "flag": "norway-1899",
+      "basis": "national"
+    },
+    "14": {
+      "tag": "DNK",
+      "flag": "denmark",
+      "basis": "national"
+    },
+    "15": {
+      "tag": "GRC",
+      "flag": "greece-1822",
+      "basis": "national"
+    },
+    "16": {
+      "tag": "SRB",
+      "flag": "serbia-civil",
+      "basis": "national"
+    },
+    "17": {
+      "tag": "MNT",
+      "flag": null,
+      "basis": "fallback",
+      "fallbackReason": "Montenegro's national flag was not standardised in 1900: Prince Nikola used several variants, and the red–blue–white tricolour was only prescribed by the 1905 constitution. The only verified PD Commons file for the period depicts the 1878 war ensign (white field with a red cross), not the national flag. A PD file of the 1905–1918 royal flag exists, but its validity begins after the reference date. Monogram retained."
+    },
+    "18": {
+      "tag": "ROM",
+      "flag": "romania-1867",
+      "basis": "national"
+    },
+    "19": {
+      "tag": "BGR",
+      "flag": "bulgaria-1879",
+      "basis": "national"
+    },
+    "20": {
+      "tag": "OTT",
+      "flag": "ottoman-1844",
+      "basis": "national"
+    },
+    "21": {
+      "tag": "LUX",
+      "flag": "luxembourg",
+      "basis": "national"
+    },
+    "22": {
+      "tag": "MCO",
+      "flag": "monaco",
+      "basis": "national"
+    },
+    "23": {
+      "tag": "SMR",
+      "flag": "san-marino-1862",
+      "basis": "national"
+    },
+    "24": {
+      "tag": "AND",
+      "flag": "andorra-1866",
+      "basis": "national"
+    },
+    "25": {
+      "tag": "LIE",
+      "flag": "liechtenstein-1852",
+      "basis": "national"
+    },
+    "26": {
+      "tag": "CHN",
+      "flag": "qing-1889",
+      "basis": "national"
+    },
+    "27": {
+      "tag": "KOR",
+      "flag": "korea-1882",
+      "basis": "national"
+    },
+    "28": {
+      "tag": "PER",
+      "flag": "persia-qajar",
+      "basis": "national"
+    },
+    "29": {
+      "tag": "AFG",
+      "flag": "afghanistan-1880",
+      "basis": "national"
+    },
+    "30": {
+      "tag": "NPL",
+      "flag": "nepal",
+      "basis": "national"
+    },
+    "31": {
+      "tag": "THA",
+      "flag": "siam-1855",
+      "basis": "national"
+    },
+    "32": {
+      "tag": "OMN",
+      "flag": "oman",
+      "basis": "national"
+    },
+    "33": {
+      "tag": "ETH",
+      "flag": "ethiopia-1897",
+      "basis": "national"
+    },
+    "34": {
+      "tag": "LBR",
+      "flag": "liberia",
+      "basis": "national"
+    },
+    "35": {
+      "tag": "MAR",
+      "flag": "morocco-1666",
+      "basis": "national"
+    },
+    "36": {
+      "tag": "ZAR",
+      "flag": null,
+      "basis": "fallback",
+      "fallbackReason": "The Transvaal Vierkleur artwork on Commons ('Flag of Transvaal.svg') is CC BY-SA 3.0 and is excluded by the PD/CC0-only policy. No PD/CC0 vector artwork of the 1857–1902 Vierkleur was found; the available PD photograph contains overlaid text and is unsuitable as a flag asset. Monogram retained."
+    },
+    "37": {
+      "tag": "ORF",
+      "flag": "orange-free-state",
+      "basis": "national"
+    },
+    "38": {
+      "tag": "MEX",
+      "flag": "mexico-1893",
+      "basis": "national"
+    },
+    "39": {
+      "tag": "GUA",
+      "flag": "guatemala-1871",
+      "basis": "national"
+    },
+    "40": {
+      "tag": "HON",
+      "flag": "honduras-1866",
+      "basis": "national"
+    },
+    "41": {
+      "tag": "SAL",
+      "flag": "el-salvador-1875",
+      "basis": "national"
+    },
+    "42": {
+      "tag": "NIC",
+      "flag": "nicaragua-1896",
+      "basis": "national"
+    },
+    "43": {
+      "tag": "COS",
+      "flag": "costa-rica-1848",
+      "basis": "national"
+    },
+    "44": {
+      "tag": "COL",
+      "flag": "colombia",
+      "basis": "national"
+    },
+    "45": {
+      "tag": "VEN",
+      "flag": "venezuela-1863",
+      "basis": "national"
+    },
+    "46": {
+      "tag": "ECU",
+      "flag": "ecuador-civil",
+      "basis": "national"
+    },
+    "47": {
+      "tag": "PRU",
+      "flag": "peru-1884",
+      "basis": "national"
+    },
+    "48": {
+      "tag": "BOL",
+      "flag": "bolivia",
+      "basis": "national"
+    },
+    "49": {
+      "tag": "CHL",
+      "flag": "chile",
+      "basis": "national"
+    },
+    "50": {
+      "tag": "ARG",
+      "flag": "argentina",
+      "basis": "national"
+    },
+    "51": {
+      "tag": "URY",
+      "flag": "uruguay",
+      "basis": "national"
+    },
+    "52": {
+      "tag": "PRY",
+      "flag": "paraguay-1842",
+      "basis": "national"
+    },
+    "53": {
+      "tag": "BRA",
+      "flag": "brazil-1889",
+      "basis": "national"
+    },
+    "54": {
+      "tag": "HTI",
+      "flag": "haiti-1859",
+      "basis": "national"
+    },
+    "55": {
+      "tag": "DOM",
+      "flag": "dominican-republic",
+      "basis": "national"
+    },
+    "56": {
+      "tag": "CAN",
+      "flag": "canada-red-ensign-1868",
+      "basis": "national"
+    },
+    "57": {
+      "tag": "AUS",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag"
+    },
+    "58": {
+      "tag": "NZL",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag"
+    },
+    "59": {
+      "tag": "CUB",
+      "flag": "cuba",
+      "basis": "national"
+    },
+    "100": {
+      "tag": "BIN",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "101": {
+      "tag": "CEY",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "102": {
+      "tag": "MAL",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "103": {
+      "tag": "HKG",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "104": {
+      "tag": "KUW",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "105": {
+      "tag": "TRU",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "106": {
+      "tag": "CYP",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "107": {
+      "tag": "MLT",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "108": {
+      "tag": "BWI",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "109": {
+      "tag": "BSA",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "110": {
+      "tag": "BWA",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "111": {
+      "tag": "BEA",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "112": {
+      "tag": "SUD",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "113": {
+      "tag": "BSO",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "114": {
+      "tag": "CRA",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "115": {
+      "tag": "HCT",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "116": {
+      "tag": "FJI",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "117": {
+      "tag": "BPO",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "118": {
+      "tag": "CAP",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "119": {
+      "tag": "NAT",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "120": {
+      "tag": "NFD",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "121": {
+      "tag": "ALG",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "122": {
+      "tag": "TUN",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "123": {
+      "tag": "FWA",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "124": {
+      "tag": "FEA",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "125": {
+      "tag": "FIC",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "126": {
+      "tag": "MAD",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "127": {
+      "tag": "FSO",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "128": {
+      "tag": "FCA",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "129": {
+      "tag": "FPO",
+      "flag": "france-tricolour",
+      "basis": "sovereign-flag",
+      "sovereignTag": "FRA"
+    },
+    "130": {
+      "tag": "GEA",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "131": {
+      "tag": "GSW",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "132": {
+      "tag": "KAM",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "133": {
+      "tag": "TOG",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "134": {
+      "tag": "GNG",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "135": {
+      "tag": "GSA",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "136": {
+      "tag": "GPN",
+      "flag": "germany-1867",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DEU"
+    },
+    "137": {
+      "tag": "CFS",
+      "flag": "belgium",
+      "basis": "sovereign-flag",
+      "sovereignTag": "BEL"
+    },
+    "138": {
+      "tag": "ANG",
+      "flag": "portugal-1830",
+      "basis": "sovereign-flag",
+      "sovereignTag": "PRT"
+    },
+    "139": {
+      "tag": "MOZ",
+      "flag": "portugal-1830",
+      "basis": "sovereign-flag",
+      "sovereignTag": "PRT"
+    },
+    "140": {
+      "tag": "PAI",
+      "flag": "portugal-1830",
+      "basis": "sovereign-flag",
+      "sovereignTag": "PRT"
+    },
+    "141": {
+      "tag": "PTM",
+      "flag": "portugal-1830",
+      "basis": "sovereign-flag",
+      "sovereignTag": "PRT"
+    },
+    "142": {
+      "tag": "MAC",
+      "flag": "portugal-1830",
+      "basis": "sovereign-flag",
+      "sovereignTag": "PRT"
+    },
+    "143": {
+      "tag": "ERI",
+      "flag": "italy-1861",
+      "basis": "sovereign-flag",
+      "sovereignTag": "ITA"
+    },
+    "144": {
+      "tag": "ITS",
+      "flag": "italy-1861",
+      "basis": "sovereign-flag",
+      "sovereignTag": "ITA"
+    },
+    "145": {
+      "tag": "DEI",
+      "flag": "netherlands",
+      "basis": "sovereign-flag",
+      "sovereignTag": "NLD"
+    },
+    "146": {
+      "tag": "SUR",
+      "flag": "netherlands",
+      "basis": "sovereign-flag",
+      "sovereignTag": "NLD"
+    },
+    "147": {
+      "tag": "DGC",
+      "flag": "netherlands",
+      "basis": "sovereign-flag",
+      "sovereignTag": "NLD"
+    },
+    "148": {
+      "tag": "SAH",
+      "flag": null,
+      "basis": "fallback",
+      "sovereignTag": "ESP",
+      "fallbackReason": "Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible."
+    },
+    "149": {
+      "tag": "SGG",
+      "flag": null,
+      "basis": "fallback",
+      "sovereignTag": "ESP",
+      "fallbackReason": "Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible."
+    },
+    "150": {
+      "tag": "PHL",
+      "flag": "usa-45-star",
+      "basis": "sovereign-flag",
+      "sovereignTag": "USA"
+    },
+    "151": {
+      "tag": "PRI",
+      "flag": "usa-45-star",
+      "basis": "sovereign-flag",
+      "sovereignTag": "USA"
+    },
+    "152": {
+      "tag": "GUM",
+      "flag": "usa-45-star",
+      "basis": "sovereign-flag",
+      "sovereignTag": "USA"
+    },
+    "153": {
+      "tag": "ASM",
+      "flag": "usa-45-star",
+      "basis": "sovereign-flag",
+      "sovereignTag": "USA"
+    },
+    "154": {
+      "tag": "ISL",
+      "flag": "denmark",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DNK"
+    },
+    "155": {
+      "tag": "GRL",
+      "flag": "denmark",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DNK"
+    },
+    "156": {
+      "tag": "FRO",
+      "flag": "denmark",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DNK"
+    },
+    "157": {
+      "tag": "DWI",
+      "flag": "denmark",
+      "basis": "sovereign-flag",
+      "sovereignTag": "DNK"
+    },
+    "158": {
+      "tag": "EGY",
+      "flag": "egypt-1882",
+      "basis": "documented-exception",
+      "sovereignTag": "OTT",
+      "exceptionReason": "Egypt was an autonomous Ottoman province with a recognised flag of its own, not a colony. The khedival flag is historically documented for 1882–1922 and the AUT status badge remains visible."
+    },
+    "159": {
+      "tag": "BHU",
+      "flag": "uk-union-1801",
+      "basis": "sovereign-flag",
+      "sovereignTag": "GBR"
+    },
+    "160": {
+      "tag": "FIN",
+      "flag": "russia-1896",
+      "basis": "sovereign-flag",
+      "sovereignTag": "RUS"
+    },
+    "161": {
+      "tag": "TWN",
+      "flag": "japan-1870",
+      "basis": "sovereign-flag",
+      "sovereignTag": "JPN"
+    }
+  }
+}

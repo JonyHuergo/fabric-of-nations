@@ -9,9 +9,10 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import { colors, nationColor, radii, spacing, type } from "../theme";
+import { colors, radii, spacing, type } from "../theme";
 import type { WorldCatalogData, WorldCatalogEntry, WorldMapData } from "../worldCatalogTypes";
 import { WorldMap, statusLabel } from "../components/WorldMap";
+import { CountryFlag } from "../components/CountryFlag";
 import { Badge, Button, Chip, Divider, Panel } from "../components/ui";
 
 const CONTINENTS = ["All", "Europe", "Asia", "Africa", "Americas", "Oceania"] as const;
@@ -188,7 +189,12 @@ export function CountrySelectionScreen({
               accessibilityState={{ selected: active }}
               onPress={() => setSelectedTag(entry.tag)}
             >
-              <View style={[styles.listSwatch, { backgroundColor: nationColor(entry.sovereignTag ?? entry.tag) }]} />
+              <CountryFlag
+                polityId={entry.id}
+                tag={entry.tag}
+                monogramTag={entry.sovereignTag ?? entry.tag}
+                size="picker"
+              />
               <View style={styles.listText}>
                 <Text style={[styles.listName, active ? styles.listNameActive : null]} numberOfLines={1}>
                   {entry.name}
@@ -226,14 +232,12 @@ export function CountrySelectionScreen({
           actions={<Badge label={selected.status} tone={statusTone(selected)} />}
         >
           <View style={styles.detailHeader}>
-            <View
-              style={[
-                styles.emblem,
-                { backgroundColor: nationColor(selected.sovereignTag ?? selected.tag) },
-              ]}
-            >
-              <Text style={styles.emblemText}>{selected.tag.slice(0, 2)}</Text>
-            </View>
+            <CountryFlag
+              polityId={selected.id}
+              tag={selected.tag}
+              monogramTag={selected.sovereignTag ?? selected.tag}
+              size="detail"
+            />
             <View style={styles.detailHeaderText}>
               <Text style={styles.detailCommon}>{selected.commonName}</Text>
               <Text style={styles.detailTag}>
@@ -447,7 +451,6 @@ const styles = StyleSheet.create({
   },
   listRowActive: { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong },
   listRowMuted: { opacity: 0.75 },
-  listSwatch: { width: 12, height: 12, borderRadius: 2 },
   listText: { flex: 1 },
   listName: { ...type.body, color: colors.text },
   listNameActive: { color: colors.accentStrong, fontWeight: "700" },
@@ -459,16 +462,6 @@ const styles = StyleSheet.create({
   narrowContent: { padding: spacing.sm, gap: spacing.sm },
   paneToggle: { flexDirection: "row", gap: spacing.xs },
   detailHeader: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  emblem: {
-    width: 46,
-    height: 52,
-    borderRadius: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.35)",
-  },
-  emblemText: { color: "#f7f1e1", fontSize: 16, fontWeight: "800", letterSpacing: 1 },
   detailHeaderText: { flex: 1 },
   detailCommon: { ...type.title, fontSize: 18, color: colors.textStrong },
   detailTag: { ...type.tiny, marginTop: 1 },

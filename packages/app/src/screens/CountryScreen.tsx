@@ -15,7 +15,8 @@ import {
 } from "@century/sim-worker";
 
 import { Badge, Notice, Section, StatRow } from "../components/ui";
-import { colors, nationColor, radii, spacing, type } from "../theme";
+import { CountryFlag } from "../components/CountryFlag";
+import { colors, radii, spacing, type } from "../theme";
 import { statusLabel } from "../components/WorldMap";
 
 export function CountryScreen({
@@ -50,9 +51,7 @@ export function CountryScreen({
   return (
     <View>
       <View style={styles.identityPanel}>
-        <View style={[styles.emblem, { backgroundColor: nationColor(country.tag) }]}>
-          <Text style={styles.emblemText}>{country.tag.slice(0, 2)}</Text>
-        </View>
+        <CountryFlag polityId={country.id} tag={country.tag} size="detail" />
         <View style={styles.identityText}>
           <Text style={styles.identityName}>{country.name}</Text>
           <Text style={styles.identityMeta}>
@@ -347,16 +346,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.md,
   },
-  emblem: {
-    width: 48,
-    height: 54,
-    borderRadius: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.35)",
-  },
-  emblemText: { color: "#f7f1e1", fontSize: 16, fontWeight: "800", letterSpacing: 1 },
   identityText: { flex: 1 },
   identityName: { ...type.title, fontSize: 18 },
   identityMeta: { ...type.tiny, marginTop: 1 },

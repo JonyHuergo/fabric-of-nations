@@ -1,0 +1,455 @@
+{
+  "generatedBy": "scripts/m11/build-flags.mjs",
+  "rasterWidth": 500,
+  "note": "SHA-256 hashes pin the committed PNG renditions. Run `pnpm flags:check` offline; `pnpm flags:audit` re-verifies the Commons licences.",
+  "assets": {
+    "afghanistan-1880": {
+      "file": "afghanistan-1880.png",
+      "sha256": "e246a2fa630fffab1394dcfcec60362c3d19b472f634e9e10085fcf90bef4c24",
+      "bytes": 982,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "andorra-1866": {
+      "file": "andorra-1866.png",
+      "sha256": "418fae3f37dc841ab87d73d61b9df84558b7de7e20b5b45553c999f4a01bb5c6",
+      "bytes": 4183,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "argentina": {
+      "file": "argentina.png",
+      "sha256": "09e327d539286dd7a5f70996e2e1b61b789b9c25e6451aff872d1e2b4ff65f29",
+      "bytes": 15384,
+      "width": 500,
+      "height": 313,
+      "aspectRatio": 1.597444
+    },
+    "belgium": {
+      "file": "belgium.png",
+      "sha256": "1df5afddcdff84816b6f6a0180e4cc7c6c4256cf1cfd78c54ba768e48e853a7a",
+      "bytes": 680,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "bolivia": {
+      "file": "bolivia.png",
+      "sha256": "3db47f184ac6375ec00b6b66bca8568a00213b4ea23d469260d9b9693e4f1c99",
+      "bytes": 19049,
+      "width": 500,
+      "height": 341,
+      "aspectRatio": 1.466276
+    },
+    "brazil-1889": {
+      "file": "brazil-1889.png",
+      "sha256": "b42a4d0a38ac15c2782ddc3f186c84dd6db60646798503623e4b0d69a52f3d4e",
+      "bytes": 20607,
+      "width": 500,
+      "height": 350,
+      "aspectRatio": 1.428571
+    },
+    "bulgaria-1879": {
+      "file": "bulgaria-1879.png",
+      "sha256": "1237a2357463702ddab5cdf280c328fcce7b95dff79647ed5f00f588e61abe85",
+      "bytes": 434,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "canada-red-ensign-1868": {
+      "file": "canada-red-ensign-1868.png",
+      "sha256": "082ad6992795c5a3b16d13a70157b12f30eb345df5d596bd95a4d20e20d72862",
+      "bytes": 16709,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "chile": {
+      "file": "chile.png",
+      "sha256": "b25feb68f7b163a96e171934c6dc67f191161a4c92c5f53870d357a730c9bd5f",
+      "bytes": 2238,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "colombia": {
+      "file": "colombia.png",
+      "sha256": "a26a2c75e0d9024c8cc95f53aac12580a1ca1dec1faaeb078d1fa3c5b5aa9c76",
+      "bytes": 652,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "costa-rica-1848": {
+      "file": "costa-rica-1848.png",
+      "sha256": "8394e6d0b95c75aa91af699bc640f850738f0cb5b664ea0f62e5c8fe72b8244e",
+      "bytes": 37184,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "cuba": {
+      "file": "cuba.png",
+      "sha256": "89ff8d31007fe0b41e2e787d69519acb214623bcc428c7bd5f82096ef3624ae2",
+      "bytes": 6370,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "denmark": {
+      "file": "denmark.png",
+      "sha256": "3351068c21cfadafa9d4efa2dbd3147c453a5507437b5ae112750184e4e70d56",
+      "bytes": 790,
+      "width": 500,
+      "height": 379,
+      "aspectRatio": 1.319261
+    },
+    "dominican-republic": {
+      "file": "dominican-republic.png",
+      "sha256": "a99efeb81d5a7308d1f5339da3ad0d4b3cbccf0acea03a386050009a303d3ebe",
+      "bytes": 12096,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "ecuador-civil": {
+      "file": "ecuador-civil.png",
+      "sha256": "83d04212d44d2bd14c35d5929d5bece3322f29e2a4e21001f504082f037f71dc",
+      "bytes": 462,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "egypt-1882": {
+      "file": "egypt-1882.png",
+      "sha256": "019c2d04ad68b9cc19a6eb82ade9eebbaf43648237fe0f26a302a316272f804e",
+      "bytes": 11524,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "el-salvador-1875": {
+      "file": "el-salvador-1875.png",
+      "sha256": "6d9c80124b2cb0cc59bfce9b5ba90f1e6bc7fa63d244d6d2cd2555c111ffcee5",
+      "bytes": 7366,
+      "width": 500,
+      "height": 286,
+      "aspectRatio": 1.748252
+    },
+    "ethiopia-1897": {
+      "file": "ethiopia-1897.png",
+      "sha256": "63ee595672205a089df621442ac2aa38cd1c71ab3e423b5841a9b87221cff46f",
+      "bytes": 21987,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "france-tricolour": {
+      "file": "france-tricolour.png",
+      "sha256": "ffe75c9502493ce3e3641ad9ec2bfe3bb70e1ebdc6b53cca265152526bb5f1d2",
+      "bytes": 713,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "germany-1867": {
+      "file": "germany-1867.png",
+      "sha256": "8e1a8419a4be4e6bac4dfeed2db41e03a0ef92ab4c0f13eed1d7383cfc774897",
+      "bytes": 692,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "greece-1822": {
+      "file": "greece-1822.png",
+      "sha256": "59b30494725058cd9194614f053a2df94b5913a6b69865cd54d834dc62321c7c",
+      "bytes": 724,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "guatemala-1871": {
+      "file": "guatemala-1871.png",
+      "sha256": "bca814694a3a1284dec7494052f4e76092c66f924d1352b6fbde20625ebb4250",
+      "bytes": 37380,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "haiti-1859": {
+      "file": "haiti-1859.png",
+      "sha256": "b0edb2ed6133c93d4f57486f0c193b1bc77d73806d32140b32f09c9eca594f2b",
+      "bytes": 21234,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "honduras-1866": {
+      "file": "honduras-1866.png",
+      "sha256": "5ecef907e5d7050a58784d763c8336db3d1ee92843505044757450e609d45455",
+      "bytes": 2361,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "italy-1861": {
+      "file": "italy-1861.png",
+      "sha256": "2f830d011cae02444cf6cf5aac0a8865139039db2f7c7cb6ad9b76dff2ef8e9c",
+      "bytes": 2406,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "japan-1870": {
+      "file": "japan-1870.png",
+      "sha256": "e8c99d7068156ec8c82894078610be36a8077f26965c4c07c537a4273c8561af",
+      "bytes": 2928,
+      "width": 500,
+      "height": 350,
+      "aspectRatio": 1.428571
+    },
+    "korea-1882": {
+      "file": "korea-1882.png",
+      "sha256": "885f1a970a0c822b1a5d9c487330ff8a3b6664ca0d4caf9ad81dc9c3cb06c355",
+      "bytes": 19068,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "liberia": {
+      "file": "liberia.png",
+      "sha256": "1fe03961e18efd8561eaa378486294f5348a35e2ae721270e03311899bd70288",
+      "bytes": 2101,
+      "width": 500,
+      "height": 264,
+      "aspectRatio": 1.893939
+    },
+    "liechtenstein-1852": {
+      "file": "liechtenstein-1852.png",
+      "sha256": "220848a58e57fae2364761bda579d835fe7a0bd31742f6a52cadf2a420c745b6",
+      "bytes": 427,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "luxembourg": {
+      "file": "luxembourg.png",
+      "sha256": "c47b843a6d5038935f5a2127a63c38d4c1be305c336c26170ff6a3700edbe33a",
+      "bytes": 398,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "mexico-1893": {
+      "file": "mexico-1893.png",
+      "sha256": "2fde035ed51b0e1f6da26395b5cdd9a738745f85ffbadebd300d6cc54bd059e2",
+      "bytes": 25891,
+      "width": 500,
+      "height": 286,
+      "aspectRatio": 1.748252
+    },
+    "monaco": {
+      "file": "monaco.png",
+      "sha256": "123ba0d0de5891859d89206d6213cd38c2b029325fae1e5efd22b59f0841f637",
+      "bytes": 382,
+      "width": 500,
+      "height": 400,
+      "aspectRatio": 1.25
+    },
+    "morocco-1666": {
+      "file": "morocco-1666.png",
+      "sha256": "1d20c89f6f0f5c2ee40143ac8ced1b82cd340cd88c24cfc94d7e2ca022553a59",
+      "bytes": 453,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "nepal": {
+      "file": "nepal.png",
+      "sha256": "33eee1e801a1660b0e1d399b2d6b1b3f8fe2f3f283bf485b7802a0f4bd7cf81d",
+      "bytes": 22034,
+      "width": 500,
+      "height": 610,
+      "aspectRatio": 0.819672
+    },
+    "netherlands": {
+      "file": "netherlands.png",
+      "sha256": "0b58f42c8f3a6a0199d73850ddbab4a198cdc9f110cbd5521c50c8140842c979",
+      "bytes": 692,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "nicaragua-1896": {
+      "file": "nicaragua-1896.png",
+      "sha256": "b486c38c9469b5dcc5eb17c9ae0aa3fae3554bd0879a55eb9e0ab4ea066cc57d",
+      "bytes": 14517,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "norway-1899": {
+      "file": "norway-1899.png",
+      "sha256": "a512961d522668d4ce7ea0f125c577a5d607152dd335c68d78bed32751b0536a",
+      "bytes": 1198,
+      "width": 500,
+      "height": 364,
+      "aspectRatio": 1.373626
+    },
+    "oman": {
+      "file": "oman.png",
+      "sha256": "608295ef9efeb8c6ee488afd64c5b4ceba7b5a442463768bd8b3bd5e892c3637",
+      "bytes": 489,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "orange-free-state": {
+      "file": "orange-free-state.png",
+      "sha256": "e38dfe40912c6fd4ea88a93fc32f7ee355baf54f65aad587480c20f33ffc80a1",
+      "bytes": 1036,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "ottoman-1844": {
+      "file": "ottoman-1844.png",
+      "sha256": "351848c1c610bad3ee9a6c7efed667833b7bb0f5b1ef49a8f3221c56f965b526",
+      "bytes": 8734,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "paraguay-1842": {
+      "file": "paraguay-1842.png",
+      "sha256": "17341bd8e5620d907a53248db20140f73b83c16b34e431ad9ed2cc6749d14ce4",
+      "bytes": 17079,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "persia-qajar": {
+      "file": "persia-qajar.png",
+      "sha256": "86163f1fca414c75a0714dbc8180eb007ab9590aa626e56385c5b829b1c96db1",
+      "bytes": 18315,
+      "width": 500,
+      "height": 166,
+      "aspectRatio": 3.012048
+    },
+    "peru-1884": {
+      "file": "peru-1884.png",
+      "sha256": "bbbb40525c3ad1d777d4cd503420dcdac1eaed342cc81d2ffcd3ce0a91227ccc",
+      "bytes": 32612,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "portugal-1830": {
+      "file": "portugal-1830.png",
+      "sha256": "9df78d009402d46243b35397ede785db6e233b0b02298acaf6d81d210f530b66",
+      "bytes": 35797,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "qing-1889": {
+      "file": "qing-1889.png",
+      "sha256": "aa9cc06aa5d0614dc3990a4720234e2a6b1dbf0d676df4fd07d0312086ab755f",
+      "bytes": 84035,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "romania-1867": {
+      "file": "romania-1867.png",
+      "sha256": "1e7520d43661d631638704ae9aaac46fb6719fb9e69e00a49c29011ea4f469dc",
+      "bytes": 680,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "russia-1896": {
+      "file": "russia-1896.png",
+      "sha256": "b23d90f484c482249e5420e8a2b304ba7abd6ccb4b12ac182f972564f04e6d87",
+      "bytes": 692,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "san-marino-1862": {
+      "file": "san-marino-1862.png",
+      "sha256": "d8a6aea6f677fdc3b05e1d15f3f72e8c13861799ec007b4d376ca4e75b2b7b71",
+      "bytes": 42467,
+      "width": 500,
+      "height": 375,
+      "aspectRatio": 1.333333
+    },
+    "serbia-civil": {
+      "file": "serbia-civil.png",
+      "sha256": "5f9c2c80b61519a9cefc99b0bb78a3c7cddd01dc57acb76ec8b6742b9bb7fa5d",
+      "bytes": 656,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "siam-1855": {
+      "file": "siam-1855.png",
+      "sha256": "9c94dee412af7220eca8b91b42f910d891de1447cef74b58e573e1e5a73a61fa",
+      "bytes": 56347,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "sweden-1844": {
+      "file": "sweden-1844.png",
+      "sha256": "3dc0a83ffa226fa5c5745ff3acbeebae59f53ff6ac93c0852c51f76a667a6d9c",
+      "bytes": 2460,
+      "width": 500,
+      "height": 313,
+      "aspectRatio": 1.597444
+    },
+    "switzerland": {
+      "file": "switzerland.png",
+      "sha256": "a16843efd7555c0558b88df9ee86513486e66233d6215bf913fd2e70d6bd70ec",
+      "bytes": 762,
+      "width": 500,
+      "height": 500,
+      "aspectRatio": 1
+    },
+    "uk-union-1801": {
+      "file": "uk-union-1801.png",
+      "sha256": "25cca2afa4b84a66b0648142b7b59d2b631c3729fb46c66e580355325726726f",
+      "bytes": 2558,
+      "width": 500,
+      "height": 300,
+      "aspectRatio": 1.666667
+    },
+    "uruguay": {
+      "file": "uruguay.png",
+      "sha256": "a3aed27d150947d58e6dcba5ff27863af6e032438276539d8c30e90ab46fb717",
+      "bytes": 18260,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "usa-45-star": {
+      "file": "usa-45-star.png",
+      "sha256": "75a08254556405a97292272ff86b10cd2604c2faaaa20f5d17c90479d26e1f65",
+      "bytes": 3488,
+      "width": 500,
+      "height": 264,
+      "aspectRatio": 1.893939
+    },
+    "venezuela-1863": {
+      "file": "venezuela-1863.png",
+      "sha256": "66e1c7aa2a977d9aea8da00a2c1e0cdb968705bae06fcca8cf09b9d0ef31aeac",
+      "bytes": 3161,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    }
+  }
+}
