@@ -9,8 +9,10 @@ import {
   serializeWorld,
 } from "@century/sim";
 
+import { m5World } from "./fixtures/m5.js";
+
 describe("determinism", () => {
-  test("identical worlds produce identical century-scale results", () => {
+  test("identical worlds produce identical century-scale driver results", () => {
     const first = createInitialWorld({ seed: 123_456_789, scenarioId: "m1-determinism" });
     const second = createInitialWorld({ seed: 123_456_789, scenarioId: "m1-determinism" });
 
@@ -23,17 +25,43 @@ describe("determinism", () => {
     expect(hashWorld(second)).toBe(hashWorld(first));
   });
 
-  test("matches the fixed century-run regression digest", () => {
+  test("matches the fixed empty-world century driver digest", () => {
     const world = createInitialWorld({ seed: 123_456_789, scenarioId: "m1-determinism" });
+    expect(world.popBlocks).toHaveLength(0);
+    expect(world.buildings).toHaveLength(0);
+    expect(world.markets).toHaveLength(0);
     runCampaign(world);
 
-    // Known-answer digest for the M1 empty-world tick driver under schema 25.
+    // Known-answer digest for the M1 empty-world tick driver under schema 26.
     // Schema 22 added the M9 technology-system flag and age-specific literacy; E6a
-    // (schema 24) adds `World.trade` and `Market.customsCountryId`. The M1 empty-world
-    // *behaviour* is unchanged; only the encoded state shape changed, so this digest is
-    // intentionally re-pinned. A change here requires an intentional
-    // simulation-version decision.
+    // (schema 24) added `World.trade` and `Market.customsCountryId`, and M10
+    // (schema 26) added military state. The M1 empty-world *behaviour* is unchanged;
+    // only the encoded state shape changed, so this digest is intentionally
+    // re-pinned. A change here requires an intentional simulation-version decision.
     expect(hashWorld(world)).toBe("c12de75e045ad0b0");
+  });
+
+  test("a one-year economic simulation is deterministic and save/resume safe", () => {
+    const first = m5World();
+    const second = m5World();
+    const context = {
+      population: { definitions: first.scenario.population.definitions },
+      economy: { definitions: first.scenario.definitions },
+    };
+    const firstSummary = runTicks(first.world, 365, context);
+    const secondSummary = runTicks(second.world, 365, context);
+    expect(firstSummary.ticksProcessed).toBe(365);
+    expect(secondSummary).toEqual(firstSummary);
+    expect(hashWorld(second.world)).toBe(hashWorld(first.world));
+    expect(serializeWorld(second.world)).toBe(serializeWorld(first.world));
+
+    const resumed = m5World();
+    runTicks(resumed.world, 180, context);
+    const restored = deserializeWorld(serializeWorld(resumed.world));
+    runTicks(resumed.world, 185, context);
+    runTicks(restored, 185, context);
+    expect(hashWorld(restored)).toBe(hashWorld(resumed.world));
+    expect(serializeWorld(restored)).toBe(serializeWorld(resumed.world));
   });
 
   test("same seed with different scenarios or data identity is distinguishable", () => {
