@@ -40,6 +40,7 @@ const CATALOG = JSON.parse(
     sovereignTag: string | null;
     selectable: boolean;
     geometry: string[];
+    markerOnly?: boolean;
     continent: string;
   }[];
   territories: {
@@ -51,6 +52,7 @@ const CATALOG = JSON.parse(
     sovereignTag: string;
     selectable: boolean;
     geometry: string[];
+    markerOnly?: boolean;
     continent: string;
   }[];
   markets: { id: number; key: string; name: string; kind: string; customsTag: string }[];
@@ -124,14 +126,18 @@ function lastEvent(events: WorkerEvent[]): WorkerEvent {
 describe("M11 historical catalog", () => {
   test("classification is complete and internally consistent", () => {
     expect(CATALOG.meta.startDate).toBe("1900-01-01");
-    expect(CATALOG.states.length).toBe(60);
-    expect(CATALOG.territories.length).toBe(62);
-    expect(CATALOG.markets.length).toBe(18);
+    expect(CATALOG.states.length).toBe(67);
+    expect(CATALOG.territories.length).toBe(66);
+    expect(CATALOG.markets.length).toBe(20);
     const selectable = CATALOG.states.filter((state) => state.selectable);
-    expect(selectable.length).toBeGreaterThanOrEqual(59);
+    expect(selectable.length).toBeGreaterThanOrEqual(66);
     for (const state of CATALOG.states) {
       expect(state.selectable).toBe(SELECTABLE_STATUSES.has(state.status));
-      expect(state.geometry.length).toBeGreaterThan(0);
+      if (state.markerOnly === true) {
+        expect(state.geometry).toEqual([]);
+      } else {
+        expect(state.geometry.length).toBeGreaterThan(0);
+      }
       expect(state.continent.length).toBeGreaterThan(0);
       expect(["Americas", "Europe", "Asia", "Africa", "Oceania"]).toContain(state.continent);
     }
@@ -141,15 +147,15 @@ describe("M11 historical catalog", () => {
       expect(territory.kind).toBe("territory");
     }
     const ids = new Set([...CATALOG.states, ...CATALOG.territories].map((entry) => entry.id));
-    expect(ids.size).toBe(122);
+    expect(ids.size).toBe(133);
     const tags = new Set([...CATALOG.states, ...CATALOG.territories].map((entry) => entry.tag));
-    expect(tags.size).toBe(122);
+    expect(tags.size).toBe(133);
     // No territory may be presented as an independent state.
     for (const territory of CATALOG.territories) {
       expect(territory.status).not.toBe("independent");
     }
     // Independent states that must be present in 1900.
-    for (const tag of ["USA", "GBR", "DEU", "FRA", "RUS", "JPN", "OTT", "CHN", "ETH", "LBR", "MAR", "ZAR", "ORF", "MEX", "BRA", "ARG", "CHL", "THA", "PER", "KOR"]) {
+    for (const tag of ["USA", "GBR", "DEU", "FRA", "RUS", "JPN", "OTT", "CHN", "ETH", "LBR", "MAR", "ZAR", "ORF", "MEX", "BRA", "ARG", "CHL", "THA", "PER", "KOR", "AUT", "TON", "SOK", "WAD", "DAR", "SHM", "CRT"]) {
       expect(tags.has(tag)).toBe(true);
     }
   });
@@ -163,14 +169,14 @@ describe("M11 world initialization", () => {
   const scenario = loadM11World();
 
   test("every selectable country exists as a playable simulation entity", () => {
-    expect(scenario.countries?.length).toBe(60);
-    expect(scenario.population.regions.length).toBe(122);
-    expect(scenario.markets.length).toBe(18);
-    expect(scenario.countryMeta?.length).toBe(60);
-    expect(scenario.marketMeta?.length).toBe(18);
-    expect(scenario.regionMeta?.length).toBe(62);
+    expect(scenario.countries?.length).toBe(67);
+    expect(scenario.population.regions.length).toBe(133);
+    expect(scenario.markets.length).toBe(20);
+    expect(scenario.countryMeta?.length).toBe(67);
+    expect(scenario.marketMeta?.length).toBe(20);
+    expect(scenario.regionMeta?.length).toBe(66);
     const byTag = tagsOfScenario(scenario);
-    expect(byTag.size).toBe(60);
+    expect(byTag.size).toBe(67);
     for (const meta of scenario.countryMeta ?? []) {
       if (!meta.selectable) continue;
       const country = scenario.countries?.find((candidate) => candidate.id === meta.countryId);
@@ -187,7 +193,7 @@ describe("M11 world initialization", () => {
   test("every selectable country can initialize a campaign", () => {
     const base = loadM11World();
     const selectable = (base.countryMeta ?? []).filter((meta) => meta.selectable);
-    expect(selectable.length).toBe(59);
+    expect(selectable.length).toBe(66);
     for (const meta of selectable) {
       const scenario = { ...base, playerCountryId: meta.countryId };
       const world = createEconomyWorld(scenario, { seed: 3 });
@@ -260,7 +266,7 @@ describe("M11 country selection and persistence", () => {
     expect(result.accepted).toBe(true);
     expect(result.snapshot.playerCountryId).toBe(countryId);
     expect(result.snapshot.countries.map((country) => country.tag)).toEqual([tag]);
-    expect(result.snapshot.countrySummaries.length).toBe(60);
+    expect(result.snapshot.countrySummaries.length).toBe(67);
   });
 
   test("non-selectable and unknown countries are rejected", () => {
@@ -384,7 +390,7 @@ describe("M11 map data", () => {
     for (const entry of [...CATALOG.states, ...CATALOG.territories]) {
       expect(tags.has(entry.tag)).toBe(true);
     }
-    expect(MAP.polities.length).toBe(122);
+    expect(MAP.polities.length).toBe(133);
     for (const polity of MAP.polities) {
       if (polity.markerOnly === true) {
         expect(polity.rings.length).toBe(0);

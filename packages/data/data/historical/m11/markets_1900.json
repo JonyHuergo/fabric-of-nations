@@ -30,7 +30,8 @@
       118,
       119,
       120,
-      159
+      159,
+      165
     ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
@@ -280,7 +281,9 @@
     "name": "Russian Imperial Market",
     "regionIds": [
       4,
-      160
+      160,
+      163,
+      164
     ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
@@ -288,7 +291,7 @@
       {
         "goodKey": "grain",
         "ownerBuildingKey": "rus-home-subsistence-farm",
-        "quantity": 32260000
+        "quantity": 33060000
       },
       {
         "goodKey": "food-products",
@@ -318,7 +321,7 @@
       {
         "goodKey": "cotton",
         "ownerBuildingKey": "rus-home-commercial-farm",
-        "quantity": 220000
+        "quantity": 228000
       },
       {
         "goodKey": "wool",
@@ -709,6 +712,8 @@
     "name": "Ottoman-Egyptian Market",
     "regionIds": [
       20,
+      65,
+      66,
       158
     ],
     "priceBasis": "base-1900",
@@ -717,7 +722,7 @@
       {
         "goodKey": "grain",
         "ownerBuildingKey": "ott-home-subsistence-farm",
-        "quantity": 8060000
+        "quantity": 8500000
       },
       {
         "goodKey": "food-products",
@@ -742,7 +747,7 @@
       {
         "goodKey": "cotton",
         "ownerBuildingKey": "ott-home-commercial-farm-peasant",
-        "quantity": 48000
+        "quantity": 50600
       },
       {
         "goodKey": "wool",
@@ -821,7 +826,8 @@
     "regionIds": [
       26,
       27,
-      31
+      31,
+      162
     ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
@@ -829,7 +835,7 @@
       {
         "goodKey": "grain",
         "ownerBuildingKey": "chn-home-subsistence-farm",
-        "quantity": 100760000
+        "quantity": 101100000
       },
       {
         "goodKey": "food-products",
@@ -854,7 +860,7 @@
       {
         "goodKey": "cotton",
         "ownerBuildingKey": "chn-home-commercial-farm-peasant",
-        "quantity": 692000
+        "quantity": 696000
       },
       {
         "goodKey": "wool",
@@ -930,7 +936,10 @@
     "regionIds": [
       33,
       34,
-      35
+      35,
+      62,
+      63,
+      64
     ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
@@ -938,7 +947,7 @@
       {
         "goodKey": "grain",
         "ownerBuildingKey": "eth-home-subsistence-farm",
-        "quantity": 3940000
+        "quantity": 7360000
       },
       {
         "goodKey": "food-products",
@@ -963,7 +972,7 @@
       {
         "goodKey": "cotton",
         "ownerBuildingKey": "eth-home-commercial-farm-peasant",
-        "quantity": 28000
+        "quantity": 52000
       },
       {
         "goodKey": "wool",
@@ -1097,6 +1106,115 @@
         "goodKey": "wool",
         "ownerBuildingKey": "chl-home-ranch",
         "quantity": 16000
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 18,
+    "key": "austro-hungarian",
+    "customsCountryTag": "AUT",
+    "name": "Austro-Hungarian Customs Union",
+    "regionIds": [
+      60
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "aut-home-subsistence-farm",
+        "quantity": 12120000
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "aut-home-food-processing",
+        "quantity": 604800
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "aut-home-ranch",
+        "quantity": 624000
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "aut-home-fishery",
+        "quantity": 624000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "aut-home-textile-mill",
+        "quantity": 102000
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "aut-home-workshop",
+        "quantity": 364000
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "aut-home-commercial-farm",
+        "quantity": 84000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "aut-home-ranch",
+        "quantity": 83200
+      }
+    ],
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 19,
+    "key": "pacific",
+    "customsCountryTag": "TON",
+    "name": "Pacific Island Trade",
+    "regionIds": [
+      61
+    ],
+    "priceBasis": "base-1900",
+    "initialPriceMultiplier": 0.25,
+    "stockLots": [
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "ton-home-subsistence-farm",
+        "quantity": 21080
+      },
+      {
+        "goodKey": "food-products",
+        "ownerBuildingKey": "ton-home-food-processing",
+        "quantity": 600
+      },
+      {
+        "goodKey": "livestock",
+        "ownerBuildingKey": "ton-home-ranch",
+        "quantity": 600
+      },
+      {
+        "goodKey": "fish",
+        "ownerBuildingKey": "ton-home-fishery",
+        "quantity": 600
+      },
+      {
+        "goodKey": "clothing",
+        "ownerBuildingKey": "ton-home-workshop-peasant",
+        "quantity": 200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "ton-home-commercial-farm-peasant",
+        "quantity": 40
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "ton-home-ranch",
+        "quantity": 40
       }
     ],
     "status": "provisional",

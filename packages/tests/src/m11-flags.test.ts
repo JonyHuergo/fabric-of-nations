@@ -50,9 +50,25 @@ const manifest = JSON.parse(readFileSync(join(DATA, "flags_1900.json"), "utf8"))
       sourceTitle: string;
       sourcePageUrl: string;
       sourceFileUrl: string;
-      sourceSha1: string;
+      sourceSha1: string | null;
       sourceWidth: number;
       sourceHeight: number;
+      sourceType: "commons" | "project";
+      flagKind: string;
+      project?: {
+        design: string;
+        width: number;
+        height: number;
+        components?: readonly {
+          role: string;
+          path: string;
+          sha256: string;
+          sourcePageUrl: string;
+          license: string;
+          licenseCode: string;
+          author: string;
+        }[];
+      };
       license: string;
       licenseCode: string;
       licenseUrl: string;
@@ -166,8 +182,8 @@ function runPipeline(args: readonly string[]): string {
 
 describe("M11 historical flags — catalog coverage", () => {
   test("every polity in the 1900 catalog has a flag or an explicit fallback reason", () => {
-    expect(allPolities).toHaveLength(122);
-    expect(Object.keys(manifest.polities)).toHaveLength(122);
+    expect(allPolities).toHaveLength(133);
+    expect(Object.keys(manifest.polities)).toHaveLength(133);
 
     for (const polity of allPolities) {
       const entry = manifest.polities[String(polity.id)];
@@ -183,16 +199,16 @@ describe("M11 historical flags — catalog coverage", () => {
     }
   });
 
-  test("the documented fallback set is exactly Spain, its colonies, Montenegro and the Transvaal", () => {
+  test("the only monogram fallbacks are Wadai and Darfur, each with a documented flag-uncertainty reason", () => {
     const fallbacks = Object.entries(manifest.polities)
       .filter(([, entry]) => entry.flag === null)
       .map(([id, entry]) => `${id}:${entry.tag}`)
       .sort();
-    expect(fallbacks).toEqual(["148:SAH", "149:SGG", "17:MNT", "36:ZAR", "7:ESP"]);
+    expect(fallbacks).toEqual(["63:WAD", "64:DAR"]);
     for (const [, entry] of Object.entries(manifest.polities).filter(
       ([, candidate]) => candidate.flag === null,
     )) {
-      expect(entry.fallbackReason).toMatch(/PD\/CC0|Public Domain|CC BY-SA|not standardised|unavailable/);
+      expect(entry.fallbackReason).toMatch(/No verified historical|monogram|flag design/);
     }
   });
 
@@ -212,9 +228,17 @@ describe("M11 historical flags — catalog coverage", () => {
     expect(flagForTag("CAN")?.description).toMatch(/Red Ensign/);
     expect(flagForTag("AUS")?.description).toMatch(/Union Flag/);
     expect(flagForTag("ORF")?.description).toMatch(/Orange Free State/);
-    expect(flagForTag("ZAR")).toBeNull();
+    expect(flagForTag("ZAR")?.description).toMatch(/Vierkleur/);
+    expect(flagForTag("ESP")?.description).toMatch(/Restoration-era Spanish/);
+    expect(flagForTag("MNT")?.description).toMatch(/Montenegrin/);
+    expect(flagForTag("AUT")?.description).toMatch(/Austria-Hungary/);
+    expect(flagForTag("TON")?.description).toMatch(/Tonga/);
+    expect(flagForTag("CRT")?.description).toMatch(/Cretan/);
+    expect(flagForTag("SOK")?.description).toMatch(/Sokoto/);
+    expect(flagForTag("SHM")?.description).toMatch(/Ha'il/);
     expect(flagForTag("USA")?.historicalNotes).toMatch(/50-star/);
     expect(flagForTag("CAN")?.historicalNotes).toMatch(/Union Jack remained/);
+    expect(flagForTag("AUT")?.historicalNotes).toMatch(/no single unified national flag/i);
   });
 });
 
@@ -308,7 +332,9 @@ describe("M11 historical flags — bundled assets and stable mapping", () => {
     expect(totalBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
 
     const directoryFiles = readdirSync(ASSET_DIR).sort();
-    expect(directoryFiles).toEqual([...assetIds.map((id) => `${id}.png`), "ledger.json"].sort());
+    expect(directoryFiles).toEqual(
+      [...assetIds.map((id) => `${id}.png`), "ledger.json", "source"].sort(),
+    );
     expect(readFileSync(join(ASSET_DIR, "ledger.json"), "utf8")).toContain('"generatedBy": "scripts/m11/build-flags.mjs"');
   });
 
@@ -431,7 +457,7 @@ describe("M11 historical flags — fallback behaviour", () => {
     expect(resolveBundledFlagId(9999, { 0: "usa-45-star" })).toBeNull();
     expect(resolveBundledFlagId(Number.NaN, { 0: "usa-45-star" })).toBeNull();
     expect(resolveBundledFlagId(-1, { 0: "usa-45-star" })).toBeNull();
-    for (const id of [7, 17, 36, 148, 149]) {
+    for (const id of [63, 64]) {
       const mapping = Object.fromEntries(
         mappingPairs().map((pair) => [pair.polityId, pair.flagId]),
       ) as Readonly<Record<number, string>>;
@@ -441,25 +467,39 @@ describe("M11 historical flags — fallback behaviour", () => {
 });
 
 describe("M11 historical flags — licensing and provenance audit", () => {
-  test("only individually verified Public Domain or CC0 files are bundled", () => {
-    expect(Object.keys(manifest.flags)).toHaveLength(56);
+  test("only individually verified Public Domain or CC0 files and documented project reconstructions are bundled", () => {
+    expect(Object.keys(manifest.flags)).toHaveLength(64);
     for (const [id, flag] of Object.entries(manifest.flags)) {
-      expect(["pd", "cc0"]).toContain(flag.licenseCode);
-      expect(flag.license).not.toMatch(/CC BY|GFDL|share-alike/i);
-      expect(flag.sourcePageUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
-      expect(flag.sourceFileUrl).toMatch(/^https:\/\/upload\.wikimedia\.org\//);
-      expect(flag.sourceSha1).toMatch(/^[0-9a-f]{40}$/);
+      if (flag.sourceType === "project") {
+        expect(flag.licenseCode).toBe("project");
+        expect(flag.license).toMatch(/Project-authored/);
+        expect(flag.sourcePageUrl).toMatch(/^internal:/);
+        expect(flag.flagKind).toBe("project-reconstruction");
+        expect(flag.project?.components?.length ?? 0).toBeGreaterThanOrEqual(0);
+      } else {
+        expect(["pd", "cc0"]).toContain(flag.licenseCode);
+        expect(flag.license).not.toMatch(/CC BY|GFDL|share-alike/i);
+        expect(flag.sourcePageUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+        expect(flag.sourceFileUrl).toMatch(/^https:\/\/upload\.wikimedia\.org\//);
+        expect(flag.sourceSha1).toMatch(/^[0-9a-f]{40}$/);
+      }
       expect(flag.author.length).toBeGreaterThan(0);
       expect(flag.retrievedAt).toBe("2026-10-30");
       expect(flag.validFrom).toMatch(/^\d{4}(-\d{2}(-\d{2})?)?$/);
       expect(flag.historicalNotes.length).toBeGreaterThan(40);
       expect(doc).toContain(`\`${id}\``);
-      expect(doc).toContain(flag.sourcePageUrl);
+      if (flag.sourceType === "project") {
+        expect(doc).toContain("project-authored reconstruction");
+      } else {
+        expect(doc).toContain(flag.sourcePageUrl);
+      }
       expect(provenanceSource).toContain(`id: "${id}"`);
     }
     expect(doc).toContain("Austria-Hungary");
     expect(doc).toContain("civil ensign");
     expect(doc).toContain("CC BY-SA");
+    expect(doc).toContain("Wadai");
+    expect(doc).toContain("Darfur");
     expect(provenanceSource).toContain("FLAG_FALLBACKS");
   });
 });
@@ -468,7 +508,7 @@ describe("M11 historical flags — reproducible asset pipeline", () => {
   test("the committed assets and generated outputs are current (offline check)", () => {
     const output = runPipeline(["--check"]);
     expect(output).toMatch(/flag assets are current/);
-    expect(output).toMatch(/56 flags/);
+    expect(output).toMatch(/64 flags/);
   }, 60_000);
 
   test("two independent offline emissions are byte-identical and match the committed outputs", () => {

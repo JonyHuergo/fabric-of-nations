@@ -106,10 +106,12 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 ## M11 historical world, country selection, map, and UI
 
 M11 turns Century into a map-driven grand-strategy game. The playable world is an
-authored 1900 catalog of **60 states** and **62 dependent territories** in
-**122 regions**, grouped into **18 documented markets**; **59 states are
+authored 1900 catalog of **67 states** and **66 dependent territories** in
+**133 regions**, grouped into **20 documented markets**; **66 states are
 selectable** and every one can start a valid campaign. The previous eight-polity
-sample remains a validated test fixture.
+sample remains a validated test fixture. The complete independent-state
+reconciliation and classification audit is
+[`docs/1900_CATALOG_COVERAGE.md`](./docs/1900_CATALOG_COVERAGE.md).
 
 - **Historical catalog and classification:** independence is coded in the
   Gleditsch–Ward / Correlates of War tradition documented by CShapes 2.0.
@@ -139,7 +141,7 @@ sample remains a validated test fixture.
   contextual polity/market panels, centralized design system and responsive
   desktop/narrow layouts.
 
-The full 122-region world is compute-heavy; the 10× and 30× speed settings
+The full 133-region world is compute-heavy; the 10× and 30× speed settings
 remain best-effort and the UI reports the measured throughput. No benchmark is
 claimed for the M11 world size.
 
@@ -1904,9 +1906,9 @@ evidence and does not satisfy the 8 ms mobile target.
   migration pool, remittances, or border-law enactment. `immigrationOpen` is a
   scenario policy flag, not an M8 law.
 - M5 historical data remains a provisional eight-polity **test fixture**. The
-  playable M11 world is a separate authored 1900 catalog: 60 states, 62 dependent
-  territories, 122 regions, 18 markets. Its population is a rounded estimate
-  (~1.52 bn, not a world total); occupation structure, literacy/wealth, building
+  playable M11 world is a separate authored 1900 catalog: 67 states, 66 dependent
+  territories, 133 regions, 20 markets. Its population is a rounded estimate
+  (~1.59 bn, not a world total); occupation structure, literacy/wealth, building
   levels, fiscal settings, and market groupings are provisional.
   Century-scale population/occupation-trend calibration is **not claimed** because
   the M3 recipes/needs are not historically calibrated and profession transition

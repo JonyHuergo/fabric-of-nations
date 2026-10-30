@@ -59,6 +59,27 @@ const API = "https://commons.wikimedia.org/w/api.php";
 const USER_AGENT =
   "CenturyGameFlagAudit/0.1 (https://github.com/century-game; offline 1900 flag asset pipeline)";
 const ALLOWED_LICENSE_CODES = new Set(["pd", "cc0"]);
+const PROJECT_LICENSE_CODE = "project";
+const PROJECT_FLAG_WIDTH = 1000;
+const PROJECT_FLAG_HEIGHT = 667;
+const PROJECT_RENDERERS = new Set(["spain-restoration", "transvaal-vierkleur"]);
+const ALLOWED_FLAG_KINDS = new Set([
+  "exact-national",
+  "de-facto-national",
+  "civil-national",
+  "national-plain",
+  "national-form",
+  "national-with-union-badge",
+  "imperial-state-standard",
+  "pre-standardization-representative",
+  "civil-ensign",
+  "national-under-occupation",
+  "provincial-national",
+  "representative-common-ensign",
+  "autonomous-state-flag",
+  "national-variant-representative",
+  "project-reconstruction",
+]);
 const MAX_SOURCE_BYTES = 4 * 1024 * 1024;
 const MAX_RASTER_EDGE = 4096;
 const MIN_RASTER_EDGE = 32;
@@ -265,8 +286,132 @@ function inspectPng(buffer, label) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Manifest validation                                                 */
+/* Project-authored flag reconstructions                               */
 /* ------------------------------------------------------------------ */
+
+function flagKindOf(manifest, id) {
+  return manifest.flags[id].flagKind ?? manifest.meta.flagKinds?.[id] ?? "exact-national";
+}
+
+function hexToInt(hex) {
+  const value = hex.replace("#", "");
+  return Jimp.rgbaToInt(
+    Number.parseInt(value.slice(0, 2), 16),
+    Number.parseInt(value.slice(2, 4), 16),
+    Number.parseInt(value.slice(4, 6), 16),
+    255,
+  );
+}
+
+function solidImage(width, height, hex) {
+  return new Jimp(width, height, hexToInt(hex));
+}
+
+function validateProjectComponents(flag) {
+  const problems = [];
+  const project = flag.project;
+  if (project === undefined || !PROJECT_RENDERERS.has(project.design)) {
+    return [`${flag.id}: unknown or missing project design`];
+  }
+  if (project.width !== PROJECT_FLAG_WIDTH || project.height !== PROJECT_FLAG_HEIGHT) {
+    problems.push(`${flag.id}: project canvas must be ${PROJECT_FLAG_WIDTH}x${PROJECT_FLAG_HEIGHT}`);
+  }
+  for (const component of project.components ?? []) {
+    const path = resolve(ROOT, component.path);
+    if (!existsSync(path)) {
+      problems.push(`${flag.id}: missing project component ${component.path}`);
+      continue;
+    }
+    const buffer = readFileSync(path);
+    const actual = sha256(buffer);
+    if (actual !== component.sha256) {
+      problems.push(`${flag.id}: project component hash mismatch for ${component.path}`);
+    }
+  }
+  return problems;
+}
+
+function clearOuterWhite(image) {
+  const { data, width, height } = image.bitmap;
+  const visited = new Uint8Array(width * height);
+  const stack = [];
+  const isOuterWhite = (x, y) => {
+    const index = y * width + x;
+    if (visited[index] === 1) return false;
+    const offset = index * 4;
+    return data[offset] > 235 && data[offset + 1] > 235 && data[offset + 2] > 235;
+  };
+  const push = (x, y) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    if (!isOuterWhite(x, y)) return;
+    const index = y * width + x;
+    visited[index] = 1;
+    data[index * 4 + 3] = 0;
+    stack.push([x, y]);
+  };
+  for (let x = 0; x < width; x += 1) {
+    push(x, 0);
+    push(x, height - 1);
+  }
+  for (let y = 0; y < height; y += 1) {
+    push(0, y);
+    push(width - 1, y);
+  }
+  while (stack.length > 0) {
+    const [x, y] = stack.pop();
+    push(x + 1, y);
+    push(x - 1, y);
+    push(x, y + 1);
+    push(x, y - 1);
+  }
+}
+
+async function renderProjectSource(flag) {
+  const project = flag.project;
+  const width = project.width;
+  const height = project.height;
+  const canvas = new Jimp(width, height, hexToInt("#ffffff"));
+
+  if (project.design === "transvaal-vierkleur") {
+    const greenWidth = Math.round(width / 3);
+    const flyWidth = width - greenWidth;
+    canvas.composite(solidImage(greenWidth, height, "#007a4d"), 0, 0);
+    const stripeHeight = Math.round(height / 3);
+    const colors = ["#de3831", "#ffffff", "#002395"];
+    let y = 0;
+    for (let index = 0; index < colors.length; index += 1) {
+      const stripe = index === colors.length - 1 ? height - y : stripeHeight;
+      canvas.composite(solidImage(flyWidth, stripe, colors[index]), greenWidth, y);
+      y += stripe;
+    }
+  } else if (project.design === "spain-restoration") {
+    const redHeight = Math.round(height / 4);
+    const yellowHeight = height - redHeight * 2;
+    canvas.composite(solidImage(width, redHeight, "#c60b1e"), 0, 0);
+    canvas.composite(solidImage(width, yellowHeight, "#ffc400"), 0, redHeight);
+    canvas.composite(solidImage(width, redHeight, "#c60b1e"), 0, redHeight + yellowHeight);
+    const component = (project.components ?? []).find((entry) => entry.role === "coat-of-arms");
+    if (component === undefined) throw new Error(`${flag.id}: missing coat-of-arms component`);
+    const arms = await Jimp.read(resolve(ROOT, component.path));
+    clearOuterWhite(arms);
+    const targetHeight = Math.round(height * 0.42);
+    const targetWidth = Math.round((arms.bitmap.width * targetHeight) / arms.bitmap.height);
+    arms.resize(targetWidth, targetHeight);
+    canvas.composite(arms, Math.round((width - targetWidth) / 2), Math.round((height - targetHeight) / 2));
+  } else {
+    throw new Error(`${flag.id}: unsupported project design ${String(project.design)}`);
+  }
+
+  const sourceBuffer = await canvas.getBufferAsync(Jimp.MIME_PNG);
+  const image = await Jimp.read(sourceBuffer);
+  image.resize(TARGET_RASTER_WIDTH, Math.round((TARGET_RASTER_WIDTH * height) / width));
+  const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+  const png = inspectPng(buffer, flag.id);
+  if (png.width !== TARGET_RASTER_WIDTH) {
+    throw new Error(`${flag.id}: project render width ${String(png.width)} is not normalized`);
+  }
+  return { buffer, png, convertedFrom: "project" };
+}
 
 function loadInputs() {
   if (!existsSync(MANIFEST_PATH)) fail(`missing manifest: ${MANIFEST_PATH}`);
@@ -292,7 +437,6 @@ function validateManifest(manifest, catalog) {
     "sourceTitle",
     "sourcePageUrl",
     "sourceFileUrl",
-    "sourceSha1",
     "license",
     "licenseCode",
     "licenseUrl",
@@ -308,17 +452,49 @@ function validateManifest(manifest, catalog) {
         problems.push(`flag ${id}: missing ${field}`);
       }
     }
-    if (!ALLOWED_LICENSE_CODES.has(entry.licenseCode)) {
-      problems.push(`flag ${id}: licence ${entry.licenseCode} is not PD/CC0`);
+    const sourceType = entry.sourceType ?? "commons";
+    const kind = flagKindOf(manifest, id);
+    if (!ALLOWED_FLAG_KINDS.has(kind)) {
+      problems.push(`flag ${id}: unknown flagKind ${kind}`);
     }
-    if (!entry.sourceTitle.startsWith("File:")) {
-      problems.push(`flag ${id}: sourceTitle must be a Commons File: title`);
-    }
-    if (!entry.sourcePageUrl.includes("commons.wikimedia.org/wiki/File:")) {
-      problems.push(`flag ${id}: sourcePageUrl is not a Commons file page`);
-    }
-    if (!/^https:\/\/upload\.wikimedia\.org\//.test(entry.sourceFileUrl)) {
-      problems.push(`flag ${id}: sourceFileUrl is not an upload.wikimedia.org URL`);
+    if (sourceType === "commons") {
+      if (!ALLOWED_LICENSE_CODES.has(entry.licenseCode)) {
+        problems.push(`flag ${id}: licence ${entry.licenseCode} is not PD/CC0`);
+      }
+      if (!entry.sourceTitle.startsWith("File:")) {
+        problems.push(`flag ${id}: sourceTitle must be a Commons File: title`);
+      }
+      if (!entry.sourcePageUrl.includes("commons.wikimedia.org/wiki/File:")) {
+        problems.push(`flag ${id}: sourcePageUrl is not a Commons file page`);
+      }
+      if (!/^https:\/\/upload\.wikimedia\.org\//.test(entry.sourceFileUrl)) {
+        problems.push(`flag ${id}: sourceFileUrl is not an upload.wikimedia.org URL`);
+      }
+      if (!/^[0-9a-f]{40}$/.test(entry.sourceSha1)) {
+        problems.push(`flag ${id}: sourceSha1 must be a 40-character SHA-1`);
+      }
+    } else if (sourceType === "project") {
+      if (entry.licenseCode !== PROJECT_LICENSE_CODE) {
+        problems.push(`flag ${id}: project licence code must be "${PROJECT_LICENSE_CODE}"`);
+      }
+      if (!entry.sourcePageUrl.startsWith("internal:")) {
+        problems.push(`flag ${id}: project sourcePageUrl must be internal:`);
+      }
+      if (!entry.sourceFileUrl.startsWith("internal:")) {
+        problems.push(`flag ${id}: project sourceFileUrl must be internal:`);
+      }
+      if (entry.sourceSha1 !== null) {
+        problems.push(`flag ${id}: project sourceSha1 must be null`);
+      }
+      problems.push(...validateProjectComponents(entry));
+      if (
+        entry.sourceWidth !== PROJECT_FLAG_WIDTH ||
+        entry.sourceHeight !== PROJECT_FLAG_HEIGHT
+      ) {
+        problems.push(`flag ${id}: project source dimensions must be 1000x667`);
+      }
+    } else {
+      problems.push(`flag ${id}: unknown sourceType ${String(sourceType)}`);
     }
     if (!/^\d{4}(-\d{2}(-\d{2})?)?$/.test(entry.validFrom)) {
       problems.push(`flag ${id}: validFrom must be an ISO date or year`);
@@ -331,9 +507,6 @@ function validateManifest(manifest, catalog) {
       entry.validTo < entry.validFrom
     ) {
       problems.push(`flag ${id}: validTo precedes validFrom`);
-    }
-    if (!/^[0-9a-f]{40}$/.test(entry.sourceSha1)) {
-      problems.push(`flag ${id}: sourceSha1 must be a 40-character SHA-1`);
     }
     if (!Number.isInteger(entry.sourceWidth) || !Number.isInteger(entry.sourceHeight)) {
       problems.push(`flag ${id}: source dimensions must be integers`);
@@ -512,10 +685,12 @@ function coreAuthor(value) {
     .replace(/\s+assumed \(based on copyright claims\)\.?$/i, "")
     .replace(/\s+The source code of this SVG is valid.*$/i, "")
     .replace(/\s+This vector image was created with Inkscape.*$/i, "")
+    .replace(/\s*\(\s*talk\s*\)\.?\s*$/i, "")
     .replace(/^See file history below.*$/i, "")
     .replace(/\s+\(per the file description;.*$/i, "")
     .replace(/\s+\(Commons author field;.*$/i, "")
     .replace(/\s+\(public-domain flag design\)$/i, "")
+    .replace(/^Unknown author( Unknown author)?$/i, "Unknown author")
     .trim();
 }
 
@@ -721,6 +896,8 @@ function buildProvenanceModule(manifest) {
   lines.push("export interface FlagProvenanceEntry {");
   lines.push("  readonly id: string;");
   lines.push("  readonly description: string;");
+  lines.push("  readonly flagKind: string;");
+  lines.push("  readonly sourceType: string;");
   lines.push("  readonly sourcePageUrl: string;");
   lines.push("  readonly license: string;");
   lines.push("  readonly licenseCode: string;");
@@ -737,6 +914,8 @@ function buildProvenanceModule(manifest) {
     lines.push("  {");
     lines.push(`    id: ${JSON.stringify(id)},`);
     lines.push(`    description: ${JSON.stringify(entry.description)},`);
+    lines.push(`    flagKind: ${JSON.stringify(flagKindOf(manifest, id))},`);
+    lines.push(`    sourceType: ${JSON.stringify(entry.sourceType ?? "commons")},`);
     lines.push(`    sourcePageUrl: ${JSON.stringify(entry.sourcePageUrl)},`);
     lines.push(`    license: ${JSON.stringify(entry.license)},`);
     lines.push(`    licenseCode: ${JSON.stringify(entry.licenseCode)},`);
@@ -784,6 +963,13 @@ function buildDoc(manifest, catalog) {
     .sort((left, right) => left - right)
     .filter((id) => manifest.polities[String(id)].flag === null);
   const bundledPolityCount = allPolities.length - fallbackIds.length;
+  const projectIds = ids.filter((id) => (manifest.flags[id].sourceType ?? "commons") === "project");
+  const externalCount = ids.length - projectIds.length;
+  const flagKindCounts = {};
+  for (const id of ids) {
+    const kind = flagKindOf(manifest, id);
+    flagKindCounts[kind] = (flagKindCounts[kind] ?? 0) + 1;
+  }
   const statusCounts = {};
   for (const polity of allPolities) {
     const key = `${polity.status}|${manifest.polities[String(polity.id)].basis}`;
@@ -803,13 +989,25 @@ function buildDoc(manifest, catalog) {
   lines.push("## Summary");
   lines.push("");
   lines.push(`- Polities in the 1900 catalog: **${String(allPolities.length)}**`);
-  lines.push(`- Bundled flag images: **${String(ids.length)}**`);
+  lines.push(
+    `- Bundled flag images: **${String(ids.length)}** (${String(externalCount)} externally sourced, ${String(
+      projectIds.length,
+    )} project-authored reconstructions)`,
+  );
   lines.push(`- Polities displaying a bundled historical flag: **${String(bundledPolityCount)}**`);
   lines.push(`- Polities using the monogram fallback: **${String(fallbackIds.length)}**`);
   lines.push(`- Reference date: **1 January 1900**; assets retrieved **${manifest.meta.retrievalDate}**`);
   lines.push(
-    `- Artwork source: **Wikimedia Commons**; licence policy: **Public Domain or CC0 only** (${manifest.meta.licensePolicy})`,
+    `- Artwork source: **Wikimedia Commons plus project-authored reconstructions**; licence policy: ${manifest.meta.licensePolicy}`,
   );
+  lines.push("");
+  lines.push("### Flag-kind counts");
+  lines.push("");
+  lines.push("| Flag kind | Count |");
+  lines.push("| --- | ---: |");
+  for (const kind of Object.keys(flagKindCounts).sort()) {
+    lines.push(`| ${mdEscape(kind)} | ${String(flagKindCounts[kind])} |`);
+  }
   lines.push("");
   lines.push("### Polity basis counts");
   lines.push("");
@@ -830,6 +1028,22 @@ function buildDoc(manifest, catalog) {
     "The pipeline downloads Wikimedia's PNG rendition of each approved file at a normalized 500 px width, preserving the flag's own aspect ratio, and validates the PNG signature, chunk CRCs, IHDR dimensions, IDAT length and trailing bytes. One approved source is a JPEG (the CC0 1886 Qajar flag); the pipeline converts it to PNG locally with `jimp-compact`, a build-time-only dependency that is already present in the Expo dependency graph. No runtime image library or network access is added to the game.",
   );
   lines.push("");
+  lines.push("## Project-authored reconstructions");
+  lines.push("");
+  lines.push(
+    "Two flags are original Century reconstructions rather than externally sourced files. They are rendered deterministically at build time from documented designs and are dedicated to the public domain by the project. Their historical sources are recorded separately from Century's authorship; no share-alike or restricted artwork was traced or copied.",
+  );
+  lines.push("");
+  for (const id of projectIds) {
+    const flag = manifest.flags[id];
+    lines.push(`- **\`${id}\`** — ${mdEscape(flag.description)}. ${mdEscape(flag.historicalNotes)}`);
+    for (const component of flag.project.components ?? []) {
+      lines.push(
+        `  - Component: ${mdEscape(component.role)} — [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}.`,
+      );
+    }
+  }
+  lines.push("");
   lines.push("## Bundled flags");
   lines.push("");
   for (const id of ids) {
@@ -844,24 +1058,42 @@ function buildDoc(manifest, catalog) {
       );
     lines.push(`### \`${id}\` — ${mdEscape(flag.description)}`);
     lines.push("");
+    lines.push(`- **Flag kind:** ${mdEscape(flagKindOf(manifest, id))}`);
     lines.push(`- **Polities:** ${polityRefs.join(", ")}`);
     lines.push(
       `- **Validity:** ${flag.validFrom}${flag.validTo === null ? " – no end date recorded (in use on 1 January 1900)" : ` – ${flag.validTo}`}`,
     );
-    lines.push(`- **Source:** [${flag.sourceTitle}](${flag.sourcePageUrl})`);
-    lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) — ${flag.licenseUrl}`);
-    lines.push(`- **Author:** ${mdEscape(flag.author)}`);
-    lines.push(`- **Retrieved:** ${flag.retrievedAt}`);
-    lines.push(
-      `- **Source file:** [original](${flag.sourceFileUrl}) (${String(flag.sourceWidth)}×${String(flag.sourceHeight)}; SHA-1 \`${flag.sourceSha1}\`)`,
-    );
+    if ((flag.sourceType ?? "commons") === "project") {
+      lines.push(
+        `- **Source:** project-authored reconstruction (design \`${flag.project.design}\`), not an externally sourced image.`,
+      );
+      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) — ${flag.licenseUrl}`);
+      lines.push(`- **Author:** ${mdEscape(flag.author)}`);
+      lines.push(`- **Retrieved:** ${flag.retrievedAt}`);
+      for (const component of flag.project.components ?? []) {
+        lines.push(
+          `- **Component:** ${mdEscape(component.role)} — [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}; SHA-256 \`${component.sha256}\`.`,
+        );
+      }
+      lines.push(
+        `- **Source file:** built by \`scripts/m11/build-flags.mjs\` at ${String(flag.sourceWidth)}×${String(flag.sourceHeight)}; no external flag file is redistributed.`,
+      );
+    } else {
+      lines.push(`- **Source:** [${flag.sourceTitle}](${flag.sourcePageUrl})`);
+      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) — ${flag.licenseUrl}`);
+      lines.push(`- **Author:** ${mdEscape(flag.author)}`);
+      lines.push(`- **Retrieved:** ${flag.retrievedAt}`);
+      lines.push(
+        `- **Source file:** [original](${flag.sourceFileUrl}) (${String(flag.sourceWidth)}×${String(flag.sourceHeight)}; SHA-1 \`${flag.sourceSha1}\`)`,
+      );
+    }
     lines.push(`- **Historical accuracy:** ${mdEscape(flag.historicalNotes)}`);
     lines.push("");
   }
   lines.push("## Monogram fallbacks");
   lines.push("");
   lines.push(
-    "A monogram is retained when no historically correct flag artwork with a verified PD/CC0 licence exists. The existing political-status badges remain visible, and the monogram uses the polity's existing national colour.",
+    "A monogram is retained when no historically correct flag artwork can be established from verified PD/CC0 files or a documented project-authored reconstruction. The existing political-status badges remain visible, and the monogram uses the polity's existing national colour.",
   );
   lines.push("");
   lines.push("| Polity | ID | Status | Reason |");
@@ -923,13 +1155,22 @@ function buildDoc(manifest, catalog) {
     "- **Australia** — `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.",
   );
   lines.push(
-    "- **Transvaal / South African Republic** — monogram fallback. The Commons Vierkleur artwork is CC BY-SA 3.0 and is excluded; no PD/CC0 Vierkleur artwork was verified. The political and historical definition of the polity is unchanged.",
+    "- **Transvaal / South African Republic** — `transvaal-vierkleur`: an original Century reconstruction of the 1857–1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.",
   );
   lines.push(
     "- **Orange Free State** — `orange-free-state`: the 1857–1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).",
   );
   lines.push(
-    "- **Austria-Hungary** — **not present in the existing 1900 catalog**, so no flag entry exists. The catalog has no Austria or Hungary polity at all; this is a pre-existing catalog-coverage gap, not a flag-system decision, and it was not changed here because the task forbids altering the country catalog's political definitions. Austria-Hungary also had no single unified national flag: the black-yellow Austrian flag and the red-white-green Hungarian flag were the national flags of the two halves, while the red-white-red civil ensign was the common merchant ensign. If an Austria-Hungary polity is added later, that civil ensign is the appropriate shared flag, with an explicit note that no single unified national flag existed.",
+    "- **Austria-Hungary** — `austria-hungary-civil-ensign`: the common civil ensign of 1869–1918, combining the Austrian red-white-red and Hungarian red-white-green halves with both coats of arms. The dual monarchy had no single unified national flag; the manifest and this document record that distinction. The polity is a single catalog state, not two independent countries.",
+  );
+  lines.push(
+    "- **Spain** — `spain-restoration`: a project-authored red–yellow–red reconstruction with the individually verified PD Restoration-era coat of arms. The Spanish colonies SAH and SGG use the same sovereign flag with their colony status badges.",
+  );
+  lines.push(
+    "- **Montenegro** — `montenegro-1881`: the verified PD red–blue–white national flag with the princely monogram, documented 1881–1905. The 1878 war ensign is not used as the national flag.",
+  );
+  lines.push(
+    "- **Tonga, Sokoto, Ha'il, Crete** — period flags verified on Commons (PD) and recorded with exact/representative flag-kind metadata.",
   );
   lines.push("");
   lines.push("## Offline and runtime guarantees");
@@ -950,16 +1191,16 @@ function buildDoc(manifest, catalog) {
   lines.push("## Remaining limitations and unresolved questions");
   lines.push("");
   lines.push(
-    "- Spain (ESP) and its colonies (SAH, SGG) use the monogram because no PD/CC0 artwork of the 1875–1931 state flag with the Restoration coat of arms was found. The verified PD Spanish file for the period is the 1785 five-stripe merchant ensign, which would be incorrect for 1900. A CC0 photograph of a surviving 1898 Spanish flag was reviewed but is a plain red–yellow–red flag without the coat of arms, so it was not used as the state flag.",
+    "- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established from the available sources, and no PD/CC0 artwork documents one. Their independence and marker locations are still represented.",
   );
   lines.push(
-    "- Montenegro (MNT) uses the monogram because its national flag was not standardised in 1900 and the only verified PD Commons file depicts the 1878 war ensign, not the national flag. A PD file of the 1905–1918 royal flag exists but begins after the reference date.",
+    "- Austria-Hungary's map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina). Galicia, Transylvania, Vojvodina and South Tyrol are not separable at Natural Earth 1:50m admin-0 resolution; the limitation is recorded in the catalog notes.",
   );
   lines.push(
-    "- The Transvaal (ZAR) Vierkleur is CC BY-SA 3.0 on Commons and is therefore excluded by the PD/CC0-only rule; the polity uses the monogram.",
+    "- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak use marker-only map integration because reliable 1900 polygon boundaries are not available at the map source. Their capitals, labels, statuses and picker entries are fully integrated; the marker approximation is recorded in the map data and the coverage audit.",
   );
   lines.push(
-    "- Several states used a plain civil/national tricolour while the state flag carried a coat of arms that is only available under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.",
+    "- Several states used a plain civil/national tricolour while the state flag carried a coat of arms available only under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.",
   );
   lines.push(
     "- Ecuador's plain tricolour is shown because the coat of arms became mandatory for the state flag only on 5 December 1900, after the reference date.",
@@ -971,7 +1212,7 @@ function buildDoc(manifest, catalog) {
     "- Persia's Qajar lion-and-sun tricolour was not legally standardised until 1905–1907; the bundled CC0 1886 artwork is period-appropriate, and the note records the lack of a detailed 1900 specification.",
   );
   lines.push(
-    "- The catalog omits Austria-Hungary entirely (see above). If that polity is added, the flag manifest and this document must be regenerated.",
+    "- Canada's Red Ensign was the distinctive de facto flag, while the Union Jack remained the official national flag in 1900; both facts are recorded.",
   );
   lines.push("");
   return `${lines.join("\n").replace(/\n+$/, "")}\n`;
@@ -1078,21 +1319,61 @@ async function runBuild(manifest, catalog, { auditOnly = false } = {}) {
   const built = {};
   for (const id of ids) {
     const flag = manifest.flags[id];
-    // eslint-disable-next-line no-await-in-loop
-    const info = await fetchSourceInfo(flag);
-    const sourceProblems = verifySourceInfo(flag, info);
-    if (sourceProblems.length > 0) {
-      for (const problem of sourceProblems) process.stderr.write(`  - ${id}: ${problem}\n`);
-      fail("source verification failed; review the licence and update the manifest deliberately");
+    const sourceType = flag.sourceType ?? "commons";
+    let rendition;
+    if (sourceType === "project") {
+      const componentProblems = validateProjectComponents(flag);
+      if (componentProblems.length > 0) {
+        for (const problem of componentProblems) process.stderr.write(`  - ${problem}\n`);
+        fail("project component verification failed");
+      }
+      if (auditOnly) {
+        for (const component of flag.project.components ?? []) {
+          if (!String(component.sourcePageUrl).includes("commons.wikimedia.org/wiki/File:")) continue;
+          const data = await apiQuery({
+            action: "query",
+            titles: component.sourceTitle,
+            prop: "imageinfo",
+            iiprop: "url|size|sha1|extmetadata",
+          });
+          const info = data.query?.pages?.[0]?.imageinfo?.[0];
+          if (info === undefined) {
+            fail(`${id}: component source not found: ${component.sourceTitle}`);
+          }
+          const licenseCode = info.extmetadata?.License?.value ?? null;
+          if (!ALLOWED_LICENSE_CODES.has(licenseCode)) {
+            fail(`${id}: component ${component.sourceTitle} is not PD/CC0 (${String(licenseCode)})`);
+          }
+          if (component.sourceSha1 !== undefined && info.sha1 !== component.sourceSha1) {
+            fail(`${id}: component source SHA-1 changed for ${component.sourceTitle}`);
+          }
+        }
+        process.stdout.write(
+          `verified ${id}: project-authored reconstruction (${flag.project.design}) with ${
+            String(flag.project.components?.length ?? 0)
+          } audited component(s)\n`,
+        );
+        continue;
+      }
+      rendition = await renderProjectSource(flag);
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      const info = await fetchSourceInfo(flag);
+      const sourceProblems = verifySourceInfo(flag, info);
+      if (sourceProblems.length > 0) {
+        for (const problem of sourceProblems) process.stderr.write(`  - ${id}: ${problem}\n`);
+        fail("source verification failed; review the licence and update the manifest deliberately");
+      }
+      if (auditOnly) {
+        process.stdout.write(
+          `verified ${id}: ${info.licenseShort} / ${info.artist || "author not stated"}\n`,
+        );
+        continue;
+      }
+      // eslint-disable-next-line no-await-in-loop
+      rendition = await fetchRendition(info, flag);
+      await sleep(1200);
     }
-    if (auditOnly) {
-      process.stdout.write(
-        `verified ${id}: ${info.licenseShort} / ${info.artist || "author not stated"}\n`,
-      );
-      continue;
-    }
-    // eslint-disable-next-line no-await-in-loop
-    const rendition = await fetchRendition(info, flag);
     const png = rendition.png;
     if (png.bytes > MAX_BUNDLED_BYTES) {
       fail(`${id}: bundled PNG is ${png.bytes} bytes (limit ${MAX_BUNDLED_BYTES})`);
@@ -1112,10 +1393,9 @@ async function runBuild(manifest, catalog, { auditOnly = false } = {}) {
     };
     process.stdout.write(
       `bundled ${id}: ${String(png.width)}x${String(png.height)}, ${String(png.bytes)} bytes${
-        rendition.convertedFrom === null ? "" : ` (converted from ${rendition.convertedFrom})`
+        rendition.convertedFrom === null ? "" : ` (${rendition.convertedFrom})`
       }\n`,
     );
-    await sleep(1200);
   }
   if (auditOnly) {
     process.stdout.write(

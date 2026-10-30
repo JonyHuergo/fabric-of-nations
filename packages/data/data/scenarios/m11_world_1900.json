@@ -3,7 +3,7 @@
     "scenarioId": "m11-world-1900",
     "dataVersion": "m3-economy-v12",
     "status": "provisional",
-    "description": "Authored 1900 world for M11 country selection: 60 polities (59 selectable), 62 dependent territories, and 18 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Not a full historical reconstruction.",
+    "description": "Authored 1900 world for M11/M11b country selection: 67 polities (66 selectable), 66 dependent territories, and 20 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.",
     "startDayIndex": 0,
     "playerCountryTag": "USA",
     "profitDistribution": {
@@ -857,6 +857,90 @@
         "population1900Estimate": 1600000,
         "confidence": "medium",
         "notes": "Not selectable: sovereignty is contested and administration is under US military occupation."
+      },
+      {
+        "countryId": 60,
+        "historicalName": "Austro-Hungarian Monarchy",
+        "status": "independent",
+        "sovereignCountryId": 60,
+        "capitalName": "Vienna",
+        "regionName": "Austria-Hungary (home territory)",
+        "selectable": true,
+        "population1900Estimate": 51000000,
+        "confidence": "medium",
+        "notes": "Cisleithania (the Austrian half) and Transleithania (the Hungarian half, including Croatia-Slavonia) each had their own government; Bosnia and Herzegovina was jointly administered. There was no single unified national flag: the common civil ensign combines the Austrian red-white-red and Hungarian red-white-green with both coats of arms. Co-capital: Budapest. The map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina); Galicia, Transylvania, Vojvodina and South Tyrol are not separable at the Natural Earth 1:50m admin-0 resolution."
+      },
+      {
+        "countryId": 61,
+        "historicalName": "Kingdom of Tonga",
+        "status": "independent",
+        "sovereignCountryId": 61,
+        "capitalName": "Nuku'alofa",
+        "regionName": "Tonga (home territory)",
+        "selectable": true,
+        "population1900Estimate": 20000,
+        "confidence": "medium",
+        "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). The map source cannot give a reliable 1900 land boundary at this scale, so the kingdom is represented by a marker at Nuku'alofa."
+      },
+      {
+        "countryId": 62,
+        "historicalName": "Sokoto Caliphate",
+        "status": "independent",
+        "sovereignCountryId": 62,
+        "capitalName": "Sokoto",
+        "regionName": "Sokoto (home territory)",
+        "selectable": true,
+        "population1900Estimate": 10000000,
+        "confidence": "low",
+        "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. The 1900 boundary is not available as a reliable polygon at the map source, so the caliphate is represented by a marker at Sokoto. Population is a rounded order-of-magnitude estimate."
+      },
+      {
+        "countryId": 63,
+        "historicalName": "Sultanate of Wadai",
+        "status": "independent",
+        "sovereignCountryId": 63,
+        "capitalName": "Abéché",
+        "regionName": "Wadai (home territory)",
+        "selectable": true,
+        "population1900Estimate": 2000000,
+        "confidence": "low",
+        "notes": "De facto independent with limited international recognition. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at Abéché and a documented monogram fallback. Population is a rounded estimate."
+      },
+      {
+        "countryId": 64,
+        "historicalName": "Sultanate of Darfur",
+        "status": "independent",
+        "sovereignCountryId": 64,
+        "capitalName": "El Fasher",
+        "regionName": "Darfur (home territory)",
+        "selectable": true,
+        "population1900Estimate": 2000000,
+        "confidence": "low",
+        "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at El Fasher and a documented monogram fallback. Population is a rounded estimate."
+      },
+      {
+        "countryId": 65,
+        "historicalName": "Emirate of Jabal Shammar (Ha'il)",
+        "status": "independent",
+        "sovereignCountryId": 65,
+        "capitalName": "Ha'il",
+        "regionName": "Jabal Shammar (home territory)",
+        "selectable": true,
+        "population1900Estimate": 1000000,
+        "confidence": "low",
+        "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. The 1900 boundary is not available as a reliable polygon at the map source, so the emirate is represented by a marker at Ha'il. Population is a rounded estimate."
+      },
+      {
+        "countryId": 66,
+        "historicalName": "Cretan State",
+        "status": "autonomous-vassal",
+        "sovereignCountryId": 66,
+        "capitalName": "Chania",
+        "regionName": "Crete (home territory)",
+        "selectable": true,
+        "population1900Estimate": 300000,
+        "confidence": "medium",
+        "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). Represented by a marker at Chania because the map source cannot separate Crete from modern Greece without an admin-1 split. The flag combines the Greek cross with a red canton and white star."
       }
     ],
     "marketMeta": [
@@ -1003,6 +1087,22 @@
         "kind": "shared",
         "description": "The independent Latin American republics, grouped as one shared trade area; national tariffs are not modelled.",
         "customsCountryId": 50
+      },
+      {
+        "marketId": 18,
+        "key": "austro-hungarian",
+        "name": "Austro-Hungarian Customs Union",
+        "kind": "national",
+        "description": "The common Austro-Hungarian customs area linking the Austrian and Hungarian halves and jointly administered Bosnia and Herzegovina.",
+        "customsCountryId": 60
+      },
+      {
+        "marketId": 19,
+        "key": "pacific",
+        "name": "Pacific Island Trade",
+        "kind": "national",
+        "description": "The independent Kingdom of Tonga's small open economy, treated as its own market in 1900.",
+        "customsCountryId": 61
       }
     ],
     "regionMeta": [
@@ -1687,6 +1787,50 @@
         "selectable": false,
         "confidence": "medium",
         "notes": ""
+      },
+      {
+        "regionId": 162,
+        "polityTag": "TIB",
+        "historicalName": "Tibet",
+        "status": "autonomous-province",
+        "sovereignCountryId": 26,
+        "capitalName": "Lhasa",
+        "selectable": false,
+        "confidence": "low",
+        "notes": "Not an independent state in 1900. Shown as a marker territory of Qing China because the map source cannot separate Tibet at admin-0 resolution. Population is a rounded estimate."
+      },
+      {
+        "regionId": 163,
+        "polityTag": "KHI",
+        "historicalName": "Khanate of Khiva",
+        "status": "protectorate",
+        "sovereignCountryId": 4,
+        "capitalName": "Khiva",
+        "selectable": false,
+        "confidence": "low",
+        "notes": "Russian protectorate, not independent. Represented by a marker at Khiva inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate."
+      },
+      {
+        "regionId": 164,
+        "polityTag": "BUK",
+        "historicalName": "Emirate of Bukhara",
+        "status": "protectorate",
+        "sovereignCountryId": 4,
+        "capitalName": "Bukhara",
+        "selectable": false,
+        "confidence": "low",
+        "notes": "Russian protectorate, not independent. Represented by a marker at Bukhara inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate."
+      },
+      {
+        "regionId": 165,
+        "polityTag": "SAR",
+        "historicalName": "Raj of Sarawak",
+        "status": "protectorate",
+        "sovereignCountryId": 1,
+        "capitalName": "Kuching",
+        "selectable": false,
+        "confidence": "low",
+        "notes": "British protectorate, not independent. Represented by a marker at Kuching inside the British imperial market; the map source aggregates Borneo into British Malaya. Population is a rounded estimate."
       }
     ]
   }

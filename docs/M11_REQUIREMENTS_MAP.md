@@ -9,9 +9,9 @@ substitute for the GDD.
 |---|---|---|
 | Campaign starts 1 Jan 1900 | `meta.startDayIndex = 0`; calendar | `m11-world.test.ts` catalog start date |
 | Documented country classification | `polities_1900.json` `meta.classification`; `COUNTRY_STATUSES` | GDD §17I.1; provenance doc |
-| Every independent state playable | 54 independent + personal-union + autonomous-vassal + 3 dominions = 59 | catalog test; six-country creation test |
-| No invented/omitted states | authored list derived from GWD/COW tradition | catalog test checks key tags |
-| Dependencies not independent | 62 territories, all `selectable: false` | catalog test |
+| Every independent state playable | 60 independent + personal-union + 2 autonomous-vassal + 3 dominions = 66 selectable | catalog test; per-country creation test |
+| No invented/omitted states | authored inventory in `docs/1900_CATALOG_COVERAGE.md`, reconciled to GWD/COW and EB11 | catalog coverage test; catalog test checks key tags |
+| Dependencies not independent | 66 territories, all `selectable: false` | catalog test |
 | Status/parent/capital/geometry/sources/confidence | catalog fields + `countryMeta`/`regionMeta` | loader validation; provenance doc |
 | Historical names, not modern substitutions | catalog names (e.g. Qing Empire, Transvaal, Siam) | catalog test; picker screenshot |
 
@@ -19,7 +19,7 @@ substitute for the GDD.
 
 | Requirement | Implementation | Evidence |
 |---|---|---|
-| Every selectable country has a valid state | generator + `createEconomyWorld` | world validator test over 122 regions |
+| Every selectable country has a valid state | generator + `createEconomyWorld` | world validator test over 133 regions |
 | Regions, population, age cohorts, professions | `regions_1900`, `pops_1900` | world test; loader |
 | Accounts, treasury, government, fiscal state | `countries_1900` | world test; ordinary validators |
 | Market membership and currency | `markets_1900`; currency identities | market tests |

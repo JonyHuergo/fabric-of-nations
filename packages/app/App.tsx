@@ -216,10 +216,13 @@ function CenturyRoot() {
                 <Divider />
                 <Text style={styles.sourceTitle}>Historical flags of 1 January 1900</Text>
                 <Text style={styles.sourceNote}>
-                  {String(FLAG_PROVENANCE.length)} flag images come from Wikimedia Commons and were
-                  individually verified as Public Domain or CC0 through the Commons API. No CC BY-SA
-                  or other share-alike artwork is bundled. Author, licence, validity dates, retrieval
-                  date and historical caveats are recorded for every file below and in
+                  {String(FLAG_PROVENANCE.filter((flag) => flag.sourceType === "commons").length)}{" "}
+                  flag images come from Wikimedia Commons and were individually verified as Public
+                  Domain or CC0 through the Commons API.{" "}
+                  {String(FLAG_PROVENANCE.filter((flag) => flag.sourceType === "project").length)}{" "}
+                  are original Century reconstructions from documented designs. No CC BY-SA or
+                  other share-alike artwork is bundled. Flag type, author, licence, validity dates,
+                  retrieval date and historical caveats are recorded for every file below and in
                   docs/FLAG_PROVENANCE.md. The game reads only the bundled PNG assets; it makes no
                   network request to display a flag.
                 </Text>
@@ -234,10 +237,14 @@ function CenturyRoot() {
                     </Text>
                     <Badge label={flag.license} tone="muted" />
                     <Text style={styles.sourceNote}>
-                      {flag.author} · {flag.validFrom}–
+                      {flag.flagKind.replaceAll("-", " ")} · {flag.author} · {flag.validFrom}–
                       {flag.validTo ?? "no end date recorded"} · retrieved {flag.retrievedAt}
                     </Text>
-                    <Text style={styles.sourceNote}>{flag.sourcePageUrl}</Text>
+                    <Text style={styles.sourceNote}>
+                      {flag.sourceType === "project"
+                        ? "Project-authored reconstruction; see docs/FLAG_PROVENANCE.md"
+                        : flag.sourcePageUrl}
+                    </Text>
                   </View>
                 ))}
                 <View style={styles.modalActions}>

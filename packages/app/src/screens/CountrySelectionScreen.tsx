@@ -332,7 +332,10 @@ export function CountrySelectionScreen({
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.headerMeta}>{playableCount} playable states</Text>
-          <Text style={styles.headerMeta}>62 dependent territories shown</Text>
+          <Text style={styles.headerMeta}>
+            {String(catalog.entries.filter((entry) => entry.kind === "territory").length)} dependent
+            territories shown
+          </Text>
         </View>
       </View>
 

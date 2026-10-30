@@ -67,9 +67,10 @@ point and land-ring counts.
 
 ## 4. Representation
 
-- `polities[]`: one entry per catalog polity (122). `rings` is a flat list of
+- `polities[]`: one entry per catalog polity (133). `rings` is a flat list of
   delta-encoded rings; `holes` indexes rings that are holes. The renderer uses
-  the even-odd fill rule.
+  the even-odd fill rule. Entries with `markerOnly: true` have no rings and are
+  drawn at their `label` capital point; `approximate` records the limitation.
 - A polity's `id` is its simulation country id (states) or region id
   (territories). Dynamic ownership and control are read from the snapshot.
 - **South Africa**: the Cape Colony, Natal, the Transvaal and the Orange Free

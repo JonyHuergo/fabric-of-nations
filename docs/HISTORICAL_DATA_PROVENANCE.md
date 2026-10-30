@@ -11,22 +11,24 @@ comes from, and what is intentionally approximate.
   2022). CShapes is used only as a classification reference and is **not
   redistributed**.
 - Catalog: `packages/data/data/historical/m11/polities_1900.json`.
-- Contents: **60 states**, **62 dependent territories**, **18 markets**,
-  **122 regions**, **59 selectable states**.
+- Contents: **67 states**, **66 dependent territories**, **20 markets**,
+  **133 regions**, **66 selectable states**.
 
 | Status | Count in catalog | Selectable |
 |---|---|---|
-| independent | 54 | yes |
+| independent | 60 | yes |
 | personal-union | 1 (Norway) | yes |
-| autonomous-vassal | 1 (Bulgaria) | yes |
+| autonomous-vassal | 2 (Bulgaria, Crete) | yes |
 | dominion | 4 (Canada, Australia and New Zealand are selectable states; Newfoundland is a non-selectable territory) | 3 states |
 | colony | 47 | no |
-| protectorate | 9 | no |
+| protectorate | 12 | no |
 | occupation | 1 (Cuba) | no |
-| autonomous-province | 2 (Egypt, Finland) | no |
+| autonomous-province | 3 (Egypt, Finland, Tibet) | no |
 | dependency | 3 (Iceland, Greenland, Faroes) | no |
 
-Exact counts are asserted in `packages/tests/src/m11-world.test.ts`.
+Exact counts are asserted in `packages/tests/src/m11-world.test.ts`. The
+independence/de-facto-state reconciliation is in
+[`1900_CATALOG_COVERAGE.md`](./1900_CATALOG_COVERAGE.md).
 
 ### Why dependencies are not independent countries
 
@@ -112,15 +114,25 @@ derived map in this project, so no CShapes geometry is included.
 - Congress Poland is assigned to the Russian Empire; the German and Austrian
   partitions of modern Poland are not separable at the map source's resolution.
 - Alsace-Lorraine is not separated from France.
-- Tibet, Xinjiang and Mongolia are not separated from Qing China.
+- Xinjiang and Mongolia remain inside Qing China; Tibet is now a marker-only
+  autonomous-province territory of China.
+- Austria-Hungary is a core-modern-unit polygon (Austria, Hungary, Czechia,
+  Slovakia, Slovenia, Croatia, Bosnia and Herzegovina); Galicia, Transylvania,
+  Vojvodina and South Tyrol are not separable at admin-0 resolution, although
+  the population total includes them.
 - South Africa is split into the Cape Colony, Natal, the Transvaal and the Orange
   Free State using modern admin-1 provinces as an approximation.
 - Newfoundland is a marker territory inside the modern Canada polygon.
 - Several small dependencies are grouped (for example British West Africa,
   British Pacific islands, French West Africa). The grouping is documented in
   each territory's notes.
-- Nejd/Arabian interior, British Aden, Zanzibar, and some Pacific condominia are
-  not separately represented.
+- Sokoto, Wadai, Darfur, Jabal Shammar, Crete, Tonga, Tibet, Khiva, Bukhara and
+  Sarawak use marker-only map integration because no reliable 1900 polygon is
+  available at the map source.
+- Ashanti, Bornu (Rabih), the Somali Dervish state, Zanzibar, Sikkim and the
+  smaller Arabian and Pacific polities are deliberately not separate state
+  entries; the precise reasons are recorded in
+  [`1900_CATALOG_COVERAGE.md`](./1900_CATALOG_COVERAGE.md).
 
 ## 6. Updating the data
 

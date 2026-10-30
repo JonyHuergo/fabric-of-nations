@@ -2898,6 +2898,286 @@
     "calibrationStatus": "provisional"
   },
   {
+    "regionId": 60,
+    "professionKey": "peasants",
+    "population": 17340000,
+    "literacy": 0.6,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.08,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 60,
+    "professionKey": "laborers",
+    "population": 18513000,
+    "literacy": 0.7325,
+    "wealthLevel": 26,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 60,
+    "professionKey": "clerks",
+    "population": 9424800,
+    "literacy": 0.9,
+    "wealthLevel": 52,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 60,
+    "professionKey": "academics",
+    "population": 1683000,
+    "literacy": 1,
+    "wealthLevel": 55,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 60,
+    "professionKey": "capitalists",
+    "population": 4039200,
+    "literacy": 0.95,
+    "wealthLevel": 80,
+    "savingsPerCapitaSUSD": 8,
+    "militancy": 0.07,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 61,
+    "professionKey": "peasants",
+    "population": 10400,
+    "literacy": 0.72,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 61,
+    "professionKey": "laborers",
+    "population": 4992,
+    "literacy": 0.875,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 61,
+    "professionKey": "clerks",
+    "population": 2880,
+    "literacy": 1,
+    "wealthLevel": 42,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 61,
+    "professionKey": "academics",
+    "population": 288,
+    "literacy": 1,
+    "wealthLevel": 45,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 61,
+    "professionKey": "capitalists",
+    "population": 1440,
+    "literacy": 1,
+    "wealthLevel": 70,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 62,
+    "professionKey": "peasants",
+    "population": 8200000,
+    "literacy": 0.04,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 62,
+    "professionKey": "laborers",
+    "population": 1800000,
+    "literacy": 0.0675,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 63,
+    "professionKey": "peasants",
+    "population": 1640000,
+    "literacy": 0.024,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 63,
+    "professionKey": "laborers",
+    "population": 360000,
+    "literacy": 0.0485,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 64,
+    "professionKey": "peasants",
+    "population": 1640000,
+    "literacy": 0.04,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 64,
+    "professionKey": "laborers",
+    "population": 360000,
+    "literacy": 0.0675,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 65,
+    "professionKey": "peasants",
+    "population": 820000,
+    "literacy": 0.04,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 65,
+    "professionKey": "laborers",
+    "population": 180000,
+    "literacy": 0.0675,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 66,
+    "professionKey": "peasants",
+    "population": 246000,
+    "literacy": 0.32,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 66,
+    "professionKey": "laborers",
+    "population": 54000,
+    "literacy": 0.4,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
     "regionId": 100,
     "professionKey": "peasants",
     "population": 241080000,
@@ -4623,6 +4903,118 @@
     "regionId": 161,
     "professionKey": "laborers",
     "population": 540000,
+    "literacy": 0.115,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 162,
+    "professionKey": "peasants",
+    "population": 984000,
+    "literacy": 0.04,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 162,
+    "professionKey": "laborers",
+    "population": 216000,
+    "literacy": 0.0675,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 163,
+    "professionKey": "peasants",
+    "population": 656000,
+    "literacy": 0.04,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 163,
+    "professionKey": "laborers",
+    "population": 144000,
+    "literacy": 0.0675,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 164,
+    "professionKey": "peasants",
+    "population": 1640000,
+    "literacy": 0.08,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 164,
+    "professionKey": "laborers",
+    "population": 360000,
+    "literacy": 0.115,
+    "wealthLevel": 17,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.09,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 165,
+    "professionKey": "peasants",
+    "population": 410000,
+    "literacy": 0.08,
+    "wealthLevel": 11,
+    "savingsPerCapitaSUSD": 3,
+    "militancy": 0.1,
+    "sourceIds": [
+      "owid-population",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "regionId": 165,
+    "professionKey": "laborers",
+    "population": 90000,
     "literacy": 0.115,
     "wealthLevel": 17,
     "savingsPerCapitaSUSD": 3,

@@ -5042,4 +5042,67 @@ political definitions of the catalog.
   (ESP, MNT, ZAR, SAH, SGG).
 - Adding an Austria-Hungary polity later requires a flag manifest and
   provenance regeneration.
+- *M11b supersedes the counts and fallbacks above; see D-095.*
+
+## D-095 — M11b complete 1900 catalog and monogram removal
+
+**Status:** implemented (M11b).
+
+### Context
+
+The M11 catalog was derived from the GWD/COW independent-state tradition but
+omitted Austria-Hungary entirely, did not separately represent several de facto
+or autonomous 1900 polities, and left five documented monogram fallbacks
+(Spain, Spanish Sahara, Spanish Guinea, Montenegro and the Transvaal). The M11b
+task requires a systematic regional inventory, actual in-game additions, map
+integration, full flag artwork and a formal coverage audit.
+
+### Decision
+
+1. **Inventory scope.** The audit reconciles 60 `independent`-status states,
+   including four de facto/partially recognised African/Arabian states (Sokoto,
+   Wadai, Darfur, Jabal Shammar), plus six other self-governing or occupied
+   states already present (Bulgaria, Norway, Canada, Australia, New Zealand,
+   Cuba) and one added autonomous state (Crete). The full sources, contested
+   cases and omissions are in `docs/1900_CATALOG_COVERAGE.md`.
+2. **Austria-Hungary is one state (ID 60), not two.** Its catalog entry records
+   the dual structure, the Austrian and Hungarian halves, the joint ministries,
+   the separate parliaments, the jointly administered Bosnia and the co-capital.
+   Its flag is the common civil ensign because there was no single unified
+   national flag.
+3. **Stable IDs.** New states use 60–66 and new territories use 162–165. No
+   existing polity ID is renumbered. Existing saves remain loadable: the save
+   carries its original world, static metadata is looked up by `countryId`, and
+   the additive entries do not alter existing IDs, tags or region ownership.
+4. **Map integration.** Austria-Hungary uses a polygon of its core modern units.
+   Polities without reliable 1900 polygon data use the existing marker-only map
+   mechanism at their capitals, marked `markerOnly`/`approximate`; no borders are
+   invented and no polygons overlap.
+5. **Flags.** Spain and the Transvaal Vierkleur are original Century
+   reconstructions; Spain composites an individually verified PD coat-of-arms
+   component and the project owns the composition. Montenegrin, Austrian,
+   Tongan, Cretan, Sokotan and Ha'il flags are individually verified PD Commons
+   files. Project artwork is recorded separately from its historical sources.
+   Wadai and Darfur remain documented monogram exceptions because no verified
+   historical flag design could be established.
+6. **Markets.** Two markets are added: `austro-hungarian` and `pacific`.
+   Sokoto/Wadai/Darfur join `african-independent`; Jabal Shammar and Crete join
+   `ottoman-egyptian`.
+7. **Data/versioning.** Scenario content changes, so the generated tables,
+   scenario and worker bundle are regenerated. The data version remains
+   `m3-economy-v12`, world schema 26 and save format 1 because no authoritative
+   state shape, unit, formula or save field changed.
+
+### Consequences
+
+- Final catalog: **67 states**, **66 territories**, **133 regions**,
+  **20 markets**, **66 selectable states**.
+- Flag assets: **64** (62 external PD/CC0, 2 project reconstructions); 131 of 133
+  polities display a flag; only Wadai and Darfur use the monogram.
+- The new African and Arabian states, Crete and Tonga have low-confidence
+  starting data; they are playable but explicitly provisional.
+- Austria-Hungary's Galicia, Transylvania, Vojvodina and South Tyrol are included
+  in its population but not its core map polygon; the limitation is documented.
+- New marker-only polities are fully selectable and picker-integrated but not
+  drawn as territories until reliable 1900 polygons are available.
 

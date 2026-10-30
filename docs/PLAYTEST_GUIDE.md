@@ -6,7 +6,7 @@
    statistics.
 2. Choose **New campaign**.
 3. Confirm the scenario screen: campaign start **1 January 1900**, one day per
-   tick, 59 playable states, 62 dependent territories, 18 markets.
+   tick, 66 playable states, 66 dependent territories, 20 markets.
 4. Choose a country:
    - search by historical name, common name, capital or tag;
    - filter by continent;
@@ -85,9 +85,11 @@
 ## Known limits
 
 - Some 1900 borders are approximated by modern source units (Congress Poland,
-  Alsace-Lorraine, Tibet/Xinjiang/Mongolia).
+  Alsace-Lorraine, Austria-Hungary's Galicia/Transylvania/Vojvodina, Tibet).
+- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak
+  use marker-only map integration; their historical 1900 polygons are unavailable.
 - Newfoundland is a marker inside the modern Canada polygon.
-- The world represents about 1.52 bn people, not the full 1.62 bn M2 estimate.
+- The world represents about 1.59 bn people, not the full 1.62 bn M2 estimate.
 - The full world is compute-heavy; high speeds are explicitly best-effort.
 - Native device builds were not re-verified for M11.
 

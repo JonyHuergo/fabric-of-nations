@@ -44,14 +44,14 @@ One coherent world, not per-country campaigns.
   market, preserving the M5 one-market-per-country invariant. Imperial markets
   are therefore customs areas, not claims that colonies are the metropole.
 
-This keeps the world at 59 selectable states and 122 regions rather than ~140
-separate country entities, which matters for authoritative tick cost and snapshot
-size.
+This keeps the world at 66 selectable states and 133 regions rather than a
+separate country entity for every dependency, which matters for authoritative
+tick cost and snapshot size.
 
 ## 3. Markets
 
 Each state declares a market key. The generated market table groups states into
-18 documented markets (national, imperial, or shared trade areas). A market is
+20 documented markets (national, imperial, or shared trade areas). A market is
 not assumed to be one country: the Latin American, Balkan, East Asian, Persian
 Gulf, Central American, Caribbean, Gran Colombian, Andean, South Atlantic,
 Northern European, Alpine, Southern African and African independent markets

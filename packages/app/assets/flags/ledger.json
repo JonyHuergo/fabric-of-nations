@@ -27,6 +27,14 @@
       "height": 313,
       "aspectRatio": 1.597444
     },
+    "austria-hungary-civil-ensign": {
+      "file": "austria-hungary-civil-ensign.png",
+      "sha256": "d402258b6b1de6febd4ce0e21a250faca40ec2db299c1b26a5020b2d96dc22b3",
+      "bytes": 19817,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
     "belgium": {
       "file": "belgium.png",
       "sha256": "1df5afddcdff84816b6f6a0180e4cc7c6c4256cf1cfd78c54ba768e48e853a7a",
@@ -87,6 +95,14 @@
       "file": "costa-rica-1848.png",
       "sha256": "8394e6d0b95c75aa91af699bc640f850738f0cb5b664ea0f62e5c8fe72b8244e",
       "bytes": 37184,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "crete-1898": {
+      "file": "crete-1898.png",
+      "sha256": "73d2120f240b06887407bfca272450eb36c6a51b3127ca8cd331eb892a52b4b5",
+      "bytes": 2355,
       "width": 500,
       "height": 334,
       "aspectRatio": 1.497006
@@ -179,6 +195,14 @@
       "height": 334,
       "aspectRatio": 1.497006
     },
+    "hail-1835": {
+      "file": "hail-1835.png",
+      "sha256": "2cf4a3de240c6104c5a8e32a46bf19ec30b89695c543695da7ec274d2870fdee",
+      "bytes": 5526,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
     "haiti-1859": {
       "file": "haiti-1859.png",
       "sha256": "b0edb2ed6133c93d4f57486f0c193b1bc77d73806d32140b32f09c9eca594f2b",
@@ -258,6 +282,14 @@
       "width": 500,
       "height": 400,
       "aspectRatio": 1.25
+    },
+    "montenegro-1881": {
+      "file": "montenegro-1881.png",
+      "sha256": "add82981a8176fd86335960247a983967184d885685b76ddba393549e6055605",
+      "bytes": 4877,
+      "width": 500,
+      "height": 333,
+      "aspectRatio": 1.501502
     },
     "morocco-1666": {
       "file": "morocco-1666.png",
@@ -403,6 +435,22 @@
       "height": 334,
       "aspectRatio": 1.497006
     },
+    "sokoto": {
+      "file": "sokoto.png",
+      "sha256": "c426687811b364f253aea257613568133b166368906f4292378d05a660e56773",
+      "bytes": 489,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "spain-restoration": {
+      "file": "spain-restoration.png",
+      "sha256": "57b47c7e37fa5b2f7c34d92b29c21f00f578790eb1bc3348a0333a25401aff6f",
+      "bytes": 18595,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
     "sweden-1844": {
       "file": "sweden-1844.png",
       "sha256": "3dc0a83ffa226fa5c5745ff3acbeebae59f53ff6ac93c0852c51f76a667a6d9c",
@@ -418,6 +466,22 @@
       "width": 500,
       "height": 500,
       "aspectRatio": 1
+    },
+    "tonga": {
+      "file": "tonga.png",
+      "sha256": "e462b7bb81f69a91a3f4b8be88bc830242b4841ab2268d30672d480003c35618",
+      "bytes": 670,
+      "width": 500,
+      "height": 250,
+      "aspectRatio": 2
+    },
+    "transvaal-vierkleur": {
+      "file": "transvaal-vierkleur.png",
+      "sha256": "15c0a663e4a4bdab54e607da199e9c01cc7ebba447edc6886045f7a315d1e965",
+      "bytes": 1691,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
     },
     "uk-union-1801": {
       "file": "uk-union-1801.png",

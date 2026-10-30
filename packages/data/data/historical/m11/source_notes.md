@@ -7,15 +7,15 @@ Status: **provisional historical abstraction**. This directory is generated from
 
 | File | Content |
 |---|---|
-| `polities_1900.json` | authored catalog: 60 states, 62 dependent territories, 18 markets, status, parent, capital, population estimate and confidence, continent, market, description, notes, sources, geometry crosswalk |
-| `regions_1900.json` | 122 regions (one home region per state, one region per territory) |
-| `countries_1900.json` | 60 countries, fiscal/debt/politics/technology starts |
-| `markets_1900.json` | 18 markets with authored names, membership, customs administration and stock lots |
-| `pops_1900.json` | 331 population blocks (region × profession) |
-| `buildings_1900.json` | ~506 building instances |
+| `polities_1900.json` | authored catalog: 67 states, 66 dependent territories, 20 markets, status, parent, capital, population estimate and confidence, continent, market, description, notes, sources, geometry crosswalk |
+| `regions_1900.json` | 133 regions (one home region per state, one region per territory) |
+| `countries_1900.json` | 67 countries, fiscal/debt/politics/technology starts |
+| `markets_1900.json` | 20 markets with authored names, membership, customs administration and stock lots |
+| `pops_1900.json` | 359 population blocks (region × profession) |
+| `buildings_1900.json` | 548 building instances |
 | `employment_1900.json` | empty; the first simulated day performs validated assignment |
 | `calibration_targets_1900.json` | one population and one peasant-share target per country |
-| `trade_routes_1900.json` | 41 market-to-market routes derived from capital-weighted market distances |
+| `trade_routes_1900.json` | 47 market-to-market routes derived from capital-weighted market distances |
 | `../../scenarios/m11_world_1900.json` | scenario metadata, sources, age profile and generated `countryMeta`/`marketMeta`/`regionMeta` |
 
 Generate with:
@@ -68,12 +68,16 @@ The loader (`packages/data/src/historical.ts`) validates every table and throws
 ## Known limitations
 
 - Some 1900 borders cannot be separated from modern source units: Congress
-  Poland (assigned to Russia), Alsace-Lorraine (France), Tibet/Xinjiang/Mongolia
-  (Qing China). South Africa is split with admin-1 provinces; Newfoundland is a
-  marker territory inside modern Canada.
+  Poland (assigned to Russia), Alsace-Lorraine (France), Austria-Hungary's
+  Galicia/Transylvania/Vojvodina/South Tyrol, and Xinjiang/Mongolia (Qing China).
+  South Africa is split with admin-1 provinces; Newfoundland is a marker
+  territory inside modern Canada.
+- Sokoto, Wadai, Darfur, Jabal Shammar, Crete, Tonga, Tibet, Khiva, Bukhara and
+  Sarawak use marker-only map integration because reliable 1900 polygons are not
+  available at the map source.
 - Some colonies are grouped (for example British West Africa, British Pacific
   islands, French West Africa), documented in their `notes`.
-- The modelled population total is about 1.52 billion, not the ~1.62 billion M2
-  world estimate.
+- The modelled population total is about 1.59 billion, closer to but still below
+  the ~1.62 billion M2 world estimate.
 - The world is not a complete historical census or a calibrated 1900 welfare
   model.

@@ -9,7 +9,7 @@ import type { WorldCatalogData } from "../worldCatalogTypes";
 
 export const WORLD_CATALOG = ({
   "meta": {
-    "version": "m11-1900-v1",
+    "version": "m11-1900-v2",
     "startDate": "1900-01-01",
     "title": "Century historical polity catalog, 1 January 1900",
     "classification": {
@@ -20,7 +20,7 @@ export const WORLD_CATALOG = ({
         "autonomous-vassal",
         "dominion"
       ],
-      "description": "States are coded by their constitutional position on 1 January 1900. Independent states and the documented semi-sovereign polities selected for play are selectable; colonies, protectorates, occupied and autonomous provinces are territories of their sovereign or administering power."
+      "description": "States are coded by their constitutional position on 1 January 1900. Independent states and the documented semi-sovereign polities selected for play are selectable; colonies, protectorates, occupied and autonomous provinces are territories of their sovereign or administering power. M11b adds the Austro-Hungarian Monarchy and documented de facto or autonomous polities, with marker-only map approximations where reliable 1900 boundaries are unavailable."
     },
     "sources": [
       {
@@ -210,6 +210,22 @@ export const WORLD_CATALOG = ({
       "kind": "shared",
       "customsTag": "ARG",
       "description": "The independent Latin American republics, grouped as one shared trade area; national tariffs are not modelled."
+    },
+    {
+      "id": 18,
+      "key": "austro-hungarian",
+      "name": "Austro-Hungarian Customs Union",
+      "kind": "national",
+      "customsTag": "AUT",
+      "description": "The common Austro-Hungarian customs area linking the Austrian and Hungarian halves and jointly administered Bosnia and Herzegovina."
+    },
+    {
+      "id": 19,
+      "key": "pacific",
+      "name": "Pacific Island Trade",
+      "kind": "national",
+      "customsTag": "TON",
+      "description": "The independent Kingdom of Tonga's small open economy, treated as its own market in 1900."
     }
   ],
   "entries": [
@@ -1690,6 +1706,168 @@ export const WORLD_CATALOG = ({
       "geometry": [
         "CUB"
       ]
+    },
+    {
+      "id": 60,
+      "tag": "AUT",
+      "name": "Austro-Hungarian Monarchy",
+      "commonName": "Austria-Hungary",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Europe",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Vienna",
+        "lat": 48.21,
+        "lon": 16.37
+      },
+      "population1900": 51000000,
+      "market": "austro-hungarian",
+      "description": "Dual monarchy of the Austrian and Hungarian halves under a common monarch, with joint foreign, defence and finance ministries and separate parliaments and governments.",
+      "confidence": "medium",
+      "notes": "Cisleithania (the Austrian half) and Transleithania (the Hungarian half, including Croatia-Slavonia) each had their own government; Bosnia and Herzegovina was jointly administered. There was no single unified national flag: the common civil ensign combines the Austrian red-white-red and Hungarian red-white-green with both coats of arms. Co-capital: Budapest. The map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina); Galicia, Transylvania, Vojvodina and South Tyrol are not separable at the Natural Earth 1:50m admin-0 resolution.",
+      "geometry": [
+        "AUT",
+        "HUN",
+        "CZE",
+        "SVK",
+        "SVN",
+        "HRV",
+        "BIH"
+      ]
+    },
+    {
+      "id": 61,
+      "tag": "TON",
+      "name": "Kingdom of Tonga",
+      "commonName": "Tonga",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Oceania",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Nuku'alofa",
+        "lat": -21.14,
+        "lon": -175.2
+      },
+      "population1900": 20000,
+      "market": "pacific",
+      "description": "Independent Polynesian kingdom under the 1875 constitution, in personal rule of King George Tupou II in 1900.",
+      "confidence": "medium",
+      "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). The map source cannot give a reliable 1900 land boundary at this scale, so the kingdom is represented by a marker at Nuku'alofa.",
+      "geometry": []
+    },
+    {
+      "id": 62,
+      "tag": "SOK",
+      "name": "Sokoto Caliphate",
+      "commonName": "Sokoto",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Africa",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Sokoto",
+        "lat": 13.06,
+        "lon": 5.24
+      },
+      "population1900": 10000000,
+      "market": "african-independent",
+      "description": "Fulani-led Islamic caliphate in the central Sudan, the largest independent state in West Africa in 1900.",
+      "confidence": "low",
+      "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. The 1900 boundary is not available as a reliable polygon at the map source, so the caliphate is represented by a marker at Sokoto. Population is a rounded order-of-magnitude estimate.",
+      "geometry": []
+    },
+    {
+      "id": 63,
+      "tag": "WAD",
+      "name": "Sultanate of Wadai",
+      "commonName": "Wadai",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Africa",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Abéché",
+        "lat": 13.83,
+        "lon": 20.83
+      },
+      "population1900": 2000000,
+      "market": "african-independent",
+      "description": "Sahelian sultanate east of Lake Chad, independent until the French conquest of 1909–1911.",
+      "confidence": "low",
+      "notes": "De facto independent with limited international recognition. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at Abéché and a documented monogram fallback. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 64,
+      "tag": "DAR",
+      "name": "Sultanate of Darfur",
+      "commonName": "Darfur",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Africa",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "El Fasher",
+        "lat": 13.63,
+        "lon": 25.35
+      },
+      "population1900": 2000000,
+      "market": "african-independent",
+      "description": "Independent sultanate in the western Sudan, conquered by Britain only in 1916.",
+      "confidence": "low",
+      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. No reliable 1900 boundary or standardised national flag design could be established; the polity uses a marker at El Fasher and a documented monogram fallback. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 65,
+      "tag": "SHM",
+      "name": "Emirate of Jabal Shammar (Ha'il)",
+      "commonName": "Jabal Shammar",
+      "kind": "state",
+      "status": "independent",
+      "continent": "Asia",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Ha'il",
+        "lat": 27.52,
+        "lon": 41.69
+      },
+      "population1900": 1000000,
+      "market": "ottoman-egyptian",
+      "description": "Rashidi emirate in central Arabia, the dominant state in Najd in 1900 and a rival of the Saudis.",
+      "confidence": "low",
+      "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. The 1900 boundary is not available as a reliable polygon at the map source, so the emirate is represented by a marker at Ha'il. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 66,
+      "tag": "CRT",
+      "name": "Cretan State",
+      "commonName": "Crete",
+      "kind": "state",
+      "status": "autonomous-vassal",
+      "continent": "Europe",
+      "sovereignTag": null,
+      "selectable": true,
+      "capital": {
+        "name": "Chania",
+        "lat": 35.51,
+        "lon": 24.02
+      },
+      "population1900": 300000,
+      "market": "ottoman-egyptian",
+      "description": "Autonomous Cretan state established in 1898 under Ottoman suzerainty and Great Power guarantee, with a Greek high commissioner.",
+      "confidence": "medium",
+      "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). Represented by a marker at Chania because the map source cannot separate Crete from modern Greece without an admin-1 split. The flag combines the Greek cross with a red canton and white star.",
+      "geometry": []
     },
     {
       "id": 100,
@@ -3253,6 +3431,94 @@ export const WORLD_CATALOG = ({
       "geometry": [
         "TWN"
       ]
+    },
+    {
+      "id": 162,
+      "tag": "TIB",
+      "name": "Tibet",
+      "commonName": "Tibet",
+      "kind": "territory",
+      "status": "autonomous-province",
+      "continent": "Asia",
+      "sovereignTag": "CHN",
+      "selectable": false,
+      "capital": {
+        "name": "Lhasa",
+        "lat": 29.65,
+        "lon": 91.14
+      },
+      "population1900": 1200000,
+      "market": null,
+      "description": "Tibetan Buddhist polity under Qing suzerainty, administered through the Dalai Lama and Qing ambans in 1900.",
+      "confidence": "low",
+      "notes": "Not an independent state in 1900. Shown as a marker territory of Qing China because the map source cannot separate Tibet at admin-0 resolution. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 163,
+      "tag": "KHI",
+      "name": "Khanate of Khiva",
+      "commonName": "Khiva",
+      "kind": "territory",
+      "status": "protectorate",
+      "continent": "Asia",
+      "sovereignTag": "RUS",
+      "selectable": false,
+      "capital": {
+        "name": "Khiva",
+        "lat": 41.38,
+        "lon": 60.36
+      },
+      "population1900": 800000,
+      "market": null,
+      "description": "Central Asian khanate under Russian protectorate after 1873, retaining its own ruler and internal administration.",
+      "confidence": "low",
+      "notes": "Russian protectorate, not independent. Represented by a marker at Khiva inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 164,
+      "tag": "BUK",
+      "name": "Emirate of Bukhara",
+      "commonName": "Bukhara",
+      "kind": "territory",
+      "status": "protectorate",
+      "continent": "Asia",
+      "sovereignTag": "RUS",
+      "selectable": false,
+      "capital": {
+        "name": "Bukhara",
+        "lat": 39.77,
+        "lon": 64.42
+      },
+      "population1900": 2000000,
+      "market": null,
+      "description": "Central Asian emirate under Russian protectorate after 1868, retaining its own ruler and internal administration.",
+      "confidence": "low",
+      "notes": "Russian protectorate, not independent. Represented by a marker at Bukhara inside the Russian imperial market; the map source cannot separate its 1900 boundary. Population is a rounded estimate.",
+      "geometry": []
+    },
+    {
+      "id": 165,
+      "tag": "SAR",
+      "name": "Raj of Sarawak",
+      "commonName": "Sarawak",
+      "kind": "territory",
+      "status": "protectorate",
+      "continent": "Asia",
+      "sovereignTag": "GBR",
+      "selectable": false,
+      "capital": {
+        "name": "Kuching",
+        "lat": 1.55,
+        "lon": 110.34
+      },
+      "population1900": 500000,
+      "market": null,
+      "description": "Independent Raj of Sarawak under British protection after 1888, ruled by the Brooke dynasty.",
+      "confidence": "low",
+      "notes": "British protectorate, not independent. Represented by a marker at Kuching inside the British imperial market; the map source aggregates Borneo into British Malaya. Population is a rounded estimate.",
+      "geometry": []
     }
   ]
 }) as unknown as WorldCatalogData;

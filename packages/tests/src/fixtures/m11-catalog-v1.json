@@ -1,0 +1,612 @@
+[
+  {
+    "id": 0,
+    "tag": "USA",
+    "kind": "state"
+  },
+  {
+    "id": 1,
+    "tag": "GBR",
+    "kind": "state"
+  },
+  {
+    "id": 2,
+    "tag": "DEU",
+    "kind": "state"
+  },
+  {
+    "id": 3,
+    "tag": "FRA",
+    "kind": "state"
+  },
+  {
+    "id": 4,
+    "tag": "RUS",
+    "kind": "state"
+  },
+  {
+    "id": 5,
+    "tag": "JPN",
+    "kind": "state"
+  },
+  {
+    "id": 6,
+    "tag": "ITA",
+    "kind": "state"
+  },
+  {
+    "id": 7,
+    "tag": "ESP",
+    "kind": "state"
+  },
+  {
+    "id": 8,
+    "tag": "PRT",
+    "kind": "state"
+  },
+  {
+    "id": 9,
+    "tag": "NLD",
+    "kind": "state"
+  },
+  {
+    "id": 10,
+    "tag": "BEL",
+    "kind": "state"
+  },
+  {
+    "id": 11,
+    "tag": "CHE",
+    "kind": "state"
+  },
+  {
+    "id": 12,
+    "tag": "SWE",
+    "kind": "state"
+  },
+  {
+    "id": 13,
+    "tag": "NOR",
+    "kind": "state"
+  },
+  {
+    "id": 14,
+    "tag": "DNK",
+    "kind": "state"
+  },
+  {
+    "id": 15,
+    "tag": "GRC",
+    "kind": "state"
+  },
+  {
+    "id": 16,
+    "tag": "SRB",
+    "kind": "state"
+  },
+  {
+    "id": 17,
+    "tag": "MNT",
+    "kind": "state"
+  },
+  {
+    "id": 18,
+    "tag": "ROM",
+    "kind": "state"
+  },
+  {
+    "id": 19,
+    "tag": "BGR",
+    "kind": "state"
+  },
+  {
+    "id": 20,
+    "tag": "OTT",
+    "kind": "state"
+  },
+  {
+    "id": 21,
+    "tag": "LUX",
+    "kind": "state"
+  },
+  {
+    "id": 22,
+    "tag": "MCO",
+    "kind": "state"
+  },
+  {
+    "id": 23,
+    "tag": "SMR",
+    "kind": "state"
+  },
+  {
+    "id": 24,
+    "tag": "AND",
+    "kind": "state"
+  },
+  {
+    "id": 25,
+    "tag": "LIE",
+    "kind": "state"
+  },
+  {
+    "id": 26,
+    "tag": "CHN",
+    "kind": "state"
+  },
+  {
+    "id": 27,
+    "tag": "KOR",
+    "kind": "state"
+  },
+  {
+    "id": 28,
+    "tag": "PER",
+    "kind": "state"
+  },
+  {
+    "id": 29,
+    "tag": "AFG",
+    "kind": "state"
+  },
+  {
+    "id": 30,
+    "tag": "NPL",
+    "kind": "state"
+  },
+  {
+    "id": 31,
+    "tag": "THA",
+    "kind": "state"
+  },
+  {
+    "id": 32,
+    "tag": "OMN",
+    "kind": "state"
+  },
+  {
+    "id": 33,
+    "tag": "ETH",
+    "kind": "state"
+  },
+  {
+    "id": 34,
+    "tag": "LBR",
+    "kind": "state"
+  },
+  {
+    "id": 35,
+    "tag": "MAR",
+    "kind": "state"
+  },
+  {
+    "id": 36,
+    "tag": "ZAR",
+    "kind": "state"
+  },
+  {
+    "id": 37,
+    "tag": "ORF",
+    "kind": "state"
+  },
+  {
+    "id": 38,
+    "tag": "MEX",
+    "kind": "state"
+  },
+  {
+    "id": 39,
+    "tag": "GUA",
+    "kind": "state"
+  },
+  {
+    "id": 40,
+    "tag": "HON",
+    "kind": "state"
+  },
+  {
+    "id": 41,
+    "tag": "SAL",
+    "kind": "state"
+  },
+  {
+    "id": 42,
+    "tag": "NIC",
+    "kind": "state"
+  },
+  {
+    "id": 43,
+    "tag": "COS",
+    "kind": "state"
+  },
+  {
+    "id": 44,
+    "tag": "COL",
+    "kind": "state"
+  },
+  {
+    "id": 45,
+    "tag": "VEN",
+    "kind": "state"
+  },
+  {
+    "id": 46,
+    "tag": "ECU",
+    "kind": "state"
+  },
+  {
+    "id": 47,
+    "tag": "PRU",
+    "kind": "state"
+  },
+  {
+    "id": 48,
+    "tag": "BOL",
+    "kind": "state"
+  },
+  {
+    "id": 49,
+    "tag": "CHL",
+    "kind": "state"
+  },
+  {
+    "id": 50,
+    "tag": "ARG",
+    "kind": "state"
+  },
+  {
+    "id": 51,
+    "tag": "URY",
+    "kind": "state"
+  },
+  {
+    "id": 52,
+    "tag": "PRY",
+    "kind": "state"
+  },
+  {
+    "id": 53,
+    "tag": "BRA",
+    "kind": "state"
+  },
+  {
+    "id": 54,
+    "tag": "HTI",
+    "kind": "state"
+  },
+  {
+    "id": 55,
+    "tag": "DOM",
+    "kind": "state"
+  },
+  {
+    "id": 56,
+    "tag": "CAN",
+    "kind": "state"
+  },
+  {
+    "id": 57,
+    "tag": "AUS",
+    "kind": "state"
+  },
+  {
+    "id": 58,
+    "tag": "NZL",
+    "kind": "state"
+  },
+  {
+    "id": 59,
+    "tag": "CUB",
+    "kind": "state"
+  },
+  {
+    "id": 100,
+    "tag": "BIN",
+    "kind": "territory"
+  },
+  {
+    "id": 101,
+    "tag": "CEY",
+    "kind": "territory"
+  },
+  {
+    "id": 102,
+    "tag": "MAL",
+    "kind": "territory"
+  },
+  {
+    "id": 103,
+    "tag": "HKG",
+    "kind": "territory"
+  },
+  {
+    "id": 104,
+    "tag": "KUW",
+    "kind": "territory"
+  },
+  {
+    "id": 105,
+    "tag": "TRU",
+    "kind": "territory"
+  },
+  {
+    "id": 106,
+    "tag": "CYP",
+    "kind": "territory"
+  },
+  {
+    "id": 107,
+    "tag": "MLT",
+    "kind": "territory"
+  },
+  {
+    "id": 108,
+    "tag": "BWI",
+    "kind": "territory"
+  },
+  {
+    "id": 109,
+    "tag": "BSA",
+    "kind": "territory"
+  },
+  {
+    "id": 110,
+    "tag": "BWA",
+    "kind": "territory"
+  },
+  {
+    "id": 111,
+    "tag": "BEA",
+    "kind": "territory"
+  },
+  {
+    "id": 112,
+    "tag": "SUD",
+    "kind": "territory"
+  },
+  {
+    "id": 113,
+    "tag": "BSO",
+    "kind": "territory"
+  },
+  {
+    "id": 114,
+    "tag": "CRA",
+    "kind": "territory"
+  },
+  {
+    "id": 115,
+    "tag": "HCT",
+    "kind": "territory"
+  },
+  {
+    "id": 116,
+    "tag": "FJI",
+    "kind": "territory"
+  },
+  {
+    "id": 117,
+    "tag": "BPO",
+    "kind": "territory"
+  },
+  {
+    "id": 118,
+    "tag": "CAP",
+    "kind": "territory"
+  },
+  {
+    "id": 119,
+    "tag": "NAT",
+    "kind": "territory"
+  },
+  {
+    "id": 120,
+    "tag": "NFD",
+    "kind": "territory"
+  },
+  {
+    "id": 121,
+    "tag": "ALG",
+    "kind": "territory"
+  },
+  {
+    "id": 122,
+    "tag": "TUN",
+    "kind": "territory"
+  },
+  {
+    "id": 123,
+    "tag": "FWA",
+    "kind": "territory"
+  },
+  {
+    "id": 124,
+    "tag": "FEA",
+    "kind": "territory"
+  },
+  {
+    "id": 125,
+    "tag": "FIC",
+    "kind": "territory"
+  },
+  {
+    "id": 126,
+    "tag": "MAD",
+    "kind": "territory"
+  },
+  {
+    "id": 127,
+    "tag": "FSO",
+    "kind": "territory"
+  },
+  {
+    "id": 128,
+    "tag": "FCA",
+    "kind": "territory"
+  },
+  {
+    "id": 129,
+    "tag": "FPO",
+    "kind": "territory"
+  },
+  {
+    "id": 130,
+    "tag": "GEA",
+    "kind": "territory"
+  },
+  {
+    "id": 131,
+    "tag": "GSW",
+    "kind": "territory"
+  },
+  {
+    "id": 132,
+    "tag": "KAM",
+    "kind": "territory"
+  },
+  {
+    "id": 133,
+    "tag": "TOG",
+    "kind": "territory"
+  },
+  {
+    "id": 134,
+    "tag": "GNG",
+    "kind": "territory"
+  },
+  {
+    "id": 135,
+    "tag": "GSA",
+    "kind": "territory"
+  },
+  {
+    "id": 136,
+    "tag": "GPN",
+    "kind": "territory"
+  },
+  {
+    "id": 137,
+    "tag": "CFS",
+    "kind": "territory"
+  },
+  {
+    "id": 138,
+    "tag": "ANG",
+    "kind": "territory"
+  },
+  {
+    "id": 139,
+    "tag": "MOZ",
+    "kind": "territory"
+  },
+  {
+    "id": 140,
+    "tag": "PAI",
+    "kind": "territory"
+  },
+  {
+    "id": 141,
+    "tag": "PTM",
+    "kind": "territory"
+  },
+  {
+    "id": 142,
+    "tag": "MAC",
+    "kind": "territory"
+  },
+  {
+    "id": 143,
+    "tag": "ERI",
+    "kind": "territory"
+  },
+  {
+    "id": 144,
+    "tag": "ITS",
+    "kind": "territory"
+  },
+  {
+    "id": 145,
+    "tag": "DEI",
+    "kind": "territory"
+  },
+  {
+    "id": 146,
+    "tag": "SUR",
+    "kind": "territory"
+  },
+  {
+    "id": 147,
+    "tag": "DGC",
+    "kind": "territory"
+  },
+  {
+    "id": 148,
+    "tag": "SAH",
+    "kind": "territory"
+  },
+  {
+    "id": 149,
+    "tag": "SGG",
+    "kind": "territory"
+  },
+  {
+    "id": 150,
+    "tag": "PHL",
+    "kind": "territory"
+  },
+  {
+    "id": 151,
+    "tag": "PRI",
+    "kind": "territory"
+  },
+  {
+    "id": 152,
+    "tag": "GUM",
+    "kind": "territory"
+  },
+  {
+    "id": 153,
+    "tag": "ASM",
+    "kind": "territory"
+  },
+  {
+    "id": 154,
+    "tag": "ISL",
+    "kind": "territory"
+  },
+  {
+    "id": 155,
+    "tag": "GRL",
+    "kind": "territory"
+  },
+  {
+    "id": 156,
+    "tag": "FRO",
+    "kind": "territory"
+  },
+  {
+    "id": 157,
+    "tag": "DWI",
+    "kind": "territory"
+  },
+  {
+    "id": 158,
+    "tag": "EGY",
+    "kind": "territory"
+  },
+  {
+    "id": 159,
+    "tag": "BHU",
+    "kind": "territory"
+  },
+  {
+    "id": 160,
+    "tag": "FIN",
+    "kind": "territory"
+  },
+  {
+    "id": 161,
+    "tag": "TWN",
+    "kind": "territory"
+  }
+]

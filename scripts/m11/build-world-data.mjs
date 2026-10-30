@@ -109,6 +109,8 @@ const REGIME_BY_TAG = {
   ROM: "constitutional-monarchy", SRB: "constitutional-monarchy", MNT: "constitutional-monarchy",
   BGR: "constitutional-monarchy", LUX: "constitutional-monarchy", MCO: "constitutional-monarchy",
   LIE: "constitutional-monarchy", ZAR: "republic", ORF: "republic",
+  AUT: "constitutional-monarchy", TON: "constitutional-monarchy", SOK: "absolute-monarchy",
+  WAD: "absolute-monarchy", DAR: "absolute-monarchy", SHM: "absolute-monarchy", CRT: "republic",
   USA: "republic", FRA: "republic", CHE: "republic", SMR: "republic", AND: "republic",
   LBR: "republic", MEX: "republic", GUA: "republic", HON: "republic", SAL: "republic",
   NIC: "republic", COS: "republic", COL: "republic", VEN: "republic", ECU: "republic",
@@ -140,6 +142,9 @@ const CURRENCY_NAMES = {
   PER: ["irq", "Persian qiran"], AFG: ["afr", "Afghan rupee"],
   NPL: ["npr", "Nepalese rupee"], THA: ["thb", "Siamese baht"],
   OMN: ["omr", "Omani rial"], ETH: ["etb", "Ethiopian birr"],
+  AUT: ["aut", "Austro-Hungarian krone"], TON: ["ton", "Tongan pound (sterling-linked)"],
+  SOK: ["sok", "Sokoto currency"], WAD: ["wad", "Wadai currency"], DAR: ["dar", "Darfur currency"],
+  SHM: ["shm", "Ha'il currency"], CRT: ["crt", "Cretan drachma"],
   LBR: ["lbd", "Liberian dollar"], MAR: ["mah", "Moroccan rial"],
   ZAR: ["zar", "Transvaal pound"], ORF: ["ofs", "Orange Free State pound"],
   MEX: ["mxp", "Mexican peso"], GUA: ["gtq", "Guatemalan peso"],
@@ -651,7 +656,11 @@ const scenario = {
     dataVersion: DATA_VERSION,
     status: "provisional",
     description:
-      "Authored 1900 world for M11 country selection: 60 polities (59 selectable), 62 dependent territories, and 18 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Not a full historical reconstruction.",
+      `Authored 1900 world for M11/M11b country selection: ${String(states.length)} polities (${String(
+        states.filter((state) => state.selectable).length,
+      )} selectable), ${String(territories.length)} dependent territories, and ${String(
+        marketsDef.length,
+      )} documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.`,
     startDayIndex: 0,
     playerCountryTag: "USA",
     profitDistribution: { enabled: true, privatePayoutRate: 1, stateRemittanceRate: 1 },

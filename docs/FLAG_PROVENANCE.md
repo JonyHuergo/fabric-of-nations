@@ -5,30 +5,49 @@ This document records every historical flag bundled for the Century 1900 catalog
 
 ## Summary
 
-- Polities in the 1900 catalog: **122**
-- Bundled flag images: **56**
-- Polities displaying a bundled historical flag: **117**
-- Polities using the monogram fallback: **5**
+- Polities in the 1900 catalog: **133**
+- Bundled flag images: **64** (62 externally sourced, 2 project-authored reconstructions)
+- Polities displaying a bundled historical flag: **131**
+- Polities using the monogram fallback: **2**
 - Reference date: **1 January 1900**; assets retrieved **2026-10-30**
-- Artwork source: **Wikimedia Commons**; licence policy: **Public Domain or CC0 only** (Only files individually verified through the Wikimedia Commons API as Public Domain (License code 'pd', including PD-old, PD-self and PD-ineligible) or CC0 ('cc0') are bundled. CC BY, CC BY-SA, GFDL and other licences are rejected.)
+- Artwork source: **Wikimedia Commons plus project-authored reconstructions**; licence policy: Externally sourced files are individually verified through the Wikimedia Commons API as Public Domain (License code 'pd', including PD-old, PD-self and PD-ineligible) or CC0 ('cc0'); CC BY, CC BY-SA, GFDL and other licences are rejected. Two flags are original project-authored reconstructions built from documented historical designs and, for Spain, an individually verified Public Domain coat-of-arms component. No share-alike artwork is bundled.
+
+### Flag-kind counts
+
+| Flag kind | Count |
+| --- | ---: |
+| autonomous-state-flag | 1 |
+| civil-ensign | 1 |
+| civil-national | 3 |
+| de-facto-national | 1 |
+| exact-national | 47 |
+| imperial-state-standard | 1 |
+| national-form | 1 |
+| national-plain | 1 |
+| national-under-occupation | 1 |
+| national-variant-representative | 1 |
+| national-with-union-badge | 1 |
+| pre-standardization-representative | 1 |
+| project-reconstruction | 2 |
+| provincial-national | 1 |
+| representative-common-ensign | 1 |
 
 ### Polity basis counts
 
 | Status | Basis | Polities |
 | --- | --- | ---: |
 | autonomous-province | documented-exception | 1 |
-| autonomous-province | sovereign-flag | 1 |
-| autonomous-vassal | national | 1 |
-| colony | fallback | 2 |
-| colony | sovereign-flag | 45 |
+| autonomous-province | sovereign-flag | 2 |
+| autonomous-vassal | national | 2 |
+| colony | sovereign-flag | 47 |
 | dependency | sovereign-flag | 3 |
 | dominion | national | 1 |
 | dominion | sovereign-flag | 3 |
-| independent | fallback | 3 |
-| independent | national | 51 |
+| independent | fallback | 2 |
+| independent | national | 58 |
 | occupation | national | 1 |
 | personal-union | national | 1 |
-| protectorate | sovereign-flag | 9 |
+| protectorate | sovereign-flag | 12 |
 
 ## Licensing and verification method
 
@@ -36,10 +55,19 @@ Each file was checked individually through the Wikimedia Commons API (`prop=imag
 
 The pipeline downloads Wikimedia's PNG rendition of each approved file at a normalized 500 px width, preserving the flag's own aspect ratio, and validates the PNG signature, chunk CRCs, IHDR dimensions, IDAT length and trailing bytes. One approved source is a JPEG (the CC0 1886 Qajar flag); the pipeline converts it to PNG locally with `jimp-compact`, a build-time-only dependency that is already present in the Expo dependency graph. No runtime image library or network access is added to the game.
 
+## Project-authored reconstructions
+
+Two flags are original Century reconstructions rather than externally sourced files. They are rendered deterministically at build time from documented designs and are dedicated to the public domain by the project. Their historical sources are recorded separately from Century's authorship; no share-alike or restricted artwork was traced or copied.
+
+- **`spain-restoration`** — Restoration-era Spanish state flag (red–yellow–red with the coat of arms). The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Century's work, not a copy of any share-alike flag file.
+  - Component: coat-of-arms — [File:Flag version of the Coat of arms of Spain (1785-1873 & 1875-1931.png](https://commons.wikimedia.org/wiki/File:Flag_version_of_the_Coat_of_arms_of_Spain_(1785-1873_%26_1875-1931.png); Public domain (pd); author Buho07.
+- **`transvaal-vierkleur`** — Vierkleur of the South African Republic (Transvaal). The South African Republic (Transvaal) Vierkleur: a green vertical stripe at the hoist and red, white and blue horizontal stripes in the fly. This is an original project-authored reconstruction from the documented 1857–1902 design. The available Commons Vierkleur vector is CC BY-SA and was not used or traced.
+
 ## Bundled flags
 
 ### `afghanistan-1880` — Black flag of the Emirate of Afghanistan
 
+- **Flag kind:** exact-national
 - **Polities:** `AFG` (ID 29)
 - **Validity:** 1880-01-01 – 1901-10-01
 - **Source:** [File:Flag of Afghanistan (1880–1901).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Afghanistan_(1880%E2%80%931901).svg)
@@ -51,6 +79,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `andorra-1866` — Blue-yellow-red flag of Andorra with the princely crown
 
+- **Flag kind:** exact-national
 - **Polities:** `AND` (ID 24)
 - **Validity:** 1866-01-01 – 1934-12-31
 - **Source:** [File:Flag of Andorra (end of the 19th century-c. 1930s).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Andorra_(end_of_the_19th_century-c._1930s).svg)
@@ -62,6 +91,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `argentina` — Flag of Argentina with the Sun of May
 
+- **Flag kind:** exact-national
 - **Polities:** `ARG` (ID 50)
 - **Validity:** 1818-02-25 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Argentina.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Argentina.svg)
@@ -71,8 +101,21 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg) (800×500; SHA-1 `b54fa14d4d27a1dc3f763d650f9e5afe155e376b`)
 - **Historical accuracy:** Light blue and white horizontal bands with the Sun of May in the centre; the sun was added in 1818. The flag was unchanged in 1900.
 
+### `austria-hungary-civil-ensign` — Common civil ensign of Austria-Hungary (Austrian and Hungarian arms)
+
+- **Flag kind:** representative-common-ensign
+- **Polities:** `AUT` (ID 60)
+- **Validity:** 1869-01-01 – 1918-11-03
+- **Source:** [File:Ensign of Austro-Hungarian civil fleet (1869-1918).svg](https://commons.wikimedia.org/wiki/File:Ensign_of_Austro-Hungarian_civil_fleet_(1869-1918).svg)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Vectorization: Sgt_bilko / Original: Željko Heimer
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/e/e8/Ensign_of_Austro-Hungarian_civil_fleet_%281869-1918%29.svg) (648×432; SHA-1 `d12c9b4fa561c6d114b36d6a5f0eb74ec823080d`)
+- **Historical accuracy:** Austria-Hungary had no single unified national flag. The Austrian half used red-white-red with the Austrian arms; the Hungarian half used red-white-green with the Hungarian arms. The common civil ensign from 1869 combined both halves and both coats of arms. It is the historically defensible representative flag of the dual monarchy for 1 January 1900.
+
 ### `belgium` — Black-yellow-red flag of Belgium
 
+- **Flag kind:** exact-national
 - **Polities:** `BEL` (ID 10), `CFS` (ID 137)
 - **Validity:** 1831-01-23 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Belgium (civil).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Belgium_(civil).svg)
@@ -84,6 +127,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `bolivia` — State flag of Bolivia
 
+- **Flag kind:** exact-national
 - **Polities:** `BOL` (ID 48)
 - **Validity:** 1851-10-31 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Bolivia (state).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Bolivia_(state).svg)
@@ -95,6 +139,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `brazil-1889` — Flag of the United States of Brazil
 
+- **Flag kind:** exact-national
 - **Polities:** `BRA` (ID 53)
 - **Validity:** 1889-11-19 – 1960-04-21
 - **Source:** [File:Flag of Brazil (1889–1960).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Brazil_(1889%E2%80%931960).svg)
@@ -106,6 +151,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `bulgaria-1879` — White-green-red flag of the Principality of Bulgaria
 
+- **Flag kind:** civil-national
 - **Polities:** `BGR` (ID 19)
 - **Validity:** 1879-04-16 – 1946-09-15
 - **Source:** [File:Flag of Bulgaria.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Bulgaria.svg)
@@ -117,6 +163,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `canada-red-ensign-1868` — Canadian Red Ensign with the 1868 provincial shield
 
+- **Flag kind:** de-facto-national
 - **Polities:** `CAN` (ID 56)
 - **Validity:** 1868-01-01 – 1921-01-01
 - **Source:** [File:Flag of Canada (1868–1921).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(1868%E2%80%931921).svg)
@@ -128,6 +175,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `chile` — Flag of Chile
 
+- **Flag kind:** exact-national
 - **Polities:** `CHL` (ID 49)
 - **Validity:** 1817-10-18 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Chile.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Chile.svg)
@@ -139,6 +187,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `colombia` — Flag of Colombia
 
+- **Flag kind:** exact-national
 - **Polities:** `COL` (ID 44)
 - **Validity:** 1861-11-26 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Colombia.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Colombia.svg)
@@ -150,6 +199,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `costa-rica-1848` — Flag of Costa Rica with the 1848 coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `COS` (ID 43)
 - **Validity:** 1848-09-29 – 1906-06-27
 - **Source:** [File:Flag of Costa Rica (1848–1906).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Costa_Rica_(1848%E2%80%931906).svg)
@@ -159,8 +209,21 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Costa_Rica_%281848%E2%80%931906%29.svg) (750×500; SHA-1 `763ea03ff09077e1bb85465d41ff29b8d2dbc576`)
 - **Historical accuracy:** Blue-white-red horizontal stripes with the 1848 coat of arms, in use until the 1906 reform.
 
+### `crete-1898` — Flag of the autonomous Cretan State
+
+- **Flag kind:** autonomous-state-flag
+- **Polities:** `CRT` (ID 66)
+- **Validity:** 1898-12-09 – 1913-12-01
+- **Source:** [File:Flag of Cretan State.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Cretan_State.svg)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Vectorization: Froztbyte
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/4/43/Flag_of_Cretan_State.svg) (1200×800; SHA-1 `26bca5a6e50e05bcaabef422f1aa676a6e47b93a`)
+- **Historical accuracy:** The Cretan State was an autonomous polity under Ottoman suzerainty and Great Power guarantee, with a Greek high commissioner. Its flag combined the Greek blue-and-white cross with a red canton and white five-pointed star. It was not a fully independent sovereign state; the status metadata records autonomous-vassal.
+
 ### `cuba` — Flag of Cuba
 
+- **Flag kind:** national-under-occupation
 - **Polities:** `CUB` (ID 59)
 - **Validity:** 1849-06-26 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Cuba.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Cuba.svg)
@@ -172,6 +235,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `denmark` — Dannebrog, the Danish national flag
 
+- **Flag kind:** exact-national
 - **Polities:** `DNK` (ID 14), `ISL` (ID 154), `GRL` (ID 155), `FRO` (ID 156), `DWI` (ID 157)
 - **Validity:** 1748-06-11 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Denmark.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Denmark.svg)
@@ -183,6 +247,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `dominican-republic` — Flag of the Dominican Republic
 
+- **Flag kind:** exact-national
 - **Polities:** `DOM` (ID 55)
 - **Validity:** 1863-09-24 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of the Dominican Republic.svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg)
@@ -194,6 +259,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `ecuador-civil` — Civil flag of Ecuador (plain yellow-blue-red tricolour)
 
+- **Flag kind:** civil-ensign
 - **Polities:** `ECU` (ID 46)
 - **Validity:** 1860-09-26 – 2009-11-05
 - **Source:** [File:Civil flag and ensign of Ecuador (1900–2009).svg](https://commons.wikimedia.org/wiki/File:Civil_flag_and_ensign_of_Ecuador_(1900%E2%80%932009).svg)
@@ -205,6 +271,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `egypt-1882` — Flag of the Khedivate of Egypt
 
+- **Flag kind:** provincial-national
 - **Polities:** `EGY` (ID 158)
 - **Validity:** 1882-01-01 – 1922-02-28
 - **Source:** [File:Flag of Egypt (1882–1922).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Egypt_(1882%E2%80%931922).svg)
@@ -216,6 +283,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `el-salvador-1875` — Flag of El Salvador with the 1875 coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `SAL` (ID 41)
 - **Validity:** 1875-05-17 – 1912-05-17
 - **Source:** [File:Flag of El Salvador (1875–1912).svg](https://commons.wikimedia.org/wiki/File:Flag_of_El_Salvador_(1875%E2%80%931912).svg)
@@ -227,6 +295,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `ethiopia-1897` — Green-yellow-red flag of the Ethiopian Empire with the Lion of Judah
 
+- **Flag kind:** imperial-state-standard
 - **Polities:** `ETH` (ID 33)
 - **Validity:** 1897-01-01 – 1936-05-05
 - **Source:** [File:Flag of Ethiopia (1897–1974).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia_(1897%E2%80%931974).svg)
@@ -238,6 +307,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `france-tricolour` — French tricolour
 
+- **Flag kind:** exact-national
 - **Polities:** `FRA` (ID 3), `ALG` (ID 121), `TUN` (ID 122), `FWA` (ID 123), `FEA` (ID 124), `FIC` (ID 125), `MAD` (ID 126), `FSO` (ID 127), `FCA` (ID 128), `FPO` (ID 129)
 - **Validity:** 1830-08-01 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of France.svg](https://commons.wikimedia.org/wiki/File:Flag_of_France.svg)
@@ -249,6 +319,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `germany-1867` — Black-white-red flag of the German Empire
 
+- **Flag kind:** exact-national
 - **Polities:** `DEU` (ID 2), `GEA` (ID 130), `GSW` (ID 131), `KAM` (ID 132), `TOG` (ID 133), `GNG` (ID 134), `GSA` (ID 135), `GPN` (ID 136)
 - **Validity:** 1867-07-01 – 1918-11-09
 - **Source:** [File:Flag of Germany (1867–1918).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Germany_(1867%E2%80%931918).svg)
@@ -260,6 +331,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `greece-1822` — National flag of the Kingdom of Greece
 
+- **Flag kind:** national-plain
 - **Polities:** `GRC` (ID 15)
 - **Validity:** 1822-01-15 – 1978-12-01
 - **Source:** [File:Flag of Greece (1822-1978).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Greece_(1822-1978).svg)
@@ -271,6 +343,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `guatemala-1871` — Flag of Guatemala with the 1871 coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `GUA` (ID 39)
 - **Validity:** 1871-08-17 – 1968-09-15
 - **Source:** [File:Flag of Guatemala (1871–1968).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Guatemala_(1871%E2%80%931968).svg)
@@ -280,8 +353,21 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/3/3a/Flag_of_Guatemala_%281871%E2%80%931968%29.svg) (900×600; SHA-1 `b09245de9fc3c043c3f038a3e6785fba41a72cce`)
 - **Historical accuracy:** Vertical blue-white-blue tricolour with the 1871 coat of arms, in use from the Liberal Revolution until 1968.
 
+### `hail-1835` — Flag of the Emirate of Jabal Shammar (Ha'il)
+
+- **Flag kind:** exact-national
+- **Polities:** `SHM` (ID 65)
+- **Validity:** 1835-01-01 – 1921-11-02
+- **Source:** [File:Flag of the Emirate of Ha'il (1835 - 1920).svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Emirate_of_Ha%27il_(1835_-_1920).svg)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Orange Tuesday
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_the_Emirate_of_Ha%27il_%281835_-_1920%29.svg) (600×400; SHA-1 `eba9be7b436107ff3ec5a89ab11b08a3c5aedb6b`)
+- **Historical accuracy:** Red flag with a yellow crescent and eight-pointed star in the canton, the Rashidi emirate of Jabal Shammar. It was de facto independent and nominally Ottoman; Ibn Saud conquered it in 1921.
+
 ### `haiti-1859` — Flag of Haiti
 
+- **Flag kind:** exact-national
 - **Polities:** `HTI` (ID 54)
 - **Validity:** 1859-01-01 – 1964-05-25
 - **Source:** [File:Flag of Haiti (1820–1849, 1859–1964).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Haiti_(1820%E2%80%931849,_1859%E2%80%931964).svg)
@@ -293,6 +379,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `honduras-1866` — Flag of Honduras with five blue stars
 
+- **Flag kind:** exact-national
 - **Polities:** `HON` (ID 40)
 - **Validity:** 1866-02-16 – 1949-01-18
 - **Source:** [File:Flag of Honduras (1866–1949).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Honduras_(1866%E2%80%931949).svg)
@@ -304,6 +391,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `italy-1861` — Flag of the Kingdom of Italy with the Savoy shield
 
+- **Flag kind:** exact-national
 - **Polities:** `ITA` (ID 6), `ERI` (ID 143), `ITS` (ID 144)
 - **Validity:** 1861-03-17 – 1946-06-18
 - **Source:** [File:Flag of Italy (1861–1946).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Italy_(1861%E2%80%931946).svg)
@@ -315,6 +403,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `japan-1870` — Hinomaru, civil and state flag of the Empire of Japan
 
+- **Flag kind:** exact-national
 - **Polities:** `JPN` (ID 5), `TWN` (ID 161)
 - **Validity:** 1870-02-27 – 1999-08-13
 - **Source:** [File:Flag of Japan (1870–1999).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Japan_(1870%E2%80%931999).svg)
@@ -326,6 +415,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `korea-1882` — Taegeukgi of the Korean Empire
 
+- **Flag kind:** exact-national
 - **Polities:** `KOR` (ID 27)
 - **Validity:** 1882-01-01 – 1910-08-29
 - **Source:** [File:Flag of Korea (1882–1910).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Korea_(1882%E2%80%931910).svg)
@@ -337,6 +427,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `liberia` — Flag of the Republic of Liberia
 
+- **Flag kind:** exact-national
 - **Polities:** `LBR` (ID 34)
 - **Validity:** 1847-08-24 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Liberia.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Liberia.svg)
@@ -348,6 +439,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `liechtenstein-1852` — Blue and red flag of Liechtenstein
 
+- **Flag kind:** exact-national
 - **Polities:** `LIE` (ID 25)
 - **Validity:** 1852-01-01 – 1921-10-05
 - **Source:** [File:Flag of Liechtenstein (1852–1921).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Liechtenstein_(1852%E2%80%931921).svg)
@@ -359,6 +451,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `luxembourg` — Red-white-blue flag of Luxembourg
 
+- **Flag kind:** exact-national
 - **Polities:** `LUX` (ID 21)
 - **Validity:** 1845-06-12 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Luxembourg.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Luxembourg.svg)
@@ -370,6 +463,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `mexico-1893` — Flag of Mexico with the Porfirian coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `MEX` (ID 38)
 - **Validity:** 1893-01-01 – 1916-09-30
 - **Source:** [File:Flag of Mexico (1893–1916).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Mexico_(1893%E2%80%931916).svg)
@@ -381,6 +475,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `monaco` — Red and white flag of Monaco
 
+- **Flag kind:** exact-national
 - **Polities:** `MCO` (ID 22)
 - **Validity:** 1881-04-04 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Monaco.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Monaco.svg)
@@ -390,8 +485,21 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/e/ea/Flag_of_Monaco.svg) (1000×800; SHA-1 `9ef05499283f6841cbd8d04d6c1b80d53f4198f4`)
 - **Historical accuracy:** Horizontal red over white bicolour, established by the princely decree of 1881.
 
+### `montenegro-1881` — Montenegrin national flag with the princely monogram (1881–1905)
+
+- **Flag kind:** national-variant-representative
+- **Polities:** `MNT` (ID 17)
+- **Validity:** 1881-01-01 – 1905-12-19
+- **Source:** [File:Flag of Montenegro from 1881 to 1905.png](https://commons.wikimedia.org/wiki/File:Flag_of_Montenegro_from_1881_to_1905.png)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Unknown author (public-domain flag design)
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/4/46/Flag_of_Montenegro_from_1881_to_1905.png) (500×333; SHA-1 `623b186d203a5e05498f9781d10b3a22fa72d3b6`)
+- **Historical accuracy:** Red-blue-white tricolour with the monogram and crown of Prince Nicholas I, documented 1881–1905. The file description records it as an unofficial/people's variation of the Montenegrin national flag; it is the closest verified period flag for 1 January 1900. The 1878 war ensign (white field with a red cross) is not used as the national flag.
+
 ### `morocco-1666` — Plain red flag of the Sultanate of Morocco
 
+- **Flag kind:** exact-national
 - **Polities:** `MAR` (ID 35)
 - **Validity:** 1666-01-01 – 1915-11-17
 - **Source:** [File:Flag of Morocco (1666–1915).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Morocco_(1666%E2%80%931915).svg)
@@ -403,6 +511,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `nepal` — Double pennant flag of the Kingdom of Nepal
 
+- **Flag kind:** exact-national
 - **Polities:** `NPL` (ID 30)
 - **Validity:** 1900-01-01 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Nepal.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg)
@@ -414,6 +523,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `netherlands` — Red-white-blue flag of the Kingdom of the Netherlands
 
+- **Flag kind:** exact-national
 - **Polities:** `NLD` (ID 9), `DEI` (ID 145), `SUR` (ID 146), `DGC` (ID 147)
 - **Validity:** 1813-11-20 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of the Netherlands.svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg)
@@ -425,6 +535,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `nicaragua-1896` — Flag of Nicaragua with the 1896 coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `NIC` (ID 42)
 - **Validity:** 1896-09-04 – 1908-09-04
 - **Source:** [File:Flag of Nicaragua (1896–1908).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Nicaragua_(1896%E2%80%931908).svg)
@@ -436,6 +547,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `norway-1899` — Norwegian national flag without the union badge
 
+- **Flag kind:** exact-national
 - **Polities:** `NOR` (ID 13)
 - **Validity:** 1899-01-01 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Norway.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Norway.svg)
@@ -447,6 +559,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `oman` — Plain red flag of the Sultanate of Muscat and Oman
 
+- **Flag kind:** exact-national
 - **Polities:** `OMN` (ID 32)
 - **Validity:** 1856-01-01 – 1970-07-23
 - **Source:** [File:Flag of Muscat.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Muscat.svg)
@@ -458,6 +571,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `orange-free-state` — Flag of the Orange Free State
 
+- **Flag kind:** exact-national
 - **Polities:** `ORF` (ID 37)
 - **Validity:** 1857-02-28 – 1902-05-31
 - **Source:** [File:Flag of the Orange Free State.svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Orange_Free_State.svg)
@@ -469,6 +583,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `ottoman-1844` — Ottoman crescent and star flag
 
+- **Flag kind:** exact-national
 - **Polities:** `OTT` (ID 20)
 - **Validity:** 1844-01-01 – 1922-11-01
 - **Source:** [File:Flag of the Ottoman Empire (1844–1922).svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Ottoman_Empire_(1844%E2%80%931922).svg)
@@ -480,6 +595,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `paraguay-1842` — Flag of Paraguay with the 1842 coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `PRY` (ID 52)
 - **Validity:** 1842-11-25 – 1954-07-15
 - **Source:** [File:Flag of Paraguay (1842–1954).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Paraguay_(1842%E2%80%931954).svg)
@@ -491,6 +607,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `persia-qajar` — Qajar Persian tricolour with the lion and sun
 
+- **Flag kind:** pre-standardization-representative
 - **Polities:** `PER` (ID 28)
 - **Validity:** 1850-01-01 – 1907-10-07
 - **Source:** [File:Qajar Persia Flag.jpg](https://commons.wikimedia.org/wiki/File:Qajar_Persia_Flag.jpg)
@@ -502,6 +619,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `peru-1884` — State flag of Peru with the coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `PRU` (ID 47)
 - **Validity:** 1884-01-01 – 1950-07-31
 - **Source:** [File:Flag of Peru (1884–1950).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Peru_(1884%E2%80%931950).svg)
@@ -513,6 +631,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `portugal-1830` — Blue-white flag of the Kingdom of Portugal with the royal arms
 
+- **Flag kind:** exact-national
 - **Polities:** `PRT` (ID 8), `ANG` (ID 138), `MOZ` (ID 139), `PAI` (ID 140), `PTM` (ID 141), `MAC` (ID 142)
 - **Validity:** 1830-07-01 – 1910-10-05
 - **Source:** [File:Flag of Portugal (1830–1910).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Portugal_(1830%E2%80%931910).svg)
@@ -524,7 +643,8 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `qing-1889` — Yellow dragon flag of the Qing Empire
 
-- **Polities:** `CHN` (ID 26)
+- **Flag kind:** exact-national
+- **Polities:** `CHN` (ID 26), `TIB` (ID 162)
 - **Validity:** 1889-01-01 – 1912-02-12
 - **Source:** [File:Flag of China (1889–1912).svg](https://commons.wikimedia.org/wiki/File:Flag_of_China_(1889%E2%80%931912).svg)
 - **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
@@ -535,6 +655,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `romania-1867` — Blue-yellow-red flag of Romania
 
+- **Flag kind:** civil-national
 - **Polities:** `ROM` (ID 18)
 - **Validity:** 1867-04-22 – 1948-01-03
 - **Source:** [File:Flag of Romania (1867–1948).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Romania_(1867%E2%80%931948).svg)
@@ -546,7 +667,8 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `russia-1896` — White-blue-red flag of the Russian Empire
 
-- **Polities:** `RUS` (ID 4), `FIN` (ID 160)
+- **Flag kind:** exact-national
+- **Polities:** `RUS` (ID 4), `FIN` (ID 160), `KHI` (ID 163), `BUK` (ID 164)
 - **Validity:** 1896-05-29 – 1917-11-07
 - **Source:** [File:Flag of Russia.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Russia.svg)
 - **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
@@ -557,6 +679,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `san-marino-1862` — White and blue flag of San Marino with the coat of arms
 
+- **Flag kind:** exact-national
 - **Polities:** `SMR` (ID 23)
 - **Validity:** 1862-01-01 – 2011-07-22
 - **Source:** [File:Flag of San Marino (pre–2011).svg](https://commons.wikimedia.org/wiki/File:Flag_of_San_Marino_(pre%E2%80%932011).svg)
@@ -568,6 +691,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `serbia-civil` — Civil flag of the Kingdom of Serbia
 
+- **Flag kind:** civil-national
 - **Polities:** `SRB` (ID 16)
 - **Validity:** 1882-03-06 – 1918-12-01
 - **Source:** [File:Civil flag of Serbia.svg](https://commons.wikimedia.org/wiki/File:Civil_flag_of_Serbia.svg)
@@ -579,6 +703,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `siam-1855` — Red flag of Siam with the white elephant
 
+- **Flag kind:** exact-national
 - **Polities:** `THA` (ID 31)
 - **Validity:** 1855-01-01 – 1916-01-01
 - **Source:** [File:Flag of Siam (1855).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Siam_(1855).svg)
@@ -588,8 +713,34 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Siam_%281855%29.svg) (900×600; SHA-1 `0e1868fa287cb94bd082caa5a5a9974a3131b551`)
 - **Historical accuracy:** Red field with a white elephant, adopted by King Mongkut (Rama IV) in 1855 and used until the 1916 change to the elephant in royal regalia. This is the flag of Siam on 1 January 1900.
 
+### `sokoto` — Green flag of the Sokoto Caliphate
+
+- **Flag kind:** exact-national
+- **Polities:** `SOK` (ID 62)
+- **Validity:** 1804-01-01 – 1903-03-01
+- **Source:** [File:Flag of the Sokoto Caliphate.svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_Sokoto_Caliphate.svg)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Orange Tuesday
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/0/04/Flag_of_the_Sokoto_Caliphate.svg) (600×400; SHA-1 `4949d00691e0ad1603d789fa21ce64bb8ed70ddf`)
+- **Historical accuracy:** Plain green flag of the Sokoto Caliphate, the Fulani-led Islamic state in the central Sudan. It was de facto independent with limited international recognition and was conquered by British forces in 1903. Some sources describe variants with a crescent or inscriptions; the plain green field is the verified Commons representation.
+
+### `spain-restoration` — Restoration-era Spanish state flag (red–yellow–red with the coat of arms)
+
+- **Flag kind:** project-reconstruction
+- **Polities:** `ESP` (ID 7), `SAH` (ID 148), `SGG` (ID 149)
+- **Validity:** 1875-01-01 – 1931-04-14
+- **Source:** project-authored reconstruction (design `spain-restoration`), not an externally sourced image.
+- **License:** Project-authored (CC0 dedication) (project) — internal:docs/FLAG_PROVENANCE.md#project-artwork
+- **Author:** Century project (reconstruction)
+- **Retrieved:** 2026-10-30
+- **Component:** coat-of-arms — [File:Flag version of the Coat of arms of Spain (1785-1873 & 1875-1931.png](https://commons.wikimedia.org/wiki/File:Flag_version_of_the_Coat_of_arms_of_Spain_(1785-1873_%26_1875-1931.png); Public domain (pd); author Buho07; SHA-256 `fc319cf7a0dff915cb188ba37abe9481f887f65e133fd7f6b6a30ad4005596d9`.
+- **Source file:** built by `scripts/m11/build-flags.mjs` at 1000×667; no external flag file is redistributed.
+- **Historical accuracy:** The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Century's work, not a copy of any share-alike flag file.
+
 ### `sweden-1844` — Swedish union flag with the Norway-Sweden union badge
 
+- **Flag kind:** national-with-union-badge
 - **Polities:** `SWE` (ID 12)
 - **Validity:** 1844-06-20 – 1905-11-01
 - **Source:** [File:Swedish civil ensign (1844–1905).svg](https://commons.wikimedia.org/wiki/File:Swedish_civil_ensign_(1844%E2%80%931905).svg)
@@ -601,6 +752,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `switzerland` — Square red flag with the white Swiss cross
 
+- **Flag kind:** exact-national
 - **Polities:** `CHE` (ID 11)
 - **Validity:** 1848-09-12 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Switzerland.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Switzerland.svg)
@@ -610,9 +762,34 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 - **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Switzerland.svg) (512×512; SHA-1 `b59554bc284833d9f890531c537d862210d2215f`)
 - **Historical accuracy:** Federal flag of Switzerland: a white cross on red. The Swiss national flag is square (1:1), unlike most national flags. The design was confirmed by the federal constitution of 1848.
 
+### `tonga` — Flag of the Kingdom of Tonga
+
+- **Flag kind:** exact-national
+- **Polities:** `TON` (ID 61)
+- **Validity:** 1862-11-04 – no end date recorded (in use on 1 January 1900)
+- **Source:** [File:Flag of Tonga.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Tonga.svg)
+- **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
+- **Author:** Uelingatoni Ngu Tupoumalohi
+- **Retrieved:** 2026-10-30
+- **Source file:** [original](https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Tonga.svg) (960×480; SHA-1 `943cafb933917bacf6f65a0d6f3017d0c74c95f9`)
+- **Historical accuracy:** Red flag with a white canton bearing a red cross, adopted by King George Tupou I in 1862. Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900).
+
+### `transvaal-vierkleur` — Vierkleur of the South African Republic (Transvaal)
+
+- **Flag kind:** project-reconstruction
+- **Polities:** `ZAR` (ID 36)
+- **Validity:** 1857-02-28 – 1902-05-31
+- **Source:** project-authored reconstruction (design `transvaal-vierkleur`), not an externally sourced image.
+- **License:** Project-authored (CC0 dedication) (project) — internal:docs/FLAG_PROVENANCE.md#project-artwork
+- **Author:** Century project (reconstruction)
+- **Retrieved:** 2026-10-30
+- **Source file:** built by `scripts/m11/build-flags.mjs` at 1000×667; no external flag file is redistributed.
+- **Historical accuracy:** The South African Republic (Transvaal) Vierkleur: a green vertical stripe at the hoist and red, white and blue horizontal stripes in the fly. This is an original project-authored reconstruction from the documented 1857–1902 design. The available Commons Vierkleur vector is CC BY-SA and was not used or traced.
+
 ### `uk-union-1801` — Union Flag of Great Britain and Ireland
 
-- **Polities:** `GBR` (ID 1), `AUS` (ID 57), `NZL` (ID 58), `BIN` (ID 100), `CEY` (ID 101), `MAL` (ID 102), `HKG` (ID 103), `KUW` (ID 104), `TRU` (ID 105), `CYP` (ID 106), `MLT` (ID 107), `BWI` (ID 108), `BSA` (ID 109), `BWA` (ID 110), `BEA` (ID 111), `SUD` (ID 112), `BSO` (ID 113), `CRA` (ID 114), `HCT` (ID 115), `FJI` (ID 116), `BPO` (ID 117), `CAP` (ID 118), `NAT` (ID 119), `NFD` (ID 120), `BHU` (ID 159)
+- **Flag kind:** exact-national
+- **Polities:** `GBR` (ID 1), `AUS` (ID 57), `NZL` (ID 58), `BIN` (ID 100), `CEY` (ID 101), `MAL` (ID 102), `HKG` (ID 103), `KUW` (ID 104), `TRU` (ID 105), `CYP` (ID 106), `MLT` (ID 107), `BWI` (ID 108), `BSA` (ID 109), `BWA` (ID 110), `BEA` (ID 111), `SUD` (ID 112), `BSO` (ID 113), `CRA` (ID 114), `HCT` (ID 115), `FJI` (ID 116), `BPO` (ID 117), `CAP` (ID 118), `NAT` (ID 119), `NFD` (ID 120), `BHU` (ID 159), `SAR` (ID 165)
 - **Validity:** 1801-01-01 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of the United Kingdom.svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Kingdom_(3-5).svg)
 - **License:** Public domain (pd) — https://commons.wikimedia.org/wiki/Commons:Copyright_tags#Public_domain
@@ -623,6 +800,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `uruguay` — Flag of Uruguay
 
+- **Flag kind:** exact-national
 - **Polities:** `URY` (ID 51)
 - **Validity:** 1830-07-11 – no end date recorded (in use on 1 January 1900)
 - **Source:** [File:Flag of Uruguay.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Uruguay.svg)
@@ -634,6 +812,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `usa-45-star` — United States flag with 45 stars
 
+- **Flag kind:** exact-national
 - **Polities:** `USA` (ID 0), `PHL` (ID 150), `PRI` (ID 151), `GUM` (ID 152), `ASM` (ID 153)
 - **Validity:** 1896-07-04 – 1908-07-03
 - **Source:** [File:Flag of the United States (1896-1908).svg](https://commons.wikimedia.org/wiki/File:Flag_of_the_United_States_(1896%E2%80%931908).svg)
@@ -645,6 +824,7 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ### `venezuela-1863` — Flag of the United States of Venezuela with seven stars
 
+- **Flag kind:** national-form
 - **Polities:** `VEN` (ID 45)
 - **Validity:** 1863-03-29 – 1905-03-28
 - **Source:** [File:Flag of Venezuela (1863–1905).svg](https://commons.wikimedia.org/wiki/File:Flag_of_Venezuela_(1863%E2%80%931905).svg)
@@ -656,15 +836,12 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ## Monogram fallbacks
 
-A monogram is retained when no historically correct flag artwork with a verified PD/CC0 licence exists. The existing political-status badges remain visible, and the monogram uses the polity's existing national colour.
+A monogram is retained when no historically correct flag artwork can be established from verified PD/CC0 files or a documented project-authored reconstruction. The existing political-status badges remain visible, and the monogram uses the polity's existing national colour.
 
 | Polity | ID | Status | Reason |
 | --- | ---: | --- | --- |
-| Kingdom of Spain (`ESP`) | 7 | independent | No Public Domain or CC0 artwork of the 1875–1931 Spanish state flag (red–yellow–red with the Restoration coat of arms) was identified on Wikimedia Commons. The verified PD file for the period is the five-stripe 1785 merchant ensign, which was not Spain's national/state flag in 1900; the plain red–yellow–red triband became the merchant flag only in 1927. A CC0 photograph of a surviving 1898 Spanish flag ('Flag of Spain (1898).png') was also reviewed, but it is a plain red–yellow–red flag without the Restoration coat of arms and was rejected as the state flag. A monogram is retained rather than bundle a historically incomplete or share-alike image. |
-| Principality of Montenegro (`MNT`) | 17 | independent | Montenegro's national flag was not standardised in 1900: Prince Nikola used several variants, and the red–blue–white tricolour was only prescribed by the 1905 constitution. The only verified PD Commons file for the period depicts the 1878 war ensign (white field with a red cross), not the national flag. A PD file of the 1905–1918 royal flag exists, but its validity begins after the reference date. Monogram retained. |
-| South African Republic (Transvaal) (`ZAR`) | 36 | independent | The Transvaal Vierkleur artwork on Commons ('Flag of Transvaal.svg') is CC BY-SA 3.0 and is excluded by the PD/CC0-only policy. No PD/CC0 vector artwork of the 1857–1902 Vierkleur was found; the available PD photograph contains overlaid text and is unsuitable as a flag asset. Monogram retained. |
-| Spanish Sahara (`SAH`) | 148 | colony | Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible. |
-| Spanish Guinea (`SGG`) | 149 | colony | Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible. |
+| Sultanate of Wadai (`WAD`) | 63 | independent | No verified historical national or state flag design for the Sultanate of Wadai could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag. |
+| Sultanate of Darfur (`DAR`) | 64 | independent | No verified historical national or state flag design for the Sultanate of Darfur could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag. |
 
 ## Dependencies: sovereign flag plus status badge
 
@@ -720,8 +897,8 @@ Dependent territories do not receive invented national flags. By default they di
 | Dutch East Indies (`DEI`) | 145 | colony | NLD | `netherlands` | sovereign-flag |
 | Suriname (`SUR`) | 146 | colony | NLD | `netherlands` | sovereign-flag |
 | Dutch Caribbean (`DGC`) | 147 | colony | NLD | `netherlands` | sovereign-flag |
-| Spanish Sahara (`SAH`) | 148 | colony | ESP | monogram fallback | fallback |
-| Spanish Guinea (`SGG`) | 149 | colony | ESP | monogram fallback | fallback |
+| Spanish Sahara (`SAH`) | 148 | colony | ESP | `spain-restoration` | sovereign-flag |
+| Spanish Guinea (`SGG`) | 149 | colony | ESP | `spain-restoration` | sovereign-flag |
 | Philippine Islands (`PHL`) | 150 | colony | USA | `usa-45-star` | sovereign-flag |
 | Puerto Rico (`PRI`) | 151 | colony | USA | `usa-45-star` | sovereign-flag |
 | Guam (`GUM`) | 152 | colony | USA | `usa-45-star` | sovereign-flag |
@@ -734,6 +911,10 @@ Dependent territories do not receive invented national flags. By default they di
 | Bhutan (`BHU`) | 159 | protectorate | GBR | `uk-union-1801` | sovereign-flag |
 | Grand Duchy of Finland (`FIN`) | 160 | autonomous-province | RUS | `russia-1896` | sovereign-flag |
 | Taiwan (Formosa) (`TWN`) | 161 | colony | JPN | `japan-1870` | sovereign-flag |
+| Tibet (`TIB`) | 162 | autonomous-province | CHN | `qing-1889` | sovereign-flag |
+| Khanate of Khiva (`KHI`) | 163 | protectorate | RUS | `russia-1896` | sovereign-flag |
+| Emirate of Bukhara (`BUK`) | 164 | protectorate | RUS | `russia-1896` | sovereign-flag |
+| Raj of Sarawak (`SAR`) | 165 | protectorate | GBR | `uk-union-1801` | sovereign-flag |
 
 ## Verification targets
 
@@ -745,9 +926,12 @@ Dependent territories do not receive invented national flags. By default they di
 - **Ottoman Empire** — `ottoman-1844`: red field with white crescent and five-pointed star, the 1844–1922 design.
 - **Canada** — `canada-red-ensign-1868`: the Red Ensign with the 1868 shield, used unofficially from 1870 and approved for use at sea in 1892; the Union Jack remained the official national flag, and the modern maple-leaf flag is not used.
 - **Australia** — `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.
-- **Transvaal / South African Republic** — monogram fallback. The Commons Vierkleur artwork is CC BY-SA 3.0 and is excluded; no PD/CC0 Vierkleur artwork was verified. The political and historical definition of the polity is unchanged.
+- **Transvaal / South African Republic** — `transvaal-vierkleur`: an original Century reconstruction of the 1857–1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.
 - **Orange Free State** — `orange-free-state`: the 1857–1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).
-- **Austria-Hungary** — **not present in the existing 1900 catalog**, so no flag entry exists. The catalog has no Austria or Hungary polity at all; this is a pre-existing catalog-coverage gap, not a flag-system decision, and it was not changed here because the task forbids altering the country catalog's political definitions. Austria-Hungary also had no single unified national flag: the black-yellow Austrian flag and the red-white-green Hungarian flag were the national flags of the two halves, while the red-white-red civil ensign was the common merchant ensign. If an Austria-Hungary polity is added later, that civil ensign is the appropriate shared flag, with an explicit note that no single unified national flag existed.
+- **Austria-Hungary** — `austria-hungary-civil-ensign`: the common civil ensign of 1869–1918, combining the Austrian red-white-red and Hungarian red-white-green halves with both coats of arms. The dual monarchy had no single unified national flag; the manifest and this document record that distinction. The polity is a single catalog state, not two independent countries.
+- **Spain** — `spain-restoration`: a project-authored red–yellow–red reconstruction with the individually verified PD Restoration-era coat of arms. The Spanish colonies SAH and SGG use the same sovereign flag with their colony status badges.
+- **Montenegro** — `montenegro-1881`: the verified PD red–blue–white national flag with the princely monogram, documented 1881–1905. The 1878 war ensign is not used as the national flag.
+- **Tonga, Sokoto, Ha'il, Crete** — period flags verified on Commons (PD) and recorded with exact/representative flag-kind metadata.
 
 ## Offline and runtime guarantees
 
@@ -764,11 +948,11 @@ pnpm flags:update   # network: deliberately accept a changed rendition and rewri
 
 ## Remaining limitations and unresolved questions
 
-- Spain (ESP) and its colonies (SAH, SGG) use the monogram because no PD/CC0 artwork of the 1875–1931 state flag with the Restoration coat of arms was found. The verified PD Spanish file for the period is the 1785 five-stripe merchant ensign, which would be incorrect for 1900. A CC0 photograph of a surviving 1898 Spanish flag was reviewed but is a plain red–yellow–red flag without the coat of arms, so it was not used as the state flag.
-- Montenegro (MNT) uses the monogram because its national flag was not standardised in 1900 and the only verified PD Commons file depicts the 1878 war ensign, not the national flag. A PD file of the 1905–1918 royal flag exists but begins after the reference date.
-- The Transvaal (ZAR) Vierkleur is CC BY-SA 3.0 on Commons and is therefore excluded by the PD/CC0-only rule; the polity uses the monogram.
-- Several states used a plain civil/national tricolour while the state flag carried a coat of arms that is only available under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.
+- Wadai (WAD) and Darfur (DAR) remain documented monogram exceptions: no verified historical national/state flag design could be established from the available sources, and no PD/CC0 artwork documents one. Their independence and marker locations are still represented.
+- Austria-Hungary's map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina). Galicia, Transylvania, Vojvodina and South Tyrol are not separable at Natural Earth 1:50m admin-0 resolution; the limitation is recorded in the catalog notes.
+- Sokoto, Wadai, Darfur, Ha'il, Crete, Tonga, Tibet, Khiva, Bukhara and Sarawak use marker-only map integration because reliable 1900 polygon boundaries are not available at the map source. Their capitals, labels, statuses and picker entries are fully integrated; the marker approximation is recorded in the map data and the coverage audit.
+- Several states used a plain civil/national tricolour while the state flag carried a coat of arms available only under CC BY-SA on Commons (Serbia, Romania, Bulgaria, Greece). The plain national flag is bundled with a note; the state-flag variant is deliberately not bundled.
 - Ecuador's plain tricolour is shown because the coat of arms became mandatory for the state flag only on 5 December 1900, after the reference date.
 - Brazil's star field changed as states were admitted; the bundled 1889–1960 rendition follows the period design rather than a star-by-star 1900 reconstruction.
 - Persia's Qajar lion-and-sun tricolour was not legally standardised until 1905–1907; the bundled CC0 1886 artwork is period-appropriate, and the note records the lack of a detailed 1900 specification.
-- The catalog omits Austria-Hungary entirely (see above). If that polity is added, the flag manifest and this document must be regenerated.
+- Canada's Red Ensign was the distinctive de facto flag, while the Union Jack remained the official national flag in 1900; both facts are recorded.

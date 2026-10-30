@@ -61,6 +61,16 @@
   },
   {
     "marketAKey": "german-empire",
+    "marketBKey": "austro-hungarian",
+    "distanceUnits": 0.5,
+    "baseCapacitySUSDPerDay": 56842,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "german-empire",
     "marketBKey": "dutch-empire",
     "distanceUnits": 0.6,
     "baseCapacitySUSDPerDay": 45367,
@@ -74,16 +84,6 @@
     "marketBKey": "belgian-congo",
     "distanceUnits": 0.7,
     "baseCapacitySUSDPerDay": 45767,
-    "status": "provisional",
-    "sourceIds": [
-      "project-authored-1900"
-    ]
-  },
-  {
-    "marketAKey": "german-empire",
-    "marketBKey": "northern-european",
-    "distanceUnits": 0.7,
-    "baseCapacitySUSDPerDay": 46517,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -141,9 +141,9 @@
   },
   {
     "marketAKey": "russian-empire",
-    "marketBKey": "dutch-empire",
-    "distanceUnits": 1.8,
-    "baseCapacitySUSDPerDay": 64600,
+    "marketBKey": "austro-hungarian",
+    "distanceUnits": 1.6,
+    "baseCapacitySUSDPerDay": 76075,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -201,9 +201,29 @@
   },
   {
     "marketAKey": "northern-european",
+    "marketBKey": "german-empire",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 46517,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "northern-european",
     "marketBKey": "dutch-empire",
     "distanceUnits": 0.9,
     "baseCapacitySUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "mediterranean",
+    "marketBKey": "austro-hungarian",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 54597,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -220,10 +240,20 @@
     ]
   },
   {
-    "marketAKey": "mediterranean",
-    "marketBKey": "ottoman-egyptian",
+    "marketAKey": "ottoman-egyptian",
+    "marketBKey": "mediterranean",
     "distanceUnits": 1.1,
-    "baseCapacitySUSDPerDay": 47847,
+    "baseCapacitySUSDPerDay": 48172,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "ottoman-egyptian",
+    "marketBKey": "austro-hungarian",
+    "distanceUnits": 1.3,
+    "baseCapacitySUSDPerDay": 49075,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -232,18 +262,8 @@
   {
     "marketAKey": "ottoman-egyptian",
     "marketBKey": "german-empire",
-    "distanceUnits": 1.7,
-    "baseCapacitySUSDPerDay": 50092,
-    "status": "provisional",
-    "sourceIds": [
-      "project-authored-1900"
-    ]
-  },
-  {
-    "marketAKey": "ottoman-egyptian",
-    "marketBKey": "alpine",
     "distanceUnits": 1.8,
-    "baseCapacitySUSDPerDay": 40000,
+    "baseCapacitySUSDPerDay": 50417,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -303,7 +323,7 @@
     "marketAKey": "persian-gulf",
     "marketBKey": "ottoman-egyptian",
     "distanceUnits": 3.2,
-    "baseCapacitySUSDPerDay": 40975,
+    "baseCapacitySUSDPerDay": 41300,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -321,19 +341,9 @@
   },
   {
     "marketAKey": "persian-gulf",
-    "marketBKey": "mediterranean",
+    "marketBKey": "austro-hungarian",
     "distanceUnits": 4.3,
-    "baseCapacitySUSDPerDay": 46822,
-    "status": "provisional",
-    "sourceIds": [
-      "project-authored-1900"
-    ]
-  },
-  {
-    "marketAKey": "african-independent",
-    "marketBKey": "ottoman-egyptian",
-    "distanceUnits": 2.8,
-    "baseCapacitySUSDPerDay": 40150,
+    "baseCapacitySUSDPerDay": 47725,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -343,7 +353,17 @@
     "marketAKey": "african-independent",
     "marketBKey": "mediterranean",
     "distanceUnits": 3,
-    "baseCapacitySUSDPerDay": 45997,
+    "baseCapacitySUSDPerDay": 49497,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "african-independent",
+    "marketBKey": "ottoman-egyptian",
+    "distanceUnits": 3,
+    "baseCapacitySUSDPerDay": 43975,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -352,8 +372,8 @@
   {
     "marketAKey": "african-independent",
     "marketBKey": "british-empire",
-    "distanceUnits": 3.4,
-    "baseCapacitySUSDPerDay": 46884,
+    "distanceUnits": 3.3,
+    "baseCapacitySUSDPerDay": 50384,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"
@@ -362,7 +382,7 @@
   {
     "marketAKey": "southern-african",
     "marketBKey": "african-independent",
-    "distanceUnits": 4.8,
+    "distanceUnits": 4.7,
     "baseCapacitySUSDPerDay": 40000,
     "status": "provisional",
     "sourceIds": [
@@ -372,7 +392,7 @@
   {
     "marketAKey": "southern-african",
     "marketBKey": "ottoman-egyptian",
-    "distanceUnits": 7.5,
+    "distanceUnits": 7.4,
     "baseCapacitySUSDPerDay": 40000,
     "status": "provisional",
     "sourceIds": [
@@ -404,6 +424,46 @@
     "marketBKey": "french-empire",
     "distanceUnits": 9.2,
     "baseCapacitySUSDPerDay": 54954,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "austro-hungarian",
+    "marketBKey": "alpine",
+    "distanceUnits": 0.7,
+    "baseCapacitySUSDPerDay": 43637,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "pacific",
+    "marketBKey": "japanese-empire",
+    "distanceUnits": 7.9,
+    "baseCapacitySUSDPerDay": 41031,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "pacific",
+    "marketBKey": "east-asian",
+    "distanceUnits": 9.8,
+    "baseCapacitySUSDPerDay": 136080,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-1900"
+    ]
+  },
+  {
+    "marketAKey": "pacific",
+    "marketBKey": "latin-america",
+    "distanceUnits": 11.4,
+    "baseCapacitySUSDPerDay": 45230,
     "status": "provisional",
     "sourceIds": [
       "project-authored-1900"

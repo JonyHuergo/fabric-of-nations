@@ -136,3 +136,29 @@ App:
 - Native iOS/Android export was not re-run; web is the verified target.
 - Tick cost at the full world size is a bounded smoke observation, not a
   benchmark.
+
+## 6. M11b addendum — complete 1900 catalog and monogram removal
+
+M11b extends the M11 catalog without changing the simulation, save format, world
+schema or data version:
+
+- Final catalog: **67 states, 66 territories, 133 regions, 20 markets, 66
+  selectable states**.
+- Added states: Austria-Hungary (one dual-monarchy state, ID 60), Tonga (61),
+  Sokoto (62), Wadai (63), Darfur (64), Jabal Shammar (65) and the autonomous
+  Cretan State (66).
+- Added territories: Tibet (162, CHN), Khiva (163, RUS), Bukhara (164, RUS) and
+  Sarawak (165, GBR).
+- Austria-Hungary uses its common civil ensign because no single unified national
+  flag existed; the dual structure is recorded in the catalog and GDD §17I.13.
+- The five previous monogram cases are resolved: Spain uses a project-authored
+  reconstruction with a PD coat-of-arms component; Spanish Sahara and Spanish
+  Guinea use the Spanish sovereign flag; Montenegro uses its 1881–1905 national
+  flag; the Transvaal uses a project-authored Vierkleur reconstruction. Only
+  Wadai and Darfur remain documented monogram exceptions.
+- The researched independent-state inventory, sources, contested
+  classifications and remaining boundary uncertainties are in
+  `docs/1900_CATALOG_COVERAGE.md`.
+- Verification: `pnpm test` — 79 suites / 851 tests pass; `pnpm typecheck`,
+  `pnpm lint`, `pnpm flags:check`, `pnpm flags:audit` (64 files), worker checks
+  and the web export pass.

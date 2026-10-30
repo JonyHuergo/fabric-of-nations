@@ -39,8 +39,8 @@ export function MainMenuScreen({
           <Text style={styles.kicker}>GRAND STRATEGY · 1900–2000</Text>
           <Text style={[styles.title, narrow ? styles.titleNarrow : null]}>CENTURY</Text>
           <Text style={styles.tagline}>
-            One world. Fifty-nine playable states. A century of industry, empire and upheaval
-            begins on 1 January 1900.
+            One world. {String(playable)} playable states. A century of industry, empire and
+            upheaval begins on 1 January 1900.
           </Text>
         </View>
       </View>

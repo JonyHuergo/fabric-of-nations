@@ -95,7 +95,8 @@
       118,
       119,
       120,
-      159
+      159,
+      165
     ],
     "currency": {
       "key": "gbp",
@@ -108,14 +109,14 @@
       "incomeTaxRate": 0.06,
       "welfareBudgetSUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 1519520,
+    "initialTreasuryCashSUSD": 1521520,
     "debt": {
       "enabled": true,
       "creditorKind": "country",
       "creditorId": 0,
       "annualCouponRate": 0.04,
       "termDays": 365,
-      "maxOutstandingPrincipalSUSD": 7597600,
+      "maxOutstandingPrincipalSUSD": 7607600,
       "refinanceOnMaturity": true,
       "arrearsGraceDays": 365
     },
@@ -129,7 +130,7 @@
         "labor": "labor-protected",
         "trade": "trade-open"
       },
-      "institutionFundingSUSDPerYear": 227928
+      "institutionFundingSUSDPerYear": 228228
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -142,7 +143,7 @@
         "printing-industry",
         "chemical-fertilizer"
       ],
-      "educationFundingSUSDPerYear": 132958,
+      "educationFundingSUSDPerYear": 133133,
       "researchStaffShare": 0.18
     },
     "sourceIds": [
@@ -307,7 +308,9 @@
     "name": "Russian Empire",
     "regionIds": [
       4,
-      160
+      160,
+      163,
+      164
     ],
     "currency": {
       "key": "rub",
@@ -320,14 +323,14 @@
       "incomeTaxRate": 0.05,
       "welfareBudgetSUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 544000,
+    "initialTreasuryCashSUSD": 555200,
     "debt": {
       "enabled": true,
       "creditorKind": "country",
       "creditorId": 1,
       "annualCouponRate": 0.04,
       "termDays": 365,
-      "maxOutstandingPrincipalSUSD": 2720000,
+      "maxOutstandingPrincipalSUSD": 2776000,
       "refinanceOnMaturity": true,
       "arrearsGraceDays": 365
     },
@@ -341,7 +344,7 @@
         "labor": "labor-repression",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 81600
+      "institutionFundingSUSDPerYear": 83280
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -351,7 +354,7 @@
         "basic-sanitation",
         "printing-industry"
       ],
-      "educationFundingSUSDPerYear": 27200,
+      "educationFundingSUSDPerYear": 27760,
       "researchStaffShare": 0.12
     },
     "sourceIds": [
@@ -1675,7 +1678,8 @@
     "tag": "CHN",
     "name": "Qing Empire",
     "regionIds": [
-      26
+      26,
+      162
     ],
     "currency": {
       "key": "cnx",
@@ -1688,14 +1692,14 @@
       "incomeTaxRate": 0.03,
       "welfareBudgetSUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 1600000,
+    "initialTreasuryCashSUSD": 1604800,
     "debt": {
       "enabled": true,
       "creditorKind": "country",
       "creditorId": 1,
       "annualCouponRate": 0.04,
       "termDays": 365,
-      "maxOutstandingPrincipalSUSD": 8000000,
+      "maxOutstandingPrincipalSUSD": 8024000,
       "refinanceOnMaturity": true,
       "arrearsGraceDays": 365
     },
@@ -1709,14 +1713,14 @@
         "labor": "labor-repression",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 240000
+      "institutionFundingSUSDPerYear": 240720
     },
     "technology": {
       "researchedTechnologyKeys": [
         "steam-power",
         "primary-schooling"
       ],
-      "educationFundingSUSDPerYear": 32000,
+      "educationFundingSUSDPerYear": 32096,
       "researchStaffShare": 0.08
     },
     "sourceIds": [
@@ -3645,6 +3649,422 @@
     "currency": {
       "key": "cup",
       "name": "Cuban peso",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "republic",
+      "governmentGroupKey": "capitalists",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-male",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 60,
+    "tag": "AUT",
+    "name": "Austro-Hungarian Monarchy",
+    "regionIds": [
+      60
+    ],
+    "currency": {
+      "key": "aut",
+      "name": "Austro-Hungarian krone",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.05,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 204000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 1020000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 30600
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "railway-logistics",
+        "primary-schooling",
+        "basic-sanitation",
+        "printing-industry"
+      ],
+      "educationFundingSUSDPerYear": 10200,
+      "researchStaffShare": 0.12
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 61,
+    "tag": "TON",
+    "name": "Kingdom of Tonga",
+    "regionIds": [
+      61
+    ],
+    "currency": {
+      "key": "ton",
+      "name": "Tongan pound (sterling-linked)",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "constitutional-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-property",
+        "labor": "labor-association",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 62,
+    "tag": "SOK",
+    "name": "Sokoto Caliphate",
+    "regionIds": [
+      62
+    ],
+    "currency": {
+      "key": "sok",
+      "name": "Sokoto currency",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 40000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 200000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 6000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 800,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 63,
+    "tag": "WAD",
+    "name": "Sultanate of Wadai",
+    "regionIds": [
+      63
+    ],
+    "currency": {
+      "key": "wad",
+      "name": "Wadai currency",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1200
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 64,
+    "tag": "DAR",
+    "name": "Sultanate of Darfur",
+    "regionIds": [
+      64
+    ],
+    "currency": {
+      "key": "dar",
+      "name": "Darfur currency",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1200
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 65,
+    "tag": "SHM",
+    "name": "Emirate of Jabal Shammar (Ha'il)",
+    "regionIds": [
+      65
+    ],
+    "currency": {
+      "key": "shm",
+      "name": "Ha'il currency",
+      "valuation": {
+        "status": "unavailable"
+      }
+    },
+    "fiscal": {
+      "incomeTaxRate": 0.03,
+      "welfareBudgetSUSDPerYear": 0
+    },
+    "initialTreasuryCashSUSD": 25000,
+    "debt": {
+      "enabled": true,
+      "creditorKind": "country",
+      "creditorId": 1,
+      "annualCouponRate": 0.04,
+      "termDays": 365,
+      "maxOutstandingPrincipalSUSD": 100000,
+      "refinanceOnMaturity": true,
+      "arrearsGraceDays": 365
+    },
+    "immigrationOpen": false,
+    "politics": {
+      "regimeKind": "absolute-monarchy",
+      "governmentGroupKey": "aristocrats",
+      "laws": {
+        "taxation": "taxation-flat",
+        "suffrage": "suffrage-none",
+        "labor": "labor-repression",
+        "trade": "trade-restricted"
+      },
+      "institutionFundingSUSDPerYear": 1000
+    },
+    "technology": {
+      "researchedTechnologyKeys": [
+        "steam-power",
+        "primary-schooling"
+      ],
+      "educationFundingSUSDPerYear": 500,
+      "researchStaffShare": 0.08
+    },
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "occupationSourceIds": [
+      "owid-employment-by-sector",
+      "project-authored-1900"
+    ]
+  },
+  {
+    "id": 66,
+    "tag": "CRT",
+    "name": "Cretan State",
+    "regionIds": [
+      66
+    ],
+    "currency": {
+      "key": "crt",
+      "name": "Cretan drachma",
       "valuation": {
         "status": "unavailable"
       }

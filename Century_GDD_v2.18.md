@@ -11,18 +11,22 @@
 
 > **v2.18 alignment note.** This revision records **M11 — Historical
 > World, Country Selection, and Complete UI Overhaul** as implemented. The
-> playable world is now a 1900 catalog of **60 states** and **62 dependent
-> territories** in **122 regions** and **18 documented markets**; **59 states are
-> selectable** and every one can initialize a valid campaign. A new campaign
-> begins with an explicit country choice on an offline historical world map, and
-> the app is rebuilt around a map-first grand-strategy shell with sliders for
-> continuous policy controls. Dependencies are modelled as territories of their
-> sovereign, never as independent countries; D-081 sovereignty/control separation
-> is preserved. This document also restores the original v2.17 file from its
-> pre-Batch-4 commit and keeps the valid D-085 audit-remediation record here.
-> World schema is **26**, simulation **0.27.0**, save format **1**, data
-> **`m3-economy-v12`**, worker protocol **14**; older saves and protocol-13
-> clients reject under D-013. The implementation record is §17I and the decisions
+> playable world is a 1900 catalog; with the M11b coverage addendum it contains
+> **67 states** and **66 dependent territories** in **133 regions** and
+> **20 documented markets**; **66 states are selectable** and every one can
+> initialize a valid campaign. A new campaign begins with an explicit country
+> choice on an offline historical world map, and the app is rebuilt around a
+> map-first grand-strategy shell with sliders for continuous policy controls.
+> Dependencies are modelled as territories of their sovereign, never as
+> independent countries; D-081 sovereignty/control separation is preserved. This
+> document also restores the original v2.17 file from its pre-Batch-4 commit and
+> keeps the valid D-085 audit-remediation record here. The M11b addendum
+> (§17I.7) adds Austria-Hungary and the documented de facto, autonomous and
+> protectorate polities, and records the catalog coverage audit in
+> `docs/1900_CATALOG_COVERAGE.md`. World schema is **26**, simulation **0.27.0**,
+> save format **1**, data **`m3-economy-v12`**, worker protocol **14**; older
+> saves and protocol-13 clients reject under D-013. The implementation record is
+> §17I and the decisions
 > are D-086 through D-093.
 >
 > **v2.17 alignment note.** This revision records **M10 — Diplomacy, Warfare, and
@@ -6189,13 +6193,13 @@ an authored catalog at
 |---|---|---|
 | `independent` | Sovereign state with no superior power on 1 January 1900 | yes |
 | `personal-union` | Separate state institutions under a shared crown (Norway–Sweden) | yes |
-| `autonomous-vassal` | Self-governing but tributary (Bulgaria) | yes |
+| `autonomous-vassal` | Self-governing but tributary (Bulgaria, Crete) | yes |
 | `dominion` | Self-governing colony with responsible government (Canada, Australia, New Zealand, Newfoundland) | yes |
 | `self-governing-colony` | Representative government without dominion status | no |
 | `protectorate` | Local ruler under a protecting power's foreign-affairs control | no |
 | `colony` | Administered dependency without sovereign status | no |
 | `occupation` | Recognised government under foreign military occupation (Cuba) | no |
-| `autonomous-province` | Autonomous province under suzerainty plus occupation (Egypt, Finland) | no |
+| `autonomous-province` | Autonomous province under suzerainty (Egypt, Finland, Tibet) | no |
 | `dependency` | Other dependency (Iceland, Greenland, the Faroes) | no |
 
 Independence coding follows the Gleditsch–Ward / Correlates of War tradition that
@@ -6205,8 +6209,9 @@ semi-sovereign categories are selectable only where the catalog records a
 separate government that can be simulated as a country; the decision and its
 reason are visible in the picker.
 
-The catalog contains **60 states** and **62 dependent territories**. **59 states
+The catalog contains **67 states** and **66 dependent territories**. **66 states
 are selectable**; Cuba is present as an occupied polity and is not selectable.
+The M11b addendum (§17I.7) records the complete independent-state reconciliation.
 Each entry records a stable id, the historical name, a common English name,
 status, parent sovereign, capital, 1900 population estimate with confidence,
 continent, market, description, notes, sources and a geometry crosswalk.
@@ -6216,7 +6221,7 @@ continent, market, description, notes, sources and a geometry crosswalk.
 A **state** entry becomes one simulation `Country` with a home region. A
 **territory** entry becomes one simulation `Region` owned by its sovereign
 country. Every state owns one home region and zero or more dependent regions.
-The resulting world has **122 regions** and **60 countries**.
+The resulting world has **133 regions** and **67 countries**.
 
 This representation preserves the M5 one-market-per-country invariant (a
 country's home and dependent regions share one market) and avoids treating a
@@ -6409,9 +6414,9 @@ in this milestone; web export is the verified target.
 | Requirement | Evidence |
 |---|---|
 | Catalog based on a documented definition and date | catalog `meta.classification`, 1 Jan 1900 |
-| Every qualifying independent state playable | 59 selectable states; M11 test checks creation for six regions |
-| Dependencies accurate and non-playable | 62 territories; all `selectable: false`; Cuba/Egypt statuses |
-| Every selectable country has a valid starting state | `m11-world.test.ts` world validator over 122 regions |
+| Every qualifying independent state playable | 66 selectable states; M11/M11b tests check creation for every selectable country |
+| Dependencies accurate and non-playable | 66 territories; all `selectable: false`; Cuba/Egypt statuses |
+| Every selectable country has a valid starting state | `m11-world.test.ts` world validator over 133 regions |
 | Country selection maps to the right country | `CREATE_GAME` test across USA/JPN/ZAR/BRA/RUS/ETH |
 | AI control for non-player countries | AI phase test: player `lastDecisionDay` stays null |
 | Player identity survives save/load and restart | serialize/deserialize test; host re-create effect |
@@ -6426,17 +6431,45 @@ in this milestone; web export is the verified target.
 
 - The map aggregates modern source units into 1900 polities. Sub-national 1900
   borders are not available for every case: Congress Poland is inside the
-  Russian Empire, Alsace-Lorraine cannot be separated from France, and Tibet,
-  Xinjiang and Mongolia are inside Qing China. South Africa and Newfoundland are
-  the documented exceptions handled with admin-1 geometry/markers.
-- The world omits or groups some small territories; the population total is about
-  1.52 billion, not a claim of 1.62 billion completeness.
+  Russian Empire, Alsace-Lorraine cannot be separated from France, Austria-
+  Hungary's Galicia/Transylvania/Vojvodina/South Tyrol are not separable at
+  admin-0 resolution, and Tibet, Xinjiang and Mongolia are inside Qing China.
+  South Africa and Newfoundland are the documented exceptions handled with
+  admin-1 geometry/markers.
+- Sokoto, Wadai, Darfur, Jabal Shammar, Crete, Tonga, Tibet, Khiva, Bukhara and
+  Sarawak use marker-only map integration because reliable 1900 polygons are not
+  available at the map source.
+- The world population total is about 1.59 billion, closer to but still below the
+  1.62 billion M2 estimate; it is not a claim of census completeness.
 - The one-market-per-country rule means imperial markets include dependent
   territories; market membership is not a sovereignty claim.
 - Native iOS/Android export and device verification were not re-run for M11.
 - Benchmarking/profiling was prohibited for this milestone; tick cost at the full
   world size is therefore reported only as a bounded smoke observation, not a
   benchmark.
+
+### 17I.13 M11b catalog-coverage addendum
+
+**Status:** implemented. M11b reconciles the 1900 catalog against a full
+independent-state inventory and closes the known coverage gaps:
+
+- **Austria-Hungary** is one catalog state (ID 60), not two independent
+  countries. Its notes record the Austrian and Hungarian halves, the joint
+  foreign/defence/finance ministries, the separate parliaments and the joint
+  administration of Bosnia. Co-capital Budapest is recorded. Its flag is the
+  common civil ensign, because no single unified national flag existed.
+- Six independent states were added: Austria-Hungary, Tonga, Sokoto, Wadai,
+  Darfur and Jabal Shammar. Crete was added as an autonomous-vassal state.
+  Tibet, Khiva, Bukhara and Sarawak were added as non-selectable territories.
+- The final catalog is **67 states**, **66 territories**, **133 regions**,
+  **20 markets** and **66 selectable states**. Existing IDs were not renumbered.
+- The five M11 monogram cases (Spain, Spanish Sahara, Spanish Guinea, Montenegro
+  and the Transvaal) are resolved with period flags or original project-authored
+  reconstructions. Only Wadai and Darfur remain documented monogram exceptions.
+- The full inventory, contested classifications, sources and remaining
+  boundary uncertainties are recorded in `docs/1900_CATALOG_COVERAGE.md`. Flag
+  provenance and the project-authored reconstruction audit are in
+  `docs/FLAG_PROVENANCE.md`.
 
 ## 18. Code-agent execution contract
 

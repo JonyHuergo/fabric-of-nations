@@ -720,6 +720,90 @@
     "calibrationStatus": "provisional"
   },
   {
+    "id": 60,
+    "key": "aut-home",
+    "name": "Austria-Hungary (home territory)",
+    "infrastructure": 0.48,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 61,
+    "key": "ton-home",
+    "name": "Tonga (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 62,
+    "key": "sok-home",
+    "name": "Sokoto (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 63,
+    "key": "wad-home",
+    "name": "Wadai (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 64,
+    "key": "dar-home",
+    "name": "Darfur (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 65,
+    "key": "shm-home",
+    "name": "Jabal Shammar (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 66,
+    "key": "crt-home",
+    "name": "Crete (home territory)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
     "id": 100,
     "key": "bin",
     "name": "British India",
@@ -1455,6 +1539,54 @@
     "id": 161,
     "key": "twn",
     "name": "Taiwan (Formosa)",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 162,
+    "key": "tib",
+    "name": "Tibet",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 163,
+    "key": "khi",
+    "name": "Khanate of Khiva",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 164,
+    "key": "buk",
+    "name": "Emirate of Bukhara",
+    "infrastructure": 0.25,
+    "sourceIds": [
+      "owid-population",
+      "maddison-2023",
+      "project-authored-1900"
+    ],
+    "calibrationStatus": "provisional"
+  },
+  {
+    "id": 165,
+    "key": "sar",
+    "name": "Raj of Sarawak",
     "infrastructure": 0.25,
     "sourceIds": [
       "owid-population",

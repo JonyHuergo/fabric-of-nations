@@ -410,6 +410,7 @@ for (const entry of [...catalog.states, ...catalog.territories]) {
       label: [entry.capital.lon, entry.capital.lat],
       small: true,
       markerOnly: true,
+      approximate: "marker-only approximation; historical 1900 boundary not separately polygonized",
     });
     continue;
   }

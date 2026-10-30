@@ -8,6 +8,8 @@
 export interface FlagProvenanceEntry {
   readonly id: string;
   readonly description: string;
+  readonly flagKind: string;
+  readonly sourceType: string;
   readonly sourcePageUrl: string;
   readonly license: string;
   readonly licenseCode: string;
@@ -22,6 +24,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "afghanistan-1880",
     description: "Black flag of the Emirate of Afghanistan",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Afghanistan_(1880%E2%80%931901).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -34,6 +38,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "andorra-1866",
     description: "Blue-yellow-red flag of Andorra with the princely crown",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Andorra_(end_of_the_19th_century-c._1930s).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -46,6 +52,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "argentina",
     description: "Flag of Argentina with the Sun of May",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Argentina.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -56,8 +64,24 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["ARG"],
   },
   {
+    id: "austria-hungary-civil-ensign",
+    description: "Common civil ensign of Austria-Hungary (Austrian and Hungarian arms)",
+    flagKind: "representative-common-ensign",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Ensign_of_Austro-Hungarian_civil_fleet_(1869-1918).svg",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Vectorization: Sgt_bilko / Original: Željko Heimer",
+    validFrom: "1869-01-01",
+    validTo: "1918-11-03",
+    retrievedAt: "2026-10-30",
+    polityTags: ["AUT"],
+  },
+  {
     id: "belgium",
     description: "Black-yellow-red flag of Belgium",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Belgium_(civil).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -70,6 +94,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "bolivia",
     description: "State flag of Bolivia",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Bolivia_(state).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -82,6 +108,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "brazil-1889",
     description: "Flag of the United States of Brazil",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Brazil_(1889%E2%80%931960).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -94,6 +122,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "bulgaria-1879",
     description: "White-green-red flag of the Principality of Bulgaria",
+    flagKind: "civil-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Bulgaria.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -106,6 +136,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "canada-red-ensign-1868",
     description: "Canadian Red Ensign with the 1868 provincial shield",
+    flagKind: "de-facto-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(1868%E2%80%931921).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -118,6 +150,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "chile",
     description: "Flag of Chile",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Chile.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -130,6 +164,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "colombia",
     description: "Flag of Colombia",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Colombia.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -142,6 +178,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "costa-rica-1848",
     description: "Flag of Costa Rica with the 1848 coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Costa_Rica_(1848%E2%80%931906).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -152,8 +190,24 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["COS"],
   },
   {
+    id: "crete-1898",
+    description: "Flag of the autonomous Cretan State",
+    flagKind: "autonomous-state-flag",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Cretan_State.svg",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Vectorization: Froztbyte",
+    validFrom: "1898-12-09",
+    validTo: "1913-12-01",
+    retrievedAt: "2026-10-30",
+    polityTags: ["CRT"],
+  },
+  {
     id: "cuba",
     description: "Flag of Cuba",
+    flagKind: "national-under-occupation",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Cuba.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -166,6 +220,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "denmark",
     description: "Dannebrog, the Danish national flag",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Denmark.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -178,6 +234,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "dominican-republic",
     description: "Flag of the Dominican Republic",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -190,6 +248,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "ecuador-civil",
     description: "Civil flag of Ecuador (plain yellow-blue-red tricolour)",
+    flagKind: "civil-ensign",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Civil_flag_and_ensign_of_Ecuador_(1900%E2%80%932009).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -202,6 +262,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "egypt-1882",
     description: "Flag of the Khedivate of Egypt",
+    flagKind: "provincial-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt_(1882%E2%80%931922).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -214,6 +276,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "el-salvador-1875",
     description: "Flag of El Salvador with the 1875 coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_El_Salvador_(1875%E2%80%931912).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -226,6 +290,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "ethiopia-1897",
     description: "Green-yellow-red flag of the Ethiopian Empire with the Lion of Judah",
+    flagKind: "imperial-state-standard",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia_(1897%E2%80%931974).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -238,6 +304,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "france-tricolour",
     description: "French tricolour",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_France.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -250,6 +318,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "germany-1867",
     description: "Black-white-red flag of the German Empire",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Germany_(1867%E2%80%931918).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -262,6 +332,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "greece-1822",
     description: "National flag of the Kingdom of Greece",
+    flagKind: "national-plain",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Greece_(1822-1978).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -274,6 +346,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "guatemala-1871",
     description: "Flag of Guatemala with the 1871 coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Guatemala_(1871%E2%80%931968).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -284,8 +358,24 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["GUA"],
   },
   {
+    id: "hail-1835",
+    description: "Flag of the Emirate of Jabal Shammar (Ha'il)",
+    flagKind: "exact-national",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Emirate_of_Ha%27il_(1835_-_1920).svg",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Orange Tuesday",
+    validFrom: "1835-01-01",
+    validTo: "1921-11-02",
+    retrievedAt: "2026-10-30",
+    polityTags: ["SHM"],
+  },
+  {
     id: "haiti-1859",
     description: "Flag of Haiti",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Haiti_(1820%E2%80%931849,_1859%E2%80%931964).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -298,6 +388,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "honduras-1866",
     description: "Flag of Honduras with five blue stars",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Honduras_(1866%E2%80%931949).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -310,6 +402,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "italy-1861",
     description: "Flag of the Kingdom of Italy with the Savoy shield",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Italy_(1861%E2%80%931946).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -322,6 +416,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "japan-1870",
     description: "Hinomaru, civil and state flag of the Empire of Japan",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Japan_(1870%E2%80%931999).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -334,6 +430,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "korea-1882",
     description: "Taegeukgi of the Korean Empire",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Korea_(1882%E2%80%931910).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -346,6 +444,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "liberia",
     description: "Flag of the Republic of Liberia",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Liberia.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -358,6 +458,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "liechtenstein-1852",
     description: "Blue and red flag of Liechtenstein",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Liechtenstein_(1852%E2%80%931921).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -370,6 +472,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "luxembourg",
     description: "Red-white-blue flag of Luxembourg",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Luxembourg.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -382,6 +486,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "mexico-1893",
     description: "Flag of Mexico with the Porfirian coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Mexico_(1893%E2%80%931916).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -394,6 +500,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "monaco",
     description: "Red and white flag of Monaco",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Monaco.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -404,8 +512,24 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["MCO"],
   },
   {
+    id: "montenegro-1881",
+    description: "Montenegrin national flag with the princely monogram (1881–1905)",
+    flagKind: "national-variant-representative",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Montenegro_from_1881_to_1905.png",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Unknown author (public-domain flag design)",
+    validFrom: "1881-01-01",
+    validTo: "1905-12-19",
+    retrievedAt: "2026-10-30",
+    polityTags: ["MNT"],
+  },
+  {
     id: "morocco-1666",
     description: "Plain red flag of the Sultanate of Morocco",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Morocco_(1666%E2%80%931915).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -418,6 +542,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "nepal",
     description: "Double pennant flag of the Kingdom of Nepal",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -430,6 +556,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "netherlands",
     description: "Red-white-blue flag of the Kingdom of the Netherlands",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -442,6 +570,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "nicaragua-1896",
     description: "Flag of Nicaragua with the 1896 coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Nicaragua_(1896%E2%80%931908).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -454,6 +584,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "norway-1899",
     description: "Norwegian national flag without the union badge",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Norway.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -466,6 +598,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "oman",
     description: "Plain red flag of the Sultanate of Muscat and Oman",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Muscat.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -478,6 +612,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "orange-free-state",
     description: "Flag of the Orange Free State",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Orange_Free_State.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -490,6 +626,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "ottoman-1844",
     description: "Ottoman crescent and star flag",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Ottoman_Empire_(1844%E2%80%931922).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -502,6 +640,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "paraguay-1842",
     description: "Flag of Paraguay with the 1842 coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Paraguay_(1842%E2%80%931954).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -514,6 +654,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "persia-qajar",
     description: "Qajar Persian tricolour with the lion and sun",
+    flagKind: "pre-standardization-representative",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Qajar_Persia_Flag.jpg",
     license: "CC0",
     licenseCode: "cc0",
@@ -526,6 +668,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "peru-1884",
     description: "State flag of Peru with the coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Peru_(1884%E2%80%931950).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -538,6 +682,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "portugal-1830",
     description: "Blue-white flag of the Kingdom of Portugal with the royal arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Portugal_(1830%E2%80%931910).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -550,6 +696,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "qing-1889",
     description: "Yellow dragon flag of the Qing Empire",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_China_(1889%E2%80%931912).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -557,11 +705,13 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     validFrom: "1889-01-01",
     validTo: "1912-02-12",
     retrievedAt: "2026-10-30",
-    polityTags: ["CHN"],
+    polityTags: ["CHN", "TIB"],
   },
   {
     id: "romania-1867",
     description: "Blue-yellow-red flag of Romania",
+    flagKind: "civil-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Romania_(1867%E2%80%931948).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -574,6 +724,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "russia-1896",
     description: "White-blue-red flag of the Russian Empire",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Russia.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -581,11 +733,13 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     validFrom: "1896-05-29",
     validTo: "1917-11-07",
     retrievedAt: "2026-10-30",
-    polityTags: ["RUS", "FIN"],
+    polityTags: ["RUS", "FIN", "KHI", "BUK"],
   },
   {
     id: "san-marino-1862",
     description: "White and blue flag of San Marino with the coat of arms",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_San_Marino_(pre%E2%80%932011).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -598,6 +752,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "serbia-civil",
     description: "Civil flag of the Kingdom of Serbia",
+    flagKind: "civil-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Civil_flag_of_Serbia.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -610,6 +766,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "siam-1855",
     description: "Red flag of Siam with the white elephant",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Siam_(1855).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -620,8 +778,38 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["THA"],
   },
   {
+    id: "sokoto",
+    description: "Green flag of the Sokoto Caliphate",
+    flagKind: "exact-national",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_Sokoto_Caliphate.svg",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Orange Tuesday",
+    validFrom: "1804-01-01",
+    validTo: "1903-03-01",
+    retrievedAt: "2026-10-30",
+    polityTags: ["SOK"],
+  },
+  {
+    id: "spain-restoration",
+    description: "Restoration-era Spanish state flag (red–yellow–red with the coat of arms)",
+    flagKind: "project-reconstruction",
+    sourceType: "project",
+    sourcePageUrl: "internal:docs/FLAG_PROVENANCE.md#spain-restoration",
+    license: "Project-authored (CC0 dedication)",
+    licenseCode: "project",
+    author: "Century project (reconstruction)",
+    validFrom: "1875-01-01",
+    validTo: "1931-04-14",
+    retrievedAt: "2026-10-30",
+    polityTags: ["ESP", "SAH", "SGG"],
+  },
+  {
     id: "sweden-1844",
     description: "Swedish union flag with the Norway-Sweden union badge",
+    flagKind: "national-with-union-badge",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Swedish_civil_ensign_(1844%E2%80%931905).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -634,6 +822,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "switzerland",
     description: "Square red flag with the white Swiss cross",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Switzerland.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -644,8 +834,38 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["CHE"],
   },
   {
+    id: "tonga",
+    description: "Flag of the Kingdom of Tonga",
+    flagKind: "exact-national",
+    sourceType: "commons",
+    sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Tonga.svg",
+    license: "Public domain",
+    licenseCode: "pd",
+    author: "Uelingatoni Ngu Tupoumalohi",
+    validFrom: "1862-11-04",
+    validTo: null,
+    retrievedAt: "2026-10-30",
+    polityTags: ["TON"],
+  },
+  {
+    id: "transvaal-vierkleur",
+    description: "Vierkleur of the South African Republic (Transvaal)",
+    flagKind: "project-reconstruction",
+    sourceType: "project",
+    sourcePageUrl: "internal:docs/FLAG_PROVENANCE.md#transvaal-vierkleur",
+    license: "Project-authored (CC0 dedication)",
+    licenseCode: "project",
+    author: "Century project (reconstruction)",
+    validFrom: "1857-02-28",
+    validTo: "1902-05-31",
+    retrievedAt: "2026-10-30",
+    polityTags: ["ZAR"],
+  },
+  {
     id: "uk-union-1801",
     description: "Union Flag of Great Britain and Ireland",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Kingdom_(3-5).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -653,11 +873,13 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     validFrom: "1801-01-01",
     validTo: null,
     retrievedAt: "2026-10-30",
-    polityTags: ["GBR", "AUS", "NZL", "BIN", "CEY", "MAL", "HKG", "KUW", "TRU", "CYP", "MLT", "BWI", "BSA", "BWA", "BEA", "SUD", "BSO", "CRA", "HCT", "FJI", "BPO", "CAP", "NAT", "NFD", "BHU"],
+    polityTags: ["GBR", "AUS", "NZL", "BIN", "CEY", "MAL", "HKG", "KUW", "TRU", "CYP", "MLT", "BWI", "BSA", "BWA", "BEA", "SUD", "BSO", "CRA", "HCT", "FJI", "BPO", "CAP", "NAT", "NFD", "BHU", "SAR"],
   },
   {
     id: "uruguay",
     description: "Flag of Uruguay",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Uruguay.svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -670,6 +892,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "usa-45-star",
     description: "United States flag with 45 stars",
+    flagKind: "exact-national",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_States_(1896%E2%80%931908).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -682,6 +906,8 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
   {
     id: "venezuela-1863",
     description: "Flag of the United States of Venezuela with seven stars",
+    flagKind: "national-form",
+    sourceType: "commons",
     sourcePageUrl: "https://commons.wikimedia.org/wiki/File:Flag_of_Venezuela_(1863%E2%80%931905).svg",
     license: "Public domain",
     licenseCode: "pd",
@@ -695,28 +921,13 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
 
 export const FLAG_FALLBACKS: readonly { polityId: number; tag: string; reason: string }[] = [
   {
-    polityId: 7,
-    tag: "ESP",
-    reason: "No Public Domain or CC0 artwork of the 1875–1931 Spanish state flag (red–yellow–red with the Restoration coat of arms) was identified on Wikimedia Commons. The verified PD file for the period is the five-stripe 1785 merchant ensign, which was not Spain's national/state flag in 1900; the plain red–yellow–red triband became the merchant flag only in 1927. A CC0 photograph of a surviving 1898 Spanish flag ('Flag of Spain (1898).png') was also reviewed, but it is a plain red–yellow–red flag without the Restoration coat of arms and was rejected as the state flag. A monogram is retained rather than bundle a historically incomplete or share-alike image.",
+    polityId: 63,
+    tag: "WAD",
+    reason: "No verified historical national or state flag design for the Sultanate of Wadai could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag.",
   },
   {
-    polityId: 17,
-    tag: "MNT",
-    reason: "Montenegro's national flag was not standardised in 1900: Prince Nikola used several variants, and the red–blue–white tricolour was only prescribed by the 1905 constitution. The only verified PD Commons file for the period depicts the 1878 war ensign (white field with a red cross), not the national flag. A PD file of the 1905–1918 royal flag exists, but its validity begins after the reference date. Monogram retained.",
-  },
-  {
-    polityId: 36,
-    tag: "ZAR",
-    reason: "The Transvaal Vierkleur artwork on Commons ('Flag of Transvaal.svg') is CC BY-SA 3.0 and is excluded by the PD/CC0-only policy. No PD/CC0 vector artwork of the 1857–1902 Vierkleur was found; the available PD photograph contains overlaid text and is unsuitable as a flag asset. Monogram retained.",
-  },
-  {
-    polityId: 148,
-    tag: "SAH",
-    reason: "Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible.",
-  },
-  {
-    polityId: 149,
-    tag: "SGG",
-    reason: "Sovereign flag unavailable: Spain has no approved PD/CC0 1900 flag in this catalog (see ESP). The COL status badge remains visible.",
+    polityId: 64,
+    tag: "DAR",
+    reason: "No verified historical national or state flag design for the Sultanate of Darfur could be established from the available sources, and no PD/CC0 artwork documents one. The polity's independence and boundary are documented, but a monogram is retained rather than invent a flag.",
   },
 ];
