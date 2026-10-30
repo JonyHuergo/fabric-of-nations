@@ -20,56 +20,58 @@ import flagAsset10 from "../../assets/flags/colombia.png";
 import flagAsset11 from "../../assets/flags/costa-rica-1848.png";
 import flagAsset12 from "../../assets/flags/crete-1898.png";
 import flagAsset13 from "../../assets/flags/cuba.png";
-import flagAsset14 from "../../assets/flags/denmark.png";
-import flagAsset15 from "../../assets/flags/dominican-republic.png";
-import flagAsset16 from "../../assets/flags/ecuador-civil.png";
-import flagAsset17 from "../../assets/flags/egypt-1882.png";
-import flagAsset18 from "../../assets/flags/el-salvador-1875.png";
-import flagAsset19 from "../../assets/flags/ethiopia-1897.png";
-import flagAsset20 from "../../assets/flags/france-tricolour.png";
-import flagAsset21 from "../../assets/flags/germany-1867.png";
-import flagAsset22 from "../../assets/flags/greece-1822.png";
-import flagAsset23 from "../../assets/flags/guatemala-1871.png";
-import flagAsset24 from "../../assets/flags/hail-1835.png";
-import flagAsset25 from "../../assets/flags/haiti-1859.png";
-import flagAsset26 from "../../assets/flags/honduras-1866.png";
-import flagAsset27 from "../../assets/flags/italy-1861.png";
-import flagAsset28 from "../../assets/flags/japan-1870.png";
-import flagAsset29 from "../../assets/flags/korea-1882.png";
-import flagAsset30 from "../../assets/flags/liberia.png";
-import flagAsset31 from "../../assets/flags/liechtenstein-1852.png";
-import flagAsset32 from "../../assets/flags/luxembourg.png";
-import flagAsset33 from "../../assets/flags/mexico-1893.png";
-import flagAsset34 from "../../assets/flags/monaco.png";
-import flagAsset35 from "../../assets/flags/montenegro-1881.png";
-import flagAsset36 from "../../assets/flags/morocco-1666.png";
-import flagAsset37 from "../../assets/flags/nepal.png";
-import flagAsset38 from "../../assets/flags/netherlands.png";
-import flagAsset39 from "../../assets/flags/nicaragua-1896.png";
-import flagAsset40 from "../../assets/flags/norway-1899.png";
-import flagAsset41 from "../../assets/flags/oman.png";
-import flagAsset42 from "../../assets/flags/orange-free-state.png";
-import flagAsset43 from "../../assets/flags/ottoman-1844.png";
-import flagAsset44 from "../../assets/flags/paraguay-1842.png";
-import flagAsset45 from "../../assets/flags/persia-qajar.png";
-import flagAsset46 from "../../assets/flags/peru-1884.png";
-import flagAsset47 from "../../assets/flags/portugal-1830.png";
-import flagAsset48 from "../../assets/flags/qing-1889.png";
-import flagAsset49 from "../../assets/flags/romania-1867.png";
-import flagAsset50 from "../../assets/flags/russia-1896.png";
-import flagAsset51 from "../../assets/flags/san-marino-1862.png";
-import flagAsset52 from "../../assets/flags/serbia-civil.png";
-import flagAsset53 from "../../assets/flags/siam-1855.png";
-import flagAsset54 from "../../assets/flags/sokoto.png";
-import flagAsset55 from "../../assets/flags/spain-restoration.png";
-import flagAsset56 from "../../assets/flags/sweden-1844.png";
-import flagAsset57 from "../../assets/flags/switzerland.png";
-import flagAsset58 from "../../assets/flags/tonga.png";
-import flagAsset59 from "../../assets/flags/transvaal-vierkleur.png";
-import flagAsset60 from "../../assets/flags/uk-union-1801.png";
-import flagAsset61 from "../../assets/flags/uruguay.png";
-import flagAsset62 from "../../assets/flags/usa-45-star.png";
-import flagAsset63 from "../../assets/flags/venezuela-1863.png";
+import flagAsset14 from "../../assets/flags/darfur-user-selected.png";
+import flagAsset15 from "../../assets/flags/denmark.png";
+import flagAsset16 from "../../assets/flags/dominican-republic.png";
+import flagAsset17 from "../../assets/flags/ecuador-civil.png";
+import flagAsset18 from "../../assets/flags/egypt-1882.png";
+import flagAsset19 from "../../assets/flags/el-salvador-1875.png";
+import flagAsset20 from "../../assets/flags/ethiopia-1897.png";
+import flagAsset21 from "../../assets/flags/france-tricolour.png";
+import flagAsset22 from "../../assets/flags/germany-1867.png";
+import flagAsset23 from "../../assets/flags/greece-1822.png";
+import flagAsset24 from "../../assets/flags/guatemala-1871.png";
+import flagAsset25 from "../../assets/flags/hail-1835.png";
+import flagAsset26 from "../../assets/flags/haiti-1859.png";
+import flagAsset27 from "../../assets/flags/honduras-1866.png";
+import flagAsset28 from "../../assets/flags/italy-1861.png";
+import flagAsset29 from "../../assets/flags/japan-1870.png";
+import flagAsset30 from "../../assets/flags/korea-1882.png";
+import flagAsset31 from "../../assets/flags/liberia.png";
+import flagAsset32 from "../../assets/flags/liechtenstein-1852.png";
+import flagAsset33 from "../../assets/flags/luxembourg.png";
+import flagAsset34 from "../../assets/flags/mexico-1893.png";
+import flagAsset35 from "../../assets/flags/monaco.png";
+import flagAsset36 from "../../assets/flags/montenegro-1881.png";
+import flagAsset37 from "../../assets/flags/morocco-1666.png";
+import flagAsset38 from "../../assets/flags/nepal.png";
+import flagAsset39 from "../../assets/flags/netherlands.png";
+import flagAsset40 from "../../assets/flags/nicaragua-1896.png";
+import flagAsset41 from "../../assets/flags/norway-1899.png";
+import flagAsset42 from "../../assets/flags/oman.png";
+import flagAsset43 from "../../assets/flags/orange-free-state.png";
+import flagAsset44 from "../../assets/flags/ottoman-1844.png";
+import flagAsset45 from "../../assets/flags/paraguay-1842.png";
+import flagAsset46 from "../../assets/flags/persia-qajar.png";
+import flagAsset47 from "../../assets/flags/peru-1884.png";
+import flagAsset48 from "../../assets/flags/portugal-1830.png";
+import flagAsset49 from "../../assets/flags/qing-1889.png";
+import flagAsset50 from "../../assets/flags/romania-1867.png";
+import flagAsset51 from "../../assets/flags/russia-1896.png";
+import flagAsset52 from "../../assets/flags/san-marino-1862.png";
+import flagAsset53 from "../../assets/flags/serbia-civil.png";
+import flagAsset54 from "../../assets/flags/siam-1855.png";
+import flagAsset55 from "../../assets/flags/sokoto.png";
+import flagAsset56 from "../../assets/flags/spain-restoration.png";
+import flagAsset57 from "../../assets/flags/sweden-1844.png";
+import flagAsset58 from "../../assets/flags/switzerland.png";
+import flagAsset59 from "../../assets/flags/tonga.png";
+import flagAsset60 from "../../assets/flags/transvaal-vierkleur.png";
+import flagAsset61 from "../../assets/flags/uk-union-1801.png";
+import flagAsset62 from "../../assets/flags/uruguay.png";
+import flagAsset63 from "../../assets/flags/usa-45-star.png";
+import flagAsset64 from "../../assets/flags/venezuela-1863.png";
+import flagAsset65 from "../../assets/flags/wadai-user-selected.png";
 
 export interface BundledFlagAsset {
   readonly id: string;
@@ -92,56 +94,58 @@ export const BUNDLED_FLAGS: Readonly<Record<string, BundledFlagAsset>> = {
   "costa-rica-1848": { id: "costa-rica-1848", source: flagAsset11, aspectRatio: 1.497006 },
   "crete-1898": { id: "crete-1898", source: flagAsset12, aspectRatio: 1.497006 },
   "cuba": { id: "cuba", source: flagAsset13, aspectRatio: 2 },
-  "denmark": { id: "denmark", source: flagAsset14, aspectRatio: 1.319261 },
-  "dominican-republic": { id: "dominican-republic", source: flagAsset15, aspectRatio: 1.497006 },
-  "ecuador-civil": { id: "ecuador-civil", source: flagAsset16, aspectRatio: 2 },
-  "egypt-1882": { id: "egypt-1882", source: flagAsset17, aspectRatio: 2 },
-  "el-salvador-1875": { id: "el-salvador-1875", source: flagAsset18, aspectRatio: 1.748252 },
-  "ethiopia-1897": { id: "ethiopia-1897", source: flagAsset19, aspectRatio: 1.497006 },
-  "france-tricolour": { id: "france-tricolour", source: flagAsset20, aspectRatio: 1.497006 },
-  "germany-1867": { id: "germany-1867", source: flagAsset21, aspectRatio: 1.497006 },
-  "greece-1822": { id: "greece-1822", source: flagAsset22, aspectRatio: 1.497006 },
-  "guatemala-1871": { id: "guatemala-1871", source: flagAsset23, aspectRatio: 1.497006 },
-  "hail-1835": { id: "hail-1835", source: flagAsset24, aspectRatio: 1.497006 },
-  "haiti-1859": { id: "haiti-1859", source: flagAsset25, aspectRatio: 1.666667 },
-  "honduras-1866": { id: "honduras-1866", source: flagAsset26, aspectRatio: 2 },
-  "italy-1861": { id: "italy-1861", source: flagAsset27, aspectRatio: 1.497006 },
-  "japan-1870": { id: "japan-1870", source: flagAsset28, aspectRatio: 1.428571 },
-  "korea-1882": { id: "korea-1882", source: flagAsset29, aspectRatio: 1.497006 },
-  "liberia": { id: "liberia", source: flagAsset30, aspectRatio: 1.893939 },
-  "liechtenstein-1852": { id: "liechtenstein-1852", source: flagAsset31, aspectRatio: 1.666667 },
-  "luxembourg": { id: "luxembourg", source: flagAsset32, aspectRatio: 1.666667 },
-  "mexico-1893": { id: "mexico-1893", source: flagAsset33, aspectRatio: 1.748252 },
-  "monaco": { id: "monaco", source: flagAsset34, aspectRatio: 1.25 },
-  "montenegro-1881": { id: "montenegro-1881", source: flagAsset35, aspectRatio: 1.501502 },
-  "morocco-1666": { id: "morocco-1666", source: flagAsset36, aspectRatio: 1.497006 },
-  "nepal": { id: "nepal", source: flagAsset37, aspectRatio: 0.819672 },
-  "netherlands": { id: "netherlands", source: flagAsset38, aspectRatio: 1.497006 },
-  "nicaragua-1896": { id: "nicaragua-1896", source: flagAsset39, aspectRatio: 1.666667 },
-  "norway-1899": { id: "norway-1899", source: flagAsset40, aspectRatio: 1.373626 },
-  "oman": { id: "oman", source: flagAsset41, aspectRatio: 1.497006 },
-  "orange-free-state": { id: "orange-free-state", source: flagAsset42, aspectRatio: 1.497006 },
-  "ottoman-1844": { id: "ottoman-1844", source: flagAsset43, aspectRatio: 1.497006 },
-  "paraguay-1842": { id: "paraguay-1842", source: flagAsset44, aspectRatio: 1.497006 },
-  "persia-qajar": { id: "persia-qajar", source: flagAsset45, aspectRatio: 3.012048 },
-  "peru-1884": { id: "peru-1884", source: flagAsset46, aspectRatio: 1.497006 },
-  "portugal-1830": { id: "portugal-1830", source: flagAsset47, aspectRatio: 1.497006 },
-  "qing-1889": { id: "qing-1889", source: flagAsset48, aspectRatio: 1.497006 },
-  "romania-1867": { id: "romania-1867", source: flagAsset49, aspectRatio: 1.497006 },
-  "russia-1896": { id: "russia-1896", source: flagAsset50, aspectRatio: 1.497006 },
-  "san-marino-1862": { id: "san-marino-1862", source: flagAsset51, aspectRatio: 1.333333 },
-  "serbia-civil": { id: "serbia-civil", source: flagAsset52, aspectRatio: 1.497006 },
-  "siam-1855": { id: "siam-1855", source: flagAsset53, aspectRatio: 1.497006 },
-  "sokoto": { id: "sokoto", source: flagAsset54, aspectRatio: 1.497006 },
-  "spain-restoration": { id: "spain-restoration", source: flagAsset55, aspectRatio: 1.497006 },
-  "sweden-1844": { id: "sweden-1844", source: flagAsset56, aspectRatio: 1.597444 },
-  "switzerland": { id: "switzerland", source: flagAsset57, aspectRatio: 1 },
-  "tonga": { id: "tonga", source: flagAsset58, aspectRatio: 2 },
-  "transvaal-vierkleur": { id: "transvaal-vierkleur", source: flagAsset59, aspectRatio: 1.497006 },
-  "uk-union-1801": { id: "uk-union-1801", source: flagAsset60, aspectRatio: 1.666667 },
-  "uruguay": { id: "uruguay", source: flagAsset61, aspectRatio: 1.497006 },
-  "usa-45-star": { id: "usa-45-star", source: flagAsset62, aspectRatio: 1.893939 },
-  "venezuela-1863": { id: "venezuela-1863", source: flagAsset63, aspectRatio: 1.497006 },
+  "darfur-user-selected": { id: "darfur-user-selected", source: flagAsset14, aspectRatio: 1.497006 },
+  "denmark": { id: "denmark", source: flagAsset15, aspectRatio: 1.319261 },
+  "dominican-republic": { id: "dominican-republic", source: flagAsset16, aspectRatio: 1.497006 },
+  "ecuador-civil": { id: "ecuador-civil", source: flagAsset17, aspectRatio: 2 },
+  "egypt-1882": { id: "egypt-1882", source: flagAsset18, aspectRatio: 2 },
+  "el-salvador-1875": { id: "el-salvador-1875", source: flagAsset19, aspectRatio: 1.748252 },
+  "ethiopia-1897": { id: "ethiopia-1897", source: flagAsset20, aspectRatio: 1.497006 },
+  "france-tricolour": { id: "france-tricolour", source: flagAsset21, aspectRatio: 1.497006 },
+  "germany-1867": { id: "germany-1867", source: flagAsset22, aspectRatio: 1.497006 },
+  "greece-1822": { id: "greece-1822", source: flagAsset23, aspectRatio: 1.497006 },
+  "guatemala-1871": { id: "guatemala-1871", source: flagAsset24, aspectRatio: 1.497006 },
+  "hail-1835": { id: "hail-1835", source: flagAsset25, aspectRatio: 1.497006 },
+  "haiti-1859": { id: "haiti-1859", source: flagAsset26, aspectRatio: 1.666667 },
+  "honduras-1866": { id: "honduras-1866", source: flagAsset27, aspectRatio: 2 },
+  "italy-1861": { id: "italy-1861", source: flagAsset28, aspectRatio: 1.497006 },
+  "japan-1870": { id: "japan-1870", source: flagAsset29, aspectRatio: 1.428571 },
+  "korea-1882": { id: "korea-1882", source: flagAsset30, aspectRatio: 1.497006 },
+  "liberia": { id: "liberia", source: flagAsset31, aspectRatio: 1.893939 },
+  "liechtenstein-1852": { id: "liechtenstein-1852", source: flagAsset32, aspectRatio: 1.666667 },
+  "luxembourg": { id: "luxembourg", source: flagAsset33, aspectRatio: 1.666667 },
+  "mexico-1893": { id: "mexico-1893", source: flagAsset34, aspectRatio: 1.748252 },
+  "monaco": { id: "monaco", source: flagAsset35, aspectRatio: 1.25 },
+  "montenegro-1881": { id: "montenegro-1881", source: flagAsset36, aspectRatio: 1.501502 },
+  "morocco-1666": { id: "morocco-1666", source: flagAsset37, aspectRatio: 1.497006 },
+  "nepal": { id: "nepal", source: flagAsset38, aspectRatio: 0.819672 },
+  "netherlands": { id: "netherlands", source: flagAsset39, aspectRatio: 1.497006 },
+  "nicaragua-1896": { id: "nicaragua-1896", source: flagAsset40, aspectRatio: 1.666667 },
+  "norway-1899": { id: "norway-1899", source: flagAsset41, aspectRatio: 1.373626 },
+  "oman": { id: "oman", source: flagAsset42, aspectRatio: 1.497006 },
+  "orange-free-state": { id: "orange-free-state", source: flagAsset43, aspectRatio: 1.497006 },
+  "ottoman-1844": { id: "ottoman-1844", source: flagAsset44, aspectRatio: 1.497006 },
+  "paraguay-1842": { id: "paraguay-1842", source: flagAsset45, aspectRatio: 1.497006 },
+  "persia-qajar": { id: "persia-qajar", source: flagAsset46, aspectRatio: 3.012048 },
+  "peru-1884": { id: "peru-1884", source: flagAsset47, aspectRatio: 1.497006 },
+  "portugal-1830": { id: "portugal-1830", source: flagAsset48, aspectRatio: 1.497006 },
+  "qing-1889": { id: "qing-1889", source: flagAsset49, aspectRatio: 1.497006 },
+  "romania-1867": { id: "romania-1867", source: flagAsset50, aspectRatio: 1.497006 },
+  "russia-1896": { id: "russia-1896", source: flagAsset51, aspectRatio: 1.497006 },
+  "san-marino-1862": { id: "san-marino-1862", source: flagAsset52, aspectRatio: 1.333333 },
+  "serbia-civil": { id: "serbia-civil", source: flagAsset53, aspectRatio: 1.497006 },
+  "siam-1855": { id: "siam-1855", source: flagAsset54, aspectRatio: 1.497006 },
+  "sokoto": { id: "sokoto", source: flagAsset55, aspectRatio: 1.497006 },
+  "spain-restoration": { id: "spain-restoration", source: flagAsset56, aspectRatio: 1.497006 },
+  "sweden-1844": { id: "sweden-1844", source: flagAsset57, aspectRatio: 1.597444 },
+  "switzerland": { id: "switzerland", source: flagAsset58, aspectRatio: 1 },
+  "tonga": { id: "tonga", source: flagAsset59, aspectRatio: 2 },
+  "transvaal-vierkleur": { id: "transvaal-vierkleur", source: flagAsset60, aspectRatio: 1.497006 },
+  "uk-union-1801": { id: "uk-union-1801", source: flagAsset61, aspectRatio: 1.666667 },
+  "uruguay": { id: "uruguay", source: flagAsset62, aspectRatio: 1.497006 },
+  "usa-45-star": { id: "usa-45-star", source: flagAsset63, aspectRatio: 1.893939 },
+  "venezuela-1863": { id: "venezuela-1863", source: flagAsset64, aspectRatio: 1.497006 },
+  "wadai-user-selected": { id: "wadai-user-selected", source: flagAsset65, aspectRatio: 1.497006 },
 };
 
 export const FLAG_ASSET_IDS: readonly string[] = [
@@ -159,6 +163,7 @@ export const FLAG_ASSET_IDS: readonly string[] = [
   "costa-rica-1848",
   "crete-1898",
   "cuba",
+  "darfur-user-selected",
   "denmark",
   "dominican-republic",
   "ecuador-civil",
@@ -209,6 +214,7 @@ export const FLAG_ASSET_IDS: readonly string[] = [
   "uruguay",
   "usa-45-star",
   "venezuela-1863",
+  "wadai-user-selected",
 ];
 
 export const POLITY_FLAG: Readonly<Record<number, string>> = {
@@ -275,6 +281,8 @@ export const POLITY_FLAG: Readonly<Record<number, string>> = {
   60: "austria-hungary-civil-ensign",
   61: "tonga",
   62: "sokoto",
+  63: "wadai-user-selected",
+  64: "darfur-user-selected",
   65: "hail-1835",
   66: "crete-1898",
   100: "uk-union-1801",

@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   COMPONENTS,
+  DISPUTED_AREAS,
   PATCHES,
   REFERENCE_DATE,
   SOURCES,
@@ -92,6 +93,20 @@ for (const id of REPLACE_BASE_IDS) {
 }
 
 // ---- Validate the authored transfers -----------------------------------------
+
+for (const area of DISPUTED_AREAS) {
+  if (!Array.isArray(area.polygon) || area.polygon.length < 4) {
+    throw new Error(`disputed area ${area.id}: polygon must have at least four points`);
+  }
+  for (const sourceId of area.sources) {
+    if (!sourceById.has(sourceId)) {
+      throw new Error(`disputed area ${area.id}: unknown source ${sourceId}`);
+    }
+  }
+  if (!["high", "medium", "low"].includes(area.confidence)) {
+    throw new Error(`disputed area ${area.id}: bad confidence ${area.confidence}`);
+  }
+}
 
 const patchIds = new Set();
 for (const patch of PATCHES) {
@@ -243,6 +258,19 @@ const output = {
     notes: patch.notes,
     ...(CLEANUP_IDS.has(patch.id) ? { cleanup: true } : {}),
     ...(REPLACE_BASE_IDS.has(patch.id) ? { replaceBase: true } : {}),
+  })),
+  disputedAreas: DISPUTED_AREAS.map((area) => ({
+    id: area.id,
+    name: area.name,
+    classification: area.classification,
+    referenceDate: area.referenceDate,
+    confidence: area.confidence,
+    polygon: area.polygon,
+    label: area.label,
+    sovereigntyClaims: area.sovereigntyClaims,
+    administration: area.administration,
+    sources: area.sources,
+    notes: area.notes,
   })),
   provenance,
 };

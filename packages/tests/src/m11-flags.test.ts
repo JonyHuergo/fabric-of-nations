@@ -41,6 +41,7 @@ const manifest = JSON.parse(readFileSync(join(DATA, "flags_1900.json"), "utf8"))
     retrievalDate: string;
     rasterWidth: number;
     licensePolicy: string;
+    flagKinds?: Record<string, string>;
   };
   flags: Record<
     string,
@@ -199,17 +200,16 @@ describe("M11 historical flags — catalog coverage", () => {
     }
   });
 
-  test("the only monogram fallbacks are Wadai and Darfur, each with a documented flag-uncertainty reason", () => {
+  test("no monogram fallbacks remain; Wadai and Darfur use user-selected representative flags", () => {
     const fallbacks = Object.entries(manifest.polities)
       .filter(([, entry]) => entry.flag === null)
       .map(([id, entry]) => `${id}:${entry.tag}`)
       .sort();
-    expect(fallbacks).toEqual(["63:WAD", "64:DAR"]);
-    for (const [, entry] of Object.entries(manifest.polities).filter(
-      ([, candidate]) => candidate.flag === null,
-    )) {
-      expect(entry.fallbackReason).toMatch(/No verified historical|monogram|flag design/);
-    }
+    expect(fallbacks).toEqual([]);
+    expect(manifest.polities["63"]?.flag).toBe("wadai-user-selected");
+    expect(manifest.polities["64"]?.flag).toBe("darfur-user-selected");
+    expect(manifest.polities["63"]?.basis).toBe("user-selected-representative");
+    expect(manifest.polities["64"]?.basis).toBe("user-selected-representative");
   });
 
   test("the verification-target flags are the period designs", () => {
@@ -457,24 +457,25 @@ describe("M11 historical flags — fallback behaviour", () => {
     expect(resolveBundledFlagId(9999, { 0: "usa-45-star" })).toBeNull();
     expect(resolveBundledFlagId(Number.NaN, { 0: "usa-45-star" })).toBeNull();
     expect(resolveBundledFlagId(-1, { 0: "usa-45-star" })).toBeNull();
-    for (const id of [63, 64]) {
-      const mapping = Object.fromEntries(
-        mappingPairs().map((pair) => [pair.polityId, pair.flagId]),
-      ) as Readonly<Record<number, string>>;
-      expect(resolveBundledFlagId(id, mapping)).toBeNull();
-    }
+    const mapping = Object.fromEntries(
+      mappingPairs().map((pair) => [pair.polityId, pair.flagId]),
+    ) as Readonly<Record<number, string>>;
+    expect(resolveBundledFlagId(63, mapping)).toBe("wadai-user-selected");
+    expect(resolveBundledFlagId(64, mapping)).toBe("darfur-user-selected");
   });
 });
 
 describe("M11 historical flags — licensing and provenance audit", () => {
   test("only individually verified Public Domain or CC0 files and documented project reconstructions are bundled", () => {
-    expect(Object.keys(manifest.flags)).toHaveLength(64);
+    expect(Object.keys(manifest.flags)).toHaveLength(66);
     for (const [id, flag] of Object.entries(manifest.flags)) {
       if (flag.sourceType === "project") {
         expect(flag.licenseCode).toBe("project");
         expect(flag.license).toMatch(/Project-authored/);
         expect(flag.sourcePageUrl).toMatch(/^internal:/);
-        expect(flag.flagKind).toBe("project-reconstruction");
+        expect(["project-reconstruction", "user-selected-representative"]).toContain(
+          flag.flagKind ?? manifest.meta.flagKinds?.[id],
+        );
         expect(flag.project?.components?.length ?? 0).toBeGreaterThanOrEqual(0);
       } else {
         expect(["pd", "cc0"]).toContain(flag.licenseCode);
@@ -508,7 +509,7 @@ describe("M11 historical flags — reproducible asset pipeline", () => {
   test("the committed assets and generated outputs are current (offline check)", () => {
     const output = runPipeline(["--check"]);
     expect(output).toMatch(/flag assets are current/);
-    expect(output).toMatch(/64 flags/);
+    expect(output).toMatch(/66 flags/);
   }, 60_000);
 
   test("two independent offline emissions are byte-identical and match the committed outputs", () => {

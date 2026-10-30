@@ -5175,3 +5175,59 @@ border with a few fragments added.
   `docs/1900_CATALOG_COVERAGE.md`; the flag investigation is in
   `docs/FLAG_PROVENANCE.md`.
 
+
+## D-097 — M11c.1 Aouzou dispute, overlap resolution, rendering and zoom
+
+**Status:** implemented (M11c.1).
+
+### Context
+
+M11c left the Aouzou strip with French Equatorial Africa, reported two residual
+overlaps, used a 1° coverage sample that missed narrow coastlines and islands,
+had a stale land layer outside the zoom transform, and stopped at scale 10.
+The user also selected Darfur and Wadai flag designs.
+
+### Decision
+
+1. **Aouzou–Tibesti is a disputed map-only zone, not FEA and not OTT.** The 1899
+   Anglo-French Declaration was a sphere-of-influence line; the ICJ record shows
+   later instruments (1919, 1902, 1955) were needed to settle the boundary.
+   France had not established continuous administration across Tibesti; Ottoman
+   authority was claimed and intermittent; Toubou/Teda communities held practical
+   authority. The zone is removed from every polity, carries explicit claims,
+   administration notes and ICJ sources, and adds no playable polity. A second
+   small zone records the undelimited Karakoram–Siachen frontier.
+2. **Overlaps are extracted, recorded and trimmed.** The Canada/Newfoundland
+   intersection (0.249 deg²) and Bolivia/Brazil intersection (0.016 deg²) are
+   written to `overlapResolutions` with bbox, area, decision and historical note.
+   The Labrador dispute and the 1927 Privy Council line are not treated as a
+   settled 1900 border; Acre is Bolivian in 1900 and the Treaty of Petrópolis is
+   not applied retroactively. Only the sliver is trimmed.
+3. **Coverage audit is polygon-level and high-resolution.** The audit groups
+   land rings into outer/hole polygons, subtracts the union of polities and
+   disputed zones per 30×30° tile, and reports total unassigned area, connected
+   components, intentional Antarctica, sub-0.02° generalization slivers and
+   small-island detail gaps. The 1° sample remains as a cross-check.
+4. **Rendering layer order is synchronized.** The land mask moved inside the
+   country transform group; it now zooms and pans with the fills and cannot
+   paint over the ocean at a different scale. Land uses the even-odd rule for
+   inland water holes; border strokes scale inversely so they remain constant
+   width.
+5. **Maximum zoom is 18** (previous 10, 1.8×). Wheel/trackpad/pinch zoom uses a
+   letterbox-aware focal point and bounded pan; the pure viewport math is tested.
+6. **Darfur/Wadai flags.** The Pax Historia rasters were inspected but are not
+   bundled because redistribution permission was not established. Century
+   independently reconstructed the simple geometric designs (green-red-black
+   triband with white crescent; white field with black border), classifies them
+   as user-selected representative flags rather than exact historical national
+   flags, and records the decision in the manifest, provenance module and docs.
+
+### Consequences
+
+- No monogram fallback remains; all 133 polities display a flag.
+- The Aouzou/Tibesti area is visually a dashed amber uncertainty zone, not an
+  unexplained void or an invented national territory.
+- The map renders cleanly at scale 18; the stale white/land-over-ocean overlay is
+  gone. Residual sub-0.01 deg² coastline slivers and small-island detail gaps are
+  documented rather than cosmetically filled.
+- Stable IDs, populations, markets, saves and simulation behavior are unchanged.

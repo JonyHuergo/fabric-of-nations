@@ -517,6 +517,72 @@ function ringArea(points) {
   return Math.abs(area / 2);
 }
 
+/** Encode a MultiPolygon into flat rings, hole indices, area and bbox. */
+function encodeMultiPolygon(polygons) {
+  const rings = [];
+  const holes = [];
+  for (const polygon of polygons) {
+    for (let index = 0; index < polygon.length; index += 1) {
+      const ring = polygon[index];
+      if (ring.length < 4) continue;
+      if (index > 0 && ringArea(ring) < 0.05) continue;
+      if (index > 0) holes.push(rings.length);
+      rings.push(ring);
+    }
+  }
+  return {
+    rings: rings.map(encodeRing),
+    holes,
+    area: Number(multiPolygonArea(polygons).toFixed(3)),
+    bbox: polygonsBBox(polygons).map((value) =>
+      Number(Number.isFinite(value) ? value.toFixed(3) : 0),
+    ),
+  };
+}
+
+/** Decode a flat delta ring into [lon, lat] points. */
+function decodeRing(flat) {
+  const points = [];
+  let x = 0;
+  let y = 0;
+  for (let index = 0; index < flat.length; index += 2) {
+    x += flat[index];
+    y += flat[index + 1];
+    points.push([x / 1000, y / 1000]);
+  }
+  return points;
+}
+
+/** Rebuild a polity's outer/hole grouping from its encoded rings. */
+function polityPolygons(polity) {
+  const rings = polity.rings.map(decodeRing);
+  const holeSet = new Set(polity.holes);
+  const outers = [];
+  const holes = [];
+  for (let index = 0; index < rings.length; index += 1) {
+    if (holeSet.has(index)) holes.push(rings[index]);
+    else outers.push({ ring: rings[index], holes: [] });
+  }
+  for (const hole of holes) {
+    const holeBox = ringBBox(hole);
+    let target = null;
+    for (const outer of outers) {
+      const outerBox = ringBBox(outer.ring);
+      if (
+        holeBox[0] >= outerBox[0] - 0.05 &&
+        holeBox[2] <= outerBox[2] + 0.05 &&
+        holeBox[1] >= outerBox[1] - 0.05 &&
+        holeBox[3] <= outerBox[3] + 0.05
+      ) {
+        target = outer;
+        break;
+      }
+    }
+    if (target !== null) target.holes.push(hole);
+  }
+  return outers.map((outer) => [outer.ring, ...outer.holes]);
+}
+
 /** Collect, union and hole-filter the rings for one set of source polygons. */
 function dissolvedRings(polygons) {
   const union = unionPolygons(polygons);
@@ -619,6 +685,30 @@ for (const list of patchesFrom.values()) list.sort((a, b) => a.id.localeCompare(
 
 for (const entry of entries) {
   polygonsByTag.set(entry.tag, applyTransfers(entry.tag, baseByTag.get(entry.tag) ?? []));
+}
+
+/**
+ * Map-only disputed/no-established-administration zones. The authored polygon is
+ * removed from every polity so no sovereign fill covers it; it is rendered as a
+ * separate dashed amber overlay and is never a playable or simulated polity.
+ */
+const disputedAreas = (boundaryData.disputedAreas ?? []).map((area) => {
+  const shape = simplifyMultiPolygon(
+    shapeFromDescriptors([{ polygon: area.polygon }]),
+  );
+  if (shape.length === 0) throw new Error(`disputed area ${area.id} produced empty geometry`);
+  return { ...area, shape };
+});
+for (const entry of entries) {
+  let polygons = polygonsByTag.get(entry.tag) ?? [];
+  for (const area of disputedAreas) {
+    try {
+      polygons = differencePolygons(polygons, area.shape);
+    } catch {
+      polygons = punchHoles(polygons, area.shape);
+    }
+  }
+  polygonsByTag.set(entry.tag, polygons);
 }
 
 /**
@@ -917,6 +1007,136 @@ if (missing.length > 0) {
   throw new Error(`no map geometry for: ${missing.join(", ")}`);
 }
 
+/**
+ * Final overlap resolution for the two M11c residual slivers. These are
+ * processed on the encoded, simplified geometry so the audit and the rendered
+ * bundle use exactly the same rings. The trim removes only the shared sliver;
+ * the historical boundary notes are recorded in `overlapResolutions`.
+ */
+const overlapResolutions = [];
+for (const [loserTag, winnerTag, historicalNote, sourceIds] of [
+  [
+    "CAN",
+    "NFD",
+    "The Labrador interior boundary was disputed around 1900; the 1927 Privy Council line is not applied retroactively. This sliver is a modern-proxy coastline/geometry artefact, not the disputed interior boundary itself. Canada keeps the modern provincial outline as a geometric proxy, with the dispute recorded in provenance.",
+    ["labrador-boundary-dispute"],
+  ],
+  [
+    "BRA",
+    "BOL",
+    "Acre was Bolivian in 1900. The 1903 Treaty of Petrópolis and the 1903-04 demarcation are not applied retroactively. This sliver is an artefact of using the modern Acre/Brazil proxy boundary, not a deliberate post-1903 cession.",
+    ["treaty-petropolis-1903"],
+  ],
+]) {
+  const loser = polities.find((entry) => entry.tag === loserTag);
+  const winner = polities.find((entry) => entry.tag === winnerTag);
+  if (loser === undefined || winner === undefined) continue;
+  let intersection;
+  try {
+    intersection = intersectPolygons(polityPolygons(loser), polityPolygons(winner));
+  } catch {
+    continue;
+  }
+  const areaBefore = multiPolygonArea(intersection);
+  if (areaBefore <= 0.0005) continue;
+  const intersectionBbox = polygonsBBox(intersection).map((value) =>
+    Number(value.toFixed(3)),
+  );
+  let trimmed;
+  try {
+    trimmed = differencePolygons(polityPolygons(loser), polityPolygons(winner));
+  } catch (error) {
+    warnings.push(`final overlap trim ${loserTag}/${winnerTag} failed: ${String(error)}`);
+    continue;
+  }
+  if (multiPolygonArea(trimmed) <= 0) continue;
+  const encoded = encodeMultiPolygon(trimmed);
+  loser.rings = encoded.rings;
+  loser.holes = encoded.holes;
+  loser.area = encoded.area;
+  loser.bbox = encoded.bbox;
+  overlapResolutions.push({
+    pair: [loserTag, winnerTag],
+    areaBeforeDegreesSquared: Number(areaBefore.toFixed(3)),
+    intersectionBbox,
+    decision: "trimmed from the loser; winner keeps the shared area",
+    historicalNote,
+    sourceIds,
+  });
+}
+
+// A second pass removes the sub-0.005 deg² residue that survives the first
+// simplification, including the small Bukhara/Russia proxy sliver.
+for (const [loserTag, winnerTag] of [
+  ["CAN", "NFD"],
+  ["RUS", "BUK"],
+]) {
+  const loser = polities.find((entry) => entry.tag === loserTag);
+  const winner = polities.find((entry) => entry.tag === winnerTag);
+  if (loser === undefined || winner === undefined) continue;
+  try {
+    const intersection = intersectPolygons(polityPolygons(loser), polityPolygons(winner));
+    if (multiPolygonArea(intersection) <= 0.0005) continue;
+    const trimmed = differencePolygons(polityPolygons(loser), polityPolygons(winner));
+    if (multiPolygonArea(trimmed) <= 0) continue;
+    const encoded = encodeMultiPolygon(trimmed);
+    loser.rings = encoded.rings;
+    loser.holes = encoded.holes;
+    loser.area = encoded.area;
+    loser.bbox = encoded.bbox;
+    if (loserTag === "RUS" && winnerTag === "BUK") {
+      overlapResolutions.push({
+        pair: [loserTag, winnerTag],
+        areaBeforeDegreesSquared: Number(multiPolygonArea(intersection).toFixed(3)),
+        intersectionBbox: polygonsBBox(intersection).map((value) => Number(value.toFixed(3))),
+        decision: "trimmed from the loser; winner keeps the shared area",
+        historicalNote:
+          "The Bukhara protectorate boundary is a modern administrative proxy; this sub-0.005 deg² sliver is a geometry artefact, not a historical claim.",
+        sourceIds: ["hammond-1912"],
+      });
+    }
+  } catch (error) {
+    warnings.push(`second-pass overlap trim ${loserTag}/${winnerTag} failed: ${String(error)}`);
+  }
+}
+
+const disputedPayload = disputedAreas.map((area) => {
+  const encoded = encodeMultiPolygon(area.shape);
+  const sourceRecords = area.sources.map((id) => {
+    const source = boundaryData.meta.sourceRegistry.find((candidate) => candidate.id === id);
+    if (source === undefined) throw new Error(`disputed area ${area.id}: unknown source ${id}`);
+    return {
+      id: source.id,
+      title: source.title,
+      url: source.url,
+      license: source.license,
+      date: source.date,
+    };
+  });
+  return {
+    id: area.id,
+    name: area.name,
+    classification: area.classification,
+    referenceDate: area.referenceDate,
+    confidence: area.confidence,
+    rings: encoded.rings,
+    holes: encoded.holes,
+    area: encoded.area,
+    bbox: encoded.bbox,
+    label: area.label,
+    provenance: {
+      id: area.id,
+      referenceDate: area.referenceDate,
+      classification: area.classification,
+      confidence: area.confidence,
+      sovereigntyClaims: area.sovereigntyClaims,
+      administration: area.administration,
+      sources: sourceRecords,
+      notes: area.notes,
+    },
+  };
+});
+
 /** Land outline for the neutral background (Antarctica and unassigned areas). */
 const landRings = [];
 function topologyObjectRings(object) {
@@ -960,11 +1180,15 @@ const payload = {
     provenanceCount,
     transferCount: patches.length,
     resolvedOverlaps,
+    disputedAreaCount: disputedPayload.length,
+    overlapResolutionCount: overlapResolutions.length,
     notes:
       "Modern source units are only geometry blocks. The authored 1900 transfers in boundaries_1900.json are applied with polygon-clipping; every polity carries boundary provenance, a reference date, a geometry class and a confidence class. Internal modern borders are not drawn. South Africa uses the four 1900 polities with modern province proxies; the Transvaal and Orange Free State are documented approximations.",
   },
   boundarySources: boundaryData.meta.sourceRegistry,
   land: landRings,
+  disputedAreas: disputedPayload,
+  overlapResolutions,
   polities,
 };
 

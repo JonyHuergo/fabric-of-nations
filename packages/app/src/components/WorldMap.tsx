@@ -19,6 +19,14 @@ import Svg, {
 import type { SimulationSnapshot } from "@century/sim-worker";
 
 import { colors, lighten, nationColor, spacing, type } from "../theme";
+import {
+  MAP_HEIGHT,
+  MAP_MAX_SCALE,
+  MAP_MIN_SCALE,
+  MAP_WIDTH,
+} from "./mapViewport";
+
+export { MAP_MAX_SCALE, MAP_MIN_SCALE, MAP_PREVIOUS_MAX_SCALE } from "./mapViewport";
 import type {
   WorldCatalogData,
   WorldCatalogEntry,
@@ -28,10 +36,8 @@ import type {
 } from "../worldCatalogTypes";
 import { Badge } from "./ui";
 
-const MAP_WIDTH = 1000;
-const MAP_HEIGHT = 500;
-const MIN_SCALE = 1;
-const MAX_SCALE = 10;
+const MIN_SCALE = MAP_MIN_SCALE;
+const MAX_SCALE = MAP_MAX_SCALE;
 
 const MARKET_COLORS = [
   "#7f9c7a",
@@ -87,9 +93,9 @@ function decodeRing(flat: readonly number[]): number[][] {
   return points;
 }
 
-function pathFor(polity: WorldMapPolity): string {
+function pathForRings(rings: readonly (readonly number[])[]): string {
   const commands: string[] = [];
-  for (const flat of polity.rings) {
+  for (const flat of rings) {
     const points = decodeRing(flat);
     if (points.length < 3) continue;
     // Draw at the antimeridian-adjacent copies so unwrapped rings wrap cleanly.
@@ -104,6 +110,10 @@ function pathFor(polity: WorldMapPolity): string {
     }
   }
   return commands.join("");
+}
+
+function pathFor(polity: WorldMapPolity): string {
+  return pathForRings(polity.rings);
 }
 
 function centroidOf(polity: WorldMapPolity): [number, number] {
@@ -234,6 +244,15 @@ export function WorldMap({
     return commands.join("");
   }, [map.land]);
 
+  const disputedAreas = useMemo(
+    () =>
+      map.disputedAreas.map((area) => ({
+        ...area,
+        path: pathForRings(area.rings),
+      })),
+    [map.disputedAreas],
+  );
+
   const viewScale =
     size.width > 0 && size.height > 0
       ? Math.min(size.width / MAP_WIDTH, size.height / MAP_HEIGHT)
@@ -278,6 +297,21 @@ export function WorldMap({
     setTranslate({ x: 0, y: 0 });
   }, []);
 
+  const screenPointToViewBox = useCallback(
+    (localX: number, localY: number): [number, number] | null => {
+      if (size.width <= 0 || size.height <= 0) return null;
+      const drawnWidth = MAP_WIDTH * viewScale;
+      const drawnHeight = MAP_HEIGHT * viewScale;
+      const offsetX = (size.width - drawnWidth) / 2;
+      const offsetY = (size.height - drawnHeight) / 2;
+      return [
+        (localX - offsetX) / Math.max(viewScale, 0.0001),
+        (localY - offsetY) / Math.max(viewScale, 0.0001),
+      ];
+    },
+    [size.height, size.width, viewScale],
+  );
+
   const panResponder = useMemo(
     () =>
       PanResponder.create({
@@ -306,10 +340,11 @@ export function WorldMap({
             const previous = gestureRef.current.distance || distance;
             const factor = previous > 0 ? distance / previous : 1;
             gestureRef.current.distance = distance;
-            const center = {
-              x: ((a.locationX + b.locationX) / 2) / Math.max(viewScale, 0.0001),
-              y: ((a.locationY + b.locationY) / 2) / Math.max(viewScale, 0.0001),
-            };
+            const point = screenPointToViewBox(
+              (a.locationX + b.locationX) / 2,
+              (a.locationY + b.locationY) / 2,
+            );
+            const center = point === null ? { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 } : { x: point[0], y: point[1] };
             zoomBy(factor, center);
             return;
           }
@@ -323,7 +358,7 @@ export function WorldMap({
           gestureRef.current.distance = 0;
         },
       }),
-    [clampTranslate, viewScale, zoomBy],
+    [clampTranslate, screenPointToViewBox, viewScale, zoomBy],
   );
 
   const onLayout = (event: LayoutChangeEvent): void => {
@@ -335,17 +370,57 @@ export function WorldMap({
 
   const screenToWorld = useCallback(
     (localX: number, localY: number): [number, number] | null => {
-      if (size.width <= 0 || size.height <= 0) return null;
-      const drawnWidth = MAP_WIDTH * viewScale;
-      const drawnHeight = MAP_HEIGHT * viewScale;
-      const offsetX = (size.width - drawnWidth) / 2;
-      const offsetY = (size.height - drawnHeight) / 2;
-      const sx = (localX - offsetX) / Math.max(viewScale, 0.0001);
-      const sy = (localY - offsetY) / Math.max(viewScale, 0.0001);
+      const view = screenPointToViewBox(localX, localY);
+      if (view === null) return null;
       // Invert the group transform.
-      return [(sx - translate.x) / scale, (sy - translate.y) / scale];
+      return [(view[0] - translate.x) / scale, (view[1] - translate.y) / scale];
     },
-    [scale, size.height, size.width, translate.x, translate.y, viewScale],
+    [scale, screenPointToViewBox, translate.x, translate.y],
+  );
+
+  const handleWheel = useCallback(
+    (event: {
+      preventDefault?: () => void;
+      nativeEvent?: {
+        deltaY?: number;
+        deltaMode?: number;
+        offsetX?: number;
+        offsetY?: number;
+        locationX?: number;
+        locationY?: number;
+        ctrlKey?: boolean;
+      };
+      deltaY?: number;
+      offsetX?: number;
+      offsetY?: number;
+      locationX?: number;
+      locationY?: number;
+      ctrlKey?: boolean;
+    }) => {
+      if (Platform.OS !== "web") return;
+      const native = (event.nativeEvent ?? event) as {
+        deltaY?: number;
+        offsetX?: number;
+        offsetY?: number;
+        locationX?: number;
+        locationY?: number;
+        ctrlKey?: boolean;
+      };
+      const deltaY = native.deltaY ?? 0;
+      if (!Number.isFinite(deltaY) || deltaY === 0) return;
+      event.preventDefault?.();
+      // Trackpad pinch gestures arrive as ctrl+wheel with small deltas; both
+      // paths use the same focal-point zoom, just a different sensitivity.
+      const sensitivity = native.ctrlKey === true ? 0.004 : 0.0015;
+      const factor = Math.exp(-deltaY * sensitivity);
+      const localX = native.offsetX ?? native.locationX ?? size.width / 2;
+      const localY = native.offsetY ?? native.locationY ?? size.height / 2;
+      const point = screenPointToViewBox(localX, localY);
+      const focus =
+        point === null ? { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 } : { x: point[0], y: point[1] };
+      zoomBy(factor, focus);
+    },
+    [screenPointToViewBox, size.height, size.width, zoomBy],
   );
 
   const pickAt = useCallback(
@@ -457,6 +532,7 @@ export function WorldMap({
       {...(Platform.OS === "web"
         ? ({
             onPointerMove: handlePointerMove,
+            onWheel: handleWheel,
             onPointerLeave: () => {
               setHoveredTag(null);
               setHoverPoint(null);
@@ -468,8 +544,21 @@ export function WorldMap({
         {size.width > 0 ? (
           <Svg width={size.width} height={size.height} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}>
             <Rect x={0} y={0} width={MAP_WIDTH} height={MAP_HEIGHT} fill={colors.mapOcean} />
-            <Path d={landPath} fill={colors.mapLand} stroke={colors.mapBorder} strokeWidth={0.4} />
             <G transform={`translate(${translate.x} ${translate.y}) scale(${scale})`}>
+              {/*
+                The neutral land mask must share the country group transform.
+                Drawing it outside this group makes it stay at world scale while
+                the political fills zoom, producing a stale "land" overlay over
+                the ocean at every zoom above 1.
+              */}
+              <Path
+                d={landPath}
+                fill={colors.mapLand}
+                fillRule="evenodd"
+                stroke={colors.mapBorder}
+                strokeWidth={0.35 / scale}
+                pointerEvents="none"
+              />
               {polities.map((polity) => {
                 const isSelected = selectedTag === polity.tag;
                 const isHovered = hoveredTag === polity.tag;
@@ -483,8 +572,7 @@ export function WorldMap({
                     d={polity.path}
                     fill={fillFor(polity)}
                     fillRule="evenodd"
-                    stroke={isSelected ? colors.accentStrong : colors.mapBorder}
-                    strokeWidth={(isSelected ? 1.6 : 0.45) / scale}
+                    stroke="none"
                     onPress={() => onSelect(polity.tag)}
                     onPressIn={() => setHoveredTag(polity.tag)}
                     accessibilityLabel={`${polity.entry.name}`}
@@ -492,6 +580,53 @@ export function WorldMap({
                   />
                 );
               })}
+              {disputedAreas.map((area) => (
+                <Path
+                  key={`disputed-${area.id}`}
+                  d={area.path}
+                  fill="rgba(216, 179, 74, 0.18)"
+                  fillRule="evenodd"
+                  stroke="#d8b34a"
+                  strokeWidth={0.7 / scale}
+                  strokeDasharray={`${3 / scale} ${2 / scale}`}
+                  strokeLinejoin="round"
+                  pointerEvents="none"
+                />
+              ))}
+              {/*
+                Borders are a separate layer after every fill. Drawing them while
+                filling each polity lets a later neighbour's fill cover a shared
+                border and makes lines appear/disappear with draw order.
+              */}
+              {polities.map((polity) => (
+                <Path
+                  key={`border-${polity.tag}`}
+                  d={polity.path}
+                  fill="none"
+                  fillRule="evenodd"
+                  stroke={colors.mapBorder}
+                  strokeWidth={0.32 / scale}
+                  strokeLinejoin="round"
+                  pointerEvents="none"
+                />
+              ))}
+              {selectedTag === null
+                ? null
+                : (() => {
+                    const selected = polities.find((polity) => polity.tag === selectedTag);
+                    if (selected === undefined) return null;
+                    return (
+                      <Path
+                        d={selected.path}
+                        fill="none"
+                        fillRule="evenodd"
+                        stroke={colors.accentStrong}
+                        strokeWidth={1.4 / scale}
+                        strokeLinejoin="round"
+                        pointerEvents="none"
+                      />
+                    );
+                  })()}
               {polities.map((polity) => {
                 const controllerTag = occupationFor(polity);
                 if (controllerTag === null) return null;
@@ -604,6 +739,12 @@ export function WorldMap({
             <View style={[styles.swatch, { backgroundColor: lighten("#b08a63", 0.3) }]} />
             <Text style={styles.legendText}>Dependent territory</Text>
           </View>
+          {map.disputedAreas.length > 0 && layer === "political" ? (
+            <View style={styles.legendRow}>
+              <View style={[styles.swatch, styles.disputedSwatch]} />
+              <Text style={styles.legendText}>Disputed / no established administration</Text>
+            </View>
+          ) : null}
           {layer === "political" || layer === "control" ? (
             <View style={styles.legendRow}>
               <View style={[styles.swatch, styles.occSwatch]} />
@@ -719,6 +860,12 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     borderWidth: 1,
     borderColor: colors.red,
+    borderStyle: "dashed",
+  },
+  disputedSwatch: {
+    backgroundColor: "rgba(216, 179, 74, 0.18)",
+    borderWidth: 1,
+    borderColor: "#d8b34a",
     borderStyle: "dashed",
   },
   tooltip: {

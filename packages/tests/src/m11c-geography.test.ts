@@ -54,9 +54,37 @@ interface MapData {
     transferCount: number;
     resolvedOverlaps: number;
     boundaryVersion: string;
+    disputedAreaCount: number;
+    overlapResolutionCount: number;
   };
   boundarySources: { id: string; title: string; url: string; license: string; date: string; notes: string }[];
   land: number[][];
+  disputedAreas: {
+    id: string;
+    name: string;
+    classification: string;
+    referenceDate: string;
+    confidence: string;
+    rings: number[][];
+    holes: number[];
+    area: number;
+    bbox: number[];
+    label: [number, number];
+    provenance: {
+      sovereigntyClaims: string[];
+      administration: string;
+      sources: { id: string; title: string; url: string; license: string; date: string }[];
+      notes: string;
+    };
+  }[];
+  overlapResolutions: {
+    pair: [string, string];
+    areaBeforeDegreesSquared: number;
+    intersectionBbox: number[];
+    decision: string;
+    historicalNote: string;
+    sourceIds: string[];
+  }[];
   polities: MapPolity[];
 }
 
@@ -119,13 +147,31 @@ interface Audit {
     invalidRings: number;
     overlaps: number;
     largestOverlapDegreesSquared: number;
+    disputedAreas: number;
+    disputedAreaDegreesSquared: number;
+    disputedOverlaps: number;
     unassignedSamples: number;
     unassignedComponents: number;
     largestUnassignedComponent: number;
+    polygonUnassignedAreaDegreesSquared: number;
+    intentionalUnassignedAreaDegreesSquared: number;
+    generalizationSliverAreaDegreesSquared: number;
+    generalizationSliverComponents: number;
+    unexplainedUnassignedAreaDegreesSquared: number;
+    unexplainedUnassignedComponents: number;
   };
   overlaps: { a: string; b: string; area: number }[];
+  disputedOverlaps: { polity: string; disputed: string; area: number | null }[];
   invalidRings: unknown[];
-  coverage: { unassignedSamples: number[][]; components: { samples: number; bbox: number[] }[] };
+  coverage: {
+    unassignedSamples: number[][];
+    components: { samples: number; bbox: number[] }[];
+    polygon: {
+      intentionalAreas?: { area: number; bbox: number[]; reason: string }[];
+      unexplainedAreas?: { area: number; bbox: number[] }[];
+      largestComponents: { area: number; bbox: number[] }[];
+    };
+  };
 }
 
 const MAP = JSON.parse(readFileSync(MAP_PATH, "utf8")) as MapData;
@@ -177,6 +223,19 @@ function owners(lon: number, lat: number): string[] {
       return lon >= minX && lon <= maxX && lat >= minY && lat <= maxY && contains(polity.tag, lon, lat);
     })
     .map((polity) => polity.tag);
+}
+
+function disputedAt(lon: number, lat: number): string | null {
+  for (const area of MAP.disputedAreas) {
+    const [minX = -180, minY = -90, maxX = 180, maxY = 90] = area.bbox;
+    if (lon < minX || lon > maxX || lat < minY || lat > maxY) continue;
+    let inside = false;
+    for (const flat of area.rings) {
+      if (pointInRing(lon, lat, decodeRing(flat))) inside = !inside;
+    }
+    if (inside) return area.id;
+  }
+  return null;
 }
 
 describe("M11c catalog, map and provenance coverage", () => {
@@ -332,8 +391,41 @@ describe("M11c Libya and Ottoman North Africa", () => {
     expect(contains("ALG", 3.06, 36.75)).toBe(true);
     expect(contains("FEA", 16.0, 12.0)).toBe(true); // central Chad / French Equatorial Africa
     expect(contains("SAH", -12.63, 23.97)).toBe(true);
-    expect(contains("OTT", 15.5, 21.5)).toBe(false); // Aouzou strip remains Chadian
-    expect(contains("FEA", 15.5, 21.5)).toBe(true);
+    expect(contains("OTT", 15.5, 21.5)).toBe(false); // Aouzou–Tibesti is not Ottoman territory
+    expect(contains("FEA", 15.5, 21.5)).toBe(false); // and not French-administered in 1900
+    expect(disputedAt(15.5, 21.5)).toBe("aouzou-tibesti");
+    expect(disputedAt(18.5, 21.5)).toBe("aouzou-tibesti"); // Tibesti
+    expect(disputedAt(18.5, 21.35)).toBe("aouzou-tibesti"); // Bardaï
+    expect(disputedAt(18.5, 21.4)).toBe("aouzou-tibesti"); // Gouro
+    expect(disputedAt(13.8, 18.7)).toBeNull(); // Bilma: French West African sphere
+    expect(contains("FWA", 13.8, 18.7)).toBe(true);
+    expect(disputedAt(18.5, 18.5)).toBeNull(); // Borkou: Wadai sphere/proxy
+    expect(contains("WAD", 18.5, 18.5)).toBe(true);
+    expect(disputedAt(22.0, 17.5)).toBeNull(); // Ennedi
+    expect(contains("WAD", 22.0, 17.5)).toBe(true);
+    expect(MAP.meta.disputedAreaCount).toBe(2);
+    expect(MAP.disputedAreas.map((area) => area.id).sort()).toEqual([
+      "aouzou-tibesti",
+      "siachen-kashmir",
+    ]);
+    expect(AUDIT.summary.disputedOverlaps).toBe(0);
+    expect(disputedAt(77.2, 35.4)).toBe("siachen-kashmir");
+    expect(contains("BIN", 77.2, 35.4)).toBe(false);
+    expect(contains("CHN", 77.2, 35.4)).toBe(false);
+  });
+
+  test("disputed areas carry explicit claims, administration and sourced uncertainty", () => {
+    const aouzou = MAP.disputedAreas.find((area) => area.id === "aouzou-tibesti");
+    expect(aouzou?.classification).toBe("disputed-no-established-administration");
+    expect(aouzou?.provenance.sovereigntyClaims.length).toBeGreaterThanOrEqual(3);
+    expect(aouzou?.provenance.administration).toMatch(/No single power/);
+    expect(aouzou?.provenance.sources.map((source) => source.id)).toEqual(
+      expect.arrayContaining(["icj-libya-chad-1994", "icj-libya-chad-pleadings"]),
+    );
+    expect(aouzou?.provenance.notes).toMatch(/1935|1955|not applied retroactively/);
+    const siachen = MAP.disputedAreas.find((area) => area.id === "siachen-kashmir");
+    expect(siachen?.classification).toBe("disputed-frontier-unsettled");
+    expect(siachen?.provenance.administration).toMatch(/surveyed/);
   });
 });
 
@@ -431,22 +523,40 @@ describe("M11c coverage, validity and overlap audit", () => {
     }
   });
 
-  test("the only residual overlaps are two documented generalization slivers", () => {
+  test("the only residual overlaps are sub-0.01 documented slivers, with resolution records", () => {
     expect(AUDIT.overlaps.map((overlap) => `${overlap.a}:${overlap.b}`).sort()).toEqual([
-      "BOL:BRA",
       "CAN:NFD",
+      "RUS:FIN",
     ]);
-    expect(AUDIT.summary.largestOverlapDegreesSquared).toBeLessThanOrEqual(0.3);
+    expect(AUDIT.summary.largestOverlapDegreesSquared).toBeLessThanOrEqual(0.01);
     for (const overlap of AUDIT.overlaps) {
-      expect(overlap.area).toBeLessThanOrEqual(0.3);
+      expect(overlap.area).toBeLessThanOrEqual(0.01);
     }
+    const resolutions = MAP.overlapResolutions;
+    expect(resolutions.map((resolution) => resolution.pair.join(":"))).toEqual(
+      expect.arrayContaining(["CAN:NFD", "BRA:BOL"]),
+    );
+    const canada = resolutions.find((resolution) => resolution.pair.join(":") === "CAN:NFD");
+    expect(canada?.areaBeforeDegreesSquared).toBeCloseTo(0.249, 2);
+    expect(canada?.intersectionBbox).toHaveLength(4);
+    expect(canada?.historicalNote).toMatch(/Labrador|1927|Privy Council/);
+    const acre = resolutions.find((resolution) => resolution.pair.join(":") === "BRA:BOL");
+    expect(acre?.areaBeforeDegreesSquared).toBeCloseTo(0.016, 2);
+    expect(acre?.historicalNote).toMatch(/Petr/);
   });
 
-  test("no unexplained land void remains; all unassigned samples are one-degree coastal artifacts", () => {
+  test("no multi-sample land void remains; coverage is classified, not cosmetically zeroed", () => {
     expect(AUDIT.summary.unassignedComponents).toBe(AUDIT.summary.unassignedSamples);
     expect(AUDIT.summary.largestUnassignedComponent).toBe(1);
     expect(AUDIT.summary.unassignedSamples).toBeLessThanOrEqual(30);
     expect(AUDIT.coverage.components.every((component) => component.samples <= 1)).toBe(true);
+    expect(AUDIT.summary.disputedAreas).toBe(2);
+    expect(AUDIT.summary.disputedAreaDegreesSquared).toBeGreaterThan(14);
+    expect(AUDIT.summary.intentionalUnassignedAreaDegreesSquared).toBeGreaterThan(4000);
+    expect(AUDIT.summary.generalizationSliverComponents).toBeGreaterThan(5000);
+    expect(AUDIT.summary.unexplainedUnassignedAreaDegreesSquared).toBeLessThan(2);
+    expect(AUDIT.summary.unexplainedUnassignedComponents).toBeLessThan(100);
+    expect(AUDIT.summary.polygonUnassignedAreaDegreesSquared).toBeGreaterThan(4000);
   });
 
   test("the map module bundles provenance and no runtime download", () => {

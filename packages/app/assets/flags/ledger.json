@@ -115,6 +115,14 @@
       "height": 250,
       "aspectRatio": 2
     },
+    "darfur-user-selected": {
+      "file": "darfur-user-selected.png",
+      "sha256": "70fdcb45b9f00240c9162ebd10c39bd8fc2721ba901ca6af6c66969edc920a23",
+      "bytes": 4010,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
     "denmark": {
       "file": "denmark.png",
       "sha256": "3351068c21cfadafa9d4efa2dbd3147c453a5507437b5ae112750184e4e70d56",
@@ -511,6 +519,14 @@
       "file": "venezuela-1863.png",
       "sha256": "66e1c7aa2a977d9aea8da00a2c1e0cdb968705bae06fcca8cf09b9d0ef31aeac",
       "bytes": 3161,
+      "width": 500,
+      "height": 334,
+      "aspectRatio": 1.497006
+    },
+    "wadai-user-selected": {
+      "file": "wadai-user-selected.png",
+      "sha256": "0592777dffbe9998198832fc2ba9498a6c5e97eaf1bd1420b9b1fe83301d9ced",
+      "bytes": 1319,
       "width": 500,
       "height": 334,
       "aspectRatio": 1.497006

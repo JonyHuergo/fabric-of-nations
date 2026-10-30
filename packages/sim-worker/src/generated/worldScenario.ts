@@ -38526,7 +38526,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 2000000,
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate."
+      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
     },
     {
       "countryId": 64,
@@ -38538,7 +38538,7 @@ export const WORLD_SCENARIO = ({
       "selectable": true,
       "population1900Estimate": 2000000,
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. No standardised national flag design could be established; the documented monogram fallback is retained. Population is a rounded estimate."
+      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
     },
     {
       "countryId": 65,

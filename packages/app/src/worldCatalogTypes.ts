@@ -131,6 +131,29 @@ export interface WorldMapPolity {
   readonly provenance: WorldMapProvenance;
 }
 
+export interface WorldMapDisputedArea {
+  readonly id: string;
+  readonly name: string;
+  readonly classification: string;
+  readonly referenceDate: string;
+  readonly confidence: BoundaryConfidence;
+  readonly rings: readonly (readonly number[])[];
+  readonly holes: readonly number[];
+  readonly area: number;
+  readonly bbox: readonly number[];
+  readonly label: readonly [number, number];
+  readonly provenance: {
+    readonly id: string;
+    readonly referenceDate: string;
+    readonly classification: string;
+    readonly confidence: BoundaryConfidence;
+    readonly sovereigntyClaims: readonly string[];
+    readonly administration: string;
+    readonly sources: readonly WorldMapBoundarySource[];
+    readonly notes: string;
+  };
+}
+
 export interface WorldMapData {
   readonly meta: {
     readonly dataset: string;
@@ -147,8 +170,19 @@ export interface WorldMapData {
     readonly provenanceCount: number;
     readonly transferCount: number;
     readonly resolvedOverlaps: number;
+    readonly disputedAreaCount: number;
+    readonly overlapResolutionCount: number;
   };
   readonly boundarySources: readonly (WorldMapBoundarySource & { readonly notes: string })[];
   readonly land: readonly (readonly number[])[];
+  readonly disputedAreas: readonly WorldMapDisputedArea[];
+  readonly overlapResolutions: readonly {
+    readonly pair: readonly [string, string];
+    readonly areaBeforeDegreesSquared: number;
+    readonly intersectionBbox: readonly number[];
+    readonly decision: string;
+    readonly historicalNote: string;
+    readonly sourceIds: readonly string[];
+  }[];
   readonly polities: readonly WorldMapPolity[];
 }

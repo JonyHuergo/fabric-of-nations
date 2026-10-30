@@ -118,6 +118,8 @@ derived map in this project, so no CShapes geometry is included.
   is separated from France; Austria-Hungary includes reconstructed Galicia,
   Transylvania, Vojvodina, South Tyrol and the Littoral; Tibet is separated from
   Qing China; and the former marker-only polities have reconstructed polygons.
+- **Aouzou–Tibesti** is a map-only disputed/no-established-administration zone,
+  not FEA or OTT; see `HISTORICAL_MAP_PROVENANCE.md` §3a and the ICJ sources.
 - Xinjiang and Mongolia remain inside Qing China at this resolution; Tibet is a
   separately drawn autonomous-province territory of China.
 - South Africa is split into the Cape Colony, Natal, the Transvaal and the Orange

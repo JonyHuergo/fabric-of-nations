@@ -218,6 +218,20 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     polityTags: ["CUB"],
   },
   {
+    id: "darfur-user-selected",
+    description: "User-selected representative flag of the Sultanate of Darfur",
+    flagKind: "user-selected-representative",
+    sourceType: "project",
+    sourcePageUrl: "internal:docs/FLAG_PROVENANCE.md#darfur-user-selected",
+    license: "Project-authored reconstruction; dedicated to the public domain by Century",
+    licenseCode: "project",
+    author: "Century project (original geometric reconstruction; design selected by the user from Pax Historia)",
+    validFrom: "1900",
+    validTo: null,
+    retrievedAt: "2026-10-30",
+    polityTags: ["DAR"],
+  },
+  {
     id: "denmark",
     description: "Dannebrog, the Danish national flag",
     flagKind: "exact-national",
@@ -917,17 +931,21 @@ export const FLAG_PROVENANCE: readonly FlagProvenanceEntry[] = [
     retrievedAt: "2026-10-30",
     polityTags: ["VEN"],
   },
+  {
+    id: "wadai-user-selected",
+    description: "User-selected representative flag of the Sultanate of Wadai",
+    flagKind: "user-selected-representative",
+    sourceType: "project",
+    sourcePageUrl: "internal:docs/FLAG_PROVENANCE.md#wadai-user-selected",
+    license: "Project-authored reconstruction; dedicated to the public domain by Century",
+    licenseCode: "project",
+    author: "Century project (original geometric reconstruction; design selected by the user from Pax Historia)",
+    validFrom: "1900",
+    validTo: null,
+    retrievedAt: "2026-10-30",
+    polityTags: ["WAD"],
+  },
 ];
 
 export const FLAG_FALLBACKS: readonly { polityId: number; tag: string; reason: string }[] = [
-  {
-    polityId: 63,
-    tag: "WAD",
-    reason: "No verified historical national or state flag design could be established. FOTW has no Wadai national-flag entry; Wikimedia Commons holds only modern user-made flags (a DeviantArt-derived 'Sultanate of Wadai' image and a CC BY-SA 4.0 'Wadai' upload), neither of which is a contemporary source. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent or mislabel a flag.",
-  },
-  {
-    polityId: 64,
-    tag: "DAR",
-    reason: "No verified historical national or state flag design could be established. The FOTW page for the Sultanate of Darfur (1603-1874, 1898-1916) records no state flag and only discusses a 1910 illustrated red flag with a white frame carried by Masalit rebels, a military/conflict standard rather than a national flag. Modern Darfur liberation/regional flags are post-1900 and are not used. The polity's independence and reconstructed boundary are documented; a monogram is retained rather than invent a flag.",
-  },
 ];

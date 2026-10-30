@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Historical flag asset pipeline for the 1900 Century catalog.
  *
@@ -62,7 +62,12 @@ const ALLOWED_LICENSE_CODES = new Set(["pd", "cc0"]);
 const PROJECT_LICENSE_CODE = "project";
 const PROJECT_FLAG_WIDTH = 1000;
 const PROJECT_FLAG_HEIGHT = 667;
-const PROJECT_RENDERERS = new Set(["spain-restoration", "transvaal-vierkleur"]);
+const PROJECT_RENDERERS = new Set([
+  "spain-restoration",
+  "transvaal-vierkleur",
+  "darfur-user-selected",
+  "wadai-user-selected",
+]);
 const ALLOWED_FLAG_KINDS = new Set([
   "exact-national",
   "de-facto-national",
@@ -79,6 +84,7 @@ const ALLOWED_FLAG_KINDS = new Set([
   "autonomous-state-flag",
   "national-variant-representative",
   "project-reconstruction",
+  "user-selected-representative",
 ]);
 const MAX_SOURCE_BYTES = 4 * 1024 * 1024;
 const MAX_RASTER_EDGE = 4096;
@@ -398,6 +404,30 @@ async function renderProjectSource(flag) {
     const targetWidth = Math.round((arms.bitmap.width * targetHeight) / arms.bitmap.height);
     arms.resize(targetWidth, targetHeight);
     canvas.composite(arms, Math.round((width - targetWidth) / 2), Math.round((height - targetHeight) / 2));
+  } else if (project.design === "darfur-user-selected") {
+    // User-selected representative design: green/red/black horizontal triband
+    // with a white crescent on the red band. This is an original Century
+    // reconstruction from the visible geometry, not the Pax Historia raster.
+    const bandHeight = Math.round(height / 3);
+    canvas.composite(solidImage(width, bandHeight, "#007b3a"), 0, 0);
+    canvas.composite(solidImage(width, bandHeight, "#cf0822"), 0, bandHeight);
+    canvas.composite(solidImage(width, height - bandHeight * 2, "#000000"), 0, bandHeight * 2);
+    const white = Jimp.rgbaToInt(255, 255, 255, 255);
+    const cx = width * 0.47;
+    const cy = height * 0.5;
+    const outer = height * 0.235;
+    const inner = height * 0.170;
+    const innerCx = cx + width * 0.060;
+    canvas.scan(0, bandHeight, width, bandHeight, function scanCrescent(x, y) {
+      const inOuter = (x - cx) ** 2 + (y - cy) ** 2 <= outer ** 2;
+      const inInner = (x - innerCx) ** 2 + (y - cy) ** 2 <= inner ** 2;
+      if (inOuter && !inInner) this.setPixelColor(white, x, y);
+    });
+  } else if (project.design === "wadai-user-selected") {
+    // User-selected representative design: white field with a thin black border.
+    const border = Math.max(4, Math.round(height * 0.024));
+    canvas.composite(solidImage(width, height, "#000000"), 0, 0);
+    canvas.composite(solidImage(width - border * 2, height - border * 2, "#ffffff"), border, border);
   } else {
     throw new Error(`${flag.id}: unsupported project design ${String(project.design)}`);
   }
@@ -977,7 +1007,7 @@ function buildDoc(manifest, catalog) {
   }
 
   const lines = [];
-  lines.push("# Historical flag provenance — Century 1900");
+  lines.push("# Historical flag provenance â€” Century 1900");
   lines.push("");
   lines.push(
     "This document records every historical flag bundled for the Century 1900 catalog. The reference date is **1 January 1900**. It is generated from",
@@ -1031,15 +1061,15 @@ function buildDoc(manifest, catalog) {
   lines.push("## Project-authored reconstructions");
   lines.push("");
   lines.push(
-    "Two flags are original Century reconstructions rather than externally sourced files. They are rendered deterministically at build time from documented designs and are dedicated to the public domain by the project. Their historical sources are recorded separately from Century's authorship; no share-alike or restricted artwork was traced or copied.",
+    "Four flags are original Century reconstructions rather than externally sourced files: the Spanish restoration flag, the Transvaal Vierkleur, and the two user-selected Darfur and Wadai designs. They are rendered deterministically at build time from documented or user-selected designs and are dedicated to the public domain by the project. Their historical or user-selected sources are recorded separately from Century's authorship; no share-alike or restricted artwork is traced or copied. The Pax Historia rasters were inspected but are not bundled because redistribution permission was not established.",
   );
   lines.push("");
   for (const id of projectIds) {
     const flag = manifest.flags[id];
-    lines.push(`- **\`${id}\`** — ${mdEscape(flag.description)}. ${mdEscape(flag.historicalNotes)}`);
+    lines.push(`- **\`${id}\`** â€” ${mdEscape(flag.description)}. ${mdEscape(flag.historicalNotes)}`);
     for (const component of flag.project.components ?? []) {
       lines.push(
-        `  - Component: ${mdEscape(component.role)} — [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}.`,
+        `  - Component: ${mdEscape(component.role)} â€” [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}.`,
       );
     }
   }
@@ -1056,35 +1086,35 @@ function buildDoc(manifest, catalog) {
         (polityId) =>
           `\`${manifest.polities[String(polityId)].tag}\` (ID ${String(polityId)})`,
       );
-    lines.push(`### \`${id}\` — ${mdEscape(flag.description)}`);
+    lines.push(`### \`${id}\` â€” ${mdEscape(flag.description)}`);
     lines.push("");
     lines.push(`- **Flag kind:** ${mdEscape(flagKindOf(manifest, id))}`);
     lines.push(`- **Polities:** ${polityRefs.join(", ")}`);
     lines.push(
-      `- **Validity:** ${flag.validFrom}${flag.validTo === null ? " – no end date recorded (in use on 1 January 1900)" : ` – ${flag.validTo}`}`,
+      `- **Validity:** ${flag.validFrom}${flag.validTo === null ? " â€“ no end date recorded (in use on 1 January 1900)" : ` â€“ ${flag.validTo}`}`,
     );
     if ((flag.sourceType ?? "commons") === "project") {
       lines.push(
         `- **Source:** project-authored reconstruction (design \`${flag.project.design}\`), not an externally sourced image.`,
       );
-      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) — ${flag.licenseUrl}`);
+      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) â€” ${flag.licenseUrl}`);
       lines.push(`- **Author:** ${mdEscape(flag.author)}`);
       lines.push(`- **Retrieved:** ${flag.retrievedAt}`);
       for (const component of flag.project.components ?? []) {
         lines.push(
-          `- **Component:** ${mdEscape(component.role)} — [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}; SHA-256 \`${component.sha256}\`.`,
+          `- **Component:** ${mdEscape(component.role)} â€” [${component.sourceTitle}](${component.sourcePageUrl}); ${component.license} (${component.licenseCode}); author ${mdEscape(component.author)}; SHA-256 \`${component.sha256}\`.`,
         );
       }
       lines.push(
-        `- **Source file:** built by \`scripts/m11/build-flags.mjs\` at ${String(flag.sourceWidth)}×${String(flag.sourceHeight)}; no external flag file is redistributed.`,
+        `- **Source file:** built by \`scripts/m11/build-flags.mjs\` at ${String(flag.sourceWidth)}Ã—${String(flag.sourceHeight)}; no external flag file is redistributed.`,
       );
     } else {
       lines.push(`- **Source:** [${flag.sourceTitle}](${flag.sourcePageUrl})`);
-      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) — ${flag.licenseUrl}`);
+      lines.push(`- **License:** ${flag.license} (${flag.licenseCode}) â€” ${flag.licenseUrl}`);
       lines.push(`- **Author:** ${mdEscape(flag.author)}`);
       lines.push(`- **Retrieved:** ${flag.retrievedAt}`);
       lines.push(
-        `- **Source file:** [original](${flag.sourceFileUrl}) (${String(flag.sourceWidth)}×${String(flag.sourceHeight)}; SHA-1 \`${flag.sourceSha1}\`)`,
+        `- **Source file:** [original](${flag.sourceFileUrl}) (${String(flag.sourceWidth)}Ã—${String(flag.sourceHeight)}; SHA-1 \`${flag.sourceSha1}\`)`,
       );
     }
     lines.push(`- **Historical accuracy:** ${mdEscape(flag.historicalNotes)}`);
@@ -1124,7 +1154,7 @@ function buildDoc(manifest, catalog) {
     if (polity.kind !== "territory") continue;
     const entry = manifest.polities[String(polity.id)];
     const flag = entry.flag === null ? "monogram fallback" : `\`${entry.flag}\``;
-    const sovereign = entry.sovereignTag ?? polity.sovereignTag ?? "—";
+    const sovereign = entry.sovereignTag ?? polity.sovereignTag ?? "â€”";
     lines.push(
       `| ${mdEscape(polity.name)} (\`${entry.tag}\`) | ${String(polity.id)} | ${mdEscape(
         polity.status,
@@ -1135,46 +1165,46 @@ function buildDoc(manifest, catalog) {
   lines.push("## Verification targets");
   lines.push("");
   lines.push(
-    "- **United States** — `usa-45-star`: 45 stars, in use 4 July 1896 – 3 July 1908. The 50-star flag is not used.",
+    "- **United States** â€” `usa-45-star`: 45 stars, in use 4 July 1896 â€“ 3 July 1908. The 50-star flag is not used.",
   );
   lines.push(
-    "- **German Empire** — `germany-1867`: black-white-red (1867–1918), not the modern black-red-gold.",
+    "- **German Empire** â€” `germany-1867`: black-white-red (1867â€“1918), not the modern black-red-gold.",
   );
   lines.push(
-    "- **Russian Empire** — `russia-1896`: white-blue-red, confirmed by the 1896 imperial decree.",
+    "- **Russian Empire** â€” `russia-1896`: white-blue-red, confirmed by the 1896 imperial decree.",
   );
   lines.push(
-    "- **Siam** — `siam-1855`: red field with the white elephant, in use 1855–1916.",
+    "- **Siam** â€” `siam-1855`: red field with the white elephant, in use 1855â€“1916.",
   );
   lines.push(
-    "- **Qing Empire** — `qing-1889`: yellow dragon flag, in use 1889–1912.",
+    "- **Qing Empire** â€” `qing-1889`: yellow dragon flag, in use 1889â€“1912.",
   );
   lines.push(
-    "- **Ottoman Empire** — `ottoman-1844`: red field with white crescent and five-pointed star, the 1844–1922 design.",
+    "- **Ottoman Empire** â€” `ottoman-1844`: red field with white crescent and five-pointed star, the 1844â€“1922 design.",
   );
   lines.push(
-    "- **Canada** — `canada-red-ensign-1868`: the Red Ensign with the 1868 shield, used unofficially from 1870 and approved for use at sea in 1892; the Union Jack remained the official national flag, and the modern maple-leaf flag is not used.",
+    "- **Canada** â€” `canada-red-ensign-1868`: the Red Ensign with the 1868 shield, used unofficially from 1870 and approved for use at sea in 1892; the Union Jack remained the official national flag, and the modern maple-leaf flag is not used.",
   );
   lines.push(
-    "- **Australia** — `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.",
+    "- **Australia** â€” `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.",
   );
   lines.push(
-    "- **Transvaal / South African Republic** — `transvaal-vierkleur`: an original Century reconstruction of the 1857–1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.",
+    "- **Transvaal / South African Republic** â€” `transvaal-vierkleur`: an original Century reconstruction of the 1857â€“1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.",
   );
   lines.push(
-    "- **Orange Free State** — `orange-free-state`: the 1857–1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).",
+    "- **Orange Free State** â€” `orange-free-state`: the 1857â€“1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).",
   );
   lines.push(
-    "- **Austria-Hungary** — `austria-hungary-civil-ensign`: the common civil ensign of 1869–1918, combining the Austrian red-white-red and Hungarian red-white-green halves with both coats of arms. The dual monarchy had no single unified national flag; the manifest and this document record that distinction. The polity is a single catalog state, not two independent countries.",
+    "- **Austria-Hungary** â€” `austria-hungary-civil-ensign`: the common civil ensign of 1869â€“1918, combining the Austrian red-white-red and Hungarian red-white-green halves with both coats of arms. The dual monarchy had no single unified national flag; the manifest and this document record that distinction. The polity is a single catalog state, not two independent countries.",
   );
   lines.push(
-    "- **Spain** — `spain-restoration`: a project-authored red–yellow–red reconstruction with the individually verified PD Restoration-era coat of arms. The Spanish colonies SAH and SGG use the same sovereign flag with their colony status badges.",
+    "- **Spain** â€” `spain-restoration`: a project-authored redâ€“yellowâ€“red reconstruction with the individually verified PD Restoration-era coat of arms. The Spanish colonies SAH and SGG use the same sovereign flag with their colony status badges.",
   );
   lines.push(
-    "- **Montenegro** — `montenegro-1881`: the verified PD red–blue–white national flag with the princely monogram, documented 1881–1905. The 1878 war ensign is not used as the national flag.",
+    "- **Montenegro** â€” `montenegro-1881`: the verified PD redâ€“blueâ€“white national flag with the princely monogram, documented 1881â€“1905. The 1878 war ensign is not used as the national flag.",
   );
   lines.push(
-    "- **Tonga, Sokoto, Ha'il, Crete** — period flags verified on Commons (PD) and recorded with exact/representative flag-kind metadata.",
+    "- **Tonga, Sokoto, Ha'il, Crete** â€” period flags verified on Commons (PD) and recorded with exact/representative flag-kind metadata.",
   );
   lines.push("");
   lines.push("## Offline and runtime guarantees");
@@ -1210,10 +1240,10 @@ function buildDoc(manifest, catalog) {
     "- Ecuador's plain tricolour is shown because the coat of arms became mandatory for the state flag only on 5 December 1900, after the reference date.",
   );
   lines.push(
-    "- Brazil's star field changed as states were admitted; the bundled 1889–1960 rendition follows the period design rather than a star-by-star 1900 reconstruction.",
+    "- Brazil's star field changed as states were admitted; the bundled 1889â€“1960 rendition follows the period design rather than a star-by-star 1900 reconstruction.",
   );
   lines.push(
-    "- Persia's Qajar lion-and-sun tricolour was not legally standardised until 1905–1907; the bundled CC0 1886 artwork is period-appropriate, and the note records the lack of a detailed 1900 specification.",
+    "- Persia's Qajar lion-and-sun tricolour was not legally standardised until 1905â€“1907; the bundled CC0 1886 artwork is period-appropriate, and the note records the lack of a detailed 1900 specification.",
   );
   lines.push(
     "- Canada's Red Ensign was the distinctive de facto flag, while the Union Jack remained the official national flag in 1900; both facts are recorded.",

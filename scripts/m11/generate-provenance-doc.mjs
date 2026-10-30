@@ -13,11 +13,13 @@ const ROOT = resolve(HERE, "..", "..");
 const CATALOG_PATH = resolve(ROOT, "packages/data/data/historical/m11/polities_1900.json");
 const BOUNDARIES_PATH = resolve(ROOT, "packages/data/data/historical/m11/boundaries_1900.json");
 const AUDIT_PATH = resolve(ROOT, "packages/data/data/map/world_map_1900_audit.json");
+const MAP_PATH = resolve(ROOT, "packages/data/data/map/world_map_1900.json");
 const OUT_PATH = resolve(ROOT, "docs/HISTORICAL_MAP_PROVENANCE.md");
 
 const catalog = JSON.parse(readFileSync(CATALOG_PATH, "utf8"));
 const boundaries = JSON.parse(readFileSync(BOUNDARIES_PATH, "utf8"));
 const audit = JSON.parse(readFileSync(AUDIT_PATH, "utf8"));
+const map = JSON.parse(readFileSync(MAP_PATH, "utf8"));
 const all = [...catalog.states, ...catalog.territories];
 const byTag = new Map(all.map((entry) => [entry.tag, entry]));
 const provenance = boundaries.provenance;
@@ -79,6 +81,20 @@ const gapLines =
         )
         .join("\n");
 
+const overlapResolutionLines = (map.overlapResolutions ?? [])
+  .map(
+    (resolution) =>
+      `- **${resolution.pair[0]} / ${resolution.pair[1]}** — before ${resolution.areaBeforeDegreesSquared} deg² at bbox ${resolution.intersectionBbox.join(", ")}. ${resolution.decision}. ${resolution.historicalNote}`,
+  )
+  .join("\n");
+
+const disputedLines = (map.disputedAreas ?? [])
+  .map(
+    (area) =>
+      `- **${area.name}** (\`${area.id}\`, ${area.classification}, ${area.confidence}) — ${area.area} deg² at bbox ${area.bbox.join(", ")}. ${area.provenance.administration}`,
+  )
+  .join("\n");
+
 const doc = `# Historical map provenance and 1900 boundary audit (M11c)
 
 **Reference date:** 1 January 1900. The map is a historical reconstruction, not
@@ -138,12 +154,20 @@ The map is built offline by \`scripts/m11/build-map.mjs\` from:
 | Catalogued polities | ${all.length} |
 | Map polities with provenance | ${audit.summary.provenanceCount} |
 | Marker-only polities | ${audit.summary.markerOnly} |
+| Disputed map-only zones | ${audit.summary.disputedAreas} |
+| Disputed area (deg²) | ${audit.summary.disputedAreaDegreesSquared} |
 | Invalid rings | ${audit.summary.invalidRings} |
 | Overlaps above 0.001 deg² | ${audit.summary.overlaps} |
+| Largest overlap (deg²) | ${audit.summary.largestOverlapDegreesSquared} |
 | Land samples (1°) | ${audit.summary.landSamples} |
-| Unassigned land samples | ${audit.summary.unassignedSamples} |
+| Disputed 1° samples | ${audit.summary.disputedSamples} |
+| Unassigned 1° samples | ${audit.summary.unassignedSamples} |
 | Unassigned components | ${audit.summary.unassignedComponents} |
 | Largest unassigned component | ${audit.summary.largestUnassignedComponent} sample(s) |
+| Polygon-level unassigned area (deg²) | ${audit.summary.polygonUnassignedAreaDegreesSquared} |
+| Intentional (Antarctica) area (deg²) | ${audit.summary.intentionalUnassignedAreaDegreesSquared} |
+| Generalization slivers (deg²) | ${audit.summary.generalizationSliverAreaDegreesSquared} |
+| Unexplained small-island area (deg²) | ${audit.summary.unexplainedUnassignedAreaDegreesSquared} |
 
 Geometry classes: ${Object.entries(classCounts)
   .map(([key, value]) => `**${key}** ${value}`)
@@ -181,10 +205,8 @@ Kraków, Vilnius, Copenhagen, Nancy, Belfort and Basel (excluded).
 Libya was not a modern independent state in 1900. The territory was under
 Ottoman sovereignty, administered as the vilayet of Tripoli (Tripolitania), the
 sanjak of Benghazi (Cyrenaica) and the loosely administered Fezzan. M11c adds
-the modern Libyan outer frame to the **Ottoman Empire (OTT)** and removes the
-Aouzou strip, which was administered from Chad in 1900 (the 1935 Franco-Italian
-cession had not occurred). No \`LBY\` polity is added, and no modern Libyan
-sovereign state is invented.
+the modern Libyan outer frame to the **Ottoman Empire (OTT)**. No \`LBY\` polity
+is added, and no modern Libyan sovereign state is invented.
 
 The map provenance records three Ottoman components:
 
@@ -201,8 +223,35 @@ explicitly approximate; the distinction between sovereignty, local
 administration and limited effective control is recorded rather than flattened
 into a modern national border. Point tests cover Tripoli, Benghazi, Sabha,
 Murzuq, Kufra and Ghadames, and the audit confirms there is no unassigned land
-sample in the Libyan box. Tunisia, Egypt, French Algeria, Spanish Sahara and
-French Equatorial Africa retain their own 1900 assignments.
+sample in the Libyan box. Tunisia, Egypt, French Algeria and Spanish Sahara
+retain their own 1900 assignments.
+
+## 3a. Aouzou–Tibesti: a disputed frontier, not FEA and not Ottoman Libya
+
+M11c.1 corrects the earlier assignment of the Aouzou strip to French Equatorial
+Africa. The 21 March 1899 Anglo-French Declaration defined a **sphere of
+influence**, not an administered boundary; the ICJ's 1994 judgment treated it as
+a line limiting the French zone and looked to later instruments (1919, 1902,
+1955) to establish the modern boundary. None of those later instruments is
+applied retroactively to 1 January 1900. France had not established continuous
+administration across Tibesti; Ottoman authority was claimed and intermittently
+projected; Toubou/Teda communities exercised the practical local authority. No
+single power administered the whole zone continuously.
+
+The area is excluded from **both OTT and FEA** and from every other polity. It is
+a map-only \`disputed-no-established-administration\` zone with claims,
+administration notes and sources. The rectangle approximates the Aouzou strip
+(15–16°E) plus the Tibesti massif (16–19°E) north of 19.5°N, including Bardaï
+and Gouro. It is an uncertainty zone, not a precise border.
+
+A second small map-only zone, \`siachen-kashmir\`, records the undelimited
+Karakoram–Siachen frontier between British India and Qing China in 1900. It is
+not a playable polity and changes no simulation id.
+
+South of the disputed zone, **Borkou and Ennedi** remain in the Wadai
+sphere/proxy, **Bilma** remains in French West Africa, and central Chad remains
+FEA. This preserves the difference between French claims, Ottoman claims, local
+authority and the later colonial map.
 
 ## 4. Global boundary audit
 
@@ -246,6 +295,13 @@ smoke/comparison artefacts, not survey maps.
 | North Africa | ![North Africa before](images/m11c/before-north-africa.png) | ![North Africa after](images/m11c/after-north-africa.png) |
 | Libya / Ottoman North Africa | — | ![Libya after](images/m11c/after-libya.png) |
 | Central Asia | — | ![Central Asia after](images/m11c/after-central-asia.png) |
+| Global at previous max zoom (10) | — | ![Previous max zoom](images/m11c1/world-prev-max.png) |
+| Europe wheel-zoom (regional clarity) | — | ![Europe zoom](images/m11c1/europe-wheel-zoom.png) |
+| Global at new max zoom (18) | — | ![New max zoom](images/m11c1/world-new-max.png) |
+| Zoom/pan ocean check (no stale land) | — | ![Zoom pan](images/m11c1/zoom-pan-new-max.png) |
+| Aouzou–Tibesti disputed zone | — | ![Aouzou](images/m11c1/libya-aouzou.png) |
+| Bolivia–Brazil / Acre | — | ![Bolivia Brazil](images/m11c1/bolivia-brazil.png) |
+| Canada–Newfoundland / Labrador | — | ![Canada Newfoundland](images/m11c1/canada-newfoundland.png) |
 
 The before images are the pre-M11c bundle at the same projection and bounds. The
 Libyan black void in the before image is the gap M11c closes; the German before
@@ -280,22 +336,58 @@ Austria-Hungary, Russia, the Ottoman Empire, Romania, Bulgaria, Serbia,
 Montenegro, Greece, Siam, British India, the African colonies, China/Tibet,
 the Central Asian protectorates and the Americas/Oceania entries above).
 
+## 5a. Canada–Newfoundland and Bolivia–Brazil overlaps
+
+The M11c audit reported two overlaps. M11c.1 extracted each intersection,
+recorded its coordinates and area, and trimmed only the shared sliver from the
+loser; the historical boundary notes are retained:
+
+${overlapResolutionLines}
+
+The Labrador interior boundary was disputed around 1900 and the 1927 Privy
+Council line is not treated as an uncontested 1900 border. The modern province
+outline is used only as a geometric proxy. Acre was Bolivian in 1900; the 1903
+Treaty of Petrópolis and the 1903–04 demarcation are not applied retroactively.
+The residual components are sub-0.01 deg² and recorded by the audit; no
+post-1903 cession or 1927 adjudication is silently applied.
+
+## 5b. Disputed map-only zones
+
+${disputedLines}
+
+These zones are not polities and have no simulation ids. Clicking them does not
+select a country; they are rendered as dashed amber overlays over the neutral
+land layer.
+
 ## 6. Residual generalization artefacts
 
-The audit reports **${audit.summary.overlaps}** overlap(s) above 0.001 deg² and
-**${audit.summary.unassignedSamples}** unassigned 1° land samples. These are
-coastline/island generalization artefacts of independently simplified
-neighbours, not unrepresented polities:
+The audit reports **${audit.summary.overlaps}** residual overlaps above 0.001 deg²
+(largest ${audit.summary.largestOverlapDegreesSquared} deg²) and **${audit.summary.unassignedSamples}**
+unassigned 1° land samples. The polygon-level audit separates:
+
+- **${audit.summary.intentionalUnassignedAreaDegreesSquared} deg² intentionally unassigned** —
+  Antarctica, outside the 1900 polity system.
+- **${audit.summary.generalizationSliverAreaDegreesSquared} deg² of coastline/island
+  generalization slivers** below 0.02 deg² each.
+- **${audit.summary.unexplainedUnassignedAreaDegreesSquared} deg² in
+  ${audit.summary.unexplainedUnassignedComponents} small-island/coastal components
+  at or above 0.02 deg²** — 1:50m base-geometry detail gaps (for example Arctic
+  islands and the Madagascar coast), not missing polities. The largest is
+  ${audit.coverage.polygon.largestComponents?.[0]?.area ?? "n/a"} deg². They are
+  retained as explicit uncertainty rather than filled with invented borders.
+
+Residual overlaps:
 
 ${overlapLines}
 
-Unassigned samples (each is a single 1° sample; there is no multi-sample void):
+Unassigned samples (each is a single 1° sample; there is no multi-sample
+terrestrial void):
 
 ${gapLines}
 
-The Libyan gap that motivated M11c is gone. Antarctica and truly unclaimed
-territory remain on the neutral land layer by design; they are not assigned to
-a sovereign state.
+The Libyan gap that motivated M11c is gone. The Aouzou–Tibesti and
+Karakoram–Siachen zones are represented explicitly as disputed, not left as
+unexplained voids. Antarctica remains on the neutral land layer by design.
 
 ## 7. Sources
 

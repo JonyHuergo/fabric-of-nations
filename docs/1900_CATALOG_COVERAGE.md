@@ -253,12 +253,20 @@ The detailed method, per-polity table and sources are in
   China/Tibet, the Central Asian protectorates, the African colonies and the
   Americas/Oceania entries** have explicit transfers or verified modern
   matches; see the audit table.
-- **Residual generalization artefacts.** The audit finds two overlaps above
-  0.001 deg²: Canada/Newfoundland (0.249 deg²) and Bolivia/Brazil around Acre
-  (0.016 deg²). These are independently simplified coastline slivers, not
-  deliberate political claims. The audit also finds 24 single-sample
-  coastal/island gaps at 1° resolution; there is no multi-sample terrestrial
-  void. Both are documented in `docs/HISTORICAL_MAP_PROVENANCE.md` §6.
+- **Aouzou–Tibesti is disputed, not FEA.** The 1899 Anglo-French Declaration was
+  a sphere-of-influence line, not effective administration; Ottoman claims and
+  Toubou local authority overlapped, and no boundary was surveyed. M11c.1
+  removes the zone from both FEA and OTT and renders it as a map-only
+  `disputed-no-established-administration` area with the ICJ record and
+  explicit uncertainty. Borkou/Ennedi remain in the Wadai proxy, Bilma remains
+  in French West Africa, and central Chad remains FEA.
+- **Residual generalization artefacts.** The audit's two remaining overlaps are
+  sub-0.01 deg²: Canada/Newfoundland (0.004 deg² after trimming the M11c
+  0.249 deg² sliver) and Russia/Finland (0.001 deg²). The full polygon-level
+  audit also reports 4,026 deg² intentionally unassigned (Antarctica),
+  19.54 deg² of sub-0.02 deg² coastline/island slivers and 1.84 deg² of
+  small-island/coastal detail gaps; there is no multi-sample terrestrial void.
+  See `docs/HISTORICAL_MAP_PROVENANCE.md` §6.
 - **South Africa** remains the documented admin-1 approximation: the Cape
   Colony, Natal, the Transvaal and the Orange Free State use modern province
   proxies; the 1900 republican borders differed from the modern provinces.
@@ -272,11 +280,13 @@ The detailed method, per-polity table and sources are in
 
 Flag provenance is documented in `docs/FLAG_PROVENANCE.md`. Summary:
 
-- 64 bundled flag images: 62 externally sourced (PD/CC0) and 2 project-authored
-  reconstructions (Spain and the Transvaal Vierkleur).
-- 131 of 133 polities display a bundled flag; the only monogram fallbacks are
-  Wadai (WAD) and Darfur (DAR), where no verified historical flag design could
-  be established.
+- 66 bundled flag images: 62 externally sourced (PD/CC0) and 4 project-authored
+  reconstructions (Spain, the Transvaal Vierkleur, and the user-selected Darfur
+  and Wadai designs).
+- All 133 polities display a bundled flag. No monogram fallback remains. Wadai
+  and Darfur use user-selected representative flags (green-red-black triband
+  with white crescent; white field with black border), classified honestly as
+  representative designs rather than exact historical national flags.
 - The five M11 monogram cases — Spain, Spanish Sahara, Spanish Guinea,
   Montenegro and the Transvaal — are resolved.
 - Austria-Hungary uses its common civil ensign, because no single unified
@@ -294,8 +304,8 @@ Flag provenance is documented in `docs/FLAG_PROVENANCE.md`. Summary:
 - **Sokoto, Wadai, Darfur and Jabal Shammar** now have reconstructed polygons,
   but their 1900 frontiers were military/administrative zones rather than
   surveyed lines. Their populations remain low-confidence rounded estimates and
-  their polygons are LOW/MEDIUM confidence. The flag monograms remain because
-  no defensible historical national flag design was established.
+  their polygons are LOW/MEDIUM confidence. Darfur and Wadai display the
+  user-selected representative flags; no monogram remains.
 - **Tibet, Khiva, Bukhara and Sarawak** have conservative reconstructed cores;
   their historical extent was larger or less sharply defined than the modern
   administrative proxies. The notes record the missing Amdo/Kham, Pamir and
@@ -303,9 +313,12 @@ Flag provenance is documented in `docs/FLAG_PROVENANCE.md`. Summary:
 - **Germany's eastern frontier strip** is generalized to about 10–20 km. The
   provinces are HIGH confidence; the exact line between the German Empire and
   Congress Poland/Austria-Hungary is MEDIUM confidence.
-- **Libya's Ottoman provincial limits** and the southern Fezzan/Aouzou limit
-  are approximate. Ottoman sovereignty, local Senussi/tribal authority and
-  limited effective control are distinguished in the provenance notes.
+- **Aouzou–Tibesti** is a map-only disputed/no-established-administration zone,
+  not Ottoman or French territory. Ottoman sovereignty, French sphere-of-influence
+  claims, Toubou local authority and the absence of a surveyed boundary are
+  distinguished in the provenance notes. The later 1935 and 1955 instruments are
+  not applied retroactively. **Karakoram–Siachen** is a second small disputed
+  frontier zone between British India and Qing China.
 - **Crete's** autonomy was internationally guaranteed but its constitutional
   future was contested; it is classified `autonomous-vassal`, not independent.
 - **Tonga's** protectorate began on 18 May 1900, after the reference date; it is

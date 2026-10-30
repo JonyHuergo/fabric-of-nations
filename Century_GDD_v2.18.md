@@ -6487,11 +6487,14 @@ with an explicit historical reconstruction and a documented audit:
   Eupen-Malmedy, Memel, East Prussia/Kaliningrad and the Prussian eastern
   provinces are added; Congress Poland and Austrian Galicia are excluded. The
   eastern frontier strip is MEDIUM confidence.
-- **Libya is Ottoman.** The modern Libyan outer frame is assigned to the
-  Ottoman Empire (OTT) minus the Aouzou strip. The provenance records
-  Tripolitania, Cyrenaica and Fezzan as separate components with the limits of
-  Ottoman administration and effective control. No independent `LBY` state is
-  added.
+- **Libya is Ottoman, except the Aouzou–Tibesti frontier zone.** The modern
+  Libyan outer frame is assigned to the Ottoman Empire (OTT). The Aouzou–Tibesti
+  zone is excluded from both OTT and FEA and represented as a map-only
+  disputed/no-established-administration area; 1899 was a sphere-of-influence
+  line, not effective administration, and the 1935/1955 instruments are not
+  retroactive. The provenance records Tripolitania, Cyrenaica and Fezzan as
+  separate components with the limits of Ottoman administration and effective
+  control. No independent `LBY` state is added.
 - **No marker-only polities remain.** Tonga, Sokoto, Wadai, Darfur, Jabal
   Shammar, Crete, Tibet, Khiva, Bukhara and Sarawak have reconstructed polygons;
   their stable IDs and simulation entries are unchanged.
@@ -6510,6 +6513,42 @@ with an explicit historical reconstruction and a documented audit:
   single-sample 1° coastal/island samples remain unassigned. These are
   generalization artefacts, not missing polities. No multi-sample terrestrial
   void remains; the Libyan void is gone.
+
+### 17I.15 M11c.1 corrections, rendering and zoom addendum
+
+**Status:** implemented. M11c.1 corrects the Aouzou classification, resolves the
+two residual overlaps, raises the coverage audit resolution, fixes the stale
+land-layer rendering bug and raises the maximum zoom.
+
+- **Aouzou–Tibesti** is a map-only `disputed-no-established-administration`
+  zone, removed from both FEA and OTT. The 1899 Anglo-French Declaration was a
+  sphere-of-influence line; the ICJ record and later instruments do not support
+  effective French administration in 1900. Ottoman claims, Toubou local
+  authority and the lack of a surveyed frontier are recorded explicitly. A
+  second map-only `disputed-frontier-unsettled` zone covers Karakoram–Siachen.
+- **Overlaps.** The Canada/Newfoundland and Bolivia/Brazil intersections are
+  extracted, recorded with bbox/area/decision/source and trimmed. The Labrador
+  dispute and the 1927 Privy Council line are not applied retroactively; Acre is
+  Bolivian in 1900 and the Treaty of Petrópolis is not applied retroactively.
+  Residual overlaps are sub-0.01 deg².
+- **Coverage audit** groups land rings into outer/hole polygons and performs a
+  polygon-level land-minus-assigned difference per 30×30° tile, in addition to
+  the 1° sample. It reports intentional Antarctica, sub-0.02° generalization
+  slivers and small-island detail gaps separately.
+- **Rendering.** The land mask is inside the country transform group, uses the
+  even-odd rule for inland water, and cannot paint over the ocean at a different
+  zoom scale. Layer order is ocean → land → country fills → borders → selection
+  → markers.
+- **Zoom.** Maximum scale **18** (previous 10, 1.8×), with wheel, trackpad,
+  pinch and cursor/pinch-midpoint focal zoom; bounded pan; reset to global view.
+- **Flags.** Darfur and Wadai use user-selected representative flags. The Pax
+  Historia rasters are not bundled because redistribution permission was not
+  established; Century independently reconstructed the simple geometric designs
+  and records them honestly as representative, not exact historical, flags. No
+  monogram fallback remains.
+- **Material decision:** D-097. Detailed audit and screenshots:
+  `docs/HISTORICAL_MAP_PROVENANCE.md`, `docs/MAP_DATA.md`,
+  `docs/FLAG_PROVENANCE.md` and `docs/images/m11c1/`.
 
 ## 18. Code-agent execution contract
 

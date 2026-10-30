@@ -238,22 +238,27 @@ describe("M11b catalog coverage — dependencies, flags and saves", () => {
     }
   });
 
-  test("the five M11 monogram cases are resolved and only Wadai/Darfur remain", () => {
+  test("the five M11 monogram cases are resolved and no monogram fallback remains", () => {
     const fallbacks = Object.entries(flags.polities)
       .filter(([, entry]) => entry.flag === null)
       .map(([, entry]) => entry.tag)
       .sort();
-    expect(fallbacks).toEqual(["DAR", "WAD"]);
-    for (const tag of ["ESP", "SAH", "SGG", "MNT", "ZAR"]) {
+    expect(fallbacks).toEqual([]);
+    for (const tag of ["ESP", "SAH", "SGG", "MNT", "ZAR", "WAD", "DAR"]) {
       expect(polityFlag(tag).flag).not.toBeNull();
     }
+    expect(polityFlag("WAD").flag).toBe("wadai-user-selected");
+    expect(polityFlag("DAR").flag).toBe("darfur-user-selected");
+
     expect(polityFlag("AUT").flag).toBe("austria-hungary-civil-ensign");
     expect(flagKind("austria-hungary-civil-ensign")).toBe("representative-common-ensign");
     expect(flagKind("spain-restoration")).toBe("project-reconstruction");
     expect(flagKind("transvaal-vierkleur")).toBe("project-reconstruction");
     expect(flags.flags["spain-restoration"]?.sourceType).toBe("project");
     expect(flags.flags["transvaal-vierkleur"]?.sourceType).toBe("project");
-    expect(coverageDoc).toContain("monogram fallbacks are");
+    expect(flagKind("darfur-user-selected")).toBe("user-selected-representative");
+    expect(flagKind("wadai-user-selected")).toBe("user-selected-representative");
+    expect(coverageDoc).toContain("Wadai");
   });
 
   test("the expanded scenario initializes, and old and new player countries survive a save round trip", () => {

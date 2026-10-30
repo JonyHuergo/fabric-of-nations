@@ -57,14 +57,22 @@ The map is built offline by `scripts/m11/build-map.mjs` from:
 | Catalogued polities | 133 |
 | Map polities with provenance | 133 |
 | Marker-only polities | 0 |
+| Disputed map-only zones | 2 |
+| Disputed area (deg²) | 15.04 |
 | Invalid rings | 0 |
 | Overlaps above 0.001 deg² | 2 |
+| Largest overlap (deg²) | 0.004 |
 | Land samples (1°) | 15351 |
-| Unassigned land samples | 24 |
-| Unassigned components | 24 |
+| Disputed 1° samples | 17 |
+| Unassigned 1° samples | 26 |
+| Unassigned components | 26 |
 | Largest unassigned component | 1 sample(s) |
+| Polygon-level unassigned area (deg²) | 4047.7959 |
+| Intentional (Antarctica) area (deg²) | 4026.4191 |
+| Generalization slivers (deg²) | 19.5388 |
+| Unexplained small-island area (deg²) | 1.838 |
 
-Geometry classes: **direct-modern-verified** 66, **aggregate-modern-verified** 20, **reconstructed** 36, **approximate** 11. Boundary confidence: **high** 75, **medium** 44, **low** 14.
+Geometry classes: **direct-modern-verified** 65, **aggregate-modern-verified** 20, **reconstructed** 37, **approximate** 11. Boundary confidence: **high** 73, **medium** 46, **low** 14.
 
 ## 2. Germany — the German Empire, not the Federal Republic
 
@@ -96,10 +104,8 @@ Kraków, Vilnius, Copenhagen, Nancy, Belfort and Basel (excluded).
 Libya was not a modern independent state in 1900. The territory was under
 Ottoman sovereignty, administered as the vilayet of Tripoli (Tripolitania), the
 sanjak of Benghazi (Cyrenaica) and the loosely administered Fezzan. M11c adds
-the modern Libyan outer frame to the **Ottoman Empire (OTT)** and removes the
-Aouzou strip, which was administered from Chad in 1900 (the 1935 Franco-Italian
-cession had not occurred). No `LBY` polity is added, and no modern Libyan
-sovereign state is invented.
+the modern Libyan outer frame to the **Ottoman Empire (OTT)**. No `LBY` polity
+is added, and no modern Libyan sovereign state is invented.
 
 The map provenance records three Ottoman components:
 
@@ -116,8 +122,35 @@ explicitly approximate; the distinction between sovereignty, local
 administration and limited effective control is recorded rather than flattened
 into a modern national border. Point tests cover Tripoli, Benghazi, Sabha,
 Murzuq, Kufra and Ghadames, and the audit confirms there is no unassigned land
-sample in the Libyan box. Tunisia, Egypt, French Algeria, Spanish Sahara and
-French Equatorial Africa retain their own 1900 assignments.
+sample in the Libyan box. Tunisia, Egypt, French Algeria and Spanish Sahara
+retain their own 1900 assignments.
+
+## 3a. Aouzou–Tibesti: a disputed frontier, not FEA and not Ottoman Libya
+
+M11c.1 corrects the earlier assignment of the Aouzou strip to French Equatorial
+Africa. The 21 March 1899 Anglo-French Declaration defined a **sphere of
+influence**, not an administered boundary; the ICJ's 1994 judgment treated it as
+a line limiting the French zone and looked to later instruments (1919, 1902,
+1955) to establish the modern boundary. None of those later instruments is
+applied retroactively to 1 January 1900. France had not established continuous
+administration across Tibesti; Ottoman authority was claimed and intermittently
+projected; Toubou/Teda communities exercised the practical local authority. No
+single power administered the whole zone continuously.
+
+The area is excluded from **both OTT and FEA** and from every other polity. It is
+a map-only `disputed-no-established-administration` zone with claims,
+administration notes and sources. The rectangle approximates the Aouzou strip
+(15–16°E) plus the Tibesti massif (16–19°E) north of 19.5°N, including Bardaï
+and Gouro. It is an uncertainty zone, not a precise border.
+
+A second small map-only zone, `siachen-kashmir`, records the undelimited
+Karakoram–Siachen frontier between British India and Qing China in 1900. It is
+not a playable polity and changes no simulation id.
+
+South of the disputed zone, **Borkou and Ennedi** remain in the Wadai
+sphere/proxy, **Bilma** remains in French West Africa, and central Chad remains
+FEA. This preserves the difference between French claims, Ottoman claims, local
+authority and the later colonial map.
 
 ## 4. Global boundary audit
 
@@ -132,9 +165,9 @@ the modern outline is retained.
 | ID | Tag | Polity | Geometry | Confidence | Transfer(s) | Boundary notes and deviations from the modern map |
 |---:|---|---|---|---|---|---|
 | 1 | `GBR` | United Kingdom of Great Britain and Ireland | aggregate-modern-verified | high | — | The United Kingdom of Great Britain and Ireland in 1900 comprised the modern United Kingdom and the whole of Ireland. External borders are unchanged. |
-| 2 | `DEU` | German Empire | reconstructed | medium | germany-alsace-lorraine, germany-north-schleswig, germany-eupen-malmedy, germany-east-prussia-kaliningrad, germany-memel, germany-prussian-east | Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÄ—da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part. |
+| 2 | `DEU` | German Empire | reconstructed | medium | germany-alsace-lorraine, germany-north-schleswig, germany-eupen-malmedy, germany-east-prussia-kaliningrad, germany-memel, germany-prussian-east | Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÃ„â€”da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part. |
 | 3 | `FRA` | French Republic | reconstructed | high | germany-alsace-lorraine | Modern France minus Alsace-Lorraine (Bas-Rhin, Haut-Rhin, Moselle). Belfort remained French and is retained. |
-| 4 | `RUS` | Russian Empire | reconstructed | medium | germany-east-prussia-kaliningrad, germany-memel, germany-prussian-east, austria-galicia, austria-cieszyn, russia-kars, khiva-from-russia, bukhara-from-russia | The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÄ—da, Galicia, Khiva and Bukhara are removed; Kars is added. |
+| 4 | `RUS` | Russian Empire | reconstructed | medium | germany-east-prussia-kaliningrad, germany-memel, germany-prussian-east, austria-galicia, austria-cieszyn, russia-kars, khiva-from-russia, bukhara-from-russia | The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÃ„â€”da, Galicia, Khiva and Bukhara are removed; Kars is added. |
 | 6 | `ITA` | Kingdom of Italy | reconstructed | high | austria-south-tyrol, austria-littoral | Modern Italy minus Trentino/South Tyrol, Trieste and Gorizia, which were Austrian in 1900. |
 | 7 | `ESP` | Kingdom of Spain | direct-modern-verified | high | — | Peninsular Spain and the Balearics were unchanged between 1900 and the modern outline; the African possessions are separate territories. |
 | 8 | `PRT` | Kingdom of Portugal | direct-modern-verified | high | — | Peninsular Portugal was unchanged; the Azores and Madeira are included in the modern outline and were Portuguese in 1900. |
@@ -145,9 +178,9 @@ the modern outline is retained.
 | 13 | `NOR` | Kingdom of Norway | direct-modern-verified | high | — | Norway's external border was unchanged in 1900. Svalbard was terra nullius until 1920 but is included in the modern Norwegian outline; this is a known small over-assignment. |
 | 14 | `DNK` | Kingdom of Denmark | reconstructed | high | germany-north-schleswig | Modern Denmark minus North Schleswig, German from 1864 to 1920. |
 | 15 | `GRC` | Kingdom of Greece | reconstructed | medium | greece-ottoman-new-lands, greece-dodecanese, crete-autonomous | The 1900 Kingdom of Greece comprised the Peloponnese, Attica, Thessaly (from 1881), the Ionian Islands, Euboea, the Cyclades and part of southern Epirus. Epirus, Macedonia, Thrace, the North Aegean and the Dodecanese are removed to the Ottoman Empire; Crete is separate. |
-| 16 | `SRB` | Kingdom of Serbia | reconstructed | high | austria-vojvodina, serbia-sandzak | The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the SandÅ¾ak (Ottoman). Both are removed. |
-| 17 | `MNT` | Principality of Montenegro | reconstructed | high | austria-kotor, montenegro-sandzak | The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the SandÅ¾ak municipalities acquired in 1912-13. |
-| 18 | `ROM` | Kingdom of Romania | reconstructed | high | austria-bukovina, austria-transylvania, bulgaria-south-dobruja | The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, CriÈ™ana, MaramureÈ™ and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria. |
+| 16 | `SRB` | Kingdom of Serbia | reconstructed | high | austria-vojvodina, serbia-sandzak | The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the SandÃ…Â¾ak (Ottoman). Both are removed. |
+| 17 | `MNT` | Principality of Montenegro | reconstructed | high | austria-kotor, montenegro-sandzak | The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the SandÃ…Â¾ak municipalities acquired in 1912-13. |
+| 18 | `ROM` | Kingdom of Romania | reconstructed | high | austria-bukovina, austria-transylvania, bulgaria-south-dobruja | The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, CriÃˆâ„¢ana, MaramureÃˆâ„¢ and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria. |
 | 19 | `BGR` | Principality of Bulgaria | reconstructed | high | bulgaria-south-dobruja | The 1900 Principality of Bulgaria included Eastern Rumelia but not southern Dobruja, which was Romanian until 1913. |
 | 21 | `LUX` | Grand Duchy of Luxembourg | direct-modern-verified | high | — | The Grand Duchy's external border was unchanged in 1900. |
 | 22 | `MCO` | Principality of Monaco | direct-modern-verified | high | — | Monaco's 1861 border was unchanged in 1900. |
@@ -190,7 +223,7 @@ the modern outline is retained.
 | 159 | `BHU` | Bhutan | direct-modern-verified | high | — | Bhutan's external border was unchanged after the 1865 Duar War settlement. |
 | 161 | `TWN` | Taiwan (Formosa) | direct-modern-verified | high | — | Taiwan was a Japanese colony from 1895; the modern island outline is correct. |
 | 162 | `TIB` | Tibet | approximate | low | tibet-from-china | Tibet is reconstructed from the modern Tibet Autonomous Region only. Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated; the polygon is a conservative core. |
-| 163 | `KHI` | Khanate of Khiva | approximate | low | khiva-from-russia | The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÅŸoguz. The desert frontier was not a hard line. |
+| 163 | `KHI` | Khanate of Khiva | approximate | low | khiva-from-russia | The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier was not a hard line. |
 | 164 | `BUK` | Emirate of Bukhara | approximate | low | bukhara-from-russia | The Emirate of Bukhara is approximated by Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. The Pamir and desert frontiers are uncertain. |
 | 165 | `SAR` | Raj of Sarawak | direct-modern-verified | high | malaya-sarawak | The Raj of Sarawak's 1900 territory matches the modern Malaysian state of Sarawak. |
 
@@ -200,7 +233,7 @@ the modern outline is retained.
 |---:|---|---|---|---|---|---|
 | 33 | `ETH` | Ethiopian Empire | direct-modern-verified | medium | — | The Ethiopian Empire's 1900 outline is broadly the modern one after Menelik II's expansion. The western and southern frontier zones were not surveyed; the modern outline is a defensible approximation. |
 | 34 | `LBR` | Republic of Liberia | direct-modern-verified | low | — | Liberia's 1900 boundary was larger than the modern one: France annexed frontier districts in 1892 and 1911. The modern outline is retained as a conservative de facto extent; the loss is not reconstructed. |
-| 35 | `MAR` | Sultanate of Morocco | direct-modern-verified | low | — | Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-BÃ©char claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation. |
+| 35 | `MAR` | Sultanate of Morocco | direct-modern-verified | low | — | Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-BÃƒÂ©char claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation. |
 | 36 | `ZAR` | South African Republic (Transvaal) | approximate | low | — | The Transvaal is approximated by the modern Gauteng, North West, Mpumalanga and Limpopo provinces. The 1900 republic's border differed from the modern provincial boundaries, especially in the west and south. |
 | 37 | `ORF` | Orange Free State | approximate | low | — | The Orange Free State is approximated by the modern Free State province. The 1900 republic's western boundary and the Basutoland border differed from the modern province. |
 | 62 | `SOK` | Sokoto Caliphate | approximate | low | sokoto-from-british-west-africa | The Sokoto Caliphate's core is reconstructed from ten modern northern Nigerian states. The frontier was a shifting military boundary; the southern and eastern emirates are not all included. |
@@ -227,11 +260,11 @@ the modern outline is retained.
 | 137 | `CFS` | Congo Free State | direct-modern-verified | medium | — | The Congo Free State in 1900 covered the modern DRC. The external border was broadly the modern one; the eastern and southern frontiers were not fully surveyed. |
 | 138 | `ANG` | Portuguese Angola | direct-modern-verified | medium | — | Portuguese Angola in 1900 included Cabinda and the modern Angolan outline. The eastern frontier with the Congo Free State and Northern Rhodesia was not fully demarcated until the 20th century. |
 | 139 | `MOZ` | Portuguese Mozambique | reconstructed | high | german-east-africa-kionga | Portuguese Mozambique in 1900 included the Kionga triangle, which is removed to German East Africa. The modern outline is otherwise correct. |
-| 140 | `PAI` | Portuguese Atlantic islands | reconstructed | medium | portuguese-india | The Portuguese colonial grouping includes Cape Verde, SÃ£o TomÃ© and PrÃ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation. |
+| 140 | `PAI` | Portuguese Atlantic islands | reconstructed | medium | portuguese-india | The Portuguese colonial grouping includes Cape Verde, SÃƒÂ£o TomÃƒÂ© and PrÃƒÂ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation. |
 | 143 | `ERI` | Italian Eritrea | direct-modern-verified | high | — | Italian Eritrea's 1900 borders were the modern Eritrean outline after the 1889-1900 delimitations. |
 | 144 | `ITS` | Italian Somaliland | reconstructed | medium | italian-somaliland-british, italian-somaliland-jubaland | Italian Somaliland in 1900 excluded British Somaliland and Jubaland. British Somaliland is removed to the British protectorate; Jubaland is removed to British East Africa. |
 | 148 | `SAH` | Spanish Sahara | direct-modern-verified | medium | — | Spanish Sahara's 1900 coastal and northern boundary was established by the 1884-1900 agreements; the eastern and southern limit with French West Africa was not fully delimited. The modern Western Sahara outline is a rough approximation. |
-| 149 | `SGG` | Spanish Guinea | direct-modern-verified | high | — | Spanish Guinea (Rio Muni and Fernando PÃ³) matches the modern Equatorial Guinea mainland and Bioko; AnnobÃ³n was also Spanish. |
+| 149 | `SGG` | Spanish Guinea | direct-modern-verified | high | — | Spanish Guinea (Rio Muni and Fernando PÃƒÂ³) matches the modern Equatorial Guinea mainland and Bioko; AnnobÃƒÂ³n was also Spanish. |
 | 158 | `EGY` | Egypt | direct-modern-verified | medium | — | Egypt was an autonomous Ottoman province under British occupation in 1900. The modern Egyptian outline is close; the Sudan condominium and the Hala'ib frontier are not shown separately. |
 
 ### Americas
@@ -239,7 +272,7 @@ the modern outline is retained.
 | ID | Tag | Polity | Geometry | Confidence | Transfer(s) | Boundary notes and deviations from the modern map |
 |---:|---|---|---|---|---|---|
 | 0 | `USA` | United States of America | direct-modern-verified | high | — | The 1900 United States external border (including Alaska and the annexed Hawaiian Islands) coincides with the modern Natural Earth outline. The Philippines, Puerto Rico, Guam and American Samoa are separate territories. |
-| 38 | `MEX` | United Mexican States | direct-modern-verified | high | — | Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of YucatÃ¡n in 1900 but is Mexican territory. |
+| 38 | `MEX` | United Mexican States | direct-modern-verified | high | — | Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of YucatÃƒÂ¡n in 1900 but is Mexican territory. |
 | 39 | `GUA` | Republic of Guatemala | direct-modern-verified | medium | — | Guatemala's external border with Mexico was fixed in 1882 and with British Honduras in 1859-1931; the modern outline is a close approximation. |
 | 40 | `HON` | Republic of Honduras | direct-modern-verified | medium | — | Honduras's borders with Nicaragua and El Salvador were settled in the early 20th century; the modern outline is a close approximation. |
 | 41 | `SAL` | Republic of El Salvador | direct-modern-verified | high | — | El Salvador's external border was unchanged in 1900. |
@@ -249,22 +282,22 @@ the modern outline is retained.
 | 45 | `VEN` | United States of Venezuela | direct-modern-verified | medium | — | Venezuela's de facto border with British Guiana followed the Schomburgk line; the modern outline is close but the Essequibo claim was larger. |
 | 46 | `ECU` | Republic of Ecuador | direct-modern-verified | low | — | Ecuador's 1900 claim to the Oriente was much larger than the modern outline; the de facto Amazonian frontier was contested with Peru. The modern outline is a conservative approximation. |
 | 47 | `PRU` | Republic of Peru | reconstructed | high | chile-tacna | Peru in 1900 did not include Tacna, which was under Chilean administration until 1929. Tacna is removed. |
-| 48 | `BOL` | Republic of Bolivia | reconstructed | medium | bolivia-acre | Bolivia in 1900 included Acre, acquired by Brazil in 1903; Acre is added. The Chaco Boreal was disputed with Paraguay and is left with Paraguay as the de facto administration, not a recognized sovereignty. |
+| 48 | `BOL` | Republic of Bolivia | reconstructed | medium | bolivia-acre | Bolivia in 1900 included Acre, acquired by Brazil in 1903; Acre is added and the Treaty of Petrópolis is not applied retroactively. The Chaco Boreal was disputed with Paraguay and is left with Paraguay as the de facto administration, not a recognized sovereignty. A residual proxy-boundary sliver with Brazil is trimmed and recorded. |
 | 49 | `CHL` | Republic of Chile | reconstructed | high | chile-tacna | Chile in 1900 administered Tacna and Arica after the War of the Pacific. Tacna is added; Arica is already in the modern Chilean outline. |
 | 50 | `ARG` | Argentine Republic | direct-modern-verified | high | — | Argentina's external border with Chile was settled in 1881-1902; the modern outline is the 1900 extent. |
 | 51 | `URY` | Oriental Republic of Uruguay | direct-modern-verified | high | — | Uruguay's borders were unchanged in 1900. |
 | 52 | `PRY` | Republic of Paraguay | direct-modern-verified | low | — | Paraguay's 1900 Chaco frontier was disputed and largely unadministered. The modern Chaco is shown as de facto Paraguayan; this is an explicit uncertainty, not a recognized 1900 border. |
-| 53 | `BRA` | Republic of the United States of Brazil | reconstructed | high | bolivia-acre | Brazil in 1900 did not include Acre, which was Bolivian until 1903. Acre is removed. |
+| 53 | `BRA` | Republic of the United States of Brazil | reconstructed | medium | bolivia-acre | Brazil in 1900 did not include Acre, which was Bolivian until 1903. Acre is removed; the Treaty of Petrópolis is not applied retroactively. A residual proxy-boundary sliver with Bolivia is trimmed and recorded. |
 | 54 | `HTI` | Republic of Haiti | direct-modern-verified | high | — | Haiti's border was unchanged in 1900. |
 | 55 | `DOM` | Dominican Republic | direct-modern-verified | high | — | The Dominican Republic's border was unchanged in 1900. |
 | 56 | `CAN` | Dominion of Canada | reconstructed | high | newfoundland-from-canada | The Dominion of Canada in 1900 excluded Newfoundland and Labrador, which are removed. The modern provincial boundaries are used; northern Quebec and the territories were administered by Canada. |
 | 59 | `CUB` | Republic of Cuba under United States occupation | direct-modern-verified | high | — | Cuba's border was unchanged; the island was under United States military occupation in January 1900. |
 | 108 | `BWI` | British West Indies | aggregate-modern-verified | medium | — | The British West Indies grouping aggregates the British Caribbean colonies and British Honduras. Individual colonial boundaries were largely unchanged; the grouping is a map aggregation. |
 | 109 | `BSA` | British South Atlantic and Pacific islands | aggregate-modern-verified | medium | — | The British South Atlantic and Pacific islands grouping aggregates the Falklands, South Georgia, St Helena, Pitcairn and the British Indian Ocean Territory. BIOT (Chagos) was administered from Mauritius in 1900; the grouping is a map aggregation. |
-| 120 | `NFD` | Newfoundland | direct-modern-verified | high | newfoundland-from-canada | Newfoundland and Labrador were a separate dominion in 1900, matching the modern Canadian province. |
-| 128 | `FCA` | French Caribbean | aggregate-modern-verified | high | — | The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St BarthÃ©lemy, St Martin) was French in 1900. |
+| 120 | `NFD` | Newfoundland | reconstructed | medium | newfoundland-from-canada | Newfoundland and Labrador were a separate dominion in 1900. The modern province is used as the polygon, but the Labrador interior boundary was disputed around 1900; the 1927 Privy Council line is not treated as an uncontested 1900 border. A residual coastline sliver is trimmed and recorded in the overlap audit. |
+| 128 | `FCA` | French Caribbean | aggregate-modern-verified | high | — | The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St BarthÃƒÂ©lemy, St Martin) was French in 1900. |
 | 146 | `SUR` | Suriname | direct-modern-verified | high | — | Suriname's 1900 border was the modern one after the 1891 arbitration. |
-| 147 | `DGC` | Dutch Caribbean | aggregate-modern-verified | high | — | The Dutch Caribbean islands (Aruba, CuraÃ§ao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900. |
+| 147 | `DGC` | Dutch Caribbean | aggregate-modern-verified | high | — | The Dutch Caribbean islands (Aruba, CuraÃƒÂ§ao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900. |
 | 151 | `PRI` | Puerto Rico | direct-modern-verified | high | — | Puerto Rico was a United States territory in 1900; the modern outline is correct. |
 | 157 | `DWI` | Danish West Indies | direct-modern-verified | high | — | The Danish West Indies (now the US Virgin Islands) were Danish in 1900; the modern island outlines are correct. |
 
@@ -299,6 +332,13 @@ smoke/comparison artefacts, not survey maps.
 | North Africa | ![North Africa before](images/m11c/before-north-africa.png) | ![North Africa after](images/m11c/after-north-africa.png) |
 | Libya / Ottoman North Africa | — | ![Libya after](images/m11c/after-libya.png) |
 | Central Asia | — | ![Central Asia after](images/m11c/after-central-asia.png) |
+| Global at previous max zoom (10) | — | ![Previous max zoom](images/m11c1/world-prev-max.png) |
+| Europe wheel-zoom (regional clarity) | — | ![Europe zoom](images/m11c1/europe-wheel-zoom.png) |
+| Global at new max zoom (18) | — | ![New max zoom](images/m11c1/world-new-max.png) |
+| Zoom/pan ocean check (no stale land) | — | ![Zoom pan](images/m11c1/zoom-pan-new-max.png) |
+| Aouzou–Tibesti disputed zone | — | ![Aouzou](images/m11c1/libya-aouzou.png) |
+| Bolivia–Brazil / Acre | — | ![Bolivia Brazil](images/m11c1/bolivia-brazil.png) |
+| Canada–Newfoundland / Labrador | — | ![Canada Newfoundland](images/m11c1/canada-newfoundland.png) |
 
 The before images are the pre-M11c bundle at the same projection and bounds. The
 Libyan black void in the before image is the gap M11c closes; the German before
@@ -333,21 +373,62 @@ Austria-Hungary, Russia, the Ottoman Empire, Romania, Bulgaria, Serbia,
 Montenegro, Greece, Siam, British India, the African colonies, China/Tibet,
 the Central Asian protectorates and the Americas/Oceania entries above).
 
+## 5a. Canada–Newfoundland and Bolivia–Brazil overlaps
+
+The M11c audit reported two overlaps. M11c.1 extracted each intersection,
+recorded its coordinates and area, and trimmed only the shared sliver from the
+loser; the historical boundary notes are retained:
+
+- **CAN / NFD** — before 0.249 deg² at bbox -64.822, 46.803, -52.88, 60.373. trimmed from the loser; winner keeps the shared area. The Labrador interior boundary was disputed around 1900; the 1927 Privy Council line is not applied retroactively. This sliver is a modern-proxy coastline/geometry artefact, not the disputed interior boundary itself. Canada keeps the modern provincial outline as a geometric proxy, with the dispute recorded in provenance.
+- **BRA / BOL** — before 0.016 deg² at bbox -73.974, -11.06, -66.726, -7.343. trimmed from the loser; winner keeps the shared area. Acre was Bolivian in 1900. The 1903 Treaty of Petrópolis and the 1903-04 demarcation are not applied retroactively. This sliver is an artefact of using the modern Acre/Brazil proxy boundary, not a deliberate post-1903 cession.
+- **RUS / BUK** — before 0.002 deg² at bbox 62.028, 36.969, 70.299, 43.481. trimmed from the loser; winner keeps the shared area. The Bukhara protectorate boundary is a modern administrative proxy; this sub-0.005 deg² sliver is a geometry artefact, not a historical claim.
+
+The Labrador interior boundary was disputed around 1900 and the 1927 Privy
+Council line is not treated as an uncontested 1900 border. The modern province
+outline is used only as a geometric proxy. Acre was Bolivian in 1900; the 1903
+Treaty of Petrópolis and the 1903–04 demarcation are not applied retroactively.
+The residual components are sub-0.01 deg² and recorded by the audit; no
+post-1903 cession or 1927 adjudication is silently applied.
+
+## 5b. Disputed map-only zones
+
+- **Aouzouâ€“Tibesti frontier zone** (`aouzou-tibesti`, disputed-no-established-administration, low) — 14 deg² at bbox 15, 19.5, 19, 23. No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.
+- **Karakoram–Siachen frontier zone** (`siachen-kashmir`, disputed-frontier-unsettled, low) — 1.04 deg² at bbox 76.6, 35, 77.9, 35.8. No surveyed or effectively administered boundary existed in the high Karakoram in 1900. The zone is represented as a disputed frontier rather than assigned to British India or Qing China.
+
+These zones are not polities and have no simulation ids. Clicking them does not
+select a country; they are rendered as dashed amber overlays over the neutral
+land layer.
+
 ## 6. Residual generalization artefacts
 
-The audit reports **2** overlap(s) above 0.001 deg² and
-**24** unassigned 1° land samples. These are
-coastline/island generalization artefacts of independently simplified
-neighbours, not unrepresented polities:
+The audit reports **2** residual overlaps above 0.001 deg²
+(largest 0.004 deg²) and **26**
+unassigned 1° land samples. The polygon-level audit separates:
 
-- `CAN` / `NFD`: 0.249 deg² — a generalized-coastline sliver, not a deliberate political claim.
-- `BOL` / `BRA`: 0.016 deg² — a generalized-coastline sliver, not a deliberate political claim.
+- **4026.4191 deg² intentionally unassigned** —
+  Antarctica, outside the 1900 polity system.
+- **19.5388 deg² of coastline/island
+  generalization slivers** below 0.02 deg² each.
+- **1.838 deg² in
+  62 small-island/coastal components
+  at or above 0.02 deg²** — 1:50m base-geometry detail gaps (for example Arctic
+  islands and the Madagascar coast), not missing polities. The largest is
+  534.9472 deg². They are
+  retained as explicit uncertainty rather than filled with invented borders.
 
-Unassigned samples (each is a single 1° sample; there is no multi-sample void):
+Residual overlaps:
+
+- `CAN` / `NFD`: 0.004 deg² — a generalized-coastline sliver, not a deliberate political claim.
+- `RUS` / `FIN`: 0.001 deg² — a generalized-coastline sliver, not a deliberate political claim.
+
+Unassigned samples (each is a single 1° sample; there is no multi-sample
+terrestrial void):
 
 - 1 sample(s) near 131.5,-11.5 to 131.5,-11.5 — a 1-degree coastal/island sample, not a missing polity.
+- 1 sample(s) near 12.5,-5.5 to 12.5,-5.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near 44.5,1.5 to 44.5,1.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near -77.5,5.5 to -77.5,5.5 — a 1-degree coastal/island sample, not a missing polity.
+- 1 sample(s) near 121.5,15.5 to 121.5,15.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near -91.5,18.5 to -91.5,18.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near 66.5,25.5 to 66.5,25.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near -75.5,35.5 to -75.5,35.5 — a 1-degree coastal/island sample, not a missing polity.
@@ -370,9 +451,9 @@ Unassigned samples (each is a single 1° sample; there is no multi-sample void):
 - 1 sample(s) near -80.5,80.5 to -80.5,80.5 — a 1-degree coastal/island sample, not a missing polity.
 - 1 sample(s) near -16.5,80.5 to -16.5,80.5 — a 1-degree coastal/island sample, not a missing polity.
 
-The Libyan gap that motivated M11c is gone. Antarctica and truly unclaimed
-territory remain on the neutral land layer by design; they are not assigned to
-a sovereign state.
+The Libyan gap that motivated M11c is gone. The Aouzou–Tibesti and
+Karakoram–Siachen zones are represented explicitly as disputed, not left as
+unexplained voids. Antarctica remains on the neutral land layer by design.
 
 ## 7. Sources
 
@@ -392,6 +473,10 @@ a sovereign state.
 - **treaty-trianon-1920** — Treaty of Trianon (1920), Hungarian territorial clauses. Public domain. 1920. <https://en.wikisource.org/wiki/Treaty_of_Trianon>
 - **treaty-lausanne-1923** — Treaty of Lausanne (1923), Ottoman successor boundaries. Public domain. 1923. <https://en.wikisource.org/wiki/Treaty_of_Lausanne>
 - **anglo-egyptian-sudan-1899** — Anglo-Egyptian Condominium Agreement (1899). Public domain. 1899. <https://en.wikisource.org/wiki/Anglo-Egyptian_Condominium_Agreement>
+- **icj-libya-chad-1994** — ICJ, Territorial Dispute (Libyan Arab Jamahiriya/Chad), Judgment of 3 February 1994. ICJ public documents; quotation and citation only. 1994. <https://www.icj-cij.org/case/83>
+- **icj-libya-chad-pleadings** — ICJ, Territorial Dispute (Libya/Chad), written pleadings and oral records, 1991-1993. ICJ public documents; citation only. 1991-1993. <https://www.icj-cij.org/case/83/written-proceedings>
+- **labrador-boundary-dispute** — Labrador boundary dispute and the 1927 Privy Council reference. Reference only (not redistributed). 1927. <https://www.thecanadianencyclopedia.ca/en/article/labrador-boundary-dispute>
+- **treaty-petropolis-1903** — Treaty of Petrópolis between Bolivia and Brazil (1903). Public domain. 1903. <https://en.wikisource.org/wiki/Treaty_of_Petr%C3%B3polis>
 - **british-aden-1839** — British Aden and the Aden Protectorate, 1839-1900. Public domain. 1911. <https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Aden>
 - **historical-basemaps-1900** — historical-basemaps world_1900 (cross-check only). GPL-3.0 (not redistributed). 2018. <https://github.com/aourednik/historical-basemaps>
 - **cshapes-2.0** — CShapes 2.0 (classification reference only). CC BY-NC-SA 4.0 (not redistributed). 2019. <https://icr.ethz.ch/data/cshapes/>

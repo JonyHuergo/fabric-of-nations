@@ -3,40 +3,138 @@
     "generatedBy": "scripts/m11/audit-map.mjs",
     "referenceDate": "1900-01-01",
     "mapPath": "packages/data/data/map/world_map_1900.json",
-    "method": "Rings are decoded and re-grouped into outer rings and holes. Pairwise intersections use polygon-clipping; coverage is a 1-degree land sample with even-odd point-in-polygon over the neutral land outline and every polity.",
+    "method": "Rings are decoded and re-grouped into outer rings and holes. Pairwise intersections use polygon-clipping. Coverage is audited twice: a 1-degree land sample with even-odd point-in-polygon, and a polygon-level land-minus-assigned difference per 30x30-degree tile. Disputed/no-administration zones are counted separately from unassigned land.",
     "overlapToleranceDegreesSquared": 0.001
   },
   "summary": {
     "polities": 133,
     "markerOnly": 0,
     "provenanceCount": 133,
+    "disputedAreas": 2,
+    "disputedAreaDegreesSquared": 15.04,
     "invalidRings": 0,
     "overlaps": 2,
-    "largestOverlapDegreesSquared": 0.249,
+    "largestOverlapDegreesSquared": 0.004,
+    "disputedOverlaps": 0,
     "landSamples": 15351,
-    "unassignedSamples": 24,
-    "unassignedComponents": 24,
-    "largestUnassignedComponent": 1
+    "disputedSamples": 17,
+    "unassignedSamples": 26,
+    "unassignedComponents": 26,
+    "largestUnassignedComponent": 1,
+    "polygonUnassignedAreaDegreesSquared": 4047.7959,
+    "polygonUnassignedComponents": 5489,
+    "largestPolygonUnassignedComponentDegreesSquared": 534.9472,
+    "intentionalUnassignedAreaDegreesSquared": 4026.4191,
+    "generalizationSliverAreaDegreesSquared": 19.5388,
+    "generalizationSliverComponents": 5311,
+    "unexplainedUnassignedAreaDegreesSquared": 1.838,
+    "unexplainedUnassignedComponents": 62
   },
   "overlaps": [
     {
       "a": "CAN",
       "b": "NFD",
-      "area": 0.249
+      "area": 0.004
     },
     {
-      "a": "BOL",
-      "b": "BRA",
-      "area": 0.016
+      "a": "RUS",
+      "b": "FIN",
+      "area": 0.001
+    }
+  ],
+  "disputedOverlaps": [],
+  "disputedAreas": [
+    {
+      "id": "aouzou-tibesti",
+      "name": "Aouzouâ€“Tibesti frontier zone",
+      "classification": "disputed-no-established-administration",
+      "confidence": "low",
+      "area": 14,
+      "bbox": [
+        15,
+        19.5,
+        19,
+        23
+      ],
+      "claims": [
+        "France: the 21 March 1899 Anglo-French Declaration placed the area in a French sphere of influence; this was not effective administration in 1900.",
+        "Ottoman Empire: Tripolitanian claims and later military/administrative activity in the wider Tibesti region; no continuous effective administration across the zone in January 1900.",
+        "Local authority: Toubou/Teda communities and trans-Saharan networks exercised the practical authority; no surveyed frontier existed."
+      ],
+      "administration": "No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.",
+      "sources": [
+        {
+          "id": "icj-libya-chad-1994",
+          "title": "ICJ, Territorial Dispute (Libyan Arab Jamahiriya/Chad), Judgment of 3 February 1994",
+          "url": "https://www.icj-cij.org/case/83",
+          "license": "ICJ public documents; quotation and citation only",
+          "date": "1994"
+        },
+        {
+          "id": "icj-libya-chad-pleadings",
+          "title": "ICJ, Territorial Dispute (Libya/Chad), written pleadings and oral records, 1991-1993",
+          "url": "https://www.icj-cij.org/case/83/written-proceedings",
+          "license": "ICJ public documents; citation only",
+          "date": "1991-1993"
+        },
+        {
+          "id": "eb1911-tripoli",
+          "title": "Encyclopaedia Britannica (1911), 'Tripoli' and 'Cyrenaica'",
+          "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Tripoli",
+          "license": "Public domain",
+          "date": "1911"
+        },
+        {
+          "id": "hammond-1912",
+          "title": "Hammond's Modern Atlas of the World (1912)",
+          "url": "https://archive.org/details/hammondsmodernat00hamm",
+          "license": "Public domain",
+          "date": "1912"
+        }
+      ],
+      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border."
+    },
+    {
+      "id": "siachen-kashmir",
+      "name": "Karakoram–Siachen frontier zone",
+      "classification": "disputed-frontier-unsettled",
+      "confidence": "low",
+      "area": 1.04,
+      "bbox": [
+        76.6,
+        35,
+        77.9,
+        35.8
+      ],
+      "claims": [
+        "British India: Kashmir was a princely state under British suzerainty; its northern boundary was not surveyed in 1900.",
+        "Qing China: the Karakoram alignment was not delimited in the Siachen/Aksai Chin sector."
+      ],
+      "administration": "No surveyed or effectively administered boundary existed in the high Karakoram in 1900. The zone is represented as a disputed frontier rather than assigned to British India or Qing China.",
+      "sources": [
+        {
+          "id": "hammond-1912",
+          "title": "Hammond's Modern Atlas of the World (1912)",
+          "url": "https://archive.org/details/hammondsmodernat00hamm",
+          "license": "Public domain",
+          "date": "1912"
+        }
+      ],
+      "notes": "A small map-only uncertainty zone at the junction of the Karakoram and Siachen. It is not a separate polity and does not change any simulation id. The rectangle is a cartographic proxy for an undelimited high-mountain frontier, not a precise boundary."
     }
   ],
   "invalidRings": [],
   "coverage": {
-    "unassignedSampleCount": 24,
+    "unassignedSampleCount": 26,
+    "disputedSampleCount": 17,
     "unassignedSamples": [
       [
         131.5,
         -11.5
+      ],
+      [
+        12.5,
+        -5.5
       ],
       [
         44.5,
@@ -45,6 +143,10 @@
       [
         -77.5,
         5.5
+      ],
+      [
+        121.5,
+        15.5
       ],
       [
         -91.5,
@@ -148,6 +250,19 @@
       {
         "samples": 1,
         "bbox": [
+          12.5,
+          -5.5,
+          12.5,
+          -5.5
+        ],
+        "sample": [
+          12.5,
+          -5.5
+        ]
+      },
+      {
+        "samples": 1,
+        "bbox": [
           44.5,
           1.5,
           44.5,
@@ -169,6 +284,19 @@
         "sample": [
           -77.5,
           5.5
+        ]
+      },
+      {
+        "samples": 1,
+        "bbox": [
+          121.5,
+          15.5,
+          121.5,
+          15.5
+        ],
+        "sample": [
+          121.5,
+          15.5
         ]
       },
       {
@@ -444,6 +572,4060 @@
           80.5
         ]
       }
-    ]
+    ],
+    "polygon": {
+      "method": "30x30-degree tiles; land minus union(polities, disputed areas) with polygon-clipping",
+      "tiles": 66,
+      "landAreaDegreesSquared": 19357.263,
+      "assignedAreaDegreesSquared": 15329.89,
+      "disputedAreaDegreesSquared": 15.04,
+      "unassignedAreaDegreesSquared": 4047.7959,
+      "unassignedPolygons": [
+        {
+          "area": 269.5989,
+          "bbox": [
+            -150,
+            -84.352,
+            -120,
+            -74.671
+          ]
+        },
+        {
+          "area": 28.7665,
+          "bbox": [
+            -174.236,
+            -84.352,
+            -150,
+            -80.957
+          ]
+        },
+        {
+          "area": 12.7999,
+          "bbox": [
+            -158.501,
+            -79.568,
+            -150,
+            -77.08
+          ]
+        },
+        {
+          "area": 6.1481,
+          "bbox": [
+            -178.023,
+            -85.187,
+            -156.459,
+            -84.352
+          ]
+        },
+        {
+          "area": 3.2777,
+          "bbox": [
+            -164.282,
+            -79.845,
+            -159.008,
+            -78.722
+          ]
+        },
+        {
+          "area": 1.4831,
+          "bbox": [
+            -127.414,
+            -74.226,
+            -123.8,
+            -73.28
+          ]
+        },
+        {
+          "area": 0.5111,
+          "bbox": [
+            -163.951,
+            -81.59,
+            -160.466,
+            -81.281
+          ]
+        },
+        {
+          "area": 0.3438,
+          "bbox": [
+            -163.796,
+            -83.119,
+            -161.636,
+            -82.843
+          ]
+        },
+        {
+          "area": 0.1968,
+          "bbox": [
+            -132.163,
+            -74.583,
+            -130.968,
+            -74.33
+          ]
+        },
+        {
+          "area": 0.1742,
+          "bbox": [
+            -128.134,
+            -74.623,
+            -127.144,
+            -74.328
+          ]
+        },
+        {
+          "area": 0.1496,
+          "bbox": [
+            -150.577,
+            -80.524,
+            -150,
+            -80.142
+          ]
+        },
+        {
+          "area": 0.1167,
+          "bbox": [
+            -155.75,
+            -80.033,
+            -153.932,
+            -79.765
+          ]
+        },
+        {
+          "area": 0.1003,
+          "bbox": [
+            -150,
+            -77.121,
+            -149.23,
+            -76.875
+          ]
+        },
+        {
+          "area": 0.099,
+          "bbox": [
+            -150.789,
+            -77.093,
+            -150,
+            -76.89
+          ]
+        },
+        {
+          "area": 0.0797,
+          "bbox": [
+            -147.117,
+            -76.993,
+            -146.163,
+            -76.866
+          ]
+        },
+        {
+          "area": 0.0708,
+          "bbox": [
+            -149.468,
+            -76.845,
+            -148.32,
+            -76.717
+          ]
+        },
+        {
+          "area": 0.0665,
+          "bbox": [
+            -147.42,
+            -76.26,
+            -146.689,
+            -76.073
+          ]
+        },
+        {
+          "area": 0.0632,
+          "bbox": [
+            -151.513,
+            -77.37,
+            -150.357,
+            -77.22
+          ]
+        },
+        {
+          "area": 0.0618,
+          "bbox": [
+            -158.99,
+            -82.105,
+            -157.835,
+            -81.779
+          ]
+        },
+        {
+          "area": 0.0607,
+          "bbox": [
+            -146.152,
+            -75.712,
+            -145.238,
+            -75.514
+          ]
+        },
+        {
+          "area": 0.0573,
+          "bbox": [
+            -147.355,
+            -76.713,
+            -146.79,
+            -76.531
+          ]
+        },
+        {
+          "area": 0.0465,
+          "bbox": [
+            -150.872,
+            -76.79,
+            -150.084,
+            -76.691
+          ]
+        },
+        {
+          "area": 0.0435,
+          "bbox": [
+            -149.302,
+            -77.007,
+            -148.438,
+            -76.916
+          ]
+        },
+        {
+          "area": 0.0295,
+          "bbox": [
+            -132.858,
+            -74.498,
+            -132.361,
+            -74.387
+          ]
+        },
+        {
+          "area": 0.0261,
+          "bbox": [
+            -149.662,
+            -77.387,
+            -148.928,
+            -77.3
+          ]
+        },
+        {
+          "area": 0.017,
+          "bbox": [
+            -162.649,
+            64.44,
+            -161.995,
+            64.716
+          ]
+        },
+        {
+          "area": 0.0157,
+          "bbox": [
+            -156.567,
+            71.182,
+            -155.646,
+            71.342
+          ]
+        },
+        {
+          "area": 0.0138,
+          "bbox": [
+            -180,
+            -84.352,
+            -178.023,
+            -84.338
+          ]
+        },
+        {
+          "area": 0.0128,
+          "bbox": [
+            -171.648,
+            63.585,
+            -170.874,
+            63.728
+          ]
+        },
+        {
+          "area": 0.0121,
+          "bbox": [
+            -167.63,
+            53.259,
+            -166.77,
+            53.476
+          ]
+        },
+        {
+          "area": 0.0107,
+          "bbox": [
+            -164.124,
+            67.196,
+            -163.721,
+            67.608
+          ]
+        },
+        {
+          "area": 0.01,
+          "bbox": [
+            -167.915,
+            65.681,
+            -167.407,
+            65.859
+          ]
+        },
+        {
+          "area": 0.01,
+          "bbox": [
+            -162.392,
+            67.019,
+            -161.719,
+            67.05
+          ]
+        },
+        {
+          "area": 0.0089,
+          "bbox": [
+            -152.269,
+            60.528,
+            -151.751,
+            60.756
+          ]
+        },
+        {
+          "area": 0.0086,
+          "bbox": [
+            -161.687,
+            66.335,
+            -161.121,
+            66.406
+          ]
+        },
+        {
+          "area": 0.0083,
+          "bbox": [
+            -154.706,
+            57.037,
+            -154.497,
+            57.353
+          ]
+        },
+        {
+          "area": 0.0083,
+          "bbox": [
+            -161.413,
+            64.516,
+            -160.931,
+            64.58
+          ]
+        },
+        {
+          "area": 0.0082,
+          "bbox": [
+            -163.868,
+            69.036,
+            -163.35,
+            69.295
+          ]
+        },
+        {
+          "area": 0.0076,
+          "bbox": [
+            -163.713,
+            64.424,
+            -163.145,
+            64.589
+          ]
+        },
+        {
+          "area": 0.007,
+          "bbox": [
+            -151.74,
+            59.188,
+            -151.171,
+            59.245
+          ]
+        },
+        {
+          "area": 0.0066,
+          "bbox": [
+            -159.671,
+            58.624,
+            -159.262,
+            58.912
+          ]
+        },
+        {
+          "area": 0.0065,
+          "bbox": [
+            -166.55,
+            53.7,
+            -166.23,
+            53.933
+          ]
+        },
+        {
+          "area": 0.0065,
+          "bbox": [
+            -165.181,
+            66.429,
+            -164.462,
+            66.589
+          ]
+        },
+        {
+          "area": 0.0065,
+          "bbox": [
+            -161.399,
+            66.552,
+            -160.866,
+            66.67
+          ]
+        },
+        {
+          "area": 0.0064,
+          "bbox": [
+            -166.77,
+            53.476,
+            -166.309,
+            53.697
+          ]
+        },
+        {
+          "area": 0.0063,
+          "bbox": [
+            -162.144,
+            58.645,
+            -161.723,
+            58.794
+          ]
+        },
+        {
+          "area": 0.0063,
+          "bbox": [
+            -151.452,
+            59.65,
+            -151.045,
+            59.789
+          ]
+        },
+        {
+          "area": 0.006,
+          "bbox": [
+            -163.908,
+            60.757,
+            -163.422,
+            60.854
+          ]
+        },
+        {
+          "area": 0.0059,
+          "bbox": [
+            -154.101,
+            56.99,
+            -153.792,
+            57.049
+          ]
+        },
+        {
+          "area": 0.0059,
+          "bbox": [
+            -160.081,
+            70.531,
+            -159.746,
+            70.635
+          ]
+        },
+        {
+          "area": 0.0059,
+          "bbox": [
+            -159.815,
+            70.477,
+            -159.386,
+            70.524
+          ]
+        },
+        {
+          "area": 0.0056,
+          "bbox": [
+            -151.401,
+            59.516,
+            -151.045,
+            59.771
+          ]
+        },
+        {
+          "area": 0.0055,
+          "bbox": [
+            -158.677,
+            58.929,
+            -158.421,
+            59.089
+          ]
+        },
+        {
+          "area": 0.0053,
+          "bbox": [
+            -172.778,
+            -13.525,
+            -172.332,
+            -13.466
+          ]
+        },
+        {
+          "area": 0.0053,
+          "bbox": [
+            -163.731,
+            60.591,
+            -163.422,
+            60.757
+          ]
+        },
+        {
+          "area": 0.0053,
+          "bbox": [
+            -161.157,
+            66.373,
+            -160.65,
+            66.495
+          ]
+        },
+        {
+          "area": 0.0052,
+          "bbox": [
+            -177.955,
+            51.826,
+            -177.646,
+            51.919
+          ]
+        },
+        {
+          "area": 0.0051,
+          "bbox": [
+            -166.1,
+            59.849,
+            -165.593,
+            59.914
+          ]
+        },
+        {
+          "area": 0.005,
+          "bbox": [
+            -165.114,
+            60.902,
+            -164.606,
+            60.933
+          ]
+        },
+        {
+          "area": 0.0049,
+          "bbox": [
+            -166.187,
+            60.334,
+            -165.893,
+            60.396
+          ]
+        },
+        {
+          "area": 0.0048,
+          "bbox": [
+            -158.274,
+            21.586,
+            -158.045,
+            21.671
+          ]
+        },
+        {
+          "area": 0.0048,
+          "bbox": [
+            -161.517,
+            55.544,
+            -161.201,
+            55.619
+          ]
+        },
+        {
+          "area": 0.0048,
+          "bbox": [
+            -150.933,
+            59.249,
+            -150.678,
+            59.427
+          ]
+        },
+        {
+          "area": 0.0047,
+          "bbox": [
+            -157.698,
+            57.679,
+            -157.611,
+            58.051
+          ]
+        },
+        {
+          "area": 0.0047,
+          "bbox": [
+            -153.91,
+            57.304,
+            -153.687,
+            57.485
+          ]
+        },
+        {
+          "area": 0.0047,
+          "bbox": [
+            -172.696,
+            60.391,
+            -172.386,
+            60.449
+          ]
+        },
+        {
+          "area": 0.0046,
+          "bbox": [
+            -166.647,
+            68.361,
+            -166.381,
+            68.425
+          ]
+        },
+        {
+          "area": 0.0046,
+          "bbox": [
+            -161.975,
+            63.453,
+            -161.265,
+            63.497
+          ]
+        },
+        {
+          "area": 0.0045,
+          "bbox": [
+            -177.826,
+            51.687,
+            -177.646,
+            51.826
+          ]
+        },
+        {
+          "area": 0.0045,
+          "bbox": [
+            -153.295,
+            57.001,
+            -153.027,
+            57.117
+          ]
+        },
+        {
+          "area": 0.0044,
+          "bbox": [
+            -157.291,
+            21.057,
+            -156.859,
+            21.112
+          ]
+        },
+        {
+          "area": 0.0043,
+          "bbox": [
+            -163.119,
+            54.954,
+            -162.864,
+            55.065
+          ]
+        },
+        {
+          "area": 0.0042,
+          "bbox": [
+            -172.634,
+            60.299,
+            -172.231,
+            60.332
+          ]
+        },
+        {
+          "area": 0.0041,
+          "bbox": [
+            -166.928,
+            65.135,
+            -166.532,
+            65.156
+          ]
+        },
+        {
+          "area": 0.004,
+          "bbox": [
+            -173.921,
+            52.105,
+            -173.657,
+            52.143
+          ]
+        },
+        {
+          "area": 0.004,
+          "bbox": [
+            -160.424,
+            55.804,
+            -160.272,
+            55.912
+          ]
+        },
+        {
+          "area": 0.004,
+          "bbox": [
+            -155.973,
+            70.835,
+            -155.581,
+            70.894
+          ]
+        },
+        {
+          "area": 0.0039,
+          "bbox": [
+            -172.537,
+            -13.804,
+            -172.224,
+            -13.775
+          ]
+        },
+        {
+          "area": 0.0039,
+          "bbox": [
+            -162.829,
+            59.946,
+            -162.572,
+            59.993
+          ]
+        },
+        {
+          "area": 0.0038,
+          "bbox": [
+            -167.617,
+            53.382,
+            -167.137,
+            53.527
+          ]
+        },
+        {
+          "area": 0.0037,
+          "bbox": [
+            -176.846,
+            -43.853,
+            -176.555,
+            -43.82
+          ]
+        },
+        {
+          "area": 0.0037,
+          "bbox": [
+            -176.382,
+            -43.866,
+            -176.177,
+            -43.74
+          ]
+        },
+        {
+          "area": 0.0037,
+          "bbox": [
+            -154.177,
+            59.074,
+            -153.859,
+            59.155
+          ]
+        },
+        {
+          "area": 0.0036,
+          "bbox": [
+            -166.467,
+            59.764,
+            -166.147,
+            59.843
+          ]
+        },
+        {
+          "area": 0.0036,
+          "bbox": [
+            -170.395,
+            63.196,
+            -170.19,
+            63.33
+          ]
+        },
+        {
+          "area": 0.0036,
+          "bbox": [
+            -166.083,
+            66.122,
+            -165.629,
+            66.139
+          ]
+        },
+        {
+          "area": 0.0036,
+          "bbox": [
+            -162.209,
+            66.785,
+            -162.018,
+            66.876
+          ]
+        },
+        {
+          "area": 0.0036,
+          "bbox": [
+            -161.856,
+            66.552,
+            -161.399,
+            66.7
+          ]
+        },
+        {
+          "area": 0.0035,
+          "bbox": [
+            -163.908,
+            59.801,
+            -163.519,
+            59.829
+          ]
+        },
+        {
+          "area": 0.0035,
+          "bbox": [
+            -163.303,
+            64.519,
+            -163.051,
+            64.606
+          ]
+        },
+        {
+          "area": 0.0033,
+          "bbox": [
+            -154.574,
+            58.098,
+            -154.245,
+            58.16
+          ]
+        },
+        {
+          "area": 0.0032,
+          "bbox": [
+            -165.355,
+            60.542,
+            -164.984,
+            60.779
+          ]
+        },
+        {
+          "area": 0.0032,
+          "bbox": [
+            -164.873,
+            64.473,
+            -164.695,
+            64.53
+          ]
+        },
+        {
+          "area": 0.0031,
+          "bbox": [
+            -152.125,
+            58.31,
+            -151.974,
+            58.374
+          ]
+        },
+        {
+          "area": 0.003,
+          "bbox": [
+            -176.962,
+            51.603,
+            -176.8,
+            51.676
+          ]
+        },
+        {
+          "area": 0.003,
+          "bbox": [
+            -164.761,
+            54.667,
+            -164.48,
+            54.907
+          ]
+        },
+        {
+          "area": 0.003,
+          "bbox": [
+            -162.468,
+            66.693,
+            -162.191,
+            66.736
+          ]
+        },
+        {
+          "area": 0.0029,
+          "bbox": [
+            -171.17,
+            63.407,
+            -170.883,
+            63.453
+          ]
+        },
+        {
+          "area": 0.0028,
+          "bbox": [
+            -160.171,
+            55.122,
+            -159.939,
+            55.245
+          ]
+        },
+        {
+          "area": 0.0028,
+          "bbox": [
+            -179.454,
+            71.571,
+            -179.111,
+            71.597
+          ]
+        },
+        {
+          "area": 0.0027,
+          "bbox": [
+            -161.492,
+            64.396,
+            -161.219,
+            64.439
+          ]
+        },
+        {
+          "area": 0.0026,
+          "bbox": [
+            -152.841,
+            58.278,
+            -152.769,
+            58.417
+          ]
+        },
+        {
+          "area": 0.0026,
+          "bbox": [
+            -161.129,
+            64.767,
+            -160.875,
+            64.925
+          ]
+        },
+        {
+          "area": 0.0025,
+          "bbox": [
+            -157.641,
+            57.483,
+            -157.46,
+            57.516
+          ]
+        },
+        {
+          "area": 0.0025,
+          "bbox": [
+            -153.695,
+            57.731,
+            -153.489,
+            57.872
+          ]
+        },
+        {
+          "area": 0.0025,
+          "bbox": [
+            -152.316,
+            58.363,
+            -152.125,
+            58.414
+          ]
+        },
+        {
+          "area": 0.0024,
+          "bbox": [
+            -175.341,
+            -21.146,
+            -175.158,
+            -21.068
+          ]
+        },
+        {
+          "area": 0.0024,
+          "bbox": [
+            -162.244,
+            55.093,
+            -162.075,
+            55.143
+          ]
+        },
+        {
+          "area": 0.0023,
+          "bbox": [
+            -176.587,
+            51.82,
+            -176.436,
+            51.862
+          ]
+        },
+        {
+          "area": 0.0023,
+          "bbox": [
+            -152.481,
+            57.62,
+            -152.304,
+            57.704
+          ]
+        },
+        {
+          "area": 0.0023,
+          "bbox": [
+            -166.455,
+            64.807,
+            -166.41,
+            64.927
+          ]
+        },
+        {
+          "area": 0.0023,
+          "bbox": [
+            -163.505,
+            63.045,
+            -163.289,
+            63.106
+          ]
+        },
+        {
+          "area": 0.0022,
+          "bbox": [
+            -157.719,
+            21.308,
+            -157.637,
+            21.458
+          ]
+        },
+        {
+          "area": 0.0022,
+          "bbox": [
+            -156.48,
+            20.914,
+            -156.276,
+            20.951
+          ]
+        },
+        {
+          "area": 0.0022,
+          "bbox": [
+            -160.682,
+            55.526,
+            -160.499,
+            55.553
+          ]
+        },
+        {
+          "area": 0.0022,
+          "bbox": [
+            -153.025,
+            60.236,
+            -152.685,
+            60.295
+          ]
+        },
+        {
+          "area": 0.0021,
+          "bbox": [
+            -174.805,
+            52.033,
+            -174.344,
+            52.077
+          ]
+        },
+        {
+          "area": 0.0021,
+          "bbox": [
+            -164.296,
+            54.528,
+            -164.073,
+            54.621
+          ]
+        },
+        {
+          "area": 0.0021,
+          "bbox": [
+            -169.564,
+            63.033,
+            -169.365,
+            63.17
+          ]
+        },
+        {
+          "area": 0.0021,
+          "bbox": [
+            -162.111,
+            63.453,
+            -161.975,
+            63.535
+          ]
+        },
+        {
+          "area": 0.0021,
+          "bbox": [
+            -160.362,
+            66.527,
+            -160.252,
+            66.613
+          ]
+        },
+        {
+          "area": 0.002,
+          "bbox": [
+            -161.363,
+            58.669,
+            -161.247,
+            58.799
+          ]
+        },
+        {
+          "area": 0.002,
+          "bbox": [
+            -152.736,
+            58.048,
+            -152.571,
+            58.169
+          ]
+        },
+        {
+          "area": 0.002,
+          "bbox": [
+            -169.849,
+            62.957,
+            -169.675,
+            63.128
+          ]
+        },
+        {
+          "area": 0.002,
+          "bbox": [
+            -164.523,
+            63.03,
+            -164.376,
+            63.127
+          ]
+        },
+        {
+          "area": 0.0019,
+          "bbox": [
+            -152.933,
+            57.294,
+            -152.679,
+            57.344
+          ]
+        },
+        {
+          "area": 0.0019,
+          "bbox": [
+            -161.121,
+            66.189,
+            -161.035,
+            66.335
+          ]
+        },
+        {
+          "area": 0.0019,
+          "bbox": [
+            -151.783,
+            60.858,
+            -151.592,
+            60.979
+          ]
+        },
+        {
+          "area": 0.0018,
+          "bbox": [
+            -166.035,
+            54.048,
+            -165.725,
+            54.095
+          ]
+        },
+        {
+          "area": 0.0017,
+          "bbox": [
+            -153.839,
+            57.636,
+            -153.691,
+            57.664
+          ]
+        },
+        {
+          "area": 0.0017,
+          "bbox": [
+            -150.394,
+            59.565,
+            -150.199,
+            59.582
+          ]
+        },
+        {
+          "area": 0.0016,
+          "bbox": [
+            -179.111,
+            71.535,
+            -178.42,
+            71.597
+          ]
+        },
+        {
+          "area": 0.0015,
+          "bbox": [
+            -176.63,
+            -44.025,
+            -176.522,
+            -43.901
+          ]
+        },
+        {
+          "area": 0.0014,
+          "bbox": [
+            -156.056,
+            57.447,
+            -155.999,
+            57.546
+          ]
+        },
+        {
+          "area": 0.0014,
+          "bbox": [
+            -165.391,
+            61.212,
+            -165.272,
+            61.275
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -176.407,
+            -43.866,
+            -176.375,
+            -43.761
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -165.891,
+            54.111,
+            -165.704,
+            54.207
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -160.805,
+            55.754,
+            -160.747,
+            55.816
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -152.417,
+            58.353,
+            -152.316,
+            58.414
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -165.344,
+            61.198,
+            -165.243,
+            61.275
+          ]
+        },
+        {
+          "area": 0.0013,
+          "bbox": [
+            -162.14,
+            60.615,
+            -161.946,
+            60.684
+          ]
+        },
+        {
+          "area": 0.0012,
+          "bbox": [
+            -158.018,
+            21.315,
+            -157.979,
+            21.378
+          ]
+        },
+        {
+          "area": 0.0012,
+          "bbox": [
+            -168.271,
+            53.239,
+            -167.864,
+            53.388
+          ]
+        },
+        {
+          "area": 0.0012,
+          "bbox": [
+            -152.305,
+            60.431,
+            -152.269,
+            60.528
+          ]
+        },
+        {
+          "area": 0.0011,
+          "bbox": [
+            -176.501,
+            -43.955,
+            -176.419,
+            -43.86
+          ]
+        },
+        {
+          "area": 0.0011,
+          "bbox": [
+            -171.605,
+            -13.958,
+            -171.52,
+            -13.879
+          ]
+        },
+        {
+          "area": 0.0011,
+          "bbox": [
+            -174.168,
+            52.35,
+            -174.046,
+            52.421
+          ]
+        },
+        {
+          "area": 0.0011,
+          "bbox": [
+            -173.657,
+            52.079,
+            -173.023,
+            52.143
+          ]
+        },
+        {
+          "area": 0.0011,
+          "bbox": [
+            -153.414,
+            59.686,
+            -153.367,
+            59.74
+          ]
+        },
+        {
+          "area": 0.001,
+          "bbox": [
+            -159.372,
+            21.932,
+            -159.3,
+            22.105
+          ]
+        },
+        {
+          "area": 0.001,
+          "bbox": [
+            -160.229,
+            54.923,
+            -159.854,
+            55.145
+          ]
+        },
+        {
+          "area": 0.001,
+          "bbox": [
+            -156.629,
+            57.009,
+            -156.546,
+            57.081
+          ]
+        },
+        {
+          "area": 0.001,
+          "bbox": [
+            -153.557,
+            70.888,
+            -153.234,
+            70.932
+          ]
+        },
+        {
+          "area": 0.0009,
+          "bbox": [
+            -176.515,
+            -43.816,
+            -176.44,
+            -43.767
+          ]
+        },
+        {
+          "area": 0.0009,
+          "bbox": [
+            -156.881,
+            20.768,
+            -156.809,
+            20.831
+          ]
+        },
+        {
+          "area": 0.0009,
+          "bbox": [
+            -160.467,
+            55.804,
+            -160.293,
+            55.832
+          ]
+        },
+        {
+          "area": 0.0009,
+          "bbox": [
+            -158.591,
+            56.13,
+            -158.533,
+            56.185
+          ]
+        },
+        {
+          "area": 0.0008,
+          "bbox": [
+            -178.034,
+            51.706,
+            -177.988,
+            51.765
+          ]
+        },
+        {
+          "area": 0.0008,
+          "bbox": [
+            -167.001,
+            53.949,
+            -166.851,
+            53.975
+          ]
+        },
+        {
+          "area": 0.0008,
+          "bbox": [
+            -165.991,
+            61.537,
+            -165.845,
+            61.551
+          ]
+        },
+        {
+          "area": 0.0008,
+          "bbox": [
+            -161.456,
+            66.219,
+            -161.187,
+            66.281
+          ]
+        },
+        {
+          "area": 0.0008,
+          "bbox": [
+            -152.601,
+            60.257,
+            -152.444,
+            60.311
+          ]
+        },
+        {
+          "area": 0.0007,
+          "bbox": [
+            -155.6,
+            19.004,
+            -155.534,
+            19.109
+          ]
+        },
+        {
+          "area": 0.0007,
+          "bbox": [
+            -165.797,
+            60.296,
+            -165.728,
+            60.327
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -176.688,
+            -43.766,
+            -176.566,
+            -43.717
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -177.171,
+            51.715,
+            -177.14,
+            51.768
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -155.779,
+            57.568,
+            -155.695,
+            57.642
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -152.147,
+            58.162,
+            -152.084,
+            58.183
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -170.654,
+            63.362,
+            -170.482,
+            63.401
+          ]
+        },
+        {
+          "area": 0.0006,
+          "bbox": [
+            -162.642,
+            66.05,
+            -162.488,
+            66.059
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -157.914,
+            21.268,
+            -157.799,
+            21.341
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -156.69,
+            20.885,
+            -156.655,
+            20.928
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -161.132,
+            58.669,
+            -161.05,
+            58.694
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -161.01,
+            55.888,
+            -160.97,
+            55.923
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -159.897,
+            55.202,
+            -159.869,
+            55.248
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -153.669,
+            59.615,
+            -153.608,
+            59.646
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -152.276,
+            57.539,
+            -152.215,
+            57.584
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -171.668,
+            63.351,
+            -171.6,
+            63.374
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -166.38,
+            60.365,
+            -166.187,
+            60.396
+          ]
+        },
+        {
+          "area": 0.0005,
+          "bbox": [
+            -150.97,
+            61.183,
+            -150.789,
+            61.243
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -154.955,
+            19.524,
+            -154.803,
+            19.653
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -166.133,
+            59.805,
+            -166.1,
+            59.849
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -161.222,
+            55.954,
+            -161.193,
+            55.992
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -160.229,
+            54.923,
+            -160.164,
+            55.021
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -152.485,
+            57.704,
+            -152.459,
+            57.754
+          ]
+        },
+        {
+          "area": 0.0004,
+          "bbox": [
+            -160.965,
+            63.641,
+            -160.826,
+            63.729
+          ]
+        },
+        {
+          "area": 0.0003,
+          "bbox": [
+            -158.477,
+            56.075,
+            -158.277,
+            56.197
+          ]
+        },
+        {
+          "area": 0.0003,
+          "bbox": [
+            -152.955,
+            57.994,
+            -152.885,
+            58.006
+          ]
+        },
+        {
+          "area": 0.0003,
+          "bbox": [
+            -152.503,
+            58.36,
+            -152.417,
+            58.406
+          ]
+        },
+        {
+          "area": 0.0003,
+          "bbox": [
+            -150.055,
+            61.17,
+            -150,
+            61.203
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -156.545,
+            20.961,
+            -156.509,
+            20.996
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -177.115,
+            51.902,
+            -177.062,
+            51.928
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -163.524,
+            54.98,
+            -163.476,
+            55.016
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -160.686,
+            55.315,
+            -160.668,
+            55.365
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -153.907,
+            57.778,
+            -153.886,
+            57.802
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -152.334,
+            60.361,
+            -152.289,
+            60.391
+          ]
+        },
+        {
+          "area": 0.0002,
+          "bbox": [
+            -150.592,
+            61.299,
+            -150.548,
+            61.308
+          ]
+        },
+        {
+          "area": 0.0001,
+          "bbox": [
+            -175.146,
+            -21.168,
+            -175.079,
+            -21.128
+          ]
+        },
+        {
+          "area": 0.0001,
+          "bbox": [
+            -178.06,
+            51.669,
+            -178.032,
+            51.68
+          ]
+        },
+        {
+          "area": 0.0001,
+          "bbox": [
+            -153.856,
+            57.847,
+            -153.827,
+            57.864
+          ]
+        }
+      ],
+      "unassignedComponents": 5489,
+      "largestUnassignedComponentDegreesSquared": 534.9472,
+      "failures": [],
+      "intentionalUnassignedAreaDegreesSquared": 4026.4191,
+      "intentionalAreas": [
+        {
+          "area": 0.0138,
+          "bbox": [
+            -180,
+            -84.352,
+            -178.023,
+            -84.338
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 6.1481,
+          "bbox": [
+            -178.023,
+            -85.187,
+            -156.459,
+            -84.352
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 28.7665,
+          "bbox": [
+            -174.236,
+            -84.352,
+            -150,
+            -80.957
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 3.2777,
+          "bbox": [
+            -164.282,
+            -79.845,
+            -159.008,
+            -78.722
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.5111,
+          "bbox": [
+            -163.951,
+            -81.59,
+            -160.466,
+            -81.281
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3438,
+          "bbox": [
+            -163.796,
+            -83.119,
+            -161.636,
+            -82.843
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0618,
+          "bbox": [
+            -158.99,
+            -82.105,
+            -157.835,
+            -81.779
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 12.7999,
+          "bbox": [
+            -158.501,
+            -79.568,
+            -150,
+            -77.08
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1167,
+          "bbox": [
+            -155.75,
+            -80.033,
+            -153.932,
+            -79.765
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0632,
+          "bbox": [
+            -151.513,
+            -77.37,
+            -150.357,
+            -77.22
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0465,
+          "bbox": [
+            -150.872,
+            -76.79,
+            -150.084,
+            -76.691
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.099,
+          "bbox": [
+            -150.789,
+            -77.093,
+            -150,
+            -76.89
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1496,
+          "bbox": [
+            -150.577,
+            -80.524,
+            -150,
+            -80.142
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 269.5989,
+          "bbox": [
+            -150,
+            -84.352,
+            -120,
+            -74.671
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1003,
+          "bbox": [
+            -150,
+            -77.121,
+            -149.23,
+            -76.875
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0261,
+          "bbox": [
+            -149.662,
+            -77.387,
+            -148.928,
+            -77.3
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0708,
+          "bbox": [
+            -149.468,
+            -76.845,
+            -148.32,
+            -76.717
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0435,
+          "bbox": [
+            -149.302,
+            -77.007,
+            -148.438,
+            -76.916
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0665,
+          "bbox": [
+            -147.42,
+            -76.26,
+            -146.689,
+            -76.073
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0573,
+          "bbox": [
+            -147.355,
+            -76.713,
+            -146.79,
+            -76.531
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0797,
+          "bbox": [
+            -147.117,
+            -76.993,
+            -146.163,
+            -76.866
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0607,
+          "bbox": [
+            -146.152,
+            -75.712,
+            -145.238,
+            -75.514
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0295,
+          "bbox": [
+            -132.858,
+            -74.498,
+            -132.361,
+            -74.387
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1968,
+          "bbox": [
+            -132.163,
+            -74.583,
+            -130.968,
+            -74.33
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1742,
+          "bbox": [
+            -128.134,
+            -74.623,
+            -127.144,
+            -74.328
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 1.4831,
+          "bbox": [
+            -127.414,
+            -74.226,
+            -123.8,
+            -73.28
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 1.4541,
+          "bbox": [
+            -123.346,
+            -74.403,
+            -120.272,
+            -73.674
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 303.5809,
+          "bbox": [
+            -120,
+            -84.352,
+            -90,
+            -72.721
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2098,
+          "bbox": [
+            -119.905,
+            -74.111,
+            -118.879,
+            -73.778
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1635,
+          "bbox": [
+            -117.399,
+            -74.193,
+            -116.153,
+            -73.866
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0777,
+          "bbox": [
+            -105.13,
+            -73.201,
+            -104.54,
+            -72.941
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 3.0751,
+          "bbox": [
+            -102.315,
+            -72.578,
+            -95.532,
+            -71.764
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0749,
+          "bbox": [
+            -95.273,
+            -72.665,
+            -94.427,
+            -72.469
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3972,
+          "bbox": [
+            -91.67,
+            -73.196,
+            -90.777,
+            -72.547
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 270.2719,
+          "bbox": [
+            -90,
+            -84.352,
+            -60,
+            -63.912
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.7759,
+          "bbox": [
+            -76.51,
+            -71.132,
+            -73.551,
+            -70.577
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.8487,
+          "bbox": [
+            -76.096,
+            -73.611,
+            -74.224,
+            -72.821
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3971,
+          "bbox": [
+            -75.804,
+            -70.179,
+            -74.44,
+            -69.728
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 11.7666,
+          "bbox": [
+            -75.383,
+            -72.67,
+            -68.24,
+            -68.789
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0779,
+          "bbox": [
+            -74.148,
+            -73.358,
+            -73.543,
+            -73.113
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1722,
+          "bbox": [
+            -72.957,
+            -69.74,
+            -71.985,
+            -69.413
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0476,
+          "bbox": [
+            -71.794,
+            -70.443,
+            -71.34,
+            -70.266
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 2.5989,
+          "bbox": [
+            -71.783,
+            -79.68,
+            -66.728,
+            -78.316
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.7703,
+          "bbox": [
+            -69.137,
+            -67.754,
+            -67.682,
+            -66.632
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2683,
+          "bbox": [
+            -68.55,
+            -79.501,
+            -67.067,
+            -79.227
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.6062,
+          "bbox": [
+            -67.808,
+            -80.078,
+            -65.504,
+            -79.547
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0697,
+          "bbox": [
+            -67.744,
+            -67.766,
+            -67.15,
+            -67.591
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0275,
+          "bbox": [
+            -67.592,
+            -66.895,
+            -67.258,
+            -66.737
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0263,
+          "bbox": [
+            -66.869,
+            -66.294,
+            -66.574,
+            -66.082
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 3.2423,
+          "bbox": [
+            -66.772,
+            -80.947,
+            -60,
+            -79.741
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0912,
+          "bbox": [
+            -66.181,
+            -65.881,
+            -65.638,
+            -65.547
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3844,
+          "bbox": [
+            -64.273,
+            -64.834,
+            -62.837,
+            -64.266
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0233,
+          "bbox": [
+            -63.557,
+            -64.907,
+            -63.179,
+            -64.738
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1806,
+          "bbox": [
+            -62.783,
+            -64.514,
+            -62.059,
+            -64.013
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0212,
+          "bbox": [
+            -62.657,
+            -63.074,
+            -62.318,
+            -62.874
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1935,
+          "bbox": [
+            -62.567,
+            -69.729,
+            -61.807,
+            -69.176
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0215,
+          "bbox": [
+            -61.404,
+            -69.976,
+            -61.109,
+            -69.856
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1314,
+          "bbox": [
+            -61.152,
+            -62.745,
+            -60,
+            -62.475
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0779,
+          "bbox": [
+            -60.976,
+            -70.71,
+            -60.454,
+            -70.509
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0382,
+          "bbox": [
+            -60.972,
+            -63.902,
+            -60.562,
+            -63.669
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.028,
+          "bbox": [
+            -60.947,
+            -71.052,
+            -60.533,
+            -70.92
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 79.1434,
+          "bbox": [
+            -60,
+            -84.352,
+            -30,
+            -80.222
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2787,
+          "bbox": [
+            -60,
+            -80.783,
+            -59.323,
+            -79.771
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.003,
+          "bbox": [
+            -60,
+            -73.095,
+            -59.957,
+            -72.957
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 1.4216,
+          "bbox": [
+            -60,
+            -64.584,
+            -56.782,
+            -63.226
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0066,
+          "bbox": [
+            -60,
+            -62.668,
+            -59.849,
+            -62.581
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1933,
+          "bbox": [
+            -59.003,
+            -62.244,
+            -57.638,
+            -61.912
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3858,
+          "bbox": [
+            -58.438,
+            -64.41,
+            -57.221,
+            -63.806
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0227,
+          "bbox": [
+            -57.682,
+            -63.879,
+            -57.106,
+            -63.791
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0626,
+          "bbox": [
+            -57.448,
+            -64.567,
+            -56.893,
+            -64.332
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.055,
+          "bbox": [
+            -56.612,
+            -63.169,
+            -56.051,
+            -62.982
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.212,
+          "bbox": [
+            -56.501,
+            -63.438,
+            -55.075,
+            -63.157
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0441,
+          "bbox": [
+            -56.234,
+            -63.58,
+            -55.72,
+            -63.407
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0466,
+          "bbox": [
+            -55.439,
+            -61.249,
+            -54.672,
+            -61.107
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 19.8633,
+          "bbox": [
+            -54.352,
+            -80.869,
+            -42.965,
+            -77.805
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0534,
+          "bbox": [
+            -45.956,
+            -60.733,
+            -45.175,
+            -60.522
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3256,
+          "bbox": [
+            -36.6,
+            -79.321,
+            -33.936,
+            -79.09
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 10.8593,
+          "bbox": [
+            -36.265,
+            -79.577,
+            -30,
+            -76.639
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0512,
+          "bbox": [
+            -32.582,
+            -79.673,
+            -31.934,
+            -79.534
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.3829,
+          "bbox": [
+            -31.999,
+            -80.01,
+            -30,
+            -79.645
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 321.1016,
+          "bbox": [
+            -30,
+            -84.352,
+            0,
+            -70.712
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0323,
+          "bbox": [
+            -30,
+            -79.957,
+            -29.616,
+            -79.808
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.4638,
+          "bbox": [
+            -22.034,
+            -74.493,
+            -20.418,
+            -73.62
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0495,
+          "bbox": [
+            -16.515,
+            -72.679,
+            -16.105,
+            -72.458
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0398,
+          "bbox": [
+            -12.962,
+            -72.188,
+            -12.508,
+            -72.007
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0588,
+          "bbox": [
+            -6.439,
+            -70.611,
+            -5.895,
+            -70.433
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2856,
+          "bbox": [
+            -3.573,
+            -71.167,
+            -2.093,
+            -70.695
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1441,
+          "bbox": [
+            -3.497,
+            -70.533,
+            -2.684,
+            -70.28
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0369,
+          "bbox": [
+            -3.404,
+            -71.231,
+            -2.954,
+            -71.063
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 411.7213,
+          "bbox": [
+            0,
+            -84.352,
+            30,
+            -70.054
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1043,
+          "bbox": [
+            0.949,
+            -70.379,
+            1.46,
+            -70.023
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0927,
+          "bbox": [
+            2.583,
+            -70.623,
+            3.26,
+            -70.382
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0892,
+          "bbox": [
+            4.07,
+            -70.479,
+            4.588,
+            -70.252
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.1886,
+          "bbox": [
+            15.561,
+            -70.071,
+            16.627,
+            -69.728
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2387,
+          "bbox": [
+            25.954,
+            -70.434,
+            26.876,
+            -70.061
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 490.0277,
+          "bbox": [
+            30,
+            -84.352,
+            60,
+            -65.858
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0302,
+          "bbox": [
+            48.293,
+            -66.808,
+            48.782,
+            -66.702
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 476.2697,
+          "bbox": [
+            60,
+            -84.352,
+            90,
+            -66.789
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0421,
+          "bbox": [
+            68.41,
+            -72.3,
+            68.842,
+            -72.103
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0902,
+          "bbox": [
+            71.646,
+            -70.632,
+            72.078,
+            -70.264
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0984,
+          "bbox": [
+            85.315,
+            -66.98,
+            85.938,
+            -66.723
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0274,
+          "bbox": [
+            86.233,
+            -66.787,
+            86.651,
+            -66.674
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 534.9472,
+          "bbox": [
+            90,
+            -84.352,
+            120,
+            -65.799
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0297,
+          "bbox": [
+            92.249,
+            -65.808,
+            92.67,
+            -65.702
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0874,
+          "bbox": [
+            96.306,
+            -66.224,
+            97.016,
+            -66.035
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2156,
+          "bbox": [
+            100.27,
+            -65.702,
+            101.238,
+            -65.377
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0659,
+          "bbox": [
+            102.761,
+            -65.455,
+            103.398,
+            -65.129
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 523.2694,
+          "bbox": [
+            120,
+            -84.352,
+            150,
+            -66.082
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0153,
+          "bbox": [
+            120,
+            -67.07,
+            120.376,
+            -66.983
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 225.21,
+          "bbox": [
+            150,
+            -84.352,
+            180,
+            -68.323
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0354,
+          "bbox": [
+            162.302,
+            -66.52,
+            162.612,
+            -66.25
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0497,
+          "bbox": [
+            163.742,
+            -74.833,
+            164.21,
+            -74.608
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.049,
+          "bbox": [
+            164.639,
+            -67.559,
+            164.909,
+            -67.259
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.2016,
+          "bbox": [
+            166.014,
+            -78.307,
+            167.641,
+            -77.993
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.9464,
+          "bbox": [
+            166.215,
+            -77.85,
+            169.351,
+            -77.187
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        },
+        {
+          "area": 0.0758,
+          "bbox": [
+            169.481,
+            -73.625,
+            169.959,
+            -73.321
+          ],
+          "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
+        }
+      ],
+      "generalizationAreaDegreesSquared": 19.5388,
+      "generalizationComponents": 5311,
+      "unexplainedAreaDegreesSquared": 1.838,
+      "unexplainedComponents": 62,
+      "unexplainedAreas": [
+        {
+          "area": 0.027,
+          "bbox": [
+            -127.198,
+            50.317,
+            -125.481,
+            50.64
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0245,
+          "bbox": [
+            -121.877,
+            35.675,
+            -121.283,
+            36.332
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0201,
+          "bbox": [
+            -137.26,
+            68.882,
+            -136.123,
+            68.963
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0704,
+          "bbox": [
+            -118.961,
+            72.684,
+            -115.523,
+            73.416
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0203,
+          "bbox": [
+            -116.801,
+            75.772,
+            -114.991,
+            75.897
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0203,
+          "bbox": [
+            -110.311,
+            76.397,
+            -109.338,
+            76.76
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0214,
+          "bbox": [
+            -103.946,
+            78.26,
+            -102.732,
+            78.371
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.048,
+          "bbox": [
+            -102.542,
+            75.513,
+            -99.194,
+            75.699
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0302,
+          "bbox": [
+            -96.774,
+            80.049,
+            -94.647,
+            80.136
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0358,
+          "bbox": [
+            -95.486,
+            77.754,
+            -93.47,
+            77.793
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0223,
+          "bbox": [
+            -94.73,
+            74.086,
+            -93.412,
+            74.178
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0417,
+          "bbox": [
+            -91.428,
+            65.874,
+            -90,
+            65.965
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0275,
+          "bbox": [
+            -73.983,
+            -40.974,
+            -73.669,
+            -39.964
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.025,
+          "bbox": [
+            -68.497,
+            -54.904,
+            -67.128,
+            -54.817
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0267,
+          "bbox": [
+            -80.747,
+            27.082,
+            -80.124,
+            28.381
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0275,
+          "bbox": [
+            -74.227,
+            18.435,
+            -72.791,
+            18.663
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0231,
+          "bbox": [
+            -85.06,
+            55.259,
+            -83.911,
+            55.315
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0286,
+          "bbox": [
+            -88.411,
+            80.989,
+            -86.478,
+            81.036
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0229,
+          "bbox": [
+            -86.615,
+            82.218,
+            -85.358,
+            82.387
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0203,
+          "bbox": [
+            -85.384,
+            72.796,
+            -84.257,
+            73.045
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0227,
+          "bbox": [
+            -82.378,
+            63.462,
+            -81.046,
+            63.707
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0357,
+          "bbox": [
+            -81.01,
+            82.68,
+            -78.749,
+            82.778
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0219,
+          "bbox": [
+            -80.981,
+            80.445,
+            -79.807,
+            80.598
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0289,
+          "bbox": [
+            -78.313,
+            72.821,
+            -76.402,
+            72.897
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0214,
+          "bbox": [
+            -75.502,
+            79.414,
+            -73.468,
+            79.501
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0226,
+          "bbox": [
+            -62.743,
+            76.157,
+            -61.188,
+            76.253
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0218,
+          "bbox": [
+            -52.901,
+            4.943,
+            -52.292,
+            5.426
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0235,
+          "bbox": [
+            -59.284,
+            81.551,
+            -57.574,
+            81.884
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0445,
+          "bbox": [
+            -53.038,
+            66.201,
+            -51.227,
+            66.882
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0296,
+          "bbox": [
+            -46.752,
+            82.067,
+            -45.067,
+            82.348
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.023,
+          "bbox": [
+            -46.012,
+            81.78,
+            -44.729,
+            81.974
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0415,
+          "bbox": [
+            -44.761,
+            82.751,
+            -41.37,
+            82.884
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0233,
+          "bbox": [
+            -32.031,
+            82.983,
+            -30,
+            83.108
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0245,
+          "bbox": [
+            -7.2,
+            4.49,
+            -5.913,
+            5.011
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0246,
+          "bbox": [
+            -3.345,
+            57.672,
+            -2.075,
+            57.711
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0306,
+          "bbox": [
+            -29.965,
+            83.063,
+            -27.002,
+            83.11
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0385,
+          "bbox": [
+            -29.248,
+            68.298,
+            -26.484,
+            68.675
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0665,
+          "bbox": [
+            -24.572,
+            71.915,
+            -22.498,
+            72.42
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0253,
+          "bbox": [
+            -23.899,
+            73.171,
+            -22.995,
+            73.399
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0205,
+          "bbox": [
+            -22.826,
+            80.912,
+            -21.536,
+            81.155
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0214,
+          "bbox": [
+            -17.455,
+            81.398,
+            -16.267,
+            81.754
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0219,
+          "bbox": [
+            23.971,
+            15.758,
+            23.982,
+            19.496
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.031,
+          "bbox": [
+            15.9,
+            41.062,
+            17.102,
+            41.512
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0943,
+          "bbox": [
+            48.177,
+            -21.844,
+            49.362,
+            -18.337
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0241,
+          "bbox": [
+            43.851,
+            0.964,
+            44.919,
+            1.81
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0233,
+          "bbox": [
+            38.717,
+            43.474,
+            39.872,
+            44.288
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0214,
+          "bbox": [
+            49.157,
+            67.87,
+            50.838,
+            68.351
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0474,
+          "bbox": [
+            73.252,
+            -53.184,
+            73.839,
+            -52.975
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0258,
+          "bbox": [
+            69.191,
+            21.135,
+            70.09,
+            21.992
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0327,
+          "bbox": [
+            61.954,
+            75.401,
+            64.048,
+            75.702
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.023,
+          "bbox": [
+            73.673,
+            71.845,
+            74.991,
+            72.145
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0225,
+          "bbox": [
+            77.59,
+            67.588,
+            78.922,
+            67.752
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0201,
+          "bbox": [
+            111.509,
+            -8.409,
+            112.679,
+            -8.304
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0237,
+          "bbox": [
+            111.729,
+            2.855,
+            112.974,
+            3.158
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0392,
+          "bbox": [
+            92.289,
+            75.744,
+            94.157,
+            75.959
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0304,
+          "bbox": [
+            95.496,
+            80.096,
+            97.588,
+            80.168
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0354,
+          "bbox": [
+            99.246,
+            76.472,
+            100.842,
+            76.525
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0291,
+          "bbox": [
+            101.202,
+            78.188,
+            102.797,
+            78.225
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0282,
+          "bbox": [
+            116.759,
+            73.59,
+            118.45,
+            73.651
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0201,
+          "bbox": [
+            120.645,
+            72.937,
+            121.748,
+            72.975
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0225,
+          "bbox": [
+            175.982,
+            -41.214,
+            176.843,
+            -40.158
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        },
+        {
+          "area": 0.0258,
+          "bbox": [
+            173.437,
+            69.856,
+            174.787,
+            69.948
+          ],
+          "reason": "Small island/coastal component missing from the 1:50m base geometry; no 1900 polity is absent. Retained as an explicit detail gap rather than filled with an invented border."
+        }
+      ],
+      "largestComponents": [
+        {
+          "area": 534.9472,
+          "bbox": [
+            90,
+            -84.352,
+            120,
+            -65.799
+          ]
+        },
+        {
+          "area": 523.2694,
+          "bbox": [
+            120,
+            -84.352,
+            150,
+            -66.082
+          ]
+        },
+        {
+          "area": 490.0277,
+          "bbox": [
+            30,
+            -84.352,
+            60,
+            -65.858
+          ]
+        },
+        {
+          "area": 476.2697,
+          "bbox": [
+            60,
+            -84.352,
+            90,
+            -66.789
+          ]
+        },
+        {
+          "area": 411.7213,
+          "bbox": [
+            0,
+            -84.352,
+            30,
+            -70.054
+          ]
+        },
+        {
+          "area": 321.1016,
+          "bbox": [
+            -30,
+            -84.352,
+            0,
+            -70.712
+          ]
+        },
+        {
+          "area": 303.5809,
+          "bbox": [
+            -120,
+            -84.352,
+            -90,
+            -72.721
+          ]
+        },
+        {
+          "area": 270.2719,
+          "bbox": [
+            -90,
+            -84.352,
+            -60,
+            -63.912
+          ]
+        },
+        {
+          "area": 269.5989,
+          "bbox": [
+            -150,
+            -84.352,
+            -120,
+            -74.671
+          ]
+        },
+        {
+          "area": 225.21,
+          "bbox": [
+            150,
+            -84.352,
+            180,
+            -68.323
+          ]
+        },
+        {
+          "area": 79.1434,
+          "bbox": [
+            -60,
+            -84.352,
+            -30,
+            -80.222
+          ]
+        },
+        {
+          "area": 28.7665,
+          "bbox": [
+            -174.236,
+            -84.352,
+            -150,
+            -80.957
+          ]
+        },
+        {
+          "area": 19.8633,
+          "bbox": [
+            -54.352,
+            -80.869,
+            -42.965,
+            -77.805
+          ]
+        },
+        {
+          "area": 12.7999,
+          "bbox": [
+            -158.501,
+            -79.568,
+            -150,
+            -77.08
+          ]
+        },
+        {
+          "area": 11.7666,
+          "bbox": [
+            -75.383,
+            -72.67,
+            -68.24,
+            -68.789
+          ]
+        },
+        {
+          "area": 10.8593,
+          "bbox": [
+            -36.265,
+            -79.577,
+            -30,
+            -76.639
+          ]
+        },
+        {
+          "area": 6.1481,
+          "bbox": [
+            -178.023,
+            -85.187,
+            -156.459,
+            -84.352
+          ]
+        },
+        {
+          "area": 3.2777,
+          "bbox": [
+            -164.282,
+            -79.845,
+            -159.008,
+            -78.722
+          ]
+        },
+        {
+          "area": 3.2423,
+          "bbox": [
+            -66.772,
+            -80.947,
+            -60,
+            -79.741
+          ]
+        },
+        {
+          "area": 3.0751,
+          "bbox": [
+            -102.315,
+            -72.578,
+            -95.532,
+            -71.764
+          ]
+        },
+        {
+          "area": 2.5989,
+          "bbox": [
+            -71.783,
+            -79.68,
+            -66.728,
+            -78.316
+          ]
+        },
+        {
+          "area": 1.4831,
+          "bbox": [
+            -127.414,
+            -74.226,
+            -123.8,
+            -73.28
+          ]
+        },
+        {
+          "area": 1.4541,
+          "bbox": [
+            -123.346,
+            -74.403,
+            -120.272,
+            -73.674
+          ]
+        },
+        {
+          "area": 1.4216,
+          "bbox": [
+            -60,
+            -64.584,
+            -56.782,
+            -63.226
+          ]
+        },
+        {
+          "area": 0.9464,
+          "bbox": [
+            166.215,
+            -77.85,
+            169.351,
+            -77.187
+          ]
+        },
+        {
+          "area": 0.8487,
+          "bbox": [
+            -76.096,
+            -73.611,
+            -74.224,
+            -72.821
+          ]
+        },
+        {
+          "area": 0.7759,
+          "bbox": [
+            -76.51,
+            -71.132,
+            -73.551,
+            -70.577
+          ]
+        },
+        {
+          "area": 0.7703,
+          "bbox": [
+            -69.137,
+            -67.754,
+            -67.682,
+            -66.632
+          ]
+        },
+        {
+          "area": 0.6062,
+          "bbox": [
+            -67.808,
+            -80.078,
+            -65.504,
+            -79.547
+          ]
+        },
+        {
+          "area": 0.5111,
+          "bbox": [
+            -163.951,
+            -81.59,
+            -160.466,
+            -81.281
+          ]
+        },
+        {
+          "area": 0.4638,
+          "bbox": [
+            -22.034,
+            -74.493,
+            -20.418,
+            -73.62
+          ]
+        },
+        {
+          "area": 0.3972,
+          "bbox": [
+            -91.67,
+            -73.196,
+            -90.777,
+            -72.547
+          ]
+        },
+        {
+          "area": 0.3971,
+          "bbox": [
+            -75.804,
+            -70.179,
+            -74.44,
+            -69.728
+          ]
+        },
+        {
+          "area": 0.3858,
+          "bbox": [
+            -58.438,
+            -64.41,
+            -57.221,
+            -63.806
+          ]
+        },
+        {
+          "area": 0.3844,
+          "bbox": [
+            -64.273,
+            -64.834,
+            -62.837,
+            -64.266
+          ]
+        },
+        {
+          "area": 0.3829,
+          "bbox": [
+            -31.999,
+            -80.01,
+            -30,
+            -79.645
+          ]
+        },
+        {
+          "area": 0.3438,
+          "bbox": [
+            -163.796,
+            -83.119,
+            -161.636,
+            -82.843
+          ]
+        },
+        {
+          "area": 0.3256,
+          "bbox": [
+            -36.6,
+            -79.321,
+            -33.936,
+            -79.09
+          ]
+        },
+        {
+          "area": 0.2856,
+          "bbox": [
+            -3.573,
+            -71.167,
+            -2.093,
+            -70.695
+          ]
+        },
+        {
+          "area": 0.2787,
+          "bbox": [
+            -60,
+            -80.783,
+            -59.323,
+            -79.771
+          ]
+        },
+        {
+          "area": 0.2683,
+          "bbox": [
+            -68.55,
+            -79.501,
+            -67.067,
+            -79.227
+          ]
+        },
+        {
+          "area": 0.2387,
+          "bbox": [
+            25.954,
+            -70.434,
+            26.876,
+            -70.061
+          ]
+        },
+        {
+          "area": 0.2156,
+          "bbox": [
+            100.27,
+            -65.702,
+            101.238,
+            -65.377
+          ]
+        },
+        {
+          "area": 0.212,
+          "bbox": [
+            -56.501,
+            -63.438,
+            -55.075,
+            -63.157
+          ]
+        },
+        {
+          "area": 0.2098,
+          "bbox": [
+            -119.905,
+            -74.111,
+            -118.879,
+            -73.778
+          ]
+        },
+        {
+          "area": 0.2016,
+          "bbox": [
+            166.014,
+            -78.307,
+            167.641,
+            -77.993
+          ]
+        },
+        {
+          "area": 0.1968,
+          "bbox": [
+            -132.163,
+            -74.583,
+            -130.968,
+            -74.33
+          ]
+        },
+        {
+          "area": 0.1935,
+          "bbox": [
+            -62.567,
+            -69.729,
+            -61.807,
+            -69.176
+          ]
+        },
+        {
+          "area": 0.1933,
+          "bbox": [
+            -59.003,
+            -62.244,
+            -57.638,
+            -61.912
+          ]
+        },
+        {
+          "area": 0.1886,
+          "bbox": [
+            15.561,
+            -70.071,
+            16.627,
+            -69.728
+          ]
+        }
+      ]
+    }
   }
 }
