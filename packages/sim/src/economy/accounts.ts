@@ -301,7 +301,8 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "business-tax-expense", side: "debit" },
     { subtype: "business-tax-revenue", side: "credit" },
   ],
-  "construction-wage": [{ subtype: "wage-income", side: "credit" }],  "construction-capitalization": [],
+  "construction-wage": [{ subtype: "wage-income", side: "credit" }],
+  "construction-capitalization": [],
   "construction-writeoff": [],
   "construction-working-capital": [],
   "construction-material-purchase": [

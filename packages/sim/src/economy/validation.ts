@@ -811,7 +811,8 @@ export function assertValidFinanceState(finance: FinanceState): void {
 
   assertValidAnnualState(finance, accounts);
 
-  const opening = record.opening as FinanceState["opening"];  if (opening === null || opening === undefined) {
+  const opening = record.opening as FinanceState["opening"];
+  if (opening === null || opening === undefined) {
     for (const account of accounts.values()) {
       if (account.balanceSUSD !== 0) {
         throw new RangeError(
