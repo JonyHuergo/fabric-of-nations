@@ -23,7 +23,7 @@ Century's M7 Expo / React Native playable shell, updated for E1 economic clarity
    labels, correction counts), confirmed session action history, world gross flows, and
    bounded diagnostics.
 
-Controls: start/pause, step one day, speeds 1/2/5/10 simulated days per second,
+Controls: start/pause, step one day, speeds 1/3/10/30 simulated days per second,
 save, and load. Actions are sent only through the versioned worker protocol. Action
 history is appended only from authoritative `ACTION_RESULT` replies and is bounded to
 48 session entries; it is cleared on load or worker restart.

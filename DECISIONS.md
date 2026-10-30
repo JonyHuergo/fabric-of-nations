@@ -4597,3 +4597,82 @@ version **`m3-economy-v11`** are unchanged; no authoritative state shape changed
 - The committed app worker bundle was regenerated because the simulation source
   changed. No schema, simulation, protocol, or data version bump was required: the
   authoritative state shape and protocol are unchanged.
+
+## D-084 — Audit remediation batch 3: speeds, cession safety, zero-recipient pay, truce, casualties, payroll, and save validation
+
+**Status:** implemented. Fixes AUDIT-009 through AUDIT-015 from the post-M10 audit.
+World schema **26**, simulation **0.26.0**, worker protocol **13**, and data version
+**`m3-economy-v11`** remain unchanged; no authoritative state shape or save format
+changed.
+
+### Decisions
+
+1. **Speed controls match GDD §3.2.** `SPEED_VALUES` is now `[1, 3, 10, 30]` days per
+   second. The app derives its selectable buttons and labels from that one constant, and
+   the worker parser rejects every other value with `invalid_speed`. The normal 100 ms
+   pump cadence runs three deterministic ticks per pump at 30×; the four-tick per-pump
+   cap from D-064 remains the bounded catch-up policy for stalls, so 30× is a best-effort
+   target rather than a guarantee during timer coalescing. The 20.3-minute campaign
+   figure is the static 36,524 / 30 arithmetic estimate in the GDD, not a measurement.
+   No protocol version bump: the `SET_SPEED` command and snapshot shapes are unchanged;
+   only the validated value set was corrected to the documented specification.
+2. **Cession is validated before mutation.** A `cede-occupied` term transfers every
+   region of the opponent that the offerer currently controls. `cessionError` requires at
+   least one controlled region and requires the ceding country to retain at least one
+   sovereign region. The check runs at offer creation, again at acceptance against the
+   current occupations (stale offers are revalidated), and in `applyPeace` before the war,
+   truce, or sovereignty state is mutated. `transferRegionSovereignty` also refuses to
+   remove a country's last region as a defensive guard. Invalid actions leave the world
+   and hash unchanged.
+3. **No recipient means no payment-dependent effect.** Batch 2 already made daily pay
+   and garrison payments require a real pop-block recipient. This batch adds explicit
+   coverage: with a zero-population occupied region, only the equipment supplier can be
+   paid; soldiers' pay and garrison costs are reported as shortfall, no `military-pay`
+   posting is created, the treasury does not move for them, and supply/organization do
+   not recover. A populated region's eligibility fallback to total civilian population is
+   unchanged.
+4. **Truce duration is elapsed-time inclusive.** A peace on day P sets the inclusive
+   last prohibited day `truceUntilDay = P + 365`. The 365 full truce days are P+1 through
+   P+365; the peace day P is also prohibited defensively, and a new declaration is first
+   legal on P+366. `validateDeclareWar` uses `world.dayIndex <= truceUntilDay`. This is
+   the existing behavior, now documented and covered at P, P+365, and P+366.
+5. **All three casualty shares are active.** `splitMilitaryCasualties` apportions integer
+   losses across deaths, wounded, and captured using integer per-mille weights from
+   `M10_DEATH_SHARE`, `M10_WOUNDED_SHARE`, and `M10_CAPTURED_SHARE` with exact
+   largest-remainder arithmetic. Equal remainders break in category order (deaths,
+   wounded, captured). `M10_CAPTURED_SHARE` is retained and now controls the captured
+   share instead of being an unused residual. Losses always sum exactly.
+6. **Government payroll treatment is explicit.** The GDD §6.5 wealth convention is
+   settlement wages plus welfare. The M4c income-tax withholding pass reads that same
+   settlement wage receipt; construction wages keep their documented separate E3
+   withholding path. Administration, education, training, and military payroll are paid
+   after (or after withholding within) the fiscal phase and are deliberately outside both
+   the income-tax base and the monthly wealth income basis. This avoids taxing income
+   before receipt, double taxation, and treating a later payment as earlier wealth income.
+   This batch documents the existing behavior; it does not change payroll amounts.
+7. **Malformed military states are rejected early.** When military is enabled, every
+   country must have exactly one `military-expense` account and every pop block exactly
+   one `military-income` account. A disabled system must have empty armies, wars,
+   relations, offers, casualties, and no last-phase day. Each peace offer must reference
+   an active war and exactly that war's two belligerents. `nextArmyId`, `nextWarId`, and
+   `nextOfferId` must be greater than every retained record id. Valid enabled and
+   disabled saves continue to load; no migration or schema bump is needed.
+
+### Consequences
+
+- The UI, worker parser, and scheduler now agree on the GDD speed set; unsupported 2×
+  and 5× values are rejected consistently.
+- Last-region cession attempts fail at validation with a specific reason instead of
+  relying on a later generic world-validation failure.
+- A zero-population region cannot receive free military services; unpaid amounts remain
+  visible as shortfall.
+- Truce boundaries are unambiguous and tested, with no hidden extra day.
+- Captured casualty counts follow the configured 15% share, and every battle loss is
+  conserved across the three categories.
+- Government payroll remains outside the tax/wealth bases by explicit documented rule;
+  no income is counted before payment or taxed twice.
+- Crafted saves with missing military accounts, mismatched offers, disabled-but-active
+  state, or stale id counters now fail at load with useful errors.
+- The committed worker bundle was regenerated. No GDD file, schema, simulation,
+  protocol, or data version was changed: the GDD already specified the corrected speed
+  set, last-region rule, 365-day truce, and settlement-wage wealth convention.

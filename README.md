@@ -1170,7 +1170,7 @@ are not.** M7 therefore carries an explicit acceptance exception (D-061).
   and prices, and Ledger/financial summary. The map is a stylized 16-region
   authored-sample grid with country selection; the 500-region production map,
   pan/zoom, and broad annual charts are not implemented. The screen states this.
-- **Controls and actions.** Start/pause, step one day, speeds 1/2/5/10 simulated
+- **Controls and actions.** Start/pause, step one day, speeds 1/3/10/30 simulated
   days per second, save/load, and the shared `set-fiscal-policy` player action.
   Commands apply only between complete ticks; the app cannot mutate the world.
 - **Save/load.** The canonical save string is compressed with gzip and base64 at
