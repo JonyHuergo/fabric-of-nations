@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { colors, radii, spacing, type } from "../theme";
 
@@ -202,6 +202,13 @@ export function Chip({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: active, disabled }}
+      /*
+       * React Native Web drops `accessibilityState.selected` for role=button,
+       * so the active filter/layer/speed would be visual-only. aria-pressed is
+       * the correct state for a toggle button. The prop is web-only so a native
+       * build is not given an unsupported accessibility prop.
+       */
+      {...(Platform.OS === "web" ? ({ "aria-pressed": active } as object) : {})}
       disabled={disabled}
       onPress={onPress}
       style={[

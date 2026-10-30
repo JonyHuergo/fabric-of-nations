@@ -222,6 +222,15 @@ export function SliderField({
           accessibilityRole="adjustable"
           accessibilityLabel={label}
           accessibilityValue={{ min, max, now: value, text: display }}
+          /*
+           * React Native Web reads the flat aria-value* props, not the
+           * accessibilityValue object. Without them the rendered slider has
+           * role="slider" but no announced value on the web build.
+           */
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={value}
+          aria-valuetext={display}
           accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
           onAccessibilityAction={(event) => {
             if (event.nativeEvent.actionName === "increment") adjust(step);

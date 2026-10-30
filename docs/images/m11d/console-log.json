@@ -1,0 +1,712 @@
+{
+  "results": [
+    {
+      "name": "startup: main menu renders",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "startup: no saved campaign yet",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "startup: playable state count shown",
+      "ok": true,
+      "detail": "66 playable states"
+    },
+    {
+      "name": "startup: map SVG rendered",
+      "ok": true,
+      "detail": "{\"svg\":1,\"paths\":269}"
+    },
+    {
+      "name": "startup: no broken images on menu",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "provenance: opens",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "provenance: lists flags",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "provenance: closes",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "brief: shows scenario facts",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "brief: flags load",
+      "ok": true,
+      "detail": "8 images, 0 broken"
+    },
+    {
+      "name": "selection: shows playable count",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: shows dependent count",
+      "ok": true,
+      "detail": "66 dependent"
+    },
+    {
+      "name": "selection: search narrows list",
+      "ok": true,
+      "detail": "1 entry"
+    },
+    {
+      "name": "selection: Austria-Hungary row clickable",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: Austria-Hungary status shown",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: Austria-Hungary playable",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "game: top bar shows Austria-Hungary",
+      "ok": true,
+      "detail": "created in 2.9 s"
+    },
+    {
+      "name": "game: date is 1900-01-01",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "game: simulation controls present",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "game: no startup error banner",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "game: creation under 60 s",
+      "ok": true,
+      "detail": "2.9 s"
+    },
+    {
+      "name": "selection: playable-only list is complete",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: all-territories view includes dependencies",
+      "ok": true,
+      "detail": "133 entries"
+    },
+    {
+      "name": "selection: every flag image loads",
+      "ok": true,
+      "detail": "134 images, 0 broken"
+    },
+    {
+      "name": "selection: dependency detail explains status",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: dependency has no play button",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: Sultanate of Wadai selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Sultanate of Darfur selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Co-Principality of Andorra selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Principality of Liechtenstein selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Most Serene Republic of San Marino selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Kingdom of Tonga selectable",
+      "ok": true,
+      "detail": "playable"
+    },
+    {
+      "name": "selection: Wadai detail opens",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: Wadai is a playable state",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "selection: rapid selection keeps the detail panel in sync",
+      "ok": true,
+      "detail": "8/8 in sync; last French Republic"
+    },
+    {
+      "name": "selection: small country campaign loads the selected country",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tabs: campaign created",
+      "ok": true,
+      "detail": "Play as United States in 2.7 s"
+    },
+    {
+      "name": "tab: Overview renders",
+      "ok": true,
+      "detail": "3349 chars"
+    },
+    {
+      "name": "tab: Overview exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Overview has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Budget renders",
+      "ok": true,
+      "detail": "5706 chars"
+    },
+    {
+      "name": "tab: Budget exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Budget has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Markets renders",
+      "ok": true,
+      "detail": "22927 chars"
+    },
+    {
+      "name": "tab: Markets exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Markets has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Industry renders",
+      "ok": true,
+      "detail": "3177 chars"
+    },
+    {
+      "name": "tab: Industry exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Industry has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Construction renders",
+      "ok": true,
+      "detail": "3487 chars"
+    },
+    {
+      "name": "tab: Construction exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Construction has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Trade renders",
+      "ok": true,
+      "detail": "10787 chars"
+    },
+    {
+      "name": "tab: Trade exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Trade has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Labor & health renders",
+      "ok": true,
+      "detail": "2699 chars"
+    },
+    {
+      "name": "tab: Labor & health exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Labor & health has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Money renders",
+      "ok": true,
+      "detail": "7834 chars"
+    },
+    {
+      "name": "tab: Money exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Money has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Population renders",
+      "ok": true,
+      "detail": "4874 chars"
+    },
+    {
+      "name": "tab: Population exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Population has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Politics renders",
+      "ok": true,
+      "detail": "5718 chars"
+    },
+    {
+      "name": "tab: Politics exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Politics has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Technology renders",
+      "ok": true,
+      "detail": "16169 chars"
+    },
+    {
+      "name": "tab: Technology exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Technology has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: War & diplomacy renders",
+      "ok": true,
+      "detail": "1917 chars"
+    },
+    {
+      "name": "tab: War & diplomacy exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: War & diplomacy has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: Ledger renders",
+      "ok": true,
+      "detail": "1579 chars"
+    },
+    {
+      "name": "tab: Ledger exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tab: Ledger has country detail",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "tab: World renders",
+      "ok": true,
+      "detail": "1624 chars"
+    },
+    {
+      "name": "tab: World exposes the active navigation state",
+      "ok": true,
+      "detail": "aria-current=page"
+    },
+    {
+      "name": "tabs: market highlight opens the world map",
+      "ok": true,
+      "detail": "world map with market layer"
+    },
+    {
+      "name": "simulation: +1 day advances the date",
+      "ok": true,
+      "detail": "1900-01-01 -> 1900-01-06"
+    },
+    {
+      "name": "simulation: running advances the date",
+      "ok": true,
+      "detail": "1900-01-06 -> 1900-01-21"
+    },
+    {
+      "name": "simulation: running does not reset the campaign",
+      "ok": true,
+      "detail": "1900-01-06 -> 1900-01-21"
+    },
+    {
+      "name": "simulation: no worker replacement while running",
+      "ok": true,
+      "detail": "1 workers; commands REQUEST_SNAPSHOT,CREATE_GAME,SET_FOCUS,STEP,STEP,STEP,STEP,STEP,SET_SPEED,START,PAUSE,SAVE"
+    },
+    {
+      "name": "simulation: pause returns to Play",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "simulation: no error banner after running",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "simulation: speed switching keeps the UI usable",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "map: zoom changes transform",
+      "ok": true,
+      "detail": "translate(-8500 -4250) scale(18)"
+    },
+    {
+      "name": "map: zoom reaches the documented maximum",
+      "ok": true,
+      "detail": "scale 18"
+    },
+    {
+      "name": "map: zoom out lowers the scale",
+      "ok": true,
+      "detail": "scale 18 -> 12"
+    },
+    {
+      "name": "map: hover Europe shows a tooltip",
+      "ok": true,
+      "detail": "hover text updated"
+    },
+    {
+      "name": "map: hover Africa shows a tooltip",
+      "ok": true,
+      "detail": "hover text updated"
+    },
+    {
+      "name": "map: hover South America shows a tooltip",
+      "ok": true,
+      "detail": "hover text updated"
+    },
+    {
+      "name": "map: hover Central Asia shows a tooltip",
+      "ok": true,
+      "detail": "hover text updated"
+    },
+    {
+      "name": "map: select Germany on the map",
+      "ok": true,
+      "detail": "German Empire"
+    },
+    {
+      "name": "map: Open overview navigates to the country screen",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "map: select Libya on the map",
+      "ok": true,
+      "detail": "Ottoman Empire"
+    },
+    {
+      "name": "map: dependent territory is inspectable",
+      "ok": true,
+      "detail": "British India"
+    },
+    {
+      "name": "map: dependent territory cannot open a country screen",
+      "ok": true,
+      "detail": "inspect button aria-disabled=true"
+    },
+    {
+      "name": "map: every layer chip activates",
+      "ok": true,
+      "detail": "[{\"chip\":\"Control\",\"selected\":\"true\",\"legend\":\"CONTROL LAYER\"},{\"chip\":\"Markets\",\"selected\":\"true\",\"legend\":\"MARKET LAYER\"},{\"chip\":\"Political\",\"selected\":\"true\",\"legend\":\"POLITICAL LAYER\"}]"
+    },
+    {
+      "name": "map: market highlight control works",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "map: wheel zooms",
+      "ok": true,
+      "detail": "translate(-731.5433254008565 -364.90077778923705) scale(2.4596031111569476)"
+    },
+    {
+      "name": "map: wheel does not scroll the page",
+      "ok": true,
+      "detail": "{\"scrollBefore\":{\"page\":0,\"inner\":0},\"scrollAfter\":{\"page\":0,\"inner\":0}}"
+    },
+    {
+      "name": "map: pan changes transform",
+      "ok": true,
+      "detail": "translate(-941.5671917493052 -417.40674437634925) scale(2.4596031111569476)"
+    },
+    {
+      "name": "map: reset restores global view",
+      "ok": true,
+      "detail": "translate(0 0) scale(1)"
+    },
+    {
+      "name": "economy: budget screen content",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "economy: budget has adjustable values",
+      "ok": true,
+      "detail": "{\"count\":8,\"labels\":[\"Personal income tax rate\",\"Income-tax exemption\",\"Business-profit tax rate\",\"Welfare budget\",\"Welfare eligibility ceiling\",\"Treasury reserve target\",\"Borrow principal\",\"Outstanding-principal ceiling\"]}"
+    },
+    {
+      "name": "economy: slider step button works",
+      "ok": true,
+      "detail": "6 -> 6.5"
+    },
+    {
+      "name": "economy: slider action confirmed",
+      "ok": true,
+      "detail": "Applied: tax 6.50%, exemption 0/yr, welfare 0/yr, welfare ceiling wealth 99, business tax 0.00%, reserve 0"
+    },
+    {
+      "name": "economy: slider numeric field present",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "economy: out-of-range value clamps without crashing",
+      "ok": true,
+      "detail": "60.00"
+    },
+    {
+      "name": "economy: non-numeric input leaves the value intact",
+      "ok": true,
+      "detail": "60.00 -> 60.00"
+    },
+    {
+      "name": "economy: non-numeric input does not raise an error",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "economy: dragging the track changes the committed value",
+      "ok": true,
+      "detail": "60 -> 39 (applied)"
+    },
+    {
+      "name": "save: reports saved",
+      "ok": true,
+      "detail": "Saved 1900-01-04 · 2975 KiB canonical · 398 KiB stored (button Save / replace, prompt true)"
+    },
+    {
+      "name": "save: existing save offered on menu",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "save: continues the same country",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "save: preserves the simulated date",
+      "ok": true,
+      "detail": "1900-01-04 -> 1900-01-04"
+    },
+    {
+      "name": "save: second save reports status",
+      "ok": true,
+      "detail": "Saved 1900-01-05 · 2978 KiB canonical · 401 KiB stored"
+    },
+    {
+      "name": "worker: restarted world keeps player country",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "worker: restart resets to the campaign start",
+      "ok": true,
+      "detail": "1900-01-01 -> 1900-01-01"
+    },
+    {
+      "name": "worker: repeated restarts stay usable",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "persistence: older schema is reported clearly",
+      "ok": true,
+      "detail": "Saved game could not be read: No readable saved game was found (the last error was: saved game uses schema 25; this build supports 26)"
+    },
+    {
+      "name": "persistence: incompatible save is not offered as Continue",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "persistence: corrupt save is reported",
+      "ok": true,
+      "detail": "Saved game could not be read: No readable saved game was found (the last error was: stored save must start with \"century-save-gzip1:\")"
+    },
+    {
+      "name": "persistence: clean start after clearing storage",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "persistence: Load without a save reports the missing save",
+      "ok": true,
+      "detail": "No saved game was found"
+    },
+    {
+      "name": "stress: 42 navigation switches stay responsive",
+      "ok": true,
+      "detail": "3.7 s"
+    },
+    {
+      "name": "stress: 20 s at 30x advances simulated time",
+      "ok": true,
+      "detail": "1900-01-01 -> 1900-02-05 (35 days)"
+    },
+    {
+      "name": "stress: repeated save/load returns to the saved date",
+      "ok": true,
+      "detail": "1900-02-05 -> 1900-02-05"
+    },
+    {
+      "name": "stress: no worker replacement during save/load cycles",
+      "ok": true,
+      "detail": "1 workers"
+    },
+    {
+      "name": "stress: JS heap growth stays bounded",
+      "ok": true,
+      "detail": "2.0 MB"
+    },
+    {
+      "name": "responsive: narrow layout keeps map and controls",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "responsive: narrow budget renders",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "responsive: no horizontal page overflow",
+      "ok": true,
+      "detail": "{\"scrollW\":480,\"clientW\":480}"
+    }
+  ],
+  "entries": [],
+  "events": {
+    "exceptions": [],
+    "logs": [],
+    "network": [],
+    "consoleWarningsAndErrors": []
+  },
+  "pageErrors": {
+    "errors": [],
+    "rejections": [],
+    "workers": [
+      {
+        "at": 1793397697457,
+        "size": 63
+      }
+    ],
+    "commands": [
+      {
+        "at": 1793397697457,
+        "type": "REQUEST_SNAPSHOT",
+        "playerCountryId": null,
+        "action": null
+      },
+      {
+        "at": 1793397703029,
+        "type": "CREATE_GAME",
+        "playerCountryId": 9,
+        "action": null
+      },
+      {
+        "at": 1793397703247,
+        "type": "SET_FOCUS",
+        "playerCountryId": null,
+        "action": null
+      }
+    ],
+    "workerErrors": []
+  }
+}

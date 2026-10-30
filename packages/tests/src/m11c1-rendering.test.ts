@@ -42,7 +42,10 @@ describe("M11c.1 rendering contract", () => {
   });
 
   test("wheel, trackpad and pinch zoom are wired, and the maximum is raised", () => {
-    expect(WORLD_MAP).toContain("onWheel: handleWheel");
+    // M11d: the wheel listener is native and explicitly non-passive so
+    // preventDefault works; a React onWheel prop would be passive on the web.
+    expect(WORLD_MAP).toContain('node.addEventListener("wheel", handleWheel, { passive: false })');
+    expect(WORLD_MAP).not.toContain("onWheel:");
     expect(WORLD_MAP).toContain("const handleWheel");
     expect(WORLD_MAP).toContain("screenPointToViewBox");
     expect(WORLD_MAP).toContain("onPanResponderMove");

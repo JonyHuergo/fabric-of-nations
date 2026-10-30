@@ -79,3 +79,16 @@ export function zoomAt(
 export function viewportScale(size: ViewportSize): number {
   return Math.min(size.width / MAP_WIDTH, size.height / MAP_HEIGHT);
 }
+
+/**
+ * Wheel/trackpad zoom factor for a wheel delta.
+ *
+ * A trackpad pinch arrives as ctrl+wheel with much smaller deltas, so it needs
+ * a larger sensitivity to feel the same. The factor is multiplicative and
+ * clamped by the caller through `clampScale`.
+ */
+export function wheelZoomFactor(deltaY: number, ctrlKey: boolean): number {
+  if (!Number.isFinite(deltaY) || deltaY === 0) return 1;
+  const sensitivity = ctrlKey ? 0.004 : 0.0015;
+  return Math.exp(-deltaY * sensitivity);
+}

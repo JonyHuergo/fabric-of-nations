@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -187,6 +188,7 @@ export function CountrySelectionScreen({
               style={[styles.listRow, active ? styles.listRowActive : null, entry.selectable ? null : styles.listRowMuted]}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
+              {...(Platform.OS === "web" ? ({ "aria-pressed": active } as object) : {})}
               onPress={() => setSelectedTag(entry.tag)}
             >
               <CountryFlag

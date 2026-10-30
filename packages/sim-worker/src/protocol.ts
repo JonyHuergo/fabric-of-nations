@@ -12,6 +12,16 @@ export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
 export const MAX_SNAPSHOT_LEDGER_MONTHS = 12;
 export const MAX_SNAPSHOT_ANNUAL_REPORTS = 12;
+/**
+ * Upper bound for a person count carried in a snapshot.
+ *
+ * The 1900 world starts at roughly 1.59 billion people and the campaign can run
+ * to the year 2000, so 20 billion is far above any plausible simulated total
+ * while still rejecting obviously corrupt values. A 100,000,000 bound rejected
+ * the United Kingdom's valid construction labour pool (107.8M idle workers
+ * across the UK and British India) and made that campaign impossible to start.
+ */
+export const MAX_SNAPSHOT_PEOPLE = 20_000_000_000;
 /** E6a: bounded in-transit consignments and blocked diagnostics per snapshot. */
 export const MAX_SNAPSHOT_TRADE_SHIPMENTS = 24;
 export const MAX_SNAPSHOT_TRADE_BLOCKED = 24;
@@ -2316,7 +2326,10 @@ function isConstructionHistory(value: unknown): value is SnapshotConstructionHis
 
 function isConstructionLabor(value: unknown): value is SnapshotConstructionLabor {
   if (!isRecord(value)) return false;
-  return isIntegerIn(value.idleWorkers, 0, 100_000_000) && isFiniteNumber(value.dailyWageSUSD);
+  return (
+    isIntegerIn(value.idleWorkers, 0, MAX_SNAPSHOT_PEOPLE) &&
+    isFiniteNumber(value.dailyWageSUSD)
+  );
 }
 
 function isIndustrialPolicy(value: unknown): value is SnapshotIndustrialPolicy {

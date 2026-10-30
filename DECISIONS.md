@@ -5231,3 +5231,81 @@ The user also selected Darfur and Wadai flag designs.
   gone. Residual sub-0.01 deg² coastline slivers and small-island detail gaps are
   documented rather than cosmetically filled.
 - Stable IDs, populations, markets, saves and simulation behavior are unchanged.
+
+## D-098 — M11d runtime playtest fixes (worker lifecycle, snapshot bound, web input)
+
+**Status:** implemented (M11d).
+
+### Context
+
+Playtesting the exported Expo web build (headless Chrome through CDP) found six
+issues that static checks could not reach:
+
+1. **Saving rebuilt the simulation.** `handleEvent` closed over the
+   `savedCampaign` state, and the worker-creation effect listed the handlers as
+   dependencies. Completing a save therefore tore down the Web Worker, then the
+   provider re-created the campaign from the player identity, silently resetting
+   the simulated date and discarding unsaved progress.
+2. **A United Kingdom campaign could not start.** The app rejected the
+   `NEW_GAME_RESULT`: the protocol validator bounded `constructionLabor.idleWorkers`
+   at 100,000,000, while the valid UK pool is 107,781,153 (the United Kingdom plus
+   British India). The generic error was "event.snapshot is not a valid snapshot".
+3. **Wheel zoom logged an error on every notch.** React attaches `onWheel`
+   passively, so the synthetic handler's `preventDefault()` produced "Unable to
+   preventDefault inside passive event listener invocation" and the page could
+   still scroll.
+4. **Sliders exposed no value to screen readers on web.** The component set
+   `accessibilityValue`, but React Native Web reads the flat `aria-value*` props;
+   the rendered `role="slider"` had no `aria-valuenow`, `aria-valuemin`,
+   `aria-valuemax` or `aria-valuetext`.
+5. **An unreadable saved game looked like no saved game.** The startup storage
+   error was cleared by the worker's initial `READY` event, leaving "No saved
+   campaign yet" with no explanation for an incompatible or corrupt save.
+6. **Every load requested a missing `/favicon.ico`.**
+7. **Country labels swallowed map clicks.** SVG text labels sit at polity
+   centroids and were the pointer target, so clicking a labelled country (for
+   example British India) produced a hover tooltip but no selection.
+
+### Decision
+
+1. Worker lifecycle depends only on the explicit restart epoch (`webEpoch` /
+   `nativeEpoch`). Supervisor callbacks always dispatch through refs, and the
+   saved-campaign envelope is mirrored into a ref. No simulation or save-format
+   change; identity and date are preserved across saves.
+2. Add the documented `MAX_SNAPSHOT_PEOPLE = 20_000_000_000` bound for person
+   counts in snapshots (the 1900 world starts at ~1.59bn and the campaign can run
+   to 2000). The snapshot shape is unchanged, so `PROTOCOL_VERSION` stays 14; only
+   the accepted value range of a valid person count widens.
+3. The map owns a native, explicitly non-passive `wheel` listener on its
+   container, maps `clientX`/`clientY` through the container box, and calls
+   `preventDefault()`. The pure factor math is `wheelZoomFactor` in
+   `mapViewport.ts`.
+4. Sliders pass both `accessibilityValue` (native) and the flat `aria-value*`
+   props (web), so a screen reader announces the current value and range.
+5. `READY` clears an existing error only when no startup storage error is
+   recorded; a successful new game or load clears the diagnosis.
+6. `app.json` declares a bundled `web.favicon`; the export now emits
+   `/favicon.ico` and the browser request succeeds.
+7. Country labels are non-interactive (`pointerEvents="none"`); polity fills and
+   small-state markers keep their press handlers.
+
+### Consequences
+
+- Saving, autosaving, loading and restarting no longer rebuild the worker
+  implicitly; the observed worker count remains one per app session, and a
+  20-second 30x run keeps its simulated date.
+- Every selectable country's initial snapshot now passes the app protocol
+  validator. `m11d-runtime-contract.test.ts` checks all 66 selectable countries
+  through `NEW_GAME_RESULT` and `parseWorkerEvent`.
+- Clicking a labelled country on the map now selects it instead of hitting the
+  label. Labels remain visible and non-focusable.
+- Pause is acknowledged only between worker pumps. The host may finish up to
+  four queued ticks first, so at the full-world 30x rate the date can advance a
+  few simulated days before the UI reports Play. This is the existing
+  command-boundary contract, not a state regression; the playtest waits for the
+  acknowledgement before comparing dates.
+- No simulation behavior, determinism, save schema, stable IDs or data versions
+  changed. The measured full-world cost is unchanged: about 650 ms per simulated
+  day in Node, so 30x remains best-effort (documented in the M11d report).
+- Native device builds were not available in this environment; the native
+  provider path was hardened (same epoch rule) but not re-run on a device.

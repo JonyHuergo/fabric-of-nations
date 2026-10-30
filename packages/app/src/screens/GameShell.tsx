@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -249,6 +250,9 @@ export function GameShell() {
                   key={item.id}
                   accessibilityRole="button"
                   accessibilityState={{ selected: active }}
+                  // RNW does not forward `selected` for buttons; aria-current
+                  // communicates the active screen to assistive technology.
+                  {...(Platform.OS === "web" ? ({ "aria-current": active ? "page" : undefined } as object) : {})}
                   onPress={() => setTab(item.id)}
                   style={[narrow ? styles.mobileNavItem : styles.railItem, active ? styles.navItemActive : null]}
                 >

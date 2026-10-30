@@ -187,6 +187,12 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const autosaveSchedulerRef = useRef<AutosaveScheduler | null>(null);
   const saveKindRef = useRef<"manual" | "autosave" | null>(null);
   const startupRef = useRef<CampaignStartup>("checking");
+  /**
+   * Set when the stored campaign could not be read. Kept separate from the
+   * transient worker errors because initial READY clears those, and a silently
+   * cleared storage error would present an unreadable save as "no save".
+   */
+  const startupStorageErrorRef = useRef<string | null>(null);
   const autosaveRequestRef = useRef<() => void>(() => {});
   const focusRequestRef = useRef<number | null>(null);
   const activePlayerCountryIdRef = useRef<number | null>(null);
@@ -215,6 +221,18 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const [webEpoch, setWebEpoch] = useState(0);
   const [nativeEpoch, setNativeEpoch] = useState(0);
 
+  /**
+   * The saved-campaign envelope is also mirrored into a ref because the worker
+   * event handler must read its current value without becoming a dependency of
+   * the worker-lifecycle effect. Re-creating the worker when a save completes
+   * would silently rebuild the campaign and reset the simulated date.
+   */
+  const savedCampaignRef = useRef<StoredCampaign | null>(null);
+  const updateSavedCampaign = useCallback((campaign: StoredCampaign | null) => {
+    savedCampaignRef.current = campaign;
+    setSavedCampaign(campaign);
+  }, []);
+
   useEffect(() => {
     runningRef.current = running;
   }, [running]);
@@ -241,20 +259,22 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       .then((campaign) => {
         if (cancelled) return;
         if (campaign === null) {
-          setSavedCampaign(null);
+          updateSavedCampaign(null);
           setStartup("menu");
           startupRef.current = "menu";
           autosaveArmedRef.current = false;
           return;
         }
-        setSavedCampaign(campaign);
+        updateSavedCampaign(campaign);
         setStartup("menu");
         startupRef.current = "menu";
         autosaveArmedRef.current = false;
       })
       .catch((storageError: unknown) => {
         if (cancelled) return;
-        setError(`Saved game could not be read: ${messageOf(storageError)}`);
+        const message = `Saved game could not be read: ${messageOf(storageError)}`;
+        startupStorageErrorRef.current = message;
+        setError(message);
         setStartup("menu");
         startupRef.current = "menu";
         // Preserve any existing file; a fresh autosave must not replace it.
@@ -314,7 +334,9 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           setAchievedDaysPerSecond(event.snapshot.achievedDaysPerSecond);
           setConnection("ready");
           connectionRef.current = "ready";
-          if (event.type === "READY") setError(null);
+          // A startup storage failure must survive the worker's initial READY;
+          // otherwise an unreadable save looks like "no save" with no reason.
+          if (event.type === "READY" && startupStorageErrorRef.current === null) setError(null);
           return;
         case "STATE":
           setRunningState(event.running);
@@ -388,7 +410,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
               setBusy(false);
               setError(null);
               autosaveArmedRef.current = true;
-              setSavedCampaign({
+              updateSavedCampaign({
                 save: event.save,
                 metadata: info.metadata,
                 source: "primary",
@@ -429,6 +451,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             autosaveArmedRef.current = true;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             focusRequestRef.current = null;
+            // A successful load replaces the unreadable-save diagnosis.
+            startupStorageErrorRef.current = null;
             setError(null);
             setSaveStatus("Saved game loaded");
             setActionHistory([]);
@@ -463,7 +487,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             pendingActionsRef.current.clear();
             focusRequestRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
-            if (savedCampaign === null) {
+            startupStorageErrorRef.current = null;
+            if (savedCampaignRef.current === null) {
               autosaveArmedRef.current = true;
               setSaveStatus("New 1900 campaign started.");
             } else {
@@ -518,7 +543,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           return;
       }
     },
-    [savedCampaign, setRunningState],
+    [setRunningState],
   );
 
   const send = useCallback(
@@ -753,7 +778,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
         setSaveStatus(null);
         return;
       }
-      setSavedCampaign(campaign);
+      updateSavedCampaign(campaign);
       setStartup("playing");
       startupRef.current = "playing";
       autosaveArmedRef.current = true;
@@ -822,6 +847,23 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     setSpeedDaysPerSecond(1);
   }, [setRunningState]);
 
+  /**
+   * Worker lifecycle must depend only on the explicit restart epoch. Handler
+   * identities change whenever provider state changes; tearing the worker down
+   * in response would silently rebuild the campaign and discard the simulated
+   * date. The supervisor always calls the latest handler through these refs.
+   */
+  const handleEventRef = useRef(handleEvent);
+  const handleSupervisorErrorRef = useRef(handleSupervisorError);
+  const handleTimeoutRef = useRef(handleTimeout);
+  const handleTransportErrorRef = useRef(handleTransportError);
+  useEffect(() => {
+    handleEventRef.current = handleEvent;
+    handleSupervisorErrorRef.current = handleSupervisorError;
+    handleTimeoutRef.current = handleTimeout;
+    handleTransportErrorRef.current = handleTransportError;
+  }, [handleEvent, handleSupervisorError, handleTimeout, handleTransportError]);
+
   useEffect(() => {
     if (Platform.OS !== "web") return;
     if (!isWebWorkerAvailable()) {
@@ -842,14 +884,15 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     webClientRef.current = client;
     const supervisor = new WorkerSupervisor({
       send: (command) => client.send(command),
-      onEvent: handleEvent,
-      onError: handleSupervisorError,
-      onTimeout: handleTimeout,
+      onEvent: (event) => handleEventRef.current(event),
+      onError: (message) => handleSupervisorErrorRef.current(message),
+      onTimeout: (commandId, commandType, message) =>
+        handleTimeoutRef.current(commandId, commandType, message),
     });
     supervisorRef.current = supervisor;
     const unsubscribe = client.subscribe((event) => supervisor.receive(event));
     const unsubscribeErrors = client.subscribeErrors((message) => {
-      handleTransportError(message);
+      handleTransportErrorRef.current(message);
     });
     supervisor.startReadiness();
     supervisor.send(INITIAL_REQUEST);
@@ -861,15 +904,16 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       if (webClientRef.current === client) webClientRef.current = null;
       if (supervisorRef.current === supervisor) supervisorRef.current = null;
     };
-  }, [webEpoch, handleEvent, handleSupervisorError, handleTimeout, handleTransportError]);
+  }, [webEpoch]);
 
   useEffect(() => {
     if (Platform.OS === "web") return;
     const supervisor = new WorkerSupervisor({
       send: (command) => nativeRef.current?.send(command),
-      onEvent: handleEvent,
-      onError: handleSupervisorError,
-      onTimeout: handleTimeout,
+      onEvent: (event) => handleEventRef.current(event),
+      onError: (message) => handleSupervisorErrorRef.current(message),
+      onTimeout: (commandId, commandType, message) =>
+        handleTimeoutRef.current(commandId, commandType, message),
     });
     supervisorRef.current = supervisor;
     supervisor.startReadiness();
@@ -877,7 +921,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       supervisor.dispose();
       if (supervisorRef.current === supervisor) supervisorRef.current = null;
     };
-  }, [nativeEpoch, handleEvent, handleSupervisorError, handleTimeout]);
+  }, [nativeEpoch]);
 
   useEffect(() => {
     const hide = (): void => {

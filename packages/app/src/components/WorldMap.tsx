@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import {
   PanResponder,
   Platform,
@@ -24,6 +24,7 @@ import {
   MAP_MAX_SCALE,
   MAP_MIN_SCALE,
   MAP_WIDTH,
+  wheelZoomFactor,
 } from "./mapViewport";
 
 export { MAP_MAX_SCALE, MAP_MIN_SCALE, MAP_PREVIOUS_MAX_SCALE } from "./mapViewport";
@@ -162,6 +163,8 @@ export function WorldMap({
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [hoveredTag, setHoveredTag] = useState<string | null>(null);
   const gestureRef = useRef({ x: 0, y: 0, distance: 0 });
+  /** DOM node used to attach a non-passive web wheel listener. */
+  const containerRef = useRef<ComponentRef<typeof View> | null>(null);
 
   const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
   const gesturing = useRef({ x: 0, y: 0 });
@@ -378,50 +381,42 @@ export function WorldMap({
     [scale, screenPointToViewBox, translate.x, translate.y],
   );
 
+  /**
+   * Web wheel zoom.
+   *
+   * React attaches `onWheel` through a passive listener, so calling
+   * preventDefault from a synthetic handler logs "Unable to preventDefault
+   * inside passive event listener invocation" and still scrolls the page. The
+   * container therefore owns a native, explicitly non-passive wheel listener
+   * and maps the pointer with client coordinates relative to its own box.
+   */
   const handleWheel = useCallback(
-    (event: {
-      preventDefault?: () => void;
-      nativeEvent?: {
-        deltaY?: number;
-        deltaMode?: number;
-        offsetX?: number;
-        offsetY?: number;
-        locationX?: number;
-        locationY?: number;
-        ctrlKey?: boolean;
-      };
-      deltaY?: number;
-      offsetX?: number;
-      offsetY?: number;
-      locationX?: number;
-      locationY?: number;
-      ctrlKey?: boolean;
-    }) => {
+    (event: WheelEvent) => {
       if (Platform.OS !== "web") return;
-      const native = (event.nativeEvent ?? event) as {
-        deltaY?: number;
-        offsetX?: number;
-        offsetY?: number;
-        locationX?: number;
-        locationY?: number;
-        ctrlKey?: boolean;
-      };
-      const deltaY = native.deltaY ?? 0;
+      const deltaY = event.deltaY;
       if (!Number.isFinite(deltaY) || deltaY === 0) return;
-      event.preventDefault?.();
-      // Trackpad pinch gestures arrive as ctrl+wheel with small deltas; both
-      // paths use the same focal-point zoom, just a different sensitivity.
-      const sensitivity = native.ctrlKey === true ? 0.004 : 0.0015;
-      const factor = Math.exp(-deltaY * sensitivity);
-      const localX = native.offsetX ?? native.locationX ?? size.width / 2;
-      const localY = native.offsetY ?? native.locationY ?? size.height / 2;
-      const point = screenPointToViewBox(localX, localY);
+      const node = containerRef.current as unknown as HTMLElement | null;
+      if (node === null) return;
+      event.preventDefault();
+      const rect = node.getBoundingClientRect();
+      const factor = wheelZoomFactor(deltaY, event.ctrlKey === true);
+      const point = screenPointToViewBox(event.clientX - rect.left, event.clientY - rect.top);
       const focus =
         point === null ? { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 } : { x: point[0], y: point[1] };
       zoomBy(factor, focus);
     },
-    [screenPointToViewBox, size.height, size.width, zoomBy],
+    [screenPointToViewBox, zoomBy],
   );
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const node = containerRef.current as unknown as HTMLElement | null;
+    if (node === null) return;
+    node.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      node.removeEventListener("wheel", handleWheel);
+    };
+  }, [handleWheel]);
 
   const pickAt = useCallback(
     (worldX: number, worldY: number): DecodedPolity | null => {
@@ -527,12 +522,12 @@ export function WorldMap({
 
   return (
     <View
+      ref={containerRef}
       style={[styles.container, { height }]}
       onLayout={onLayout}
       {...(Platform.OS === "web"
         ? ({
             onPointerMove: handlePointerMove,
-            onWheel: handleWheel,
             onPointerLeave: () => {
               setHoveredTag(null);
               setHoverPoint(null);
@@ -660,6 +655,13 @@ export function WorldMap({
                     stroke={colors.mapOcean}
                     strokeWidth={0.6 / scale}
                     opacity={0.95}
+                    /*
+                     * Labels are drawn at the polity centroid, which is exactly
+                     * where a player is most likely to click. Without this the
+                     * text becomes the pointer target and selection silently
+                     * fails for every labelled country.
+                     */
+                    pointerEvents="none"
                   >
                     {polity.entry.commonName}
                   </SvgText>
