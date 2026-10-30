@@ -92,12 +92,13 @@ App:
   AI exclusion, six-region host creation, rejection of dependencies/unknown ids, focus bounds, save/load
   persistence, snapshot size, market identity/membership, map geometry, action
   ranges, and protocol/supervisor handling of `CREATE_GAME`/`NEW_GAME_RESULT`.
-- Full Jest suite: **822 of 823 tests passed** on the first M11 run. The single
-  failure was `batch5-validation`'s pinned world digest, which changes because
+- Full Jest suite: **822 of 823 tests passed** on the main M11 run (before the
+  final all-selectable initialization test was added). The single failure was `batch5-validation`'s pinned world digest, which changes because
   M11 bumps the encoded simulation/data version metadata without changing that
   fixture's behaviour. The digest was re-pinned with a comment, and
   `batch5-validation` then passed 10/10 in isolation. All other suites and tests
-  passed in that run; no other M11 regression was found.
+  passed in that run; no other M11 regression was found. The added all-selectable
+  test was run separately and passes (22/22 M11 tests).
 - Browser smoke (Expo web export served locally):
   - main menu, new-game brief and country picker rendered;
   - `?country=JPN` created a campaign through `CREATE_GAME`, showing Japan's
