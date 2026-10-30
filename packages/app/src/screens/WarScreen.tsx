@@ -132,7 +132,10 @@ export function WarScreen({
     );
     return war !== undefined;
   });
-  const declareTargets = snapshot.countries.filter((candidate) => candidate.id !== country.id);
+  // Declarations may target any country, including summaries not focused for detail.
+  const declareTargets = snapshot.countrySummaries.filter(
+    (candidate) => candidate.id !== country.id,
+  );
   const parsedPersonnel = Number(personnelText);
   const recruitError =
     !Number.isInteger(parsedPersonnel) || parsedPersonnel <= 0

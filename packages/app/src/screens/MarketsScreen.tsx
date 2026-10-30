@@ -34,7 +34,7 @@ export function MarketsScreen({
   readonly countryId: number | null;
   readonly onShowOnMap?: (marketId: number) => void;
 }) {
-  const country = snapshot.countries.find((entry) => entry.id === countryId) ?? null;
+  const country = snapshot.countrySummaries.find((entry) => entry.id === countryId) ?? null;
   const homeMarket = marketForCountry(snapshot, country);
   const essential = new Set(essentialGoodIds(snapshot));
   const countryById = new Map(snapshot.countrySummaries.map((entry) => [entry.id, entry]));

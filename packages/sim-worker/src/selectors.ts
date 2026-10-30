@@ -114,7 +114,7 @@ export function latestFinancePeriod(country: CountrySnapshot) {
 /** Selected market for a country: the market of its first owned region. */
 export function marketForCountry(
   snapshot: SimulationSnapshot,
-  country: CountrySnapshot | null,
+  country: { readonly regionIds: readonly number[] } | null,
 ): MarketSnapshot | null {
   if (country === null) return null;
   for (const regionId of country.regionIds) {
@@ -129,7 +129,7 @@ export function marketForCountry(
 /** Every market containing at least one region owned by the country. */
 export function marketsForCountry(
   snapshot: SimulationSnapshot,
-  country: CountrySnapshot | null,
+  country: { readonly regionIds: readonly number[] } | null,
 ): readonly MarketSnapshot[] {
   if (country === null) return [];
   const countryRegions = new Set(country.regionIds);

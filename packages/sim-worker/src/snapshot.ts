@@ -1856,6 +1856,7 @@ function countrySummarySnapshots(
       const meta = countryMeta.get(country.id);
       const blocks = blocksByCountry.get(country.id) ?? [];
       let population = 0;
+      let workingAge = 0;
       let hardshipPopulation = 0;
       let weightedLiteracy = 0;
       let weightedWealth = 0;
@@ -1863,6 +1864,7 @@ function countrySummarySnapshots(
       for (const block of blocks) {
         const blockPopulation = populationTotal(block);
         population += blockPopulation;
+        workingAge += workingAgePopulation(block);
         if (block.unmetSubsistenceDays >= AI_HARDSHIP_SUBSISTENCE_DAYS) {
           hardshipPopulation += blockPopulation;
         }
@@ -1902,6 +1904,7 @@ function countrySummarySnapshots(
         regionIds,
         marketIds,
         population,
+        workingAgePopulation: workingAge,
         employedWorkers: employedByCountry.get(country.id) ?? 0,
         treasuryCashSUSD: roundDisplay(
           index.find("country", country.id, "treasury-cash")?.balanceSUSD ?? 0,

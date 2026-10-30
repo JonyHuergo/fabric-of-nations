@@ -27,7 +27,7 @@ export function PopulationScreen({
         title="Population and employment"
         subtitle="Country aggregates derived from the authoritative single-year sex/age blocks."
       >
-        {snapshot.countries.map((entry) => (
+        {snapshot.countrySummaries.map((entry) => (
           <Pressable
             key={entry.id}
             accessibilityRole="button"

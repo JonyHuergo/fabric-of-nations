@@ -374,6 +374,12 @@ export function GameShell() {
                 <Screen
                   tab={tab}
                   countryId={focusedCountryId}
+                  onSelectCountry={(countryId) => {
+                    const tag = snapshot?.countrySummaries.find(
+                      (candidate) => candidate.id === countryId,
+                    )?.tag;
+                    if (tag !== undefined) setSelectedTag(tag);
+                  }}
                   onShowMarket={(marketId) => {
                     setLayer("markets");
                     setHighlightMarketId(marketId);
@@ -399,10 +405,12 @@ export function GameShell() {
 function Screen({
   tab,
   countryId,
+  onSelectCountry,
   onShowMarket,
 }: {
   readonly tab: TabId;
   readonly countryId: number;
+  readonly onSelectCountry: (countryId: number) => void;
   readonly onShowMarket: (marketId: number) => void;
 }) {
   const { snapshot } = useSimulation();
@@ -427,7 +435,13 @@ function Screen({
     case "money":
       return <MoneyScreen snapshot={snapshot} countryId={countryId} />;
     case "population":
-      return <PopulationScreen snapshot={snapshot} countryId={countryId} onSelectCountry={() => undefined} />;
+      return (
+        <PopulationScreen
+          snapshot={snapshot}
+          countryId={countryId}
+          onSelectCountry={onSelectCountry}
+        />
+      );
     case "politics":
       return <PoliticsScreen snapshot={snapshot} countryId={countryId} />;
     case "technology":

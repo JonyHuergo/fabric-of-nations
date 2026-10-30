@@ -1011,6 +1011,7 @@ export interface CountrySummarySnapshot {
   readonly regionIds: readonly number[];
   readonly marketIds: readonly number[];
   readonly population: number;
+  readonly workingAgePopulation: number;
   readonly employedWorkers: number;
   readonly treasuryCashSUSD: number;
   readonly hardshipPopulationShare: number;
@@ -2618,6 +2619,7 @@ function isCountrySummary(value: unknown): value is CountrySummarySnapshot {
   if (!isNumberArray(value.regionIds) || !isNumberArray(value.marketIds)) return false;
   for (const key of [
     "population",
+    "workingAgePopulation",
     "employedWorkers",
     "treasuryCashSUSD",
     "hardshipPopulationShare",

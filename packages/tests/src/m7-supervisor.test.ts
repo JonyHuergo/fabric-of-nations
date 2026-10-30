@@ -312,6 +312,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         regionIds: [0],
         marketIds: [0],
         population: 100,
+        workingAgePopulation: 60,
         employedWorkers: 0,
         treasuryCashSUSD: 100,
         hardshipPopulationShare: 0,

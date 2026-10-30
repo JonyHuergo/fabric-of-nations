@@ -226,7 +226,7 @@ export function TradeScreen({
           value={`infrastructure ${percent(market.infrastructure)} · customs ${
             market.customsCountryId === null
               ? "none"
-              : (snapshot.countries.find((entry) => entry.id === market.customsCountryId)?.tag ??
+              : (snapshot.countrySummaries.find((entry) => entry.id === market.customsCountryId)?.tag ??
                 String(market.customsCountryId))
           }`}
         />
