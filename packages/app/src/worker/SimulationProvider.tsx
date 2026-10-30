@@ -720,7 +720,6 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
         playerCountryId,
       });
       if (accepted) {
-        activePlayerCountryIdRef.current = playerCountryId;
         setSaveStatus("Preparing the 1900 world…");
       } else {
         setError("The simulation worker is not connected. Restart it and try again.");

@@ -80,6 +80,39 @@ App:
 
 ## 4. Verification
 
+- `pnpm lint` — passed (198 TypeScript files, 60 in packages/sim).
+- `pnpm typecheck` — passed for sim, data, sim-worker, bench, tests and app.
+- `pnpm run check:worker` — generated world scenario current; committed worker
+  bundle current.
+- `pnpm -F @century/app build:worker` — bundle regenerated after the M11 source
+  and protocol changes.
+- `pnpm -F @century/app export:web` — static web export succeeded (Expo).
+- `pnpm -F @century/tests test -- m11-world` — **21 tests pass**: catalog
+  completeness, 122-region world validation, AI exclusion, six-region country
+  creation, rejection of dependencies/unknown ids, focus bounds, save/load
+  persistence, snapshot size, market identity/membership, map geometry, action
+  ranges, and protocol/supervisor handling of `CREATE_GAME`/`NEW_GAME_RESULT`.
+- Full Jest suite: **822 of 823 tests passed** on the first M11 run. The single
+  failure was `batch5-validation`'s pinned world digest, which changes because
+  M11 bumps the encoded simulation/data version metadata without changing that
+  fixture's behaviour. The digest was re-pinned with a comment, and
+  `batch5-validation` then passed 10/10 in isolation. All other suites and tests
+  passed in that run; no other M11 regression was found.
+- Browser smoke (Expo web export served locally):
+  - main menu, new-game brief and country picker rendered;
+  - `?country=JPN` created a campaign through `CREATE_GAME`, showing Japan's
+    identity, 47.1 M population, treasury and Japanese Empire Market;
+  - the World map rendered political fills, player highlight, labels, capital
+    markers and legend;
+  - the Markets screen listed the British Empire and Sterling Area's four member
+    countries and 26 regions with customs and prices;
+  - pressing the Budget income-tax slider's step button produced the
+    authoritative result "Applied: tax 5.50%…";
+  - a 500×900 viewport stacked the top bar, horizontal navigation, map and
+    context panel.
+- No benchmarks, profiling, stress/soak tests, full-campaign runs, `pnpm run ci`,
+  or native device builds were executed, per the milestone restrictions.
+
 - `pnpm -F @century/app typecheck` — pass.
 - `pnpm -F @century/sim build`, `@century/data build`, `@century/sim-worker build` — pass.
 - `pnpm -F @century/app build:worker` — regenerated bundle.

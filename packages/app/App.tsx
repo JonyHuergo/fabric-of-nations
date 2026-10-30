@@ -128,7 +128,7 @@ function CenturyRoot() {
           />
         )}
 
-        {error === null ? null : (
+        {error === null || view === "game" ? null : (
           <Pressable style={styles.errorBanner} onPress={clearError} accessibilityRole="button">
             <Text style={styles.errorText}>{error}</Text>
             <Text style={styles.errorDismiss}>Dismiss</Text>

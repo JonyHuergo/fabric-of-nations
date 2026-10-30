@@ -139,6 +139,10 @@ sample remains a validated test fixture.
   contextual polity/market panels, centralized design system and responsive
   desktop/narrow layouts.
 
+The full 122-region world is compute-heavy; the 10× and 30× speed settings
+remain best-effort and the UI reports the measured throughput. No benchmark is
+claimed for the M11 world size.
+
 Contracts: `EconomyScenarioDef.countryMeta/marketMeta/regionMeta`; bounded
 snapshots (full player + focus country, compact summaries for all others);
 worker protocol **14** (`CREATE_GAME`, `SET_FOCUS`, `NEW_GAME_RESULT`). World
