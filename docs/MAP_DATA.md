@@ -131,7 +131,8 @@ node scripts/m11/generate-provenance-doc.mjs
 - **Small states**: `small` marks polities whose total ring area is below
   0.5 deg². They are drawn as markers at all zoom levels; click targets use the
   marker.
-- **Labels**: shown by area threshold and zoom.
+- **Labels**: shown by area threshold and zoom, then sized to the country's
+  projected bounds and culled on collision (see §5a).
 
 ## 5. Projection
 
@@ -147,15 +148,32 @@ The map is drawn in a 1000×500 viewBox and letterboxed with
 hit testing inverts that transform and uses even-odd point-in-polygon with a
 bounding-box prefilter.
 
-## 5a. Rendering and zoom (M11c.1)
+## 5a. Rendering and zoom (M11c.1, updated in M11d)
 
 The SVG layer order is fixed: ocean rectangle, transformed land mask, country
-fills, political borders (drawn with each fill), disputed-zone overlays,
-selection/occupation overlays, markers and labels. The land mask is **inside the
-same transform group** as the country fills. M11c drew it outside that group,
-which left a world-scale land layer fixed behind a zoomed political map; this was
-the source of the stale land-over-ocean overlay. The mask now also uses the
-even-odd fill rule so inland water holes remain water.
+fills, disputed-zone overlays, one political-border pass, selection/occupation
+overlays, capital markers and labels. The land mask is **inside the same
+transform group** as the country fills. M11c drew it outside that group, which
+left a world-scale land layer fixed behind a zoomed political map; this was the
+source of the stale land-over-ocean overlay. The mask now also uses the even-odd
+fill rule so inland water holes remain water.
+
+M11d rendering refinements:
+
+- The land mask is **fill-only**; the single border pass strokes every coastline
+  and shared border once from the country geometry. Stroking the separately
+  simplified land mask produced a second, offset coastline.
+- `world_map_1900.json` carries `displayCorrections`. The current entry bridges
+  the sub-0.02° gap left by independently simplified northern/southern East
+  Prussian pieces along the modern Kaliningrad border. The bridge is presentation
+  geometry and adds no simulation entity or value.
+- Disputed zones use a diagonal amber hatch (`century-disputed-hatch`), a bright
+  dashed edge and a "Disputed" label at regional zoom. They remain excluded from
+  every polity and are not playable.
+- Country labels are sized from the country's projected bounding box, its
+  name length and its on-screen area (7–24 px screen, selected +1.5 px), with a
+  dark halo and a collision cull; the player/selected label is a priority
+  candidate.
 
 Zoom:
 - Minimum scale **1**, previous maximum **10**, new maximum **18** (1.8×).

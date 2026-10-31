@@ -154,7 +154,7 @@ any scenario. The only console error class found was the passive-wheel error
 | Renderer/worker crashes | 0 |
 | React error-boundary activations | 0 |
 | Playtest checks executed | **134** (all passed in the final run) |
-| Automated tests | **892 passed / 0 failed** (87 suites; includes 12 new M11d regression tests) |
+| Automated tests | **897 passed / 0 failed** (88 suites; includes 17 new M11d regression tests and the map follow-up) |
 | Runtime crashes | 0 |
 | Performance issues | 1 identified and measured (full-world tick cost; see below), not fixed |
 
@@ -205,19 +205,24 @@ the saved date.
 |---|---|
 | `packages/app/src/worker/SimulationProvider.tsx` | Worker lifecycle depends only on restart epochs; handler refs; saved-campaign ref; startup storage error preserved across READY |
 | `packages/sim-worker/src/protocol.ts` | Documented `MAX_SNAPSHOT_PEOPLE` bound replaces the 100M `idleWorkers` cap |
-| `packages/app/src/components/WorldMap.tsx` | Non-passive native wheel listener; label hit-testing fix; pure wheel factor |
+| `packages/app/src/components/WorldMap.tsx` | Non-passive native wheel listener; label hit-testing fix; pure wheel factor; size-aware labels, disputed hatch, single coastline and clearer borders (follow-up) |
 | `packages/app/src/components/mapViewport.ts` | `wheelZoomFactor` |
+| `scripts/m11/build-map.mjs` | Display-only East Prussian seam bridge and `displayCorrections` metadata |
+| `packages/data/data/map/world_map_1900.json`, `world_map_1900_audit.json`, `packages/app/src/generated/worldMap1900.ts` | Regenerated map geometry, seam correction and audit |
+| `packages/tests/src/m11d-map-legibility.test.ts` | New seam, hatch and label-typography regression suite |
+| `packages/tests/src/m11d-map-selection.test.ts` | Updated for the new label layer; added sizing/collision assertions |
 | `packages/app/src/components/Slider.tsx` | Flat `aria-value*` props for the web |
 | `packages/app/src/components/ui.tsx` | Web-only `aria-pressed` on toggle chips |
 | `packages/app/src/screens/GameShell.tsx` | Web-only `aria-current="page"` on the active navigation entry |
 | `packages/app/src/screens/CountrySelectionScreen.tsx` | Web-only `aria-pressed` on the selected country row |
 | `packages/app/app.json` | `web.favicon` |
 | `packages/app/assets/favicon.png` | New bundled favicon |
-| `packages/tests/src/m11d-*.test.ts` | Five new regression suites (12 tests) |
+| `packages/tests/src/m11d-*.test.ts` | Six new regression suites (17 tests, including the map-legibility follow-up) |
 | `packages/tests/src/m11c1-rendering.test.ts` | Existing wheel assertion updated: it asserted the passive `onWheel` prop that caused finding #4; it now asserts the native `{ passive: false }` listener and the absence of the React prop |
-| `scripts/m11d/**` | Reusable CDP playtest harness, scenarios and measurement scripts |
+| `scripts/m11d/**` | Reusable CDP playtest harness, scenarios, measurement and map-fix screenshot scripts |
 | `docs/M11D_PLAYTEST_REPORT.md` | This report |
-| `DECISIONS.md` | D-098 |
+| `docs/MAP_DATA.md` | Rendering, seam-bridge and label-typography notes |
+| `DECISIONS.md` | D-098 and D-099 |
 | `.gitignore` | Ignore the M11d browser profile |
 
 No simulation logic, schema, data version, RNG, seed or save format was changed.
@@ -228,9 +233,9 @@ All commands were executed from the repository root on the final tree.
 
 | Command | Result |
 |---|---|
-| `pnpm test` | **892 passed / 0 failed** (87 suites) |
+| `pnpm test` | **897 passed / 0 failed** (88 suites; includes the map-legibility follow-up) |
 | `pnpm typecheck` | pass |
-| `pnpm lint` | pass (216 TypeScript files checked) |
+| `pnpm lint` | pass (217 TypeScript files checked) |
 | `pnpm flags:check` | pass (66 flags, 133 polities, 723,273 bytes) |
 | `pnpm flags:audit` | pass (66 files, licence audit) |
 | `pnpm run check:worker` | pass (scenario and worker bundle current) |
@@ -256,6 +261,48 @@ listener and the absence of the React prop. No assertion was deleted or
 weakened; the behaviour it protects (wheel/trackpad pinch zoom, maximum scale,
 buttons) is still asserted.
 
+## 7. Map legibility follow-up
+
+The first playtest pass focused on runtime errors. A visual follow-up fixed the
+remaining map defects reported from the running game:
+
+1. **The black squares under Libya and near India are disputed frontier zones,
+   not rendering holes.** They are the map-only `aouzou-tibesti` and
+   `siachen-kashmir` zones. They are deliberately excluded from every polity,
+   have no simulation id, and carry their own claims and sources. Their previous
+   fill was `rgba(216,179,74,0.18)`; over the dark land mask this averaged to
+   near black at world zoom. They now use a diagonal amber hatch
+   (`century-disputed-hatch`), a bright dashed edge and a "Disputed" label at
+   regional zoom, so they read as uncertainty annotations.
+2. **The line inside Germany near East Prussia/Memel was a modern border.** The
+   northern and southern East Prussian pieces were simplified independently and
+   left a sub-0.02° gap along the 1945 Kaliningrad–Poland border, so the renderer
+   stroked that line inside Germany. `build-map.mjs` now unions a documented
+   display-only seam strip; the correction is recorded in
+   `world_map_1900.json → displayCorrections`. The line is gone.
+3. **Borders are single-stroked and clearer.** The land mask is fill-only, so
+   coastlines are no longer drawn twice from two differently simplified paths.
+   The country border pass is 1.1 px screen width with round joins.
+4. **Country names scale with the country.** Labels are sized from the country's
+   projected bounds, name length and on-screen area (7–24 px, selected +1.5 px),
+   with a dark halo and a collision cull. Large states get large names in the
+   middle; microstates keep readable labels; off-screen labels are culled instead
+   of being clipped at the map edge.
+
+![World map](images/m11d/fix-world.png)
+![Disputed zone under Libya](images/m11d/fix-libya-disputed.png)
+![East Prussia after the seam fix](images/m11d/fix-east-prussia.png)
+![Germany at regional zoom](images/m11d/fix-germany.png)
+
+Verification for this follow-up: `pnpm test` **897 passed / 88 suites**,
+`pnpm typecheck`, `pnpm lint`, `pnpm flags:check`, `pnpm flags:audit`,
+`pnpm run check:worker` and `pnpm -F @century/app export:web` all pass; the map
+playtest scenario passes all checks with zero console errors. The map audit was
+regenerated: 2 political overlaps (largest 0.004 deg²), 4,047.8007 deg²
+unassigned (4,026.4191 deg² intentional Antarctica), `resolvedOverlaps` 201.
+No simulation, schema, RNG or save data changed.
+
 **Fix commit:** `48a5b5e` — "fix: eliminate M11d runtime playtest defects"
+**Map follow-up commit:** the commit that adds this section.
 **Report commit:** this commit (docs only).
 **Working tree:** clean after the final commit.

@@ -21,12 +21,12 @@
     "unassignedSamples": 26,
     "unassignedComponents": 26,
     "largestUnassignedComponent": 1,
-    "polygonUnassignedAreaDegreesSquared": 4047.7959,
-    "polygonUnassignedComponents": 5489,
+    "polygonUnassignedAreaDegreesSquared": 4047.8007,
+    "polygonUnassignedComponents": 5490,
     "largestPolygonUnassignedComponentDegreesSquared": 534.9472,
     "intentionalUnassignedAreaDegreesSquared": 4026.4191,
-    "generalizationSliverAreaDegreesSquared": 19.5388,
-    "generalizationSliverComponents": 5311,
+    "generalizationSliverAreaDegreesSquared": 19.5436,
+    "generalizationSliverComponents": 5312,
     "unexplainedUnassignedAreaDegreesSquared": 1.838,
     "unexplainedUnassignedComponents": 62
   },
@@ -579,7 +579,7 @@
       "landAreaDegreesSquared": 19357.263,
       "assignedAreaDegreesSquared": 15329.89,
       "disputedAreaDegreesSquared": 15.04,
-      "unassignedAreaDegreesSquared": 4047.7959,
+      "unassignedAreaDegreesSquared": 4047.8007,
       "unassignedPolygons": [
         {
           "area": 269.5989,
@@ -2382,7 +2382,7 @@
           ]
         }
       ],
-      "unassignedComponents": 5489,
+      "unassignedComponents": 5490,
       "largestUnassignedComponentDegreesSquared": 534.9472,
       "failures": [],
       "intentionalUnassignedAreaDegreesSquared": 4026.4191,
@@ -3548,8 +3548,8 @@
           "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
         }
       ],
-      "generalizationAreaDegreesSquared": 19.5388,
-      "generalizationComponents": 5311,
+      "generalizationAreaDegreesSquared": 19.5436,
+      "generalizationComponents": 5312,
       "unexplainedAreaDegreesSquared": 1.838,
       "unexplainedComponents": 62,
       "unexplainedAreas": [

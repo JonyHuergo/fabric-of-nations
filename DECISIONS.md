@@ -5309,3 +5309,63 @@ issues that static checks could not reach:
   day in Node, so 30x remains best-effort (documented in the M11d report).
 - Native device builds were not available in this environment; the native
   provider path was hardened (same epoch rule) but not re-run on a device.
+
+## D-099 — M11d follow-up: map seams, disputed-zone colour and country labels
+
+**Status:** implemented (M11d follow-up).
+
+### Context
+
+Playtesting the M11d map reported four visual defects: a black square south of
+Libya, a similar square near India, a straight line inside Germany close to East
+Prussia/Memel, and country names that were only about five screen pixels high
+and unreadable. Close inspection also showed a second coastline stroke offset
+from the country coastline.
+
+- The two "black squares" are the **Aouzou–Tibesti** and **Karakoram–Siachen**
+  disputed frontier zones. They are deliberately excluded from every polity and
+  were filled with `rgba(216,179,74,0.18)`; over the dark land mask that
+  averaged to nearly black at world zoom.
+- The line across East Prussia is the **1945 southern border of Kaliningrad
+  Oblast**, a modern line that did not exist in 1900. The northern and southern
+  East Prussian pieces were simplified independently and left a sub-0.02 degree
+  gap, so the renderer kept two rings and stroked the modern line.
+- The land mask and the polity border pass both stroked coastlines, using
+  different simplification tolerances, producing two offset coastlines.
+
+### Decision
+
+1. **Display-only seam bridge.** `build-map.mjs` has a documented
+   `DISPLAY_SEAM_BRIDGES` table. A thin strip along the Kaliningrad–Poland seam
+   is unioned into the German geometry and the result is simplified again. The
+   strip closes only the simplification gap; it adds ~0.025 deg² of the German
+   land that the two pieces already represented. The correction is recorded in
+   `world_map_1900.json` under `displayCorrections`; it changes no polity id,
+   population, market, simulation state or save.
+2. **Disputed zones are a hatch, not a dark translucent fill.** They use a
+   diagonal amber pattern (`century-disputed-hatch`), a bright dashed edge and a
+   "Disputed" label at regional zoom. They remain non-playable and unassigned.
+3. **Country labels are sized to the country.** Screen font size is derived from
+   the polity's projected bounding box, the length of its name, and its on-screen
+   area, clamped to 7–24 px (selected +1.5 px). Labels use a dark halo, a
+   collision cull and the player/selected country as a priority candidate.
+4. **One coastline stroke.** The land mask is fill-only; the polity border pass
+   is the single coastline source and is drawn at 1.1 px screen width with round
+   joins/caps.
+5. The map audit was regenerated after the geometry change.
+
+### Consequences
+
+- The Germany line near East Prussia/Memel is gone; Germany is eight outer rings
+  (mainland, islands) with no artificial seam.
+- The disputed zones read as amber hatched frontier annotations at world zoom and
+  carry a label when zoomed in; they no longer look like black holes.
+- Large countries get large names and small countries keep readable labels; the
+  collision cull removes overlaps while the player/selected label is preserved.
+- Coastlines are single-stroked; country borders are more visible.
+- Map data only: DEU area +0.021 deg² and RUS −0.026 deg² from the display bridge
+  and overlap resolution. Audit: 2 political overlaps (largest 0.004 deg²),
+  4,047.8007 deg² unassigned (4,026.4191 deg² intentional Antarctica),
+  `resolvedOverlaps` 201. No simulation, schema, RNG or save change.
+- New regression suite `m11d-map-legibility.test.ts` and the updated map-selection
+  tests cover the seam, hatch, label sizing and single coastline.

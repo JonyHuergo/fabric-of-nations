@@ -794,6 +794,52 @@ function multiPolygonArea(polygons) {
 }
 
 /**
+ * Display-only seam bridges.
+ *
+ * The German 1900 reconstruction is assembled from modern Polish voivodeships
+ * plus the Kaliningrad and Klaipeda units. The modern southern border of
+ * Kaliningrad is not a 1900 border, but independent simplification of the two
+ * pieces leaves a sub-0.01 degree gap along it. The pieces therefore stay two
+ * rings, and the renderer draws a straight line inside Germany.
+ *
+ * A triangle spanning only that gap joins the two rings without adding any
+ * meaningful area. These bridges are presentation geometry: they change no
+ * simulation state, polity id, population, market or save data. Audit and
+ * provenance records still describe the authored boundary sources.
+ */
+const DISPLAY_SEAM_BRIDGES = [
+  {
+    id: "germany-east-prussia-seam",
+    tag: "DEU",
+    reason:
+      "The 1945 southern border of Kaliningrad Oblast is not a 1900 border; the northern and southern East Prussian pieces were separated by a sub-0.02 degree simplification gap.",
+    seam: [
+      [19.61, 54.457],
+      [22.767, 54.356],
+    ],
+    halfWidthDegrees: 0.02,
+  },
+];
+
+/** A thin strip along a seam, wide enough to overlap both pieces. */
+function seamStripPolygon(seam, halfWidthDegrees) {
+  const [start, end] = seam;
+  const dx = end[0] - start[0];
+  const dy = end[1] - start[1];
+  const length = Math.hypot(dx, dy);
+  if (!(length > 0)) return null;
+  const nx = (-dy / length) * halfWidthDegrees;
+  const ny = (dx / length) * halfWidthDegrees;
+  const offset = (point, sign) => [point[0] + nx * sign, point[1] + ny * sign];
+  return closeRing([
+    offset(start, 1),
+    offset(end, 1),
+    offset(end, -1),
+    offset(start, -1),
+  ]);
+}
+
+/**
  * Deterministic pairwise overlap resolution. A transfer destination always
  * beats its source; otherwise the smaller (more specific) polity keeps the
  * disputed sliver. The intersection is removed only from the loser, so the
@@ -947,6 +993,44 @@ for (const entry of entries) {
   simplifiedByTag.set(entry.tag, simplified);
 }
 resolvedOverlaps += resolveOverlapsInMap(simplifiedByTag);
+
+const displayCorrections = [];
+for (const correction of DISPLAY_SEAM_BRIDGES) {
+  const polygons = simplifiedByTag.get(correction.tag);
+  if (polygons === undefined || polygons.length === 0) {
+    warnings.push(`display seam bridge ${correction.id}: no geometry for ${correction.tag}`);
+    continue;
+  }
+  const bridgeRing = seamStripPolygon(correction.seam, correction.halfWidthDegrees);
+  if (bridgeRing === null || bridgeRing.length < 4) {
+    warnings.push(`display seam bridge ${correction.id}: invalid strip`);
+    continue;
+  }
+  const beforeArea = multiPolygonArea(polygons);
+  let merged;
+  try {
+    merged = simplifyMultiPolygon(unionPolygons([polygons, [[bridgeRing]]]));
+  } catch (error) {
+    warnings.push(`display seam bridge ${correction.id} failed: ${String(error)}`);
+    continue;
+  }
+  if (merged.length === 0 || multiPolygonArea(merged) <= 0) {
+    warnings.push(`display seam bridge ${correction.id} produced empty geometry`);
+    continue;
+  }
+  simplifiedByTag.set(correction.tag, merged);
+  displayCorrections.push({
+    id: correction.id,
+    tag: correction.tag,
+    reason: correction.reason,
+    seam: correction.seam,
+    halfWidthDegrees: correction.halfWidthDegrees,
+    areaAddedDegreesSquared: Number((multiPolygonArea(merged) - beforeArea).toFixed(4)),
+  });
+}
+if (displayCorrections.length > 0) {
+  resolvedOverlaps += resolveOverlapsInMap(simplifiedByTag);
+}
 
 for (const entry of entries) {
   const finalPolygons = simplifiedByTag.get(entry.tag) ?? [];
@@ -1182,13 +1266,15 @@ const payload = {
     resolvedOverlaps,
     disputedAreaCount: disputedPayload.length,
     overlapResolutionCount: overlapResolutions.length,
+    displayCorrectionCount: displayCorrections.length,
     notes:
-      "Modern source units are only geometry blocks. The authored 1900 transfers in boundaries_1900.json are applied with polygon-clipping; every polity carries boundary provenance, a reference date, a geometry class and a confidence class. Internal modern borders are not drawn. South Africa uses the four 1900 polities with modern province proxies; the Transvaal and Orange Free State are documented approximations.",
+      "Modern source units are only geometry blocks. The authored 1900 transfers in boundaries_1900.json are applied with polygon-clipping; every polity carries boundary provenance, a reference date, a geometry class and a confidence class. Internal modern borders are not drawn; display-only seam bridges close sub-0.01 degree simplification gaps between pieces of the same polity and change no simulation state. South Africa uses the four 1900 polities with modern province proxies; the Transvaal and Orange Free State are documented approximations.",
   },
   boundarySources: boundaryData.meta.sourceRegistry,
   land: landRings,
   disputedAreas: disputedPayload,
   overlapResolutions,
+  displayCorrections,
   polities,
 };
 

@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import Svg, {
   Circle,
+  Defs,
   G,
   Path,
+  Pattern,
   Rect,
   Text as SvgText,
 } from "react-native-svg";
@@ -508,13 +510,108 @@ export function WorldMap({
     return controllerTag;
   };
 
-  const labelVisible = (polity: DecodedPolity): boolean => {
-    if (polity.markerOnly === true) return false;
-    if (scale >= 2.6) return !polity.small;
-    if (scale >= 1.8) return polity.area > 2;
-    if (scale >= 1.25) return polity.area > 8;
-    return polity.area > 55;
-  };
+  /**
+   * Screen-constant country labels with a simple collision cull.
+   *
+   * Labels used to be 6 viewBox units divided by the zoom scale, which is about
+   * five screen pixels at every zoom level. They are now ~12 px on screen with a
+   * dark halo, and a larger country wins the space when two labels overlap.
+   * The selected or player country is always a candidate.
+   */
+  const screenScale = Math.max(viewScale * scale, 0.0001);
+  const labelLayout = useMemo(() => {
+    const visible = {
+      left: -translate.x / scale,
+      right: (MAP_WIDTH - translate.x) / scale,
+      top: -translate.y / scale,
+      bottom: (MAP_HEIGHT - translate.y) / scale,
+    };
+    const placed: {
+      readonly tag: string;
+      readonly name: string;
+      readonly x: number;
+      readonly y: number;
+      readonly fontSize: number;
+      readonly selected: boolean;
+    }[] = [];
+    const boxes: { left: number; right: number; top: number; bottom: number }[] = [];
+    const candidates = polities.filter((polity) => {
+      if (polity.markerOnly === true) return false;
+      if (polity.tag === selectedTag) return true;
+      if (playerTag !== null && polity.tag === playerTag) return true;
+      if (scale >= 2.6) return !polity.small;
+      if (scale >= 1.8) return polity.area > 6;
+      if (scale >= 1.25) return polity.area > 15;
+      return polity.area > 90;
+    });
+    candidates.sort((left, right) => {
+      const leftSelected = left.tag === selectedTag ? 1 : 0;
+      const rightSelected = right.tag === selectedTag ? 1 : 0;
+      if (leftSelected !== rightSelected) return rightSelected - leftSelected;
+      return right.area - left.area;
+    });
+    for (const polity of candidates) {
+      const selected = polity.tag === selectedTag;
+      const name = polity.entry.commonName;
+      const [x, y] = polity.centroid;
+      /*
+       * Size the label to the country on screen. A large state gets a large
+       * name that sits inside its outline; a small state keeps a readable but
+       * modest label. The text is also capped by the width available for this
+       * specific name so long names do not spill across neighbours.
+       */
+      const countryWidth = Math.max(
+        (polity.screenBox[2] - polity.screenBox[0]) * screenScale,
+        1,
+      );
+      const countryHeight = Math.max(
+        (polity.screenBox[3] - polity.screenBox[1]) * screenScale,
+        1,
+      );
+      const fitByWidth = countryWidth / (Math.max(name.length, 1) * 0.68);
+      const fitByHeight = countryHeight * 0.48;
+      const areaBased = Math.sqrt(countryWidth * countryHeight) * 0.14;
+      const screenFontSize = Math.max(
+        7,
+        Math.min(24, fitByWidth, fitByHeight, areaBased),
+      );
+      const fontSize = (screenFontSize + (selected ? 1.5 : 0)) / screenScale;
+      const width = name.length * fontSize * 0.68 + 8 / screenScale;
+      const height = fontSize * 1.35;
+      const box = {
+        left: x - width / 2,
+        right: x + width / 2,
+        top: y - height / 2,
+        bottom: y + height / 2,
+      };
+      // A label that does not fit the visible world rectangle is clipped by the
+      // SVG viewport and leaves stray fragments at the map edge; skip it.
+      if (
+        box.left < visible.left ||
+        box.right > visible.right ||
+        box.top < visible.top ||
+        box.bottom > visible.bottom
+      ) {
+        continue;
+      }
+      if (
+        boxes.some(
+          (existing) =>
+            !(
+              box.right < existing.left ||
+              box.left > existing.right ||
+              box.bottom < existing.top ||
+              box.top > existing.bottom
+            ),
+        )
+      ) {
+        continue;
+      }
+      boxes.push(box);
+      placed.push({ tag: polity.tag, name, x, y, fontSize, selected });
+    }
+    return placed;
+  }, [playerTag, polities, scale, screenScale, selectedTag, translate.x, translate.y]);
 
   const hovered = hoveredTag === null ? null : (entryByTag.get(hoveredTag) ?? null);
   const tooltipLeft = hoverPoint === null ? 0 : Math.min(Math.max(hoverPoint.x + 12, 8), Math.max(size.width - 220, 8));
@@ -538,6 +635,30 @@ export function WorldMap({
       <View style={styles.mapFrame} {...panResponder.panHandlers}>
         {size.width > 0 ? (
           <Svg width={size.width} height={size.height} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}>
+            <Defs>
+              {/*
+                A diagonal hatch keeps disputed zones visually distinct from a
+                sovereign fill. Sizes are divided by the zoom scale so the
+                stripe period stays constant on screen.
+              */}
+              <Pattern
+                id="century-disputed-hatch"
+                patternUnits="userSpaceOnUse"
+                width={9 / scale}
+                height={9 / scale}
+                patternTransform="rotate(45)"
+              >
+                <Rect x={0} y={0} width={9 / scale} height={9 / scale} fill="#463a15" />
+                <Rect
+                  x={0}
+                  y={0}
+                  width={4.5 / scale}
+                  height={9 / scale}
+                  fill="#c9a227"
+                  fillOpacity={0.55}
+                />
+              </Pattern>
+            </Defs>
             <Rect x={0} y={0} width={MAP_WIDTH} height={MAP_HEIGHT} fill={colors.mapOcean} />
             <G transform={`translate(${translate.x} ${translate.y}) scale(${scale})`}>
               {/*
@@ -550,8 +671,12 @@ export function WorldMap({
                 d={landPath}
                 fill={colors.mapLand}
                 fillRule="evenodd"
-                stroke={colors.mapBorder}
-                strokeWidth={0.35 / scale}
+                /*
+                 * No stroke: the polity border pass below already strokes every
+                 * coastline. Stroking the land mask too produced a second,
+                 * slightly offset coastline because it is simplified separately.
+                 */
+                stroke="none"
                 pointerEvents="none"
               />
               {polities.map((polity) => {
@@ -579,15 +704,52 @@ export function WorldMap({
                 <Path
                   key={`disputed-${area.id}`}
                   d={area.path}
-                  fill="rgba(216, 179, 74, 0.18)"
+                  /*
+                   * Fill with a hatch rather than the ocean peeking through a
+                   * dark translucent overlay. The old treatment averaged to a
+                   * near-black square at world zoom.
+                   */
+                  fill="url(#century-disputed-hatch)"
                   fillRule="evenodd"
-                  stroke="#d8b34a"
-                  strokeWidth={0.7 / scale}
-                  strokeDasharray={`${3 / scale} ${2 / scale}`}
+                  stroke="#e2bd4a"
+                  strokeWidth={1.1 / scale}
+                  strokeDasharray={`${4 / scale} ${2.5 / scale}`}
                   strokeLinejoin="round"
                   pointerEvents="none"
                 />
               ))}
+              {scale >= 2.2
+                ? disputedAreas.map((area) => {
+                    const [x, y] = project(area.label[0], area.label[1]);
+                    return (
+                      <G key={`disputed-label-${area.id}`} pointerEvents="none">
+                        <SvgText
+                          x={x}
+                          y={y}
+                          fill="none"
+                          stroke={colors.mapOcean}
+                          strokeWidth={3 / scale}
+                          strokeLinejoin="round"
+                          fontSize={10 / scale}
+                          fontWeight="700"
+                          textAnchor="middle"
+                        >
+                          Disputed
+                        </SvgText>
+                        <SvgText
+                          x={x}
+                          y={y}
+                          fill="#e2bd4a"
+                          fontSize={10 / scale}
+                          fontWeight="700"
+                          textAnchor="middle"
+                        >
+                          Disputed
+                        </SvgText>
+                      </G>
+                    );
+                  })
+                : null}
               {/*
                 Borders are a separate layer after every fill. Drawing them while
                 filling each polity lets a later neighbour's fill cover a shared
@@ -600,8 +762,9 @@ export function WorldMap({
                   fill="none"
                   fillRule="evenodd"
                   stroke={colors.mapBorder}
-                  strokeWidth={0.32 / scale}
+                  strokeWidth={1.1 / scale}
                   strokeLinejoin="round"
+                  strokeLinecap="round"
                   pointerEvents="none"
                 />
               ))}
@@ -639,34 +802,34 @@ export function WorldMap({
                   />
                 );
               })}
-              {polities.map((polity) => {
-                if (!labelVisible(polity) || polity.markerOnly === true) return null;
-                const [x, y] = polity.centroid;
-                const isSelected = selectedTag === polity.tag;
-                return (
+              {labelLayout.map((label) => (
+                <G key={`label-${label.tag}`} pointerEvents="none">
                   <SvgText
-                    key={`label-${polity.tag}`}
-                    x={x}
-                    y={y}
-                    fill={isSelected ? colors.accentStrong : colors.text}
-                    fontSize={(isSelected ? 7.5 : 6) / Math.max(scale, 0.7)}
-                    fontWeight="600"
-                    textAnchor="middle"
+                    x={label.x}
+                    y={label.y}
+                    fill="none"
                     stroke={colors.mapOcean}
-                    strokeWidth={0.6 / scale}
-                    opacity={0.95}
-                    /*
-                     * Labels are drawn at the polity centroid, which is exactly
-                     * where a player is most likely to click. Without this the
-                     * text becomes the pointer target and selection silently
-                     * fails for every labelled country.
-                     */
-                    pointerEvents="none"
+                    strokeWidth={3 / scale}
+                    strokeLinejoin="round"
+                    fontSize={label.fontSize}
+                    fontWeight="700"
+                    textAnchor="middle"
                   >
-                    {polity.entry.commonName}
+                    {label.name}
                   </SvgText>
-                );
-              })}
+                  <SvgText
+                    x={label.x}
+                    y={label.y}
+                    fill={colors.textStrong}
+                    fontSize={label.fontSize}
+                    fontWeight={label.selected ? "800" : "700"}
+                    textAnchor="middle"
+                    opacity={0.98}
+                  >
+                    {label.name}
+                  </SvgText>
+                </G>
+              ))}
               {polities.map((polity) => {
                 const [cx, cy] = project(polity.entry.capital.lon, polity.entry.capital.lat);
                 const isSelected = selectedTag === polity.tag;
@@ -865,9 +1028,10 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
   },
   disputedSwatch: {
-    backgroundColor: "rgba(216, 179, 74, 0.18)",
+    backgroundColor: "#7b6420",
+    opacity: 0.9,
     borderWidth: 1,
-    borderColor: "#d8b34a",
+    borderColor: "#e2bd4a",
     borderStyle: "dashed",
   },
   tooltip: {
