@@ -1,9 +1,9 @@
 {
   "meta": {
-    "version": "m11c-1900-boundaries-v1",
+    "version": "m11d-1900-boundaries-v2",
     "referenceDate": "1900-01-01",
     "title": "Century M11c historical boundary reconstruction and audit, 1 January 1900",
-    "method": "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity.",
+    "method": "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity. M11d resolves the two former uncertainty rectangles by splitting them along current Natural Earth admin-0 borders: the Aouzou-Tibesti zone is divided between the Ottoman Empire, French Equatorial Africa and French West Africa; the Karakoram-Siachen zone between British India and Qing China. The split lines are a cartographic choice for a definite border, not a surveyed 1900 boundary.",
     "confidenceDefinitions": {
       "high": "Supported by strong historical cartographic, administrative or treaty evidence, with only modern generalization uncertainty.",
       "medium": "Reconstructed from reliable sources; the frontier line or the exact extent has some unresolved uncertainty.",
@@ -1902,7 +1902,20 @@
         "eb1911-tripoli",
         "hammond-1912"
       ],
-      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border."
+      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border.",
+      "resolution": {
+        "strategy": "split-by-current-borders",
+        "dataset": "natural-earth-50m",
+        "reference": "Natural Earth 1:50m admin-0 boundaries are used only to choose a definite line inside the former uncertainty zone. They are not treated as 1900 evidence.",
+        "assignments": {
+          "LBY": "OTT",
+          "TCD": "FEA",
+          "NER": "FWA",
+          "DZA": "ALG"
+        },
+        "fallback": "FEA",
+        "notes": "The rectangle is partitioned by the current Libyan, Chadian, Nigerian and Algerian borders and assigned to the corresponding 1900 polities. Chad receives the Aouzou strip and Tibesti; Libya receives the northern edge; Niger and Algeria receive their modern-side edges. The resulting line follows current borders, not a surveyed 1900 frontier."
+      }
     },
     {
       "id": "siachen-kashmir",
@@ -1940,7 +1953,20 @@
       "sources": [
         "hammond-1912"
       ],
-      "notes": "A small map-only uncertainty zone at the junction of the Karakoram and Siachen. It is not a separate polity and does not change any simulation id. The rectangle is a cartographic proxy for an undelimited high-mountain frontier, not a precise boundary."
+      "notes": "A small map-only uncertainty zone at the junction of the Karakoram and Siachen. It is not a separate polity and does not change any simulation id. The rectangle is a cartographic proxy for an undelimited high-mountain frontier, not a precise boundary.",
+      "resolution": {
+        "strategy": "split-by-current-borders",
+        "dataset": "natural-earth-50m",
+        "reference": "Natural Earth 1:50m admin-0 boundaries are used only to choose a definite line inside the former uncertainty zone. They are not treated as 1900 evidence.",
+        "assignments": {
+          "KAS": "BIN",
+          "IND": "BIN",
+          "PAK": "BIN",
+          "CHN": "CHN"
+        },
+        "fallback": "BIN",
+        "notes": "The rectangle is partitioned by the current Siachen Glacier, Indian, Pakistani and Chinese polygons. The glacier, India and Pakistan are treated as British India (Jammu and Kashmir) because Pakistan was part of British India in 1900; the Chinese side is assigned to the Qing Empire."
+      }
     }
   ],
   "provenance": {

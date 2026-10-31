@@ -38,11 +38,11 @@ try {
   await app.screenshot("fix-world");
   await zoomAt(17, 21.3, 4);
   console.log("libya scale", await scale());
-  await app.screenshot("fix-libya-disputed");
+  await app.screenshot("fix-libya-border");
   await reset();
   await zoomAt(77.25, 35.4, 6);
   console.log("siachen scale", await scale());
-  await app.screenshot("fix-india-disputed");
+  await app.screenshot("fix-india-border");
   await reset();
   await zoomAt(20.5, 54.2, 7);
   console.log("prussia scale", await scale());

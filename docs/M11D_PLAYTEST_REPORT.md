@@ -205,11 +205,11 @@ the saved date.
 |---|---|
 | `packages/app/src/worker/SimulationProvider.tsx` | Worker lifecycle depends only on restart epochs; handler refs; saved-campaign ref; startup storage error preserved across READY |
 | `packages/sim-worker/src/protocol.ts` | Documented `MAX_SNAPSHOT_PEOPLE` bound replaces the 100M `idleWorkers` cap |
-| `packages/app/src/components/WorldMap.tsx` | Non-passive native wheel listener; label hit-testing fix; pure wheel factor; size-aware labels, disputed hatch, single coastline and clearer borders (follow-up) |
+| `packages/app/src/components/WorldMap.tsx` | Non-passive native wheel listener; label hit-testing fix; pure wheel factor; size-aware labels, current-border dispute resolution, single coastline and clearer borders (follow-up) |
 | `packages/app/src/components/mapViewport.ts` | `wheelZoomFactor` |
 | `scripts/m11/build-map.mjs` | Display-only East Prussian seam bridge and `displayCorrections` metadata |
 | `packages/data/data/map/world_map_1900.json`, `world_map_1900_audit.json`, `packages/app/src/generated/worldMap1900.ts` | Regenerated map geometry, seam correction and audit |
-| `packages/tests/src/m11d-map-legibility.test.ts` | New seam, hatch and label-typography regression suite |
+| `packages/tests/src/m11d-map-legibility.test.ts` | New seam, dispute-resolution and label-typography regression suite |
 | `packages/tests/src/m11d-map-selection.test.ts` | Updated for the new label layer; added sizing/collision assertions |
 | `packages/app/src/components/Slider.tsx` | Flat `aria-value*` props for the web |
 | `packages/app/src/components/ui.tsx` | Web-only `aria-pressed` on toggle chips |
@@ -266,14 +266,15 @@ buttons) is still asserted.
 The first playtest pass focused on runtime errors. A visual follow-up fixed the
 remaining map defects reported from the running game:
 
-1. **The black squares under Libya and near India are disputed frontier zones,
-   not rendering holes.** They are the map-only `aouzou-tibesti` and
-   `siachen-kashmir` zones. They are deliberately excluded from every polity,
-   have no simulation id, and carry their own claims and sources. Their previous
-   fill was `rgba(216,179,74,0.18)`; over the dark land mask this averaged to
-   near black at world zoom. They now use a diagonal amber hatch
-   (`century-disputed-hatch`), a bright dashed edge and a "Disputed" label at
-   regional zoom, so they read as uncertainty annotations.
+1. **The black squares under Libya and near India were disputed frontier zones,
+   not rendering holes.** They were the map-only `aouzou-tibesti` and
+   `siachen-kashmir` zones; their dark translucent fill averaged to near black
+   over the land mask. They have now been **resolved rather than styled**: the
+   rectangles are split along current Natural Earth admin-0 borders and assigned
+   to the 1900 polities (Aouzou–Tibesti → Ottoman Libya / French Equatorial
+   Africa / French West Africa; Karakoram–Siachen → British India / Qing China).
+   `disputedAreas` is empty, `resolvedDisputes` records the split, and the
+   overlay, label and legend row were removed (DECISIONS D-100).
 2. **The line inside Germany near East Prussia/Memel was a modern border.** The
    northern and southern East Prussian pieces were simplified independently and
    left a sub-0.02° gap along the 1945 Kaliningrad–Poland border, so the renderer
@@ -290,7 +291,8 @@ remaining map defects reported from the running game:
    of being clipped at the map edge.
 
 ![World map](images/m11d/fix-world.png)
-![Disputed zone under Libya](images/m11d/fix-libya-disputed.png)
+![Former Aouzou-Tibesti zone after the current-border split](images/m11d/fix-libya-border.png)
+![Former Karakoram-Siachen zone after the current-border split](images/m11d/fix-india-border.png)
 ![East Prussia after the seam fix](images/m11d/fix-east-prussia.png)
 ![Germany at regional zoom](images/m11d/fix-germany.png)
 
@@ -298,7 +300,7 @@ Verification for this follow-up: `pnpm test` **897 passed / 88 suites**,
 `pnpm typecheck`, `pnpm lint`, `pnpm flags:check`, `pnpm flags:audit`,
 `pnpm run check:worker` and `pnpm -F @century/app export:web` all pass; the map
 playtest scenario passes all checks with zero console errors. The map audit was
-regenerated: 2 political overlaps (largest 0.004 deg²), 4,047.8007 deg²
+regenerated: 2 political overlaps (largest 0.004 deg²), 4,047.8074 deg²
 unassigned (4,026.4191 deg² intentional Antarctica), `resolvedOverlaps` 201.
 No simulation, schema, RNG or save data changed.
 

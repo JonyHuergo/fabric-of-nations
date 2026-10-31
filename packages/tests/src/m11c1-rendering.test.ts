@@ -22,12 +22,13 @@ describe("M11c.1 rendering contract", () => {
     const group = WORLD_MAP.indexOf("<G transform={`translate");
     const land = WORLD_MAP.indexOf("d={landPath}");
     const polities = WORLD_MAP.indexOf("{polities.map");
-    const disputed = WORLD_MAP.indexOf("{disputedAreas.map");
+    const borders = WORLD_MAP.indexOf("key={`border-${polity.tag}`}");
     expect(ocean).toBeGreaterThanOrEqual(0);
     expect(group).toBeGreaterThan(ocean);
     expect(land).toBeGreaterThan(group);
     expect(polities).toBeGreaterThan(land);
-    expect(disputed).toBeGreaterThan(polities);
+    expect(borders).toBeGreaterThan(polities);
+    expect(WORLD_MAP).not.toContain("disputedAreas.map");
     // The land mask must use the even-odd rule and must not capture pointer events.
     expect(WORLD_MAP).toContain("fillRule=\"evenodd\"");
     expect(WORLD_MAP).toContain("pointerEvents=\"none\"");

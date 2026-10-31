@@ -10,23 +10,23 @@
     "polities": 133,
     "markerOnly": 0,
     "provenanceCount": 133,
-    "disputedAreas": 2,
-    "disputedAreaDegreesSquared": 15.04,
+    "disputedAreas": 0,
+    "disputedAreaDegreesSquared": 0,
     "invalidRings": 0,
     "overlaps": 2,
     "largestOverlapDegreesSquared": 0.004,
     "disputedOverlaps": 0,
     "landSamples": 15351,
-    "disputedSamples": 17,
+    "disputedSamples": 0,
     "unassignedSamples": 26,
     "unassignedComponents": 26,
     "largestUnassignedComponent": 1,
-    "polygonUnassignedAreaDegreesSquared": 4047.8007,
-    "polygonUnassignedComponents": 5490,
+    "polygonUnassignedAreaDegreesSquared": 4047.8074,
+    "polygonUnassignedComponents": 5493,
     "largestPolygonUnassignedComponentDegreesSquared": 534.9472,
     "intentionalUnassignedAreaDegreesSquared": 4026.4191,
-    "generalizationSliverAreaDegreesSquared": 19.5436,
-    "generalizationSliverComponents": 5312,
+    "generalizationSliverAreaDegreesSquared": 19.5504,
+    "generalizationSliverComponents": 5315,
     "unexplainedUnassignedAreaDegreesSquared": 1.838,
     "unexplainedUnassignedComponents": 62
   },
@@ -43,90 +43,11 @@
     }
   ],
   "disputedOverlaps": [],
-  "disputedAreas": [
-    {
-      "id": "aouzou-tibesti",
-      "name": "Aouzouâ€“Tibesti frontier zone",
-      "classification": "disputed-no-established-administration",
-      "confidence": "low",
-      "area": 14,
-      "bbox": [
-        15,
-        19.5,
-        19,
-        23
-      ],
-      "claims": [
-        "France: the 21 March 1899 Anglo-French Declaration placed the area in a French sphere of influence; this was not effective administration in 1900.",
-        "Ottoman Empire: Tripolitanian claims and later military/administrative activity in the wider Tibesti region; no continuous effective administration across the zone in January 1900.",
-        "Local authority: Toubou/Teda communities and trans-Saharan networks exercised the practical authority; no surveyed frontier existed."
-      ],
-      "administration": "No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.",
-      "sources": [
-        {
-          "id": "icj-libya-chad-1994",
-          "title": "ICJ, Territorial Dispute (Libyan Arab Jamahiriya/Chad), Judgment of 3 February 1994",
-          "url": "https://www.icj-cij.org/case/83",
-          "license": "ICJ public documents; quotation and citation only",
-          "date": "1994"
-        },
-        {
-          "id": "icj-libya-chad-pleadings",
-          "title": "ICJ, Territorial Dispute (Libya/Chad), written pleadings and oral records, 1991-1993",
-          "url": "https://www.icj-cij.org/case/83/written-proceedings",
-          "license": "ICJ public documents; citation only",
-          "date": "1991-1993"
-        },
-        {
-          "id": "eb1911-tripoli",
-          "title": "Encyclopaedia Britannica (1911), 'Tripoli' and 'Cyrenaica'",
-          "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Tripoli",
-          "license": "Public domain",
-          "date": "1911"
-        },
-        {
-          "id": "hammond-1912",
-          "title": "Hammond's Modern Atlas of the World (1912)",
-          "url": "https://archive.org/details/hammondsmodernat00hamm",
-          "license": "Public domain",
-          "date": "1912"
-        }
-      ],
-      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border."
-    },
-    {
-      "id": "siachen-kashmir",
-      "name": "Karakoram–Siachen frontier zone",
-      "classification": "disputed-frontier-unsettled",
-      "confidence": "low",
-      "area": 1.04,
-      "bbox": [
-        76.6,
-        35,
-        77.9,
-        35.8
-      ],
-      "claims": [
-        "British India: Kashmir was a princely state under British suzerainty; its northern boundary was not surveyed in 1900.",
-        "Qing China: the Karakoram alignment was not delimited in the Siachen/Aksai Chin sector."
-      ],
-      "administration": "No surveyed or effectively administered boundary existed in the high Karakoram in 1900. The zone is represented as a disputed frontier rather than assigned to British India or Qing China.",
-      "sources": [
-        {
-          "id": "hammond-1912",
-          "title": "Hammond's Modern Atlas of the World (1912)",
-          "url": "https://archive.org/details/hammondsmodernat00hamm",
-          "license": "Public domain",
-          "date": "1912"
-        }
-      ],
-      "notes": "A small map-only uncertainty zone at the junction of the Karakoram and Siachen. It is not a separate polity and does not change any simulation id. The rectangle is a cartographic proxy for an undelimited high-mountain frontier, not a precise boundary."
-    }
-  ],
+  "disputedAreas": [],
   "invalidRings": [],
   "coverage": {
     "unassignedSampleCount": 26,
-    "disputedSampleCount": 17,
+    "disputedSampleCount": 0,
     "unassignedSamples": [
       [
         131.5,
@@ -577,9 +498,9 @@
       "method": "30x30-degree tiles; land minus union(polities, disputed areas) with polygon-clipping",
       "tiles": 66,
       "landAreaDegreesSquared": 19357.263,
-      "assignedAreaDegreesSquared": 15329.89,
-      "disputedAreaDegreesSquared": 15.04,
-      "unassignedAreaDegreesSquared": 4047.8007,
+      "assignedAreaDegreesSquared": 15329.883,
+      "disputedAreaDegreesSquared": 0,
+      "unassignedAreaDegreesSquared": 4047.8074,
       "unassignedPolygons": [
         {
           "area": 269.5989,
@@ -2382,7 +2303,7 @@
           ]
         }
       ],
-      "unassignedComponents": 5490,
+      "unassignedComponents": 5493,
       "largestUnassignedComponentDegreesSquared": 534.9472,
       "failures": [],
       "intentionalUnassignedAreaDegreesSquared": 4026.4191,
@@ -3548,8 +3469,8 @@
           "reason": "Antarctica: outside the 1900 polity system and intentionally unassigned"
         }
       ],
-      "generalizationAreaDegreesSquared": 19.5436,
-      "generalizationComponents": 5312,
+      "generalizationAreaDegreesSquared": 19.5504,
+      "generalizationComponents": 5315,
       "unexplainedAreaDegreesSquared": 1.838,
       "unexplainedComponents": 62,
       "unexplainedAreas": [

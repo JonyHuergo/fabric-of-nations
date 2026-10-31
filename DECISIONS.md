@@ -5369,3 +5369,54 @@ from the country coastline.
   `resolvedOverlaps` 201. No simulation, schema, RNG or save change.
 - New regression suite `m11d-map-legibility.test.ts` and the updated map-selection
   tests cover the seam, hatch, label sizing and single coastline.
+
+## D-100 — M11d follow-up: resolve the former disputed zones by current borders
+
+**Status:** implemented (M11d follow-up; supersedes the disputed-zone rendering
+in D-099).
+
+### Context
+
+D-099 left two map-only uncertainty rectangles (Aouzou–Tibesti and
+Karakoram–Siachen) and rendered them as amber hatched annotations. The designer
+then asked for no more disputed areas: choose a border and implement it, using
+current borders to split the rectangles.
+
+### Decision
+
+1. `boundaries_1900.json` now gives each former zone a
+   `resolution.strategy = "split-by-current-borders"` and a mapping from modern
+   Natural Earth 1:50m admin-0 codes to 1900 polity tags:
+   - Aouzou–Tibesti: `LBY → OTT`, `TCD → FEA`, `NER → FWA`, `DZA → ALG`
+     (fallback FEA). Result: Chad/Aouzou/Tibesti → FEA (11.412 deg²), the
+     northern edge → OTT (1.104 deg²), the western edge → FWA (1.484 deg²).
+   - Karakoram–Siachen: `KAS → BIN`, `IND → BIN`, `PAK → BIN`, `CHN → CHN`
+     (fallback BIN). Result: the Siachen Glacier, Indian and Pakistani polygons
+     → British India (0.711 deg²), the Chinese side → Qing Empire (0.330 deg²).
+   The current borders are a cartographic choice for a definite line, **not**
+   1900 evidence.
+2. The map build intersects each modern admin-0 polygon with the former
+   rectangle, unions the intersection into the target polity and removes the
+   rectangle from every polity first. The resolved components and source IDs are
+   recorded in `world_map_1900.json → resolvedDisputes` and
+   `meta.resolvedDisputeCount`.
+3. `disputedAreas` is now empty. The disputed hatch, label and legend row were
+   removed from `WorldMap.tsx`; the map draws ordinary sovereign fills and one
+   border pass.
+4. The map bundle and audit were regenerated. The boundary dataset version is
+   `m11d-1900-boundaries-v2`.
+5. Tests now assert the split components, point membership and the absence of
+   disputed overlays; the audit reports `disputedAreas: 0`.
+
+### Consequences
+
+- The black squares are gone because there is no uncertainty overlay left; the
+  area is ordinary territory of FEA/OTT/FWA and BIN/CHN.
+- The border inside the former zones follows current Natural Earth borders. This
+  is a deliberate, documented approximation and should not be read as a surveyed
+  1900 frontier.
+- No simulation polity, population, market, id, schema, RNG or save data
+  changed. Map-only geometry and presentation changed.
+- Audit: 133 polities, 0 invalid rings, 2 political overlaps (largest
+  0.004 deg²), 0 disputed areas, 4,047.8074 deg² unassigned (4,026.4191 deg²
+  intentional Antarctica).

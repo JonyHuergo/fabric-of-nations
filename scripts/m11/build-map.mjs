@@ -712,6 +712,89 @@ for (const entry of entries) {
 }
 
 /**
+ * Resolve former uncertainty zones to a definite border.
+ *
+ * The authored `resolution.assignments` map modern Natural Earth admin-0 codes
+ * to 1900 polity tags. Each modern polygon is intersected with the uncertainty
+ * rectangle and unioned into the chosen polity, so the zone is split along the
+ * current borders instead of being rendered as a "disputed" overlay. The
+ * current boundaries are a cartographic choice for a definite line, not 1900
+ * evidence; the resolution metadata records that explicitly.
+ */
+const resolvedDisputes = [];
+for (const area of disputedAreas) {
+  const resolution = area.resolution;
+  if (resolution === undefined) continue;
+  let remaining = area.shape;
+  const components = [];
+  for (const [code, targetTag] of Object.entries(resolution.assignments ?? {})) {
+    const feature = admin0ByCode.get(code);
+    if (feature === undefined) {
+      warnings.push(`disputed area ${area.id}: modern country ${code} is unavailable`);
+      continue;
+    }
+    const target = polygonsByTag.get(targetTag);
+    if (target === undefined) {
+      warnings.push(`disputed area ${area.id}: target polity ${targetTag} is unavailable`);
+      continue;
+    }
+    let clipped;
+    try {
+      clipped = intersectPolygons(remaining, geoJsonToPolygons(feature.geometry));
+    } catch (error) {
+      warnings.push(`disputed area ${area.id}: intersection with ${code} failed: ${String(error)}`);
+      continue;
+    }
+    if (clipped.length === 0) continue;
+    const clippedArea = multiPolygonArea(clipped);
+    if (!(clippedArea > 0.0001)) continue;
+    polygonsByTag.set(targetTag, unionPolygons([target, clipped]));
+    components.push({
+      modernCode: code,
+      modernName: feature.properties.NAME ?? feature.properties.ADMIN ?? code,
+      targetTag,
+      areaDegreesSquared: Number(clippedArea.toFixed(3)),
+    });
+    try {
+      remaining = differencePolygons(remaining, clipped);
+    } catch (error) {
+      warnings.push(`disputed area ${area.id}: remainder subtraction after ${code} failed: ${String(error)}`);
+      remaining = [];
+    }
+  }
+  if (remaining.length > 0) {
+    const remainingArea = multiPolygonArea(remaining);
+    const fallback = resolution.fallback;
+    if (remainingArea > 0.0005 && fallback !== undefined) {
+      const target = polygonsByTag.get(fallback);
+      if (target !== undefined) {
+        polygonsByTag.set(fallback, unionPolygons([target, remaining]));
+        components.push({
+          modernCode: null,
+          modernName: "remainder",
+          targetTag: fallback,
+          areaDegreesSquared: Number(remainingArea.toFixed(3)),
+        });
+      } else {
+        warnings.push(`disputed area ${area.id}: fallback polity ${fallback} is unavailable`);
+      }
+    }
+  }
+  resolvedDisputes.push({
+    id: area.id,
+    name: area.name,
+    classification: area.classification,
+    strategy: resolution.strategy,
+    dataset: resolution.dataset,
+    reference: resolution.reference,
+    notes: resolution.notes,
+    label: area.label,
+    components,
+    sources: area.sources,
+  });
+}
+
+/**
  * Overlap cleanup. A transfer's destination owns the disputed area. We subtract
  * the destination's geometry *within the transfer's bounding box* (plus the
  * transfer shape itself) from each source. Clipping the destination first keeps
@@ -1184,7 +1267,7 @@ for (const [loserTag, winnerTag] of [
   }
 }
 
-const disputedPayload = disputedAreas.map((area) => {
+const disputedPayload = disputedAreas.filter((area) => area.resolution === undefined).map((area) => {
   const encoded = encodeMultiPolygon(area.shape);
   const sourceRecords = area.sources.map((id) => {
     const source = boundaryData.meta.sourceRegistry.find((candidate) => candidate.id === id);
@@ -1265,6 +1348,7 @@ const payload = {
     transferCount: patches.length,
     resolvedOverlaps,
     disputedAreaCount: disputedPayload.length,
+    resolvedDisputeCount: resolvedDisputes.length,
     overlapResolutionCount: overlapResolutions.length,
     displayCorrectionCount: displayCorrections.length,
     notes:
@@ -1273,6 +1357,7 @@ const payload = {
   boundarySources: boundaryData.meta.sourceRegistry,
   land: landRings,
   disputedAreas: disputedPayload,
+  resolvedDisputes,
   overlapResolutions,
   displayCorrections,
   polities,

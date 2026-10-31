@@ -16,12 +16,21 @@ const ROOT = resolve(HERE, "../../..");
 const MAP = JSON.parse(
   readFileSync(join(ROOT, "packages/data/data/map/world_map_1900.json"), "utf8"),
 ) as {
-  meta: { displayCorrectionCount?: number };
+  meta: {
+    displayCorrectionCount?: number;
+    disputedAreaCount?: number;
+    resolvedDisputeCount?: number;
+  };
   displayCorrections?: {
     id: string;
     tag: string;
     seam: number[][];
     reason: string;
+  }[];
+  disputedAreas?: unknown[];
+  resolvedDisputes?: {
+    id: string;
+    components: { modernCode: string | null; targetTag: string }[];
   }[];
   polities: { tag: string; rings: number[][]; holes: number[]; area: number }[];
 };
@@ -64,12 +73,23 @@ describe("M11d map display geometry", () => {
     }
   });
 
-  test("the disputed zones are drawn as a visible hatch with a label", () => {
-    expect(WORLD_MAP).toContain('id="century-disputed-hatch"');
-    expect(WORLD_MAP).toContain('fill="url(#century-disputed-hatch)"');
-    expect(WORLD_MAP).toContain("Disputed");
-    // The old dark translucent fill must not come back.
-    expect(WORLD_MAP).not.toContain("rgba(216, 179, 74, 0.18)");
+  test("the former disputed zones are split by current borders and not drawn", () => {
+    expect(MAP.meta.disputedAreaCount).toBe(0);
+    expect(MAP.meta.resolvedDisputeCount).toBe(2);
+    expect(MAP.disputedAreas).toEqual([]);
+    expect(WORLD_MAP).not.toContain("century-disputed-hatch");
+    expect(WORLD_MAP).not.toContain("Disputed / no established administration");
+    const aouzou = MAP.resolvedDisputes?.find((area) => area.id === "aouzou-tibesti");
+    expect(aouzou?.components).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ modernCode: "TCD", targetTag: "FEA" }),
+        expect.objectContaining({ modernCode: "LBY", targetTag: "OTT" }),
+      ]),
+    );
+    const siachen = MAP.resolvedDisputes?.find((area) => area.id === "siachen-kashmir");
+    expect(siachen?.components).toEqual(
+      expect.arrayContaining([expect.objectContaining({ modernCode: "CHN", targetTag: "CHN" })]),
+    );
   });
 });
 

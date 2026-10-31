@@ -10,10 +10,8 @@ import {
 } from "react-native";
 import Svg, {
   Circle,
-  Defs,
   G,
   Path,
-  Pattern,
   Rect,
   Text as SvgText,
 } from "react-native-svg";
@@ -248,15 +246,6 @@ export function WorldMap({
     }
     return commands.join("");
   }, [map.land]);
-
-  const disputedAreas = useMemo(
-    () =>
-      map.disputedAreas.map((area) => ({
-        ...area,
-        path: pathForRings(area.rings),
-      })),
-    [map.disputedAreas],
-  );
 
   const viewScale =
     size.width > 0 && size.height > 0
@@ -635,30 +624,6 @@ export function WorldMap({
       <View style={styles.mapFrame} {...panResponder.panHandlers}>
         {size.width > 0 ? (
           <Svg width={size.width} height={size.height} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}>
-            <Defs>
-              {/*
-                A diagonal hatch keeps disputed zones visually distinct from a
-                sovereign fill. Sizes are divided by the zoom scale so the
-                stripe period stays constant on screen.
-              */}
-              <Pattern
-                id="century-disputed-hatch"
-                patternUnits="userSpaceOnUse"
-                width={9 / scale}
-                height={9 / scale}
-                patternTransform="rotate(45)"
-              >
-                <Rect x={0} y={0} width={9 / scale} height={9 / scale} fill="#463a15" />
-                <Rect
-                  x={0}
-                  y={0}
-                  width={4.5 / scale}
-                  height={9 / scale}
-                  fill="#c9a227"
-                  fillOpacity={0.55}
-                />
-              </Pattern>
-            </Defs>
             <Rect x={0} y={0} width={MAP_WIDTH} height={MAP_HEIGHT} fill={colors.mapOcean} />
             <G transform={`translate(${translate.x} ${translate.y}) scale(${scale})`}>
               {/*
@@ -700,56 +665,6 @@ export function WorldMap({
                   />
                 );
               })}
-              {disputedAreas.map((area) => (
-                <Path
-                  key={`disputed-${area.id}`}
-                  d={area.path}
-                  /*
-                   * Fill with a hatch rather than the ocean peeking through a
-                   * dark translucent overlay. The old treatment averaged to a
-                   * near-black square at world zoom.
-                   */
-                  fill="url(#century-disputed-hatch)"
-                  fillRule="evenodd"
-                  stroke="#e2bd4a"
-                  strokeWidth={1.1 / scale}
-                  strokeDasharray={`${4 / scale} ${2.5 / scale}`}
-                  strokeLinejoin="round"
-                  pointerEvents="none"
-                />
-              ))}
-              {scale >= 2.2
-                ? disputedAreas.map((area) => {
-                    const [x, y] = project(area.label[0], area.label[1]);
-                    return (
-                      <G key={`disputed-label-${area.id}`} pointerEvents="none">
-                        <SvgText
-                          x={x}
-                          y={y}
-                          fill="none"
-                          stroke={colors.mapOcean}
-                          strokeWidth={3 / scale}
-                          strokeLinejoin="round"
-                          fontSize={10 / scale}
-                          fontWeight="700"
-                          textAnchor="middle"
-                        >
-                          Disputed
-                        </SvgText>
-                        <SvgText
-                          x={x}
-                          y={y}
-                          fill="#e2bd4a"
-                          fontSize={10 / scale}
-                          fontWeight="700"
-                          textAnchor="middle"
-                        >
-                          Disputed
-                        </SvgText>
-                      </G>
-                    );
-                  })
-                : null}
               {/*
                 Borders are a separate layer after every fill. Drawing them while
                 filling each polity lets a later neighbour's fill cover a shared
@@ -904,12 +819,6 @@ export function WorldMap({
             <View style={[styles.swatch, { backgroundColor: lighten("#b08a63", 0.3) }]} />
             <Text style={styles.legendText}>Dependent territory</Text>
           </View>
-          {map.disputedAreas.length > 0 && layer === "political" ? (
-            <View style={styles.legendRow}>
-              <View style={[styles.swatch, styles.disputedSwatch]} />
-              <Text style={styles.legendText}>Disputed / no established administration</Text>
-            </View>
-          ) : null}
           {layer === "political" || layer === "control" ? (
             <View style={styles.legendRow}>
               <View style={[styles.swatch, styles.occSwatch]} />
@@ -1025,13 +934,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     borderWidth: 1,
     borderColor: colors.red,
-    borderStyle: "dashed",
-  },
-  disputedSwatch: {
-    backgroundColor: "#7b6420",
-    opacity: 0.9,
-    borderWidth: 1,
-    borderColor: "#e2bd4a",
     borderStyle: "dashed",
   },
   tooltip: {

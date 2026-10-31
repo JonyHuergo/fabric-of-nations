@@ -55,10 +55,23 @@ interface MapData {
     resolvedOverlaps: number;
     boundaryVersion: string;
     disputedAreaCount: number;
+    resolvedDisputeCount: number;
     overlapResolutionCount: number;
   };
   boundarySources: { id: string; title: string; url: string; license: string; date: string; notes: string }[];
   land: number[][];
+  resolvedDisputes: {
+    id: string;
+    name: string;
+    strategy: string;
+    components: {
+      modernCode: string | null;
+      modernName: string;
+      targetTag: string;
+      areaDegreesSquared: number;
+    }[];
+    sources: string[];
+  }[];
   disputedAreas: {
     id: string;
     name: string;
@@ -381,7 +394,7 @@ describe("M11c Libya and Ottoman North Africa", () => {
     expect(BOUNDARIES.provenance.OTT?.notes).toMatch(/Libya|Tripolitania|Cyrenaica|Fezzan/);
   });
 
-  test("the whole Libyan land area is covered and the neighbours keep their 1900 assignment", () => {
+  test("the former Aouzou–Tibesti uncertainty zone is split by current borders", () => {
     const libyaGaps = AUDIT.coverage.unassignedSamples.filter(
       ([lon = 0, lat = 0]) => lon >= 9 && lon <= 25 && lat >= 19 && lat <= 33.5,
     );
@@ -391,41 +404,51 @@ describe("M11c Libya and Ottoman North Africa", () => {
     expect(contains("ALG", 3.06, 36.75)).toBe(true);
     expect(contains("FEA", 16.0, 12.0)).toBe(true); // central Chad / French Equatorial Africa
     expect(contains("SAH", -12.63, 23.97)).toBe(true);
-    expect(contains("OTT", 15.5, 21.5)).toBe(false); // Aouzou–Tibesti is not Ottoman territory
-    expect(contains("FEA", 15.5, 21.5)).toBe(false); // and not French-administered in 1900
-    expect(disputedAt(15.5, 21.5)).toBe("aouzou-tibesti");
-    expect(disputedAt(18.5, 21.5)).toBe("aouzou-tibesti"); // Tibesti
-    expect(disputedAt(18.5, 21.35)).toBe("aouzou-tibesti"); // Bardaï
-    expect(disputedAt(18.5, 21.4)).toBe("aouzou-tibesti"); // Gouro
+    // Current Chad/Libya/Niger borders decide the former rectangle.
+    expect(contains("FEA", 15.5, 21.5)).toBe(true); // Aouzou strip, Chad
+    expect(contains("OTT", 15.5, 21.5)).toBe(false);
+    expect(contains("FEA", 18.5, 21.5)).toBe(true); // Tibesti, Chad
+    expect(contains("OTT", 18.8, 22.9)).toBe(true); // northern edge, Libya
+    expect(contains("FWA", 15.1, 20.0)).toBe(true); // western edge, Niger
+    expect(disputedAt(15.5, 21.5)).toBeNull();
+    expect(disputedAt(18.5, 21.35)).toBeNull();
     expect(disputedAt(13.8, 18.7)).toBeNull(); // Bilma: French West African sphere
     expect(contains("FWA", 13.8, 18.7)).toBe(true);
     expect(disputedAt(18.5, 18.5)).toBeNull(); // Borkou: Wadai sphere/proxy
     expect(contains("WAD", 18.5, 18.5)).toBe(true);
     expect(disputedAt(22.0, 17.5)).toBeNull(); // Ennedi
     expect(contains("WAD", 22.0, 17.5)).toBe(true);
-    expect(MAP.meta.disputedAreaCount).toBe(2);
-    expect(MAP.disputedAreas.map((area) => area.id).sort()).toEqual([
-      "aouzou-tibesti",
-      "siachen-kashmir",
-    ]);
+    expect(MAP.meta.disputedAreaCount).toBe(0);
+    expect(MAP.disputedAreas).toEqual([]);
+    expect(MAP.meta.resolvedDisputeCount).toBe(2);
     expect(AUDIT.summary.disputedOverlaps).toBe(0);
-    expect(disputedAt(77.2, 35.4)).toBe("siachen-kashmir");
-    expect(contains("BIN", 77.2, 35.4)).toBe(false);
-    expect(contains("CHN", 77.2, 35.4)).toBe(false);
+    // Current India/Pakistan/China polygons decide the former Siachen rectangle.
+    expect(disputedAt(77.2, 35.4)).toBeNull();
+    expect(contains("BIN", 77.2, 35.4)).toBe(true); // Siachen Glacier side, British India
+    expect(contains("CHN", 77.7, 35.6)).toBe(true); // Chinese side
   });
 
-  test("disputed areas carry explicit claims, administration and sourced uncertainty", () => {
-    const aouzou = MAP.disputedAreas.find((area) => area.id === "aouzou-tibesti");
-    expect(aouzou?.classification).toBe("disputed-no-established-administration");
-    expect(aouzou?.provenance.sovereigntyClaims.length).toBeGreaterThanOrEqual(3);
-    expect(aouzou?.provenance.administration).toMatch(/No single power/);
-    expect(aouzou?.provenance.sources.map((source) => source.id)).toEqual(
+  test("resolved disputes record the modern-border split and its sources", () => {
+    const aouzou = MAP.resolvedDisputes.find((area) => area.id === "aouzou-tibesti");
+    expect(aouzou?.strategy).toBe("split-by-current-borders");
+    expect(aouzou?.components).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ modernCode: "TCD", targetTag: "FEA" }),
+        expect.objectContaining({ modernCode: "LBY", targetTag: "OTT" }),
+        expect.objectContaining({ modernCode: "NER", targetTag: "FWA" }),
+      ]),
+    );
+    expect(aouzou?.sources).toEqual(
       expect.arrayContaining(["icj-libya-chad-1994", "icj-libya-chad-pleadings"]),
     );
-    expect(aouzou?.provenance.notes).toMatch(/1935|1955|not applied retroactively/);
-    const siachen = MAP.disputedAreas.find((area) => area.id === "siachen-kashmir");
-    expect(siachen?.classification).toBe("disputed-frontier-unsettled");
-    expect(siachen?.provenance.administration).toMatch(/surveyed/);
+    const siachen = MAP.resolvedDisputes.find((area) => area.id === "siachen-kashmir");
+    expect(siachen?.strategy).toBe("split-by-current-borders");
+    expect(siachen?.components).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ modernCode: "KAS", targetTag: "BIN" }),
+        expect.objectContaining({ modernCode: "CHN", targetTag: "CHN" }),
+      ]),
+    );
   });
 });
 
@@ -550,8 +573,8 @@ describe("M11c coverage, validity and overlap audit", () => {
     expect(AUDIT.summary.largestUnassignedComponent).toBe(1);
     expect(AUDIT.summary.unassignedSamples).toBeLessThanOrEqual(30);
     expect(AUDIT.coverage.components.every((component) => component.samples <= 1)).toBe(true);
-    expect(AUDIT.summary.disputedAreas).toBe(2);
-    expect(AUDIT.summary.disputedAreaDegreesSquared).toBeGreaterThan(14);
+    expect(AUDIT.summary.disputedAreas).toBe(0);
+    expect(AUDIT.summary.disputedAreaDegreesSquared).toBe(0);
     expect(AUDIT.summary.intentionalUnassignedAreaDegreesSquared).toBeGreaterThan(4000);
     expect(AUDIT.summary.generalizationSliverComponents).toBeGreaterThan(5000);
     expect(AUDIT.summary.unexplainedUnassignedAreaDegreesSquared).toBeLessThan(2);

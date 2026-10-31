@@ -57,19 +57,19 @@ The map is built offline by `scripts/m11/build-map.mjs` from:
 | Catalogued polities | 133 |
 | Map polities with provenance | 133 |
 | Marker-only polities | 0 |
-| Disputed map-only zones | 2 |
-| Disputed area (deg²) | 15.04 |
+| Disputed map-only zones | 0 (resolved by current borders) |
+| Disputed area (deg²) | 0 |
 | Invalid rings | 0 |
 | Overlaps above 0.001 deg² | 2 |
 | Largest overlap (deg²) | 0.004 |
 | Land samples (1°) | 15351 |
-| Disputed 1° samples | 17 |
+| Disputed 1° samples | 0 |
 | Unassigned 1° samples | 26 |
 | Unassigned components | 26 |
 | Largest unassigned component | 1 sample(s) |
-| Polygon-level unassigned area (deg²) | 4047.7959 |
+| Polygon-level unassigned area (deg²) | 4047.8074 |
 | Intentional (Antarctica) area (deg²) | 4026.4191 |
-| Generalization slivers (deg²) | 19.5388 |
+| Generalization slivers (deg²) | 19.5504 |
 | Unexplained small-island area (deg²) | 1.838 |
 
 Geometry classes: **direct-modern-verified** 65, **aggregate-modern-verified** 20, **reconstructed** 37, **approximate** 11. Boundary confidence: **high** 73, **medium** 46, **low** 14.
@@ -390,14 +390,19 @@ Treaty of Petrópolis and the 1903–04 demarcation are not applied retroactivel
 The residual components are sub-0.01 deg² and recorded by the audit; no
 post-1903 cession or 1927 adjudication is silently applied.
 
-## 5b. Disputed map-only zones
+## 5b. Former disputed map-only zones (resolved)
 
-- **Aouzouâ€“Tibesti frontier zone** (`aouzou-tibesti`, disputed-no-established-administration, low) — 14 deg² at bbox 15, 19.5, 19, 23. No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.
-- **Karakoram–Siachen frontier zone** (`siachen-kashmir`, disputed-frontier-unsettled, low) — 1.04 deg² at bbox 76.6, 35, 77.9, 35.8. No surveyed or effectively administered boundary existed in the high Karakoram in 1900. The zone is represented as a disputed frontier rather than assigned to British India or Qing China.
+- **Aouzou–Tibesti frontier zone** (`aouzou-tibesti`, disputed-no-established-administration, low) — 14 deg² at bbox 15, 19.5, 19, 23. No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.
+- **Karakoram–Siachen frontier zone** (`siachen-kashmir`, disputed-frontier-unsettled, low) — 1.04 deg² at bbox 76.6, 35, 77.9, 35.8. No surveyed or effectively administered boundary existed in the high Karakoram in 1900.
 
-These zones are not polities and have no simulation ids. Clicking them does not
-select a country; they are rendered as dashed amber overlays over the neutral
-land layer.
+M11d follow-up (DECISIONS D-100) resolves both zones into ordinary territory:
+the rectangles are split along current Natural Earth admin-0 borders and assigned
+to the 1900 polities. Aouzou–Tibesti becomes Ottoman Libya (northern edge),
+French Equatorial Africa (Chad/Aouzou/Tibesti) and French West Africa (Niger
+edge); Karakoram–Siachen becomes British India (Siachen/India/Pakistan) and Qing
+China. The split lines are a cartographic choice for a definite border, not a
+surveyed 1900 frontier. `disputedAreas` is empty and `resolvedDisputes` records
+the modern-to-1900 mapping; there is no disputed overlay, label or legend row.
 
 ## 6. Residual generalization artefacts
 
@@ -407,7 +412,7 @@ unassigned 1° land samples. The polygon-level audit separates:
 
 - **4026.4191 deg² intentionally unassigned** —
   Antarctica, outside the 1900 polity system.
-- **19.5388 deg² of coastline/island
+- **19.5504 deg² of coastline/island
   generalization slivers** below 0.02 deg² each.
 - **1.838 deg² in
   62 small-island/coastal components

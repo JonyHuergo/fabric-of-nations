@@ -112,9 +112,11 @@ node scripts/m11/generate-provenance-doc.mjs
   confidence, underlying boundary date, deviations from the modern map, known
   uncertainties, transfer ids and optional composite components (for example
   Ottoman Tripolitania/Cyrenaica/Fezzan).
-- `disputedAreas[]` holds map-only uncertainty zones such as Aouzou–Tibesti and
-  Karakoram–Siachen. They are excluded from every polity, have no simulation id,
-  and carry their own claims, administration notes and sources.
+- `disputedAreas[]` is empty after M11d. The two former uncertainty rectangles
+  (Aouzou–Tibesti, Karakoram–Siachen) are split by current Natural Earth admin-0
+  borders and assigned to the 1900 polities; `resolvedDisputes[]` records the
+  modern-to-1900 component mapping and sources. They have no separate simulation
+  id.
 - `overlapResolutions[]` records each extracted overlap, its area and bbox, the
   trimming decision and the historical boundary note.
 - **No marker-only polities remain.** M11b's marker entries were replaced by
@@ -151,12 +153,12 @@ bounding-box prefilter.
 ## 5a. Rendering and zoom (M11c.1, updated in M11d)
 
 The SVG layer order is fixed: ocean rectangle, transformed land mask, country
-fills, disputed-zone overlays, one political-border pass, selection/occupation
-overlays, capital markers and labels. The land mask is **inside the same
-transform group** as the country fills. M11c drew it outside that group, which
-left a world-scale land layer fixed behind a zoomed political map; this was the
-source of the stale land-over-ocean overlay. The mask now also uses the even-odd
-fill rule so inland water holes remain water.
+fills, one political-border pass, selection/occupation overlays, capital markers
+and labels. The land mask is **inside the same transform group** as the country
+fills. M11c drew it outside that group, which left a world-scale land layer fixed
+behind a zoomed political map; this was the source of the stale land-over-ocean
+overlay. The mask now also uses the even-odd fill rule so inland water holes
+remain water.
 
 M11d rendering refinements:
 
@@ -167,9 +169,10 @@ M11d rendering refinements:
   the sub-0.02° gap left by independently simplified northern/southern East
   Prussian pieces along the modern Kaliningrad border. The bridge is presentation
   geometry and adds no simulation entity or value.
-- Disputed zones use a diagonal amber hatch (`century-disputed-hatch`), a bright
-  dashed edge and a "Disputed" label at regional zoom. They remain excluded from
-  every polity and are not playable.
+- The former disputed zones are **resolved by current-border split**, not drawn
+  as an overlay: `resolvedDisputes[]` maps modern admin-0 components to 1900
+  polities (Aouzou–Tibesti → OTT/FEA/FWA; Karakoram–Siachen → BIN/CHN). The
+  disputed hatch, label and legend row were removed.
 - Country labels are sized from the country's projected bounding box, its
   name length and its on-screen area (7–24 px screen, selected +1.5 px), with a
   dark halo and a collision cull; the player/selected label is a priority

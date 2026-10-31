@@ -253,13 +253,18 @@ The detailed method, per-polity table and sources are in
   China/Tibet, the Central Asian protectorates, the African colonies and the
   Americas/Oceania entries** have explicit transfers or verified modern
   matches; see the audit table.
-- **Aouzou–Tibesti is disputed, not FEA.** The 1899 Anglo-French Declaration was
-  a sphere-of-influence line, not effective administration; Ottoman claims and
-  Toubou local authority overlapped, and no boundary was surveyed. M11c.1
-  removes the zone from both FEA and OTT and renders it as a map-only
-  `disputed-no-established-administration` area with the ICJ record and
-  explicit uncertainty. Borkou/Ennedi remain in the Wadai proxy, Bilma remains
-  in French West Africa, and central Chad remains FEA.
+- **Aouzou–Tibesti is resolved by current borders (M11d).** The 1899
+  Anglo-French Declaration was a sphere-of-influence line, not effective
+  administration; Ottoman claims and Toubou local authority overlapped, and no
+  boundary was surveyed. M11d splits the former uncertainty rectangle along
+  current Libya/Chad/Niger borders: Chad/Aouzou/Tibesti goes to FEA, the
+  northern edge to OTT and the Niger edge to FWA. The split is a cartographic
+  choice for a definite border, not a surveyed 1900 frontier. Borkou/Ennedi
+  remain in the Wadai proxy and Bilma remains in French West Africa.
+- **Karakoram–Siachen is resolved by current borders (M11d).** The high
+  Karakoram frontier is split along current Siachen Glacier/India/Pakistan/China
+  polygons: the glacier, Indian and Pakistani sides go to British India
+  (Kashmir), the Chinese side to Qing China.
 - **Residual generalization artefacts.** The audit's two remaining overlaps are
   sub-0.01 deg²: Canada/Newfoundland (0.004 deg² after trimming the M11c
   0.249 deg² sliver) and Russia/Finland (0.001 deg²). The full polygon-level
@@ -313,12 +318,14 @@ Flag provenance is documented in `docs/FLAG_PROVENANCE.md`. Summary:
 - **Germany's eastern frontier strip** is generalized to about 10–20 km. The
   provinces are HIGH confidence; the exact line between the German Empire and
   Congress Poland/Austria-Hungary is MEDIUM confidence.
-- **Aouzou–Tibesti** is a map-only disputed/no-established-administration zone,
-  not Ottoman or French territory. Ottoman sovereignty, French sphere-of-influence
-  claims, Toubou local authority and the absence of a surveyed boundary are
-  distinguished in the provenance notes. The later 1935 and 1955 instruments are
-  not applied retroactively. **Karakoram–Siachen** is a second small disputed
-  frontier zone between British India and Qing China.
+- **Aouzou–Tibesti** is no longer an uncertainty overlay: M11d splits the former
+  rectangle along current Libya/Chad/Niger borders into Ottoman, French
+  Equatorial African and French West African territory. The 1899
+  sphere-of-influence line, Ottoman claims, Toubou local authority and the
+  absence of a surveyed boundary remain documented. The later 1935 and 1955
+  instruments are not applied retroactively. **Karakoram–Siachen** is split
+  along the current Siachen Glacier/India/Pakistan/China polygons between
+  British India and Qing China.
 - **Crete's** autonomy was internationally guaranteed but its constitutional
   future was contested; it is classified `autonomous-vassal`, not independent.
 - **Tonga's** protectorate began on 18 May 1900, after the reference date; it is

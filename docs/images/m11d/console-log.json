@@ -18,7 +18,7 @@
     {
       "name": "startup: map SVG rendered",
       "ok": true,
-      "detail": "{\"svg\":1,\"paths\":269}"
+      "detail": "{\"svg\":1,\"paths\":267}"
     },
     {
       "name": "startup: no broken images on menu",
@@ -183,7 +183,7 @@
     {
       "name": "tabs: campaign created",
       "ok": true,
-      "detail": "Play as United States in 2.7 s"
+      "detail": "Play as United States in 2.8 s"
     },
     {
       "name": "tab: Overview renders",
@@ -383,7 +383,7 @@
     {
       "name": "tab: World renders",
       "ok": true,
-      "detail": "1581 chars"
+      "detail": "1540 chars"
     },
     {
       "name": "tab: World exposes the active navigation state",
@@ -398,17 +398,17 @@
     {
       "name": "simulation: +1 day advances the date",
       "ok": true,
-      "detail": "1900-01-01 -> 1900-01-06"
+      "detail": "1900-01-01 -> 1900-01-05"
     },
     {
       "name": "simulation: running advances the date",
       "ok": true,
-      "detail": "1900-01-06 -> 1900-01-21"
+      "detail": "1900-01-05 -> 1900-01-17"
     },
     {
       "name": "simulation: running does not reset the campaign",
       "ok": true,
-      "detail": "1900-01-06 -> 1900-01-21"
+      "detail": "1900-01-05 -> 1900-01-17"
     },
     {
       "name": "simulation: no worker replacement while running",
@@ -633,7 +633,7 @@
     {
       "name": "stress: 42 navigation switches stay responsive",
       "ok": true,
-      "detail": "3.8 s"
+      "detail": "6.6 s"
     },
     {
       "name": "stress: 20 s at 30x advances simulated time",
@@ -653,7 +653,7 @@
     {
       "name": "stress: JS heap growth stays bounded",
       "ok": true,
-      "detail": "-33.2 MB"
+      "detail": "36.6 MB"
     },
     {
       "name": "responsive: narrow layout keeps map and controls",
@@ -683,25 +683,25 @@
     "rejections": [],
     "workers": [
       {
-        "at": 1793405347995,
+        "at": 1793457099236,
         "size": 63
       }
     ],
     "commands": [
       {
-        "at": 1793405347995,
+        "at": 1793457099236,
         "type": "REQUEST_SNAPSHOT",
         "playerCountryId": null,
         "action": null
       },
       {
-        "at": 1793405353593,
+        "at": 1793457136149,
         "type": "CREATE_GAME",
         "playerCountryId": 9,
         "action": null
       },
       {
-        "at": 1793405353787,
+        "at": 1793457136764,
         "type": "SET_FOCUS",
         "playerCountryId": null,
         "action": null
