@@ -83,7 +83,7 @@
     {
       "name": "game: top bar shows Austria-Hungary",
       "ok": true,
-      "detail": "created in 2.9 s"
+      "detail": "created in 2.8 s"
     },
     {
       "name": "game: date is 1900-01-01",
@@ -103,7 +103,7 @@
     {
       "name": "game: creation under 60 s",
       "ok": true,
-      "detail": "2.9 s"
+      "detail": "2.8 s"
     },
     {
       "name": "selection: playable-only list is complete",
@@ -383,7 +383,7 @@
     {
       "name": "tab: World renders",
       "ok": true,
-      "detail": "1624 chars"
+      "detail": "1581 chars"
     },
     {
       "name": "tab: World exposes the active navigation state",
@@ -633,7 +633,7 @@
     {
       "name": "stress: 42 navigation switches stay responsive",
       "ok": true,
-      "detail": "3.7 s"
+      "detail": "3.8 s"
     },
     {
       "name": "stress: 20 s at 30x advances simulated time",
@@ -653,7 +653,7 @@
     {
       "name": "stress: JS heap growth stays bounded",
       "ok": true,
-      "detail": "2.0 MB"
+      "detail": "-33.2 MB"
     },
     {
       "name": "responsive: narrow layout keeps map and controls",
@@ -683,25 +683,25 @@
     "rejections": [],
     "workers": [
       {
-        "at": 1793397697457,
+        "at": 1793405347995,
         "size": 63
       }
     ],
     "commands": [
       {
-        "at": 1793397697457,
+        "at": 1793405347995,
         "type": "REQUEST_SNAPSHOT",
         "playerCountryId": null,
         "action": null
       },
       {
-        "at": 1793397703029,
+        "at": 1793405353593,
         "type": "CREATE_GAME",
         "playerCountryId": 9,
         "action": null
       },
       {
-        "at": 1793397703247,
+        "at": 1793405353787,
         "type": "SET_FOCUS",
         "playerCountryId": null,
         "action": null
