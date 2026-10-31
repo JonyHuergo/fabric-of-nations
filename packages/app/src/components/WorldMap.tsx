@@ -26,6 +26,12 @@ import {
   MAP_WIDTH,
   wheelZoomFactor,
 } from "./mapViewport";
+import {
+  decodePolityGeometry,
+  pathForRings,
+  project,
+  type DecodedPolityGeometry,
+} from "./worldMapGeometry";
 
 export { MAP_MAX_SCALE, MAP_MIN_SCALE, MAP_PREVIOUS_MAX_SCALE } from "./mapViewport";
 import type {
@@ -65,64 +71,23 @@ export type MapLayer = "political" | "control" | "markets";
 
 interface DecodedPolity extends WorldMapPolity {
   readonly entry: WorldCatalogEntry;
-  readonly path: string;
+  /** Null only for a polity with no rings; it renders as a marker fallback. */
+  readonly path: string | null;
   readonly centroid: readonly [number, number];
   readonly screenBox: readonly [number, number, number, number];
-  readonly points: readonly (readonly number[][])[];
+  readonly points: DecodedPolityGeometry["points"];
 }
 
-function miller(latDegrees: number): number {
-  const lat = (Math.max(-89.9, Math.min(89.9, latDegrees)) * Math.PI) / 180;
-  return 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * lat));
-}
-const MILLER_MAX = miller(89.9);
-
-function project(lon: number, lat: number): [number, number] {
-  return [((lon + 180) / 360) * MAP_WIDTH, ((MILLER_MAX - miller(lat)) / (2 * MILLER_MAX)) * MAP_HEIGHT];
-}
-
-function decodeRing(flat: readonly number[]): number[][] {
-  const points: number[][] = [];
-  let x = 0;
-  let y = 0;
-  for (let index = 0; index < flat.length; index += 2) {
-    x += flat[index] ?? 0;
-    y += flat[index + 1] ?? 0;
-    const [px, py] = project(x / 1000, y / 1000);
-    points.push([px, py]);
-  }
-  return points;
-}
-
-function pathForRings(rings: readonly (readonly number[])[]): string {
-  const commands: string[] = [];
-  for (const flat of rings) {
-    const points = decodeRing(flat);
-    if (points.length < 3) continue;
-    // Draw at the antimeridian-adjacent copies so unwrapped rings wrap cleanly.
-    for (const offset of [-MAP_WIDTH, 0, MAP_WIDTH]) {
-      const [startX = 0, startY = 0] = points[0] ?? [];
-      commands.push(`M${(startX + offset).toFixed(1)} ${startY.toFixed(1)}`);
-      for (let index = 1; index < points.length; index += 1) {
-        const [x = 0, y = 0] = points[index] ?? [];
-        commands.push(`L${(x + offset).toFixed(1)} ${y.toFixed(1)}`);
-      }
-      commands.push("Z");
-    }
-  }
-  return commands.join("");
-}
-
-function pathFor(polity: WorldMapPolity): string {
-  return pathForRings(polity.rings);
-}
-
-function centroidOf(polity: WorldMapPolity): [number, number] {
+function centroidOf(polity: WorldMapPolity): readonly [number, number] {
   const [lon, lat] = polity.label;
   return project(lon, lat);
 }
 
-function pointInRing(x: number, y: number, points: readonly number[][]): boolean {
+function pointInRing(
+  x: number,
+  y: number,
+  points: readonly (readonly number[])[],
+): boolean {
   let inside = false;
   for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
     const [xi = 0, yi = 0] = points[i] ?? [];
@@ -168,6 +133,8 @@ export function WorldMap({
 
   const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
   const gesturing = useRef({ x: 0, y: 0 });
+  /** Suppresses the click that the browser emits at the end of a map drag. */
+  const suppressClickRef = useRef(false);
   const translateRef = useRef(translate);
   translateRef.current = translate;
   const scaleRef = useRef(scale);
@@ -218,34 +185,25 @@ export function WorldMap({
       const [minX = -180, minY = -90, maxX = 180, maxY = 90] = polity.bbox;
       const topLeft = project(minX, maxY);
       const bottomRight = project(maxX, minY);
+      const geometry = decodePolityGeometry(polity);
       return {
         ...polity,
         entry,
-        path: pathFor(polity),
+        path: geometry.path,
+        // A polity without rings has no fill; the marker layer still draws and
+        // selects it, so the country is never silently discarded.
+        markerOnly: polity.markerOnly === true || geometry.path === null,
         centroid,
         screenBox: [topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]],
-        points: polity.rings.map((flat) => decodeRing(flat)),
+        points: geometry.points,
       };
     });
   }, [entryByTag, map.polities]);
 
-  const landPath = useMemo(() => {
-    const commands: string[] = [];
-    for (const flat of map.land) {
-      const points = decodeRing(flat);
-      if (points.length < 3) continue;
-      for (const offset of [-MAP_WIDTH, 0, MAP_WIDTH]) {
-        const [startX = 0, startY = 0] = points[0] ?? [];
-        commands.push(`M${(startX + offset).toFixed(1)} ${startY.toFixed(1)}`);
-        for (let index = 1; index < points.length; index += 1) {
-          const [x = 0, y = 0] = points[index] ?? [];
-          commands.push(`L${(x + offset).toFixed(1)} ${y.toFixed(1)}`);
-        }
-        commands.push("Z");
-      }
-    }
-    return commands.join("");
-  }, [map.land]);
+  const landPath = useMemo(
+    () => pathForRings(map.land, "world.land") ?? "",
+    [map.land],
+  );
 
   const viewScale =
     size.width > 0 && size.height > 0
@@ -348,8 +306,14 @@ export function WorldMap({
           };
           setTranslate(clampTranslate(next, scaleRef.current));
         },
-        onPanResponderRelease: () => {
+        onPanResponderRelease: (_event, gesture) => {
           gestureRef.current.distance = 0;
+          if (Platform.OS === "web" && (Math.abs(gesture.dx) > 3 || Math.abs(gesture.dy) > 3)) {
+            suppressClickRef.current = true;
+            setTimeout(() => {
+              suppressClickRef.current = false;
+            }, 250);
+          }
         },
       }),
     [clampTranslate, screenPointToViewBox, viewScale, zoomBy],
@@ -498,6 +462,35 @@ export function WorldMap({
     const controllerTag = countryTagById.get(region.controllerCountryId) ?? null;
     return controllerTag;
   };
+
+  /**
+   * Platform-specific selection props for an SVG country shape.
+   *
+   * On web, `react-native-svg`'s `WebShape` treats `onPress`/`onPressIn` as React
+   * Native touchables and injects `onStartShouldSetResponder`, `onResponder*` and
+   * `onPressIn` into a DOM SVG node. React DOM rejects those as unknown event
+   * handler properties, which produced the repeated WebShape console errors for
+   * every interactive polity. The web build instead listens to the ordinary DOM
+   * click in the capture phase; native keeps the touchable props. `onClickCapture`
+   * is not rewritten by `WebShape.prepare`, unlike `onClick`.
+   *
+   * Pointer hover is already handled by the container's `onPointerMove`, so the
+   * web branch does not need `onPressIn`.
+   */
+  const polityPressProps = (tag: string): object =>
+    Platform.OS === "web"
+      ? {
+          onClickCapture: () => {
+            // A drag ends with a browser click; do not turn map panning into a
+            // country selection.
+            if (suppressClickRef.current) return;
+            onSelect(tag);
+          },
+        }
+      : {
+          onPress: () => onSelect(tag),
+          onPressIn: () => setHoveredTag(tag),
+        };
 
   /**
    * Screen-constant country labels with a simple collision cull.
@@ -651,6 +644,9 @@ export function WorldMap({
                   layer === "markets" &&
                   highlightMarketId !== null &&
                   marketIdFor(polity) !== highlightMarketId;
+                // A ringless polity has no fill. Its marker is rendered by the
+                // marker layer below, so it remains visible and selectable.
+                if (polity.path === null) return null;
                 return (
                   <Path
                     key={polity.tag}
@@ -658,8 +654,7 @@ export function WorldMap({
                     fill={fillFor(polity)}
                     fillRule="evenodd"
                     stroke="none"
-                    onPress={() => onSelect(polity.tag)}
-                    onPressIn={() => setHoveredTag(polity.tag)}
+                    {...polityPressProps(polity.tag)}
                     accessibilityLabel={`${polity.entry.name}`}
                     opacity={dimmed ? 0.18 : isHovered && !isSelected ? 0.92 : 1}
                   />
@@ -670,24 +665,26 @@ export function WorldMap({
                 filling each polity lets a later neighbour's fill cover a shared
                 border and makes lines appear/disappear with draw order.
               */}
-              {polities.map((polity) => (
-                <Path
-                  key={`border-${polity.tag}`}
-                  d={polity.path}
-                  fill="none"
-                  fillRule="evenodd"
-                  stroke={colors.mapBorder}
-                  strokeWidth={1.1 / scale}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  pointerEvents="none"
-                />
-              ))}
+              {polities.map((polity) =>
+                polity.path === null ? null : (
+                  <Path
+                    key={`border-${polity.tag}`}
+                    d={polity.path}
+                    fill="none"
+                    fillRule="evenodd"
+                    stroke={colors.mapBorder}
+                    strokeWidth={1.1 / scale}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    pointerEvents="none"
+                  />
+                ),
+              )}
               {selectedTag === null
                 ? null
                 : (() => {
                     const selected = polities.find((polity) => polity.tag === selectedTag);
-                    if (selected === undefined) return null;
+                    if (selected === undefined || selected.path === null) return null;
                     return (
                       <Path
                         d={selected.path}
@@ -702,7 +699,7 @@ export function WorldMap({
                   })()}
               {polities.map((polity) => {
                 const controllerTag = occupationFor(polity);
-                if (controllerTag === null) return null;
+                if (controllerTag === null || polity.path === null) return null;
                 return (
                   <Path
                     key={`occ-${polity.tag}`}
@@ -775,7 +772,7 @@ export function WorldMap({
                     fill={isSelected ? colors.accentStrong : colors.textStrong}
                     stroke={colors.mapBorder}
                     strokeWidth={0.8 / scale}
-                    onPress={() => onSelect(polity.tag)}
+                    {...polityPressProps(polity.tag)}
                   />
                 );
               })}

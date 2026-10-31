@@ -5420,3 +5420,106 @@ current borders to split the rectangles.
 - Audit: 133 polities, 0 invalid rings, 2 political overlaps (largest
   0.004 deg²), 0 disputed areas, 4,047.8074 deg² unassigned (4,026.4191 deg²
   intentional Antarctica).
+
+## D-101 â€” M11e: acyclic simulation dependency hierarchy
+
+**Status:** implemented (M11e).
+
+### Context
+
+The Expo/Metro development bundle reported three `Require cycle` warnings from
+the generated simulation modules:
+
+- `world.js -> economy/validation.js -> economy/trade.js -> world.js`
+- `world.js -> economy/validation.js -> economy/trade.js -> economy/monetary.js -> world.js`
+- `world.js -> economy/military.js -> world.js`
+
+`world.ts` must validate every subsystem before a tick and before save encoding.
+The runtime phase modules (`trade.ts`, `monetary.ts`, `military.ts`) also called
+`assertValidWorld*` after staging their work. Because `validation.ts` imported
+those phase modules for their state validators, the whole-world validator and the
+phase modules imported each other. The cycles were structural but still created
+partially initialized exports and Metro warnings.
+
+### Decision
+
+1. `world.ts` remains the authoritative `World` state definition and the
+   whole-world validator. It is the top of the validation hierarchy.
+2. State construction, lookups, and structural validation live in new lower-level
+   modules:
+   - `economy/tradeState.ts` â€” trade policy/state creation and trade validators;
+   - `economy/monetaryState.ts` â€” price-index/monetary state factories, shared
+     valuation/account helpers, and monetary validators;
+   - `economy/militaryState.ts` â€” military state construction, stable lookups,
+     and the military validator.
+   These modules import `World` only with `import type`; they never import world
+   initialization at runtime.
+3. `world.ts` and `economy/validation.ts` import the low-level state/validation
+   modules. They no longer import `trade.ts`, `monetary.ts`, or `military.ts`.
+4. The runtime phase modules keep their self-validation contract by importing
+   `assertValidWorld*` from `world.ts`, but `world.ts` no longer imports them, so
+   the runtime graph is acyclic. They re-export their state surface so the public
+   `@century/sim` API, scenario construction and existing tests do not change.
+5. A reusable checker, `scripts/m11e/check-sim-dependencies.mjs` (root script
+   `pnpm check:sim-deps`), builds the TypeScript runtime graph (ignoring
+   type-only imports) and the generated JavaScript graph, and fails on any
+   strongly connected component. Jest regressions pin the hierarchy.
+
+### Consequences
+
+- All three Metro require cycles are gone, along with the previously unreported
+  `world -> profit -> validation -> trade -> ...` component.
+- Whole-world validation, phase validation timing, economic/monetary/military
+  behavior, determinism, serialization, and save schemas are unchanged.
+- Type-only imports are exactly the erased interface bridge; no logic was
+  duplicated and no generic utility module was introduced.
+- `pnpm ci` now runs `check:sim-deps` after the library build.
+
+## D-102 â€” M11e: platform-specific WorldMap SVG selection and geometry validation
+
+**Status:** implemented (M11e).
+
+### Context
+
+The development console reported repeated React DOM errors originating at
+`react-native-svg/lib/module/web/WebShape.js` and the polity `Path` render in
+`WorldMap.tsx`:
+
+`Unknown event handler property `onStartShouldSetResponder`. It will be ignored.`
+
+and the same for `onResponderTerminationRequest`, `onResponderGrant`,
+`onResponderMove`, `onResponderRelease`, `onResponderTerminate` and `onPressIn`.
+`WebShape` treats any `onPress`/`onPressIn` prop as a React Native touchable and
+injects responder props into the DOM SVG node. React DOM rejects them. The
+production export suppresses these development warnings, which is why the
+exported build appeared clean; the defect is still real in development and on
+any future stricter DOM runtime.
+
+### Decision
+
+1. Selection props are platform-specific. On web, polity fills and small-state
+   markers use `onClickCapture`; `WebShape.prepare` only rewrites `onClick`, so
+   the capture handler reaches the DOM intact and no touchable mixin is engaged.
+   Native keeps `onPress`/`onPressIn`.
+2. Web hover continues to use the container's `onPointerMove`; the native-only
+   `onPressIn` is not needed on web.
+3. A drag that ends in a browser click does not select a country: the pan
+   responder records movement and suppresses the following click briefly.
+4. Map projection, ring decoding, path building and validation move to the pure
+   `worldMapGeometry.ts`. Malformed rings (odd coordinates, non-finite values,
+   fewer than three points, missing/empty rings) throw a tagged `RangeError`
+   instead of being silently skipped. A polity with no rings at all has the
+   explicit marker fallback; it is never discarded.
+5. Regression tests decode all 133 polities, build the complete 267-path/17-marker
+   render plan, cover invalid geometries and the empty fallback, and pin the
+   absence of runtime `onPress`/`onPressIn` on web SVG shapes.
+
+### Consequences
+
+- The repeated WebShape console errors and the three require-cycle warnings are
+  gone from the development console; only the expected React DevTools information
+  message remains.
+- Country selection, hover, zoom and panning are unchanged in the browser; native
+  touch behavior is unchanged.
+- Map data, historical borders, simulation state, saves, determinism and the
+  public API are unchanged.

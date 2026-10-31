@@ -45,14 +45,14 @@ import type {
   TradeState,
 } from "./economy/types.js";
 import { assertValidPopulationState } from "./population/state.js";
-import { assertValidTradeState } from "./economy/trade.js";
+import { assertValidTradeState } from "./economy/tradeState.js";
 import {
   assertValidMonetaryState,
   assertValidPriceIndexState,
-} from "./economy/monetary.js";
-import { assertValidMilitaryState } from "./economy/military.js";
+} from "./economy/monetaryState.js";
+import { assertValidMilitaryState } from "./economy/militaryState.js";
 import type { PopBlock, Region } from "./population/types.js";
-import { emptyMilitaryState } from "./economy/military.js";
+import { emptyMilitaryState } from "./economy/militaryState.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
   requireArray,

@@ -55,7 +55,7 @@ import {
   assertValidRegimeState,
 } from "./politics.js";
 import { assertValidLaborPolicyState } from "./labor.js";
-import { assertValidTradePolicyState } from "./trade.js";
+import { assertValidTradePolicyState } from "./tradeState.js";
 import { assertValidConstructionState } from "./constructionModel.js";
 import {
   assertValidBudgetTotals,

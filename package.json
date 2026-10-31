@@ -15,12 +15,13 @@
     "flags:audit": "node scripts/m11/build-flags.mjs --audit",
     "flags:update": "node scripts/m11/build-flags.mjs --update",
     "check:worker": "pnpm run build:libs && pnpm -F @century/sim-worker scenario:build:check && pnpm -F @century/app build:worker:check",
+    "check:sim-deps": "node scripts/m11e/check-sim-dependencies.mjs",
     "typecheck": "pnpm run build:libs && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "bench": "pnpm build && pnpm -F @century/bench start",
     "bench:campaign": "pnpm build && pnpm -F @century/bench campaign",
     "app:export": "pnpm -F @century/app export:web && pnpm -F @century/app export:ios && pnpm -F @century/app export:android",
-    "ci": "pnpm lint && pnpm run check:worker && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
+    "ci": "pnpm lint && pnpm run check:worker && pnpm run check:sim-deps && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
   "devDependencies": {
     "jimp-compact": "0.16.1",

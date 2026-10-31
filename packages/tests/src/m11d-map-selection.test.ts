@@ -30,10 +30,15 @@ describe("M11d map selection hit testing", () => {
   });
 
   test("polity fills and small-state markers remain selectable", () => {
-    const fillStart = source.indexOf("onPress={() => onSelect(polity.tag)}");
-    expect(fillStart).toBeGreaterThan(0);
-    const markerStart = source.indexOf("key={`marker-${polity.tag}`}");
-    expect(markerStart).toBeGreaterThan(0);
-    expect(source.slice(markerStart, markerStart + 500)).toContain("onPress={() => onSelect(polity.tag)}");
+    // M11e: selection props are platform-specific because react-native-svg's web
+    // WebShape turns onPress/onPressIn into unknown DOM responder props.
+    const helperStart = source.indexOf("const polityPressProps = (tag: string)");
+    expect(helperStart).toBeGreaterThan(0);
+    const helperBlock = source.slice(helperStart, helperStart + 1_200);
+    expect(helperBlock).toContain("onClickCapture");
+    expect(helperBlock).toContain("onPress: () => onSelect(tag)");
+    expect(helperBlock).toContain("onPressIn: () => setHoveredTag(tag)");
+    expect(source.split("{...polityPressProps(polity.tag)}").length - 1).toBe(2);
+    expect(source).not.toContain("onPress={() => onSelect(polity.tag)}");
   });
 });
