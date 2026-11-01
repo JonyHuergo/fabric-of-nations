@@ -1,4 +1,4 @@
-/**
+﻿/**
  * M12a playtest: open a real exported campaign and screenshot the province map.
  *
  * Usage: node scripts/m12/playtest-screenshot.mjs
@@ -53,7 +53,7 @@ try {
   await app.evaluate(`(() => {
     const target = document.elementFromPoint(650, 330) ?? document.querySelector('svg');
     if (target === null) return false;
-    for (let index = 0; index < 7; index += 1) {
+    for (let index = 0; index < 13; index += 1) {
       target.dispatchEvent(new WheelEvent('wheel', {
         deltaY: -120,
         clientX: 650,
@@ -101,3 +101,4 @@ try {
 } finally {
   await app.close?.();
 }
+

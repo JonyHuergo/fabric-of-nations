@@ -5557,13 +5557,16 @@ whose ownership can change without rebuilding country polygons.
    formal claims and special status for every province. Mutations
    (`transferProvinceOwnership`, `setProvinceControl`, claims, special status)
    never touch geometry, names or ids. Occupation changes only the controller.
-4. **Country borders are derived from current provincial ownership.** The app
-   draws every internal province edge as a quiet solid white hairline and a thin
-   near-black country border only where the two provinces have different current
-   owners. The country border weight matches the established non-European polity
-   borders (about 1.25 screen px); it is deliberately not a heavy outline. A 1900
-   polity whose territory is covered by provinces does not draw its static 1900
-   outline, so a transferred province cannot leave a stale border behind.
+4. **Country borders are derived from current provincial ownership.** Province
+   boundaries are the province fill outlines themselves: each province path
+   carries a quiet solid white hairline, so shared edges are double-stroked at
+   identical coordinates and stay continuous and aligned with the fills. At the
+   1900 start state the continuous polity outline is the exact boundary of its
+   province union and is drawn as the country border at the established
+   non-European weight (about 1.25 screen px); it is deliberately not a heavy
+   outline. Once a province changes hands, the changed polity's static outline is
+   suppressed so a stale 1900 border cannot survive, and the border is derived
+   from current province ownership.
 5. **Geometry source.** Natural Earth 1:10m admin-1 units are internal blocks
    only; every province is clipped to the authored M11c 1900 polity polygon.
    Later borders that cut a 1900 unit are reconstructed as separate provinces

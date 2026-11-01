@@ -106,11 +106,14 @@ bundle and audit; the bundle and the code are authoritative if they disagree.
   id and name never change. A province split is an explicit data change with a
   new id and documented coverage, not dynamic geometry surgery.
 - Country borders are reconstructed from current provincial ownership. The map
-  draws province fills by current owner; every internal province edge is a quiet
-  solid white hairline; a thin near-black country border is drawn only where the
-  two neighbouring provinces have different current owners. Province boundaries
-  therefore remain visible between provinces of the same country. The country
-  border weight matches the established non-European polity borders.
+  draws province fills by current owner; every province outline carries a quiet
+  solid white hairline (shared edges are double-stroked at the same coordinates,
+  so they stay continuous and aligned with the fills). At the 1900 start state
+  the continuous polity outline is the exact boundary of its province union and
+  is used for the country border, with the same thin near-black weight as the
+  established non-European borders. After a transfer the changed polity's static
+  outline is suppressed and the border is derived from current province
+  ownership.
 - Non-European territories are outside this milestone. The M11c 1900 polity
   polygons remain the underlay for colonies, Asiatic Russia, Anatolia and other
   non-European areas.

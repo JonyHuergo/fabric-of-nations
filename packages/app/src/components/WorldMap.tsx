@@ -105,7 +105,6 @@ interface DecodedProvince extends ProvinceMapProvince {
  * Widths are screen pixels, converted to viewBox units in the renderer.
  */
 const PROVINCE_BORDER_COLOR = "#ffffff";
-const PROVINCE_BORDER_WIDTH_PX = 1;
 const COUNTRY_BORDER_WIDTH_PX = 1.25;
 const COASTLINE_WIDTH_PX = 0.9;
 const SELECTION_WIDTH_PX = 1.4;
@@ -295,6 +294,24 @@ export function WorldMap({
     () => new Set(provinces.map((province) => province.initialOwnerTag)),
     [provinces],
   );
+
+  /**
+   * True once any province has changed hands. Until then the 1900 polity
+   * outlines are the exact, continuous boundary of the province union, so the
+   * map uses those for country borders (the same geometry and weight as the
+   * non-European polity borders). After a transfer the derived province-edge
+   * border is used instead.
+   */
+  const provincesChanged = useMemo(() => {
+    if (snapshot === null) return false;
+    for (const entry of snapshot.provinces) {
+      const definition = provinceById.get(entry.provinceId);
+      if (definition !== undefined && entry.ownerPolityId !== definition.initialOwnerPolityId) {
+        return true;
+      }
+    }
+    return false;
+  }, [provinceById, snapshot]);
 
   const provinceBorderPlan = useMemo(
     () => planProvinceBorders(provinceMap.borders, ownerTagByProvinceId),
@@ -904,8 +921,10 @@ export function WorldMap({
                         d={province.path}
                         fill={provinceFillFor(province)}
                         fillRule="evenodd"
-                        stroke={provinceFillFor(province)}
-                        strokeWidth={strokePx(0.45)}
+                        stroke={PROVINCE_BORDER_COLOR}
+                        strokeWidth={strokePx(0.9)}
+                        strokeOpacity={scale >= 2 ? 0.3 : scale >= 1.25 ? 0.2 : 0.11}
+                        strokeLinejoin="round"
                         {...provincePressProps(province)}
                         accessibilityLabel={`${province.displayName}, ${
                           ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag
@@ -916,25 +935,26 @@ export function WorldMap({
                   })
                 : null}
               {/*
-                Provincial boundaries: one dotted white layer for every internal
-                province edge, including neighbours of the same country. A
-                stronger solid layer is drawn only where the current owners of the
-                two provinces differ, so national borders remain derived from
-                provincial ownership rather than from the 1900 polity outlines.
+                The province fill paths already carry the province boundary
+                stroke (every outline is drawn, so shared edges are double-drawn
+                at the same coordinates and stay continuous and aligned with the
+                fills). Re-stroke the coastline after the provinces so the white
+                province outline never shows along the shore.
               */}
-              {showProvinces && provinceBorderPaths.dotted.length > 0 ? (
-                <Path
-                  d={provinceBorderPaths.dotted}
-                  fill="none"
-                  stroke={PROVINCE_BORDER_COLOR}
-                  strokeWidth={strokePx(PROVINCE_BORDER_WIDTH_PX)}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  opacity={scale >= 2 ? 0.34 : scale >= 1.25 ? 0.22 : 0.12}
-                  pointerEvents="none"
-                />
-              ) : null}
-              {showProvinces && provinceBorderPaths.national.length > 0 ? (
+              <Path
+                d={landPath}
+                fill="none"
+                stroke={colors.mapBorder}
+                strokeWidth={strokePx(COASTLINE_WIDTH_PX)}
+                pointerEvents="none"
+              />
+              {/*
+                Country borders derived from current provincial ownership are
+                only needed after a transfer. At the 1900 start state the static
+                polity outlines below are the exact, continuous boundary of the
+                province union and look like the established African borders.
+              */}
+              {provincesChanged && showProvinces && provinceBorderPaths.national.length > 0 ? (
                 <Path
                   d={provinceBorderPaths.national}
                   fill="none"
@@ -979,15 +999,17 @@ export function WorldMap({
                 />
               ) : null}
               {/*
-                Borders are a separate layer after every fill. Drawing them while
-                filling each polity lets a later neighbour's fill cover a shared
-                border and makes lines appear/disappear with draw order. A 1900
-                polity whose territory is covered by provinces is skipped: its
-                international borders are reconstructed from current provincial
-                ownership above, so a stale 1900 line never survives a transfer.
+                Country borders are a separate layer after every fill. At the
+                1900 start state the polity outlines are the exact boundary of
+                their province union, so they are drawn for every polity with the
+                same weight as the non-European borders. Once a province has
+                changed hands the changed polity's static 1900 outline would be
+                stale, so it is skipped and the derived national path above is
+                used instead.
               */}
               {polities.map((polity) =>
-                polity.path === null || (showProvinces && provinceOwnerTags.has(polity.tag)) ? null : (
+                polity.path === null ||
+                (provincesChanged && showProvinces && provinceOwnerTags.has(polity.tag)) ? null : (
                   <Path
                     key={`border-${polity.tag}`}
                     d={polity.path}

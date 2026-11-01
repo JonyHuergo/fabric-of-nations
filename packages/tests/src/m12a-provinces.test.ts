@@ -1020,8 +1020,10 @@ describe("M12a historical reference snapshots", () => {
     expect(renderPlan).not.toMatch(/SimulationRegion|RegionSnapshot/iu);
     expect(worldMap).toContain("PROVINCES_1900");
     expect(worldMap).toContain("decodeProvinceGeometry");
-    expect(worldMap).toContain("provinceBorderPaths.dotted");
-    expect(worldMap).toContain("strokePx(PROVINCE_BORDER_WIDTH_PX)");
+    expect(worldMap).toContain("strokeOpacity");
+    expect(worldMap).toContain("PROVINCE_BORDER_COLOR");
+    expect(worldMap).toContain("provincesChanged");
+    expect(worldMap).toContain("strokePx(COUNTRY_BORDER_WIDTH_PX)");
   });
 
   test("Irish partition distinguishes the six northern counties", () => {

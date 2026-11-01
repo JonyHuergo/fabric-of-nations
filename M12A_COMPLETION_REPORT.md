@@ -171,14 +171,18 @@ Validation snapshots live in `packages/tests/src/m12a-provinces.test.ts`:
 ## 15. Provincial line-rendering implementation and visual results
 
 - `planProvinceBorders` classifies each shared edge by current owners.
-- Internal province edges are quiet solid white hairlines (1 screen px, no dash),
-  with opacity `0.12` at global zoom, `0.22` at continental zoom and `0.34` at
-  country zoom. They are drawn only where both sides are provinces, so coasts and
-  non-province frontiers do not add clutter.
-- A country border is a thin near-black `colors.mapBorder` line (1.25 screen px)
-  over the shared edge when owners differ. This matches the established
-  non-European polity border weight instead of producing a heavy European
-  outline; coastlines come from the single land-mask stroke.
+- Province boundaries are the province fill outlines themselves: every province
+  path carries a solid white hairline (0.9 screen px), with shared edges
+  double-stroked at identical coordinates. This guarantees continuous, gap-free
+  boundaries that align exactly with the fills (the earlier extracted border-line
+  layer fragmented at high zoom and is no longer used for internal borders).
+  Opacity is `0.11` at global zoom, `0.2` at continental zoom and `0.3` at country
+  zoom, so provinces remain visible without competing with country borders.
+- At the 1900 start state a country border is the exact continuous polity outline
+  (the boundary of its province union), drawn at the established non-European
+  1.25 screen px near-black weight. Once a province changes hands, the changed
+  polity's static outline is suppressed and the derived province-edge border is
+  used; this preserves dynamic ownership without stale 1900 lines.
 - All map stroke widths are converted from screen pixels using
   `scale * viewScale`, so they stay visually constant and never become
   sub-pixel at country zoom.

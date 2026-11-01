@@ -36,9 +36,9 @@
   "mapFeaturesCovered": 32,
   "duplicateProvinceIds": 0,
   "duplicateKeys": 0,
-  "unmatchedBorderSegments": 2,
-  "borderSegmentCount": 32981,
-  "borderPairCount": 1528,
+  "unmatchedBorderSegments": 66,
+  "borderSegmentCount": 142592,
+  "borderPairCount": 1604,
   "coverage": [
     {
       "tag": "AND",

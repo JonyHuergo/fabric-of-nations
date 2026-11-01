@@ -509,6 +509,11 @@ for (const province of plan.provinces) {
     ...province,
     ...encoded,
     polygons: simplified,
+    // Border extraction must use the shared source geometry BEFORE independent
+    // simplification. Simplifying each province separately gives the two sides
+    // of a shared edge different vertices, which quantizes into different
+    // segments and produces the disconnected border fragments seen on the map.
+    rawPolygons: source,
     label,
     residual: false,
   });
@@ -589,9 +594,10 @@ function nextResidualId(tag) {
 const allProvinces = [...built, ...residuals];
 const segmentMap = new Map();
 for (const province of allProvinces) {
-  for (let ringIndex = 0; ringIndex < province.rings.length; ringIndex += 1) {
-    const ring = decodeRing(province.rings[ringIndex]);
-    for (let index = 0; index < ring.length - 1; index += 1) {
+  const rings = province.rawPolygons ?? [];
+  for (const polygon of rings) {
+    for (const ring of polygon) {
+      for (let index = 0; index < ring.length - 1; index += 1) {
       const [x1, y1] = ring[index];
       const [x2, y2] = ring[index + 1];
       const qx1 = Math.round(x1 * 1000);
@@ -609,6 +615,7 @@ for (const province of allProvinces) {
         segmentMap.set(key, entry);
       }
       entry.provinces.add(province.provinceId);
+      }
     }
   }
 }
