@@ -96,12 +96,19 @@ interface DecodedProvince extends ProvinceMapProvince {
   readonly points: DecodedPolityGeometry["points"];
 }
 
-/** Provincial boundaries are thin white dotted lines; country borders are stronger. */
-const PROVINCE_BORDER_COLOR = "#f4f1e6";
-const PROVINCE_BORDER_WIDTH = 0.9;
-const PROVINCE_DASH_ON = 1.5;
-const PROVINCE_DASH_OFF = 1.7;
-const COUNTRY_BORDER_WIDTH = 1.7;
+/**
+ * Visual hierarchy (revised after playtest review):
+ * - international borders are thick near-black lines and have absolute priority;
+ * - province boundaries are quiet solid hairlines, never dashed, so they read as
+ *   a subtle internal grid instead of competing with the national borders;
+ * - only internal province edges are drawn (no coastline/outer-edge clutter).
+ * Widths are screen pixels, converted to viewBox units in the renderer.
+ */
+const PROVINCE_BORDER_COLOR = "#ffffff";
+const PROVINCE_BORDER_WIDTH_PX = 1;
+const COUNTRY_BORDER_WIDTH_PX = 1.25;
+const COASTLINE_WIDTH_PX = 0.9;
+const SELECTION_WIDTH_PX = 1.4;
 
 function centroidOf(polity: WorldMapPolity): readonly [number, number] {
   const [lon, lat] = polity.label;
@@ -298,8 +305,11 @@ export function WorldMap({
     const national: string[] = [];
     for (const border of provinceBorderPlan) {
       if (border.path === null) continue;
-      dotted.push(border.path);
-      if (border.national) national.push(border.path);
+      if (border.national) {
+        national.push(border.path);
+      } else if (border.internal) {
+        dotted.push(border.path);
+      }
     }
     return { dotted: dotted.join(""), national: national.join("") };
   }, [provinceBorderPlan]);
@@ -323,6 +333,16 @@ export function WorldMap({
     size.width > 0 && size.height > 0
       ? Math.min(size.width / MAP_WIDTH, size.height / MAP_HEIGHT)
       : 1;
+  /**
+   * Convert a desired on-screen stroke width to SVG viewBox units. The map
+   * group is scaled by both the responsive viewBox fit and the user zoom, so a
+   * value divided only by `scale` becomes sub-pixel at country zoom.
+   */
+  const strokePx = useCallback(
+    (pixels: number): number =>
+      pixels / Math.max(scale * viewScale, 0.0001),
+    [scale, viewScale],
+  );
 
   const clampTranslate = useCallback(
     (next: { x: number; y: number }, nextScale: number) => {
@@ -840,7 +860,7 @@ export function WorldMap({
                  * the identical outline rather than a separate simplified one.
                  */
                 stroke={colors.mapBorder}
-                strokeWidth={0.9 / scale}
+                strokeWidth={strokePx(COASTLINE_WIDTH_PX)}
                 pointerEvents="none"
               />
               {polities.map((polity) => {
@@ -885,7 +905,7 @@ export function WorldMap({
                         fill={provinceFillFor(province)}
                         fillRule="evenodd"
                         stroke={provinceFillFor(province)}
-                        strokeWidth={0.35 / scale}
+                        strokeWidth={strokePx(0.45)}
                         {...provincePressProps(province)}
                         accessibilityLabel={`${province.displayName}, ${
                           ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag
@@ -907,11 +927,10 @@ export function WorldMap({
                   d={provinceBorderPaths.dotted}
                   fill="none"
                   stroke={PROVINCE_BORDER_COLOR}
-                  strokeWidth={PROVINCE_BORDER_WIDTH / scale}
+                  strokeWidth={strokePx(PROVINCE_BORDER_WIDTH_PX)}
                   strokeLinejoin="round"
                   strokeLinecap="round"
-                  strokeDasharray={`${PROVINCE_DASH_ON / scale} ${PROVINCE_DASH_OFF / scale}`}
-                  opacity={scale >= 2 ? 0.78 : scale >= 1.25 ? 0.62 : 0.42}
+                  opacity={scale >= 2 ? 0.34 : scale >= 1.25 ? 0.22 : 0.12}
                   pointerEvents="none"
                 />
               ) : null}
@@ -920,7 +939,7 @@ export function WorldMap({
                   d={provinceBorderPaths.national}
                   fill="none"
                   stroke={colors.mapBorder}
-                  strokeWidth={COUNTRY_BORDER_WIDTH / scale}
+                  strokeWidth={strokePx(COUNTRY_BORDER_WIDTH_PX)}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                   pointerEvents="none"
@@ -941,7 +960,7 @@ export function WorldMap({
                         fill="none"
                         fillRule="evenodd"
                         stroke={colors.accentStrong}
-                        strokeWidth={1.4 / scale}
+                        strokeWidth={strokePx(SELECTION_WIDTH_PX)}
                         strokeLinejoin="round"
                         pointerEvents="none"
                       />
@@ -953,7 +972,7 @@ export function WorldMap({
                   fill="none"
                   fillRule="evenodd"
                   stroke={colors.accentStrong}
-                  strokeWidth={1.15 / scale}
+                  strokeWidth={strokePx(1.4)}
                   strokeLinejoin="round"
                   opacity={0.9}
                   pointerEvents="none"
@@ -975,7 +994,7 @@ export function WorldMap({
                     fill="none"
                     fillRule="evenodd"
                     stroke={colors.mapBorder}
-                    strokeWidth={1.1 / scale}
+                    strokeWidth={strokePx(COUNTRY_BORDER_WIDTH_PX)}
                     strokeLinejoin="round"
                     strokeLinecap="round"
                     pointerEvents="none"
@@ -999,7 +1018,7 @@ export function WorldMap({
                         fill="none"
                         fillRule="evenodd"
                         stroke={colors.accentStrong}
-                        strokeWidth={1.4 / scale}
+                        strokeWidth={strokePx(SELECTION_WIDTH_PX)}
                         strokeLinejoin="round"
                         pointerEvents="none"
                       />
@@ -1016,8 +1035,8 @@ export function WorldMap({
                     fillOpacity={0.42}
                     fillRule="evenodd"
                     stroke={nationColor(controllerTag)}
-                    strokeWidth={1 / scale}
-                    strokeDasharray={`${2 / scale} ${1.4 / scale}`}
+                    strokeWidth={strokePx(1.1)}
+                    strokeDasharray={`${strokePx(2)} ${strokePx(1.4)}`}
                     pointerEvents="none"
                   />
                 );
@@ -1042,8 +1061,8 @@ export function WorldMap({
                         fillOpacity={0.38}
                         fillRule="evenodd"
                         stroke={nationColor(controllerTag)}
-                        strokeWidth={1 / scale}
-                        strokeDasharray={`${2 / scale} ${1.4 / scale}`}
+                        strokeWidth={strokePx(1.1)}
+                        strokeDasharray={`${strokePx(2)} ${strokePx(1.4)}`}
                         pointerEvents="none"
                       />
                     );
@@ -1089,7 +1108,7 @@ export function WorldMap({
                     r={(isSelected ? 2.6 : 1.8) / scale}
                     fill={colors.mapOcean}
                     stroke={isSelected ? colors.accentStrong : colors.textStrong}
-                    strokeWidth={1 / scale}
+                    strokeWidth={strokePx(1)}
                     pointerEvents="none"
                   />
                 );
@@ -1106,7 +1125,7 @@ export function WorldMap({
                     r={(isSelected ? 5 : 3.2) / Math.max(scale, 0.8)}
                     fill={isSelected ? colors.accentStrong : colors.textStrong}
                     stroke={colors.mapBorder}
-                    strokeWidth={0.8 / scale}
+                    strokeWidth={strokePx(0.8)}
                     {...polityPressProps(polity.tag)}
                   />
                 );
@@ -1178,11 +1197,11 @@ export function WorldMap({
             <>
               <View style={styles.legendRow}>
                 <View style={[styles.provinceLineSwatch]} />
-                <Text style={styles.legendText}>Province boundary (dotted)</Text>
+                <Text style={styles.legendText}>Province boundary</Text>
               </View>
               <View style={styles.legendRow}>
                 <View style={[styles.countryLineSwatch]} />
-                <Text style={styles.legendText}>Country border (from provinces)</Text>
+                <Text style={styles.legendText}>Country border</Text>
               </View>
             </>
           ) : null}
@@ -1300,13 +1319,12 @@ const styles = StyleSheet.create({
     width: 18,
     height: 0,
     borderTopWidth: 1,
-    borderTopColor: "#f4f1e6",
-    borderStyle: "dotted",
+    borderTopColor: "rgba(255,255,255,0.45)",
   },
   countryLineSwatch: {
     width: 18,
     height: 0,
-    borderTopWidth: 2,
+    borderTopWidth: 3,
     borderTopColor: colors.mapBorder,
   },
   occSwatch: {

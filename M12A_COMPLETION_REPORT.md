@@ -18,9 +18,9 @@ milestone delivery, verification commands and remaining uncertainties.
   preserved as `SimulationRegion` (explicit aliases added) and keeps its runtime
   field name `regions` for save compatibility; it is no longer used for map
   geometry, selection or country composition.
-- The map renders one fill per province, one dotted white edge per province
-  boundary, and a stronger solid edge only when the two provinces have different
-  current owners. Country borders are therefore reconstructed from province
+- The map renders one fill per province, one quiet solid white hairline per
+  internal province boundary, and a thin near-black country border only when the
+  two provinces have different current owners. Country borders are therefore reconstructed from province
   ownership. A 1900 polity covered by provinces does not draw its static 1900
   outline, so transfers cannot leave stale national borders.
 - Province hit-testing and selection are implemented at every zoom; the country
@@ -32,7 +32,8 @@ milestone delivery, verification commands and remaining uncertainties.
   the province map bundle. The regression test
   `map geometry no longer depends on the simulation Region layer` asserts this.
 - `WorldMap.tsx` uses `PROVINCES_1900`, `decodeProvinceGeometry`,
-  `planProvinceBorders`, `provinceBorderPaths.dotted` and `strokeDasharray`.
+  `planProvinceBorders`, `provinceBorderPaths.dotted` and the shared
+`strokePx` screen-width helper.
 - The old implicit “one map polygon = one region” relationship is gone. Map
   geometry comes exclusively from the province bundle; simulation regions no
   longer have polygons in the app.
@@ -170,13 +171,17 @@ Validation snapshots live in `packages/tests/src/m12a-provinces.test.ts`:
 ## 15. Provincial line-rendering implementation and visual results
 
 - `planProvinceBorders` classifies each shared edge by current owners.
-- Every edge is drawn with `strokeDasharray` (`1.5` on / `1.7` off screen units),
-  white `#f4f1e6`, `0.9` px at ordinary zoom, opacity `0.42` at global zoom,
-  `0.62` at continental zoom and `0.78` at country zoom.
-- A national border is a solid `colors.mapBorder` line at `1.7` px over the same
-  shared edge when owners differ; coastlines come from the single land-mask
-  stroke. Internal province dotted lines remain visible between provinces of the
-  same country.
+- Internal province edges are quiet solid white hairlines (1 screen px, no dash),
+  with opacity `0.12` at global zoom, `0.22` at continental zoom and `0.34` at
+  country zoom. They are drawn only where both sides are provinces, so coasts and
+  non-province frontiers do not add clutter.
+- A country border is a thin near-black `colors.mapBorder` line (1.25 screen px)
+  over the shared edge when owners differ. This matches the established
+  non-European polity border weight instead of producing a heavy European
+  outline; coastlines come from the single land-mask stroke.
+- All map stroke widths are converted from screen pixels using
+  `scale * viewScale`, so they stay visually constant and never become
+  sub-pixel at country zoom.
 - Static verification render: [`docs/images/m12a-provinces-1900.png`](docs/images/m12a-provinces-1900.png).
 - Real exported-app verification: [`docs/images/m12a-game-map.png`](docs/images/m12a-game-map.png)
   (global), [`docs/images/m12a-game-map-zoom.png`](docs/images/m12a-game-map-zoom.png)
@@ -187,9 +192,9 @@ Validation snapshots live in `packages/tests/src/m12a-provinces.test.ts`:
 
 ## 16. Map rendering and performance results
 
-- Province fill layer: 570 paths; province border layer: 1,528 shared-border
-  paths combined into one dotted path and one national path; polity labels remain
-  screen-constant with collision culling.
+- Province fill layer: 570 paths; province border layer: internal shared edges
+  combined into one solid hairline path and one thin national-border path; polity
+  labels remain screen-constant with collision culling.
 - No white ocean overlay: the land mask keeps its transform and no extra ocean
   layer is added; province fills are clipped to the 1900 polity polygons.
 - Hit-testing uses world coordinates, so it is invariant under zoom and pan;
@@ -201,9 +206,9 @@ Validation snapshots live in `packages/tests/src/m12a-provinces.test.ts`:
 ## 16a. Visual verification results
 
 The exported web app was driven through Chrome DevTools Protocol. At global zoom
-the province layer is intentionally subdued (0.42 opacity); at continental and
-country zoom the white dotted province edges and the stronger solid country
-borders are clearly distinguishable. Selecting Bavaria opens the province panel
+the province layer is intentionally subdued (0.12 opacity); at continental and
+country zoom the solid white province hairlines remain visible while the thin
+near-black country borders keep visual priority. Selecting Bavaria opens the province panel
 with `Province 2001 · high confidence`, current owner DEU, 1900 owner DEU,
 `Kingdom of Bavaria`, special status and the historical note. The screenshots are
 committed under `docs/images/`.

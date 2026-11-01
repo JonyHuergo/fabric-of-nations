@@ -4,7 +4,7 @@
  * Extracted from `WorldMap.tsx` so the relationship between provincial
  * ownership and drawn borders can be tested without mounting React:
  *
- * - every province edge is a dotted line (internal boundaries stay visible
+ * - every internal province edge is a subtle solid hairline (it stays visible
  *   between two provinces of the same country);
  * - an edge is "national" only when the current owners of its two provinces
  *   differ (or, for the 1900 baseline, their initial owners differ);
@@ -22,6 +22,13 @@ export interface ProvinceBorderPlanEntry {
   readonly path: string | null;
   /** True when the edge separates two different current owners. */
   readonly national: boolean;
+  /**
+   * True when both sides are provinces. Outer edges are coastlines or the
+   * boundary with a non-province area; they are not drawn as province borders
+   * (the coastline and polity borders already cover them) and must not add
+   * dotted clutter along every shore.
+   */
+  readonly internal: boolean;
 }
 
 /**
@@ -50,6 +57,7 @@ export function planProvinceBorders(
         ownerA !== undefined &&
         ownerB !== undefined &&
         ownerA !== ownerB,
+      internal: border.b >= 0,
     });
   }
   return plan;

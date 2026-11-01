@@ -619,7 +619,7 @@ describe("M12a province inventory and geometry", () => {
     expect(lineCount).toBeGreaterThan(1000);
   });
 
-  test("province edges stay dotted inside a country and become national across owners", () => {
+  test("province edges stay internal inside a country and become national across owners", () => {
     const ownerByProvinceId = new Map(
       BUNDLE.provinces.map((province) => [province.id, province.initialOwnerTag]),
     );
@@ -652,8 +652,8 @@ describe("M12a province inventory and geometry", () => {
       (border) => border.a === alsace || border.b === alsace,
     );
     expect(alsaceNeighbours.some((border) => border.national)).toBe(true);
-    // The dotted layer always contains every edge, including same-owner ones.
-    expect(plan.filter((border) => !border.national).length).toBeGreaterThan(0);
+    // Internal same-owner edges remain in the province layer.
+    expect(plan.filter((border) => !border.national && border.internal).length).toBeGreaterThan(0);
   });
 
   test("province hit testing is zoom-independent and picks the containing province", () => {
@@ -1021,7 +1021,7 @@ describe("M12a historical reference snapshots", () => {
     expect(worldMap).toContain("PROVINCES_1900");
     expect(worldMap).toContain("decodeProvinceGeometry");
     expect(worldMap).toContain("provinceBorderPaths.dotted");
-    expect(worldMap).toContain("strokeDasharray");
+    expect(worldMap).toContain("strokePx(PROVINCE_BORDER_WIDTH_PX)");
   });
 
   test("Irish partition distinguishes the six northern counties", () => {

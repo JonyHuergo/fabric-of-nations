@@ -99,7 +99,7 @@ describe("M11d map typography", () => {
     expect(WORLD_MAP).toContain("Math.sqrt(countryWidth * countryHeight)");
     expect(WORLD_MAP).toContain("boxes.some(");
     expect(WORLD_MAP).toContain("fontSize = (screenFontSize + (selected ? 1.5 : 0)) / screenScale");
-    expect(WORLD_MAP).toContain('strokeWidth={1.1 / scale}');
+    expect(WORLD_MAP).toContain("strokePx(COUNTRY_BORDER_WIDTH_PX)");
   });
 
   test("the land mask is the single coastline source", () => {
