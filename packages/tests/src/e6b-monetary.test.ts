@@ -10,12 +10,12 @@
 import {
   applyCountryAction,
   assertValidWorld,
-  authorityLiabilitySUSD,
-  authorityReservesSUSD,
+  authorityLiabilityRUSD,
+  authorityReservesRUSD,
   convertibilityState,
   civilDateToDayIndex,
   createEconomyWorld,
-  currencyFromSusd,
+  currencyFromRusd,
   daysInMonth,
   derivePriceIndexes,
   deserializeWorld,
@@ -27,7 +27,7 @@ import {
   runMonetaryPhase,
   runTradeDispatchPhase,
   serializeWorld,
-  susdFromCurrency,
+  rusdFromCurrency,
   validateCountryAction,
   type EconomyScenarioDef,
   type Month,
@@ -55,7 +55,7 @@ const SEED = 20_261_105;
 const SPECIFIED_A = {
   currencyId: 0,
   status: "specified" as const,
-  susdPerUnit: 0.5 as never,
+  rusdPerUnit: 0.5 as never,
   setOnDay: 0,
   source: "scenario" as const,
 };
@@ -80,10 +80,10 @@ function monetaryScenario(
       currencies: [
         {
           currencyId: 0,
-          paritySusdPerUnit: options.parity ?? 0.5,
-          reserveFundingSUSD: options.reserves ?? 2_000,
+          parityRusdPerUnit: options.parity ?? 0.5,
+          reserveFundingRUSD: options.reserves ?? 2_000,
           currencyIssuedUnits: options.units ?? 1_000,
-          externalCashSUSD: options.externalCash ?? 5_000,
+          externalCashRUSD: options.externalCash ?? 5_000,
         },
       ],
     };
@@ -117,7 +117,7 @@ function balance(world: World, ownerKind: string, ownerId: number | null, subtyp
       candidate.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind}:${ownerId} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function designatedCash(world: World): number {
@@ -127,7 +127,7 @@ function designatedCash(world: World): number {
         account.subtype,
       ),
     )
-    .reduce((total, account) => total + account.balanceSUSD, 0);
+    .reduce((total, account) => total + account.balanceRUSD, 0);
 }
 
 function runDay(world: World, scenario: EconomyScenarioDef): void {
@@ -145,9 +145,9 @@ function monetaryAction(overrides: Record<string, unknown> = {}) {
     dayIndex: 0,
     source: "player" as const,
     regime: "pegged" as const,
-    paritySusdPerUnit: null as number | null,
-    reserveTransferSUSD: 0,
-    currencyConversionSUSD: 0,
+    parityRusdPerUnit: null as number | null,
+    reserveTransferRUSD: 0,
+    currencyConversionRUSD: 0,
     ...overrides,
   };
 }
@@ -155,12 +155,12 @@ function monetaryAction(overrides: Record<string, unknown> = {}) {
 describe("E6b currency valuation and conversion", () => {
   test("valuation direction and conversion are unambiguous and reversible", () => {
     const rate = requireCurrencyRate(
-      [{ currencyId: 0, status: "specified", susdPerUnit: 0.5 as never, setOnDay: 0, source: "scenario" }],
+      [{ currencyId: 0, status: "specified", rusdPerUnit: 0.5 as never, setOnDay: 0, source: "scenario" }],
       0,
     );
-    expect(susdFromCurrency(100, rate)).toBeCloseTo(50, 10);
-    expect(currencyFromSusd(50, rate)).toBeCloseTo(100, 10);
-    expect(currencyFromSusd(susdFromCurrency(123.456, rate), rate)).toBeCloseTo(123.456, 10);
+    expect(rusdFromCurrency(100, rate)).toBeCloseTo(50, 10);
+    expect(currencyFromRusd(50, rate)).toBeCloseTo(100, 10);
+    expect(currencyFromRusd(rusdFromCurrency(123.456, rate), rate)).toBeCloseTo(123.456, 10);
     // Missing and unavailable are named errors, never a silent parity.
     expect(() =>
       requireCurrencyRate([{ currencyId: 1, status: "unavailable" }], 1),
@@ -175,7 +175,7 @@ describe("E6b currency valuation and conversion", () => {
         {
           ...monetaryScenario(),
           monetary: {
-            currencies: [{ currencyId: 0, regime: "managed" as never, paritySusdPerUnit: 0.5 }],
+            currencies: [{ currencyId: 0, regime: "managed" as never, parityRusdPerUnit: 0.5 }],
           },
         },
         { seed: SEED },
@@ -187,7 +187,7 @@ describe("E6b currency valuation and conversion", () => {
         {
           ...monetaryScenario(),
           monetary: {
-            currencies: [{ currencyId: 0, reserveFundingSUSD: 10_000_000 }],
+            currencies: [{ currencyId: 0, reserveFundingRUSD: 10_000_000 }],
           },
         },
         { seed: SEED },
@@ -200,7 +200,7 @@ describe("E6b currency valuation and conversion", () => {
           ...monetaryScenario(),
           monetary: {
             currencies: [
-              { currencyId: 0, paritySusdPerUnit: 0.5, currencyIssuedUnits: 10_000, externalCashSUSD: 1 },
+              { currencyId: 0, parityRusdPerUnit: 0.5, currencyIssuedUnits: 10_000, externalCashRUSD: 1 },
             ],
           },
         },
@@ -223,11 +223,11 @@ describe("E6b currency valuation and conversion", () => {
         ? { ...country, monetary: { kind: "adopted" as const, currencyId: 0 } }
         : country,
     );
-    scenario.monetary = { currencies: [{ currencyId: 0, paritySusdPerUnit: 0.5, reserveFundingSUSD: 100 }] };
+    scenario.monetary = { currencies: [{ currencyId: 0, parityRusdPerUnit: 0.5, reserveFundingRUSD: 100 }] };
     const world = createEconomyWorld(scenario, { seed: SEED });
     const validation = validateCountryAction(
       world,
-      monetaryAction({ countryId: M5_COUNTRY_C, paritySusdPerUnit: 0.4, reserveTransferSUSD: 10 }),
+      monetaryAction({ countryId: M5_COUNTRY_C, parityRusdPerUnit: 0.4, reserveTransferRUSD: 10 }),
       scenario.definitions,
     );
     expect(validation.valid).toBe(false);
@@ -258,7 +258,7 @@ describe("E6b price index and inflation measurement", () => {
     const target = basket[0]!;
     const totalWeight = basket.reduce((total, item) => total + item.weight, 0);
     const market = world.markets[0]!;
-    market.priceSUSD[target.goodId] = (market.priceSUSD[target.goodId] ?? 0) * 1.1;
+    market.priceRUSD[target.goodId] = (market.priceRUSD[target.goodId] ?? 0) * 1.1;
     const values = derivePriceIndexes(world);
     const expected = 100 + (target.weight / totalWeight) * 10;
     expect(values.markets.get(market.id)).toBeCloseTo(expected, 6);
@@ -271,7 +271,7 @@ describe("E6b price index and inflation measurement", () => {
     const basket = world.priceIndex.basket;
     const target = basket[0]!;
     const market = world.markets[0]!;
-    market.priceSUSD[target.goodId] = 0;
+    market.priceRUSD[target.goodId] = 0;
     const coverage = priceIndexCoverage(world, market.id);
     const totalWeight = basket.reduce((total, item) => total + item.weight, 0);
     expect(coverage).toBeCloseTo((totalWeight - target.weight) / totalWeight, 9);
@@ -318,9 +318,9 @@ describe("E6b price index and inflation measurement", () => {
     expect(hashWorld(world)).toBe(before);
     // No account or price is rescaled by the index.
     const market = world.markets[0]!;
-    const prices = [...market.priceSUSD];
+    const prices = [...market.priceRUSD];
     runMonetaryPhase(world, scenario.definitions, 30);
-    expect(market.priceSUSD).toEqual(prices);
+    expect(market.priceRUSD).toEqual(prices);
   });
 });
 
@@ -330,8 +330,8 @@ describe("E6b monetary authority accounting", () => {
     const record = authority(world);
     expect(record.active).toBe(true);
     expect(record.currencyIssuedUnits).toBeCloseTo(1_000, 9);
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(2_500, 9);
-    expect(authorityLiabilitySUSD(world, record)).toBeCloseTo(500, 9);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(2_500, 9);
+    expect(authorityLiabilityRUSD(world, record)).toBeCloseTo(500, 9);
     expect(balance(world, "country", M5_COUNTRY_A, "monetary-equity")).toBeCloseTo(2_000, 9);
     expect(balance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBeCloseTo(8_000, 9);
     expect(balance(world, "system", null, "external-cash")).toBeCloseTo(4_500, 9);
@@ -350,11 +350,11 @@ describe("E6b monetary authority accounting", () => {
     );
     const result = applyCountryAction(
       world,
-      monetaryAction({ paritySusdPerUnit: 0.4, reserveTransferSUSD: 0 }),
+      monetaryAction({ parityRusdPerUnit: 0.4, reserveTransferRUSD: 0 }),
       scenario.definitions,
     );
-    expect(result.monetaryAction?.paritySusdPerUnit).toBeCloseTo(0.4, 9);
-    expect(authorityLiabilitySUSD(world, record)).toBeCloseTo(400, 6);
+    expect(result.monetaryAction?.parityRusdPerUnit).toBeCloseTo(0.4, 9);
+    expect(authorityLiabilityRUSD(world, record)).toBeCloseTo(400, 6);
     expect(balance(world, "system", null, "external-currency-holding")).toBeCloseTo(400, 6);
     expect(designatedCash(world)).toBeCloseTo(cashBefore, 6);
     expect(
@@ -377,20 +377,20 @@ describe("E6b monetary authority accounting", () => {
     const cashBefore = designatedCash(world);
     applyCountryAction(
       world,
-      monetaryAction({ currencyConversionSUSD: 250 }),
+      monetaryAction({ currencyConversionRUSD: 250 }),
       scenario.definitions,
     );
     expect(record.currencyIssuedUnits).toBeCloseTo(1_500, 6);
-    expect(authorityLiabilitySUSD(world, record)).toBeCloseTo(750, 6);
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(2_750, 6);
+    expect(authorityLiabilityRUSD(world, record)).toBeCloseTo(750, 6);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(2_750, 6);
     expect(designatedCash(world)).toBeCloseTo(cashBefore, 6);
     applyCountryAction(
       world,
-      monetaryAction({ currencyConversionSUSD: -100 }),
+      monetaryAction({ currencyConversionRUSD: -100 }),
       scenario.definitions,
     );
     expect(record.currencyIssuedUnits).toBeCloseTo(1_300, 6);
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(2_650, 6);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(2_650, 6);
     const issuance = world.finance.postings.filter(
       (posting) => posting.transactionKind === "fx-issuance",
     );
@@ -408,22 +408,22 @@ describe("E6b monetary authority accounting", () => {
     const cashBefore = designatedCash(world);
     applyCountryAction(
       world,
-      monetaryAction({ reserveTransferSUSD: 500 }),
+      monetaryAction({ reserveTransferRUSD: 500 }),
       scenario.definitions,
     );
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(3_000, 6);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(3_000, 6);
     expect(balance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBeCloseTo(7_500, 6);
     applyCountryAction(
       world,
-      monetaryAction({ reserveTransferSUSD: -500 }),
+      monetaryAction({ reserveTransferRUSD: -500 }),
       scenario.definitions,
     );
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(2_500, 6);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(2_500, 6);
     expect(designatedCash(world)).toBeCloseTo(cashBefore, 6);
     expect(() =>
       applyCountryAction(
         world,
-        monetaryAction({ reserveTransferSUSD: -1_000_000 }),
+        monetaryAction({ reserveTransferRUSD: -1_000_000 }),
         scenario.definitions,
       ),
     ).toThrow(/reserves/);
@@ -438,12 +438,12 @@ describe("E6b monetary authority accounting", () => {
     expect(world.currencyValuations.find((value) => value.currencyId === 0)?.status).toBe("specified");
     const result = applyCountryAction(
       world,
-      monetaryAction({ paritySusdPerUnit: 0.25, reserveTransferSUSD: 1_000 }),
+      monetaryAction({ parityRusdPerUnit: 0.25, reserveTransferRUSD: 1_000 }),
       scenario.definitions,
     );
-    expect(result.monetaryAction?.paritySusdPerUnit).toBeCloseTo(0.25, 9);
+    expect(result.monetaryAction?.parityRusdPerUnit).toBeCloseTo(0.25, 9);
     expect(record.active).toBe(true);
-    expect(authorityReservesSUSD(world, record)).toBeCloseTo(1_000, 6);
+    expect(authorityReservesRUSD(world, record)).toBeCloseTo(1_000, 6);
     expect(record.currencyIssuedUnits).toBe(0);
     assertValidWorld(world);
   });
@@ -454,25 +454,25 @@ describe("E6b monetary authority accounting", () => {
     expect(() =>
       applyCountryAction(
         world,
-        monetaryAction({ paritySusdPerUnit: 1.5 }),
+        monetaryAction({ parityRusdPerUnit: 1.5 }),
         scenario.definitions,
       ),
     ).toThrow(/moves more than/);
     // AI source is not implemented.
     const ai = validateCountryAction(
       world,
-      monetaryAction({ paritySusdPerUnit: 0.45, source: "ai" }),
+      monetaryAction({ parityRusdPerUnit: 0.45, source: "ai" }),
       scenario.definitions,
     );
     expect(ai.valid).toBe(false);
     expect(ai.errors.join(" ")).toMatch(/AI monetary policy/);
     // Valid change, then a second one inside the cooldown window is rejected.
-    applyCountryAction(world, monetaryAction({ paritySusdPerUnit: 0.45 }), scenario.definitions);
+    applyCountryAction(world, monetaryAction({ parityRusdPerUnit: 0.45 }), scenario.definitions);
     world.dayIndex = 10;
     expect(() =>
       applyCountryAction(
         world,
-        monetaryAction({ paritySusdPerUnit: 0.42, dayIndex: 10 }),
+        monetaryAction({ parityRusdPerUnit: 0.42, dayIndex: 10 }),
         scenario.definitions,
       ),
     ).toThrow(/days since the last one/);
@@ -493,7 +493,7 @@ describe("E6b monetary authority accounting", () => {
     expect(managedLaw).toBeDefined();
     sample.currencyValuations = (sample.currencyValuations ?? []).map((valuation) =>
       valuation.currencyId === 0
-        ? { currencyId: 0, status: "specified" as const, susdPerUnit: 0.2 as never, setOnDay: 0, source: "scenario" as const }
+        ? { currencyId: 0, status: "specified" as const, rusdPerUnit: 0.2 as never, setOnDay: 0, source: "scenario" as const }
         : valuation,
     );
     sample.countries = (sample.countries ?? []).map((country) =>
@@ -505,10 +505,10 @@ describe("E6b monetary authority accounting", () => {
       currencies: [
         {
           currencyId: 0,
-          paritySusdPerUnit: 0.2,
-          reserveFundingSUSD: 50_000,
+          parityRusdPerUnit: 0.2,
+          reserveFundingRUSD: 50_000,
           currencyIssuedUnits: 100_000,
-          externalCashSUSD: 40_000,
+          externalCashRUSD: 40_000,
         },
       ],
     };
@@ -523,21 +523,21 @@ describe("E6b monetary authority accounting", () => {
         dayIndex: managedWorld.dayIndex,
         source: "player",
         regime: "managed",
-        paritySusdPerUnit: null,
-        reserveTransferSUSD: 0,
-        currencyConversionSUSD: 0,
+        parityRusdPerUnit: null,
+        reserveTransferRUSD: 0,
+        currencyConversionRUSD: 0,
       },
       sample.definitions,
     );
     expect(applied.monetaryAction?.regime).toBe("managed");
     // Realized deficit pressure depreciates the managed valuation by the bounded step.
-    record.lastMonthExportsSUSD = 0;
-    record.lastMonthImportsSUSD = 100_000;
+    record.lastMonthExportsRUSD = 0;
+    record.lastMonthImportsRUSD = 100_000;
     const before = requireCurrencyRate(managedWorld.currencyValuations, 0);
     runMonetaryPhase(managedWorld, sample.definitions, managedWorld.dayIndex);
     const after = requireCurrencyRate(managedWorld.currencyValuations, 0);
     expect(after).toBeLessThan(before);
-    expect(after).toBeGreaterThanOrEqual((record.referenceParitySusdPerUnit ?? 0.2) * 0.5 - 1e-12);
+    expect(after).toBeGreaterThanOrEqual((record.referenceParityRusdPerUnit ?? 0.2) * 0.5 - 1e-12);
     assertValidWorld(managedWorld);
   });
 });
@@ -556,18 +556,18 @@ describe("E6b convertibility and E6a integration", () => {
       market.id === 0
         ? {
             ...market,
-            priceSUSD: market.priceSUSD.map((price, goodId) => (goodId === M5_CLOTHING ? 1 : price)),
+            priceRUSD: market.priceRUSD.map((price, goodId) => (goodId === M5_CLOTHING ? 1 : price)),
             stockLots: [{ goodId: M5_CLOTHING, ownerBuildingId: 8, quantity: 1_000 }],
           }
         : {
             ...market,
-            priceSUSD: market.priceSUSD.map((price, goodId) => (goodId === M5_CLOTHING ? 1.5 : price)),
+            priceRUSD: market.priceRUSD.map((price, goodId) => (goodId === M5_CLOTHING ? 1.5 : price)),
           },
     );
-    scenario.tradeRoutes = [{ marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacitySUSDPerDay: 1e9 }];
+    scenario.tradeRoutes = [{ marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacityRUSDPerDay: 1e9 }];
     scenario.currencyValuations = [
       { currencyId: 0, status: "unavailable" },
-      { currencyId: 1, status: "specified", susdPerUnit: 0.5 as never, setOnDay: 0, source: "scenario" },
+      { currencyId: 1, status: "specified", rusdPerUnit: 0.5 as never, setOnDay: 0, source: "scenario" },
       { currencyId: 2, status: "unavailable" },
     ];
     // Country B (market 1's customs administration) holds almost no reserves.
@@ -575,18 +575,18 @@ describe("E6b convertibility and E6a integration", () => {
       currencies: [
         {
           currencyId: 1,
-          paritySusdPerUnit: 0.5,
-          reserveFundingSUSD: 100,
+          parityRusdPerUnit: 0.5,
+          reserveFundingRUSD: 100,
           currencyIssuedUnits: 0,
-          externalCashSUSD: 0,
+          externalCashRUSD: 0,
         },
       ],
     };
     const world = createEconomyWorld(scenario, { seed: SEED });
     const record = world.monetary.currencies.find((entry) => entry.currencyId === 1)!;
-    // A completed month with 1,000 SUSD of imports needs 500 SUSD of cover.
-    record.lastMonthImportsSUSD = 1_000;
-    record.lastMonthExportsSUSD = 0;
+    // A completed month with 1,000 RUSD of imports needs 500 RUSD of cover.
+    record.lastMonthImportsRUSD = 1_000;
+    record.lastMonthExportsRUSD = 0;
     expect(convertibilityState(world, M5_COUNTRY_B).state).toBe("suspended");
     const blocked = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
     expect(blocked.shipments).toHaveLength(0);
@@ -602,9 +602,9 @@ describe("E6b convertibility and E6a integration", () => {
         dayIndex: world.dayIndex,
         source: "player",
         regime: "pegged",
-        paritySusdPerUnit: 0.5,
-        reserveTransferSUSD: 900,
-        currencyConversionSUSD: 0,
+        parityRusdPerUnit: 0.5,
+        reserveTransferRUSD: 900,
+        currencyConversionRUSD: 0,
       },
       scenario.definitions,
     );
@@ -621,8 +621,8 @@ describe("E6b convertibility and E6a integration", () => {
       (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
       0,
     );
-    applyCountryAction(world, monetaryAction({ paritySusdPerUnit: 0.45 }), scenario.definitions);
-    applyCountryAction(world, monetaryAction({ currencyConversionSUSD: 100 }), scenario.definitions);
+    applyCountryAction(world, monetaryAction({ parityRusdPerUnit: 0.45 }), scenario.definitions);
+    applyCountryAction(world, monetaryAction({ currencyConversionRUSD: 100 }), scenario.definitions);
     expect(
       world.markets.reduce(
         (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
@@ -637,8 +637,8 @@ describe("E6b determinism, persistence, and worker contract", () => {
   test("two identical monetary runs produce the same world hash", () => {
     const first = buildMonetary();
     const second = buildMonetary();
-    applyCountryAction(first.world, monetaryAction({ paritySusdPerUnit: 0.45 }), first.scenario.definitions);
-    applyCountryAction(second.world, monetaryAction({ paritySusdPerUnit: 0.45 }), second.scenario.definitions);
+    applyCountryAction(first.world, monetaryAction({ parityRusdPerUnit: 0.45 }), first.scenario.definitions);
+    applyCountryAction(second.world, monetaryAction({ parityRusdPerUnit: 0.45 }), second.scenario.definitions);
     for (let day = 0; day < 8; day += 1) {
       runDay(first.world, first.scenario);
       runDay(second.world, second.scenario);
@@ -696,17 +696,17 @@ describe("E6b determinism, persistence, and worker contract", () => {
         kind: "set-monetary-policy",
         countryId: player.id,
         regime: "pegged",
-        paritySusdPerUnit: 0.25,
-        reserveTransferSUSD: 10_000,
-        currencyConversionSUSD: 0,
+        parityRusdPerUnit: 0.25,
+        reserveTransferRUSD: 10_000,
+        currencyConversionRUSD: 0,
       },
     });
     expect(actionResult).not.toBeNull();
     expect(actionResult!.accepted).toBe(true);
     const after = actionResult!.snapshot.countries.find((country) => country.id === player.id)!;
     expect(after.monetary.active).toBe(true);
-    expect(after.monetary.paritySusdPerUnit).toBeCloseTo(0.25, 9);
-    expect(after.monetary.valuationSusdPerUnit).toBeCloseTo(0.25, 9);
+    expect(after.monetary.parityRusdPerUnit).toBeCloseTo(0.25, 9);
+    expect(after.monetary.valuationRusdPerUnit).toBeCloseTo(0.25, 9);
   });
 
   test("malformed monetary commands are rejected at the protocol boundary", () => {
@@ -719,9 +719,9 @@ describe("E6b determinism, persistence, and worker contract", () => {
         kind: "set-monetary-policy",
         countryId: 0,
         regime: "pegged",
-        paritySusdPerUnit: 0.25,
-        reserveTransferSUSD: 100,
-        currencyConversionSUSD: 0,
+        parityRusdPerUnit: 0.25,
+        reserveTransferRUSD: 100,
+        currencyConversionRUSD: 0,
       },
     };
     expect(() => parseWorkerCommand(base)).not.toThrow();
@@ -729,10 +729,10 @@ describe("E6b determinism, persistence, and worker contract", () => {
       parseWorkerCommand({ ...base, action: { ...base.action, regime: "float" } }),
     ).toThrow();
     expect(() =>
-      parseWorkerCommand({ ...base, action: { ...base.action, paritySusdPerUnit: -1 } }),
+      parseWorkerCommand({ ...base, action: { ...base.action, parityRusdPerUnit: -1 } }),
     ).toThrow();
     expect(() =>
-      parseWorkerCommand({ ...base, action: { ...base.action, reserveTransferSUSD: "10" } }),
+      parseWorkerCommand({ ...base, action: { ...base.action, reserveTransferRUSD: "10" } }),
     ).toThrow();
   });
 });

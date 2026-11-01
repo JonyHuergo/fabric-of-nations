@@ -1,0 +1,96 @@
+{
+  "generatedBy": "scripts/map/build-render-bundle.mjs",
+  "provinceCount": 1689,
+  "fill": {
+    "vertices": 242531,
+    "triangles": 190867,
+    "untriangulatedProvinces": [],
+    "worstAreaDeviation": 0.105371
+  },
+  "lakes": {
+    "polygons": 698,
+    "excludedReservoirCount": 196,
+    "naturalRegulatedLakesKept": [
+      "Akkajaure",
+      "Koitere",
+      "Lac Saint-Jean",
+      "Lac Seul",
+      "Lake Abitibi",
+      "Lake Il'Men'",
+      "Lake Imandra",
+      "Lake Zaysan",
+      "Mjøsa",
+      "Oulujärvi",
+      "Rikkavesi",
+      "Stora Lulevatten",
+      "Umbozero Lake"
+    ],
+    "historicExtents": [
+      "Aral Sea",
+      "Lake Chad"
+    ]
+  },
+  "land": [
+    {
+      "lod": 0,
+      "landVertices": 392995,
+      "landTriangles": 374617,
+      "lakeVertices": 70164,
+      "coastPieces": 37355,
+      "minimalIslands": 0
+    },
+    {
+      "lod": 1,
+      "landVertices": 137562,
+      "landTriangles": 118216,
+      "lakeVertices": 16063,
+      "coastPieces": 26307,
+      "minimalIslands": 3881
+    },
+    {
+      "lod": 2,
+      "landVertices": 73908,
+      "landTriangles": 54594,
+      "lakeVertices": 4227,
+      "coastPieces": 18670,
+      "minimalIslands": 7272
+    }
+  ],
+  "borders": {
+    "sharedInputLines": 14506,
+    "mergedChains": 11888,
+    "recoveredPairs": 1526,
+    "recoveredSegments": 32577,
+    "coastSegmentsReplacedByLandLayer": 106001
+  },
+  "borderLods": [
+    {
+      "lod": 0,
+      "segments": 73061,
+      "pieces": 12061
+    },
+    {
+      "lod": 1,
+      "segments": 66531,
+      "pieces": 12047
+    },
+    {
+      "lod": 2,
+      "segments": 39200,
+      "pieces": 11920
+    }
+  ],
+  "bundleBytes": 9113264,
+  "bundleSha256": "d609846f66aebe76ad4df352ecc0a12e31e4ecd2f74c5bc2c48c26013d8220df",
+  "provinceSourceHash": "028da30cba6237d92310e1e8fc726a5755c8aaa9a8ecd236a8fa6cf06fc580c3",
+  "projection": {
+    "id": "gall-stereographic",
+    "width": 1000,
+    "height": 657.1124436158528,
+    "northLat": 84,
+    "southLat": -78
+  },
+  "reliefBytes": 1108751,
+  "oceanBytes": 765335,
+  "compressedBytes": 5833091
+}

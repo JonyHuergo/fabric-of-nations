@@ -1,5 +1,5 @@
 import {
-  MONEY_TOLERANCE_SUSD,
+  MONEY_TOLERANCE_RUSD,
   postCashTransfer,
   postJournalEntry,
   type FinanceState,
@@ -33,7 +33,7 @@ function transfer(
   postCashTransfer(finance, 0, kind, {
     fromAccountId: from,
     toAccountId: to,
-    amountSUSD: amount,
+    amountRUSD: amount,
   });
 }
 
@@ -49,8 +49,8 @@ describe("M3a minimal cash ledger", () => {
     expect(finance.postings).toHaveLength(1);
     expect(finance.postings[0]?.transactionKind).toBe("goods-purchase");
     expect(finance.postings[0]?.lines).toEqual([
-      { accountId: SELLER_BUILDING, side: "debit", amountSUSD: 20 },
-      { accountId: HOUSEHOLD, side: "credit", amountSUSD: 20 },
+      { accountId: SELLER_BUILDING, side: "debit", amountRUSD: 20 },
+      { accountId: HOUSEHOLD, side: "credit", amountRUSD: 20 },
     ]);
   });
 
@@ -107,22 +107,22 @@ describe("M3a minimal cash ledger", () => {
     postCashTransfer(world.finance, 0, "goods-purchase", {
       fromAccountId: HOUSEHOLD,
       toAccountId: SELLER_BUILDING,
-      amountSUSD: 5,
+      amountRUSD: 5,
     });
     postCashTransfer(world.finance, 1, "wages", {
       fromAccountId: SELLER_BUILDING,
       toAccountId: OTHER_HOUSEHOLD,
-      amountSUSD: 2,
+      amountRUSD: 2,
     });
     expect(totalCash(world)).toBeCloseTo(before, 9);
     for (const posting of world.finance.postings) {
       const debits = posting.lines
         .filter((line) => line.side === "debit")
-        .reduce((total, line) => total + line.amountSUSD, 0);
+        .reduce((total, line) => total + line.amountRUSD, 0);
       const credits = posting.lines
         .filter((line) => line.side === "credit")
-        .reduce((total, line) => total + line.amountSUSD, 0);
-      expect(Math.abs(debits - credits)).toBeLessThanOrEqual(MONEY_TOLERANCE_SUSD);
+        .reduce((total, line) => total + line.amountRUSD, 0);
+      expect(Math.abs(debits - credits)).toBeLessThanOrEqual(MONEY_TOLERANCE_RUSD);
     }
   });
 
@@ -132,9 +132,9 @@ describe("M3a minimal cash ledger", () => {
     const first = balanceOf(finance, HOUSEHOLD);
     const second = balanceOf(finance, OTHER_HOUSEHOLD);
     postJournalEntry(finance, 0, "wages", [
-      { accountId: HOUSEHOLD, side: "debit", amountSUSD: 5 },
-      { accountId: OTHER_HOUSEHOLD, side: "debit", amountSUSD: 4 },
-      { accountId: SELLER_BUILDING, side: "credit", amountSUSD: 9 },
+      { accountId: HOUSEHOLD, side: "debit", amountRUSD: 5 },
+      { accountId: OTHER_HOUSEHOLD, side: "debit", amountRUSD: 4 },
+      { accountId: SELLER_BUILDING, side: "credit", amountRUSD: 9 },
     ]);
     expect(balanceOf(finance, HOUSEHOLD)).toBeCloseTo(first + 5, 9);
     expect(balanceOf(finance, OTHER_HOUSEHOLD)).toBeCloseTo(second + 4, 9);
@@ -143,14 +143,14 @@ describe("M3a minimal cash ledger", () => {
 
   test("rejects unbalanced, invalid, unknown-account, and overdraft postings atomically", () => {
     const finance = financeOf();
-    const before = finance.accounts.map((account) => account.balanceSUSD);
+    const before = finance.accounts.map((account) => account.balanceRUSD);
     const postingCount = finance.postings.length;
     const baselineBuilding = balanceOf(finance, SELLER_BUILDING);
 
     expect(() =>
       postJournalEntry(finance, 0, "goods-purchase", [
-        { accountId: SELLER_BUILDING, side: "debit", amountSUSD: 10 },
-        { accountId: HOUSEHOLD, side: "credit", amountSUSD: 9 },
+        { accountId: SELLER_BUILDING, side: "debit", amountRUSD: 10 },
+        { accountId: HOUSEHOLD, side: "credit", amountRUSD: 9 },
       ]),
     ).toThrow(/balance|debit|credit/i);
 
@@ -158,7 +158,7 @@ describe("M3a minimal cash ledger", () => {
       postCashTransfer(finance, 0, "goods-purchase", {
         fromAccountId: HOUSEHOLD,
         toAccountId: SELLER_BUILDING,
-        amountSUSD: 0,
+        amountRUSD: 0,
       }),
     ).toThrow(/amount|positive/i);
 
@@ -166,7 +166,7 @@ describe("M3a minimal cash ledger", () => {
       postCashTransfer(finance, 0, "goods-purchase", {
         fromAccountId: HOUSEHOLD,
         toAccountId: 999,
-        amountSUSD: 1,
+        amountRUSD: 1,
       }),
     ).toThrow(/account|unknown/i);
 
@@ -174,11 +174,11 @@ describe("M3a minimal cash ledger", () => {
       postCashTransfer(finance, 0, "goods-purchase", {
         fromAccountId: HOUSEHOLD,
         toAccountId: SELLER_BUILDING,
-        amountSUSD: baselineBuilding + 1,
+        amountRUSD: baselineBuilding + 1,
       }),
     ).toThrow(/overdraft|balance|insufficient/i);
 
-    expect(finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
+    expect(finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
     expect(finance.postings).toHaveLength(postingCount);
   });
 
@@ -188,14 +188,14 @@ describe("M3a minimal cash ledger", () => {
       postCashTransfer(finance, -1, "goods-purchase", {
         fromAccountId: HOUSEHOLD,
         toAccountId: SELLER_BUILDING,
-        amountSUSD: 1,
+        amountRUSD: 1,
       }),
     ).toThrow(/day/i);
     expect(() =>
       postCashTransfer(finance, 0, "not-a-kind" as PublicTransactionKind, {
         fromAccountId: HOUSEHOLD,
         toAccountId: SELLER_BUILDING,
-        amountSUSD: 1,
+        amountRUSD: 1,
       }),
     ).toThrow(/kind|transaction/i);
     const lines: JournalLine[] = [];
@@ -206,5 +206,5 @@ describe("M3a minimal cash ledger", () => {
 function balanceOf(finance: FinanceState, accountId: number): number {
   const account = finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }

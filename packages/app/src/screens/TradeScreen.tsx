@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewTradePolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -216,7 +216,7 @@ export function TradeScreen({
         <StatRow
           key={route.id}
           label={`${marketLabel(snapshot, route.marketAId)} ↔ ${marketLabel(snapshot, route.marketBId)}`}
-          value={`dist ${route.distanceUnits.toFixed(1)} · ${route.transitDays}d · ${formatSUSD(route.capacitySUSDPerDay)}/day each way`}
+          value={`dist ${route.distanceUnits.toFixed(1)} · ${route.transitDays}d · ${formatRUSD(route.capacityRUSDPerDay)}/day each way`}
         />
       ))}
       {snapshot.markets.map((market) => (
@@ -239,11 +239,11 @@ export function TradeScreen({
         <>
           <StatRow label="Dispatched" value={`${lastDay.dispatchedShipments} shipment(s)`} />
           <StatRow label="Arrived" value={`${lastDay.arrivedShipments} shipment(s)`} />
-          <StatRow label="Freight paid" value={formatSUSD(lastDay.freightPaidSUSD)} />
-          <StatRow label="Duty paid to customs" value={formatSUSD(lastDay.dutyPaidSUSD)} />
+          <StatRow label="Freight paid" value={formatRUSD(lastDay.freightPaidRUSD)} />
+          <StatRow label="Duty paid to customs" value={formatRUSD(lastDay.dutyPaidRUSD)} />
           <StatRow
             label="Owner-funded working capital"
-            value={formatSUSD(lastDay.ownerFundedSUSD)}
+            value={formatRUSD(lastDay.ownerFundedRUSD)}
           />
           {lastDay.blocked.length === 0 ? (
             <Text style={styles.help}>No blocked shipment was recorded for that day.</Text>
@@ -272,8 +272,8 @@ export function TradeScreen({
             {goodLabel(snapshot, shipment.goodId)} {shipment.quantity.toFixed(0)} units ·{" "}
             {marketLabel(snapshot, shipment.originMarketId)} →{" "}
             {marketLabel(snapshot, shipment.destinationMarketId)} · arrives day{" "}
-            {shipment.arrivalDay} · freight {formatSUSD(shipment.freightCostSUSD)} · duty{" "}
-            {formatSUSD(shipment.dutySUSD)}
+            {shipment.arrivalDay} · freight {formatRUSD(shipment.freightCostRUSD)} · duty{" "}
+            {formatRUSD(shipment.dutyRUSD)}
           </Text>
         ))
       )}
@@ -292,23 +292,23 @@ export function TradeScreen({
       />
       <StatRow
         label="Duty received this month"
-        value={formatSUSD(country.trade.dutyReceivedMonthToDateSUSD)}
+        value={formatRUSD(country.trade.dutyReceivedMonthToDateRUSD)}
       />
       <StatRow
         label="Duty paid this month (as exporter)"
-        value={formatSUSD(country.trade.dutyPaidMonthToDateSUSD)}
+        value={formatRUSD(country.trade.dutyPaidMonthToDateRUSD)}
       />
       <StatRow
         label="Freight paid this month"
-        value={formatSUSD(country.trade.freightPaidMonthToDateSUSD)}
+        value={formatRUSD(country.trade.freightPaidMonthToDateRUSD)}
       />
       <StatRow
         label="Exports this month (cargo value)"
-        value={formatSUSD(country.trade.exportsValueMonthToDateSUSD)}
+        value={formatRUSD(country.trade.exportsValueMonthToDateRUSD)}
       />
       <StatRow
         label="Imports this month (cargo value)"
-        value={formatSUSD(country.trade.importsValueMonthToDateSUSD)}
+        value={formatRUSD(country.trade.importsValueMonthToDateRUSD)}
       />
       {preview.tariffInert ? (
         <Notice title="Tariff frontier" tone="warning">
@@ -449,11 +449,11 @@ export function TradeScreen({
           label="Export-banned goods"
           value={`${preview.exportBannedGoodCount}`}
         />
-        {preview.estimatedDutyPerUnitSUSD.map((duty, goodId) => (
+        {preview.estimatedDutyPerUnitRUSD.map((duty, goodId) => (
           <StatRow
             key={goodId}
             label={`Estimated duty per ${goodLabel(snapshot, goodId)} unit`}
-            value={formatSUSD(duty)}
+            value={formatRUSD(duty)}
           />
         ))}
         {preview.notes.map((note) => (

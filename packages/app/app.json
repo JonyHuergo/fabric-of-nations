@@ -1,21 +1,38 @@
 {
   "expo": {
-    "name": "Century",
-    "slug": "century",
+    "name": "Fabric of Nations",
+    "slug": "fabric-of-nations",
     "version": "0.3.0",
+    "description": "A historically grounded grand-strategy simulation of the world from 1900 to 2000.",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "backgroundColor": "#0b1014",
     "newArchEnabled": true,
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.century.game"
+      "bundleIdentifier": "com.century.game",
+      "icon": "./assets/icon.png"
     },
     "android": {
-      "package": "com.century.game"
+      "package": "com.century.game",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0b1014"
+      }
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Fabric of Nations",
+      "shortName": "Fabric of Nations",
+      "lang": "en",
+      "description": "A historically grounded grand-strategy simulation of the world from 1900 to 2000.",
+      "themeColor": "#0b1014",
+      "backgroundColor": "#0b1014",
+      "display": "standalone",
+      "startUrl": "/",
+      "scope": "/"
     }
   }
 }

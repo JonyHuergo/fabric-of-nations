@@ -12,7 +12,7 @@
  * they are not serialized into `World`.
  */
 
-import type { Day, Id, MoneySUSD, Rate } from "../types.js";
+import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
 import type { ProvinceScenarioInput } from "../provinces/types.js";
 
@@ -24,10 +24,10 @@ export interface GoodDef {
   key: string;
   name: string;
   category: GoodCategory;
-  /** Nominal 1900 SUSD per physical unit. Provisional. */
-  basePrice1900SUSD: MoneySUSD;
-  /** SUSD per physical unit. M3 single-market data uses 0. */
-  transportCostPerUnit: MoneySUSD;
+  /** Nominal 1900 RUSD per physical unit. Provisional. */
+  basePrice1900RUSD: MoneyRUSD;
+  /** RUSD per physical unit. M3 single-market data uses 0. */
+  transportCostPerUnit: MoneyRUSD;
   /** Responsiveness parameter. Not used by M3a; provisional. */
   priceElasticity: number;
   /** Annual spoilage rate in 0..1. M3 uses 0 while spoilage is deferred. */
@@ -49,10 +49,10 @@ export interface ProfessionDef {
   qualificationLiteracy: Rate;
   /** Minimum wealth level required for this profession, 0..99. */
   qualificationWealthLevel: number;
-  /** Nominal 1900 annual wage in SUSD. Provisional. */
-  baseWage1900SUSDPerYear: MoneySUSD;
-  /** Training cost in SUSD. M3 has no training behavior. */
-  trainingCostSUSD: MoneySUSD;
+  /** Nominal 1900 annual wage in RUSD. Provisional. */
+  baseWage1900RUSDPerYear: MoneyRUSD;
+  /** Training cost in RUSD. M3 has no training behavior. */
+  trainingCostRUSD: MoneyRUSD;
   /** Labor productivity modifier; strictly positive and dimensionless. */
   laborProductivityModifier: number;
 }
@@ -103,7 +103,7 @@ export interface BuildingDef {
   jobs: ProfessionJobDef[];
   /** Validated E4 sector classification used for industrial policy eligibility. */
   sector: BuildingSector;
-  constructionCostSUSD: MoneySUSD;
+  constructionCostRUSD: MoneyRUSD;
   /**
    * E3 maximum daily construction crew for this project type. The crew is hired
    * from idle eligible workers and paid their profession's base daily wage; the
@@ -115,7 +115,7 @@ export interface BuildingDef {
    * by construction. Empty for project types with no modeled material requirement.
    */
   constructionMaterials: ConstructionMaterialDef[];
-  dailyUpkeepSUSDAtLevelOne: MoneySUSD;
+  dailyUpkeepRUSDAtLevelOne: MoneyRUSD;
   storageCapacityByGood: StorageCapacityDef[];
   /** M3 requires this list to be empty; regional resource limits are deferred. */
   resourceRequirements: GoodQuantityDef[];
@@ -178,8 +178,8 @@ export interface StockLot {
 export interface Market {
   id: Id;
   regionIds: Id[];
-  /** SUSD per physical unit, indexed by good id. */
-  priceSUSD: number[];
+  /** RUSD per physical unit, indexed by good id. */
+  priceRUSD: number[];
   /** Sole authoritative inventory representation. */
   stockLots: StockLot[];
   /**
@@ -264,7 +264,7 @@ export interface FinancialAccount {
   category: AccountCategory;
   subtype: AccountSubtype;
   /** Balance in normal-side units; non-negative except equity, which may be signed. */
-  balanceSUSD: MoneySUSD;
+  balanceRUSD: MoneyRUSD;
 }
 
 export type JournalSide = "debit" | "credit";
@@ -272,8 +272,8 @@ export type JournalSide = "debit" | "credit";
 export interface JournalLine {
   accountId: Id;
   side: JournalSide;
-  /** Strictly positive SUSD. */
-  amountSUSD: MoneySUSD;
+  /** Strictly positive RUSD. */
+  amountRUSD: MoneyRUSD;
 }
 
 /**
@@ -419,8 +419,8 @@ export interface FinancePeriodSummary {
    * `MAX_DETAILED_PERIOD_SUMMARIES`; empty for compacted summaries, which retain
    * `countryFiscalTotals` and `flowTotalsByKind` instead.
    */
-  accountTotals: Record<Id, MoneySUSD>;
-  flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
+  accountTotals: Record<Id, MoneyRUSD>;
+  flowTotalsByKind: Record<FlowTransactionKind, MoneyRUSD>;
   /**
    * Per-country fiscal totals retained after account-level compaction (D-065).
    * Absent on detailed summaries. Reporting-only, exact values from the
@@ -437,28 +437,28 @@ export interface FinancePeriodSummary {
 
 /** Exact per-country fiscal totals retained in a period summary (D-047, E2). */
 export interface FinancePeriodFiscalTotals {
-  readonly incomeTaxRevenueSUSD: MoneySUSD;
+  readonly incomeTaxRevenueRUSD: MoneyRUSD;
   /** E2 business-profit tax revenue collected through the treasury. */
-  readonly businessTaxRevenueSUSD: MoneySUSD;
-  readonly welfareExpenseSUSD: MoneySUSD;
-  readonly interestExpenseSUSD: MoneySUSD;
+  readonly businessTaxRevenueRUSD: MoneyRUSD;
+  readonly welfareExpenseRUSD: MoneyRUSD;
+  readonly interestExpenseRUSD: MoneyRUSD;
   /** E4 sectoral production-subsidy expense paid through the treasury. */
-  readonly subsidyExpenseSUSD: MoneySUSD;
+  readonly subsidyExpenseRUSD: MoneyRUSD;
   /**
    * M8 public-administration payroll paid through the treasury. Optional for
    * pre-M8 summaries/fixtures; absent means zero (D-076).
    */
-  readonly administrationExpenseSUSD?: MoneySUSD;
+  readonly administrationExpenseRUSD?: MoneyRUSD;
   /** M9 education/research payroll paid through the treasury. Optional pre-M9 = zero. */
-  readonly educationExpenseSUSD?: MoneySUSD;
+  readonly educationExpenseRUSD?: MoneyRUSD;
   /** E5 training provider payroll and trainee stipend. Optional pre-E5 = zero. */
-  readonly trainingExpenseSUSD?: MoneySUSD;
+  readonly trainingExpenseRUSD?: MoneyRUSD;
   /** M10 military pay, equipment, and garrison procurement. Optional pre-M10 = zero. */
-  readonly militaryExpenseSUSD?: MoneySUSD;
+  readonly militaryExpenseRUSD?: MoneyRUSD;
   /** E6a customs duty actually collected on dutiable shipments. Optional pre-E6a = zero. */
-  readonly customsDutyRevenueSUSD?: MoneySUSD;
+  readonly customsDutyRevenueRUSD?: MoneyRUSD;
   /** Tax revenue minus welfare, interest, subsidy, administration, education, training, and customs is not subtracted (customs is revenue). */
-  readonly netFiscalResultSUSD: MoneySUSD;
+  readonly netFiscalResultRUSD: MoneyRUSD;
 }
 
 /**
@@ -467,50 +467,50 @@ export interface FinancePeriodFiscalTotals {
  * These amounts separate what was requested/assessed from what was actually paid
  * or collected, and separate deficit financing from revenue and expense:
  *
- * - `welfareRequestedSUSD` is the authorized daily budget share accumulated over
+ * - `welfareRequestedRUSD` is the authorized daily budget share accumulated over
  *   the period, including any amount the treasury could not pay.
- * - `welfareShortfallSUSD` is the unpaid part. It is an unmet budget, never a
+ * - `welfareShortfallRUSD` is the unpaid part. It is an unmet budget, never a
  *   liability, and `welfareRequested = welfarePaid + welfareShortfall` exactly
- *   (welfare paid is the period `welfareExpenseSUSD`).
- * - `businessTaxAssessedSUSD` is the period-end assessment; collected revenue is
- *   the period `businessTaxRevenueSUSD` and `businessTaxUncollectedSUSD` is the
+ *   (welfare paid is the period `welfareExpenseRUSD`).
+ * - `businessTaxAssessedRUSD` is the period-end assessment; collected revenue is
+ *   the period `businessTaxRevenueRUSD` and `businessTaxUncollectedRUSD` is the
  *   difference that exceeded a building's operating cash (no receivable is
  *   created).
- * - `debtIssuedSUSD` and `principalRepaidSUSD` are financing movements, not
- *   revenue or expense. `interestPaidSUSD` is the cash coupon/maturity payment,
- *   distinct from the accrued `interestExpenseSUSD`. `unfinancedRequirementSUSD`
+ * - `debtIssuedRUSD` and `principalRepaidRUSD` are financing movements, not
+ *   revenue or expense. `interestPaidRUSD` is the cash coupon/maturity payment,
+ *   distinct from the accrued `interestExpenseRUSD`. `unfinancedRequirementRUSD`
  *   is the month-end financing requirement left unfunded by the creditor,
  *   ceiling, and contract-cap constraints.
  */
 export interface FinancePeriodBudgetTotals {
-  readonly welfareRequestedSUSD: MoneySUSD;
-  readonly welfareShortfallSUSD: MoneySUSD;
-  readonly businessTaxAssessedSUSD: MoneySUSD;
-  readonly businessTaxUncollectedSUSD: MoneySUSD;
-  readonly debtIssuedSUSD: MoneySUSD;
-  readonly principalRepaidSUSD: MoneySUSD;
-  readonly interestPaidSUSD: MoneySUSD;
-  readonly unfinancedRequirementSUSD: MoneySUSD;
+  readonly welfareRequestedRUSD: MoneyRUSD;
+  readonly welfareShortfallRUSD: MoneyRUSD;
+  readonly businessTaxAssessedRUSD: MoneyRUSD;
+  readonly businessTaxUncollectedRUSD: MoneyRUSD;
+  readonly debtIssuedRUSD: MoneyRUSD;
+  readonly principalRepaidRUSD: MoneyRUSD;
+  readonly interestPaidRUSD: MoneyRUSD;
+  readonly unfinancedRequirementRUSD: MoneyRUSD;
   /** E3 gross construction labor paid (capitalized, not an expense). */
-  readonly constructionSpentSUSD: MoneySUSD;
+  readonly constructionSpentRUSD: MoneyRUSD;
   /** E3 work-in-progress written off on cancellation. */
-  readonly constructionWrittenOffSUSD: MoneySUSD;
+  readonly constructionWrittenOffRUSD: MoneyRUSD;
   /** E4 construction/commissioning materials purchased and capitalized. */
-  readonly constructionMaterialsSpentSUSD: MoneySUSD;
+  readonly constructionMaterialsSpentRUSD: MoneyRUSD;
   /** E4 sectoral subsidy entitlement and unpaid shortfall. */
-  readonly subsidyRequestedSUSD: MoneySUSD;
-  readonly subsidyShortfallSUSD: MoneySUSD;
+  readonly subsidyRequestedRUSD: MoneyRUSD;
+  readonly subsidyShortfallRUSD: MoneyRUSD;
   /** E4 public-enterprise capital contributions (capital transfer, not expense). */
-  readonly publicEnterpriseSupportSUSD: MoneySUSD;
+  readonly publicEnterpriseSupportRUSD: MoneyRUSD;
   /** M8 administration payroll requested/paid/shortfall. Optional pre-M8 = zero. */
-  readonly administrationRequestedSUSD?: MoneySUSD;
-  readonly administrationShortfallSUSD?: MoneySUSD;
+  readonly administrationRequestedRUSD?: MoneyRUSD;
+  readonly administrationShortfallRUSD?: MoneyRUSD;
   /** M9 education payroll requested/paid/shortfall. Optional pre-M9 = zero. */
-  readonly educationRequestedSUSD?: MoneySUSD;
-  readonly educationShortfallSUSD?: MoneySUSD;
+  readonly educationRequestedRUSD?: MoneyRUSD;
+  readonly educationShortfallRUSD?: MoneyRUSD;
   /** E5 training payroll+stipend requested/shortfall. Optional pre-E5 = zero. */
-  readonly trainingRequestedSUSD?: MoneySUSD;
-  readonly trainingShortfallSUSD?: MoneySUSD;
+  readonly trainingRequestedRUSD?: MoneyRUSD;
+  readonly trainingShortfallRUSD?: MoneyRUSD;
 }
 
 /**
@@ -520,39 +520,39 @@ export interface FinancePeriodBudgetTotals {
  * financing-requirement memo, not a liability.
  */
 export interface FinanceBudgetMemo {
-  readonly welfareRequestedSUSD: MoneySUSD;
-  readonly welfareShortfallSUSD: MoneySUSD;
-  readonly businessTaxAssessedSUSD: MoneySUSD;
-  readonly businessTaxUncollectedSUSD: MoneySUSD;
-  readonly debtIssuedSUSD: MoneySUSD;
-  readonly principalRepaidSUSD: MoneySUSD;
-  readonly interestPaidSUSD: MoneySUSD;
-  readonly unfinancedRequirementSUSD: MoneySUSD;
-  readonly constructionSpentSUSD: MoneySUSD;
-  readonly constructionWrittenOffSUSD: MoneySUSD;
-  readonly constructionMaterialsSpentSUSD: MoneySUSD;
-  readonly subsidyRequestedSUSD: MoneySUSD;
-  readonly subsidyShortfallSUSD: MoneySUSD;
-  readonly publicEnterpriseSupportSUSD: MoneySUSD;
+  readonly welfareRequestedRUSD: MoneyRUSD;
+  readonly welfareShortfallRUSD: MoneyRUSD;
+  readonly businessTaxAssessedRUSD: MoneyRUSD;
+  readonly businessTaxUncollectedRUSD: MoneyRUSD;
+  readonly debtIssuedRUSD: MoneyRUSD;
+  readonly principalRepaidRUSD: MoneyRUSD;
+  readonly interestPaidRUSD: MoneyRUSD;
+  readonly unfinancedRequirementRUSD: MoneyRUSD;
+  readonly constructionSpentRUSD: MoneyRUSD;
+  readonly constructionWrittenOffRUSD: MoneyRUSD;
+  readonly constructionMaterialsSpentRUSD: MoneyRUSD;
+  readonly subsidyRequestedRUSD: MoneyRUSD;
+  readonly subsidyShortfallRUSD: MoneyRUSD;
+  readonly publicEnterpriseSupportRUSD: MoneyRUSD;
   /** M8 administration payroll requested/shortfall; optional pre-M8 = zero. */
-  readonly administrationRequestedSUSD?: MoneySUSD;
-  readonly administrationShortfallSUSD?: MoneySUSD;
+  readonly administrationRequestedRUSD?: MoneyRUSD;
+  readonly administrationShortfallRUSD?: MoneyRUSD;
   /** M9 education payroll requested/shortfall; optional pre-M9 = zero. */
-  readonly educationRequestedSUSD?: MoneySUSD;
-  readonly educationShortfallSUSD?: MoneySUSD;
+  readonly educationRequestedRUSD?: MoneyRUSD;
+  readonly educationShortfallRUSD?: MoneyRUSD;
   /** E5 training requested/shortfall; optional pre-E5 = zero. */
-  readonly trainingRequestedSUSD?: MoneySUSD;
-  readonly trainingShortfallSUSD?: MoneySUSD;
+  readonly trainingRequestedRUSD?: MoneyRUSD;
+  readonly trainingShortfallRUSD?: MoneyRUSD;
   /** Day of the most recent period-end business-tax assessment, if any. */
   readonly businessTaxAssessedDay: Day | null;
 }
 
 /** Year-end balance-sheet values retained by an annual summary. */
 export interface AnnualClosingBalances {
-  readonly treasuryCashSUSD: MoneySUSD;
+  readonly treasuryCashRUSD: MoneyRUSD;
   /** Debt principal liability, excluding accrued interest payable. */
-  readonly debtLiabilitySUSD: MoneySUSD;
-  readonly interestPayableSUSD: MoneySUSD;
+  readonly debtLiabilityRUSD: MoneyRUSD;
+  readonly interestPayableRUSD: MoneyRUSD;
 }
 
 /**
@@ -574,7 +574,7 @@ export interface AnnualFinanceSummary {
   /** Annual budget decomposition per country; exact sums of monthly values. */
   budgetTotals: Record<Id, FinancePeriodBudgetTotals>;
   /** Annual world-wide gross flows for the four M4b flow kinds. */
-  flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD>;
+  flowTotalsByKind: Record<FlowTransactionKind, MoneyRUSD>;
   /** End-of-year balances per country. */
   closingBalances: Record<Id, AnnualClosingBalances>;
   /** Number of controlled correction records posted during the year. */
@@ -642,17 +642,17 @@ export interface FinanceState {
 }
 
 /**
- * SUSD-equivalent value of one unit of a currency.
+ * RUSD-equivalent value of one unit of a currency.
  *
- * This is not a MoneySUSD amount: its unit is SUSD per one currency unit.
+ * This is not a MoneyRUSD amount: its unit is RUSD per one currency unit.
  * The brand is compile-time only; serialized state remains a plain JSON number.
  * D-003 deliberately avoided branded numeric types for ordinary state, but this
  * value has distinct dimensions and the M4a-2 design review explicitly requires
  * dimensional separation. It is the narrow exception recorded in D-044.
  */
-declare const susdPerCurrencyUnitBrand: unique symbol;
-export type SusdPerCurrencyUnit = number & {
-  readonly [susdPerCurrencyUnitBrand]: true;
+declare const rusdPerCurrencyUnitBrand: unique symbol;
+export type RusdPerCurrencyUnit = number & {
+  readonly [rusdPerCurrencyUnitBrand]: true;
 };
 
 /** Identity of the entity that issues a currency. */
@@ -663,7 +663,7 @@ export type CurrencyIssuer =
 
 export interface Currency {
   id: Id;
-  /** Stable lower-case key; never `susd` in any casing. */
+  /** Stable lower-case key; never `rusd` in any casing. */
   key: string;
   name: string;
   issuer: CurrencyIssuer;
@@ -682,31 +682,31 @@ export type MonetaryArrangement =
  * M4c/E2 per-country fiscal policy state.
  *
  * Every field is provisional hard-bounded policy, not law-bounded: M8 taxation
- * and budget laws may later replace enacted values. All amounts are nominal SUSD
+ * and budget laws may later replace enacted values. All amounts are nominal RUSD
  * and all rates are dimensionless.
  *
  * - `incomeTaxRate` is a flat rate on the taxable part of wages actually
  *   received, withheld daily by the fiscal phase.
- * - `incomeTaxAllowanceSUSDPerYear` is a per-pop-block annual exemption,
+ * - `incomeTaxAllowanceRUSDPerYear` is a per-pop-block annual exemption,
  *   pro-rated by the civil year length and subtracted from the block's actual
  *   daily wage receipt before the rate applies.
- * - `welfareBudgetSUSDPerYear` is a requested annual expenditure target, paid
+ * - `welfareBudgetRUSDPerYear` is a requested annual expenditure target, paid
  *   daily as `budget / daysInYear(civil year)`; it is not a spendable pool.
  * - `welfareMaxWealthLevel` is the inclusive eligibility ceiling on the block
  *   wealth level (0..99). 99 reproduces universal eligibility.
  * - `businessProfitTaxRate` is assessed once per civil month-end on each taxed
  *   building's positive period net result.
- * - `reserveTargetSUSD` is a treasury liquidity floor, not a spendable pool: the
+ * - `reserveTargetRUSD` is a treasury liquidity floor, not a spendable pool: the
  *   daily welfare transfer may not draw treasury cash below it, and a player
  *   principal repayment may not take cash below it.
  */
 export interface FiscalPolicy {
   incomeTaxRate: Rate;
-  incomeTaxAllowanceSUSDPerYear: MoneySUSD;
-  welfareBudgetSUSDPerYear: MoneySUSD;
+  incomeTaxAllowanceRUSDPerYear: MoneyRUSD;
+  welfareBudgetRUSDPerYear: MoneyRUSD;
   welfareMaxWealthLevel: number;
   businessProfitTaxRate: Rate;
-  reserveTargetSUSD: MoneySUSD;
+  reserveTargetRUSD: MoneyRUSD;
 }
 
 /**
@@ -716,7 +716,7 @@ export interface FiscalPolicy {
  */
 export type FiscalPolicyInput = Pick<
   FiscalPolicy,
-  "incomeTaxRate" | "welfareBudgetSUSDPerYear"
+  "incomeTaxRate" | "welfareBudgetRUSDPerYear"
 > &
   Partial<FiscalPolicy>;
 
@@ -751,8 +751,8 @@ export interface DebtPolicy {
   annualCouponRate: Rate;
   /** Contract term in civil days, at least 1. */
   termDays: number;
-  /** Maximum total outstanding principal, in SUSD. */
-  maxOutstandingPrincipalSUSD: MoneySUSD;
+  /** Maximum total outstanding principal, in RUSD. */
+  maxOutstandingPrincipalRUSD: MoneyRUSD;
   refinanceOnMaturity: boolean;
   /** Days after first arrears before the remaining debt is written off. */
   arrearsGraceDays: number;
@@ -768,10 +768,10 @@ export interface DebtHistoryAggregate {
   readonly contractsRetired: number;
   /** Defaulted contracts removed from retained detail. */
   readonly contractsDefaulted: number;
-  readonly principalIssuedSUSD: MoneySUSD;
-  readonly principalRepaidSUSD: MoneySUSD;
-  readonly principalWrittenOffSUSD: MoneySUSD;
-  readonly interestWrittenOffSUSD: MoneySUSD;
+  readonly principalIssuedRUSD: MoneyRUSD;
+  readonly principalRepaidRUSD: MoneyRUSD;
+  readonly principalWrittenOffRUSD: MoneyRUSD;
+  readonly interestWrittenOffRUSD: MoneyRUSD;
 }
 
 /** M5b public-debt contract. Persisted in `FinanceState`. */
@@ -782,13 +782,13 @@ export interface DebtContract {
   issuerCountryId: Id;
   holderKind: "country" | "popBlock";
   holderId: Id;
-  principalSUSD: MoneySUSD;
-  outstandingPrincipalSUSD: MoneySUSD;
+  principalRUSD: MoneyRUSD;
+  outstandingPrincipalRUSD: MoneyRUSD;
   annualCouponRate: Rate;
   issueDay: Day;
   maturityDay: Day;
   /** Accrued but unpaid coupon interest. */
-  accruedInterestSUSD: MoneySUSD;
+  accruedInterestRUSD: MoneyRUSD;
   status: "active" | "arrears" | "repaid" | "defaulted";
   arrearsSinceDay: Day | null;
 }
@@ -830,11 +830,11 @@ export interface ConstructionProjectMaterial {
 /**
  * One persisted public-construction project.
  *
- * `totalCostSUSD` is the building definition's construction **labor** cost
+ * `totalCostRUSD` is the building definition's construction **labor** cost
  * snapshot at authorization; construction advances by gross labor payroll until
- * `spentSUSD` reaches it. `materialsSpentSUSD` is the actual market cost of
+ * `spentRUSD` reaches it. `materialsSpentRUSD` is the actual market cost of
  * materials purchased/delivered for the project, also capitalized in
- * work-in-progress. `workingCapitalSUSD` is the completion endowment target
+ * work-in-progress. `workingCapitalRUSD` is the completion endowment target
  * (30 days of the building's daily upkeep), paid from treasury only to the extent
  * cash is available. Project ids are stable and queue order is ascending id.
  */
@@ -848,13 +848,13 @@ export interface ConstructionProject {
   startedDay: Day | null;
   completedDay: Day | null;
   cancelledDay: Day | null;
-  totalCostSUSD: MoneySUSD;
-  workingCapitalSUSD: MoneySUSD;
-  workingCapitalPaidSUSD: MoneySUSD;
+  totalCostRUSD: MoneyRUSD;
+  workingCapitalRUSD: MoneyRUSD;
+  workingCapitalPaidRUSD: MoneyRUSD;
   /** Gross construction labor paid and capitalized. */
-  spentSUSD: MoneySUSD;
+  spentRUSD: MoneyRUSD;
   /** Actual market purchases of construction/commissioning materials, capitalized. */
-  materialsSpentSUSD: MoneySUSD;
+  materialsSpentRUSD: MoneyRUSD;
   /** Required and delivered material quantities, snapshotted at authorization. */
   materials: ConstructionProjectMaterial[];
   /** Workers hired on the most recent progress day (0 when waiting/paused). */
@@ -873,8 +873,8 @@ export interface ConstructionHistoryAggregate {
   readonly countryId: Id;
   readonly projectsCompleted: number;
   readonly projectsCancelled: number;
-  readonly totalSpentSUSD: MoneySUSD;
-  readonly totalWrittenOffSUSD: MoneySUSD;
+  readonly totalSpentRUSD: MoneyRUSD;
+  readonly totalWrittenOffRUSD: MoneyRUSD;
 }
 
 /** Authoritative E3 construction state. */
@@ -1059,11 +1059,11 @@ export interface LawDef {
    */
   requiredTechnologyIds: Id[];
   /**
-   * E5 labor-slot full-time annual minimum wage floor in SUSD, or 0 when the law
+   * E5 labor-slot full-time annual minimum wage floor in RUSD, or 0 when the law
    * imposes no floor. The daily obligation is the greater of the profession base
    * wage and this floor, prorated by the hours factor.
    */
-  laborMinimumWageSUSDPerYear: MoneySUSD;
+  laborMinimumWageRUSDPerYear: MoneyRUSD;
   /**
    * E5 labor-slot standard working week in hours, or 0 when the law does not set
    * one. The provisional 60-hour baseline scales capacity and wages; shorter weeks
@@ -1217,20 +1217,20 @@ export interface CountryTechnologyState {
  * population, technology, law, and finance state.
  */
 export interface EducationState {
-  /** Annual SUSD education/research payroll target. */
-  fundedAnnualSUSD: MoneySUSD;
+  /** Annual RUSD education/research payroll target. */
+  fundedAnnualRUSD: MoneyRUSD;
   /** Share of available academic workers assigned to research time, 0..1. */
   researchStaffShare: Rate;
   lastUpdateDay: Day | null;
-  fundingRequestedMonthToDateSUSD: MoneySUSD;
-  fundingShortfallMonthToDateSUSD: MoneySUSD;
+  fundingRequestedMonthToDateRUSD: MoneyRUSD;
+  fundingShortfallMonthToDateRUSD: MoneyRUSD;
 }
 
 /** Scenario input for one country's M9 technology and education state. */
 export interface CountryTechnologyInput {
   /** Research technology keys that start completed. */
   researchedTechnologyKeys?: string[];
-  educationFundingSUSDPerYear?: MoneySUSD;
+  educationFundingRUSDPerYear?: MoneyRUSD;
   researchStaffShare?: Rate;
 }
 
@@ -1251,7 +1251,7 @@ export interface InterestGroupState {
 
 /** Derived/cached M8 institution state (GDD §5.5, D-076). */
 export interface InstitutionState {
-  fundedAnnualSUSD: MoneySUSD;
+  fundedAnnualRUSD: MoneyRUSD;
   staffedByProfession: Record<Id, number>;
   serviceOutputIndex: number;
   quality: Rate;
@@ -1261,8 +1261,8 @@ export interface InstitutionState {
   /** Day of the most recent derivation, or null before world creation. */
   lastUpdateDay: Day | null;
   /** Month-to-date payroll request and unpaid shortfall (reporting memo). */
-  fundingRequestedMonthToDateSUSD: MoneySUSD;
-  fundingShortfallMonthToDateSUSD: MoneySUSD;
+  fundingRequestedMonthToDateRUSD: MoneyRUSD;
+  fundingShortfallMonthToDateRUSD: MoneyRUSD;
   /**
    * E5 share of the administration clerk base assigned to public health, 0..1.
    * Administration staffing is net of this share. Zero preserves M8 behaviour.
@@ -1278,24 +1278,24 @@ export interface InstitutionState {
  * funded/staffed training service on the first civil day, not by time alone.
  */
 export interface LaborPolicyState {
-  /** Annual SUSD training provider payroll target. */
-  trainingBudgetSUSDPerYear: MoneySUSD;
+  /** Annual RUSD training provider payroll target. */
+  trainingBudgetRUSDPerYear: MoneyRUSD;
   /** Immediate annual stipend per trainee; zero means no stipend. */
-  trainingStipendPerTraineeSUSDPerYear: MoneySUSD;
+  trainingStipendPerTraineeRUSDPerYear: MoneyRUSD;
   /** Share of available academic staff time assigned to training, 0..1. */
   trainingStaffShare: Rate;
   /** Monthly training participation share of eligible working-age people, 0..1. */
   trainingParticipation: Rate;
   lastUpdateDay: Day | null;
   /** Month-to-date training request and unpaid shortfall (payroll + stipend). */
-  trainingRequestedMonthToDateSUSD: MoneySUSD;
-  trainingShortfallMonthToDateSUSD: MoneySUSD;
+  trainingRequestedMonthToDateRUSD: MoneyRUSD;
+  trainingShortfallMonthToDateRUSD: MoneyRUSD;
 }
 
 /** Scenario input for one country's E5 labor policy. */
 export interface LaborPolicyInput {
-  trainingBudgetSUSDPerYear?: MoneySUSD;
-  trainingStipendPerTraineeSUSDPerYear?: MoneySUSD;
+  trainingBudgetRUSDPerYear?: MoneyRUSD;
+  trainingStipendPerTraineeRUSDPerYear?: MoneyRUSD;
   trainingStaffShare?: Rate;
   healthStaffShare?: Rate;
 }
@@ -1322,15 +1322,15 @@ export interface TradePolicyState {
   /** Day of the most recent trade-policy change, or null before any change. */
   lastUpdateDay: Day | null;
   /** Month-to-date cargo value exported by this country's buildings. */
-  exportsValueMonthToDateSUSD: MoneySUSD;
+  exportsValueMonthToDateRUSD: MoneyRUSD;
   /** Month-to-date cargo value imported into this country's customs zone. */
-  importsValueMonthToDateSUSD: MoneySUSD;
+  importsValueMonthToDateRUSD: MoneyRUSD;
   /** Month-to-date duty received as the importing administration. */
-  dutyReceivedMonthToDateSUSD: MoneySUSD;
+  dutyReceivedMonthToDateRUSD: MoneyRUSD;
   /** Month-to-date duty paid by this country's buildings as exporters. */
-  dutyPaidMonthToDateSUSD: MoneySUSD;
+  dutyPaidMonthToDateRUSD: MoneyRUSD;
   /** Month-to-date freight paid by this country's buildings. */
-  freightPaidMonthToDateSUSD: MoneySUSD;
+  freightPaidMonthToDateRUSD: MoneyRUSD;
 }
 
 /** Scenario input for one country's E6a trade policy; omitted fields are neutral. */
@@ -1354,8 +1354,8 @@ export interface TradeRoute {
   marketBId: Id;
   /** Route distance in provisional distance units; transit days = ceil(distance). */
   distanceUnits: number;
-  /** Unscaled daily cargo-value capacity in SUSD at infrastructure 1. */
-  baseCapacitySUSDPerDay: MoneySUSD;
+  /** Unscaled daily cargo-value capacity in RUSD at infrastructure 1. */
+  baseCapacityRUSDPerDay: MoneyRUSD;
 }
 
 /** Scenario input for one component route; ids are assigned deterministically. */
@@ -1363,7 +1363,7 @@ export interface TradeRouteInitialDef {
   marketAId: Id;
   marketBId: Id;
   distanceUnits: number;
-  baseCapacitySUSDPerDay: MoneySUSD;
+  baseCapacityRUSDPerDay: MoneyRUSD;
 }
 
 /**
@@ -1371,7 +1371,7 @@ export interface TradeRouteInitialDef {
  *
  * The seller keeps ownership while the goods are in transit. The goods are not part
  * of any market's stock until arrival, so they are never double-counted. Freight and
- * duty were paid and posted at dispatch; `cargoValueSUSD` is the origin-price value
+ * duty were paid and posted at dispatch; `cargoValueRUSD` is the origin-price value
  * used for capacity, duty, and reporting.
  */
 export interface TradeShipment {
@@ -1386,9 +1386,9 @@ export interface TradeShipment {
   destinationCountryId: Id | null;
   dispatchDay: Day;
   arrivalDay: Day;
-  cargoValueSUSD: MoneySUSD;
-  freightCostSUSD: MoneySUSD;
-  dutySUSD: MoneySUSD;
+  cargoValueRUSD: MoneyRUSD;
+  freightCostRUSD: MoneyRUSD;
+  dutyRUSD: MoneyRUSD;
   dutyRate: Rate;
 }
 
@@ -1416,10 +1416,10 @@ export interface TradeBlockedDiagnostic {
 export interface TradeDayReport {
   dayIndex: Day;
   dispatchedShipments: number;
-  freightPaidSUSD: MoneySUSD;
-  dutyPaidSUSD: MoneySUSD;
+  freightPaidRUSD: MoneyRUSD;
+  dutyPaidRUSD: MoneyRUSD;
   /** Freight/duty funded by the shipping building's owner as a capital injection. */
-  ownerFundedSUSD: MoneySUSD;
+  ownerFundedRUSD: MoneyRUSD;
   arrivedShipments: number;
   /** Ascending (origin, destination, good, reason) order; bounded. */
   blocked: TradeBlockedDiagnostic[];
@@ -1522,7 +1522,7 @@ export interface CountryPoliticsInput {
   governmentGroupKey?: InterestGroupKey;
   /** Law keys by slot; omitted slots use the regime default. */
   laws?: Partial<Record<LawSlot, string>>;
-  institutionFundingSUSDPerYear?: MoneySUSD;
+  institutionFundingRUSDPerYear?: MoneyRUSD;
 }
 
 export interface Country {
@@ -1574,7 +1574,7 @@ export interface Country {
 /**
  * Scenario input for one country. `treasuryAccountId` is declared so account
  * allocation is deterministic and cannot collide with other declared accounts;
- * `initialTreasuryCashSUSD` is applied once through the opening-balance record.
+ * `initialTreasuryCashRUSD` is applied once through the opening-balance record.
  */
 export interface CountryInitialDef {
   id: Id;
@@ -1583,7 +1583,7 @@ export interface CountryInitialDef {
   monetary: MonetaryArrangement;
   regionIds: Id[];
   treasuryAccountId: Id;
-  initialTreasuryCashSUSD: MoneySUSD;
+  initialTreasuryCashRUSD: MoneyRUSD;
   fiscal: FiscalPolicyInput;
   /** E4 industrial policy; omitted means all sector subsidy rates are zero. */
   industrial?: IndustrialPolicyInput;
@@ -1602,7 +1602,7 @@ export interface CountryInitialDef {
 }
 
 /**
- * Authoritative SUSD-relative valuation of one currency. `specified` carries
+ * Authoritative RUSD-relative valuation of one currency. `specified` carries
  * the value; `unavailable` explicitly records that no value is known and never
  * defaults to parity.
  */
@@ -1610,7 +1610,7 @@ export type CurrencyValuation =
   | {
       currencyId: Id;
       status: "specified";
-      susdPerUnit: SusdPerCurrencyUnit;
+      rusdPerUnit: RusdPerCurrencyUnit;
       setOnDay: Day;
       source: "scenario" | "policy" | "market";
     }
@@ -1623,21 +1623,21 @@ export type MonetaryRegime = (typeof MONETARY_REGIMES)[number];
 /**
  * E6b per-currency monetary-authority state (D-080).
  *
- * The authority is a reserve-backed currency board: it holds SUSD reserves, issues its
- * currency against them, and holds monetary equity. All balances are SUSD; the currency
+ * The authority is a reserve-backed currency board: it holds RUSD reserves, issues its
+ * currency against them, and holds monetary equity. All balances are RUSD; the currency
  * itself is recorded as units and measured at the authoritative `CurrencyValuation`.
  * `currencyIssuedUnits` is authoritative; the liability and the external holding are its
- * SUSD measurement and are validated against `units × valuation`.
+ * RUSD measurement and are validated against `units × valuation`.
  */
 export interface MonetaryCurrencyState {
   currencyId: Id;
   /** Simulated country that issues the currency, or null when no authority exists. */
   issuerCountryId: Id | null;
   regime: MonetaryRegime;
-  /** Current policy parity in SUSD per currency unit; null until a parity is declared. */
-  paritySusdPerUnit: SusdPerCurrencyUnit | null;
+  /** Current policy parity in RUSD per currency unit; null until a parity is declared. */
+  parityRusdPerUnit: RusdPerCurrencyUnit | null;
   /** The declared reference parity; managed valuations are bounded around it. */
-  referenceParitySusdPerUnit: SusdPerCurrencyUnit | null;
+  referenceParityRusdPerUnit: RusdPerCurrencyUnit | null;
   /** Currency units in circulation. */
   currencyIssuedUnits: number;
   /** True once the authority has been established and is operating. */
@@ -1655,9 +1655,9 @@ export interface MonetaryCurrencyState {
   lastManagedUpdateDay: Day | null;
   /** Day of the last completed-mouth capture (idempotency marker). */
   lastMonthEndDay: Day | null;
-  /** Realized exports/imports of the most recently completed month, SUSD. */
-  lastMonthExportsSUSD: MoneySUSD;
-  lastMonthImportsSUSD: MoneySUSD;
+  /** Realized exports/imports of the most recently completed month, RUSD. */
+  lastMonthExportsRUSD: MoneyRUSD;
+  lastMonthImportsRUSD: MoneyRUSD;
 }
 
 /** Authoritative E6b monetary-system state. */
@@ -1675,13 +1675,13 @@ export interface MonetaryCurrencyInput {
   currencyId: Id;
   regime?: MonetaryRegime;
   /** Declared parity; defaults to the scenario's specified valuation. */
-  paritySusdPerUnit?: number;
+  parityRusdPerUnit?: number;
   /** Opening reserves capitalized by the issuing country's treasury. */
-  reserveFundingSUSD?: MoneySUSD;
+  reserveFundingRUSD?: MoneyRUSD;
   /** Opening currency units in circulation held by the external counterparty. */
   currencyIssuedUnits?: number;
-  /** Opening SUSD cash of the external counterparty. Must cover its opening holding. */
-  externalCashSUSD?: MoneySUSD;
+  /** Opening RUSD cash of the external counterparty. Must cover its opening holding. */
+  externalCashRUSD?: MoneyRUSD;
 }
 
 /** Scenario input for the E6b monetary system; omitted means disabled. */
@@ -1740,13 +1740,13 @@ export interface BuildingInstanceInitialDef {  id: Id;
   builtOnDay: Day;
   operational: boolean;
   operatingCashAccountId: Id;
-  initialOperatingCashSUSD: MoneySUSD;
+  initialOperatingCashRUSD: MoneyRUSD;
 }
 
 export interface MarketInitialDef {
   id: Id;
   regionIds: Id[];
-  priceSUSD: number[];
+  priceRUSD: number[];
   stockLots: StockLot[];
   /** E6a customs administration; omitted means the country owning the lowest region id. */
   customsCountryId?: Id | null;
@@ -1755,7 +1755,7 @@ export interface MarketInitialDef {
 export interface SystemAccountInitialDef {
   id: Id;
   accountKind: "system-reserve";
-  balanceSUSD: MoneySUSD;
+  balanceRUSD: MoneyRUSD;
 }
 
 export interface EmploymentAssignmentInitialDef {

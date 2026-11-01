@@ -16,7 +16,7 @@ export const M5B_TREASURY_B = 9001;
 export interface M5bOptions {
   readonly debt?: Partial<DebtPolicy>;
   readonly incomeTaxRate?: number;
-  readonly welfareBudgetSUSDPerYear?: number;
+  readonly welfareBudgetRUSDPerYear?: number;
   readonly initialState?: (scenario: EconomyScenarioDef) => void;
 }
 
@@ -33,9 +33,9 @@ export function m5bScenario(options: M5bOptions = {}): EconomyScenarioDef {
       country.id === M5B_COUNTRY_A
         ? {
             incomeTaxRate: options.incomeTaxRate ?? 0,
-            welfareBudgetSUSDPerYear: options.welfareBudgetSUSDPerYear ?? 0,
+            welfareBudgetRUSDPerYear: options.welfareBudgetRUSDPerYear ?? 0,
           }
-        : { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
+        : { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
     ...(country.id === M5B_COUNTRY_A
       ? {
           debt: {
@@ -44,7 +44,7 @@ export function m5bScenario(options: M5bOptions = {}): EconomyScenarioDef {
             creditorId: M5B_COUNTRY_B,
             annualCouponRate: 0.12,
             termDays: 10,
-            maxOutstandingPrincipalSUSD: 1_000_000,
+            maxOutstandingPrincipalRUSD: 1_000_000,
             refinanceOnMaturity: false,
             arrearsGraceDays: 0,
             ...options.debt,

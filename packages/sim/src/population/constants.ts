@@ -47,8 +47,8 @@ export const REMAINDER_TOLERANCE = 1e-9;
 /** Small positive number used to guard division in indicator formulas. */
 export const POPULATION_EPSILON = 1e-9;
 
-/** Tolerance for SUSD invariant checks. */
-export const MONEY_TOLERANCE_SUSD = 1e-6;
+/** Tolerance for RUSD invariant checks. */
+export const MONEY_TOLERANCE_RUSD = 1e-6;
 
 /** Tolerance for physical quantity and supply invariant checks. */
 export const QUANTITY_TOLERANCE = 1e-9;

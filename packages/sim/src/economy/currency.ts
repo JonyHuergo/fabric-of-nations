@@ -2,10 +2,10 @@
  * M4a-2 currency valuation and conversion helpers.
  *
  * Direction convention (never invert it accidentally):
- * - `susdPerUnit` is the SUSD-equivalent value of ONE unit of a currency.
+ * - `rusdPerUnit` is the RUSD-equivalent value of ONE unit of a currency.
  * - `crossRate(from, to)` returns units of `to` per ONE unit of `from`.
  *
- * SUSD is not a registered currency. There is no `fxToUSD` field, no stored
+ * RUSD is not a registered currency. There is no `fxToUSD` field, no stored
  * inverse rate, and no default parity. An unavailable or missing valuation is a
  * named error, never a silent substitution.
  */
@@ -15,8 +15,8 @@ import {
   CURRENCY_RATE_MIN,
   CURRENCY_RATE_RELATIVE_TOLERANCE,
 } from "../constants.js";
-import type { Id, MoneySUSD } from "../types.js";
-import type { CurrencyValuation, SusdPerCurrencyUnit } from "./types.js";
+import type { Id, MoneyRUSD } from "../types.js";
+import type { CurrencyValuation, RusdPerCurrencyUnit } from "./types.js";
 
 /** Named error for a missing, unavailable, or invalid currency valuation. */
 export class CurrencyValuationError extends RangeError {
@@ -32,13 +32,13 @@ export class CurrencyValuationError extends RangeError {
 }
 
 /**
- * Validate and brand a SUSD-per-currency-unit value.
+ * Validate and brand a RUSD-per-currency-unit value.
  * Bounds are provisional numerical safety limits, not historical economics.
  */
-export function assertValidSusdPerCurrencyUnit(
+export function assertValidRusdPerCurrencyUnit(
   value: unknown,
-  path = "susdPerUnit",
-): SusdPerCurrencyUnit {
+  path = "rusdPerUnit",
+): RusdPerCurrencyUnit {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new RangeError(`${path} must be a finite number`);
   }
@@ -50,12 +50,12 @@ export function assertValidSusdPerCurrencyUnit(
       `${path} must be in ${String(CURRENCY_RATE_MIN)}..${String(CURRENCY_RATE_MAX)}, received ${String(value)}`,
     );
   }
-  return value as SusdPerCurrencyUnit;
+  return value as RusdPerCurrencyUnit;
 }
 
-/** Construct a validated SUSD-per-currency-unit value. */
-export function asSusdPerCurrencyUnit(value: number): SusdPerCurrencyUnit {
-  return assertValidSusdPerCurrencyUnit(value);
+/** Construct a validated RUSD-per-currency-unit value. */
+export function asRusdPerCurrencyUnit(value: number): RusdPerCurrencyUnit {
+  return assertValidRusdPerCurrencyUnit(value);
 }
 
 function assertMoneyAmount(value: unknown, path: string): number {
@@ -82,35 +82,35 @@ function assertConversionResult(
   return result;
 }
 
-/** Convert an amount in currency units to its nominal SUSD value. */
-export function susdFromCurrency(
-  amount: MoneySUSD,
-  rate: SusdPerCurrencyUnit,
-): MoneySUSD {
+/** Convert an amount in currency units to its nominal RUSD value. */
+export function rusdFromCurrency(
+  amount: MoneyRUSD,
+  rate: RusdPerCurrencyUnit,
+): MoneyRUSD {
   const value = assertMoneyAmount(amount, "amount");
-  const valuation = assertValidSusdPerCurrencyUnit(rate, "susdPerUnit");
+  const valuation = assertValidRusdPerCurrencyUnit(rate, "rusdPerUnit");
   const result = value * valuation;
-  return assertConversionResult(result, value > 0, "susdFromCurrency");
+  return assertConversionResult(result, value > 0, "rusdFromCurrency");
 }
 
-/** Convert a nominal SUSD amount to units of a currency. */
-export function currencyFromSusd(
-  amount: MoneySUSD,
-  rate: SusdPerCurrencyUnit,
+/** Convert a nominal RUSD amount to units of a currency. */
+export function currencyFromRusd(
+  amount: MoneyRUSD,
+  rate: RusdPerCurrencyUnit,
 ): number {
   const value = assertMoneyAmount(amount, "amount");
-  const valuation = assertValidSusdPerCurrencyUnit(rate, "susdPerUnit");
+  const valuation = assertValidRusdPerCurrencyUnit(rate, "rusdPerUnit");
   const result = value / valuation;
-  return assertConversionResult(result, value > 0, "currencyFromSusd");
+  return assertConversionResult(result, value > 0, "currencyFromRusd");
 }
 
 /**
  * Units of `to` per ONE unit of `from`:
- * `crossRate(from, to) = from.susdPerUnit / to.susdPerUnit`.
+ * `crossRate(from, to) = from.rusdPerUnit / to.rusdPerUnit`.
  */
-export function crossRate(from: SusdPerCurrencyUnit, to: SusdPerCurrencyUnit): number {
-  const fromRate = assertValidSusdPerCurrencyUnit(from, "from.susdPerUnit");
-  const toRate = assertValidSusdPerCurrencyUnit(to, "to.susdPerUnit");
+export function crossRate(from: RusdPerCurrencyUnit, to: RusdPerCurrencyUnit): number {
+  const fromRate = assertValidRusdPerCurrencyUnit(from, "from.rusdPerUnit");
+  const toRate = assertValidRusdPerCurrencyUnit(to, "to.rusdPerUnit");
   const result = fromRate / toRate;
   if (!Number.isFinite(result)) {
     throw new RangeError("crossRate overflowed to a non-finite value");
@@ -133,7 +133,7 @@ export function findCurrencyValuation(
 export function requireCurrencyRate(
   valuations: readonly CurrencyValuation[],
   currencyId: Id,
-): SusdPerCurrencyUnit {
+): RusdPerCurrencyUnit {
   const valuation = findCurrencyValuation(valuations, currencyId);
   if (valuation === undefined) {
     throw new CurrencyValuationError(currencyId, "missing");
@@ -142,7 +142,7 @@ export function requireCurrencyRate(
     throw new CurrencyValuationError(currencyId, "unavailable");
   }
   try {
-    return assertValidSusdPerCurrencyUnit(valuation.susdPerUnit, "susdPerUnit");
+    return assertValidRusdPerCurrencyUnit(valuation.rusdPerUnit, "rusdPerUnit");
   } catch {
     throw new CurrencyValuationError(currencyId, "invalid");
   }
@@ -160,7 +160,7 @@ export function crossRateFor(
   );
 }
 
-/** Dimensionless relative comparison for rates; never an SUSD absolute epsilon. */
+/** Dimensionless relative comparison for rates; never an RUSD absolute epsilon. */
 export function ratesApproximatelyEqual(left: number, right: number): boolean {
   if (!Number.isFinite(left) || !Number.isFinite(right)) return false;
   const scale = Math.max(Math.abs(left), Math.abs(right), Number.MIN_VALUE);

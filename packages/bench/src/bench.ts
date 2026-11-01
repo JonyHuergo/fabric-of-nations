@@ -45,7 +45,7 @@ import {
   createInitialWorld,
   createPopulationWorld,
   designatedCashTotal,
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   hashWorld,
   populationTotal,
   refreshEmploymentIfDue,
@@ -240,15 +240,15 @@ interface SettlementBenchmarkResult {
   readonly transactions: number;
   readonly wages: number;
   readonly postings: number;
-  readonly marketPurchasesSUSD: number;
-  readonly wagesPaidSUSD: number;
-  readonly unpaidWagesSUSD: number;
-  readonly upkeepPaidSUSD: number;
-  readonly unpaidUpkeepSUSD: number;
-  readonly producerProfitSUSD: number;
+  readonly marketPurchasesRUSD: number;
+  readonly wagesPaidRUSD: number;
+  readonly unpaidWagesRUSD: number;
+  readonly upkeepPaidRUSD: number;
+  readonly unpaidUpkeepRUSD: number;
+  readonly producerProfitRUSD: number;
   readonly minTransactions: number;
-  readonly minWagesPaidSUSD: number;
-  readonly minUpkeepPaidSUSD: number;
+  readonly minWagesPaidRUSD: number;
+  readonly minUpkeepPaidRUSD: number;
   readonly minPostings: number;
 }
 
@@ -295,7 +295,7 @@ interface FinanceCloseBenchmarkResult {
   readonly summaryDay: number;
   readonly closingPostings: number;
   readonly minClosingPostings: number;
-  readonly flowTotalSUSD: number;
+  readonly flowTotalRUSD: number;
   readonly zeroed: boolean;
   readonly cashConserved: boolean;
   readonly identityPreserved: boolean;
@@ -326,9 +326,9 @@ function formatMs(value: number): string {
 
 function inputsFor(blockIds: readonly number[]): PopulationInputs {
   return {
-    prices: Object.entries(M2_PRICES).map(([goodKey, unitPriceSUSD]) => ({
+    prices: Object.entries(M2_PRICES).map(([goodKey, unitPriceRUSD]) => ({
       goodKey,
-      unitPriceSUSD,
+      unitPriceRUSD,
     })),
     supply: Object.entries(M2_SUPPLY).map(([goodKey, availableQuantityPerCapita]) => ({
       goodKey,
@@ -336,8 +336,8 @@ function inputsFor(blockIds: readonly number[]): PopulationInputs {
     })),
     income: blockIds.map((popBlockId) => ({
       popBlockId,
-      annualSettledIncomePerCapitaSUSD: 250,
-      annualMandatoryPaymentsPerCapitaSUSD: 50,
+      annualSettledIncomePerCapitaRUSD: 250,
+      annualMandatoryPaymentsPerCapitaRUSD: 50,
     })),
   };
 }
@@ -559,12 +559,12 @@ function scaledProductionScenario(groups: number): EconomyScenarioDef {
     {
       id: 0,
       regionIds: [0],
-      priceSUSD: [...base.markets[0]!.priceSUSD],
+      priceRUSD: [...base.markets[0]!.priceRUSD],
       stockLots,
     },
   ];
   scenario.systemAccounts = [
-    { id: systemAccountId, accountKind: "system-reserve", balanceSUSD: 0 },
+    { id: systemAccountId, accountKind: "system-reserve", balanceRUSD: 0 },
   ];
   return scenario;
 }
@@ -780,7 +780,7 @@ function runMarketBenchmark(
   const market = world.markets[0];
   if (market === undefined) throw new Error("missing M3 market");
   const openingLots = market.stockLots.map((lot) => ({ ...lot }));
-  const openingPrices = [...market.priceSUSD];
+  const openingPrices = [...market.priceRUSD];
   const input = marketDemandInput(world, scenario, groups);
   if (input.householdDemands.length === 0 || input.productionDemands.length === 0) {
     throw new Error("market benchmark has no demands");
@@ -788,7 +788,7 @@ function runMarketBenchmark(
 
   const reset = (): void => {
     market.stockLots = openingLots.map((lot) => ({ ...lot }));
-    market.priceSUSD = [...openingPrices];
+    market.priceRUSD = [...openingPrices];
   };
   const oneDay = (): {
     readonly ns: number;
@@ -830,7 +830,7 @@ function runMarketBenchmark(
       0,
     );
     const changedPrices = result.priceUpdates.filter(
-      (update) => Math.abs(update.newPriceSUSD - update.oldPriceSUSD) > 1e-12,
+      (update) => Math.abs(update.newPriceRUSD - update.oldPriceRUSD) > 1e-12,
     ).length;
     minHouseholdFulfilled = Math.min(minHouseholdFulfilled, household);
     minPassBFulfilled = Math.min(minPassBFulfilled, passB);
@@ -906,10 +906,10 @@ function printMarketBenchmark(result: MarketBenchmarkResult): void {
 function settlementBenchmarkScenario(groups: number): EconomyScenarioDef {
   const scenario = scaledProductionScenario(groups);
   for (const block of scenario.population.popBlocks) {
-    block.initialSavingsSUSD = 1_000_000;
+    block.initialSavingsRUSD = 1_000_000;
   }
   for (const building of scenario.buildingInstances) {
-    building.initialOperatingCashSUSD = 1_000_000;
+    building.initialOperatingCashRUSD = 1_000_000;
   }
   return scenario;
 }
@@ -927,21 +927,21 @@ function runSettlementBenchmark(
   const market = world.markets[0];
   if (market === undefined) throw new Error("missing M3 market");
   const openingLots = market.stockLots.map((lot) => ({ ...lot }));
-  const openingPrices = [...market.priceSUSD];
+  const openingPrices = [...market.priceRUSD];
   const openingBalances = new Map<number, number>();
   for (const account of world.finance.accounts) {
-    openingBalances.set(account.id, account.balanceSUSD);
+    openingBalances.set(account.id, account.balanceRUSD);
   }
   const openingNextPostingId = world.finance.nextPostingId;
   const demandInput = marketDemandInput(world, scenario, groups);
 
   const reset = (): void => {
     market.stockLots = openingLots.map((lot) => ({ ...lot }));
-    market.priceSUSD = [...openingPrices];
+    market.priceRUSD = [...openingPrices];
     for (const account of world.finance.accounts) {
       const balance = openingBalances.get(account.id);
       if (balance === undefined) throw new Error(`missing opening balance ${String(account.id)}`);
-      account.balanceSUSD = balance;
+      account.balanceRUSD = balance;
     }
     world.finance.postings = [];
     world.finance.nextPostingId = openingNextPostingId;
@@ -963,37 +963,37 @@ function runSettlementBenchmark(
   const samples = new Array<number>(iterations);
   const hashes = new Set<string>();
   let minTransactions = Number.MAX_SAFE_INTEGER;
-  let minWagesPaidSUSD = Number.MAX_SAFE_INTEGER;
-  let minUpkeepPaidSUSD = Number.MAX_SAFE_INTEGER;
+  let minWagesPaidRUSD = Number.MAX_SAFE_INTEGER;
+  let minUpkeepPaidRUSD = Number.MAX_SAFE_INTEGER;
   let minPostings = Number.MAX_SAFE_INTEGER;
   let transactions = 0;
   let wages = 0;
   let postings = 0;
-  let marketPurchasesSUSD = 0;
-  let wagesPaidSUSD = 0;
-  let unpaidWagesSUSD = 0;
-  let upkeepPaidSUSD = 0;
-  let unpaidUpkeepSUSD = 0;
-  let producerProfitSUSD = 0;
+  let marketPurchasesRUSD = 0;
+  let wagesPaidRUSD = 0;
+  let unpaidWagesRUSD = 0;
+  let upkeepPaidRUSD = 0;
+  let unpaidUpkeepRUSD = 0;
+  let producerProfitRUSD = 0;
   let hash = "";
 
   for (let index = 0; index < iterations; index += 1) {
     const { ns, settlement } = oneSample();
     samples[index] = ns;
     minTransactions = Math.min(minTransactions, settlement.transactions.length);
-    minWagesPaidSUSD = Math.min(minWagesPaidSUSD, settlement.totals.wagesPaidSUSD);
-    minUpkeepPaidSUSD = Math.min(minUpkeepPaidSUSD, settlement.totals.upkeepPaidSUSD);
+    minWagesPaidRUSD = Math.min(minWagesPaidRUSD, settlement.totals.wagesPaidRUSD);
+    minUpkeepPaidRUSD = Math.min(minUpkeepPaidRUSD, settlement.totals.upkeepPaidRUSD);
     minPostings = Math.min(minPostings, settlement.postingIds.length);
     if (index === 0) {
       transactions = settlement.transactions.length;
       wages = settlement.wages.length;
       postings = settlement.postingIds.length;
-      marketPurchasesSUSD = settlement.totals.marketPurchasesSUSD;
-      wagesPaidSUSD = settlement.totals.wagesPaidSUSD;
-      unpaidWagesSUSD = settlement.totals.unpaidWagesSUSD;
-      upkeepPaidSUSD = settlement.totals.upkeepPaidSUSD;
-      unpaidUpkeepSUSD = settlement.totals.unpaidUpkeepSUSD;
-      producerProfitSUSD = settlement.totals.producerProfitSUSD;
+      marketPurchasesRUSD = settlement.totals.marketPurchasesRUSD;
+      wagesPaidRUSD = settlement.totals.wagesPaidRUSD;
+      unpaidWagesRUSD = settlement.totals.unpaidWagesRUSD;
+      upkeepPaidRUSD = settlement.totals.upkeepPaidRUSD;
+      unpaidUpkeepRUSD = settlement.totals.unpaidUpkeepRUSD;
+      producerProfitRUSD = settlement.totals.producerProfitRUSD;
       assertValidWorld(world);
     }
     const sampleHash = hashWorld(world);
@@ -1022,15 +1022,15 @@ function runSettlementBenchmark(
     transactions,
     wages,
     postings,
-    marketPurchasesSUSD,
-    wagesPaidSUSD,
-    unpaidWagesSUSD,
-    upkeepPaidSUSD,
-    unpaidUpkeepSUSD,
-    producerProfitSUSD,
+    marketPurchasesRUSD,
+    wagesPaidRUSD,
+    unpaidWagesRUSD,
+    upkeepPaidRUSD,
+    unpaidUpkeepRUSD,
+    producerProfitRUSD,
     minTransactions,
-    minWagesPaidSUSD,
-    minUpkeepPaidSUSD,
+    minWagesPaidRUSD,
+    minUpkeepPaidRUSD,
     minPostings,
   };
 }
@@ -1049,10 +1049,10 @@ function printSettlementBenchmark(result: SettlementBenchmarkResult): void {
       `${String(result.postings)} postings`,
   );
   console.log(
-    `  purchases ${result.marketPurchasesSUSD.toFixed(3)} SUSD, wages paid ` +
-      `${result.wagesPaidSUSD.toFixed(3)}, unpaid wages ${result.unpaidWagesSUSD.toFixed(3)}, ` +
-      `upkeep paid ${result.upkeepPaidSUSD.toFixed(3)}, unpaid upkeep ${result.unpaidUpkeepSUSD.toFixed(3)}, ` +
-      `producer profit ${result.producerProfitSUSD.toFixed(3)}`,
+    `  purchases ${result.marketPurchasesRUSD.toFixed(3)} RUSD, wages paid ` +
+      `${result.wagesPaidRUSD.toFixed(3)}, unpaid wages ${result.unpaidWagesRUSD.toFixed(3)}, ` +
+      `upkeep paid ${result.upkeepPaidRUSD.toFixed(3)}, unpaid upkeep ${result.unpaidUpkeepRUSD.toFixed(3)}, ` +
+      `producer profit ${result.producerProfitRUSD.toFixed(3)}`,
   );
   console.log(
     `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
@@ -1232,7 +1232,7 @@ function runFinanceCloseBenchmark(
     let zeroed = true;
     for (const account of world.finance.accounts) {
       if (account.category !== "revenue" && account.category !== "expense") continue;
-      if (account.balanceSUSD !== 0) zeroed = false;
+      if (account.balanceRUSD !== 0) zeroed = false;
     }
     let identityPreserved = true;
     try {
@@ -1300,7 +1300,7 @@ function runFinanceCloseBenchmark(
     summaryDay: measured.summaryDay,
     closingPostings: measured.closingPostings,
     minClosingPostings,
-    flowTotalSUSD: measured.flowTotal,
+    flowTotalRUSD: measured.flowTotal,
     zeroed: measured.zeroed,
     cashConserved: measured.cashConserved,
     identityPreserved: measured.identityPreserved,
@@ -1321,7 +1321,7 @@ function printFinanceCloseBenchmark(result: FinanceCloseBenchmarkResult): void {
       `warm-up ${String(result.warmupIterations)}; close only; setup/clone/hash excluded`,
   );
   console.log(
-    `  ${String(result.closingPostings)} closing entries, ${result.flowTotalSUSD.toFixed(4)} SUSD gross flows, ` +
+    `  ${String(result.closingPostings)} closing entries, ${result.flowTotalRUSD.toFixed(4)} RUSD gross flows, ` +
       `minimum entries ${String(result.minClosingPostings)}`,
   );
   console.log(
@@ -1344,11 +1344,11 @@ interface FiscalBenchmarkResult {
   readonly fixtureBlocks: number;
   readonly fixtureBuildings: number;
   readonly accounts: number;
-  readonly incomeTaxSUSD: number;
-  readonly welfarePaidSUSD: number;
-  readonly welfareShortfallSUSD: number;
-  readonly treasuryStartSUSD: number;
-  readonly treasuryEndSUSD: number;
+  readonly incomeTaxRUSD: number;
+  readonly welfarePaidRUSD: number;
+  readonly welfareShortfallRUSD: number;
+  readonly treasuryStartRUSD: number;
+  readonly treasuryEndRUSD: number;
   readonly treasuryReconciled: boolean;
   readonly cashConserved: boolean;
   readonly identityPreserved: boolean;
@@ -1397,8 +1397,8 @@ function fiscalBenchmarkScenario(groups: number): EconomyScenarioDef {
     monetary: { kind: "own", currencyId: 0 },
     regionIds: [0],
     treasuryAccountId: M4C_TREASURY_ACCOUNT_ID,
-    initialTreasuryCashSUSD: 5_000_000,
-    fiscal: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 1_000_000 },
+    initialTreasuryCashRUSD: 5_000_000,
+    fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 1_000_000 },
   };
   return {
     ...scenario,
@@ -1411,7 +1411,7 @@ function fiscalBenchmarkScenario(groups: number): EconomyScenarioDef {
       {
         currencyId: 0,
         status: "specified",
-        susdPerUnit: asSusdPerCurrencyUnit(1),
+        rusdPerUnit: asRusdPerCurrencyUnit(1),
         setOnDay: 0,
         source: "scenario",
       },
@@ -1426,7 +1426,7 @@ function treasuryCashOf(world: World): number {
     (candidate) => candidate.id === country.treasuryAccountId,
   );
   if (account === undefined) throw new Error("M4c benchmark world has no treasury account");
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function runFiscalBenchmark(
@@ -1471,11 +1471,11 @@ function runFiscalBenchmark(
       if (measured) samples.push(Number(end - start));
       const fiscal = result.economy?.fiscal;
       if (fiscal === undefined) throw new Error("M4c fiscal tick did not return fiscal results");
-      incomeTax += fiscal.totals.incomeTaxSUSD;
-      welfarePaid += fiscal.totals.welfarePaidSUSD;
-      welfareShortfall += fiscal.totals.welfareShortfallSUSD;
-      minIncomeTax = Math.min(minIncomeTax, fiscal.totals.incomeTaxSUSD);
-      minWelfarePaid = Math.min(minWelfarePaid, fiscal.totals.welfarePaidSUSD);
+      incomeTax += fiscal.totals.incomeTaxRUSD;
+      welfarePaid += fiscal.totals.welfarePaidRUSD;
+      welfareShortfall += fiscal.totals.welfareShortfallRUSD;
+      minIncomeTax = Math.min(minIncomeTax, fiscal.totals.incomeTaxRUSD);
+      minWelfarePaid = Math.min(minWelfarePaid, fiscal.totals.welfarePaidRUSD);
     }
     return {
       samples,
@@ -1517,11 +1517,11 @@ function runFiscalBenchmark(
     fixtureBlocks: world.popBlocks.length,
     fixtureBuildings: world.buildings.length,
     accounts: world.finance.accounts.length,
-    incomeTaxSUSD: first.incomeTax,
-    welfarePaidSUSD: first.welfarePaid,
-    welfareShortfallSUSD: first.welfareShortfall,
-    treasuryStartSUSD: first.treasuryAtStart,
-    treasuryEndSUSD: treasuryEnd,
+    incomeTaxRUSD: first.incomeTax,
+    welfarePaidRUSD: first.welfarePaid,
+    welfareShortfallRUSD: first.welfareShortfall,
+    treasuryStartRUSD: first.treasuryAtStart,
+    treasuryEndRUSD: treasuryEnd,
     treasuryReconciled,
     cashConserved: Math.abs(designatedCashTotal(world.finance) - cashBefore) <= 1e-6,
     identityPreserved,
@@ -1540,9 +1540,9 @@ function printFiscalBenchmark(result: FiscalBenchmarkResult): void {
       `tick only; setup/reset/hash excluded`,
   );
   console.log(
-    `  income tax ${result.incomeTaxSUSD.toFixed(4)} SUSD, welfare paid ${result.welfarePaidSUSD.toFixed(4)} SUSD, ` +
-      `shortfall ${result.welfareShortfallSUSD.toFixed(4)} SUSD, ` +
-      `treasury ${result.treasuryStartSUSD.toFixed(2)} -> ${result.treasuryEndSUSD.toFixed(2)} SUSD`,
+    `  income tax ${result.incomeTaxRUSD.toFixed(4)} RUSD, welfare paid ${result.welfarePaidRUSD.toFixed(4)} RUSD, ` +
+      `shortfall ${result.welfareShortfallRUSD.toFixed(4)} RUSD, ` +
+      `treasury ${result.treasuryStartRUSD.toFixed(2)} -> ${result.treasuryEndRUSD.toFixed(2)} RUSD`,
   );
   console.log(
     `  total ${formatMs(result.totalMs)} ms, avg ${formatMs(result.averageMs)} ms, ` +
@@ -1624,7 +1624,7 @@ function thresholdSatisfied(results: readonly RunResult[], thresholdMs: number):
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a/M5b/M6/M7 simulation-core benchmark");
+  console.log("Fabric of Nations M1/M2/M3b/M3c/M3d/M3e/M3f/M4b/M4c/M5/M5a/M5b/M6/M7 simulation-core benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);
@@ -1846,8 +1846,8 @@ function main(): void {
   const settlementValid = (result: SettlementBenchmarkResult): boolean =>
     result.hashesEqual &&
     result.minTransactions > 0 &&
-    result.minWagesPaidSUSD > 0 &&
-    result.minUpkeepPaidSUSD > 0 &&
+    result.minWagesPaidRUSD > 0 &&
+    result.minUpkeepPaidRUSD > 0 &&
     result.minPostings > 0;
   const m3eValid = settlementValid(m3eSmall) && settlementValid(m3eStress);
   const economicDayValid = (result: EconomicDayBenchmarkResult): boolean =>
@@ -1865,15 +1865,15 @@ function main(): void {
     result.identityPreserved &&
     result.summariesContiguous &&
     result.minClosingPostings > 0 &&
-    result.flowTotalSUSD > 0;
+    result.flowTotalRUSD > 0;
   const m4bValid = financeCloseValid(m4bCloseSmall) && financeCloseValid(m4bCloseStress);
   const fiscalValid = (result: FiscalBenchmarkResult): boolean =>
     result.hashesEqual &&
     result.treasuryReconciled &&
     result.cashConserved &&
     result.identityPreserved &&
-    result.incomeTaxSUSD > 0 &&
-    result.welfarePaidSUSD > 0;
+    result.incomeTaxRUSD > 0 &&
+    result.welfarePaidRUSD > 0;
   const m4cValid = fiscalValid(m4cFiscalSmall) && fiscalValid(m4cFiscalStress);
   const passed =
     m1Results.every((result) => result.ticks === CAMPAIGN_TICKS) &&

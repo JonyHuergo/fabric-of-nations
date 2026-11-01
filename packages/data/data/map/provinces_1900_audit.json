@@ -36,8 +36,8 @@
   "mapFeaturesCovered": 32,
   "duplicateProvinceIds": 0,
   "duplicateKeys": 0,
-  "unmatchedBorderSegments": 66,
-  "borderSegmentCount": 142592,
+  "unmatchedBorderSegments": 67,
+  "borderSegmentCount": 142610,
   "borderPairCount": 1604,
   "coverage": [
     {
@@ -50,29 +50,29 @@
     {
       "tag": "AUT",
       "scopeArea": 81.3566,
-      "coveredArea": 80.4522,
-      "residualArea": 0.9044,
+      "coveredArea": 80.4396,
+      "residualArea": 0.917,
       "estimated": false
     },
     {
       "tag": "BEL",
       "scopeArea": 3.7563,
-      "coveredArea": 3.6747,
-      "residualArea": 0.0816,
+      "coveredArea": 3.6731,
+      "residualArea": 0.0832,
       "estimated": false
     },
     {
       "tag": "BGR",
       "scopeArea": 11.519,
-      "coveredArea": 11.4093,
-      "residualArea": 0.1098,
+      "coveredArea": 11.4053,
+      "residualArea": 0.1137,
       "estimated": false
     },
     {
       "tag": "CHE",
       "scopeArea": 4.8685,
-      "coveredArea": 4.7321,
-      "residualArea": 0.1364,
+      "coveredArea": 4.7303,
+      "residualArea": 0.1382,
       "estimated": false
     },
     {
@@ -92,8 +92,8 @@
     {
       "tag": "DEU",
       "scopeArea": 70.7715,
-      "coveredArea": 69.2855,
-      "residualArea": 1.486,
+      "coveredArea": 69.2421,
+      "residualArea": 1.5294,
       "estimated": false
     },
     {
@@ -106,15 +106,15 @@
     {
       "tag": "ESP",
       "scopeArea": 53.0358,
-      "coveredArea": 52.5596,
-      "residualArea": 0.4763,
+      "coveredArea": 52.5592,
+      "residualArea": 0.4766,
       "estimated": false
     },
     {
       "tag": "FIN",
       "scopeArea": 62.287,
-      "coveredArea": 61.78,
-      "residualArea": 0.507,
+      "coveredArea": 61.7766,
+      "residualArea": 0.5105,
       "estimated": false
     },
     {
@@ -162,8 +162,8 @@
     {
       "tag": "ITA",
       "scopeArea": 31.4927,
-      "coveredArea": 6.61,
-      "residualArea": 24.8827,
+      "coveredArea": 6.609,
+      "residualArea": 24.8837,
       "estimated": true
     },
     {
@@ -211,36 +211,36 @@
     {
       "tag": "NOR",
       "scopeArea": 86.3155,
-      "coveredArea": 47.877,
-      "residualArea": 38.4385,
+      "coveredArea": 47.865,
+      "residualArea": 38.4505,
       "estimated": true
     },
     {
       "tag": "OTT",
       "scopeArea": 18.0174,
-      "coveredArea": 16.488,
-      "residualArea": 1.5294,
+      "coveredArea": 16.4813,
+      "residualArea": 1.536,
       "estimated": false
     },
     {
       "tag": "PRT",
       "scopeArea": 9.2367,
-      "coveredArea": 9.0608,
-      "residualArea": 0.1759,
+      "coveredArea": 9.0616,
+      "residualArea": 0.1751,
       "estimated": false
     },
     {
       "tag": "ROM",
       "scopeArea": 15.4477,
-      "coveredArea": 13.8,
-      "residualArea": 1.6477,
+      "coveredArea": 13.7999,
+      "residualArea": 1.6478,
       "estimated": false
     },
     {
       "tag": "RUS",
       "scopeArea": 703.381,
-      "coveredArea": 679.7989,
-      "residualArea": 23.5822,
+      "coveredArea": 679.7881,
+      "residualArea": 23.5929,
       "estimated": false
     },
     {
@@ -426,7 +426,7 @@
       "area": 0.0063,
       "bbox": [
         28.201,
-        45.234,
+        45.236,
         31.304,
         48.222
       ]
@@ -689,29 +689,29 @@
   "residuals": [],
   "warnings": [
     "38 province pairs overlap (largest 0.174 square degrees: deu-rhine-province / deu-palatinate)",
-    "coverage gap AUT: 0.904 square degrees remain outside the authored provinces",
-    "coverage gap BEL: 0.082 square degrees remain outside the authored provinces",
-    "coverage gap BGR: 0.110 square degrees remain outside the authored provinces",
-    "coverage gap CHE: 0.136 square degrees remain outside the authored provinces",
-    "coverage gap DEU: 1.486 square degrees remain outside the authored provinces",
+    "coverage gap AUT: 0.917 square degrees remain outside the authored provinces",
+    "coverage gap BEL: 0.083 square degrees remain outside the authored provinces",
+    "coverage gap BGR: 0.114 square degrees remain outside the authored provinces",
+    "coverage gap CHE: 0.138 square degrees remain outside the authored provinces",
+    "coverage gap DEU: 1.529 square degrees remain outside the authored provinces",
     "coverage gap DNK: 0.371 square degrees remain outside the authored provinces",
-    "coverage gap ESP: 0.476 square degrees remain outside the authored provinces",
-    "coverage gap FIN: 0.507 square degrees remain outside the authored provinces",
+    "coverage gap ESP: 0.477 square degrees remain outside the authored provinces",
+    "coverage gap FIN: 0.510 square degrees remain outside the authored provinces",
     "coverage gap GRL: 0.014 square degrees remain outside the authored provinces",
     "coverage gap LUX: 0.015 square degrees remain outside the authored provinces",
     "coverage gap MNT: 0.030 square degrees remain outside the authored provinces",
     "coverage gap NLD: 0.122 square degrees remain outside the authored provinces",
-    "coverage gap OTT: 1.529 square degrees remain outside the authored provinces",
-    "coverage gap PRT: 0.176 square degrees remain outside the authored provinces",
+    "coverage gap OTT: 1.536 square degrees remain outside the authored provinces",
+    "coverage gap PRT: 0.175 square degrees remain outside the authored provinces",
     "coverage gap ROM: 1.648 square degrees remain outside the authored provinces",
-    "coverage gap RUS: 23.582 square degrees remain outside the authored provinces",
+    "coverage gap RUS: 23.593 square degrees remain outside the authored provinces",
     "coverage gap SRB: 0.087 square degrees remain outside the authored provinces",
     "coverage gap SWE: 0.724 square degrees remain outside the authored provinces",
     "coverage subtraction failed for FRA; residual estimated by area (RangeError: Maximum call stack size exceeded)",
-    "coverage subtraction failed for GBR; residual estimated by area (Error: Unable to find segment #1926614 [-6.494443314810523, 57.99081000793836] -> [-6.494443314810485, 57.99081000793836] in SweepLine tree.)",
-    "coverage subtraction failed for GRC; residual estimated by area (Error: Unable to find segment #1938854 [21.876, 39.833] -> [21.884425489404112, 39.88202102926027] in SweepLine tree.)",
+    "coverage subtraction failed for GBR; residual estimated by area (Error: Unable to find segment #2147763 [-6.494443314810523, 57.99081000793836] -> [-6.494443314810485, 57.99081000793836] in SweepLine tree.)",
+    "coverage subtraction failed for GRC; residual estimated by area (Error: Unable to find segment #2160003 [21.876, 39.833] -> [21.884425489404112, 39.88202102926027] in SweepLine tree.)",
     "coverage subtraction failed for ITA; residual estimated by area (RangeError: Maximum call stack size exceeded)",
-    "coverage subtraction failed for NOR; residual estimated by area (Error: Unable to find segment #1992766 [5.620003416066605, 59.94010215538807] -> [5.620003416066614, 59.94010215538807] in SweepLine tree.)"
+    "coverage subtraction failed for NOR; residual estimated by area (Error: Unable to find segment #2214221 [5.620003416066605, 59.94010215538807] -> [5.620003416066614, 59.94010215538807] in SweepLine tree.)"
   ],
   "sourceCount": 17
 }

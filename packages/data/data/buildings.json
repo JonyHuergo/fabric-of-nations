@@ -17,9 +17,9 @@
         "workersPerThroughputUnit": 50000
       }
     ],
-    "constructionCostSUSD": 1000,
+    "constructionCostRUSD": 1000,
     "constructionWorkers": 80,
-    "dailyUpkeepSUSDAtLevelOne": 20,
+    "dailyUpkeepRUSDAtLevelOne": 20,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -58,9 +58,9 @@
         "workersPerThroughputUnit": 40000
       }
     ],
-    "constructionCostSUSD": 2000,
+    "constructionCostRUSD": 2000,
     "constructionWorkers": 120,
-    "dailyUpkeepSUSDAtLevelOne": 40,
+    "dailyUpkeepRUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -103,9 +103,9 @@
         "workersPerThroughputUnit": 30000
       }
     ],
-    "constructionCostSUSD": 1500,
+    "constructionCostRUSD": 1500,
     "constructionWorkers": 60,
-    "dailyUpkeepSUSDAtLevelOne": 30,
+    "dailyUpkeepRUSDAtLevelOne": 30,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -144,9 +144,9 @@
         "workersPerThroughputUnit": 25000
       }
     ],
-    "constructionCostSUSD": 1200,
+    "constructionCostRUSD": 1200,
     "constructionWorkers": 50,
-    "dailyUpkeepSUSDAtLevelOne": 25,
+    "dailyUpkeepRUSDAtLevelOne": 25,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -186,9 +186,9 @@
         "workersPerThroughputUnit": 20000
       }
     ],
-    "constructionCostSUSD": 3000,
+    "constructionCostRUSD": 3000,
     "constructionWorkers": 100,
-    "dailyUpkeepSUSDAtLevelOne": 35,
+    "dailyUpkeepRUSDAtLevelOne": 35,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -236,9 +236,9 @@
         "workersPerThroughputUnit": 30000
       }
     ],
-    "constructionCostSUSD": 4000,
+    "constructionCostRUSD": 4000,
     "constructionWorkers": 150,
-    "dailyUpkeepSUSDAtLevelOne": 50,
+    "dailyUpkeepRUSDAtLevelOne": 50,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -286,9 +286,9 @@
         "workersPerThroughputUnit": 10000
       }
     ],
-    "constructionCostSUSD": 2500,
+    "constructionCostRUSD": 2500,
     "constructionWorkers": 80,
-    "dailyUpkeepSUSDAtLevelOne": 40,
+    "dailyUpkeepRUSDAtLevelOne": 40,
     "storageCapacityByGood": [],
     "resourceRequirements": [],
     "requiredTechnologyId": null,
@@ -313,9 +313,9 @@
     "inputs": [],
     "outputs": [],
     "jobs": [],
-    "constructionCostSUSD": 500,
+    "constructionCostRUSD": 500,
     "constructionWorkers": 40,
-    "dailyUpkeepSUSDAtLevelOne": 10,
+    "dailyUpkeepRUSDAtLevelOne": 10,
     "storageCapacityByGood": [
       {
         "goodId": 0,

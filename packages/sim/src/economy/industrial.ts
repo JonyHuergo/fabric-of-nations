@@ -22,7 +22,7 @@ import {
   assertValidDayIndex,
   isTerminalDayIndex,
 } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { DayIndex, Id } from "../types.js";
 import {
   assertValidWorldForTick,
@@ -46,25 +46,25 @@ import { BUILDING_SECTORS } from "./types.js";
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 export interface IndustrialSubsidyBuildingResult {
   readonly buildingId: Id;
   readonly countryId: Id;
   readonly sector: BuildingDef["sector"];
-  readonly outputValueSUSD: number;
+  readonly outputValueRUSD: number;
   readonly rate: number;
-  readonly entitlementSUSD: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
+  readonly entitlementRUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
 }
 
 export interface IndustrialSubsidyCountryResult {
   readonly countryId: Id;
-  readonly requestedSUSD: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
+  readonly requestedRUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
 }
 
 export interface IndustrialSubsidyPhaseResult {
@@ -72,9 +72,9 @@ export interface IndustrialSubsidyPhaseResult {
   readonly dayIndex: DayIndex;
   readonly buildings: readonly IndustrialSubsidyBuildingResult[];
   readonly countries: readonly IndustrialSubsidyCountryResult[];
-  readonly requestedSUSD: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
+  readonly requestedRUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
   readonly postingIds: readonly number[];
 }
 
@@ -84,9 +84,9 @@ function emptyResult(dayIndex: DayIndex): IndustrialSubsidyPhaseResult {
     dayIndex,
     buildings: [],
     countries: [],
-    requestedSUSD: 0,
-    paidSUSD: 0,
-    shortfallSUSD: 0,
+    requestedRUSD: 0,
+    paidRUSD: 0,
+    shortfallRUSD: 0,
     postingIds: [],
   };
 }
@@ -138,7 +138,7 @@ export function runIndustrialSubsidyPhase(
     buildingId: Id;
     countryId: Id;
     sector: BuildingDef["sector"];
-    outputValueSUSD: number;
+    outputValueRUSD: number;
     rate: number;
   }[] = [];
   for (const market of [...markets].sort((left, right) => left.marketId - right.marketId)) {
@@ -172,7 +172,7 @@ export function runIndustrialSubsidyPhase(
         buildingId: building.id,
         countryId,
         sector: definition.sector,
-        outputValueSUSD: outputValue,
+        outputValueRUSD: outputValue,
         rate,
       });
     }
@@ -187,16 +187,16 @@ export function runIndustrialSubsidyPhase(
   const buildingResults: IndustrialSubsidyBuildingResult[] = [];
   const requestedByCountry = new Map<Id, number>();
   const paidByCountry = new Map<Id, number>();
-  let requestedSUSD = 0;
-  let paidSUSD = 0;
-  let shortfallSUSD = 0;
+  let requestedRUSD = 0;
+  let paidRUSD = 0;
+  let shortfallRUSD = 0;
   for (const candidate of candidates) {
     const treasury = index.get("country", candidate.countryId, "treasury-cash");
     if (!cashByCountry.has(candidate.countryId)) {
-      cashByCountry.set(candidate.countryId, treasury.balanceSUSD);
+      cashByCountry.set(candidate.countryId, treasury.balanceRUSD);
     }
     let cash = cashByCountry.get(candidate.countryId) ?? 0;
-    const entitlement = candidate.outputValueSUSD * candidate.rate;
+    const entitlement = candidate.outputValueRUSD * candidate.rate;
     const paid = Math.min(entitlement, cash);
     const shortfall = Math.max(0, entitlement - paid);
     requestedByCountry.set(
@@ -207,9 +207,9 @@ export function runIndustrialSubsidyPhase(
       candidate.countryId,
       (paidByCountry.get(candidate.countryId) ?? 0) + paid,
     );
-    requestedSUSD += entitlement;
-    paidSUSD += paid;
-    shortfallSUSD += shortfall;
+    requestedRUSD += entitlement;
+    paidRUSD += paid;
+    shortfallRUSD += shortfall;
     if (paid > toleranceMoney(paid)) {
       const buildingCash = index.get("building", candidate.buildingId, "operating-cash");
       const subsidyRevenue = index.get("building", candidate.buildingId, "subsidy-revenue");
@@ -217,10 +217,10 @@ export function runIndustrialSubsidyPhase(
       entries.push({
         transactionKind: "production-subsidy",
         lines: [
-          { accountId: subsidyExpense.id, side: "debit", amountSUSD: paid },
-          { accountId: treasury.id, side: "credit", amountSUSD: paid },
-          { accountId: buildingCash.id, side: "debit", amountSUSD: paid },
-          { accountId: subsidyRevenue.id, side: "credit", amountSUSD: paid },
+          { accountId: subsidyExpense.id, side: "debit", amountRUSD: paid },
+          { accountId: treasury.id, side: "credit", amountRUSD: paid },
+          { accountId: buildingCash.id, side: "debit", amountRUSD: paid },
+          { accountId: subsidyRevenue.id, side: "credit", amountRUSD: paid },
         ],
         sourceEntityId: candidate.countryId,
         targetEntityId: candidate.buildingId,
@@ -232,11 +232,11 @@ export function runIndustrialSubsidyPhase(
       buildingId: candidate.buildingId,
       countryId: candidate.countryId,
       sector: candidate.sector,
-      outputValueSUSD: candidate.outputValueSUSD,
+      outputValueRUSD: candidate.outputValueRUSD,
       rate: candidate.rate,
-      entitlementSUSD: entitlement,
-      paidSUSD: paid,
-      shortfallSUSD: shortfall,
+      entitlementRUSD: entitlement,
+      paidRUSD: paid,
+      shortfallRUSD: shortfall,
     });
   }
   for (const [countryId, requested] of [...requestedByCountry.entries()].sort(
@@ -244,8 +244,8 @@ export function runIndustrialSubsidyPhase(
   )) {
     const paid = paidByCountry.get(countryId) ?? 0;
     accumulateBudgetMemo(stagedFinance, countryId, {
-      subsidyRequestedSUSD: requested,
-      subsidyShortfallSUSD: Math.max(0, requested - paid),
+      subsidyRequestedRUSD: requested,
+      subsidyShortfallRUSD: Math.max(0, requested - paid),
     });
   }
   const postings = postJournalBatch(stagedFinance, dayIndex, entries);
@@ -265,14 +265,14 @@ export function runIndustrialSubsidyPhase(
     countries: [...requestedByCountry.entries()]
       .map(([countryId, requested]) => ({
         countryId,
-        requestedSUSD: requested,
-        paidSUSD: paidByCountry.get(countryId) ?? 0,
-        shortfallSUSD: Math.max(0, requested - (paidByCountry.get(countryId) ?? 0)),
+        requestedRUSD: requested,
+        paidRUSD: paidByCountry.get(countryId) ?? 0,
+        shortfallRUSD: Math.max(0, requested - (paidByCountry.get(countryId) ?? 0)),
       }))
       .sort((left, right) => left.countryId - right.countryId),
-    requestedSUSD,
-    paidSUSD,
-    shortfallSUSD,
+    requestedRUSD,
+    paidRUSD,
+    shortfallRUSD,
     postingIds: postings.map((posting) => posting.id),
   };
 }

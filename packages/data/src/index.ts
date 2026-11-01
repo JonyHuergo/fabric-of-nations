@@ -1,5 +1,5 @@
 /**
- * Century static content package.
+ * Fabric of Nations static content package.
  *
  * Static data is canonical JSON under `packages/data/data` and is loaded by
  * explicit loader functions. M5 adds the source-annotated historical pipeline in

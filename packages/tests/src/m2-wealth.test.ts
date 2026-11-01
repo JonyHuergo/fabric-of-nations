@@ -1,5 +1,5 @@
 import {
-  MONEY_TOLERANCE_SUSD,
+  MONEY_TOLERANCE_RUSD,
   WEALTH_INTERCEPT,
   WEALTH_MAX,
   WEALTH_MIN,
@@ -191,7 +191,7 @@ describe("M2 wealth and militancy", () => {
       expect(Number.isFinite(update.newWealthLevel)).toBe(true);
       expect(update.newWealthLevel).toBeGreaterThanOrEqual(WEALTH_MIN);
       expect(update.newWealthLevel).toBeLessThanOrEqual(WEALTH_MAX);
-      expect(update.annualSubsistenceCostPerCapitaSUSD).toBeGreaterThan(0);
+      expect(update.annualSubsistenceCostPerCapitaRUSD).toBeGreaterThan(0);
     }
     updateDailyMilitancy(world, needs);
     for (const block of world.popBlocks) {
@@ -201,14 +201,14 @@ describe("M2 wealth and militancy", () => {
     }
   });
 
-  test("budget quantities use SUSD without mutating account balances", () => {
+  test("budget quantities use RUSD without mutating account balances", () => {
     const { scenario, world } = multiBlockWorld();
-    const before = world.finance.accounts.map((account) => account.balanceSUSD);
+    const before = world.finance.accounts.map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2]);
     const result = tick(world, contextFor(scenario, inputs));
-    expect(result.population?.needs.blocks.every((block) => block.spentSUSD >= 0)).toBe(true);
-    expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
+    expect(result.population?.needs.blocks.every((block) => block.spentRUSD >= 0)).toBe(true);
+    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
     expect(populationTotal(world.popBlocks[0]!)).toBeGreaterThan(0);
-    expect(MONEY_TOLERANCE_SUSD).toBeGreaterThan(0);
+    expect(MONEY_TOLERANCE_RUSD).toBeGreaterThan(0);
   });
 });

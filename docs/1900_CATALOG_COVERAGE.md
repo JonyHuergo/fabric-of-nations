@@ -2,7 +2,7 @@
 
 Reference date: **1 January 1900**. This document reconciles the researched
 inventory of the world's states and relevant political entities against the
-canonical Century catalog (`packages/data/data/historical/m11/polities_1900.json`).
+canonical Fabric of Nations catalog (`packages/data/data/historical/m11/polities_1900.json`).
 It is an authored historical audit, not a copy of a modern country list.
 
 ## 1. Method and sources

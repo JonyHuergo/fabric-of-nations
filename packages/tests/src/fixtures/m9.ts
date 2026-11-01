@@ -64,10 +64,10 @@ export function m9TechnologyGatedBuilding(): BuildingDef {
     inputs: [],
     outputs: [{ goodId: 0, quantityPerThroughputUnit: 400 }],
     jobs: [{ professionId: M5_PEASANTS, workersPerThroughputUnit: 50 }],
-    constructionCostSUSD: 1_000,
+    constructionCostRUSD: 1_000,
     constructionWorkers: 8,
     constructionMaterials: [],
-    dailyUpkeepSUSDAtLevelOne: 10,
+    dailyUpkeepRUSDAtLevelOne: 10,
     storageCapacityByGood: [],
     resourceRequirements: [],
     requiredTechnologyId: M9_MECHANIZED_AGRICULTURE,
@@ -115,7 +115,7 @@ export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
         femaleAgeGroups: m5AgeGroups(10_000),
         literacy: 0.95,
         wealthLevel: 60,
-        initialSavingsSUSD: 100_000,
+        initialSavingsRUSD: 100_000,
         militancy: 0.03,
       },
     ],
@@ -133,7 +133,7 @@ export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
         ...country,
         technology: {
           researchedTechnologyKeys: [...(options.researchedA ?? [])],
-          educationFundingSUSDPerYear: options.fundingA ?? M9_EDUCATION_FUNDING,
+          educationFundingRUSDPerYear: options.fundingA ?? M9_EDUCATION_FUNDING,
           researchStaffShare: options.researchShareA ?? M9_RESEARCH_SHARE,
         },
       };
@@ -143,7 +143,7 @@ export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
         ...country,
         technology: {
           researchedTechnologyKeys: [],
-          educationFundingSUSDPerYear: options.fundingB,
+          educationFundingRUSDPerYear: options.fundingB,
           researchStaffShare: 0,
         },
       };

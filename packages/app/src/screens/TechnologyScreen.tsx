@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewEducationFunding,
   previewResearchStaffShare,
   previewResearchStart,
@@ -16,7 +16,7 @@ import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
-const MAX_ANNUAL_FUNDING_SUSD = 1e15;
+const MAX_ANNUAL_FUNDING_RUSD = 1e15;
 
 /**
  * The worker rejects education funding only for non-finite/negative values or the
@@ -25,15 +25,15 @@ const MAX_ANNUAL_FUNDING_SUSD = 1e15;
  * always includes the current policy value so it remains representable).
  */
 function annualFundingCeiling(
-  currentAnnualSUSD: number,
-  treasuryCashSUSD: number,
+  currentAnnualRUSD: number,
+  treasuryCashRUSD: number,
 ): number {
-  const affordable = Number.isFinite(treasuryCashSUSD)
-    ? Math.max(0, treasuryCashSUSD) * 365
+  const affordable = Number.isFinite(treasuryCashRUSD)
+    ? Math.max(0, treasuryCashRUSD) * 365
     : 0;
   return Math.min(
-    MAX_ANNUAL_FUNDING_SUSD,
-    Math.max(1_000, currentAnnualSUSD, affordable),
+    MAX_ANNUAL_FUNDING_RUSD,
+    Math.max(1_000, currentAnnualRUSD, affordable),
   );
 }
 
@@ -62,12 +62,12 @@ export function TechnologyScreen({
 
   useEffect(() => {
     if (country === null) return;
-    setFundingText(country.education.fundedAnnualSUSD.toFixed(0));
+    setFundingText(country.education.fundedAnnualRUSD.toFixed(0));
     setShareText(country.education.researchStaffShare.toFixed(2));
     setSelectedTechnologyId(null);
   }, [
     countryId,
-    country?.education.fundedAnnualSUSD,
+    country?.education.fundedAnnualRUSD,
     country?.education.researchStaffShare,
   ]);
 
@@ -78,14 +78,14 @@ export function TechnologyScreen({
   const parsedFunding = Number(fundingText);
   const parsedShare = Number(shareText);
 
-  const applyFunding = (annualSUSD?: number): void => {
+  const applyFunding = (annualRUSD?: number): void => {
     if (country === null) return;
     if (!isPlayerCountry) {
       setLocalError("Only the player-controlled country may set education funding.");
       return;
     }
     if (!country.technology.enabled) return;
-    const target = annualSUSD ?? parsedFunding;
+    const target = annualRUSD ?? parsedFunding;
     const preview = previewEducationFunding(snapshot, country, target);
     if (!preview.valid) {
       setLocalError(preview.errors.join(" "));
@@ -95,7 +95,7 @@ export function TechnologyScreen({
     applyAction({
       kind: "set-education-funding",
       countryId: country.id,
-      annualSUSD: target,
+      annualRUSD: target,
     });
   };
 
@@ -147,8 +147,8 @@ export function TechnologyScreen({
   const fundingPreview = previewEducationFunding(snapshot, country, parsedFunding);
   const sharePreview = previewResearchStaffShare(snapshot, country, parsedShare);
   const fundingLimit = annualFundingCeiling(
-    country.education.fundedAnnualSUSD,
-    country.treasuryCashSUSD,
+    country.education.fundedAnnualRUSD,
+    country.treasuryCashRUSD,
   );
   const fundingStep = Math.max(1, Math.round(fundingLimit / 100));
   const statusById = new Map(
@@ -261,8 +261,8 @@ export function TechnologyScreen({
         />
         <StatRow
           label="Funding (this month)"
-          value={`${formatSUSD(country.education.fundedAnnualSUSD)}/yr`}
-          detail={`Requested ${formatSUSD(country.education.fundingRequestedMonthToDateSUSD)} · shortfall ${formatSUSD(country.education.fundingShortfallMonthToDateSUSD)}`}
+          value={`${formatRUSD(country.education.fundedAnnualRUSD)}/yr`}
+          detail={`Requested ${formatRUSD(country.education.fundingRequestedMonthToDateRUSD)} · shortfall ${formatRUSD(country.education.fundingShortfallMonthToDateRUSD)}`}
         />
         {country.education.educationBlockedReason === null ? null : (
           <Text style={styles.detail}>
@@ -280,7 +280,7 @@ export function TechnologyScreen({
           max={fundingLimit}
           step={fundingStep}
           precision={0}
-          unit="SUSD/yr"
+          unit="RUSD/yr"
           disabled={!isPlayerCountry || connection !== "ready"}
           pending={fundingCommit.hasPending}
           onChange={(value) => setFundingText(value.toFixed(0))}
@@ -296,8 +296,8 @@ export function TechnologyScreen({
           />
         </View>
         <Text style={styles.detail}>
-          Daily request {formatSUSD(fundingPreview.dailyRequestSUSD)}; treasury cash{" "}
-          {formatSUSD(country.treasuryCashSUSD)}. Funding also pays research staff.
+          Daily request {formatRUSD(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
+          {formatRUSD(country.treasuryCashRUSD)}. Funding also pays research staff.
         </Text>
         <SliderField
           label="Research staff share"

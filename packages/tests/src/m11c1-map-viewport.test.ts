@@ -54,15 +54,15 @@ describe("M11c.1 map viewport", () => {
   });
 
   test("pointer-to-viewBox conversion handles letterboxing", () => {
-    const size = { width: 1400, height: 500 };
+    const size = { width: 1400, height: MAP_HEIGHT };
     expect(viewportScale(size)).toBe(1);
-    expect(screenPointToViewBox(700, 250, size, 1)).toEqual({ x: 500, y: 250 });
-    const offCentre = screenPointToViewBox(900, 250, size, 1);
+    expect(screenPointToViewBox(700, MAP_HEIGHT / 2, size, 1)).toEqual({ x: 500, y: MAP_HEIGHT / 2 });
+    const offCentre = screenPointToViewBox(900, MAP_HEIGHT / 2, size, 1);
     expect(offCentre?.x).toBeCloseTo(700, 6);
     expect(screenPointToViewBox(700, 250, { width: 0, height: 0 }, 1)).toBeNull();
-    const letterboxed = { width: 1000, height: 600 };
-    const point = screenPointToViewBox(500, 300, letterboxed, viewportScale(letterboxed));
+    const letterboxed = { width: 1000, height: MAP_HEIGHT + 100 };
+    const point = screenPointToViewBox(500, letterboxed.height / 2, letterboxed, viewportScale(letterboxed));
     expect(point?.x).toBeCloseTo(500, 6);
-    expect(point?.y).toBeCloseTo(250, 6);
+    expect(point?.y).toBeCloseTo(MAP_HEIGHT / 2, 6);
   });
 });

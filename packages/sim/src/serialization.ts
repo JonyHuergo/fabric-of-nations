@@ -77,7 +77,7 @@ import type {
   InstitutionState,
   InterestGroupState,
   StockLot,
-  SusdPerCurrencyUnit,
+  RusdPerCurrencyUnit,
   Army,
   CasusBelli,
   MilitaryState,
@@ -103,7 +103,7 @@ import {
   assertValidCountryAIPolicy,
   assertValidCountryAIState,
 } from "./economy/aiState.js";
-import { asSusdPerCurrencyUnit } from "./economy/currency.js";
+import { asRusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import { assertValidProvinceState } from "./provinces/state.js";
 import type {
@@ -220,14 +220,14 @@ export type SerializedFinancialAccount = {
   readonly ownerId: number | null;
   readonly category: AccountCategory;
   readonly subtype: AccountSubtype;
-  readonly balanceSUSD: number;
+  readonly balanceRUSD: number;
 };
 
 /** Encoded journal line. */
 export type SerializedJournalLine = {
   readonly accountId: number;
   readonly side: "debit" | "credit";
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 };
 
 /** Encoded journal posting. */
@@ -267,45 +267,45 @@ export type SerializedFinanceState = {
 
 /** Encoded E2 month-to-date budget memo for one country. */
 export type SerializedFinanceBudgetMemo = {
-  readonly welfareRequestedSUSD: number;
-  readonly welfareShortfallSUSD: number;
-  readonly businessTaxAssessedSUSD: number;
-  readonly businessTaxUncollectedSUSD: number;
-  readonly debtIssuedSUSD: number;
-  readonly principalRepaidSUSD: number;
-  readonly interestPaidSUSD: number;
-  readonly unfinancedRequirementSUSD: number;
-  readonly constructionSpentSUSD: number;
-  readonly constructionWrittenOffSUSD: number;
-  readonly constructionMaterialsSpentSUSD: number;
-  readonly subsidyRequestedSUSD: number;
-  readonly subsidyShortfallSUSD: number;
-  readonly publicEnterpriseSupportSUSD: number;
+  readonly welfareRequestedRUSD: number;
+  readonly welfareShortfallRUSD: number;
+  readonly businessTaxAssessedRUSD: number;
+  readonly businessTaxUncollectedRUSD: number;
+  readonly debtIssuedRUSD: number;
+  readonly principalRepaidRUSD: number;
+  readonly interestPaidRUSD: number;
+  readonly unfinancedRequirementRUSD: number;
+  readonly constructionSpentRUSD: number;
+  readonly constructionWrittenOffRUSD: number;
+  readonly constructionMaterialsSpentRUSD: number;
+  readonly subsidyRequestedRUSD: number;
+  readonly subsidyShortfallRUSD: number;
+  readonly publicEnterpriseSupportRUSD: number;
   readonly businessTaxAssessedDay: number | null;
 };
 
 /** Encoded E2 per-country budget decomposition. Zero fields may be omitted. */
 export type SerializedFinanceBudgetTotals = {
-  readonly welfareRequestedSUSD?: number;
-  readonly welfareShortfallSUSD?: number;
-  readonly businessTaxAssessedSUSD?: number;
-  readonly businessTaxUncollectedSUSD?: number;
-  readonly debtIssuedSUSD?: number;
-  readonly principalRepaidSUSD?: number;
-  readonly interestPaidSUSD?: number;
-  readonly unfinancedRequirementSUSD?: number;
-  readonly constructionSpentSUSD?: number;
-  readonly constructionWrittenOffSUSD?: number;
-  readonly constructionMaterialsSpentSUSD?: number;
-  readonly subsidyRequestedSUSD?: number;
-  readonly subsidyShortfallSUSD?: number;
-  readonly publicEnterpriseSupportSUSD?: number;
-  readonly administrationRequestedSUSD?: number;
-  readonly administrationShortfallSUSD?: number;
-  readonly educationRequestedSUSD?: number;
-  readonly educationShortfallSUSD?: number;
-  readonly trainingRequestedSUSD?: number;
-  readonly trainingShortfallSUSD?: number;
+  readonly welfareRequestedRUSD?: number;
+  readonly welfareShortfallRUSD?: number;
+  readonly businessTaxAssessedRUSD?: number;
+  readonly businessTaxUncollectedRUSD?: number;
+  readonly debtIssuedRUSD?: number;
+  readonly principalRepaidRUSD?: number;
+  readonly interestPaidRUSD?: number;
+  readonly unfinancedRequirementRUSD?: number;
+  readonly constructionSpentRUSD?: number;
+  readonly constructionWrittenOffRUSD?: number;
+  readonly constructionMaterialsSpentRUSD?: number;
+  readonly subsidyRequestedRUSD?: number;
+  readonly subsidyShortfallRUSD?: number;
+  readonly publicEnterpriseSupportRUSD?: number;
+  readonly administrationRequestedRUSD?: number;
+  readonly administrationShortfallRUSD?: number;
+  readonly educationRequestedRUSD?: number;
+  readonly educationShortfallRUSD?: number;
+  readonly trainingRequestedRUSD?: number;
+  readonly trainingShortfallRUSD?: number;
 };
 
 /** Encoded E4 construction/commissioning material requirement. */
@@ -326,11 +326,11 @@ export type SerializedConstructionProject = {
   readonly startedDay: number | null;
   readonly completedDay: number | null;
   readonly cancelledDay: number | null;
-  readonly totalCostSUSD: number;
-  readonly workingCapitalSUSD: number;
-  readonly workingCapitalPaidSUSD: number;
-  readonly spentSUSD: number;
-  readonly materialsSpentSUSD: number;
+  readonly totalCostRUSD: number;
+  readonly workingCapitalRUSD: number;
+  readonly workingCapitalPaidRUSD: number;
+  readonly spentRUSD: number;
+  readonly materialsSpentRUSD: number;
   readonly materials: readonly SerializedConstructionMaterial[];
   readonly lastWorkers: number;
   readonly blockedReason: "labor" | "funds" | "materials" | null;
@@ -342,8 +342,8 @@ export type SerializedConstructionHistoryAggregate = {
   readonly countryId: number;
   readonly projectsCompleted: number;
   readonly projectsCancelled: number;
-  readonly totalSpentSUSD: number;
-  readonly totalWrittenOffSUSD: number;
+  readonly totalSpentRUSD: number;
+  readonly totalWrittenOffRUSD: number;
 };
 
 /** Encoded E3 construction state. */
@@ -356,17 +356,17 @@ export type SerializedConstructionState = {
 
 /** Encoded per-country fiscal totals retained by a compacted summary. Zero fields may be omitted. */
 export type SerializedCountryFiscalTotals = {
-  readonly incomeTaxRevenueSUSD?: number;
-  readonly businessTaxRevenueSUSD?: number;
-  readonly welfareExpenseSUSD?: number;
-  readonly interestExpenseSUSD?: number;
-  readonly subsidyExpenseSUSD?: number;
-  readonly administrationExpenseSUSD?: number;
-  readonly educationExpenseSUSD?: number;
-  readonly trainingExpenseSUSD?: number;
-  readonly militaryExpenseSUSD?: number;
-  readonly customsDutyRevenueSUSD?: number;
-  readonly netFiscalResultSUSD?: number;
+  readonly incomeTaxRevenueRUSD?: number;
+  readonly businessTaxRevenueRUSD?: number;
+  readonly welfareExpenseRUSD?: number;
+  readonly interestExpenseRUSD?: number;
+  readonly subsidyExpenseRUSD?: number;
+  readonly administrationExpenseRUSD?: number;
+  readonly educationExpenseRUSD?: number;
+  readonly trainingExpenseRUSD?: number;
+  readonly militaryExpenseRUSD?: number;
+  readonly customsDutyRevenueRUSD?: number;
+  readonly netFiscalResultRUSD?: number;
 };
 
 /** Encoded aggregate of compacted terminated debt contracts. */
@@ -374,10 +374,10 @@ export type SerializedDebtHistoryAggregate = {
   readonly issuerCountryId: number;
   readonly contractsRetired: number;
   readonly contractsDefaulted: number;
-  readonly principalIssuedSUSD: number;
-  readonly principalRepaidSUSD: number;
-  readonly principalWrittenOffSUSD: number;
-  readonly interestWrittenOffSUSD: number;
+  readonly principalIssuedRUSD: number;
+  readonly principalRepaidRUSD: number;
+  readonly principalWrittenOffRUSD: number;
+  readonly interestWrittenOffRUSD: number;
 };
 
 /**
@@ -408,9 +408,9 @@ export type SerializedAnnualFinanceSummary = {
     Record<
       string,
       {
-        readonly treasuryCashSUSD: number;
-        readonly debtLiabilitySUSD: number;
-        readonly interestPayableSUSD: number;
+        readonly treasuryCashRUSD: number;
+        readonly debtLiabilityRUSD: number;
+        readonly interestPayableRUSD: number;
       }
     >
   >;
@@ -427,7 +427,7 @@ export type SerializedFinanceCorrection = {
   readonly lines: readonly {
     readonly accountId: number;
     readonly side: "debit" | "credit";
-    readonly amountSUSD: number;
+    readonly amountRUSD: number;
   }[];
 };
 
@@ -454,11 +454,11 @@ export type SerializedMonetaryArrangement =
 /** Encoded fiscal policy. */
 export type SerializedFiscalPolicy = {
   readonly incomeTaxRate: number;
-  readonly incomeTaxAllowanceSUSDPerYear: number;
-  readonly welfareBudgetSUSDPerYear: number;
+  readonly incomeTaxAllowanceRUSDPerYear: number;
+  readonly welfareBudgetRUSDPerYear: number;
   readonly welfareMaxWealthLevel: number;
   readonly businessProfitTaxRate: number;
-  readonly reserveTargetSUSD: number;
+  readonly reserveTargetRUSD: number;
 };
 
 /** Encoded M5a profit-allocation policy. */
@@ -488,7 +488,7 @@ export type SerializedDebtPolicy = {
   readonly creditorId: number;
   readonly annualCouponRate: number;
   readonly termDays: number;
-  readonly maxOutstandingPrincipalSUSD: number;
+  readonly maxOutstandingPrincipalRUSD: number;
   readonly refinanceOnMaturity: boolean;
   readonly arrearsGraceDays: number;
 };
@@ -500,12 +500,12 @@ export type SerializedDebtContract = {
   readonly issuerCountryId: number;
   readonly holderKind: "country" | "popBlock";
   readonly holderId: number;
-  readonly principalSUSD: number;
-  readonly outstandingPrincipalSUSD: number;
+  readonly principalRUSD: number;
+  readonly outstandingPrincipalRUSD: number;
   readonly annualCouponRate: number;
   readonly issueDay: number;
   readonly maturityDay: number;
-  readonly accruedInterestSUSD: number;
+  readonly accruedInterestRUSD: number;
   readonly status: "active" | "arrears" | "repaid" | "defaulted";
   readonly arrearsSinceDay: number | null;
 };
@@ -550,15 +550,15 @@ export type SerializedInterestGroupState = {
 };
 
 export type SerializedInstitutionState = {
-  readonly fundedAnnualSUSD: number;
+  readonly fundedAnnualRUSD: number;
   readonly staffedByProfession: Readonly<Record<string, number>>;
   readonly serviceOutputIndex: number;
   readonly quality: number;
   readonly overload: number;
   readonly disruptionUntilDay: number | null;
   readonly lastUpdateDay: number | null;
-  readonly fundingRequestedMonthToDateSUSD: number;
-  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly fundingRequestedMonthToDateRUSD: number;
+  readonly fundingShortfallMonthToDateRUSD: number;
 };
 
 export type SerializedLawTransition = {
@@ -624,22 +624,22 @@ export type SerializedCountryTechnology = {
 
 /** Encoded M9 per-country education policy state. */
 export type SerializedEducationState = {
-  readonly fundedAnnualSUSD: number;
+  readonly fundedAnnualRUSD: number;
   readonly researchStaffShare: number;
   readonly lastUpdateDay: number | null;
-  readonly fundingRequestedMonthToDateSUSD: number;
-  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly fundingRequestedMonthToDateRUSD: number;
+  readonly fundingShortfallMonthToDateRUSD: number;
 };
 
 /** Encoded E5 per-country labor/training policy state. */
 export type SerializedLaborPolicyState = {
-  readonly trainingBudgetSUSDPerYear: number;
-  readonly trainingStipendPerTraineeSUSDPerYear: number;
+  readonly trainingBudgetRUSDPerYear: number;
+  readonly trainingStipendPerTraineeRUSDPerYear: number;
   readonly trainingStaffShare: number;
   readonly trainingParticipation: number;
   readonly lastUpdateDay: number | null;
-  readonly trainingRequestedMonthToDateSUSD: number;
-  readonly trainingShortfallMonthToDateSUSD: number;
+  readonly trainingRequestedMonthToDateRUSD: number;
+  readonly trainingShortfallMonthToDateRUSD: number;
 };
 
 /** Encoded E6a per-country trade policy and month-to-date memo. */
@@ -649,11 +649,11 @@ export type SerializedTradePolicyState = {
   readonly importQuotaUsedQuantity: readonly number[];
   readonly exportRestricted: readonly boolean[];
   readonly lastUpdateDay: number | null;
-  readonly exportsValueMonthToDateSUSD: number;
-  readonly importsValueMonthToDateSUSD: number;
-  readonly dutyReceivedMonthToDateSUSD: number;
-  readonly dutyPaidMonthToDateSUSD: number;
-  readonly freightPaidMonthToDateSUSD: number;
+  readonly exportsValueMonthToDateRUSD: number;
+  readonly importsValueMonthToDateRUSD: number;
+  readonly dutyReceivedMonthToDateRUSD: number;
+  readonly dutyPaidMonthToDateRUSD: number;
+  readonly freightPaidMonthToDateRUSD: number;
 };
 
 /** Encoded E6a transport route. */
@@ -662,7 +662,7 @@ export type SerializedTradeRoute = {
   readonly marketAId: number;
   readonly marketBId: number;
   readonly distanceUnits: number;
-  readonly baseCapacitySUSDPerDay: number;
+  readonly baseCapacityRUSDPerDay: number;
 };
 
 /** Encoded E6a in-transit consignment. */
@@ -677,9 +677,9 @@ export type SerializedTradeShipment = {
   readonly destinationCountryId: number | null;
   readonly dispatchDay: number;
   readonly arrivalDay: number;
-  readonly cargoValueSUSD: number;
-  readonly freightCostSUSD: number;
-  readonly dutySUSD: number;
+  readonly cargoValueRUSD: number;
+  readonly freightCostRUSD: number;
+  readonly dutyRUSD: number;
   readonly dutyRate: number;
 };
 
@@ -695,9 +695,9 @@ export type SerializedTradeBlockedDiagnostic = {
 export type SerializedTradeDayReport = {
   readonly dayIndex: number;
   readonly dispatchedShipments: number;
-  readonly freightPaidSUSD: number;
-  readonly dutyPaidSUSD: number;
-  readonly ownerFundedSUSD: number;
+  readonly freightPaidRUSD: number;
+  readonly dutyPaidRUSD: number;
+  readonly ownerFundedRUSD: number;
   readonly arrivedShipments: number;
   readonly blocked: readonly SerializedTradeBlockedDiagnostic[];
 };
@@ -737,8 +737,8 @@ export type SerializedMonetaryCurrencyState = {
   readonly currencyId: number;
   readonly issuerCountryId: number | null;
   readonly regime: string;
-  readonly paritySusdPerUnit: number | null;
-  readonly referenceParitySusdPerUnit: number | null;
+  readonly parityRusdPerUnit: number | null;
+  readonly referenceParityRusdPerUnit: number | null;
   readonly currencyIssuedUnits: number;
   readonly active: boolean;
   readonly reserveAccountId: number | null;
@@ -750,8 +750,8 @@ export type SerializedMonetaryCurrencyState = {
   readonly lastParityChangeDay: number | null;
   readonly lastManagedUpdateDay: number | null;
   readonly lastMonthEndDay: number | null;
-  readonly lastMonthExportsSUSD: number;
-  readonly lastMonthImportsSUSD: number;
+  readonly lastMonthExportsRUSD: number;
+  readonly lastMonthImportsRUSD: number;
 };
 
 /** Encoded M10 army. */
@@ -851,12 +851,12 @@ export type SerializedIndustrialPolicy = {
   readonly sectorSubsidyRates: readonly number[];
 };
 
-/** Encoded SUSD-relative valuation. */
+/** Encoded RUSD-relative valuation. */
 export type SerializedCurrencyValuation =
   | {
       readonly currencyId: number;
       readonly status: "specified";
-      readonly susdPerUnit: number;
+      readonly rusdPerUnit: number;
       readonly setOnDay: number;
       readonly source: "scenario" | "policy" | "market";
     }
@@ -896,7 +896,7 @@ export type SerializedEmploymentAssignment = {
 export type SerializedMarket = {
   readonly id: number;
   readonly regionIds: readonly number[];
-  readonly priceSUSD: readonly number[];
+  readonly priceRUSD: readonly number[];
   readonly stockLots: readonly SerializedStockLot[];
   readonly customsCountryId: number | null;
 };
@@ -1168,17 +1168,17 @@ function encodeCountryFiscalTotals(
     // the bounded canonical save stays within its target as stages add lines.
     const encodedEntry: Record<string, number> = {};
     for (const field of [
-      "incomeTaxRevenueSUSD",
-      "businessTaxRevenueSUSD",
-      "welfareExpenseSUSD",
-      "interestExpenseSUSD",
-      "subsidyExpenseSUSD",
-      "administrationExpenseSUSD",
-      "educationExpenseSUSD",
-      "trainingExpenseSUSD",
-      "militaryExpenseSUSD",
-      "customsDutyRevenueSUSD",
-      "netFiscalResultSUSD",
+      "incomeTaxRevenueRUSD",
+      "businessTaxRevenueRUSD",
+      "welfareExpenseRUSD",
+      "interestExpenseRUSD",
+      "subsidyExpenseRUSD",
+      "administrationExpenseRUSD",
+      "educationExpenseRUSD",
+      "trainingExpenseRUSD",
+      "militaryExpenseRUSD",
+      "customsDutyRevenueRUSD",
+      "netFiscalResultRUSD",
     ] as const) {
       const value = entry[field] ?? 0;
       if (value !== 0) encodedEntry[field] = value;
@@ -1205,26 +1205,26 @@ function encodeBudgetTotals(
     // summary schema.
     const encodedEntry: Record<string, number> = {};
     for (const field of [
-      "welfareRequestedSUSD",
-      "welfareShortfallSUSD",
-      "businessTaxAssessedSUSD",
-      "businessTaxUncollectedSUSD",
-      "debtIssuedSUSD",
-      "principalRepaidSUSD",
-      "interestPaidSUSD",
-      "unfinancedRequirementSUSD",
-      "constructionSpentSUSD",
-      "constructionWrittenOffSUSD",
-      "constructionMaterialsSpentSUSD",
-      "subsidyRequestedSUSD",
-      "subsidyShortfallSUSD",
-      "publicEnterpriseSupportSUSD",
-      "administrationRequestedSUSD",
-      "administrationShortfallSUSD",
-      "educationRequestedSUSD",
-      "educationShortfallSUSD",
-      "trainingRequestedSUSD",
-      "trainingShortfallSUSD",
+      "welfareRequestedRUSD",
+      "welfareShortfallRUSD",
+      "businessTaxAssessedRUSD",
+      "businessTaxUncollectedRUSD",
+      "debtIssuedRUSD",
+      "principalRepaidRUSD",
+      "interestPaidRUSD",
+      "unfinancedRequirementRUSD",
+      "constructionSpentRUSD",
+      "constructionWrittenOffRUSD",
+      "constructionMaterialsSpentRUSD",
+      "subsidyRequestedRUSD",
+      "subsidyShortfallRUSD",
+      "publicEnterpriseSupportRUSD",
+      "administrationRequestedRUSD",
+      "administrationShortfallRUSD",
+      "educationRequestedRUSD",
+      "educationShortfallRUSD",
+      "trainingRequestedRUSD",
+      "trainingShortfallRUSD",
     ] as const) {
       const value = entry[field] ?? 0;
       if (value !== 0) encodedEntry[field] = value;
@@ -1306,11 +1306,11 @@ export function encodeWorld(world: World): SerializedWorld {
         treasuryAccountId: country.treasuryAccountId,
         fiscal: {
           incomeTaxRate: country.fiscal.incomeTaxRate,
-          incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
-          welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+          incomeTaxAllowanceRUSDPerYear: country.fiscal.incomeTaxAllowanceRUSDPerYear,
+          welfareBudgetRUSDPerYear: country.fiscal.welfareBudgetRUSDPerYear,
           welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
           businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
-          reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
+          reserveTargetRUSD: country.fiscal.reserveTargetRUSD,
         },
         debt: {
           enabled: country.debt.enabled,
@@ -1318,7 +1318,7 @@ export function encodeWorld(world: World): SerializedWorld {
           creditorId: country.debt.creditorId,
           annualCouponRate: country.debt.annualCouponRate,
           termDays: country.debt.termDays,
-          maxOutstandingPrincipalSUSD: country.debt.maxOutstandingPrincipalSUSD,
+          maxOutstandingPrincipalRUSD: country.debt.maxOutstandingPrincipalRUSD,
           refinanceOnMaturity: country.debt.refinanceOnMaturity,
           arrearsGraceDays: country.debt.arrearsGraceDays,
         },
@@ -1382,25 +1382,25 @@ export function encodeWorld(world: World): SerializedWorld {
           ),
         },
         education: {
-          fundedAnnualSUSD: country.education.fundedAnnualSUSD,
+          fundedAnnualRUSD: country.education.fundedAnnualRUSD,
           researchStaffShare: country.education.researchStaffShare,
           lastUpdateDay: country.education.lastUpdateDay,
-          fundingRequestedMonthToDateSUSD:
-            country.education.fundingRequestedMonthToDateSUSD,
-          fundingShortfallMonthToDateSUSD:
-            country.education.fundingShortfallMonthToDateSUSD,
+          fundingRequestedMonthToDateRUSD:
+            country.education.fundingRequestedMonthToDateRUSD,
+          fundingShortfallMonthToDateRUSD:
+            country.education.fundingShortfallMonthToDateRUSD,
         },
         labor: {
-          trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
-          trainingStipendPerTraineeSUSDPerYear:
-            country.labor.trainingStipendPerTraineeSUSDPerYear,
+          trainingBudgetRUSDPerYear: country.labor.trainingBudgetRUSDPerYear,
+          trainingStipendPerTraineeRUSDPerYear:
+            country.labor.trainingStipendPerTraineeRUSDPerYear,
           trainingStaffShare: country.labor.trainingStaffShare,
           trainingParticipation: country.labor.trainingParticipation,
           lastUpdateDay: country.labor.lastUpdateDay,
-          trainingRequestedMonthToDateSUSD:
-            country.labor.trainingRequestedMonthToDateSUSD,
-          trainingShortfallMonthToDateSUSD:
-            country.labor.trainingShortfallMonthToDateSUSD,
+          trainingRequestedMonthToDateRUSD:
+            country.labor.trainingRequestedMonthToDateRUSD,
+          trainingShortfallMonthToDateRUSD:
+            country.labor.trainingShortfallMonthToDateRUSD,
         },
         trade: {
           tariffRates: [...country.trade.tariffRates],
@@ -1408,11 +1408,11 @@ export function encodeWorld(world: World): SerializedWorld {
           importQuotaUsedQuantity: [...country.trade.importQuotaUsedQuantity],
           exportRestricted: [...country.trade.exportRestricted],
           lastUpdateDay: country.trade.lastUpdateDay,
-          exportsValueMonthToDateSUSD: country.trade.exportsValueMonthToDateSUSD,
-          importsValueMonthToDateSUSD: country.trade.importsValueMonthToDateSUSD,
-          dutyReceivedMonthToDateSUSD: country.trade.dutyReceivedMonthToDateSUSD,
-          dutyPaidMonthToDateSUSD: country.trade.dutyPaidMonthToDateSUSD,
-          freightPaidMonthToDateSUSD: country.trade.freightPaidMonthToDateSUSD,
+          exportsValueMonthToDateRUSD: country.trade.exportsValueMonthToDateRUSD,
+          importsValueMonthToDateRUSD: country.trade.importsValueMonthToDateRUSD,
+          dutyReceivedMonthToDateRUSD: country.trade.dutyReceivedMonthToDateRUSD,
+          dutyPaidMonthToDateRUSD: country.trade.dutyPaidMonthToDateRUSD,
+          freightPaidMonthToDateRUSD: country.trade.freightPaidMonthToDateRUSD,
         },
       })),
     currencies: [...world.currencies]
@@ -1430,7 +1430,7 @@ export function encodeWorld(world: World): SerializedWorld {
           ? {
               currencyId: valuation.currencyId,
               status: "specified" as const,
-              susdPerUnit: valuation.susdPerUnit,
+              rusdPerUnit: valuation.rusdPerUnit,
               setOnDay: valuation.setOnDay,
               source: valuation.source,
             }
@@ -1484,7 +1484,7 @@ export function encodeWorld(world: World): SerializedWorld {
       .map((market) => ({
         id: market.id,
         regionIds: [...market.regionIds],
-        priceSUSD: [...market.priceSUSD],
+        priceRUSD: [...market.priceRUSD],
         stockLots: canonicalizeStockLots(market.stockLots).map((lot) => ({
           goodId: lot.goodId,
           ownerBuildingId: lot.ownerBuildingId,
@@ -1501,7 +1501,7 @@ export function encodeWorld(world: World): SerializedWorld {
           ownerId: account.ownerId,
           category: account.category,
           subtype: account.subtype,
-          balanceSUSD: account.balanceSUSD,
+          balanceRUSD: account.balanceRUSD,
         })),
       postings: [...world.finance.postings]
         .sort((left, right) => left.id - right.id)
@@ -1512,7 +1512,7 @@ export function encodeWorld(world: World): SerializedWorld {
           lines: posting.lines.map((line) => ({
             accountId: line.accountId,
             side: line.side,
-            amountSUSD: line.amountSUSD,
+            amountRUSD: line.amountRUSD,
           })),
           sourceEntityId: posting.sourceEntityId,
           targetEntityId: posting.targetEntityId,
@@ -1546,9 +1546,9 @@ export function encodeWorld(world: World): SerializedWorld {
               .map(([countryId, balances]) => [
                 countryId,
                 {
-                  treasuryCashSUSD: balances.treasuryCashSUSD,
-                  debtLiabilitySUSD: balances.debtLiabilitySUSD,
-                  interestPayableSUSD: balances.interestPayableSUSD,
+                  treasuryCashRUSD: balances.treasuryCashRUSD,
+                  debtLiabilityRUSD: balances.debtLiabilityRUSD,
+                  interestPayableRUSD: balances.interestPayableRUSD,
                 },
               ]),
           ),
@@ -1565,7 +1565,7 @@ export function encodeWorld(world: World): SerializedWorld {
           lines: correction.lines.map((line) => ({
             accountId: line.accountId,
             side: line.side,
-            amountSUSD: line.amountSUSD,
+            amountRUSD: line.amountRUSD,
           })),
         })),
       nextCorrectionId: world.finance.nextCorrectionId,
@@ -1577,12 +1577,12 @@ export function encodeWorld(world: World): SerializedWorld {
           issuerCountryId: contract.issuerCountryId,
           holderKind: contract.holderKind,
           holderId: contract.holderId,
-          principalSUSD: contract.principalSUSD,
-          outstandingPrincipalSUSD: contract.outstandingPrincipalSUSD,
+          principalRUSD: contract.principalRUSD,
+          outstandingPrincipalRUSD: contract.outstandingPrincipalRUSD,
           annualCouponRate: contract.annualCouponRate,
           issueDay: contract.issueDay,
           maturityDay: contract.maturityDay,
-          accruedInterestSUSD: contract.accruedInterestSUSD,
+          accruedInterestRUSD: contract.accruedInterestRUSD,
           status: contract.status,
           arrearsSinceDay: contract.arrearsSinceDay,
         })),
@@ -1592,10 +1592,10 @@ export function encodeWorld(world: World): SerializedWorld {
           issuerCountryId: aggregate.issuerCountryId,
           contractsRetired: aggregate.contractsRetired,
           contractsDefaulted: aggregate.contractsDefaulted,
-          principalIssuedSUSD: aggregate.principalIssuedSUSD,
-          principalRepaidSUSD: aggregate.principalRepaidSUSD,
-          principalWrittenOffSUSD: aggregate.principalWrittenOffSUSD,
-          interestWrittenOffSUSD: aggregate.interestWrittenOffSUSD,
+          principalIssuedRUSD: aggregate.principalIssuedRUSD,
+          principalRepaidRUSD: aggregate.principalRepaidRUSD,
+          principalWrittenOffRUSD: aggregate.principalWrittenOffRUSD,
+          interestWrittenOffRUSD: aggregate.interestWrittenOffRUSD,
         })),
       nextContractId: world.finance.nextContractId,
       budgetMemosThisMonth: Object.fromEntries(
@@ -1604,26 +1604,26 @@ export function encodeWorld(world: World): SerializedWorld {
           .map(([countryId, memo]) => [
             countryId,
             {
-              welfareRequestedSUSD: memo.welfareRequestedSUSD,
-              welfareShortfallSUSD: memo.welfareShortfallSUSD,
-              businessTaxAssessedSUSD: memo.businessTaxAssessedSUSD,
-              businessTaxUncollectedSUSD: memo.businessTaxUncollectedSUSD,
-              debtIssuedSUSD: memo.debtIssuedSUSD,
-              principalRepaidSUSD: memo.principalRepaidSUSD,
-              interestPaidSUSD: memo.interestPaidSUSD,
-              unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
-              constructionSpentSUSD: memo.constructionSpentSUSD,
-              constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
-              constructionMaterialsSpentSUSD: memo.constructionMaterialsSpentSUSD,
-              subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
-              subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
-              publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
-              administrationRequestedSUSD: memo.administrationRequestedSUSD ?? 0,
-              administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
-              educationRequestedSUSD: memo.educationRequestedSUSD ?? 0,
-              educationShortfallSUSD: memo.educationShortfallSUSD ?? 0,
-              trainingRequestedSUSD: memo.trainingRequestedSUSD ?? 0,
-              trainingShortfallSUSD: memo.trainingShortfallSUSD ?? 0,
+              welfareRequestedRUSD: memo.welfareRequestedRUSD,
+              welfareShortfallRUSD: memo.welfareShortfallRUSD,
+              businessTaxAssessedRUSD: memo.businessTaxAssessedRUSD,
+              businessTaxUncollectedRUSD: memo.businessTaxUncollectedRUSD,
+              debtIssuedRUSD: memo.debtIssuedRUSD,
+              principalRepaidRUSD: memo.principalRepaidRUSD,
+              interestPaidRUSD: memo.interestPaidRUSD,
+              unfinancedRequirementRUSD: memo.unfinancedRequirementRUSD,
+              constructionSpentRUSD: memo.constructionSpentRUSD,
+              constructionWrittenOffRUSD: memo.constructionWrittenOffRUSD,
+              constructionMaterialsSpentRUSD: memo.constructionMaterialsSpentRUSD,
+              subsidyRequestedRUSD: memo.subsidyRequestedRUSD,
+              subsidyShortfallRUSD: memo.subsidyShortfallRUSD,
+              publicEnterpriseSupportRUSD: memo.publicEnterpriseSupportRUSD,
+              administrationRequestedRUSD: memo.administrationRequestedRUSD ?? 0,
+              administrationShortfallRUSD: memo.administrationShortfallRUSD ?? 0,
+              educationRequestedRUSD: memo.educationRequestedRUSD ?? 0,
+              educationShortfallRUSD: memo.educationShortfallRUSD ?? 0,
+              trainingRequestedRUSD: memo.trainingRequestedRUSD ?? 0,
+              trainingShortfallRUSD: memo.trainingShortfallRUSD ?? 0,
               businessTaxAssessedDay: memo.businessTaxAssessedDay,
             },
           ]),
@@ -1649,11 +1649,11 @@ export function encodeWorld(world: World): SerializedWorld {
           startedDay: project.startedDay,
           completedDay: project.completedDay,
           cancelledDay: project.cancelledDay,
-          totalCostSUSD: project.totalCostSUSD,
-          workingCapitalSUSD: project.workingCapitalSUSD,
-          workingCapitalPaidSUSD: project.workingCapitalPaidSUSD,
-          spentSUSD: project.spentSUSD,
-          materialsSpentSUSD: project.materialsSpentSUSD,
+          totalCostRUSD: project.totalCostRUSD,
+          workingCapitalRUSD: project.workingCapitalRUSD,
+          workingCapitalPaidRUSD: project.workingCapitalPaidRUSD,
+          spentRUSD: project.spentRUSD,
+          materialsSpentRUSD: project.materialsSpentRUSD,
           materials: [...project.materials]
             .sort((left, right) => left.goodId - right.goodId)
             .map((material) => ({
@@ -1671,8 +1671,8 @@ export function encodeWorld(world: World): SerializedWorld {
           countryId: aggregate.countryId,
           projectsCompleted: aggregate.projectsCompleted,
           projectsCancelled: aggregate.projectsCancelled,
-          totalSpentSUSD: aggregate.totalSpentSUSD,
-          totalWrittenOffSUSD: aggregate.totalWrittenOffSUSD,
+          totalSpentRUSD: aggregate.totalSpentRUSD,
+          totalWrittenOffRUSD: aggregate.totalWrittenOffRUSD,
         })),
       nextProjectId: world.construction.nextProjectId,
       nextBuildingId: world.construction.nextBuildingId,
@@ -1699,7 +1699,7 @@ export function encodeWorld(world: World): SerializedWorld {
           marketAId: route.marketAId,
           marketBId: route.marketBId,
           distanceUnits: route.distanceUnits,
-          baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
+          baseCapacityRUSDPerDay: route.baseCapacityRUSDPerDay,
         })),
       shipments: [...world.trade.shipments]
         .sort((left, right) => left.id - right.id)
@@ -1714,9 +1714,9 @@ export function encodeWorld(world: World): SerializedWorld {
           destinationCountryId: shipment.destinationCountryId,
           dispatchDay: shipment.dispatchDay,
           arrivalDay: shipment.arrivalDay,
-          cargoValueSUSD: shipment.cargoValueSUSD,
-          freightCostSUSD: shipment.freightCostSUSD,
-          dutySUSD: shipment.dutySUSD,
+          cargoValueRUSD: shipment.cargoValueRUSD,
+          freightCostRUSD: shipment.freightCostRUSD,
+          dutyRUSD: shipment.dutyRUSD,
           dutyRate: shipment.dutyRate,
         })),
       nextShipmentId: world.trade.nextShipmentId,
@@ -1727,9 +1727,9 @@ export function encodeWorld(world: World): SerializedWorld {
           : {
               dayIndex: world.trade.lastDay.dayIndex,
               dispatchedShipments: world.trade.lastDay.dispatchedShipments,
-              freightPaidSUSD: world.trade.lastDay.freightPaidSUSD,
-              dutyPaidSUSD: world.trade.lastDay.dutyPaidSUSD,
-              ownerFundedSUSD: world.trade.lastDay.ownerFundedSUSD,
+              freightPaidRUSD: world.trade.lastDay.freightPaidRUSD,
+              dutyPaidRUSD: world.trade.lastDay.dutyPaidRUSD,
+              ownerFundedRUSD: world.trade.lastDay.ownerFundedRUSD,
               arrivedShipments: world.trade.lastDay.arrivedShipments,
               blocked: world.trade.lastDay.blocked.map((entry) => ({
                 originMarketId: entry.originMarketId,
@@ -1767,8 +1767,8 @@ export function encodeWorld(world: World): SerializedWorld {
           currencyId: record.currencyId,
           issuerCountryId: record.issuerCountryId,
           regime: record.regime,
-          paritySusdPerUnit: record.paritySusdPerUnit,
-          referenceParitySusdPerUnit: record.referenceParitySusdPerUnit,
+          parityRusdPerUnit: record.parityRusdPerUnit,
+          referenceParityRusdPerUnit: record.referenceParityRusdPerUnit,
           currencyIssuedUnits: record.currencyIssuedUnits,
           active: record.active,
           reserveAccountId: record.reserveAccountId,
@@ -1780,8 +1780,8 @@ export function encodeWorld(world: World): SerializedWorld {
           lastParityChangeDay: record.lastParityChangeDay,
           lastManagedUpdateDay: record.lastManagedUpdateDay,
           lastMonthEndDay: record.lastMonthEndDay,
-          lastMonthExportsSUSD: record.lastMonthExportsSUSD,
-          lastMonthImportsSUSD: record.lastMonthImportsSUSD,
+          lastMonthExportsRUSD: record.lastMonthExportsRUSD,
+          lastMonthImportsRUSD: record.lastMonthImportsRUSD,
         })),
       lastUpdateDay: world.monetary.lastUpdateDay,
     },
@@ -1965,17 +1965,17 @@ function decodeCountryFiscalTotals(
         ? 0
         : requireFiniteNumber(entry[field], `${path}[${key}].${field}`);
     totals[countryId] = {
-      incomeTaxRevenueSUSD: optionalNumber("incomeTaxRevenueSUSD"),
-      businessTaxRevenueSUSD: optionalNumber("businessTaxRevenueSUSD"),
-      welfareExpenseSUSD: optionalNumber("welfareExpenseSUSD"),
-      interestExpenseSUSD: optionalNumber("interestExpenseSUSD"),
-      subsidyExpenseSUSD: optionalNumber("subsidyExpenseSUSD"),
-      administrationExpenseSUSD: optionalNumber("administrationExpenseSUSD"),
-      educationExpenseSUSD: optionalNumber("educationExpenseSUSD"),
-      trainingExpenseSUSD: optionalNumber("trainingExpenseSUSD"),
-      militaryExpenseSUSD: optionalNumber("militaryExpenseSUSD"),
-      customsDutyRevenueSUSD: optionalNumber("customsDutyRevenueSUSD"),
-      netFiscalResultSUSD: optionalNumber("netFiscalResultSUSD"),
+      incomeTaxRevenueRUSD: optionalNumber("incomeTaxRevenueRUSD"),
+      businessTaxRevenueRUSD: optionalNumber("businessTaxRevenueRUSD"),
+      welfareExpenseRUSD: optionalNumber("welfareExpenseRUSD"),
+      interestExpenseRUSD: optionalNumber("interestExpenseRUSD"),
+      subsidyExpenseRUSD: optionalNumber("subsidyExpenseRUSD"),
+      administrationExpenseRUSD: optionalNumber("administrationExpenseRUSD"),
+      educationExpenseRUSD: optionalNumber("educationExpenseRUSD"),
+      trainingExpenseRUSD: optionalNumber("trainingExpenseRUSD"),
+      militaryExpenseRUSD: optionalNumber("militaryExpenseRUSD"),
+      customsDutyRevenueRUSD: optionalNumber("customsDutyRevenueRUSD"),
+      netFiscalResultRUSD: optionalNumber("netFiscalResultRUSD"),
     };
   }
   return totals;
@@ -2001,26 +2001,26 @@ function decodeBudgetTotals(
         ? 0
         : requireFiniteNumber(entry[field], `${path}[${key}].${field}`);
     totals[countryId] = {
-      welfareRequestedSUSD: optionalNumber("welfareRequestedSUSD"),
-      welfareShortfallSUSD: optionalNumber("welfareShortfallSUSD"),
-      businessTaxAssessedSUSD: optionalNumber("businessTaxAssessedSUSD"),
-      businessTaxUncollectedSUSD: optionalNumber("businessTaxUncollectedSUSD"),
-      debtIssuedSUSD: optionalNumber("debtIssuedSUSD"),
-      principalRepaidSUSD: optionalNumber("principalRepaidSUSD"),
-      interestPaidSUSD: optionalNumber("interestPaidSUSD"),
-      unfinancedRequirementSUSD: optionalNumber("unfinancedRequirementSUSD"),
-      constructionSpentSUSD: optionalNumber("constructionSpentSUSD"),
-      constructionWrittenOffSUSD: optionalNumber("constructionWrittenOffSUSD"),
-      constructionMaterialsSpentSUSD: optionalNumber("constructionMaterialsSpentSUSD"),
-      subsidyRequestedSUSD: optionalNumber("subsidyRequestedSUSD"),
-      subsidyShortfallSUSD: optionalNumber("subsidyShortfallSUSD"),
-      publicEnterpriseSupportSUSD: optionalNumber("publicEnterpriseSupportSUSD"),
-      administrationRequestedSUSD: optionalNumber("administrationRequestedSUSD"),
-      administrationShortfallSUSD: optionalNumber("administrationShortfallSUSD"),
-      educationRequestedSUSD: optionalNumber("educationRequestedSUSD"),
-      educationShortfallSUSD: optionalNumber("educationShortfallSUSD"),
-      trainingRequestedSUSD: optionalNumber("trainingRequestedSUSD"),
-      trainingShortfallSUSD: optionalNumber("trainingShortfallSUSD"),
+      welfareRequestedRUSD: optionalNumber("welfareRequestedRUSD"),
+      welfareShortfallRUSD: optionalNumber("welfareShortfallRUSD"),
+      businessTaxAssessedRUSD: optionalNumber("businessTaxAssessedRUSD"),
+      businessTaxUncollectedRUSD: optionalNumber("businessTaxUncollectedRUSD"),
+      debtIssuedRUSD: optionalNumber("debtIssuedRUSD"),
+      principalRepaidRUSD: optionalNumber("principalRepaidRUSD"),
+      interestPaidRUSD: optionalNumber("interestPaidRUSD"),
+      unfinancedRequirementRUSD: optionalNumber("unfinancedRequirementRUSD"),
+      constructionSpentRUSD: optionalNumber("constructionSpentRUSD"),
+      constructionWrittenOffRUSD: optionalNumber("constructionWrittenOffRUSD"),
+      constructionMaterialsSpentRUSD: optionalNumber("constructionMaterialsSpentRUSD"),
+      subsidyRequestedRUSD: optionalNumber("subsidyRequestedRUSD"),
+      subsidyShortfallRUSD: optionalNumber("subsidyShortfallRUSD"),
+      publicEnterpriseSupportRUSD: optionalNumber("publicEnterpriseSupportRUSD"),
+      administrationRequestedRUSD: optionalNumber("administrationRequestedRUSD"),
+      administrationShortfallRUSD: optionalNumber("administrationShortfallRUSD"),
+      educationRequestedRUSD: optionalNumber("educationRequestedRUSD"),
+      educationShortfallRUSD: optionalNumber("educationShortfallRUSD"),
+      trainingRequestedRUSD: optionalNumber("trainingRequestedRUSD"),
+      trainingShortfallRUSD: optionalNumber("trainingShortfallRUSD"),
     };
   }
   return totals;
@@ -2032,97 +2032,97 @@ function decodeBudgetMemo(
 ): FinanceBudgetMemo {
   const record = requireRecord(value, path);
   return {
-    welfareRequestedSUSD: requireFiniteNumber(
-      record.welfareRequestedSUSD,
-      `${path}.welfareRequestedSUSD`,
+    welfareRequestedRUSD: requireFiniteNumber(
+      record.welfareRequestedRUSD,
+      `${path}.welfareRequestedRUSD`,
     ),
-    welfareShortfallSUSD: requireFiniteNumber(
-      record.welfareShortfallSUSD,
-      `${path}.welfareShortfallSUSD`,
+    welfareShortfallRUSD: requireFiniteNumber(
+      record.welfareShortfallRUSD,
+      `${path}.welfareShortfallRUSD`,
     ),
-    businessTaxAssessedSUSD: requireFiniteNumber(
-      record.businessTaxAssessedSUSD,
-      `${path}.businessTaxAssessedSUSD`,
+    businessTaxAssessedRUSD: requireFiniteNumber(
+      record.businessTaxAssessedRUSD,
+      `${path}.businessTaxAssessedRUSD`,
     ),
-    businessTaxUncollectedSUSD: requireFiniteNumber(
-      record.businessTaxUncollectedSUSD,
-      `${path}.businessTaxUncollectedSUSD`,
+    businessTaxUncollectedRUSD: requireFiniteNumber(
+      record.businessTaxUncollectedRUSD,
+      `${path}.businessTaxUncollectedRUSD`,
     ),
-    debtIssuedSUSD: requireFiniteNumber(record.debtIssuedSUSD, `${path}.debtIssuedSUSD`),
-    principalRepaidSUSD: requireFiniteNumber(
-      record.principalRepaidSUSD,
-      `${path}.principalRepaidSUSD`,
+    debtIssuedRUSD: requireFiniteNumber(record.debtIssuedRUSD, `${path}.debtIssuedRUSD`),
+    principalRepaidRUSD: requireFiniteNumber(
+      record.principalRepaidRUSD,
+      `${path}.principalRepaidRUSD`,
     ),
-    interestPaidSUSD: requireFiniteNumber(record.interestPaidSUSD, `${path}.interestPaidSUSD`),
-    unfinancedRequirementSUSD: requireFiniteNumber(
-      record.unfinancedRequirementSUSD,
-      `${path}.unfinancedRequirementSUSD`,
+    interestPaidRUSD: requireFiniteNumber(record.interestPaidRUSD, `${path}.interestPaidRUSD`),
+    unfinancedRequirementRUSD: requireFiniteNumber(
+      record.unfinancedRequirementRUSD,
+      `${path}.unfinancedRequirementRUSD`,
     ),
-    constructionSpentSUSD: requireFiniteNumber(
-      record.constructionSpentSUSD,
-      `${path}.constructionSpentSUSD`,
+    constructionSpentRUSD: requireFiniteNumber(
+      record.constructionSpentRUSD,
+      `${path}.constructionSpentRUSD`,
     ),
-    constructionWrittenOffSUSD: requireFiniteNumber(
-      record.constructionWrittenOffSUSD,
-      `${path}.constructionWrittenOffSUSD`,
+    constructionWrittenOffRUSD: requireFiniteNumber(
+      record.constructionWrittenOffRUSD,
+      `${path}.constructionWrittenOffRUSD`,
     ),
-    constructionMaterialsSpentSUSD: requireFiniteNumber(
-      record.constructionMaterialsSpentSUSD,
-      `${path}.constructionMaterialsSpentSUSD`,
+    constructionMaterialsSpentRUSD: requireFiniteNumber(
+      record.constructionMaterialsSpentRUSD,
+      `${path}.constructionMaterialsSpentRUSD`,
     ),
-    subsidyRequestedSUSD: requireFiniteNumber(
-      record.subsidyRequestedSUSD,
-      `${path}.subsidyRequestedSUSD`,
+    subsidyRequestedRUSD: requireFiniteNumber(
+      record.subsidyRequestedRUSD,
+      `${path}.subsidyRequestedRUSD`,
     ),
-    subsidyShortfallSUSD: requireFiniteNumber(
-      record.subsidyShortfallSUSD,
-      `${path}.subsidyShortfallSUSD`,
+    subsidyShortfallRUSD: requireFiniteNumber(
+      record.subsidyShortfallRUSD,
+      `${path}.subsidyShortfallRUSD`,
     ),
-    publicEnterpriseSupportSUSD: requireFiniteNumber(
-      record.publicEnterpriseSupportSUSD,
-      `${path}.publicEnterpriseSupportSUSD`,
+    publicEnterpriseSupportRUSD: requireFiniteNumber(
+      record.publicEnterpriseSupportRUSD,
+      `${path}.publicEnterpriseSupportRUSD`,
     ),
-    administrationRequestedSUSD:
-      record.administrationRequestedSUSD === undefined
+    administrationRequestedRUSD:
+      record.administrationRequestedRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.administrationRequestedSUSD,
-            `${path}.administrationRequestedSUSD`,
+            record.administrationRequestedRUSD,
+            `${path}.administrationRequestedRUSD`,
           ),
-    administrationShortfallSUSD:
-      record.administrationShortfallSUSD === undefined
+    administrationShortfallRUSD:
+      record.administrationShortfallRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.administrationShortfallSUSD,
-            `${path}.administrationShortfallSUSD`,
+            record.administrationShortfallRUSD,
+            `${path}.administrationShortfallRUSD`,
           ),
-    educationRequestedSUSD:
-      record.educationRequestedSUSD === undefined
+    educationRequestedRUSD:
+      record.educationRequestedRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.educationRequestedSUSD,
-            `${path}.educationRequestedSUSD`,
+            record.educationRequestedRUSD,
+            `${path}.educationRequestedRUSD`,
           ),
-    educationShortfallSUSD:
-      record.educationShortfallSUSD === undefined
+    educationShortfallRUSD:
+      record.educationShortfallRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.educationShortfallSUSD,
-            `${path}.educationShortfallSUSD`,
+            record.educationShortfallRUSD,
+            `${path}.educationShortfallRUSD`,
           ),
-    trainingRequestedSUSD:
-      record.trainingRequestedSUSD === undefined
+    trainingRequestedRUSD:
+      record.trainingRequestedRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.trainingRequestedSUSD,
-            `${path}.trainingRequestedSUSD`,
+            record.trainingRequestedRUSD,
+            `${path}.trainingRequestedRUSD`,
           ),
-    trainingShortfallSUSD:
-      record.trainingShortfallSUSD === undefined
+    trainingShortfallRUSD:
+      record.trainingShortfallRUSD === undefined
         ? 0
         : requireFiniteNumber(
-            record.trainingShortfallSUSD,
-            `${path}.trainingShortfallSUSD`,
+            record.trainingShortfallRUSD,
+            `${path}.trainingShortfallRUSD`,
           ),
     businessTaxAssessedDay:
       record.businessTaxAssessedDay === null
@@ -2146,7 +2146,7 @@ function decodeDebtPolicy(value: unknown, path: string): DebtPolicy {
         creditorId: record.creditorId,
         annualCouponRate: record.annualCouponRate,
         termDays: record.termDays,
-        maxOutstandingPrincipalSUSD: record.maxOutstandingPrincipalSUSD,
+        maxOutstandingPrincipalRUSD: record.maxOutstandingPrincipalRUSD,
         refinanceOnMaturity: record.refinanceOnMaturity,
         arrearsGraceDays: record.arrearsGraceDays,
       },
@@ -2191,10 +2191,10 @@ function decodeDebtContract(value: unknown, path: string): DebtContract {
     issuerCountryId: requireUint32(record.issuerCountryId, `${path}.issuerCountryId`),
     holderKind: record.holderKind,
     holderId: requireUint32(record.holderId, `${path}.holderId`),
-    principalSUSD: requireFiniteNumber(record.principalSUSD, `${path}.principalSUSD`),
-    outstandingPrincipalSUSD: requireFiniteNumber(
-      record.outstandingPrincipalSUSD,
-      `${path}.outstandingPrincipalSUSD`,
+    principalRUSD: requireFiniteNumber(record.principalRUSD, `${path}.principalRUSD`),
+    outstandingPrincipalRUSD: requireFiniteNumber(
+      record.outstandingPrincipalRUSD,
+      `${path}.outstandingPrincipalRUSD`,
     ),
     annualCouponRate: requireFiniteNumber(record.annualCouponRate, `${path}.annualCouponRate`),
     issueDay: requireInteger(record.issueDay, `${path}.issueDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
@@ -2204,9 +2204,9 @@ function decodeDebtContract(value: unknown, path: string): DebtContract {
       0,
       CAMPAIGN_TERMINAL_DAY_INDEX,
     ),
-    accruedInterestSUSD: requireFiniteNumber(
-      record.accruedInterestSUSD,
-      `${path}.accruedInterestSUSD`,
+    accruedInterestRUSD: requireFiniteNumber(
+      record.accruedInterestRUSD,
+      `${path}.accruedInterestRUSD`,
     ),
     status,
     arrearsSinceDay:
@@ -2454,9 +2454,9 @@ function decodeCountryPolitics(value: unknown, path: string) {
     );
   }
   const institutions: InstitutionState = {
-    fundedAnnualSUSD: requireFiniteNumber(
-      institutionsRecord.fundedAnnualSUSD,
-      `${path}.institutions.fundedAnnualSUSD`,
+    fundedAnnualRUSD: requireFiniteNumber(
+      institutionsRecord.fundedAnnualRUSD,
+      `${path}.institutions.fundedAnnualRUSD`,
     ),
     staffedByProfession,
     serviceOutputIndex: requireFiniteNumber(
@@ -2483,13 +2483,13 @@ function decodeCountryPolitics(value: unknown, path: string) {
             0,
             CAMPAIGN_TERMINAL_DAY_INDEX,
           ),
-    fundingRequestedMonthToDateSUSD: requireFiniteNumber(
-      institutionsRecord.fundingRequestedMonthToDateSUSD,
-      `${path}.institutions.fundingRequestedMonthToDateSUSD`,
+    fundingRequestedMonthToDateRUSD: requireFiniteNumber(
+      institutionsRecord.fundingRequestedMonthToDateRUSD,
+      `${path}.institutions.fundingRequestedMonthToDateRUSD`,
     ),
-    fundingShortfallMonthToDateSUSD: requireFiniteNumber(
-      institutionsRecord.fundingShortfallMonthToDateSUSD,
-      `${path}.institutions.fundingShortfallMonthToDateSUSD`,
+    fundingShortfallMonthToDateRUSD: requireFiniteNumber(
+      institutionsRecord.fundingShortfallMonthToDateRUSD,
+      `${path}.institutions.fundingShortfallMonthToDateRUSD`,
     ),
     healthStaffShare:
       institutionsRecord.healthStaffShare === undefined
@@ -2565,7 +2565,7 @@ function decodeCountryTechnology(
 function decodeEducationState(value: unknown, path: string): EducationState {
   const record = requireRecord(value, path);
   return {
-    fundedAnnualSUSD: requireFiniteNumber(record.fundedAnnualSUSD, `${path}.fundedAnnualSUSD`),
+    fundedAnnualRUSD: requireFiniteNumber(record.fundedAnnualRUSD, `${path}.fundedAnnualRUSD`),
     researchStaffShare: requireFiniteNumber(
       record.researchStaffShare,
       `${path}.researchStaffShare`,
@@ -2579,13 +2579,13 @@ function decodeEducationState(value: unknown, path: string): EducationState {
             0,
             CAMPAIGN_TERMINAL_DAY_INDEX,
           ),
-    fundingRequestedMonthToDateSUSD: requireFiniteNumber(
-      record.fundingRequestedMonthToDateSUSD,
-      `${path}.fundingRequestedMonthToDateSUSD`,
+    fundingRequestedMonthToDateRUSD: requireFiniteNumber(
+      record.fundingRequestedMonthToDateRUSD,
+      `${path}.fundingRequestedMonthToDateRUSD`,
     ),
-    fundingShortfallMonthToDateSUSD: requireFiniteNumber(
-      record.fundingShortfallMonthToDateSUSD,
-      `${path}.fundingShortfallMonthToDateSUSD`,
+    fundingShortfallMonthToDateRUSD: requireFiniteNumber(
+      record.fundingShortfallMonthToDateRUSD,
+      `${path}.fundingShortfallMonthToDateRUSD`,
     ),
   };
 }
@@ -2593,13 +2593,13 @@ function decodeEducationState(value: unknown, path: string): EducationState {
 function decodeLaborPolicyState(value: unknown, path: string): LaborPolicyState {
   const record = requireRecord(value, path);
   return {
-    trainingBudgetSUSDPerYear: requireFiniteNumber(
-      record.trainingBudgetSUSDPerYear,
-      `${path}.trainingBudgetSUSDPerYear`,
+    trainingBudgetRUSDPerYear: requireFiniteNumber(
+      record.trainingBudgetRUSDPerYear,
+      `${path}.trainingBudgetRUSDPerYear`,
     ),
-    trainingStipendPerTraineeSUSDPerYear: requireFiniteNumber(
-      record.trainingStipendPerTraineeSUSDPerYear,
-      `${path}.trainingStipendPerTraineeSUSDPerYear`,
+    trainingStipendPerTraineeRUSDPerYear: requireFiniteNumber(
+      record.trainingStipendPerTraineeRUSDPerYear,
+      `${path}.trainingStipendPerTraineeRUSDPerYear`,
     ),
     trainingStaffShare: requireFiniteNumber(
       record.trainingStaffShare,
@@ -2618,13 +2618,13 @@ function decodeLaborPolicyState(value: unknown, path: string): LaborPolicyState 
             0,
             CAMPAIGN_TERMINAL_DAY_INDEX,
           ),
-    trainingRequestedMonthToDateSUSD: requireFiniteNumber(
-      record.trainingRequestedMonthToDateSUSD,
-      `${path}.trainingRequestedMonthToDateSUSD`,
+    trainingRequestedMonthToDateRUSD: requireFiniteNumber(
+      record.trainingRequestedMonthToDateRUSD,
+      `${path}.trainingRequestedMonthToDateRUSD`,
     ),
-    trainingShortfallMonthToDateSUSD: requireFiniteNumber(
-      record.trainingShortfallMonthToDateSUSD,
-      `${path}.trainingShortfallMonthToDateSUSD`,
+    trainingShortfallMonthToDateRUSD: requireFiniteNumber(
+      record.trainingShortfallMonthToDateRUSD,
+      `${path}.trainingShortfallMonthToDateRUSD`,
     ),
   };
 }
@@ -2670,25 +2670,25 @@ function decodeTradePolicyState(value: unknown, path: string): TradePolicyState 
     importQuotaUsedQuantity,
     exportRestricted,
     lastUpdateDay,
-    exportsValueMonthToDateSUSD: requireFiniteNumber(
-      record.exportsValueMonthToDateSUSD,
-      `${path}.exportsValueMonthToDateSUSD`,
+    exportsValueMonthToDateRUSD: requireFiniteNumber(
+      record.exportsValueMonthToDateRUSD,
+      `${path}.exportsValueMonthToDateRUSD`,
     ),
-    importsValueMonthToDateSUSD: requireFiniteNumber(
-      record.importsValueMonthToDateSUSD,
-      `${path}.importsValueMonthToDateSUSD`,
+    importsValueMonthToDateRUSD: requireFiniteNumber(
+      record.importsValueMonthToDateRUSD,
+      `${path}.importsValueMonthToDateRUSD`,
     ),
-    dutyReceivedMonthToDateSUSD: requireFiniteNumber(
-      record.dutyReceivedMonthToDateSUSD,
-      `${path}.dutyReceivedMonthToDateSUSD`,
+    dutyReceivedMonthToDateRUSD: requireFiniteNumber(
+      record.dutyReceivedMonthToDateRUSD,
+      `${path}.dutyReceivedMonthToDateRUSD`,
     ),
-    dutyPaidMonthToDateSUSD: requireFiniteNumber(
-      record.dutyPaidMonthToDateSUSD,
-      `${path}.dutyPaidMonthToDateSUSD`,
+    dutyPaidMonthToDateRUSD: requireFiniteNumber(
+      record.dutyPaidMonthToDateRUSD,
+      `${path}.dutyPaidMonthToDateRUSD`,
     ),
-    freightPaidMonthToDateSUSD: requireFiniteNumber(
-      record.freightPaidMonthToDateSUSD,
-      `${path}.freightPaidMonthToDateSUSD`,
+    freightPaidMonthToDateRUSD: requireFiniteNumber(
+      record.freightPaidMonthToDateRUSD,
+      `${path}.freightPaidMonthToDateRUSD`,
     ),
   };
 }
@@ -2706,9 +2706,9 @@ function decodeTradeState(value: unknown, path: string): TradeState {
       marketAId: requireUint32(route.marketAId, `${routePath}.marketAId`),
       marketBId: requireUint32(route.marketBId, `${routePath}.marketBId`),
       distanceUnits: requireFiniteNumber(route.distanceUnits, `${routePath}.distanceUnits`),
-      baseCapacitySUSDPerDay: requireFiniteNumber(
-        route.baseCapacitySUSDPerDay,
-        `${routePath}.baseCapacitySUSDPerDay`,
+      baseCapacityRUSDPerDay: requireFiniteNumber(
+        route.baseCapacityRUSDPerDay,
+        `${routePath}.baseCapacityRUSDPerDay`,
       ),
     };
   });
@@ -2750,15 +2750,15 @@ function decodeTradeState(value: unknown, path: string): TradeState {
         0,
         CAMPAIGN_TERMINAL_DAY_INDEX,
       ),
-      cargoValueSUSD: requireFiniteNumber(
-        shipment.cargoValueSUSD,
-        `${shipmentPath}.cargoValueSUSD`,
+      cargoValueRUSD: requireFiniteNumber(
+        shipment.cargoValueRUSD,
+        `${shipmentPath}.cargoValueRUSD`,
       ),
-      freightCostSUSD: requireFiniteNumber(
-        shipment.freightCostSUSD,
-        `${shipmentPath}.freightCostSUSD`,
+      freightCostRUSD: requireFiniteNumber(
+        shipment.freightCostRUSD,
+        `${shipmentPath}.freightCostRUSD`,
       ),
-      dutySUSD: requireFiniteNumber(shipment.dutySUSD, `${shipmentPath}.dutySUSD`),
+      dutyRUSD: requireFiniteNumber(shipment.dutyRUSD, `${shipmentPath}.dutyRUSD`),
       dutyRate: requireFiniteNumber(shipment.dutyRate, `${shipmentPath}.dutyRate`),
     };
   });
@@ -2798,14 +2798,14 @@ function decodeTradeState(value: unknown, path: string): TradeState {
         0,
         Number.MAX_SAFE_INTEGER,
       ),
-      freightPaidSUSD: requireFiniteNumber(
-        report.freightPaidSUSD,
-        `${reportPath}.freightPaidSUSD`,
+      freightPaidRUSD: requireFiniteNumber(
+        report.freightPaidRUSD,
+        `${reportPath}.freightPaidRUSD`,
       ),
-      dutyPaidSUSD: requireFiniteNumber(report.dutyPaidSUSD, `${reportPath}.dutyPaidSUSD`),
-      ownerFundedSUSD: requireFiniteNumber(
-        report.ownerFundedSUSD,
-        `${reportPath}.ownerFundedSUSD`,
+      dutyPaidRUSD: requireFiniteNumber(report.dutyPaidRUSD, `${reportPath}.dutyPaidRUSD`),
+      ownerFundedRUSD: requireFiniteNumber(
+        report.ownerFundedRUSD,
+        `${reportPath}.ownerFundedRUSD`,
       ),
       arrivedShipments: requireInteger(
         report.arrivedShipments,
@@ -2923,10 +2923,10 @@ function decodeMonetaryCurrencyState(
     record[field] === null || record[field] === undefined
       ? null
       : requireUint32(record[field], `${path}.${field}`);
-  const optionalRate = (field: string): SusdPerCurrencyUnit | null => {
+  const optionalRate = (field: string): RusdPerCurrencyUnit | null => {
     if (record[field] === null || record[field] === undefined) return null;
     try {
-      return asSusdPerCurrencyUnit(requireFiniteNumber(record[field], `${path}.${field}`));
+      return asRusdPerCurrencyUnit(requireFiniteNumber(record[field], `${path}.${field}`));
     } catch (error) {
       throw new SaveFormatError(`${path}.${field} is invalid: ${errorMessage(error)}`);
     }
@@ -2942,8 +2942,8 @@ function decodeMonetaryCurrencyState(
     currencyId: requireUint32(record.currencyId, `${path}.currencyId`),
     issuerCountryId: optionalAccount("issuerCountryId"),
     regime,
-    paritySusdPerUnit: optionalRate("paritySusdPerUnit"),
-    referenceParitySusdPerUnit: optionalRate("referenceParitySusdPerUnit"),
+    parityRusdPerUnit: optionalRate("parityRusdPerUnit"),
+    referenceParityRusdPerUnit: optionalRate("referenceParityRusdPerUnit"),
     currencyIssuedUnits: requireFiniteNumber(
       record.currencyIssuedUnits,
       `${path}.currencyIssuedUnits`,
@@ -2958,13 +2958,13 @@ function decodeMonetaryCurrencyState(
     lastParityChangeDay: optionalDay("lastParityChangeDay"),
     lastManagedUpdateDay: optionalDay("lastManagedUpdateDay"),
     lastMonthEndDay: optionalDay("lastMonthEndDay"),
-    lastMonthExportsSUSD: requireFiniteNumber(
-      record.lastMonthExportsSUSD,
-      `${path}.lastMonthExportsSUSD`,
+    lastMonthExportsRUSD: requireFiniteNumber(
+      record.lastMonthExportsRUSD,
+      `${path}.lastMonthExportsRUSD`,
     ),
-    lastMonthImportsSUSD: requireFiniteNumber(
-      record.lastMonthImportsSUSD,
-      `${path}.lastMonthImportsSUSD`,
+    lastMonthImportsRUSD: requireFiniteNumber(
+      record.lastMonthImportsRUSD,
+      `${path}.lastMonthImportsRUSD`,
     ),
   };
 }
@@ -3179,12 +3179,12 @@ function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuatio
   if (status !== "specified") {
     throw new SaveFormatError(`${path}.status is invalid`);
   }
-  const rawRate = requireFiniteNumber(record.susdPerUnit, `${path}.susdPerUnit`);
-  let rate: SusdPerCurrencyUnit;
+  const rawRate = requireFiniteNumber(record.rusdPerUnit, `${path}.rusdPerUnit`);
+  let rate: RusdPerCurrencyUnit;
   try {
-    rate = asSusdPerCurrencyUnit(rawRate);
+    rate = asRusdPerCurrencyUnit(rawRate);
   } catch (error) {
-    throw new SaveFormatError(`${path}.susdPerUnit is invalid: ${errorMessage(error)}`);
+    throw new SaveFormatError(`${path}.rusdPerUnit is invalid: ${errorMessage(error)}`);
   }
   const source = requireString(record.source, `${path}.source`, { minLength: 1 });
   if (source !== "scenario" && source !== "policy" && source !== "market") {
@@ -3193,7 +3193,7 @@ function decodeCurrencyValuation(value: unknown, path: string): CurrencyValuatio
   return {
     currencyId,
     status: "specified",
-    susdPerUnit: rate,
+    rusdPerUnit: rate,
     setOnDay: requireInteger(
       record.setOnDay,
       `${path}.setOnDay`,
@@ -3238,7 +3238,7 @@ function decodeFinancialAccount(value: unknown, path: string): FinancialAccount 
     ownerId,
     category: category as AccountCategory,
     subtype: subtype as AccountSubtype,
-    balanceSUSD: requireFiniteNumber(record.balanceSUSD, `${path}.balanceSUSD`),
+    balanceRUSD: requireFiniteNumber(record.balanceRUSD, `${path}.balanceRUSD`),
   };
 }
 
@@ -3250,7 +3250,7 @@ function decodeJournalLine(value: unknown, path: string): JournalLine {
   return {
     accountId: requireUint32(record.accountId, `${path}.accountId`),
     side: record.side,
-    amountSUSD: requireFiniteNumber(record.amountSUSD, `${path}.amountSUSD`),
+    amountRUSD: requireFiniteNumber(record.amountRUSD, `${path}.amountRUSD`),
   };
 }
 
@@ -3328,17 +3328,17 @@ function decodeAnnualSummary(value: unknown, path: string): AnnualFinanceSummary
     }
     const entry = requireRecord(rawBalances[key], `${path}.closingBalances[${key}]`);
     closingBalances[countryId] = {
-      treasuryCashSUSD: requireFiniteNumber(
-        entry.treasuryCashSUSD,
-        `${path}.closingBalances[${key}].treasuryCashSUSD`,
+      treasuryCashRUSD: requireFiniteNumber(
+        entry.treasuryCashRUSD,
+        `${path}.closingBalances[${key}].treasuryCashRUSD`,
       ),
-      debtLiabilitySUSD: requireFiniteNumber(
-        entry.debtLiabilitySUSD,
-        `${path}.closingBalances[${key}].debtLiabilitySUSD`,
+      debtLiabilityRUSD: requireFiniteNumber(
+        entry.debtLiabilityRUSD,
+        `${path}.closingBalances[${key}].debtLiabilityRUSD`,
       ),
-      interestPayableSUSD: requireFiniteNumber(
-        entry.interestPayableSUSD,
-        `${path}.closingBalances[${key}].interestPayableSUSD`,
+      interestPayableRUSD: requireFiniteNumber(
+        entry.interestPayableRUSD,
+        `${path}.closingBalances[${key}].interestPayableRUSD`,
       ),
     };
   }
@@ -3462,21 +3462,21 @@ function decodeDebtHistoryAggregate(
       0,
       1_000_000,
     ),
-    principalIssuedSUSD: requireFiniteNumber(
-      record.principalIssuedSUSD,
-      `${path}.principalIssuedSUSD`,
+    principalIssuedRUSD: requireFiniteNumber(
+      record.principalIssuedRUSD,
+      `${path}.principalIssuedRUSD`,
     ),
-    principalRepaidSUSD: requireFiniteNumber(
-      record.principalRepaidSUSD,
-      `${path}.principalRepaidSUSD`,
+    principalRepaidRUSD: requireFiniteNumber(
+      record.principalRepaidRUSD,
+      `${path}.principalRepaidRUSD`,
     ),
-    principalWrittenOffSUSD: requireFiniteNumber(
-      record.principalWrittenOffSUSD,
-      `${path}.principalWrittenOffSUSD`,
+    principalWrittenOffRUSD: requireFiniteNumber(
+      record.principalWrittenOffRUSD,
+      `${path}.principalWrittenOffRUSD`,
     ),
-    interestWrittenOffSUSD: requireFiniteNumber(
-      record.interestWrittenOffSUSD,
-      `${path}.interestWrittenOffSUSD`,
+    interestWrittenOffRUSD: requireFiniteNumber(
+      record.interestWrittenOffRUSD,
+      `${path}.interestWrittenOffRUSD`,
     ),
   };
 }
@@ -3617,8 +3617,8 @@ function decodeMarket(value: unknown, path: string): Market {
   const regionIds = requireArray(record.regionIds, `${path}.regionIds`).map((regionId, index) =>
     requireUint32(regionId, `${path}.regionIds[${String(index)}]`),
   );
-  const prices = requireArray(record.priceSUSD, `${path}.priceSUSD`).map((price, index) =>
-    requireFiniteNumber(price, `${path}.priceSUSD[${String(index)}]`),
+  const prices = requireArray(record.priceRUSD, `${path}.priceRUSD`).map((price, index) =>
+    requireFiniteNumber(price, `${path}.priceRUSD[${String(index)}]`),
   );
   const lots = requireArray(record.stockLots, `${path}.stockLots`).map((lot, index) =>
     decodeStockLot(lot, `${path}.stockLots[${String(index)}]`),
@@ -3626,7 +3626,7 @@ function decodeMarket(value: unknown, path: string): Market {
   return {
     id: requireUint32(record.id, `${path}.id`),
     regionIds,
-    priceSUSD: prices,
+    priceRUSD: prices,
     stockLots: canonicalizeStockLots(lots),
     customsCountryId:
       record.customsCountryId === null || record.customsCountryId === undefined
@@ -3792,19 +3792,19 @@ function decodeConstructionProject(
       record.cancelledDay === null
         ? null
         : requireInteger(record.cancelledDay, `${path}.cancelledDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
-    totalCostSUSD: requireFiniteNumber(record.totalCostSUSD, `${path}.totalCostSUSD`),
-    workingCapitalSUSD: requireFiniteNumber(
-      record.workingCapitalSUSD,
-      `${path}.workingCapitalSUSD`,
+    totalCostRUSD: requireFiniteNumber(record.totalCostRUSD, `${path}.totalCostRUSD`),
+    workingCapitalRUSD: requireFiniteNumber(
+      record.workingCapitalRUSD,
+      `${path}.workingCapitalRUSD`,
     ),
-    workingCapitalPaidSUSD: requireFiniteNumber(
-      record.workingCapitalPaidSUSD,
-      `${path}.workingCapitalPaidSUSD`,
+    workingCapitalPaidRUSD: requireFiniteNumber(
+      record.workingCapitalPaidRUSD,
+      `${path}.workingCapitalPaidRUSD`,
     ),
-    spentSUSD: requireFiniteNumber(record.spentSUSD, `${path}.spentSUSD`),
-    materialsSpentSUSD: requireFiniteNumber(
-      record.materialsSpentSUSD,
-      `${path}.materialsSpentSUSD`,
+    spentRUSD: requireFiniteNumber(record.spentRUSD, `${path}.spentRUSD`),
+    materialsSpentRUSD: requireFiniteNumber(
+      record.materialsSpentRUSD,
+      `${path}.materialsSpentRUSD`,
     ),
     materials: requireArray(record.materials, `${path}.materials`).map(
       (material, index) => {
@@ -3861,13 +3861,13 @@ function decodeConstructionState(value: unknown): ConstructionState {
         0,
         1_000_000,
       ),
-      totalSpentSUSD: requireFiniteNumber(
-        entry.totalSpentSUSD,
-        `${path}.history[${String(index)}].totalSpentSUSD`,
+      totalSpentRUSD: requireFiniteNumber(
+        entry.totalSpentRUSD,
+        `${path}.history[${String(index)}].totalSpentRUSD`,
       ),
-      totalWrittenOffSUSD: requireFiniteNumber(
-        entry.totalWrittenOffSUSD,
-        `${path}.history[${String(index)}].totalWrittenOffSUSD`,
+      totalWrittenOffRUSD: requireFiniteNumber(
+        entry.totalWrittenOffRUSD,
+        `${path}.history[${String(index)}].totalWrittenOffRUSD`,
       ),
     };
   });
@@ -4237,6 +4237,46 @@ export function serializeWorld(world: World): string {
   return stableStringify(envelope);
 }
 
+/**
+ * M14 save compatibility: canonical saves use RUSD field names, while saves
+ * written before the rename use the former SUSD vocabulary. The monetary unit
+ * is the same quantity with the same scale, so only object keys are translated;
+ * numeric values, arrays and string values are untouched. The envelope checksum
+ * is verified against the raw payload before this translation.
+ */
+function normalizeLegacyMonetaryKeys(value: unknown, path = "save payload"): unknown {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      value[index] = normalizeLegacyMonetaryKeys(value[index], `${path}[${String(index)}]`);
+    }
+    return value;
+  }
+  if (value !== null && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      const normalizedKey = key
+        .replaceAll("SUSD", "RUSD")
+        .replaceAll("Susd", "Rusd")
+        .replaceAll("susd", "rusd");
+      if (normalizedKey !== key) {
+        if (Object.prototype.hasOwnProperty.call(record, normalizedKey)) {
+          throw new SaveFormatError(
+            `${path} mixes legacy and current spellings for ${JSON.stringify(normalizedKey)}`,
+          );
+        }
+        record[normalizedKey] = record[key];
+        delete record[key];
+      }
+      record[normalizedKey] = normalizeLegacyMonetaryKeys(
+        record[normalizedKey],
+        `${path}.${normalizedKey}`,
+      );
+    }
+    return record;
+  }
+  return value;
+}
+
 function decodeEnvelope(value: unknown): World {
   const envelope = requireRecord(value, "save envelope");
 
@@ -4313,7 +4353,7 @@ function decodeEnvelope(value: unknown): World {
     );
   }
 
-  const world = decodeWorldPayload(payload);
+  const world = decodeWorldPayload(normalizeLegacyMonetaryKeys(payload));
 
   if (
     schemaVersion !== world.schemaVersion ||

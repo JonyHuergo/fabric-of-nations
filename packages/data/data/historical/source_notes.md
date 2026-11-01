@@ -57,7 +57,7 @@ against the M2 1900 world estimate of about 1.62 billion.
   groupings are a simulation simplification, not historical trade agreements.
 - **Currencies and valuations** — each country issues its own currency for
   identity purposes. All valuations are explicitly `unavailable`; M5 performs no
-  FX conversion and SUSD remains the accounting unit. No 1900 exchange rates are
+  FX conversion and RUSD remains the accounting unit. No 1900 exchange rates are
   invented.
 
 ## Transformations and assumptions
@@ -67,7 +67,7 @@ against the M2 1900 world estimate of about 1.62 billion.
 2. Each block total is expanded to 17 five-year male and female bands by
    proportional largest-remainder allocation from the shared age profile. Sums are
    exact; within-band single-year expansion remains the documented M2 assumption.
-3. Initial household savings are `population × savingsPerCapitaSUSD`; the
+3. Initial household savings are `population × savingsPerCapitaRUSD`; the
    per-capita values are provisional structural inputs, not measured wealth.
 4. Building levels are authored to provide substantial employment capacity for
    the authored population. The M3 recipes and needs baskets are provisional
@@ -79,7 +79,7 @@ against the M2 1900 world estimate of about 1.62 billion.
    requires the destination country's provisional open-border flag.
 6. Market membership is authored. Each country's regions are in one market; the
    shared markets exercise cross-country pooled clearing. Initial market prices
-   use the goods definitions' `basePrice1900SUSD`; no market-specific 1900 price
+   use the goods definitions' `basePrice1900RUSD`; no market-specific 1900 price
    data is claimed.
 7. Fiscal settings are illustrative flat income-tax rates and zero welfare
    budgets. They are not historical tax schedules and the model is not a

@@ -106,7 +106,7 @@ function stressScenario(base: EconomyScenarioDef): EconomyScenarioDef {
     ...building,
     id: base.buildingInstances.length + index,
     operatingCashAccountId: 500_000 + index,
-    initialOperatingCashSUSD: 10_000,
+    initialOperatingCashRUSD: 10_000,
   }));
   return {
     ...base,
@@ -140,8 +140,8 @@ function applyBenchmarkFiscalTrigger(scenario: EconomyScenarioDef): void {
     (candidate) => candidate.id !== (scenario.playerCountryId ?? null),
   );
   if (country === undefined) return;
-  country.fiscal.welfareBudgetSUSDPerYear = 10_000_000;
-  country.initialTreasuryCashSUSD = 0;
+  country.fiscal.welfareBudgetRUSDPerYear = 10_000_000;
+  country.initialTreasuryCashRUSD = 0;
 }
 
 function countAiDay(result: ReturnType<typeof tick>): AiDaySummary {

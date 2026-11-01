@@ -48,7 +48,7 @@ function accountBalance(world: World, countryId: number, subtype: string): numbe
         account.ownerKind === "country" &&
         account.ownerId === countryId &&
         account.subtype === subtype,
-    )?.balanceSUSD ?? 0
+    )?.balanceRUSD ?? 0
   );
 }
 
@@ -79,26 +79,26 @@ describe("M7a annual accounting", () => {
         const totals = governmentPeriodTotals(world.finance, summary).find(
           (entry) => entry.countryId === country.id,
         );
-        tax += totals?.incomeTaxRevenueSUSD ?? 0;
-        businessTax += totals?.businessTaxRevenueSUSD ?? 0;
-        welfare += totals?.welfareExpenseSUSD ?? 0;
-        interest += totals?.interestExpenseSUSD ?? 0;
-        subsidy += totals?.subsidyExpenseSUSD ?? 0;
-        administration += totals?.administrationExpenseSUSD ?? 0;
-        education += totals?.educationExpenseSUSD ?? 0;
+        tax += totals?.incomeTaxRevenueRUSD ?? 0;
+        businessTax += totals?.businessTaxRevenueRUSD ?? 0;
+        welfare += totals?.welfareExpenseRUSD ?? 0;
+        interest += totals?.interestExpenseRUSD ?? 0;
+        subsidy += totals?.subsidyExpenseRUSD ?? 0;
+        administration += totals?.administrationExpenseRUSD ?? 0;
+        education += totals?.educationExpenseRUSD ?? 0;
       }
       const annualCountry = annual.fiscalTotals[country.id]!;
-      expect(annualCountry.incomeTaxRevenueSUSD).toBeCloseTo(tax, 6);
-      expect(annualCountry.welfareExpenseSUSD).toBeCloseTo(welfare, 6);
-      expect(annualCountry.interestExpenseSUSD).toBeCloseTo(interest, 6);
-      expect(annualCountry.educationExpenseSUSD ?? 0).toBeCloseTo(education, 6);
-      expect(annualCountry.netFiscalResultSUSD).toBeCloseTo(
+      expect(annualCountry.incomeTaxRevenueRUSD).toBeCloseTo(tax, 6);
+      expect(annualCountry.welfareExpenseRUSD).toBeCloseTo(welfare, 6);
+      expect(annualCountry.interestExpenseRUSD).toBeCloseTo(interest, 6);
+      expect(annualCountry.educationExpenseRUSD ?? 0).toBeCloseTo(education, 6);
+      expect(annualCountry.netFiscalResultRUSD).toBeCloseTo(
         tax + businessTax - welfare - interest - subsidy - administration - education,
         6,
       );
     }
     const country = world.countries[0]!;
-    expect(annual.closingBalances[country.id]?.treasuryCashSUSD).toBeCloseTo(
+    expect(annual.closingBalances[country.id]?.treasuryCashRUSD).toBeCloseTo(
       accountBalance(world, country.id, "treasury-cash"),
       6,
     );
@@ -214,8 +214,8 @@ describe("M7a annual accounting", () => {
       originalPostingId: 1,
       reason: "test owner capital correction",
       lines: [
-        { accountId: cash.id, side: "debit", amountSUSD: 10 },
-        { accountId: equity.id, side: "credit", amountSUSD: 10 },
+        { accountId: cash.id, side: "debit", amountRUSD: 10 },
+        { accountId: equity.id, side: "credit", amountRUSD: 10 },
       ],
     });
     expect(result.postingId).toBeGreaterThan(0);
@@ -230,7 +230,7 @@ describe("M7a annual accounting", () => {
       postFinanceCorrection(world, world.dayIndex, {
         originalPostingId: 2,
         reason: "invalid unbalanced",
-        lines: [{ accountId: cash.id, side: "debit", amountSUSD: 1 }],
+        lines: [{ accountId: cash.id, side: "debit", amountRUSD: 1 }],
       }),
     ).toThrow(/unbalanced/);
     expect(hashWorld(world)).toBe(beforeInvalidHash);

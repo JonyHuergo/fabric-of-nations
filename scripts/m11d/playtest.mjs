@@ -117,7 +117,7 @@ async function pauseAndWait() {
 
 async function gotoApp() {
   await app.navigate(APP_URL);
-  await waitFor(`document.body.innerText.includes('CENTURY')`, { timeout: 90000, label: "app shell" });
+  await waitFor(`document.body.innerText.includes('FABRIC OF NATIONS')`, { timeout: 90000, label: "app shell" });
   await sleep(2500);
 }
 
@@ -263,7 +263,7 @@ try {
     await gotoApp();
     const body = await app.text();
     await app.screenshot("01-main-menu");
-    mark("startup: main menu renders", body.includes("CENTURY") && body.includes("New campaign"));
+    mark("startup: main menu renders", body.includes("FABRIC OF NATIONS") && body.includes("New campaign"));
     mark("startup: no saved campaign yet", body.includes("No saved campaign yet"));
     mark("startup: playable state count shown", body.includes("66 playable states"), body.match(/\d+ playable states/)?.[0] ?? "missing");
     const assetState = await app.evaluate(`({

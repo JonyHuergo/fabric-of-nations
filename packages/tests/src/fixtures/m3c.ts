@@ -127,7 +127,7 @@ export function reservation(
 export function stockOf(world: World, goodId: number): number {
   const market = world.markets[0];
   if (market === undefined) throw new Error("missing market");
-  return deriveStockByGood(market, market.priceSUSD.length)[goodId] ?? 0;
+  return deriveStockByGood(market, market.priceRUSD.length)[goodId] ?? 0;
 }
 
 export function lotQuantity(world: World, goodId: number, ownerBuildingId: number): number {
@@ -147,5 +147,5 @@ export function totalCash(world: World): number {
 export function prices(world: World): number[] {
   const market = world.markets[0];
   if (market === undefined) throw new Error("missing market");
-  return [...market.priceSUSD];
+  return [...market.priceRUSD];
 }

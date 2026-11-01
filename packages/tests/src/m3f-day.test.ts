@@ -90,7 +90,7 @@ describe("M3f integrated economic day", () => {
       new Set(result.economy?.settlement.transactions.map((transaction) => transaction.sellerBuildingId))
         .size,
     ).toBeGreaterThan(1);
-    expect(result.economy?.settlement.totals.producerProfitSUSD).toBeLessThan(0);
+    expect(result.economy?.settlement.totals.producerProfitRUSD).toBeLessThan(0);
     expect(result.economy?.employment.refreshed).toBe(true);
     expect(world.dayIndex).toBe(1);
     expect(totalCash(world)).toBeCloseTo(beforeCash, 9);
@@ -117,7 +117,7 @@ describe("M3f integrated economic day", () => {
     const household = result.economy?.settlement.households.find(
       (entry) => entry.popBlockId === 0,
     );
-    expect(household?.marketPurchasesSUSD).toBeLessThanOrEqual(0.5 + 1e-9);
+    expect(household?.marketPurchasesRUSD).toBeLessThanOrEqual(0.5 + 1e-9);
     expect(balance(world, householdId)).toBeGreaterThanOrEqual(0);
     const fundedCost = result.economy!.householdDemands
       .filter((demand) => demand.popBlockId === 0)
@@ -138,9 +138,9 @@ describe("M3f integrated economic day", () => {
     const household = result.economy?.settlement.households.find(
       (entry) => entry.popBlockId === 0,
     );
-    expect(household?.marketPurchasesSUSD).toBe(0);
-    expect(household?.wagesReceivedSUSD).toBeGreaterThan(0);
-    expect(household?.endingCashAfterSettlementSUSD).toBeGreaterThan(0);
+    expect(household?.marketPurchasesRUSD).toBe(0);
+    expect(household?.wagesReceivedRUSD).toBeGreaterThan(0);
+    expect(household?.endingCashAfterSettlementRUSD).toBeGreaterThan(0);
   });
 
   test("uses valid same-batch sales receipts to fund a production-input purchase", () => {
@@ -193,26 +193,26 @@ describe("M3f integrated economic day", () => {
       throw new Error("missing receipt-funded transactions");
     }
 
-    expect(openingMillCash).toBeLessThan(millInput.totalSUSD);
-    expect(millSale.totalSUSD).toBeGreaterThanOrEqual(millInput.totalSUSD);
+    expect(openingMillCash).toBeLessThan(millInput.totalRUSD);
+    expect(millSale.totalRUSD).toBeGreaterThanOrEqual(millInput.totalRUSD);
     expect(millInput.buyerAccountId).toBe(millId);
     expect(millInput.sellerAccountId).toBe(sellerId);
-    expect(millProducer.initialCashSUSD).toBe(openingMillCash);
-    expect(millProducer.revenueSUSD).toBeCloseTo(millSale.totalSUSD, 9);
-    expect(millProducer.inputCostsSUSD).toBeCloseTo(millInput.totalSUSD, 9);
-    expect(millProducer.endingCashAfterSettlementSUSD).toBeCloseTo(
-      millProducer.initialCashSUSD +
-        millProducer.revenueSUSD -
-        millProducer.inputCostsSUSD -
-        millProducer.wagesPaidSUSD -
-        millProducer.upkeepPaidSUSD,
+    expect(millProducer.initialCashRUSD).toBe(openingMillCash);
+    expect(millProducer.revenueRUSD).toBeCloseTo(millSale.totalRUSD, 9);
+    expect(millProducer.inputCostsRUSD).toBeCloseTo(millInput.totalRUSD, 9);
+    expect(millProducer.endingCashAfterSettlementRUSD).toBeCloseTo(
+      millProducer.initialCashRUSD +
+        millProducer.revenueRUSD -
+        millProducer.inputCostsRUSD -
+        millProducer.wagesPaidRUSD -
+        millProducer.upkeepPaidRUSD,
       9,
     );
-    expect(millProducer.endingCashAfterSettlementSUSD).toBeGreaterThanOrEqual(0);
-    expect(sellerProducer.initialCashSUSD).toBe(openingSellerCash);
-    expect(sellerProducer.revenueSUSD).toBeGreaterThanOrEqual(millInput.totalSUSD);
-    expect(balance(world, sellerId)).toBeCloseTo(sellerProducer.endingCashAfterSettlementSUSD, 9);
-    expect(balance(world, millId)).toBeCloseTo(millProducer.endingCashAfterSettlementSUSD, 9);
+    expect(millProducer.endingCashAfterSettlementRUSD).toBeGreaterThanOrEqual(0);
+    expect(sellerProducer.initialCashRUSD).toBe(openingSellerCash);
+    expect(sellerProducer.revenueRUSD).toBeGreaterThanOrEqual(millInput.totalRUSD);
+    expect(balance(world, sellerId)).toBeCloseTo(sellerProducer.endingCashAfterSettlementRUSD, 9);
+    expect(balance(world, millId)).toBeCloseTo(millProducer.endingCashAfterSettlementRUSD, 9);
 
     const grainFlow = result.economy?.market.inventory.find(
       (flow) => flow.goodId === GRAIN_ID,
@@ -249,7 +249,7 @@ describe("M3f integrated economic day", () => {
     setCashBalance(world, millId, 0);
     const market = world.markets[0];
     if (market === undefined) throw new Error("missing market");
-    const openingPrices = [...market.priceSUSD];
+    const openingPrices = [...market.priceRUSD];
     const openingLots = market.stockLots.map((lot) => ({ ...lot }));
     const openingStockByGood = scenario.definitions.goods.map((good) =>
       openingLots
@@ -280,7 +280,7 @@ describe("M3f integrated economic day", () => {
     ).toEqual(openingStockByGood);
     expect(balance(world, millId)).toBeGreaterThanOrEqual(0);
     for (const account of world.finance.accounts) {
-      expect(account.balanceSUSD).toBeGreaterThanOrEqual(0);
+      expect(account.balanceRUSD).toBeGreaterThanOrEqual(0);
     }
     expect(totalCash(world)).toBeCloseTo(beforeCash, 9);
     expect(world.dayIndex).toBe(1);
@@ -321,10 +321,10 @@ describe("M3f integrated economic day", () => {
       if (account !== undefined) setCashBalance(world, account.id, 0);
     }
     const result = tick(world, contextFor(scenario));
-    expect(result.economy?.settlement.totals.unpaidWagesSUSD).toBeGreaterThan(0);
-    expect(result.economy?.settlement.totals.unpaidUpkeepSUSD).toBeGreaterThan(0);
+    expect(result.economy?.settlement.totals.unpaidWagesRUSD).toBeGreaterThan(0);
+    expect(result.economy?.settlement.totals.unpaidUpkeepRUSD).toBeGreaterThan(0);
     for (const account of world.finance.accounts) {
-      expect(account.balanceSUSD).toBeGreaterThanOrEqual(0);
+      expect(account.balanceRUSD).toBeGreaterThanOrEqual(0);
     }
   });
 
@@ -336,19 +336,19 @@ describe("M3f integrated economic day", () => {
     expect(serializeWorld(clone)).toBe(serializeWorld(world));
     const originalSerialized = serializeWorld(world);
     const originalAgeCell = world.popBlocks[0]!.maleByAge[0] ?? 0;
-    const originalBalance = clone.finance.accounts[0]!.balanceSUSD;
+    const originalBalance = clone.finance.accounts[0]!.balanceRUSD;
     const originalLot = clone.markets[0]!.stockLots[0]!.quantity;
 
     clone.popBlocks[0]!.maleByAge[0] = originalAgeCell + 1;
-    clone.finance.accounts[0]!.balanceSUSD += 1;
+    clone.finance.accounts[0]!.balanceRUSD += 1;
     clone.markets[0]!.stockLots[0]!.quantity += 1;
     clone.diagnostics.recentWarnings.push("clone-only");
     const clonePosting = clone.finance.postings[0];
-    if (clonePosting !== undefined) clonePosting.lines[0]!.amountSUSD += 1;
+    if (clonePosting !== undefined) clonePosting.lines[0]!.amountRUSD += 1;
 
     // The clone changed exactly where it was mutated...
     expect(clone.popBlocks[0]!.maleByAge[0]).toBe(originalAgeCell + 1);
-    expect(clone.finance.accounts[0]!.balanceSUSD).toBeCloseTo(originalBalance + 1, 9);
+    expect(clone.finance.accounts[0]!.balanceRUSD).toBeCloseTo(originalBalance + 1, 9);
     expect(clone.markets[0]!.stockLots[0]!.quantity).toBeCloseTo(originalLot + 1, 9);
     // ...and the source world remains byte-identical.
     expect(serializeWorld(world)).toBe(originalSerialized);
@@ -373,9 +373,9 @@ describe("M3f integrated economic day", () => {
     const beforeSerialized = serializeWorld(world);
     const beforeDay = world.dayIndex;
     const beforePostingId = world.finance.nextPostingId;
-    const beforeBalances = world.finance.accounts.map((account) => account.balanceSUSD);
+    const beforeBalances = world.finance.accounts.map((account) => account.balanceRUSD);
     const beforeLots = world.markets[0]?.stockLots.map((lot) => ({ ...lot }));
-    const beforePrices = world.markets[0]?.priceSUSD.slice();
+    const beforePrices = world.markets[0]?.priceRUSD.slice();
     const beforeMaleByAge = world.popBlocks.map((block) => block.maleByAge.slice());
     const beforeFemaleByAge = world.popBlocks.map((block) => block.femaleByAge.slice());
     const beforeNeeds = world.popBlocks.map((block) => ({
@@ -390,9 +390,9 @@ describe("M3f integrated economic day", () => {
 
     expect(world.dayIndex).toBe(beforeDay);
     expect(world.finance.nextPostingId).toBe(beforePostingId);
-    expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(beforeBalances);
+    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(beforeBalances);
     expect(world.markets[0]?.stockLots).toEqual(beforeLots);
-    expect(world.markets[0]?.priceSUSD).toEqual(beforePrices);
+    expect(world.markets[0]?.priceRUSD).toEqual(beforePrices);
     expect(world.popBlocks.map((block) => block.maleByAge)).toEqual(beforeMaleByAge);
     expect(world.popBlocks.map((block) => block.femaleByAge)).toEqual(beforeFemaleByAge);
     expect(
@@ -422,11 +422,11 @@ describe("M3f integrated economic day", () => {
     if (block === undefined || update === undefined || household === undefined) {
       throw new Error("missing block 0 wealth inputs");
     }
-    expect(update.annualDisposableIncomePerCapitaSUSD).toBeCloseTo(
-      (household.wagesReceivedSUSD / populationTotal(block)) * 365,
+    expect(update.annualDisposableIncomePerCapitaRUSD).toBeCloseTo(
+      (household.wagesReceivedRUSD / populationTotal(block)) * 365,
       9,
     );
-    expect(update.annualSubsistenceCostPerCapitaSUSD).toBeGreaterThan(0);
+    expect(update.annualSubsistenceCostPerCapitaRUSD).toBeGreaterThan(0);
     expect(update.newWealthLevel).not.toBe(update.oldWealthLevel);
     expect(block.wealthLevel).toBe(update.newWealthLevel);
   });
@@ -629,7 +629,7 @@ describe("M3f integrated economic day", () => {
     if (armyBefore === undefined) throw new Error("military fixture has no army");
     const beforeSupply = armyBefore.supply;
     const beforeImports = world.countries.map(
-      (country) => country.trade.importsValueMonthToDateSUSD,
+      (country) => country.trade.importsValueMonthToDateRUSD,
     );
     const beforeQuota = world.countries.map((country) => [
       ...country.trade.importQuotaUsedQuantity,
@@ -640,7 +640,7 @@ describe("M3f integrated economic day", () => {
     expect(world.dayIndex).toBe(beforeDay);
     expect(world.military.lastPhaseDay).toBe(beforePhase);
     expect(armyBefore.supply).toBe(beforeSupply);
-    expect(world.countries.map((country) => country.trade.importsValueMonthToDateSUSD)).toEqual(
+    expect(world.countries.map((country) => country.trade.importsValueMonthToDateRUSD)).toEqual(
       beforeImports,
     );
     expect(world.countries.map((country) => [...country.trade.importQuotaUsedQuantity])).toEqual(

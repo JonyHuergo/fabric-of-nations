@@ -19,7 +19,7 @@
  */
 
 import { assertValidDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
 import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import {
@@ -59,7 +59,7 @@ import {
 export interface CashTransferOptions {
   readonly fromAccountId: Id;
   readonly toAccountId: Id;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 export interface JournalEntryInput {
@@ -80,7 +80,7 @@ interface ValidatedLines {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function accountMap(finance: FinanceState): Map<number, FinancialAccount> {
@@ -145,11 +145,11 @@ function validatePostingLines(
       throw new RangeError(`journal line ${String(index)}.side must be debit or credit`);
     }
     const amount = requireFiniteNumber(
-      record.amountSUSD,
-      `journal line ${String(index)}.amountSUSD`,
+      record.amountRUSD,
+      `journal line ${String(index)}.amountRUSD`,
     );
     if (!(amount > 0)) {
-      throw new RangeError(`journal line ${String(index)}.amountSUSD must be strictly positive`);
+      throw new RangeError(`journal line ${String(index)}.amountRUSD must be strictly positive`);
     }
     // D-047 semantic matrix: applies to revenue/expense lines for every kind.
     assertSemanticJournalLine(transactionKind, account, side, `journal line ${String(index)}`);
@@ -160,7 +160,7 @@ function validatePostingLines(
     deltas.set(accountId, (deltas.get(accountId) ?? 0) + signed);
     if (isCashAccount(account)) cashDelta += signed;
   }
-  if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
+  if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
     throw new RangeError(
       `journal posting is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
     );
@@ -231,13 +231,13 @@ function assertBalanceConstraints(
   for (const [accountId, delta] of deltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    const next = account.balanceSUSD + delta;
+    const next = account.balanceRUSD + delta;
     if (!Number.isFinite(next)) {
       throw new RangeError(`posting would make account ${String(accountId)} non-finite`);
     }
     if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
       throw new RangeError(
-        `insufficient funds; posting would make ${account.category} account ${String(accountId)} negative: ${String(account.balanceSUSD)} + ${String(delta)} < 0`,
+        `insufficient funds; posting would make ${account.category} account ${String(accountId)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
       );
     }
   }
@@ -280,7 +280,7 @@ export function postJournalEntry(
   for (const [accountId, delta] of validated.deltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceSUSD += delta;
+    account.balanceRUSD += delta;
   }
 
   const posting: JournalPosting = {
@@ -325,7 +325,7 @@ export function postCorrectionEntry(
   for (const [accountId, delta] of validated.deltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceSUSD += delta;
+    account.balanceRUSD += delta;
   }
   const posting: JournalPosting = {
     id: nextId,
@@ -396,7 +396,7 @@ export function postJournalBatch(
   for (const [accountId, delta] of aggregate) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceSUSD += delta;
+    account.balanceRUSD += delta;
   }
 
   const postings: JournalPosting[] = [];
@@ -450,8 +450,8 @@ export function postCashTransfer(
     dayIndex,
     transactionKind,
     [
-      { accountId: options.toAccountId, side: "debit", amountSUSD: options.amountSUSD },
-      { accountId: options.fromAccountId, side: "credit", amountSUSD: options.amountSUSD },
+      { accountId: options.toAccountId, side: "debit", amountRUSD: options.amountRUSD },
+      { accountId: options.fromAccountId, side: "credit", amountRUSD: options.amountRUSD },
     ],
     sourceEntityId,
     targetEntityId,

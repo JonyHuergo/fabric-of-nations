@@ -3,7 +3,7 @@
     "marketAKey": "north-atlantic",
     "marketBKey": "continental-europe",
     "distanceUnits": 1.5,
-    "baseCapacitySUSDPerDay": 250000,
+    "baseCapacityRUSDPerDay": 250000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -11,7 +11,7 @@
     "marketAKey": "north-atlantic",
     "marketBKey": "russian-empire",
     "distanceUnits": 2.5,
-    "baseCapacitySUSDPerDay": 120000,
+    "baseCapacityRUSDPerDay": 120000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -19,7 +19,7 @@
     "marketAKey": "north-atlantic",
     "marketBKey": "asian-trade",
     "distanceUnits": 3,
-    "baseCapacitySUSDPerDay": 150000,
+    "baseCapacityRUSDPerDay": 150000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -27,7 +27,7 @@
     "marketAKey": "north-atlantic",
     "marketBKey": "brazil",
     "distanceUnits": 2,
-    "baseCapacitySUSDPerDay": 180000,
+    "baseCapacityRUSDPerDay": 180000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -35,7 +35,7 @@
     "marketAKey": "continental-europe",
     "marketBKey": "russian-empire",
     "distanceUnits": 1.5,
-    "baseCapacitySUSDPerDay": 140000,
+    "baseCapacityRUSDPerDay": 140000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -43,7 +43,7 @@
     "marketAKey": "continental-europe",
     "marketBKey": "asian-trade",
     "distanceUnits": 3,
-    "baseCapacitySUSDPerDay": 130000,
+    "baseCapacityRUSDPerDay": 130000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -51,7 +51,7 @@
     "marketAKey": "continental-europe",
     "marketBKey": "brazil",
     "distanceUnits": 2,
-    "baseCapacitySUSDPerDay": 110000,
+    "baseCapacityRUSDPerDay": 110000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -59,7 +59,7 @@
     "marketAKey": "russian-empire",
     "marketBKey": "asian-trade",
     "distanceUnits": 2,
-    "baseCapacitySUSDPerDay": 90000,
+    "baseCapacityRUSDPerDay": 90000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -67,7 +67,7 @@
     "marketAKey": "russian-empire",
     "marketBKey": "brazil",
     "distanceUnits": 3,
-    "baseCapacitySUSDPerDay": 60000,
+    "baseCapacityRUSDPerDay": 60000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   },
@@ -75,7 +75,7 @@
     "marketAKey": "asian-trade",
     "marketBKey": "brazil",
     "distanceUnits": 3,
-    "baseCapacitySUSDPerDay": 70000,
+    "baseCapacityRUSDPerDay": 70000,
     "status": "provisional",
     "sourceIds": ["project-authored-sample"]
   }

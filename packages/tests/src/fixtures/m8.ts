@@ -70,8 +70,8 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
     participationRate: 0.55,
     qualificationLiteracy: 0.7,
     qualificationWealthLevel: 20,
-    baseWage1900SUSDPerYear: 450,
-    trainingCostSUSD: 0,
+    baseWage1900RUSDPerYear: 450,
+    trainingCostRUSD: 0,
     laborProductivityModifier: 1.1,
   };
   const academics = {
@@ -82,8 +82,8 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
     participationRate: 0.6,
     qualificationLiteracy: 0.85,
     qualificationWealthLevel: 40,
-    baseWage1900SUSDPerYear: 320,
-    trainingCostSUSD: 0,
+    baseWage1900RUSDPerYear: 320,
+    trainingCostRUSD: 0,
     laborProductivityModifier: 1.15,
   };
   scenario.definitions = {
@@ -123,7 +123,7 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
         femaleAgeGroups: m5AgeGroups(2_500),
         literacy: 0.9,
         wealthLevel: 60,
-        initialSavingsSUSD: 10_000,
+        initialSavingsRUSD: 10_000,
         militancy: 0.04,
       },
     ],
@@ -141,7 +141,7 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
             labor: "labor-association",
             trade: "trade-open",
           },
-          institutionFundingSUSDPerYear: options.fundingA ?? 2_000,
+          institutionFundingRUSDPerYear: options.fundingA ?? 2_000,
         },
       };
     }
@@ -157,7 +157,7 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
             labor: "labor-repression",
             trade: "trade-restricted",
           },
-          institutionFundingSUSDPerYear: 0,
+          institutionFundingRUSDPerYear: 0,
         },
       };
     }
@@ -172,7 +172,7 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
           labor: "labor-repression",
           trade: "trade-restricted",
         },
-        institutionFundingSUSDPerYear: options.fundingC ?? 500,
+        institutionFundingRUSDPerYear: options.fundingC ?? 500,
       },
     };
   });

@@ -9,7 +9,7 @@ import type { CountrySnapshot, SimulationSnapshot } from "./protocol.js";
 import {
   essentialGoodIds,
   formatQuantity,
-  formatSUSD,
+  formatRUSD,
   marketsForCountry,
   productionCapacityForGood,
 } from "./selectors.js";
@@ -53,8 +53,8 @@ function essentialConditions(
         const price = market.prices.find((entry) => entry.goodId === goodId);
         if (price === undefined) continue;
         stock += price.stockQuantity;
-        minPrice = minPrice === null ? price.priceSUSD : Math.min(minPrice, price.priceSUSD);
-        maxPrice = maxPrice === null ? price.priceSUSD : Math.max(maxPrice, price.priceSUSD);
+        minPrice = minPrice === null ? price.priceRUSD : Math.min(minPrice, price.priceRUSD);
+        maxPrice = maxPrice === null ? price.priceRUSD : Math.max(maxPrice, price.priceRUSD);
       }
       return {
         goodId,
@@ -72,9 +72,9 @@ function essentialConditions(
 function priceLabel(condition: EssentialGoodCondition): string {
   if (condition.minPrice === null || condition.maxPrice === null) return "no quoted price";
   if (condition.minPrice === condition.maxPrice) {
-    return `${condition.minPrice.toFixed(4)} SUSD/${condition.unitLabel}`;
+    return `${condition.minPrice.toFixed(4)} RUSD/${condition.unitLabel}`;
   }
-  return `${condition.minPrice.toFixed(4)}–${condition.maxPrice.toFixed(4)} SUSD/${condition.unitLabel}`;
+  return `${condition.minPrice.toFixed(4)}–${condition.maxPrice.toFixed(4)} RUSD/${condition.unitLabel}`;
 }
 
 function rank(severity: EconomicExplanationSeverity): number {
@@ -140,14 +140,14 @@ export function buildEconomicExplanations(
 
   if (country.hardshipPopulationShare > 0) {
     const cashPerCapita =
-      country.population > 0 ? country.householdCashSUSD / country.population : 0;
+      country.population > 0 ? country.householdCashRUSD / country.population : 0;
     explanations.push({
       id: "household-purchasing-power",
       severity: "warning",
       title: "Household purchasing power may be constrained",
       observation:
-        `Households hold ${formatSUSD(country.householdCashSUSD)} in cash (${formatSUSD(cashPerCapita)} per capita); ` +
-        `estimated daily wage base is ${formatSUSD(country.estimatedDailyWageBaseSUSD)}; wealth index ${country.wealthLevel.toFixed(1)}.`,
+        `Households hold ${formatRUSD(country.householdCashRUSD)} in cash (${formatRUSD(cashPerCapita)} per capita); ` +
+        `estimated daily wage base is ${formatRUSD(country.estimatedDailyWageBaseRUSD)}; wealth index ${country.wealthLevel.toFixed(1)}.`,
       evidence: [
         `Employed workers: ${country.employedWorkers.toLocaleString("en-US")} of ${country.workingAgePopulation.toLocaleString("en-US")} working-age people.`,
         `The wage base is a current-employment estimate at base wages, not realized household income.`,
@@ -160,19 +160,19 @@ export function buildEconomicExplanations(
 
   const latest = country.latestFiscal;
   if (latest !== null) {
-    const monthlyOutflow = latest.welfareExpenseSUSD + latest.interestExpenseSUSD;
-    if (latest.netFiscalResultSUSD < 0 || country.treasuryCashSUSD < monthlyOutflow) {
+    const monthlyOutflow = latest.welfareExpenseRUSD + latest.interestExpenseRUSD;
+    if (latest.netFiscalResultRUSD < 0 || country.treasuryCashRUSD < monthlyOutflow) {
       explanations.push({
         id: "fiscal-pressure",
-        severity: latest.netFiscalResultSUSD < 0 ? "warning" : "info",
+        severity: latest.netFiscalResultRUSD < 0 ? "warning" : "info",
         title: "Public finances are under pressure",
         observation:
-          `Latest closed month: tax ${formatSUSD(latest.incomeTaxSUSD)}, welfare ${formatSUSD(latest.welfareExpenseSUSD)}, ` +
-          `interest ${formatSUSD(latest.interestExpenseSUSD)}, net ${formatSUSD(latest.netFiscalResultSUSD)}. ` +
-          `Treasury cash is ${formatSUSD(country.treasuryCashSUSD)}.`,
+          `Latest closed month: tax ${formatRUSD(latest.incomeTaxRUSD)}, welfare ${formatRUSD(latest.welfareExpenseRUSD)}, ` +
+          `interest ${formatRUSD(latest.interestExpenseRUSD)}, net ${formatRUSD(latest.netFiscalResultRUSD)}. ` +
+          `Treasury cash is ${formatRUSD(country.treasuryCashRUSD)}.`,
         evidence: [
-          `Outstanding principal: ${formatSUSD(country.debtOutstandingPrincipalSUSD)}; accrued interest payable: ${formatSUSD(country.debtInterestPayableSUSD)}.`,
-          country.treasuryCashSUSD < monthlyOutflow
+          `Outstanding principal: ${formatRUSD(country.debtOutstandingPrincipalRUSD)}; accrued interest payable: ${formatRUSD(country.debtInterestPayableRUSD)}.`,
+          country.treasuryCashRUSD < monthlyOutflow
             ? "Treasury cash is below last month's welfare plus interest outflow."
             : "Treasury cash currently covers last month's welfare plus interest outflow.",
         ],

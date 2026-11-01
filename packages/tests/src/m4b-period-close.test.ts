@@ -87,7 +87,7 @@ function manualFinance(
     subtype: AccountSubtype;
     ownerKind?: FinancialAccountOwnerKind;
     ownerId?: number | null;
-    balanceSUSD?: number;
+    balanceRUSD?: number;
   }[],
 ): FinanceState {
   return {
@@ -97,7 +97,7 @@ function manualFinance(
       ownerId: entry.ownerId === undefined ? 0 : entry.ownerId,
       category: categoryForSubtype(entry.subtype),
       subtype: entry.subtype,
-      balanceSUSD: entry.balanceSUSD ?? 0,
+      balanceRUSD: entry.balanceRUSD ?? 0,
     })),
     postings: [],
     nextPostingId: 1,
@@ -174,9 +174,9 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const revenueBefore = revenueFinance.accounts.map((account) => ({ ...account }));
     expect(() =>
       applyOpeningBalances(revenueFinance, 0, [
-        { accountId: 1, balanceSUSD: 50 },
-        { accountId: 2, balanceSUSD: 40 },
-        { accountId: 3, balanceSUSD: 10 },
+        { accountId: 1, balanceRUSD: 50 },
+        { accountId: 2, balanceRUSD: 40 },
+        { accountId: 3, balanceRUSD: 10 },
       ]),
     ).toThrow(/revenue and expense accounts start at zero/i);
     expect(revenueFinance.accounts).toEqual(revenueBefore);
@@ -190,9 +190,9 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const expenseBefore = expenseFinance.accounts.map((account) => ({ ...account }));
     expect(() =>
       applyOpeningBalances(expenseFinance, 0, [
-        { accountId: 1, balanceSUSD: 8 },
-        { accountId: 2, balanceSUSD: 20 },
-        { accountId: 3, balanceSUSD: 12 },
+        { accountId: 1, balanceRUSD: 8 },
+        { accountId: 2, balanceRUSD: 20 },
+        { accountId: 3, balanceRUSD: 12 },
       ]),
     ).toThrow(/revenue and expense accounts start at zero/i);
     expect(expenseFinance.accounts).toEqual(expenseBefore);
@@ -207,13 +207,13 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       { id: 4, subtype: "consumption-expense" },
     ]);
     applyOpeningBalances(finance, 0, [
-      { accountId: 1, balanceSUSD: 25 },
-      { accountId: 2, balanceSUSD: 25 },
-      { accountId: 3, balanceSUSD: 0 },
-      { accountId: 4, balanceSUSD: 0 },
+      { accountId: 1, balanceRUSD: 25 },
+      { accountId: 2, balanceRUSD: 25 },
+      { accountId: 3, balanceRUSD: 0 },
+      { accountId: 4, balanceRUSD: 0 },
     ]);
     expect(finance.opening).not.toBeNull();
-    expect(finance.accounts.find((account) => account.id === 3)?.balanceSUSD).toBe(0);
+    expect(finance.accounts.find((account) => account.id === 3)?.balanceRUSD).toBe(0);
   });
 
   test("rejects invalid kind/subtype/side combinations for individual postings", () => {
@@ -234,7 +234,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       lines: readonly {
         accountId: number;
         side: "debit" | "credit";
-        amountSUSD: number;
+        amountRUSD: number;
       }[],
     ): void => {
       expect(() => postJournalEntry(world.finance, 0, kind, lines)).toThrow(
@@ -244,36 +244,36 @@ describe("M4b opening balances and the semantic posting matrix", () => {
 
     // goods-purchase may only debit consumption expense and credit sales revenue.
     expectMatrixRejection("goods-purchase", [
-      { accountId: sales.id, side: "debit", amountSUSD: 5 },
-      { accountId: householdCash.id, side: "credit", amountSUSD: 5 },
+      { accountId: sales.id, side: "debit", amountRUSD: 5 },
+      { accountId: householdCash.id, side: "credit", amountRUSD: 5 },
     ]);
     expectMatrixRejection("goods-purchase", [
-      { accountId: wageExpense.id, side: "debit", amountSUSD: 5 },
-      { accountId: householdCash.id, side: "credit", amountSUSD: 5 },
+      { accountId: wageExpense.id, side: "debit", amountRUSD: 5 },
+      { accountId: householdCash.id, side: "credit", amountRUSD: 5 },
     ]);
     // input-purchase may only debit input expense.
     expectMatrixRejection("input-purchase", [
-      { accountId: consumption.id, side: "debit", amountSUSD: 5 },
-      { accountId: buildingCash.id, side: "credit", amountSUSD: 5 },
+      { accountId: consumption.id, side: "debit", amountRUSD: 5 },
+      { accountId: buildingCash.id, side: "credit", amountRUSD: 5 },
     ]);
     // wages may only debit wage expense and credit wage income.
     expectMatrixRejection("wages", [
-      { accountId: wageExpense.id, side: "credit", amountSUSD: 5 },
-      { accountId: wageIncome.id, side: "debit", amountSUSD: 5 },
+      { accountId: wageExpense.id, side: "credit", amountRUSD: 5 },
+      { accountId: wageIncome.id, side: "debit", amountRUSD: 5 },
     ]);
     // upkeep may only credit system income.
     expectMatrixRejection("upkeep", [
-      { accountId: wageIncome.id, side: "credit", amountSUSD: 5 },
-      { accountId: wageExpense.id, side: "debit", amountSUSD: 5 },
+      { accountId: wageIncome.id, side: "credit", amountRUSD: 5 },
+      { accountId: wageExpense.id, side: "debit", amountRUSD: 5 },
     ]);
     // Equity-transfer kinds may not post to revenue or expense accounts.
     expectMatrixRejection("owner-capital-injection", [
-      { accountId: equity.id, side: "debit", amountSUSD: 5 },
-      { accountId: wageIncome.id, side: "credit", amountSUSD: 5 },
+      { accountId: equity.id, side: "debit", amountRUSD: 5 },
+      { accountId: wageIncome.id, side: "credit", amountRUSD: 5 },
     ]);
     expectMatrixRejection("profit-distribution", [
-      { accountId: consumption.id, side: "credit", amountSUSD: 5 },
-      { accountId: equity.id, side: "debit", amountSUSD: 5 },
+      { accountId: consumption.id, side: "credit", amountRUSD: 5 },
+      { accountId: equity.id, side: "debit", amountRUSD: 5 },
     ]);
 
     expect(world.finance.accounts).toEqual(before);
@@ -298,17 +298,17 @@ describe("M4b opening balances and the semantic posting matrix", () => {
         {
           transactionKind: "goods-purchase",
           lines: [
-            { accountId: consumption.id, side: "debit", amountSUSD: 10 },
-            { accountId: buildingCash.id, side: "debit", amountSUSD: 10 },
-            { accountId: householdCash.id, side: "credit", amountSUSD: 10 },
-            { accountId: sales.id, side: "credit", amountSUSD: 10 },
+            { accountId: consumption.id, side: "debit", amountRUSD: 10 },
+            { accountId: buildingCash.id, side: "debit", amountRUSD: 10 },
+            { accountId: householdCash.id, side: "credit", amountRUSD: 10 },
+            { accountId: sales.id, side: "credit", amountRUSD: 10 },
           ],
         },
         {
           transactionKind: "owner-capital-injection",
           lines: [
-            { accountId: equity.id, side: "debit", amountSUSD: 1 },
-            { accountId: wageIncome.id, side: "credit", amountSUSD: 1 },
+            { accountId: equity.id, side: "debit", amountRUSD: 1 },
+            { accountId: wageIncome.id, side: "credit", amountRUSD: 1 },
           ],
         },
       ]),
@@ -328,14 +328,14 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const cashBefore = designatedCashTotal(world.finance);
 
     postJournalEntry(world.finance, 0, "goods-purchase", [
-      { accountId: consumption.id, side: "debit", amountSUSD: 10 },
-      { accountId: buildingCash.id, side: "debit", amountSUSD: 10 },
-      { accountId: householdCash.id, side: "credit", amountSUSD: 10 },
-      { accountId: sales.id, side: "credit", amountSUSD: 10 },
+      { accountId: consumption.id, side: "debit", amountRUSD: 10 },
+      { accountId: buildingCash.id, side: "debit", amountRUSD: 10 },
+      { accountId: householdCash.id, side: "credit", amountRUSD: 10 },
+      { accountId: sales.id, side: "credit", amountRUSD: 10 },
     ]);
     expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 9);
-    expect(consumption.balanceSUSD).toBeCloseTo(10, 9);
-    expect(sales.balanceSUSD).toBeCloseTo(10, 9);
+    expect(consumption.balanceRUSD).toBeCloseTo(10, 9);
+    expect(sales.balanceRUSD).toBeCloseTo(10, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
 
@@ -347,8 +347,8 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const postingCount = world.finance.postings.length;
     const internalKind = "period-close" as unknown as PublicTransactionKind;
     const lines = [
-      { accountId: householdCash.id, side: "debit" as const, amountSUSD: 1 },
-      { accountId: buildingCash.id, side: "credit" as const, amountSUSD: 1 },
+      { accountId: householdCash.id, side: "debit" as const, amountRUSD: 1 },
+      { accountId: buildingCash.id, side: "credit" as const, amountRUSD: 1 },
     ];
 
     expect(() => postJournalEntry(world.finance, 0, internalKind, lines)).toThrow(
@@ -360,7 +360,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     expect(() => postCashTransfer(world.finance, 0, internalKind, {
       fromAccountId: householdCash.id,
       toAccountId: buildingCash.id,
-      amountSUSD: 1,
+      amountRUSD: 1,
     })).toThrow(/internal to the period-close helper/i);
     expect(world.finance.accounts).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
@@ -423,15 +423,15 @@ describe("M4b monthly periodic close", () => {
 
     // Mapped gross period flows equal the settlement totals for the closed day.
     expect(summary.flowTotalsByKind["goods-purchase"]).toBeCloseTo(
-      settlement.totals.householdPurchasesSUSD,
+      settlement.totals.householdPurchasesRUSD,
       9,
     );
     expect(summary.flowTotalsByKind["input-purchase"]).toBeCloseTo(
-      settlement.totals.inputPurchasesSUSD,
+      settlement.totals.inputPurchasesRUSD,
       9,
     );
-    expect(summary.flowTotalsByKind.wages).toBeCloseTo(settlement.totals.wagesPaidSUSD, 9);
-    expect(summary.flowTotalsByKind.upkeep).toBeCloseTo(settlement.totals.upkeepPaidSUSD, 9);
+    expect(summary.flowTotalsByKind.wages).toBeCloseTo(settlement.totals.wagesPaidRUSD, 9);
+    expect(summary.flowTotalsByKind.upkeep).toBeCloseTo(settlement.totals.upkeepPaidRUSD, 9);
     expect(Object.keys(summary.flowTotalsByKind).sort()).toEqual(
       [...FLOW_TRANSACTION_KINDS].sort(),
     );
@@ -439,32 +439,32 @@ describe("M4b monthly periodic close", () => {
     // Per-owner revenue/expense balances captured before the close.
     for (const producer of settlement.producers) {
       expect(summaryTotal(summary, accountOf(world, "building", producer.buildingId, "sales-revenue").id)).toBeCloseTo(
-        producer.revenueSUSD,
+        producer.revenueRUSD,
         9,
       );
       expect(summaryTotal(summary, accountOf(world, "building", producer.buildingId, "input-expense").id)).toBeCloseTo(
-        producer.inputCostsSUSD,
+        producer.inputCostsRUSD,
         9,
       );
       expect(summaryTotal(summary, accountOf(world, "building", producer.buildingId, "wage-expense").id)).toBeCloseTo(
-        producer.wagesPaidSUSD,
+        producer.wagesPaidRUSD,
         9,
       );
       expect(summaryTotal(summary, accountOf(world, "building", producer.buildingId, "upkeep-expense").id)).toBeCloseTo(
-        producer.upkeepPaidSUSD,
+        producer.upkeepPaidRUSD,
         9,
       );
     }
     for (const household of settlement.households) {
       expect(
         summaryTotal(summary, accountOf(world, "popBlock", household.popBlockId, "consumption-expense").id),
-      ).toBeCloseTo(household.marketPurchasesSUSD, 9);
+      ).toBeCloseTo(household.marketPurchasesRUSD, 9);
       expect(
         summaryTotal(summary, accountOf(world, "popBlock", household.popBlockId, "wage-income").id),
-      ).toBeCloseTo(household.wagesReceivedSUSD, 9);
+      ).toBeCloseTo(household.wagesReceivedRUSD, 9);
     }
     expect(summaryTotal(summary, accountOf(world, "system", null, "system-income").id)).toBeCloseTo(
-      settlement.totals.upkeepPaidSUSD,
+      settlement.totals.upkeepPaidRUSD,
       9,
     );
 
@@ -474,38 +474,38 @@ describe("M4b monthly periodic close", () => {
       if (account.category !== "asset") continue;
       const total = summary.accountTotals[account.id];
       if (total === undefined) {
-        expect(account.balanceSUSD).toBe(0);
+        expect(account.balanceRUSD).toBe(0);
       } else {
-        expect(total).toBeCloseTo(account.balanceSUSD, 9);
-        expect(account.balanceSUSD).not.toBe(0);
+        expect(total).toBeCloseTo(account.balanceRUSD, 9);
+        expect(account.balanceRUSD).not.toBe(0);
       }
     }
     // Equity was adjusted by the net period result, so the captured pre-close
     // equity equals the live equity minus that owner's net.
     for (const producer of settlement.producers) {
       const net =
-        producer.revenueSUSD -
-        producer.inputCostsSUSD -
-        producer.wagesPaidSUSD -
-        producer.upkeepPaidSUSD;
+        producer.revenueRUSD -
+        producer.inputCostsRUSD -
+        producer.wagesPaidRUSD -
+        producer.upkeepPaidRUSD;
       expect(
         summaryTotal(summary, accountOf(world, "building", producer.buildingId, "owner-equity").id),
       ).toBeCloseTo(
-        accountOf(world, "building", producer.buildingId, "owner-equity").balanceSUSD - net,
+        accountOf(world, "building", producer.buildingId, "owner-equity").balanceRUSD - net,
         9,
       );
     }
     for (const household of settlement.households) {
-      const net = household.wagesReceivedSUSD - household.marketPurchasesSUSD;
+      const net = household.wagesReceivedRUSD - household.marketPurchasesRUSD;
       expect(
         summaryTotal(summary, accountOf(world, "popBlock", household.popBlockId, "owner-equity").id),
       ).toBeCloseTo(
-        accountOf(world, "popBlock", household.popBlockId, "owner-equity").balanceSUSD - net,
+        accountOf(world, "popBlock", household.popBlockId, "owner-equity").balanceRUSD - net,
         9,
       );
     }
     expect(summaryTotal(summary, accountOf(world, "system", null, "owner-equity").id)).toBeCloseTo(
-      accountOf(world, "system", null, "owner-equity").balanceSUSD - settlement.totals.upkeepPaidSUSD,
+      accountOf(world, "system", null, "owner-equity").balanceRUSD - settlement.totals.upkeepPaidRUSD,
       9,
     );
     for (const key of Object.keys(summary.accountTotals)) {
@@ -516,7 +516,7 @@ describe("M4b monthly periodic close", () => {
     // Closing entries zero revenue and expense exactly and never touch cash.
     for (const account of world.finance.accounts) {
       if (account.category === "revenue" || account.category === "expense") {
-        expect(account.balanceSUSD).toBe(0);
+        expect(account.balanceRUSD).toBe(0);
       }
     }
     expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 9);
@@ -582,17 +582,17 @@ describe("M4b monthly periodic close", () => {
     const sales = accountOf(world, "building", 0, "sales-revenue");
     world.dayIndex = FIRST_MONTH_END;
     postJournalEntry(world.finance, FIRST_MONTH_END, "goods-purchase", [
-      { accountId: consumption.id, side: "debit", amountSUSD: 12 },
-      { accountId: buildingCash.id, side: "debit", amountSUSD: 12 },
-      { accountId: householdCash.id, side: "credit", amountSUSD: 12 },
-      { accountId: sales.id, side: "credit", amountSUSD: 12 },
+      { accountId: consumption.id, side: "debit", amountRUSD: 12 },
+      { accountId: buildingCash.id, side: "debit", amountRUSD: 12 },
+      { accountId: householdCash.id, side: "credit", amountRUSD: 12 },
+      { accountId: sales.id, side: "credit", amountRUSD: 12 },
     ]);
-    const householdEquity = equityAccountOf(world, "popBlock", 0).balanceSUSD;
-    const buildingEquity = equityAccountOf(world, "building", 0).balanceSUSD;
+    const householdEquity = equityAccountOf(world, "popBlock", 0).balanceRUSD;
+    const buildingEquity = equityAccountOf(world, "building", 0).balanceRUSD;
     const close = closeFinancePeriod(world);
 
-    expect(equityAccountOf(world, "popBlock", 0).balanceSUSD).toBeCloseTo(householdEquity - 12, 9);
-    expect(equityAccountOf(world, "building", 0).balanceSUSD).toBeCloseTo(buildingEquity + 12, 9);
+    expect(equityAccountOf(world, "popBlock", 0).balanceRUSD).toBeCloseTo(householdEquity - 12, 9);
+    expect(equityAccountOf(world, "building", 0).balanceRUSD).toBeCloseTo(buildingEquity + 12, 9);
     expect(close.summary.flowTotalsByKind["goods-purchase"]).toBeCloseTo(12, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
@@ -602,17 +602,17 @@ describe("M4b monthly periodic close", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     const equity = equityAccountOf(world, "popBlock", 0);
     const revenue = accountOf(world, "popBlock", 0, "wage-income");
-    const originalEquity = equity.balanceSUSD;
-    const shift = equity.balanceSUSD + 100;
-    equity.balanceSUSD = -100;
-    revenue.balanceSUSD += shift;
-    expect(equity.balanceSUSD).toBeLessThan(0);
+    const originalEquity = equity.balanceRUSD;
+    const shift = equity.balanceRUSD + 100;
+    equity.balanceRUSD = -100;
+    revenue.balanceRUSD += shift;
+    expect(equity.balanceRUSD).toBeLessThan(0);
     expect(() => assertValidWorld(world)).not.toThrow();
 
     world.dayIndex = FIRST_MONTH_END;
     const close = closeFinancePeriod(world);
     expect(close.summary.accountTotals[equity.id]).toBeCloseTo(-100, 9);
-    expect(equityAccountOf(world, "popBlock", 0).balanceSUSD).toBeCloseTo(originalEquity, 9);
+    expect(equityAccountOf(world, "popBlock", 0).balanceRUSD).toBeCloseTo(originalEquity, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
 
@@ -666,10 +666,10 @@ describe("M4b monthly periodic close", () => {
     const sales = accountOf(world, "building", 0, "sales-revenue");
     world.dayIndex = FIRST_MONTH_END;
     postJournalEntry(world.finance, FIRST_MONTH_END, "goods-purchase", [
-      { accountId: consumption.id, side: "debit", amountSUSD: 7 },
-      { accountId: buildingCash.id, side: "debit", amountSUSD: 7 },
-      { accountId: householdCash.id, side: "credit", amountSUSD: 7 },
-      { accountId: sales.id, side: "credit", amountSUSD: 7 },
+      { accountId: consumption.id, side: "debit", amountRUSD: 7 },
+      { accountId: buildingCash.id, side: "debit", amountRUSD: 7 },
+      { accountId: householdCash.id, side: "credit", amountRUSD: 7 },
+      { accountId: sales.id, side: "credit", amountRUSD: 7 },
     ]);
     world.finance.nextPostingId = Number.MAX_SAFE_INTEGER;
     const snapshot = financeSnapshot(world);
@@ -1004,7 +1004,7 @@ describe("M4b finance summary persistence and validation", () => {
     const wrongAmount: JournalPosting = {
       ...profitable,
       lines: profitable.lines.map((line) =>
-        line === equityLine ? { ...line, amountSUSD: line.amountSUSD + 1 } : { ...line },
+        line === equityLine ? { ...line, amountRUSD: line.amountRUSD + 1 } : { ...line },
       ),
     };
     expect(() => assertValidJournalPosting(wrongAmount, accounts)).toThrow(/unbalanced/i);
@@ -1024,7 +1024,7 @@ describe("M4b finance summary persistence and validation", () => {
     const unbalanced: JournalPosting = {
       ...profitable,
       lines: profitable.lines.map((line) =>
-        line === revenueLine ? { ...line, amountSUSD: line.amountSUSD + 1 } : { ...line },
+        line === revenueLine ? { ...line, amountRUSD: line.amountRUSD + 1 } : { ...line },
       ),
     };
     expect(() => assertValidJournalPosting(unbalanced, accounts)).toThrow(/unbalanced/i);
@@ -1034,8 +1034,8 @@ describe("M4b finance summary persistence and validation", () => {
       ...profitable,
       lines: [
         ...profitable.lines.map((line) => ({ ...line })),
-        { accountId: cashLine.id, side: "debit", amountSUSD: 1 },
-        { accountId: cashLine.id, side: "credit", amountSUSD: 1 },
+        { accountId: cashLine.id, side: "debit", amountRUSD: 1 },
+        { accountId: cashLine.id, side: "credit", amountRUSD: 1 },
       ],
     };
     expect(() => assertValidJournalPosting(withCash, accounts)).toThrow(/cash/i);
@@ -1048,7 +1048,7 @@ describe("M4b finance summary persistence and validation", () => {
       ownerId: 0,
       category: "revenue",
       subtype: "wage-income",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     };
     const expense: FinancialAccount = {
       id: 2,
@@ -1056,7 +1056,7 @@ describe("M4b finance summary persistence and validation", () => {
       ownerId: 0,
       category: "expense",
       subtype: "wage-expense",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     };
     const equity: FinancialAccount = {
       id: 3,
@@ -1064,7 +1064,7 @@ describe("M4b finance summary persistence and validation", () => {
       ownerId: 0,
       category: "equity",
       subtype: "owner-equity",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     };
     const liability: FinancialAccount = {
       id: 4,
@@ -1072,7 +1072,7 @@ describe("M4b finance summary persistence and validation", () => {
       ownerId: 0,
       category: "liability",
       subtype: "owner-equity",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     };
     const accounts = new Map<number, FinancialAccount>([
       [revenue.id, revenue],
@@ -1092,8 +1092,8 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 10 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 10 },
         ]),
         accounts,
       ),
@@ -1102,10 +1102,10 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 10 },
-          { accountId: equity.id, side: "credit", amountSUSD: 1 },
-          { accountId: equity.id, side: "debit", amountSUSD: 1 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 10 },
+          { accountId: equity.id, side: "credit", amountRUSD: 1 },
+          { accountId: equity.id, side: "debit", amountRUSD: 1 },
         ]),
         accounts,
       ),
@@ -1114,10 +1114,10 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 10 },
-          { accountId: liability.id, side: "credit", amountSUSD: 3 },
-          { accountId: equity.id, side: "debit", amountSUSD: 3 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 10 },
+          { accountId: liability.id, side: "credit", amountRUSD: 3 },
+          { accountId: equity.id, side: "debit", amountRUSD: 3 },
         ]),
         accounts,
       ),
@@ -1126,10 +1126,10 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 4 },
-          { accountId: equity.id, side: "credit", amountSUSD: 5 },
-          { accountId: equity.id, side: "credit", amountSUSD: 1 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 4 },
+          { accountId: equity.id, side: "credit", amountRUSD: 5 },
+          { accountId: equity.id, side: "credit", amountRUSD: 1 },
         ]),
         accounts,
       ),
@@ -1138,9 +1138,9 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 4 },
-          { accountId: equity.id, side: "credit", amountSUSD: 6 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 4 },
+          { accountId: equity.id, side: "credit", amountRUSD: 6 },
         ]),
         accounts,
       ),
@@ -1151,9 +1151,9 @@ describe("M4b finance summary persistence and validation", () => {
     expect(() =>
       assertValidJournalPosting(
         posting([
-          { accountId: revenue.id, side: "debit", amountSUSD: 10 },
-          { accountId: expense.id, side: "credit", amountSUSD: 4 },
-          { accountId: equity.id, side: "credit", amountSUSD: 5 },
+          { accountId: revenue.id, side: "debit", amountRUSD: 10 },
+          { accountId: expense.id, side: "credit", amountRUSD: 4 },
+          { accountId: equity.id, side: "credit", amountRUSD: 5 },
         ]),
         accounts,
       ),

@@ -19,7 +19,7 @@
  */
 
 import { assertValidDayIndex, dayIndexToCivilDate, daysInMonth, isTerminalDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { DayIndex, Id } from "../types.js";
 import {
   assertAccountingIdentity,
@@ -93,12 +93,12 @@ export interface BuildingProfitAllocationResult {
   readonly buildingId: Id;
   readonly ownerKind: "private" | "state";
   readonly ownerId: Id;
-  readonly periodNetSUSD: number;
-  readonly retainedProfitBeforeSUSD: number;
-  readonly retainedProfitAfterSUSD: number;
-  readonly distributableSUSD: number;
-  readonly distributedSUSD: number;
-  readonly retainedSUSD: number;
+  readonly periodNetRUSD: number;
+  readonly retainedProfitBeforeRUSD: number;
+  readonly retainedProfitAfterRUSD: number;
+  readonly distributableRUSD: number;
+  readonly distributedRUSD: number;
+  readonly retainedRUSD: number;
 }
 
 /** Transient result of the M5a month-end allocation phase. */
@@ -107,9 +107,9 @@ export interface ProfitDistributionResult {
   readonly dayIndex: DayIndex;
   readonly periodEndDay: DayIndex | null;
   readonly buildings: readonly BuildingProfitAllocationResult[];
-  readonly totalPrivateDistributionSUSD: number;
-  readonly totalStateRemittanceSUSD: number;
-  readonly totalRetainedSUSD: number;
+  readonly totalPrivateDistributionRUSD: number;
+  readonly totalStateRemittanceRUSD: number;
+  readonly totalRetainedRUSD: number;
   readonly postingIds: readonly number[];
 }
 
@@ -119,9 +119,9 @@ function emptyResult(dayIndex: DayIndex): ProfitDistributionResult {
     dayIndex,
     periodEndDay: null,
     buildings: [],
-    totalPrivateDistributionSUSD: 0,
-    totalStateRemittanceSUSD: 0,
-    totalRetainedSUSD: 0,
+    totalPrivateDistributionRUSD: 0,
+    totalStateRemittanceRUSD: 0,
+    totalRetainedRUSD: 0,
     postingIds: [],
   };
 }
@@ -129,7 +129,7 @@ function emptyResult(dayIndex: DayIndex): ProfitDistributionResult {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function isLastCivilDayOfMonth(dayIndex: DayIndex): boolean {
@@ -274,7 +274,7 @@ export function runProfitDistributionPhase(
       throw new RangeError(`building ${String(building.id)} period net result is not finite`);
     }
     if (Math.abs(periodNet) <= toleranceMoney(periodNet)) periodNet = 0;
-    const retainedBefore = retained.balanceSUSD;
+    const retainedBefore = retained.balanceRUSD;
     if (!Number.isFinite(retainedBefore)) {
       throw new RangeError(`building ${String(building.id)} retained profit is not finite`);
     }
@@ -286,12 +286,12 @@ export function runProfitDistributionPhase(
         lines:
           periodNet > 0
             ? [
-                { accountId: ownerEquity.id, side: "debit", amountSUSD: amount },
-                { accountId: retained.id, side: "credit", amountSUSD: amount },
+                { accountId: ownerEquity.id, side: "debit", amountRUSD: amount },
+                { accountId: retained.id, side: "credit", amountRUSD: amount },
               ]
             : [
-                { accountId: retained.id, side: "debit", amountSUSD: amount },
-                { accountId: ownerEquity.id, side: "credit", amountSUSD: amount },
+                { accountId: retained.id, side: "debit", amountRUSD: amount },
+                { accountId: ownerEquity.id, side: "credit", amountRUSD: amount },
               ],
         sourceEntityId: building.id,
         targetEntityId: null,
@@ -306,7 +306,7 @@ export function runProfitDistributionPhase(
     const rate =
       building.ownerKind === "state" ? policy.stateRemittanceRate : policy.privatePayoutRate;
     const target = distributable * rate;
-    const availableCash = operating.balanceSUSD;
+    const availableCash = operating.balanceRUSD;
     if (!Number.isFinite(availableCash) || availableCash < 0) {
       throw new RangeError(`building ${String(building.id)} has invalid operating cash`);
     }
@@ -322,10 +322,10 @@ export function runProfitDistributionPhase(
       entries.push({
         transactionKind: kind,
         lines: [
-          { accountId: retained.id, side: "debit", amountSUSD: distributed },
-          { accountId: operating.id, side: "credit", amountSUSD: distributed },
-          { accountId: recipient.cash.id, side: "debit", amountSUSD: distributed },
-          { accountId: recipient.equity.id, side: "credit", amountSUSD: distributed },
+          { accountId: retained.id, side: "debit", amountRUSD: distributed },
+          { accountId: operating.id, side: "credit", amountRUSD: distributed },
+          { accountId: recipient.cash.id, side: "debit", amountRUSD: distributed },
+          { accountId: recipient.equity.id, side: "credit", amountRUSD: distributed },
         ],
         sourceEntityId: building.id,
         targetEntityId:
@@ -343,12 +343,12 @@ export function runProfitDistributionPhase(
         building.ownerKind === "state"
           ? (recipient.cash.ownerId ?? -1)
           : (recipient.equity.ownerId ?? -1),
-      periodNetSUSD: periodNet,
-      retainedProfitBeforeSUSD: retainedBefore,
-      retainedProfitAfterSUSD: retainedAfterDistribution,
-      distributableSUSD: distributable,
-      distributedSUSD: distributed,
-      retainedSUSD: retainedAfterDistribution,
+      periodNetRUSD: periodNet,
+      retainedProfitBeforeRUSD: retainedBefore,
+      retainedProfitAfterRUSD: retainedAfterDistribution,
+      distributableRUSD: distributable,
+      distributedRUSD: distributed,
+      retainedRUSD: retainedAfterDistribution,
     });
   }
 
@@ -375,9 +375,9 @@ export function runProfitDistributionPhase(
     dayIndex,
     periodEndDay: close.summary.periodEndDay,
     buildings,
-    totalPrivateDistributionSUSD: totalPrivate,
-    totalStateRemittanceSUSD: totalState,
-    totalRetainedSUSD: totalRetained,
+    totalPrivateDistributionRUSD: totalPrivate,
+    totalStateRemittanceRUSD: totalState,
+    totalRetainedRUSD: totalRetained,
     postingIds,
   };
 }

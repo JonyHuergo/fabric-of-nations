@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewInstitutionFunding,
   previewLawProposal,
   type SimulationSnapshot,
@@ -15,7 +15,7 @@ import { colors, spacing } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
-const MAX_ANNUAL_FUNDING_SUSD = 1e15;
+const MAX_ANNUAL_FUNDING_RUSD = 1e15;
 
 /**
  * The worker rejects a funding target only for non-finite/negative values or the
@@ -24,15 +24,15 @@ const MAX_ANNUAL_FUNDING_SUSD = 1e15;
  * always includes the current policy value so it remains representable).
  */
 function annualFundingCeiling(
-  currentAnnualSUSD: number,
-  treasuryCashSUSD: number,
+  currentAnnualRUSD: number,
+  treasuryCashRUSD: number,
 ): number {
-  const affordable = Number.isFinite(treasuryCashSUSD)
-    ? Math.max(0, treasuryCashSUSD) * 365
+  const affordable = Number.isFinite(treasuryCashRUSD)
+    ? Math.max(0, treasuryCashRUSD) * 365
     : 0;
   return Math.min(
-    MAX_ANNUAL_FUNDING_SUSD,
-    Math.max(1_000, currentAnnualSUSD, affordable),
+    MAX_ANNUAL_FUNDING_RUSD,
+    Math.max(1_000, currentAnnualRUSD, affordable),
   );
 }
 
@@ -87,9 +87,9 @@ export function PoliticsScreen({
 
   useEffect(() => {
     if (country === null) return;
-    setFundingText(country.politics.institution.fundedAnnualSUSD.toFixed(0));
+    setFundingText(country.politics.institution.fundedAnnualRUSD.toFixed(0));
     setSelectedLawId(null);
-  }, [countryId, country?.politics.institution.fundedAnnualSUSD]);
+  }, [countryId, country?.politics.institution.fundedAnnualRUSD]);
 
   const isPlayerCountry =
     country !== null &&
@@ -97,14 +97,14 @@ export function PoliticsScreen({
     country.id === snapshot.playerCountryId;
   const parsedFunding = Number(fundingText);
 
-  const applyFunding = (annualSUSD?: number): void => {
+  const applyFunding = (annualRUSD?: number): void => {
     if (country === null) return;
     if (!isPlayerCountry) {
       setLocalError("Only the player-controlled country may set administration funding.");
       return;
     }
     if (!country.politics.enabled) return;
-    const target = annualSUSD ?? parsedFunding;
+    const target = annualRUSD ?? parsedFunding;
     const preview = previewInstitutionFunding(snapshot, country, target);
     if (!preview.valid) {
       setLocalError(preview.errors.join(" "));
@@ -114,7 +114,7 @@ export function PoliticsScreen({
     applyAction({
       kind: "set-institution-funding",
       countryId: country.id,
-      annualSUSD: target,
+      annualRUSD: target,
     });
   };
   // Unconditional hook: coalesces rapid slider commits so only one validated action
@@ -142,8 +142,8 @@ export function PoliticsScreen({
   const canAct = isPlayerCountry && !busy && connection === "ready";
   const fundingPreview = previewInstitutionFunding(snapshot, country, parsedFunding);
   const fundingLimit = annualFundingCeiling(
-    politics.institution.fundedAnnualSUSD,
-    country.treasuryCashSUSD,
+    politics.institution.fundedAnnualRUSD,
+    country.treasuryCashRUSD,
   );
   const fundingStep = Math.max(1, Math.round(fundingLimit / 100));
   const selectedLaw =
@@ -233,8 +233,8 @@ export function PoliticsScreen({
         />
         <StatRow
           label="Funding (this month)"
-          value={`${formatSUSD(politics.institution.fundedAnnualSUSD)}/yr`}
-          detail={`Requested ${formatSUSD(politics.institution.fundingRequestedMonthToDateSUSD)} · shortfall ${formatSUSD(politics.institution.fundingShortfallMonthToDateSUSD)}`}
+          value={`${formatRUSD(politics.institution.fundedAnnualRUSD)}/yr`}
+          detail={`Requested ${formatRUSD(politics.institution.fundingRequestedMonthToDateRUSD)} · shortfall ${formatRUSD(politics.institution.fundingShortfallMonthToDateRUSD)}`}
         />
         <SliderField
           label="Administration funding"
@@ -247,7 +247,7 @@ export function PoliticsScreen({
           max={fundingLimit}
           step={fundingStep}
           precision={0}
-          unit="SUSD/yr"
+          unit="RUSD/yr"
           disabled={!isPlayerCountry || connection !== "ready"}
           pending={fundingCommit.hasPending}
           onChange={(value) => setFundingText(value.toFixed(0))}
@@ -263,8 +263,8 @@ export function PoliticsScreen({
           />
         </View>
         <Text style={styles.detail}>
-          Daily request {formatSUSD(fundingPreview.dailyRequestSUSD)}; treasury cash{" "}
-          {formatSUSD(country.treasuryCashSUSD)}.
+          Daily request {formatRUSD(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
+          {formatRUSD(country.treasuryCashRUSD)}.
         </Text>
         {fundingPreview.errors.map((error) => (
           <Text key={error} style={styles.error}>

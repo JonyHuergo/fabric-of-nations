@@ -1,12 +1,12 @@
 /**
- * Versioned Century worker protocol and immutable UI snapshot contract.
+ * Versioned Fabric of Nations worker protocol and immutable UI snapshot contract.
  *
  * This module is intentionally free of simulation, Node, React Native, and DOM
  * imports. The app may import it directly; it contains only plain data contracts,
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 15 as const;
+export const PROTOCOL_VERSION = 16 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -50,31 +50,31 @@ export interface FiscalPolicyActionDto {
   readonly kind: "set-fiscal-policy";
   readonly countryId: number;
   readonly incomeTaxRate: number;
-  readonly incomeTaxAllowanceSUSDPerYear: number;
-  readonly welfareBudgetSUSDPerYear: number;
+  readonly incomeTaxAllowanceRUSDPerYear: number;
+  readonly welfareBudgetRUSDPerYear: number;
   readonly welfareMaxWealthLevel: number;
   readonly businessProfitTaxRate: number;
-  readonly reserveTargetSUSD: number;
+  readonly reserveTargetRUSD: number;
 }
 
 export interface IssueDebtActionDto {
   readonly kind: "issue-debt";
   readonly countryId: number;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 export interface RepayDebtActionDto {
   readonly kind: "repay-debt";
   readonly countryId: number;
   readonly contractId: number;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 export interface SetDebtPolicyActionDto {
   readonly kind: "set-debt-policy";
   readonly countryId: number;
   readonly refinanceOnMaturity: boolean;
-  readonly maxOutstandingPrincipalSUSD: number;
+  readonly maxOutstandingPrincipalRUSD: number;
 }
 
 export interface StartConstructionActionDto {
@@ -110,7 +110,7 @@ export interface SupportPublicEnterpriseActionDto {
   readonly kind: "support-public-enterprise";
   readonly countryId: number;
   readonly buildingId: number;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 /** M8: propose, change, or repeal a law by target law id. */
@@ -124,7 +124,7 @@ export interface ProposeLawActionDto {
 export interface SetInstitutionFundingActionDto {
   readonly kind: "set-institution-funding";
   readonly countryId: number;
-  readonly annualSUSD: number;
+  readonly annualRUSD: number;
 }
 
 /** M9: start researching one technology. */
@@ -144,7 +144,7 @@ export interface CancelResearchActionDto {
 export interface SetEducationFundingActionDto {
   readonly kind: "set-education-funding";
   readonly countryId: number;
-  readonly annualSUSD: number;
+  readonly annualRUSD: number;
 }
 
 /** M9: set the share of academic staff time assigned to research. */
@@ -158,14 +158,14 @@ export interface SetResearchStaffShareActionDto {
 export interface SetTrainingBudgetActionDto {
   readonly kind: "set-training-budget";
   readonly countryId: number;
-  readonly annualSUSD: number;
+  readonly annualRUSD: number;
 }
 
 /** E5: set the annual training stipend per trainee. */
 export interface SetTrainingStipendActionDto {
   readonly kind: "set-training-stipend";
   readonly countryId: number;
-  readonly annualSUSD: number;
+  readonly annualRUSD: number;
 }
 
 /** E5: set the share of academic staff time assigned to vocational training. */
@@ -237,9 +237,9 @@ export interface SetMonetaryPolicyActionDto {
   readonly kind: "set-monetary-policy";
   readonly countryId: number;
   readonly regime: "pegged" | "managed";
-  readonly paritySusdPerUnit: number | null;
-  readonly reserveTransferSUSD: number;
-  readonly currencyConversionSUSD: number;
+  readonly parityRusdPerUnit: number | null;
+  readonly reserveTransferRUSD: number;
+  readonly currencyConversionRUSD: number;
 }
 
 /** Every action the player UI may request. */
@@ -329,43 +329,43 @@ export interface SnapshotCivilDate {
 
 export interface SnapshotFiscalPolicy {
   readonly incomeTaxRate: number;
-  readonly incomeTaxAllowanceSUSDPerYear: number;
-  readonly welfareBudgetSUSDPerYear: number;
+  readonly incomeTaxAllowanceRUSDPerYear: number;
+  readonly welfareBudgetRUSDPerYear: number;
   readonly welfareMaxWealthLevel: number;
   readonly businessProfitTaxRate: number;
-  readonly reserveTargetSUSD: number;
+  readonly reserveTargetRUSD: number;
 }
 
 /** E2 budget decomposition for one closed period (flows, not balances). */
 export interface SnapshotBudgetTotals {
-  readonly welfareRequestedSUSD: number;
-  readonly welfareShortfallSUSD: number;
-  readonly businessTaxAssessedSUSD: number;
-  readonly businessTaxUncollectedSUSD: number;
-  readonly debtIssuedSUSD: number;
-  readonly principalRepaidSUSD: number;
-  readonly interestPaidSUSD: number;
-  readonly unfinancedRequirementSUSD: number;
-  readonly constructionSpentSUSD: number;
-  readonly constructionWrittenOffSUSD: number;
-  readonly constructionMaterialsSpentSUSD: number;
-  readonly subsidyRequestedSUSD: number;
-  readonly subsidyShortfallSUSD: number;
-  readonly publicEnterpriseSupportSUSD: number;
-  readonly administrationRequestedSUSD?: number;
-  readonly administrationShortfallSUSD?: number;
+  readonly welfareRequestedRUSD: number;
+  readonly welfareShortfallRUSD: number;
+  readonly businessTaxAssessedRUSD: number;
+  readonly businessTaxUncollectedRUSD: number;
+  readonly debtIssuedRUSD: number;
+  readonly principalRepaidRUSD: number;
+  readonly interestPaidRUSD: number;
+  readonly unfinancedRequirementRUSD: number;
+  readonly constructionSpentRUSD: number;
+  readonly constructionWrittenOffRUSD: number;
+  readonly constructionMaterialsSpentRUSD: number;
+  readonly subsidyRequestedRUSD: number;
+  readonly subsidyShortfallRUSD: number;
+  readonly publicEnterpriseSupportRUSD: number;
+  readonly administrationRequestedRUSD?: number;
+  readonly administrationShortfallRUSD?: number;
 }
 
 /** Current open-period budget memo. Values are flows so far this month. */
 export interface SnapshotBudgetMonthToDate extends SnapshotBudgetTotals {
-  readonly businessTaxBaseMonthToDateSUSD: number;
+  readonly businessTaxBaseMonthToDateRUSD: number;
 }
 
 /** M5b debt policy plus derived financing constraints. */
 export interface SnapshotDebtPolicy {
   readonly enabled: boolean;
   readonly refinanceOnMaturity: boolean;
-  readonly maxOutstandingPrincipalSUSD: number;
+  readonly maxOutstandingPrincipalRUSD: number;
   readonly creditorKind: "country" | "popBlock";
   readonly creditorId: number;
   readonly creditorLabel: string;
@@ -373,9 +373,9 @@ export interface SnapshotDebtPolicy {
   readonly termDays: number;
   readonly arrearsGraceDays: number;
   /** Creditor's current designated cash; a hard issuance limit. */
-  readonly creditorCashSUSD: number;
+  readonly creditorCashRUSD: number;
   /** Remaining outstanding-principal headroom under the ceiling. */
-  readonly headroomSUSD: number;
+  readonly headroomRUSD: number;
 }
 
 /** One outstanding debt contract exposed for repayment planning. */
@@ -384,12 +384,12 @@ export interface SnapshotDebtContract {
   readonly holderKind: "country" | "popBlock";
   readonly holderId: number;
   readonly holderLabel: string;
-  readonly principalSUSD: number;
-  readonly outstandingPrincipalSUSD: number;
+  readonly principalRUSD: number;
+  readonly outstandingPrincipalRUSD: number;
   readonly annualCouponRate: number;
   readonly issueDay: number;
   readonly maturityDay: number;
-  readonly accruedInterestSUSD: number;
+  readonly accruedInterestRUSD: number;
   readonly status: "active" | "arrears" | "repaid" | "defaulted";
 }
 
@@ -418,11 +418,11 @@ export interface SnapshotProjectType {
   readonly key: string;
   readonly name: string;
   readonly sector: string;
-  readonly constructionCostSUSD: number;
+  readonly constructionCostRUSD: number;
   readonly constructionWorkers: number;
   readonly plannedJobs: number;
-  readonly dailyUpkeepSUSDAtLevelOne: number;
-  readonly workingCapitalSUSD: number;
+  readonly dailyUpkeepRUSDAtLevelOne: number;
+  readonly workingCapitalRUSD: number;
   readonly outputs: readonly SnapshotProjectOutput[];
   readonly materials: readonly SnapshotConstructionMaterialRequirement[];
 }
@@ -436,8 +436,8 @@ export interface SnapshotProjectMaterial {
   readonly requiredQuantity: number;
   readonly deliveredQuantity: number;
   readonly remainingQuantity: number;
-  readonly unitPriceSUSD: number;
-  readonly deliveredValueSUSD: number;
+  readonly unitPriceRUSD: number;
+  readonly deliveredValueRUSD: number;
 }
 
 /** Current/persisted public-construction project. */
@@ -460,15 +460,15 @@ export interface SnapshotConstructionProject {
   readonly startedDay: number | null;
   readonly completedDay: number | null;
   readonly cancelledDay: number | null;
-  readonly totalCostSUSD: number;
-  readonly workingCapitalSUSD: number;
-  readonly workingCapitalPaidSUSD: number;
-  readonly spentSUSD: number;
-  readonly materialsSpentSUSD: number;
+  readonly totalCostRUSD: number;
+  readonly workingCapitalRUSD: number;
+  readonly workingCapitalPaidRUSD: number;
+  readonly spentRUSD: number;
+  readonly materialsSpentRUSD: number;
   readonly materials: readonly SnapshotProjectMaterial[];
   readonly progress: number;
   readonly materialsProgress: number;
-  readonly remainingSUSD: number;
+  readonly remainingRUSD: number;
   readonly lastWorkers: number;
   readonly blockedReason: "labor" | "funds" | "materials" | null;
   readonly buildingId: number | null;
@@ -478,15 +478,15 @@ export interface SnapshotConstructionProject {
 export interface SnapshotConstructionHistory {
   readonly projectsCompleted: number;
   readonly projectsCancelled: number;
-  readonly totalSpentSUSD: number;
-  readonly totalWrittenOffSUSD: number;
+  readonly totalSpentRUSD: number;
+  readonly totalWrittenOffRUSD: number;
 }
 
 /** Current construction-labor availability and wage estimate. */
 export interface SnapshotConstructionLabor {
   readonly idleWorkers: number;
   /** Idle-worker-weighted mean daily base wage, 0 when no idle workers. */
-  readonly dailyWageSUSD: number;
+  readonly dailyWageRUSD: number;
 }
 
 /** One validated building-sector row used by the industrial-policy UI. */
@@ -496,15 +496,15 @@ export interface SnapshotSector {
   readonly label: string;
   readonly subsidyRate: number;
   /** Presentation estimate: current sector capacity valued at current prices. */
-  readonly estimatedDailyOutputValueSUSD: number;
+  readonly estimatedDailyOutputValueRUSD: number;
 }
 
 /** Policy state and month-to-date subsidy outcome for one country. */
 export interface SnapshotIndustrialPolicy {
   readonly sectors: readonly SnapshotSector[];
-  readonly requestedMonthToDateSUSD: number;
-  readonly paidMonthToDateSUSD: number;
-  readonly shortfallMonthToDateSUSD: number;
+  readonly requestedMonthToDateRUSD: number;
+  readonly paidMonthToDateRUSD: number;
+  readonly shortfallMonthToDateRUSD: number;
 }
 
 /** A state-owned productive enterprise available for operating support. */
@@ -518,27 +518,27 @@ export interface SnapshotPublicEnterprise {
   readonly sector: string;
   readonly level: number;
   readonly condition: number;
-  readonly operatingCashSUSD: number;
+  readonly operatingCashRUSD: number;
   readonly ownerCountryId: number;
 }
 
 export interface SnapshotFiscalTotals {
   readonly periodStartDay: number;
   readonly periodEndDay: number;
-  readonly incomeTaxSUSD: number;
-  readonly welfareExpenseSUSD: number;
-  readonly interestExpenseSUSD: number;
-  readonly subsidyExpenseSUSD: number;
-  readonly administrationExpenseSUSD?: number;
+  readonly incomeTaxRUSD: number;
+  readonly welfareExpenseRUSD: number;
+  readonly interestExpenseRUSD: number;
+  readonly subsidyExpenseRUSD: number;
+  readonly administrationExpenseRUSD?: number;
   /**
    * Additive, optional categories. Current snapshots always populate them; an
    * older protocol-13 snapshot may omit them, in which case reports show zero.
    */
-  readonly educationExpenseSUSD?: number;
-  readonly trainingExpenseSUSD?: number;
-  readonly customsDutyRevenueSUSD?: number;
-  readonly militaryExpenseSUSD?: number;
-  readonly netFiscalResultSUSD: number;
+  readonly educationExpenseRUSD?: number;
+  readonly trainingExpenseRUSD?: number;
+  readonly customsDutyRevenueRUSD?: number;
+  readonly militaryExpenseRUSD?: number;
+  readonly netFiscalResultRUSD: number;
 }
 
 export interface SnapshotProductionCapacity {
@@ -568,7 +568,7 @@ export interface SnapshotNeedTier {
 
 export interface SnapshotFinancePeriod extends SnapshotFiscalTotals, SnapshotBudgetTotals {
   /** E2 business-profit tax revenue recognized in the period. */
-  readonly businessTaxRevenueSUSD: number;
+  readonly businessTaxRevenueRUSD: number;
   /** World-wide gross flows for the four M4b flow kinds. */
   readonly grossFlowTotals: Readonly<Record<string, number>>;
   /** Canonical labels for the inclusive closed period. */
@@ -579,9 +579,9 @@ export interface SnapshotFinancePeriod extends SnapshotFiscalTotals, SnapshotBud
    * (the recent detailed window). Older compacted summaries keep only fiscal
    * flows, so these are null rather than a fabricated zero.
    */
-  readonly treasuryCashEndSUSD: number | null;
-  readonly debtOutstandingEndSUSD: number | null;
-  readonly householdCashEndSUSD: number | null;
+  readonly treasuryCashEndRUSD: number | null;
+  readonly debtOutstandingEndRUSD: number | null;
+  readonly householdCashEndRUSD: number | null;
 }
 
 export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
@@ -591,20 +591,20 @@ export interface SnapshotAnnualReport extends SnapshotBudgetTotals {
   readonly periodStartLabel: string;
   readonly periodEndLabel: string;
   readonly complete: boolean;
-  readonly incomeTaxSUSD: number;
-  readonly businessTaxRevenueSUSD: number;
-  readonly welfareExpenseSUSD: number;
-  readonly interestExpenseSUSD: number;
-  readonly subsidyExpenseSUSD: number;
-  readonly administrationExpenseSUSD?: number;
-  readonly educationExpenseSUSD?: number;
-  readonly trainingExpenseSUSD?: number;
-  readonly customsDutyRevenueSUSD?: number;
-  readonly militaryExpenseSUSD?: number;
-  readonly netFiscalResultSUSD: number;
-  readonly treasuryCashEndSUSD: number;
-  readonly debtLiabilityEndSUSD: number;
-  readonly interestPayableEndSUSD: number;
+  readonly incomeTaxRUSD: number;
+  readonly businessTaxRevenueRUSD: number;
+  readonly welfareExpenseRUSD: number;
+  readonly interestExpenseRUSD: number;
+  readonly subsidyExpenseRUSD: number;
+  readonly administrationExpenseRUSD?: number;
+  readonly educationExpenseRUSD?: number;
+  readonly trainingExpenseRUSD?: number;
+  readonly customsDutyRevenueRUSD?: number;
+  readonly militaryExpenseRUSD?: number;
+  readonly netFiscalResultRUSD: number;
+  readonly treasuryCashEndRUSD: number;
+  readonly debtLiabilityEndRUSD: number;
+  readonly interestPayableEndRUSD: number;
   readonly correctionCount: number;
 }
 
@@ -620,13 +620,13 @@ export interface SnapshotInterestGroup {
 
 /** M8 institution view: derived quality/overload and actual funding memo. */
 export interface SnapshotInstitution {
-  readonly fundedAnnualSUSD: number;
+  readonly fundedAnnualRUSD: number;
   readonly quality: number;
   readonly overload: number;
   readonly serviceOutputIndex: number;
   readonly staffedPopulation: number;
-  readonly fundingRequestedMonthToDateSUSD: number;
-  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly fundingRequestedMonthToDateRUSD: number;
+  readonly fundingShortfallMonthToDateRUSD: number;
   readonly disruptionUntilDay: number | null;
 }
 
@@ -771,7 +771,7 @@ export interface SnapshotTechnology {
 /** M9 country education institution snapshot (derived values labelled as such). */
 export interface SnapshotEducation {
   readonly enabled: boolean;
-  readonly fundedAnnualSUSD: number;
+  readonly fundedAnnualRUSD: number;
   readonly researchStaffShare: number;
   readonly academicPopulation: number;
   readonly availableAcademicWorkers: number;
@@ -784,8 +784,8 @@ export interface SnapshotEducation {
   readonly fundingAdequacy: number;
   readonly quality: number;
   readonly serviceOutputIndex: number;
-  readonly fundingRequestedMonthToDateSUSD: number;
-  readonly fundingShortfallMonthToDateSUSD: number;
+  readonly fundingRequestedMonthToDateRUSD: number;
+  readonly fundingShortfallMonthToDateRUSD: number;
   readonly researchBlockedReason: string | null;
   readonly educationBlockedReason: string | null;
   readonly lastUpdateDay: number | null;
@@ -793,16 +793,16 @@ export interface SnapshotEducation {
 
 export interface SnapshotLabor {
   /** E5 training policy and derived service. */
-  readonly trainingBudgetSUSDPerYear: number;
-  readonly trainingStipendPerTraineeSUSDPerYear: number;
+  readonly trainingBudgetRUSDPerYear: number;
+  readonly trainingStipendPerTraineeRUSDPerYear: number;
   readonly trainingStaffShare: number;
   readonly trainingParticipation: number;
   readonly trainingInstructors: number;
   readonly eligibleWorkingAge: number;
   readonly capacityTrainees: number;
   readonly trainees: number;
-  readonly trainingRequestedMonthToDateSUSD: number;
-  readonly trainingShortfallMonthToDateSUSD: number;
+  readonly trainingRequestedMonthToDateRUSD: number;
+  readonly trainingShortfallMonthToDateRUSD: number;
   readonly trainingBlockedReason: string | null;
   /** Weighted average vocational qualification of the country's working-age people. */
   readonly qualificationAverage: number;
@@ -813,7 +813,7 @@ export interface SnapshotLabor {
   readonly healthServiceOutputIndex: number;
   readonly healthMortalityFactor: number;
   readonly healthBlockedReason: string | null;
-  readonly minimumWageSUSDPerYear: number;
+  readonly minimumWageRUSDPerYear: number;
   readonly hoursPerWeek: number;
   readonly hoursFactor: number;
 }
@@ -827,11 +827,11 @@ export interface SnapshotTradePolicy {
   /** Customs markets this country administers; empty when it administers none. */
   readonly customsMarketIds: readonly number[];
   readonly lastUpdateDay: number | null;
-  readonly exportsValueMonthToDateSUSD: number;
-  readonly importsValueMonthToDateSUSD: number;
-  readonly dutyReceivedMonthToDateSUSD: number;
-  readonly dutyPaidMonthToDateSUSD: number;
-  readonly freightPaidMonthToDateSUSD: number;
+  readonly exportsValueMonthToDateRUSD: number;
+  readonly importsValueMonthToDateRUSD: number;
+  readonly dutyReceivedMonthToDateRUSD: number;
+  readonly dutyPaidMonthToDateRUSD: number;
+  readonly freightPaidMonthToDateRUSD: number;
 }
 
 /** One observed transport route and its derived daily capacity. */
@@ -841,9 +841,9 @@ export interface SnapshotTradeRoute {
   readonly marketBId: number;
   readonly distanceUnits: number;
   readonly transitDays: number;
-  readonly baseCapacitySUSDPerDay: number;
+  readonly baseCapacityRUSDPerDay: number;
   /** Derived capacity at the current market infrastructure, per direction per day. */
-  readonly capacitySUSDPerDay: number;
+  readonly capacityRUSDPerDay: number;
 }
 
 /** One observed in-transit consignment. */
@@ -859,9 +859,9 @@ export interface SnapshotTradeShipment {
   readonly destinationCountryId: number | null;
   readonly dispatchDay: number;
   readonly arrivalDay: number;
-  readonly cargoValueSUSD: number;
-  readonly freightCostSUSD: number;
-  readonly dutySUSD: number;
+  readonly cargoValueRUSD: number;
+  readonly freightCostRUSD: number;
+  readonly dutyRUSD: number;
   readonly dutyRate: number;
 }
 
@@ -886,15 +886,15 @@ export interface SnapshotTradeNetwork {
     readonly dayIndex: number;
     readonly dispatchedShipments: number;
     readonly arrivedShipments: number;
-    readonly freightPaidSUSD: number;
-    readonly dutyPaidSUSD: number;
-    readonly ownerFundedSUSD: number;
+    readonly freightPaidRUSD: number;
+    readonly dutyPaidRUSD: number;
+    readonly ownerFundedRUSD: number;
     readonly blocked: readonly SnapshotTradeBlockedReason[];
     readonly blockedTruncated: boolean;
   } | null;
 }
 
-/** One currency identity and its authoritative SUSD valuation, for the Money screen. */
+/** One currency identity and its authoritative RUSD valuation, for the Money screen. */
 export interface SnapshotCurrency {
   readonly id: number;
   readonly key: string;
@@ -902,8 +902,8 @@ export interface SnapshotCurrency {
   readonly issuerKind: "country" | "foreign" | "union";
   readonly issuerCountryId: number | null;
   readonly valuationStatus: "specified" | "unavailable";
-  /** SUSD per one currency unit; null when unavailable. Never a parity default. */
-  readonly susdPerUnit: number | null;
+  /** RUSD per one currency unit; null when unavailable. Never a parity default. */
+  readonly rusdPerUnit: number | null;
   readonly valuationSource: "scenario" | "policy" | "market" | null;
 }
 
@@ -951,17 +951,17 @@ export interface SnapshotMonetaryAuthority {
   readonly hasAuthority: boolean;
   readonly active: boolean;
   readonly regime: string;
-  readonly paritySusdPerUnit: number | null;
-  readonly valuationSusdPerUnit: number | null;
-  readonly reserveCashSUSD: number;
+  readonly parityRusdPerUnit: number | null;
+  readonly valuationRusdPerUnit: number | null;
+  readonly reserveCashRUSD: number;
   readonly currencyIssuedUnits: number;
-  readonly liabilitySUSD: number;
+  readonly liabilityRUSD: number;
   /** Reserves in months of the last completed month's imports; null when no imports. */
   readonly reserveCoverMonths: number | null;
   readonly convertibility: "no-authority" | "inactive" | "open" | "suspended";
   readonly lastParityChangeDay: number | null;
-  readonly lastMonthExportsSUSD: number;
-  readonly lastMonthImportsSUSD: number;
+  readonly lastMonthExportsRUSD: number;
+  readonly lastMonthImportsRUSD: number;
   /** Why the authority is not operating, or null. */
   readonly blockedReason: string | null;
 }
@@ -1023,13 +1023,13 @@ export interface CountrySummarySnapshot {
   readonly population: number;
   readonly workingAgePopulation: number;
   readonly employedWorkers: number;
-  readonly treasuryCashSUSD: number;
+  readonly treasuryCashRUSD: number;
   readonly hardshipPopulationShare: number;
   readonly literacy: number;
   readonly wealthLevel: number;
   readonly militancy: number;
   readonly militaryPersonnel: number;
-  readonly latestNetFiscalResultSUSD: number | null;
+  readonly latestNetFiscalResultRUSD: number | null;
 }
 
 export interface CountrySnapshot {
@@ -1040,10 +1040,10 @@ export interface CountrySnapshot {
   readonly meta: CountryMetaSnapshot | null;
   readonly regionIds: readonly number[];
   readonly fiscal: SnapshotFiscalPolicy;
-  readonly treasuryCashSUSD: number;
+  readonly treasuryCashRUSD: number;
   readonly debtEnabled: boolean;
-  readonly debtOutstandingPrincipalSUSD: number;
-  readonly debtInterestPayableSUSD: number;
+  readonly debtOutstandingPrincipalRUSD: number;
+  readonly debtInterestPayableRUSD: number;
   /** Player-visible debt policy and derived financing limits. */
   readonly debtPolicy: SnapshotDebtPolicy;
   /** Outstanding/arrears contracts, in ascending id order (bounded by the cap). */
@@ -1052,22 +1052,22 @@ export interface CountrySnapshot {
   readonly workingAgePopulation: number;
   readonly employedWorkers: number;
   /** Household cash stock across the country's population blocks. */
-  readonly householdCashSUSD: number;
+  readonly householdCashRUSD: number;
   /**
    * Estimated daily wage obligation/taxable wage base from current employment
    * at base wages. It is a current-base static estimate, not realized wages.
    */
-  readonly estimatedDailyWageBaseSUSD: number;
+  readonly estimatedDailyWageBaseRUSD: number;
   /**
    * Estimated daily taxable wage base after the current income-tax allowance.
    * Exact for the current policy given the base-wage estimate; not realized
    * wages, and not an exemption estimate for a different allowance.
    */
-  readonly estimatedDailyTaxableWageBaseSUSD: number;
+  readonly estimatedDailyTaxableWageBaseRUSD: number;
   /** Blocks with a positive estimated daily wage base (for allowance estimates). */
   readonly estimatedWageEarningBlockCount: number;
   /** Month-to-date taxable enterprise profit used by the business-tax preview. */
-  readonly businessTaxBaseMonthToDateSUSD: number;
+  readonly businessTaxBaseMonthToDateRUSD: number;
   /** Current open-period budget memo (flows so far this month). */
   readonly budgetMonthToDate: SnapshotBudgetMonthToDate;
   /** Population-weighted own-country indicators, 0..1 or 0..99 as named. */
@@ -1091,9 +1091,9 @@ export interface CountrySnapshot {
   /** Current idle construction labor and wage estimate. */
   readonly constructionLabor: SnapshotConstructionLabor;
   /** Country work-in-progress asset balance (capitalized labor not yet completed). */
-  readonly constructionInProgressSUSD: number;
+  readonly constructionInProgressRUSD: number;
   /** Country capitalized public-capital asset balance. */
-  readonly publicCapitalSUSD: number;
+  readonly publicCapitalRUSD: number;
   /** E4 industrial policy, month-to-date subsidy outcome, and sector estimates. */
   readonly industrialPolicy: SnapshotIndustrialPolicy;
   /** Existing state-owned enterprises eligible for operating support. */
@@ -1231,7 +1231,7 @@ export interface MarketPriceSnapshot {
   readonly goodKey: string;
   readonly goodName: string;
   readonly unitLabel: string;
-  readonly priceSUSD: number;
+  readonly priceRUSD: number;
   readonly stockQuantity: number;
   /** Estimated daily output capacity of buildings in this market, not demand. */
   readonly dailyProductionCapacity: number;
@@ -1307,7 +1307,7 @@ export interface SimulationSnapshot {
   readonly trade: SnapshotTradeNetwork;
   /** E6b world price-index definition and measurement. */
   readonly priceIndex: SnapshotPriceIndex;
-  /** E6b currency identities and authoritative SUSD valuations. */
+  /** E6b currency identities and authoritative RUSD valuations. */
   readonly currencies: readonly SnapshotCurrency[];
   /** M10 wars, pending peace offers, and the enabled flag. */
   readonly military: {
@@ -1477,24 +1477,24 @@ function parseAction(value: unknown): CountryActionDto {
         "command.action.businessProfitTaxRate must be in 0..1",
       );
     }
-    const incomeTaxAllowanceSUSDPerYear = requireFiniteNumber(
-      record.incomeTaxAllowanceSUSDPerYear,
-      "command.action.incomeTaxAllowanceSUSDPerYear",
+    const incomeTaxAllowanceRUSDPerYear = requireFiniteNumber(
+      record.incomeTaxAllowanceRUSDPerYear,
+      "command.action.incomeTaxAllowanceRUSDPerYear",
     );
-    if (incomeTaxAllowanceSUSDPerYear < 0) {
+    if (incomeTaxAllowanceRUSDPerYear < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.incomeTaxAllowanceSUSDPerYear must be non-negative",
+        "command.action.incomeTaxAllowanceRUSDPerYear must be non-negative",
       );
     }
-    const welfareBudgetSUSDPerYear = requireFiniteNumber(
-      record.welfareBudgetSUSDPerYear,
-      "command.action.welfareBudgetSUSDPerYear",
+    const welfareBudgetRUSDPerYear = requireFiniteNumber(
+      record.welfareBudgetRUSDPerYear,
+      "command.action.welfareBudgetRUSDPerYear",
     );
-    if (welfareBudgetSUSDPerYear < 0) {
+    if (welfareBudgetRUSDPerYear < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.welfareBudgetSUSDPerYear must be non-negative",
+        "command.action.welfareBudgetRUSDPerYear must be non-negative",
       );
     }
     const welfareMaxWealthLevel = requireInteger(
@@ -1503,33 +1503,33 @@ function parseAction(value: unknown): CountryActionDto {
       0,
       99,
     );
-    const reserveTargetSUSD = requireFiniteNumber(
-      record.reserveTargetSUSD,
-      "command.action.reserveTargetSUSD",
+    const reserveTargetRUSD = requireFiniteNumber(
+      record.reserveTargetRUSD,
+      "command.action.reserveTargetRUSD",
     );
-    if (reserveTargetSUSD < 0) {
+    if (reserveTargetRUSD < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.reserveTargetSUSD must be non-negative",
+        "command.action.reserveTargetRUSD must be non-negative",
       );
     }
     return {
       kind: "set-fiscal-policy",
       countryId,
       incomeTaxRate,
-      incomeTaxAllowanceSUSDPerYear,
-      welfareBudgetSUSDPerYear,
+      incomeTaxAllowanceRUSDPerYear,
+      welfareBudgetRUSDPerYear,
       welfareMaxWealthLevel,
       businessProfitTaxRate,
-      reserveTargetSUSD,
+      reserveTargetRUSD,
     };
   }
   if (kind === "issue-debt") {
-    const amountSUSD = requireFiniteNumber(record.amountSUSD, "command.action.amountSUSD");
-    if (!(amountSUSD > 0)) {
-      throw new ProtocolError("invalid_action", "command.action.amountSUSD must be positive");
+    const amountRUSD = requireFiniteNumber(record.amountRUSD, "command.action.amountRUSD");
+    if (!(amountRUSD > 0)) {
+      throw new ProtocolError("invalid_action", "command.action.amountRUSD must be positive");
     }
-    return { kind: "issue-debt", countryId, amountSUSD };
+    return { kind: "issue-debt", countryId, amountRUSD };
   }
   if (kind === "repay-debt") {
     const contractId = requireInteger(
@@ -1538,11 +1538,11 @@ function parseAction(value: unknown): CountryActionDto {
       0,
       0xffff_ffff,
     );
-    const amountSUSD = requireFiniteNumber(record.amountSUSD, "command.action.amountSUSD");
-    if (!(amountSUSD > 0)) {
-      throw new ProtocolError("invalid_action", "command.action.amountSUSD must be positive");
+    const amountRUSD = requireFiniteNumber(record.amountRUSD, "command.action.amountRUSD");
+    if (!(amountRUSD > 0)) {
+      throw new ProtocolError("invalid_action", "command.action.amountRUSD must be positive");
     }
-    return { kind: "repay-debt", countryId, contractId, amountSUSD };
+    return { kind: "repay-debt", countryId, contractId, amountRUSD };
   }
   if (kind === "set-debt-policy") {
     if (typeof record.refinanceOnMaturity !== "boolean") {
@@ -1551,21 +1551,21 @@ function parseAction(value: unknown): CountryActionDto {
         "command.action.refinanceOnMaturity must be a boolean",
       );
     }
-    const maxOutstandingPrincipalSUSD = requireFiniteNumber(
-      record.maxOutstandingPrincipalSUSD,
-      "command.action.maxOutstandingPrincipalSUSD",
+    const maxOutstandingPrincipalRUSD = requireFiniteNumber(
+      record.maxOutstandingPrincipalRUSD,
+      "command.action.maxOutstandingPrincipalRUSD",
     );
-    if (maxOutstandingPrincipalSUSD < 0) {
+    if (maxOutstandingPrincipalRUSD < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.maxOutstandingPrincipalSUSD must be non-negative",
+        "command.action.maxOutstandingPrincipalRUSD must be non-negative",
       );
     }
     return {
       kind: "set-debt-policy",
       countryId,
       refinanceOnMaturity: record.refinanceOnMaturity,
-      maxOutstandingPrincipalSUSD,
+      maxOutstandingPrincipalRUSD,
     };
   }
   if (kind === "start-construction") {
@@ -1647,14 +1647,14 @@ function parseAction(value: unknown): CountryActionDto {
     return { kind: "set-industrial-policy", countryId, sectorSubsidyRates: rates };
   }
   if (kind === "support-public-enterprise") {
-    const amountSUSD = requireFiniteNumber(
-      record.amountSUSD,
-      "command.action.amountSUSD",
+    const amountRUSD = requireFiniteNumber(
+      record.amountRUSD,
+      "command.action.amountRUSD",
     );
-    if (!(amountSUSD > 0)) {
+    if (!(amountRUSD > 0)) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.amountSUSD must be positive",
+        "command.action.amountRUSD must be positive",
       );
     }
     return {
@@ -1666,7 +1666,7 @@ function parseAction(value: unknown): CountryActionDto {
         0,
         0xffff_ffff,
       ),
-      amountSUSD,
+      amountRUSD,
     };
   }
   if (kind === "propose-law") {
@@ -1677,17 +1677,17 @@ function parseAction(value: unknown): CountryActionDto {
     };
   }
   if (kind === "set-institution-funding") {
-    const annualSUSD = requireFiniteNumber(
-      record.annualSUSD,
-      "command.action.annualSUSD",
+    const annualRUSD = requireFiniteNumber(
+      record.annualRUSD,
+      "command.action.annualRUSD",
     );
-    if (annualSUSD < 0) {
+    if (annualRUSD < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.annualSUSD must be non-negative",
+        "command.action.annualRUSD must be non-negative",
       );
     }
-    return { kind: "set-institution-funding", countryId, annualSUSD };
+    return { kind: "set-institution-funding", countryId, annualRUSD };
   }
   if (kind === "start-research") {
     return {
@@ -1705,17 +1705,17 @@ function parseAction(value: unknown): CountryActionDto {
     return { kind: "cancel-research", countryId };
   }
   if (kind === "set-education-funding") {
-    const annualSUSD = requireFiniteNumber(
-      record.annualSUSD,
-      "command.action.annualSUSD",
+    const annualRUSD = requireFiniteNumber(
+      record.annualRUSD,
+      "command.action.annualRUSD",
     );
-    if (annualSUSD < 0) {
+    if (annualRUSD < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.annualSUSD must be non-negative",
+        "command.action.annualRUSD must be non-negative",
       );
     }
-    return { kind: "set-education-funding", countryId, annualSUSD };
+    return { kind: "set-education-funding", countryId, annualRUSD };
   }
   if (kind === "set-research-staff-share") {
     const share = requireFiniteNumber(record.share, "command.action.share");
@@ -1728,17 +1728,17 @@ function parseAction(value: unknown): CountryActionDto {
     return { kind: "set-research-staff-share", countryId, share };
   }
   if (kind === "set-training-budget" || kind === "set-training-stipend") {
-    const annualSUSD = requireFiniteNumber(
-      record.annualSUSD,
-      "command.action.annualSUSD",
+    const annualRUSD = requireFiniteNumber(
+      record.annualRUSD,
+      "command.action.annualRUSD",
     );
-    if (annualSUSD < 0) {
+    if (annualRUSD < 0) {
       throw new ProtocolError(
         "invalid_action",
-        "command.action.annualSUSD must be non-negative",
+        "command.action.annualRUSD must be non-negative",
       );
     }
-    return { kind, countryId, annualSUSD };
+    return { kind, countryId, annualRUSD };
   }
   if (
     kind === "set-training-staff-share" ||
@@ -1826,34 +1826,34 @@ function parseAction(value: unknown): CountryActionDto {
         'command.action.regime must be "pegged" or "managed"',
       );
     }
-    let paritySusdPerUnit: number | null = null;
-    if (record.paritySusdPerUnit !== null && record.paritySusdPerUnit !== undefined) {
-      paritySusdPerUnit = requireFiniteNumber(
-        record.paritySusdPerUnit,
-        "command.action.paritySusdPerUnit",
+    let parityRusdPerUnit: number | null = null;
+    if (record.parityRusdPerUnit !== null && record.parityRusdPerUnit !== undefined) {
+      parityRusdPerUnit = requireFiniteNumber(
+        record.parityRusdPerUnit,
+        "command.action.parityRusdPerUnit",
       );
-      if (!(paritySusdPerUnit > 0)) {
+      if (!(parityRusdPerUnit > 0)) {
         throw new ProtocolError(
           "invalid_action",
-          "command.action.paritySusdPerUnit must be positive or null",
+          "command.action.parityRusdPerUnit must be positive or null",
         );
       }
     }
-    const reserveTransferSUSD = requireFiniteNumber(
-      record.reserveTransferSUSD,
-      "command.action.reserveTransferSUSD",
+    const reserveTransferRUSD = requireFiniteNumber(
+      record.reserveTransferRUSD,
+      "command.action.reserveTransferRUSD",
     );
-    const currencyConversionSUSD = requireFiniteNumber(
-      record.currencyConversionSUSD,
-      "command.action.currencyConversionSUSD",
+    const currencyConversionRUSD = requireFiniteNumber(
+      record.currencyConversionRUSD,
+      "command.action.currencyConversionRUSD",
     );
     return {
       kind: "set-monetary-policy",
       countryId,
       regime,
-      paritySusdPerUnit,
-      reserveTransferSUSD,
-      currencyConversionSUSD,
+      parityRusdPerUnit,
+      reserveTransferRUSD,
+      currencyConversionRUSD,
     };
   }
   if (kind === "declare-war") {
@@ -2041,11 +2041,11 @@ function isNumberArray(value: unknown): value is readonly number[] {
 }
 
 const OPTIONAL_FISCAL_TOTAL_FIELDS = [
-  "administrationExpenseSUSD",
-  "educationExpenseSUSD",
-  "trainingExpenseSUSD",
-  "customsDutyRevenueSUSD",
-  "militaryExpenseSUSD",
+  "administrationExpenseRUSD",
+  "educationExpenseRUSD",
+  "trainingExpenseRUSD",
+  "customsDutyRevenueRUSD",
+  "militaryExpenseRUSD",
 ] as const;
 
 function optionalFiscalFieldsAreValid(value: Record<string, unknown>): boolean {
@@ -2060,11 +2060,11 @@ function isFiscalTotals(value: unknown): value is SnapshotFiscalTotals {
     optionalFiscalFieldsAreValid(value) &&
     isIntegerIn(value.periodStartDay, 0, 36_524) &&
     isIntegerIn(value.periodEndDay, 0, 36_524) &&
-    isFiniteNumber(value.incomeTaxSUSD) &&
-    isFiniteNumber(value.welfareExpenseSUSD) &&
-    isFiniteNumber(value.interestExpenseSUSD) &&
-    isFiniteNumber(value.subsidyExpenseSUSD) &&
-    isFiniteNumber(value.netFiscalResultSUSD)
+    isFiniteNumber(value.incomeTaxRUSD) &&
+    isFiniteNumber(value.welfareExpenseRUSD) &&
+    isFiniteNumber(value.interestExpenseRUSD) &&
+    isFiniteNumber(value.subsidyExpenseRUSD) &&
+    isFiniteNumber(value.netFiscalResultRUSD)
   );
 }
 
@@ -2073,20 +2073,20 @@ function isNullableFiniteNumber(value: unknown): value is number | null {
 }
 
 const BUDGET_TOTAL_FIELDS = [
-  "welfareRequestedSUSD",
-  "welfareShortfallSUSD",
-  "businessTaxAssessedSUSD",
-  "businessTaxUncollectedSUSD",
-  "debtIssuedSUSD",
-  "principalRepaidSUSD",
-  "interestPaidSUSD",
-  "unfinancedRequirementSUSD",
-  "constructionSpentSUSD",
-  "constructionWrittenOffSUSD",
-  "constructionMaterialsSpentSUSD",
-  "subsidyRequestedSUSD",
-  "subsidyShortfallSUSD",
-  "publicEnterpriseSupportSUSD",
+  "welfareRequestedRUSD",
+  "welfareShortfallRUSD",
+  "businessTaxAssessedRUSD",
+  "businessTaxUncollectedRUSD",
+  "debtIssuedRUSD",
+  "principalRepaidRUSD",
+  "interestPaidRUSD",
+  "unfinancedRequirementRUSD",
+  "constructionSpentRUSD",
+  "constructionWrittenOffRUSD",
+  "constructionMaterialsSpentRUSD",
+  "subsidyRequestedRUSD",
+  "subsidyShortfallRUSD",
+  "publicEnterpriseSupportRUSD",
 ] as const;
 
 function isBudgetTotals(value: unknown): value is SnapshotBudgetTotals {
@@ -2099,7 +2099,7 @@ function isBudgetTotals(value: unknown): value is SnapshotBudgetTotals {
 function isBudgetMonthToDate(value: unknown): value is SnapshotBudgetMonthToDate {
   if (!isBudgetTotals(value)) return false;
   const record = value as unknown as Record<string, unknown>;
-  return isFiniteNumber(record.businessTaxBaseMonthToDateSUSD);
+  return isFiniteNumber(record.businessTaxBaseMonthToDateRUSD);
 }
 
 function isSnapshotDebtPolicy(value: unknown): value is SnapshotDebtPolicy {
@@ -2107,16 +2107,16 @@ function isSnapshotDebtPolicy(value: unknown): value is SnapshotDebtPolicy {
   if (typeof value.enabled !== "boolean") return false;
   if (typeof value.refinanceOnMaturity !== "boolean") return false;
   for (const field of [
-    "maxOutstandingPrincipalSUSD",
+    "maxOutstandingPrincipalRUSD",
     "annualCouponRate",
-    "creditorCashSUSD",
-    "headroomSUSD",
+    "creditorCashRUSD",
+    "headroomRUSD",
   ] as const) {
     if (!isFiniteNumber(value[field])) return false;
   }
-  if ((value.maxOutstandingPrincipalSUSD as number) < 0) return false;
-  if ((value.creditorCashSUSD as number) < 0) return false;
-  if ((value.headroomSUSD as number) < 0) return false;
+  if ((value.maxOutstandingPrincipalRUSD as number) < 0) return false;
+  if ((value.creditorCashRUSD as number) < 0) return false;
+  if ((value.headroomRUSD as number) < 0) return false;
   if ((value.annualCouponRate as number) < 0 || (value.annualCouponRate as number) > 1) {
     return false;
   }
@@ -2143,19 +2143,19 @@ function isSnapshotDebtContract(value: unknown): value is SnapshotDebtContract {
     isIntegerIn(value.id, 0, 0xffff_ffff) &&
     isIntegerIn(value.holderId, 0, 0xffff_ffff) &&
     isString(value.holderLabel, 256) &&
-    isFiniteNumber(value.principalSUSD) &&
-    isFiniteNumber(value.outstandingPrincipalSUSD) &&
+    isFiniteNumber(value.principalRUSD) &&
+    isFiniteNumber(value.outstandingPrincipalRUSD) &&
     isFiniteNumber(value.annualCouponRate) &&
     isIntegerIn(value.issueDay, 0, 36_524) &&
     isIntegerIn(value.maturityDay, 0, 36_524) &&
-    isFiniteNumber(value.accruedInterestSUSD)
+    isFiniteNumber(value.accruedInterestRUSD)
   );
 }
 
 function isFinancePeriod(value: unknown): value is SnapshotFinancePeriod {
   if (!isFiscalTotals(value)) return false;
   const record = value as unknown as Record<string, unknown>;
-  if (!isFiniteNumber(record.businessTaxRevenueSUSD)) return false;
+  if (!isFiniteNumber(record.businessTaxRevenueRUSD)) return false;
   if (!isBudgetTotals(record)) return false;
   if (!isRecord(record.grossFlowTotals)) return false;
   if (!Object.values(record.grossFlowTotals).every((entry) => isFiniteNumber(entry))) {
@@ -2164,9 +2164,9 @@ function isFinancePeriod(value: unknown): value is SnapshotFinancePeriod {
   return (
     isString(record.periodStartLabel, 10) &&
     isString(record.periodEndLabel, 10) &&
-    isNullableFiniteNumber(record.treasuryCashEndSUSD) &&
-    isNullableFiniteNumber(record.debtOutstandingEndSUSD) &&
-    isNullableFiniteNumber(record.householdCashEndSUSD)
+    isNullableFiniteNumber(record.treasuryCashEndRUSD) &&
+    isNullableFiniteNumber(record.debtOutstandingEndRUSD) &&
+    isNullableFiniteNumber(record.householdCashEndRUSD)
   );
 }
 
@@ -2215,15 +2215,15 @@ function isAnnualReport(value: unknown): value is SnapshotAnnualReport {
     isString(value.periodStartLabel, 10) &&
     isString(value.periodEndLabel, 10) &&
     typeof value.complete === "boolean" &&
-    isFiniteNumber(value.incomeTaxSUSD) &&
-    isFiniteNumber(value.businessTaxRevenueSUSD) &&
-    isFiniteNumber(value.welfareExpenseSUSD) &&
-    isFiniteNumber(value.interestExpenseSUSD) &&
-    isFiniteNumber(value.subsidyExpenseSUSD) &&
-    isFiniteNumber(value.netFiscalResultSUSD) &&
-    isFiniteNumber(value.treasuryCashEndSUSD) &&
-    isFiniteNumber(value.debtLiabilityEndSUSD) &&
-    isFiniteNumber(value.interestPayableEndSUSD) &&
+    isFiniteNumber(value.incomeTaxRUSD) &&
+    isFiniteNumber(value.businessTaxRevenueRUSD) &&
+    isFiniteNumber(value.welfareExpenseRUSD) &&
+    isFiniteNumber(value.interestExpenseRUSD) &&
+    isFiniteNumber(value.subsidyExpenseRUSD) &&
+    isFiniteNumber(value.netFiscalResultRUSD) &&
+    isFiniteNumber(value.treasuryCashEndRUSD) &&
+    isFiniteNumber(value.debtLiabilityEndRUSD) &&
+    isFiniteNumber(value.interestPayableEndRUSD) &&
     isIntegerIn(value.correctionCount, 0, 1_000_000)
   );
 }
@@ -2261,11 +2261,11 @@ function isProjectType(value: unknown): value is SnapshotProjectType {
     isString(value.key, 128) &&
     isString(value.name, 256) &&
     isString(value.sector, 64) &&
-    isFiniteNumber(value.constructionCostSUSD) &&
+    isFiniteNumber(value.constructionCostRUSD) &&
     isIntegerIn(value.constructionWorkers, 1, 1_000_000) &&
     isFiniteNumber(value.plannedJobs) &&
-    isFiniteNumber(value.dailyUpkeepSUSDAtLevelOne) &&
-    isFiniteNumber(value.workingCapitalSUSD) &&
+    isFiniteNumber(value.dailyUpkeepRUSDAtLevelOne) &&
+    isFiniteNumber(value.workingCapitalRUSD) &&
     value.outputs.every((output) => isProjectOutput(output)) &&
     value.materials.every((material) => isConstructionMaterialRequirement(material))
   );
@@ -2281,8 +2281,8 @@ function isProjectMaterial(value: unknown): value is SnapshotProjectMaterial {
     isFiniteNumber(value.requiredQuantity) &&
     isFiniteNumber(value.deliveredQuantity) &&
     isFiniteNumber(value.remainingQuantity) &&
-    isFiniteNumber(value.unitPriceSUSD) &&
-    isFiniteNumber(value.deliveredValueSUSD)
+    isFiniteNumber(value.unitPriceRUSD) &&
+    isFiniteNumber(value.deliveredValueRUSD)
   );
 }
 
@@ -2321,14 +2321,14 @@ function isConstructionProject(value: unknown): value is SnapshotConstructionPro
     (value.startedDay === null || isIntegerIn(value.startedDay, 0, 36_524)) &&
     (value.completedDay === null || isIntegerIn(value.completedDay, 0, 36_524)) &&
     (value.cancelledDay === null || isIntegerIn(value.cancelledDay, 0, 36_524)) &&
-    isFiniteNumber(value.totalCostSUSD) &&
-    isFiniteNumber(value.workingCapitalSUSD) &&
-    isFiniteNumber(value.workingCapitalPaidSUSD) &&
-    isFiniteNumber(value.spentSUSD) &&
-    isFiniteNumber(value.materialsSpentSUSD) &&
+    isFiniteNumber(value.totalCostRUSD) &&
+    isFiniteNumber(value.workingCapitalRUSD) &&
+    isFiniteNumber(value.workingCapitalPaidRUSD) &&
+    isFiniteNumber(value.spentRUSD) &&
+    isFiniteNumber(value.materialsSpentRUSD) &&
     isFiniteNumber(value.progress) &&
     isFiniteNumber(value.materialsProgress) &&
-    isFiniteNumber(value.remainingSUSD) &&
+    isFiniteNumber(value.remainingRUSD) &&
     isIntegerIn(value.lastWorkers, 0, 1_000_000) &&
     (value.buildingId === null || isIntegerIn(value.buildingId, 0, 0xffff_ffff))
   );
@@ -2339,8 +2339,8 @@ function isConstructionHistory(value: unknown): value is SnapshotConstructionHis
   return (
     isIntegerIn(value.projectsCompleted, 0, 1_000_000) &&
     isIntegerIn(value.projectsCancelled, 0, 1_000_000) &&
-    isFiniteNumber(value.totalSpentSUSD) &&
-    isFiniteNumber(value.totalWrittenOffSUSD)
+    isFiniteNumber(value.totalSpentRUSD) &&
+    isFiniteNumber(value.totalWrittenOffRUSD)
   );
 }
 
@@ -2348,7 +2348,7 @@ function isConstructionLabor(value: unknown): value is SnapshotConstructionLabor
   if (!isRecord(value)) return false;
   return (
     isIntegerIn(value.idleWorkers, 0, MAX_SNAPSHOT_PEOPLE) &&
-    isFiniteNumber(value.dailyWageSUSD)
+    isFiniteNumber(value.dailyWageRUSD)
   );
 }
 
@@ -2363,12 +2363,12 @@ function isIndustrialPolicy(value: unknown): value is SnapshotIndustrialPolicy {
         isString(sector.key, 64) &&
         isString(sector.label, 128) &&
         isFiniteNumber(sector.subsidyRate) &&
-        isFiniteNumber(sector.estimatedDailyOutputValueSUSD)
+        isFiniteNumber(sector.estimatedDailyOutputValueRUSD)
       );
     }) &&
-    isFiniteNumber(value.requestedMonthToDateSUSD) &&
-    isFiniteNumber(value.paidMonthToDateSUSD) &&
-    isFiniteNumber(value.shortfallMonthToDateSUSD)
+    isFiniteNumber(value.requestedMonthToDateRUSD) &&
+    isFiniteNumber(value.paidMonthToDateRUSD) &&
+    isFiniteNumber(value.shortfallMonthToDateRUSD)
   );
 }
 
@@ -2384,7 +2384,7 @@ function isPublicEnterprise(value: unknown): value is SnapshotPublicEnterprise {
     isString(value.sector, 64) &&
     isFiniteNumber(value.level) &&
     isFiniteNumber(value.condition) &&
-    isFiniteNumber(value.operatingCashSUSD) &&
+    isFiniteNumber(value.operatingCashRUSD) &&
     isIntegerIn(value.ownerCountryId, 0, 0xffff_ffff)
   );
 }
@@ -2457,7 +2457,7 @@ function isEducationSnapshot(value: unknown): value is SnapshotEducation {
   if (!isRecord(value)) return false;
   if (typeof value.enabled !== "boolean") return false;
   for (const field of [
-    "fundedAnnualSUSD",
+    "fundedAnnualRUSD",
     "researchStaffShare",
     "academicPopulation",
     "availableAcademicWorkers",
@@ -2470,8 +2470,8 @@ function isEducationSnapshot(value: unknown): value is SnapshotEducation {
     "fundingAdequacy",
     "quality",
     "serviceOutputIndex",
-    "fundingRequestedMonthToDateSUSD",
-    "fundingShortfallMonthToDateSUSD",
+    "fundingRequestedMonthToDateRUSD",
+    "fundingShortfallMonthToDateRUSD",
   ] as const) {
     if (!isFiniteNumber(value[field])) return false;
   }
@@ -2486,23 +2486,23 @@ function isEducationSnapshot(value: unknown): value is SnapshotEducation {
 function isLaborSnapshot(value: unknown): value is SnapshotLabor {
   if (!isRecord(value)) return false;
   for (const field of [
-    "trainingBudgetSUSDPerYear",
-    "trainingStipendPerTraineeSUSDPerYear",
+    "trainingBudgetRUSDPerYear",
+    "trainingStipendPerTraineeRUSDPerYear",
     "trainingStaffShare",
     "trainingParticipation",
     "trainingInstructors",
     "eligibleWorkingAge",
     "capacityTrainees",
     "trainees",
-    "trainingRequestedMonthToDateSUSD",
-    "trainingShortfallMonthToDateSUSD",
+    "trainingRequestedMonthToDateRUSD",
+    "trainingShortfallMonthToDateRUSD",
     "qualificationAverage",
     "healthStaffShare",
     "healthStaff",
     "administrationStaff",
     "healthServiceOutputIndex",
     "healthMortalityFactor",
-    "minimumWageSUSDPerYear",
+    "minimumWageRUSDPerYear",
     "hoursPerWeek",
     "hoursFactor",
   ] as const) {
@@ -2522,29 +2522,29 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value.fiscal)) return false;
   for (const field of [
     "incomeTaxRate",
-    "welfareBudgetSUSDPerYear",
-    "incomeTaxAllowanceSUSDPerYear",
+    "welfareBudgetRUSDPerYear",
+    "incomeTaxAllowanceRUSDPerYear",
     "welfareMaxWealthLevel",
     "businessProfitTaxRate",
-    "reserveTargetSUSD",
+    "reserveTargetRUSD",
   ] as const) {
     if (!isFiniteNumber(value.fiscal[field])) return false;
   }
-  if (!isFiniteNumber(value.treasuryCashSUSD)) return false;
+  if (!isFiniteNumber(value.treasuryCashRUSD)) return false;
   if (typeof value.debtEnabled !== "boolean") return false;
-  if (!isFiniteNumber(value.debtOutstandingPrincipalSUSD)) return false;
-  if (!isFiniteNumber(value.debtInterestPayableSUSD)) return false;
+  if (!isFiniteNumber(value.debtOutstandingPrincipalRUSD)) return false;
+  if (!isFiniteNumber(value.debtInterestPayableRUSD)) return false;
   if (!isSnapshotDebtPolicy(value.debtPolicy)) return false;
   if (!Array.isArray(value.debtContracts)) return false;
   if (!value.debtContracts.every((contract) => isSnapshotDebtContract(contract))) return false;
   if (!isFiniteNumber(value.population)) return false;
   if (!isFiniteNumber(value.workingAgePopulation)) return false;
   if (!isFiniteNumber(value.employedWorkers)) return false;
-  if (!isFiniteNumber(value.householdCashSUSD)) return false;
-  if (!isFiniteNumber(value.estimatedDailyWageBaseSUSD)) return false;
-  if (!isFiniteNumber(value.estimatedDailyTaxableWageBaseSUSD)) return false;
+  if (!isFiniteNumber(value.householdCashRUSD)) return false;
+  if (!isFiniteNumber(value.estimatedDailyWageBaseRUSD)) return false;
+  if (!isFiniteNumber(value.estimatedDailyTaxableWageBaseRUSD)) return false;
   if (!isIntegerIn(value.estimatedWageEarningBlockCount, 0, 1_000_000)) return false;
-  if (!isFiniteNumber(value.businessTaxBaseMonthToDateSUSD)) return false;
+  if (!isFiniteNumber(value.businessTaxBaseMonthToDateRUSD)) return false;
   if (!isBudgetMonthToDate(value.budgetMonthToDate)) return false;
   if (!isFiniteNumber(value.literacy)) return false;
   if (!isFiniteNumber(value.wealthLevel)) return false;
@@ -2566,8 +2566,8 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   }
   if (!isConstructionHistory(value.constructionHistory)) return false;
   if (!isConstructionLabor(value.constructionLabor)) return false;
-  if (!isFiniteNumber(value.constructionInProgressSUSD)) return false;
-  if (!isFiniteNumber(value.publicCapitalSUSD)) return false;
+  if (!isFiniteNumber(value.constructionInProgressRUSD)) return false;
+  if (!isFiniteNumber(value.publicCapitalRUSD)) return false;
   if (!isIndustrialPolicy(value.industrialPolicy)) return false;
   if (!Array.isArray(value.publicEnterprises)) return false;
   if (!value.publicEnterprises.every((enterprise) => isPublicEnterprise(enterprise))) {
@@ -2630,7 +2630,7 @@ function isMarketSnapshot(value: unknown): value is MarketSnapshot {
       isString(price.goodKey, 64) &&
       isString(price.goodName, 256) &&
       isString(price.unitLabel, 64) &&
-      isFiniteNumber(price.priceSUSD) &&
+      isFiniteNumber(price.priceRUSD) &&
       isFiniteNumber(price.stockQuantity) &&
       isFiniteNumber(price.dailyProductionCapacity) &&
       price.dailyProductionCapacity >= 0
@@ -2667,7 +2667,7 @@ function isCountrySummary(value: unknown): value is CountrySummarySnapshot {
     "population",
     "workingAgePopulation",
     "employedWorkers",
-    "treasuryCashSUSD",
+    "treasuryCashRUSD",
     "hardshipPopulationShare",
     "literacy",
     "wealthLevel",
@@ -2677,8 +2677,8 @@ function isCountrySummary(value: unknown): value is CountrySummarySnapshot {
     if (!isFiniteNumber(value[key])) return false;
   }
   if (
-    value.latestNetFiscalResultSUSD !== null &&
-    !isFiniteNumber(value.latestNetFiscalResultSUSD)
+    value.latestNetFiscalResultRUSD !== null &&
+    !isFiniteNumber(value.latestNetFiscalResultRUSD)
   ) {
     return false;
   }

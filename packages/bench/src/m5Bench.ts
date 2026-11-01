@@ -121,7 +121,7 @@ function stressScenario(base: EconomyScenarioDef): EconomyScenarioDef {
     ...building,
     id: base.buildingInstances.length + index,
     operatingCashAccountId: 500_000 + index,
-    initialOperatingCashSUSD: 10_000,
+    initialOperatingCashRUSD: 10_000,
   }));
   return {
     ...base,
@@ -212,7 +212,7 @@ export function runM5Benchmarks(): boolean {
     m5aSamples.push(nanosecondsToMs(process.hrtime.bigint() - start));
     m5aApplied = result.applied;
     m5aBuildings = result.buildings.length;
-    m5aDistributed = result.totalPrivateDistributionSUSD + result.totalStateRemittanceSUSD;
+    m5aDistributed = result.totalPrivateDistributionRUSD + result.totalStateRemittanceRUSD;
   }
   const m5aStats = stats(m5aSamples);
 
@@ -233,7 +233,7 @@ export function runM5Benchmarks(): boolean {
     creditorId: creditor.id,
     annualCouponRate: 0.03,
     termDays: 1825,
-    maxOutstandingPrincipalSUSD: 1_000_000_000,
+    maxOutstandingPrincipalRUSD: 1_000_000_000,
     refinanceOnMaturity: false,
     arrearsGraceDays: 90,
   };
@@ -245,13 +245,13 @@ export function runM5Benchmarks(): boolean {
       account.subtype === "treasury-cash",
   );
   if (creditorTreasury === undefined) throw new Error("M5b benchmark creditor has no treasury");
-  const debtPrincipal = Math.min(1_000_000, creditorTreasury.balanceSUSD * 0.1);
+  const debtPrincipal = Math.min(1_000_000, creditorTreasury.balanceRUSD * 0.1);
   if (debtPrincipal > 0) {
     issueGovernmentDebt(debtWorld, {
       issuerCountryId: issuer.id,
       holderKind: "country",
       holderId: creditor.id,
-      principalSUSD: debtPrincipal,
+      principalRUSD: debtPrincipal,
       annualCouponRate: 0.03,
       termDays: 1825,
     });
@@ -263,7 +263,7 @@ export function runM5Benchmarks(): boolean {
     const start = process.hrtime.bigint();
     const result = runDebtPhase(debtWorld, day);
     m5bSamples.push(nanosecondsToMs(process.hrtime.bigint() - start));
-    m5bInterestAccrued += result.interestAccruedSUSD;
+    m5bInterestAccrued += result.interestAccruedRUSD;
   }
   const m5bStats = stats(m5bSamples);
   const m5bContracts = debtWorld.finance.debtContracts.length;
@@ -320,12 +320,12 @@ export function runM5Benchmarks(): boolean {
   console.log(
     `  M5a profit allocation: avg ${formatMs(m5aStats.averageMs)} ms, p50 ${formatMs(m5aStats.p50Ms)} ms, ` +
       `p95 ${formatMs(m5aStats.p95Ms)} ms; ${String(m5aBuildings)} buildings, ` +
-      `${m5aDistributed.toFixed(2)} SUSD distributed in the sample; clone/close excluded`,
+      `${m5aDistributed.toFixed(2)} RUSD distributed in the sample; clone/close excluded`,
   );
   console.log(
     `  M5b debt phase: avg ${formatMs(m5bStats.averageMs)} ms, p50 ${formatMs(m5bStats.p50Ms)} ms, ` +
       `p95 ${formatMs(m5bStats.p95Ms)} ms; ${String(m5bContracts)} contracts, ` +
-      `${m5bInterestAccrued.toFixed(2)} SUSD interest accrued in the sample`,
+      `${m5bInterestAccrued.toFixed(2)} RUSD interest accrued in the sample`,
   );
   console.log(
     `M5 stress: ${String(stressCounts.countries)} countries, ${String(stressCounts.regions)} regions, ` +

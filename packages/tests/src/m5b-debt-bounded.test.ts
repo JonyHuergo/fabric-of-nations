@@ -28,7 +28,7 @@ function treasuryCash(world: ReturnType<typeof createM5bWorld>, countryId: numbe
       candidate.subtype === "treasury-cash",
   );
   if (account === undefined) throw new Error("missing treasury account");
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function issueMany(
@@ -41,7 +41,7 @@ function issueMany(
       issuerCountryId: M5B_COUNTRY_A,
       holderKind: "country",
       holderId: M5B_COUNTRY_B,
-      principalSUSD: 1_000,
+      principalRUSD: 1_000,
       annualCouponRate: 0,
       termDays,
     });
@@ -51,31 +51,31 @@ function issueMany(
 describe("bounded debt contracts and financing semantics", () => {
   test("treasury liquidity prevents unnecessary issuance, including prior cash inflows", () => {
     const scenario = m5bScenario({
-      welfareBudgetSUSDPerYear: 36_500,
+      welfareBudgetRUSDPerYear: 36_500,
       initialState: (value) => {
         const country = value.countries?.find((candidate) => candidate.id === M5B_COUNTRY_A);
         if (country === undefined) throw new Error("missing fixture country");
-        country.initialTreasuryCashSUSD = 100_000;
+        country.initialTreasuryCashRUSD = 100_000;
         const creditor = value.countries?.find((candidate) => candidate.id === M5B_COUNTRY_B);
         if (creditor === undefined) throw new Error("missing creditor country");
-        creditor.initialTreasuryCashSUSD = 100_000;
+        creditor.initialTreasuryCashRUSD = 100_000;
       },
     });
     const world = createM5bWorld(scenario);
     const last = tick(world, scenario, 31);
-    expect(last.economy!.debt.financingRequirementSUSD).toBe(0);
-    expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBe(0);
+    expect(last.economy!.debt.financingRequirementRUSD).toBe(0);
+    expect(last.economy!.debt.debtIssuedForDeficitRUSD).toBe(0);
     expect(world.finance.debtContracts).toHaveLength(0);
     expect(treasuryCash(world, M5B_COUNTRY_A)).toBeGreaterThan(90_000);
   });
 
   test("unpaid welfare is a memo in the financing requirement, never a back-pay liability", () => {
     const scenario = m5bScenario({
-      welfareBudgetSUSDPerYear: 36_500,
+      welfareBudgetRUSDPerYear: 36_500,
       initialState: (value) => {
         const country = value.countries?.find((candidate) => candidate.id === M5B_COUNTRY_A);
         if (country === undefined) throw new Error("missing fixture country");
-        country.initialTreasuryCashSUSD = 0;
+        country.initialTreasuryCashRUSD = 0;
       },
     });
     const world = createM5bWorld(scenario);
@@ -83,10 +83,10 @@ describe("bounded debt contracts and financing semantics", () => {
     const fiscal = last.economy!.fiscal.countries.find(
       (country) => country.countryId === M5B_COUNTRY_A,
     );
-    expect(fiscal?.welfareShortfallSUSD).toBeCloseTo(100, 6);
-    expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBeCloseTo(3_100, 6);
+    expect(fiscal?.welfareShortfallRUSD).toBeCloseTo(100, 6);
+    expect(last.economy!.debt.debtIssuedForDeficitRUSD).toBeCloseTo(3_100, 6);
     expect(
-      world.finance.budgetMemosThisMonth[M5B_COUNTRY_A]?.welfareRequestedSUSD ?? 0,
+      world.finance.budgetMemosThisMonth[M5B_COUNTRY_A]?.welfareRequestedRUSD ?? 0,
     ).toBe(0);
     // Borrowing adds cash but does not retroactively post welfare expense.
     expect(treasuryCash(world, M5B_COUNTRY_A)).toBeCloseTo(3_100, 6);
@@ -96,17 +96,17 @@ describe("bounded debt contracts and financing semantics", () => {
           account.ownerKind === "country" &&
           account.ownerId === M5B_COUNTRY_A &&
           account.subtype === "welfare-expense" &&
-          account.balanceSUSD > 0,
+          account.balanceRUSD > 0,
       ),
     ).toBe(false);
   });
 
   test("caps active contracts explicitly and retains bounded terminated detail", () => {
     const scenario = m5bScenario({
-      debt: { termDays: 1, maxOutstandingPrincipalSUSD: 1_000_000 },
+      debt: { termDays: 1, maxOutstandingPrincipalRUSD: 1_000_000 },
       initialState: (value) => {
         for (const country of value.countries ?? []) {
-          country.initialTreasuryCashSUSD = 100_000;
+          country.initialTreasuryCashRUSD = 100_000;
         }
       },
     });
@@ -117,7 +117,7 @@ describe("bounded debt contracts and financing semantics", () => {
     expect(world.finance.debtContracts).toHaveLength(MAX_RETAINED_TERMINATED_DEBT_CONTRACTS);
     expect(world.finance.debtHistory).toHaveLength(1);
     expect(world.finance.debtHistory[0]?.contractsRetired).toBe(40);
-    expect(world.finance.debtHistory[0]?.principalRepaidSUSD).toBeCloseTo(40_000, 6);
+    expect(world.finance.debtHistory[0]?.principalRepaidRUSD).toBeCloseTo(40_000, 6);
     expect(() => assertValidFinanceState(world.finance)).not.toThrow();
 
     const save = serializeWorld(world);
@@ -133,8 +133,8 @@ describe("bounded debt contracts and financing semantics", () => {
         ...template,
         id: 10_000 + index,
         status: "active",
-        outstandingPrincipalSUSD: 1,
-        principalSUSD: 1,
+        outstandingPrincipalRUSD: 1,
+        principalRUSD: 1,
         maturityDay: template.maturityDay + 100,
       });
     }
@@ -148,14 +148,14 @@ describe("bounded debt contracts and financing semantics", () => {
     expect(usa?.debt?.enabled).toBe(true);
     expect(usa?.debt?.creditorKind).toBe("country");
     expect(usa?.debt?.creditorId).toBe(1);
-    expect(usa?.fiscal.welfareBudgetSUSDPerYear).toBeGreaterThan(0);
+    expect(usa?.fiscal.welfareBudgetRUSDPerYear).toBeGreaterThan(0);
     expect(
       scenario.countries?.filter((country) => country.debt?.enabled === true).length,
     ).toBeLessThan(8);
 
     const world = createM5bWorld(scenario as never);
     const last = tickM5b(world, scenario as never, 31);
-    expect(last.economy!.debt.debtIssuedForDeficitSUSD).toBeGreaterThan(0);
+    expect(last.economy!.debt.debtIssuedForDeficitRUSD).toBeGreaterThan(0);
     expect(world.finance.debtContracts.length).toBeGreaterThan(0);
     expect(world.finance.debtHistory.length).toBe(0);
     const liability = world.finance.accounts.find(
@@ -164,18 +164,18 @@ describe("bounded debt contracts and financing semantics", () => {
         account.ownerId === usa?.id &&
         account.subtype === "debt-liability",
     );
-    expect(liability?.balanceSUSD ?? 0).toBeGreaterThan(0);
+    expect(liability?.balanceRUSD ?? 0).toBeGreaterThan(0);
     const activePrincipal = world.finance.debtContracts
       .filter((contract) => contract.status === "active" || contract.status === "arrears")
-      .reduce((total, contract) => total + contract.outstandingPrincipalSUSD, 0);
-    expect(liability?.balanceSUSD ?? 0).toBeCloseTo(activePrincipal, 6);
+      .reduce((total, contract) => total + contract.outstandingPrincipalRUSD, 0);
+    expect(liability?.balanceRUSD ?? 0).toBeCloseTo(activePrincipal, 6);
     const bondAsset = world.finance.accounts.find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === 1 &&
         account.subtype === "bond-asset",
     );
-    expect(bondAsset?.balanceSUSD ?? 0).toBeCloseTo(activePrincipal, 6);
+    expect(bondAsset?.balanceRUSD ?? 0).toBeCloseTo(activePrincipal, 6);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 });

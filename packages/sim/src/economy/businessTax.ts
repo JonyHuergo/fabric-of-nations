@@ -35,7 +35,7 @@ import {
   daysInMonth,
   isTerminalDayIndex,
 } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { DayIndex, Id } from "../types.js";
 import {
   assertValidWorldForTick,
@@ -59,18 +59,18 @@ import type { FinanceState } from "./types.js";
 export interface BusinessTaxBuildingResult {
   readonly buildingId: Id;
   readonly countryId: Id;
-  readonly taxableProfitSUSD: number;
-  readonly assessedSUSD: number;
-  readonly collectedSUSD: number;
-  readonly uncollectedSUSD: number;
+  readonly taxableProfitRUSD: number;
+  readonly assessedRUSD: number;
+  readonly collectedRUSD: number;
+  readonly uncollectedRUSD: number;
 }
 
 /** One country's business-profit tax result. */
 export interface BusinessTaxCountryResult {
   readonly countryId: Id;
-  readonly assessedSUSD: number;
-  readonly collectedSUSD: number;
-  readonly uncollectedSUSD: number;
+  readonly assessedRUSD: number;
+  readonly collectedRUSD: number;
+  readonly uncollectedRUSD: number;
 }
 
 /** Transient result of one business-profit tax phase. */
@@ -79,9 +79,9 @@ export interface BusinessTaxPhaseResult {
   readonly dayIndex: DayIndex;
   readonly countries: readonly BusinessTaxCountryResult[];
   readonly buildings: readonly BusinessTaxBuildingResult[];
-  readonly assessedSUSD: number;
-  readonly collectedSUSD: number;
-  readonly uncollectedSUSD: number;
+  readonly assessedRUSD: number;
+  readonly collectedRUSD: number;
+  readonly uncollectedRUSD: number;
   readonly postingIds: readonly number[];
 }
 
@@ -91,9 +91,9 @@ function emptyResult(dayIndex: DayIndex): BusinessTaxPhaseResult {
     dayIndex,
     countries: [],
     buildings: [],
-    assessedSUSD: 0,
-    collectedSUSD: 0,
-    uncollectedSUSD: 0,
+    assessedRUSD: 0,
+    collectedRUSD: 0,
+    uncollectedRUSD: 0,
     postingIds: [],
   };
 }
@@ -101,7 +101,7 @@ function emptyResult(dayIndex: DayIndex): BusinessTaxPhaseResult {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function isLastCivilDayOfMonth(dayIndex: DayIndex): boolean {
@@ -111,11 +111,11 @@ function isLastCivilDayOfMonth(dayIndex: DayIndex): boolean {
 
 /** Current open-period net result of one building, from its authoritative accounts. */
 function periodNetResult(index: FinanceIndex, buildingId: Id): number {
-  const revenue = index.get("building", buildingId, "sales-revenue").balanceSUSD;
-  const subsidy = index.get("building", buildingId, "subsidy-revenue").balanceSUSD;
-  const input = index.get("building", buildingId, "input-expense").balanceSUSD;
-  const wage = index.get("building", buildingId, "wage-expense").balanceSUSD;
-  const upkeep = index.get("building", buildingId, "upkeep-expense").balanceSUSD;
+  const revenue = index.get("building", buildingId, "sales-revenue").balanceRUSD;
+  const subsidy = index.get("building", buildingId, "subsidy-revenue").balanceRUSD;
+  const input = index.get("building", buildingId, "input-expense").balanceRUSD;
+  const wage = index.get("building", buildingId, "wage-expense").balanceRUSD;
+  const upkeep = index.get("building", buildingId, "upkeep-expense").balanceRUSD;
   const result = revenue + subsidy - input - wage - upkeep;
   if (!Number.isFinite(result)) {
     throw new RangeError(`building ${String(buildingId)} period net result is not finite`);
@@ -175,7 +175,7 @@ export function runBusinessTaxPhase(
         throw new RangeError(`invalid business-profit tax for building ${String(building.id)}`);
       }
       if (!(assessed > 0)) continue;
-      const operatingCash = index.get("building", building.id, "operating-cash").balanceSUSD;
+      const operatingCash = index.get("building", building.id, "operating-cash").balanceRUSD;
       const available = Math.max(0, operatingCash);
       const collected = Math.min(assessed, available);
       if (collected < 0 || !Number.isFinite(collected)) {
@@ -194,22 +194,22 @@ export function runBusinessTaxPhase(
             {
               accountId: index.get("building", building.id, "business-tax-expense").id,
               side: "debit",
-              amountSUSD: paid,
+              amountRUSD: paid,
             },
             {
               accountId: index.get("building", building.id, "operating-cash").id,
               side: "credit",
-              amountSUSD: paid,
+              amountRUSD: paid,
             },
             {
               accountId: index.get("country", country.id, "treasury-cash").id,
               side: "debit",
-              amountSUSD: paid,
+              amountRUSD: paid,
             },
             {
               accountId: index.get("country", country.id, "business-tax-revenue").id,
               side: "credit",
-              amountSUSD: paid,
+              amountRUSD: paid,
             },
           ],
           sourceEntityId: country.id,
@@ -219,10 +219,10 @@ export function runBusinessTaxPhase(
       buildingResults.push({
         buildingId: building.id,
         countryId: country.id,
-        taxableProfitSUSD: taxable,
-        assessedSUSD: assessed,
-        collectedSUSD: paid,
-        uncollectedSUSD: uncollected,
+        taxableProfitRUSD: taxable,
+        assessedRUSD: assessed,
+        collectedRUSD: paid,
+        uncollectedRUSD: uncollected,
       });
       const total = countryTotals.get(country.id) ?? {
         assessed: 0,
@@ -245,8 +245,8 @@ export function runBusinessTaxPhase(
     const totals = countryTotals.get(country.id);
     if (totals === undefined) continue;
     accumulateBudgetMemo(staged, country.id, {
-      businessTaxAssessedSUSD: totals.assessed,
-      businessTaxUncollectedSUSD: totals.uncollected,
+      businessTaxAssessedRUSD: totals.assessed,
+      businessTaxUncollectedRUSD: totals.uncollected,
       businessTaxAssessedDay: dayIndex,
     });
   }
@@ -266,9 +266,9 @@ export function runBusinessTaxPhase(
   const countriesResult = [...countryTotals.entries()]
     .map(([countryId, totals]) => ({
       countryId,
-      assessedSUSD: totals.assessed,
-      collectedSUSD: totals.collected,
-      uncollectedSUSD: totals.uncollected,
+      assessedRUSD: totals.assessed,
+      collectedRUSD: totals.collected,
+      uncollectedRUSD: totals.uncollected,
     }))
     .sort((left, right) => left.countryId - right.countryId);
   buildingResults.sort((left, right) => left.buildingId - right.buildingId);
@@ -277,10 +277,10 @@ export function runBusinessTaxPhase(
     dayIndex,
     countries: countriesResult,
     buildings: buildingResults,
-    assessedSUSD: countriesResult.reduce((total, entry) => total + entry.assessedSUSD, 0),
-    collectedSUSD: countriesResult.reduce((total, entry) => total + entry.collectedSUSD, 0),
-    uncollectedSUSD: countriesResult.reduce(
-      (total, entry) => total + entry.uncollectedSUSD,
+    assessedRUSD: countriesResult.reduce((total, entry) => total + entry.assessedRUSD, 0),
+    collectedRUSD: countriesResult.reduce((total, entry) => total + entry.collectedRUSD, 0),
+    uncollectedRUSD: countriesResult.reduce(
+      (total, entry) => total + entry.uncollectedRUSD,
       0,
     ),
     postingIds: postings.map((posting) => posting.id),

@@ -112,8 +112,15 @@ export interface PolityDef {
   readonly tag: string;
   readonly historicalName: string;
   readonly commonName: string;
-  /** Catalog kind; `future-state` is used for polities not yet independent. */
-  readonly kind: "state" | "territory" | "future-state";
+  /**
+   * Catalog kind. `future-state` is used for polities not yet independent;
+   * `historical` is a registry-only polity that did not exist in 1900 (a
+   * breakaway republic, a short-lived state or a predecessor union). A
+   * historical entry never owns a province at the 1900 start and is never
+   * selectable; it exists so an alternate-history or breakaway scenario can
+   * transfer provinces to it.
+   */
+  readonly kind: "state" | "territory" | "future-state" | "historical";
   readonly status: CountryStatus;
   /** Sovereign polity id, or null for a sovereign state. */
   readonly sovereignPolityId: Id | null;

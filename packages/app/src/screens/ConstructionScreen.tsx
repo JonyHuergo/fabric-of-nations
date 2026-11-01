@@ -5,7 +5,7 @@ import {
   countryById,
   formatQuantity,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   previewConstruction,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -115,23 +115,23 @@ export function ConstructionScreen({
       >
         <StatRow
           label="Treasury cash (stock)"
-          value={formatSUSD(country.treasuryCashSUSD)}
-          detail={`Construction work-in-progress ${formatSUSD(country.constructionInProgressSUSD)} · public capital ${formatSUSD(country.publicCapitalSUSD)}`}
+          value={formatRUSD(country.treasuryCashRUSD)}
+          detail={`Construction work-in-progress ${formatRUSD(country.constructionInProgressRUSD)} · public capital ${formatRUSD(country.publicCapitalRUSD)}`}
         />
         <StatRow
           label="Idle construction labor"
           value={`${formatQuantity(country.constructionLabor.idleWorkers)} workers`}
-          detail={`Mean daily base wage ${formatSUSD(country.constructionLabor.dailyWageSUSD)} · only workers not assigned to production are hired`}
+          detail={`Mean daily base wage ${formatRUSD(country.constructionLabor.dailyWageRUSD)} · only workers not assigned to production are hired`}
         />
         <StatRow
           label="This month construction outlay"
-          value={formatSUSD(country.budgetMonthToDate.constructionSpentSUSD)}
-          detail={`Materials ${formatSUSD(country.budgetMonthToDate.constructionMaterialsSpentSUSD)} · written off ${formatSUSD(country.budgetMonthToDate.constructionWrittenOffSUSD)}; capital spending is not an expense.`}
+          value={formatRUSD(country.budgetMonthToDate.constructionSpentRUSD)}
+          detail={`Materials ${formatRUSD(country.budgetMonthToDate.constructionMaterialsSpentRUSD)} · written off ${formatRUSD(country.budgetMonthToDate.constructionWrittenOffRUSD)}; capital spending is not an expense.`}
         />
         <StatRow
           label="Retained history"
           value={`${String(country.constructionHistory.projectsCompleted)} completed · ${String(country.constructionHistory.projectsCancelled)} cancelled`}
-          detail={`Compacted spent ${formatSUSD(country.constructionHistory.totalSpentSUSD)} · written off ${formatSUSD(country.constructionHistory.totalWrittenOffSUSD)}`}
+          detail={`Compacted spent ${formatRUSD(country.constructionHistory.totalSpentRUSD)} · written off ${formatRUSD(country.constructionHistory.totalWrittenOffRUSD)}`}
         />
         {!snapshot.constructionEnabled ? (
           <Text style={styles.error}>
@@ -152,7 +152,7 @@ export function ConstructionScreen({
             {snapshot.projectTypes.map((type) => (
               <Pill
                 key={type.definitionId}
-                label={`${type.name} · ${formatSUSD(type.constructionCostSUSD)}`}
+                label={`${type.name} · ${formatRUSD(type.constructionCostRUSD)}`}
                 active={definitionId === type.definitionId}
                 onPress={() => setDefinitionId(type.definitionId)}
                 disabled={!isPlayerCountry || busy}
@@ -181,8 +181,8 @@ export function ConstructionScreen({
             />
             <StatRow
               label="Construction labor budget"
-              value={formatSUSD(selectedType.constructionCostSUSD)}
-              detail={`Paid as construction wages over time; working-capital target ${formatSUSD(selectedType.workingCapitalSUSD)} (30 days upkeep).`}
+              value={formatRUSD(selectedType.constructionCostRUSD)}
+              detail={`Paid as construction wages over time; working-capital target ${formatRUSD(selectedType.workingCapitalRUSD)} (30 days upkeep).`}
             />
             <StatRow
               label="Output at level 1"
@@ -192,14 +192,14 @@ export function ConstructionScreen({
                     `${formatQuantity(output.dailyCapacityAtLevelOne)} ${output.unitLabel} ${output.goodName}/day`,
                 )
                 .join(" · ")}
-              detail={`Daily upkeep ${formatSUSD(selectedType.dailyUpkeepSUSDAtLevelOne)}; the completed building then uses ordinary production, employment, market, and state-remittance rules.`}
+              detail={`Daily upkeep ${formatRUSD(selectedType.dailyUpkeepRUSDAtLevelOne)}; the completed building then uses ordinary production, employment, market, and state-remittance rules.`}
             />
             {preview === null ? null : (
               <>
                 <StatRow
                   label="Treasury requirement"
-                  value={`${formatSUSD(preview.upfrontRequirementSUSD)} upfront`}
-                  detail={`Materials estimate ${formatSUSD(preview.estimatedMaterialsCostSUSD)} · total investment estimate ${formatSUSD(preview.totalInvestmentSUSD)} · treasury ${formatSUSD(preview.treasuryCashSUSD)} · grant ${preview.valid ? "affordable" : "not affordable"}`}
+                  value={`${formatRUSD(preview.upfrontRequirementRUSD)} upfront`}
+                  detail={`Materials estimate ${formatRUSD(preview.estimatedMaterialsCostRUSD)} · total investment estimate ${formatRUSD(preview.totalInvestmentRUSD)} · treasury ${formatRUSD(preview.treasuryCashRUSD)} · grant ${preview.valid ? "affordable" : "not affordable"}`}
                 />
                 {preview.materials.length === 0 ? null : (
                   <View style={styles.materials}>
@@ -207,9 +207,9 @@ export function ConstructionScreen({
                     {preview.materials.map((material) => (
                       <Text key={material.goodId} style={styles.projectDetail}>
                         {material.goodName}: {formatQuantity(material.requiredQuantity)}{" "}
-                        {material.unitLabel} · price {formatSUSD(material.unitPriceSUSD)} · market
+                        {material.unitLabel} · price {formatRUSD(material.unitPriceRUSD)} · market
                         stock {formatQuantity(material.marketStock)} · estimated{" "}
-                        {formatSUSD(material.estimatedCostSUSD)}
+                        {formatRUSD(material.estimatedCostRUSD)}
                         {material.shortfallQuantity > 0
                           ? ` · short ${formatQuantity(material.shortfallQuantity)}`
                           : ""}
@@ -224,7 +224,7 @@ export function ConstructionScreen({
                       ? "Waiting for labor"
                       : `${formatQuantity(preview.desiredCrew)} workers · ~${String(preview.estimatedDays)} days`
                   }
-                  detail={`Daily payroll estimate ${formatSUSD(preview.estimatedDailyPayrollSUSD)} at the current idle wage; a static projection, not a promise.`}
+                  detail={`Daily payroll estimate ${formatRUSD(preview.estimatedDailyPayrollRUSD)} at the current idle wage; a static projection, not a promise.`}
                 />
                 {preview.errors.map((error) => (
                   <Text key={error} style={styles.error}>
@@ -271,9 +271,9 @@ export function ConstructionScreen({
                 </View>
                 <Text style={styles.projectDetail}>
                   Labor {formatRate(project.progress)} · materials{" "}
-                  {formatRate(project.materialsProgress)} · spent {formatSUSD(project.spentSUSD)} +{" "}
-                  {formatSUSD(project.materialsSpentSUSD)} materials · remaining{" "}
-                  {formatSUSD(project.remainingSUSD)}
+                  {formatRate(project.materialsProgress)} · spent {formatRUSD(project.spentRUSD)} +{" "}
+                  {formatRUSD(project.materialsSpentRUSD)} materials · remaining{" "}
+                  {formatRUSD(project.remainingRUSD)}
                 </Text>
                 {project.materials.length === 0 ? null : (
                   <Text style={styles.projectDetail}>

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import {
+  RUSD_UNIT_NAME,
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewMonetaryPolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -18,7 +19,7 @@ function percent(value: number): string {
 }
 
 function rate(value: number | null): string {
-  return value === null ? "unavailable" : `${value.toFixed(6)} SUSD/unit`;
+  return value === null ? "unavailable" : `${value.toFixed(6)} RUSD/unit`;
 }
 
 export function MoneyScreen({
@@ -43,8 +44,8 @@ export function MoneyScreen({
     // documented placeholder default so both the slider and Apply agree.
     setParityText(
       (
-        country.monetary.paritySusdPerUnit ??
-        country.monetary.valuationSusdPerUnit ??
+        country.monetary.parityRusdPerUnit ??
+        country.monetary.valuationRusdPerUnit ??
         0.2
       ).toFixed(6),
     );
@@ -54,7 +55,7 @@ export function MoneyScreen({
   }, [
     countryId,
     country?.monetary.regime,
-    country?.monetary.paritySusdPerUnit,
+    country?.monetary.parityRusdPerUnit,
     country?.monetary.active,
   ]);
 
@@ -81,9 +82,9 @@ export function MoneyScreen({
     const parity = regime === "managed" ? null : parsedParity;
     const preview = previewMonetaryPolicy(snapshot, country, {
       regime,
-      paritySusdPerUnit: parity,
-      reserveTransferSUSD: Number.isFinite(reserve) ? reserve : 0,
-      currencyConversionSUSD: Number.isFinite(conversion) ? conversion : 0,
+      parityRusdPerUnit: parity,
+      reserveTransferRUSD: Number.isFinite(reserve) ? reserve : 0,
+      currencyConversionRUSD: Number.isFinite(conversion) ? conversion : 0,
     });
     if (!isPlayerCountry) {
       setLocalError("Only the player-controlled country may change monetary policy.");
@@ -108,9 +109,9 @@ export function MoneyScreen({
       kind: "set-monetary-policy",
       countryId: country.id,
       regime,
-      paritySusdPerUnit: parity,
-      reserveTransferSUSD: reserve,
-      currencyConversionSUSD: conversion,
+      parityRusdPerUnit: parity,
+      reserveTransferRUSD: reserve,
+      currencyConversionRUSD: conversion,
     });
   };
 
@@ -139,16 +140,16 @@ export function MoneyScreen({
   const previewParity = regime === "managed" ? null : parsedParity;
   const preview = previewMonetaryPolicy(snapshot, country, {
     regime,
-    paritySusdPerUnit: previewParity,
-    reserveTransferSUSD: Number.isFinite(parsedReserve) ? parsedReserve : 0,
-    currencyConversionSUSD: Number.isFinite(parsedConversion) ? parsedConversion : 0,
+    parityRusdPerUnit: previewParity,
+    reserveTransferRUSD: Number.isFinite(parsedReserve) ? parsedReserve : 0,
+    currencyConversionRUSD: Number.isFinite(parsedConversion) ? parsedConversion : 0,
   });
 
   // The authoritative parity move is limited to 50% of the current parity, so the
   // slider spans half to one-and-a-half times the reference rate.
   const referenceParity =
-    country.monetary.paritySusdPerUnit ??
-    country.monetary.valuationSusdPerUnit ??
+    country.monetary.parityRusdPerUnit ??
+    country.monetary.valuationRusdPerUnit ??
     0.2;
   const parityMin = Math.max(0.000001, referenceParity * 0.5);
   const parityMax = Math.max(parityMin, referenceParity * 1.5);
@@ -159,9 +160,9 @@ export function MoneyScreen({
       : referenceParity;
   // Reserve transfers are bounded by treasury cash (deposit) and authority
   // reserves (withdrawal), the limits enforced by the worker.
-  const reserveCeiling = Math.max(0, Math.floor(country.treasuryCashSUSD));
+  const reserveCeiling = Math.max(0, Math.floor(country.treasuryCashRUSD));
   const reserveFloor = country.monetary.active
-    ? -Math.max(0, Math.floor(country.monetary.reserveCashSUSD))
+    ? -Math.max(0, Math.floor(country.monetary.reserveCashRUSD))
     : 0;
   const reserveStep = Math.max(
     1,
@@ -190,12 +191,12 @@ export function MoneyScreen({
         <>
           <StatRow label="Regime" value={monetary.regime} />
           <StatRow label="Status" value={monetary.active ? "established" : "not established"} />
-          <StatRow label="Parity" value={rate(monetary.paritySusdPerUnit)} />
-          <StatRow label="Valuation" value={rate(monetary.valuationSusdPerUnit)} />
-          <StatRow label="Reserves" value={formatSUSD(monetary.reserveCashSUSD)} />
+          <StatRow label="Parity" value={rate(monetary.parityRusdPerUnit)} />
+          <StatRow label="Valuation" value={rate(monetary.valuationRusdPerUnit)} />
+          <StatRow label="Reserves" value={formatRUSD(monetary.reserveCashRUSD)} />
           <StatRow
             label="Currency in circulation"
-            value={`${monetary.currencyIssuedUnits.toFixed(2)} units (${formatSUSD(monetary.liabilitySUSD)})`}
+            value={`${monetary.currencyIssuedUnits.toFixed(2)} units (${formatRUSD(monetary.liabilityRUSD)})`}
           />
           <StatRow
             label="Reserve cover"
@@ -219,7 +220,7 @@ export function MoneyScreen({
           />
           <StatRow
             label="Last completed month exports / imports"
-            value={`${formatSUSD(monetary.lastMonthExportsSUSD)} / ${formatSUSD(monetary.lastMonthImportsSUSD)}`}
+            value={`${formatRUSD(monetary.lastMonthExportsRUSD)} / ${formatRUSD(monetary.lastMonthImportsRUSD)}`}
           />
         </>
       ) : (
@@ -231,10 +232,15 @@ export function MoneyScreen({
               : "No authority has been established yet. Declare a parity and transfer reserves from the treasury to establish one."}
         </Notice>
       )}
+      <Notice title={`RUSD — ${RUSD_UNIT_NAME}`} tone="info">
+        RUSD is Fabric of Nations' standard unit of economic measurement. It allows
+        currencies, prices, wages and other economic values to be compared across
+        countries. It is not an actual national currency or legal tender, is not issued
+        or adopted by any country, and is not a fixed-rate substitute for the US dollar.
+      </Notice>
       <Text style={styles.help}>
-        SUSD is the fixed unit of measurement and accounting denomination; it is not a
-        national currency. The valuation is SUSD per one unit of the country's currency.
-        Domestic accounts and trade remain SUSD and are never converted twice.
+        The valuation is RUSD per one unit of the country's currency. Domestic accounts
+        and trade remain RUSD and are never converted twice.
       </Text>
 
       <Text style={styles.heading}>Price index (measured, base 100)</Text>
@@ -300,7 +306,7 @@ export function MoneyScreen({
           label={`${currency.key.toUpperCase()} — ${currency.name}`}
           value={
             currency.valuationStatus === "specified"
-              ? `${(currency.susdPerUnit ?? 0).toFixed(6)} SUSD/unit (${currency.valuationSource})`
+              ? `${(currency.rusdPerUnit ?? 0).toFixed(6)} RUSD/unit (${currency.valuationSource})`
               : "valuation unavailable (no rate is invented)"
           }
         />
@@ -336,7 +342,7 @@ export function MoneyScreen({
         max={parityMax}
         step={parityStep}
         precision={6}
-        unit="SUSD/unit"
+        unit="RUSD/unit"
         disabled={!canAct || regime === "managed"}
         pending={parityCommit.hasPending}
         onChange={(value) => setParityText(value.toFixed(6))}
@@ -344,7 +350,7 @@ export function MoneyScreen({
         hint={
           regime === "managed"
             ? "Managed rates are rule-driven; parity is sent as unchanged."
-            : "SUSD per unit. A change may move at most 50% from the current parity."
+            : "RUSD per unit. A change may move at most 50% from the current parity."
         }
       />
       <SliderField
@@ -354,7 +360,7 @@ export function MoneyScreen({
         max={reserveCeiling}
         step={reserveStep}
         precision={0}
-        unit="SUSD"
+        unit="RUSD"
         disabled={!canAct}
         pending={reserveCommit.hasPending}
         onChange={(value) => setReserveText(value.toFixed(0))}
@@ -365,7 +371,7 @@ export function MoneyScreen({
             : "A positive transfer is required to establish the authority."
         }
       />
-      <Text style={styles.label}>Currency conversion (SUSD; signed)</Text>
+      <Text style={styles.label}>Currency conversion (RUSD; signed)</Text>
       <TextInput
         style={styles.input}
         value={conversionText}
@@ -379,12 +385,12 @@ export function MoneyScreen({
         <Text style={styles.estimateTitle}>Estimate (not a forecast)</Text>
         <StatRow
           label="Projected valuation"
-          value={rate(preview.projectedValuationSusdPerUnit)}
+          value={rate(preview.projectedValuationRusdPerUnit)}
         />
-        <StatRow label="Projected reserves" value={formatSUSD(preview.projectedReservesSUSD)} />
+        <StatRow label="Projected reserves" value={formatRUSD(preview.projectedReservesRUSD)} />
         <StatRow
           label="Projected currency liability"
-          value={formatSUSD(preview.projectedLiabilitySUSD)}
+          value={formatRUSD(preview.projectedLiabilityRUSD)}
         />
         <StatRow
           label="Projected reserve cover"

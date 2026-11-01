@@ -125,7 +125,7 @@ function accountBalance(
       candidate.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 describe("M10 sovereignty and military control", () => {
@@ -219,7 +219,7 @@ describe("M10 sovereignty and military control", () => {
     const monetaryBefore = world.currencyValuations.map((valuation) => ({
       currencyId: valuation.currencyId,
       status: valuation.status,
-      value: valuation.status === "specified" ? valuation.susdPerUnit : 0,
+      value: valuation.status === "specified" ? valuation.rusdPerUnit : 0,
     }));
     const war = world.military.wars.find((entry) => entry.endedDay === null);
     expect(war).toBeDefined();
@@ -265,7 +265,7 @@ describe("M10 sovereignty and military control", () => {
       world.currencyValuations.map((valuation) => ({
         currencyId: valuation.currencyId,
         status: valuation.status,
-        value: valuation.status === "specified" ? valuation.susdPerUnit : 0,
+        value: valuation.status === "specified" ? valuation.rusdPerUnit : 0,
       })),
     ).toEqual(monetaryBefore);
     expect(world.regions.find((region) => region.id === M5_REGION_A2)?.controllerCountryId).toBeNull();
@@ -761,10 +761,10 @@ describe("M10 determinism, persistence, and worker contract", () => {
       (entry) => entry.countryId === M5_COUNTRY_A,
     );
     expect(totals).toBeDefined();
-    expect(totals?.militaryExpenseSUSD ?? 0).toBeGreaterThan(0);
+    expect(totals?.militaryExpenseRUSD ?? 0).toBeGreaterThan(0);
     // Military spending is an expense, so the net result is lower than revenue alone.
-    expect(totals?.netFiscalResultSUSD ?? 0).toBeLessThan(
-      (totals?.incomeTaxRevenueSUSD ?? 0) + (totals?.businessTaxRevenueSUSD ?? 0),
+    expect(totals?.netFiscalResultRUSD ?? 0).toBeLessThan(
+      (totals?.incomeTaxRevenueRUSD ?? 0) + (totals?.businessTaxRevenueRUSD ?? 0),
     );
     // No money was created: cash conservation across the posting set is intact.
     expect(world.finance.opening).not.toBeNull();

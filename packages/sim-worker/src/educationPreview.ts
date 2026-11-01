@@ -77,10 +77,10 @@ export function previewResearchStart(
 export interface EducationFundingPreview {
   readonly valid: boolean;
   readonly errors: readonly string[];
-  readonly annualSUSD: number;
-  readonly dailyRequestSUSD: number;
-  readonly currentAnnualSUSD: number;
-  readonly treasuryCashSUSD: number;
+  readonly annualRUSD: number;
+  readonly dailyRequestRUSD: number;
+  readonly currentAnnualRUSD: number;
+  readonly treasuryCashRUSD: number;
   readonly constraints: readonly string[];
 }
 
@@ -88,7 +88,7 @@ export interface EducationFundingPreview {
 export function previewEducationFunding(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
-  annualSUSD: number,
+  annualRUSD: number,
 ): EducationFundingPreview {
   const errors: string[] = [];
   if (snapshot.playerCountryId !== country.id) {
@@ -97,11 +97,11 @@ export function previewEducationFunding(
   if (!country.education.enabled) {
     errors.push("Education is not enabled for this world.");
   }
-  if (!Number.isFinite(annualSUSD) || annualSUSD < 0) {
+  if (!Number.isFinite(annualRUSD) || annualRUSD < 0) {
     errors.push("The annual funding target must be a finite non-negative amount.");
   }
-  const dailyRequestSUSD = Number.isFinite(annualSUSD) ? annualSUSD / 365 : 0;
-  if (dailyRequestSUSD > country.treasuryCashSUSD) {
+  const dailyRequestRUSD = Number.isFinite(annualRUSD) ? annualRUSD / 365 : 0;
+  if (dailyRequestRUSD > country.treasuryCashRUSD) {
     errors.push(
       "The daily request exceeds current treasury cash; the education phase would pay only the available amount above the reserve floor.",
     );
@@ -109,10 +109,10 @@ export function previewEducationFunding(
   return {
     valid: errors.length === 0,
     errors,
-    annualSUSD,
-    dailyRequestSUSD,
-    currentAnnualSUSD: country.education.fundedAnnualSUSD,
-    treasuryCashSUSD: country.treasuryCashSUSD,
+    annualRUSD,
+    dailyRequestRUSD,
+    currentAnnualRUSD: country.education.fundedAnnualRUSD,
+    treasuryCashRUSD: country.treasuryCashRUSD,
     constraints: [
       "Education payroll is a daily cash-limited transfer to academic households; it is not money creation.",
       "Unpaid request is an explicit shortfall, not debt or a receivable.",

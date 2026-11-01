@@ -220,7 +220,7 @@ function CenturyRoot() {
                   flag images come from Wikimedia Commons and were individually verified as Public
                   Domain or CC0 through the Commons API.{" "}
                   {String(FLAG_PROVENANCE.filter((flag) => flag.sourceType === "project").length)}{" "}
-                  are original Century reconstructions from documented designs. No CC BY-SA or
+                  are original Fabric of Nations reconstructions from documented designs. No CC BY-SA or
                   other share-alike artwork is bundled. Flag type, author, licence, validity dates,
                   retrieval date and historical caveats are recorded for every file below and in
                   docs/FLAG_PROVENANCE.md. The game reads only the bundled PNG assets; it makes no
@@ -264,7 +264,7 @@ function SplashScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.splash}>
         <ActivityIndicator color={colors.accent} />
-        <Text style={styles.splashTitle}>CENTURY</Text>
+        <Text style={styles.splashTitle}>FABRIC OF NATIONS</Text>
         <Text style={styles.splashBody}>Reading the saved world and starting the simulation…</Text>
       </View>
     </SafeAreaView>
@@ -383,8 +383,8 @@ function BriefFact({
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
-  splash: { flex: 1, alignItems: "center", justifyContent: "center", gap: spacing.md },
-  splashTitle: { ...type.display, letterSpacing: 8 },
+  splash: { flex: 1, alignItems: "center", justifyContent: "center", gap: spacing.md, paddingHorizontal: spacing.lg },
+  splashTitle: { ...type.display, letterSpacing: 3.5, textAlign: "center" },
   splashBody: { ...type.small },
   screen: { flex: 1, backgroundColor: colors.background },
   briefContent: { padding: spacing.lg, paddingBottom: spacing.xxxl, maxWidth: 1200, width: "100%", alignSelf: "center" },

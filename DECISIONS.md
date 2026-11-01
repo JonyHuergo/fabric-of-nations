@@ -1,8 +1,9 @@
-# Century decision register
+# Fabric of Nations decision register
 
 This file records material implementation decisions, GDD/`AGENTS.md` conflicts,
 and provisional assumptions made in M0/M1/M2/M2.1/M3/M4a-1/M4a-2. It follows GDD §20 and
-`AGENTS.md` §1.
+`AGENTS.md` §1. It also retains decisions recorded under the game's former name
+*Century*; historical entries are preserved as written.
 
 Scope of this session: **M0 project foundation, M1 simulation core, M2/M2.1
 population core, M3a economy definitions/state/serialization, M3b deterministic
@@ -5606,3 +5607,838 @@ whose ownership can change without rebuilding country polygons.
   `docs/EUROPE_PROVINCIALIZATION.md`; they are not presented as surveyed lines.
 - Province geometry adds about 1 MiB to the committed offline bundle and about
   1,300 paths to the map. The map remains a single offline SVG render.
+
+## D-104 — M12b: Asian provinces extend the same permanent-province model
+
+### Decision
+
+1. **One model, two bundles.** Asia reuses the M12a province model and rendering
+   contracts exactly. There is still one geographical subdivision, `Province`;
+   no Polity → Region → Province hierarchy and no new simulation model were
+   introduced. Europe and Asia are separate deterministic build artifacts
+   (`provinces_1900.json`, `provinces_asia_1900.json`) combined by one loader in
+   `packages/data/src/provinces.ts` (simulation definitions) and
+   `packages/app/src/provinceMapBundle.ts` (rendering, merged borders and future
+   polities).
+2. **Disjoint ids and keys.** Asia province ids start at 100001, above the M12a
+   Europe block (maximum 66001). Every Asia key is prefixed `as-`. The build and
+   both loaders reject an id/key collision instead of silently replacing a
+   province. Europe ids and keys are unchanged by M12b.
+3. **Shared geometry pipeline.** The M12a build helpers were extracted into
+   `scripts/m12/province-build-lib.mjs`. Both builds use the same clipping,
+   simplification, cross-owner trimming and border-extraction code. Re-running
+   the Europe build after the extraction reproduces the committed European
+   bundle exactly (570 provinces, 1604 border pairs, 142610 segments, 67
+   multi-neighbour segments, 38 small overlaps).
+4. **Cross-bundle overlap priority.** The Asia build seeds the committed European
+   provinces as earlier, higher-priority geometry. An Asian province is clipped
+   by a European province of a different owner so it cannot paint a
+   foreign-coloured sliver across an already reviewed frontier; same-owner
+   cross-bundle overlap is not trimmed because it cannot produce a foreign
+   enclave.
+5. **Future polity range.** Asia future successor polities use ids 1100–1199.
+   They never collide with the M12a Europe range 1000–1016 and are never
+   selectable in 1900. The registry includes the Ottoman successor states, the
+   mandates, the post-colonial states of South and Southeast Asia, the Chinese,
+   Korean and Mongolian successors, and the 1991 Central Asian and Caucasian
+   republics.
+6. **Successor-border splits.** A province is the permanent geographical unit, but
+   one 1900 administrative area may be represented by more than one permanent
+   province when a later successor frontier runs through it. Asia therefore
+   splits Indian/West Punjab; Indian, Azad and Aksai Chin Kashmir; Lebanon/Syrian
+   Coast; Aleppo/Urfa; Hatay; Jerusalem/Palestine; South/North Gangwon;
+   Batum/Artvin, Erivan/Iğdır and Kars; Kazakh/Uzbek Syr-Darya; Fergana/Osh;
+   Samarkand/Khojand; Pamir/Wakhan; and Khiva/Tashauz. Manchuria additionally has
+   Rehe and Xing'an as separate Qing/Manchukuo-scale provinces, approximated
+   through modern Hebei, Liaoning and Inner Mongolia. The split lines follow
+   modern first-level units or the 1900 M11c frontier, are labelled low
+   confidence, and are never dynamic geometry surgery: each split is a data
+   definition with its own stable id. This is what makes the 1947 Radcliffe line,
+   the 1949 Israel/Palestine and Kashmir ceasefire lines, the 38th-parallel
+   Korean division, the 1921 Turkish frontier, the 1932-1933 Manchukuo extent and
+   the 1991 Central Asian and Caucasian borders representable without moving a
+   polygon.
+7. **Mutable ownership, derived borders.** Asian provinces use the same
+   `World.provinces` ownership/control/claims/special-status state and the same
+   snapshot contract as Europe. Country borders are derived from current
+   province ownership; the 1900 polity outline is used only while the province
+   union still equals that outline.
+8. **Schema and save policy.** `World` schema stays 27, the save envelope and
+   worker protocol are unchanged, and the data content version stays
+   `m3-economy-v12`: M12b is additive content, not a new state shape. An
+   M12a-era save therefore loads under the existing strict same-version policy
+   but contains only the 570 European ownership records; its Asian provinces
+   have no mutable record until a new campaign is created.
+
+### Consequences
+
+- The 1900 world now has 809 permanent provinces (570 Europe + 239 Asia) in one
+  combined catalogue with 2237 border pairs and one future-polity registry.
+- The 1900, 1918–1920, 1932–1939, 1945, 1947–1949, 1988 and 1990–1991 Asian
+  configurations are reproducible through ordinary ownership transfers,
+  effective-control changes, claims and special statuses; no polygon changes.
+- The map adds about 0.8 MiB of Asia geometry and about 239 province paths. The
+  map remains one offline SVG render with the M12a visual hierarchy: solid white
+  province hairlines, thin near-black country borders and no dashed province
+  lines.
+- Known approximations: the M11c Russian/Afghan/Chinese Pamir and Uriankhai
+  frontiers, Siamese 1907/1909 losses, Gwadar, the Dodecanese, Kinmen, the
+  successor-border split lines, and the use of modern admin-1 units as
+  historical proxies. They are labelled low or medium confidence in
+  `docs/ASIA_PROVINCIALIZATION.md` §9 and in the bundle.
+- Coverage residual is the sum of many small coastal/frontier slivers. It stays
+  under the correct 1900 owner's polity fill, so it cannot appear as a
+  foreign-coloured enclave; the audit records every unassigned unit and every
+  cross-frontier code assignment.
+
+
+## D-105 — M12c: African provinces complete the three-bundle model
+
+**Status:** implemented (M12c).
+
+### Decision
+
+1. **One model, three bundles.** Africa reuses the M12a/M12b province model and
+   rendering contracts exactly. There is still one geographical subdivision,
+   `Province`; no Polity → Region → Province hierarchy and no new simulation
+   model were introduced. Europe, Asia and Africa are separate deterministic
+   build artifacts (`provinces_1900.json`, `provinces_asia_1900.json`,
+   `provinces_africa_1900.json`) combined by one loader in
+   `packages/data/src/provinces.ts` (simulation definitions) and
+   `packages/app/src/provinceMapBundle.ts` (rendering, merged borders and future
+   polities).
+2. **Disjoint ids and keys.** Africa province ids start at 200001, above the M12a
+   Europe block (maximum 66001) and the M12b Asia block (100001–100239). Every
+   Africa key is prefixed `af-`. The build and both loaders reject an id/key
+   collision. Europe and Asia ids and keys are unchanged by M12c.
+3. **Shared geometry pipeline.** `scripts/m12/province-build-lib.mjs` is reused
+   unchanged. The Africa build seeds **both** committed bundles (Europe first,
+   then Asia) as higher-priority cross-owner geometry, so an African province
+   cannot paint a foreign-coloured sliver across an already reviewed frontier.
+4. **Coverage scope is per shared feature.** Africa shares several map features
+   with Europe and Asia. The build measures coverage only over the African part:
+   Ottoman Libya within the Ottoman Empire, Réunion and Mayotte within France, the
+   African islands within the Portuguese Atlantic and British Indian/South
+   Atlantic features, Morocco north of Western Sahara and the Cape without the
+   Prince Edward Islands. Coverage clips are audit boundaries, not political
+   borders.
+5. **Display-only cross-feature seam borders.** Shared border extraction is
+   exact only between two provinces of the same 1900 map feature. Frontiers
+   between two features (Eritrea/Ethiopia, British/Italian Somaliland,
+   Kenya/Tanganyika, Cabinda/Congo, Nigeria/Kamerun, ...) are clipped by two
+   independently authored polity polygons and can be several tenths of a degree
+   apart, so the derived national border would be missing there after a transfer.
+   The build adds deterministic, display-only seams in two passes: a
+   province-outline pass (nearest point on the other outline, midpoint, 0.5°
+   tolerance, point-to-segment so straight frontiers work, with land, polity and
+   third-province filters) and a polity-frontier pass for feature pairs the first
+   pass cannot connect (midline between the two 1900 polity outlines, 0.4°
+   tolerance, plus a forced Algeria/Mauritania frontier). Neither changes a
+   province polygon, id or simulation state; both follow the M11c map's existing
+   display-only seam-bridge precedent. **183** seam pairs are committed (10 of
+   them polity-frontier seams) and listed in the bundle audit and in
+   `docs/AFRICA_PROVINCIALIZATION.md` §3.1. The audit proves that every modern
+   African land border has a province edge except three pairs that are not
+   borders: the Botswana/Zambia quadripoint, the undelimited Kenya/South Sudan
+   Ilemi Triangle (unassigned in the M11c map), and Djibouti/Somalia, which is
+   mediated by Somaliland.
+6. **Future polity range.** Africa future successor polities use ids 1200–1256.
+   They never collide with the M12a Europe range (1000–1016) or the M12b Asia
+   range (1100–1144) and are never selectable in 1900. They cover every sovereign
+   African state that appeared between 1900 and 2000, including Tanganyika (1961),
+   Zanzibar (1963) and Tanzania (1964), and the Rhodesian sequence (Rhodesia
+   (1965), Zimbabwe Rhodesia (1979), Zimbabwe (1980)).
+7. **Successor-border splits.** A province is the permanent geographical unit, but
+   one 1900 administrative area is represented by more than one permanent
+   province wherever a later successor frontier runs through it: Sudan/South
+   Sudan; German East Africa into Tanganyika, Rwanda and Burundi; Kamerun into its
+   French and British portions; Togoland likewise; Nigeria into Lagos, Southern
+   and Northern Nigeria (plus the separate Sokoto emirates); French West Africa
+   and French Equatorial Africa into their modern successor groups; Northern and
+   Southern Rhodesia and Nyasaland; Bechuanaland, Basutoland and Swaziland; the
+   Cape Colony and Walvis Bay; Libya into Tripolitania, Cyrenaica and Fezzan;
+   Morocco into its Spanish and French zones; Portuguese Guinea, Cape Verde, São
+   Tomé and Príncipe. Every pair shares a continuous province edge in the bundle,
+   proved by the M12c test suite. The split lines follow modern first-level units
+   or an authored historical line; none moves a polygon.
+8. **Mutable ownership, derived borders.** African provinces use the same
+   `World.provinces` ownership/control/claims/special-status state and the same
+   snapshot contract. Sudan starts as an explicit `condominium`; future mandates
+   and protectorates are ordinary control/status changes. Country borders are
+   derived from current province ownership.
+9. **Schema and save policy.** `World` schema stays 27, the save envelope and the
+   worker protocol are unchanged, and the data content version is unchanged: M12c
+   is additive content, not a new state shape. An M12a-era save (570 European
+   records) or an M12b-era save (809 European and Asian records) still loads under
+   the strict same-version policy but has no mutable record for its African
+   provinces until a new campaign is created.
+10. **South Sudan activation is clamped to the campaign boundary.** The
+    simulation calendar covers 1900-01-01 to 2000-01-01. South Sudan's historical
+    independence (9 July 2011) is outside that window, so the future-polity
+    registry activation is set to 2000-01-01 and its note records the real date.
+    The southern Sudanese provinces are permanently separate from 1900, so the
+    transfer itself remains a single ordinary ownership change.
+
+### Consequences
+
+- The 1900 world now has **1069** permanent provinces (570 Europe + 239 Asia +
+  260 Africa) in one combined catalogue with one future-polity registry
+  (17 + 45 + 57 = 119 future polities) and 3075 border pairs
+  (1604 + 633 + 838). 16 polities own African provinces.
+- The 1900, 1903–1916, 1910, 1911–1912, 1919–1922, 1936–1941, 1956–1968,
+  1975–1977, 1980–1994 and 2011 African configurations are reproducible through
+  ordinary ownership transfers, effective-control changes, claims and special
+  statuses; no polygon changes.
+- The map adds about 0.54 MiB of African geometry and about 260 province paths.
+  It remains one offline SVG render with the established visual hierarchy: solid
+  white province hairlines, thin near-black country borders at 1.25 screen px and
+  no dashed province lines.
+- Known approximations: the 26th-parallel Saguia el-Hamra/Río de Oro line, the
+  Tarfaya strip, the Spanish presidios (not exposed by the M11c map), the
+  French/Spanish Moroccan zone line, the Libyan internal boundaries, the
+  British/French Togoland and Cameroons partition lines, the coarser Cape/Natal/
+  Orange Free State and Bechuanaland province granularity, and the use of modern
+  admin-1 units as historical proxies. They are labelled low or medium confidence
+  in `docs/AFRICA_PROVINCIALIZATION.md` §9 and in the bundle.
+- Coverage residual is the sum of many small coastal, lake and frontier slivers.
+  It stays under the correct 1900 owner's polity fill, so it cannot appear as a
+  foreign-coloured enclave; the audit records every unassigned unit, every
+  cross-frontier code assignment and every seam border.
+
+## D-106 — M12d: American provinces complete the four-bundle model
+
+**Status:** implemented (M12d); the polity registry is extended by D-107.
+
+### Context
+
+M12a Europe, M12b Asia and M12c Africa left the Americas as the last 1900
+theatre without permanent provinces. The M11c map already carried separate
+features for the United States, Canada, Newfoundland, Mexico, the Central
+American republics, Colombia (including Panama), Venezuela, Ecuador, Peru,
+Bolivia, Chile, Argentina, Uruguay, Paraguay, Brazil, Haiti, the Dominican
+Republic, Cuba, Puerto Rico, the British, French, Dutch and Danish Caribbean,
+Suriname, Greenland and the British South Atlantic. The task required the same
+permanent-province model, mutable ownership and reconstructed country borders,
+without a Polity → Region → Province hierarchy.
+
+### Decision
+
+1. **One model, four bundles.** The Americas reuse the M12a/M12b/M12c province
+   model and rendering contracts exactly. There is still one geographical
+   subdivision, `Province`; no Polity → Region → Province hierarchy and no new
+   simulation model were introduced. Europe, Asia, Africa and the Americas are
+   separate deterministic build artifacts (`provinces_1900.json`,
+   `provinces_asia_1900.json`, `provinces_africa_1900.json`,
+   `provinces_americas_1900.json`) combined by one loader in
+   `packages/data/src/provinces.ts` (simulation definitions) and
+   `packages/app/src/provinceMapBundle.ts` (rendering, merged borders and future
+   polities).
+2. **Disjoint ids and keys.** Americas province ids start at 300001, above the
+   M12a Europe block (maximum 66001), the M12b Asia block (100001–100239) and the
+   M12c Africa block (200001–200260). Every Americas key is prefixed `am-`. The
+   build and both loaders reject an id/key collision. Europe, Asia and Africa
+   ids and keys are unchanged by M12d.
+3. **Shared geometry pipeline.** `scripts/m12/province-build-lib.mjs` is reused.
+   The Americas build seeds **all three** committed bundles (Europe first, then
+   Asia, then Africa) as higher-priority cross-owner geometry, so an American
+   province cannot paint a foreign-coloured sliver across an already reviewed
+   frontier.
+4. **Coverage scope is per shared feature.** The Americas share the French
+   feature with Europe/Africa and the British South Atlantic feature with
+   Africa/Asia/Oceania. Coverage is measured only over French Guiana and the
+   French Antilles (two disjoint rings, which is why the shared pipeline now
+   accepts a multi-ring coverage scope) and over the Falklands, South Georgia and
+   the South Sandwich Islands. Coverage clips are audit boundaries, not political
+   borders. BWI, FCA, DGC, DWI, SUR, GRL, PRI and every sovereign American
+   feature are wholly American and need no clip.
+5. **Future polity range.** Americas future successor polities use ids 1300–1399.
+   They never collide with the M12a Europe range (1000–1016), the M12b Asia range
+   (1100–1144) or the M12c Africa range (1200–1256), and are never selectable in
+   1900. The registry holds Panama (1903), the British Caribbean independences,
+   Belize, Guyana, Suriname, and the optional Netherlands Antilles (1954) and
+   Aruba (1986) status polities.
+6. **Newfoundland is the one 1900-active registry entry.** Newfoundland was a
+   self-governing Dominion on 1 January 1900 but is absent from the 67-polity
+   M11c selectable catalog. It is registered as a non-selectable 1900 polity
+   (`kind: "state"`, `activeFrom: 1900-01-01`, `activeTo: 1949-03-31`) so its
+   permanent provinces are distinct from Canada and the 1949 union is an ordinary
+   ownership transfer. The data loader accepts an explicit `kind` and
+   `selectable1900` on a future-polity record; the defaults remain `future-state`
+   and `false`, so the earlier bundles are unchanged.
+7. **Successor-border splits.** A province is the permanent geographical unit, but
+   one 1900 administrative area is represented by more than one permanent
+   province wherever a later successor frontier runs through it: Colombia/Panama;
+   Canada/Newfoundland; the three Danish West Indies islands; every British
+   Caribbean colony that became a separate state; the French and Dutch island
+   groups; Acre and Tacna. The split lines are modern first-level units or the
+   1900 M11c frontier, never a crude rectangular correction box. Every pair shares
+   a continuous province edge in the bundle, proved by the M12d test.
+8. **Mutable ownership, derived borders.** American provinces use the same
+   `World.provinces` ownership/control/claims/special-status state and the same
+   snapshot contract. Cuba and Puerto Rico are United States-owned in 1900
+   (Cuba transfers to `CUB` in 1902); Panama is Colombian until 1903; the Danish
+   West Indies are Danish until 1917; Newfoundland is its own registry polity
+   until 1949. Country borders are derived from current province ownership; the
+   1900 polity outline is used only while the province union still equals it.
+9. **Display-only cross-feature seams.** As in M12c, shared border extraction is
+   exact only within one 1900 feature. The build adds deterministic seams in a
+   province-outline pass (point-to-segment, 0.5° tolerance, land/polity/third-
+   province filters) and a polity-frontier pass (midline within 0.4°). The
+   committed bundle has 178 seam pairs. The M12d test asserts that all 38 modern
+   sovereign American land borders are backed by an edge. The only American land
+   border outside the sovereign audit is the non-sovereign Saint-Martin/Sint
+   Maarten line; both halves are separate provinces, but the M11c land mask does
+   not resolve the island.
+10. **Optional episodes.** The West Indies Federation is not an ownership layer:
+    it was a federation of Crown colonies and never held provincial ownership;
+    the islands are separate permanent provinces so the episode can be added
+    later. The Netherlands Antilles and Aruba are registry polities with ordinary
+    transfers. The Panama Canal Zone is not a separate province: it was a lease,
+    not a sovereignty transfer, and a five-mile strip would require a crude
+    authored rectangle; United States control and the 1979 reversion are
+    representable as controller/special-status changes on the Panama province.
+11. **Schema and save policy.** `World` schema stays 27, the save envelope and
+    worker protocol are unchanged, and the data content version is unchanged:
+    M12d is additive content, not a new state shape. An M12a-era save (570
+    European records), an M12b-era save (809 European and Asian records) or an
+    M12c-era save (1069 European, Asian and African records) still loads under the
+    strict same-version policy but has no mutable record for its American
+    provinces until a new campaign is created.
+12. **Twentieth-century state and border audit.** Every sovereign American state
+    that appears between 1900 and 2000 is registered as a 1900 catalog polity, a
+    future polity, or both (36 states, 0 missing). The test and the standalone
+    audit enumerate 38 modern sovereign land borders and prove each is backed by
+    a shared or seam province edge.
+
+### Consequences
+
+- The 1900 world now has **1538** permanent provinces (570 Europe + 239 Asia +
+  260 Africa + 469 Americas) in one combined catalogue with one future-polity
+  registry (17 + 45 + 57 + 17 = 136 future polities) and **4444** border pairs
+  (1604 + 633 + 838 + 1369). 25 polities own American provinces.
+- The 1900, 1902, 1903, 1917, 1929, 1949, 1954, 1962–1983, 1975, 1979 and 1986
+  American configurations are reproducible through ordinary ownership
+  transfers, effective-control changes, claims and special statuses; no polygon
+  changes.
+- The map adds about 1.1 MiB of American geometry and 469 province paths. It
+  remains one offline SVG render with the established visual hierarchy: solid
+  white province hairlines, thin near-black country borders at 1.25 screen px and
+  no dashed province lines.
+- Known approximations: modern admin-1 units as 1900 proxies; grouped Oklahoma
+  Territory/Indian Territory; Alberta/Saskatchewan as Northwest Territories
+  districts; a single 1900 Baja California; grouped Brazilian territories and
+  the modern Federal District inside Goiás; Carriacou grouped with Grenada;
+  San Andrés attached to Bolívar; Bonaire/Saba/Sint Eustatius not exposed; the
+  Saint-Martin/Sint Maarten seam; the Canal Zone control approximation; and the
+  Newfoundland registry exception. They are labelled low or medium confidence in
+  `docs/AMERICAS_PROVINCIALIZATION.md` §9 and in the bundle.
+- Coverage residual is the sum of many small coastal, river and frontier slivers.
+  It stays under the correct 1900 owner's polity fill, so it cannot appear as a
+  foreign-coloured enclave; the audit records every unassigned unit, every
+  cross-frontier code assignment and every seam border.
+- D-107 extends the polity registry with 30 historical/breakaway entries (47
+  Americas registry entries, 166 combined). It changes no province, border or
+  save count; it only adds registry metadata.
+
+## D-107 — M12d addendum: historical and breakaway polities in the Americas registry
+
+**Status:** implemented (M12d addendum).
+
+### Context
+
+The M12d sovereign-state audit covered every American sovereign state that
+appeared between 1900 and 2000, but the game may also want to represent
+historical breakaways and alternate-history states. Texas, the Riograndense
+Republic and the California Republic are the clearest examples; the same
+question applies to the other declared American breakaway republics, the
+short-lived twentieth-century states (Acre, Anguilla, the West Indies
+Federation) and the predecessor unions that could be restored in an
+alternate-history scenario.
+
+### Decision
+
+1. **A new registry kind, not a new geography layer.** `PolityDef.kind` gains
+   `"historical"`. A historical entry is registry metadata only: it is never a
+   1900 owner, never selectable, and never owns a province at the start. The
+   province model, ids, geometry, rendering and save format are unchanged.
+2. **30 historical and breakaway entries.** The Americas registry now holds 47
+   entries: the 17 post-1900 successors already delivered by M12d plus 30
+   historical/breakaway entries with ids **1317–1346**:
+   - **United States breakaways / alternatives:** Texas (TEX), California
+     (CAL), Deseret (DES), Confederate States of America (CSA), West Florida
+     (WFL), the Floridas (FLR), Indian Stream (INS) and Madawaska (MDW).
+   - **Latin American breakaways:** Riograndense Republic (RGR), Juliana
+     Republic (JUL), Republic of the Rio Grande (RRG), Yucatán (YUC), Acre
+     (ACR), Counani (CNU), Sonora (SON), Lower California (LBC), the Equator
+     (EQT), Bahia (BAH), Pernambuco (PEM) and Entre Ríos (ERY).
+   - **Canada:** Republic of Canada (RCN) and Republic of Lower Canada (RLC).
+   - **Short-lived twentieth-century states:** Republic of Acre (ACR, real
+     start 1899, end 1903), Republic of Anguilla (AIA, 1967–1969) and the West
+     Indies Federation (WIF, 1958–1962).
+   - **Predecessor unions:** Gran Colombia (GCO), United Provinces of the Río
+     de la Plata (UPR), Argentine Confederation (ACF), State of Buenos Aires
+     (SBA) and the Peru-Bolivian Confederation (PBC).
+3. **Calendar clamp.** A pre-1900 state cannot use its real activation date
+   inside the 1900–2000 calendar. Its `activeFrom`/`activeTo` are clamped to
+   1900-01-01 (the documented last resort), or to the real end when that falls
+   inside the window (Acre ends 1903, Anguilla 1969, the West Indies Federation
+   1962). The real dates are recorded in the entry notes; no other data is
+   altered.
+4. **Historical entries are usable by scenario transfers.** A province can be
+   transferred to a historical polity by the ordinary ownership API. The M12d
+   test proves alternate-history transfers of Texas, California, the
+   Riograndense Republic and Yucatán, without changing any province id or
+   geometry.
+5. **Semihistorical entries are labelled.** Counani, West Florida, the Floridas,
+   Indian Stream, Madawaska, the Canadian rebellions, Sonora/Lower California
+   and the Brazilian provincial republics are low or medium confidence; they are
+   included because the user asked for semihistorical states, not presented as
+   uncontested sovereign facts.
+6. **Schema and save policy.** `World` schema stays 27, the save envelope and
+   worker protocol are unchanged, and no simulation country is added. The
+   registry remains static scenario content; old saves are unaffected.
+
+### Consequences
+
+- Americas registry entries: **47** (17 successors + 30 historical/breakaway).
+  Combined registry: **166** entries (17 Europe + 45 Asia + 57 Africa + 47
+  Americas). Combined catalogue remains **1538** provinces and **4444** border
+  pairs; historical polities own nothing at the 1900 start.
+- The M12d suite has **35 tests**, including a historical-registry inventory and
+  an alternate-history transfer proof. The standalone audit prints **30
+  historical/breakaway entries, 0 missing** in addition to the 36-state and
+  38-border checks.
+- The registry now answers "what historical American states could appear?" for
+  the declared breakaways the user named and for the documented short-lived and
+  predecessor states. It does not add every filibuster or every proposed
+  subdivision; entries are limited to states with a declared government and a
+  documented name. That boundary is recorded in
+  `docs/AMERICAS_PROVINCIALIZATION.md` §4.2.
+
+## D-108 — M12e: Oceanian provinces and global land-gap closure
+
+**Status:** implemented (M12e).
+
+### Decision
+
+1. **One model, five bundles.** Oceania reuses the M12a-M12d province model and
+   rendering contracts exactly. There is still one geographical subdivision,
+   `Province`; no Polity -> Region -> Province hierarchy and no new simulation
+   model were introduced. Europe, Asia, Africa, the Americas and Oceania are
+   separate deterministic build artifacts (`provinces_1900.json`,
+   `provinces_asia_1900.json`, `provinces_africa_1900.json`,
+   `provinces_americas_1900.json`, `provinces_oceania_1900.json`) combined by one
+   loader in `packages/data/src/provinces.ts` (simulation definitions) and
+   `packages/app/src/provinceMapBundle.ts` (rendering, merged borders and future
+   polities).
+2. **Disjoint ids and keys.** Oceania province ids start at 400001, above the
+   M12a Europe block (maximum 66001), the M12b Asia block (100001-100239), the
+   M12c Africa block (200001-200260) and the M12d Americas block
+   (300001-300469). Every Oceania key is prefixed `oc-`. The build and both
+   loaders reject an id/key collision. The block is partitioned deterministically:
+   400001-404999 authored provinces, 405001-405999 one residual province per 1900
+   map feature, 406001-406999 the automatic land-ring closure.
+3. **Shared geometry pipeline.** `scripts/m12/province-build-lib.mjs` is reused.
+   The Oceania build seeds **all four** committed bundles (Europe, Asia, Africa,
+   then the Americas) as higher-priority cross-owner geometry, so an Oceanian
+   province cannot paint a foreign-coloured sliver across an already reviewed
+   frontier. The library gained generic `detached` and gap-province support rather
+   than forking the pipeline: `detached` provinces use the modern admin-1 island
+   coastline without intersecting the coarse 1900 feature; `feature-residual` and
+   `land-ring` gap provinces are computed as the difference between the 1900
+   feature (or the M11c land ring) and every existing province of every bundle.
+4. **Coverage scope is per shared feature.** The build measures coverage only over
+   the Oceanian part of a shared feature: the British Pacific feature is scoped to
+   the two Pacific boxes (its Indian Ocean islands are Africa/Asia provinces); the
+   British South Atlantic feature to Pitcairn and Chagos; Chile to Easter Island
+   and Juan Fernandez; Mexico to Revillagigedo; the United States to the Pacific
+   remote islands and Navassa (empty in the 1900 feature, so the residual is zero
+   rather than the whole United States); the United Kingdom to the Isle of Man,
+   Norway to Svalbard and Austria-Hungary to Krk/Cres/Losinj. Coverage clips are
+   audit boundaries, not political borders.
+5. **Australia.** The six 1900 colonies are permanent provinces. The Northern
+   Territory (part of South Australia), the Federal Capital Territory and Jervis
+   Bay (part of New South Wales) are separate permanent provinces so the 1911
+   transfers are ordinary ownership changes. The 1901 federation transfers the ten
+   Australian provinces to the future Commonwealth of Australia (`AUS`, 1400); the
+   tag is shared with the 1900 catalog polity so the palette colour is unchanged,
+   following the M12d Newfoundland precedent that a future tag may equal a 1900
+   tag. Macquarie Island is a detached Australian province; Lord Howe Island is a
+   second polygon part of the New South Wales admin-1 unit and therefore part of
+   the New South Wales province.
+6. **New Zealand.** The modern regional-council areas are the permanent proxy for
+   the 1900 provincial-district subdivision (the provinces were abolished in 1876).
+   Stewart Island, the Chatham Islands, the Kermadecs, the Three Kings, the
+   Auckland Islands, Campbell Island, the Antipodes and The Snares are separate
+   provinces. The 1907 dominion is a status change, not an ownership change; `NZD`
+   is registered for the state audit but owns no province. Tokelau is owned by the
+   United Kingdom in 1900 (British protectorate) even though the M11c New Zealand
+   feature contains the atolls because of the modern association.
+7. **Papua New Guinea.** German New Guinea and British New Guinea (Papua) are
+   separate 1900 province groups. The M11c `german-new-guinea-papua` patch assigns
+   the southern first-level units to the British Pacific feature; the modern PNG
+   province boundaries are the permanent provinces and the proxy for the 1885-86
+   central-range line. The 1906 Australian administration, the 1914 occupation, the
+   1920 League mandate, the 1949 union and 1975 independence are ordinary
+   control/ownership changes. The only modern sovereign Oceanian land border is the
+   141 E Papua New Guinea / Indonesia line, backed by a cross-bundle seam edge.
+8. **Melanesia, Micronesia and Polynesia.** One province per colonial island group
+   or modern first-level unit. Fiji uses its five colonial divisions; the Solomon
+   Islands use the modern provincial units of the 1900 protectorate (the northern
+   Solomons are German and part of German New Guinea); the New Hebrides are six
+   `condominium` provinces owned by the United Kingdom with France as
+   co-administrator; New Caledonia uses its three provinces. Nauru, the Marshall
+   chains, the four Caroline groups, Palau, the four Northern Mariana units, Guam,
+   the three Kiribati groups, the Ellice Islands, Tonga's five divisions, German
+   Samoa, American Samoa, the two Cook Island groups, Niue, Tokelau, the five
+   French Polynesian subdivisions, the two Wallis and Futuna provinces, Pitcairn,
+   Easter Island and Juan Fernandez are permanent provinces with the required
+   successor sequences.
+9. **Remote islands and gaps.** Islands the coarse 1900 feature omits are detached
+   provinces built from the modern admin-1 island (Pitcairn, Easter Island, Juan
+   Fernandez, Revillagigedo, Wake/Midway/Johnston/Palmyra, Navassa, Tokelau,
+   Kermadec, the New Zealand subantarctic islands, Heard/McDonald, Chagos). The
+   M11c map does not expose Ashmore/Cartier, the Coral Sea islands, the Minerva
+   Reefs, Christmas Island or the Cocos (Keeling) Islands (below the 0.02 square
+   degree land-mask threshold and absent from the 1900 features and the admin-1
+   layer); they are documented rather than silently dropped. Clipperton is required
+   by the milestone but absent from every source, so it is a small authored island
+   polygon (low confidence, coastline approximation). Svalbard is Norwegian with low
+   confidence (terra nullius until 1920); Heard/McDonald are British with low
+   confidence (unclaimed in 1900, annexed 1910, transferred to Australia 1947).
+   No 1900 territory already covered by M12b/M12d is duplicated: the Philippines,
+   Indonesia and Portuguese Timor stay Asian provinces, Hawaii stays
+   `am-usa-hawaii`, and the Galapagos stay `am-ecu-galapagos`; M12e adds only the
+   missing island rings of those shared features.
+10. **Global coverage residual provinces.** The bundle also closes the remaining
+    inland gaps of the earlier continents (Morocco's southern coast, French
+    Equatorial Africa, the Ottoman and Greek residuals, Austria-Hungary, the British
+    Isles, Russia, Romania, Germany, Algeria, China, British East Africa, Italian
+    Somaliland, the Portuguese islands, Argentina, Canada, the Philippines and the
+    Oceanian features). Each is computed as `feature - every province of every
+    bundle`, owned by the feature's 1900 sovereign, and labelled `low` confidence
+    coverage geometry. The German New Guinea residual is owned by the United
+    Kingdom because the M11c feature retains pre-1885 coastal islets that belong to
+    British Papua. A deterministic automatic land-ring closure is the final safety
+    net; it emits no province in the committed build because the authored and
+    residual partition already covers every non-Antarctic land ring.
+11. **Display-only cross-feature and straight-frontier seams.** The M12c/M12d
+    point-to-segment seam pass is reused for cross-feature frontiers and is also run
+    for same-feature straight frontiers whose two admin-1 units carry different
+    vertex densities (the 141 E NSW/SA line, the 26 S SA/NT line). The pass
+    compares Oceanian provinces against the committed earlier bundles, so the
+    Papua New Guinea / Indonesia border is a seam pair. Seams change no province
+    polygon, id or simulation state.
+12. **Antimeridian.** Province rings are stored unwrapped around the antimeridian
+    (the Russian Empire feature runs to 190 E) and the renderer draws every ring at
+    -360/0/+360 degrees. The global land audit and the independent test both test
+    every sample point at the same three longitude offsets. Fiji, Kiribati and
+    Tonga are the main antimeridian cases.
+13. **Future polity range.** Oceania future successor polities use ids 1400-1499.
+    They never collide with the M12a Europe range (1000-1016), the M12b Asia range
+    (1100-1144), the M12c Africa range (1200-1256) or the M12d Americas range
+    (1300-1346), and are never selectable in 1900. The registry holds the
+    Commonwealth of Australia (1400), Papua New Guinea, Western Samoa, Nauru,
+    Tuvalu, the Solomon Islands, Kiribati, Vanuatu, the Marshall Islands, the
+    Federated States of Micronesia, Palau, the Cook Islands, Niue, Tokelau, Fiji,
+    the Northern Mariana Islands and the Dominion of New Zealand, plus eight
+    historical/breakaway entries (Republic of Hawaii, Kingdom of Tahiti, Kingdom of
+    Fiji, Republic of the North Solomons, Tafea Nation, Republic of Vemerana,
+    Republic of Minerva and the Principality of Hutt River). The Kingdom of Hawaii
+    is registered by the M12d Americas bundle; a tag cannot repeat across the one
+    combined registry, so the M12e registry adds the Republic of Hawaii instead.
+14. **Global land audit.** `scripts/m12e/audit-global-land.mjs` decodes the M11c
+    land mask, reconstructs land polygons with their holes, classifies Antarctica
+    (maximum latitude below -60) and endorheic water holes (the Caspian), and tests
+    every remaining land ring's representative vertices and a deterministic interior
+    sample grid against every province with bbox-filtered point-in-polygon. A sample
+    is assigned when it is inside a province or within the 0.075 degree coastline
+    quantization band of a province outline (the band between the 0.04 degree land
+    mask and the 0.02 degree province simplification; it is reported separately and
+    is not an exemption for unassigned land). The audit writes
+    `packages/data/data/map/global_land_audit.json`; the test re-derives the result
+    independently. The committed result is 795 land rings, 93 Antarctic exceptions,
+    1 water-hole exception, 701 non-Antarctic land rings all assigned, 0 unassigned
+    area, 0 unassigned samples, 0 unassigned vertices, 133/133 map features with a
+    province and 0 unassigned admin-1 units across the five bundles.
+15. **Twentieth-century state and border audit.** The test and
+    `scripts/m12e/audit-successors.mjs` enumerate every sovereign Oceanian state and
+    self-governing entity between 1900 and 2000 (28 checked, 0 missing), the one
+    modern sovereign land border (Papua New Guinea / Indonesia, backed by a province
+    edge) and the eight historical/breakaway entries. The key transitions (1901
+    federation, 1907 dominion, the German New Guinea and Samoa mandate sequences,
+    the Japanese mandate and United States trust, the 1968-1980 independence wave
+    and the 1986/1994 compacts) are driven as ordinary ownership/control changes in
+    the M12e suite.
+16. **Schema and save policy.** `World` schema stays 27, the save envelope and
+    worker protocol are unchanged, and the data content version is unchanged: M12e
+    is additive content, not a new state shape. An M12a-era save (570 European
+    records), an M12b-era save (809 European and Asian records), an M12c-era save
+    (1069 records) and an M12d-era save (1538 records) still load under the strict
+    same-version policy but have no mutable record for their Oceanian provinces
+    until a new campaign is created.
+17. **Test-maintenance note.** The M12a Austria-Hungary dissolution helper now
+    also transfers the M12e Austrian Littoral provinces (Krk and Cres/Losinj to
+    Yugoslavia, the Austro-Hungarian coverage residual to rump Austria), and the
+    M11c.1 rendering test now expects the two land-mask paths (fill and coastline
+    re-stroke) that the M12a rendering contract introduced. Both are test updates for
+    the additive content and the existing renderer; no assertion was weakened.
+
+### Consequences
+
+- The 1900 world now has **1689** permanent provinces (570 Europe + 239 Asia +
+  260 Africa + 469 Americas + 151 Oceania) in one combined catalogue with one
+  future-polity registry (17 + 45 + 57 + 47 + 25 = 191 entries) and **5030** border
+  pairs (1604 + 633 + 838 + 1369 + 586). 21 polities own M12e provinces (11 of them
+  Oceanian owners; the rest are the global-gap owners).
+- The 1900, 1901, 1906-1920, 1949, 1962, 1968-1980, 1986 and 1994 Oceanian
+  configurations are reproducible through ordinary ownership transfers,
+  effective-control changes, claims and special statuses; no polygon changes.
+- The map adds about 1.5 MiB of Oceanian and gap geometry and 151 province paths.
+  It remains one offline SVG render with the established visual hierarchy: solid
+  white province hairlines, thin near-black country borders at 1.25 screen px and no
+  dashed province lines.
+- Known approximations: modern admin-1 units as 1900 proxies; the New Zealand
+  regional-council proxy for the abolished 1876 provinces; the German/British New
+  Guinea partition following the M11c patch; the coarse Pacific island features;
+  the Kvarner same-owner overlap; the Svalbard and Heard 1900 ownership; the
+  authored Clipperton polygon; and the coverage-residual provinces. They are
+  labelled low/medium confidence in `docs/OCEANIA_PROVINCIALIZATION.md` §9 and in
+  the bundle.
+- Coverage residual is the sum of many small coastal and frontier slivers. The
+  global land audit reports zero unassigned area outside Antarctica and the
+  Caspian water hole; the coastline quantization band is reported separately.
+
+## D-109 — M13: complete rebranding from Century to Fabric of Nations
+
+**Status:** implemented (M13).\
+**Scope:** player-facing branding, application and distribution metadata,
+current documentation, brand assets and automated branding checks. No game
+mechanic, political/geographical datum, polity or province identifier, simulation
+coefficient, save schema or simulation version changed.
+
+### Decision
+
+1. **Official name.** The game's official name is **Fabric of Nations**, in that
+   exact spelling and capitalization. The former name *Century* is retained only
+   in historical documents and deliberately retained technical identifiers.
+2. **Player-facing identity.** The main menu, in-app loading/splash screen,
+   new-campaign flow, country selection, campaign shell, Sources and Licensing
+   dialog, error boundary logging, browser tab, install metadata and generated
+   provenance text use Fabric of Nations. There is no standalone Settings screen
+   or pause menu in this build; the pause control and save/load controls live in
+   the campaign top bar and contain no old branding.
+3. **Application metadata.** Expo `name` is `Fabric of Nations`, the project
+   slug is `fabric-of-nations`, and the web config declares the full and short
+   name, description, language, theme/background colours, standalone display and
+   start URL. A custom `public/index.html` supplies the manifest link and install
+   metadata, and `public/manifest.webmanifest` supplies the PWA identity.
+4. **Icons and splash.** The obsolete "C" favicon is replaced by a typographic
+   "F" monogram in the existing deep-ink/brass/serif identity, with a 1024 px
+   application icon, an Android adaptive foreground and 192/512/maskable/apple
+   touch PWA icons. The in-app splash uses the full name. Raster assets are
+   generated by `scripts/m13/build-brand-assets.py`; the app build never needs
+   Python or Pillow.
+5. **Save compatibility.** All existing Century-era saves remain loadable. The
+   canonical format string `century-save`, format version 1, compressed prefix
+   `century-save-gzip1:`, AsyncStorage keys `century.m7.save.v1`,
+   `century.m7.save.v1.previous` and `century.m7.save.v1.staging`, schema 27 and
+   the save codec are unchanged. Save metadata stores no game-name field, so no
+   migration or branding rewrite is required. A compressed save generated before
+   the rebrand is committed as `packages/tests/src/fixtures/century-era-save.json`
+   and is loaded by the M13 regression test.
+6. **Internal identifiers deliberately retained.** The private workspace package
+   names and namespace `@century/*`, the root private package name `century`,
+   `runCentury`, `CenturyRoot`, `window.__centuryReceive`, the
+   `century-save`/`century.*` save identifiers and the historical GitHub path are
+   unchanged. Renaming them would churn imports, test fixtures, worker protocol
+   code and storage keys without changing anything a player sees.
+7. **Native identifiers deliberately retained.** iOS `bundleIdentifier` and
+   Android `package` remain `com.century.game`. Changing them would create a new
+   store identity and break update compatibility for any installed build. No
+   reverse-domain organization identifier was invented; no URL scheme existed to
+   update.
+8. **Generated content.** Current scenario, boundary, province, flag and map
+   provenance strings named the project; these are now Fabric of Nations in both
+   the authored source files and the committed generated artifacts. Provenance
+   metadata is not simulation state, does not enter world hashes and does not
+   change starting conditions. Historical flag images, map geometry and
+   simulation data are byte-identical except for the provenance text.
+9. **Documentation.** The current GDD is renamed from `Century_GDD_v2.18.md` to
+   `Fabric_of_Nations_GDD.md`, keeps GDD version 2.18 because no design content
+   changed, and gains a name note. GDD v2.1–v2.17, `GDD_V2.*_CHANGE_REPORT.md`,
+   milestone completion reports, historical playtest reports and historical
+   screenshots keep their original contents. `README.md`, `AGENTS.md`, package
+   READMEs and current provenance/provincialization documents use the new name.
+10. **Automated check.** `pnpm audit:branding` scans current source, generated
+    content, metadata and current documentation, allows only the retained
+    identifiers and documented historical references, verifies the app/PWA/GDD/
+    README metadata and asserts the save-compatibility constants. It is covered
+    by an automated test and a CI step.
+
+### Consequences
+
+- The browser tab, install prompt, application display name, main menu and
+  splash identity all read Fabric of Nations.
+- Existing saves continue to load under schema 27 with the same format; new
+  campaigns start from unchanged 1900 data and produce unchanged deterministic
+  hashes for identical inputs.
+- Historical screenshots under `docs/images/` and historical reports still show
+  or mention Century. This is intentional historical evidence; new M13
+  screenshots document the rebranded build.
+- An Expo slug change can affect EAS project linkage. No EAS project identifier
+  is committed in this repository, so the slug change is safe here; native
+  package identities, which do affect installed applications, were not changed.
+- If the retained `@century` namespace or `com.century.game` identity is ever
+  renamed, that must be a separate compatibility decision with an explicit
+  migration plan for saves, package imports and app-store updates.
+
+## D-110 — M14: monetary unit renamed from SUSD to RUSD
+
+**Status:** implemented (M14).\
+**Scope:** terminology, source identifiers, serialized field names, data keys,
+UI labels, current documentation and compatibility aliases. No monetary value,
+scale, conversion formula, calibration target, starting condition, simulation
+rule or tick behavior changed.
+
+### Decision
+
+1. **Official unit.** The unit of account is **RUSD — Reference US Dollars**.
+   It is the same neutral measurement unit previously called **SUSD — Simulated
+   US Dollars**. RUSD is not a national currency, legal tender, an adoptable
+   currency, an issuer, or a fixed-rate substitute for the real-world US dollar.
+   Actual national currencies, including USD, remain distinct; no USD/RUSD peg
+   or exchange rate is introduced.
+2. **Complete current vocabulary.** Current TypeScript identifiers, constants,
+   types, function names, data keys, snapshot fields, UI labels, tooltips,
+   generated content and current documentation use `RUSD`, `Reference US
+   Dollars`, `rusd` and `Rusd`. The migration is not limited to the UI.
+3. **Serialized representation.** New canonical saves and world payloads use
+   RUSD field names. The save envelope format (`century-save`), format version
+   (`1`), world schema (`27`), simulation version (`0.28.0`) and data version
+   (`m3-economy-v12`) are unchanged because the state shape and economic
+   semantics are unchanged. Worker protocol is bumped from **15** to **16**
+   because snapshot monetary field names changed; app and worker are shipped and
+   rebuilt together.
+4. **Legacy save compatibility.** `deserializeWorld` verifies the envelope
+   checksum against the raw payload, then translates legacy `SUSD`/`Susd`/`susd`
+   object keys to the RUSD spelling before decoding. Numeric values, arrays and
+   string values are untouched. A save mixing both spellings for the same key is
+   rejected as ambiguous. This makes every pre-M14 save loadable with every
+   monetary value unchanged.
+5. **Legacy USD distinction.** `RUSD_CURRENCY_KEY = "rusd"` is reserved and can
+   never be a registered currency. The former `"susd"` key is also rejected as a
+   reserved legacy spelling. Real currency keys such as `usd`, `gbp` or `frf`
+   remain valid and distinct.
+6. **Deterministic diagnostic hash.** `hashWorld` retains the pre-M14 SUSD
+   spelling for its encoded diagnostic view. This is a compatibility view over
+   the same numeric state, not a second economic model; it keeps known-answer
+   determinism hashes and benchmark digests stable. Canonical saves and their
+   checksums use RUSD directly. The opening-balance checksum, a derived
+   integrity value stored in the world, likewise uses its historical field
+   spelling so unchanged balances keep their historical checksum.
+7. **Data and generated content.** Authored JSON keys such as
+   `basePrice1900RUSD`, `balanceRUSD`, `initialTreasuryCashRUSD` and
+   `rusdPerUnit` replace the SUSD spellings. Generated world catalog, worker
+   scenario and worker bundle are regenerated. The data version stays
+   `m3-economy-v12` because no content, quantity or calibration changed.
+8. **UI explanation.** The Money screen explains RUSD, its use as a cross-country
+   measurement unit and its non-currency status. All monetary labels use the
+   existing suffix convention (`1,000.00 RUSD`, `RUSD/unit`).
+9. **Documentation.** `Fabric_of_Nations_GDD.md`, `AGENTS.md`, README, package
+   READMEs and current provenance docs use RUSD. Historical GDD versions,
+   change reports, completion reports, requirements maps, M11D/M11E reports and
+   the M13 report retain their original SUSD wording. D-110 is the only current
+   decision entry added; earlier decisions are unchanged.
+10. **Audit and tests.** `pnpm audit:monetary` scans current source, data,
+    snapshots, UI and current GDD for obsolete SUSD terminology while allowing
+    documented legacy aliases and historical files. Regression tests cover the
+    canonical constants, USD/RUSD distinction, reserved-key rejection, legacy
+    save loading, canonical RUSD serialization, monetary equivalence and
+    deterministic hashes.
+
+### Consequences
+
+- All player-facing monetary values read RUSD; actual USD remains a distinct
+  national currency.
+- Existing saves load, retain their previous campaign state and keep their exact
+  monetary values. New saves serialize the RUSD vocabulary.
+- The diagnostic world hash and opening-balance checksum remain stable for
+  economically identical worlds.
+- The retained SUSD spellings are narrow compatibility aliases: legacy save key
+  translation, the reserved legacy currency key, historical documents and the
+  hash/opening-checksum compatibility views.
+- If the legacy aliases are ever removed, that requires a save migration and a
+  deliberate decision, not an incidental cleanup.
+
+## D-111 — M15: WebGL world map, Gall stereographic projection and 1:10m display geometry
+
+**Status:** implemented. Supersedes D-092 items 5 and 7 on the web; D-092 remains in
+force for native builds.
+
+### Context
+
+The world map was the visual centrepiece of the game but rendered as about 1,800
+React-managed SVG paths over 224,000 ring edges, drawn three times for the seam. Hover
+took about 200 ms per pointer event and panning stalled for up to 350 ms. Land and sea
+were nearly the same colour, coasts stopped at Natural Earth 1:50m, lakes were absent
+(so North America had no Great Lakes), and sixteen hash-assigned colours could not
+separate neighbours. Independently simplified province rings left 117,141 of 170,721
+unique edges without an exact partner, so province-derived borders were discontinuous.
+
+### Decision
+
+1. **Separate display geometry from authoritative geometry.** A new compiler,
+   `scripts/map/build-render-bundle.mjs`, reads the province data and writes a display
+   bundle to `packages/app/public/map/`. Province ids, ownership, polity geometry and
+   gameplay granularity are unchanged. The bundle records the SHA-256 of its province
+   inputs and a test fails if it goes stale. `pnpm map:check` proves byte-reproducibility.
+2. **Natural Earth 1:10m land and lakes define the visible coast.** Fills are confined
+   to land through the stencil buffer; land beyond a province ring is coloured through a
+   nearest-province raster. This avoids a global polygon overlay, which `polygon-clipping`
+   already could not finish for some features (D-108).
+3. **Recover shared borders by exact probes.** A `b = -1` segment with a different
+   province on its far side is a shared border; 1,526 province pairs were recovered.
+4. **WebGL2 renderer on the web, SVG elsewhere.** Hardware WebGL2 runs the new renderer.
+   Native builds, browsers without WebGL2, and software rasterisers keep the SVG renderer,
+   which shares the projection, palette and catalogue. `Canvas 2D` was rejected because it
+   re-rasterises the geometry every frame; a third-party GL or map library was rejected
+   because the needs are narrow and it would add a runtime dependency.
+5. **Province style table.** One texture holds per-province colour, flags and owner and
+   unit groups, so ownership changes, map modes, hover and selection never rebuild
+   geometry. Border class is decided in the vertex shader from the two provinces.
+6. **Gall stereographic projection** replaces Miller for the map, in one shared module.
+   It stays cylindrical with linear longitude, so the world still wraps exactly. At 50N
+   the shape stretch is 1.06 against 1.19 for Miller, and high-latitude area inflation is
+   lower. The cost is about 20% north-south stretch at the equator. Latitudes are limited
+   to 84N and 78S. The map's aspect ratio changes from 2:1 to about 1.52:1.
+7. **Authored political palette.** `STATE_COLORS` is keyed by tag and tested against the
+   map's real adjacency under normal and simulated deuteranopic vision. Territories
+   derive from their sovereign by status.
+8. **Territories select as themselves.** A click selects the province's political unit
+   (British India), not its sovereign (the United Kingdom), which M12a had done as a side
+   effect. The sovereign's whole realm is still indicated, more weakly.
+9. **Period corrections are explicit.** 196 modern reservoirs are excluded, thirteen
+   natural regulated lakes are kept by a named list, and the Aral Sea and Lake Chad use
+   Natural Earth's historic polygons.
+10. **Same-origin static assets.** The bundle is fetched from the application's own origin.
+    D-092's rule that the game never uses remote map data or services stands.
+
+### Assumptions and provisional values
+
+All style values (colours, zoom bands, line weights, relief strength, label sizes) are
+display-only and provisional. None reach the simulation, and none are subject to the
+numerical rules for simulation coefficients.
+
+### Consequences
+
+- The web build gains about 7.4 MB of static assets. `earcut` 3.0.2 (ISC) is a build-time
+  root dev dependency and does not ship in the application.
+- The GDD's M11 description of Miller is amended by this decision. Historical reports and
+  `docs/HISTORICAL_MAP_PROVENANCE.md` retain Miller as a record of how they were produced.
+- The `WorldMap.tsx` source-text tests of M11c to M11e still run, and now describe the SVG
+  renderer. Behaviour of the WebGL renderer is covered by `m15-map-*.test.ts` and by
+  `pnpm map:verify` in a real browser. Neither set was weakened.
+- Headless runs on SwiftShader exercise the SVG path. Verifying the WebGL path needs a
+  GPU, so `pnpm map:verify` is a manual step, not part of `pnpm ci`.
+- See `docs/MAP_RENDERING.md` for architecture, sources and limitations.

@@ -15,7 +15,7 @@ import { runM6FullCampaignBenchmark } from "./m6Bench.js";
 function main(): void {
   const cpuList = cpus();
   const firstCpu = cpuList[0];
-  console.log("Century M6 full-campaign country-AI benchmark");
+  console.log("Fabric of Nations M6 full-campaign country-AI benchmark");
   console.log(`node: ${process.version} (${process.platform} ${process.arch})`);
   console.log(`cpu: ${firstCpu?.model ?? "unknown"} (${String(cpuList.length)} logical processors)`);
   console.log(`memory: ${(totalmem() / 1024 ** 3).toFixed(2)} GiB total`);

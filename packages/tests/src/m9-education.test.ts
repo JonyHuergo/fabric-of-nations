@@ -56,7 +56,7 @@ function academicsBlock(world: World): World["popBlocks"][number] {
 function designatedCash(world: World): number {
   return buildFinanceIndex(world.finance)
     .cash()
-    .reduce((total, account) => total + account.balanceSUSD, 0);
+    .reduce((total, account) => total + account.balanceRUSD, 0);
 }
 
 describe("M9 education institution and staffing", () => {
@@ -102,8 +102,8 @@ describe("M9 education payroll accounting", () => {
     );
     const after = buildFinanceIndex(world.finance);
     const treasury = after.get("country", M5_COUNTRY_A, "treasury-cash");
-    const expense = after.get("country", M5_COUNTRY_A, "education-expense").balanceSUSD;
-    const income = after.get("popBlock", M9_ACADEMICS_BLOCK, "education-income").balanceSUSD;
+    const expense = after.get("country", M5_COUNTRY_A, "education-expense").balanceRUSD;
+    const income = after.get("popBlock", M9_ACADEMICS_BLOCK, "education-income").balanceRUSD;
     const expectedDaily = M9_EDUCATION_FUNDING / 365;
     expect(expense).toBeCloseTo(expectedDaily, 6);
     expect(income).toBeCloseTo(expense, 6);
@@ -114,15 +114,15 @@ describe("M9 education payroll accounting", () => {
     expect(payroll).toBeDefined();
     const treasuryCredits = (payroll?.lines ?? [])
       .filter((line) => line.accountId === treasury.id && line.side === "credit")
-      .reduce((total, line) => total + line.amountSUSD, 0);
+      .reduce((total, line) => total + line.amountRUSD, 0);
     expect(treasuryCredits).toBeCloseTo(expense, 6);
     // The transfer moves existing designated cash; it does not create money.
     expect(designatedCash(world)).toBeCloseTo(cashBefore, 6);
     expect(
       world.finance.postings.some((posting) => posting.transactionKind === "education-payroll"),
     ).toBe(true);
-    expect(country.education.fundingRequestedMonthToDateSUSD).toBeCloseTo(expectedDaily, 6);
-    expect(country.education.fundingShortfallMonthToDateSUSD).toBe(0);
+    expect(country.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(expectedDaily, 6);
+    expect(country.education.fundingShortfallMonthToDateRUSD).toBe(0);
   });
 
   test("treasury cash limits the payroll and records an explicit shortfall, not debt", () => {
@@ -133,11 +133,11 @@ describe("M9 education payroll accounting", () => {
       scenario.definitions,
       world.dayIndex,
     );
-    expect(country.education.fundingShortfallMonthToDateSUSD).toBeGreaterThan(0);
-    expect(country.education.fundingRequestedMonthToDateSUSD).toBeCloseTo(
-      country.education.fundingShortfallMonthToDateSUSD +
+    expect(country.education.fundingShortfallMonthToDateRUSD).toBeGreaterThan(0);
+    expect(country.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(
+      country.education.fundingShortfallMonthToDateRUSD +
         (buildFinanceIndex(world.finance).get("country", M5_COUNTRY_A, "education-expense")
-          .balanceSUSD),
+          .balanceRUSD),
       6,
     );
     // No debt or payable account is created for the unpaid request.
@@ -155,7 +155,7 @@ describe("M9 education payroll accounting", () => {
     expect(world.dayIndex).toBe(32);
     const current = world.countries.find((entry) => entry.id === M5_COUNTRY_A);
     if (current === undefined) throw new Error("world lost country A after ticks");
-    expect(current.education.fundingRequestedMonthToDateSUSD).toBeCloseTo(
+    expect(current.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(
       M9_EDUCATION_FUNDING / 365,
       6,
     );

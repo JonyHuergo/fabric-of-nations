@@ -1,5 +1,5 @@
 import {
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   type CountryInitialDef,
   type EconomyScenarioDef,
   type FiscalPolicy,
@@ -13,11 +13,11 @@ export const FISCAL_COUNTRY_ID = 0;
 export function zeroFiscalPolicy(): FiscalPolicy {
   return {
     incomeTaxRate: 0,
-    incomeTaxAllowanceSUSDPerYear: 0,
-    welfareBudgetSUSDPerYear: 0,
+    incomeTaxAllowanceRUSDPerYear: 0,
+    welfareBudgetRUSDPerYear: 0,
     welfareMaxWealthLevel: 99,
     businessProfitTaxRate: 0,
-    reserveTargetSUSD: 0,
+    reserveTargetRUSD: 0,
   };
 }
 
@@ -29,7 +29,7 @@ export function fiscalCountry(overrides: Partial<CountryInitialDef> = {}): Count
     monetary: { kind: "own", currencyId: 0 },
     regionIds: [0],
     treasuryAccountId: FISCAL_TREASURY_ACCOUNT_ID,
-    initialTreasuryCashSUSD: 0,
+    initialTreasuryCashRUSD: 0,
     fiscal: zeroFiscalPolicy(),
     ...overrides,
   };
@@ -55,10 +55,10 @@ export function fiscalScenario(options: FiscalScenarioOptions = {}): EconomyScen
       ? [...options.countries]
       : [
           fiscalCountry({
-            initialTreasuryCashSUSD: options.treasuryCash ?? 0,
+            initialTreasuryCashRUSD: options.treasuryCash ?? 0,
             fiscal: {
               incomeTaxRate: options.rate ?? 0,
-              welfareBudgetSUSDPerYear: options.budget ?? 0,
+              welfareBudgetRUSDPerYear: options.budget ?? 0,
             },
           }),
         ];
@@ -77,7 +77,7 @@ export function fiscalScenario(options: FiscalScenarioOptions = {}): EconomyScen
       {
         currencyId: 0,
         status: "specified",
-        susdPerUnit: asSusdPerCurrencyUnit(1),
+        rusdPerUnit: asRusdPerCurrencyUnit(1),
         setOnDay: options.valuationSetOnDay ?? 0,
         source: "scenario",
       },

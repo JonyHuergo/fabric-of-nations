@@ -63,7 +63,7 @@ function scenarioWithGroups(
           femaleAgeGroups: femaleGroups,
           literacy: 0.5,
           wealthLevel: 30,
-          initialSavingsSUSD: 1000,
+          initialSavingsRUSD: 1000,
           militancy: 0.1,
         },
       ],

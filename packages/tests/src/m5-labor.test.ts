@@ -210,7 +210,7 @@ describe("M5 labor mobility", () => {
       );
       expect(taxExpense).toBeDefined();
       if (taxExpense === undefined) continue;
-      const tax = taxExpense.balanceSUSD;
+      const tax = taxExpense.balanceRUSD;
       expect(tax).toBeGreaterThanOrEqual(0);
       const treasury = world.finance.accounts.find(
         (account) =>
@@ -219,7 +219,7 @@ describe("M5 labor mobility", () => {
           account.subtype === "income-tax-revenue",
       );
       expect(treasury).toBeDefined();
-      expect(accountById.get(block.financialAccountId)?.balanceSUSD ?? 0).toBeGreaterThanOrEqual(0);
+      expect(accountById.get(block.financialAccountId)?.balanceRUSD ?? 0).toBeGreaterThanOrEqual(0);
     }
     for (const country of world.countries) {
       const taxRevenue = world.finance.accounts.find(
@@ -238,9 +238,9 @@ describe("M5 labor mobility", () => {
               account.ownerId === block.id &&
               account.subtype === "income-tax-expense",
           );
-          return total + (expense?.balanceSUSD ?? 0);
+          return total + (expense?.balanceRUSD ?? 0);
         }, 0);
-      expect(taxRevenue?.balanceSUSD ?? 0).toBeCloseTo(residentTax, 6);
+      expect(taxRevenue?.balanceRUSD ?? 0).toBeCloseTo(residentTax, 6);
     }
   });
 });

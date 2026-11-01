@@ -2,7 +2,7 @@
   "meta": {
     "version": "m11d-1900-boundaries-v2",
     "referenceDate": "1900-01-01",
-    "title": "Century M11c historical boundary reconstruction and audit, 1 January 1900",
+    "title": "Fabric of Nations M11c historical boundary reconstruction and audit, 1 January 1900",
     "method": "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity. M11d resolves the two former uncertainty rectangles by splitting them along current Natural Earth admin-0 borders: the Aouzou-Tibesti zone is divided between the Ottoman Empire, French Equatorial Africa and French West Africa; the Karakoram-Siachen zone between British India and Qing China. The split lines are a cartographic choice for a definite border, not a surveyed 1900 boundary.",
     "confidenceDefinitions": {
       "high": "Supported by strong historical cartographic, administrative or treaty evidence, with only modern generalization uncertainty.",
@@ -203,7 +203,7 @@
       },
       {
         "id": "project-authored-1900",
-        "title": "Century M11c authored boundary reconstruction",
+        "title": "Fabric of Nations M11c authored boundary reconstruction",
         "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
         "license": "Project data",
         "date": "2026",
@@ -1999,7 +1999,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2042,7 +2042,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2085,7 +2085,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2190,7 +2190,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2256,7 +2256,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2357,7 +2357,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2400,7 +2400,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2453,7 +2453,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2496,7 +2496,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2539,7 +2539,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2582,7 +2582,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2641,7 +2641,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2684,7 +2684,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2727,7 +2727,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2770,7 +2770,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2829,7 +2829,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2890,7 +2890,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -2957,7 +2957,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3024,7 +3024,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3092,7 +3092,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3151,7 +3151,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3251,7 +3251,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3294,7 +3294,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3337,7 +3337,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3380,7 +3380,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3423,7 +3423,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3466,7 +3466,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3518,7 +3518,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3561,7 +3561,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3604,7 +3604,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3647,7 +3647,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3690,7 +3690,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3744,7 +3744,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3796,7 +3796,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3839,7 +3839,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3882,7 +3882,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3925,7 +3925,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -3968,7 +3968,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4011,7 +4011,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4054,7 +4054,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4097,7 +4097,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4140,7 +4140,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4183,7 +4183,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4226,7 +4226,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4269,7 +4269,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4312,7 +4312,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4355,7 +4355,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4398,7 +4398,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4450,7 +4450,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4502,7 +4502,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4554,7 +4554,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4597,7 +4597,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4640,7 +4640,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4683,7 +4683,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4735,7 +4735,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4778,7 +4778,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4821,7 +4821,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4873,7 +4873,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4916,7 +4916,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -4959,7 +4959,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5002,7 +5002,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5089,7 +5089,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5141,7 +5141,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5193,7 +5193,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5252,7 +5252,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5311,7 +5311,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5363,7 +5363,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5422,7 +5422,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5484,7 +5484,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5536,7 +5536,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5589,7 +5589,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5632,7 +5632,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5675,7 +5675,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5718,7 +5718,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5761,7 +5761,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5804,7 +5804,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5847,7 +5847,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5890,7 +5890,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -5950,7 +5950,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6009,7 +6009,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6068,7 +6068,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6120,7 +6120,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6163,7 +6163,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6206,7 +6206,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6249,7 +6249,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6305,7 +6305,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6357,7 +6357,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6400,7 +6400,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6452,7 +6452,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6495,7 +6495,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6538,7 +6538,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6581,7 +6581,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6640,7 +6640,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6694,7 +6694,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6737,7 +6737,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6780,7 +6780,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6823,7 +6823,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6875,7 +6875,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6935,7 +6935,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -6987,7 +6987,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7030,7 +7030,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7089,7 +7089,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7141,7 +7141,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7184,7 +7184,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7227,7 +7227,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7270,7 +7270,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7313,7 +7313,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7365,7 +7365,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7417,7 +7417,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7460,7 +7460,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7503,7 +7503,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7546,7 +7546,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7606,7 +7606,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7649,7 +7649,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7692,7 +7692,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7735,7 +7735,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7778,7 +7778,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7821,7 +7821,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7864,7 +7864,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7907,7 +7907,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7950,7 +7950,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -7993,7 +7993,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8036,7 +8036,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8079,7 +8079,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8122,7 +8122,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8165,7 +8165,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8208,7 +8208,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8251,7 +8251,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8294,7 +8294,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8337,7 +8337,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8389,7 +8389,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8441,7 +8441,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"
@@ -8493,7 +8493,7 @@
         },
         {
           "id": "project-authored-1900",
-          "title": "Century M11c authored boundary reconstruction",
+          "title": "Fabric of Nations M11c authored boundary reconstruction",
           "url": "internal:packages/data/data/historical/m11/boundaries_1900.json",
           "license": "Project data",
           "date": "2026"

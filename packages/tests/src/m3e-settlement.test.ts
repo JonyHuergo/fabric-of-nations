@@ -56,8 +56,8 @@ describe("M3e market settlement", () => {
       buyerPopBlockId: 0,
       sellerBuildingId: 0,
       quantity: 10,
-      unitPriceSUSD: 0.05,
-      totalSUSD: 0.5,
+      unitPriceRUSD: 0.05,
+      totalRUSD: 0.5,
       buyerAccountId: householdId,
       sellerAccountId: sellerId,
     });
@@ -71,8 +71,8 @@ describe("M3e market settlement", () => {
       9,
     );
     expect(marketDay.settled).toBe(true);
-    expect(settlement.totals.marketPurchasesSUSD).toBeCloseTo(0.5, 9);
-    expect(settlement.totals.producerProfitSUSD).toBeCloseTo(
+    expect(settlement.totals.marketPurchasesRUSD).toBeCloseTo(0.5, 9);
+    expect(settlement.totals.producerProfitRUSD).toBeCloseTo(
       0.5 - FARM_UPKEEP - WAREHOUSE_UPKEEP,
       9,
     );
@@ -102,8 +102,8 @@ describe("M3e market settlement", () => {
       buyerBuildingId: 4,
       sellerBuildingId: 0,
       quantity: 5,
-      unitPriceSUSD: 0.05,
-      totalSUSD: 0.25,
+      unitPriceRUSD: 0.05,
+      totalRUSD: 0.25,
       buyerAccountId: buyerId,
       sellerAccountId: sellerId,
     });
@@ -116,10 +116,10 @@ describe("M3e market settlement", () => {
       9,
     );
     expect(settlement.producers.find((producer) => producer.buildingId === 4)).toMatchObject({
-      revenueSUSD: 0,
-      inputCostsSUSD: 0.25,
-      wagesPaidSUSD: PROCESSOR_WAGE,
-      upkeepPaidSUSD: PROCESSOR_UPKEEP,
+      revenueRUSD: 0,
+      inputCostsRUSD: 0.25,
+      wagesPaidRUSD: PROCESSOR_WAGE,
+      upkeepPaidRUSD: PROCESSOR_UPKEEP,
     });
   });
 
@@ -172,9 +172,9 @@ describe("M3e wages", () => {
     const { settlement } = runSettlement(scenario, world);
     expect(settlement.wages).toHaveLength(1);
     const wage = settlement.wages.find((entry) => entry.buildingId === 0);
-    expect(wage?.obligationSUSD).toBeCloseTo(FARM_WAGE, 9);
-    expect(wage?.paidSUSD).toBeCloseTo(FARM_WAGE, 9);
-    expect(wage?.unpaidSUSD).toBe(0);
+    expect(wage?.obligationRUSD).toBeCloseTo(FARM_WAGE, 9);
+    expect(wage?.paidRUSD).toBeCloseTo(FARM_WAGE, 9);
+    expect(wage?.unpaidRUSD).toBe(0);
     expect(wage?.payments).toHaveLength(1);
     expect(wage?.payments[0]?.workers).toBe(45);
     expect(accountBalance(world, householdId)).toBeCloseTo(startHousehold + FARM_WAGE, 9);
@@ -186,7 +186,7 @@ describe("M3e wages", () => {
       startSystem + FARM_UPKEEP + WAREHOUSE_UPKEEP,
       9,
     );
-    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitSUSD).toBeCloseTo(
+    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitRUSD).toBeCloseTo(
       -FARM_WAGE - FARM_UPKEEP,
       9,
     );
@@ -216,8 +216,8 @@ describe("M3e wages", () => {
     );
 
     expect(settlement.transactions).toHaveLength(2);
-    expect(settlement.totals.householdPurchasesSUSD).toBeCloseTo(2, 9);
-    expect(settlement.totals.inputPurchasesSUSD).toBeCloseTo(0.25, 9);
+    expect(settlement.totals.householdPurchasesRUSD).toBeCloseTo(2, 9);
+    expect(settlement.totals.inputPurchasesRUSD).toBeCloseTo(0.25, 9);
     expect(accountBalance(world, sellerId)).toBeCloseTo(
       startSeller + 0.25 - FARM_UPKEEP,
       9,
@@ -233,14 +233,14 @@ describe("M3e wages", () => {
       9,
     );
     const millWage = settlement.wages.find((wage) => wage.buildingId === 5);
-    expect(millWage?.paidSUSD).toBeCloseTo(1.75, 9);
-    expect(millWage?.unpaidSUSD).toBeCloseTo(PROCESSOR_WAGE - 1.75, 9);
+    expect(millWage?.paidRUSD).toBeCloseTo(1.75, 9);
+    expect(millWage?.unpaidRUSD).toBeCloseTo(PROCESSOR_WAGE - 1.75, 9);
     expect(settlement.upkeep.find((entry) => entry.buildingId === 5)).toMatchObject({
-      obligationSUSD: MILL_UPKEEP,
-      paidSUSD: 0,
-      unpaidSUSD: MILL_UPKEEP,
+      obligationRUSD: MILL_UPKEEP,
+      paidRUSD: 0,
+      unpaidRUSD: MILL_UPKEEP,
     });
-    expect(settlement.producers.find((producer) => producer.buildingId === 5)?.profitSUSD).toBeCloseTo(
+    expect(settlement.producers.find((producer) => producer.buildingId === 5)?.profitRUSD).toBeCloseTo(
       0,
       9,
     );
@@ -263,19 +263,19 @@ describe("M3e wages", () => {
 
     const settlement = settleMarketDay(world, scenario.definitions, marketDay);
     const wage = settlement.wages.find((entry) => entry.buildingId === 0);
-    expect(wage?.obligationSUSD).toBeCloseTo(FARM_WAGE, 9);
-    expect(wage?.paidSUSD).toBeCloseTo(10, 9);
-    expect(wage?.unpaidSUSD).toBeCloseTo(FARM_WAGE - 10, 9);
+    expect(wage?.obligationRUSD).toBeCloseTo(FARM_WAGE, 9);
+    expect(wage?.paidRUSD).toBeCloseTo(10, 9);
+    expect(wage?.unpaidRUSD).toBeCloseTo(FARM_WAGE - 10, 9);
     expect(accountBalance(world, employerId)).toBeCloseTo(0, 9);
     expect(accountBalance(world, householdId)).toBeCloseTo(startHousehold + 10, 9);
-    expect(settlement.totals.unpaidWagesSUSD).toBeCloseTo(FARM_WAGE - 10, 9);
+    expect(settlement.totals.unpaidWagesRUSD).toBeCloseTo(FARM_WAGE - 10, 9);
     expect(settlement.upkeep.find((entry) => entry.buildingId === 0)).toMatchObject({
-      obligationSUSD: FARM_UPKEEP,
-      paidSUSD: 0,
-      unpaidSUSD: FARM_UPKEEP,
+      obligationRUSD: FARM_UPKEEP,
+      paidRUSD: 0,
+      unpaidRUSD: FARM_UPKEEP,
     });
-    expect(settlement.totals.unpaidUpkeepSUSD).toBeCloseTo(FARM_UPKEEP, 9);
-    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitSUSD).toBeCloseTo(
+    expect(settlement.totals.unpaidUpkeepRUSD).toBeCloseTo(FARM_UPKEEP, 9);
+    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitRUSD).toBeCloseTo(
       -10,
       9,
     );
@@ -297,15 +297,15 @@ describe("M3e upkeep", () => {
 
     expect(settlement.upkeep).toHaveLength(2);
     expect(settlement.upkeep.find((entry) => entry.buildingId === 0)).toMatchObject({
-      obligationSUSD: FARM_UPKEEP * 2,
-      paidSUSD: FARM_UPKEEP * 2,
-      unpaidSUSD: 0,
+      obligationRUSD: FARM_UPKEEP * 2,
+      paidRUSD: FARM_UPKEEP * 2,
+      unpaidRUSD: 0,
       systemAccountId: SYSTEM_ACCOUNT_ID,
     });
     expect(settlement.upkeep.find((entry) => entry.buildingId === 7)).toMatchObject({
-      obligationSUSD: WAREHOUSE_UPKEEP,
-      paidSUSD: WAREHOUSE_UPKEEP,
-      unpaidSUSD: 0,
+      obligationRUSD: WAREHOUSE_UPKEEP,
+      paidRUSD: WAREHOUSE_UPKEEP,
+      unpaidRUSD: 0,
     });
     expect(accountBalance(world, buildingAccountId(world, 0))).toBeCloseTo(
       startFarm - FARM_UPKEEP * 2,
@@ -319,11 +319,11 @@ describe("M3e upkeep", () => {
       startSystem + FARM_UPKEEP * 2 + WAREHOUSE_UPKEEP,
       9,
     );
-    expect(settlement.totals.upkeepPaidSUSD).toBeCloseTo(
+    expect(settlement.totals.upkeepPaidRUSD).toBeCloseTo(
       FARM_UPKEEP * 2 + WAREHOUSE_UPKEEP,
       9,
     );
-    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitSUSD).toBeCloseTo(
+    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitRUSD).toBeCloseTo(
       -FARM_UPKEEP * 2,
       9,
     );
@@ -354,17 +354,17 @@ describe("M3e upkeep", () => {
     const { settlement } = runSettlement(scenario, world);
     const upkeep = settlement.upkeep.find((entry) => entry.buildingId === 0);
     expect(upkeep).toMatchObject({
-      obligationSUSD: FARM_UPKEEP,
-      paidSUSD: 5,
-      unpaidSUSD: FARM_UPKEEP - 5,
+      obligationRUSD: FARM_UPKEEP,
+      paidRUSD: 5,
+      unpaidRUSD: FARM_UPKEEP - 5,
     });
     expect(accountBalance(world, farmId)).toBeCloseTo(0, 9);
     expect(accountBalance(world, SYSTEM_ACCOUNT_ID)).toBeCloseTo(
       startSystem + 5 + WAREHOUSE_UPKEEP,
       9,
     );
-    expect(settlement.totals.unpaidUpkeepSUSD).toBeCloseTo(FARM_UPKEEP - 5, 9);
-    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitSUSD).toBeCloseTo(
+    expect(settlement.totals.unpaidUpkeepRUSD).toBeCloseTo(FARM_UPKEEP - 5, 9);
+    expect(settlement.producers.find((producer) => producer.buildingId === 0)?.profitRUSD).toBeCloseTo(
       -5,
       9,
     );
@@ -398,23 +398,23 @@ describe("M3e producer profit and household cash", () => {
     const processor = settlement.producers.find((producer) => producer.buildingId === 4);
     const warehouse = settlement.producers.find((producer) => producer.buildingId === 7);
     expect(farm).toMatchObject({
-      revenueSUSD: 0.5,
-      inputCostsSUSD: 0,
-      wagesPaidSUSD: FARM_WAGE,
-      upkeepPaidSUSD: FARM_UPKEEP,
+      revenueRUSD: 0.5,
+      inputCostsRUSD: 0,
+      wagesPaidRUSD: FARM_WAGE,
+      upkeepPaidRUSD: FARM_UPKEEP,
     });
-    expect(farm?.profitSUSD).toBeCloseTo(0.5 - FARM_WAGE - FARM_UPKEEP, 9);
+    expect(farm?.profitRUSD).toBeCloseTo(0.5 - FARM_WAGE - FARM_UPKEEP, 9);
     expect(processor).toMatchObject({
-      revenueSUSD: 0,
-      inputCostsSUSD: 0.25,
-      wagesPaidSUSD: PROCESSOR_WAGE,
-      upkeepPaidSUSD: PROCESSOR_UPKEEP,
+      revenueRUSD: 0,
+      inputCostsRUSD: 0.25,
+      wagesPaidRUSD: PROCESSOR_WAGE,
+      upkeepPaidRUSD: PROCESSOR_UPKEEP,
     });
-    expect(processor?.profitSUSD).toBeCloseTo(
+    expect(processor?.profitRUSD).toBeCloseTo(
       -0.25 - PROCESSOR_WAGE - PROCESSOR_UPKEEP,
       9,
     );
-    expect(warehouse?.profitSUSD).toBeCloseTo(-WAREHOUSE_UPKEEP, 9);
+    expect(warehouse?.profitRUSD).toBeCloseTo(-WAREHOUSE_UPKEEP, 9);
     expect(accountBalance(world, householdId)).toBeCloseTo(
       startHousehold - 0.25 + FARM_WAGE,
       9,
@@ -429,15 +429,15 @@ describe("M3e producer profit and household cash", () => {
       9,
     );
     expect(totalCash(world)).toBeCloseTo(start, 9);
-    expect(settlement.totals.marketPurchasesSUSD).toBeCloseTo(0.5, 9);
-    expect(settlement.totals.producerRevenueSUSD).toBeCloseTo(0.5, 9);
-    expect(settlement.totals.producerInputCostsSUSD).toBeCloseTo(0.25, 9);
-    expect(settlement.totals.wagesPaidSUSD).toBeCloseTo(FARM_WAGE + PROCESSOR_WAGE, 9);
-    expect(settlement.totals.upkeepPaidSUSD).toBeCloseTo(
+    expect(settlement.totals.marketPurchasesRUSD).toBeCloseTo(0.5, 9);
+    expect(settlement.totals.producerRevenueRUSD).toBeCloseTo(0.5, 9);
+    expect(settlement.totals.producerInputCostsRUSD).toBeCloseTo(0.25, 9);
+    expect(settlement.totals.wagesPaidRUSD).toBeCloseTo(FARM_WAGE + PROCESSOR_WAGE, 9);
+    expect(settlement.totals.upkeepPaidRUSD).toBeCloseTo(
       FARM_UPKEEP + PROCESSOR_UPKEEP + WAREHOUSE_UPKEEP,
       9,
     );
-    expect(settlement.totals.producerProfitSUSD).toBeCloseTo(
+    expect(settlement.totals.producerProfitRUSD).toBeCloseTo(
       0.5 -
         0.25 -
         FARM_WAGE -
@@ -608,7 +608,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     const badTotal: MarketDayResult = {
       ...marketDay,
       settled: false,
-      pendingTransactions: [{ ...original, totalSUSD: original.totalSUSD + 1 }],
+      pendingTransactions: [{ ...original, totalRUSD: original.totalRUSD + 1 }],
     };
     expect(() => settleMarketDay(world, scenario.definitions, badTotal)).toThrow(/reconcile/i);
     expect(world.finance.accounts).toEqual(balances);
@@ -633,32 +633,32 @@ describe("M3e conservation, determinism, and inventory separation", () => {
       ),
     );
     const lotsBefore = world.markets[0]!.stockLots.map((lot) => ({ ...lot }));
-    const pricesBefore = [...world.markets[0]!.priceSUSD];
+    const pricesBefore = [...world.markets[0]!.priceRUSD];
     const before = totalCash(world);
     const systemBefore = accountBalance(world, SYSTEM_ACCOUNT_ID);
     const settlement = settleMarketDay(world, scenario.definitions, marketDay);
 
     expect(world.markets[0]!.stockLots).toEqual(lotsBefore);
-    expect(world.markets[0]!.priceSUSD).toEqual(pricesBefore);
+    expect(world.markets[0]!.priceRUSD).toEqual(pricesBefore);
     expect(totalCash(world)).toBeCloseTo(before, 9);
-    expect(settlement.totals.initialCashSUSD).toBeCloseTo(before, 9);
-    expect(settlement.totals.endingCashAfterSettlementSUSD).toBeCloseTo(before, 9);
+    expect(settlement.totals.initialCashRUSD).toBeCloseTo(before, 9);
+    expect(settlement.totals.endingCashAfterSettlementRUSD).toBeCloseTo(before, 9);
     for (const posting of world.finance.postings) {
       const debits = posting.lines
         .filter((line) => line.side === "debit")
-        .reduce((total, line) => total + line.amountSUSD, 0);
+        .reduce((total, line) => total + line.amountRUSD, 0);
       const credits = posting.lines
         .filter((line) => line.side === "credit")
-        .reduce((total, line) => total + line.amountSUSD, 0);
+        .reduce((total, line) => total + line.amountRUSD, 0);
       expect(Math.abs(debits - credits)).toBeLessThanOrEqual(1e-6);
     }
     const producerProfit = settlement.producers.reduce(
-      (total, producer) => total + producer.profitSUSD,
+      (total, producer) => total + producer.profitRUSD,
       0,
     );
     const householdChange = settlement.households.reduce(
       (total, householdResult) =>
-        total + householdResult.endingCashAfterSettlementSUSD - householdResult.initialCashSUSD,
+        total + householdResult.endingCashAfterSettlementRUSD - householdResult.initialCashRUSD,
       0,
     );
     const systemChange = accountBalance(world, SYSTEM_ACCOUNT_ID) - systemBefore;

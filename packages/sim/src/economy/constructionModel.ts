@@ -9,7 +9,7 @@
  */
 
 import { assertValidDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
 import type { World } from "../world.js";
 import {
@@ -40,8 +40,8 @@ export function constructionProjectIsLive(status: ConstructionProjectStatus): bo
 
 /** Completed fraction in 0..1, derived from capitalized labor actually spent. */
 export function constructionProjectProgress(project: ConstructionProject): number {
-  if (!(project.totalCostSUSD > 0)) return 1;
-  const progress = project.spentSUSD / project.totalCostSUSD;
+  if (!(project.totalCostRUSD > 0)) return 1;
+  const progress = project.spentRUSD / project.totalCostRUSD;
   if (progress <= 0) return 0;
   if (progress >= 1) return 1;
   return progress;
@@ -77,7 +77,7 @@ export function constructionMaterialRemaining(
 
 /** Remaining authorized construction cost, never negative. */
 export function constructionProjectRemaining(project: ConstructionProject): number {
-  return Math.max(0, project.totalCostSUSD - project.spentSUSD);
+  return Math.max(0, project.totalCostRUSD - project.spentRUSD);
 }
 
 /** Total planned jobs at level 1, condition 1 (a data-derived crew/size proxy). */
@@ -91,12 +91,12 @@ export function constructionPlannedJobs(definition: BuildingDef): number {
 
 /** Documented completion working-capital target: 30 days of daily upkeep. */
 export function constructionWorkingCapital(definition: BuildingDef): number {
-  return definition.dailyUpkeepSUSDAtLevelOne * CONSTRUCTION_WORKING_CAPITAL_DAYS;
+  return definition.dailyUpkeepRUSDAtLevelOne * CONSTRUCTION_WORKING_CAPITAL_DAYS;
 }
 
-/** Daily base wage in SUSD for a profession and civil year. */
+/** Daily base wage in RUSD for a profession and civil year. */
 export function constructionDailyWage(profession: ProfessionDef, yearDays: number): number {
-  return profession.baseWage1900SUSDPerYear / yearDays;
+  return profession.baseWage1900RUSDPerYear / yearDays;
 }
 
 /**
@@ -153,7 +153,7 @@ export function constructionIdleWorkers(
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function requireProjectState(project: ConstructionProject): void {
@@ -184,14 +184,14 @@ function requireProjectState(project: ConstructionProject): void {
       }
     }
   }
-  if (!Number.isFinite(project.totalCostSUSD) || !(project.totalCostSUSD > 0)) {
-    throw new RangeError(`${path}.totalCostSUSD must be positive and finite`);
+  if (!Number.isFinite(project.totalCostRUSD) || !(project.totalCostRUSD > 0)) {
+    throw new RangeError(`${path}.totalCostRUSD must be positive and finite`);
   }
   for (const [field, value] of [
-    ["workingCapitalSUSD", project.workingCapitalSUSD],
-    ["workingCapitalPaidSUSD", project.workingCapitalPaidSUSD],
-    ["spentSUSD", project.spentSUSD],
-    ["materialsSpentSUSD", project.materialsSpentSUSD],
+    ["workingCapitalRUSD", project.workingCapitalRUSD],
+    ["workingCapitalPaidRUSD", project.workingCapitalPaidRUSD],
+    ["spentRUSD", project.spentRUSD],
+    ["materialsSpentRUSD", project.materialsSpentRUSD],
   ] as const) {
     if (!Number.isFinite(value) || value < 0) {
       throw new RangeError(`${path}.${field} must be finite and non-negative`);
@@ -225,17 +225,17 @@ function requireProjectState(project: ConstructionProject): void {
     }
   }
   if (
-    project.spentSUSD >
-    project.totalCostSUSD + toleranceMoney(project.spentSUSD, project.totalCostSUSD)
+    project.spentRUSD >
+    project.totalCostRUSD + toleranceMoney(project.spentRUSD, project.totalCostRUSD)
   ) {
-    throw new RangeError(`${path}.spentSUSD must not exceed totalCostSUSD`);
+    throw new RangeError(`${path}.spentRUSD must not exceed totalCostRUSD`);
   }
   if (
-    project.workingCapitalPaidSUSD >
-    project.workingCapitalSUSD +
-      toleranceMoney(project.workingCapitalPaidSUSD, project.workingCapitalSUSD)
+    project.workingCapitalPaidRUSD >
+    project.workingCapitalRUSD +
+      toleranceMoney(project.workingCapitalPaidRUSD, project.workingCapitalRUSD)
   ) {
-    throw new RangeError(`${path}.workingCapitalPaidSUSD must not exceed its target`);
+    throw new RangeError(`${path}.workingCapitalPaidRUSD must not exceed its target`);
   }
   if (!Number.isInteger(project.lastWorkers) || project.lastWorkers < 0) {
     throw new RangeError(`${path}.lastWorkers must be a non-negative integer`);
@@ -253,21 +253,21 @@ function requireProjectState(project: ConstructionProject): void {
       throw new RangeError(`${path}.buildingId must be a non-negative integer or null`);
     }
   }
-  if (project.workingCapitalPaidSUSD > 0 && project.status !== "completed") {
-    throw new RangeError(`${path}.workingCapitalPaidSUSD must be zero before completion`);
+  if (project.workingCapitalPaidRUSD > 0 && project.status !== "completed") {
+    throw new RangeError(`${path}.workingCapitalPaidRUSD must be zero before completion`);
   }
   if (project.status === "active" && project.lastWorkers < 0) {
     throw new RangeError(`${path} active project must report a non-negative worker count`);
   }
   const nearComplete =
-    Math.abs(project.spentSUSD - project.totalCostSUSD) <=
-    toleranceMoney(project.spentSUSD, project.totalCostSUSD);
+    Math.abs(project.spentRUSD - project.totalCostRUSD) <=
+    toleranceMoney(project.spentRUSD, project.totalCostRUSD);
   if (project.status === "authorized") {
-    if (project.spentSUSD !== 0 || project.startedDay !== null) {
+    if (project.spentRUSD !== 0 || project.startedDay !== null) {
       throw new RangeError(`${path} authorized project must not have started or spent`);
     }
     if (
-      project.materialsSpentSUSD !== 0 ||
+      project.materialsSpentRUSD !== 0 ||
       project.materials.some((material) => material.deliveredQuantity !== 0)
     ) {
       throw new RangeError(`${path} authorized project must not have procured materials`);
@@ -285,7 +285,7 @@ function requireProjectState(project: ConstructionProject): void {
     if (project.cancelledDay !== null || project.blockedReason !== null) {
       throw new RangeError(`${path} active project has an invalid terminal/blocked state`);
     }
-    if (!(project.spentSUSD > 0)) {
+    if (!(project.spentRUSD > 0)) {
       throw new RangeError(`${path} active project must have spending`);
     }
   } else if (project.status === "waiting") {
@@ -328,7 +328,7 @@ function requireProjectState(project: ConstructionProject): void {
     if (project.cancelledDay === null || project.blockedReason !== null) {
       throw new RangeError(`${path} cancelled project must record its cancellation day`);
     }
-    if (project.workingCapitalPaidSUSD !== 0) {
+    if (project.workingCapitalPaidRUSD !== 0) {
       throw new RangeError(`${path} cancelled project must not have working capital`);
     }
   }
@@ -468,8 +468,8 @@ export function assertValidConstructionState(world: World): void {
       }
     }
     for (const [field, value] of [
-      ["totalSpentSUSD", aggregate.totalSpentSUSD],
-      ["totalWrittenOffSUSD", aggregate.totalWrittenOffSUSD],
+      ["totalSpentRUSD", aggregate.totalSpentRUSD],
+      ["totalWrittenOffRUSD", aggregate.totalWrittenOffRUSD],
     ] as const) {
       if (!Number.isFinite(value) || value < 0) {
         throw new RangeError(`construction history ${field} must be finite and non-negative`);
@@ -489,7 +489,7 @@ export interface ConstructionProjectSummary {
   readonly projectId: Id;
   readonly status: ConstructionProjectStatus;
   readonly progress: number;
-  readonly remainingSUSD: number;
+  readonly remainingRUSD: number;
 }
 
 /** Summarize one project for callers that do not need the full record. */
@@ -498,6 +498,6 @@ export function summarizeConstructionProject(project: ConstructionProject): Cons
     projectId: project.id,
     status: project.status,
     progress: constructionProjectProgress(project),
-    remainingSUSD: constructionProjectRemaining(project),
+    remainingRUSD: constructionProjectRemaining(project),
   };
 }

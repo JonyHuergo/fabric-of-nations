@@ -45,6 +45,18 @@ const ROOT = resolve(HERE, "../../..");
 const BUNDLE = JSON.parse(
   readFileSync(join(ROOT, "packages/data/data/map/provinces_1900.json"), "utf8"),
 ) as ProvinceMapData;
+const ASIA_BUNDLE = JSON.parse(
+  readFileSync(join(ROOT, "packages/data/data/map/provinces_asia_1900.json"), "utf8"),
+) as ProvinceMapData;
+const AFRICA_BUNDLE = JSON.parse(
+  readFileSync(join(ROOT, "packages/data/data/map/provinces_africa_1900.json"), "utf8"),
+) as ProvinceMapData;
+const AMERICAS_BUNDLE = JSON.parse(
+  readFileSync(join(ROOT, "packages/data/data/map/provinces_americas_1900.json"), "utf8"),
+) as ProvinceMapData;
+const OCEANIA_BUNDLE = JSON.parse(
+  readFileSync(join(ROOT, "packages/data/data/map/provinces_oceania_1900.json"), "utf8"),
+) as ProvinceMapData;
 const AUDIT = JSON.parse(
   readFileSync(join(ROOT, "packages/data/data/map/provinces_1900_audit.json"), "utf8"),
 ) as {
@@ -58,6 +70,15 @@ const AUDIT = JSON.parse(
 
 const M11_SCENARIO = loadM11World();
 const BY_KEY = new Map(BUNDLE.provinces.map((province) => [province.key, province]));
+const ID_BY_KEY = new Map(
+  [
+    ...BUNDLE.provinces,
+    ...ASIA_BUNDLE.provinces,
+    ...AFRICA_BUNDLE.provinces,
+    ...AMERICAS_BUNDLE.provinces,
+    ...OCEANIA_BUNDLE.provinces,
+  ].map((province) => [province.key, province.id] as const),
+);
 const DEFINITIONS = new Map<number, ProvinceDefinition>(
   (M11_SCENARIO.provinces?.definitions ?? []).map((definition) => [
     definition.provinceId,
@@ -75,6 +96,16 @@ function idsFor(predicate: (key: string, province: ProvinceMapData["provinces"][
   const ids: Id[] = [];
   for (const province of BUNDLE.provinces) {
     if (predicate(province.key, province)) ids.push(province.id);
+  }
+  return ids;
+}
+
+/** Ids by key across every committed bundle (the M12e gap provinces included). */
+function idsByKey(keys: readonly string[]): Id[] {
+  const ids: Id[] = [];
+  for (const key of keys) {
+    const id = ID_BY_KEY.get(key);
+    if (id !== undefined) ids.push(id);
   }
   return ids;
 }
@@ -225,7 +256,12 @@ function dissolveAustriaHungary(world: World): void {
   ];
   transfer(
     world,
-    idsFor((key) => yugoslavKeys.includes(key)),
+    [
+      ...idsFor((key) => yugoslavKeys.includes(key)),
+      // M12e: the Kvarner islands (Krk, Cres, Losinj) were Austrian Littoral and
+      // passed to the Kingdom of Serbs, Croats and Slovenes after 1918.
+      ...idsByKey(["oc-aut-krk-island", "oc-aut-cres-and-losinj"]),
+    ],
     yug,
     "union",
     "Proclamation of the Kingdom of Serbs, Croats and Slovenes",
@@ -259,7 +295,13 @@ function dissolveAustriaHungary(world: World): void {
   ];
   transfer(
     world,
-    idsFor((key) => austrianKeys.includes(key)),
+    [
+      ...idsFor((key) => austrianKeys.includes(key)),
+      // M12e: the residual slivers of the Austro-Hungarian feature are attached
+      // to the rump Austrian republic when the monarchy dissolves. They are
+      // coverage geometry, not a reviewed frontier.
+      ...idsByKey(["oc-gap-aut-residual"]),
+    ],
     aut,
     "dissolution",
     "Proclamation of the Republic of Austria",
@@ -736,12 +778,21 @@ describe("M12a province inventory and geometry", () => {
 describe("M12a authoritative provincial ownership", () => {
   test("the 1900 world starts with one ownership record per province", () => {
     const scenario = loadM11World();
-    expect(scenario.provinces?.definitions.length).toBe(BUNDLE.provinces.length);
-    expect(scenario.provinces?.polityRegistry?.length).toBe(BUNDLE.futurePolities.length);
+    const definitions = scenario.provinces?.definitions ?? [];
+    // The M12b Asia bundle is part of the same scenario from M12b onwards; the
+    // European inventory must remain a complete subset of the combined one.
+    expect(definitions.length).toBeGreaterThanOrEqual(BUNDLE.provinces.length);
+    const definitionIds = new Set(definitions.map((definition) => definition.provinceId));
+    for (const province of BUNDLE.provinces) {
+      expect(definitionIds.has(province.id)).toBe(true);
+    }
+    expect(scenario.provinces?.polityRegistry?.length).toBeGreaterThanOrEqual(
+      BUNDLE.futurePolities.length,
+    );
     const world = createEconomyWorld(scenario, { seed: 20_260_101 });
     assertValidWorld(world);
     expect(world.provinces.enabled).toBe(true);
-    expect(world.provinces.ownership.length).toBe(BUNDLE.provinces.length);
+    expect(world.provinces.ownership.length).toBe(definitions.length);
     expect(new Set(world.provinces.ownership.map((entry) => entry.provinceId)).size).toBe(
       world.provinces.ownership.length,
     );
@@ -908,7 +959,13 @@ describe("M12a historical reference snapshots", () => {
       (entry) => entry.provinceId === BY_KEY.get("deu-berlin")?.id,
     );
     expect(berlin?.specialStatus).toBe("neutral");
-    expect(world.provinces.ownership.filter((entry) => entry.ownerPolityId === 2)).toEqual([]);
+    // The assertion is European: the African German colonies (M12c) are still
+    // owned by the German Empire in this 1919-1949 European sequence.
+    expect(
+      world.provinces.ownership.filter(
+        (entry) => entry.ownerPolityId === 2 && entry.provinceId <= 66001,
+      ),
+    ).toEqual([]);
   });
 
   test("1990 reunification does not restore the former eastern territories", () => {
@@ -989,7 +1046,7 @@ describe("M12a historical reference snapshots", () => {
   });
 
   test("province ownership aggregates to complete country territory", () => {
-    const { world } = referenceWorld();
+    const { world, scenario } = referenceWorld();
     const byOwner = new Map<number, number>();
     for (const entry of world.provinces.ownership) {
       byOwner.set(entry.ownerPolityId, (byOwner.get(entry.ownerPolityId) ?? 0) + 1);
@@ -997,10 +1054,28 @@ describe("M12a historical reference snapshots", () => {
     expect([...byOwner.values()].reduce((sum, value) => sum + value, 0)).toBe(
       world.provinces.ownership.length,
     );
-    expect(byOwner.get(2)).toBe(BUNDLE.provinces.filter((p) => p.initialOwnerTag === "DEU").length);
-    expect(byOwner.get(60)).toBe(BUNDLE.provinces.filter((p) => p.initialOwnerTag === "AUT").length);
-    expect(byOwner.get(4)).toBe(BUNDLE.provinces.filter((p) => p.initialOwnerTag === "RUS").length);
-    expect(byOwner.get(1)).toBe(BUNDLE.provinces.filter((p) => p.initialOwnerTag === "GBR").length);
+    // The world carries the combined M12a Europe, M12b Asia, M12c Africa,
+    // M12d Americas and M12e Oceania catalogue, so the expected count is the
+    // combined definition count for each owner.
+    const definitions = scenario.provinces?.definitions ?? [];
+    const combinedProvinces = [
+      ...BUNDLE.provinces,
+      ...ASIA_BUNDLE.provinces,
+      ...AFRICA_BUNDLE.provinces,
+      ...AMERICAS_BUNDLE.provinces,
+      ...OCEANIA_BUNDLE.provinces,
+    ];
+    const ownerCount = (tag: string): number =>
+      definitions.filter((definition) => {
+        const province = combinedProvinces.find(
+          (candidate) => candidate.id === definition.provinceId,
+        );
+        return province?.initialOwnerTag === tag;
+      }).length;
+    expect(byOwner.get(2)).toBe(ownerCount("DEU"));
+    expect(byOwner.get(60)).toBe(ownerCount("AUT"));
+    expect(byOwner.get(4)).toBe(ownerCount("RUS"));
+    expect(byOwner.get(1)).toBe(ownerCount("GBR"));
   });
 
   test("map geometry no longer depends on the simulation Region layer", () => {
@@ -1018,7 +1093,7 @@ describe("M12a historical reference snapshots", () => {
     );
     expect(geometrySource).not.toMatch(/SimulationRegion|RegionSnapshot/iu);
     expect(renderPlan).not.toMatch(/SimulationRegion|RegionSnapshot/iu);
-    expect(worldMap).toContain("PROVINCES_1900");
+    expect(worldMap).toContain("PROVINCE_MAP_1900");
     expect(worldMap).toContain("decodeProvinceGeometry");
     expect(worldMap).toContain("strokeOpacity");
     expect(worldMap).toContain("PROVINCE_BORDER_COLOR");

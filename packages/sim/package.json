@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Pure deterministic simulation core for Century. No platform, DOM, or UI dependencies.",
+  "description": "Pure deterministic simulation core for Fabric of Nations. No platform, DOM, or UI dependencies.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

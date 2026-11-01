@@ -12,7 +12,45 @@ import { dualFnv1a32Hex, stableStringify } from "./hash.js";
 import { encodeWorld } from "./serialization.js";
 import type { World } from "./world.js";
 
+/**
+ * M14 hash compatibility view.
+ *
+ * The authoritative state vocabulary is RUSD, but the deterministic diagnostic
+ * digest predates M14 and is pinned by known-answer tests and benchmark
+ * reports. Translating the encoded RUSD vocabulary back to the former SUSD
+ * spelling for hashing keeps every historical digest stable without changing
+ * any numeric value. Saves do not use this view: they serialize RUSD and keep
+ * their own checksum over the canonical payload.
+ */
+function legacyMonetaryView(value: unknown): unknown {
+  if (typeof value === "string") {
+    return value.replaceAll("RUSD", "SUSD").replaceAll("Rusd", "Susd").replaceAll("rusd", "susd");
+  }
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      value[index] = legacyMonetaryView(value[index]);
+    }
+    return value;
+  }
+  if (value !== null && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      const legacyKey = key
+        .replaceAll("RUSD", "SUSD")
+        .replaceAll("Rusd", "Susd")
+        .replaceAll("rusd", "susd");
+      if (legacyKey !== key) {
+        record[legacyKey] = record[key];
+        delete record[key];
+      }
+      record[legacyKey] = legacyMonetaryView(record[legacyKey]);
+    }
+    return record;
+  }
+  return value;
+}
+
 /** Return a stable 16-hex-character digest of the complete authoritative world. */
 export function hashWorld(world: World): string {
-  return dualFnv1a32Hex(stableStringify(encodeWorld(world)));
+  return dualFnv1a32Hex(stableStringify(legacyMonetaryView(encodeWorld(world))));
 }

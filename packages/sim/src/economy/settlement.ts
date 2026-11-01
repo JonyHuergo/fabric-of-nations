@@ -26,7 +26,7 @@ import {
   daysInYear,
   isTerminalDayIndex,
 } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id, Seed } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
@@ -44,7 +44,7 @@ import { assertValidEconomyDefinitions } from "./definitions.js";
 import { assertValidEmploymentState } from "./employment.js";
 import {
   laborHoursFactor,
-  laborMinimumWageSUSDPerYear,
+  laborMinimumWageRUSDPerYear,
   qualificationWageFactor,
 } from "./labor.js";
 import type {
@@ -70,8 +70,8 @@ export interface SettledMarketTransaction {
   readonly sellerBuildingId: number;
   readonly goodId: number;
   readonly quantity: number;
-  readonly unitPriceSUSD: number;
-  readonly totalSUSD: number;
+  readonly unitPriceRUSD: number;
+  readonly totalRUSD: number;
   readonly tier: MarketTier;
   readonly phase: "A" | "B";
   readonly buyerAccountId: Id;
@@ -83,17 +83,17 @@ export interface WagePayment {
   readonly professionId: Id;
   readonly workers: number;
   readonly accountId: Id;
-  readonly obligationSUSD: number;
-  readonly paidSUSD: number;
-  readonly unpaidSUSD: number;
+  readonly obligationRUSD: number;
+  readonly paidRUSD: number;
+  readonly unpaidRUSD: number;
 }
 
 export interface WageSettlement {
   readonly buildingId: Id;
   readonly operatingAccountId: Id;
-  readonly obligationSUSD: number;
-  readonly paidSUSD: number;
-  readonly unpaidSUSD: number;
+  readonly obligationRUSD: number;
+  readonly paidRUSD: number;
+  readonly unpaidRUSD: number;
   readonly payments: readonly WagePayment[];
 }
 
@@ -101,56 +101,56 @@ export interface UpkeepSettlement {
   readonly buildingId: Id;
   readonly operatingAccountId: Id;
   readonly systemAccountId: Id;
-  readonly obligationSUSD: number;
-  readonly paidSUSD: number;
-  readonly unpaidSUSD: number;
+  readonly obligationRUSD: number;
+  readonly paidRUSD: number;
+  readonly unpaidRUSD: number;
 }
 
 export interface ProducerSettlement {
   readonly buildingId: Id;
   readonly ownerAccountId: Id;
   readonly operatingAccountId: Id;
-  readonly initialCashSUSD: number;
-  readonly revenueSUSD: number;
-  readonly inputCostsSUSD: number;
-  readonly wagesPaidSUSD: number;
-  readonly wageObligationSUSD: number;
-  readonly unpaidWagesSUSD: number;
-  readonly upkeepPaidSUSD: number;
-  readonly upkeepObligationSUSD: number;
-  readonly unpaidUpkeepSUSD: number;
-  readonly profitSUSD: number;
+  readonly initialCashRUSD: number;
+  readonly revenueRUSD: number;
+  readonly inputCostsRUSD: number;
+  readonly wagesPaidRUSD: number;
+  readonly wageObligationRUSD: number;
+  readonly unpaidWagesRUSD: number;
+  readonly upkeepPaidRUSD: number;
+  readonly upkeepObligationRUSD: number;
+  readonly unpaidUpkeepRUSD: number;
+  readonly profitRUSD: number;
   /** Building cash after market/wages/upkeep settlement (fiscal does not touch it). */
-  readonly endingCashAfterSettlementSUSD: number;
+  readonly endingCashAfterSettlementRUSD: number;
 }
 
 export interface HouseholdSettlement {
   readonly popBlockId: Id;
   readonly financialAccountId: Id;
-  readonly initialCashSUSD: number;
-  readonly marketPurchasesSUSD: number;
-  readonly wagesReceivedSUSD: number;
+  readonly initialCashRUSD: number;
+  readonly marketPurchasesRUSD: number;
+  readonly wagesReceivedRUSD: number;
   /** Household cash after market/wages/upkeep settlement, before the fiscal phase. */
-  readonly endingCashAfterSettlementSUSD: number;
+  readonly endingCashAfterSettlementRUSD: number;
 }
 
 export interface SettlementTotals {
-  readonly marketPurchasesSUSD: number;
-  readonly householdPurchasesSUSD: number;
-  readonly inputPurchasesSUSD: number;
-  readonly wageObligationSUSD: number;
-  readonly wagesPaidSUSD: number;
-  readonly unpaidWagesSUSD: number;
-  readonly upkeepObligationSUSD: number;
-  readonly upkeepPaidSUSD: number;
-  readonly unpaidUpkeepSUSD: number;
-  readonly producerRevenueSUSD: number;
-  readonly producerInputCostsSUSD: number;
-  readonly producerWagesSUSD: number;
-  readonly producerProfitSUSD: number;
-  readonly initialCashSUSD: number;
+  readonly marketPurchasesRUSD: number;
+  readonly householdPurchasesRUSD: number;
+  readonly inputPurchasesRUSD: number;
+  readonly wageObligationRUSD: number;
+  readonly wagesPaidRUSD: number;
+  readonly unpaidWagesRUSD: number;
+  readonly upkeepObligationRUSD: number;
+  readonly upkeepPaidRUSD: number;
+  readonly unpaidUpkeepRUSD: number;
+  readonly producerRevenueRUSD: number;
+  readonly producerInputCostsRUSD: number;
+  readonly producerWagesRUSD: number;
+  readonly producerProfitRUSD: number;
+  readonly initialCashRUSD: number;
   /** Aggregate cash after settlement; income tax and welfare are applied later. */
-  readonly endingCashAfterSettlementSUSD: number;
+  readonly endingCashAfterSettlementRUSD: number;
 }
 
 export interface MarketSettlementResult {
@@ -197,13 +197,13 @@ interface WageGroup {
   readonly professionId: Id;
   readonly workers: number;
   readonly accountId: Id;
-  readonly obligationSUSD: number;
+  readonly obligationRUSD: number;
 }
 
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function householdCash(index: FinanceIndex, popBlockId: Id): FinancialAccount {
@@ -225,16 +225,16 @@ function operatingCash(index: FinanceIndex, buildingId: Id): FinancialAccount {
 function assertTransactionAmount(transaction: PendingTransaction, path: string): void {
   for (const [name, value] of [
     ["quantity", transaction.quantity],
-    ["unitPriceSUSD", transaction.unitPriceSUSD],
-    ["totalSUSD", transaction.totalSUSD],
+    ["unitPriceRUSD", transaction.unitPriceRUSD],
+    ["totalRUSD", transaction.totalRUSD],
   ] as const) {
     if (!Number.isFinite(value) || !(value > 0)) {
       throw new RangeError(`${path}.${name} must be finite and strictly positive`);
     }
   }
-  const expected = transaction.quantity * transaction.unitPriceSUSD;
-  if (Math.abs(expected - transaction.totalSUSD) > toleranceMoney(expected, transaction.totalSUSD)) {
-    throw new RangeError(`${path}.totalSUSD does not reconcile with quantity × unit price`);
+  const expected = transaction.quantity * transaction.unitPriceRUSD;
+  if (Math.abs(expected - transaction.totalRUSD) > toleranceMoney(expected, transaction.totalRUSD)) {
+    throw new RangeError(`${path}.totalRUSD does not reconcile with quantity × unit price`);
   }
 }
 
@@ -321,11 +321,11 @@ function allocateMoney(
   const allocations = new Map<Id, number>();
   if (!(total > 0) || groups.length === 0) return allocations;
   let totalWeight = 0;
-  for (const group of groups) totalWeight += group.obligationSUSD;
+  for (const group of groups) totalWeight += group.obligationRUSD;
   if (!(totalWeight > 0)) return allocations;
   let allocated = 0;
   for (const group of groups) {
-    const quantity = (total * group.obligationSUSD) / totalWeight;
+    const quantity = (total * group.obligationRUSD) / totalWeight;
     allocations.set(group.popBlockId, quantity);
     allocated += quantity;
   }
@@ -372,7 +372,7 @@ function buildWageGroups(
   index: FinanceIndex,
   yearDays: number,
   laborStandards: {
-    readonly minimumWageSUSDPerYear: number;
+    readonly minimumWageRUSDPerYear: number;
     readonly hoursFactor: number;
   },
 ): WageGroup[] {
@@ -388,8 +388,8 @@ function buildWageGroups(
     // vocational qualification adds a premium. All three are real labor-market
     // channels, not display modifiers.
     const annualBase = Math.max(
-      profession.baseWage1900SUSDPerYear,
-      laborStandards.minimumWageSUSDPerYear,
+      profession.baseWage1900RUSDPerYear,
+      laborStandards.minimumWageRUSDPerYear,
     );
     const dailyWage =
       (annualBase * laborStandards.hoursFactor * qualificationWageFactor(block)) /
@@ -405,13 +405,13 @@ function buildWageGroups(
         professionId: profession.id,
         workers: assignment.workers,
         accountId: account.id,
-        obligationSUSD: obligation,
+        obligationRUSD: obligation,
       });
     } else {
       groups.set(block.id, {
         ...current,
         workers: current.workers + assignment.workers,
-        obligationSUSD: current.obligationSUSD + obligation,
+        obligationRUSD: current.obligationRUSD + obligation,
       });
     }
   }
@@ -527,7 +527,7 @@ function settleMarketDaysInternal(
   const transactions = prepareTransactions(world, definitions, index, pendingTransactions);
 
   const openingBalances = new Map<Id, number>();
-  for (const account of world.finance.accounts) openingBalances.set(account.id, account.balanceSUSD);
+  for (const account of world.finance.accounts) openingBalances.set(account.id, account.balanceRUSD);
   const openingPostings = [...world.finance.postings];
   const openingNextPostingId = world.finance.nextPostingId;
 
@@ -535,17 +535,17 @@ function settleMarketDaysInternal(
   for (const transaction of transactions) {
     marketDeltas.set(
       transaction.sellerAccountId,
-      (marketDeltas.get(transaction.sellerAccountId) ?? 0) + transaction.totalSUSD,
+      (marketDeltas.get(transaction.sellerAccountId) ?? 0) + transaction.totalRUSD,
     );
     marketDeltas.set(
       transaction.buyerAccountId,
-      (marketDeltas.get(transaction.buyerAccountId) ?? 0) - transaction.totalSUSD,
+      (marketDeltas.get(transaction.buyerAccountId) ?? 0) - transaction.totalRUSD,
     );
   }
   for (const [accountId, delta] of marketDeltas) {
     const account = index.byId.get(accountId);
     if (account === undefined) throw new RangeError(`unknown settlement account ${String(accountId)}`);
-    if (account.balanceSUSD + delta < 0) {
+    if (account.balanceRUSD + delta < 0) {
       throw new RangeError(
         `insufficient funds; market settlement would overdraw account ${String(accountId)}`,
       );
@@ -561,22 +561,22 @@ function settleMarketDaysInternal(
           {
             accountId: transaction.buyerExpenseAccountId,
             side: "debit",
-            amountSUSD: transaction.totalSUSD,
+            amountRUSD: transaction.totalRUSD,
           },
           {
             accountId: transaction.sellerAccountId,
             side: "debit",
-            amountSUSD: transaction.totalSUSD,
+            amountRUSD: transaction.totalRUSD,
           },
           {
             accountId: transaction.buyerAccountId,
             side: "credit",
-            amountSUSD: transaction.totalSUSD,
+            amountRUSD: transaction.totalRUSD,
           },
           {
             accountId: transaction.sellerRevenueAccountId,
             side: "credit",
-            amountSUSD: transaction.totalSUSD,
+            amountRUSD: transaction.totalRUSD,
           },
         ],
         sourceEntityId: transaction.buyerPopBlockId ?? transaction.buyerBuildingId,
@@ -609,42 +609,42 @@ function settleMarketDaysInternal(
             country.regionIds.includes(building.regionId),
           );
           return owner === undefined
-            ? { minimumWageSUSDPerYear: 0, hoursFactor: 1 }
+            ? { minimumWageRUSDPerYear: 0, hoursFactor: 1 }
             : {
-                minimumWageSUSDPerYear: laborMinimumWageSUSDPerYear(owner, definitions),
+                minimumWageRUSDPerYear: laborMinimumWageRUSDPerYear(owner, definitions),
                 hoursFactor: laborHoursFactor(owner, definitions),
               };
         })(),
       );
       if (groups.length === 0) continue;
-      const obligation = groups.reduce((total, group) => total + group.obligationSUSD, 0);
+      const obligation = groups.reduce((total, group) => total + group.obligationRUSD, 0);
       const employer = operatingCash(index, building.id);
-      const paid = Math.min(employer.balanceSUSD, obligation);
+      const paid = Math.min(employer.balanceRUSD, obligation);
       const allocations = allocateMoney(world, dayIndex, paid, groups);
       const payments: WagePayment[] = groups.map((group) => {
-        const paidSUSD = allocations.get(group.popBlockId) ?? 0;
+        const paidRUSD = allocations.get(group.popBlockId) ?? 0;
         return {
           ...group,
-          paidSUSD,
-          unpaidSUSD: Math.max(0, group.obligationSUSD - paidSUSD),
+          paidRUSD,
+          unpaidRUSD: Math.max(0, group.obligationRUSD - paidRUSD),
         };
       });
-      let paidTotal = payments.reduce((total, payment) => total + payment.paidSUSD, 0);
-      if (paidTotal > employer.balanceSUSD) {
-        let excess = paidTotal - employer.balanceSUSD;
+      let paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
+      if (paidTotal > employer.balanceRUSD) {
+        let excess = paidTotal - employer.balanceRUSD;
         for (let index = payments.length - 1; index >= 0 && excess > 0; index -= 1) {
           const payment = payments[index];
           if (payment === undefined) continue;
-          const reduction = Math.min(payment.paidSUSD, excess);
+          const reduction = Math.min(payment.paidRUSD, excess);
           if (reduction <= 0) continue;
           payments[index] = {
             ...payment,
-            paidSUSD: payment.paidSUSD - reduction,
-            unpaidSUSD: payment.unpaidSUSD + reduction,
+            paidRUSD: payment.paidRUSD - reduction,
+            unpaidRUSD: payment.unpaidRUSD + reduction,
           };
           excess -= reduction;
         }
-        paidTotal = payments.reduce((total, payment) => total + payment.paidSUSD, 0);
+        paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
       }
       // Proportional allocation can exceed the employer balance by one or two
       // binary64 ulps even though every amount is finite. A reduction smaller
@@ -652,60 +652,60 @@ function settleMarketDaysInternal(
       // until the paid total is genuinely affordable. The difference is paid as
       // reported shortfall, never as debt or negative cash.
       let roundingGuard = 0;
-      while (paidTotal > employer.balanceSUSD && roundingGuard < 32) {
+      while (paidTotal > employer.balanceRUSD && roundingGuard < 32) {
         let reduced = false;
         for (let index = payments.length - 1; index >= 0 && !reduced; index -= 1) {
           const payment = payments[index];
-          if (payment === undefined || payment.paidSUSD <= 0) continue;
+          if (payment === undefined || payment.paidRUSD <= 0) continue;
           const step = Math.max(
-            paidTotal - employer.balanceSUSD,
-            Math.abs(payment.paidSUSD) * Number.EPSILON * 2,
+            paidTotal - employer.balanceRUSD,
+            Math.abs(payment.paidRUSD) * Number.EPSILON * 2,
           );
-          const reduction = Math.min(payment.paidSUSD, step);
-          const nextPaid = payment.paidSUSD - reduction;
-          if (!(nextPaid < payment.paidSUSD)) continue;
+          const reduction = Math.min(payment.paidRUSD, step);
+          const nextPaid = payment.paidRUSD - reduction;
+          if (!(nextPaid < payment.paidRUSD)) continue;
           payments[index] = {
             ...payment,
-            paidSUSD: nextPaid,
-            unpaidSUSD: payment.unpaidSUSD + (payment.paidSUSD - nextPaid),
+            paidRUSD: nextPaid,
+            unpaidRUSD: payment.unpaidRUSD + (payment.paidRUSD - nextPaid),
           };
           reduced = true;
         }
         if (!reduced) break;
-        paidTotal = payments.reduce((total, payment) => total + payment.paidSUSD, 0);
+        paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
         roundingGuard += 1;
       }
-      if (paidTotal > employer.balanceSUSD + toleranceMoney(paidTotal, employer.balanceSUSD)) {
+      if (paidTotal > employer.balanceRUSD + toleranceMoney(paidTotal, employer.balanceRUSD)) {
         throw new RangeError(`wage payment exceeds employer cash for building ${String(building.id)}`);
       }
       if (paidTotal > 0) {
         const wageExpense = index.get("building", building.id, "wage-expense");
         const lines: JournalLine[] = [];
         for (const payment of payments) {
-          if (payment.paidSUSD <= 0) continue;
+          if (payment.paidRUSD <= 0) continue;
           lines.push({
             accountId: payment.accountId,
             side: "debit",
-            amountSUSD: payment.paidSUSD,
+            amountRUSD: payment.paidRUSD,
           });
         }
         lines.push({
           accountId: wageExpense.id,
           side: "debit",
-          amountSUSD: paidTotal,
+          amountRUSD: paidTotal,
         });
         lines.push({
           accountId: employer.id,
           side: "credit",
-          amountSUSD: paidTotal,
+          amountRUSD: paidTotal,
         });
         for (const payment of payments) {
-          if (payment.paidSUSD <= 0) continue;
+          if (payment.paidRUSD <= 0) continue;
           const income = index.get("popBlock", payment.popBlockId, "wage-income");
           lines.push({
             accountId: income.id,
             side: "credit",
-            amountSUSD: payment.paidSUSD,
+            amountRUSD: payment.paidRUSD,
           });
         }
         wageEntries.push({
@@ -718,9 +718,9 @@ function settleMarketDaysInternal(
       wageSettlements.push({
         buildingId: building.id,
         operatingAccountId: employer.id,
-        obligationSUSD: obligation,
-        paidSUSD: paidTotal,
-        unpaidSUSD: Math.max(0, obligation - paidTotal),
+        obligationRUSD: obligation,
+        paidRUSD: paidTotal,
+        unpaidRUSD: Math.max(0, obligation - paidTotal),
         payments,
       });
     }
@@ -741,7 +741,7 @@ function settleMarketDaysInternal(
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
-      const obligation = definition.dailyUpkeepSUSDAtLevelOne * building.level;
+      const obligation = definition.dailyUpkeepRUSDAtLevelOne * building.level;
       if (!Number.isFinite(obligation) || obligation < 0) {
         throw new RangeError(`invalid upkeep obligation for building ${String(building.id)}`);
       }
@@ -760,17 +760,17 @@ function settleMarketDaysInternal(
         systemIncome = index.get("system", null, "system-income");
       }
       const employer = operatingCash(index, building.id);
-      const paid = Math.min(employer.balanceSUSD, obligation);
+      const paid = Math.min(employer.balanceRUSD, obligation);
       const unpaid = Math.max(0, obligation - paid);
       if (paid > 0) {
         const upkeepExpense = index.get("building", building.id, "upkeep-expense");
         upkeepEntries.push({
           transactionKind: "upkeep",
           lines: [
-            { accountId: systemAccount.id, side: "debit", amountSUSD: paid },
-            { accountId: upkeepExpense.id, side: "debit", amountSUSD: paid },
-            { accountId: employer.id, side: "credit", amountSUSD: paid },
-            { accountId: systemIncome!.id, side: "credit", amountSUSD: paid },
+            { accountId: systemAccount.id, side: "debit", amountRUSD: paid },
+            { accountId: upkeepExpense.id, side: "debit", amountRUSD: paid },
+            { accountId: employer.id, side: "credit", amountRUSD: paid },
+            { accountId: systemIncome!.id, side: "credit", amountRUSD: paid },
           ],
           sourceEntityId: building.id,
           targetEntityId: systemAccount.id,
@@ -780,9 +780,9 @@ function settleMarketDaysInternal(
         buildingId: building.id,
         operatingAccountId: employer.id,
         systemAccountId: systemAccount.id,
-        obligationSUSD: obligation,
-        paidSUSD: paid,
-        unpaidSUSD: unpaid,
+        obligationRUSD: obligation,
+        paidRUSD: paid,
+        unpaidRUSD: unpaid,
       });
       upkeepPaidByBuilding.set(building.id, paid);
       upkeepObligationByBuilding.set(building.id, obligation);
@@ -798,18 +798,18 @@ function settleMarketDaysInternal(
     for (const transaction of transactions) {
       revenueByBuilding.set(
         transaction.sellerBuildingId,
-        (revenueByBuilding.get(transaction.sellerBuildingId) ?? 0) + transaction.totalSUSD,
+        (revenueByBuilding.get(transaction.sellerBuildingId) ?? 0) + transaction.totalRUSD,
       );
       if (transaction.kind === "input-purchase" && transaction.buyerBuildingId !== null) {
         inputCostsByBuilding.set(
           transaction.buyerBuildingId,
-          (inputCostsByBuilding.get(transaction.buyerBuildingId) ?? 0) + transaction.totalSUSD,
+          (inputCostsByBuilding.get(transaction.buyerBuildingId) ?? 0) + transaction.totalRUSD,
         );
       }
       if (transaction.buyerPopBlockId !== null) {
         purchasesByBlock.set(
           transaction.buyerPopBlockId,
-          (purchasesByBlock.get(transaction.buyerPopBlockId) ?? 0) + transaction.totalSUSD,
+          (purchasesByBlock.get(transaction.buyerPopBlockId) ?? 0) + transaction.totalRUSD,
         );
       }
     }
@@ -818,13 +818,13 @@ function settleMarketDaysInternal(
     const unpaidWagesByBuilding = new Map<Id, number>();
     const wagesByBlock = new Map<Id, number>();
     for (const settlement of wageSettlements) {
-      wagesByBuilding.set(settlement.buildingId, settlement.paidSUSD);
-      wageObligationByBuilding.set(settlement.buildingId, settlement.obligationSUSD);
-      unpaidWagesByBuilding.set(settlement.buildingId, settlement.unpaidSUSD);
+      wagesByBuilding.set(settlement.buildingId, settlement.paidRUSD);
+      wageObligationByBuilding.set(settlement.buildingId, settlement.obligationRUSD);
+      unpaidWagesByBuilding.set(settlement.buildingId, settlement.unpaidRUSD);
       for (const payment of settlement.payments) {
         wagesByBlock.set(
           payment.popBlockId,
-          (wagesByBlock.get(payment.popBlockId) ?? 0) + payment.paidSUSD,
+          (wagesByBlock.get(payment.popBlockId) ?? 0) + payment.paidRUSD,
         );
       }
     }
@@ -842,24 +842,24 @@ function settleMarketDaysInternal(
           buildingId: building.id,
           ownerAccountId: building.ownerAccountId,
           operatingAccountId: building.operatingCashAccountId,
-          initialCashSUSD: initialCash,
-          revenueSUSD: revenue,
-          inputCostsSUSD: inputCosts,
-          wagesPaidSUSD: wagesPaid,
-          wageObligationSUSD: wageObligationByBuilding.get(building.id) ?? 0,
-          unpaidWagesSUSD: unpaidWagesByBuilding.get(building.id) ?? 0,
-          upkeepPaidSUSD: upkeepPaid,
-          upkeepObligationSUSD: upkeepObligationByBuilding.get(building.id) ?? 0,
-          unpaidUpkeepSUSD: unpaidUpkeepByBuilding.get(building.id) ?? 0,
-          profitSUSD: producerProfit(
+          initialCashRUSD: initialCash,
+          revenueRUSD: revenue,
+          inputCostsRUSD: inputCosts,
+          wagesPaidRUSD: wagesPaid,
+          wageObligationRUSD: wageObligationByBuilding.get(building.id) ?? 0,
+          unpaidWagesRUSD: unpaidWagesByBuilding.get(building.id) ?? 0,
+          upkeepPaidRUSD: upkeepPaid,
+          upkeepObligationRUSD: upkeepObligationByBuilding.get(building.id) ?? 0,
+          unpaidUpkeepRUSD: unpaidUpkeepByBuilding.get(building.id) ?? 0,
+          profitRUSD: producerProfit(
             initialCash,
-            current.balanceSUSD,
+            current.balanceRUSD,
             revenue,
             inputCosts,
             wagesPaid,
             upkeepPaid,
           ),
-          endingCashAfterSettlementSUSD: current.balanceSUSD,
+          endingCashAfterSettlementRUSD: current.balanceRUSD,
         };
       });
 
@@ -871,16 +871,16 @@ function settleMarketDaysInternal(
         const purchases = purchasesByBlock.get(block.id) ?? 0;
         const wages = wagesByBlock.get(block.id) ?? 0;
         const expected = initialCash - purchases + wages;
-        if (Math.abs(expected - account.balanceSUSD) > toleranceMoney(expected, account.balanceSUSD)) {
+        if (Math.abs(expected - account.balanceRUSD) > toleranceMoney(expected, account.balanceRUSD)) {
           throw new RangeError(`household cash does not reconcile for popBlock ${String(block.id)}`);
         }
         return {
           popBlockId: block.id,
           financialAccountId: account.id,
-          initialCashSUSD: initialCash,
-          marketPurchasesSUSD: purchases,
-          wagesReceivedSUSD: wages,
-          endingCashAfterSettlementSUSD: account.balanceSUSD,
+          initialCashRUSD: initialCash,
+          marketPurchasesRUSD: purchases,
+          wagesReceivedRUSD: wages,
+          endingCashAfterSettlementRUSD: account.balanceRUSD,
         };
       });
 
@@ -895,31 +895,31 @@ function settleMarketDaysInternal(
     }
 
     const totals: SettlementTotals = {
-      marketPurchasesSUSD: transactions.reduce((total, transaction) => total + transaction.totalSUSD, 0),
-      householdPurchasesSUSD: transactions
+      marketPurchasesRUSD: transactions.reduce((total, transaction) => total + transaction.totalRUSD, 0),
+      householdPurchasesRUSD: transactions
         .filter((transaction) => transaction.kind === "household-purchase")
-        .reduce((total, transaction) => total + transaction.totalSUSD, 0),
-      inputPurchasesSUSD: transactions
+        .reduce((total, transaction) => total + transaction.totalRUSD, 0),
+      inputPurchasesRUSD: transactions
         .filter((transaction) => transaction.kind === "input-purchase")
-        .reduce((total, transaction) => total + transaction.totalSUSD, 0),
-      wageObligationSUSD: wageSettlements.reduce((total, settlement) => total + settlement.obligationSUSD, 0),
-      wagesPaidSUSD: wageSettlements.reduce((total, settlement) => total + settlement.paidSUSD, 0),
-      unpaidWagesSUSD: wageSettlements.reduce((total, settlement) => total + settlement.unpaidSUSD, 0),
-      upkeepObligationSUSD: upkeepSettlements.reduce(
-        (total, settlement) => total + settlement.obligationSUSD,
+        .reduce((total, transaction) => total + transaction.totalRUSD, 0),
+      wageObligationRUSD: wageSettlements.reduce((total, settlement) => total + settlement.obligationRUSD, 0),
+      wagesPaidRUSD: wageSettlements.reduce((total, settlement) => total + settlement.paidRUSD, 0),
+      unpaidWagesRUSD: wageSettlements.reduce((total, settlement) => total + settlement.unpaidRUSD, 0),
+      upkeepObligationRUSD: upkeepSettlements.reduce(
+        (total, settlement) => total + settlement.obligationRUSD,
         0,
       ),
-      upkeepPaidSUSD: upkeepSettlements.reduce((total, settlement) => total + settlement.paidSUSD, 0),
-      unpaidUpkeepSUSD: upkeepSettlements.reduce(
-        (total, settlement) => total + settlement.unpaidSUSD,
+      upkeepPaidRUSD: upkeepSettlements.reduce((total, settlement) => total + settlement.paidRUSD, 0),
+      unpaidUpkeepRUSD: upkeepSettlements.reduce(
+        (total, settlement) => total + settlement.unpaidRUSD,
         0,
       ),
-      producerRevenueSUSD: producers.reduce((total, producer) => total + producer.revenueSUSD, 0),
-      producerInputCostsSUSD: producers.reduce((total, producer) => total + producer.inputCostsSUSD, 0),
-      producerWagesSUSD: producers.reduce((total, producer) => total + producer.wagesPaidSUSD, 0),
-      producerProfitSUSD: producers.reduce((total, producer) => total + producer.profitSUSD, 0),
-      initialCashSUSD: initialCash,
-      endingCashAfterSettlementSUSD: endingCash,
+      producerRevenueRUSD: producers.reduce((total, producer) => total + producer.revenueRUSD, 0),
+      producerInputCostsRUSD: producers.reduce((total, producer) => total + producer.inputCostsRUSD, 0),
+      producerWagesRUSD: producers.reduce((total, producer) => total + producer.wagesPaidRUSD, 0),
+      producerProfitRUSD: producers.reduce((total, producer) => total + producer.profitRUSD, 0),
+      initialCashRUSD: initialCash,
+      endingCashAfterSettlementRUSD: endingCash,
     };
 
     return {
@@ -943,7 +943,7 @@ function settleMarketDaysInternal(
     for (const account of world.finance.accounts) {
       const balance = openingBalances.get(account.id);
       if (balance === undefined) throw new RangeError(`settlement rollback lost account ${String(account.id)}`);
-      account.balanceSUSD = balance;
+      account.balanceRUSD = balance;
     }
     world.finance.postings = openingPostings;
     world.finance.nextPostingId = openingNextPostingId;

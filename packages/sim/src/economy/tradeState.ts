@@ -7,7 +7,7 @@
  * module re-exports these symbols for the public economy surface.
  */
 
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { World } from "../world.js";
 import {
   MAX_TRADE_BLOCKED_DIAGNOSTICS,
@@ -31,11 +31,11 @@ export function neutralTradePolicyState(goodCount: number): TradePolicyState {
     importQuotaUsedQuantity: new Array<number>(goodCount).fill(0),
     exportRestricted: new Array<boolean>(goodCount).fill(false),
     lastUpdateDay: null,
-    exportsValueMonthToDateSUSD: 0,
-    importsValueMonthToDateSUSD: 0,
-    dutyReceivedMonthToDateSUSD: 0,
-    dutyPaidMonthToDateSUSD: 0,
-    freightPaidMonthToDateSUSD: 0,
+    exportsValueMonthToDateRUSD: 0,
+    importsValueMonthToDateRUSD: 0,
+    dutyReceivedMonthToDateRUSD: 0,
+    dutyPaidMonthToDateRUSD: 0,
+    freightPaidMonthToDateRUSD: 0,
   };
 }
 
@@ -182,11 +182,11 @@ export function assertValidTradePolicyState(
     }
   }
   for (const field of [
-    "exportsValueMonthToDateSUSD",
-    "importsValueMonthToDateSUSD",
-    "dutyReceivedMonthToDateSUSD",
-    "dutyPaidMonthToDateSUSD",
-    "freightPaidMonthToDateSUSD",
+    "exportsValueMonthToDateRUSD",
+    "importsValueMonthToDateRUSD",
+    "dutyReceivedMonthToDateRUSD",
+    "dutyPaidMonthToDateRUSD",
+    "freightPaidMonthToDateRUSD",
   ] as const) {
     finiteNonNegative(value[field], `${path}.${field}`);
   }
@@ -240,9 +240,9 @@ export function createTradeState(routes: readonly TradeRouteInitialDef[] | undef
       marketAId: lower,
       marketBId: upper,
       distanceUnits: finitePositive(input.distanceUnits, `${path}.distanceUnits`),
-      baseCapacitySUSDPerDay: finitePositive(
-        input.baseCapacitySUSDPerDay,
-        `${path}.baseCapacitySUSDPerDay`,
+      baseCapacityRUSDPerDay: finitePositive(
+        input.baseCapacityRUSDPerDay,
+        `${path}.baseCapacityRUSDPerDay`,
       ),
     };
   });
@@ -283,7 +283,7 @@ export function assertValidTradeState(world: World, path = "world.trade"): void 
   const marketIds = new Set(world.markets.map((market) => market.id));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const countryIds = new Set(world.countries.map((country) => country.id));
-  const goodCount = world.markets[0]?.priceSUSD.length ?? 0;
+  const goodCount = world.markets[0]?.priceRUSD.length ?? 0;
 
   if (!Array.isArray(trade.routes)) throw new TypeError(`${path}.routes must be an array`);
   if (trade.routes.length > MAX_TRADE_ROUTES) {
@@ -316,8 +316,8 @@ export function assertValidTradeState(world: World, path = "world.trade"): void 
     ) {
       throw new RangeError(`${entryPath}.distanceUnits must be a positive bounded number`);
     }
-    if (!Number.isFinite(route.baseCapacitySUSDPerDay) || !(route.baseCapacitySUSDPerDay > 0)) {
-      throw new RangeError(`${entryPath}.baseCapacitySUSDPerDay must be positive`);
+    if (!Number.isFinite(route.baseCapacityRUSDPerDay) || !(route.baseCapacityRUSDPerDay > 0)) {
+      throw new RangeError(`${entryPath}.baseCapacityRUSDPerDay must be positive`);
     }
   }
 
@@ -380,23 +380,23 @@ export function assertValidTradeState(world: World, path = "world.trade"): void 
         `${entryPath}.arrivalDay ${String(shipment.arrivalDay)} is before the world day ${String(world.dayIndex)}; an arrived shipment must have been delivered and removed`,
       );
     }
-    for (const field of ["cargoValueSUSD", "freightCostSUSD", "dutySUSD"] as const) {
+    for (const field of ["cargoValueRUSD", "freightCostRUSD", "dutyRUSD"] as const) {
       if (!Number.isFinite(shipment[field]) || shipment[field] < 0) {
         throw new RangeError(`${entryPath}.${field} must be finite and non-negative`);
       }
     }
-    if (!(shipment.cargoValueSUSD > 0)) {
-      throw new RangeError(`${entryPath}.cargoValueSUSD must be positive`);
+    if (!(shipment.cargoValueRUSD > 0)) {
+      throw new RangeError(`${entryPath}.cargoValueRUSD must be positive`);
     }
     if (!Number.isFinite(shipment.dutyRate) || shipment.dutyRate < 0 || shipment.dutyRate > 1) {
       throw new RangeError(`${entryPath}.dutyRate must be a rate in 0..1`);
     }
-    const expectedDuty = shipment.cargoValueSUSD * shipment.dutyRate;
+    const expectedDuty = shipment.cargoValueRUSD * shipment.dutyRate;
     if (
-      Math.abs(expectedDuty - shipment.dutySUSD) >
-      MONEY_TOLERANCE_SUSD * Math.max(1, expectedDuty, shipment.dutySUSD)
+      Math.abs(expectedDuty - shipment.dutyRUSD) >
+      MONEY_TOLERANCE_RUSD * Math.max(1, expectedDuty, shipment.dutyRUSD)
     ) {
-      throw new RangeError(`${entryPath}.dutySUSD does not reconcile with cargo value × rate`);
+      throw new RangeError(`${entryPath}.dutyRUSD does not reconcile with cargo value × rate`);
     }
   }
   if (!Number.isInteger(trade.nextShipmentId) || trade.nextShipmentId <= maxShipmentId) {
@@ -424,7 +424,7 @@ export function assertValidTradeState(world: World, path = "world.trade"): void 
         throw new RangeError(`${path}.lastDay.${field} must be a non-negative integer`);
       }
     }
-    for (const field of ["freightPaidSUSD", "dutyPaidSUSD", "ownerFundedSUSD"] as const) {
+    for (const field of ["freightPaidRUSD", "dutyPaidRUSD", "ownerFundedRUSD"] as const) {
       if (!Number.isFinite(lastDay[field]) || lastDay[field] < 0) {
         throw new RangeError(`${path}.lastDay.${field} must be finite and non-negative`);
       }

@@ -46,7 +46,7 @@ describe("E5 worker protocol and snapshot", () => {
     const snapshot = latest();
     const country = snapshot.countries.find((entry) => entry.id === M5_COUNTRY_A);
     if (country === undefined) throw new Error("snapshot has no country A");
-    expect(country.labor.trainingBudgetSUSDPerYear).toBeGreaterThan(0);
+    expect(country.labor.trainingBudgetRUSDPerYear).toBeGreaterThan(0);
     expect(country.labor.trainingInstructors).toBeGreaterThan(0);
     expect(country.labor.eligibleWorkingAge).toBeGreaterThan(0);
     expect(country.labor.trainingParticipation).toBeGreaterThan(0);
@@ -58,13 +58,13 @@ describe("E5 worker protocol and snapshot", () => {
     expect(Object.isFrozen(country.labor)).toBe(true);
 
     const training = previewTrainingPolicy(snapshot, country, {
-      trainingBudgetSUSDPerYear: 500_000,
-      trainingStipendPerTraineeSUSDPerYear: 2,
+      trainingBudgetRUSDPerYear: 500_000,
+      trainingStipendPerTraineeRUSDPerYear: 2,
       trainingStaffShare: 0.3,
     });
     expect(training.valid).toBe(true);
     expect(training.instructors).toBeGreaterThan(0);
-    expect(training.annualCostSUSD).toBeGreaterThan(0);
+    expect(training.annualCostRUSD).toBeGreaterThan(0);
     const health = previewHealthPolicy(snapshot, country, 0.3);
     expect(health.valid).toBe(true);
     expect(health.healthStaff).toBeGreaterThan(0);

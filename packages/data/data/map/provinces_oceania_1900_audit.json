@@ -1,0 +1,5324 @@
+{
+  "generatedBy": "scripts/m12e/build-oceania-provinces.mjs",
+  "referenceDate": "1900-01-01",
+  "toleranceDegrees": 0.02,
+  "gapToleranceDegrees": 0.004,
+  "provinceCount": 151,
+  "plannedProvinceCount": 126,
+  "gapProvinceCount": 25,
+  "gapProvinces": [
+    {
+      "key": "oc-fra-clipperton-island",
+      "id": 400127,
+      "mapTag": "FRA",
+      "area": 0.0048
+    },
+    {
+      "key": "oc-gap-mar-residual",
+      "id": 400128,
+      "mapTag": "MAR",
+      "area": 13.462595
+    },
+    {
+      "key": "oc-gap-fea-residual",
+      "id": 400129,
+      "mapTag": "FEA",
+      "area": 3.475075
+    },
+    {
+      "key": "oc-gap-ott-residual",
+      "id": 400130,
+      "mapTag": "OTT",
+      "area": 3.321468
+    },
+    {
+      "key": "oc-gap-grc-residual",
+      "id": 400131,
+      "mapTag": "GRC",
+      "area": 1.494828
+    },
+    {
+      "key": "oc-gap-aut-residual",
+      "id": 400132,
+      "mapTag": "AUT",
+      "area": 0.779928
+    },
+    {
+      "key": "oc-gap-gbr-residual",
+      "id": 400133,
+      "mapTag": "GBR",
+      "area": 1.091153
+    },
+    {
+      "key": "oc-gap-rus-residual",
+      "id": 400134,
+      "mapTag": "RUS",
+      "area": 36.384138
+    },
+    {
+      "key": "oc-gap-rom-residual",
+      "id": 400135,
+      "mapTag": "ROM",
+      "area": 1.639935
+    },
+    {
+      "key": "oc-gap-deu-residual",
+      "id": 400136,
+      "mapTag": "DEU",
+      "area": 1.513206
+    },
+    {
+      "key": "oc-gap-alg-residual",
+      "id": 400137,
+      "mapTag": "ALG",
+      "area": 1.272372
+    },
+    {
+      "key": "oc-gap-chn-residual",
+      "id": 400138,
+      "mapTag": "CHN",
+      "area": 20.949502
+    },
+    {
+      "key": "oc-gap-bea-residual",
+      "id": 400139,
+      "mapTag": "BEA",
+      "area": 0.729785
+    },
+    {
+      "key": "oc-gap-its-residual",
+      "id": 400140,
+      "mapTag": "ITS",
+      "area": 1.658723
+    },
+    {
+      "key": "oc-gap-pai-residual",
+      "id": 400141,
+      "mapTag": "PAI",
+      "area": 0.427967
+    },
+    {
+      "key": "oc-gap-arg-residual",
+      "id": 400142,
+      "mapTag": "ARG",
+      "area": 1.168553
+    },
+    {
+      "key": "oc-gap-can-residual",
+      "id": 400143,
+      "mapTag": "CAN",
+      "area": 17.15012
+    },
+    {
+      "key": "oc-gap-phl-residual",
+      "id": 400144,
+      "mapTag": "PHL",
+      "area": 0.7778
+    },
+    {
+      "key": "oc-gap-gng-residual",
+      "id": 400145,
+      "mapTag": "GNG",
+      "area": 0.402405
+    },
+    {
+      "key": "oc-gap-bpo-residual",
+      "id": 400146,
+      "mapTag": "BPO",
+      "area": 0.215397
+    },
+    {
+      "key": "oc-gap-fpo-residual",
+      "id": 400147,
+      "mapTag": "FPO",
+      "area": 0.107079
+    },
+    {
+      "key": "oc-gap-aus-residual",
+      "id": 400148,
+      "mapTag": "AUS",
+      "area": 2.11099
+    },
+    {
+      "key": "oc-gap-nzl-residual",
+      "id": 400149,
+      "mapTag": "NZL",
+      "area": 0.627055
+    },
+    {
+      "key": "oc-gap-fji-residual",
+      "id": 400150,
+      "mapTag": "FJI",
+      "area": 0.074525
+    },
+    {
+      "key": "oc-gap-gpn-residual",
+      "id": 400153,
+      "mapTag": "GPN",
+      "area": 0.021802
+    }
+  ],
+  "skippedGapProvinces": [
+    {
+      "key": "oc-gap-ton-residual",
+      "reason": "below-threshold",
+      "area": 0.0025
+    },
+    {
+      "key": "oc-gap-gsa-residual",
+      "reason": "below-threshold",
+      "area": 0.0042
+    },
+    {
+      "key": "oc-gap-gum-residual",
+      "reason": "below-threshold",
+      "area": 0.0007
+    },
+    {
+      "key": "oc-gap-asm-residual",
+      "reason": "below-threshold",
+      "area": 0.0019
+    }
+  ],
+  "autoLandGapProvinceCount": 0,
+  "autoLandGapProvinces": [],
+  "skippedLandGaps": [
+    {
+      "ring": 0,
+      "reason": "assigned"
+    },
+    {
+      "ring": 1,
+      "reason": "water-hole"
+    },
+    {
+      "ring": 2,
+      "reason": "assigned"
+    },
+    {
+      "ring": 3,
+      "reason": "assigned"
+    },
+    {
+      "ring": 4,
+      "reason": "assigned"
+    },
+    {
+      "ring": 5,
+      "reason": "assigned"
+    },
+    {
+      "ring": 6,
+      "reason": "assigned"
+    },
+    {
+      "ring": 7,
+      "reason": "assigned"
+    },
+    {
+      "ring": 8,
+      "reason": "assigned"
+    },
+    {
+      "ring": 9,
+      "reason": "assigned"
+    },
+    {
+      "ring": 10,
+      "reason": "assigned"
+    },
+    {
+      "ring": 11,
+      "reason": "assigned"
+    },
+    {
+      "ring": 12,
+      "reason": "assigned"
+    },
+    {
+      "ring": 13,
+      "reason": "assigned"
+    },
+    {
+      "ring": 14,
+      "reason": "assigned"
+    },
+    {
+      "ring": 15,
+      "reason": "assigned"
+    },
+    {
+      "ring": 16,
+      "reason": "assigned"
+    },
+    {
+      "ring": 17,
+      "reason": "assigned"
+    },
+    {
+      "ring": 18,
+      "reason": "assigned"
+    },
+    {
+      "ring": 19,
+      "reason": "assigned"
+    },
+    {
+      "ring": 20,
+      "reason": "assigned"
+    },
+    {
+      "ring": 21,
+      "reason": "assigned"
+    },
+    {
+      "ring": 22,
+      "reason": "assigned"
+    },
+    {
+      "ring": 23,
+      "reason": "assigned"
+    },
+    {
+      "ring": 24,
+      "reason": "assigned"
+    },
+    {
+      "ring": 25,
+      "reason": "assigned"
+    },
+    {
+      "ring": 26,
+      "reason": "assigned"
+    },
+    {
+      "ring": 27,
+      "reason": "assigned"
+    },
+    {
+      "ring": 28,
+      "reason": "assigned"
+    },
+    {
+      "ring": 29,
+      "reason": "assigned"
+    },
+    {
+      "ring": 30,
+      "reason": "assigned"
+    },
+    {
+      "ring": 31,
+      "reason": "assigned"
+    },
+    {
+      "ring": 32,
+      "reason": "assigned"
+    },
+    {
+      "ring": 33,
+      "reason": "assigned"
+    },
+    {
+      "ring": 34,
+      "reason": "assigned"
+    },
+    {
+      "ring": 35,
+      "reason": "assigned"
+    },
+    {
+      "ring": 36,
+      "reason": "assigned"
+    },
+    {
+      "ring": 37,
+      "reason": "assigned"
+    },
+    {
+      "ring": 38,
+      "reason": "assigned"
+    },
+    {
+      "ring": 39,
+      "reason": "assigned"
+    },
+    {
+      "ring": 40,
+      "reason": "assigned"
+    },
+    {
+      "ring": 41,
+      "reason": "assigned"
+    },
+    {
+      "ring": 42,
+      "reason": "assigned"
+    },
+    {
+      "ring": 43,
+      "reason": "assigned"
+    },
+    {
+      "ring": 44,
+      "reason": "assigned"
+    },
+    {
+      "ring": 45,
+      "reason": "assigned"
+    },
+    {
+      "ring": 46,
+      "reason": "assigned"
+    },
+    {
+      "ring": 47,
+      "reason": "assigned"
+    },
+    {
+      "ring": 48,
+      "reason": "assigned"
+    },
+    {
+      "ring": 49,
+      "reason": "assigned"
+    },
+    {
+      "ring": 50,
+      "reason": "assigned"
+    },
+    {
+      "ring": 51,
+      "reason": "assigned"
+    },
+    {
+      "ring": 52,
+      "reason": "assigned"
+    },
+    {
+      "ring": 53,
+      "reason": "assigned"
+    },
+    {
+      "ring": 54,
+      "reason": "assigned"
+    },
+    {
+      "ring": 55,
+      "reason": "assigned"
+    },
+    {
+      "ring": 56,
+      "reason": "assigned"
+    },
+    {
+      "ring": 57,
+      "reason": "assigned"
+    },
+    {
+      "ring": 58,
+      "reason": "assigned"
+    },
+    {
+      "ring": 59,
+      "reason": "assigned"
+    },
+    {
+      "ring": 60,
+      "reason": "assigned"
+    },
+    {
+      "ring": 61,
+      "reason": "assigned"
+    },
+    {
+      "ring": 62,
+      "reason": "assigned"
+    },
+    {
+      "ring": 63,
+      "reason": "assigned"
+    },
+    {
+      "ring": 64,
+      "reason": "assigned"
+    },
+    {
+      "ring": 65,
+      "reason": "assigned"
+    },
+    {
+      "ring": 66,
+      "reason": "assigned"
+    },
+    {
+      "ring": 67,
+      "reason": "assigned"
+    },
+    {
+      "ring": 68,
+      "reason": "assigned"
+    },
+    {
+      "ring": 69,
+      "reason": "assigned"
+    },
+    {
+      "ring": 70,
+      "reason": "assigned"
+    },
+    {
+      "ring": 71,
+      "reason": "assigned"
+    },
+    {
+      "ring": 72,
+      "reason": "assigned"
+    },
+    {
+      "ring": 73,
+      "reason": "assigned"
+    },
+    {
+      "ring": 74,
+      "reason": "assigned"
+    },
+    {
+      "ring": 75,
+      "reason": "assigned"
+    },
+    {
+      "ring": 76,
+      "reason": "assigned"
+    },
+    {
+      "ring": 77,
+      "reason": "assigned"
+    },
+    {
+      "ring": 78,
+      "reason": "assigned"
+    },
+    {
+      "ring": 79,
+      "reason": "assigned"
+    },
+    {
+      "ring": 80,
+      "reason": "assigned"
+    },
+    {
+      "ring": 81,
+      "reason": "assigned"
+    },
+    {
+      "ring": 82,
+      "reason": "assigned"
+    },
+    {
+      "ring": 83,
+      "reason": "assigned"
+    },
+    {
+      "ring": 84,
+      "reason": "assigned"
+    },
+    {
+      "ring": 85,
+      "reason": "assigned"
+    },
+    {
+      "ring": 86,
+      "reason": "assigned"
+    },
+    {
+      "ring": 87,
+      "reason": "assigned"
+    },
+    {
+      "ring": 88,
+      "reason": "assigned"
+    },
+    {
+      "ring": 89,
+      "reason": "assigned"
+    },
+    {
+      "ring": 90,
+      "reason": "assigned"
+    },
+    {
+      "ring": 91,
+      "reason": "assigned"
+    },
+    {
+      "ring": 92,
+      "reason": "assigned"
+    },
+    {
+      "ring": 93,
+      "reason": "assigned"
+    },
+    {
+      "ring": 94,
+      "reason": "assigned"
+    },
+    {
+      "ring": 95,
+      "reason": "assigned"
+    },
+    {
+      "ring": 96,
+      "reason": "assigned"
+    },
+    {
+      "ring": 97,
+      "reason": "assigned"
+    },
+    {
+      "ring": 98,
+      "reason": "assigned"
+    },
+    {
+      "ring": 99,
+      "reason": "assigned"
+    },
+    {
+      "ring": 100,
+      "reason": "assigned"
+    },
+    {
+      "ring": 101,
+      "reason": "assigned"
+    },
+    {
+      "ring": 102,
+      "reason": "assigned"
+    },
+    {
+      "ring": 103,
+      "reason": "assigned"
+    },
+    {
+      "ring": 104,
+      "reason": "assigned"
+    },
+    {
+      "ring": 105,
+      "reason": "assigned"
+    },
+    {
+      "ring": 106,
+      "reason": "assigned"
+    },
+    {
+      "ring": 107,
+      "reason": "assigned"
+    },
+    {
+      "ring": 108,
+      "reason": "assigned"
+    },
+    {
+      "ring": 109,
+      "reason": "assigned"
+    },
+    {
+      "ring": 110,
+      "reason": "assigned"
+    },
+    {
+      "ring": 111,
+      "reason": "assigned"
+    },
+    {
+      "ring": 112,
+      "reason": "assigned"
+    },
+    {
+      "ring": 113,
+      "reason": "assigned"
+    },
+    {
+      "ring": 114,
+      "reason": "assigned"
+    },
+    {
+      "ring": 115,
+      "reason": "assigned"
+    },
+    {
+      "ring": 116,
+      "reason": "assigned"
+    },
+    {
+      "ring": 117,
+      "reason": "assigned"
+    },
+    {
+      "ring": 118,
+      "reason": "assigned"
+    },
+    {
+      "ring": 119,
+      "reason": "assigned"
+    },
+    {
+      "ring": 120,
+      "reason": "assigned"
+    },
+    {
+      "ring": 121,
+      "reason": "assigned"
+    },
+    {
+      "ring": 122,
+      "reason": "assigned"
+    },
+    {
+      "ring": 123,
+      "reason": "assigned"
+    },
+    {
+      "ring": 124,
+      "reason": "assigned"
+    },
+    {
+      "ring": 125,
+      "reason": "assigned"
+    },
+    {
+      "ring": 126,
+      "reason": "assigned"
+    },
+    {
+      "ring": 127,
+      "reason": "assigned"
+    },
+    {
+      "ring": 128,
+      "reason": "assigned"
+    },
+    {
+      "ring": 129,
+      "reason": "assigned"
+    },
+    {
+      "ring": 130,
+      "reason": "assigned"
+    },
+    {
+      "ring": 131,
+      "reason": "assigned"
+    },
+    {
+      "ring": 132,
+      "reason": "assigned"
+    },
+    {
+      "ring": 133,
+      "reason": "assigned"
+    },
+    {
+      "ring": 134,
+      "reason": "assigned"
+    },
+    {
+      "ring": 135,
+      "reason": "assigned"
+    },
+    {
+      "ring": 136,
+      "reason": "assigned"
+    },
+    {
+      "ring": 137,
+      "reason": "assigned"
+    },
+    {
+      "ring": 138,
+      "reason": "assigned"
+    },
+    {
+      "ring": 139,
+      "reason": "assigned"
+    },
+    {
+      "ring": 140,
+      "reason": "assigned"
+    },
+    {
+      "ring": 141,
+      "reason": "assigned"
+    },
+    {
+      "ring": 142,
+      "reason": "assigned"
+    },
+    {
+      "ring": 143,
+      "reason": "assigned"
+    },
+    {
+      "ring": 144,
+      "reason": "assigned"
+    },
+    {
+      "ring": 145,
+      "reason": "assigned"
+    },
+    {
+      "ring": 146,
+      "reason": "assigned"
+    },
+    {
+      "ring": 147,
+      "reason": "assigned"
+    },
+    {
+      "ring": 148,
+      "reason": "assigned"
+    },
+    {
+      "ring": 149,
+      "reason": "assigned"
+    },
+    {
+      "ring": 150,
+      "reason": "assigned"
+    },
+    {
+      "ring": 151,
+      "reason": "assigned"
+    },
+    {
+      "ring": 152,
+      "reason": "assigned"
+    },
+    {
+      "ring": 153,
+      "reason": "assigned"
+    },
+    {
+      "ring": 154,
+      "reason": "assigned"
+    },
+    {
+      "ring": 155,
+      "reason": "assigned"
+    },
+    {
+      "ring": 156,
+      "reason": "assigned"
+    },
+    {
+      "ring": 157,
+      "reason": "assigned"
+    },
+    {
+      "ring": 158,
+      "reason": "assigned"
+    },
+    {
+      "ring": 159,
+      "reason": "assigned"
+    },
+    {
+      "ring": 160,
+      "reason": "assigned"
+    },
+    {
+      "ring": 161,
+      "reason": "assigned"
+    },
+    {
+      "ring": 162,
+      "reason": "assigned"
+    },
+    {
+      "ring": 163,
+      "reason": "assigned"
+    },
+    {
+      "ring": 164,
+      "reason": "assigned"
+    },
+    {
+      "ring": 165,
+      "reason": "assigned"
+    },
+    {
+      "ring": 166,
+      "reason": "assigned"
+    },
+    {
+      "ring": 167,
+      "reason": "assigned"
+    },
+    {
+      "ring": 168,
+      "reason": "assigned"
+    },
+    {
+      "ring": 169,
+      "reason": "assigned"
+    },
+    {
+      "ring": 170,
+      "reason": "assigned"
+    },
+    {
+      "ring": 171,
+      "reason": "assigned"
+    },
+    {
+      "ring": 172,
+      "reason": "assigned"
+    },
+    {
+      "ring": 173,
+      "reason": "assigned"
+    },
+    {
+      "ring": 174,
+      "reason": "assigned"
+    },
+    {
+      "ring": 175,
+      "reason": "assigned"
+    },
+    {
+      "ring": 176,
+      "reason": "assigned"
+    },
+    {
+      "ring": 177,
+      "reason": "assigned"
+    },
+    {
+      "ring": 178,
+      "reason": "assigned"
+    },
+    {
+      "ring": 179,
+      "reason": "assigned"
+    },
+    {
+      "ring": 180,
+      "reason": "assigned"
+    },
+    {
+      "ring": 181,
+      "reason": "assigned"
+    },
+    {
+      "ring": 182,
+      "reason": "assigned"
+    },
+    {
+      "ring": 183,
+      "reason": "assigned"
+    },
+    {
+      "ring": 184,
+      "reason": "assigned"
+    },
+    {
+      "ring": 185,
+      "reason": "assigned"
+    },
+    {
+      "ring": 186,
+      "reason": "assigned"
+    },
+    {
+      "ring": 187,
+      "reason": "assigned"
+    },
+    {
+      "ring": 188,
+      "reason": "assigned"
+    },
+    {
+      "ring": 189,
+      "reason": "assigned"
+    },
+    {
+      "ring": 190,
+      "reason": "assigned"
+    },
+    {
+      "ring": 191,
+      "reason": "assigned"
+    },
+    {
+      "ring": 192,
+      "reason": "assigned"
+    },
+    {
+      "ring": 193,
+      "reason": "assigned"
+    },
+    {
+      "ring": 194,
+      "reason": "assigned"
+    },
+    {
+      "ring": 195,
+      "reason": "assigned"
+    },
+    {
+      "ring": 196,
+      "reason": "assigned"
+    },
+    {
+      "ring": 197,
+      "reason": "assigned"
+    },
+    {
+      "ring": 198,
+      "reason": "assigned"
+    },
+    {
+      "ring": 199,
+      "reason": "assigned"
+    },
+    {
+      "ring": 200,
+      "reason": "assigned"
+    },
+    {
+      "ring": 201,
+      "reason": "assigned"
+    },
+    {
+      "ring": 202,
+      "reason": "assigned"
+    },
+    {
+      "ring": 203,
+      "reason": "assigned"
+    },
+    {
+      "ring": 204,
+      "reason": "assigned"
+    },
+    {
+      "ring": 205,
+      "reason": "assigned"
+    },
+    {
+      "ring": 206,
+      "reason": "assigned"
+    },
+    {
+      "ring": 207,
+      "reason": "assigned"
+    },
+    {
+      "ring": 208,
+      "reason": "assigned"
+    },
+    {
+      "ring": 209,
+      "reason": "assigned"
+    },
+    {
+      "ring": 210,
+      "reason": "assigned"
+    },
+    {
+      "ring": 211,
+      "reason": "assigned"
+    },
+    {
+      "ring": 212,
+      "reason": "assigned"
+    },
+    {
+      "ring": 213,
+      "reason": "assigned"
+    },
+    {
+      "ring": 214,
+      "reason": "assigned"
+    },
+    {
+      "ring": 215,
+      "reason": "assigned"
+    },
+    {
+      "ring": 216,
+      "reason": "assigned"
+    },
+    {
+      "ring": 217,
+      "reason": "assigned"
+    },
+    {
+      "ring": 218,
+      "reason": "assigned"
+    },
+    {
+      "ring": 219,
+      "reason": "assigned"
+    },
+    {
+      "ring": 220,
+      "reason": "assigned"
+    },
+    {
+      "ring": 221,
+      "reason": "assigned"
+    },
+    {
+      "ring": 222,
+      "reason": "assigned"
+    },
+    {
+      "ring": 223,
+      "reason": "assigned"
+    },
+    {
+      "ring": 224,
+      "reason": "assigned"
+    },
+    {
+      "ring": 225,
+      "reason": "assigned"
+    },
+    {
+      "ring": 226,
+      "reason": "assigned"
+    },
+    {
+      "ring": 227,
+      "reason": "assigned"
+    },
+    {
+      "ring": 228,
+      "reason": "assigned"
+    },
+    {
+      "ring": 229,
+      "reason": "assigned"
+    },
+    {
+      "ring": 230,
+      "reason": "assigned"
+    },
+    {
+      "ring": 231,
+      "reason": "assigned"
+    },
+    {
+      "ring": 232,
+      "reason": "assigned"
+    },
+    {
+      "ring": 233,
+      "reason": "assigned"
+    },
+    {
+      "ring": 234,
+      "reason": "assigned"
+    },
+    {
+      "ring": 235,
+      "reason": "assigned"
+    },
+    {
+      "ring": 236,
+      "reason": "assigned"
+    },
+    {
+      "ring": 237,
+      "reason": "assigned"
+    },
+    {
+      "ring": 238,
+      "reason": "assigned"
+    },
+    {
+      "ring": 239,
+      "reason": "assigned"
+    },
+    {
+      "ring": 240,
+      "reason": "assigned"
+    },
+    {
+      "ring": 241,
+      "reason": "assigned"
+    },
+    {
+      "ring": 242,
+      "reason": "assigned"
+    },
+    {
+      "ring": 243,
+      "reason": "assigned"
+    },
+    {
+      "ring": 244,
+      "reason": "assigned"
+    },
+    {
+      "ring": 245,
+      "reason": "assigned"
+    },
+    {
+      "ring": 246,
+      "reason": "assigned"
+    },
+    {
+      "ring": 247,
+      "reason": "assigned"
+    },
+    {
+      "ring": 248,
+      "reason": "assigned"
+    },
+    {
+      "ring": 249,
+      "reason": "assigned"
+    },
+    {
+      "ring": 250,
+      "reason": "assigned"
+    },
+    {
+      "ring": 251,
+      "reason": "assigned"
+    },
+    {
+      "ring": 252,
+      "reason": "assigned"
+    },
+    {
+      "ring": 253,
+      "reason": "assigned"
+    },
+    {
+      "ring": 254,
+      "reason": "assigned"
+    },
+    {
+      "ring": 255,
+      "reason": "assigned"
+    },
+    {
+      "ring": 256,
+      "reason": "assigned"
+    },
+    {
+      "ring": 257,
+      "reason": "assigned"
+    },
+    {
+      "ring": 258,
+      "reason": "assigned"
+    },
+    {
+      "ring": 259,
+      "reason": "assigned"
+    },
+    {
+      "ring": 260,
+      "reason": "assigned"
+    },
+    {
+      "ring": 261,
+      "reason": "assigned"
+    },
+    {
+      "ring": 262,
+      "reason": "assigned"
+    },
+    {
+      "ring": 263,
+      "reason": "assigned"
+    },
+    {
+      "ring": 264,
+      "reason": "assigned"
+    },
+    {
+      "ring": 265,
+      "reason": "assigned"
+    },
+    {
+      "ring": 266,
+      "reason": "assigned"
+    },
+    {
+      "ring": 267,
+      "reason": "assigned"
+    },
+    {
+      "ring": 268,
+      "reason": "assigned"
+    },
+    {
+      "ring": 269,
+      "reason": "assigned"
+    },
+    {
+      "ring": 270,
+      "reason": "assigned"
+    },
+    {
+      "ring": 271,
+      "reason": "assigned"
+    },
+    {
+      "ring": 272,
+      "reason": "assigned"
+    },
+    {
+      "ring": 273,
+      "reason": "assigned"
+    },
+    {
+      "ring": 274,
+      "reason": "assigned"
+    },
+    {
+      "ring": 275,
+      "reason": "assigned"
+    },
+    {
+      "ring": 276,
+      "reason": "assigned"
+    },
+    {
+      "ring": 277,
+      "reason": "assigned"
+    },
+    {
+      "ring": 278,
+      "reason": "assigned"
+    },
+    {
+      "ring": 279,
+      "reason": "assigned"
+    },
+    {
+      "ring": 280,
+      "reason": "assigned"
+    },
+    {
+      "ring": 281,
+      "reason": "assigned"
+    },
+    {
+      "ring": 282,
+      "reason": "assigned"
+    },
+    {
+      "ring": 283,
+      "reason": "assigned"
+    },
+    {
+      "ring": 284,
+      "reason": "assigned"
+    },
+    {
+      "ring": 285,
+      "reason": "assigned"
+    },
+    {
+      "ring": 286,
+      "reason": "assigned"
+    },
+    {
+      "ring": 287,
+      "reason": "assigned"
+    },
+    {
+      "ring": 288,
+      "reason": "assigned"
+    },
+    {
+      "ring": 289,
+      "reason": "assigned"
+    },
+    {
+      "ring": 290,
+      "reason": "assigned"
+    },
+    {
+      "ring": 291,
+      "reason": "assigned"
+    },
+    {
+      "ring": 292,
+      "reason": "assigned"
+    },
+    {
+      "ring": 293,
+      "reason": "assigned"
+    },
+    {
+      "ring": 294,
+      "reason": "assigned"
+    },
+    {
+      "ring": 295,
+      "reason": "assigned"
+    },
+    {
+      "ring": 296,
+      "reason": "assigned"
+    },
+    {
+      "ring": 297,
+      "reason": "assigned"
+    },
+    {
+      "ring": 298,
+      "reason": "assigned"
+    },
+    {
+      "ring": 299,
+      "reason": "assigned"
+    },
+    {
+      "ring": 300,
+      "reason": "assigned"
+    },
+    {
+      "ring": 301,
+      "reason": "assigned"
+    },
+    {
+      "ring": 302,
+      "reason": "assigned"
+    },
+    {
+      "ring": 303,
+      "reason": "assigned"
+    },
+    {
+      "ring": 304,
+      "reason": "assigned"
+    },
+    {
+      "ring": 305,
+      "reason": "assigned"
+    },
+    {
+      "ring": 306,
+      "reason": "assigned"
+    },
+    {
+      "ring": 307,
+      "reason": "assigned"
+    },
+    {
+      "ring": 308,
+      "reason": "assigned"
+    },
+    {
+      "ring": 309,
+      "reason": "assigned"
+    },
+    {
+      "ring": 310,
+      "reason": "assigned"
+    },
+    {
+      "ring": 311,
+      "reason": "assigned"
+    },
+    {
+      "ring": 312,
+      "reason": "assigned"
+    },
+    {
+      "ring": 313,
+      "reason": "assigned"
+    },
+    {
+      "ring": 314,
+      "reason": "assigned"
+    },
+    {
+      "ring": 315,
+      "reason": "assigned"
+    },
+    {
+      "ring": 316,
+      "reason": "assigned"
+    },
+    {
+      "ring": 317,
+      "reason": "assigned"
+    },
+    {
+      "ring": 318,
+      "reason": "assigned"
+    },
+    {
+      "ring": 319,
+      "reason": "assigned"
+    },
+    {
+      "ring": 320,
+      "reason": "assigned"
+    },
+    {
+      "ring": 321,
+      "reason": "assigned"
+    },
+    {
+      "ring": 322,
+      "reason": "assigned"
+    },
+    {
+      "ring": 323,
+      "reason": "assigned"
+    },
+    {
+      "ring": 324,
+      "reason": "assigned"
+    },
+    {
+      "ring": 325,
+      "reason": "assigned"
+    },
+    {
+      "ring": 326,
+      "reason": "assigned"
+    },
+    {
+      "ring": 327,
+      "reason": "assigned"
+    },
+    {
+      "ring": 328,
+      "reason": "assigned"
+    },
+    {
+      "ring": 329,
+      "reason": "assigned"
+    },
+    {
+      "ring": 330,
+      "reason": "assigned"
+    },
+    {
+      "ring": 331,
+      "reason": "assigned"
+    },
+    {
+      "ring": 332,
+      "reason": "assigned"
+    },
+    {
+      "ring": 333,
+      "reason": "assigned"
+    },
+    {
+      "ring": 334,
+      "reason": "assigned"
+    },
+    {
+      "ring": 335,
+      "reason": "assigned"
+    },
+    {
+      "ring": 336,
+      "reason": "assigned"
+    },
+    {
+      "ring": 337,
+      "reason": "assigned"
+    },
+    {
+      "ring": 338,
+      "reason": "assigned"
+    },
+    {
+      "ring": 339,
+      "reason": "assigned"
+    },
+    {
+      "ring": 340,
+      "reason": "assigned"
+    },
+    {
+      "ring": 341,
+      "reason": "assigned"
+    },
+    {
+      "ring": 342,
+      "reason": "assigned"
+    },
+    {
+      "ring": 343,
+      "reason": "assigned"
+    },
+    {
+      "ring": 344,
+      "reason": "assigned"
+    },
+    {
+      "ring": 345,
+      "reason": "assigned"
+    },
+    {
+      "ring": 346,
+      "reason": "assigned"
+    },
+    {
+      "ring": 347,
+      "reason": "assigned"
+    },
+    {
+      "ring": 348,
+      "reason": "assigned"
+    },
+    {
+      "ring": 349,
+      "reason": "assigned"
+    },
+    {
+      "ring": 350,
+      "reason": "assigned"
+    },
+    {
+      "ring": 351,
+      "reason": "assigned"
+    },
+    {
+      "ring": 352,
+      "reason": "assigned"
+    },
+    {
+      "ring": 353,
+      "reason": "assigned"
+    },
+    {
+      "ring": 354,
+      "reason": "assigned"
+    },
+    {
+      "ring": 355,
+      "reason": "assigned"
+    },
+    {
+      "ring": 356,
+      "reason": "assigned"
+    },
+    {
+      "ring": 357,
+      "reason": "assigned"
+    },
+    {
+      "ring": 358,
+      "reason": "assigned"
+    },
+    {
+      "ring": 359,
+      "reason": "assigned"
+    },
+    {
+      "ring": 360,
+      "reason": "assigned"
+    },
+    {
+      "ring": 361,
+      "reason": "assigned"
+    },
+    {
+      "ring": 362,
+      "reason": "assigned"
+    },
+    {
+      "ring": 363,
+      "reason": "assigned"
+    },
+    {
+      "ring": 364,
+      "reason": "assigned"
+    },
+    {
+      "ring": 365,
+      "reason": "assigned"
+    },
+    {
+      "ring": 366,
+      "reason": "assigned"
+    },
+    {
+      "ring": 367,
+      "reason": "assigned"
+    },
+    {
+      "ring": 368,
+      "reason": "assigned"
+    },
+    {
+      "ring": 369,
+      "reason": "assigned"
+    },
+    {
+      "ring": 370,
+      "reason": "assigned"
+    },
+    {
+      "ring": 371,
+      "reason": "assigned"
+    },
+    {
+      "ring": 372,
+      "reason": "assigned"
+    },
+    {
+      "ring": 373,
+      "reason": "assigned"
+    },
+    {
+      "ring": 374,
+      "reason": "assigned"
+    },
+    {
+      "ring": 375,
+      "reason": "assigned"
+    },
+    {
+      "ring": 376,
+      "reason": "assigned"
+    },
+    {
+      "ring": 377,
+      "reason": "assigned"
+    },
+    {
+      "ring": 378,
+      "reason": "assigned"
+    },
+    {
+      "ring": 379,
+      "reason": "assigned"
+    },
+    {
+      "ring": 380,
+      "reason": "assigned"
+    },
+    {
+      "ring": 381,
+      "reason": "assigned"
+    },
+    {
+      "ring": 382,
+      "reason": "assigned"
+    },
+    {
+      "ring": 383,
+      "reason": "assigned"
+    },
+    {
+      "ring": 384,
+      "reason": "assigned"
+    },
+    {
+      "ring": 385,
+      "reason": "assigned"
+    },
+    {
+      "ring": 386,
+      "reason": "assigned"
+    },
+    {
+      "ring": 387,
+      "reason": "assigned"
+    },
+    {
+      "ring": 388,
+      "reason": "assigned"
+    },
+    {
+      "ring": 389,
+      "reason": "assigned"
+    },
+    {
+      "ring": 390,
+      "reason": "assigned"
+    },
+    {
+      "ring": 391,
+      "reason": "assigned"
+    },
+    {
+      "ring": 392,
+      "reason": "assigned"
+    },
+    {
+      "ring": 393,
+      "reason": "assigned"
+    },
+    {
+      "ring": 394,
+      "reason": "assigned"
+    },
+    {
+      "ring": 395,
+      "reason": "assigned"
+    },
+    {
+      "ring": 396,
+      "reason": "assigned"
+    },
+    {
+      "ring": 397,
+      "reason": "assigned"
+    },
+    {
+      "ring": 398,
+      "reason": "assigned"
+    },
+    {
+      "ring": 399,
+      "reason": "assigned"
+    },
+    {
+      "ring": 400,
+      "reason": "assigned"
+    },
+    {
+      "ring": 401,
+      "reason": "assigned"
+    },
+    {
+      "ring": 402,
+      "reason": "assigned"
+    },
+    {
+      "ring": 403,
+      "reason": "assigned"
+    },
+    {
+      "ring": 404,
+      "reason": "assigned"
+    },
+    {
+      "ring": 405,
+      "reason": "assigned"
+    },
+    {
+      "ring": 406,
+      "reason": "assigned"
+    },
+    {
+      "ring": 407,
+      "reason": "assigned"
+    },
+    {
+      "ring": 408,
+      "reason": "assigned"
+    },
+    {
+      "ring": 409,
+      "reason": "assigned"
+    },
+    {
+      "ring": 410,
+      "reason": "assigned"
+    },
+    {
+      "ring": 411,
+      "reason": "assigned"
+    },
+    {
+      "ring": 412,
+      "reason": "assigned"
+    },
+    {
+      "ring": 413,
+      "reason": "assigned"
+    },
+    {
+      "ring": 414,
+      "reason": "assigned"
+    },
+    {
+      "ring": 415,
+      "reason": "assigned"
+    },
+    {
+      "ring": 416,
+      "reason": "assigned"
+    },
+    {
+      "ring": 417,
+      "reason": "assigned"
+    },
+    {
+      "ring": 418,
+      "reason": "assigned"
+    },
+    {
+      "ring": 419,
+      "reason": "assigned"
+    },
+    {
+      "ring": 420,
+      "reason": "assigned"
+    },
+    {
+      "ring": 421,
+      "reason": "assigned"
+    },
+    {
+      "ring": 422,
+      "reason": "assigned"
+    },
+    {
+      "ring": 423,
+      "reason": "assigned"
+    },
+    {
+      "ring": 424,
+      "reason": "assigned"
+    },
+    {
+      "ring": 425,
+      "reason": "assigned"
+    },
+    {
+      "ring": 426,
+      "reason": "assigned"
+    },
+    {
+      "ring": 427,
+      "reason": "assigned"
+    },
+    {
+      "ring": 428,
+      "reason": "assigned"
+    },
+    {
+      "ring": 429,
+      "reason": "assigned"
+    },
+    {
+      "ring": 430,
+      "reason": "assigned"
+    },
+    {
+      "ring": 431,
+      "reason": "assigned"
+    },
+    {
+      "ring": 432,
+      "reason": "assigned"
+    },
+    {
+      "ring": 433,
+      "reason": "assigned"
+    },
+    {
+      "ring": 434,
+      "reason": "assigned"
+    },
+    {
+      "ring": 435,
+      "reason": "assigned"
+    },
+    {
+      "ring": 436,
+      "reason": "assigned"
+    },
+    {
+      "ring": 437,
+      "reason": "assigned"
+    },
+    {
+      "ring": 438,
+      "reason": "assigned"
+    },
+    {
+      "ring": 439,
+      "reason": "assigned"
+    },
+    {
+      "ring": 440,
+      "reason": "assigned"
+    },
+    {
+      "ring": 441,
+      "reason": "assigned"
+    },
+    {
+      "ring": 442,
+      "reason": "assigned"
+    },
+    {
+      "ring": 443,
+      "reason": "assigned"
+    },
+    {
+      "ring": 444,
+      "reason": "assigned"
+    },
+    {
+      "ring": 445,
+      "reason": "assigned"
+    },
+    {
+      "ring": 446,
+      "reason": "assigned"
+    },
+    {
+      "ring": 447,
+      "reason": "assigned"
+    },
+    {
+      "ring": 448,
+      "reason": "assigned"
+    },
+    {
+      "ring": 449,
+      "reason": "assigned"
+    },
+    {
+      "ring": 450,
+      "reason": "assigned"
+    },
+    {
+      "ring": 451,
+      "reason": "assigned"
+    },
+    {
+      "ring": 452,
+      "reason": "assigned"
+    },
+    {
+      "ring": 453,
+      "reason": "assigned"
+    },
+    {
+      "ring": 454,
+      "reason": "assigned"
+    },
+    {
+      "ring": 455,
+      "reason": "assigned"
+    },
+    {
+      "ring": 456,
+      "reason": "assigned"
+    },
+    {
+      "ring": 457,
+      "reason": "assigned"
+    },
+    {
+      "ring": 458,
+      "reason": "assigned"
+    },
+    {
+      "ring": 459,
+      "reason": "assigned"
+    },
+    {
+      "ring": 460,
+      "reason": "assigned"
+    },
+    {
+      "ring": 461,
+      "reason": "assigned"
+    },
+    {
+      "ring": 462,
+      "reason": "assigned"
+    },
+    {
+      "ring": 463,
+      "reason": "assigned"
+    },
+    {
+      "ring": 464,
+      "reason": "assigned"
+    },
+    {
+      "ring": 465,
+      "reason": "assigned"
+    },
+    {
+      "ring": 466,
+      "reason": "assigned"
+    },
+    {
+      "ring": 467,
+      "reason": "assigned"
+    },
+    {
+      "ring": 468,
+      "reason": "assigned"
+    },
+    {
+      "ring": 469,
+      "reason": "assigned"
+    },
+    {
+      "ring": 470,
+      "reason": "assigned"
+    },
+    {
+      "ring": 471,
+      "reason": "assigned"
+    },
+    {
+      "ring": 472,
+      "reason": "assigned"
+    },
+    {
+      "ring": 473,
+      "reason": "assigned"
+    },
+    {
+      "ring": 474,
+      "reason": "assigned"
+    },
+    {
+      "ring": 475,
+      "reason": "assigned"
+    },
+    {
+      "ring": 476,
+      "reason": "assigned"
+    },
+    {
+      "ring": 477,
+      "reason": "assigned"
+    },
+    {
+      "ring": 478,
+      "reason": "assigned"
+    },
+    {
+      "ring": 479,
+      "reason": "assigned"
+    },
+    {
+      "ring": 480,
+      "reason": "assigned"
+    },
+    {
+      "ring": 481,
+      "reason": "assigned"
+    },
+    {
+      "ring": 482,
+      "reason": "assigned"
+    },
+    {
+      "ring": 483,
+      "reason": "assigned"
+    },
+    {
+      "ring": 484,
+      "reason": "assigned"
+    },
+    {
+      "ring": 485,
+      "reason": "assigned"
+    },
+    {
+      "ring": 486,
+      "reason": "assigned"
+    },
+    {
+      "ring": 487,
+      "reason": "assigned"
+    },
+    {
+      "ring": 488,
+      "reason": "assigned"
+    },
+    {
+      "ring": 489,
+      "reason": "assigned"
+    },
+    {
+      "ring": 490,
+      "reason": "assigned"
+    },
+    {
+      "ring": 491,
+      "reason": "assigned"
+    },
+    {
+      "ring": 492,
+      "reason": "assigned"
+    },
+    {
+      "ring": 493,
+      "reason": "assigned"
+    },
+    {
+      "ring": 494,
+      "reason": "assigned"
+    },
+    {
+      "ring": 495,
+      "reason": "assigned"
+    },
+    {
+      "ring": 496,
+      "reason": "assigned"
+    },
+    {
+      "ring": 497,
+      "reason": "assigned"
+    },
+    {
+      "ring": 498,
+      "reason": "assigned"
+    },
+    {
+      "ring": 499,
+      "reason": "assigned"
+    },
+    {
+      "ring": 500,
+      "reason": "assigned"
+    },
+    {
+      "ring": 501,
+      "reason": "assigned"
+    },
+    {
+      "ring": 502,
+      "reason": "assigned"
+    },
+    {
+      "ring": 503,
+      "reason": "assigned"
+    },
+    {
+      "ring": 504,
+      "reason": "assigned"
+    },
+    {
+      "ring": 505,
+      "reason": "assigned"
+    },
+    {
+      "ring": 506,
+      "reason": "assigned"
+    },
+    {
+      "ring": 507,
+      "reason": "assigned"
+    },
+    {
+      "ring": 508,
+      "reason": "assigned"
+    },
+    {
+      "ring": 509,
+      "reason": "assigned"
+    },
+    {
+      "ring": 510,
+      "reason": "assigned"
+    },
+    {
+      "ring": 511,
+      "reason": "assigned"
+    },
+    {
+      "ring": 512,
+      "reason": "assigned"
+    },
+    {
+      "ring": 513,
+      "reason": "assigned"
+    },
+    {
+      "ring": 514,
+      "reason": "assigned"
+    },
+    {
+      "ring": 515,
+      "reason": "assigned"
+    },
+    {
+      "ring": 516,
+      "reason": "assigned"
+    },
+    {
+      "ring": 517,
+      "reason": "assigned"
+    },
+    {
+      "ring": 518,
+      "reason": "assigned"
+    },
+    {
+      "ring": 519,
+      "reason": "assigned"
+    },
+    {
+      "ring": 520,
+      "reason": "assigned"
+    },
+    {
+      "ring": 521,
+      "reason": "assigned"
+    },
+    {
+      "ring": 522,
+      "reason": "assigned"
+    },
+    {
+      "ring": 523,
+      "reason": "assigned"
+    },
+    {
+      "ring": 524,
+      "reason": "assigned"
+    },
+    {
+      "ring": 525,
+      "reason": "assigned"
+    },
+    {
+      "ring": 526,
+      "reason": "assigned"
+    },
+    {
+      "ring": 527,
+      "reason": "assigned"
+    },
+    {
+      "ring": 528,
+      "reason": "assigned"
+    },
+    {
+      "ring": 529,
+      "reason": "assigned"
+    },
+    {
+      "ring": 530,
+      "reason": "assigned"
+    },
+    {
+      "ring": 531,
+      "reason": "assigned"
+    },
+    {
+      "ring": 532,
+      "reason": "assigned"
+    },
+    {
+      "ring": 533,
+      "reason": "assigned"
+    },
+    {
+      "ring": 534,
+      "reason": "assigned"
+    },
+    {
+      "ring": 535,
+      "reason": "assigned"
+    },
+    {
+      "ring": 536,
+      "reason": "assigned"
+    },
+    {
+      "ring": 537,
+      "reason": "assigned"
+    },
+    {
+      "ring": 538,
+      "reason": "assigned"
+    },
+    {
+      "ring": 539,
+      "reason": "assigned"
+    },
+    {
+      "ring": 540,
+      "reason": "assigned"
+    },
+    {
+      "ring": 541,
+      "reason": "assigned"
+    },
+    {
+      "ring": 542,
+      "reason": "assigned"
+    },
+    {
+      "ring": 543,
+      "reason": "assigned"
+    },
+    {
+      "ring": 544,
+      "reason": "assigned"
+    },
+    {
+      "ring": 545,
+      "reason": "assigned"
+    },
+    {
+      "ring": 546,
+      "reason": "assigned"
+    },
+    {
+      "ring": 547,
+      "reason": "assigned"
+    },
+    {
+      "ring": 548,
+      "reason": "assigned"
+    },
+    {
+      "ring": 549,
+      "reason": "assigned"
+    },
+    {
+      "ring": 550,
+      "reason": "assigned"
+    },
+    {
+      "ring": 551,
+      "reason": "assigned"
+    },
+    {
+      "ring": 552,
+      "reason": "assigned"
+    },
+    {
+      "ring": 553,
+      "reason": "assigned"
+    },
+    {
+      "ring": 554,
+      "reason": "assigned"
+    },
+    {
+      "ring": 555,
+      "reason": "assigned"
+    },
+    {
+      "ring": 556,
+      "reason": "assigned"
+    },
+    {
+      "ring": 557,
+      "reason": "assigned"
+    },
+    {
+      "ring": 558,
+      "reason": "assigned"
+    },
+    {
+      "ring": 559,
+      "reason": "assigned"
+    },
+    {
+      "ring": 560,
+      "reason": "assigned"
+    },
+    {
+      "ring": 561,
+      "reason": "assigned"
+    },
+    {
+      "ring": 562,
+      "reason": "assigned"
+    },
+    {
+      "ring": 563,
+      "reason": "assigned"
+    },
+    {
+      "ring": 564,
+      "reason": "assigned"
+    },
+    {
+      "ring": 565,
+      "reason": "assigned"
+    },
+    {
+      "ring": 566,
+      "reason": "assigned"
+    },
+    {
+      "ring": 567,
+      "reason": "assigned"
+    },
+    {
+      "ring": 568,
+      "reason": "assigned"
+    },
+    {
+      "ring": 569,
+      "reason": "assigned"
+    },
+    {
+      "ring": 570,
+      "reason": "assigned"
+    },
+    {
+      "ring": 571,
+      "reason": "assigned"
+    },
+    {
+      "ring": 572,
+      "reason": "assigned"
+    },
+    {
+      "ring": 573,
+      "reason": "assigned"
+    },
+    {
+      "ring": 574,
+      "reason": "assigned"
+    },
+    {
+      "ring": 575,
+      "reason": "assigned"
+    },
+    {
+      "ring": 576,
+      "reason": "assigned"
+    },
+    {
+      "ring": 577,
+      "reason": "assigned"
+    },
+    {
+      "ring": 578,
+      "reason": "assigned"
+    },
+    {
+      "ring": 579,
+      "reason": "assigned"
+    },
+    {
+      "ring": 580,
+      "reason": "assigned"
+    },
+    {
+      "ring": 581,
+      "reason": "assigned"
+    },
+    {
+      "ring": 582,
+      "reason": "assigned"
+    },
+    {
+      "ring": 583,
+      "reason": "assigned"
+    },
+    {
+      "ring": 584,
+      "reason": "assigned"
+    },
+    {
+      "ring": 585,
+      "reason": "assigned"
+    },
+    {
+      "ring": 586,
+      "reason": "assigned"
+    },
+    {
+      "ring": 587,
+      "reason": "assigned"
+    },
+    {
+      "ring": 588,
+      "reason": "assigned"
+    },
+    {
+      "ring": 589,
+      "reason": "assigned"
+    },
+    {
+      "ring": 590,
+      "reason": "assigned"
+    },
+    {
+      "ring": 591,
+      "reason": "assigned"
+    },
+    {
+      "ring": 592,
+      "reason": "assigned"
+    },
+    {
+      "ring": 593,
+      "reason": "assigned"
+    },
+    {
+      "ring": 594,
+      "reason": "assigned"
+    },
+    {
+      "ring": 595,
+      "reason": "assigned"
+    },
+    {
+      "ring": 596,
+      "reason": "assigned"
+    },
+    {
+      "ring": 597,
+      "reason": "assigned"
+    },
+    {
+      "ring": 598,
+      "reason": "assigned"
+    },
+    {
+      "ring": 599,
+      "reason": "assigned"
+    },
+    {
+      "ring": 600,
+      "reason": "assigned"
+    },
+    {
+      "ring": 601,
+      "reason": "assigned"
+    },
+    {
+      "ring": 602,
+      "reason": "assigned"
+    },
+    {
+      "ring": 603,
+      "reason": "assigned"
+    },
+    {
+      "ring": 604,
+      "reason": "assigned"
+    },
+    {
+      "ring": 605,
+      "reason": "assigned"
+    },
+    {
+      "ring": 606,
+      "reason": "assigned"
+    },
+    {
+      "ring": 607,
+      "reason": "assigned"
+    },
+    {
+      "ring": 608,
+      "reason": "assigned"
+    },
+    {
+      "ring": 609,
+      "reason": "assigned"
+    },
+    {
+      "ring": 610,
+      "reason": "assigned"
+    },
+    {
+      "ring": 611,
+      "reason": "assigned"
+    },
+    {
+      "ring": 612,
+      "reason": "assigned"
+    },
+    {
+      "ring": 613,
+      "reason": "assigned"
+    },
+    {
+      "ring": 614,
+      "reason": "assigned"
+    },
+    {
+      "ring": 615,
+      "reason": "assigned"
+    },
+    {
+      "ring": 616,
+      "reason": "assigned"
+    },
+    {
+      "ring": 617,
+      "reason": "assigned"
+    },
+    {
+      "ring": 618,
+      "reason": "assigned"
+    },
+    {
+      "ring": 619,
+      "reason": "assigned"
+    },
+    {
+      "ring": 620,
+      "reason": "assigned"
+    },
+    {
+      "ring": 621,
+      "reason": "assigned"
+    },
+    {
+      "ring": 622,
+      "reason": "assigned"
+    },
+    {
+      "ring": 623,
+      "reason": "assigned"
+    },
+    {
+      "ring": 624,
+      "reason": "assigned"
+    },
+    {
+      "ring": 625,
+      "reason": "assigned"
+    },
+    {
+      "ring": 626,
+      "reason": "assigned"
+    },
+    {
+      "ring": 627,
+      "reason": "assigned"
+    },
+    {
+      "ring": 628,
+      "reason": "assigned"
+    },
+    {
+      "ring": 629,
+      "reason": "assigned"
+    },
+    {
+      "ring": 630,
+      "reason": "assigned"
+    },
+    {
+      "ring": 631,
+      "reason": "assigned"
+    },
+    {
+      "ring": 632,
+      "reason": "assigned"
+    },
+    {
+      "ring": 633,
+      "reason": "assigned"
+    },
+    {
+      "ring": 634,
+      "reason": "assigned"
+    },
+    {
+      "ring": 635,
+      "reason": "assigned"
+    },
+    {
+      "ring": 636,
+      "reason": "assigned"
+    },
+    {
+      "ring": 637,
+      "reason": "assigned"
+    },
+    {
+      "ring": 638,
+      "reason": "assigned"
+    },
+    {
+      "ring": 639,
+      "reason": "assigned"
+    },
+    {
+      "ring": 640,
+      "reason": "assigned"
+    },
+    {
+      "ring": 641,
+      "reason": "assigned"
+    },
+    {
+      "ring": 642,
+      "reason": "assigned"
+    },
+    {
+      "ring": 643,
+      "reason": "assigned"
+    },
+    {
+      "ring": 644,
+      "reason": "assigned"
+    },
+    {
+      "ring": 645,
+      "reason": "assigned"
+    },
+    {
+      "ring": 646,
+      "reason": "assigned"
+    },
+    {
+      "ring": 647,
+      "reason": "assigned"
+    },
+    {
+      "ring": 648,
+      "reason": "assigned"
+    },
+    {
+      "ring": 649,
+      "reason": "assigned"
+    },
+    {
+      "ring": 650,
+      "reason": "assigned"
+    },
+    {
+      "ring": 651,
+      "reason": "assigned"
+    },
+    {
+      "ring": 652,
+      "reason": "assigned"
+    },
+    {
+      "ring": 653,
+      "reason": "assigned"
+    },
+    {
+      "ring": 654,
+      "reason": "assigned"
+    },
+    {
+      "ring": 655,
+      "reason": "assigned"
+    },
+    {
+      "ring": 656,
+      "reason": "assigned"
+    },
+    {
+      "ring": 657,
+      "reason": "assigned"
+    },
+    {
+      "ring": 658,
+      "reason": "assigned"
+    },
+    {
+      "ring": 659,
+      "reason": "assigned"
+    },
+    {
+      "ring": 660,
+      "reason": "assigned"
+    },
+    {
+      "ring": 661,
+      "reason": "assigned"
+    },
+    {
+      "ring": 662,
+      "reason": "assigned"
+    },
+    {
+      "ring": 663,
+      "reason": "assigned"
+    },
+    {
+      "ring": 664,
+      "reason": "assigned"
+    },
+    {
+      "ring": 665,
+      "reason": "assigned"
+    },
+    {
+      "ring": 666,
+      "reason": "assigned"
+    },
+    {
+      "ring": 667,
+      "reason": "assigned"
+    },
+    {
+      "ring": 668,
+      "reason": "assigned"
+    },
+    {
+      "ring": 669,
+      "reason": "assigned"
+    },
+    {
+      "ring": 670,
+      "reason": "assigned"
+    },
+    {
+      "ring": 671,
+      "reason": "assigned"
+    },
+    {
+      "ring": 672,
+      "reason": "assigned"
+    },
+    {
+      "ring": 673,
+      "reason": "assigned"
+    },
+    {
+      "ring": 674,
+      "reason": "assigned"
+    },
+    {
+      "ring": 675,
+      "reason": "assigned"
+    },
+    {
+      "ring": 676,
+      "reason": "assigned"
+    },
+    {
+      "ring": 677,
+      "reason": "assigned"
+    },
+    {
+      "ring": 678,
+      "reason": "assigned"
+    },
+    {
+      "ring": 679,
+      "reason": "assigned"
+    },
+    {
+      "ring": 680,
+      "reason": "assigned"
+    },
+    {
+      "ring": 681,
+      "reason": "assigned"
+    },
+    {
+      "ring": 682,
+      "reason": "assigned"
+    },
+    {
+      "ring": 683,
+      "reason": "assigned"
+    },
+    {
+      "ring": 684,
+      "reason": "assigned"
+    },
+    {
+      "ring": 685,
+      "reason": "assigned"
+    },
+    {
+      "ring": 686,
+      "reason": "assigned"
+    },
+    {
+      "ring": 687,
+      "reason": "assigned"
+    },
+    {
+      "ring": 688,
+      "reason": "assigned"
+    },
+    {
+      "ring": 689,
+      "reason": "assigned"
+    },
+    {
+      "ring": 690,
+      "reason": "assigned"
+    },
+    {
+      "ring": 691,
+      "reason": "assigned"
+    },
+    {
+      "ring": 692,
+      "reason": "assigned"
+    },
+    {
+      "ring": 693,
+      "reason": "assigned"
+    },
+    {
+      "ring": 694,
+      "reason": "assigned"
+    },
+    {
+      "ring": 695,
+      "reason": "assigned"
+    },
+    {
+      "ring": 696,
+      "reason": "assigned"
+    },
+    {
+      "ring": 697,
+      "reason": "assigned"
+    },
+    {
+      "ring": 698,
+      "reason": "assigned"
+    },
+    {
+      "ring": 699,
+      "reason": "assigned"
+    },
+    {
+      "ring": 700,
+      "reason": "assigned"
+    },
+    {
+      "ring": 701,
+      "reason": "assigned"
+    },
+    {
+      "ring": 702,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 703,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 704,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 705,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 706,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 707,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 708,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 709,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 710,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 711,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 712,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 713,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 714,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 715,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 716,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 717,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 718,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 719,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 720,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 721,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 722,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 723,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 724,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 725,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 726,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 727,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 728,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 729,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 730,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 731,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 732,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 733,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 734,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 735,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 736,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 737,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 738,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 739,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 740,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 741,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 742,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 743,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 744,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 745,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 746,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 747,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 748,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 749,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 750,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 751,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 752,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 753,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 754,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 755,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 756,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 757,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 758,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 759,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 760,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 761,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 762,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 763,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 764,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 765,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 766,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 767,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 768,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 769,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 770,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 771,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 772,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 773,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 774,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 775,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 776,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 777,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 778,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 779,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 780,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 781,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 782,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 783,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 784,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 785,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 786,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 787,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 788,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 789,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 790,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 791,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 792,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 793,
+      "reason": "antarctica"
+    },
+    {
+      "ring": 794,
+      "reason": "antarctica"
+    }
+  ],
+  "gapSubtractionFailures": [
+    "preexisting:108.636,18.218,117.171,25.517"
+  ],
+  "residualProvinceCount": 25,
+  "politiesCovered": [
+    "ARG",
+    "AUS",
+    "AUT",
+    "CAN",
+    "CHL",
+    "CHN",
+    "DEU",
+    "FRA",
+    "GBR",
+    "GRC",
+    "ITA",
+    "MAR",
+    "MEX",
+    "NOR",
+    "NZL",
+    "OTT",
+    "PRT",
+    "ROM",
+    "RUS",
+    "TON",
+    "USA"
+  ],
+  "mapFeaturesCovered": 18,
+  "duplicateProvinceIds": 0,
+  "duplicateKeys": 0,
+  "unmatchedBorderSegments": 28,
+  "borderSegmentCount": 85898,
+  "borderPairCount": 586,
+  "coverage": [
+    {
+      "tag": "ASM",
+      "scopeArea": 0.0094,
+      "coveredArea": 0.0076,
+      "residualArea": 0.0019,
+      "estimated": false
+    },
+    {
+      "tag": "AUS",
+      "scopeArea": 695.9024,
+      "coveredArea": 695.9024,
+      "residualArea": 0,
+      "estimated": true
+    },
+    {
+      "tag": "AUT",
+      "scopeArea": 0.124,
+      "coveredArea": 0.124,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "BPO",
+      "scopeArea": 19.1924,
+      "coveredArea": 19.1692,
+      "residualArea": 0.0232,
+      "estimated": false
+    },
+    {
+      "tag": "BSA",
+      "scopeArea": 0.0117,
+      "coveredArea": 0.0052,
+      "residualArea": 0.0065,
+      "estimated": false
+    },
+    {
+      "tag": "CHL",
+      "scopeArea": 0.0182,
+      "coveredArea": 0.0182,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "FJI",
+      "scopeArea": 1.5436,
+      "coveredArea": 1.5425,
+      "residualArea": 0.0011,
+      "estimated": false
+    },
+    {
+      "tag": "FPO",
+      "scopeArea": 2.6805,
+      "coveredArea": 2.6786,
+      "residualArea": 0.0019,
+      "estimated": false
+    },
+    {
+      "tag": "GBR",
+      "scopeArea": 0.078,
+      "coveredArea": 0.078,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "GNG",
+      "scopeArea": 21.6995,
+      "coveredArea": 21.6995,
+      "residualArea": 0,
+      "estimated": true
+    },
+    {
+      "tag": "GPN",
+      "scopeArea": 0.1126,
+      "coveredArea": 0.1122,
+      "residualArea": 0.0004,
+      "estimated": false
+    },
+    {
+      "tag": "GSA",
+      "scopeArea": 0.221,
+      "coveredArea": 0.2168,
+      "residualArea": 0.0043,
+      "estimated": false
+    },
+    {
+      "tag": "GUM",
+      "scopeArea": 0.038,
+      "coveredArea": 0.0372,
+      "residualArea": 0.0008,
+      "estimated": false
+    },
+    {
+      "tag": "MEX",
+      "scopeArea": 0.011,
+      "coveredArea": 0.011,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "NOR",
+      "scopeArea": 25.7008,
+      "coveredArea": 25.6986,
+      "residualArea": 0.0022,
+      "estimated": false
+    },
+    {
+      "tag": "NZL",
+      "scopeArea": 28.9894,
+      "coveredArea": 28.9875,
+      "residualArea": 0.0019,
+      "estimated": false
+    },
+    {
+      "tag": "TON",
+      "scopeArea": 0.031,
+      "coveredArea": 0.0284,
+      "residualArea": 0.0026,
+      "estimated": false
+    },
+    {
+      "tag": "USA",
+      "scopeArea": 0,
+      "coveredArea": 0,
+      "residualArea": 0
+    }
+  ],
+  "overlaps": [
+    {
+      "left": "oc-aut-krk-island",
+      "right": "oc-aut-cres-and-losinj",
+      "area": 0.0197,
+      "bbox": [
+        14.4,
+        44.95,
+        14.85,
+        45.3
+      ]
+    }
+  ],
+  "overlapCount": 1,
+  "residuals": [],
+  "warnings": [
+    "1 province pairs overlap (largest 0.0197 square degrees: oc-aut-krk-island / oc-aut-cres-and-losinj)",
+    "coverage gap BPO: 0.023 square degrees remain outside the authored provinces",
+    "coverage subtraction failed for AUS; residual estimated by area (Error: Unable to complete output ring starting at [134.1620200427318, -32.94002173161397]. Last matching segment found ends at [134.1620200427318, -32.94002173161395].)",
+    "coverage subtraction failed for GNG; residual estimated by area (Error: Unable to find segment #22268192 [142.707, -8.271] -> [142.89473577141484, -8.312719060314413] in SweepLine tree.)"
+  ],
+  "sourceCount": 12,
+  "crossFeatureSeamBorders": [
+    {
+      "a": 400037,
+      "b": 400051,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100232,
+      "b": 400037,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400040,
+      "b": 400146,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400042,
+      "b": 400146,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400044,
+      "b": 400146,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100232,
+      "b": 400051,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200001,
+      "b": 400128,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200002,
+      "b": 400128,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200230,
+      "b": 400128,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200231,
+      "b": 400128,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200232,
+      "b": 400128,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200015,
+      "b": 400129,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200064,
+      "b": 400129,
+      "lines": 9,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200065,
+      "b": 400129,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200067,
+      "b": 400129,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200068,
+      "b": 400129,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200069,
+      "b": 400129,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200070,
+      "b": 400129,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200088,
+      "b": 400129,
+      "lines": 20,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200090,
+      "b": 400129,
+      "lines": 18,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200102,
+      "b": 400129,
+      "lines": 14,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200103,
+      "b": 400129,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 400129,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200105,
+      "b": 400129,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200115,
+      "b": 400129,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200215,
+      "b": 400129,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15003,
+      "b": 400130,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15006,
+      "b": 400130,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15008,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15009,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15010,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 15011,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16003,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16004,
+      "b": 400130,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 17001,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 17002,
+      "b": 400130,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19001,
+      "b": 400130,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19002,
+      "b": 400130,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19003,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19005,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60031,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100031,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100032,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100033,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100034,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100035,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100037,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100038,
+      "b": 400130,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100040,
+      "b": 400130,
+      "lines": 16,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100048,
+      "b": 400130,
+      "lines": 17,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100050,
+      "b": 400130,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100129,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100195,
+      "b": 400130,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200057,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200058,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200062,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200236,
+      "b": 400130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200237,
+      "b": 400130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19001,
+      "b": 400131,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19002,
+      "b": 400131,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19003,
+      "b": 400131,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 20002,
+      "b": 400131,
+      "lines": 23,
+      "kind": "province-outline"
+    },
+    {
+      "a": 20003,
+      "b": 400131,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 20007,
+      "b": 400131,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 66001,
+      "b": 400131,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 6004,
+      "b": 400132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 6005,
+      "b": 400132,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 6019,
+      "b": 400132,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 11003,
+      "b": 400132,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 11010,
+      "b": 400132,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16001,
+      "b": 400132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16003,
+      "b": 400132,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16005,
+      "b": 400132,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 17001,
+      "b": 400132,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 17002,
+      "b": 400132,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 17003,
+      "b": 400132,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 18001,
+      "b": 400132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 18002,
+      "b": 400132,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 18003,
+      "b": 400132,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2001,
+      "b": 400132,
+      "lines": 14,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2002,
+      "b": 400132,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2021,
+      "b": 400132,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4036,
+      "b": 400132,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4047,
+      "b": 400132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4048,
+      "b": 400132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 13008,
+      "b": 400134,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 18003,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 18004,
+      "b": 400134,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60010,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60011,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60012,
+      "b": 400134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60013,
+      "b": 400134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60014,
+      "b": 400134,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60017,
+      "b": 400134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60043,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2017,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2018,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2021,
+      "b": 400134,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2022,
+      "b": 400134,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2023,
+      "b": 400134,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60053,
+      "b": 400134,
+      "lines": 9,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2024,
+      "b": 400134,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2025,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 2026,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4004,
+      "b": 400134,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4006,
+      "b": 400134,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4008,
+      "b": 400134,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4009,
+      "b": 400134,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100040,
+      "b": 400134,
+      "lines": 12,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100042,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100043,
+      "b": 400134,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100052,
+      "b": 400134,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100054,
+      "b": 400134,
+      "lines": 16,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100056,
+      "b": 400134,
+      "lines": 20,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100091,
+      "b": 400134,
+      "lines": 29,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100093,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100094,
+      "b": 400134,
+      "lines": 21,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100096,
+      "b": 400134,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100097,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100098,
+      "b": 400134,
+      "lines": 19,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100099,
+      "b": 400134,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100100,
+      "b": 400134,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100164,
+      "b": 400134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100165,
+      "b": 400134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100166,
+      "b": 400134,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100167,
+      "b": 400134,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100168,
+      "b": 400134,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16004,
+      "b": 400135,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 16005,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19004,
+      "b": 400135,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19005,
+      "b": 400135,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 19006,
+      "b": 400135,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60017,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60018,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60047,
+      "b": 400135,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60050,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4056,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4057,
+      "b": 400135,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4059,
+      "b": 400135,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 9001,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 9003,
+      "b": 400136,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 9004,
+      "b": 400136,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 9005,
+      "b": 400136,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 10005,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 21001,
+      "b": 400136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 21002,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 11004,
+      "b": 400136,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 11005,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 11007,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 14003,
+      "b": 400136,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60003,
+      "b": 400136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60004,
+      "b": 400136,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60007,
+      "b": 400136,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60008,
+      "b": 400136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 60010,
+      "b": 400136,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4030,
+      "b": 400136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 4039,
+      "b": 400136,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200183,
+      "b": 400137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200188,
+      "b": 400137,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200235,
+      "b": 400137,
+      "lines": 12,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200237,
+      "b": 400137,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200241,
+      "b": 400137,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200244,
+      "b": 400137,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200245,
+      "b": 400137,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200255,
+      "b": 400137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200259,
+      "b": 400137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200260,
+      "b": 400137,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100056,
+      "b": 400138,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100057,
+      "b": 400138,
+      "lines": 11,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100058,
+      "b": 400138,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100059,
+      "b": 400138,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100060,
+      "b": 400138,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100101,
+      "b": 400138,
+      "lines": 31,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100102,
+      "b": 400138,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100103,
+      "b": 400138,
+      "lines": 12,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100104,
+      "b": 400138,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100138,
+      "b": 400138,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100139,
+      "b": 400138,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100143,
+      "b": 400138,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100147,
+      "b": 400138,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100148,
+      "b": 400138,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100149,
+      "b": 400138,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100153,
+      "b": 400138,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100155,
+      "b": 400138,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100156,
+      "b": 400138,
+      "lines": 20,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100158,
+      "b": 400138,
+      "lines": 18,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100159,
+      "b": 400138,
+      "lines": 11,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100160,
+      "b": 400138,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100163,
+      "b": 400138,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100171,
+      "b": 400138,
+      "lines": 12,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100174,
+      "b": 400138,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100175,
+      "b": 400138,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100180,
+      "b": 400138,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100181,
+      "b": 400138,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100182,
+      "b": 400138,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100191,
+      "b": 400138,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100193,
+      "b": 400138,
+      "lines": 15,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100194,
+      "b": 400138,
+      "lines": 16,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100207,
+      "b": 400138,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100209,
+      "b": 400138,
+      "lines": 24,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100213,
+      "b": 400138,
+      "lines": 11,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200042,
+      "b": 400139,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200043,
+      "b": 400139,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200045,
+      "b": 400139,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200065,
+      "b": 400139,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200075,
+      "b": 400139,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200076,
+      "b": 400139,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200077,
+      "b": 400139,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200082,
+      "b": 400139,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200085,
+      "b": 400139,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200105,
+      "b": 400139,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200109,
+      "b": 400139,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200030,
+      "b": 400140,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200045,
+      "b": 400140,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100185,
+      "b": 400141,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100188,
+      "b": 400141,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100196,
+      "b": 400141,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200181,
+      "b": 400141,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200195,
+      "b": 400141,
+      "lines": 10,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300295,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300297,
+      "b": 400142,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300299,
+      "b": 400142,
+      "lines": 18,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300300,
+      "b": 400142,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300302,
+      "b": 400142,
+      "lines": 9,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300303,
+      "b": 400142,
+      "lines": 12,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300304,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300305,
+      "b": 400142,
+      "lines": 9,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300306,
+      "b": 400142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300307,
+      "b": 400142,
+      "lines": 9,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300308,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300309,
+      "b": 400142,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300310,
+      "b": 400142,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300311,
+      "b": 400142,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300312,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300314,
+      "b": 400142,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300340,
+      "b": 400142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300350,
+      "b": 400142,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300351,
+      "b": 400142,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300354,
+      "b": 400142,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300360,
+      "b": 400142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300361,
+      "b": 400142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300362,
+      "b": 400142,
+      "lines": 8,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300365,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300367,
+      "b": 400142,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300373,
+      "b": 400142,
+      "lines": 11,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300374,
+      "b": 400142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300376,
+      "b": 400142,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300394,
+      "b": 400142,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300395,
+      "b": 400142,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300396,
+      "b": 400142,
+      "lines": 19,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300001,
+      "b": 400143,
+      "lines": 26,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300022,
+      "b": 400143,
+      "lines": 14,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300023,
+      "b": 400143,
+      "lines": 13,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300024,
+      "b": 400143,
+      "lines": 15,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300035,
+      "b": 400143,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300036,
+      "b": 400143,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300063,
+      "b": 400143,
+      "lines": 155,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100232,
+      "b": 400145,
+      "lines": 7,
+      "kind": "province-outline"
+    },
+    {
+      "a": 100232,
+      "b": 400146,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400001,
+      "b": 400004,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400003,
+      "b": 400004,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400004,
+      "b": 400007,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400005,
+      "b": 400007,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400008,
+      "b": 400148,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400009,
+      "b": 400148,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400018,
+      "b": 400149,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400019,
+      "b": 400149,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400020,
+      "b": 400149,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400041,
+      "b": 400145,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400042,
+      "b": 400145,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400043,
+      "b": 400145,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400044,
+      "b": 400145,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400045,
+      "b": 400145,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400062,
+      "b": 400146,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 400076,
+      "b": 400146,
+      "lines": 1,
+      "kind": "province-outline"
+    }
+  ],
+  "crossFeatureSeamBorderCount": 275,
+  "crossFeatureBundles": 255,
+  "crossFeaturePolityFrontierSeams": [],
+  "crossFeaturePolityFrontierSeamCount": 0,
+  "unassignedUnits": [],
+  "unassignedUnitCount": 0,
+  "crossPolityUnitAssignments": [],
+  "crossPolityUnitAssignmentCount": 0,
+  "duplicateUnitClaims": [],
+  "duplicateUnitClaimCount": 0,
+  "oceaniaCountries": [
+    "ASM",
+    "AUS",
+    "COK",
+    "FJI",
+    "FSM",
+    "GUM",
+    "HMD",
+    "IOT",
+    "KIR",
+    "MHL",
+    "MNP",
+    "NCL",
+    "NFK",
+    "NIU",
+    "NRU",
+    "NZL",
+    "PCN",
+    "PLW",
+    "PNG",
+    "PYF",
+    "SLB",
+    "TON",
+    "TUV",
+    "UMI",
+    "VUT",
+    "WLF",
+    "WSM"
+  ],
+  "featureResidualProvinces": [
+    "oc-gap-mar-residual",
+    "oc-gap-fea-residual",
+    "oc-gap-ott-residual",
+    "oc-gap-grc-residual",
+    "oc-gap-aut-residual",
+    "oc-gap-gbr-residual",
+    "oc-gap-rus-residual",
+    "oc-gap-rom-residual",
+    "oc-gap-deu-residual",
+    "oc-gap-alg-residual",
+    "oc-gap-chn-residual",
+    "oc-gap-bea-residual",
+    "oc-gap-its-residual",
+    "oc-gap-pai-residual",
+    "oc-gap-arg-residual",
+    "oc-gap-can-residual",
+    "oc-gap-phl-residual",
+    "oc-gap-gng-residual",
+    "oc-gap-bpo-residual",
+    "oc-gap-fpo-residual",
+    "oc-gap-aus-residual",
+    "oc-gap-nzl-residual",
+    "oc-gap-fji-residual",
+    "oc-gap-gpn-residual"
+  ],
+  "documentedExceptions": [
+    {
+      "kind": "antarctica",
+      "count": 93,
+      "reason": "Every land ring whose maximum latitude is below -60 (the continent, its ice shelves and the South Shetland/South Orkney islands). Antarctica has no 1900 polity and no permanent province."
+    },
+    {
+      "kind": "water-hole",
+      "count": 1,
+      "reason": "The Caspian Sea is stored as an inner ring of the Afro-Eurasian land polygon. It is water, not land, and is excluded from the land-coverage audit."
+    },
+    {
+      "kind": "not-exposed",
+      "count": 3,
+      "reason": "Ashmore/Cartier, the Coral Sea islands and the Minerva Reefs are below the M11c 0.02 square degree land-mask threshold and absent from the 1900 features and the admin-1 layer."
+    },
+    {
+      "kind": "not-exposed",
+      "count": 2,
+      "reason": "Christmas Island and the Cocos (Keeling) Islands are below the M11c land-mask threshold and absent from the 1900 features and the admin-1 layer."
+    }
+  ],
+  "regionIds": {
+    "AUS": 57,
+    "BPO": 117,
+    "NZL": 58,
+    "GNG": 134,
+    "FJI": 116,
+    "FPO": 129,
+    "GPN": 136,
+    "GUM": 152,
+    "TON": 61,
+    "GSA": 135,
+    "ASM": 153,
+    "BSA": 109,
+    "CHL": 49,
+    "MEX": 38,
+    "USA": 0,
+    "GBR": 1,
+    "NOR": 13,
+    "AUT": 60,
+    "FRA": 3,
+    "MAR": 35,
+    "FEA": 124,
+    "OTT": 20,
+    "GRC": 15,
+    "RUS": 4,
+    "ROM": 18,
+    "DEU": 2,
+    "ALG": 121,
+    "CHN": 26,
+    "BEA": 111,
+    "ITS": 144,
+    "PAI": 140,
+    "ARG": 50,
+    "CAN": 56,
+    "PHL": 150
+  }
+}

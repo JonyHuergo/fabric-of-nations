@@ -1,19 +1,19 @@
 import {
   CurrencyValuationError,
-  asSusdPerCurrencyUnit,
-  assertValidSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
+  assertValidRusdPerCurrencyUnit,
   assertValidWorld,
   createEconomyWorld,
   crossRate,
   crossRateFor,
-  currencyFromSusd,
+  currencyFromRusd,
   regionOwner,
   requireCurrencyRate,
   ratesApproximatelyEqual,
-  susdFromCurrency,
+  rusdFromCurrency,
   type EconomyScenarioDef,
-  type MoneySUSD,
-  type SusdPerCurrencyUnit,
+  type MoneyRUSD,
+  type RusdPerCurrencyUnit,
 } from "@century/sim";
 import {
   baseScenario,
@@ -141,11 +141,11 @@ describe("M4a-2 country and currency identity", () => {
     expect(() => build(scenario)).toThrow(/foreign-issued currency.*adopted/i);
   });
 
-  test("rejects SUSD as a currency key regardless of casing", () => {
-    for (const key of ["susd", "SUSD", "Susd"]) {
+  test("rejects RUSD and the legacy SUSD spelling as currency keys regardless of casing", () => {
+    for (const key of ["rusd", "RUSD", "Rusd", "susd", "SUSD", "Susd"]) {
       const scenario = ownCurrencyScenario();
       scenario.currencies![0]!.key = key;
-      expect(() => build(scenario)).toThrow(/reserved for the SUSD/i);
+      expect(() => build(scenario)).toThrow(/reserved for the RUSD/i);
     }
   });
 
@@ -264,11 +264,11 @@ describe("M4a-2 country and currency identity", () => {
 });
 
 describe("M4a-2 conversion semantics", () => {
-  const A = asSusdPerCurrencyUnit(0.25);
-  const B = asSusdPerCurrencyUnit(2);
-  const C = asSusdPerCurrencyUnit(1.6);
+  const A = asRusdPerCurrencyUnit(0.25);
+  const B = asRusdPerCurrencyUnit(2);
+  const C = asRusdPerCurrencyUnit(1.6);
 
-  test("cross rates use SUSD per unit in the documented direction", () => {
+  test("cross rates use RUSD per unit in the documented direction", () => {
     expect(crossRate(A, B)).toBeCloseTo(0.125, 12);
     expect(crossRate(B, A)).toBeCloseTo(8, 12);
     expect(crossRate(A, B) * crossRate(B, A)).toBeCloseTo(1, 12);
@@ -280,11 +280,11 @@ describe("M4a-2 conversion semantics", () => {
   });
 
   test("converts amounts in both directions with round trips", () => {
-    const susd = susdFromCurrency(1000, A);
-    expect(susd).toBeCloseTo(250, 12);
-    const b = currencyFromSusd(susd, B);
+    const rusd = rusdFromCurrency(1000, A);
+    expect(rusd).toBeCloseTo(250, 12);
+    const b = currencyFromRusd(rusd, B);
     expect(b).toBeCloseTo(125, 12);
-    expect(currencyFromSusd(susdFromCurrency(1000, A), A)).toBeCloseTo(1000, 12);
+    expect(currencyFromRusd(rusdFromCurrency(1000, A), A)).toBeCloseTo(1000, 12);
   });
 
   test("crossRateFor uses authoritative currency valuations", () => {
@@ -295,24 +295,24 @@ describe("M4a-2 conversion semantics", () => {
 
   test("rejects invalid amounts and rates", () => {
     for (const amount of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, -1]) {
-      expect(() => susdFromCurrency(amount, A)).toThrow(/finite|non-negative/i);
+      expect(() => rusdFromCurrency(amount, A)).toThrow(/finite|non-negative/i);
     }
     for (const rate of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1e-13, 1e13]) {
       expect(() =>
-        susdFromCurrency(1, rate as SusdPerCurrencyUnit),
+        rusdFromCurrency(1, rate as RusdPerCurrencyUnit),
       ).toThrow(/positive|finite|in 1e-12/i);
     }
   });
 
   test("rejects overflow and positive underflow", () => {
-    expect(() => susdFromCurrency(1e308, asSusdPerCurrencyUnit(1e12))).toThrow(/overflow/i);
-    expect(() => susdFromCurrency(1e-320, asSusdPerCurrencyUnit(1e-12))).toThrow(/underflow/i);
-    expect(() => currencyFromSusd(1e-320, asSusdPerCurrencyUnit(1e12))).toThrow(/underflow/i);
+    expect(() => rusdFromCurrency(1e308, asRusdPerCurrencyUnit(1e12))).toThrow(/overflow/i);
+    expect(() => rusdFromCurrency(1e-320, asRusdPerCurrencyUnit(1e-12))).toThrow(/underflow/i);
+    expect(() => currencyFromRusd(1e-320, asRusdPerCurrencyUnit(1e12))).toThrow(/underflow/i);
   });
 
   test("a zero amount is allowed and yields zero", () => {
-    expect(susdFromCurrency(0, A)).toBe(0);
-    expect(currencyFromSusd(0, A)).toBe(0);
+    expect(rusdFromCurrency(0, A)).toBe(0);
+    expect(currencyFromRusd(0, A)).toBe(0);
   });
 
   test("unavailable and missing valuations never default to parity", () => {
@@ -348,18 +348,18 @@ describe("M4a-2 conversion semantics", () => {
     expect(ratesApproximatelyEqual(0.125, 0.125 * (1 + 1e-9))).toBe(false);
   });
 
-  test("SusdPerCurrencyUnit is not interchangeable with MoneySUSD", () => {
-    const amount: MoneySUSD = 2;
-    // @ts-expect-error a MoneySUSD amount must not be accepted as a currency valuation
-    const rate: SusdPerCurrencyUnit = amount;
+  test("RusdPerCurrencyUnit is not interchangeable with MoneyRUSD", () => {
+    const amount: MoneyRUSD = 2;
+    // @ts-expect-error a MoneyRUSD amount must not be accepted as a currency valuation
+    const rate: RusdPerCurrencyUnit = amount;
     expect(typeof rate).toBe("number");
   });
 
   test("rate construction rejects non-finite and out-of-bounds values", () => {
     for (const value of [Number.NaN, Number.POSITIVE_INFINITY, 0, -1, 1e-13, 1e13]) {
-      expect(() => asSusdPerCurrencyUnit(value)).toThrow();
-      expect(() => assertValidSusdPerCurrencyUnit(value)).toThrow();
+      expect(() => asRusdPerCurrencyUnit(value)).toThrow();
+      expect(() => assertValidRusdPerCurrencyUnit(value)).toThrow();
     }
-    expect(asSusdPerCurrencyUnit(0.25)).toBe(0.25);
+    expect(asRusdPerCurrencyUnit(0.25)).toBe(0.25);
   });
 });

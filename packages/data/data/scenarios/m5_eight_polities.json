@@ -41,7 +41,7 @@
       },
       {
         "id": "project-m2-1900-age-structure",
-        "title": "Century M2 provisional 1900 world age structure",
+        "title": "Fabric of Nations M2 provisional 1900 world age structure",
         "url": "internal:packages/data/data/scenarios/m2_world_aggregate.json",
         "accessDate": "2026-10-26",
         "license": "Project data",
@@ -49,7 +49,7 @@
       },
       {
         "id": "project-authored-sample",
-        "title": "Century M5 authored sample tables and source notes",
+        "title": "Fabric of Nations M5 authored sample tables and source notes",
         "url": "internal:packages/data/data/historical/source_notes.md",
         "accessDate": "2026-10-26",
         "license": "Project data",

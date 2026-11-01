@@ -536,7 +536,7 @@ export function createPopulationWorld(
     }
     assertRate(initial.literacy, `popBlock ${String(initial.id)} literacy`);
     assertWealth(initial.wealthLevel, `popBlock ${String(initial.id)} wealthLevel`);
-    assertNonNegative(initial.initialSavingsSUSD, `popBlock ${String(initial.id)} initialSavingsSUSD`);
+    assertNonNegative(initial.initialSavingsRUSD, `popBlock ${String(initial.id)} initialSavingsRUSD`);
     assertRate(initial.militancy, `popBlock ${String(initial.id)} militancy`);
 
     const block: PopBlock = {
@@ -595,16 +595,16 @@ export function createPopulationWorld(
         ownerId: initial.id,
         category: categoryForSubtype(ownerAccount.subtype),
         subtype: ownerAccount.subtype,
-        balanceSUSD: 0,
+        balanceRUSD: 0,
       });
     }
     openingEntries.push({
       accountId: initial.financialAccountId,
-      balanceSUSD: initial.initialSavingsSUSD,
+      balanceRUSD: initial.initialSavingsRUSD,
     });
     openingEntries.push({
       accountId: equityAccountId,
-      balanceSUSD: initial.initialSavingsSUSD,
+      balanceRUSD: initial.initialSavingsRUSD,
     });
   }
 

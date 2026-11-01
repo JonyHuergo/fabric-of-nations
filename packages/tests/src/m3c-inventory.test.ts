@@ -166,13 +166,13 @@ describe("M3c inventory movement and storage", () => {
     const { scenario, world } = productionWorld();
     const employment = world.employment.map((assignment) => ({ ...assignment }));
     const cash = totalCash(world);
-    const priceSnapshot = [...world.markets[0]!.priceSUSD];
+    const priceSnapshot = [...world.markets[0]!.priceRUSD];
     runProductionPhase(world, scenario.definitions, [
       reservation(4, GRAIN_ID, 0, 10),
     ]);
     expect(world.employment).toEqual(employment);
     expect(totalCash(world)).toBeCloseTo(cash, 9);
-    expect(world.markets[0]!.priceSUSD).toEqual(priceSnapshot);
+    expect(world.markets[0]!.priceRUSD).toEqual(priceSnapshot);
   });
 
   test("save/load after a production phase preserves the inventory and hash", () => {

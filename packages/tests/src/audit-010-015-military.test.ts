@@ -9,9 +9,9 @@
 import {
   M10_CAPTURED_SHARE,
   M10_DEATH_SHARE,
-  M10_EQUIPMENT_DAILY_UPKEEP_SUSD,
-  M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD,
-  M10_SOLDIER_DAILY_PAY_SUSD,
+  M10_EQUIPMENT_DAILY_UPKEEP_RUSD,
+  M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD,
+  M10_SOLDIER_DAILY_PAY_RUSD,
   M10_TRUCE_DAYS,
   M10_WOUNDED_SHARE,
   applyMilitaryAction,
@@ -71,7 +71,7 @@ function militaryScenario(): EconomyScenarioDef {
 function buildWorld(): World {
   const scenario = militaryScenario();
   for (const country of scenario.countries ?? []) {
-    country.initialTreasuryCashSUSD = 1_000_000;
+    country.initialTreasuryCashRUSD = 1_000_000;
   }
   return createEconomyWorld(scenario, { seed: SEED });
 }
@@ -159,7 +159,7 @@ function accountBalance(
       candidate.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function zeroRegionPopulation(world: World, regionId: Id): void {
@@ -338,12 +338,12 @@ describe("AUDIT-011 zero-recipient military payments", () => {
       .slice(postingsBefore)
       .filter((posting) => posting.dayIndex === phaseDay && posting.transactionKind === "military-pay");
     expect(payPostings).toHaveLength(0);
-    const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_SUSD;
-    const payRequired = army.personnel * M10_SOLDIER_DAILY_PAY_SUSD;
+    const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_RUSD;
+    const payRequired = army.personnel * M10_SOLDIER_DAILY_PAY_RUSD;
     const garrisonRequired =
-      army.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD;
-    expect(result.paidSUSD).toBeCloseTo(equipmentRequired, 6);
-    expect(result.shortfallSUSD).toBeCloseTo(payRequired + garrisonRequired, 6);
+      army.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD;
+    expect(result.paidRUSD).toBeCloseTo(equipmentRequired, 6);
+    expect(result.shortfallRUSD).toBeCloseTo(payRequired + garrisonRequired, 6);
     expect(treasuryBefore - accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBeCloseTo(
       equipmentRequired,
       6,

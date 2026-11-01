@@ -66,11 +66,11 @@ function accountOf(
 function balanceOf(finance: FinanceState, accountId: number): number {
   const account = finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function manualFinance(
-  entries: readonly { id: number; subtype: FinancialAccount["subtype"]; balanceSUSD?: number }[],
+  entries: readonly { id: number; subtype: FinancialAccount["subtype"]; balanceRUSD?: number }[],
 ): FinanceState {
   const accounts: FinancialAccount[] = entries.map((entry) => ({
     id: entry.id,
@@ -85,7 +85,7 @@ function manualFinance(
             ? "revenue"
             : "expense",
     subtype: entry.subtype,
-    balanceSUSD: entry.balanceSUSD ?? 0,
+    balanceRUSD: entry.balanceRUSD ?? 0,
   }));
   return {
     accounts,
@@ -116,15 +116,15 @@ describe("M4a-1 opening balances", () => {
       { id: 2, subtype: "owner-equity" },
     ]);
     const opening = applyOpeningBalances(finance, 0, [
-      { accountId: 1, balanceSUSD: 100 },
-      { accountId: 2, balanceSUSD: 100 },
+      { accountId: 1, balanceRUSD: 100 },
+      { accountId: 2, balanceRUSD: 100 },
     ]);
     expect(opening.dayIndex).toBe(0);
     expect(opening.accountCount).toBe(2);
     expect(opening.checksum.length).toBeGreaterThan(0);
     expect(balanceOf(finance, 1)).toBe(100);
     expect(() =>
-      applyOpeningBalances(finance, 0, [{ accountId: 1, balanceSUSD: 1 }]),
+      applyOpeningBalances(finance, 0, [{ accountId: 1, balanceRUSD: 1 }]),
     ).toThrow(/already been applied/i);
   });
 
@@ -144,16 +144,16 @@ describe("M4a-1 opening balances", () => {
     for (const block of world.popBlocks) {
       const cash = accountOf(world, "popBlock", block.id, "household-cash");
       const equity = accountOf(world, "popBlock", block.id, "owner-equity");
-      expect(equity.balanceSUSD).toBeCloseTo(cash.balanceSUSD, 9);
+      expect(equity.balanceRUSD).toBeCloseTo(cash.balanceRUSD, 9);
     }
     for (const building of world.buildings) {
       const cash = accountOf(world, "building", building.id, "operating-cash");
       const equity = accountOf(world, "building", building.id, "owner-equity");
-      expect(equity.balanceSUSD).toBeCloseTo(cash.balanceSUSD, 9);
+      expect(equity.balanceRUSD).toBeCloseTo(cash.balanceRUSD, 9);
     }
     const systemCash = accountOf(world, "system", null, "system-reserve-cash");
     const systemEquity = accountOf(world, "system", null, "owner-equity");
-    expect(systemEquity.balanceSUSD).toBeCloseTo(systemCash.balanceSUSD, 9);
+    expect(systemEquity.balanceRUSD).toBeCloseTo(systemCash.balanceRUSD, 9);
   });
 
   test("rejects an unbalanced or negative-asset opening set without mutating state", () => {
@@ -163,8 +163,8 @@ describe("M4a-1 opening balances", () => {
     ]);
     expect(() =>
       applyOpeningBalances(unbalanced, 0, [
-        { accountId: 1, balanceSUSD: 100 },
-        { accountId: 2, balanceSUSD: 90 },
+        { accountId: 1, balanceRUSD: 100 },
+        { accountId: 2, balanceRUSD: 90 },
       ]),
     ).toThrow(/not balanced/i);
     expect(unbalanced.opening).toBeNull();
@@ -176,17 +176,17 @@ describe("M4a-1 opening balances", () => {
     ]);
     expect(() =>
       applyOpeningBalances(negative, 0, [
-        { accountId: 1, balanceSUSD: -5 },
-        { accountId: 2, balanceSUSD: -5 },
+        { accountId: 1, balanceRUSD: -5 },
+        { accountId: 2, balanceRUSD: -5 },
       ]),
     ).toThrow(/non-negative/i);
     expect(negative.opening).toBeNull();
   });
 
   test("rejects opening balances when an account is already non-zero", () => {
-    const finance = manualFinance([{ id: 1, subtype: "household-cash", balanceSUSD: 5 }]);
+    const finance = manualFinance([{ id: 1, subtype: "household-cash", balanceRUSD: 5 }]);
     expect(() =>
-      applyOpeningBalances(finance, 0, [{ accountId: 1, balanceSUSD: 5 }]),
+      applyOpeningBalances(finance, 0, [{ accountId: 1, balanceRUSD: 5 }]),
     ).toThrow(/zeroed/i);
   });
 
@@ -207,20 +207,20 @@ describe("M4a-1 account semantics", () => {
     const buildingCashBefore = balanceOf(world.finance, buildingCashId);
     const consumption = accountOf(world, "popBlock", 0, "consumption-expense");
     const sales = accountOf(world, "building", 0, "sales-revenue");
-    const consumptionBefore = consumption.balanceSUSD;
-    const salesBefore = sales.balanceSUSD;
+    const consumptionBefore = consumption.balanceRUSD;
+    const salesBefore = sales.balanceRUSD;
 
     postJournalEntry(world.finance, 0, "goods-purchase", [
-      { accountId: consumption.id, side: "debit", amountSUSD: 10 },
-      { accountId: buildingCashId, side: "debit", amountSUSD: 10 },
-      { accountId: householdId, side: "credit", amountSUSD: 10 },
-      { accountId: sales.id, side: "credit", amountSUSD: 10 },
+      { accountId: consumption.id, side: "debit", amountRUSD: 10 },
+      { accountId: buildingCashId, side: "debit", amountRUSD: 10 },
+      { accountId: householdId, side: "credit", amountRUSD: 10 },
+      { accountId: sales.id, side: "credit", amountRUSD: 10 },
     ]);
 
     expect(balanceOf(world.finance, householdId)).toBeCloseTo(householdCashBefore - 10, 9);
     expect(balanceOf(world.finance, buildingCashId)).toBeCloseTo(buildingCashBefore + 10, 9);
-    expect(consumption.balanceSUSD).toBeCloseTo(consumptionBefore + 10, 9);
-    expect(sales.balanceSUSD).toBeCloseTo(salesBefore + 10, 9);
+    expect(consumption.balanceRUSD).toBeCloseTo(consumptionBefore + 10, 9);
+    expect(sales.balanceRUSD).toBeCloseTo(salesBefore + 10, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
 
@@ -233,7 +233,7 @@ describe("M4a-1 account semantics", () => {
       postCashTransfer(world.finance, 0, "goods-purchase", {
         fromAccountId: householdId,
         toAccountId: M3_BUILDING_ACCOUNT_FIRST_ID,
-        amountSUSD: balanceOf(world.finance, householdId) + 1,
+        amountRUSD: balanceOf(world.finance, householdId) + 1,
       }),
     ).toThrow(/insufficient|negative/i);
     expect(world.finance.accounts).toEqual(before);
@@ -247,36 +247,36 @@ describe("M4a-1 account semantics", () => {
     // outside a period close, so construct the balanced state directly.
     const equity = accountOf(world, "popBlock", 0, "owner-equity");
     const revenue = accountOf(world, "popBlock", 0, "wage-income");
-    const shift = equity.balanceSUSD + 100;
-    equity.balanceSUSD = -100;
-    revenue.balanceSUSD += shift;
-    expect(equity.balanceSUSD).toBeLessThan(0);
+    const shift = equity.balanceRUSD + 100;
+    equity.balanceRUSD = -100;
+    revenue.balanceRUSD += shift;
+    expect(equity.balanceRUSD).toBeLessThan(0);
     expect(() => assertValidWorld(world)).not.toThrow();
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
 
     expect(() =>
       postJournalEntry(world.finance, 0, "owner-capital-injection", [
-        { accountId: revenue.id, side: "debit", amountSUSD: 100 },
-        { accountId: equity.id, side: "credit", amountSUSD: 100 },
+        { accountId: revenue.id, side: "debit", amountRUSD: 100 },
+        { accountId: equity.id, side: "credit", amountRUSD: 100 },
       ]),
     ).toThrow(/semantic matrix|may not/i);
 
     const expense = accountOf(world, "popBlock", 0, "consumption-expense");
     expect(() =>
       postJournalEntry(world.finance, 0, "owner-capital-injection", [
-        { accountId: expense.id, side: "credit", amountSUSD: 100 },
-        { accountId: equity.id, side: "debit", amountSUSD: 100 },
+        { accountId: expense.id, side: "credit", amountRUSD: 100 },
+        { accountId: equity.id, side: "debit", amountRUSD: 100 },
       ]),
     ).toThrow(/semantic matrix|may not/i);
 
     const negativeRevenue = m3World().world;
     const revenueAccount = accountOf(negativeRevenue, "popBlock", 0, "wage-income");
-    revenueAccount.balanceSUSD = -1;
+    revenueAccount.balanceRUSD = -1;
     expect(() => assertValidWorld(negativeRevenue)).toThrow(/negative revenue/i);
 
     const negativeExpense = m3World().world;
     const expenseAccount = accountOf(negativeExpense, "popBlock", 0, "consumption-expense");
-    expenseAccount.balanceSUSD = -1;
+    expenseAccount.balanceRUSD = -1;
     expect(() => assertValidWorld(negativeExpense)).toThrow(/negative expense/i);
   });
 });
@@ -303,7 +303,7 @@ describe("M4a-1 invariants", () => {
   test("the designated cash set is explicit and never every asset account", () => {
     // E6b (D-080) adds the interest-free monetary reserve and the external
     // counterparty's settlement cash to the designated-cash set; both are real
-    // spendable SUSD assets with exact conservation rules.
+    // spendable RUSD assets with exact conservation rules.
     expect(CASH_SUBTYPES).toEqual([
       "household-cash",
       "operating-cash",
@@ -326,8 +326,8 @@ describe("M4a-1 invariants", () => {
     const before = designatedCashTotal(world.finance);
     expect(() =>
       postJournalEntry(world.finance, 0, "goods-purchase", [
-        { accountId: M3_HOUSEHOLD_ACCOUNT_IDS[0], side: "debit", amountSUSD: 5 },
-        { accountId: sales.id, side: "credit", amountSUSD: 5 },
+        { accountId: M3_HOUSEHOLD_ACCOUNT_IDS[0], side: "debit", amountRUSD: 5 },
+        { accountId: sales.id, side: "credit", amountRUSD: 5 },
       ]),
     ).toThrow(/aggregate designated cash/i);
     expect(designatedCashTotal(world.finance)).toBeCloseTo(before, 9);
@@ -338,8 +338,8 @@ describe("M4a-1 invariants", () => {
     const kind = CASH_CHANGING_TRANSACTION_KINDS[0] as PublicTransactionKind;
     expect(() =>
       postJournalEntry(world.finance, 0, kind, [
-        { accountId: M3_HOUSEHOLD_ACCOUNT_IDS[0], side: "debit", amountSUSD: 5 },
-        { accountId: M3_BUILDING_ACCOUNT_FIRST_ID, side: "credit", amountSUSD: 5 },
+        { accountId: M3_HOUSEHOLD_ACCOUNT_IDS[0], side: "debit", amountRUSD: 5 },
+        { accountId: M3_BUILDING_ACCOUNT_FIRST_ID, side: "credit", amountRUSD: 5 },
       ]),
     ).toThrow(/not implemented/i);
   });
@@ -366,8 +366,8 @@ describe("M4a-1 invariants", () => {
       let debits = 0;
       let credits = 0;
       for (const line of posting.lines) {
-        if (line.side === "debit") debits += line.amountSUSD;
-        else credits += line.amountSUSD;
+        if (line.side === "debit") debits += line.amountRUSD;
+        else credits += line.amountRUSD;
       }
       expect(Math.abs(debits - credits)).toBeLessThanOrEqual(
         1e-6 * Math.max(1, debits, credits),
@@ -412,15 +412,15 @@ describe("M4a-1 invariants", () => {
         {
           transactionKind: "goods-purchase",
           lines: [
-            { accountId: building, side: "debit", amountSUSD: 1 },
-            { accountId: household, side: "credit", amountSUSD: 1 },
+            { accountId: building, side: "debit", amountRUSD: 1 },
+            { accountId: household, side: "credit", amountRUSD: 1 },
           ],
         },
         {
           transactionKind: "goods-purchase",
           lines: [
-            { accountId: building, side: "debit", amountSUSD: 1 },
-            { accountId: household, side: "credit", amountSUSD: 0.5 },
+            { accountId: building, side: "debit", amountRUSD: 1 },
+            { accountId: household, side: "credit", amountRUSD: 0.5 },
           ],
         },
       ]),
@@ -455,7 +455,7 @@ describe("M4a-1 owner-reference validation", () => {
         ownerId: 999,
         category: categoryForSubtype(subtype),
         subtype,
-        balanceSUSD: 0,
+        balanceRUSD: 0,
       });
       expect(() => assertValidWorld(world)).toThrow(
         new RegExp(
@@ -479,8 +479,8 @@ describe("M4a-1 recognition preserves M3 cash behaviour", () => {
     const consumption = accountOf(world, "popBlock", 0, "consumption-expense");
     runSettlement(scenario, world, [household(0, 1, GRAIN_ID, 5)]);
     expect(totalCash(world)).toBeCloseTo(cashBefore, 9);
-    expect(sales.balanceSUSD).toBeGreaterThan(0);
-    expect(consumption.balanceSUSD).toBeCloseTo(sales.balanceSUSD, 9);
+    expect(sales.balanceRUSD).toBeGreaterThan(0);
+    expect(consumption.balanceRUSD).toBeCloseTo(sales.balanceRUSD, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
   });
 
@@ -494,10 +494,10 @@ describe("M4a-1 recognition preserves M3 cash behaviour", () => {
     const wageExpense = accountOf(world, "building", 0, "wage-expense");
     const income = accountOf(world, "popBlock", 0, "wage-income");
     const settlement = runSettlement(scenario, world);
-    expect(settlement.settlement.totals.wagesPaidSUSD).toBeGreaterThan(0);
+    expect(settlement.settlement.totals.wagesPaidRUSD).toBeGreaterThan(0);
     expect(totalCash(world)).toBeCloseTo(cashBefore, 9);
-    expect(wageExpense.balanceSUSD).toBeCloseTo(settlement.settlement.totals.wagesPaidSUSD, 9);
-    expect(income.balanceSUSD).toBeCloseTo(settlement.settlement.totals.wagesPaidSUSD, 9);
+    expect(wageExpense.balanceRUSD).toBeCloseTo(settlement.settlement.totals.wagesPaidRUSD, 9);
+    expect(income.balanceRUSD).toBeCloseTo(settlement.settlement.totals.wagesPaidRUSD, 9);
   });
 
   test("upkeep recognizes operating expense and system income without changing aggregate cash", () => {
@@ -510,13 +510,13 @@ describe("M4a-1 recognition preserves M3 cash behaviour", () => {
     const upkeepExpense = accountOf(world, "building", 0, "upkeep-expense");
     const systemIncome = accountOf(world, "system", null, "system-income");
     const settlement = runSettlement(scenario, world);
-    expect(settlement.settlement.totals.upkeepPaidSUSD).toBeGreaterThan(0);
+    expect(settlement.settlement.totals.upkeepPaidRUSD).toBeGreaterThan(0);
     expect(totalCash(world)).toBeCloseTo(cashBefore, 9);
     const farmUpkeep = settlement.settlement.upkeep.find((entry) => entry.buildingId === 0);
     if (farmUpkeep === undefined) throw new Error("missing farm upkeep settlement");
-    expect(upkeepExpense.balanceSUSD).toBeCloseTo(farmUpkeep.paidSUSD, 9);
-    expect(systemIncome.balanceSUSD).toBeCloseTo(
-      settlement.settlement.totals.upkeepPaidSUSD,
+    expect(upkeepExpense.balanceRUSD).toBeCloseTo(farmUpkeep.paidRUSD, 9);
+    expect(systemIncome.balanceRUSD).toBeCloseTo(
+      settlement.settlement.totals.upkeepPaidRUSD,
       9,
     );
   });
@@ -530,15 +530,15 @@ describe("M4a-1 recognition preserves M3 cash behaviour", () => {
     const settlement = runSettlement(scenario, world);
     for (const producer of settlement.settlement.producers) {
       const expected =
-        producer.initialCashSUSD +
-        producer.revenueSUSD -
-        producer.inputCostsSUSD -
-        producer.wagesPaidSUSD -
-        producer.upkeepPaidSUSD;
-      expect(producer.endingCashAfterSettlementSUSD).toBeCloseTo(expected, 9);
+        producer.initialCashRUSD +
+        producer.revenueRUSD -
+        producer.inputCostsRUSD -
+        producer.wagesPaidRUSD -
+        producer.upkeepPaidRUSD;
+      expect(producer.endingCashAfterSettlementRUSD).toBeCloseTo(expected, 9);
     }
-    expect(settlement.settlement.totals.endingCashAfterSettlementSUSD).toBeCloseTo(
-      settlement.settlement.totals.initialCashSUSD,
+    expect(settlement.settlement.totals.endingCashAfterSettlementRUSD).toBeCloseTo(
+      settlement.settlement.totals.initialCashRUSD,
       9,
     );
   });
@@ -559,7 +559,7 @@ describe("M4a-1 persistence and compatibility", () => {
     const clone = cloneWorld(world);
     expect(serializeWorld(clone)).toBe(serializeWorld(world));
     const original = serializeWorld(world);
-    clone.finance.accounts[0]!.balanceSUSD += 1;
+    clone.finance.accounts[0]!.balanceRUSD += 1;
     if (clone.finance.opening === null) throw new Error("missing clone opening record");
     clone.finance.opening.checksum = "tampered";
     expect(serializeWorld(world)).toBe(original);

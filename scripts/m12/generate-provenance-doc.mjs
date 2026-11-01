@@ -238,6 +238,7 @@ ${ownerLines.join("\n")}
 9. Coverage residuals and small clip-seam overlaps are reported in
    \`provinces_1900_audit.json\`. They are not hidden by clamping.
 
+
 ## 10. Verification
 
 - \`pnpm test\` includes \`m12a-provinces.test.ts\`: bundle/geometry validation,
@@ -250,3 +251,4 @@ ${ownerLines.join("\n")}
 
 writeFileSync(resolve(ROOT, "docs/EUROPE_PROVINCIALIZATION.md"), doc, "utf8");
 console.log(`wrote docs/EUROPE_PROVINCIALIZATION.md (${(doc.length / 1024).toFixed(0)} KiB)`);
+

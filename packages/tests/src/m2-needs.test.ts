@@ -14,9 +14,9 @@ import {
 } from "./fixtures/m2.js";
 
 function totalSpent(
-  summaries: readonly { spentSUSD: number }[],
+  summaries: readonly { spentRUSD: number }[],
 ): number {
-  return summaries.reduce((total, summary) => total + summary.spentSUSD, 0);
+  return summaries.reduce((total, summary) => total + summary.spentRUSD, 0);
 }
 
 describe("M2 needs, budgets, and shared supply", () => {
@@ -30,10 +30,10 @@ describe("M2 needs, budgets, and shared supply", () => {
 
     expect(needs.blocks).toHaveLength(3);
     for (const block of needs.blocks) {
-      expect(block.budgetStartBeforeNeedsSUSD).toBeGreaterThanOrEqual(0);
-      expect(block.budgetEndAfterNeedsSUSD).toBeGreaterThanOrEqual(0);
-      expect(block.budgetEndAfterNeedsSUSD).toBeCloseTo(block.budgetStartBeforeNeedsSUSD - block.spentSUSD, 6);
-      expect(block.spentSUSD).toBeCloseTo(totalSpent(block.tierSummaries), 6);
+      expect(block.budgetStartBeforeNeedsRUSD).toBeGreaterThanOrEqual(0);
+      expect(block.budgetEndAfterNeedsRUSD).toBeGreaterThanOrEqual(0);
+      expect(block.budgetEndAfterNeedsRUSD).toBeCloseTo(block.budgetStartBeforeNeedsRUSD - block.spentRUSD, 6);
+      expect(block.spentRUSD).toBeCloseTo(totalSpent(block.tierSummaries), 6);
       for (const summary of block.tierSummaries) {
         if (summary.active) expect(summary.fullyMet).toBe(true);
       }
@@ -65,8 +65,8 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.spentSUSD).toBeLessThanOrEqual(block.budgetStartBeforeNeedsSUSD + 1e-6);
-      expect(block.budgetEndAfterNeedsSUSD).toBeGreaterThanOrEqual(0);
+      expect(block.spentRUSD).toBeLessThanOrEqual(block.budgetStartBeforeNeedsRUSD + 1e-6);
+      expect(block.budgetEndAfterNeedsRUSD).toBeGreaterThanOrEqual(0);
       const subsistence = block.tierSummaries.find((summary) => summary.tier === "subsistence");
       const basic = block.tierSummaries.find((summary) => summary.tier === "basic");
       expect(subsistence?.active).toBe(true);
@@ -183,7 +183,7 @@ describe("M2 needs, budgets, and shared supply", () => {
     const clerk = needs.blocks.find((block) => block.popBlockId === 2);
     const comfort = clerk?.tierSummaries.find((tier) => tier.tier === "comfort");
     expect(comfort?.active).toBe(true);
-    expect(comfort?.spentSUSD).toBe(0);
+    expect(comfort?.spentRUSD).toBe(0);
     expect(comfort?.fullyMet).toBe(false);
   });
 
@@ -191,9 +191,9 @@ describe("M2 needs, budgets, and shared supply", () => {
     const { scenario, world } = multiBlockWorld();
     for (const account of world.finance.accounts) {
       if (account.subtype !== "household-cash" && account.subtype !== "owner-equity") continue;
-      account.balanceSUSD = 1_000_000_000;
+      account.balanceRUSD = 1_000_000_000;
     }
-    const before = world.finance.accounts.map((account) => account.balanceSUSD);
+    const before = world.finance.accounts.map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2], {
       annualIncomePerCapita: 0,
       annualMandatoryPerCapita: 0,
@@ -202,16 +202,16 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.budgetStartBeforeNeedsSUSD).toBe(0);
-      expect(block.spentSUSD).toBe(0);
-      expect(block.budgetEndAfterNeedsSUSD).toBe(0);
+      expect(block.budgetStartBeforeNeedsRUSD).toBe(0);
+      expect(block.spentRUSD).toBe(0);
+      expect(block.budgetEndAfterNeedsRUSD).toBe(0);
     }
-    expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
+    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
   });
 
   test("handles a non-positive disposable budget without creating money", () => {
     const { scenario, world } = multiBlockWorld();
-    const before = world.finance.accounts.map((account) => account.balanceSUSD);
+    const before = world.finance.accounts.map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2], {
       annualIncomePerCapita: 10,
       annualMandatoryPerCapita: 100,
@@ -220,11 +220,11 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     if (needs === undefined) throw new Error("expected needs result");
     for (const block of needs.blocks) {
-      expect(block.budgetStartBeforeNeedsSUSD).toBe(0);
-      expect(block.spentSUSD).toBe(0);
-      expect(block.budgetEndAfterNeedsSUSD).toBe(0);
+      expect(block.budgetStartBeforeNeedsRUSD).toBe(0);
+      expect(block.spentRUSD).toBe(0);
+      expect(block.budgetEndAfterNeedsRUSD).toBe(0);
     }
-    expect(world.finance.accounts.map((account) => account.balanceSUSD)).toEqual(before);
+    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
   });
 
   test("zero-population blocks produce zero needs without NaN", () => {
@@ -234,8 +234,8 @@ describe("M2 needs, budgets, and shared supply", () => {
     const needs = result.population?.needs;
     const block = needs?.blocks[0];
     expect(block?.population).toBe(0);
-    expect(block?.spentSUSD).toBe(0);
-    expect(block?.budgetStartBeforeNeedsSUSD).toBe(0);
+    expect(block?.spentRUSD).toBe(0);
+    expect(block?.budgetStartBeforeNeedsRUSD).toBe(0);
     expect(block?.tierSummaries.every((tier) => tier.active === false)).toBe(true);
     expect(worldPopulation(world)).toBe(0);
   });
@@ -266,9 +266,9 @@ describe("M2 needs, budgets, and shared supply", () => {
       }
       expect(summaryBlock.popBlockId).toBe(detailedBlock.popBlockId);
       expect(summaryBlock.population).toBe(detailedBlock.population);
-      expect(summaryBlock.budgetStartBeforeNeedsSUSD).toBe(detailedBlock.budgetStartBeforeNeedsSUSD);
-      expect(summaryBlock.budgetEndAfterNeedsSUSD).toBe(detailedBlock.budgetEndAfterNeedsSUSD);
-      expect(summaryBlock.spentSUSD).toBe(detailedBlock.spentSUSD);
+      expect(summaryBlock.budgetStartBeforeNeedsRUSD).toBe(detailedBlock.budgetStartBeforeNeedsRUSD);
+      expect(summaryBlock.budgetEndAfterNeedsRUSD).toBe(detailedBlock.budgetEndAfterNeedsRUSD);
+      expect(summaryBlock.spentRUSD).toBe(detailedBlock.spentRUSD);
       expect(summaryBlock.tiers).toEqual([]);
       expect(summaryBlock.tierSummaries).toEqual(detailedBlock.tierSummaries);
     }
@@ -286,9 +286,9 @@ describe("M2 needs, budgets, and shared supply", () => {
     if (block === undefined) throw new Error("expected needs block");
 
     expect(block.population).toBe(3000);
-    expect(block.budgetStartBeforeNeedsSUSD).toBeCloseTo(1643.835616438356, 9);
-    expect(block.budgetEndAfterNeedsSUSD).toBeCloseTo(1271.835616438356, 9);
-    expect(block.spentSUSD).toBe(372);
+    expect(block.budgetStartBeforeNeedsRUSD).toBeCloseTo(1643.835616438356, 9);
+    expect(block.budgetEndAfterNeedsRUSD).toBeCloseTo(1271.835616438356, 9);
+    expect(block.spentRUSD).toBe(372);
     expect(block.tiers).toHaveLength(4);
     expect(block.tiers.map((tier) => tier.tier)).toEqual([
       "subsistence",
@@ -296,7 +296,7 @@ describe("M2 needs, budgets, and shared supply", () => {
       "comfort",
       "luxury",
     ]);
-    expect(block.tierSummaries.map((summary) => summary.spentSUSD)).toEqual([186, 60, 126, 0]);
+    expect(block.tierSummaries.map((summary) => summary.spentRUSD)).toEqual([186, 60, 126, 0]);
 
     const subsistence = block.tiers.find((tier) => tier.tier === "subsistence");
     const basic = block.tiers.find((tier) => tier.tier === "basic");

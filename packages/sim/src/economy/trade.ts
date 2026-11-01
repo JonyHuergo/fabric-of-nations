@@ -19,7 +19,7 @@
  */
 
 import { dayIndexToCivilDate } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD, QUANTITY_TOLERANCE } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD, QUANTITY_TOLERANCE } from "../population/constants.js";
 import type { DayIndex, Id } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
@@ -73,21 +73,21 @@ export function marketInfrastructureQuality(world: World, market: Market): numbe
 /**
  * Effective route capacity for one direction on one day.
  *
- * Capacity is a daily flow limit in SUSD of cargo value at the origin market price,
+ * Capacity is a daily flow limit in RUSD of cargo value at the origin market price,
  * scaled by the mean of the two markets' infrastructure quality (D-079 §3). It is
  * never stored or accumulated.
  */
-export function routeCapacitySUSDPerDay(
+export function routeCapacityRUSDPerDay(
   route: TradeRoute,
   originInfrastructure: number,
   destinationInfrastructure: number,
 ): number {
   const factor = 0.5 * originInfrastructure + 0.5 * destinationInfrastructure;
   if (!Number.isFinite(factor) || factor <= 0) return 0;
-  return route.baseCapacitySUSDPerDay * Math.min(1, factor);
+  return route.baseCapacityRUSDPerDay * Math.min(1, factor);
 }
 
-/** Freight charged per physical unit on a route (SUSD). */
+/** Freight charged per physical unit on a route (RUSD). */
 export function freightCostPerUnit(good: GoodDef, route: TradeRoute): number {
   return good.transportCostPerUnit * route.distanceUnits;
 }
@@ -178,9 +178,9 @@ export function runTradeArrivals(
   world.trade.lastDay = {
     dayIndex,
     dispatchedShipments: previous?.dayIndex === dayIndex ? previous.dispatchedShipments : 0,
-    freightPaidSUSD: previous?.dayIndex === dayIndex ? previous.freightPaidSUSD : 0,
-    dutyPaidSUSD: previous?.dayIndex === dayIndex ? previous.dutyPaidSUSD : 0,
-    ownerFundedSUSD: previous?.dayIndex === dayIndex ? previous.ownerFundedSUSD : 0,
+    freightPaidRUSD: previous?.dayIndex === dayIndex ? previous.freightPaidRUSD : 0,
+    dutyPaidRUSD: previous?.dayIndex === dayIndex ? previous.dutyPaidRUSD : 0,
+    ownerFundedRUSD: previous?.dayIndex === dayIndex ? previous.ownerFundedRUSD : 0,
     arrivedShipments:
       (previous?.dayIndex === dayIndex ? previous.arrivedShipments : 0) + due.length,
     blocked: previous?.dayIndex === dayIndex ? previous.blocked : [],
@@ -192,16 +192,16 @@ export interface TradeCapacityUse {
   readonly routeId: Id;
   readonly originMarketId: Id;
   readonly destinationMarketId: Id;
-  readonly capacitySUSD: number;
-  readonly usedSUSD: number;
+  readonly capacityRUSD: number;
+  readonly usedRUSD: number;
 }
 
 export interface TradeDispatchResult {
   readonly dayIndex: DayIndex;
   readonly shipments: readonly TradeShipment[];
-  readonly freightPaidSUSD: number;
-  readonly dutyPaidSUSD: number;
-  readonly ownerFundedSUSD: number;
+  readonly freightPaidRUSD: number;
+  readonly dutyPaidRUSD: number;
+  readonly ownerFundedRUSD: number;
   readonly blocked: readonly TradeBlockedDiagnostic[];
   readonly capacityUse: readonly TradeCapacityUse[];
   readonly postingIds: readonly number[];
@@ -316,9 +316,9 @@ function dispatchTrade(
     return {
       dayIndex,
       shipments: [],
-      freightPaidSUSD: 0,
-      dutyPaidSUSD: 0,
-      ownerFundedSUSD: 0,
+      freightPaidRUSD: 0,
+      dutyPaidRUSD: 0,
+      ownerFundedRUSD: 0,
       blocked: [],
       capacityUse: [],
       postingIds: [],
@@ -327,9 +327,9 @@ function dispatchTrade(
   const empty: TradeDispatchResult = {
     dayIndex,
     shipments: [],
-    freightPaidSUSD: 0,
-    dutyPaidSUSD: 0,
-    ownerFundedSUSD: 0,
+    freightPaidRUSD: 0,
+    dutyPaidRUSD: 0,
+    ownerFundedRUSD: 0,
     blocked: [],
     capacityUse: [],
     postingIds: [],
@@ -338,9 +338,9 @@ function dispatchTrade(
     world.trade.lastDay = {
       dayIndex,
       dispatchedShipments: 0,
-      freightPaidSUSD: 0,
-      dutyPaidSUSD: 0,
-      ownerFundedSUSD: 0,
+      freightPaidRUSD: 0,
+      dutyPaidRUSD: 0,
+      ownerFundedRUSD: 0,
       arrivedShipments: 0,
       blocked: [],
     };
@@ -355,11 +355,11 @@ function dispatchTrade(
       country.trade.importQuotaUsedQuantity = world.trade.enabled
         ? new Array<number>(definitions.goods.length).fill(0)
         : country.trade.importQuotaUsedQuantity;
-      country.trade.exportsValueMonthToDateSUSD = 0;
-      country.trade.importsValueMonthToDateSUSD = 0;
-      country.trade.dutyReceivedMonthToDateSUSD = 0;
-      country.trade.dutyPaidMonthToDateSUSD = 0;
-      country.trade.freightPaidMonthToDateSUSD = 0;
+      country.trade.exportsValueMonthToDateRUSD = 0;
+      country.trade.importsValueMonthToDateRUSD = 0;
+      country.trade.dutyReceivedMonthToDateRUSD = 0;
+      country.trade.dutyPaidMonthToDateRUSD = 0;
+      country.trade.freightPaidMonthToDateRUSD = 0;
     }
   }
 
@@ -380,8 +380,8 @@ function dispatchTrade(
     const existing = cashByBuilding.get(buildingId);
     if (existing !== undefined) return existing;
     const account = accountByOwner(world, "building", buildingId, "operating-cash");
-    cashByBuilding.set(buildingId, account.balanceSUSD);
-    return account.balanceSUSD;
+    cashByBuilding.set(buildingId, account.balanceRUSD);
+    return account.balanceRUSD;
   };
   // Running cash per account for owner funding, which several buildings may share.
   const cashByAccount = new Map<Id, number>();
@@ -392,8 +392,8 @@ function dispatchTrade(
     if (account === undefined) {
       throw new RangeError(`unknown cash account ${String(accountId)} for E6a trade`);
     }
-    cashByAccount.set(accountId, account.balanceSUSD);
-    return account.balanceSUSD;
+    cashByAccount.set(accountId, account.balanceRUSD);
+    return account.balanceRUSD;
   };
 
   const shipments: TradeShipment[] = [];
@@ -401,9 +401,9 @@ function dispatchTrade(
   const capacityUse: TradeCapacityUse[] = [];
   const entries: JournalEntryInput[] = [];
   let nextShipmentId = world.trade.nextShipmentId;
-  let freightPaidSUSD = 0;
-  let dutyPaidSUSD = 0;
-  let ownerFundedSUSD = 0;
+  let freightPaidRUSD = 0;
+  let dutyPaidRUSD = 0;
+  let ownerFundedRUSD = 0;
 
   // Uncommitted lot quantity for the whole dispatch. A lot may be offered to several
   // destinations on different routes; this map is decremented by every shipment so the
@@ -471,12 +471,12 @@ function dispatchTrade(
     for (const direction of directions) {
       const origin = direction.origin;
       const destination = direction.destination;
-      const capacitySUSD = routeCapacitySUSDPerDay(
+      const capacityRUSD = routeCapacityRUSDPerDay(
         route,
         infrastructureByMarket.get(origin.id) ?? 0,
         infrastructureByMarket.get(destination.id) ?? 0,
       );
-      let usedSUSD = 0;
+      let usedRUSD = 0;
       const destinationAdminId = destination.customsCountryId;
       const originAdminId = origin.customsCountryId;
       const dutiable =
@@ -491,11 +491,11 @@ function dispatchTrade(
       const fxSuspended =
         destinationAdminId !== null &&
         isConvertibilitySuspended(world, destinationAdminId);
-      const destinationPrices = destination.priceSUSD;
+      const destinationPrices = destination.priceRUSD;
 
       for (const good of goods) {
         const goodId = good.id;
-        const originPrice = origin.priceSUSD[goodId];
+        const originPrice = origin.priceRUSD[goodId];
         const destinationPrice = destinationPrices[goodId];
         if (
           originPrice === undefined ||
@@ -557,7 +557,7 @@ function dispatchTrade(
           continue;
         }
 
-        const remainingCapacity = Math.max(0, capacitySUSD - usedSUSD);
+        const remainingCapacity = Math.max(0, capacityRUSD - usedRUSD);
         if (!(remainingCapacity > 0) || inTransitCapReached(world, shipments.length)) {
           noteBlock(origin.id, destination.id, goodId, "capacity");
           continue;
@@ -604,7 +604,7 @@ function dispatchTrade(
           const availableCash = buildingCash + ownerCash;
           const cashQuantity =
             costPerUnit > 0
-              ? Math.max(0, availableCash - MONEY_TOLERANCE_SUSD) / costPerUnit
+              ? Math.max(0, availableCash - MONEY_TOLERANCE_RUSD) / costPerUnit
               : Number.POSITIVE_INFINITY;
           const lotQuantity = Math.min(
             lot.quantity,
@@ -621,7 +621,7 @@ function dispatchTrade(
           const freightCost = lotQuantity * freightPerUnit;
           const dutyCost = lotQuantity * dutyPerUnit;
           const totalCost = freightCost + dutyCost;
-          if (totalCost > availableCash + MONEY_TOLERANCE_SUSD * Math.max(1, availableCash)) {
+          if (totalCost > availableCash + MONEY_TOLERANCE_RUSD * Math.max(1, availableCash)) {
             continue;
           }
           // Working-capital rule (D-079 §12a): the enterprise pays from its own cash;
@@ -629,7 +629,7 @@ function dispatchTrade(
           // a loan, payable, or negative balance.
           const buildingPortion = Math.min(buildingCash, totalCost);
           const ownerPortion = totalCost - buildingPortion;
-          if (ownerPortion > ownerCash + MONEY_TOLERANCE_SUSD * Math.max(1, ownerCash)) {
+          if (ownerPortion > ownerCash + MONEY_TOLERANCE_RUSD * Math.max(1, ownerCash)) {
             continue;
           }
           if (ownerPortion > 0) {
@@ -639,29 +639,29 @@ function dispatchTrade(
                 {
                   accountId: building.operatingCashAccountId,
                   side: "debit",
-                  amountSUSD: ownerPortion,
+                  amountRUSD: ownerPortion,
                 },
                 {
                   accountId: accountByOwner(world, "building", building.id, "owner-equity").id,
                   side: "credit",
-                  amountSUSD: ownerPortion,
+                  amountRUSD: ownerPortion,
                 },
                 {
                   accountId: owner.cashAccountId,
                   side: "credit",
-                  amountSUSD: ownerPortion,
+                  amountRUSD: ownerPortion,
                 },
                 {
                   accountId: owner.equityAccountId,
                   side: "debit",
-                  amountSUSD: ownerPortion,
+                  amountRUSD: ownerPortion,
                 },
               ],
               sourceEntityId: owner.ownerId,
               targetEntityId: building.id,
             });
             cashByAccount.set(owner.cashAccountId, ownerCash - ownerPortion);
-            ownerFundedSUSD += ownerPortion;
+            ownerFundedRUSD += ownerPortion;
           }
           const shipment: TradeShipment = {
             id: nextShipmentId,
@@ -674,35 +674,35 @@ function dispatchTrade(
             destinationCountryId: destinationAdminId,
             dispatchDay: dayIndex,
             arrivalDay: dayIndex + transitDays(route),
-            cargoValueSUSD: cargoValue,
-            freightCostSUSD: freightCost,
-            dutySUSD: dutyCost,
+            cargoValueRUSD: cargoValue,
+            freightCostRUSD: freightCost,
+            dutyRUSD: dutyCost,
             dutyRate,
           };
           nextShipmentId += 1;
           shipments.push(shipment);
           shippedQuantity += lotQuantity;
-          usedSUSD += cargoValue;
+          usedRUSD += cargoValue;
           const remainingLot = remainingByLot.get(lot.key);
           if (remainingLot === undefined) {
             throw new RangeError(`trade dispatch lost lot ${lot.key}`);
           }
           remainingLot.quantity -= lotQuantity;
           cashByBuilding.set(building.id, buildingCash - buildingPortion);
-          freightPaidSUSD += freightCost;
-          dutyPaidSUSD += dutyCost;
+          freightPaidRUSD += freightCost;
+          dutyPaidRUSD += dutyCost;
 
           if (countryId !== null) {
             const exporter = countryById.get(countryId);
             if (exporter !== undefined) {
-              exporter.trade.exportsValueMonthToDateSUSD += cargoValue;
-              exporter.trade.dutyPaidMonthToDateSUSD += dutyCost;
-              exporter.trade.freightPaidMonthToDateSUSD += freightCost;
+              exporter.trade.exportsValueMonthToDateRUSD += cargoValue;
+              exporter.trade.dutyPaidMonthToDateRUSD += dutyCost;
+              exporter.trade.freightPaidMonthToDateRUSD += freightCost;
             }
           }
           if (destinationCountry !== undefined) {
-            destinationCountry.trade.importsValueMonthToDateSUSD += cargoValue;
-            destinationCountry.trade.dutyReceivedMonthToDateSUSD += dutyCost;
+            destinationCountry.trade.importsValueMonthToDateRUSD += cargoValue;
+            destinationCountry.trade.dutyReceivedMonthToDateRUSD += dutyCost;
             if (dutiable) {
               destinationCountry.trade.importQuotaUsedQuantity[goodId] =
                 (destinationCountry.trade.importQuotaUsedQuantity[goodId] ?? 0) + lotQuantity;
@@ -716,22 +716,22 @@ function dispatchTrade(
                 {
                   accountId: accountByOwner(world, "building", building.id, "freight-expense").id,
                   side: "debit",
-                  amountSUSD: freightCost,
+                  amountRUSD: freightCost,
                 },
                 {
                   accountId: building.operatingCashAccountId,
                   side: "credit",
-                  amountSUSD: freightCost,
+                  amountRUSD: freightCost,
                 },
                 {
                   accountId: systemCashAccount(world).id,
                   side: "debit",
-                  amountSUSD: freightCost,
+                  amountRUSD: freightCost,
                 },
                 {
                   accountId: accountByOwner(world, "system", null, "system-income").id,
                   side: "credit",
-                  amountSUSD: freightCost,
+                  amountRUSD: freightCost,
                 },
               ],
               sourceEntityId: building.id,
@@ -745,22 +745,22 @@ function dispatchTrade(
                 {
                   accountId: accountByOwner(world, "building", building.id, "customs-duty-expense").id,
                   side: "debit",
-                  amountSUSD: dutyCost,
+                  amountRUSD: dutyCost,
                 },
                 {
                   accountId: building.operatingCashAccountId,
                   side: "credit",
-                  amountSUSD: dutyCost,
+                  amountRUSD: dutyCost,
                 },
                 {
                   accountId: destinationCountry.treasuryAccountId,
                   side: "debit",
-                  amountSUSD: dutyCost,
+                  amountRUSD: dutyCost,
                 },
                 {
                   accountId: accountByOwner(world, "country", destinationCountry.id, "customs-duty-revenue").id,
                   side: "credit",
-                  amountSUSD: dutyCost,
+                  amountRUSD: dutyCost,
                 },
               ],
               sourceEntityId: building.id,
@@ -777,8 +777,8 @@ function dispatchTrade(
         routeId: route.id,
         originMarketId: origin.id,
         destinationMarketId: destination.id,
-        capacitySUSD,
-        usedSUSD,
+        capacityRUSD,
+        usedRUSD,
       });
     }
   }
@@ -845,9 +845,9 @@ function dispatchTrade(
   world.trade.lastDay = {
     dayIndex,
     dispatchedShipments: shipments.length,
-    freightPaidSUSD,
-    dutyPaidSUSD,
-    ownerFundedSUSD,
+    freightPaidRUSD,
+    dutyPaidRUSD,
+    ownerFundedRUSD,
     arrivedShipments: previousDay?.dayIndex === dayIndex ? previousDay.arrivedShipments : 0,
     blocked: blockedDiagnostics,
   };
@@ -855,9 +855,9 @@ function dispatchTrade(
   return {
     dayIndex,
     shipments,
-    freightPaidSUSD,
-    dutyPaidSUSD,
-    ownerFundedSUSD,
+    freightPaidRUSD,
+    dutyPaidRUSD,
+    ownerFundedRUSD,
     blocked: blockedDiagnostics,
     capacityUse,
     postingIds: postings.map((posting) => posting.id),

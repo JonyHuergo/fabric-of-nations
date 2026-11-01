@@ -228,7 +228,7 @@ const output = {
   meta: {
     version: "m11c-1900-boundaries-v1",
     referenceDate: REFERENCE_DATE,
-    title: "Century M11c historical boundary reconstruction and audit, 1 January 1900",
+    title: "Fabric of Nations M11c historical boundary reconstruction and audit, 1 January 1900",
     method:
       "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity.",
     confidenceDefinitions: {

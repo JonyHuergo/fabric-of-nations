@@ -60,7 +60,7 @@ describe("M3d smoke", () => {
       lots: [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }],
     });
     const world = createEconomyWorld(scenario, { seed: 1 });
-    const before = world.markets[0]!.priceSUSD[GRAIN_ID]!;
+    const before = world.markets[0]!.priceRUSD[GRAIN_ID]!;
     const result = runMarketDay(
       world,
       scenario.definitions,
@@ -514,20 +514,20 @@ describe("M3d price updates", () => {
 
   test("shortage raises, surplus lowers, and balance holds", () => {
     const shortage = priceCase([{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 5 }], 10);
-    expect(shortage.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.0525, 12);
+    expect(shortage.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.0525, 12);
     const surplus = priceCase([{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }], 5);
-    expect(surplus.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.0475, 12);
+    expect(surplus.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.0475, 12);
     const balanced = priceCase([{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }], 10);
-    expect(balanced.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.05, 12);
+    expect(balanced.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.05, 12);
   });
 
   test("zero demand and zero supply have explicit behavior", () => {
     const zeroDemand = priceCase([{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 10 }], 0);
-    expect(zeroDemand.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.0475, 12);
+    expect(zeroDemand.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.0475, 12);
     const zeroSupply = priceCase([], 10);
-    expect(zeroSupply.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.0525, 12);
+    expect(zeroSupply.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.0525, 12);
     const zeroBoth = priceCase([], 0);
-    expect(zeroBoth.result.priceUpdates[GRAIN_ID]?.newPriceSUSD).toBeCloseTo(0.05, 12);
+    expect(zeroBoth.result.priceUpdates[GRAIN_ID]?.newPriceRUSD).toBeCloseTo(0.05, 12);
   });
 
   test("same-day transactions use the opening price and updates apply afterward", () => {
@@ -541,7 +541,7 @@ describe("M3d price updates", () => {
       scenario.definitions,
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 10)]),
     );
-    expect(day0.pendingTransactions[0]?.unitPriceSUSD).toBeCloseTo(0.05, 12);
+    expect(day0.pendingTransactions[0]?.unitPriceRUSD).toBeCloseTo(0.05, 12);
     expect(day0.updatedPrices[GRAIN_ID]).toBeCloseTo(0.0525, 12);
 
     world.dayIndex = 1;
@@ -552,13 +552,13 @@ describe("M3d price updates", () => {
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 1)]),
     );
     expect(day1.openingPrices[GRAIN_ID]).toBeCloseTo(0.0525, 12);
-    expect(day1.pendingTransactions[0]?.unitPriceSUSD).toBeCloseTo(0.0525, 12);
+    expect(day1.pendingTransactions[0]?.unitPriceRUSD).toBeCloseTo(0.0525, 12);
   });
 
   test("daily price changes stay within the configured bound and price bounds", () => {
     const scenario = marketScenario({ produce: false, lots: [] });
     const world = createEconomyWorld(scenario, { seed: 1 });
-    let previous = world.markets[0]!.priceSUSD[GRAIN_ID]!;
+    let previous = world.markets[0]!.priceRUSD[GRAIN_ID]!;
     for (let day = 0; day < 100; day += 1) {
       world.dayIndex = day;
       const result = runMarketDay(
@@ -567,11 +567,11 @@ describe("M3d price updates", () => {
         marketInput(scenario, world, [household(0, 1, GRAIN_ID, 10)]),
       );
       const update = result.priceUpdates[GRAIN_ID]!;
-      expect(Math.abs(update.newPriceSUSD / previous - 1)).toBeLessThanOrEqual(0.0500000001);
-      expect(update.newPriceSUSD).toBeGreaterThan(0);
-      expect(update.newPriceSUSD).toBeLessThanOrEqual(0.2 + 1e-12);
-      expect(Number.isFinite(update.newPriceSUSD)).toBe(true);
-      previous = update.newPriceSUSD;
+      expect(Math.abs(update.newPriceRUSD / previous - 1)).toBeLessThanOrEqual(0.0500000001);
+      expect(update.newPriceRUSD).toBeGreaterThan(0);
+      expect(update.newPriceRUSD).toBeLessThanOrEqual(0.2 + 1e-12);
+      expect(Number.isFinite(update.newPriceRUSD)).toBe(true);
+      previous = update.newPriceRUSD;
     }
     expect(previous).toBeCloseTo(0.2, 12);
   });

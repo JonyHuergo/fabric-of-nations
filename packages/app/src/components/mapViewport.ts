@@ -1,13 +1,14 @@
 /**
  * Pure map viewport math used by the WorldMap component and its tests.
  *
- * The map is drawn in a 1000x500 Miller-projected viewBox and letterboxed into
+ * The SVG map is drawn in the shared projection's viewBox and letterboxed into
  * the available container. Keeping the scale/bounds/focal-point math here makes
  * the zoom limits and transform semantics testable without React Native.
  */
 
-export const MAP_WIDTH = 1000;
-export const MAP_HEIGHT = 500;
+import { MAP_HEIGHT, MAP_WIDTH } from "../map/projection";
+
+export { MAP_HEIGHT, MAP_WIDTH };
 export const MAP_MIN_SCALE = 1;
 export const MAP_MAX_SCALE = 18;
 export const MAP_PREVIOUS_MAX_SCALE = 10;

@@ -1,13 +1,21 @@
-# CENTURY — GRAND STRATEGY 1900–2000
+# FABRIC OF NATIONS — GRAND STRATEGY 1900–2000
 
-**Working title:** *Century*\
+**Official name:** *Fabric of Nations*\
 **Document type:** Game Design Document and Agent Implementation Specification\
 **Version:** 2.18\
 **Revision date:** 2026-10-30\
+**Rebranding revision:** 2026-11-01 (M13)\
 **Target platform:** iOS and Android\
 **Application stack:** React Native / Expo with a versioned worker/snapshot bus (M7 implementation; native release verification pending)\
 **Simulation period:** 1900-01-01 through the boundary at 2000-01-01\
 **Simulation resolution:** One simulated civil day per tick
+
+> **Name note (M13).** The game was formerly *Century*. M13 rebranded the
+> player-facing application, distribution metadata and current documentation to
+> **Fabric of Nations** without changing simulation behavior, save schema or
+> historical starting conditions. This document keeps GDD version 2.18 because
+> no game-design content changed; earlier GDD versions retain their original
+> titles as archived historical documents.
 
 > **v2.18 alignment note.** This revision records **M11 — Historical
 > World, Country Selection, and Complete UI Overhaul** as implemented. The
@@ -24,7 +32,7 @@
 > (§17I.7) adds Austria-Hungary and the documented de facto, autonomous and
 > protectorate polities, and records the catalog coverage audit in
 > `docs/1900_CATALOG_COVERAGE.md`. World schema is **26**, simulation **0.27.0**,
-> save format **1**, data **`m3-economy-v12`**, worker protocol **14**; older
+> save format **1**, data **`m3-economy-v12`**, worker protocol **16**; older
 > saves and protocol-13 clients reject under D-013. The implementation record is
 > §17I and the decisions
 > are D-086 through D-093.
@@ -66,7 +74,7 @@
 > by realized trade and relative prices; balanced currency-board accounting for reserve
 > capitalization, currency issue/redemption, and parity/valuation revaluation; and a
 > reserve-cover convertibility rule whose suspension blocks imports into the country's
-> customs zone. SUSD remains the fixed unit of account; domestic accounts and trade are
+> customs zone. RUSD remains the fixed unit of account; domestic accounts and trade are
 > never redenominated or converted twice.
 >
 > Commercial banks, deposits, bank credit, a policy interest rate, lender-of-last-resort,
@@ -294,7 +302,7 @@
 > the M1 foundation, the M2/M2.1 population and demographic model, the M3a–M3f
 > economy stages, M4a-1 category-aware double-entry accounts and opening
 > balances, M4a-2 country/currency identity, monetary arrangements, and
-> SUSD-relative valuation, M4b monthly period close and finance summaries, and
+> RUSD-relative valuation, M4b monthly period close and finance summaries, and
 > M4c per-country treasury, daily income taxation, and budgeted welfare
 > transfers. It does not claim that the complete v1 design, the full economic
 > model, or any later milestone is implemented. The revision (a) records the
@@ -404,7 +412,7 @@ The agent must not silently resolve a contradiction that changes game behavior. 
 
 ### 1.1 Vision
 
-*Century* is a historical grand-strategy simulation in which the player governs a state through the economic, demographic, political, and geopolitical transformations of the twentieth century. The simulation spans industrialization, urbanization, mass education, total war, ideological conflict, decolonization, fiscal expansion, and the rise of the service economy.
+*Fabric of Nations* is a historical grand-strategy simulation in which the player governs a state through the economic, demographic, political, and geopolitical transformations of the twentieth century. The simulation spans industrialization, urbanization, mass education, total war, ideological conflict, decolonization, fiscal expansion, and the rise of the service economy.
 
 The player should feel that a country is not a collection of abstract meters. It is a population with needs, workers with occupations, businesses that produce and sell, governments that collect and spend money, institutions that shape behavior, and physical goods that must be extracted, made, transported, and consumed.
 
@@ -431,7 +439,7 @@ The simulation is deliberately aggregate. It models groups and systems rather th
 
 ### 1.4 Economic management design objective
 
-Century must be a game in which the player governs a country's economy through
+Fabric of Nations must be a game in which the player governs a country's economy through
 consequential policy choices, public spending, investment, and institution-building.
 The player must be able to understand the economy's current condition, identify
 important causes, choose interventions, finance those interventions, and assess their
@@ -469,7 +477,7 @@ This does **not** prohibit every scalar, counter, index, or stored value. Money 
 
 ### 2.2 Required replacements
 
-| Traditional abstraction | Required model in *Century* |
+| Traditional abstraction | Required model in *Fabric of Nations* |
 |---|---|
 | Political-power points | Support, organization, and leverage derived from population groups, wealth, literacy, laws, and institutions; enactment also consumes time and political support. |
 | Research-point pool | Research work performed by employed academics and funded research institutions on explicit projects. Project progress records completed work; it is not a generic pool that can be spent anywhere. |
@@ -779,20 +787,26 @@ only if the full-demand attempt would overdraw a buyer.
 ```ts
 type DayIndex = number;       // 0..36_524; terminal boundary is 36_524
 type Id = number;             // stable dense numeric ID within a world
-type MoneySUSD = number;      // nominal SUSD unit of measurement (not a national currency)
+type MoneyRUSD = number;      // nominal RUSD unit of measurement (not a national currency)
 type Rate = number;          // normalized ratio, normally 0..1
 type Count = number;          // non-negative integer persons, jobs, or items
 type IndexValue = number;     // documented derived index; range specified per field
 ```
 
-`SUSD` is the simulation's fixed **unit of measurement and accounting
-denomination**, not a national currency or necessarily an actual U.S. dollar.
-Its definition is fixed, but its purchasing power is not fixed: nominal SUSD
+`RUSD` — **Reference US Dollars** — is the simulation's fixed **unit of
+measurement and accounting denomination**. It is a neutral reference unit used
+to compare and calculate economic values across national monetary systems. It is
+not a currency issued by any country, not legal tender, not an adoptable
+national currency, and not a replacement for the real-world United States
+dollar or any other national currency. One RUSD is not defined as one real US
+dollar, and no fixed USD/RUSD exchange rate is implied.
+
+Its definition is fixed, but its purchasing power is not fixed: nominal RUSD
 values are distinct from any future real/inflation-adjusted values derived from
 a documented price index or reference period. M4a-1 accounting balances are
-nominal SUSD. SUSD is not registered, issued, or adopted as a currency in M4a-2,
-and a fixed SUSD measurement unit does not imply that other currencies are
-pegged to SUSD. Future currency regimes and FX indicators may influence
+nominal RUSD. RUSD is not registered, issued, or adopted as a currency in M4a-2,
+and a fixed RUSD measurement unit does not imply that other currencies are
+pegged to RUSD. Future currency regimes and FX indicators may influence
 cross-market prices, reserves, trade, and capital flows, but M4a-2 does not
 implement dynamic FX, inflation, monetary policy, or native-currency accounting.
 This is an explicit scope boundary, not a license to create unexplained money.
@@ -805,8 +819,8 @@ interface GoodDef {
   key: string;
   name: string;
   category: 'food' | 'raw' | 'industrial' | 'luxury' | 'service';
-  basePrice1900SUSD: MoneySUSD;
-  transportCostPerUnit: MoneySUSD;
+  basePrice1900RUSD: MoneyRUSD;
+  transportCostPerUnit: MoneyRUSD;
   priceElasticity: number;       // calibrated parameter; documented range
   spoilageRateAnnual: Rate;      // 0 for non-perishable goods
   unitLabel: string;
@@ -820,8 +834,8 @@ interface ProfessionDef {
   participationRate: Rate;       // applied to the eligible working-age population
   qualificationLiteracy: Rate;
   qualificationWealthLevel: number; // 0..99
-  baseWage1900SUSDPerYear: MoneySUSD;
-  trainingCostSUSD: MoneySUSD;
+  baseWage1900RUSDPerYear: MoneyRUSD;
+  trainingCostRUSD: MoneyRUSD;
   laborProductivityModifier: number;
 }
 
@@ -832,8 +846,8 @@ interface BuildingDef {
   inputs: { goodId: Id; quantityPerFullOutputDay: number }[];
   outputs: { goodId: Id; quantityPerFullOutputDay: number }[];
   jobs: { professionId: Id; workersAtLevelOne: number }[];
-  constructionCostSUSD: MoneySUSD;
-  dailyUpkeepSUSDAtLevelOne: MoneySUSD;
+  constructionCostRUSD: MoneyRUSD;
+  dailyUpkeepRUSDAtLevelOne: MoneyRUSD;
   storageCapacityByGood?: { goodId: Id; quantity: number }[];
   resourceRequirements?: { goodId: Id; quantityPerDayAtFullOutput: number }[];
   requiredTechnologyId: Id | null;
@@ -952,7 +966,7 @@ interface Region {
 interface Market {
   id: Id;
   regionIds: Id[];
-  priceSUSD: number[];
+  priceRUSD: number[];
   openingStock: number[];
   closingStock: number[];
   storageCapacity: number[];
@@ -987,16 +1001,16 @@ interface Country {
 
 interface FiscalPolicy {
   incomeTaxRate: Rate;                       // flat rate on taxable wages, 0..1
-  incomeTaxAllowanceSUSDPerYear: MoneySUSD;  // E2 per-block annual exemption, >= 0
-  welfareBudgetSUSDPerYear: MoneySUSD;       // requested annual nominal target, >= 0
+  incomeTaxAllowanceRUSDPerYear: MoneyRUSD;  // E2 per-block annual exemption, >= 0
+  welfareBudgetRUSDPerYear: MoneyRUSD;       // requested annual nominal target, >= 0
   welfareMaxWealthLevel: number;             // E2 inclusive eligibility ceiling, 0..99
   businessProfitTaxRate: Rate;               // E2 rate on positive monthly profit, 0..1
-  reserveTargetSUSD: MoneySUSD;              // E2 treasury liquidity floor, >= 0
+  reserveTargetRUSD: MoneyRUSD;              // E2 treasury liquidity floor, >= 0
 }
 
 interface Currency {
   id: Id;
-  key: string;                         // stable lower-case; `susd` reserved
+  key: string;                         // stable lower-case; `rusd` reserved
   name: string;
   issuer: CurrencyIssuer;
 }
@@ -1011,13 +1025,13 @@ type MonetaryArrangement =
   | { kind: 'adopted'; currencyId: Id }
   | { kind: 'shared'; currencyId: Id; unionKey: string }; // rejected in M4a-2
 
-type SusdPerCurrencyUnit = number;     // SUSD per one currency unit; branded in code
+type RusdPerCurrencyUnit = number;     // RUSD per one currency unit; branded in code
 
 type CurrencyValuation =
   | {
       currencyId: Id;
       status: 'specified';
-      susdPerUnit: SusdPerCurrencyUnit;
+      rusdPerUnit: RusdPerCurrencyUnit;
       setOnDay: DayIndex;              // equals the world start day in M4a-2
       source: 'scenario';
     }
@@ -1025,7 +1039,7 @@ type CurrencyValuation =
 
 // Historical: the v2.2 `CurrencyState` target (`regime`, `fxToUSD`,
 // `inflationIndex`, `goldReservesOunces`, `centralBankAccountId`,
-// `moneySupplySUSD`) is superseded by the M4a-2 model above. Those fields are
+// `moneySupplyRUSD`) is superseded by the M4a-2 model above. Those fields are
 // not current authoritative state; they are retained only in the historical
 // v2.2 document. Regimes, inflation, gold convertibility, central banking, and
 // monetary aggregates remain future systems described in §8.6.
@@ -1035,12 +1049,12 @@ interface CountryStats {
   workingAgePopulation: number;
   employment: number;
   unemployment: number;
-  nominalGDP12M: MoneySUSD;
-  exports12M: MoneySUSD;
-  imports12M: MoneySUSD;
-  governmentRevenue12M: MoneySUSD;
-  governmentSpending12M: MoneySUSD;
-  debt: MoneySUSD;
+  nominalGDP12M: MoneyRUSD;
+  exports12M: MoneyRUSD;
+  imports12M: MoneyRUSD;
+  governmentRevenue12M: MoneyRUSD;
+  governmentSpending12M: MoneyRUSD;
+  debt: MoneyRUSD;
   debtToGDP: number;
   literacy: Rate;
   urbanization: Rate;
@@ -1072,8 +1086,8 @@ ownership is authoritative in `Country.regionIds`. Current `BuildingInstance`
 uses `ownerAccountId` and `operatingCashAccountId` rather than the target
 `ownerCountryId`/`jobsFilledByProfession`; employment lives in the explicit
 assignment collection. Current `Market` stores authoritative `stockLots` plus
-`regionIds` and `priceSUSD`, not the target aggregate flow arrays. M4a-1
-`FinancialAccount` uses `category`/`subtype` with normal-side `balanceSUSD`, and
+`regionIds` and `priceRUSD`, not the target aggregate flow arrays. M4a-1
+`FinancialAccount` uses `category`/`subtype` with normal-side `balanceRUSD`, and
 M4c adds the `country` owner kind and the fiscal subtypes (§5.4.3);
 `FinanceState` contains `accounts`, `postings`, `nextPostingId`, `nextAccountId`,
 `opening`, `periodSummaries`, `annualSummaries`, `corrections`,
@@ -1103,7 +1117,7 @@ M4a-2 makes `World.countries`, `World.currencies`, and
 `World.currencyValuations` authoritative. `Country.monetary` is the sole domestic
 monetary arrangement; there is no top-level `Country.currencyId`.
 M4c extends the scenario country input to `CountryInitialDef`, which adds
-`treasuryAccountId`, `initialTreasuryCashSUSD`, and `fiscal`; construction builds
+`treasuryAccountId`, `initialTreasuryCashRUSD`, and `fiscal`; construction builds
 the runtime `Country` from it and creates the fiscal accounts (§5.4.3).
 `Country.regionIds` is the sole country-to-region ownership mapping; there is no
 `Region.countryId`.
@@ -1126,18 +1140,18 @@ Issuance is independent of domestic use:
 
 Every registered currency has exactly one issuer and exactly one valuation
 record. A `CurrencyValuation` is either `specified` or explicitly `unavailable`.
-A specified record carries `susdPerUnit` (the SUSD value of **one** unit of the
+A specified record carries `rusdPerUnit` (the RUSD value of **one** unit of the
 currency), `setOnDay` (equal to the world start day in M4a-2), and
 `source: 'scenario'`. Missing or unavailable valuations never default to parity or
-another currency's value. SUSD is not a currency-registry entry or a valid
-arrangement target, and currency keys cannot represent SUSD through casing
+another currency's value. RUSD is not a currency-registry entry or a valid
+arrangement target, and currency keys cannot represent RUSD through casing
 variations.
 
 Cross rates are derived, never stored:
 
-`crossRate(from, to) = from.susdPerUnit / to.susdPerUnit`
+`crossRate(from, to) = from.rusdPerUnit / to.rusdPerUnit`
 
-The result is units of `to` per one unit of `from`. `susdPerUnit` is a valuation
+The result is units of `to` per one unit of `from`. `rusdPerUnit` is a valuation
 input, not by itself a peg. M4a-2 does not implement dynamic FX, floating or
 managed exchange rates, inflation, monetary policy, central-bank operations, gold
 convertibility, legal-tender enforcement, issuance operations, native-currency
@@ -1307,7 +1321,7 @@ in force.
 `owner-equity` (equity) account. The treasury id is scenario-declared
 (`CountryInitialDef.treasuryAccountId`); the remaining country accounts are
 deterministically allocated above the declared-id floor. Opening treasury cash
-(`CountryInitialDef.initialTreasuryCashSUSD`) is applied once through
+(`CountryInitialDef.initialTreasuryCashRUSD`) is applied once through
 `applyOpeningBalances` with the country equity account as its counterpart; opening
 revenue/expense balances remain rejected. Every pop block in a world that declares
 at least one country owns `income-tax-expense` (expense) and `welfare-income`
@@ -1319,11 +1333,11 @@ benchmark baseline; validation requires the fiscal account set whenever the worl
 contains a country.
 
 **Fiscal policy.** `Country.fiscal` carries `incomeTaxRate` (dimensionless, 0..1),
-`incomeTaxAllowanceSUSDPerYear` (nominal per-pop-block annual exemption, finite,
-nonnegative, bounded), `welfareBudgetSUSDPerYear` (nominal SUSD/year, finite,
+`incomeTaxAllowanceRUSDPerYear` (nominal per-pop-block annual exemption, finite,
+nonnegative, bounded), `welfareBudgetRUSDPerYear` (nominal RUSD/year, finite,
 nonnegative, bounded), `welfareMaxWealthLevel` (inclusive block wealth ceiling,
 integer 0..99; 99 is universal), `businessProfitTaxRate` (dimensionless, 0..1), and
-`reserveTargetSUSD` (treasury liquidity floor, finite, nonnegative, bounded). It is
+`reserveTargetRUSD` (treasury liquidity floor, finite, nonnegative, bounded). It is
 scenario-initialised provisional state, not law-bounded; M8 may replace the rates
 with enacted taxation and budget laws. The shipped scenario declares only the M4c
 rate and welfare budget; every E2 field starts at its neutral default (zero
@@ -1335,7 +1349,7 @@ yet.
 **Income tax.** Once per processed day, in the fiscal phase after settlement, a
 residence-based tax is withheld from each pop block as
 `incomeTaxRate × max(0, wages actually received that day −
-incomeTaxAllowanceSUSDPerYear / daysInYear(civil year))`. The residence country is
+incomeTaxAllowanceRUSDPerYear / daysInYear(civil year))`. The residence country is
 the country that owns the block's region. There are no strata, wealth taxes, or tax
 on welfare. Partial wage payments produce proportionally partial tax, and multiple
 employers are already combined by settlement into one daily receipt. The posting
@@ -1345,11 +1359,11 @@ employer's `wage-expense` are unchanged. Tax cannot exceed received wages or the
 block's cash; a violation is reported as an implementation error without mutation.
 
 **Welfare transfer.** Once per processed day, `requested =
-welfareBudgetSUSDPerYear / daysInYear(current civil year)`. Eligible blocks are
+welfareBudgetRUSDPerYear / daysInYear(current civil year)`. Eligible blocks are
 those with positive population whose wealth level is at or below
 `welfareMaxWealthLevel`; the payable amount is the lesser of `requested` and the
 treasury cash available after that day's income-tax receipts and above
-`reserveTargetSUSD`. Payable is allocated across eligible blocks in proportion to
+`reserveTargetRUSD`. Payable is allocated across eligible blocks in proportion to
 population in ascending block-id order; the final recipient receives the exact
 remainder, so allocations sum exactly to payable without a random draw. The posting
 debits `welfare-expense`, credits each block's `welfare-income`, debits each block's
@@ -1374,7 +1388,7 @@ revenue. The tax expense and revenue are recognized in the period that generated
 profit, the close zeroes them, and the M5a distribution uses the after-tax result.
 A second assessment for the same country and day is rejected.
 
-**Treasury reserve (E2).** `reserveTargetSUSD` is a liquidity floor, not a spendable
+**Treasury reserve (E2).** `reserveTargetRUSD` is a liquidity floor, not a spendable
 pool or a separate account. Daily welfare may not draw treasury cash below it, and a
 **discretionary** player principal repayment may not either. It never causes
 borrowing and does not restrict contractual coupon, maturity, or arrears payments;
@@ -1393,7 +1407,7 @@ replaces `world.finance`. Any failure leaves the original accounts, postings,
 posting ids, summaries, close boundary, and settlement consumption state unchanged.
 The transient phase result reports per-country income tax, requested/paid welfare,
 shortfall, eligible block/population counts, start/end treasury cash, reserve target,
-and per-block tax/welfare amounts plus `endingCashAfterFiscalSUSD` read from the
+and per-block tax/welfare amounts plus `endingCashAfterFiscalRUSD` read from the
 staged authoritative account. The supported simulation entry point remains
 `tick`/`runEconomicDay`; tests import the phase module directly only to exercise
 staging and guards.
@@ -1412,19 +1426,19 @@ per-country income-tax revenue, welfare expense, and net fiscal result from a
 frozen M4b summary's `accountTotals` plus the current account registry. It stores
 no redundant totals and does not add a flow kind.
 
-**Monetary precision.** Authoritative SUSD amounts remain continuous binary64
+**Monetary precision.** Authoritative RUSD amounts remain continuous binary64
 `number` values in a fixed deterministic order; there is no cent quantization,
-decimal money type, or fixed-point migration. `MONEY_TOLERANCE_SUSD = 1e-6` is
+decimal money type, or fixed-point migration. `MONEY_TOLERANCE_RUSD = 1e-6` is
 used for invariant/reconciliation comparisons only, never as a rounding operation
 on balances. The welfare residual rule is proportional by population in ascending
 block-id order with the exact remainder and no random draw. D-049 records the
 full policy; display formatting belongs to a future UI layer.
 
 **Transient cash fields.** Settlement results report
-`endingCashAfterSettlementSUSD` (after market/wages/upkeep, before fiscal). Needs
-results report `budgetStartBeforeNeedsSUSD` and `budgetEndAfterNeedsSUSD` (before
+`endingCashAfterSettlementRUSD` (after market/wages/upkeep, before fiscal). Needs
+results report `budgetStartBeforeNeedsRUSD` and `budgetEndAfterNeedsRUSD` (before
 and after needs spending, before fiscal). Fiscal block results report
-`endingCashAfterFiscalSUSD`. Only the authoritative ledger balance is final
+`endingCashAfterFiscalRUSD`. Only the authoritative ledger balance is final
 end-of-day cash; these transient fields are phase-qualified and must not be
 presented as final cash.
 
@@ -1586,7 +1600,7 @@ accrual, monthly coupons, maturity and principal repayment, refinancing, explici
 arrears, and explicit default. It is a public-finance system, not banking or
 monetary policy.
 
-**Issuers and holders.** A country treasury issues SUSD debt. The holder must be an
+**Issuers and holders.** A country treasury issues RUSD debt. The holder must be an
 existing simulated entity: another country's treasury-cash account or a pop block's
 household-cash account. The issuer may not hold its own debt. This permits domestic
 and foreign creditors without creating a bank, central bank, external investor pool,
@@ -1605,8 +1619,8 @@ budget memo for financing, not a liability, and resets at close.
 plus the most recent **32** terminated records. Older terminated records are removed
 only after their principal/default history is folded into
 `FinanceState.debtHistory`, one aggregate per issuer (`contractsRetired`,
-`contractsDefaulted`, `principalIssuedSUSD`, `principalRepaidSUSD`,
-`principalWrittenOffSUSD`, `interestWrittenOffSUSD`). Active contracts are capped at
+`contractsDefaulted`, `principalIssuedRUSD`, `principalRepaidRUSD`,
+`principalWrittenOffRUSD`, `interestWrittenOffRUSD`). Active contracts are capped at
 **64**; explicit issuance beyond the cap fails, while automatic financing reports
 the amount as unfinanced. A hard cap never silently omits an outstanding liability;
 only zero-balance terminated detail is compacted. `nextContractId` remains
@@ -1663,7 +1677,7 @@ does not borrow merely because remittance cash is not income-tax revenue. The
 requirement is capped by the designated creditor's actual cash and outstanding
 headroom; the active-contract cap is an explicit additional constraint. Borrowing
 proceeds are financing, not revenue. Any unissued requirement is reported as
-`unfinancedDeficitSUSD`; no invisible liability is created. Principal repayment is
+`unfinancedDeficitRUSD`; no invisible liability is created. Principal repayment is
 not expenditure. `governmentPeriodTotals` reports interest expense and a net fiscal
 result including it; the M4b four flow kinds remain unchanged. The accounting fiscal
 result and the liquidity-based financing requirement are distinct reported measures.
@@ -1675,8 +1689,8 @@ publishing. Failures leave the authoritative world unchanged.
 
 **Scenario activation and compatibility.** The shipped eight-polity scenario enables
 debt for the USA (the designated player country) only: welfare budget 2,000,000
-SUSD/year, opening treasury 100,000 SUSD, creditor GBR, 4% annual coupon, 365-day
-term, 1,000,000 SUSD ceiling, refinance on maturity, 365-day arrears grace. These are
+RUSD/year, opening treasury 100,000 RUSD, creditor GBR, 4% annual coupon, 365-day
+term, 1,000,000 RUSD ceiling, refinance on maturity, 365-day arrears grace. These are
 provisional authored inputs, not historical calibration. The other seven countries
 remain debt-disabled. Since the player country is exempt from AI fiscal decisions,
 its authored fiscal/debt policy is not silently overwritten; debt financing itself
@@ -1716,7 +1730,7 @@ type TechnologyEffect = RuleEffect;
 type LawEffect = RuleEffect | { kind: 'taxRateBounds'; taxType: string; min: Rate; max: Rate };
 
 interface InstitutionState {
-  fundedAnnualSUSD: MoneySUSD;
+  fundedAnnualRUSD: MoneyRUSD;
   staffedByProfession: Record<Id, Count>;
   serviceOutputIndex: number;
   quality: Rate;                       // derived/cached from staffing, funding, and institutions
@@ -1751,13 +1765,13 @@ interface FinancialAccount {
   ownerId: Id | null;
   category: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
   subtype: string;                     // validated functional subtype
-  balanceSUSD: MoneySUSD;              // normal-side units; signed only for equity
+  balanceRUSD: MoneyRUSD;              // normal-side units; signed only for equity
 }
 
 interface JournalLine {
   accountId: Id;
   side: 'debit' | 'credit';
-  amountSUSD: MoneySUSD;               // strictly positive
+  amountRUSD: MoneyRUSD;               // strictly positive
 }
 
 interface JournalPosting {
@@ -1775,12 +1789,12 @@ interface DebtContract {
   issuerCountryId: Id;
   holderKind: 'country' | 'popBlock';
   holderId: Id;
-  principalSUSD: MoneySUSD;
-  outstandingPrincipalSUSD: MoneySUSD;
+  principalRUSD: MoneyRUSD;
+  outstandingPrincipalRUSD: MoneyRUSD;
   annualCouponRate: Rate;
   issueDay: DayIndex;
   maturityDay: DayIndex;
-  accruedInterestSUSD: MoneySUSD;
+  accruedInterestRUSD: MoneyRUSD;
   status: 'active' | 'arrears' | 'repaid' | 'defaulted';
   arrearsSinceDay: DayIndex | null;
 }
@@ -1802,8 +1816,8 @@ interface FinanceState {
 interface FinancePeriodSummary {
   periodStartDay: DayIndex;
   periodEndDay: DayIndex;
-  accountTotals: Record<Id, MoneySUSD>;   // pre-close trial balance, nonzero accounts only
-  flowTotalsByKind: Record<string, MoneySUSD>; // the four current flow kinds; M4c fiscal totals are derived, not added
+  accountTotals: Record<Id, MoneyRUSD>;   // pre-close trial balance, nonzero accounts only
+  flowTotalsByKind: Record<string, MoneyRUSD>; // the four current flow kinds; M4c fiscal totals are derived, not added
 }
 
 interface AnnualFinanceSummary {           // current M7a
@@ -1812,7 +1826,7 @@ interface AnnualFinanceSummary {           // current M7a
   periodEndDay: DayIndex;                 // 31 December
   complete: boolean;                       // periodStartDay is 1 January
   fiscalTotals: Record<Id, FinancePeriodFiscalTotals>; // annual flows
-  flowTotalsByKind: Record<string, MoneySUSD>;         // annual world gross flows
+  flowTotalsByKind: Record<string, MoneyRUSD>;         // annual world gross flows
   closingBalances: Record<Id, AnnualClosingBalances>;  // year-end stocks
   correctionCount: number;
 }
@@ -2190,7 +2204,7 @@ Every term uses the same unit. Closing stock must be non-negative and must not e
 
 ### 7.6 Prices
 
-Prices are nominal SUSD per unit. The initial price model is incremental and bounded; it is not a full equilibrium solver. Calculate market imbalance using funded demand and sellable supply, with explicit behavior when the denominator is zero.
+Prices are nominal RUSD per unit. The initial price model is incremental and bounded; it is not a full equilibrium solver. Calculate market imbalance using funded demand and sellable supply, with explicit behavior when the denominator is zero.
 
 A provisional update structure is:
 
@@ -2223,7 +2237,7 @@ from future requirements.
 
 - Wage obligations use actual `EmploymentAssignment.workers`; unfilled slots are
   not paid and a worker is not paid twice. The daily rate is
-  `baseWage1900SUSDPerYear / daysInYear(civil year)`.
+  `baseWage1900RUSDPerYear / daysInYear(civil year)`.
 - Wage index, labor scarcity, productivity-wage adjustment, inflation, laws, and
   wage-productivity modifiers are not implemented.
 - Wages are paid after market settlement from the employer operating account.
@@ -2233,7 +2247,7 @@ from future requirements.
   and reports the unpaid remainder. Unpaid wages are not a liability, debt, or
   negative balance in M3e.
 - Every operational building owes
-  `dailyUpkeepSUSDAtLevelOne × building.level` per settlement day, paid after
+  `dailyUpkeepRUSDAtLevelOne × building.level` per settlement day, paid after
   wages from its operating account to the single system-reserve account. Condition
   and staffing do not scale upkeep in M3e; shortfalls are reported and do not
   create debt or automatic closure.
@@ -2300,9 +2314,9 @@ a GDP calculation.
 
 ### 8.1 Accounting principles
 
-V1 uses SUSD as the fixed unit of measurement and accounting denomination. M4a-1
-keeps all accounting balances in nominal SUSD; M4a-2 adds currency identity and
-SUSD-relative valuation but no native-currency balances or a parallel ledger. The
+V1 uses RUSD as the fixed unit of measurement and accounting denomination. M4a-1
+keeps all accounting balances in nominal RUSD; M4a-2 adds currency identity and
+RUSD-relative valuation but no native-currency balances or a parallel ledger. The
 design does not claim to reproduce every detail of national banking systems, but
 it does require internally consistent financial flows.
 
@@ -2321,7 +2335,7 @@ category-aware, double-entry cash and recognition ledger with household,
 building, country-treasury, and system-reserve accounts. Each account carries a
 validated `category` and `subtype`, balances are stored in normal-side units, and
 opening balances are applied once with a persisted provenance record. M3 cash
-outcomes are unchanged. M4a-2 adds country/currency identity and SUSD-relative
+outcomes are unchanged. M4a-2 adds country/currency identity and RUSD-relative
 valuation but does not change the ledger, create native-currency balances, or add
 a second accounting book. M4b adds a monthly period close that recognizes the net
 period result in owner equity and records an immutable monthly summary. M4c adds a
@@ -2425,11 +2439,11 @@ of recognized profit, not government expenditure, and are implemented in M5a
 (§5.4.5).
 
 **M4c/E2 welfare transfer (implemented, provisional).** The country's
-`welfareBudgetSUSDPerYear` is a requested annual nominal expenditure target, not a
+`welfareBudgetRUSDPerYear` is a requested annual nominal expenditure target, not a
 spendable pool. Its daily share is
-`welfareBudgetSUSDPerYear / daysInYear(current civil year)`. Eligible blocks are
+`welfareBudgetRUSDPerYear / daysInYear(current civil year)`. Eligible blocks are
 those with positive population at or below `welfareMaxWealthLevel`. The payable
-amount is the lesser of the request and treasury cash above `reserveTargetSUSD`
+amount is the lesser of the request and treasury cash above `reserveTargetRUSD`
 after the day's income-tax receipts, so a funding shortfall reduces the transfer
 proportionally rather than creating debt, arrears, receivables, or negative cash.
 Payable is allocated across eligible blocks in proportion to population with a
@@ -2461,7 +2475,7 @@ Education expenditure funds teachers, schools, education services, and research 
 ### 8.5 Deficits, borrowing, credit, and default
 
 **Status: current M5b public-debt subset with E2 player financing actions; no
-banking, central bank, or market pricing.** Country treasuries issue SUSD debt to
+banking, central bank, or market pricing.** Country treasuries issue RUSD debt to
 another country treasury or a pop-block household. Contracts persist version,
 issuer, holder, principal, outstanding liability, coupon, issue/maturity, accrued
 interest, status, and arrears start day (§5.4.6, D-057). The current rule is:
@@ -2481,7 +2495,7 @@ interest, status, and arrears start day (§5.4.6, D-057). The current rule is:
   country's designated creditor within that creditor's actual cash, the
   outstanding-principal ceiling, and the active-contract cap; (b) repay part or all of
   one outstanding contract's principal early when treasury cash covers it and the
-  payment leaves cash at or above `reserveTargetSUSD`; and (c) change the
+  payment leaves cash at or above `reserveTargetRUSD`; and (c) change the
   refinancing policy and the outstanding-principal ceiling, the latter never below
   current outstanding principal. Player borrowing posts immediately and its proceeds
   increase treasury cash, so the month-end automatic financing requirement is
@@ -2515,15 +2529,15 @@ The original debt/GDP value of 1.5 is a provisional alert threshold, not a unive
 ### 8.6 Prices, inflation, and currency regimes
 
 **Status: current M4a-2 identity/valuation only; future monetary systems.** M3
-and M4a-1 prices and balances are nominal SUSD market/accounting values. M4a-2
+and M4a-1 prices and balances are nominal RUSD market/accounting values. M4a-2
 adds country/currency identity and a scenario-provided or explicitly unavailable
-SUSD-relative valuation. It does not implement floating or managed exchange
+RUSD-relative valuation. It does not implement floating or managed exchange
 rates, inflation dynamics, monetary policy, central-bank operations, gold
 convertibility, regime transitions, pegged exchange rates, or currency
-conversion in market settlement. `CurrencyValuation.susdPerUnit` is the SUSD
+conversion in market settlement. `CurrencyValuation.rusdPerUnit` is the RUSD
 value of one unit of a currency; it is a valuation input, not by itself a peg.
 
-All M4a-1/M4a-2/M4b monetary balances and quoted prices are stored in nominal SUSD.
+All M4a-1/M4a-2/M4b monetary balances and quoted prices are stored in nominal RUSD.
 A per-country inflation index and FX/regime state remain future design goals; the
 v2.2 representation is superseded, and no such authoritative field exists in
 M4a-2. Future aggregate rules may model macroeconomic consequences without
@@ -2737,7 +2751,7 @@ are rejected and recorded as deferred.
 | **M2** | Population blocks, single-year sex-separated age state, age-specific fertility/mortality, needs baskets, wealth index in a single-region fixture | Single-year/sex population conservation passes; five-year bands reconcile as derived aggregates; births enter age 0 with documented sex split; deterministic fractional accumulation passes; no negative counts; unmet needs change the specified outcomes. Needs use the M2 annual-disposable-income fixture without savings drawdown or account mutation. Historical total calibration is reported separately and is not required for structural M2 completion. |
 | **M2.1** | Population correction and demographic validation: authoritative single-year/sex state, exact annual ageing, ASFR fertility, sex-specific mortality, annual WPP 1950–2000 schedules, WPP-1950 validation scenario | Structural correctness, conservation, save/resume, and deterministic regression tests pass; annual age/sex and total validation against WPP is reported with absolute/relative differences. Post-1950 WPP validation is source-backed; 1900–1949 age structure/schedules remain provisional. The campaign's +9.553% 2000 difference is documented as a no-shock baseline limitation, not historical calibration success. Full pre-1950 historical calibration remains incomplete. |
 | **M3** | Buildings, employment assignments, goods, production, market clearing, inventory, price updates, wages/profits, and an integrated economic tick in a small economy | Goods conservation passes; price-shock tests behave correctly; scarce-goods allocation is order-independent; no NaN/infinity; insolvent or unproductive buildings can fail without creating value. The accepted M3 baseline is delivered through stages M3a–M3f below. |
-| **M4** | Finance/public-finance extension, staged: M4a-1 category-aware double-entry accounts and opening balances; M4a-2 country/currency identity, monetary arrangements, and SUSD-relative valuation; M4b monthly period close and finance summaries; M4c per-country treasury, daily income tax, and budgeted welfare transfers; remaining finance/public-finance work is not implemented, with specific extensions assigned to the Economic Management program E2 (fiscal instruments/spending), E4 (industrial/business), and E6a (customs/trade); land/property and other prerequisites remain unassigned/unimplemented | M4a-1/M4a-2/M4b/M4c acceptance is recorded in §17.2. The remaining M4 revenue/expenditure definition of done stays future: all postings balance; no money appears without a defined source; no E2/E4/E6a instrument is claimed until its own stage acceptance. The debt/interest/maturity, distribution/remittance, annual-close, and inflation/FX/monetary items formerly bundled into M4's eventual goal are reassigned by §17.3 to M5b, M5a, M7a, and M8a respectively; their acceptance criteria belong to those stages and are not M4 acceptance. M4 extends the M3a/M3e foundation; it does not introduce the first accounting interface. |
+| **M4** | Finance/public-finance extension, staged: M4a-1 category-aware double-entry accounts and opening balances; M4a-2 country/currency identity, monetary arrangements, and RUSD-relative valuation; M4b monthly period close and finance summaries; M4c per-country treasury, daily income tax, and budgeted welfare transfers; remaining finance/public-finance work is not implemented, with specific extensions assigned to the Economic Management program E2 (fiscal instruments/spending), E4 (industrial/business), and E6a (customs/trade); land/property and other prerequisites remain unassigned/unimplemented | M4a-1/M4a-2/M4b/M4c acceptance is recorded in §17.2. The remaining M4 revenue/expenditure definition of done stays future: all postings balance; no money appears without a defined source; no E2/E4/E6a instrument is claimed until its own stage acceptance. The debt/interest/maturity, distribution/remittance, annual-close, and inflation/FX/monetary items formerly bundled into M4's eventual goal are reassigned by §17.3 to M5b, M5a, M7a, and M8a respectively; their acceptance criteria belong to those stages and are not M4 acceptance. M4 extends the M3a/M3e foundation; it does not introduce the first accounting interface. |
 | **M5** | Multi-region/multi-country worlds, shared/trade markets, migration, labor mobility, initial historical data pipeline | Eight authored sample polities run together; data validator passes; population, goods, and finance invariants pass; occupation structure trends meet country-specific baseline ranges where data supports them. |
 | **M5a** | Profit distributions to designated private owners/household capitalists or deterministic retention as business funds; actual state-owned-enterprise profit remittances to country treasuries through balanced postings (§5.4.5, §17.2b) | Ownership, timing, account semantics, and available-funds rules are explicit and deterministic; a distribution or remittance never exceeds distributable profit or available cash; no negative balances, unexplained money creation, or breakage of the accounting identity, determinism, and M4b close invariants; M5 ownership/enterprise structures are established or explicitly extended rather than assumed. **Implemented and accepted** (§17.2b, D-056). |
 | **M5b** | Public debt and deficit financing: versioned debt contracts, issuance with matching asset/liability entries and actual cash transfers, daily interest accrual, monthly coupons, maturity/principal repayment, refinancing, explicit arrears, and default; deficit financing limited by creditor cash and an outstanding-principal ceiling (§5.4.6, §17.3, D-057) | Fiscal deficit, financing transactions, borrowing proceeds, interest expense, and principal repayment are separately and explicitly recorded; every issuance moves existing cash between identified issuer/holder accounts; outstanding liability reconciles; financing constraints and default consequences are defined; no unexplained money creation, invisible unpaid obligation, or premature full banking/central-bank system. |
@@ -2809,7 +2823,7 @@ M8a respectively) and are not implemented; M8a is retained as E6b in §17A.
 | Stage | Deliverable | Acceptance boundary | Status |
 |---|---|---|---|
 | **M4a-1** | Category-aware double-entry accounts, normal-side balances, opening balances, recognition legs | Account categories/subtypes validate; opening balances apply once with provenance; postings balance and the accounting identity holds; M3 cash outcomes and producer/household settlement totals are unchanged; serialization, determinism, and rollback tests pass. | Accepted |
-| **M4a-2** | Country/currency identity, monetary arrangements, SUSD-relative valuation, country-region ownership | Runtime `countries`/`currencies`/`currencyValuations` validate, serialize, hash, and clone; `own`/`adopted` rules validate; foreign adoption and one-issued-currency restrictions are enforced; region ownership is authoritative in `Country.regionIds`; conversion direction and unavailable-valuation errors are tested; no M3/M4a-1 economic outcome changes. | Accepted |
+| **M4a-2** | Country/currency identity, monetary arrangements, RUSD-relative valuation, country-region ownership | Runtime `countries`/`currencies`/`currencyValuations` validate, serialize, hash, and clone; `own`/`adopted` rules validate; foreign adoption and one-issued-currency restrictions are enforced; region ownership is authoritative in `Country.regionIds`; conversion direction and unavailable-valuation errors are tested; no M3/M4a-1 economic outcome changes. | Accepted |
 | **M4b** | Monthly period close, immutable finance summaries, semantic posting matrix, internal `period-close`, staged-versus-published close boundary | Economic worlds close on civil month-ends after settlement, needs/militancy, and month-end wealth; the first period may be partial and duplicate/gap/terminal cases reject; summaries capture the pre-close trial balance and the four mapped gross flows; revenue/expense opening balances are zero and the semantic matrix is enforced for single, batched, and persisted postings; closing entries zero revenue/expense exactly, close into existing owner equity in deterministic order, remain cash-neutral, and preserve the accounting identity; missing owner equity fails before mutation; the close is atomic and staged; published validation/serialization/hashing/deserialization reject an unadvanced close; summaries and `closedThroughDay` round-trip, clone, hash, and validate; schema-7/simulation-0.7.0 saves are rejected; deterministic and benchmark coverage passes. | Accepted |
 | **M4c** | Per-country treasury and fiscal accounts, `Country.fiscal` policy state, daily income tax on actual wages, daily budgeted per-capita welfare transfer with proportional shortfall, fiscal posting kinds and semantic matrix, wealth-input refinement | Country and household fiscal account sets validate; treasury opening cash applies once with provenance and balance-sheet counterparts; fiscal values, treasury references, id collisions, and region-ownership gaps reject before mutation; income tax equals the flat rate on actual received wages and cannot exceed them or household cash; welfare uses the civil year's day count, allocates exactly per capita, and reduces proportionally when treasury cash is insufficient without debt, arrears, or negative cash; fiscal postings are cash-neutral, balanced, structurally require their recognition/cash legs, are semantically validated for single/batched/persisted forms, and close into country equity in deterministic order; the fiscal phase is staged on a finance clone and publishes only after complete staged validation, rejects duplicate/stale/wrong-day/terminal execution before mutation, and leaves the original state unchanged on a post-posting failure; transient settlement/needs/fiscal cash fields are phase-qualified and `governmentPeriodTotals` derives government totals from a frozen summary; M4b summary shape and four flow kinds are unchanged; M2/M3/M4a/M4b behavior is preserved for zero-fiscal and countryless worlds; schema-9/simulation-0.9.0 round-trip, determinism, save/resume, and benchmark coverage pass; schema-8/0.8.0 saves reject. | Accepted |
 
@@ -3124,7 +3138,7 @@ to 100 campaign years) but only the latest 12 are exposed in the snapshot.
 basket, base period, weights, price sources, refresh cadence, and treatment of
 missing or new goods; it is a derived index, not a spendable value or an arbitrary
 scalar. Exchange-rate dynamics must build on `CurrencyValuation` and the existing
-country/currency identities; `susdPerUnit` remains a valuation input, not by
+country/currency identities; `rusdPerUnit` remains a valuation input, not by
 itself a peg. Monetary-policy authority must be an institution- or law-backed
 actor with explicit instruments, timing, bounds, and transmission channels. Any
 change in money supply, credit, or central-bank balance sheet must have balanced
@@ -3317,7 +3331,7 @@ evidence, limits, and deferred data dependencies are recorded in §17A.17, §17A
 
 ### 17A.1 Product goal and core loop
 
-> **Central goal.** Century should be a game in which the player governs a country's
+> **Central goal.** Fabric of Nations should be a game in which the player governs a country's
 > economy through consequential policy choices, public spending, investment, and
 > institution-building. The player must be able to understand the economy's current
 > condition, identify important causes, choose interventions, finance those
@@ -3416,9 +3430,9 @@ Every control, indicator, and policy in this section carries one of these labels
 | **A. Fiscal policy/public finances** | Flat wage income tax; welfare budget/transfer; state-enterprise remittance; treasury cash; public debt/coupon/maturity/default; monthly close | Personal/business/consumption/excise/property/land taxes; customs; administration/education/health/infrastructure/subsidy/procurement spending; reserves; debt limits/priorities/refinancing | E2 (fiscal management); customs in E6a; education/health service delivery in E5 | New tax bases and collection mechanics; expenditure categories and service delivery; procurement demand; budget/reserve policy state; UI actions |
 | **B. Public investment/construction** | Building definitions, levels, operating cash, production capacity, employment, inventory, ownership; a building has a real construction cost definition | Player project queue; government/public-enterprise/private-supported projects; materials/labor/time; progress/completion; cancellation/failure; infrastructure | E3 | Project state/queue; construction-phase accounting; material/labor requirements; completion rules; infrastructure/transport model |
 | **C. Industrial/business policy** | Private/state ownership kinds; retained profit, distributions, remittances; firm production/profit/cash; market prices | Sectoral subsidies; investment incentives; public-enterprise creation/expansion; procurement; priority-sector programs; exceptional price/production controls | E4 (core); price controls in E7 | Subsidy/procurement postings; enterprise investment decisions; sector classification; public-enterprise capital formation |
-| **D. Trade/commercial policy** | Shared markets (not international trade); market-scoped inventory/prices; country/currency identity; SUSD valuation placeholders | Tariffs/customs; import/export restrictions; trade agreements/market access; export incentives; protection; imported inputs/consumer goods; FX implications | E6a (after real trade mechanics) | Inter-market goods flows; transport/trade costs; customs boundary; trade postings; currency transaction/FX mechanics |
+| **D. Trade/commercial policy** | Shared markets (not international trade); market-scoped inventory/prices; country/currency identity; RUSD valuation placeholders | Tariffs/customs; import/export restrictions; trade agreements/market access; export incentives; protection; imported inputs/consumer goods; FX implications | E6a (after real trade mechanics) | Inter-market goods flows; transport/trade costs; customs boundary; trade postings; currency transaction/FX mechanics |
 | **E. Labor/social policy** | Population blocks, literacy/wealth, qualification/participation, employment, wages, needs, welfare; migration/open borders; education/literacy as a state | Minimum wages; hours/standards; bargaining; education/training; health/public services; pensions/social insurance; migration; qualification/productivity/welfare effects | E5 (after M8/M9) | Laws/institutions (M8); education/health service mechanics (M9/E5); qualification channels; pension/institution mechanisms |
-| **F. Monetary policy/currency** | SUSD unit; currency identity/issuer/valuation; unavailable/specified valuation; public debt; country treasuries | Monetary regime; policy rates; central-bank lending; bank credit; convertibility; exchange-rate policy; inflation/price-level dynamics | E6b (M8a scope) | Money/credit creation model; banks/monetary institutions; interest-rate channel; inflation measure; FX dynamics; central-bank accounting |
+| **F. Monetary policy/currency** | RUSD unit; currency identity/issuer/valuation; unavailable/specified valuation; public debt; country treasuries | Monetary regime; policy rates; central-bank lending; bank credit; convertibility; exchange-rate policy; inflation/price-level dynamics | E6b (M8a scope) | Money/credit creation model; banks/monetary institutions; interest-rate channel; inflation measure; FX dynamics; central-bank accounting |
 | **G. Regulation/structural reform** | Ownership kinds; private/state enterprises; market allocation/price rules; land is not modeled; privatization/nationalization not modeled | Competition/market regulation; price controls/rationing; land reform; privatization/nationalization; investment restrictions/incentives; historically appropriate institutions | E7 (post-E6 regulation stage) | Market-structure/competition model; legal institutions; land/property system; ownership transfer mechanics; enforcement |
 
 **Framework rules.** A policy area may be *specified* here without being scheduled
@@ -3436,20 +3450,20 @@ path, affected agents, timing, and player-visible consequence.
 
 | Instrument | Real base / expenditure path | Calculation and timing | Accounting / agents | Player-visible consequence | Status / dependency |
 |---|---|---|---|---|---|
-| **Personal income tax** | Wages actually received by resident pop blocks; `incomeTaxAllowanceSUSDPerYear` exempts a pro-rated daily share | E2: `rate × max(0, actual daily wages − allowance / daysInYear)`, daily withholding at the fiscal phase. Rate and exemption are hard-bounded provisional policy, not law-bounded. | Household `income-tax-expense`/cash → country `income-tax-revenue`/treasury. Net cash to treasury; household disposable cash falls. | Net wages, household purchasing power, treasury receipts, distributional incidence (when strata are modeled). | **Implemented (wage-only schedule, provisional).** No other personal-income base exists; M8 remains the law-enactment dependency. |
+| **Personal income tax** | Wages actually received by resident pop blocks; `incomeTaxAllowanceRUSDPerYear` exempts a pro-rated daily share | E2: `rate × max(0, actual daily wages − allowance / daysInYear)`, daily withholding at the fiscal phase. Rate and exemption are hard-bounded provisional policy, not law-bounded. | Household `income-tax-expense`/cash → country `income-tax-revenue`/treasury. Net cash to treasury; household disposable cash falls. | Net wages, household purchasing power, treasury receipts, distributional incidence (when strata are modeled). | **Implemented (wage-only schedule, provisional).** No other personal-income base exists; M8 remains the law-enactment dependency. |
 | **Business-profit tax** | Each building's recognized current-period result (`sales-revenue − input-expense − wage-expense − upkeep-expense`), positive part only, not gross sales | E2: assessed once per civil month-end at `businessProfitTaxRate × max(0, period result)`; losses are not refunded or carried forward for tax. | Building `business-tax-expense`/`operating-cash` → country `business-tax-revenue`/`treasury-cash` through the distinct `business-profit-tax` posting kind. Collection is limited by actual operating cash; the uncollected part is an explicit shortfall. Affects after-tax retained profit, distributions/remittances, and investment capacity. | After-tax profit, distributions/remittances, investment, treasury revenue. | **Implemented (E2, provisional).** The base is the M5a/M4b recognized period result; no sector or deduction system is introduced. |
 | **Consumption/excise tax** | Eligible final or excise-good transactions at a defined stage | Rate × taxable transaction amount; collected once at the documented stage, not repeatedly through the chain. | Buyer household/building cash → seller/collecting account → treasury; requires tax-line tagging or a settlement hook. | Consumer price wedge, household real purchasing power, government revenue, demand composition. | **Not implemented.** Depends on transaction tax-stage/tagging rules and posting integration; deferred past E2. |
 | **Property tax** | Defined assessed property/land value or rent base | Periodic assessment × rate, with assessment cadence and payment timing. | Owner cash/equity → treasury; requires property registers and valuation. | Owner burden, construction/investment incentives, treasury revenue. | **Not implemented.** Requires property/land ownership and assessment mechanics (E7/land reform; not merely a tax slider). |
 | **Land tax** | Defined land value/rent and agricultural property base | Periodic assessment × rate; collection efficiency may depend on administration. | Landowner/household cash → treasury; requires land tenure model. | Rural burden, land use, investment, treasury revenue. | **Deferred** until a land/property system exists (E7 or an explicitly scoped E2 extension). |
 | **Customs duties** | Imports crossing a defined customs boundary, by good/origin | Tariff schedule × dutiable value at the customs event. | Importer cash → customs/treasury; requires trade and customs transactions. | Import prices, input availability, protection, revenue, retaliation. | **Implemented (E6a, D-079).** Ad-valorem duty on each shipment between different customs administrations; shipper cash → destination treasury; retaliation requires an agreement/partner interface that does not exist. |
-| **Welfare/household transfers** | Eligible blocks: positive population at or below `welfareMaxWealthLevel`; policy budget | E2: annual welfare budget / civil-year days, proportional allocation across eligible population, exact remainder; payable is limited by treasury cash above `reserveTargetSUSD` and a shortfall is explicit. | Country treasury → household cash; welfare-expense/welfare-income recognition; no debt, receivable, or negative cash. | Household cash, needs fulfillment, poverty/living standards, treasury cost. | **Implemented (single budgeted targeted transfer, provisional).** E5 may add eligibility/categorical rules and service delivery; shortfall semantics must be preserved. |
+| **Welfare/household transfers** | Eligible blocks: positive population at or below `welfareMaxWealthLevel`; policy budget | E2: annual welfare budget / civil-year days, proportional allocation across eligible population, exact remainder; payable is limited by treasury cash above `reserveTargetRUSD` and a shortfall is explicit. | Country treasury → household cash; welfare-expense/welfare-income recognition; no debt, receivable, or negative cash. | Household cash, needs fulfillment, poverty/living standards, treasury cost. | **Implemented (single budgeted targeted transfer, provisional).** E5 may add eligibility/categorical rules and service delivery; shortfall semantics must be preserved. |
 | **Public administration** | Staffed government offices/functions (not a generic capacity pool) | Operating cost per function/staff/day or month; paid from treasury. | Treasury → wages/supplies; government employment and service output. | Administrative service quality, collection/enforcement, treasury cost. | **Not implemented.** Requires government employment/service production; E2/E5. |
 | **Education spending** | Schools/teachers/students and defined service outputs | Operating + investment budget; service capacity changes slowly. | Treasury → education providers/wages; human-capital/qualification effects with lags. | Literacy, qualifications, productivity, wages, long-run growth. | **Not implemented.** Requires M9 education/literacy delivery plus E5 service mechanics. |
 | **Healthcare spending** | Health facilities/staff/service outputs | Operating + investment budget; health outcomes with lags. | Treasury → providers/wages; health/mortality/productivity effects. | Mortality/morbidity, workforce, productivity, welfare. | **Not implemented.** Requires a health-service/population-health model; E5 (not a pure cash transfer). |
 | **Infrastructure/public investment budgets** | Actual projects/assets (roads, ports, utilities, warehouses, etc.) | Project costs, materials, labor, time; budget authorization and payment schedule. | Treasury/enterprise cash → construction inputs/assets; project capitalization. | Capacity, transport/trade access, productivity, maintenance cost. | **Not implemented.** E6a now supplies the transport/access/capacity model that infrastructure would feed, so transport-dependent infrastructure is a credible adjacent extension; building/maintaining it remains outside E3 and E6a acceptance. |
 | **Industrial subsidies** | Eligible enterprises/sectors and a defined activity/input/output base | Subsidy rate/amount per eligible unit/activity, paid against verified production/investment. | Treasury → enterprise cash; subsidy expense; affects prices, entry, output. | Sectoral output, costs, profits, budget cost, fiscal trade-off. | **Not implemented.** E4; needs sector classification, eligibility, verification, posting kind. |
 | **Government procurement** | Actual goods/services demanded by government | Purchase orders at market prices or defined contract prices; funded by treasury. | Treasury cash → seller; government goods/services; market demand tier. | Prices, demand, supplier revenue, service delivery, budget cost. | **Not implemented.** E4; requires procurement demand (market priority tier 4 is not implemented) and delivery/stock rules. |
-| **Treasury reserves/liquidity** | Actual treasury cash and `reserveTargetSUSD` floor | E2: cash balance managed daily; target is liquidity policy, not a spendable pool or pool of money. It rations daily welfare and discretionary principal repayment, never causes borrowing, and never restricts contractual coupon/maturity/arrears payments. | No special posting; the floor changes welfare paid/shortfall and the maximum discretionary repayment. | Cash buffer, shortfall/borrowing risk, ability to absorb shocks. | **Implemented (E2, provisional).** |
+| **Treasury reserves/liquidity** | Actual treasury cash and `reserveTargetRUSD` floor | E2: cash balance managed daily; target is liquidity policy, not a spendable pool or pool of money. It rations daily welfare and discretionary principal repayment, never causes borrowing, and never restricts contractual coupon/maturity/arrears payments. | No special posting; the floor changes welfare paid/shortfall and the maximum discretionary repayment. | Cash buffer, shortfall/borrowing risk, ability to absorb shocks. | **Implemented (E2, provisional).** |
 | **Public borrowing** | Existing debt contracts, creditor cash, outstanding ceiling, term/coupon | Issuance at defined events (month-end automatic financing and validated player issuance); interest accrues daily; coupons/maturity per contract. | Cash transfer issuer↔holder; debt liability/bond asset; interest expense/payable, not revenue. | Debt, interest, cash, future obligations, creditor exposure. | **Implemented (M5b mechanics + E2 player issuance, provisional).** The creditor, coupon, and term remain scenario/contract inputs; no bond market or auction. |
 | **Debt repayment/refinancing** | Outstanding principal, treasury cash, maturity/refinancing policy | Scheduled maturity plus E2 validated early principal repayment; refinancing replaces principal when policy allows it at maturity. | Treasury cash → holder; liability/bond asset reduce; principal repayment ≠ expenditure. | Debt stock, cash, credibility, future interest. | **Implemented (M5b contract rules + E2 repayment and refinancing/ceiling policy).** No manual refinancing of a non-maturing contract; repay and issue are the explicit equivalent. |
 
@@ -3515,7 +3529,7 @@ construction are not acceptable substitutes.
 
 | Element | Required design | Current status / dependency |
 |---|---|---|
-| **Project definition** | Stable project type based on a validated building definition (or a separately validated infrastructure definition), with cost, build time, labor/throughput requirement, required goods/materials, and output asset. | **Implemented (E3, D-074) for productive buildings.** Building definitions carry `constructionCostSUSD` and an authored `constructionWorkers` crew cap; the snapshot exposes buildable project types with output capacity. No separate infrastructure definition; materials are deferred. |
+| **Project definition** | Stable project type based on a validated building definition (or a separately validated infrastructure definition), with cost, build time, labor/throughput requirement, required goods/materials, and output asset. | **Implemented (E3, D-074) for productive buildings.** Building definitions carry `constructionCostRUSD` and an authored `constructionWorkers` crew cap; the snapshot exposes buildable project types with output capacity. No separate infrastructure definition; materials are deferred. |
 | **Owner/financer** | Government, public enterprise, private owner, or a government-supported private project. Funding source and ownership must be explicit. | **Implemented (E3, D-074) for government-financed, state-owned productive buildings.** The treasury pays construction wages and the completed asset is state-owned. Public-enterprise operation/expansion, private co-financing, subsidies, loans, and guarantees remain E4. |
 | **Location** | Region/market with valid ownership, land/space rules where required, and infrastructure access. | **Implemented (E3) for country-owned regions with a valid market.** Land/space rules and transport/access are not modeled; infrastructure requiring them remains deferred (E6a). |
 | **Resource requirements** | Money (staged), construction labor/workers, required goods/materials, operating cash after completion. | **Implemented (E3) for money, actual idle labor, time, and completion working capital.** No construction bill of materials or government procurement demand; materials are explicitly deferred to E4 under §17A.16. |
@@ -3634,7 +3648,7 @@ decorative controls.
 
 ### 17A.8 Trade and commercial policy
 
-**Current truth (v2.15).** Century now has **real inter-market trade with a customs
+**Current truth (v2.15).** Fabric of Nations now has **real inter-market trade with a customs
 boundary**. Markets remain the source of truth for stock, prices, and settlement;
 intra-market pooled allocation is still **shared-market clearing** and is not
 relabelled as trade. E6a adds, outside clearing, authored transport routes between
@@ -3666,7 +3680,7 @@ merchant/rest-of-world account, trade contract, or cross-market goods flow exist
    rest-of-world counterparty) with no money or goods creation — `trade-freight` and
    `customs-duty` are cash-neutral and structurally validated; goods are conserved.
 5. **Currency/valuation transactions** if prices/currencies differ — not required:
-   every price and account is already SUSD. E6b (D-080) keeps trade SUSD-settled and
+   every price and account is already RUSD. E6b (D-080) keeps trade RUSD-settled and
    confines conversion to the reserve-backed monetary window; there is no double
    conversion.
 6. **Trade policy state and validation** — `Country.trade` tariffs, monthly import
@@ -3686,7 +3700,7 @@ Before any trade control can be exposed (retained as the prerequisite definition
    country, and commodity classification.
 4. **Balanced trade postings** (buyer, seller, transport, customs/treasury, and any
    rest-of-world counterparty) with no money or goods creation.
-5. **Currency/valuation transactions** if prices/currencies differ; SUSD valuation
+5. **Currency/valuation transactions** if prices/currencies differ; RUSD valuation
    alone does not implement FX settlement.
 6. **Trade policy state and validation**: tariffs, quotas, agreements, and
    restrictions with time/scope rules, and a player/AI action path.
@@ -3704,7 +3718,7 @@ Before any trade control can be exposed (retained as the prerequisite definition
 | **Trade agreement/market access** | Change tariffs/quotas/access by partner and good | Agreement state, partner identity, validation, duration, dispute/exit rules | **Not implemented.** Requires a diplomacy/foreign-relations interface (M8/M10) that does not exist; not faked as a global modifier. |
 | **Domestic-industry protection** | Combine tariffs/quota/procurement/subsidy | Actual component instruments, not a protection score | **Partially implemented (E6a).** Tariffs and quotas are the real components; no "protection score" exists. |
 | **Imported inputs/consumer goods** | Availability and price effects from real imports | Trade flows, inventories, landed costs, customs | **Implemented (E6a, D-079).** Imported lots enter the destination market, cost freight and duty, and are sold through normal clearing. |
-| **FX/currency implications** | Relative-price and settlement effects | Currency transaction, FX rate/valuation, external accounts | **Partially implemented (E6b, D-080).** A reserve-backed currency board issues/redeems currency against SUSD reserves with an external counterparty, revalues valuations, and gates imports on reserve cover. No FX market, external debt, or multi-currency settlement exists. |
+| **FX/currency implications** | Relative-price and settlement effects | Currency transaction, FX rate/valuation, external accounts | **Partially implemented (E6b, D-080).** A reserve-backed currency board issues/redeems currency against RUSD reserves with an external counterparty, revalues valuations, and gates imports on reserve cover. No FX market, external debt, or multi-currency settlement exists. |
 
 #### 17A.8.3 Rules
 
@@ -3774,7 +3788,7 @@ as if they acted on the same time scale.
 ### 17A.10 Monetary policy and currency
 
 **Status (v2.16): implemented as E6b for the documented monetary foundation (§17G,
-D-080).** Current behavior has currency identity, issuer identity, SUSD-relative
+D-080).** Current behavior has currency identity, issuer identity, RUSD-relative
 valuations, a derived price index, a reserve-backed currency board for own-currency
 countries, pegged and law-gated managed exchange-rate regimes, balanced money
 accounting, and a reserve-cover convertibility rule with a real import effect. It does
@@ -3782,15 +3796,15 @@ accounting, and a reserve-cover convertibility rule with a real import effect. I
 last resort, external debt, domestic currency-denominated ledgers, or an FX order book;
 those remain recorded missing prerequisites rather than faked controls.
 
-#### 17A.10.1 SUSD convention
+#### 17A.10.1 RUSD convention
 
-- **SUSD is the fixed unit of measurement and accounting denomination.** It is not a
+- **RUSD is the fixed unit of measurement and accounting denomination.** It is not a
   national legal tender, not necessarily an actual U.S. dollar, and not a promise of
   constant purchasing power.
-- Nominal SUSD values are distinct from future real/inflation-adjusted values. Any
+- Nominal RUSD values are distinct from future real/inflation-adjusted values. Any
   price-level or real-value measure must document its basket, base, weights, and
   window.
-- `CurrencyValuation.susdPerUnit` is a valuation input for a currency; it is not by
+- `CurrencyValuation.rusdPerUnit` is a valuation input for a currency; it is not by
   itself a peg, a policy instrument, or a complete exchange-rate model.
 
 #### 17A.10.2 Required institutional and accounting foundations
@@ -3821,7 +3835,7 @@ Before monetary controls can be exposed:
 | **Policy interest rate** | Change central-bank lending/deposit conditions → bank credit, investment, cash demand | Central bank + banking/credit model + interest channel | **Not implemented.** Requires a banking/deposit/credit model that does not exist; recorded as a missing prerequisite, not approximated by a slider. |
 | **Central-bank lending/credit conditions** | Collateral/term/eligibility rules affecting credit supply | Central-bank balance sheet, banks, eligible assets | **Not implemented.** Same missing banking/credit prerequisite. |
 | **Bank credit/availability** | Loan creation and allocation to firms/households | Banking model, capital/regulatory constraints, lending behavior | **Not implemented.** No commercial banks or deposits are modeled. |
-| **Currency convertibility** | Rules for exchanging domestic/foreign currency | FX market/settlement, external accounts, legal rules | **Implemented (E6b, D-080).** A currency board issues/redeems currency against SUSD reserves with an external counterparty; reserve cover below the documented minimum suspends convertibility and blocks imports into that customs zone. |
+| **Currency convertibility** | Rules for exchanging domestic/foreign currency | FX market/settlement, external accounts, legal rules | **Implemented (E6b, D-080).** A currency board issues/redeems currency against RUSD reserves with an external counterparty; reserve cover below the documented minimum suspends convertibility and blocks imports into that customs zone. |
 | **Exchange-rate policy** | Peg/manage/float within a documented regime | FX model, reserves, intervention accounting, external accounts | **Implemented (E6b, D-080).** A pegged parity changes only by a bounded policy action with a cooldown and explicit revaluation; a managed rate follows a documented bounded rule from realized trade and relative prices. No arbitrary per-tick setting. |
 | **Inflation/price-level dynamics** | Price index derived from actual prices; monetary/real drivers | Basket/weights/window; price formation; money/credit channels | **Implemented as measurement (E6b, D-080).** A Laspeyres index over a fixed needs-derived basket with base 100, bounded month-end observations, and coverage. It has no behavioural effect because the GDD does not specify indexation. |
 
@@ -3886,12 +3900,12 @@ The dashboard (or an overview plus drill-downs) brings together:
 |---|---|---|
 | **Production** | Output by good and sector; capacity/utilization; production losses | Physical units per day/week/month; stock vs. flow; observed vs. estimated capacity |
 | **Supply/demand/inventory** | Supply available, funded/desired demand, shortages/unmet demand, opening/closing stock, storage utilization/overflow | Physical units; daily/monthly; stock vs. flow; shortage definitions stated |
-| **Employment/wages** | Assigned workers, vacancies, unemployment where defined, participation/qualification, wages paid/obligations | People, hours/worker-day, SUSD per period; nominal; current vs. period |
-| **Household conditions** | Household cash/income, purchasing power, unmet needs by tier, living-standard/wealth indicators | SUSD nominal, real where a defined price index exists; daily/monthly/yearly |
-| **Prices** | Prices by good/market, changes/trends, relative price signals | SUSD per physical unit; period change; nominal; observed, not forecast |
-| **Fiscal** | Tax revenue by instrument, spending by category, treasury cash, surplus/deficit, unpaid/shortfall | SUSD per day/month/year; flow vs. stock; requested/authorized/accrued/paid |
-| **Debt** | Outstanding principal, interest accrued/paid, upcoming coupons/maturities, creditor composition, refinancing | SUSD stock; interest flow; dates; actual vs. projected |
-| **Investment** | Projects, cost spent/committed/remaining, progress, blockers, expected completion | SUSD, work/time, resources; actual vs. projection with assumptions |
+| **Employment/wages** | Assigned workers, vacancies, unemployment where defined, participation/qualification, wages paid/obligations | People, hours/worker-day, RUSD per period; nominal; current vs. period |
+| **Household conditions** | Household cash/income, purchasing power, unmet needs by tier, living-standard/wealth indicators | RUSD nominal, real where a defined price index exists; daily/monthly/yearly |
+| **Prices** | Prices by good/market, changes/trends, relative price signals | RUSD per physical unit; period change; nominal; observed, not forecast |
+| **Fiscal** | Tax revenue by instrument, spending by category, treasury cash, surplus/deficit, unpaid/shortfall | RUSD per day/month/year; flow vs. stock; requested/authorized/accrued/paid |
+| **Debt** | Outstanding principal, interest accrued/paid, upcoming coupons/maturities, creditor composition, refinancing | RUSD stock; interest flow; dates; actual vs. projected |
+| **Investment** | Projects, cost spent/committed/remaining, progress, blockers, expected completion | RUSD, work/time, resources; actual vs. projection with assumptions |
 | **Changes/history** | Month-over-month and year-over-year changes for the above, with comparable periods | Explicit period; nominal vs. real; no implied precision beyond source |
 
 **Definition rules.**
@@ -4353,7 +4367,7 @@ resolve them with a decision record and tests before implementation.
 | Trade counterparty/rest-of-world | Shared markets are not international trade | **Resolved by E6a/D-079:** the foreign counterparty is the real foreign selling building, its accounts, and its country, with bilateral origin/destination country per shipment. A non-simulated rest-of-world sector and external accounts are E6b scope and are not faked. |
 | Banking/credit/monetary institutions | No banks, deposits, credit creation, or central bank | **Partially resolved by E6b/D-080:** a reserve-backed monetary authority exists for own-currency countries. Commercial banks, deposits, bank credit, a policy interest rate, and lender of last resort remain missing prerequisites and are not faked. |
 | Inflation/real-value measure | No defined basket/price index | **Resolved by E6b/D-080:** a documented Laspeyres index over a fixed needs-derived basket, base 100 at the scenario start, bounded month-end observations, country/world measures, and explicit coverage. Measurement only; no indexation. |
-| Currency/native-currency balances and FX | No native-currency balances, FX market, or external accounts | **Partially resolved by E6b/D-080:** a currency board holds SUSD reserves, issues currency against them with an external counterparty, and revalues them explicitly. Domestic accounts remain SUSD; no FX order book or external debt. |
+| Currency/native-currency balances and FX | No native-currency balances, FX market, or external accounts | **Partially resolved by E6b/D-080:** a currency board holds RUSD reserves, issues currency against them with an external counterparty, and revalues them explicitly. Domestic accounts remain RUSD; no FX order book or external debt. |
 | Health/pension/collective-bargaining mechanisms | No service/eligibility/organization models | Defer within E5; do not expose laws without effects |
 | Sector classification and eligibility | No sector taxonomy beyond building/good categories | **Resolved by E4/D-075:** `BuildingDef.sector` is a validated enum (agriculture, food-processing, textiles, manufacturing, storage); subsidy eligibility is derived from it, not UI labels. |
 | Foreign investment/ownership rules | No foreign-investor/ownership model | Regulation/investment restrictions deferred (E7) |
@@ -4411,7 +4425,7 @@ E1 uses only immutable snapshot data:
 |---|---|---|
 | Population, working age, employed, hardship, unmet-block counts | M2 population blocks and current counters | No unemployment rate, participation rate, or per-capita income is calculated |
 | Production capacity by good | M3 buildings, definitions, staffing, level, condition, productivity (`computeBuildingCapacity`) | Estimated capacity, not realized production or demand |
-| Market stock, prices, capacity | M3 market lots, `priceSUSD`, building capacity by market region | No historical price/demand series; stock is current inventory |
+| Market stock, prices, capacity | M3 market lots, `priceRUSD`, building capacity by market region | No historical price/demand series; stock is current inventory |
 | Treasury, debt, interest payable | M4/M5 finance index and debt contracts | Closing balances exist only for the retained detailed window |
 | Tax, welfare, interest, net result | M4b/frozen monthly close summaries | Flows are closed-period actuals, not forecasts |
 | Income-tax base and preview | Current employment × profession base wage ÷ civil-year days | Static current-base estimate, not realized wages or behavior |
@@ -4425,9 +4439,9 @@ definitions, retained series, or models that do not exist. E2–E6 mechanics rem
 #### Monthly report and balance semantics
 
 The report uses the existing monthly `FinancePeriodSummary` window (at most 12 closes).
-`incomeTaxSUSD`, `welfareExpenseSUSD`, `interestExpenseSUSD`, and
-`netFiscalResultSUSD` are **flows** for the closed period. `treasuryCashEndSUSD`,
-`debtOutstandingEndSUSD`, and `householdCashEndSUSD` are **balances** at close, exposed
+`incomeTaxRUSD`, `welfareExpenseRUSD`, `interestExpenseRUSD`, and
+`netFiscalResultRUSD` are **flows** for the closed period. `treasuryCashEndRUSD`,
+`debtOutstandingEndRUSD`, and `householdCashEndRUSD` are **balances** at close, exposed
 only while a summary retains account detail; compacted summaries return `null` and the
 UI says "not retained." A balance change is derived only from two detailed closes; no
 change is invented across a compacted gap. The current treasury/debt shown on Overview
@@ -4504,10 +4518,10 @@ snapshot contract; it does not add E3–E6 mechanics.
 
 | Instrument | Base | Calculation and timing | Posting path | Bounds and constraints | Player control |
 |---|---|---|---|---|---|
-| Personal income tax schedule | Actual daily wages received by each pop block | `incomeTaxRate × max(0, wages − incomeTaxAllowanceSUSDPerYear / daysInYear)`, withheld every processed day at the fiscal phase | Household `income-tax-expense`/`household-cash` ↔ country `treasury-cash`/`income-tax-revenue` (`income-tax`) | Rate 0..1; exemption nonnegative and numeric-safety bounded; tax cannot exceed wages or household cash; no tax on welfare or zero wages | `set-fiscal-policy` |
-| Welfare transfer with eligibility | Policy budget and eligible blocks (positive population, wealth level ≤ `welfareMaxWealthLevel`) | Annual budget ÷ civil-year days; proportional allocation across eligible population with an exact final remainder; payable limited by treasury cash above `reserveTargetSUSD` | Country `welfare-expense`/`treasury-cash` ↔ household `household-cash`/`welfare-income` (`welfare-transfer`) | Budget nonnegative and bounded; ceiling integer 0..99; unpaid budget is an explicit shortfall, never a liability; no eligible block pays nothing | `set-fiscal-policy` |
+| Personal income tax schedule | Actual daily wages received by each pop block | `incomeTaxRate × max(0, wages − incomeTaxAllowanceRUSDPerYear / daysInYear)`, withheld every processed day at the fiscal phase | Household `income-tax-expense`/`household-cash` ↔ country `treasury-cash`/`income-tax-revenue` (`income-tax`) | Rate 0..1; exemption nonnegative and numeric-safety bounded; tax cannot exceed wages or household cash; no tax on welfare or zero wages | `set-fiscal-policy` |
+| Welfare transfer with eligibility | Policy budget and eligible blocks (positive population, wealth level ≤ `welfareMaxWealthLevel`) | Annual budget ÷ civil-year days; proportional allocation across eligible population with an exact final remainder; payable limited by treasury cash above `reserveTargetRUSD` | Country `welfare-expense`/`treasury-cash` ↔ household `household-cash`/`welfare-income` (`welfare-transfer`) | Budget nonnegative and bounded; ceiling integer 0..99; unpaid budget is an explicit shortfall, never a liability; no eligible block pays nothing | `set-fiscal-policy` |
 | Business-profit tax | Each building's recognized current-period `sales-revenue − input-expense − wage-expense − upkeep-expense`, positive part | Assessed once per civil month-end after the fiscal phase, before the debt phase and the close; collected from operating cash | Building `business-tax-expense`/`operating-cash` ↔ country `treasury-cash`/`business-tax-revenue` (`business-profit-tax`) | Rate 0..1; collection ≤ operating cash; uncollected assessment is an explicit shortfall, not a receivable; a duplicate same-day assessment is rejected; losses are not refunded or carried forward for tax | `set-fiscal-policy` |
-| Treasury reserve | Actual treasury cash and `reserveTargetSUSD` | Daily welfare cash ceiling and discretionary repayment floor | No special posting | Policy floor only: never creates cash, never causes borrowing, never blocks contractual coupon/maturity/arrears payments | `set-fiscal-policy` |
+| Treasury reserve | Actual treasury cash and `reserveTargetRUSD` | Daily welfare cash ceiling and discretionary repayment floor | No special posting | Policy floor only: never creates cash, never causes borrowing, never blocks contractual coupon/maturity/arrears payments | `set-fiscal-policy` |
 | Debt issuance | Existing designated creditor, coupon, term, ceiling, creditor cash, contract cap | Immediate validated action; interest accrues daily per the existing contract rules | Existing `debt-issuance` posting | Principal positive and finite; creditor's actual cash; outstanding-principal headroom; active-contract cap | `issue-debt` |
 | Debt repayment | One outstanding contract and actual treasury cash | Immediate validated action; principal only | Existing `debt-principal-repayment` posting | Amount positive and no larger than outstanding principal; treasury cash covers it; post-payment cash ≥ reserve target | `repay-debt` |
 | Debt policy | Existing refinancing flag and outstanding-principal ceiling | Immediate validated action; affects the next maturity and future issuance/financing | No posting | Country debt policy must be enabled; ceiling nonnegative, bounded, and never below current outstanding principal; creditor/coupon/term remain scenario/contract inputs | `set-debt-policy` |
@@ -4524,15 +4538,15 @@ action may never target it, adding defense in depth to the existing AI-phase ski
 `FinancePeriodSummary` and `AnnualFinanceSummary` carry exact per-country budget
 totals in addition to the accounting fiscal totals:
 
-- `welfareRequestedSUSD` and `welfareShortfallSUSD` (unpaid budget; paid welfare is the
-  period `welfareExpenseSUSD`);
-- `businessTaxAssessedSUSD` and `businessTaxUncollectedSUSD` (collected business tax is
-  the period `businessTaxRevenueSUSD`);
-- `debtIssuedSUSD`, `principalRepaidSUSD`, `interestPaidSUSD`, and
-  `unfinancedRequirementSUSD`.
+- `welfareRequestedRUSD` and `welfareShortfallRUSD` (unpaid budget; paid welfare is the
+  period `welfareExpenseRUSD`);
+- `businessTaxAssessedRUSD` and `businessTaxUncollectedRUSD` (collected business tax is
+  the period `businessTaxRevenueRUSD`);
+- `debtIssuedRUSD`, `principalRepaidRUSD`, `interestPaidRUSD`, and
+  `unfinancedRequirementRUSD`.
 
-`FinancePeriodFiscalTotals` adds `businessTaxRevenueSUSD`, and
-`netFiscalResultSUSD = incomeTax + businessTax − welfareExpense − interestExpense`.
+`FinancePeriodFiscalTotals` adds `businessTaxRevenueRUSD`, and
+`netFiscalResultRUSD = incomeTax + businessTax − welfareExpense − interestExpense`.
 Annual flows remain exact sums of the year's monthly summaries; annual balances remain
 year-end stocks. Zero-only budget entries are omitted from summaries and read as zero,
 keeping the bounded save small. The month-to-date memo
@@ -4563,8 +4577,8 @@ rather than assuming they always agree.
 
 #### Snapshot, protocol, and state consequences
 
-- `Country.fiscal` gains `incomeTaxAllowanceSUSDPerYear`, `welfareMaxWealthLevel`,
-  `businessProfitTaxRate`, and `reserveTargetSUSD`; scenario input may omit them and
+- `Country.fiscal` gains `incomeTaxAllowanceRUSDPerYear`, `welfareMaxWealthLevel`,
+  `businessProfitTaxRate`, and `reserveTargetRUSD`; scenario input may omit them and
   they default to neutral values (zero exemption, 99 universal, zero business tax, zero
   reserve). Persisted policy is validated as complete.
 - New account subtypes: country `business-tax-revenue`, building
@@ -4667,10 +4681,10 @@ dependencies.
 
 | Element | E3 implementation |
 |---|---|
-| Project type | Validated building definition with at least one productive output, positive `constructionCostSUSD`, positive authored `constructionWorkers`, no required technology, no resource requirements, and state ownership allowed. Warehouse-only capacity is not offered. |
-| Parameters | `totalCostSUSD` is the definition construction cost; `workingCapitalSUSD` is 30 days of the definition's level-1 daily upkeep (a provisional structural target); `constructionWorkers` is the maximum daily crew. |
+| Project type | Validated building definition with at least one productive output, positive `constructionCostRUSD`, positive authored `constructionWorkers`, no required technology, no resource requirements, and state ownership allowed. Warehouse-only capacity is not offered. |
+| Parameters | `totalCostRUSD` is the definition construction cost; `workingCapitalRUSD` is 30 days of the definition's level-1 daily upkeep (a provisional structural target); `constructionWorkers` is the maximum daily crew. |
 | Location | One country-owned region with a valid market. No land/space/transport access model is claimed. |
-| Authorization | `start-construction` is player-only. It requires the project type to be currently buildable, the region to be owned by the country, the M5a state-remittance policy to be enabled, fewer than 32 non-terminal projects, and treasury cash at least `totalCostSUSD + workingCapitalSUSD`. No money is escrowed or reserved. |
+| Authorization | `start-construction` is player-only. It requires the project type to be currently buildable, the region to be owned by the country, the M5a state-remittance policy to be enabled, fewer than 32 non-terminal projects, and treasury cash at least `totalCostRUSD + workingCapitalRUSD`. No money is escrowed or reserved. |
 | Identity | Monotonic `nextProjectId`; project records are ordered by ascending id. `nextBuildingId` is monotonic and initialized above every existing building id. |
 | Retention | At most 32 non-terminal projects; at most 32 terminated project records retained in detail; older terminated records are compacted into per-country counters/amounts (bounded at 256 aggregates). |
 | Cancellation | Player-only `cancel-construction` for any non-terminal project. Spent work-in-progress is written off; no refund or liability. |
@@ -4696,10 +4710,10 @@ Projects are processed in ascending id order.
    counted both in production and construction.
 3. The project hires at most its authored crew and at most the workers whose daily base
    wage the treasury can actually pay. The daily wage is
-   `profession.baseWage1900SUSDPerYear / daysInYear` for the block's profession.
-4. Gross paid wages increase the project's `spentSUSD` and progress. The final payment
+   `profession.baseWage1900RUSDPerYear / daysInYear` for the block's profession.
+4. Gross paid wages increase the project's `spentRUSD` and progress. The final payment
    is clamped so spend reaches the authorized total exactly. Progress is
-   `spentSUSD / totalCostSUSD`.
+   `spentRUSD / totalCostRUSD`.
 5. Gross wages are paid to the workers' household blocks and capitalized; the existing
    daily income tax is applied to construction wages using the remaining daily
    allowance after the block's settled market wages. No income tax is charged on
@@ -4732,8 +4746,8 @@ bonus.
 | Completion working capital | Country treasury credit / owner-equity debit; building `operating-cash` debit / owner-equity credit (`construction-working-capital`) | Cash-neutral transfer from country to building |
 | Cancellation write-off | Country `construction-in-progress` credit / country owner-equity debit (`construction-writeoff`) | None |
 
-Construction cost is **capitalized, not expensed**. `constructionSpentSUSD` and
-`constructionWrittenOffSUSD` are added to the month-to-date budget memo and to monthly
+Construction cost is **capitalized, not expensed**. `constructionSpentRUSD` and
+`constructionWrittenOffRUSD` are added to the month-to-date budget memo and to monthly
 and annual budget decompositions; they are capital outlay/write-off measures, not
 welfare or interest expense. The accounting identity, aggregate designated-cash
 conservation, and all existing close/annual invariants hold.
@@ -4867,13 +4881,13 @@ production building in ascending building-id order:
 3. payment is limited by actual treasury cash, so aggregate payments cannot overdraw;
 4. paid amount posts country `subsidy-expense` / treasury and building
    `operating-cash` / `subsidy-revenue` (`production-subsidy`); it is cash-neutral;
-5. unpaid entitlement is accumulated as an explicit `subsidyShortfallSUSD`; it is not
+5. unpaid entitlement is accumulated as an explicit `subsidyShortfallRUSD`; it is not
    debt, a receivable, or cash already received.
 
 Subsidy revenue is taxable enterprise revenue and is included in the month-end
 business-profit tax base. A country's monthly/annual budget reports requested, paid,
-and shortfall; the accounting fiscal totals add `subsidyExpenseSUSD` and subtract it
-from `netFiscalResultSUSD`.
+and shortfall; the accounting fiscal totals add `subsidyExpenseRUSD` and subtract it
+from `netFiscalResultRUSD`.
 
 #### Construction materials and procurement
 
@@ -4915,7 +4929,7 @@ operating-cash debit / building owner-equity credit
 expense, loan, guarantee, or unconditional transfer. It does not change ownership,
 level, condition, inputs, sales, wages, tax, or remittance obligations; ordinary
 production/employment/market/tax/M5a rules continue. The monthly budget reports
-`publicEnterpriseSupportSUSD` as a capital flow. Expansion, discontinuation,
+`publicEnterpriseSupportRUSD` as a capital flow. Expansion, discontinuation,
 privatization, and nationalization remain deferred.
 
 #### Accounting and reporting
@@ -4935,7 +4949,7 @@ monthly/annual flow reconciliation hold.
 #### Snapshot, protocol, data, and persistence
 
 - World schema **20** adds `Country.industrial`, project material state and
-  `materialsSpentSUSD`, construction material budget fields, subsidy/support budget
+  `materialsSpentRUSD`, construction material budget fields, subsidy/support budget
   fields, and fiscal subsidy expense.
 - Data version **`m3-economy-v5`** adds `sector` and `constructionMaterials` to every
   authored building definition (including historical variants). The change is a
@@ -5059,15 +5073,15 @@ balance aborts the annual summary atomically.
 
 Annual flows are exact sums of that year's monthly `countryFiscalTotals`:
 
-- `incomeTaxRevenueSUSD`, `welfareExpenseSUSD`, `interestExpenseSUSD`;
-- `netFiscalResultSUSD = tax − welfare − interest`;
+- `incomeTaxRevenueRUSD`, `welfareExpenseRUSD`, `interestExpenseRUSD`;
+- `netFiscalResultRUSD = tax − welfare − interest`;
 - the four world gross `flowTotalsByKind`.
 
 Annual balances are year-end stocks, not flows:
 
-- `treasuryCashSUSD`;
-- `debtLiabilitySUSD` (principal liability, excluding interest payable);
-- `interestPayableSUSD`.
+- `treasuryCashRUSD`;
+- `debtLiabilityRUSD` (principal liability, excluding interest payable);
+- `interestPayableRUSD`.
 
 No annual account-level trial balance is retained. Annual totals are not the latest
 monthly total repeated, and annual balances are not inferred by differencing
@@ -5250,7 +5264,7 @@ The state administration is staffed by the country's clerks (the authored
 administration profession). The model does not create government buildings or
 duplicate people; this is a documented simplification.
 
-- `fundedAnnualSUSD` is an annual target paid daily.
+- `fundedAnnualRUSD` is an annual target paid daily.
 - The fiscal phase pays `target / daysInYear` after income tax and welfare, limited
   by actual treasury cash above the reserve floor. Posting: country
   `administration-expense` debit / treasury credit; administration household
@@ -5277,9 +5291,9 @@ duplicate people; this is a documented simplification.
 | Construction progress | Existing wages/materials capitalization | Lower crew cap, not a second accounting path |
 | Crisis/revolution | No monetary posting | Real state change only |
 
-Fiscal totals add optional `administrationExpenseSUSD`; budget totals add
-`administrationRequestedSUSD` and `administrationShortfallSUSD`;
-`netFiscalResultSUSD = incomeTax + businessTax − welfare − interest − subsidy −
+Fiscal totals add optional `administrationExpenseRUSD`; budget totals add
+`administrationRequestedRUSD` and `administrationShortfallRUSD`;
+`netFiscalResultRUSD = incomeTax + businessTax − welfare − interest − subsidy −
 administrationExpense`. The accounting identity, designated-cash conservation, and
 monthly/annual reconciliation hold. Net fiscal reconciliation across monthly
 summaries now also subtracts subsidy and administration expense.
@@ -5444,7 +5458,7 @@ and validated definitions. They are never stored as a second authority.
 
 ### 17D.4 Education payroll and literacy
 
-- Payroll target `fundedAnnualSUSD / daysInYear` is paid from actual treasury cash
+- Payroll target `fundedAnnualRUSD / daysInYear` is paid from actual treasury cash
   above the reserve floor. Posting: country `education-expense` debit / treasury
   credit; academic household `household-cash` debit / `education-income` credit
   (`education-payroll`). It is a cash-neutral transfer. The unpaid request is an
@@ -5471,8 +5485,8 @@ and validated definitions. They are never stored as a second authority.
 | Research | no monetary posting | Real labour only; funded through the same education payroll |
 | Technology completion/effects | no monetary posting | Real state/behaviour change only |
 
-Fiscal totals add optional `educationExpenseSUSD`; `netFiscalResultSUSD` subtracts
-it. Budget totals add optional `educationRequestedSUSD`/`educationShortfallSUSD`.
+Fiscal totals add optional `educationExpenseRUSD`; `netFiscalResultRUSD` subtracts
+it. Budget totals add optional `educationRequestedRUSD`/`educationShortfallRUSD`.
 Per-country fiscal totals are now encoded sparsely (zero fields omitted; missing
 decodes as zero), preserving exact values while keeping the 1,200-month canonical
 save under the 4 MiB target.
@@ -5614,7 +5628,7 @@ practitioner-level medical staffing.
   qualification series exists; built only by funded training.
 - `Country.institutions.healthStaffShare`: 0..1 share of the administration clerk base
   assigned to public health. Administration staffing is net of it.
-- `LawDef.laborMinimumWageSUSDPerYear`, `LawDef.laborHoursPerWeek`, and
+- `LawDef.laborMinimumWageRUSDPerYear`, `LawDef.laborHoursPerWeek`, and
   `LawDef.healthStaffFloor`.
 - Training payroll/stipend accounts and posting kinds; optional training expense and
   budget memo fields.
@@ -5698,7 +5712,7 @@ cash-neutral postings use `training-expense` (country) and `training-income`
 
 Both are limited by actual treasury cash above the reserve target; the unpaid request
 is a month-to-date shortfall, never debt. Fiscal totals add optional
-`trainingExpenseSUSD`; budget totals add optional requested/shortfall fields. The
+`trainingExpenseRUSD`; budget totals add optional requested/shortfall fields. The
 monthly memo resets on the first civil day. Participation is set monthly, so retrying a
 day cannot re-enrol or double-pay; qualification gains and postings apply once per
 processed day.
@@ -5795,7 +5809,7 @@ inflation measurement, credit creation, or M10.
 | Export incentives | **Deferred.** Requires the E4 incentive/investment machinery; no free transfer is created. |
 | Non-simulated rest-of-world sector | **Deferred.** Would need externally endowed goods and cash without a modeled source; E6b owns external accounts and FX. |
 | Infrastructure construction/investment | **Deferred.** E6a supplies the transport model; §17A.13.2/§17A.14 E6a do not require building infrastructure, and §17A.6.2 keeps it outside E3. |
-| FX conversion / external accounts | **Deferred to E6b.** Every price and account is SUSD, so no currency transaction is required. |
+| FX conversion / external accounts | **Deferred to E6b.** Every price and account is RUSD, so no currency transaction is required. |
 
 ### 17F.2 Authoritative state and phases
 
@@ -5854,7 +5868,7 @@ open period and before the monthly close.
 - `owner-capital-injection`: building `operating-cash` debit, building `owner-equity`
   credit, owner cash credit, owner `owner-equity` debit.
 - All three are cash-neutral. Period and annual fiscal totals add
-  `customsDutyRevenueSUSD`; it increases `netFiscalResultSUSD`. Duty is reported only
+  `customsDutyRevenueRUSD`; it increases `netFiscalResultRUSD`. Duty is reported only
   when a shipment actually incurred and settled it. The customs account is created only
   in trade-enabled worlds, so pre-E6a fixtures keep their accepted account sets.
 
@@ -5943,9 +5957,9 @@ policy interest rate, external debt, or an FX market.
 
 | §17A.10 item | Status |
 |---|---|
-| SUSD convention | **Preserved.** SUSD remains the fixed unit of measurement and accounting denomination; no account or closed period is rescaled. |
+| RUSD convention | **Preserved.** RUSD remains the fixed unit of measurement and accounting denomination; no account or closed period is rescaled. |
 | Price/inflation measure | **Implemented.** Laspeyres index over a fixed needs-derived basket, base 100 at the first processed day, market/country/world values, bounded month-end observations (24), coverage, and MoM/YoY. Measurement only; no indexation. |
-| Exchange-rate state and dynamics | **Implemented.** `susdPerUnit` keeps its direction; pegged parities change only by a bounded action with a cooldown; managed rates follow a documented bounded rule from realized trade and relative prices. |
+| Exchange-rate state and dynamics | **Implemented.** `rusdPerUnit` keeps its direction; pegged parities change only by a bounded action with a cooldown; managed rates follow a documented bounded rule from realized trade and relative prices. |
 | Monetary authority | **Implemented.** A reserve-backed currency board per own-currency country, law-gated managed regime, player-only action, bounds, timing, and account ids in state. |
 | Money/credit accounting | **Implemented for the monetary base.** Reserve capitalization/withdrawal, currency issue/redemption against reserves, and revaluation are balanced and cash-neutral. No bank credit or deposits exist. |
 | Convertibility and transaction effects | **Implemented.** Reserve cover vs. realized imports; suspension blocks imports in E6a dispatch with `fx-convertibility`. |
@@ -5959,7 +5973,7 @@ policy interest rate, external debt, or an FX market.
   parity, reference parity, circulation units, explicit account ids, last parity change,
   last managed update, last month-end capture, realized month exports/imports), and the
   last update day.
-- `CurrencyValuation`: the single authoritative SUSD-per-unit rate; `source` is
+- `CurrencyValuation`: the single authoritative RUSD-per-unit rate; `source` is
   `scenario | policy | market` provenance.
 - Finance: six account subtypes and four posting kinds
   (`monetary-reserve-contribution`, `fx-issuance`, `fx-redemption`, `fx-revaluation`).
@@ -5979,13 +5993,13 @@ price-index observation at a civil month-end. Both are idempotent per day.
   `clamp(KAPPA_FX × (w_trade × tradePressure + w_price × priceGap), ±MAX_DAILY)`, bounded
   to a band around the reference parity. `tradePressure` is the completed month's net
   external position over turnover; `priceGap` is the world/country index ratio minus one.
-- The currency board exchanges SUSD reserves for currency units with an external
+- The currency board exchanges RUSD reserves for currency units with an external
   counterparty (issue/redeem), bounded by reserves and external cash/holdings. Treasury
   reserve transfers are capital, not revenue or expense.
 - Reserve cover is reserves divided by the completed month's realized imports. Below the
   documented minimum (or with zero reserves) convertibility is suspended; E6a dispatch
   blocks imports into that country's customs zone with `fx-convertibility`. Trade values
-  remain SUSD and are never converted.
+  remain RUSD and are never converted.
 
 ### 17G.4 Accounting, determinism, and compatibility
 
@@ -6002,7 +6016,7 @@ price-index observation at a civil month-end. Both are idempotent per day.
 
 ### 17G.5 UI and player workflow
 
-A Money tab shows the currency identities and SUSD-per-unit valuations, the authority's
+A Money tab shows the currency identities and RUSD-per-unit valuations, the authority's
 regime/parity/valuation/reserves/circulation/liability/cover/convertibility, the price
 index definition (basket, base period, weights, coverage) and its MoM/YoY measurements,
 and the bounded month-end observations. It offers one validated monetary action (regime,
@@ -6029,7 +6043,7 @@ enacted through the Politics path.
 
 ### 17G.7 Deliberate limits
 
-- Domestic accounts, prices, wages, and trade remain SUSD; FX transmission to domestic
+- Domestic accounts, prices, wages, and trade remain RUSD; FX transmission to domestic
   prices and wages is limited to the convertibility channel and the authority's balance
   sheet.
 - The sample's rates are unavailable by design; the player establishes a parity rather
@@ -6077,7 +6091,7 @@ an idempotent `lastPhaseDay`. `Region` carries `controllerCountryId` and `occupi
 Accounts: country `military-expense` and pop-block `military-income`; posting kinds
 `military-pay` (treasury to the soldiers' region households) and `military-procurement`
 (treasury to the system equipment supplier), both cash-conserving and structurally
-validated. `FinancePeriodFiscalTotals.militaryExpenseSUSD` reports the spending.
+validated. `FinancePeriodFiscalTotals.militaryExpenseRUSD` reports the spending.
 
 ### 17H.3 Military mechanics
 
@@ -6086,7 +6100,7 @@ validated. `FinancePeriodFiscalTotals.militaryExpenseSUSD` reports the spending.
   (18–45, males then females) from the region's pop blocks into the roster, apportioned
   across blocks by available eligible population with deterministic largest-remainder
   ties and per-block capacity. It charges a real signing cost to the treasury paid to the
-  blocks that supplied the recruits, and buys equipment units at a documented SUSD price
+  blocks that supplied the recruits, and buys equipment units at a documented RUSD price
   from the non-simulated system supplier. Formation takes 14 days before deployment.
 - **Upkeep.** Daily pay and equipment upkeep are paid from actual treasury cash; a
   shortfall pays pro rata, never creates money, and erodes supply/organization. Soldier
@@ -6124,7 +6138,7 @@ validated. `FinancePeriodFiscalTotals.militaryExpenseSUSD` reports the spending.
 - **Markets/trade/customs:** membership, customs administration, shipments, and duty are
   untouched by occupation and cession. No E6a record is rewritten.
 - **Monetary/FX:** the authority, parity, reserves, convertibility, and price index are
-  untouched. SUSD remains the unit of account; no conversion is introduced.
+  untouched. RUSD remains the unit of account; no conversion is introduced.
 - **Buildings/construction/private ownership:** unchanged by occupation or cession.
 - **Laws/politics/AI:** the sovereign's laws, institutions, and unrest channel continue;
   the AI uses the same action validator and rules, with its bounded peace rule only.
@@ -6325,8 +6339,9 @@ The map is bundled, offline and interactive:
 - Polygons are unioned with `polygon-clipping` (MIT) at build time, simplified to
   a 0.02° tolerance, quantized to 0.001°, delta encoded, and unwrapped at the
   antimeridian. The renderer draws each ring at −360/0/+360 offsets.
-- Projection: Miller cylindrical, implemented in app code (x is linear in
-  longitude, so the antimeridian offsets are exact).
+- Projection: Gall stereographic cylindrical, implemented in app code (x is
+  linear in longitude, so the antimeridian offsets are exact). M11 used Miller
+  cylindrical; D-111 records the change.
 - Layers: political sovereignty, military control/occupation, market
   membership, selection. Occupation is a translucent, dashed control overlay
   using the controller's colour; the sovereign fill remains underneath.
@@ -6543,7 +6558,7 @@ land-layer rendering bug and raises the maximum zoom.
   pinch and cursor/pinch-midpoint focal zoom; bounded pan; reset to global view.
 - **Flags.** Darfur and Wadai use user-selected representative flags. The Pax
   Historia rasters are not bundled because redistribution permission was not
-  established; Century independently reconstructed the simple geometric designs
+  established; Fabric of Nations independently reconstructed the simple geometric designs
   and records them honestly as representative, not exact historical, flags. No
   monogram fallback remains.
 - **Material decision:** D-097. Detailed audit and screenshots:
@@ -6641,7 +6656,7 @@ The following choices are resolved in this version:
 1. **Population grouping:** aggregate region × principal occupation blocks, including dependents, with authoritative single-year male/female age state (`Uint32Array(81)`; index 80 = 80+) and derived 17 five-year reporting bands.
 2. **Employment:** explicit quantitative assignments; no single `employedAt` per pop block.
 3. **Market stock:** physical inventory requires storage capacity; the Warehouse is included in v1.
-4. **Accounting unit:** SUSD is the fixed unit of measurement/accounting denomination, not a national currency. M4a-1 balances are nominal SUSD. M4a-2 adds currency identity and scenario-provided or unavailable SUSD-relative valuation; it does not implement dynamic FX, inflation, monetary policy, native-currency balances, or currency conversion in settlement. Future regime/FX effects remain aggregate and simplified.
+4. **Accounting unit:** RUSD is the fixed unit of measurement/accounting denomination, not a national currency. M4a-1 balances are nominal RUSD. M4a-2 adds currency identity and scenario-provided or unavailable RUSD-relative valuation; it does not implement dynamic FX, inflation, monetary policy, native-currency balances, or currency conversion in settlement. Future regime/FX effects remain aggregate and simplified.
 5. **Accounting integrity:** financial flows use balanced double-entry postings. M4a-1 adds category-aware accounts, normal-side balances, recognition legs, and opening balances. M4b adds the monthly period close, immutable monthly finance summaries, the semantic posting matrix, and the internal `period-close` kind (§5.4.2, D-047). M4c adds country treasury and fiscal accounts, the cash-neutral `income-tax` and `welfare-transfer` kinds, and fiscal close into country equity (§5.4.3, D-048). Annual close and controlled correction/reversal entries are planned in M7a; long-term history compaction remains future.
 6. **Randomness:** keyed/counter-based deterministic random draws, not one shared mutable PRNG stream.
 7. **Daily ordering:** the pipeline in §4.2 is binding unless changed with tests and a decision record. In particular, M3d market clearing includes bounded price adjustment before M3e settlement; settlement uses established transaction prices (D-043). Moving price adjustment after settlement requires a new decision and regression tests.
@@ -6653,9 +6668,9 @@ The following choices are resolved in this version:
 13. **M2-only finance fixture:** on the M2-only path, needs are funded from annual disposable income only, with no savings drawdown and no account mutation. M3f economic worlds instead use opening household cash and actual settlement; the full intended model remains household financial assets plus settled income less mandatory payments.
 14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate.
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
-16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved SUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
+16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved RUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
 17. **Government fiscal policy:** M4c makes `Country.fiscal` and `Country.treasuryAccountId` authoritative; E2 extends `Country.fiscal` with the income-tax exemption, welfare eligibility ceiling, business-profit tax rate, and treasury reserve target. The personal rate is a provisional hard-bounded tax on the taxable part of actual wages, not law-bounded; collection efficiency is fixed at 1.0; welfare is a single budgeted transfer with a wealth-eligibility ceiling and proportional funding reduction. The business-profit tax is assessed at month-end on each building's positive recognized period result and limited by its operating cash. D-048 records the M4c scope, timing, and limitations; D-073 records the E2 extension. M5a adds scenario-initialised `World.profitDistribution` and balanced private distributions/state-enterprise remittances (D-056); it does not make state receipts income-tax revenue. M5b adds scenario-initialised `Country.debt`, versioned contracts, deficit financing, interest, maturity/refinancing, arrears, and explicit default (D-057); borrowing is not revenue and principal repayment is not expenditure. M6 adds the shared `set-fiscal-policy` player/AI action and `World.countryAI`/`Country.ai` state (D-058). E2 extends that action to the complete fiscal policy and adds validated `issue-debt`, `repay-debt`, and `set-debt-policy` actions; none creates money or a posting without a balanced counterpart. The budget memo and period/annual budget totals separate requested/paid/shortfall and revenue/borrowing/principal/interest. Consumption/excise, property/land, customs, and education/health/administration/procurement spending remain unimplemented dependencies (E5/E6a/E4 and prerequisite systems). Inflation/FX/monetary-policy foundations remain planned in M8a/E6b (§17.3/§17A.10).
-18. **Monetary precision and result phases:** authoritative SUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
+18. **Monetary precision and result phases:** authoritative RUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_RUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
 19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. **E6a adds real inter-market trade (D-079):** authored directional routes, capacity derived from the two markets' M8 infrastructure, producer-consignment shipments with transit, exact-once delivery, and a market-level customs boundary with an explicit administration. Intra-market pooled allocation remains shared-market clearing and is not dutiable. A non-simulated rest-of-world sector and foreign-exchange settlement are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052/D-079 record the rules and non-goals.
 20. **Historical data pipeline:** the M5 sample is eight authored 1900 polities in source-annotated tables with a deterministic validator/loader. Population totals are rounded source-referenced estimates; occupation composition and other structure are provisional. No century-scale historical population/occupation-trend calibration is claimed, no FX rates are invented, and no simulation code reads calibration totals to force outcomes. D-053 records the contracts and limitations.
 21. **Country AI:** M6 makes `World.countryAI.enabled` a scenario-provided policy and `Country.ai` the fixed-size persisted schedule/goal state. The AI decision function receives only `CountryAIObservation`; it has one action, `set-fiscal-policy`, shared with a player through `validateCountryAction`/`applyCountryAction`. The AI is deterministic, uses no random draw, and never borrows, issues money, or mutates debt. Construction, infrastructure priority, laws, diplomacy, and military actions remain unimplemented. D-058 records the rules and non-goals; D-059 records the hot-path summary-validation optimization.
@@ -6672,7 +6687,7 @@ These are intentionally left open because they depend on desired gameplay depth 
 2. **Player country selection:** default is any fully authored sovereign polity in the selected scenario; incomplete stubs are not playable until validated.
 3. **Ironman/reload restrictions:** default is unrestricted save/load, with no Ironman mode in v1.
 4. **Historical deviations:** default is a baseline event set that allows outcomes to diverge; no forced “railroad” restoration after an alternate outcome unless an event explicitly requires it.
-5. **Monetary depth beyond v1:** default is the fixed-SUSD measurement model with M4a-2 currency identity and SUSD-relative valuation; dynamic FX, inflation, monetary policy, central banking, detailed local denominations, and banking instruments remain deferred and are not current M4a-2 behavior. M8a is the planned stage for inflation measurement, exchange-rate dynamics, and monetary-policy foundations, but it is not implemented and any missing prerequisite must be recorded.
+5. **Monetary depth beyond v1:** default is the fixed-RUSD measurement model with M4a-2 currency identity and RUSD-relative valuation; dynamic FX, inflation, monetary policy, central banking, detailed local denominations, and banking instruments remain deferred and are not current M4a-2 behavior. M8a is the planned stage for inflation measurement, exchange-rate dynamics, and monetary-policy foundations, but it is not implemented and any missing prerequisite must be recorded.
 6. **Monthly-wealth income window:** the current convention uses current-day actual settled wages annualized by the civil year because the GDD does not define a monthly window and no accumulator exists. An exact trailing-month average requires an authoritative per-block income accumulator and a schema/save-format change. The default remains the documented provisional convention until the designer chooses a measurement window and migration policy.
 7. **Economic Management open choices:** the questions in §17A.16 (construction capitalization/materials, land/property, trade counterparty, banking/credit, inflation measure, health/pensions/bargaining, sector classification, player/AI action expansion, GDP/headline measures, report retention, and save/schema migration) are otherwise unresolved. Each later E stage must resolve the questions it needs with a decision record and tests; none may be treated as accepted by E0 alone. E1 resolves report retention for its own scope as 12 monthly summaries plus 48 session actions (D-071); it does not resolve the other choices. The default is to leave the lever unimplemented until its mechanism exists.
 
@@ -6707,20 +6722,20 @@ For every agent session:
 - **Five-year band:** a reporting/validation aggregate derived from single-year age state; never separate authoritative population.
 - **Historical-validation scenario:** a run initialized from a source-backed historical date and age/sex distribution, used to test whether source-backed schedules reproduce history.
 - **Gameplay baseline:** a scenario with explicitly provisional or designed assumptions, used for play; it is not automatically a historical validation.
-- **SUSD:** the simulation's fixed unit of measurement and accounting denomination. It is not a national currency, necessarily an actual U.S. dollar, or a promise of constant purchasing power. Its definition is fixed; nominal SUSD values are distinct from future real/inflation-adjusted values.
+- **RUSD:** the simulation's fixed unit of measurement and accounting denomination. It is not a national currency, necessarily an actual U.S. dollar, or a promise of constant purchasing power. Its definition is fixed; nominal RUSD values are distinct from future real/inflation-adjusted values.
 - **Currency issuer:** the entity that issued a currency: a simulated country, an explicitly represented foreign issuer, or a future union. Adoption does not change issuer identity.
 - **Domestic monetary arrangement:** a country's sole `own` or `adopted` selection of a currency for domestic use; it is not the same as issuer identity.
-- **Currency valuation:** the single `CurrencyValuation` record for a currency, either specified (`susdPerUnit`, `setOnDay`, scenario source) or explicitly unavailable. It never defaults to parity.
-- **SusdPerCurrencyUnit:** the SUSD value of one unit of a currency. It is a valuation input, not by itself a peg; it is serialized as a plain JSON number and branded in code.
-- **Nominal SUSD:** an amount measured in the fixed SUSD unit without inflation adjustment.
-- **Real purchasing power:** a future derived measure of what nominal SUSD can buy, using a documented price index or reference period; it is not the same as nominal SUSD.
+- **Currency valuation:** the single `CurrencyValuation` record for a currency, either specified (`rusdPerUnit`, `setOnDay`, scenario source) or explicitly unavailable. It never defaults to parity.
+- **RusdPerCurrencyUnit:** the RUSD value of one unit of a currency. It is a valuation input, not by itself a peg; it is serialized as a plain JSON number and branded in code.
+- **Nominal RUSD:** an amount measured in the fixed RUSD unit without inflation adjustment.
+- **Real purchasing power:** a future derived measure of what nominal RUSD can buy, using a documented price index or reference period; it is not the same as nominal RUSD.
 - **Country-region ownership:** the authoritative mapping in `Country.regionIds`; a region may be unassigned, and there is no `Region.countryId`.
 - **Finance period summary:** the immutable `FinancePeriodSummary` recorded at a monthly close: inclusive period start/end, the pre-close trial balance of nonzero accounts, and the four mapped gross period-flow totals.
 - **Period close:** the M4b month-end operation that captures a finance period summary, zeroes revenue and expense accounts with closing entries into existing owner equity, and advances `FinanceState.closedThroughDay`.
 - **Closed-through day:** `FinanceState.closedThroughDay`, the inclusive end day of the most recently closed period, or `null` before the first close. A published world requires it to be `null` or earlier than `world.dayIndex`.
 - **Staged close / published close:** a staged close is the in-progress result on a copied finance state and may temporarily have `closedThroughDay === world.dayIndex`; a published world requires `closedThroughDay === null || closedThroughDay < world.dayIndex`.
 - **Semantic posting matrix:** the D-047/D-048 rule set that fixes which account subtypes each transaction kind may debit or credit; it applies to revenue and expense lines in single, batched, and persisted postings.
-- **Fiscal policy:** the M4c provisional `Country.fiscal` state: a flat dimensionless `incomeTaxRate` on actual wages and a nominal annual `welfareBudgetSUSDPerYear` expenditure target. It is scenario-initialised state, not a spendable pool, and is not law-bounded or action-mutable in M4c.
+- **Fiscal policy:** the M4c provisional `Country.fiscal` state: a flat dimensionless `incomeTaxRate` on actual wages and a nominal annual `welfareBudgetRUSDPerYear` expenditure target. It is scenario-initialised state, not a spendable pool, and is not law-bounded or action-mutable in M4c.
 - **Treasury:** the country-owned `treasury-cash` asset account that receives income-tax proceeds and pays budgeted welfare. Its balance is authoritative cash, not a capacity or policy pool.
 - **Welfare shortfall:** the difference between a country's requested daily welfare budget share and the amount actually payable from treasury cash. It is reported for diagnostics and is not a debt, arrear, or liability in M4c.
 - **Technology project work:** cumulative record of research labor applied to one specific technology.
@@ -6747,7 +6762,7 @@ For every agent session:
 - **Sovereignty:** the country that legally owns a region under the simulation's territorial model. It is `Country.regionIds` and changes only through a validated peace-treaty cession (M10/D-081).
 - **Military control / occupation:** the country exercising temporary effective military control over a region, recorded separately as `Region.controllerCountryId` and `Region.occupiedSinceDay`. It never changes sovereignty, markets, buildings, people, accounts, treasuries, or monetary authority.
 - **Occupation:** temporary military control of a region by an at-war country; it applies unrest and a garrison cost to the controller but transfers no ownership or economic state.
-- **Real vs nominal:** nominal values are measured in fixed SUSD; real values require a documented price index/base. **E6b (D-080)** implements a Laspeyres price index with a fixed needs-derived basket, base 100 at the scenario start, bounded month-end observations, and coverage; it is a measured nominal price-level comparison, not a full deflator, and it does not index any contract or account.
+- **Real vs nominal:** nominal values are measured in fixed RUSD; real values require a documented price index/base. **E6b (D-080)** implements a Laspeyres price index with a fixed needs-derived basket, base 100 at the scenario start, bounded month-end observations, and coverage; it is a measured nominal price-level comparison, not a full deflator, and it does not index any contract or account.
 - **Whole-day staging:** running all phases of an economic day on a structural clone and publishing it only after every phase and final validation succeeds.
 - **Vertical slice:** the smallest playable end-to-end version that proves the complete product path rather than only isolated systems.
 

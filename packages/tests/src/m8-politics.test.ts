@@ -53,7 +53,7 @@ function account(
   ownerId: number,
   subtype: "income-tax-revenue" | "administration-expense" | "administration-income",
 ): number {
-  return buildFinanceIndex(world.finance).find(ownerKind, ownerId, subtype)?.balanceSUSD ?? 0;
+  return buildFinanceIndex(world.finance).find(ownerKind, ownerId, subtype)?.balanceRUSD ?? 0;
 }
 
 function fiscalAction(countryId: number, rate: number, dayIndex: number): CountryAction {
@@ -63,11 +63,11 @@ function fiscalAction(countryId: number, rate: number, dayIndex: number): Countr
     dayIndex,
     source: "player",
     incomeTaxRate: rate,
-    incomeTaxAllowanceSUSDPerYear: 0,
-    welfareBudgetSUSDPerYear: 0,
+    incomeTaxAllowanceRUSDPerYear: 0,
+    welfareBudgetRUSDPerYear: 0,
     welfareMaxWealthLevel: 99,
     businessProfitTaxRate: 0,
-    reserveTargetSUSD: 0,
+    reserveTargetRUSD: 0,
   };
 }
 
@@ -126,8 +126,8 @@ describe("M8 political institutions", () => {
     expect(paid).toBeGreaterThan(0);
     expect(received).toBeCloseTo(paid, 6);
     expect(designatedCashTotal(world.finance)).toBeCloseTo(beforeCash, 6);
-    expect(country.institutions.fundingRequestedMonthToDateSUSD).toBeGreaterThan(0);
-    expect(country.institutions.fundingShortfallMonthToDateSUSD).toBeGreaterThanOrEqual(0);
+    expect(country.institutions.fundingRequestedMonthToDateRUSD).toBeGreaterThan(0);
+    expect(country.institutions.fundingShortfallMonthToDateRUSD).toBeGreaterThanOrEqual(0);
     assertValidWorld(world);
   });
 
@@ -392,7 +392,7 @@ describe("M8 political institutions", () => {
     setInstitutionFunding(
       first,
       scenario.definitions,
-      { countryId: M8_COUNTRY_A, annualSUSD: 4_000 },
+      { countryId: M8_COUNTRY_A, annualRUSD: 4_000 },
       0,
     );
     const saved = serializeWorld(first);
@@ -412,17 +412,17 @@ describe("M8 political institutions", () => {
       (entry) => entry.countryId === M8_COUNTRY_A,
     )!;
     const budget = summary.countryBudgetTotals[M8_COUNTRY_A]!;
-    expect(totals.administrationExpenseSUSD).toBeGreaterThan(0);
-    expect(budget.administrationRequestedSUSD).toBeGreaterThanOrEqual(
-      totals.administrationExpenseSUSD ?? 0,
+    expect(totals.administrationExpenseRUSD).toBeGreaterThan(0);
+    expect(budget.administrationRequestedRUSD).toBeGreaterThanOrEqual(
+      totals.administrationExpenseRUSD ?? 0,
     );
-    expect(totals.netFiscalResultSUSD).toBeCloseTo(
-      totals.incomeTaxRevenueSUSD +
-        totals.businessTaxRevenueSUSD -
-        totals.welfareExpenseSUSD -
-        totals.interestExpenseSUSD -
-        totals.subsidyExpenseSUSD -
-        (totals.administrationExpenseSUSD ?? 0),
+    expect(totals.netFiscalResultRUSD).toBeCloseTo(
+      totals.incomeTaxRevenueRUSD +
+        totals.businessTaxRevenueRUSD -
+        totals.welfareExpenseRUSD -
+        totals.interestExpenseRUSD -
+        totals.subsidyExpenseRUSD -
+        (totals.administrationExpenseRUSD ?? 0),
       6,
     );
   });
@@ -446,7 +446,7 @@ describe("M8 political institutions", () => {
     });
     command("APPLY_ACTION", "a2", {
       actionId: "fund-1",
-      action: { kind: "set-institution-funding", countryId: M8_COUNTRY_A, annualSUSD: 1_000 },
+      action: { kind: "set-institution-funding", countryId: M8_COUNTRY_A, annualRUSD: 1_000 },
     });
     command("REQUEST_SNAPSHOT", "s1");
     const snapshot = events
@@ -457,7 +457,7 @@ describe("M8 political institutions", () => {
     const country = snapshot.countries.find((entry) => entry.id === M8_COUNTRY_A)!;
     expect(country.politics.enabled).toBe(true);
     expect(country.politics.lawTransitions).toHaveLength(1);
-    expect(country.politics.institution.fundedAnnualSUSD).toBe(1_000);
+    expect(country.politics.institution.fundedAnnualRUSD).toBe(1_000);
     expect(Object.isFrozen(country.politics)).toBe(true);
 
     command("SAVE", "save-before");

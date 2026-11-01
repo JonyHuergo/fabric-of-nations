@@ -28,7 +28,7 @@ import {
   deriveHealth,
   deriveTraining,
   laborHoursFactor,
-  laborMinimumWageSUSDPerYear,
+  laborMinimumWageRUSDPerYear,
   lawDefinition,
   lawPrerequisitesMet,
   lawSupport,
@@ -44,11 +44,11 @@ import {
   armiesOfCountry,
   regionSovereignCountryId,
   relationBetween,
-  routeCapacitySUSDPerDay,
+  routeCapacityRUSDPerDay,
   transitDays,
-  authorityLiabilitySUSD,
+  authorityLiabilityRUSD,
   authorityReserveCoverMonths,
-  authorityReservesSUSD,
+  authorityReservesRUSD,
   convertibilityState,
   derivePriceIndexes,
   monetaryCurrencyForCountry,
@@ -230,7 +230,7 @@ function fiscalTotals(
   summary: FinancePeriodSummary,
   countryId: number,
   world: World,
-): { totals: SnapshotFiscalTotals; businessTaxRevenueSUSD: number } | null {
+): { totals: SnapshotFiscalTotals; businessTaxRevenueRUSD: number } | null {
   const totals = governmentPeriodTotals(world.finance, summary).find(
     (entry) => entry.countryId === countryId,
   );
@@ -239,18 +239,18 @@ function fiscalTotals(
     totals: {
       periodStartDay: summary.periodStartDay,
       periodEndDay: summary.periodEndDay,
-      incomeTaxSUSD: roundDisplay(totals.incomeTaxRevenueSUSD, 6),
-      welfareExpenseSUSD: roundDisplay(totals.welfareExpenseSUSD, 6),
-      interestExpenseSUSD: roundDisplay(totals.interestExpenseSUSD, 6),
-      subsidyExpenseSUSD: roundDisplay(totals.subsidyExpenseSUSD, 6),
-      administrationExpenseSUSD: roundDisplay(totals.administrationExpenseSUSD ?? 0, 6),
-      educationExpenseSUSD: roundDisplay(totals.educationExpenseSUSD ?? 0, 6),
-      trainingExpenseSUSD: roundDisplay(totals.trainingExpenseSUSD ?? 0, 6),
-      customsDutyRevenueSUSD: roundDisplay(totals.customsDutyRevenueSUSD ?? 0, 6),
-      militaryExpenseSUSD: roundDisplay(totals.militaryExpenseSUSD ?? 0, 6),
-      netFiscalResultSUSD: roundDisplay(totals.netFiscalResultSUSD, 6),
+      incomeTaxRUSD: roundDisplay(totals.incomeTaxRevenueRUSD, 6),
+      welfareExpenseRUSD: roundDisplay(totals.welfareExpenseRUSD, 6),
+      interestExpenseRUSD: roundDisplay(totals.interestExpenseRUSD, 6),
+      subsidyExpenseRUSD: roundDisplay(totals.subsidyExpenseRUSD, 6),
+      administrationExpenseRUSD: roundDisplay(totals.administrationExpenseRUSD ?? 0, 6),
+      educationExpenseRUSD: roundDisplay(totals.educationExpenseRUSD ?? 0, 6),
+      trainingExpenseRUSD: roundDisplay(totals.trainingExpenseRUSD ?? 0, 6),
+      customsDutyRevenueRUSD: roundDisplay(totals.customsDutyRevenueRUSD ?? 0, 6),
+      militaryExpenseRUSD: roundDisplay(totals.militaryExpenseRUSD ?? 0, 6),
+      netFiscalResultRUSD: roundDisplay(totals.netFiscalResultRUSD, 6),
     },
-    businessTaxRevenueSUSD: roundDisplay(totals.businessTaxRevenueSUSD, 6),
+    businessTaxRevenueRUSD: roundDisplay(totals.businessTaxRevenueRUSD, 6),
   };
 }
 
@@ -258,43 +258,43 @@ function budgetTotalsSnapshot(
   totals: FinancePeriodSummary["countryBudgetTotals"][number],
 ): SnapshotBudgetTotals {
   return {
-    welfareRequestedSUSD: roundDisplay(totals.welfareRequestedSUSD, 6),
-    welfareShortfallSUSD: roundDisplay(totals.welfareShortfallSUSD, 6),
-    businessTaxAssessedSUSD: roundDisplay(totals.businessTaxAssessedSUSD, 6),
-    businessTaxUncollectedSUSD: roundDisplay(totals.businessTaxUncollectedSUSD, 6),
-    debtIssuedSUSD: roundDisplay(totals.debtIssuedSUSD, 6),
-    principalRepaidSUSD: roundDisplay(totals.principalRepaidSUSD, 6),
-    interestPaidSUSD: roundDisplay(totals.interestPaidSUSD, 6),
-    unfinancedRequirementSUSD: roundDisplay(totals.unfinancedRequirementSUSD, 6),
-    constructionSpentSUSD: roundDisplay(totals.constructionSpentSUSD, 6),
-    constructionWrittenOffSUSD: roundDisplay(totals.constructionWrittenOffSUSD, 6),
-    constructionMaterialsSpentSUSD: roundDisplay(totals.constructionMaterialsSpentSUSD, 6),
-    subsidyRequestedSUSD: roundDisplay(totals.subsidyRequestedSUSD, 6),
-    subsidyShortfallSUSD: roundDisplay(totals.subsidyShortfallSUSD, 6),
-    publicEnterpriseSupportSUSD: roundDisplay(totals.publicEnterpriseSupportSUSD, 6),
-    administrationRequestedSUSD: roundDisplay(totals.administrationRequestedSUSD ?? 0, 6),
-    administrationShortfallSUSD: roundDisplay(totals.administrationShortfallSUSD ?? 0, 6),
+    welfareRequestedRUSD: roundDisplay(totals.welfareRequestedRUSD, 6),
+    welfareShortfallRUSD: roundDisplay(totals.welfareShortfallRUSD, 6),
+    businessTaxAssessedRUSD: roundDisplay(totals.businessTaxAssessedRUSD, 6),
+    businessTaxUncollectedRUSD: roundDisplay(totals.businessTaxUncollectedRUSD, 6),
+    debtIssuedRUSD: roundDisplay(totals.debtIssuedRUSD, 6),
+    principalRepaidRUSD: roundDisplay(totals.principalRepaidRUSD, 6),
+    interestPaidRUSD: roundDisplay(totals.interestPaidRUSD, 6),
+    unfinancedRequirementRUSD: roundDisplay(totals.unfinancedRequirementRUSD, 6),
+    constructionSpentRUSD: roundDisplay(totals.constructionSpentRUSD, 6),
+    constructionWrittenOffRUSD: roundDisplay(totals.constructionWrittenOffRUSD, 6),
+    constructionMaterialsSpentRUSD: roundDisplay(totals.constructionMaterialsSpentRUSD, 6),
+    subsidyRequestedRUSD: roundDisplay(totals.subsidyRequestedRUSD, 6),
+    subsidyShortfallRUSD: roundDisplay(totals.subsidyShortfallRUSD, 6),
+    publicEnterpriseSupportRUSD: roundDisplay(totals.publicEnterpriseSupportRUSD, 6),
+    administrationRequestedRUSD: roundDisplay(totals.administrationRequestedRUSD ?? 0, 6),
+    administrationShortfallRUSD: roundDisplay(totals.administrationShortfallRUSD ?? 0, 6),
   };
 }
 
 function emptyBudgetTotalsSnapshot(): SnapshotBudgetTotals {
   return {
-    welfareRequestedSUSD: 0,
-    welfareShortfallSUSD: 0,
-    businessTaxAssessedSUSD: 0,
-    businessTaxUncollectedSUSD: 0,
-    debtIssuedSUSD: 0,
-    principalRepaidSUSD: 0,
-    interestPaidSUSD: 0,
-    unfinancedRequirementSUSD: 0,
-    constructionSpentSUSD: 0,
-    constructionWrittenOffSUSD: 0,
-    constructionMaterialsSpentSUSD: 0,
-    subsidyRequestedSUSD: 0,
-    subsidyShortfallSUSD: 0,
-    publicEnterpriseSupportSUSD: 0,
-    administrationRequestedSUSD: 0,
-    administrationShortfallSUSD: 0,
+    welfareRequestedRUSD: 0,
+    welfareShortfallRUSD: 0,
+    businessTaxAssessedRUSD: 0,
+    businessTaxUncollectedRUSD: 0,
+    debtIssuedRUSD: 0,
+    principalRepaidRUSD: 0,
+    interestPaidRUSD: 0,
+    unfinancedRequirementRUSD: 0,
+    constructionSpentRUSD: 0,
+    constructionWrittenOffRUSD: 0,
+    constructionMaterialsSpentRUSD: 0,
+    subsidyRequestedRUSD: 0,
+    subsidyShortfallRUSD: 0,
+    publicEnterpriseSupportRUSD: 0,
+    administrationRequestedRUSD: 0,
+    administrationShortfallRUSD: 0,
   };
 }
 
@@ -306,7 +306,7 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
       (definition) =>
         definition.ownershipAllowed.includes("state") &&
         definition.outputs.length > 0 &&
-        definition.constructionCostSUSD > 0 &&
+        definition.constructionCostRUSD > 0 &&
         Number.isInteger(definition.constructionWorkers) &&
         definition.constructionWorkers > 0 &&
         definition.requiredTechnologyId === null &&
@@ -317,12 +317,12 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
       definitionId: definition.id,
       key: definition.key,
       name: definition.name,
-      constructionCostSUSD: roundDisplay(definition.constructionCostSUSD, 6),
+      constructionCostRUSD: roundDisplay(definition.constructionCostRUSD, 6),
       constructionWorkers: definition.constructionWorkers,
       plannedJobs: roundDisplay(constructionPlannedJobs(definition), 2),
       sector: definition.sector,
-      dailyUpkeepSUSDAtLevelOne: roundDisplay(definition.dailyUpkeepSUSDAtLevelOne, 6),
-      workingCapitalSUSD: roundDisplay(constructionWorkingCapital(definition), 6),
+      dailyUpkeepRUSDAtLevelOne: roundDisplay(definition.dailyUpkeepRUSDAtLevelOne, 6),
+      workingCapitalRUSD: roundDisplay(constructionWorkingCapital(definition), 6),
       outputs: definition.outputs
         .map((output) => {
           const good = goods.get(output.goodId);
@@ -388,15 +388,15 @@ function constructionProjectSnapshots(
         startedDay: project.startedDay,
         completedDay: project.completedDay,
         cancelledDay: project.cancelledDay,
-        totalCostSUSD: roundDisplay(project.totalCostSUSD, 6),
-        workingCapitalSUSD: roundDisplay(project.workingCapitalSUSD, 6),
-        workingCapitalPaidSUSD: roundDisplay(project.workingCapitalPaidSUSD, 6),
-        spentSUSD: roundDisplay(project.spentSUSD, 6),
-        materialsSpentSUSD: roundDisplay(project.materialsSpentSUSD, 6),
+        totalCostRUSD: roundDisplay(project.totalCostRUSD, 6),
+        workingCapitalRUSD: roundDisplay(project.workingCapitalRUSD, 6),
+        workingCapitalPaidRUSD: roundDisplay(project.workingCapitalPaidRUSD, 6),
+        spentRUSD: roundDisplay(project.spentRUSD, 6),
+        materialsSpentRUSD: roundDisplay(project.materialsSpentRUSD, 6),
         materials: project.materials
           .map((material) => {
             const good = goods.get(material.goodId);
-            const unitPriceSUSD = market?.priceSUSD[material.goodId] ?? 0;
+            const unitPriceRUSD = market?.priceRUSD[material.goodId] ?? 0;
             const remaining = Math.max(
               0,
               material.requiredQuantity - material.deliveredQuantity,
@@ -409,9 +409,9 @@ function constructionProjectSnapshots(
               requiredQuantity: material.requiredQuantity,
               deliveredQuantity: material.deliveredQuantity,
               remainingQuantity: remaining,
-              unitPriceSUSD: roundDisplay(unitPriceSUSD, 6),
-              deliveredValueSUSD: roundDisplay(
-                material.deliveredQuantity * unitPriceSUSD,
+              unitPriceRUSD: roundDisplay(unitPriceRUSD, 6),
+              deliveredValueRUSD: roundDisplay(
+                material.deliveredQuantity * unitPriceRUSD,
                 6,
               ),
             };
@@ -419,7 +419,7 @@ function constructionProjectSnapshots(
           .sort((left, right) => left.goodId - right.goodId),
         progress: roundDisplay(constructionProjectProgress(project), 6),
         materialsProgress: roundDisplay(constructionMaterialsProgress(project), 6),
-        remainingSUSD: roundDisplay(constructionProjectRemaining(project), 6),
+        remainingRUSD: roundDisplay(constructionProjectRemaining(project), 6),
         lastWorkers: project.lastWorkers,
         blockedReason: project.blockedReason,
         buildingId: project.buildingId,
@@ -435,8 +435,8 @@ function constructionHistorySnapshot(
   return {
     projectsCompleted: aggregate?.projectsCompleted ?? 0,
     projectsCancelled: aggregate?.projectsCancelled ?? 0,
-    totalSpentSUSD: roundDisplay(aggregate?.totalSpentSUSD ?? 0, 6),
-    totalWrittenOffSUSD: roundDisplay(aggregate?.totalWrittenOffSUSD ?? 0, 6),
+    totalSpentRUSD: roundDisplay(aggregate?.totalSpentRUSD ?? 0, 6),
+    totalWrittenOffRUSD: roundDisplay(aggregate?.totalWrittenOffRUSD ?? 0, 6),
   };
 }
 
@@ -462,7 +462,7 @@ function constructionLaborSnapshot(
   }
   return {
     idleWorkers: workers,
-    dailyWageSUSD: workers > 0 ? roundDisplay(weightedWage / workers, 6) : 0,
+    dailyWageRUSD: workers > 0 ? roundDisplay(weightedWage / workers, 6) : 0,
   };
 }
 
@@ -493,20 +493,20 @@ function debtPolicySnapshot(
     policy.creditorKind === "country"
       ? index.find("country", policy.creditorId, "treasury-cash")
       : index.find("popBlock", policy.creditorId, "household-cash");
-  const creditorCash = Math.max(0, cashAccount?.balanceSUSD ?? 0);
+  const creditorCash = Math.max(0, cashAccount?.balanceRUSD ?? 0);
   return {
     enabled: policy.enabled,
     refinanceOnMaturity: policy.refinanceOnMaturity,
-    maxOutstandingPrincipalSUSD: policy.maxOutstandingPrincipalSUSD,
+    maxOutstandingPrincipalRUSD: policy.maxOutstandingPrincipalRUSD,
     creditorKind: policy.creditorKind,
     creditorId: policy.creditorId,
     creditorLabel: holderLabel(world, policy.creditorKind, policy.creditorId),
     annualCouponRate: policy.annualCouponRate,
     termDays: policy.termDays,
     arrearsGraceDays: policy.arrearsGraceDays,
-    creditorCashSUSD: roundDisplay(creditorCash, 6),
-    headroomSUSD: roundDisplay(
-      Math.max(0, policy.maxOutstandingPrincipalSUSD - outstanding),
+    creditorCashRUSD: roundDisplay(creditorCash, 6),
+    headroomRUSD: roundDisplay(
+      Math.max(0, policy.maxOutstandingPrincipalRUSD - outstanding),
       6,
     ),
   };
@@ -529,12 +529,12 @@ function debtContractSnapshots(
       holderKind: contract.holderKind,
       holderId: contract.holderId,
       holderLabel: holderLabel(world, contract.holderKind, contract.holderId),
-      principalSUSD: roundDisplay(contract.principalSUSD, 6),
-      outstandingPrincipalSUSD: roundDisplay(contract.outstandingPrincipalSUSD, 6),
+      principalRUSD: roundDisplay(contract.principalRUSD, 6),
+      outstandingPrincipalRUSD: roundDisplay(contract.outstandingPrincipalRUSD, 6),
       annualCouponRate: contract.annualCouponRate,
       issueDay: contract.issueDay,
       maturityDay: contract.maturityDay,
-      accruedInterestSUSD: roundDisplay(contract.accruedInterestSUSD, 6),
+      accruedInterestRUSD: roundDisplay(contract.accruedInterestRUSD, 6),
       status: contract.status,
     }));
 }
@@ -598,13 +598,13 @@ function financeHistory(
     history.push({
       ...periodFiscal.totals,
       ...(budget === undefined ? emptyBudgetTotalsSnapshot() : budgetTotalsSnapshot(budget)),
-      businessTaxRevenueSUSD: periodFiscal.businessTaxRevenueSUSD,
+      businessTaxRevenueRUSD: periodFiscal.businessTaxRevenueRUSD,
       grossFlowTotals: { ...summary.flowTotalsByKind },
       periodStartLabel: dayLabel(summary.periodStartDay),
       periodEndLabel: dayLabel(summary.periodEndDay),
-      treasuryCashEndSUSD: treasury,
-      debtOutstandingEndSUSD: debt,
-      householdCashEndSUSD: household,
+      treasuryCashEndRUSD: treasury,
+      debtOutstandingEndRUSD: debt,
+      householdCashEndRUSD: household,
     });
   }
   return history;
@@ -628,23 +628,23 @@ function annualReportSnapshots(
         periodStartLabel: dayLabel(summary.periodStartDay),
         periodEndLabel: dayLabel(summary.periodEndDay),
         complete: summary.complete,
-        incomeTaxSUSD: roundDisplay(totals?.incomeTaxRevenueSUSD ?? 0, 6),
-        businessTaxRevenueSUSD: roundDisplay(totals?.businessTaxRevenueSUSD ?? 0, 6),
-        welfareExpenseSUSD: roundDisplay(totals?.welfareExpenseSUSD ?? 0, 6),
-        interestExpenseSUSD: roundDisplay(totals?.interestExpenseSUSD ?? 0, 6),
-        subsidyExpenseSUSD: roundDisplay(totals?.subsidyExpenseSUSD ?? 0, 6),
-        administrationExpenseSUSD: roundDisplay(
-          totals?.administrationExpenseSUSD ?? 0,
+        incomeTaxRUSD: roundDisplay(totals?.incomeTaxRevenueRUSD ?? 0, 6),
+        businessTaxRevenueRUSD: roundDisplay(totals?.businessTaxRevenueRUSD ?? 0, 6),
+        welfareExpenseRUSD: roundDisplay(totals?.welfareExpenseRUSD ?? 0, 6),
+        interestExpenseRUSD: roundDisplay(totals?.interestExpenseRUSD ?? 0, 6),
+        subsidyExpenseRUSD: roundDisplay(totals?.subsidyExpenseRUSD ?? 0, 6),
+        administrationExpenseRUSD: roundDisplay(
+          totals?.administrationExpenseRUSD ?? 0,
           6,
         ),
-        educationExpenseSUSD: roundDisplay(totals?.educationExpenseSUSD ?? 0, 6),
-        trainingExpenseSUSD: roundDisplay(totals?.trainingExpenseSUSD ?? 0, 6),
-        customsDutyRevenueSUSD: roundDisplay(totals?.customsDutyRevenueSUSD ?? 0, 6),
-        militaryExpenseSUSD: roundDisplay(totals?.militaryExpenseSUSD ?? 0, 6),
-        netFiscalResultSUSD: roundDisplay(totals?.netFiscalResultSUSD ?? 0, 6),
-        treasuryCashEndSUSD: roundDisplay(balances?.treasuryCashSUSD ?? 0, 6),
-        debtLiabilityEndSUSD: roundDisplay(balances?.debtLiabilitySUSD ?? 0, 6),
-        interestPayableEndSUSD: roundDisplay(balances?.interestPayableSUSD ?? 0, 6),
+        educationExpenseRUSD: roundDisplay(totals?.educationExpenseRUSD ?? 0, 6),
+        trainingExpenseRUSD: roundDisplay(totals?.trainingExpenseRUSD ?? 0, 6),
+        customsDutyRevenueRUSD: roundDisplay(totals?.customsDutyRevenueRUSD ?? 0, 6),
+        militaryExpenseRUSD: roundDisplay(totals?.militaryExpenseRUSD ?? 0, 6),
+        netFiscalResultRUSD: roundDisplay(totals?.netFiscalResultRUSD ?? 0, 6),
+        treasuryCashEndRUSD: roundDisplay(balances?.treasuryCashRUSD ?? 0, 6),
+        debtLiabilityEndRUSD: roundDisplay(balances?.debtLiabilityRUSD ?? 0, 6),
+        interestPayableEndRUSD: roundDisplay(balances?.interestPayableRUSD ?? 0, 6),
         correctionCount: summary.correctionCount,
       };
     });
@@ -673,7 +673,7 @@ function countrySectorValueEstimates(
     const capacity = computeBuildingCapacity(world, definitions, building.id);
     let value = 0;
     for (const output of definition.outputs) {
-      const price = market.priceSUSD[output.goodId] ?? 0;
+      const price = market.priceRUSD[output.goodId] ?? 0;
       value += output.quantityPerThroughputUnit * capacity.capacityTU * price;
     }
     values.set(definition.sector, (values.get(definition.sector) ?? 0) + value);
@@ -799,7 +799,7 @@ function educationSnapshot(
   const derived = deriveEducation(world, country, definitions);
   return {
     enabled: definitions.technology !== undefined && world.technology.enabled,
-    fundedAnnualSUSD: country.education.fundedAnnualSUSD,
+    fundedAnnualRUSD: country.education.fundedAnnualRUSD,
     researchStaffShare: country.education.researchStaffShare,
     academicPopulation: derived.academicPopulation,
     availableAcademicWorkers: derived.availableAcademicWorkers,
@@ -812,12 +812,12 @@ function educationSnapshot(
     fundingAdequacy: derived.fundingAdequacy,
     quality: derived.quality,
     serviceOutputIndex: derived.serviceOutputIndex,
-    fundingRequestedMonthToDateSUSD: roundDisplay(
-      country.education.fundingRequestedMonthToDateSUSD,
+    fundingRequestedMonthToDateRUSD: roundDisplay(
+      country.education.fundingRequestedMonthToDateRUSD,
       6,
     ),
-    fundingShortfallMonthToDateSUSD: roundDisplay(
-      country.education.fundingShortfallMonthToDateSUSD,
+    fundingShortfallMonthToDateRUSD: roundDisplay(
+      country.education.fundingShortfallMonthToDateRUSD,
       6,
     ),
     researchBlockedReason: derived.researchBlockedReason,
@@ -845,7 +845,7 @@ function laborSnapshot(
   const qualificationAverage =
     workingAgeTotal > 0 ? qualificationWeighted / workingAgeTotal : 0;
   const trainingBlockedReason =
-    country.labor.trainingBudgetSUSDPerYear <= 0
+    country.labor.trainingBudgetRUSDPerYear <= 0
       ? "no-funding"
       : training.instructors <= 0
         ? "no-academic-staff"
@@ -865,21 +865,21 @@ function laborSnapshot(
       ? null
       : lawDefinition(definitions.politics, country.laws.labor);
   return {
-    trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
-    trainingStipendPerTraineeSUSDPerYear:
-      country.labor.trainingStipendPerTraineeSUSDPerYear,
+    trainingBudgetRUSDPerYear: country.labor.trainingBudgetRUSDPerYear,
+    trainingStipendPerTraineeRUSDPerYear:
+      country.labor.trainingStipendPerTraineeRUSDPerYear,
     trainingStaffShare: country.labor.trainingStaffShare,
     trainingParticipation: country.labor.trainingParticipation,
     trainingInstructors: roundDisplay(training.instructors, 2),
     eligibleWorkingAge: Math.round(training.eligibleWorkingAge),
     capacityTrainees: training.capacityTrainees,
     trainees: roundDisplay(training.trainees, 2),
-    trainingRequestedMonthToDateSUSD: roundDisplay(
-      country.labor.trainingRequestedMonthToDateSUSD,
+    trainingRequestedMonthToDateRUSD: roundDisplay(
+      country.labor.trainingRequestedMonthToDateRUSD,
       6,
     ),
-    trainingShortfallMonthToDateSUSD: roundDisplay(
-      country.labor.trainingShortfallMonthToDateSUSD,
+    trainingShortfallMonthToDateRUSD: roundDisplay(
+      country.labor.trainingShortfallMonthToDateRUSD,
       6,
     ),
     trainingBlockedReason,
@@ -890,7 +890,7 @@ function laborSnapshot(
     healthServiceOutputIndex: health.serviceOutputIndex,
     healthMortalityFactor: health.mortalityFactor,
     healthBlockedReason,
-    minimumWageSUSDPerYear: laborMinimumWageSUSDPerYear(country, definitions),
+    minimumWageRUSDPerYear: laborMinimumWageRUSDPerYear(country, definitions),
     hoursPerWeek: law === null ? 0 : law.laborHoursPerWeek,
     hoursFactor: roundDisplay(laborHoursFactor(country, definitions), 6),
   };
@@ -925,7 +925,7 @@ function politicsSnapshot(
     constructionProgressFactor: 1,
     interestGroups: [],
     institution: {
-      fundedAnnualSUSD: country.institutions.fundedAnnualSUSD,
+      fundedAnnualRUSD: country.institutions.fundedAnnualRUSD,
       quality: country.institutions.quality,
       overload: country.institutions.overload,
       serviceOutputIndex: country.institutions.serviceOutputIndex,
@@ -933,8 +933,8 @@ function politicsSnapshot(
         (total, value) => total + value,
         0,
       ),
-      fundingRequestedMonthToDateSUSD: country.institutions.fundingRequestedMonthToDateSUSD,
-      fundingShortfallMonthToDateSUSD: country.institutions.fundingShortfallMonthToDateSUSD,
+      fundingRequestedMonthToDateRUSD: country.institutions.fundingRequestedMonthToDateRUSD,
+      fundingShortfallMonthToDateRUSD: country.institutions.fundingShortfallMonthToDateRUSD,
       disruptionUntilDay: country.institutions.disruptionUntilDay,
     },
     lawSlots: [],
@@ -1106,7 +1106,7 @@ function countrySnapshot(
     employedWorkers += assignment.workers;
     const profession = professionById.get(assignment.professionId);
     if (profession !== undefined) {
-      const wage = (profession.baseWage1900SUSDPerYear / yearDays) * assignment.workers;
+      const wage = (profession.baseWage1900RUSDPerYear / yearDays) * assignment.workers;
       estimatedDailyWageBase += wage;
       wageBaseByBlock.set(
         assignment.popBlockId,
@@ -1117,7 +1117,7 @@ function countrySnapshot(
   // Estimated taxable wage base at the current E2 exemption. This is an exact
   // calculation over the current base-wage estimate (employment × profession base
   // wage ÷ civil year days), not realized wages and not a forecast.
-  const dailyAllowance = country.fiscal.incomeTaxAllowanceSUSDPerYear / yearDays;
+  const dailyAllowance = country.fiscal.incomeTaxAllowanceRUSDPerYear / yearDays;
   let estimatedDailyTaxableWageBase = 0;
   let estimatedWageEarningBlockCount = 0;
   for (const blockId of [...blockIds].sort((left, right) => left - right)) {
@@ -1131,38 +1131,38 @@ function countrySnapshot(
   let businessTaxBaseMonthToDate = 0;
   for (const building of world.buildings) {
     if (!regionIds.has(building.regionId)) continue;
-    const revenue = index.find("building", building.id, "sales-revenue")?.balanceSUSD ?? 0;
-    const subsidy = index.find("building", building.id, "subsidy-revenue")?.balanceSUSD ?? 0;
-    const input = index.find("building", building.id, "input-expense")?.balanceSUSD ?? 0;
-    const wage = index.find("building", building.id, "wage-expense")?.balanceSUSD ?? 0;
-    const upkeep = index.find("building", building.id, "upkeep-expense")?.balanceSUSD ?? 0;
+    const revenue = index.find("building", building.id, "sales-revenue")?.balanceRUSD ?? 0;
+    const subsidy = index.find("building", building.id, "subsidy-revenue")?.balanceRUSD ?? 0;
+    const input = index.find("building", building.id, "input-expense")?.balanceRUSD ?? 0;
+    const wage = index.find("building", building.id, "wage-expense")?.balanceRUSD ?? 0;
+    const upkeep = index.find("building", building.id, "upkeep-expense")?.balanceRUSD ?? 0;
     businessTaxBaseMonthToDate += Math.max(0, revenue + subsidy - input - wage - upkeep);
   }
   let householdCash = 0;
   for (const blockId of blockIds) {
-    householdCash += index.find("popBlock", blockId, "household-cash")?.balanceSUSD ?? 0;
+    householdCash += index.find("popBlock", blockId, "household-cash")?.balanceRUSD ?? 0;
   }
   const debtInterestPayable =
-    index.find("country", country.id, "interest-payable")?.balanceSUSD ?? 0;
+    index.find("country", country.id, "interest-payable")?.balanceRUSD ?? 0;
   const memo = readBudgetMemo(world.finance, country.id);
   const budgetMonthToDate: SnapshotBudgetMonthToDate = {
-    welfareRequestedSUSD: roundDisplay(memo.welfareRequestedSUSD, 6),
-    welfareShortfallSUSD: roundDisplay(memo.welfareShortfallSUSD, 6),
-    businessTaxAssessedSUSD: roundDisplay(memo.businessTaxAssessedSUSD, 6),
-    businessTaxUncollectedSUSD: roundDisplay(memo.businessTaxUncollectedSUSD, 6),
-    debtIssuedSUSD: roundDisplay(memo.debtIssuedSUSD, 6),
-    principalRepaidSUSD: roundDisplay(memo.principalRepaidSUSD, 6),
-    interestPaidSUSD: roundDisplay(memo.interestPaidSUSD, 6),
-    unfinancedRequirementSUSD: roundDisplay(memo.unfinancedRequirementSUSD, 6),
-    constructionSpentSUSD: roundDisplay(memo.constructionSpentSUSD, 6),
-    constructionWrittenOffSUSD: roundDisplay(memo.constructionWrittenOffSUSD, 6),
-    constructionMaterialsSpentSUSD: roundDisplay(memo.constructionMaterialsSpentSUSD, 6),
-    subsidyRequestedSUSD: roundDisplay(memo.subsidyRequestedSUSD, 6),
-    subsidyShortfallSUSD: roundDisplay(memo.subsidyShortfallSUSD, 6),
-    publicEnterpriseSupportSUSD: roundDisplay(memo.publicEnterpriseSupportSUSD, 6),
-    administrationRequestedSUSD: roundDisplay(memo.administrationRequestedSUSD ?? 0, 6),
-    administrationShortfallSUSD: roundDisplay(memo.administrationShortfallSUSD ?? 0, 6),
-    businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
+    welfareRequestedRUSD: roundDisplay(memo.welfareRequestedRUSD, 6),
+    welfareShortfallRUSD: roundDisplay(memo.welfareShortfallRUSD, 6),
+    businessTaxAssessedRUSD: roundDisplay(memo.businessTaxAssessedRUSD, 6),
+    businessTaxUncollectedRUSD: roundDisplay(memo.businessTaxUncollectedRUSD, 6),
+    debtIssuedRUSD: roundDisplay(memo.debtIssuedRUSD, 6),
+    principalRepaidRUSD: roundDisplay(memo.principalRepaidRUSD, 6),
+    interestPaidRUSD: roundDisplay(memo.interestPaidRUSD, 6),
+    unfinancedRequirementRUSD: roundDisplay(memo.unfinancedRequirementRUSD, 6),
+    constructionSpentRUSD: roundDisplay(memo.constructionSpentRUSD, 6),
+    constructionWrittenOffRUSD: roundDisplay(memo.constructionWrittenOffRUSD, 6),
+    constructionMaterialsSpentRUSD: roundDisplay(memo.constructionMaterialsSpentRUSD, 6),
+    subsidyRequestedRUSD: roundDisplay(memo.subsidyRequestedRUSD, 6),
+    subsidyShortfallRUSD: roundDisplay(memo.subsidyShortfallRUSD, 6),
+    publicEnterpriseSupportRUSD: roundDisplay(memo.publicEnterpriseSupportRUSD, 6),
+    administrationRequestedRUSD: roundDisplay(memo.administrationRequestedRUSD ?? 0, 6),
+    administrationShortfallRUSD: roundDisplay(memo.administrationShortfallRUSD ?? 0, 6),
+    businessTaxBaseMonthToDateRUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
   };
   const latestFiscal = history.length === 0 ? null : (history[history.length - 1] ?? null);
   const sectorValues = countrySectorValueEstimates(world, definitions, country);
@@ -1179,14 +1179,14 @@ function countrySnapshot(
       key,
       label: sectorLabels[key] ?? key,
       subsidyRate: country.industrial.sectorSubsidyRates[index] ?? 0,
-      estimatedDailyOutputValueSUSD: roundDisplay(sectorValues.get(key) ?? 0, 6),
+      estimatedDailyOutputValueRUSD: roundDisplay(sectorValues.get(key) ?? 0, 6),
     })),
-    requestedMonthToDateSUSD: roundDisplay(memo.subsidyRequestedSUSD, 6),
-    paidMonthToDateSUSD: roundDisplay(
-      Math.max(0, memo.subsidyRequestedSUSD - memo.subsidyShortfallSUSD),
+    requestedMonthToDateRUSD: roundDisplay(memo.subsidyRequestedRUSD, 6),
+    paidMonthToDateRUSD: roundDisplay(
+      Math.max(0, memo.subsidyRequestedRUSD - memo.subsidyShortfallRUSD),
       6,
     ),
-    shortfallMonthToDateSUSD: roundDisplay(memo.subsidyShortfallSUSD, 6),
+    shortfallMonthToDateRUSD: roundDisplay(memo.subsidyShortfallRUSD, 6),
   };
   const regionById = new Map(world.regions.map((region) => [region.id, region]));
   const definitionById = new Map(
@@ -1212,8 +1212,8 @@ function countrySnapshot(
         sector: definition?.sector ?? "storage",
         level: building.level,
         condition: building.condition,
-        operatingCashSUSD: roundDisplay(
-          index.find("building", building.id, "operating-cash")?.balanceSUSD ?? 0,
+        operatingCashRUSD: roundDisplay(
+          index.find("building", building.id, "operating-cash")?.balanceRUSD ?? 0,
           6,
         ),
         ownerCountryId: country.id,
@@ -1239,29 +1239,29 @@ function countrySnapshot(
     regionIds: [...country.regionIds].sort((left, right) => left - right),
     fiscal: {
       incomeTaxRate: country.fiscal.incomeTaxRate,
-      incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
-      welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+      incomeTaxAllowanceRUSDPerYear: country.fiscal.incomeTaxAllowanceRUSDPerYear,
+      welfareBudgetRUSDPerYear: country.fiscal.welfareBudgetRUSDPerYear,
       welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
       businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
-      reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
+      reserveTargetRUSD: country.fiscal.reserveTargetRUSD,
     },
-    treasuryCashSUSD: index.get("country", country.id, "treasury-cash").balanceSUSD,
+    treasuryCashRUSD: index.get("country", country.id, "treasury-cash").balanceRUSD,
     debtEnabled: country.debt.enabled,
-    debtOutstandingPrincipalSUSD: debtOutstandingPrincipal(
+    debtOutstandingPrincipalRUSD: debtOutstandingPrincipal(
       world.finance.debtContracts,
       country.id,
     ),
-    debtInterestPayableSUSD: roundDisplay(debtInterestPayable, 6),
+    debtInterestPayableRUSD: roundDisplay(debtInterestPayable, 6),
     debtPolicy: debtPolicySnapshot(world, country, index),
     debtContracts: debtContractSnapshots(world, country.id),
     population,
     workingAgePopulation: workingAge,
     employedWorkers,
-    householdCashSUSD: roundDisplay(householdCash, 6),
-    estimatedDailyWageBaseSUSD: roundDisplay(estimatedDailyWageBase, 6),
-    estimatedDailyTaxableWageBaseSUSD: roundDisplay(estimatedDailyTaxableWageBase, 6),
+    householdCashRUSD: roundDisplay(householdCash, 6),
+    estimatedDailyWageBaseRUSD: roundDisplay(estimatedDailyWageBase, 6),
+    estimatedDailyTaxableWageBaseRUSD: roundDisplay(estimatedDailyTaxableWageBase, 6),
     estimatedWageEarningBlockCount,
-    businessTaxBaseMonthToDateSUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
+    businessTaxBaseMonthToDateRUSD: roundDisplay(businessTaxBaseMonthToDate, 6),
     budgetMonthToDate,
     literacy: population > 0 ? roundDisplay(weightedLiteracy / population) : 0,
     wealthLevel: population > 0 ? roundDisplay(weightedWealth / population, 2) : 0,
@@ -1278,12 +1278,12 @@ function countrySnapshot(
     constructionProjects: constructionProjectSnapshots(world, definitions, country.id),
     constructionHistory: constructionHistorySnapshot(world, country.id),
     constructionLabor: constructionLaborSnapshot(world, definitions, country.id, yearDays),
-    constructionInProgressSUSD: roundDisplay(
-      index.find("country", country.id, "construction-in-progress")?.balanceSUSD ?? 0,
+    constructionInProgressRUSD: roundDisplay(
+      index.find("country", country.id, "construction-in-progress")?.balanceRUSD ?? 0,
       6,
     ),
-    publicCapitalSUSD: roundDisplay(
-      index.find("country", country.id, "public-capital")?.balanceSUSD ?? 0,
+    publicCapitalRUSD: roundDisplay(
+      index.find("country", country.id, "public-capital")?.balanceRUSD ?? 0,
       6,
     ),
     industrialPolicy,
@@ -1316,21 +1316,21 @@ function tradePolicySnapshot(
     exportRestricted: [...country.trade.exportRestricted],
     customsMarketIds,
     lastUpdateDay: country.trade.lastUpdateDay,
-    exportsValueMonthToDateSUSD: roundDisplay(
-      country.trade.exportsValueMonthToDateSUSD,
+    exportsValueMonthToDateRUSD: roundDisplay(
+      country.trade.exportsValueMonthToDateRUSD,
       2,
     ),
-    importsValueMonthToDateSUSD: roundDisplay(
-      country.trade.importsValueMonthToDateSUSD,
+    importsValueMonthToDateRUSD: roundDisplay(
+      country.trade.importsValueMonthToDateRUSD,
       2,
     ),
-    dutyReceivedMonthToDateSUSD: roundDisplay(
-      country.trade.dutyReceivedMonthToDateSUSD,
+    dutyReceivedMonthToDateRUSD: roundDisplay(
+      country.trade.dutyReceivedMonthToDateRUSD,
       2,
     ),
-    dutyPaidMonthToDateSUSD: roundDisplay(country.trade.dutyPaidMonthToDateSUSD, 2),
-    freightPaidMonthToDateSUSD: roundDisplay(
-      country.trade.freightPaidMonthToDateSUSD,
+    dutyPaidMonthToDateRUSD: roundDisplay(country.trade.dutyPaidMonthToDateRUSD, 2),
+    freightPaidMonthToDateRUSD: roundDisplay(
+      country.trade.freightPaidMonthToDateRUSD,
       2,
     ),
   };
@@ -1353,9 +1353,9 @@ function tradeNetworkSnapshot(
       marketBId: route.marketBId,
       distanceUnits: route.distanceUnits,
       transitDays: transitDays(route),
-      baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
-      capacitySUSDPerDay: roundDisplay(
-        routeCapacitySUSDPerDay(
+      baseCapacityRUSDPerDay: route.baseCapacityRUSDPerDay,
+      capacityRUSDPerDay: roundDisplay(
+        routeCapacityRUSDPerDay(
           route,
           infrastructureByMarket.get(route.marketAId) ?? 0,
           infrastructureByMarket.get(route.marketBId) ?? 0,
@@ -1377,9 +1377,9 @@ function tradeNetworkSnapshot(
     destinationCountryId: shipment.destinationCountryId,
     dispatchDay: shipment.dispatchDay,
     arrivalDay: shipment.arrivalDay,
-    cargoValueSUSD: roundDisplay(shipment.cargoValueSUSD, 2),
-    freightCostSUSD: roundDisplay(shipment.freightCostSUSD, 2),
-    dutySUSD: roundDisplay(shipment.dutySUSD, 2),
+    cargoValueRUSD: roundDisplay(shipment.cargoValueRUSD, 2),
+    freightCostRUSD: roundDisplay(shipment.freightCostRUSD, 2),
+    dutyRUSD: roundDisplay(shipment.dutyRUSD, 2),
     dutyRate: shipment.dutyRate,
   }));
   const lastDay = world.trade.lastDay;
@@ -1403,9 +1403,9 @@ function tradeNetworkSnapshot(
             dayIndex: lastDay.dayIndex,
             dispatchedShipments: lastDay.dispatchedShipments,
             arrivedShipments: lastDay.arrivedShipments,
-            freightPaidSUSD: roundDisplay(lastDay.freightPaidSUSD, 2),
-            dutyPaidSUSD: roundDisplay(lastDay.dutyPaidSUSD, 2),
-            ownerFundedSUSD: roundDisplay(lastDay.ownerFundedSUSD, 2),
+            freightPaidRUSD: roundDisplay(lastDay.freightPaidRUSD, 2),
+            dutyPaidRUSD: roundDisplay(lastDay.dutyPaidRUSD, 2),
+            ownerFundedRUSD: roundDisplay(lastDay.ownerFundedRUSD, 2),
             blocked,
             blockedTruncated: (lastDay.blocked.length ?? 0) > blocked.length,
           },
@@ -1511,9 +1511,9 @@ function currenciesSnapshot(world: World): readonly SnapshotCurrency[] {
           valuation === undefined || valuation.status === "unavailable"
             ? "unavailable"
             : "specified",
-        susdPerUnit:
+        rusdPerUnit:
           valuation !== undefined && valuation.status === "specified"
-            ? valuation.susdPerUnit
+            ? valuation.rusdPerUnit
             : null,
         valuationSource:
           valuation !== undefined && valuation.status === "specified"
@@ -1533,16 +1533,16 @@ function monetarySnapshot(
       hasAuthority: false,
       active: false,
       regime: "pegged",
-      paritySusdPerUnit: null,
-      valuationSusdPerUnit: null,
-      reserveCashSUSD: 0,
+      parityRusdPerUnit: null,
+      valuationRusdPerUnit: null,
+      reserveCashRUSD: 0,
       currencyIssuedUnits: 0,
-      liabilitySUSD: 0,
+      liabilityRUSD: 0,
       reserveCoverMonths: null,
       convertibility: "no-authority",
       lastParityChangeDay: null,
-      lastMonthExportsSUSD: 0,
-      lastMonthImportsSUSD: 0,
+      lastMonthExportsRUSD: 0,
+      lastMonthImportsRUSD: 0,
       blockedReason:
         country.monetary.kind !== "own"
           ? "adopted-or-shared-currency"
@@ -1558,22 +1558,22 @@ function monetarySnapshot(
     hasAuthority: true,
     active: record.active,
     regime: record.regime,
-    paritySusdPerUnit: record.paritySusdPerUnit,
-    valuationSusdPerUnit:
+    parityRusdPerUnit: record.parityRusdPerUnit,
+    valuationRusdPerUnit:
       valuation !== undefined && valuation.status === "specified"
-        ? valuation.susdPerUnit
+        ? valuation.rusdPerUnit
         : null,
-    reserveCashSUSD: roundDisplay(authorityReservesSUSD(world, record), 2),
+    reserveCashRUSD: roundDisplay(authorityReservesRUSD(world, record), 2),
     currencyIssuedUnits: roundDisplay(record.currencyIssuedUnits, 3),
-    liabilitySUSD: roundDisplay(authorityLiabilitySUSD(world, record), 2),
+    liabilityRUSD: roundDisplay(authorityLiabilityRUSD(world, record), 2),
     reserveCoverMonths: Number.isFinite(coverMonths) ? roundDisplay(coverMonths, 2) : null,
     convertibility: state.state,
     lastParityChangeDay: record.lastParityChangeDay,
-    lastMonthExportsSUSD: roundDisplay(record.lastMonthExportsSUSD, 2),
-    lastMonthImportsSUSD: roundDisplay(record.lastMonthImportsSUSD, 2),
+    lastMonthExportsRUSD: roundDisplay(record.lastMonthExportsRUSD, 2),
+    lastMonthImportsRUSD: roundDisplay(record.lastMonthImportsRUSD, 2),
     blockedReason: record.active
       ? null
-      : record.paritySusdPerUnit === null
+      : record.parityRusdPerUnit === null
         ? "no-declared-parity"
         : "not-established",
   };
@@ -1819,7 +1819,7 @@ function marketSnapshots(
           goodKey: good.key,
           goodName: good.name,
           unitLabel: good.unitLabel,
-          priceSUSD: market.priceSUSD[good.id] ?? 0,
+          priceRUSD: market.priceRUSD[good.id] ?? 0,
           stockQuantity: stockByGood.get(good.id) ?? 0,
           dailyProductionCapacity: roundDisplay(capacity?.get(good.id) ?? 0, 3),
         })),
@@ -1925,8 +1925,8 @@ function countrySummarySnapshots(
         population,
         workingAgePopulation: workingAge,
         employedWorkers: employedByCountry.get(country.id) ?? 0,
-        treasuryCashSUSD: roundDisplay(
-          index.find("country", country.id, "treasury-cash")?.balanceSUSD ?? 0,
+        treasuryCashRUSD: roundDisplay(
+          index.find("country", country.id, "treasury-cash")?.balanceRUSD ?? 0,
           6,
         ),
         hardshipPopulationShare: population > 0 ? hardshipPopulation / population : 0,
@@ -1934,8 +1934,8 @@ function countrySummarySnapshots(
         wealthLevel: population > 0 ? weightedWealth / population : 0,
         militancy: population > 0 ? weightedMilitancy / population : 0,
         militaryPersonnel: armyPersonnel,
-        latestNetFiscalResultSUSD:
-          fiscal === undefined ? null : roundDisplay(fiscal.netFiscalResultSUSD, 6),
+        latestNetFiscalResultRUSD:
+          fiscal === undefined ? null : roundDisplay(fiscal.netFiscalResultRUSD, 6),
       };
     });
 }

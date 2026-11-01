@@ -18,7 +18,7 @@
  *   seven days per country, staggered by stable country id.
  *
  * M6's only implemented action is setting the existing M4c fiscal policy
- * (`incomeTaxRate`, `welfareBudgetSUSDPerYear`). Construction queues, infrastructure
+ * (`incomeTaxRate`, `welfareBudgetRUSDPerYear`). Construction queues, infrastructure
  * priorities, laws, debt actions, and diplomacy/military actions are not
  * implemented because their underlying systems do not exist yet (D-058).
  */
@@ -30,9 +30,9 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX, MAX_RECENT_WARNINGS } from "../constants.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
-import type { Day, Id, MoneySUSD, Rate } from "../types.js";
+import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
   assertValidCountryAIState,
@@ -54,8 +54,8 @@ import {
   AI_WELFARE_ADJUSTMENT_RELATIVE_THRESHOLD,
   AI_WELFARE_REVENUE_SHARE,
   MAX_AI_ACTION_SUMMARY_LENGTH,
-  MAX_DEBT_PRINCIPAL_SUSD,
-  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+  MAX_DEBT_PRINCIPAL_RUSD,
+  MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
   MAX_TRADE_QUOTA_QUANTITY,
 } from "./constants.js";
 import { assertValidFiscalPolicy } from "./country.js";
@@ -134,16 +134,16 @@ export interface SetFiscalPolicyAction {
   readonly source: "player" | "ai";
   /** Dimensionless flat rate on taxable realized wages, 0..1. */
   readonly incomeTaxRate: Rate;
-  /** Per-pop-block annual wage exemption in nominal SUSD. */
-  readonly incomeTaxAllowanceSUSDPerYear: MoneySUSD;
-  /** Nominal annual welfare expenditure target in SUSD. */
-  readonly welfareBudgetSUSDPerYear: MoneySUSD;
+  /** Per-pop-block annual wage exemption in nominal RUSD. */
+  readonly incomeTaxAllowanceRUSDPerYear: MoneyRUSD;
+  /** Nominal annual welfare expenditure target in RUSD. */
+  readonly welfareBudgetRUSDPerYear: MoneyRUSD;
   /** Inclusive block wealth ceiling for welfare eligibility, 0..99. */
   readonly welfareMaxWealthLevel: number;
   /** Dimensionless rate on the positive monthly building net result, 0..1. */
   readonly businessProfitTaxRate: Rate;
-  /** Treasury liquidity floor in nominal SUSD. */
-  readonly reserveTargetSUSD: MoneySUSD;
+  /** Treasury liquidity floor in nominal RUSD. */
+  readonly reserveTargetRUSD: MoneyRUSD;
 }
 
 /**
@@ -155,8 +155,8 @@ export interface IssueDebtAction {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  /** Principal to borrow in nominal SUSD. */
-  readonly amountSUSD: MoneySUSD;
+  /** Principal to borrow in nominal RUSD. */
+  readonly amountRUSD: MoneyRUSD;
 }
 
 /** Repay part or all of one outstanding contract's principal early. */
@@ -166,8 +166,8 @@ export interface RepayDebtAction {
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
   readonly contractId: Id;
-  /** Principal to repay in nominal SUSD. */
-  readonly amountSUSD: MoneySUSD;
+  /** Principal to repay in nominal RUSD. */
+  readonly amountRUSD: MoneyRUSD;
 }
 
 /**
@@ -181,7 +181,7 @@ export interface SetDebtPolicyAction {
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
   readonly refinanceOnMaturity: boolean;
-  readonly maxOutstandingPrincipalSUSD: MoneySUSD;
+  readonly maxOutstandingPrincipalRUSD: MoneyRUSD;
 }
 
 /** Start one E3 public-construction project in a country-owned region. */
@@ -229,7 +229,7 @@ export interface SupportPublicEnterpriseAction {
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
   readonly buildingId: Id;
-  readonly amountSUSD: MoneySUSD;
+  readonly amountRUSD: MoneyRUSD;
 }
 
 /** M8: propose, change, or repeal a law (target may be the slot's base law). */
@@ -247,7 +247,7 @@ export interface SetInstitutionFundingAction {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly annualSUSD: MoneySUSD;
+  readonly annualRUSD: MoneyRUSD;
 }
 
 /** M9: set the active research project. */
@@ -273,7 +273,7 @@ export interface SetEducationFundingAction {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly annualSUSD: MoneySUSD;
+  readonly annualRUSD: MoneyRUSD;
 }
 
 /** M9: set the share of academic staff time assigned to research. */
@@ -291,7 +291,7 @@ export interface SetTrainingBudgetAction {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly annualSUSD: MoneySUSD;
+  readonly annualRUSD: MoneyRUSD;
 }
 
 /** E5: set the annual training stipend per trainee. */
@@ -300,7 +300,7 @@ export interface SetTrainingStipendAction {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly annualSUSD: MoneySUSD;
+  readonly annualRUSD: MoneyRUSD;
 }
 
 /** E5: set the share of academic staff time assigned to vocational training. */
@@ -390,9 +390,9 @@ export interface SetMonetaryPolicyAction {
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
   readonly regime: MonetaryRegime;
-  readonly paritySusdPerUnit: number | null;
-  readonly reserveTransferSUSD: number;
-  readonly currencyConversionSUSD: number;
+  readonly parityRusdPerUnit: number | null;
+  readonly reserveTransferRUSD: number;
+  readonly currencyConversionRUSD: number;
 }
 
 /** Every implemented country action. */
@@ -443,7 +443,7 @@ export interface CountryActionApplication {
   /** New or affected contract for debt actions, else null. */
   readonly debtContract: DebtContract | null;
   /** Principal repaid by a `repay-debt` action, else zero. */
-  readonly principalPaidSUSD: MoneySUSD;
+  readonly principalPaidRUSD: MoneyRUSD;
   /** Started/cancelled/paused project for construction actions, else null. */
   readonly constructionProject: ConstructionProject | null;
   /** New industrial policy for `set-industrial-policy`, else null. */
@@ -451,7 +451,7 @@ export interface CountryActionApplication {
   /** Supported enterprise for `support-public-enterprise`, else null. */
   readonly publicEnterpriseSupport?: {
     readonly buildingId: Id;
-    readonly amountSUSD: MoneySUSD;
+    readonly amountRUSD: MoneyRUSD;
   } | null;
   /** Law transition for `propose-law`, else null. */
   readonly lawAction?: {
@@ -462,8 +462,8 @@ export interface CountryActionApplication {
   } | null;
   /** Institution funding change for `set-institution-funding`, else null. */
   readonly institutionFunding?: {
-    readonly previousAnnualSUSD: MoneySUSD;
-    readonly annualSUSD: MoneySUSD;
+    readonly previousAnnualRUSD: MoneyRUSD;
+    readonly annualRUSD: MoneyRUSD;
     readonly changed: boolean;
   } | null;
   /** Started research technology for `start-research`, else null. */
@@ -475,17 +475,17 @@ export interface CountryActionApplication {
   readonly cancelledResearchTechnologyId?: Id | null;
   /** Education funding/share change for the M9 policy actions, else null. */
   readonly educationAction?: {
-    readonly previousFundedAnnualSUSD: MoneySUSD;
-    readonly fundedAnnualSUSD: MoneySUSD;
+    readonly previousFundedAnnualRUSD: MoneyRUSD;
+    readonly fundedAnnualRUSD: MoneyRUSD;
     readonly previousResearchStaffShare: Rate;
     readonly researchStaffShare: Rate;
   } | null;
   /** E5 training/health policy change, else null. */
   readonly laborAction?: {
-    readonly previousTrainingBudgetSUSDPerYear: MoneySUSD;
-    readonly trainingBudgetSUSDPerYear: MoneySUSD;
-    readonly previousTrainingStipendPerTraineeSUSDPerYear: MoneySUSD;
-    readonly trainingStipendPerTraineeSUSDPerYear: MoneySUSD;
+    readonly previousTrainingBudgetRUSDPerYear: MoneyRUSD;
+    readonly trainingBudgetRUSDPerYear: MoneyRUSD;
+    readonly previousTrainingStipendPerTraineeRUSDPerYear: MoneyRUSD;
+    readonly trainingStipendPerTraineeRUSDPerYear: MoneyRUSD;
     readonly previousTrainingStaffShare: Rate;
     readonly trainingStaffShare: Rate;
     readonly previousHealthStaffShare: Rate;
@@ -509,18 +509,18 @@ export interface CountryActionApplication {
     readonly regionId: Id | null;
     readonly personnel: number;
     readonly equipmentUnits: number;
-    readonly spentSUSD: MoneySUSD;
+    readonly spentRUSD: MoneyRUSD;
   } | null;
   /** E6b monetary operation applied by the action, else null. */
   readonly monetaryAction?: {
     readonly currencyId: Id;
     readonly regime: MonetaryRegime;
-    readonly paritySusdPerUnit: number;
-    readonly valuationSusdPerUnit: number;
-    readonly reserveTransferSUSD: MoneySUSD;
-    readonly currencyConversionSUSD: MoneySUSD;
+    readonly parityRusdPerUnit: number;
+    readonly valuationRusdPerUnit: number;
+    readonly reserveTransferRUSD: MoneyRUSD;
+    readonly currencyConversionRUSD: MoneyRUSD;
     readonly currencyIssuedUnits: number;
-    readonly revaluationSUSD: MoneySUSD;
+    readonly revaluationRUSD: MoneyRUSD;
   } | null;
 }
 
@@ -541,15 +541,15 @@ export interface CountryAIObservedBlock {
 export interface CountryAIObservedPeriod {
   readonly periodStartDay: Day;
   readonly periodEndDay: Day;
-  readonly incomeTaxSUSD: number;
-  readonly welfarePaidSUSD: number;
-  readonly interestExpenseSUSD: number;
+  readonly incomeTaxRUSD: number;
+  readonly welfarePaidRUSD: number;
+  readonly interestExpenseRUSD: number;
 }
 
 /** Own-country debt exposure. Contracts held by others are not exposed. */
 export interface CountryAIObservedDebt {
   readonly enabled: boolean;
-  readonly outstandingPrincipalSUSD: number;
+  readonly outstandingPrincipalRUSD: number;
 }
 
 /**
@@ -561,7 +561,7 @@ export interface CountryAIObservation {
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly fiscal: FiscalPolicy;
-  readonly treasuryCashSUSD: number;
+  readonly treasuryCashRUSD: number;
   readonly regionIds: readonly Id[];
   readonly population: number;
   readonly blocks: readonly CountryAIObservedBlock[];
@@ -613,7 +613,7 @@ function roundTo(value: number, decimals: number): number {
 function toleranceFor(...values: readonly number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function treasuryAccountOf(world: World, countryId: Id): FinancialAccount {
@@ -674,23 +674,23 @@ export function buildCountryAIObservation(
     lastClosedPeriod = {
       periodStartDay: latestSummary.periodStartDay,
       periodEndDay: latestSummary.periodEndDay,
-      incomeTaxSUSD: totals.incomeTaxRevenueSUSD,
-      welfarePaidSUSD: totals.welfareExpenseSUSD,
-      interestExpenseSUSD: totals.interestExpenseSUSD,
+      incomeTaxRUSD: totals.incomeTaxRevenueRUSD,
+      welfarePaidRUSD: totals.welfareExpenseRUSD,
+      interestExpenseRUSD: totals.interestExpenseRUSD,
     };
   }
   return {
     countryId,
     dayIndex,
     fiscal: { ...country.fiscal },
-    treasuryCashSUSD: treasuryAccountOf(world, countryId).balanceSUSD,
+    treasuryCashRUSD: treasuryAccountOf(world, countryId).balanceRUSD,
     regionIds: [...country.regionIds],
     population,
     blocks,
     lastClosedPeriod,
     debt: {
       enabled: country.debt.enabled,
-      outstandingPrincipalSUSD: debtOutstandingPrincipal(
+      outstandingPrincipalRUSD: debtOutstandingPrincipal(
         world.finance.debtContracts,
         countryId,
       ),
@@ -751,17 +751,17 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
   const annualTaxRevenue =
     observation.lastClosedPeriod === null
       ? 0
-      : annualize(observation.lastClosedPeriod.incomeTaxSUSD, periodDays, yearDays);
+      : annualize(observation.lastClosedPeriod.incomeTaxRUSD, periodDays, yearDays);
   const annualWelfarePaid =
     observation.lastClosedPeriod === null
       ? 0
-      : annualize(observation.lastClosedPeriod.welfarePaidSUSD, periodDays, yearDays);
+      : annualize(observation.lastClosedPeriod.welfarePaidRUSD, periodDays, yearDays);
   const annualInterest =
     observation.lastClosedPeriod === null
       ? 0
-      : annualize(observation.lastClosedPeriod.interestExpenseSUSD, periodDays, yearDays);
+      : annualize(observation.lastClosedPeriod.interestExpenseRUSD, periodDays, yearDays);
   const committedWelfare = Math.max(
-    observation.fiscal.welfareBudgetSUSDPerYear,
+    observation.fiscal.welfareBudgetRUSDPerYear,
     annualWelfarePaid,
   );
   const annualOutlays = committedWelfare + annualInterest;
@@ -774,10 +774,10 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
   const solvencyTolerance = toleranceFor(
     annualOutlays,
     annualTaxRevenue,
-    observation.treasuryCashSUSD,
+    observation.treasuryCashRUSD,
   );
   const lowTreasury =
-    observation.treasuryCashSUSD + solvencyTolerance < bufferTarget;
+    observation.treasuryCashRUSD + solvencyTolerance < bufferTarget;
   // Revenue is unknown before the first close, not zero. Do not infer a deficit
   // from missing history; the first observed period supplies the revenue basis.
   const runningDeficit =
@@ -788,7 +788,7 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
 
   let goalId: CountryAIGoalId = "maintain";
   let targetTax = observation.fiscal.incomeTaxRate;
-  let targetWelfare = observation.fiscal.welfareBudgetSUSDPerYear;
+  let targetWelfare = observation.fiscal.welfareBudgetRUSDPerYear;
 
   if (lowTreasury || runningDeficit) {
     goalId = "restore-solvency";
@@ -797,25 +797,25 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
       roundTo(observation.fiscal.incomeTaxRate + AI_TAX_STEP, AI_TAX_RATE_DECIMALS),
     );
     targetWelfare = Math.min(
-      observation.fiscal.welfareBudgetSUSDPerYear,
+      observation.fiscal.welfareBudgetRUSDPerYear,
       Math.max(0, affordableWelfare),
     );
   } else if (hardship) {
     goalId = "relieve-hardship";
     targetTax = Math.max(observation.fiscal.incomeTaxRate, AI_HARDSHIP_MIN_TAX_RATE);
     targetWelfare = Math.max(
-      observation.fiscal.welfareBudgetSUSDPerYear,
+      observation.fiscal.welfareBudgetRUSDPerYear,
       Math.max(0, affordableWelfare),
     );
   }
 
   targetTax = clamp(roundTo(targetTax, AI_TAX_RATE_DECIMALS), 0, 1);
   targetWelfare = Math.min(
-    MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+    MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
     Math.max(0, roundTo(targetWelfare, AI_MONEY_DECIMALS)),
   );
 
-  const currentWelfare = observation.fiscal.welfareBudgetSUSDPerYear;
+  const currentWelfare = observation.fiscal.welfareBudgetRUSDPerYear;
   const welfareDelta = Math.abs(targetWelfare - currentWelfare);
   const welfareChanged =
     welfareDelta > AI_POLICY_MONEY_EPSILON &&
@@ -832,12 +832,12 @@ export function planCountryActions(observation: CountryAIObservation): CountryAI
           dayIndex: observation.dayIndex,
           source: "ai",
           incomeTaxRate: targetTax,
-          incomeTaxAllowanceSUSDPerYear:
-            observation.fiscal.incomeTaxAllowanceSUSDPerYear,
-          welfareBudgetSUSDPerYear: targetWelfare,
+          incomeTaxAllowanceRUSDPerYear:
+            observation.fiscal.incomeTaxAllowanceRUSDPerYear,
+          welfareBudgetRUSDPerYear: targetWelfare,
           welfareMaxWealthLevel: observation.fiscal.welfareMaxWealthLevel,
           businessProfitTaxRate: observation.fiscal.businessProfitTaxRate,
-          reserveTargetSUSD: observation.fiscal.reserveTargetSUSD,
+          reserveTargetRUSD: observation.fiscal.reserveTargetRUSD,
         },
       ]
     : [];
@@ -939,11 +939,11 @@ export function validateCountryAction(
         assertValidFiscalPolicy(
           {
             incomeTaxRate: action.incomeTaxRate,
-            incomeTaxAllowanceSUSDPerYear: action.incomeTaxAllowanceSUSDPerYear,
-            welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
+            incomeTaxAllowanceRUSDPerYear: action.incomeTaxAllowanceRUSDPerYear,
+            welfareBudgetRUSDPerYear: action.welfareBudgetRUSDPerYear,
             welfareMaxWealthLevel: action.welfareMaxWealthLevel,
             businessProfitTaxRate: action.businessProfitTaxRate,
-            reserveTargetSUSD: action.reserveTargetSUSD,
+            reserveTargetRUSD: action.reserveTargetRUSD,
           },
           "action.fiscal",
         );
@@ -978,7 +978,7 @@ export function validateCountryAction(
           issuerCountryId: country.id,
           holderKind: country.debt.creditorKind,
           holderId: country.debt.creditorId,
-          principalSUSD: action.amountSUSD,
+          principalRUSD: action.amountRUSD,
           annualCouponRate: country.debt.annualCouponRate,
           termDays: country.debt.termDays,
         });
@@ -990,7 +990,7 @@ export function validateCountryAction(
         validateDebtRepayment(world, {
           issuerCountryId: country.id,
           contractId: action.contractId,
-          amountSUSD: action.amountSUSD,
+          amountRUSD: action.amountRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1054,7 +1054,7 @@ export function validateCountryAction(
         validatePublicEnterpriseSupport(world, {
           countryId: country.id,
           buildingId: action.buildingId,
-          amountSUSD: action.amountSUSD,
+          amountRUSD: action.amountRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1082,7 +1082,7 @@ export function validateCountryAction(
       try {
         validateInstitutionFunding(world, definitions, {
           countryId: country.id,
-          annualSUSD: action.annualSUSD,
+          annualRUSD: action.annualRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1115,7 +1115,7 @@ export function validateCountryAction(
       try {
         validateEducationFunding(world, definitions, {
           countryId: country.id,
-          annualSUSD: action.annualSUSD,
+          annualRUSD: action.annualRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1139,7 +1139,7 @@ export function validateCountryAction(
       try {
         validateTrainingBudget(world, definitions, {
           countryId: country.id,
-          annualSUSD: action.annualSUSD,
+          annualRUSD: action.annualRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1151,7 +1151,7 @@ export function validateCountryAction(
       try {
         validateTrainingStipend(world, definitions, {
           countryId: country.id,
-          annualSUSD: action.annualSUSD,
+          annualRUSD: action.annualRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1222,9 +1222,9 @@ export function validateCountryAction(
         validateMonetaryPolicy(world, definitions, {
           countryId: country.id,
           regime: action.regime,
-          paritySusdPerUnit: action.paritySusdPerUnit,
-          reserveTransferSUSD: action.reserveTransferSUSD,
-          currencyConversionSUSD: action.currencyConversionSUSD,
+          parityRusdPerUnit: action.parityRusdPerUnit,
+          reserveTransferRUSD: action.reserveTransferRUSD,
+          currencyConversionRUSD: action.currencyConversionRUSD,
         });
       } catch (error) {
         errors.push(errorMessage(error));
@@ -1270,19 +1270,19 @@ function validateDebtPolicyChange(
   if (typeof action.refinanceOnMaturity !== "boolean") {
     throw new TypeError("action.refinanceOnMaturity must be a boolean");
   }
-  const ceiling = action.maxOutstandingPrincipalSUSD;
+  const ceiling = action.maxOutstandingPrincipalRUSD;
   if (typeof ceiling !== "number" || !Number.isFinite(ceiling) || ceiling < 0) {
-    throw new RangeError("action.maxOutstandingPrincipalSUSD must be a finite non-negative number");
+    throw new RangeError("action.maxOutstandingPrincipalRUSD must be a finite non-negative number");
   }
-  if (ceiling > MAX_DEBT_PRINCIPAL_SUSD) {
+  if (ceiling > MAX_DEBT_PRINCIPAL_RUSD) {
     throw new RangeError(
-      `action.maxOutstandingPrincipalSUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_SUSD)}`,
+      `action.maxOutstandingPrincipalRUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_RUSD)}`,
     );
   }
   const outstanding = debtOutstandingPrincipal(world.finance.debtContracts, country.id);
-  if (ceiling < outstanding - MONEY_TOLERANCE_SUSD) {
+  if (ceiling < outstanding - MONEY_TOLERANCE_RUSD) {
     throw new RangeError(
-      `action.maxOutstandingPrincipalSUSD ${String(ceiling)} is below the outstanding principal ${String(outstanding)}`,
+      `action.maxOutstandingPrincipalRUSD ${String(ceiling)} is below the outstanding principal ${String(outstanding)}`,
     );
   }
 }
@@ -1312,11 +1312,11 @@ export function applyCountryAction(
   if (action.kind === "set-fiscal-policy") {
     const fiscal: FiscalPolicy = {
       incomeTaxRate: action.incomeTaxRate,
-      incomeTaxAllowanceSUSDPerYear: action.incomeTaxAllowanceSUSDPerYear,
-      welfareBudgetSUSDPerYear: action.welfareBudgetSUSDPerYear,
+      incomeTaxAllowanceRUSDPerYear: action.incomeTaxAllowanceRUSDPerYear,
+      welfareBudgetRUSDPerYear: action.welfareBudgetRUSDPerYear,
       welfareMaxWealthLevel: action.welfareMaxWealthLevel,
       businessProfitTaxRate: action.businessProfitTaxRate,
-      reserveTargetSUSD: action.reserveTargetSUSD,
+      reserveTargetRUSD: action.reserveTargetRUSD,
     };
     const changed = (
       Object.keys(fiscal) as (keyof FiscalPolicy)[]
@@ -1331,7 +1331,7 @@ export function applyCountryAction(
         previousDebt,
         debt: previousDebt,
         debtContract: null,
-        principalPaidSUSD: 0,
+        principalPaidRUSD: 0,
         constructionProject: null,
         changed: false,
       };
@@ -1354,7 +1354,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...candidateCountry.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       changed: true,
     };
@@ -1365,7 +1365,7 @@ export function applyCountryAction(
       issuerCountryId: country.id,
       holderKind: country.debt.creditorKind,
       holderId: country.debt.creditorId,
-      principalSUSD: action.amountSUSD,
+      principalRUSD: action.amountRUSD,
       annualCouponRate: country.debt.annualCouponRate,
       termDays: country.debt.termDays,
     });
@@ -1378,7 +1378,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: issuance.contract,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       changed: true,
     };
@@ -1388,7 +1388,7 @@ export function applyCountryAction(
     const repayment = repayGovernmentDebt(world, {
       issuerCountryId: country.id,
       contractId: action.contractId,
-      amountSUSD: action.amountSUSD,
+      amountRUSD: action.amountRUSD,
     });
     return {
       countryId: country.id,
@@ -1399,7 +1399,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: repayment.contract,
-      principalPaidSUSD: repayment.principalPaidSUSD,
+      principalPaidRUSD: repayment.principalPaidRUSD,
       constructionProject: null,
       changed: true,
     };
@@ -1423,7 +1423,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: project,
       changed: true,
     };
@@ -1444,7 +1444,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: cancelled.project,
       changed: true,
     };
@@ -1465,7 +1465,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: project,
       changed: true,
     };
@@ -1482,7 +1482,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...updated.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       industrialPolicy: {
         sectorSubsidyRates: [...updated.industrial.sectorSubsidyRates],
@@ -1498,7 +1498,7 @@ export function applyCountryAction(
       {
         countryId: country.id,
         buildingId: action.buildingId,
-        amountSUSD: action.amountSUSD,
+        amountRUSD: action.amountRUSD,
       },
       action.dayIndex,
     );
@@ -1511,12 +1511,12 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       industrialPolicy: null,
       publicEnterpriseSupport: {
         buildingId: supported.building.id,
-        amountSUSD: supported.amountSUSD,
+        amountRUSD: supported.amountRUSD,
       },
       changed: true,
     };
@@ -1542,7 +1542,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...proposal.country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       lawAction: {
         lawId: proposal.law.id,
@@ -1558,7 +1558,7 @@ export function applyCountryAction(
     const result = setInstitutionFunding(
       world,
       definitions,
-      { countryId: country.id, annualSUSD: action.annualSUSD },
+      { countryId: country.id, annualRUSD: action.annualRUSD },
       action.dayIndex,
     );
     return {
@@ -1570,11 +1570,11 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...result.country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       institutionFunding: {
-        previousAnnualSUSD: result.previousAnnualSUSD,
-        annualSUSD: result.annualSUSD,
+        previousAnnualRUSD: result.previousAnnualRUSD,
+        annualRUSD: result.annualRUSD,
         changed: result.changed,
       },
       changed: result.changed,
@@ -1607,7 +1607,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       researchAction: {
         technologyId: definition.id,
@@ -1639,7 +1639,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       cancelledResearchTechnologyId: cancelled,
       changed: true,
@@ -1657,9 +1657,9 @@ export function applyCountryAction(
     if (action.kind === "set-education-funding") {
       validateEducationFunding(world, definitions, {
         countryId: country.id,
-        annualSUSD: action.annualSUSD,
+        annualRUSD: action.annualRUSD,
       });
-      country.education = { ...country.education, fundedAnnualSUSD: action.annualSUSD };
+      country.education = { ...country.education, fundedAnnualRUSD: action.annualRUSD };
     } else {
       validateResearchStaffShare(world, definitions, {
         countryId: country.id,
@@ -1674,7 +1674,7 @@ export function applyCountryAction(
       throw error;
     }
     const changed =
-      country.education.fundedAnnualSUSD !== previousEducation.fundedAnnualSUSD ||
+      country.education.fundedAnnualRUSD !== previousEducation.fundedAnnualRUSD ||
       country.education.researchStaffShare !== previousEducation.researchStaffShare;
     return {
       countryId: country.id,
@@ -1685,11 +1685,11 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       educationAction: {
-        previousFundedAnnualSUSD: previousEducation.fundedAnnualSUSD,
-        fundedAnnualSUSD: country.education.fundedAnnualSUSD,
+        previousFundedAnnualRUSD: previousEducation.fundedAnnualRUSD,
+        fundedAnnualRUSD: country.education.fundedAnnualRUSD,
         previousResearchStaffShare: previousEducation.researchStaffShare,
         researchStaffShare: country.education.researchStaffShare,
       },
@@ -1711,20 +1711,20 @@ export function applyCountryAction(
     if (action.kind === "set-training-budget") {
       validateTrainingBudget(world, definitions, {
         countryId: country.id,
-        annualSUSD: action.annualSUSD,
+        annualRUSD: action.annualRUSD,
       });
       country.labor = {
         ...country.labor,
-        trainingBudgetSUSDPerYear: action.annualSUSD,
+        trainingBudgetRUSDPerYear: action.annualRUSD,
       };
     } else if (action.kind === "set-training-stipend") {
       validateTrainingStipend(world, definitions, {
         countryId: country.id,
-        annualSUSD: action.annualSUSD,
+        annualRUSD: action.annualRUSD,
       });
       country.labor = {
         ...country.labor,
-        trainingStipendPerTraineeSUSDPerYear: action.annualSUSD,
+        trainingStipendPerTraineeRUSDPerYear: action.annualRUSD,
       };
     } else if (action.kind === "set-training-staff-share") {
       validateTrainingStaffShare(world, definitions, {
@@ -1750,10 +1750,10 @@ export function applyCountryAction(
       throw error;
     }
     const changed =
-      country.labor.trainingBudgetSUSDPerYear !==
-        previousLabor.trainingBudgetSUSDPerYear ||
-      country.labor.trainingStipendPerTraineeSUSDPerYear !==
-        previousLabor.trainingStipendPerTraineeSUSDPerYear ||
+      country.labor.trainingBudgetRUSDPerYear !==
+        previousLabor.trainingBudgetRUSDPerYear ||
+      country.labor.trainingStipendPerTraineeRUSDPerYear !==
+        previousLabor.trainingStipendPerTraineeRUSDPerYear ||
       country.labor.trainingStaffShare !== previousLabor.trainingStaffShare ||
       country.institutions.healthStaffShare !== previousInstitutions.healthStaffShare;
     return {
@@ -1765,15 +1765,15 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       laborAction: {
-        previousTrainingBudgetSUSDPerYear: previousLabor.trainingBudgetSUSDPerYear,
-        trainingBudgetSUSDPerYear: country.labor.trainingBudgetSUSDPerYear,
-        previousTrainingStipendPerTraineeSUSDPerYear:
-          previousLabor.trainingStipendPerTraineeSUSDPerYear,
-        trainingStipendPerTraineeSUSDPerYear:
-          country.labor.trainingStipendPerTraineeSUSDPerYear,
+        previousTrainingBudgetRUSDPerYear: previousLabor.trainingBudgetRUSDPerYear,
+        trainingBudgetRUSDPerYear: country.labor.trainingBudgetRUSDPerYear,
+        previousTrainingStipendPerTraineeRUSDPerYear:
+          previousLabor.trainingStipendPerTraineeRUSDPerYear,
+        trainingStipendPerTraineeRUSDPerYear:
+          country.labor.trainingStipendPerTraineeRUSDPerYear,
         previousTrainingStaffShare: previousLabor.trainingStaffShare,
         trainingStaffShare: country.labor.trainingStaffShare,
         previousHealthStaffShare: previousInstitutions.healthStaffShare,
@@ -1829,7 +1829,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       tradeAction: {
         previousTariffRates: [...previousTrade.tariffRates],
@@ -1860,7 +1860,7 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       militaryAction: {
         kind: result.kind,
@@ -1870,7 +1870,7 @@ export function applyCountryAction(
         regionId: result.regionId,
         personnel: result.personnel,
         equipmentUnits: result.equipmentUnits,
-        spentSUSD: result.spentSUSD,
+        spentRUSD: result.spentRUSD,
       },
       changed: true,
     };
@@ -1883,9 +1883,9 @@ export function applyCountryAction(
     const result = applyMonetaryPolicy(world, definitions, {
       countryId: country.id,
       regime: action.regime,
-      paritySusdPerUnit: action.paritySusdPerUnit,
-      reserveTransferSUSD: action.reserveTransferSUSD,
-      currencyConversionSUSD: action.currencyConversionSUSD,
+      parityRusdPerUnit: action.parityRusdPerUnit,
+      reserveTransferRUSD: action.reserveTransferRUSD,
+      currencyConversionRUSD: action.currencyConversionRUSD,
     }, action.dayIndex);
     try {
       assertValidWorld(world);
@@ -1901,17 +1901,17 @@ export function applyCountryAction(
       previousDebt,
       debt: { ...country.debt },
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       monetaryAction: {
         currencyId: result.currencyId,
         regime: result.regime,
-        paritySusdPerUnit: result.paritySusdPerUnit,
-        valuationSusdPerUnit: result.valuationSusdPerUnit,
-        reserveTransferSUSD: result.reserveTransferSUSD,
-        currencyConversionSUSD: result.currencyConversionSUSD,
+        parityRusdPerUnit: result.parityRusdPerUnit,
+        valuationRusdPerUnit: result.valuationRusdPerUnit,
+        reserveTransferRUSD: result.reserveTransferRUSD,
+        currencyConversionRUSD: result.currencyConversionRUSD,
         currencyIssuedUnits: result.currencyIssuedUnits,
-        revaluationSUSD: result.revaluationSUSD,
+        revaluationRUSD: result.revaluationRUSD,
       },
       changed: true,
     };
@@ -1920,11 +1920,11 @@ export function applyCountryAction(
   const debt: DebtPolicy = {
     ...country.debt,
     refinanceOnMaturity: action.refinanceOnMaturity,
-    maxOutstandingPrincipalSUSD: action.maxOutstandingPrincipalSUSD,
+    maxOutstandingPrincipalRUSD: action.maxOutstandingPrincipalRUSD,
   };
   const changed =
     debt.refinanceOnMaturity !== previousDebt.refinanceOnMaturity ||
-    debt.maxOutstandingPrincipalSUSD !== previousDebt.maxOutstandingPrincipalSUSD;
+    debt.maxOutstandingPrincipalRUSD !== previousDebt.maxOutstandingPrincipalRUSD;
   if (!changed) {
     return {
       countryId: country.id,
@@ -1935,7 +1935,7 @@ export function applyCountryAction(
       previousDebt,
       debt: previousDebt,
       debtContract: null,
-      principalPaidSUSD: 0,
+      principalPaidRUSD: 0,
       constructionProject: null,
       changed: false,
     };
@@ -1958,7 +1958,7 @@ export function applyCountryAction(
     previousDebt,
     debt: { ...debt },
     debtContract: null,
-    principalPaidSUSD: 0,
+    principalPaidRUSD: 0,
     constructionProject: null,
     changed: true,
   };

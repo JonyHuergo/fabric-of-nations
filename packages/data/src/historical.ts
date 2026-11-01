@@ -30,10 +30,10 @@ import {
   MAX_CURRENCY_KEY_LENGTH,
   MAX_CURRENCY_NAME_LENGTH,
   MAX_DEBT_ARREARS_GRACE_DAYS,
-  MAX_DEBT_PRINCIPAL_SUSD,
+  MAX_DEBT_PRINCIPAL_RUSD,
   MAX_DEBT_TERM_DAYS,
-  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
-  asSusdPerCurrencyUnit,
+  MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
+  asRusdPerCurrencyUnit,
   assertValidEconomyDefinitions,
   assertValidPoliticsDefinitions,
   assertValidPopulationDefinitions,
@@ -157,7 +157,7 @@ export interface HistoricalCurrencyInput {
     | { readonly status: "unavailable" }
     | {
         readonly status: "specified";
-        readonly susdPerUnit: number;
+        readonly rusdPerUnit: number;
         readonly sourceIds: readonly string[];
       };
 }
@@ -170,9 +170,9 @@ export interface HistoricalCountryInput {
   readonly currency: HistoricalCurrencyInput;
   readonly fiscal: {
     readonly incomeTaxRate: number;
-    readonly welfareBudgetSUSDPerYear: number;
+    readonly welfareBudgetRUSDPerYear: number;
   };
-  readonly initialTreasuryCashSUSD: number;
+  readonly initialTreasuryCashRUSD: number;
   /**
    * Optional public-debt policy. Debt is a provincially authored policy input,
    * not a historical claim; omitted countries use the disabled default.
@@ -183,7 +183,7 @@ export interface HistoricalCountryInput {
     readonly creditorId: number;
     readonly annualCouponRate: number;
     readonly termDays: number;
-    readonly maxOutstandingPrincipalSUSD: number;
+    readonly maxOutstandingPrincipalRUSD: number;
     readonly refinanceOnMaturity: boolean;
     readonly arrearsGraceDays: number;
   };
@@ -239,7 +239,7 @@ export interface HistoricalTradeRouteInput {
   readonly marketAKey: string;
   readonly marketBKey: string;
   readonly distanceUnits: number;
-  readonly baseCapacitySUSDPerDay: number;
+  readonly baseCapacityRUSDPerDay: number;
   readonly status: "provisional" | "calibrated";
   readonly sourceIds: readonly string[];
 }
@@ -250,7 +250,7 @@ export interface HistoricalPopulationInput {
   readonly population: number;
   readonly literacy: number;
   readonly wealthLevel: number;
-  readonly savingsPerCapitaSUSD: number;
+  readonly savingsPerCapitaRUSD: number;
   readonly militancy: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
@@ -262,7 +262,7 @@ export interface HistoricalBuildingInput {
   readonly definitionKey: string;
   readonly level: number;
   readonly ownerProfessionKey: string;
-  readonly operatingCashSUSD: number;
+  readonly operatingCashRUSD: number;
   readonly status: "provisional" | "calibrated";
 }
 
@@ -808,9 +808,9 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
                 errors,
               ),
               termDays: numberField(debtor, "termDays", `${path}.debt`, errors),
-              maxOutstandingPrincipalSUSD: numberField(
+              maxOutstandingPrincipalRUSD: numberField(
                 debtor,
-                "maxOutstandingPrincipalSUSD",
+                "maxOutstandingPrincipalRUSD",
                 `${path}.debt`,
                 errors,
               ),
@@ -865,12 +865,12 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
                     ) as NonNullable<CountryPoliticsInput["governmentGroupKey"]>,
                   }),
               ...(laws === undefined ? {} : { laws }),
-              ...(politicsRecord.institutionFundingSUSDPerYear === undefined
+              ...(politicsRecord.institutionFundingRUSDPerYear === undefined
                 ? {}
                 : {
-                    institutionFundingSUSDPerYear: numberField(
+                    institutionFundingRUSDPerYear: numberField(
                       politicsRecord,
-                      "institutionFundingSUSDPerYear",
+                      "institutionFundingRUSDPerYear",
                       `${path}.politics`,
                       errors,
                     ),
@@ -899,12 +899,12 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
               ...(researchedTechnologyKeys === undefined
                 ? {}
                 : { researchedTechnologyKeys }),
-              ...(technologyRecord.educationFundingSUSDPerYear === undefined
+              ...(technologyRecord.educationFundingRUSDPerYear === undefined
                 ? {}
                 : {
-                    educationFundingSUSDPerYear: numberField(
+                    educationFundingRUSDPerYear: numberField(
                       technologyRecord,
-                      "educationFundingSUSDPerYear",
+                      "educationFundingRUSDPerYear",
                       `${path}.technology`,
                       errors,
                     ),
@@ -937,9 +937,9 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
           valuationStatus === "specified"
             ? {
                 status: "specified" as const,
-                susdPerUnit: numberField(
+                rusdPerUnit: numberField(
                   valuationRecord,
-                  "susdPerUnit",
+                  "rusdPerUnit",
                   `${path}.currency.valuation`,
                   errors,
                 ),
@@ -954,14 +954,14 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       },
       fiscal: {
         incomeTaxRate: numberField(fiscal, "incomeTaxRate", `${path}.fiscal`, errors),
-        welfareBudgetSUSDPerYear: numberField(
+        welfareBudgetRUSDPerYear: numberField(
           fiscal,
-          "welfareBudgetSUSDPerYear",
+          "welfareBudgetRUSDPerYear",
           `${path}.fiscal`,
           errors,
         ),
       },
-      initialTreasuryCashSUSD: numberField(record, "initialTreasuryCashSUSD", path, errors),
+      initialTreasuryCashRUSD: numberField(record, "initialTreasuryCashRUSD", path, errors),
       ...(debt === undefined ? {} : { debt }),
       ...(politics === undefined ? {} : { politics }),
       ...(technology === undefined ? {} : { technology }),
@@ -1065,7 +1065,7 @@ function parseTradeRoutes(value: unknown, errors: string[]): HistoricalTradeRout
       marketAKey: stringField(record, "marketAKey", path, errors),
       marketBKey: stringField(record, "marketBKey", path, errors),
       distanceUnits: numberField(record, "distanceUnits", path, errors),
-      baseCapacitySUSDPerDay: numberField(record, "baseCapacitySUSDPerDay", path, errors),
+      baseCapacityRUSDPerDay: numberField(record, "baseCapacityRUSDPerDay", path, errors),
       status: status === "calibrated" ? "calibrated" : "provisional",
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
     };
@@ -1087,7 +1087,7 @@ function parsePopulations(value: unknown, errors: string[]): HistoricalPopulatio
       population: numberField(record, "population", path, errors),
       literacy: numberField(record, "literacy", path, errors),
       wealthLevel: numberField(record, "wealthLevel", path, errors),
-      savingsPerCapitaSUSD: numberField(record, "savingsPerCapitaSUSD", path, errors),
+      savingsPerCapitaRUSD: numberField(record, "savingsPerCapitaRUSD", path, errors),
       militancy: numberField(record, "militancy", path, errors),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
@@ -1110,7 +1110,7 @@ function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInp
       definitionKey: stringField(record, "definitionKey", path, errors),
       level: numberField(record, "level", path, errors),
       ownerProfessionKey: stringField(record, "ownerProfessionKey", path, errors),
-      operatingCashSUSD: numberField(record, "operatingCashSUSD", path, errors),
+      operatingCashRUSD: numberField(record, "operatingCashRUSD", path, errors),
       status: status === "calibrated" ? "calibrated" : "provisional",
     };
   });
@@ -1328,7 +1328,12 @@ export function validateM5HistoricalData(
         `${path}.currency.name must be at most ${String(MAX_CURRENCY_NAME_LENGTH)} characters`,
       );
     }
-    if (country.currency.key === "susd") errors.push(`${path}.currency.key is reserved for SUSD`);
+    if (
+      country.currency.key === "rusd" ||
+      country.currency.key === "susd"
+    ) {
+      errors.push(`${path}.currency.key is reserved for RUSD`);
+    }
     if (currencyKeys.has(country.currency.key)) {
       errors.push(`${path}.currency.key ${JSON.stringify(country.currency.key)} is duplicated`);
     }
@@ -1337,16 +1342,16 @@ export function validateM5HistoricalData(
     if (!(fiscal.incomeTaxRate >= 0 && fiscal.incomeTaxRate <= 1)) {
       errors.push(`${path}.fiscal.incomeTaxRate must be in 0..1`);
     }
-    if (!(fiscal.welfareBudgetSUSDPerYear >= 0)) {
-      errors.push(`${path}.fiscal.welfareBudgetSUSDPerYear must be non-negative`);
+    if (!(fiscal.welfareBudgetRUSDPerYear >= 0)) {
+      errors.push(`${path}.fiscal.welfareBudgetRUSDPerYear must be non-negative`);
     }
-    if (fiscal.welfareBudgetSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+    if (fiscal.welfareBudgetRUSDPerYear > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
       errors.push(
-        `${path}.fiscal.welfareBudgetSUSDPerYear must not exceed ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+        `${path}.fiscal.welfareBudgetRUSDPerYear must not exceed ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
       );
     }
-    if (!(country.initialTreasuryCashSUSD >= 0)) {
-      errors.push(`${path}.initialTreasuryCashSUSD must be non-negative`);
+    if (!(country.initialTreasuryCashRUSD >= 0)) {
+      errors.push(`${path}.initialTreasuryCashRUSD must be non-negative`);
     }
     if (country.debt !== undefined) {
       const debt = country.debt;
@@ -1359,12 +1364,12 @@ export function validateM5HistoricalData(
       if (debt.termDays > MAX_DEBT_TERM_DAYS) {
         errors.push(`${path}.debt.termDays must not exceed ${String(MAX_DEBT_TERM_DAYS)}`);
       }
-      if (!(debt.maxOutstandingPrincipalSUSD >= 0)) {
-        errors.push(`${path}.debt.maxOutstandingPrincipalSUSD must be non-negative`);
+      if (!(debt.maxOutstandingPrincipalRUSD >= 0)) {
+        errors.push(`${path}.debt.maxOutstandingPrincipalRUSD must be non-negative`);
       }
-      if (debt.maxOutstandingPrincipalSUSD > MAX_DEBT_PRINCIPAL_SUSD) {
+      if (debt.maxOutstandingPrincipalRUSD > MAX_DEBT_PRINCIPAL_RUSD) {
         errors.push(
-          `${path}.debt.maxOutstandingPrincipalSUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_SUSD)}`,
+          `${path}.debt.maxOutstandingPrincipalRUSD must not exceed ${String(MAX_DEBT_PRINCIPAL_RUSD)}`,
         );
       }
       if (!Number.isInteger(debt.arrearsGraceDays) || debt.arrearsGraceDays < 0) {
@@ -1383,12 +1388,12 @@ export function validateM5HistoricalData(
       }
     }
     if (country.currency.valuation.status === "specified") {
-      const rate = country.currency.valuation.susdPerUnit;
+      const rate = country.currency.valuation.rusdPerUnit;
       if (!(rate > 0)) {
-        errors.push(`${path}.currency.valuation.susdPerUnit must be positive`);
+        errors.push(`${path}.currency.valuation.rusdPerUnit must be positive`);
       } else if (rate < CURRENCY_RATE_MIN || rate > CURRENCY_RATE_MAX) {
         errors.push(
-          `${path}.currency.valuation.susdPerUnit must be in ${String(CURRENCY_RATE_MIN)}..${String(CURRENCY_RATE_MAX)}`,
+          `${path}.currency.valuation.rusdPerUnit must be in ${String(CURRENCY_RATE_MIN)}..${String(CURRENCY_RATE_MAX)}`,
         );
       }
       requireSources(country.currency.valuation.sourceIds, `${path}.currency.valuation.sourceIds`);
@@ -1571,8 +1576,8 @@ export function validateM5HistoricalData(
       routePairs.add(pair);
     }
     if (!(route.distanceUnits > 0)) errors.push(`${path}.distanceUnits must be positive`);
-    if (!(route.baseCapacitySUSDPerDay > 0)) {
-      errors.push(`${path}.baseCapacitySUSDPerDay must be positive`);
+    if (!(route.baseCapacityRUSDPerDay > 0)) {
+      errors.push(`${path}.baseCapacityRUSDPerDay must be positive`);
     }
     requireSources(route.sourceIds, `${path}.sourceIds`);
   }
@@ -1605,10 +1610,10 @@ export function validateM5HistoricalData(
     if (!(population.wealthLevel >= 0 && population.wealthLevel <= 99)) {
       errors.push(`${path}.wealthLevel must be in 0..99`);
     }
-    if (!(population.savingsPerCapitaSUSD >= 0)) {
-      errors.push(`${path}.savingsPerCapitaSUSD must be non-negative`);
+    if (!(population.savingsPerCapitaRUSD >= 0)) {
+      errors.push(`${path}.savingsPerCapitaRUSD must be non-negative`);
     }
-    if (!Number.isFinite(population.population * population.savingsPerCapitaSUSD)) {
+    if (!Number.isFinite(population.population * population.savingsPerCapitaRUSD)) {
       errors.push(`${path} initial savings overflow to a non-finite value`);
     }
     if (!(population.militancy >= 0 && population.militancy <= 1)) {
@@ -1663,8 +1668,8 @@ export function validateM5HistoricalData(
     if (!isPositiveInteger(building.level)) {
       errors.push(`${path}.level must be a positive integer`);
     }
-    if (!(building.operatingCashSUSD >= 0)) {
-      errors.push(`${path}.operatingCashSUSD must be non-negative`);
+    if (!(building.operatingCashRUSD >= 0)) {
+      errors.push(`${path}.operatingCashRUSD must be non-negative`);
     }
     const ownerBlock = (populationByRegion.get(building.regionId) ?? []).find(
       (population) => population.professionKey === building.ownerProfessionKey,
@@ -2111,7 +2116,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       femaleAgeGroups: ages.femaleAgeGroups,
       literacy: population.literacy,
       wealthLevel: population.wealthLevel,
-      initialSavingsSUSD: population.population * population.savingsPerCapitaSUSD,
+      initialSavingsRUSD: population.population * population.savingsPerCapitaRUSD,
       militancy: population.militancy,
     };
   });
@@ -2167,7 +2172,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         builtOnDay: data.meta.startDayIndex,
         operational: true,
         operatingCashAccountId: HISTORICAL_BUILDING_ACCOUNT_BASE + index,
-        initialOperatingCashSUSD: building.operatingCashSUSD,
+        initialOperatingCashRUSD: building.operatingCashRUSD,
       };
     },
   );
@@ -2217,7 +2222,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     return {
       id: market.id,
       regionIds: [...market.regionIds].sort((left, right) => left - right),
-      priceSUSD: goods.map((good) => good.basePrice1900SUSD * market.initialPriceMultiplier),
+      priceRUSD: goods.map((good) => good.basePrice1900RUSD * market.initialPriceMultiplier),
       stockLots: market.stockLots.map((lot) => {
         const good = goodByKey.get(lot.goodKey);
         const ownerBuildingId = buildingIdByKey.get(lot.ownerBuildingKey);
@@ -2250,7 +2255,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       marketAId,
       marketBId,
       distanceUnits: route.distanceUnits,
-      baseCapacitySUSDPerDay: route.baseCapacitySUSDPerDay,
+      baseCapacityRUSDPerDay: route.baseCapacityRUSDPerDay,
     };
   });
 
@@ -2271,7 +2276,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         ? {
             currencyId: country.id,
             status: "specified" as const,
-            susdPerUnit: asSusdPerCurrencyUnit(country.currency.valuation.susdPerUnit),
+            rusdPerUnit: asRusdPerCurrencyUnit(country.currency.valuation.rusdPerUnit),
             setOnDay: data.meta.startDayIndex,
             source: "scenario" as const,
           }
@@ -2288,7 +2293,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       monetary: { kind: "own", currencyId: country.id },
       regionIds: [...country.regionIds].sort((left, right) => left - right),
       treasuryAccountId: HISTORICAL_TREASURY_ACCOUNT_BASE + country.id,
-      initialTreasuryCashSUSD: country.initialTreasuryCashSUSD,
+      initialTreasuryCashRUSD: country.initialTreasuryCashRUSD,
       fiscal: { ...country.fiscal },
       ...(country.debt === undefined ? {} : { debt: { ...country.debt } }),
       ...(country.politics === undefined ? {} : { politics: { ...country.politics } }),
@@ -2300,7 +2305,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     {
       id: HISTORICAL_SYSTEM_ACCOUNT_ID,
       accountKind: "system-reserve",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     },
   ];
 

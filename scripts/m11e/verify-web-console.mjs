@@ -20,7 +20,7 @@ try {
   const started = Date.now();
   for (;;) {
     const ready = await app.evaluate(
-      "document.body.innerText.includes('CENTURY') && document.querySelectorAll('svg path').length >= 260",
+      "document.body.innerText.includes('FABRIC OF NATIONS') && document.querySelectorAll('svg path').length >= 260",
     );
     if (ready === true) break;
     if (Date.now() - started > 90_000) throw new Error("timed out waiting for the main menu map");

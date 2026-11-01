@@ -106,8 +106,8 @@ export interface HouseholdPurchase {
   readonly goodId: number;
   readonly sellerBuildingId: number;
   readonly quantity: number;
-  readonly unitPriceSUSD: number;
-  readonly totalSUSD: number;
+  readonly unitPriceRUSD: number;
+  readonly totalRUSD: number;
   readonly phase: "A" | "B";
 }
 
@@ -118,16 +118,16 @@ export interface PendingTransaction {
   readonly sellerBuildingId: number;
   readonly goodId: number;
   readonly quantity: number;
-  readonly unitPriceSUSD: number;
-  readonly totalSUSD: number;
+  readonly unitPriceRUSD: number;
+  readonly totalRUSD: number;
   readonly tier: MarketTier;
   readonly phase: "A" | "B";
 }
 
 export interface PriceUpdate {
   readonly goodId: number;
-  readonly oldPriceSUSD: number;
-  readonly newPriceSUSD: number;
+  readonly oldPriceRUSD: number;
+  readonly newPriceRUSD: number;
   readonly fundedDemand: number;
   readonly sellableSupply: number;
   readonly imbalance: number;
@@ -261,7 +261,7 @@ function validateMarketDayInput(
   if (market === undefined) {
     throw new RangeError(`market-day input references unknown market ${String(input.marketId)}`);
   }
-  if (market.priceSUSD.length !== definitions.goods.length) {
+  if (market.priceRUSD.length !== definitions.goods.length) {
     throw new RangeError("market price array does not match the goods definitions");
   }
   const marketRegionIds = new Set(market.regionIds);
@@ -553,19 +553,19 @@ function openingLotMap(world: World, marketId: number): Map<string, number> {
 
 /** Update all market prices once, after clearing, using bounded incremental rules. */
 export function updateMarketPrices(
-  market: { readonly id: number; priceSUSD: number[] },
-  goods: readonly { readonly id: number; readonly basePrice1900SUSD: number }[],
+  market: { readonly id: number; priceRUSD: number[] },
+  goods: readonly { readonly id: number; readonly basePrice1900RUSD: number }[],
   fundedDemandByGood: readonly number[],
   sellableSupplyByGood: readonly number[],
 ): PriceUpdate[] {
-  if (market.priceSUSD.length !== goods.length) {
+  if (market.priceRUSD.length !== goods.length) {
     throw new RangeError("market price array does not match goods");
   }
   const updates: PriceUpdate[] = [];
-  const newPrices = [...market.priceSUSD];
+  const newPrices = [...market.priceRUSD];
   for (const good of goods) {
     const goodId = good.id;
-    const oldPrice = market.priceSUSD[goodId];
+    const oldPrice = market.priceRUSD[goodId];
     if (oldPrice === undefined || !Number.isFinite(oldPrice) || !(oldPrice > 0)) {
       throw new RangeError(`market price for good ${String(goodId)} is invalid`);
     }
@@ -583,8 +583,8 @@ export function updateMarketPrices(
       -M3_PRICE_MAX_DAILY_CHANGE,
       Math.min(M3_PRICE_MAX_DAILY_CHANGE, M3_PRICE_KAPPA * imbalance),
     );
-    const lower = good.basePrice1900SUSD * M3_PRICE_MIN_RATIO;
-    const upper = good.basePrice1900SUSD * M3_PRICE_MAX_RATIO;
+    const lower = good.basePrice1900RUSD * M3_PRICE_MIN_RATIO;
+    const upper = good.basePrice1900RUSD * M3_PRICE_MAX_RATIO;
     const newPrice = Math.min(upper, Math.max(lower, oldPrice * (1 + boundedChange)));
     if (!Number.isFinite(newPrice) || !(newPrice > 0)) {
       throw new RangeError(`updated price for good ${String(goodId)} is invalid`);
@@ -592,15 +592,15 @@ export function updateMarketPrices(
     newPrices[goodId] = newPrice;
     updates.push({
       goodId,
-      oldPriceSUSD: oldPrice,
-      newPriceSUSD: newPrice,
+      oldPriceRUSD: oldPrice,
+      newPriceRUSD: newPrice,
       fundedDemand,
       sellableSupply,
       imbalance,
       dailyChange: newPrice / oldPrice - 1,
     });
   }
-  market.priceSUSD = newPrices;
+  market.priceRUSD = newPrices;
   return updates;
 }
 
@@ -615,7 +615,7 @@ export function runMarketDay(
   const market = world.markets.find((candidate) => candidate.id === validated.marketId);
   if (market === undefined) throw new RangeError("missing market");
   const openingLots = market.stockLots.map((lot) => ({ ...lot }));
-  const openingPrices = [...market.priceSUSD];
+  const openingPrices = [...market.priceRUSD];
   const demands = demandStates(input);
   const reservations: MarketReservation[] = [];
   const remainingByLot = openingLotMap(world, market.id);
@@ -866,8 +866,8 @@ export function runMarketDay(
       goodId: reservation.goodId,
       sellerBuildingId: reservation.sellerBuildingId,
       quantity: reservation.quantity,
-      unitPriceSUSD: openingPrices[reservation.goodId] ?? 0,
-      totalSUSD: reservation.quantity * (openingPrices[reservation.goodId] ?? 0),
+      unitPriceRUSD: openingPrices[reservation.goodId] ?? 0,
+      totalRUSD: reservation.quantity * (openingPrices[reservation.goodId] ?? 0),
       phase: reservation.phase,
     }));
     householdPurchases.sort((left, right) => {
@@ -886,8 +886,8 @@ export function runMarketDay(
         sellerBuildingId: purchase.sellerBuildingId,
         goodId: purchase.goodId,
         quantity: purchase.quantity,
-        unitPriceSUSD: purchase.unitPriceSUSD,
-        totalSUSD: purchase.totalSUSD,
+        unitPriceRUSD: purchase.unitPriceRUSD,
+        totalRUSD: purchase.totalRUSD,
         tier: purchase.tier,
         phase: purchase.phase,
       });
@@ -913,8 +913,8 @@ export function runMarketDay(
         sellerBuildingId: use.sellerBuildingId,
         goodId: use.goodId,
         quantity: use.usedQuantity,
-        unitPriceSUSD: unitPrice,
-        totalSUSD: use.usedQuantity * unitPrice,
+        unitPriceRUSD: unitPrice,
+        totalRUSD: use.usedQuantity * unitPrice,
         tier: reservation.tier,
         phase: "A",
       });
@@ -985,7 +985,7 @@ export function runMarketDay(
       marketId: market.id,
       dayIndex: input.dayIndex,
       openingPrices,
-      updatedPrices: [...market.priceSUSD],
+      updatedPrices: [...market.priceRUSD],
       householdDemands: householdDemandResults,
       productionDemands: productionDemandResults,
       reservations,
@@ -999,7 +999,7 @@ export function runMarketDay(
     };
   } catch (error) {
     market.stockLots = openingLots;
-    market.priceSUSD = openingPrices;
+    market.priceRUSD = openingPrices;
     throw error;
   }
 }

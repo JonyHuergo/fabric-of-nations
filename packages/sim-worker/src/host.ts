@@ -1,5 +1,5 @@
 /**
- * Headless Century simulation host used by the native WebView worker and the
+ * Headless Fabric of Nations simulation host used by the native WebView worker and the
  * Node worker proof of concept.
  *
  * The host owns the authoritative world. Commands are applied only between

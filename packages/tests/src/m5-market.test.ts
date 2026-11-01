@@ -114,7 +114,7 @@ describe("M5 multi-market clearing and conservation", () => {
     expect(market0).toBeDefined();
     expect(market1).toBeDefined();
     if (market0 === undefined || market1 === undefined) return;
-    expect(market0.priceSUSD).not.toEqual(market1.priceSUSD);
+    expect(market0.priceRUSD).not.toEqual(market1.priceRUSD);
   });
 
   test("does not duplicate goods when regions share a market", () => {
@@ -251,12 +251,12 @@ describe("M5 multi-market clearing and conservation", () => {
     expect(new Set(settlement.producers.map((producer) => producer.buildingId)).size).toBe(
       settlement.producers.length,
     );
-    expect(settlement.totals.wagesPaidSUSD).toBeCloseTo(
-      settlement.wages.reduce((total, wage) => total + wage.paidSUSD, 0),
+    expect(settlement.totals.wagesPaidRUSD).toBeCloseTo(
+      settlement.wages.reduce((total, wage) => total + wage.paidRUSD, 0),
       8,
     );
-    expect(settlement.totals.upkeepPaidSUSD).toBeCloseTo(
-      settlement.upkeep.reduce((total, upkeep) => total + upkeep.paidSUSD, 0),
+    expect(settlement.totals.upkeepPaidRUSD).toBeCloseTo(
+      settlement.upkeep.reduce((total, upkeep) => total + upkeep.paidRUSD, 0),
       8,
     );
     const wagesPostings = world.finance.postings.filter(
@@ -265,8 +265,8 @@ describe("M5 multi-market clearing and conservation", () => {
     const upkeepPostings = world.finance.postings.filter(
       (posting) => posting.transactionKind === "upkeep" && posting.dayIndex === day,
     );
-    expect(wagesPostings).toHaveLength(settlement.wages.filter((wage) => wage.paidSUSD > 0).length);
-    expect(upkeepPostings).toHaveLength(settlement.upkeep.filter((upkeep) => upkeep.paidSUSD > 0).length);
+    expect(wagesPostings).toHaveLength(settlement.wages.filter((wage) => wage.paidRUSD > 0).length);
+    expect(upkeepPostings).toHaveLength(settlement.upkeep.filter((upkeep) => upkeep.paidRUSD > 0).length);
     assertAccountingIdentity(world.finance);
     assertValidEmploymentState(world, scenario.definitions);
     assertValidWorld(world);

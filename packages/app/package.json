@@ -2,7 +2,7 @@
   "name": "@century/app",
   "version": "0.3.0",
   "private": true,
-  "description": "Century M7 Expo/React Native playable shell with a WebView/Web Worker simulation host.",
+  "description": "Fabric of Nations M7 Expo/React Native playable shell with a WebView/Web Worker simulation host.",
   "main": "./index.ts",
   "scripts": {
     "start": "expo start",

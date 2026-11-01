@@ -1,6 +1,6 @@
 # Keyed deterministic randomness
 
-Century never uses a mutable random stream, ambient entropy, `Math.random`, the
+Fabric of Nations never uses a mutable random stream, ambient entropy, `Math.random`, the
 host clock, or object identity as a source of randomness. Every draw is a pure
 function of a stable key. The implementation lives in
 `packages/sim/src/rng.ts`.

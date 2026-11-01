@@ -485,7 +485,7 @@ unexplained voids. Antarctica remains on the neutral land layer by design.
 - **british-aden-1839** — British Aden and the Aden Protectorate, 1839-1900. Public domain. 1911. <https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Aden>
 - **historical-basemaps-1900** — historical-basemaps world_1900 (cross-check only). GPL-3.0 (not redistributed). 2018. <https://github.com/aourednik/historical-basemaps>
 - **cshapes-2.0** — CShapes 2.0 (classification reference only). CC BY-NC-SA 4.0 (not redistributed). 2019. <https://icr.ethz.ch/data/cshapes/>
-- **project-authored-1900** — Century M11c authored boundary reconstruction. Project data. 2026. <internal:packages/data/data/historical/m11/boundaries_1900.json>
+- **project-authored-1900** — Fabric of Nations M11c authored boundary reconstruction. Project data. 2026. <internal:packages/data/data/historical/m11/boundaries_1900.json>
 
 ## 8. Reproducing the audit
 

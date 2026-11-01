@@ -1,0 +1,157 @@
+{
+  "startedAt": "2026-11-01T21:15:23.325Z",
+  "checks": [
+    {
+      "name": "main menu displays the official game name",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "main menu has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "country search is present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "United States row selectable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "campaign initializes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "campaign has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "campaign displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Money screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Money screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Budget screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Budget screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Markets screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Markets screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Ledger screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Ledger screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Trade screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Trade screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Overview screen displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Overview screen has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "manual save succeeds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "saved campaign has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "manual load succeeds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "loaded campaign displays RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "loaded campaign has no SUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "0"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/m14/m14-main-menu.png",
+    "docs/images/m14/m14-campaign.png",
+    "docs/images/m14/m14-money.png",
+    "docs/images/m14/m14-budget.png",
+    "docs/images/m14/m14-markets.png",
+    "docs/images/m14/m14-ledger.png",
+    "docs/images/m14/m14-trade.png",
+    "docs/images/m14/m14-overview.png",
+    "docs/images/m14/m14-loaded.png"
+  ],
+  "consoleErrors": [],
+  "exceptions": [],
+  "failedLoads": [],
+  "finishedAt": "2026-11-01T21:15:44.345Z",
+  "passed": true
+}

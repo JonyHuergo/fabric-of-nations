@@ -4,7 +4,7 @@ import {
   countryById,
   formatCount,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
@@ -75,12 +75,12 @@ export function PopulationScreen({
           />
           <StatRow
             label="Household cash"
-            value={formatSUSD(country.householdCashSUSD)}
+            value={formatRUSD(country.householdCashRUSD)}
             detail="Sum of household cash accounts; stock."
           />
           <StatRow
             label="Estimated daily wage base"
-            value={formatSUSD(country.estimatedDailyWageBaseSUSD)}
+            value={formatRUSD(country.estimatedDailyWageBaseRUSD)}
             detail="Current employment × base wages ÷ civil year days; current-base estimate, not realized wages."
           />
           <StatRow label="Literacy" value={formatRate(country.literacy)} detail="population-weighted, 0–100%" />

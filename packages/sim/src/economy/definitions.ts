@@ -55,7 +55,7 @@ function assertGood(value: unknown, path: string): GoodDef {
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
     name: requireString(record.name, `${path}.name`, { minLength: 1 }),
     category: requireString(record.category, `${path}.category`) as GoodDef["category"],
-    basePrice1900SUSD: assertPositive(record.basePrice1900SUSD, `${path}.basePrice1900SUSD`),
+    basePrice1900RUSD: assertPositive(record.basePrice1900RUSD, `${path}.basePrice1900RUSD`),
     transportCostPerUnit: assertNonNegative(
       record.transportCostPerUnit,
       `${path}.transportCostPerUnit`,
@@ -96,11 +96,11 @@ function assertProfession(value: unknown, path: string): ProfessionDef {
       0,
       99,
     ),
-    baseWage1900SUSDPerYear: assertNonNegative(
-      record.baseWage1900SUSDPerYear,
-      `${path}.baseWage1900SUSDPerYear`,
+    baseWage1900RUSDPerYear: assertNonNegative(
+      record.baseWage1900RUSDPerYear,
+      `${path}.baseWage1900RUSDPerYear`,
     ),
-    trainingCostSUSD: assertNonNegative(record.trainingCostSUSD, `${path}.trainingCostSUSD`),
+    trainingCostRUSD: assertNonNegative(record.trainingCostRUSD, `${path}.trainingCostRUSD`),
     laborProductivityModifier: assertPositive(
       record.laborProductivityModifier,
       `${path}.laborProductivityModifier`,
@@ -306,9 +306,9 @@ function assertBuilding(
     outputs: outputs as BuildingDef["outputs"],
     jobs: jobs as BuildingDef["jobs"],
     sector: sector as BuildingSector,
-    constructionCostSUSD: assertNonNegative(
-      record.constructionCostSUSD,
-      `${path}.constructionCostSUSD`,
+    constructionCostRUSD: assertNonNegative(
+      record.constructionCostRUSD,
+      `${path}.constructionCostRUSD`,
     ),
     constructionWorkers: requireInteger(
       record.constructionWorkers,
@@ -317,9 +317,9 @@ function assertBuilding(
       1_000_000,
     ),
     constructionMaterials: materials as BuildingDef["constructionMaterials"],
-    dailyUpkeepSUSDAtLevelOne: assertNonNegative(
-      record.dailyUpkeepSUSDAtLevelOne,
-      `${path}.dailyUpkeepSUSDAtLevelOne`,
+    dailyUpkeepRUSDAtLevelOne: assertNonNegative(
+      record.dailyUpkeepRUSDAtLevelOne,
+      `${path}.dailyUpkeepRUSDAtLevelOne`,
     ),
     storageCapacityByGood: storage as BuildingDef["storageCapacityByGood"],
     resourceRequirements: [],

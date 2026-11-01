@@ -39,7 +39,7 @@ bundle and audit; the bundle and the code are authoritative if they disagree.
 - 1900 owner polities with at least one province: **26**.
 - Future successor polities in the registry: **17**.
 - Unique province ids/keys: **yes**.
-- Border pairs: **1604**; shared border segments: **142592**; segments with more than two neighbours: **66**.
+- Border pairs: **1604**; shared border segments: **142610**; segments with more than two neighbours: **67**.
 - Significant province-pair overlaps (area > 0.005 deg²): **38** (largest documented in the audit file; all are small, mostly at authored clip seams).
 - Confidence: low **38**, medium **307**, high **225**.
 
@@ -80,8 +80,8 @@ The committed build products are:
 | `potdam-1945` | Potsdam Agreement (1945), German territorial clauses | Public domain | 1945 | https://en.wikisource.org/wiki/Potsdam_Agreement |
 | `basic-law-1949` | Basic Law for the Federal Republic of Germany (1949) and GDR constitution | Public domain | 1949 | https://en.wikisource.org/wiki/Basic_Law_for_the_Federal_Republic_of_Germany |
 | `two-plus-four-1990` | Treaty on the Final Settlement with Respect to Germany (1990) | Public domain | 1990 | https://en.wikisource.org/wiki/Treaty_on_the_Final_Settlement_with_Respect_to_Germany |
-| `project-authored-1900` | Century M11c authored 1900 boundary reconstruction | Project data | 2026 | internal:packages/data/data/historical/m11/boundaries_1900.json |
-| `project-authored-m12` | Century M12a authored provincial partition | Project data | 2026 | internal:scripts/m12/province-plan.mjs |
+| `project-authored-1900` | Fabric of Nations M11c authored 1900 boundary reconstruction | Project data | 2026 | internal:packages/data/data/historical/m11/boundaries_1900.json |
+| `project-authored-m12` | Fabric of Nations M12a authored provincial partition | Project data | 2026 | internal:scripts/m12/province-plan.mjs |
 
 ## 5. Completeness
 
@@ -95,13 +95,13 @@ exceeded the geometry library's limits; their residual is approximated by area.
 | Map feature | 1900 scope (deg²) | Covered by provinces (deg²) | Residual |
 |---|---:|---:|---:|
 | AND | 0.05 | 0.05 | 0.00 |
-| AUT | 81.36 | 80.45 | 0.90 |
+| AUT | 81.36 | 80.44 | 0.92 |
 | BEL | 3.76 | 3.67 | 0.08 |
 | BGR | 11.52 | 11.41 | 0.11 |
 | CHE | 4.87 | 4.73 | 0.14 |
 | CRT | 0.78 | 0.78 | 0.00 |
 | CYP | 0.90 | 0.90 | 0.00 |
-| DEU | 70.77 | 69.29 | 1.49 |
+| DEU | 70.77 | 69.24 | 1.53 |
 | DNK | 5.46 | 5.09 | 0.37 |
 | ESP | 53.04 | 52.56 | 0.48 |
 | FIN | 62.29 | 61.78 | 0.51 |
@@ -118,11 +118,11 @@ exceeded the geometry library's limits; their residual is approximated by area.
 | MLT | 0.03 | 0.03 | 0.00 |
 | MNT | 1.06 | 1.03 | 0.03 |
 | NLD | 4.86 | 4.74 | 0.12 |
-| NOR | 86.32 | 47.88 | 38.44 (estimated) |
-| OTT | 18.02 | 16.49 | 1.53 |
+| NOR | 86.32 | 47.87 | 38.45 (estimated) |
+| OTT | 18.02 | 16.48 | 1.54 |
 | PRT | 9.24 | 9.06 | 0.18 |
 | ROM | 15.45 | 13.80 | 1.65 |
-| RUS | 703.38 | 679.80 | 23.58 |
+| RUS | 703.38 | 679.79 | 23.59 |
 | SMR | 0.01 | 0.01 | 0.00 |
 | SRB | 5.80 | 5.71 | 0.09 |
 | SWE | 78.46 | 77.73 | 0.72 |
@@ -966,6 +966,7 @@ independent; 1900 population estimate 5100000; geometry SWE.
    with a provincial transfer is a future milestone.
 9. Coverage residuals and small clip-seam overlaps are reported in
    `provinces_1900_audit.json`. They are not hidden by clamping.
+
 
 ## 10. Verification
 

@@ -7,8 +7,8 @@
     "participationRate": 0.6,
     "qualificationLiteracy": 0,
     "qualificationWealthLevel": 0,
-    "baseWage1900SUSDPerYear": 60,
-    "trainingCostSUSD": 0,
+    "baseWage1900RUSDPerYear": 60,
+    "trainingCostRUSD": 0,
     "laborProductivityModifier": 1
   },
   {
@@ -19,8 +19,8 @@
     "participationRate": 0.4,
     "qualificationLiteracy": 0.1,
     "qualificationWealthLevel": 0,
-    "baseWage1900SUSDPerYear": 130,
-    "trainingCostSUSD": 0,
+    "baseWage1900RUSDPerYear": 130,
+    "trainingCostRUSD": 0,
     "laborProductivityModifier": 1
   },
   {
@@ -31,8 +31,8 @@
     "participationRate": 0.55,
     "qualificationLiteracy": 0.7,
     "qualificationWealthLevel": 20,
-    "baseWage1900SUSDPerYear": 250,
-    "trainingCostSUSD": 0,
+    "baseWage1900RUSDPerYear": 250,
+    "trainingCostRUSD": 0,
     "laborProductivityModifier": 1.1
   },
   {
@@ -43,8 +43,8 @@
     "participationRate": 0.4,
     "qualificationLiteracy": 0.8,
     "qualificationWealthLevel": 50,
-    "baseWage1900SUSDPerYear": 600,
-    "trainingCostSUSD": 0,
+    "baseWage1900RUSDPerYear": 600,
+    "trainingCostRUSD": 0,
     "laborProductivityModifier": 1
   },
   {
@@ -55,8 +55,8 @@
     "participationRate": 0.6,
     "qualificationLiteracy": 0.85,
     "qualificationWealthLevel": 40,
-    "baseWage1900SUSDPerYear": 320,
-    "trainingCostSUSD": 0,
+    "baseWage1900RUSDPerYear": 320,
+    "trainingCostRUSD": 0,
     "laborProductivityModifier": 1.15
   }
 ]

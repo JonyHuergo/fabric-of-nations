@@ -259,7 +259,7 @@ for (const region of regions) {
       population,
       literacy: Number(literacyByProfession[professionKey].toFixed(4)),
       wealthLevel: wealthByProfession[professionKey],
-      savingsPerCapitaSUSD: tier.savings,
+      savingsPerCapitaRUSD: tier.savings,
       militancy: Number((militancyBase + (professionKey === "peasants" ? 0.01 : 0)).toFixed(4)),
       sourceIds: ["owid-population", "project-authored-1900"],
       calibrationStatus: "provisional",
@@ -272,14 +272,14 @@ for (const region of regions) {
 /** Buildings: rural grain + storage; hubs add processing, textiles and protein. */
 const buildings = [];
 const buildingByRegion = new Map();
-function addBuilding(region, key, definitionKey, level, ownerProfessionKey, operatingCashSUSD) {
+function addBuilding(region, key, definitionKey, level, ownerProfessionKey, operatingCashRUSD) {
   const building = {
     key: `${region.key}-${key}`,
     regionId: region.id,
     definitionKey,
     level,
     ownerProfessionKey,
-    operatingCashSUSD,
+    operatingCashRUSD,
     status: "provisional",
   };
   buildings.push(building);
@@ -371,16 +371,16 @@ const countries = states.map((state) => {
     currency: { key: currencyKey, name: currencyName, valuation: { status: "unavailable" } },
     fiscal: {
       incomeTaxRate: state.tier === "industrial" ? 0.06 : state.tier === "mixed" ? 0.05 : 0.03,
-      welfareBudgetSUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 0,
     },
-    initialTreasuryCashSUSD: Math.max(25000, Math.round(totalPopulation * 0.004)),
+    initialTreasuryCashRUSD: Math.max(25000, Math.round(totalPopulation * 0.004)),
     debt: {
       enabled: true,
       creditorKind: "country",
       creditorId: state.tag === "GBR" ? stateByTag.get("USA").id : stateByTag.get("GBR").id,
       annualCouponRate: 0.04,
       termDays: 365,
-      maxOutstandingPrincipalSUSD: Math.max(100000, Math.round(totalPopulation * 0.02)),
+      maxOutstandingPrincipalRUSD: Math.max(100000, Math.round(totalPopulation * 0.02)),
       refinanceOnMaturity: true,
       arrearsGraceDays: 365,
     },
@@ -394,11 +394,11 @@ const countries = states.map((state) => {
             ? "capitalists"
             : "aristocrats",
       laws,
-      institutionFundingSUSDPerYear: Math.max(1000, Math.round(totalPopulation * 0.0006)),
+      institutionFundingRUSDPerYear: Math.max(1000, Math.round(totalPopulation * 0.0006)),
     },
     technology: {
       researchedTechnologyKeys: tier.tech,
-      educationFundingSUSDPerYear: Math.max(500, Math.round(totalPopulation * tier.educationPerCapita)),
+      educationFundingRUSDPerYear: Math.max(500, Math.round(totalPopulation * tier.educationPerCapita)),
       researchStaffShare: tier.researchStaffShare,
     },
     sourceIds: ["owid-population", "maddison-2023", "project-authored-1900"],
@@ -543,7 +543,7 @@ for (const market of marketCentroids) {
       marketAKey: market.key,
       marketBKey: other.key,
       distanceUnits: Math.max(0.5, Math.round((km / 1000) * 10) / 10),
-      baseCapacitySUSDPerDay: capacity,
+      baseCapacityRUSDPerDay: capacity,
       status: "provisional",
       sourceIds: ["project-authored-1900"],
     });
@@ -614,7 +614,7 @@ const sources = [
   },
   {
     id: "project-m2-1900-age-structure",
-    title: "Century M2 provisional 1900 world age structure",
+    title: "Fabric of Nations M2 provisional 1900 world age structure",
     url: "internal:packages/data/data/scenarios/m2_world_aggregate.json",
     accessDate: "2026-10-29",
     license: "Project data",
@@ -622,7 +622,7 @@ const sources = [
   },
   {
     id: "project-authored-1900",
-    title: "Century M11 authored 1900 world tables",
+    title: "Fabric of Nations M11 authored 1900 world tables",
     url: "internal:packages/data/data/historical/m11/polities_1900.json",
     accessDate: "2026-10-29",
     license: "Project data",

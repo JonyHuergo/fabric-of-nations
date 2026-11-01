@@ -31,8 +31,8 @@ import {
   daysInMonth,
   isTerminalDayIndex,
 } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
-import type { Day, Id, MoneySUSD, Month } from "../types.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
+import type { Day, Id, MoneyRUSD, Month } from "../types.js";
 import { requireInteger } from "../validation.js";
 import type { World } from "../world.js";
 import {
@@ -86,26 +86,26 @@ export interface FinanceCloseResult {
 /** Derived government totals for one persisted M4b summary. */
 export interface GovernmentPeriodTotals {
   readonly countryId: Id;
-  readonly incomeTaxRevenueSUSD: MoneySUSD;
+  readonly incomeTaxRevenueRUSD: MoneyRUSD;
   /** E2 business-profit tax revenue collected by the country. */
-  readonly businessTaxRevenueSUSD: MoneySUSD;
-  readonly welfareExpenseSUSD: MoneySUSD;
+  readonly businessTaxRevenueRUSD: MoneyRUSD;
+  readonly welfareExpenseRUSD: MoneyRUSD;
   /** M5b interest expense accrued in the period. */
-  readonly interestExpenseSUSD: MoneySUSD;
+  readonly interestExpenseRUSD: MoneyRUSD;
   /** E4 sectoral production-subsidy expense paid in the period. */
-  readonly subsidyExpenseSUSD: MoneySUSD;
+  readonly subsidyExpenseRUSD: MoneyRUSD;
   /** M8 public-administration payroll paid in the period. */
-  readonly administrationExpenseSUSD?: MoneySUSD;
+  readonly administrationExpenseRUSD?: MoneyRUSD;
   /** M9 education/research payroll paid in the period. */
-  readonly educationExpenseSUSD?: MoneySUSD;
+  readonly educationExpenseRUSD?: MoneyRUSD;
   /** E5 training provider payroll and trainee stipend paid in the period. */
-  readonly trainingExpenseSUSD?: MoneySUSD;
+  readonly trainingExpenseRUSD?: MoneyRUSD;
   /** M10 military pay, equipment, and garrison procurement paid in the period. */
-  readonly militaryExpenseSUSD?: MoneySUSD;
+  readonly militaryExpenseRUSD?: MoneyRUSD;
   /** E6a customs duty collected by this country's customs administration. */
-  readonly customsDutyRevenueSUSD?: MoneySUSD;
+  readonly customsDutyRevenueRUSD?: MoneyRUSD;
   /** Tax and customs revenue minus welfare, interest, subsidy, administration, education, and training expense. */
-  readonly netFiscalResultSUSD: MoneySUSD;
+  readonly netFiscalResultRUSD: MoneyRUSD;
 }
 
 /**
@@ -127,17 +127,17 @@ export function governmentPeriodTotals(
         const countryId = Number(countryIdText);
         return {
           countryId,
-          incomeTaxRevenueSUSD: totals.incomeTaxRevenueSUSD,
-          businessTaxRevenueSUSD: totals.businessTaxRevenueSUSD,
-          welfareExpenseSUSD: totals.welfareExpenseSUSD,
-          interestExpenseSUSD: totals.interestExpenseSUSD,
-          subsidyExpenseSUSD: totals.subsidyExpenseSUSD,
-          administrationExpenseSUSD: totals.administrationExpenseSUSD ?? 0,
-          educationExpenseSUSD: totals.educationExpenseSUSD ?? 0,
-          trainingExpenseSUSD: totals.trainingExpenseSUSD ?? 0,
-          militaryExpenseSUSD: totals.militaryExpenseSUSD ?? 0,
-          customsDutyRevenueSUSD: totals.customsDutyRevenueSUSD ?? 0,
-          netFiscalResultSUSD: totals.netFiscalResultSUSD,
+          incomeTaxRevenueRUSD: totals.incomeTaxRevenueRUSD,
+          businessTaxRevenueRUSD: totals.businessTaxRevenueRUSD,
+          welfareExpenseRUSD: totals.welfareExpenseRUSD,
+          interestExpenseRUSD: totals.interestExpenseRUSD,
+          subsidyExpenseRUSD: totals.subsidyExpenseRUSD,
+          administrationExpenseRUSD: totals.administrationExpenseRUSD ?? 0,
+          educationExpenseRUSD: totals.educationExpenseRUSD ?? 0,
+          trainingExpenseRUSD: totals.trainingExpenseRUSD ?? 0,
+          militaryExpenseRUSD: totals.militaryExpenseRUSD ?? 0,
+          customsDutyRevenueRUSD: totals.customsDutyRevenueRUSD ?? 0,
+          netFiscalResultRUSD: totals.netFiscalResultRUSD,
         };
       })
       .sort((left, right) => left.countryId - right.countryId);
@@ -233,17 +233,17 @@ export function governmentPeriodTotals(
   return [...totals.entries()]
     .map(([countryId, values]) => ({
       countryId,
-      incomeTaxRevenueSUSD: values.tax,
-      businessTaxRevenueSUSD: values.businessTax,
-      welfareExpenseSUSD: values.welfare,
-      interestExpenseSUSD: values.interest,
-      subsidyExpenseSUSD: values.subsidy,
-      administrationExpenseSUSD: values.administration,
-      educationExpenseSUSD: values.education,
-      trainingExpenseSUSD: values.training,
-      militaryExpenseSUSD: values.military,
-      customsDutyRevenueSUSD: values.customs,
-      netFiscalResultSUSD:
+      incomeTaxRevenueRUSD: values.tax,
+      businessTaxRevenueRUSD: values.businessTax,
+      welfareExpenseRUSD: values.welfare,
+      interestExpenseRUSD: values.interest,
+      subsidyExpenseRUSD: values.subsidy,
+      administrationExpenseRUSD: values.administration,
+      educationExpenseRUSD: values.education,
+      trainingExpenseRUSD: values.training,
+      militaryExpenseRUSD: values.military,
+      customsDutyRevenueRUSD: values.customs,
+      netFiscalResultRUSD:
         values.tax +
         values.businessTax +
         values.customs -
@@ -277,17 +277,17 @@ export function compactFinanceHistory(finance: FinanceState): number {
     const countryFiscalTotals: Record<Id, FinancePeriodFiscalTotals> = {};
     for (const entry of totals) {
       countryFiscalTotals[entry.countryId] = {
-        incomeTaxRevenueSUSD: entry.incomeTaxRevenueSUSD,
-        businessTaxRevenueSUSD: entry.businessTaxRevenueSUSD,
-        welfareExpenseSUSD: entry.welfareExpenseSUSD,
-        interestExpenseSUSD: entry.interestExpenseSUSD,
-        subsidyExpenseSUSD: entry.subsidyExpenseSUSD,
-        administrationExpenseSUSD: entry.administrationExpenseSUSD ?? 0,
-        educationExpenseSUSD: entry.educationExpenseSUSD ?? 0,
-        trainingExpenseSUSD: entry.trainingExpenseSUSD ?? 0,
-        militaryExpenseSUSD: entry.militaryExpenseSUSD ?? 0,
-        customsDutyRevenueSUSD: entry.customsDutyRevenueSUSD ?? 0,
-        netFiscalResultSUSD: entry.netFiscalResultSUSD,
+        incomeTaxRevenueRUSD: entry.incomeTaxRevenueRUSD,
+        businessTaxRevenueRUSD: entry.businessTaxRevenueRUSD,
+        welfareExpenseRUSD: entry.welfareExpenseRUSD,
+        interestExpenseRUSD: entry.interestExpenseRUSD,
+        subsidyExpenseRUSD: entry.subsidyExpenseRUSD,
+        administrationExpenseRUSD: entry.administrationExpenseRUSD ?? 0,
+        educationExpenseRUSD: entry.educationExpenseRUSD ?? 0,
+        trainingExpenseRUSD: entry.trainingExpenseRUSD ?? 0,
+        militaryExpenseRUSD: entry.militaryExpenseRUSD ?? 0,
+        customsDutyRevenueRUSD: entry.customsDutyRevenueRUSD ?? 0,
+        netFiscalResultRUSD: entry.netFiscalResultRUSD,
       };
     }
     finance.periodSummaries[index] = {
@@ -311,7 +311,7 @@ export function compactFinanceHistory(finance: FinanceState): number {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function isLastCivilDayOfMonth(dayIndex: Day): boolean {
@@ -423,15 +423,15 @@ function capturePeriodSummary(
   bounds: ClosePeriodBounds,
 ): FinancePeriodSummary {
   const accounts = [...finance.accounts].sort((left, right) => left.id - right.id);
-  const accountTotals: Record<Id, MoneySUSD> = {};
-  const flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD> = {
+  const accountTotals: Record<Id, MoneyRUSD> = {};
+  const flowTotalsByKind: Record<FlowTransactionKind, MoneyRUSD> = {
     "goods-purchase": 0,
     "input-purchase": 0,
     wages: 0,
     upkeep: 0,
   };
   for (const account of accounts) {
-    const balance = Object.is(account.balanceSUSD, -0) ? 0 : account.balanceSUSD;
+    const balance = Object.is(account.balanceRUSD, -0) ? 0 : account.balanceRUSD;
     if (balance !== 0) accountTotals[account.id] = balance;
     for (const kind of FLOW_TRANSACTION_KINDS) {
       if (account.subtype !== FLOW_EXPENSE_SUBTYPE[kind]) continue;
@@ -597,9 +597,9 @@ function buildClosingEntries(finance: FinanceState): ClosingEntry[] {
     const revenue = [...owner.revenue].sort((left, right) => left.id - right.id);
     const expense = [...owner.expense].sort((left, right) => left.id - right.id);
     let revenueTotal = 0;
-    for (const account of revenue) revenueTotal += account.balanceSUSD;
+    for (const account of revenue) revenueTotal += account.balanceRUSD;
     let expenseTotal = 0;
-    for (const account of expense) expenseTotal += account.balanceSUSD;
+    for (const account of expense) expenseTotal += account.balanceRUSD;
     if (revenueTotal === 0 && expenseTotal === 0) continue;
     const net = revenueTotal - expenseTotal;
     const label = ownerLabel(owner.ownerKind, owner.ownerId);
@@ -611,21 +611,21 @@ function buildClosingEntries(finance: FinanceState): ClosingEntry[] {
     const lines: JournalLine[] = [];
     const closedAccountIds: Id[] = [];
     for (const account of revenue) {
-      if (!(account.balanceSUSD > 0)) continue;
-      lines.push({ accountId: account.id, side: "debit", amountSUSD: account.balanceSUSD });
+      if (!(account.balanceRUSD > 0)) continue;
+      lines.push({ accountId: account.id, side: "debit", amountRUSD: account.balanceRUSD });
       closedAccountIds.push(account.id);
     }
     for (const account of expense) {
-      if (!(account.balanceSUSD > 0)) continue;
-      lines.push({ accountId: account.id, side: "credit", amountSUSD: account.balanceSUSD });
+      if (!(account.balanceRUSD > 0)) continue;
+      lines.push({ accountId: account.id, side: "credit", amountRUSD: account.balanceRUSD });
       closedAccountIds.push(account.id);
     }
     if (net > 0) {
       if (owner.equity === undefined) throw new RangeError(`${label} has no owner-equity account`);
-      lines.push({ accountId: owner.equity.id, side: "credit", amountSUSD: net });
+      lines.push({ accountId: owner.equity.id, side: "credit", amountRUSD: net });
     } else if (net < 0) {
       if (owner.equity === undefined) throw new RangeError(`${label} has no owner-equity account`);
-      lines.push({ accountId: owner.equity.id, side: "debit", amountSUSD: -net });
+      lines.push({ accountId: owner.equity.id, side: "debit", amountRUSD: -net });
     }
     entries.push({
       lines,
@@ -685,7 +685,7 @@ function postPeriodCloseEntries(
           `closing entry for ${entry.ownerLabel} references unknown account ${String(line.accountId)}`,
         );
       }
-      const amount = line.amountSUSD;
+      const amount = line.amountRUSD;
       if (!Number.isFinite(amount) || !(amount > 0)) {
         throw new RangeError(
           `closing entry for ${entry.ownerLabel} requires strictly positive finite amounts`,
@@ -709,13 +709,13 @@ function postPeriodCloseEntries(
   for (const [accountId, delta] of aggregate) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    const next = account.balanceSUSD + delta;
+    const next = account.balanceRUSD + delta;
     if (!Number.isFinite(next)) {
       throw new RangeError(`period close would make account ${String(accountId)} non-finite`);
     }
     if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
       throw new RangeError(
-        `period close would make ${account.category} account ${String(accountId)} negative: ${String(account.balanceSUSD)} + ${String(delta)} < 0`,
+        `period close would make ${account.category} account ${String(accountId)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
       );
     }
   }
@@ -723,7 +723,7 @@ function postPeriodCloseEntries(
   for (const [accountId, delta] of aggregate) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceSUSD += delta;
+    account.balanceRUSD += delta;
   }
 
   const postings: JournalPosting[] = [];
@@ -787,7 +787,7 @@ function buildAnnualSummary(
   // zeroed every revenue/expense account before an annual summary can exist.
   for (const account of finance.accounts) {
     if (account.category !== "revenue" && account.category !== "expense") continue;
-    if (Math.abs(account.balanceSUSD) > toleranceMoney(account.balanceSUSD)) {
+    if (Math.abs(account.balanceRUSD) > toleranceMoney(account.balanceRUSD)) {
       throw new RangeError(
         `year-end account ${String(account.id)} retains a nonzero revenue/expense balance`,
       );
@@ -797,37 +797,37 @@ function buildAnnualSummary(
   const fiscalTotals: Record<
     Id,
     {
-      incomeTaxRevenueSUSD: number;
-      businessTaxRevenueSUSD: number;
-      welfareExpenseSUSD: number;
-      interestExpenseSUSD: number;
-      subsidyExpenseSUSD: number;
-      administrationExpenseSUSD: number;
-      educationExpenseSUSD: number;
-      trainingExpenseSUSD: number;
-      militaryExpenseSUSD: number;
-      customsDutyRevenueSUSD: number;
-      netFiscalResultSUSD: number;
+      incomeTaxRevenueRUSD: number;
+      businessTaxRevenueRUSD: number;
+      welfareExpenseRUSD: number;
+      interestExpenseRUSD: number;
+      subsidyExpenseRUSD: number;
+      administrationExpenseRUSD: number;
+      educationExpenseRUSD: number;
+      trainingExpenseRUSD: number;
+      militaryExpenseRUSD: number;
+      customsDutyRevenueRUSD: number;
+      netFiscalResultRUSD: number;
     }
   > = {};
   const budgetTotals: Record<Id, FinancePeriodBudgetTotals> = {};
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     fiscalTotals[country.id] = {
-      incomeTaxRevenueSUSD: 0,
-      businessTaxRevenueSUSD: 0,
-      welfareExpenseSUSD: 0,
-      interestExpenseSUSD: 0,
-      subsidyExpenseSUSD: 0,
-      administrationExpenseSUSD: 0,
-      educationExpenseSUSD: 0,
-      trainingExpenseSUSD: 0,
-      militaryExpenseSUSD: 0,
-      customsDutyRevenueSUSD: 0,
-      netFiscalResultSUSD: 0,
+      incomeTaxRevenueRUSD: 0,
+      businessTaxRevenueRUSD: 0,
+      welfareExpenseRUSD: 0,
+      interestExpenseRUSD: 0,
+      subsidyExpenseRUSD: 0,
+      administrationExpenseRUSD: 0,
+      educationExpenseRUSD: 0,
+      trainingExpenseRUSD: 0,
+      militaryExpenseRUSD: 0,
+      customsDutyRevenueRUSD: 0,
+      netFiscalResultRUSD: 0,
     };
     budgetTotals[country.id] = emptyBudgetTotals();
   }
-  const flowTotalsByKind: Record<FlowTransactionKind, MoneySUSD> = {
+  const flowTotalsByKind: Record<FlowTransactionKind, MoneyRUSD> = {
     "goods-purchase": 0,
     "input-purchase": 0,
     wages: 0,
@@ -838,27 +838,27 @@ function buildAnnualSummary(
       const current = fiscalTotals[countryTotals.countryId];
       if (current === undefined) continue;
       fiscalTotals[countryTotals.countryId] = {
-        incomeTaxRevenueSUSD:
-          current.incomeTaxRevenueSUSD + countryTotals.incomeTaxRevenueSUSD,
-        businessTaxRevenueSUSD:
-          current.businessTaxRevenueSUSD + countryTotals.businessTaxRevenueSUSD,
-        welfareExpenseSUSD: current.welfareExpenseSUSD + countryTotals.welfareExpenseSUSD,
-        interestExpenseSUSD:
-          current.interestExpenseSUSD + countryTotals.interestExpenseSUSD,
-        subsidyExpenseSUSD:
-          current.subsidyExpenseSUSD + countryTotals.subsidyExpenseSUSD,
-        administrationExpenseSUSD:
-          current.administrationExpenseSUSD +
-          (countryTotals.administrationExpenseSUSD ?? 0),
-        educationExpenseSUSD:
-          current.educationExpenseSUSD + (countryTotals.educationExpenseSUSD ?? 0),
-        trainingExpenseSUSD:
-          current.trainingExpenseSUSD + (countryTotals.trainingExpenseSUSD ?? 0),
-        militaryExpenseSUSD:
-          current.militaryExpenseSUSD + (countryTotals.militaryExpenseSUSD ?? 0),
-        customsDutyRevenueSUSD:
-          current.customsDutyRevenueSUSD + (countryTotals.customsDutyRevenueSUSD ?? 0),
-        netFiscalResultSUSD: 0,
+        incomeTaxRevenueRUSD:
+          current.incomeTaxRevenueRUSD + countryTotals.incomeTaxRevenueRUSD,
+        businessTaxRevenueRUSD:
+          current.businessTaxRevenueRUSD + countryTotals.businessTaxRevenueRUSD,
+        welfareExpenseRUSD: current.welfareExpenseRUSD + countryTotals.welfareExpenseRUSD,
+        interestExpenseRUSD:
+          current.interestExpenseRUSD + countryTotals.interestExpenseRUSD,
+        subsidyExpenseRUSD:
+          current.subsidyExpenseRUSD + countryTotals.subsidyExpenseRUSD,
+        administrationExpenseRUSD:
+          current.administrationExpenseRUSD +
+          (countryTotals.administrationExpenseRUSD ?? 0),
+        educationExpenseRUSD:
+          current.educationExpenseRUSD + (countryTotals.educationExpenseRUSD ?? 0),
+        trainingExpenseRUSD:
+          current.trainingExpenseRUSD + (countryTotals.trainingExpenseRUSD ?? 0),
+        militaryExpenseRUSD:
+          current.militaryExpenseRUSD + (countryTotals.militaryExpenseRUSD ?? 0),
+        customsDutyRevenueRUSD:
+          current.customsDutyRevenueRUSD + (countryTotals.customsDutyRevenueRUSD ?? 0),
+        netFiscalResultRUSD: 0,
       };
     }
     for (const [countryIdText, budget] of Object.entries(summary.countryBudgetTotals)) {
@@ -872,17 +872,17 @@ function buildAnnualSummary(
     }
   }
   for (const totals of Object.values(fiscalTotals)) {
-    totals.netFiscalResultSUSD =
-      totals.incomeTaxRevenueSUSD +
-      totals.businessTaxRevenueSUSD +
-      totals.customsDutyRevenueSUSD -
-      totals.welfareExpenseSUSD -
-      totals.interestExpenseSUSD -
-      totals.subsidyExpenseSUSD -
-      totals.administrationExpenseSUSD -
-      totals.educationExpenseSUSD -
-      totals.trainingExpenseSUSD -
-      totals.militaryExpenseSUSD;
+    totals.netFiscalResultRUSD =
+      totals.incomeTaxRevenueRUSD +
+      totals.businessTaxRevenueRUSD +
+      totals.customsDutyRevenueRUSD -
+      totals.welfareExpenseRUSD -
+      totals.interestExpenseRUSD -
+      totals.subsidyExpenseRUSD -
+      totals.administrationExpenseRUSD -
+      totals.educationExpenseRUSD -
+      totals.trainingExpenseRUSD -
+      totals.militaryExpenseRUSD;
   }
   // Zero-only annual budget entries carry no information; omit them exactly as
   // monthly summaries do. Missing entries are treated as zero by reporting.
@@ -896,25 +896,25 @@ function buildAnnualSummary(
   const closingBalances: Record<Id, AnnualClosingBalances> = {};
   for (const country of world.countries) {
     closingBalances[country.id] = {
-      treasuryCashSUSD: 0,
-      debtLiabilitySUSD: 0,
-      interestPayableSUSD: 0,
+      treasuryCashRUSD: 0,
+      debtLiabilityRUSD: 0,
+      interestPayableRUSD: 0,
     };
   }
   for (const account of finance.accounts) {
     if (account.ownerKind !== "country" || account.ownerId === null) continue;
     const balances = closingBalances[account.ownerId];
     if (balances === undefined) continue;
-    let treasury = balances.treasuryCashSUSD;
-    let debt = balances.debtLiabilitySUSD;
-    let interest = balances.interestPayableSUSD;
-    if (account.subtype === "treasury-cash") treasury += account.balanceSUSD;
-    else if (account.subtype === "debt-liability") debt += account.balanceSUSD;
-    else if (account.subtype === "interest-payable") interest += account.balanceSUSD;
+    let treasury = balances.treasuryCashRUSD;
+    let debt = balances.debtLiabilityRUSD;
+    let interest = balances.interestPayableRUSD;
+    if (account.subtype === "treasury-cash") treasury += account.balanceRUSD;
+    else if (account.subtype === "debt-liability") debt += account.balanceRUSD;
+    else if (account.subtype === "interest-payable") interest += account.balanceRUSD;
     closingBalances[account.ownerId] = {
-      treasuryCashSUSD: treasury,
-      debtLiabilitySUSD: debt,
-      interestPayableSUSD: interest,
+      treasuryCashRUSD: treasury,
+      debtLiabilityRUSD: debt,
+      interestPayableRUSD: interest,
     };
   }
 

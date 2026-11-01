@@ -10,19 +10,19 @@ export interface IndustrialSectorPreview {
   readonly key: string;
   readonly label: string;
   readonly rate: number;
-  readonly estimatedDailyOutputValueSUSD: number;
-  readonly estimatedDailySubsidySUSD: number;
+  readonly estimatedDailyOutputValueRUSD: number;
+  readonly estimatedDailySubsidyRUSD: number;
 }
 
 export interface IndustrialPolicyPreview {
   readonly valid: boolean;
   readonly errors: readonly string[];
   readonly sectors: readonly IndustrialSectorPreview[];
-  readonly estimatedDailySubsidySUSD: number;
-  readonly treasuryCashSUSD: number;
-  readonly requestedMonthToDateSUSD: number;
-  readonly paidMonthToDateSUSD: number;
-  readonly shortfallMonthToDateSUSD: number;
+  readonly estimatedDailySubsidyRUSD: number;
+  readonly treasuryCashRUSD: number;
+  readonly requestedMonthToDateRUSD: number;
+  readonly paidMonthToDateRUSD: number;
+  readonly shortfallMonthToDateRUSD: number;
   readonly constraints: readonly string[];
 }
 
@@ -53,15 +53,15 @@ export function previewIndustrialPolicy(
       key: sector.key,
       label: sector.label,
       rate,
-      estimatedDailyOutputValueSUSD: sector.estimatedDailyOutputValueSUSD,
-      estimatedDailySubsidySUSD: sector.estimatedDailyOutputValueSUSD * rate,
+      estimatedDailyOutputValueRUSD: sector.estimatedDailyOutputValueRUSD,
+      estimatedDailySubsidyRUSD: sector.estimatedDailyOutputValueRUSD * rate,
     };
   });
-  const estimatedDailySubsidySUSD = sectors.reduce(
-    (total, sector) => total + sector.estimatedDailySubsidySUSD,
+  const estimatedDailySubsidyRUSD = sectors.reduce(
+    (total, sector) => total + sector.estimatedDailySubsidyRUSD,
     0,
   );
-  if (estimatedDailySubsidySUSD > country.treasuryCashSUSD) {
+  if (estimatedDailySubsidyRUSD > country.treasuryCashRUSD) {
     constraints.push(
       "The static daily entitlement exceeds current treasury cash; actual payment will be rationed in building-id order and the unpaid part reported as a shortfall.",
     );
@@ -76,11 +76,11 @@ export function previewIndustrialPolicy(
     valid: errors.length === 0,
     errors,
     sectors,
-    estimatedDailySubsidySUSD,
-    treasuryCashSUSD: country.treasuryCashSUSD,
-    requestedMonthToDateSUSD: country.industrialPolicy.requestedMonthToDateSUSD,
-    paidMonthToDateSUSD: country.industrialPolicy.paidMonthToDateSUSD,
-    shortfallMonthToDateSUSD: country.industrialPolicy.shortfallMonthToDateSUSD,
+    estimatedDailySubsidyRUSD,
+    treasuryCashRUSD: country.treasuryCashRUSD,
+    requestedMonthToDateRUSD: country.industrialPolicy.requestedMonthToDateRUSD,
+    paidMonthToDateRUSD: country.industrialPolicy.paidMonthToDateRUSD,
+    shortfallMonthToDateRUSD: country.industrialPolicy.shortfallMonthToDateRUSD,
     constraints,
   };
 }
@@ -89,9 +89,9 @@ export interface PublicEnterpriseSupportPreview {
   readonly valid: boolean;
   readonly errors: readonly string[];
   readonly buildingId: number;
-  readonly amountSUSD: number;
-  readonly treasuryCashSUSD: number;
-  readonly operatingCashSUSD: number;
+  readonly amountRUSD: number;
+  readonly treasuryCashRUSD: number;
+  readonly operatingCashRUSD: number;
   readonly constraints: readonly string[];
 }
 
@@ -100,7 +100,7 @@ export function previewPublicEnterpriseSupport(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
   buildingId: number,
-  amountSUSD: number,
+  amountRUSD: number,
 ): PublicEnterpriseSupportPreview {
   const errors: string[] = [];
   const enterprise = country.publicEnterprises.find(
@@ -112,18 +112,18 @@ export function previewPublicEnterpriseSupport(
   if (snapshot.playerCountryId !== country.id) {
     errors.push("Only the player-controlled country may support a public enterprise.");
   }
-  if (!Number.isFinite(amountSUSD) || !(amountSUSD > 0)) {
+  if (!Number.isFinite(amountRUSD) || !(amountRUSD > 0)) {
     errors.push("The support amount must be positive.");
-  } else if (amountSUSD > country.treasuryCashSUSD + 1e-6) {
+  } else if (amountRUSD > country.treasuryCashRUSD + 1e-6) {
     errors.push("Treasury cash does not cover the support amount.");
   }
   return {
     valid: errors.length === 0,
     errors,
     buildingId,
-    amountSUSD,
-    treasuryCashSUSD: country.treasuryCashSUSD,
-    operatingCashSUSD: enterprise?.operatingCashSUSD ?? 0,
+    amountRUSD,
+    treasuryCashRUSD: country.treasuryCashRUSD,
+    operatingCashRUSD: enterprise?.operatingCashRUSD ?? 0,
     constraints: [
       "The payment is a capital contribution from country treasury/equity to the enterprise's operating cash/equity; it is not an expense, loan, or guaranteed return.",
       "It does not guarantee inputs, sales, profitability, or continued operation; ordinary production, wages, upkeep, tax, and remittance still apply.",

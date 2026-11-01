@@ -32,11 +32,14 @@ export interface ProvinceFuturePolity {
   readonly tag: string;
   readonly historicalName: string;
   readonly commonName: string;
+  /** Optional 1900-active registry kind; absent means a future state. */
+  readonly kind?: "state" | "territory" | "future-state" | "historical";
   readonly status: string;
   readonly activeFrom: string;
   readonly activeTo: string | null;
   readonly capitalName: string;
   readonly flagKey: string | null;
+  readonly selectable1900?: boolean;
   readonly confidence: ProvinceConfidence;
   readonly notes: string;
 }

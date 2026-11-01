@@ -164,7 +164,7 @@ describe("M5 historical data pipeline", () => {
       countries: {
         id: number;
         sourceIds: string[];
-        currency: { valuation: { status: string; susdPerUnit?: number; sourceIds?: string[] } };
+        currency: { valuation: { status: string; rusdPerUnit?: number; sourceIds?: string[] } };
         fiscal: { incomeTaxRate: number };
       }[];
       calibration: { sourceIds: string[] }[];
@@ -172,14 +172,14 @@ describe("M5 historical data pipeline", () => {
     broken.countries[0]!.sourceIds = ["missing-source"];
     broken.countries[1]!.currency.valuation = {
       status: "specified",
-      susdPerUnit: -1,
+      rusdPerUnit: -1,
       sourceIds: ["missing-source"],
     };
     broken.countries[2]!.fiscal.incomeTaxRate = 1.5;
     broken.calibration[0]!.sourceIds = [];
     const validation = validateM5HistoricalData(broken as unknown as HistoricalData);
     expect(validation.errors.some((error) => error.includes("missing-source"))).toBe(true);
-    expect(validation.errors.some((error) => error.includes("susdPerUnit"))).toBe(true);
+    expect(validation.errors.some((error) => error.includes("rusdPerUnit"))).toBe(true);
     expect(validation.errors.some((error) => error.includes("incomeTaxRate"))).toBe(true);
     expect(validation.errors.some((error) => error.includes("at least one source"))).toBe(true);
   });

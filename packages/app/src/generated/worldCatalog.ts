@@ -11,7 +11,7 @@ export const WORLD_CATALOG = ({
   "meta": {
     "version": "m11-1900-v2",
     "startDate": "1900-01-01",
-    "title": "Century historical polity catalog, 1 January 1900",
+    "title": "Fabric of Nations historical polity catalog, 1 January 1900",
     "classification": {
       "source": "Gleditsch-Ward / Correlates of War independent-state tradition as documented by CShapes 2.0",
       "selectableStatuses": [
@@ -55,7 +55,7 @@ export const WORLD_CATALOG = ({
       },
       {
         "id": "project-authored-1900",
-        "title": "Century M11 authored 1900 world content",
+        "title": "Fabric of Nations M11 authored 1900 world content",
         "license": "Project data",
         "notes": "Status, capitals, market grouping, geometry crosswalk, fiscal, technology and building starts are authored provisional inputs."
       }

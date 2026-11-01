@@ -8,16 +8,16 @@
  */
 
 import { CURRENCY_RATE_MAX, CURRENCY_RATE_MIN } from "../constants.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Id } from "../types.js";
 import type { World } from "../world.js";
 import { FX_MAX_RATIO, FX_MIN_RATIO, MAX_PRICE_INDEX_OBSERVATIONS } from "./constants.js";
-import { asSusdPerCurrencyUnit } from "./currency.js";
+import { asRusdPerCurrencyUnit } from "./currency.js";
 import { MONETARY_REGIMES } from "./types.js";
 import type {
   MonetaryState,
   PriceIndexState,
-  SusdPerCurrencyUnit,
+  RusdPerCurrencyUnit,
 } from "./types.js";
 
 /** Empty price-index state for population-only worlds. */
@@ -35,29 +35,29 @@ export function emptyMonetaryState(): MonetaryState {
   return { enabled: false, currencies: [], lastUpdateDay: null };
 }
 
-export function parseCurrencyRate(value: unknown, path: string): SusdPerCurrencyUnit {
+export function parseCurrencyRate(value: unknown, path: string): RusdPerCurrencyUnit {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new RangeError(`${path} must be a finite number`);
   }
   if (!(value > 0) || value < CURRENCY_RATE_MIN || value > CURRENCY_RATE_MAX) {
-    throw new RangeError(`${path} must be a positive SUSD-per-unit valuation in range`);
+    throw new RangeError(`${path} must be a positive RUSD-per-unit valuation in range`);
   }
-  return asSusdPerCurrencyUnit(value);
+  return asRusdPerCurrencyUnit(value);
 }
 
-export function accountBalanceSUSD(world: World, accountId: Id | null): number {
+export function accountBalanceRUSD(world: World, accountId: Id | null): number {
   if (accountId === null) return 0;
   const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) {
     throw new RangeError(`monetary authority references unknown account ${String(accountId)}`);
   }
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
-export function currencyValuationOf(world: World, currencyId: Id): SusdPerCurrencyUnit | null {
+export function currencyValuationOf(world: World, currencyId: Id): RusdPerCurrencyUnit | null {
   const valuation = world.currencyValuations.find((entry) => entry.currencyId === currencyId);
   if (valuation === undefined || valuation.status !== "specified") return null;
-  return valuation.susdPerUnit;
+  return valuation.rusdPerUnit;
 }
 
 /** Validate the price-index state against markets, goods, and countries. */
@@ -79,7 +79,7 @@ export function assertValidPriceIndexState(world: World, path = "world.priceInde
     }
     return;
   }
-  const goodCount = world.markets[0]?.priceSUSD.length ?? 0;
+  const goodCount = world.markets[0]?.priceRUSD.length ?? 0;
   let previousGoodId = -1;
   let totalWeight = 0;
   for (let index = 0; index < state.basket.length; index += 1) {
@@ -215,15 +215,15 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
     if (!Number.isFinite(record.currencyIssuedUnits) || record.currencyIssuedUnits < 0) {
       throw new RangeError(`${entryPath}.currencyIssuedUnits must be finite and non-negative`);
     }
-    for (const field of ["paritySusdPerUnit", "referenceParitySusdPerUnit"] as const) {
+    for (const field of ["parityRusdPerUnit", "referenceParityRusdPerUnit"] as const) {
       const value = record[field];
       if (value !== null) parseCurrencyRate(value, `${entryPath}.${field}`);
     }
-    if (!Number.isFinite(record.lastMonthExportsSUSD) || record.lastMonthExportsSUSD < 0) {
-      throw new RangeError(`${entryPath}.lastMonthExportsSUSD must be finite and non-negative`);
+    if (!Number.isFinite(record.lastMonthExportsRUSD) || record.lastMonthExportsRUSD < 0) {
+      throw new RangeError(`${entryPath}.lastMonthExportsRUSD must be finite and non-negative`);
     }
-    if (!Number.isFinite(record.lastMonthImportsSUSD) || record.lastMonthImportsSUSD < 0) {
-      throw new RangeError(`${entryPath}.lastMonthImportsSUSD must be finite and non-negative`);
+    if (!Number.isFinite(record.lastMonthImportsRUSD) || record.lastMonthImportsRUSD < 0) {
+      throw new RangeError(`${entryPath}.lastMonthImportsRUSD must be finite and non-negative`);
     }
     for (const [field, value] of [
       ["lastParityChangeDay", record.lastParityChangeDay],
@@ -267,7 +267,7 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
       }
     }
     if (record.active) {
-      if (record.paritySusdPerUnit === null || record.referenceParitySusdPerUnit === null) {
+      if (record.parityRusdPerUnit === null || record.referenceParityRusdPerUnit === null) {
         throw new RangeError(`${entryPath} active authority requires a parity`);
       }
       const valuation = currencyValuationOf(world, record.currencyId);
@@ -276,13 +276,13 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
       }
       if (record.regime === "pegged") {
         if (
-          Math.abs(valuation - record.paritySusdPerUnit) >
-          Math.abs(record.paritySusdPerUnit) * 1e-12
+          Math.abs(valuation - record.parityRusdPerUnit) >
+          Math.abs(record.parityRusdPerUnit) * 1e-12
         ) {
           throw new RangeError(`${entryPath} pegged valuation must equal its parity`);
         }
       } else {
-        const reference = record.referenceParitySusdPerUnit;
+        const reference = record.referenceParityRusdPerUnit;
         if (
           valuation < reference * FX_MIN_RATIO - 1e-12 ||
           valuation > reference * FX_MAX_RATIO + 1e-12
@@ -290,18 +290,18 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
           throw new RangeError(`${entryPath} managed valuation is outside the allowed band`);
         }
       }
-      const liability = accountBalanceSUSD(world, record.liabilityAccountId);
+      const liability = accountBalanceRUSD(world, record.liabilityAccountId);
       const expectedLiability = record.currencyIssuedUnits * valuation;
       if (
         Math.abs(liability - expectedLiability) >
-        MONEY_TOLERANCE_SUSD * Math.max(1, expectedLiability)
+        MONEY_TOLERANCE_RUSD * Math.max(1, expectedLiability)
       ) {
         throw new RangeError(`${entryPath} currency liability does not match units × valuation`);
       }
-      const holding = accountBalanceSUSD(world, record.externalCurrencyAccountId);
+      const holding = accountBalanceRUSD(world, record.externalCurrencyAccountId);
       if (
         Math.abs(holding - expectedLiability) >
-        MONEY_TOLERANCE_SUSD * Math.max(1, expectedLiability)
+        MONEY_TOLERANCE_RUSD * Math.max(1, expectedLiability)
       ) {
         throw new RangeError(`${entryPath} external holding does not match the liability`);
       }

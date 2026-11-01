@@ -10,9 +10,9 @@
 import type { CountrySnapshot, SnapshotAnnualReport, SnapshotFinancePeriod } from "./protocol.js";
 
 export interface MonthlyBalanceChange {
-  readonly endSUSD: number;
+  readonly endRUSD: number;
   /** Change from the previous detailed close, or null when not derivable. */
-  readonly changeSUSD: number | null;
+  readonly changeRUSD: number | null;
 }
 
 export interface MonthlyEconomicReport {
@@ -20,33 +20,33 @@ export interface MonthlyEconomicReport {
   readonly periodEndDay: number;
   readonly periodStartLabel: string;
   readonly periodEndLabel: string;
-  readonly incomeTaxSUSD: number;
-  readonly businessTaxRevenueSUSD: number;
-  readonly welfareRequestedSUSD: number;
-  readonly welfareExpenseSUSD: number;
-  readonly welfareShortfallSUSD: number;
-  readonly businessTaxAssessedSUSD: number;
-  readonly businessTaxUncollectedSUSD: number;
-  readonly debtIssuedSUSD: number;
-  readonly principalRepaidSUSD: number;
-  readonly interestExpenseSUSD: number;
-  readonly interestPaidSUSD: number;
-  readonly unfinancedRequirementSUSD: number;
-  readonly constructionSpentSUSD: number;
-  readonly constructionWrittenOffSUSD: number;
-  readonly constructionMaterialsSpentSUSD: number;
-  readonly subsidyRequestedSUSD: number;
-  readonly subsidyShortfallSUSD: number;
-  readonly publicEnterpriseSupportSUSD: number;
-  readonly subsidyExpenseSUSD: number;
-  readonly administrationRequestedSUSD: number;
-  readonly administrationExpenseSUSD: number;
-  readonly administrationShortfallSUSD: number;
-  readonly educationExpenseSUSD: number;
-  readonly trainingExpenseSUSD: number;
-  readonly customsDutyRevenueSUSD: number;
-  readonly militaryExpenseSUSD: number;
-  readonly netFiscalResultSUSD: number;
+  readonly incomeTaxRUSD: number;
+  readonly businessTaxRevenueRUSD: number;
+  readonly welfareRequestedRUSD: number;
+  readonly welfareExpenseRUSD: number;
+  readonly welfareShortfallRUSD: number;
+  readonly businessTaxAssessedRUSD: number;
+  readonly businessTaxUncollectedRUSD: number;
+  readonly debtIssuedRUSD: number;
+  readonly principalRepaidRUSD: number;
+  readonly interestExpenseRUSD: number;
+  readonly interestPaidRUSD: number;
+  readonly unfinancedRequirementRUSD: number;
+  readonly constructionSpentRUSD: number;
+  readonly constructionWrittenOffRUSD: number;
+  readonly constructionMaterialsSpentRUSD: number;
+  readonly subsidyRequestedRUSD: number;
+  readonly subsidyShortfallRUSD: number;
+  readonly publicEnterpriseSupportRUSD: number;
+  readonly subsidyExpenseRUSD: number;
+  readonly administrationRequestedRUSD: number;
+  readonly administrationExpenseRUSD: number;
+  readonly administrationShortfallRUSD: number;
+  readonly educationExpenseRUSD: number;
+  readonly trainingExpenseRUSD: number;
+  readonly customsDutyRevenueRUSD: number;
+  readonly militaryExpenseRUSD: number;
+  readonly netFiscalResultRUSD: number;
   readonly grossFlowTotals: Readonly<Record<string, number>>;
   readonly detailedBalances: boolean;
   readonly treasuryCash: MonthlyBalanceChange | null;
@@ -60,8 +60,8 @@ function balanceChange(
 ): MonthlyBalanceChange | null {
   if (current === null) return null;
   return {
-    endSUSD: current,
-    changeSUSD: previous === null ? null : current - previous,
+    endRUSD: current,
+    changeRUSD: previous === null ? null : current - previous,
   };
 }
 
@@ -78,43 +78,43 @@ export function buildMonthlyReports(country: CountrySnapshot): readonly MonthlyE
       periodEndDay: period.periodEndDay,
       periodStartLabel: period.periodStartLabel,
       periodEndLabel: period.periodEndLabel,
-      incomeTaxSUSD: period.incomeTaxSUSD,
-      businessTaxRevenueSUSD: period.businessTaxRevenueSUSD,
-      welfareRequestedSUSD: period.welfareRequestedSUSD,
-      welfareExpenseSUSD: period.welfareExpenseSUSD,
-      welfareShortfallSUSD: period.welfareShortfallSUSD,
-      businessTaxAssessedSUSD: period.businessTaxAssessedSUSD,
-      businessTaxUncollectedSUSD: period.businessTaxUncollectedSUSD,
-      debtIssuedSUSD: period.debtIssuedSUSD,
-      principalRepaidSUSD: period.principalRepaidSUSD,
-      interestExpenseSUSD: period.interestExpenseSUSD,
-      interestPaidSUSD: period.interestPaidSUSD,
-      unfinancedRequirementSUSD: period.unfinancedRequirementSUSD,
-      constructionSpentSUSD: period.constructionSpentSUSD,
-      constructionWrittenOffSUSD: period.constructionWrittenOffSUSD,
-      constructionMaterialsSpentSUSD: period.constructionMaterialsSpentSUSD,
-      subsidyRequestedSUSD: period.subsidyRequestedSUSD,
-      subsidyShortfallSUSD: period.subsidyShortfallSUSD,
-      publicEnterpriseSupportSUSD: period.publicEnterpriseSupportSUSD,
-      subsidyExpenseSUSD: period.subsidyExpenseSUSD,
-      administrationRequestedSUSD: period.administrationRequestedSUSD ?? 0,
-      administrationExpenseSUSD: period.administrationExpenseSUSD ?? 0,
-      administrationShortfallSUSD: period.administrationShortfallSUSD ?? 0,
-      educationExpenseSUSD: period.educationExpenseSUSD ?? 0,
-      trainingExpenseSUSD: period.trainingExpenseSUSD ?? 0,
-      customsDutyRevenueSUSD: period.customsDutyRevenueSUSD ?? 0,
-      militaryExpenseSUSD: period.militaryExpenseSUSD ?? 0,
-      netFiscalResultSUSD: period.netFiscalResultSUSD,
+      incomeTaxRUSD: period.incomeTaxRUSD,
+      businessTaxRevenueRUSD: period.businessTaxRevenueRUSD,
+      welfareRequestedRUSD: period.welfareRequestedRUSD,
+      welfareExpenseRUSD: period.welfareExpenseRUSD,
+      welfareShortfallRUSD: period.welfareShortfallRUSD,
+      businessTaxAssessedRUSD: period.businessTaxAssessedRUSD,
+      businessTaxUncollectedRUSD: period.businessTaxUncollectedRUSD,
+      debtIssuedRUSD: period.debtIssuedRUSD,
+      principalRepaidRUSD: period.principalRepaidRUSD,
+      interestExpenseRUSD: period.interestExpenseRUSD,
+      interestPaidRUSD: period.interestPaidRUSD,
+      unfinancedRequirementRUSD: period.unfinancedRequirementRUSD,
+      constructionSpentRUSD: period.constructionSpentRUSD,
+      constructionWrittenOffRUSD: period.constructionWrittenOffRUSD,
+      constructionMaterialsSpentRUSD: period.constructionMaterialsSpentRUSD,
+      subsidyRequestedRUSD: period.subsidyRequestedRUSD,
+      subsidyShortfallRUSD: period.subsidyShortfallRUSD,
+      publicEnterpriseSupportRUSD: period.publicEnterpriseSupportRUSD,
+      subsidyExpenseRUSD: period.subsidyExpenseRUSD,
+      administrationRequestedRUSD: period.administrationRequestedRUSD ?? 0,
+      administrationExpenseRUSD: period.administrationExpenseRUSD ?? 0,
+      administrationShortfallRUSD: period.administrationShortfallRUSD ?? 0,
+      educationExpenseRUSD: period.educationExpenseRUSD ?? 0,
+      trainingExpenseRUSD: period.trainingExpenseRUSD ?? 0,
+      customsDutyRevenueRUSD: period.customsDutyRevenueRUSD ?? 0,
+      militaryExpenseRUSD: period.militaryExpenseRUSD ?? 0,
+      netFiscalResultRUSD: period.netFiscalResultRUSD,
       grossFlowTotals: period.grossFlowTotals,
-      detailedBalances: period.treasuryCashEndSUSD !== null,
-      treasuryCash: balanceChange(period.treasuryCashEndSUSD, previous?.treasuryCashEndSUSD ?? null),
+      detailedBalances: period.treasuryCashEndRUSD !== null,
+      treasuryCash: balanceChange(period.treasuryCashEndRUSD, previous?.treasuryCashEndRUSD ?? null),
       debtOutstanding: balanceChange(
-        period.debtOutstandingEndSUSD,
-        previous?.debtOutstandingEndSUSD ?? null,
+        period.debtOutstandingEndRUSD,
+        previous?.debtOutstandingEndRUSD ?? null,
       ),
       householdCash: balanceChange(
-        period.householdCashEndSUSD,
-        previous?.householdCashEndSUSD ?? null,
+        period.householdCashEndRUSD,
+        previous?.householdCashEndRUSD ?? null,
       ),
     });
   }

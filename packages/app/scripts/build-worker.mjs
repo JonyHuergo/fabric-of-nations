@@ -72,7 +72,7 @@ const output = result.outputFiles?.[0];
 if (output === undefined) throw new Error("esbuild produced no worker output");
 const script = output.text;
 if (!script.includes("SimulationHost") && !script.includes("READY")) {
-  throw new Error("worker bundle does not look like the Century worker entry");
+  throw new Error("worker bundle does not look like the Fabric of Nations worker entry");
 }
 const escapedScript = script.replace(/<\/script/gi, "<\\/script");
 const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head><body><script>${escapedScript}</script></body></html>`;

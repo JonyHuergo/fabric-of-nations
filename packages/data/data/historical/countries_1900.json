@@ -16,16 +16,16 @@
     },
     "fiscal": {
       "incomeTaxRate": 0,
-      "welfareBudgetSUSDPerYear": 2000000
+      "welfareBudgetRUSDPerYear": 2000000
     },
-    "initialTreasuryCashSUSD": 100000,
+    "initialTreasuryCashRUSD": 100000,
     "debt": {
       "enabled": true,
       "creditorKind": "country",
       "creditorId": 1,
       "annualCouponRate": 0.04,
       "termDays": 365,
-      "maxOutstandingPrincipalSUSD": 1000000,
+      "maxOutstandingPrincipalRUSD": 1000000,
       "refinanceOnMaturity": true,
       "arrearsGraceDays": 365
     },
@@ -46,7 +46,7 @@
         "labor": "labor-association",
         "trade": "trade-open"
       },
-      "institutionFundingSUSDPerYear": 120000
+      "institutionFundingRUSDPerYear": 120000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -57,7 +57,7 @@
         "electrical-generation",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 60000,
+      "educationFundingRUSDPerYear": 60000,
       "researchStaffShare": 0.2
     }
   },
@@ -78,9 +78,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.05,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 2075000,
+    "initialTreasuryCashRUSD": 2075000,
     "immigrationOpen": true,
     "sourceIds": [
       "owid-population",
@@ -98,7 +98,7 @@
         "labor": "labor-association",
         "trade": "trade-open"
       },
-      "institutionFundingSUSDPerYear": 80000
+      "institutionFundingRUSDPerYear": 80000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -109,7 +109,7 @@
         "printing-industry",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 30000,
+      "educationFundingRUSDPerYear": 30000,
       "researchStaffShare": 0.2
     }
   },
@@ -130,9 +130,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.06,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 2800000,
+    "initialTreasuryCashRUSD": 2800000,
     "immigrationOpen": false,
     "sourceIds": [
       "owid-population",
@@ -150,7 +150,7 @@
         "labor": "labor-association",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 70000
+      "institutionFundingRUSDPerYear": 70000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -161,7 +161,7 @@
         "chemical-fertilizer",
         "university-system"
       ],
-      "educationFundingSUSDPerYear": 40000,
+      "educationFundingRUSDPerYear": 40000,
       "researchStaffShare": 0.25
     }
   },
@@ -182,9 +182,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.05,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 1945000,
+    "initialTreasuryCashRUSD": 1945000,
     "immigrationOpen": false,
     "sourceIds": [
       "owid-population",
@@ -202,7 +202,7 @@
         "labor": "labor-association",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 60000
+      "institutionFundingRUSDPerYear": 60000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -213,7 +213,7 @@
         "university-system",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 30000,
+      "educationFundingRUSDPerYear": 30000,
       "researchStaffShare": 0.2
     }
   },
@@ -234,9 +234,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.03,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 6800000,
+    "initialTreasuryCashRUSD": 6800000,
     "immigrationOpen": false,
     "sourceIds": [
       "owid-population",
@@ -254,7 +254,7 @@
         "labor": "labor-repression",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 90000
+      "institutionFundingRUSDPerYear": 90000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -263,7 +263,7 @@
         "primary-schooling",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 40000,
+      "educationFundingRUSDPerYear": 40000,
       "researchStaffShare": 0.1
     }
   },
@@ -284,9 +284,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.05,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 2200000,
+    "initialTreasuryCashRUSD": 2200000,
     "immigrationOpen": false,
     "sourceIds": [
       "owid-population",
@@ -304,7 +304,7 @@
         "labor": "labor-repression",
         "trade": "trade-restricted"
       },
-      "institutionFundingSUSDPerYear": 50000
+      "institutionFundingRUSDPerYear": 50000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -313,7 +313,7 @@
         "primary-schooling",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 25000,
+      "educationFundingRUSDPerYear": 25000,
       "researchStaffShare": 0.2
     }
   },
@@ -334,9 +334,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.02,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 11900000,
+    "initialTreasuryCashRUSD": 11900000,
     "immigrationOpen": true,
     "sourceIds": [
       "owid-population",
@@ -354,14 +354,14 @@
         "labor": "labor-repression",
         "trade": "trade-open"
       },
-      "institutionFundingSUSDPerYear": 100000
+      "institutionFundingRUSDPerYear": 100000
     },
     "technology": {
       "researchedTechnologyKeys": [
         "steam-power",
         "primary-schooling"
       ],
-      "educationFundingSUSDPerYear": 30000,
+      "educationFundingRUSDPerYear": 30000,
       "researchStaffShare": 0.1
     }
   },
@@ -382,9 +382,9 @@
     },
     "fiscal": {
       "incomeTaxRate": 0.02,
-      "welfareBudgetSUSDPerYear": 0
+      "welfareBudgetRUSDPerYear": 0
     },
-    "initialTreasuryCashSUSD": 880000,
+    "initialTreasuryCashRUSD": 880000,
     "immigrationOpen": true,
     "sourceIds": [
       "owid-population",
@@ -402,7 +402,7 @@
         "labor": "labor-repression",
         "trade": "trade-open"
       },
-      "institutionFundingSUSDPerYear": 40000
+      "institutionFundingRUSDPerYear": 40000
     },
     "technology": {
       "researchedTechnologyKeys": [
@@ -410,7 +410,7 @@
         "primary-schooling",
         "basic-sanitation"
       ],
-      "educationFundingSUSDPerYear": 10000,
+      "educationFundingRUSDPerYear": 10000,
       "researchStaffShare": 0.1
     }
   }

@@ -7,7 +7,7 @@
  * world so a save can be matched to the same definitions.
  */
 
-import type { Day, Id, MoneySUSD, Rate } from "../types.js";
+import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { EconomyDefinitions } from "../economy/types.js";
 import type { NeedTier } from "./constants.js";
 
@@ -160,7 +160,7 @@ export interface PopBlockInitialDef {
   femaleAgeGroups: readonly number[];
   literacy: Rate;
   wealthLevel: number;
-  initialSavingsSUSD: MoneySUSD;
+  initialSavingsRUSD: MoneyRUSD;
   militancy: Rate;
 }
 
@@ -187,7 +187,7 @@ export interface PopulationScenarioDef {
 
 export interface GoodPriceInput {
   goodKey: string;
-  unitPriceSUSD: number;
+  unitPriceRUSD: number;
 }
 
 export interface GoodSupplyInput {
@@ -197,8 +197,8 @@ export interface GoodSupplyInput {
 
 export interface PopBlockIncomeInput {
   popBlockId: Id;
-  annualSettledIncomePerCapitaSUSD: number;
-  annualMandatoryPaymentsPerCapitaSUSD: number;
+  annualSettledIncomePerCapitaRUSD: number;
+  annualMandatoryPaymentsPerCapitaRUSD: number;
 }
 
 export interface PopulationInputs {
@@ -239,9 +239,9 @@ export interface NeedTierSummary {
   tier: NeedTier;
   active: boolean;
   fullyMet: boolean;
-  desiredCostSUSD: number;
-  fundedCostSUSD: number;
-  spentSUSD: number;
+  desiredCostRUSD: number;
+  fundedCostRUSD: number;
+  spentRUSD: number;
 }
 
 export interface NeedTierResult extends NeedTierSummary {
@@ -252,10 +252,10 @@ export interface PopBlockNeedsResult {
   popBlockId: Id;
   population: number;
   /** Cash/goods budget at the start of the needs phase, before market spending. */
-  budgetStartBeforeNeedsSUSD: number;
+  budgetStartBeforeNeedsRUSD: number;
   /** Remaining budget after needs spending; excludes any later fiscal phase. */
-  budgetEndAfterNeedsSUSD: number;
-  spentSUSD: number;
+  budgetEndAfterNeedsRUSD: number;
+  spentRUSD: number;
   tiers: readonly NeedTierResult[];
   tierSummaries: readonly NeedTierSummary[];
 }
@@ -293,8 +293,8 @@ export interface WealthUpdate {
   oldWealthLevel: number;
   targetWealthLevel: number;
   newWealthLevel: number;
-  annualDisposableIncomePerCapitaSUSD: number;
-  annualSubsistenceCostPerCapitaSUSD: number;
+  annualDisposableIncomePerCapitaRUSD: number;
+  annualSubsistenceCostPerCapitaRUSD: number;
 }
 
 export interface PopulationTickResult {

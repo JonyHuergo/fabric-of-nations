@@ -232,8 +232,13 @@ export function assertValidPolityRegistry(
       minLength: 1,
       maxLength: MAX_POLITY_NAME_LENGTH,
     });
-    if (polity.kind !== "state" && polity.kind !== "territory" && polity.kind !== "future-state") {
-      throw new RangeError(`${path}.kind must be state, territory or future-state`);
+    if (
+      polity.kind !== "state" &&
+      polity.kind !== "territory" &&
+      polity.kind !== "future-state" &&
+      polity.kind !== "historical"
+    ) {
+      throw new RangeError(`${path}.kind must be state, territory, future-state or historical`);
     }
     requireString(polity.status, `${path}.status`, { minLength: 1, maxLength: 32 });
     if (!(COUNTRY_STATUSES as readonly string[]).includes(polity.status)) {
@@ -257,6 +262,12 @@ export function assertValidPolityRegistry(
     }
     if (polity.kind === "future-state" && polity.activeFromDay === CAMPAIGN_START_DAY_INDEX) {
       throw new RangeError(`${path} is a future state and cannot be active in 1900`);
+    }
+    if (polity.kind === "historical" && polity.selectable1900) {
+      throw new RangeError(`${path} is a historical registry polity and cannot be selectable in 1900`);
+    }
+    if (polity.kind === "historical" && countryIds.has(polity.polityId)) {
+      throw new RangeError(`${path} is a historical registry polity and reuses a simulation country id`);
     }
     if (countryIds.has(polity.polityId) && polity.kind === "future-state") {
       throw new RangeError(`${path} reuses an active simulation country id`);

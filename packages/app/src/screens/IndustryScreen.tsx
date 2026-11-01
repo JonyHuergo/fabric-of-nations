@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewIndustrialPolicy,
   previewPublicEnterpriseSupport,
   type SimulationSnapshot,
@@ -44,7 +44,7 @@ function EnterpriseSupportField({
       max={max}
       step={Math.max(1, Math.round(max / 100))}
       precision={0}
-      unit="SUSD"
+      unit="RUSD"
       disabled={disabled}
       pending={commit.hasPending}
       onChange={onChange}
@@ -133,12 +133,12 @@ export function IndustryScreen({
     return Number.isFinite(parsed) ? parsed / 100 : Number.NaN;
   });
   const preview = previewIndustrialPolicy(snapshot, country, rates);
-  const applyEnterpriseSupport = (buildingId: number, amountSUSD: number): void => {
+  const applyEnterpriseSupport = (buildingId: number, amountRUSD: number): void => {
     const support = previewPublicEnterpriseSupport(
       snapshot,
       country,
       buildingId,
-      amountSUSD,
+      amountRUSD,
     );
     if (!support.valid) {
       setLocalError(support.errors.join(" "));
@@ -149,7 +149,7 @@ export function IndustryScreen({
       kind: "support-public-enterprise",
       countryId: country.id,
       buildingId,
-      amountSUSD,
+      amountRUSD,
     });
   };
 
@@ -161,12 +161,12 @@ export function IndustryScreen({
       >
         <StatRow
           label="Treasury cash (stock)"
-          value={formatSUSD(country.treasuryCashSUSD)}
-          detail={`Subsidy requested this month ${formatSUSD(country.industrialPolicy.requestedMonthToDateSUSD)} · paid ${formatSUSD(country.industrialPolicy.paidMonthToDateSUSD)} · shortfall ${formatSUSD(country.industrialPolicy.shortfallMonthToDateSUSD)}`}
+          value={formatRUSD(country.treasuryCashRUSD)}
+          detail={`Subsidy requested this month ${formatRUSD(country.industrialPolicy.requestedMonthToDateRUSD)} · paid ${formatRUSD(country.industrialPolicy.paidMonthToDateRUSD)} · shortfall ${formatRUSD(country.industrialPolicy.shortfallMonthToDateRUSD)}`}
         />
         <StatRow
           label="Static daily subsidy estimate"
-          value={formatSUSD(preview.estimatedDailySubsidySUSD)}
+          value={formatRUSD(preview.estimatedDailySubsidyRUSD)}
           detail="Current sector capacity valued at current market prices times the proposed rates. Actual payment uses verified daily output and actual cash."
         />
       </Section>
@@ -185,7 +185,7 @@ export function IndustryScreen({
               <View style={styles.rowText}>
                 <Text style={styles.label}>{sector.label}</Text>
                 <Text style={styles.detail}>
-                  Current capacity value {formatSUSD(sector.estimatedDailyOutputValueSUSD)}/day · policy rate{" "}
+                  Current capacity value {formatRUSD(sector.estimatedDailyOutputValueRUSD)}/day · policy rate{" "}
                   {(sector.subsidyRate * 100).toFixed(2)}%
                 </Text>
               </View>
@@ -245,7 +245,7 @@ export function IndustryScreen({
         ) : (
           country.publicEnterprises.map((enterprise) => {
             const amount = Number(supportTexts[enterprise.buildingId] ?? "");
-            const maxSupport = Math.max(0, Math.floor(country.treasuryCashSUSD));
+            const maxSupport = Math.max(0, Math.floor(country.treasuryCashRUSD));
             const support = previewPublicEnterpriseSupport(
               snapshot,
               country,
@@ -261,7 +261,7 @@ export function IndustryScreen({
                 <Text style={styles.detail}>
                   {enterprise.sector} · level {String(enterprise.level)} · condition{" "}
                   {enterprise.condition.toFixed(2)} · operating cash{" "}
-                  {formatSUSD(enterprise.operatingCashSUSD)}
+                  {formatRUSD(enterprise.operatingCashRUSD)}
                 </Text>
                 <EnterpriseSupportField
                   label={`${enterprise.definitionName} capital support`}

@@ -13,7 +13,7 @@ import {
   freightCostPerUnit,
   governmentPeriodTotals,
   hashWorld,
-  routeCapacitySUSDPerDay,
+  routeCapacityRUSDPerDay,
   runEconomicDay,
   runTradeArrivals,
   runTradeDispatchPhase,
@@ -48,7 +48,7 @@ interface TradeFixtureOptions {
   readonly tariff?: number;
   readonly quota?: number | null;
   readonly exportRestricted?: boolean;
-  readonly capacitySUSDPerDay?: number;
+  readonly capacityRUSDPerDay?: number;
   readonly distanceUnits?: number;
   readonly stock?: number;
   readonly freightPerUnit?: number;
@@ -74,7 +74,7 @@ function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
     if (market.id === 0) {
       return {
         ...market,
-        priceSUSD: market.priceSUSD.map((price, goodId) =>
+        priceRUSD: market.priceRUSD.map((price, goodId) =>
           goodId === M5_CLOTHING ? (options.priceOrigin ?? 1) : price,
         ),
         stockLots: [
@@ -88,7 +88,7 @@ function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
     }
     return {
       ...market,
-      priceSUSD: market.priceSUSD.map((price, goodId) =>
+      priceRUSD: market.priceRUSD.map((price, goodId) =>
         goodId === M5_CLOTHING ? (options.priceDestination ?? 1.5) : price,
       ),
     };
@@ -99,7 +99,7 @@ function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
         marketAId: 0,
         marketBId: 1,
         distanceUnits: options.distanceUnits ?? 1,
-        baseCapacitySUSDPerDay: options.capacitySUSDPerDay ?? 1e9,
+        baseCapacityRUSDPerDay: options.capacityRUSDPerDay ?? 1e9,
       },
     ];
   }
@@ -109,20 +109,20 @@ function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
   ) {
     scenario.buildingInstances = scenario.buildingInstances.map((building) => ({
       ...building,
-      initialOperatingCashSUSD:
+      initialOperatingCashRUSD:
         options.workshopCash !== undefined && building.id === 8
           ? options.workshopCash
-          : building.initialOperatingCashSUSD,
+          : building.initialOperatingCashRUSD,
     }));
     if (options.ownerSavings !== undefined) {
       scenario.population = {
         ...scenario.population,
         popBlocks: scenario.population.popBlocks.map((block) => ({
           ...block,
-          initialSavingsSUSD:
+          initialSavingsRUSD:
             options.ownerSavings !== undefined && block.id === 6
               ? options.ownerSavings
-              : block.initialSavingsSUSD,
+              : block.initialSavingsRUSD,
         })),
       };
     }
@@ -192,7 +192,7 @@ function accountBalance(
       candidate.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind}:${ownerId} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function clothingLots(world: World, marketId: number): { ownerBuildingId: number; quantity: number }[] {
@@ -226,21 +226,21 @@ describe("E6a route and access validation", () => {
       createEconomyWorld({
         ...tradeScenario(),
         tradeRoutes: [
-          { marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacitySUSDPerDay: 100 },
-          { marketAId: 1, marketBId: 0, distanceUnits: 2, baseCapacitySUSDPerDay: 100 },
+          { marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacityRUSDPerDay: 100 },
+          { marketAId: 1, marketBId: 0, distanceUnits: 2, baseCapacityRUSDPerDay: 100 },
         ],
       }, { seed: SEED }),
     ).toThrow(/duplicates route/);
     expect(() =>
       createEconomyWorld({
         ...tradeScenario(),
-        tradeRoutes: [{ marketAId: 0, marketBId: 0, distanceUnits: 1, baseCapacitySUSDPerDay: 100 }],
+        tradeRoutes: [{ marketAId: 0, marketBId: 0, distanceUnits: 1, baseCapacityRUSDPerDay: 100 }],
       }, { seed: SEED }),
     ).toThrow(/different markets/);
     expect(() =>
       createEconomyWorld({
         ...tradeScenario(),
-        tradeRoutes: [{ marketAId: 0, marketBId: 9, distanceUnits: 1, baseCapacitySUSDPerDay: 100 }],
+        tradeRoutes: [{ marketAId: 0, marketBId: 9, distanceUnits: 1, baseCapacityRUSDPerDay: 100 }],
       }, { seed: SEED }),
     ).toThrow(/unknown market/);
   });
@@ -273,12 +273,12 @@ describe("E6a route and access validation", () => {
       marketAId: 0,
       marketBId: 1,
       distanceUnits: 2.2,
-      baseCapacitySUSDPerDay: 1_000,
+      baseCapacityRUSDPerDay: 1_000,
     };
-    expect(routeCapacitySUSDPerDay(route, 0, 0)).toBe(0);
-    expect(routeCapacitySUSDPerDay(route, 1, 1)).toBeCloseTo(1_000, 6);
-    expect(routeCapacitySUSDPerDay(route, 0.5, 0.5)).toBeCloseTo(500, 6);
-    expect(routeCapacitySUSDPerDay(route, 0.8, 0.4)).toBeCloseTo(600, 6);
+    expect(routeCapacityRUSDPerDay(route, 0, 0)).toBe(0);
+    expect(routeCapacityRUSDPerDay(route, 1, 1)).toBeCloseTo(1_000, 6);
+    expect(routeCapacityRUSDPerDay(route, 0.5, 0.5)).toBeCloseTo(500, 6);
+    expect(routeCapacityRUSDPerDay(route, 0.8, 0.4)).toBeCloseTo(600, 6);
     expect(transitDays(route)).toBe(3);
     expect(transitDays({ ...route, distanceUnits: 1 })).toBe(1);
   });
@@ -301,18 +301,18 @@ describe("E6a dispatch, customs, and delivery", () => {
     expect(shipment.originCountryId).toBe(M5_COUNTRY_C);
     expect(shipment.destinationCountryId).toBe(M5_COUNTRY_B);
     expect(shipment.quantity).toBeGreaterThan(0);
-    expect(shipment.cargoValueSUSD).toBeCloseTo(
-      shipment.quantity * (world.markets[0]!.priceSUSD[M5_CLOTHING] ?? 0),
+    expect(shipment.cargoValueRUSD).toBeCloseTo(
+      shipment.quantity * (world.markets[0]!.priceRUSD[M5_CLOTHING] ?? 0),
       6,
     );
-    expect(shipment.freightCostSUSD).toBeCloseTo(
+    expect(shipment.freightCostRUSD).toBeCloseTo(
       shipment.quantity * freightCostPerUnit(
         scenario.definitions.goods.find((good) => good.id === M5_CLOTHING)!,
         routeOf(world),
       ),
       6,
     );
-    expect(shipment.dutySUSD).toBeCloseTo(shipment.cargoValueSUSD * 0.2, 6);
+    expect(shipment.dutyRUSD).toBeCloseTo(shipment.cargoValueRUSD * 0.2, 6);
     expect(shipment.arrivalDay).toBe(world.dayIndex + transitDays(routeOf(world)));
 
     // Physical movement: origin stock decreased by exactly the shipped quantity.
@@ -321,19 +321,19 @@ describe("E6a dispatch, customs, and delivery", () => {
     expect(clothingStock(world, 1)).toBe(0);
     // Duty and freight are real, once-per-shipment, balanced postings.
     expect(accountBalance(world, "country", M5_COUNTRY_B, "treasury-cash")).toBeCloseTo(
-      treasuryBefore + result.dutyPaidSUSD,
+      treasuryBefore + result.dutyPaidRUSD,
       6,
     );
     expect(accountBalance(world, "country", M5_COUNTRY_B, "customs-duty-revenue")).toBeCloseTo(
-      customsBefore + result.dutyPaidSUSD,
+      customsBefore + result.dutyPaidRUSD,
       6,
     );
     expect(accountBalance(world, "system", null, "system-reserve-cash")).toBeCloseTo(
-      systemBefore + result.freightPaidSUSD,
+      systemBefore + result.freightPaidRUSD,
       6,
     );
-    expect(world.countries.find((country) => country.id === M5_COUNTRY_B)!.trade.dutyReceivedMonthToDateSUSD).toBeCloseTo(
-      result.dutyPaidSUSD,
+    expect(world.countries.find((country) => country.id === M5_COUNTRY_B)!.trade.dutyReceivedMonthToDateRUSD).toBeCloseTo(
+      result.dutyPaidRUSD,
       6,
     );
     assertValidWorld(world);
@@ -365,12 +365,12 @@ describe("E6a dispatch, customs, and delivery", () => {
     const ownerBefore = accountBalance(world, "popBlock", 6, "household-cash");
     const result = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
     expect(result.shipments.length).toBeGreaterThan(0);
-    expect(result.ownerFundedSUSD).toBeGreaterThan(0);
+    expect(result.ownerFundedRUSD).toBeGreaterThan(0);
     expect(
-      result.ownerFundedSUSD,
-    ).toBeCloseTo(result.freightPaidSUSD + result.dutyPaidSUSD, 6);
+      result.ownerFundedRUSD,
+    ).toBeCloseTo(result.freightPaidRUSD + result.dutyPaidRUSD, 6);
     expect(accountBalance(world, "popBlock", 6, "household-cash")).toBeCloseTo(
-      ownerBefore - result.ownerFundedSUSD,
+      ownerBefore - result.ownerFundedRUSD,
       6,
     );
     expect(accountBalance(world, "building", 8, "operating-cash")).toBeCloseTo(0, 6);
@@ -392,15 +392,15 @@ describe("E6a dispatch, customs, and delivery", () => {
       {
         id: 2,
         regionIds: [4],
-        priceSUSD: scenario.markets[0]!.priceSUSD.map((price, goodId) =>
+        priceRUSD: scenario.markets[0]!.priceRUSD.map((price, goodId) =>
           goodId === M5_CLOTHING ? 1.5 : price,
         ),
         stockLots: [],
       },
     ];
     scenario.tradeRoutes = [
-      { marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacitySUSDPerDay: 1e9 },
-      { marketAId: 0, marketBId: 2, distanceUnits: 1, baseCapacitySUSDPerDay: 1e9 },
+      { marketAId: 0, marketBId: 1, distanceUnits: 1, baseCapacityRUSDPerDay: 1e9 },
+      { marketAId: 0, marketBId: 2, distanceUnits: 1, baseCapacityRUSDPerDay: 1e9 },
     ];
     const world = createEconomyWorld(scenario, { seed: SEED });
     const result = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
@@ -421,12 +421,12 @@ describe("E6a dispatch, customs, and delivery", () => {
       ...scenario.population,
       popBlocks: scenario.population.popBlocks.map((block) => ({
         ...block,
-        initialSavingsSUSD: 0,
+        initialSavingsRUSD: 0,
       })),
     };
     scenario.buildingInstances = scenario.buildingInstances.map((building) => ({
       ...building,
-      initialOperatingCashSUSD: 0,
+      initialOperatingCashRUSD: 0,
     }));
     const world = createEconomyWorld(scenario, { seed: SEED });
     const result = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
@@ -463,16 +463,16 @@ describe("E6a trade policy instruments", () => {
   });
 
   test("route capacity caps physical cargo value", () => {
-    const { scenario, world } = build({ capacitySUSDPerDay: 1 });
+    const { scenario, world } = build({ capacityRUSDPerDay: 1 });
     const result = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
     expect(result.shipments.length).toBeGreaterThan(0);
-    const capacity = routeCapacitySUSDPerDay(
+    const capacity = routeCapacityRUSDPerDay(
       routeOf(world),
       0.5,
       0.5,
     );
     expect(capacity).toBeCloseTo(0.5, 6);
-    const used = result.shipments.reduce((total, shipment) => total + shipment.cargoValueSUSD, 0);
+    const used = result.shipments.reduce((total, shipment) => total + shipment.cargoValueRUSD, 0);
     expect(used).toBeLessThanOrEqual(capacity + 1e-6);
     assertValidWorld(world);
   });
@@ -529,7 +529,7 @@ describe("E6a trade policy instruments", () => {
     const totals = governmentPeriodTotals(withTariff.world.finance, summary);
     const destination = totals.find((entry) => entry.countryId === M5_COUNTRY_B);
     expect(destination).toBeDefined();
-    expect(destination!.customsDutyRevenueSUSD ?? 0).toBeGreaterThan(0);
+    expect(destination!.customsDutyRevenueRUSD ?? 0).toBeGreaterThan(0);
 
     const freeTrade = build();
     for (let day = 0; day < 40; day += 1) runDay(freeTrade.world, freeTrade.scenario);
@@ -539,7 +539,7 @@ describe("E6a trade policy instruments", () => {
       freeSummaries[freeSummaries.length - 1]!,
     );
     const freeDestination = freeTotals.find((entry) => entry.countryId === M5_COUNTRY_B);
-    expect(freeDestination?.customsDutyRevenueSUSD ?? 0).toBe(0);
+    expect(freeDestination?.customsDutyRevenueRUSD ?? 0).toBe(0);
   });
 });
 
@@ -722,19 +722,19 @@ describe("E6a construction procurement cannot bypass trade rules", () => {
     // legs: procurement has no customs boundary and must never book duty revenue.
     expect(() =>
       postJournalEntry(world.finance, world.dayIndex, "construction-material-purchase", [
-        { accountId: building.operatingCashAccountId, side: "credit", amountSUSD: 5 },
-        { accountId: systemAccount.id, side: "debit", amountSUSD: 5 },
-        { accountId: dutyExpense.id, side: "debit", amountSUSD: 5 },
-        { accountId: customsRevenue.id, side: "credit", amountSUSD: 5 },
+        { accountId: building.operatingCashAccountId, side: "credit", amountRUSD: 5 },
+        { accountId: systemAccount.id, side: "debit", amountRUSD: 5 },
+        { accountId: dutyExpense.id, side: "debit", amountRUSD: 5 },
+        { accountId: customsRevenue.id, side: "credit", amountRUSD: 5 },
       ]),
     ).toThrow();
     // The genuine customs kind requires the four trade legs; a three-leg variant is
     // rejected before any balance changes.
     expect(() =>
       postJournalEntry(world.finance, world.dayIndex, "customs-duty", [
-        { accountId: dutyExpense.id, side: "debit", amountSUSD: 5 },
-        { accountId: building.operatingCashAccountId, side: "credit", amountSUSD: 5 },
-        { accountId: treasury, side: "debit", amountSUSD: 5 },
+        { accountId: dutyExpense.id, side: "debit", amountRUSD: 5 },
+        { accountId: building.operatingCashAccountId, side: "credit", amountRUSD: 5 },
+        { accountId: treasury, side: "debit", amountRUSD: 5 },
       ]),
     ).toThrow();
     // Procurement is bought from the project's own market at its current price, so it

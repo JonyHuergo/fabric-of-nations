@@ -1,5 +1,5 @@
 /**
- * Century application package status.
+ * Fabric of Nations application package status.
  *
  * The playable Expo/React Native shell lives in `App.tsx` and `src/`. This
  * module is a small status export; it contains no UI or simulation logic.

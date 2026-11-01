@@ -63,7 +63,7 @@ describe("M3a schema-25 serialization", () => {
     postCashTransfer(world.finance, 0, "goods-purchase", {
       fromAccountId: M3_HOUSEHOLD_ACCOUNT_IDS[0],
       toAccountId: M3_BUILDING_ACCOUNT_FIRST_ID,
-      amountSUSD: 25,
+      amountRUSD: 25,
     });
     world.dayIndex = 30;
 
@@ -83,7 +83,7 @@ describe("M3a schema-25 serialization", () => {
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.buildings).toEqual(world.buildings);
     expect(restored.employment).toEqual(world.employment);
-    expect(restored.markets[0]?.priceSUSD).toEqual(world.markets[0]?.priceSUSD);
+    expect(restored.markets[0]?.priceRUSD).toEqual(world.markets[0]?.priceRUSD);
     expect(restored.markets[0]?.stockLots).toEqual(world.markets[0]?.stockLots);
     expect(restored.finance.accounts).toEqual(world.finance.accounts);
     expect(restored.finance.postings).toEqual(world.finance.postings);
@@ -156,7 +156,7 @@ describe("M3a schema-25 serialization", () => {
 
   test("rejects malformed decoded markets and references", () => {
     const invalid = cloneM3Scenario();
-    invalid.markets[0]!.priceSUSD = [0.05];
+    invalid.markets[0]!.priceRUSD = [0.05];
     expect(() => createEconomyWorld(invalid)).toThrow(/price|good|length/i);
   });
 });

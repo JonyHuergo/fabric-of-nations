@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, "..", "..", "..");
 export const WEB_ROOT = resolve(ROOT, "packages/app/dist-web");
-export const SHOT_DIR = resolve(ROOT, "docs/images/m11d");
+export const SHOT_DIR = resolve(ROOT, process.env.PLAYTEST_SHOT_DIR ?? "docs/images/m11d");
 
 export const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 
@@ -24,6 +24,7 @@ const MIME = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json",
+  ".webmanifest": "application/manifest+json",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
@@ -73,7 +74,11 @@ export async function connectChrome({ port = 9462, profile = ".cache-m11d/chrome
     findChrome(),
     [
       "--headless=new",
-      "--disable-gpu",
+      // The WebGL map needs a GL implementation: the real GPU when asked for,
+      // otherwise SwiftShader, which keeps headless runs reproducible.
+      ...(process.env.PLAYTEST_GPU === "1"
+        ? ["--use-angle=d3d11", "--ignore-gpu-blocklist", "--enable-gpu-rasterization"]
+        : ["--disable-gpu", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]),
       "--no-sandbox",
       "--no-first-run",
       "--no-default-browser-check",

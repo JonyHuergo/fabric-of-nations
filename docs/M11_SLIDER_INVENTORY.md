@@ -13,27 +13,27 @@ validation; the worker remains the final validator.
 | Screen | Control | Min | Max | Step | Unit | Action |
 |---|---|---:|---:|---:|---|---|
 | Budget | Personal income tax rate | 0 | 60 | 0.5 | % | `set-fiscal-policy.incomeTaxRate` (0–1) |
-| Budget | Income-tax exemption | 0 | max(1,000, taxable daily base × 365) | 100 | SUSD/yr | `set-fiscal-policy.incomeTaxAllowanceSUSDPerYear` |
+| Budget | Income-tax exemption | 0 | max(1,000, taxable daily base × 365) | 100 | RUSD/yr | `set-fiscal-policy.incomeTaxAllowanceRUSDPerYear` |
 | Budget | Business-profit tax rate | 0 | 50 | 0.5 | % | `set-fiscal-policy.businessProfitTaxRate` |
-| Budget | Welfare budget | 0 | max(10,000,000; treasury × 0.5) | 100,000 | SUSD/yr | `set-fiscal-policy.welfareBudgetSUSDPerYear` |
+| Budget | Welfare budget | 0 | max(10,000,000; treasury × 0.5) | 100,000 | RUSD/yr | `set-fiscal-policy.welfareBudgetRUSDPerYear` |
 | Budget | Welfare eligibility ceiling | 0 | 99 | 1 | wealth level | `set-fiscal-policy.welfareMaxWealthLevel` |
-| Budget | Treasury reserve target | 0 | max(1,000; treasury) | 1,000 | SUSD | `set-fiscal-policy.reserveTargetSUSD` |
-| Budget | Borrow principal | 0 | debt headroom | 1,000 | SUSD | `issue-debt.amountSUSD` |
-| Budget | Outstanding-principal ceiling | 0 | max(1,000,000; current ceiling × 2) | 100,000 | SUSD | `set-debt-policy.maxOutstandingPrincipalSUSD` |
-| Budget | Repay principal (per contract) | 0 | contract outstanding | 100 | SUSD | `repay-debt.amountSUSD` |
+| Budget | Treasury reserve target | 0 | max(1,000; treasury) | 1,000 | RUSD | `set-fiscal-policy.reserveTargetRUSD` |
+| Budget | Borrow principal | 0 | debt headroom | 1,000 | RUSD | `issue-debt.amountRUSD` |
+| Budget | Outstanding-principal ceiling | 0 | max(1,000,000; current ceiling × 2) | 100,000 | RUSD | `set-debt-policy.maxOutstandingPrincipalRUSD` |
+| Budget | Repay principal (per contract) | 0 | contract outstanding | 100 | RUSD | `repay-debt.amountRUSD` |
 | Trade | Tariff rate (per good) | 0 | 100 | 0.5 | % | `set-trade-policy.tariffRates` (0–1) |
 | Trade | Monthly import quota (per good) | 0 | observed stock + 30 days capacity (or current quota) | 1% of max | good unit | `set-trade-policy.importQuotaQuantity` |
-| Politics | Administration funding | 0 | cash-limited ceiling (preview) | 1% of max | SUSD/yr | `set-institution-funding.annualSUSD` |
-| Technology | Education/research funding | 0 | cash-limited ceiling (preview) | 1% of max | SUSD/yr | `set-education-funding.annualSUSD` |
+| Politics | Administration funding | 0 | cash-limited ceiling (preview) | 1% of max | RUSD/yr | `set-institution-funding.annualRUSD` |
+| Technology | Education/research funding | 0 | cash-limited ceiling (preview) | 1% of max | RUSD/yr | `set-education-funding.annualRUSD` |
 | Technology | Research staff share | 0 | 1 | 0.01 | share | `set-research-staff-share.share` |
-| Labor | Annual training budget | 0 | practical max(treasury × 0.5, current × 2) | 1% of max | SUSD/yr | `set-training-budget.annualSUSD` |
-| Labor | Annual stipend per trainee | 0 | max(10,000; current × 2) | 1% of max | SUSD/yr | `set-training-stipend.annualSUSD` |
+| Labor | Annual training budget | 0 | practical max(treasury × 0.5, current × 2) | 1% of max | RUSD/yr | `set-training-budget.annualRUSD` |
+| Labor | Annual stipend per trainee | 0 | max(10,000; current × 2) | 1% of max | RUSD/yr | `set-training-stipend.annualRUSD` |
 | Labor | Academic staff share for training | 0 | 1 − research staff share | 0.01 | share | `set-training-staff-share.share` |
 | Labor | Health staff share of administration | 0 | 1 | 0.01 | share | `set-health-staff-share.share` |
 | Industry | Sector subsidy rate (5 sectors) | 0 | 100 | 0.5 | % | `set-industrial-policy.sectorSubsidyRates` |
-| Industry | Public-enterprise capital support (per enterprise) | 0 | treasury cash | 1% of max | SUSD | `support-public-enterprise.amountSUSD` |
-| Money | Currency parity | reference × 0.5 | reference × 1.5 | 1% of reference | SUSD/unit | `set-monetary-policy.paritySusdPerUnit` |
-| Money | Reserve transfer (signed) | −reserves | treasury cash | 1% of range | SUSD | `set-monetary-policy.reserveTransferSUSD` |
+| Industry | Public-enterprise capital support (per enterprise) | 0 | treasury cash | 1% of max | RUSD | `support-public-enterprise.amountRUSD` |
+| Money | Currency parity | reference × 0.5 | reference × 1.5 | 1% of reference | RUSD/unit | `set-monetary-policy.parityRusdPerUnit` |
+| Money | Reserve transfer (signed) | −reserves | treasury cash | 1% of range | RUSD | `set-monetary-policy.reserveTransferRUSD` |
 | War | Recruitment personnel | 1,000 | 25% of the recruiting region's population | 1,000 | soldiers | `recruit-army.personnel` |
 
 `SliderField` also provides threshold ticks, min/max labels, the live value,
@@ -60,7 +60,7 @@ numeric field accepts a typed value and clamps it to the slider range.
 
 | Screen | Control | Why |
 |---|---|---|
-| Money | Currency conversion (signed SUSD) | The positive bound is the external counterparty's SUSD cash and the negative bound includes the external currency holding; neither is in the snapshot, so a slider could not cover all valid values without admitting invalid ones. It remains a typed value committed through the same validated action. |
+| Money | Currency conversion (signed RUSD) | The positive bound is the external counterparty's RUSD cash and the negative bound includes the external currency holding; neither is in the snapshot, so a slider could not cover all valid values without admitting invalid ones. It remains a typed value committed through the same validated action. |
 | Construction | — | The current screen has no level or quantity input; project type and region are categorical. |
 
 ### Read-only or derived values

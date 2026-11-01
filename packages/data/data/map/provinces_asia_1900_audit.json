@@ -1,0 +1,1034 @@
+{
+  "generatedBy": "scripts/m12b/build-asia-provinces.mjs",
+  "referenceDate": "1900-01-01",
+  "toleranceDegrees": 0.02,
+  "provinceCount": 239,
+  "plannedProvinceCount": 239,
+  "residualProvinceCount": 0,
+  "politiesCovered": [
+    "AFG",
+    "CHN",
+    "FRA",
+    "GBR",
+    "JPN",
+    "KOR",
+    "NLD",
+    "NPL",
+    "OMN",
+    "OTT",
+    "PER",
+    "PRT",
+    "RUS",
+    "SHM",
+    "THA",
+    "USA"
+  ],
+  "mapFeaturesCovered": 29,
+  "duplicateProvinceIds": 0,
+  "duplicateKeys": 0,
+  "unmatchedBorderSegments": 64,
+  "borderSegmentCount": 155016,
+  "borderPairCount": 633,
+  "coverage": [
+    {
+      "tag": "AFG",
+      "scopeArea": 62.5294,
+      "coveredArea": 62.2154,
+      "residualArea": 0.314,
+      "estimated": false
+    },
+    {
+      "tag": "BHU",
+      "scopeArea": 3.6349,
+      "coveredArea": 3.5851,
+      "residualArea": 0.0498,
+      "estimated": false
+    },
+    {
+      "tag": "BIN",
+      "scopeArea": 455.3891,
+      "coveredArea": 453.3623,
+      "residualArea": 2.0268,
+      "estimated": false
+    },
+    {
+      "tag": "BPO",
+      "scopeArea": 0.0009,
+      "coveredArea": 0.0008,
+      "residualArea": 0.0001,
+      "estimated": false
+    },
+    {
+      "tag": "BUK",
+      "scopeArea": 26.6175,
+      "coveredArea": 26.6084,
+      "residualArea": 0.0091,
+      "estimated": false
+    },
+    {
+      "tag": "CEY",
+      "scopeArea": 5.3772,
+      "coveredArea": 5.296,
+      "residualArea": 0.0812,
+      "estimated": true
+    },
+    {
+      "tag": "CHN",
+      "scopeArea": 1028.2088,
+      "coveredArea": 1025.2405,
+      "residualArea": 2.9683,
+      "estimated": false
+    },
+    {
+      "tag": "DEI",
+      "scopeArea": 151.5537,
+      "coveredArea": 149.182,
+      "residualArea": 2.3717,
+      "estimated": true
+    },
+    {
+      "tag": "FIC",
+      "scopeArea": 55.9684,
+      "coveredArea": 55.536,
+      "residualArea": 0.4324,
+      "estimated": true
+    },
+    {
+      "tag": "HKG",
+      "scopeArea": 0.0862,
+      "coveredArea": 0.0674,
+      "residualArea": 0.0188,
+      "estimated": false
+    },
+    {
+      "tag": "JPN",
+      "scopeArea": 37.8997,
+      "coveredArea": 37.062,
+      "residualArea": 0.8377,
+      "estimated": true
+    },
+    {
+      "tag": "KHI",
+      "scopeArea": 26.9606,
+      "coveredArea": 26.937,
+      "residualArea": 0.0236,
+      "estimated": false
+    },
+    {
+      "tag": "KOR",
+      "scopeArea": 22.7145,
+      "coveredArea": 22.2709,
+      "residualArea": 0.4436,
+      "estimated": false
+    },
+    {
+      "tag": "KUW",
+      "scopeArea": 1.5978,
+      "coveredArea": 1.5754,
+      "residualArea": 0.0224,
+      "estimated": false
+    },
+    {
+      "tag": "MAC",
+      "scopeArea": 0.0015,
+      "coveredArea": 0.0015,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "MAL",
+      "scopeArea": 14.0983,
+      "coveredArea": 13.809,
+      "residualArea": 0.2893,
+      "estimated": true
+    },
+    {
+      "tag": "NPL",
+      "scopeArea": 13.507,
+      "coveredArea": 13.3236,
+      "residualArea": 0.1834,
+      "estimated": false
+    },
+    {
+      "tag": "OMN",
+      "scopeArea": 27.35,
+      "coveredArea": 27.2001,
+      "residualArea": 0.1499,
+      "estimated": false
+    },
+    {
+      "tag": "OTT",
+      "scopeArea": 258.4791,
+      "coveredArea": 257.5518,
+      "residualArea": 0.9273,
+      "estimated": false
+    },
+    {
+      "tag": "PER",
+      "scopeArea": 156.0743,
+      "coveredArea": 155.5586,
+      "residualArea": 0.5157,
+      "estimated": false
+    },
+    {
+      "tag": "PHL",
+      "scopeArea": 23.9834,
+      "coveredArea": 23.2064,
+      "residualArea": 0.777,
+      "estimated": false
+    },
+    {
+      "tag": "PTM",
+      "scopeArea": 1.2305,
+      "coveredArea": 1.1855,
+      "residualArea": 0.0451,
+      "estimated": false
+    },
+    {
+      "tag": "RUS",
+      "scopeArea": 2554.9835,
+      "coveredArea": 2554.9835,
+      "residualArea": 0,
+      "estimated": true
+    },
+    {
+      "tag": "SAR",
+      "scopeArea": 9.8288,
+      "coveredArea": 9.8172,
+      "residualArea": 0.0116,
+      "estimated": false
+    },
+    {
+      "tag": "SHM",
+      "scopeArea": 71.8544,
+      "coveredArea": 71.7947,
+      "residualArea": 0.0597,
+      "estimated": false
+    },
+    {
+      "tag": "THA",
+      "scopeArea": 52.8837,
+      "coveredArea": 52.495,
+      "residualArea": 0.3887,
+      "estimated": true
+    },
+    {
+      "tag": "TIB",
+      "scopeArea": 107.2364,
+      "coveredArea": 107.2364,
+      "residualArea": 0,
+      "estimated": true
+    },
+    {
+      "tag": "TRU",
+      "scopeArea": 6.3493,
+      "coveredArea": 6.2444,
+      "residualArea": 0.1049,
+      "estimated": false
+    },
+    {
+      "tag": "TWN",
+      "scopeArea": 3.1575,
+      "coveredArea": 3.1132,
+      "residualArea": 0.0443,
+      "estimated": false
+    }
+  ],
+  "overlaps": [
+    {
+      "left": "as-tib-u-tsang",
+      "right": "as-tib-kham",
+      "area": 0.0359,
+      "bbox": [
+        78.391,
+        27.317,
+        99.109,
+        36.449
+      ]
+    },
+    {
+      "left": "as-rus-yeniseysk",
+      "right": "as-rus-yakutsk",
+      "area": 0.026,
+      "bbox": [
+        76.053,
+        51.316,
+        113.871,
+        81.28
+      ]
+    },
+    {
+      "left": "as-rus-amur",
+      "right": "as-rus-khabarovsk",
+      "area": 0.0179,
+      "bbox": [
+        119.67,
+        48.855,
+        134.956,
+        57.041
+      ]
+    },
+    {
+      "left": "as-rus-tomsk",
+      "right": "as-rus-yeniseysk",
+      "area": 0.0158,
+      "bbox": [
+        75.069,
+        52.168,
+        89.449,
+        61.047
+      ]
+    },
+    {
+      "left": "as-rus-yeniseysk",
+      "right": "as-rus-irkutsk",
+      "area": 0.0148,
+      "bbox": [
+        76.053,
+        51.316,
+        113.871,
+        81.28
+      ]
+    },
+    {
+      "left": "as-rus-uralsk",
+      "right": "as-rus-transcaspia",
+      "area": 0.0145,
+      "bbox": [
+        46.478,
+        41.264,
+        56.707,
+        51.775
+      ]
+    },
+    {
+      "left": "as-rus-transbaikal",
+      "right": "as-rus-kamchatka",
+      "area": 0.0145,
+      "bbox": [
+        107.745,
+        49.138,
+        163.46,
+        66.359
+      ]
+    },
+    {
+      "left": "as-chn-inner-mongolia",
+      "right": "as-chn-eastern-and-gobi-mongolia",
+      "area": 0.0138,
+      "bbox": [
+        97.191,
+        37.394,
+        126.056,
+        53.193
+      ]
+    },
+    {
+      "left": "as-rus-transbaikal",
+      "right": "as-rus-yakutsk",
+      "area": 0.0135,
+      "bbox": [
+        107.745,
+        49.138,
+        163.46,
+        66.359
+      ]
+    },
+    {
+      "left": "as-rus-semipalatinsk",
+      "right": "as-rus-tomsk",
+      "area": 0.0123,
+      "bbox": [
+        66.02,
+        45.548,
+        87.324,
+        55.435
+      ]
+    },
+    {
+      "left": "as-rus-semipalatinsk",
+      "right": "as-rus-altai",
+      "area": 0.0117,
+      "bbox": [
+        66.02,
+        45.548,
+        87.324,
+        55.435
+      ]
+    },
+    {
+      "left": "as-chn-khalkha-mongolia",
+      "right": "as-chn-eastern-and-gobi-mongolia",
+      "area": 0.0111,
+      "bbox": [
+        93.191,
+        46.38,
+        109.039,
+        52.117
+      ]
+    },
+    {
+      "left": "as-rus-primorye",
+      "right": "as-rus-khabarovsk",
+      "area": 0.0108,
+      "bbox": [
+        130.424,
+        42.302,
+        139.003,
+        49.486
+      ]
+    },
+    {
+      "left": "as-chn-qinghai",
+      "right": "as-chn-xinjiang",
+      "area": 0.0104,
+      "bbox": [
+        89.435,
+        31.535,
+        103.04,
+        39.324
+      ]
+    },
+    {
+      "left": "as-chn-heilongjiang",
+      "right": "as-chn-xing-an",
+      "area": 0.01,
+      "bbox": [
+        121.167,
+        43.433,
+        134.751,
+        53.546
+      ]
+    },
+    {
+      "left": "as-rus-tobolsk",
+      "right": "as-rus-yeniseysk",
+      "area": 0.0098,
+      "bbox": [
+        59.223,
+        55.132,
+        86.031,
+        73.573
+      ]
+    },
+    {
+      "left": "as-rus-tobolsk",
+      "right": "as-rus-omsk",
+      "area": 0.0094,
+      "bbox": [
+        59.223,
+        55.132,
+        86.031,
+        73.573
+      ]
+    },
+    {
+      "left": "as-bin-assam",
+      "right": "as-bin-burma",
+      "area": 0.0094,
+      "bbox": [
+        89.656,
+        21.957,
+        97.362,
+        29.368
+      ]
+    },
+    {
+      "left": "as-bin-bihar",
+      "right": "as-bin-united-provinces",
+      "area": 0.0091,
+      "bbox": [
+        83.323,
+        21.996,
+        88.304,
+        27.492
+      ]
+    },
+    {
+      "left": "as-chn-sichuan",
+      "right": "as-chn-guizhou",
+      "area": 0.0088,
+      "bbox": [
+        97.361,
+        26.035,
+        110.175,
+        34.3
+      ]
+    },
+    {
+      "left": "as-rus-irkutsk",
+      "right": "as-rus-yakutsk",
+      "area": 0.0087,
+      "bbox": [
+        95.653,
+        49.967,
+        119.132,
+        64.298
+      ]
+    },
+    {
+      "left": "as-rus-irkutsk",
+      "right": "as-rus-uriankhai",
+      "area": 0.0083,
+      "bbox": [
+        95.653,
+        49.967,
+        119.132,
+        64.298
+      ]
+    },
+    {
+      "left": "as-chn-jiangxi",
+      "right": "as-chn-fujian",
+      "area": 0.0081,
+      "bbox": [
+        113.559,
+        24.5,
+        118.476,
+        30.049
+      ]
+    },
+    {
+      "left": "as-bin-united-provinces",
+      "right": "as-bin-central-provinces",
+      "area": 0.008,
+      "bbox": [
+        77.058,
+        23.912,
+        84.611,
+        31.41
+      ]
+    },
+    {
+      "left": "as-chn-shaanxi",
+      "right": "as-chn-sichuan",
+      "area": 0.0079,
+      "bbox": [
+        105.499,
+        31.705,
+        111.227,
+        39.579
+      ]
+    },
+    {
+      "left": "as-bin-madras",
+      "right": "as-bin-mysore",
+      "area": 0.0079,
+      "bbox": [
+        76.231,
+        8.078,
+        84.769,
+        19.158
+      ]
+    },
+    {
+      "left": "as-chn-qinghai",
+      "right": "as-chn-sichuan",
+      "area": 0.0076,
+      "bbox": [
+        89.435,
+        31.535,
+        103.04,
+        39.324
+      ]
+    },
+    {
+      "left": "as-rus-altai",
+      "right": "as-rus-yeniseysk",
+      "area": 0.0076,
+      "bbox": [
+        77.785,
+        49.077,
+        89.868,
+        54.487
+      ]
+    },
+    {
+      "left": "as-rus-transbaikal",
+      "right": "as-rus-khabarovsk",
+      "area": 0.0076,
+      "bbox": [
+        107.745,
+        49.138,
+        163.46,
+        66.359
+      ]
+    },
+    {
+      "left": "as-chn-zhili",
+      "right": "as-chn-rehe",
+      "area": 0.0075,
+      "bbox": [
+        113.438,
+        36.057,
+        119.843,
+        42.178
+      ]
+    },
+    {
+      "left": "as-bin-west-punjab",
+      "right": "as-bin-baluchistan",
+      "area": 0.0074,
+      "bbox": [
+        69.331,
+        27.71,
+        75.353,
+        34.021
+      ]
+    },
+    {
+      "left": "as-bin-burma",
+      "right": "as-bin-frontier-divisions",
+      "area": 0.0074,
+      "bbox": [
+        93.904,
+        9.88,
+        99.607,
+        27.354
+      ]
+    },
+    {
+      "left": "as-bin-central-provinces",
+      "right": "as-bin-hyderabad",
+      "area": 0.0071,
+      "bbox": [
+        74.025,
+        17.776,
+        84.353,
+        26.86
+      ]
+    },
+    {
+      "left": "as-bin-west-punjab",
+      "right": "as-bin-rajputana",
+      "area": 0.007,
+      "bbox": [
+        69.331,
+        27.71,
+        75.353,
+        34.021
+      ]
+    },
+    {
+      "left": "as-chn-jilin",
+      "right": "as-chn-xing-an",
+      "area": 0.0067,
+      "bbox": [
+        121.65,
+        40.859,
+        131.259,
+        46.292
+      ]
+    },
+    {
+      "left": "as-chn-guangdong",
+      "right": "as-chn-guangxi",
+      "area": 0.0066,
+      "bbox": [
+        108.636,
+        18.218,
+        117.171,
+        25.517
+      ]
+    },
+    {
+      "left": "as-chn-gansu",
+      "right": "as-chn-xinjiang",
+      "area": 0.0065,
+      "bbox": [
+        92.764,
+        32.594,
+        108.704,
+        42.787
+      ]
+    },
+    {
+      "left": "as-rus-osh",
+      "right": "as-rus-khojand",
+      "area": 0.0065,
+      "bbox": [
+        69.226,
+        39.189,
+        74.832,
+        42.206
+      ]
+    },
+    {
+      "left": "as-rus-pamir",
+      "right": "as-rus-wakhan",
+      "area": 0.0064,
+      "bbox": [
+        70.274,
+        36.696,
+        75.119,
+        39.46
+      ]
+    },
+    {
+      "left": "as-tha-nakhon-sawan",
+      "right": "as-tha-phitsanulok",
+      "area": 0.0062,
+      "bbox": [
+        97.909,
+        14.947,
+        101.791,
+        17.813
+      ]
+    },
+    {
+      "left": "as-chn-guangxi",
+      "right": "as-chn-yunnan",
+      "area": 0.0062,
+      "bbox": [
+        104.483,
+        21.44,
+        112.053,
+        26.39
+      ]
+    },
+    {
+      "left": "as-dei-central-sulawesi",
+      "right": "as-dei-south-sulawesi",
+      "area": 0.0062,
+      "bbox": [
+        118.785,
+        -3.537,
+        123.865,
+        1.327
+      ]
+    },
+    {
+      "left": "as-shm-ha-il",
+      "right": "as-shm-riyadh",
+      "area": 0.0061,
+      "bbox": [
+        39,
+        24.612,
+        44.841,
+        28.876
+      ]
+    },
+    {
+      "left": "as-chn-shaanxi",
+      "right": "as-chn-inner-mongolia",
+      "area": 0.0061,
+      "bbox": [
+        105.499,
+        31.705,
+        111.227,
+        39.579
+      ]
+    },
+    {
+      "left": "as-bin-kashmir",
+      "right": "as-bin-azad-kashmir",
+      "area": 0.0061,
+      "bbox": [
+        73.775,
+        32.301,
+        79.235,
+        35.491
+      ]
+    },
+    {
+      "left": "as-bin-shan-states",
+      "right": "as-bin-frontier-divisions",
+      "area": 0.0061,
+      "bbox": [
+        96.158,
+        19.288,
+        101.148,
+        24.142
+      ]
+    },
+    {
+      "left": "as-chn-hunan",
+      "right": "as-chn-guangxi",
+      "area": 0.006,
+      "bbox": [
+        108.788,
+        24.643,
+        114.228,
+        30.098
+      ]
+    },
+    {
+      "left": "as-bin-central-provinces",
+      "right": "as-bin-bombay",
+      "area": 0.006,
+      "bbox": [
+        74.025,
+        17.776,
+        84.353,
+        26.86
+      ]
+    },
+    {
+      "left": "as-chn-shaanxi",
+      "right": "as-chn-gansu",
+      "area": 0.0059,
+      "bbox": [
+        105.499,
+        31.705,
+        111.227,
+        39.579
+      ]
+    },
+    {
+      "left": "as-bin-orissa",
+      "right": "as-bin-central-provinces",
+      "area": 0.0058,
+      "bbox": [
+        81.391,
+        17.787,
+        87.477,
+        22.556
+      ]
+    },
+    {
+      "left": "as-ott-syrian-coast",
+      "right": "as-ott-baghdad",
+      "area": 0.0057,
+      "bbox": [
+        35.765,
+        33.131,
+        40.173,
+        35.927
+      ]
+    },
+    {
+      "left": "as-per-kermanshah",
+      "right": "as-per-tehran",
+      "area": 0.0057,
+      "bbox": [
+        45.398,
+        32.103,
+        50.002,
+        36.508
+      ]
+    },
+    {
+      "left": "as-rus-yakutsk",
+      "right": "as-rus-amur",
+      "area": 0.0057,
+      "bbox": [
+        105.54,
+        55.465,
+        162.847,
+        76.766
+      ]
+    },
+    {
+      "left": "as-chn-xing-an",
+      "right": "as-chn-eastern-and-gobi-mongolia",
+      "area": 0.0056,
+      "bbox": [
+        115.5,
+        44.2,
+        125.99,
+        53.317
+      ]
+    },
+    {
+      "left": "as-khi-tashauz",
+      "right": "as-khi-karakalpak",
+      "area": 0.0056,
+      "bbox": [
+        56.534,
+        39.476,
+        61.004,
+        42.791
+      ]
+    },
+    {
+      "left": "as-bin-bengal",
+      "right": "as-bin-eastern-bengal",
+      "area": 0.0056,
+      "bbox": [
+        85.822,
+        21.584,
+        89.888,
+        27.249
+      ]
+    },
+    {
+      "left": "as-fic-cochinchina",
+      "right": "as-fic-cambodia",
+      "area": 0.0055,
+      "bbox": [
+        103.848,
+        8.583,
+        107.61,
+        12.311
+      ]
+    },
+    {
+      "left": "as-bin-sind",
+      "right": "as-bin-baluchistan",
+      "area": 0.0053,
+      "bbox": [
+        66.695,
+        23.753,
+        71.083,
+        28.528
+      ]
+    },
+    {
+      "left": "as-chn-sichuan",
+      "right": "as-chn-yunnan",
+      "area": 0.0052,
+      "bbox": [
+        97.361,
+        26.035,
+        110.175,
+        34.3
+      ]
+    },
+    {
+      "left": "as-chn-yunnan",
+      "right": "as-chn-guizhou",
+      "area": 0.0052,
+      "bbox": [
+        97.53,
+        21.15,
+        106.2,
+        29.224
+      ]
+    },
+    {
+      "left": "as-bin-sind",
+      "right": "as-bin-rajputana",
+      "area": 0.0052,
+      "bbox": [
+        66.695,
+        23.753,
+        71.083,
+        28.528
+      ]
+    },
+    {
+      "left": "as-bin-rajputana",
+      "right": "as-bin-central-provinces",
+      "area": 0.0052,
+      "bbox": [
+        69.465,
+        23.036,
+        78.247,
+        30.204
+      ]
+    },
+    {
+      "left": "as-ott-aleppo",
+      "right": "as-ott-urfa",
+      "area": 0.0051,
+      "bbox": [
+        36.149,
+        34.072,
+        42.377,
+        37.325
+      ]
+    },
+    {
+      "left": "as-dei-central-borneo",
+      "right": "as-dei-south-and-east-borneo",
+      "area": 0.005,
+      "bbox": [
+        110.785,
+        -3.551,
+        115.808,
+        0.737
+      ]
+    }
+  ],
+  "overlapCount": 64,
+  "residuals": [],
+  "warnings": [
+    "53 province code assignments have a label point outside the province map feature (boundary units)",
+    "64 province pairs overlap (largest 0.0359 square degrees: as-tib-u-tsang / as-tib-kham)",
+    "coverage gap AFG: 0.314 square degrees remain outside the authored provinces",
+    "coverage gap BHU: 0.050 square degrees remain outside the authored provinces",
+    "coverage gap BIN: 2.027 square degrees remain outside the authored provinces",
+    "coverage gap CHN: 2.968 square degrees remain outside the authored provinces",
+    "coverage gap HKG: 0.019 square degrees remain outside the authored provinces",
+    "coverage gap KHI: 0.024 square degrees remain outside the authored provinces",
+    "coverage gap KOR: 0.444 square degrees remain outside the authored provinces",
+    "coverage gap KUW: 0.022 square degrees remain outside the authored provinces",
+    "coverage gap NPL: 0.183 square degrees remain outside the authored provinces",
+    "coverage gap OMN: 0.150 square degrees remain outside the authored provinces",
+    "coverage gap OTT: 0.927 square degrees remain outside the authored provinces",
+    "coverage gap PER: 0.516 square degrees remain outside the authored provinces",
+    "coverage gap PHL: 0.777 square degrees remain outside the authored provinces",
+    "coverage gap PTM: 0.045 square degrees remain outside the authored provinces",
+    "coverage gap SAR: 0.012 square degrees remain outside the authored provinces",
+    "coverage gap SHM: 0.060 square degrees remain outside the authored provinces",
+    "coverage gap TRU: 0.105 square degrees remain outside the authored provinces",
+    "coverage gap TWN: 0.044 square degrees remain outside the authored provinces",
+    "coverage subtraction failed for CEY; residual estimated by area (Error: Unable to complete output ring starting at [80.10498185387019, 9.420642900772231]. Last matching segment found ends at [80.10498185387019, 9.420642900772235].)",
+    "coverage subtraction failed for DEI; residual estimated by area (Error: Unable to complete output ring starting at [110.703, -3.022]. Last matching segment found ends at [114.274, 1.471].)",
+    "coverage subtraction failed for FIC; residual estimated by area (Error: Infinite loop when passing sweep line over endpoints (queue size too big).)",
+    "coverage subtraction failed for JPN; residual estimated by area (RangeError: Maximum call stack size exceeded)",
+    "coverage subtraction failed for MAL; residual estimated by area (Error: Unable to complete output ring starting at [101.43512305872578, 4.97458822657141]. Last matching segment found ends at [101.43512305872625, 4.974588226569887].)",
+    "coverage subtraction failed for RUS; residual estimated by area (RangeError: Maximum call stack size exceeded)",
+    "coverage subtraction failed for THA; residual estimated by area (Error: Unable to complete output ring starting at [100.89550776408294, 12.654938324716886]. Last matching segment found ends at [100.89550776408294, 12.654938324716891].)",
+    "coverage subtraction failed for TIB; residual estimated by area (Error: Unable to complete output ring starting at [98.911978, 28.822143]. Last matching segment found ends at [98.91243559300479, 28.822413254901964].)"
+  ],
+  "sourceCount": 19,
+  "unassignedUnits": [],
+  "unassignedUnitCount": 0,
+  "crossPolityUnitAssignments": [
+    "as-bin-frontier-divisions:MM-15()",
+    "as-bin-frontier-divisions:MM-16()",
+    "as-bin-goa:IN-DH(PAI)",
+    "as-bin-goa:IN-GA(PAI)",
+    "as-bpo-maldives:MV-00()",
+    "as-bpo-maldives:MV-01()",
+    "as-bpo-maldives:MV-02()",
+    "as-bpo-maldives:MV-03()",
+    "as-bpo-maldives:MV-04()",
+    "as-bpo-maldives:MV-05()",
+    "as-bpo-maldives:MV-07()",
+    "as-bpo-maldives:MV-08()",
+    "as-bpo-maldives:MV-12()",
+    "as-bpo-maldives:MV-13()",
+    "as-bpo-maldives:MV-14()",
+    "as-bpo-maldives:MV-17()",
+    "as-bpo-maldives:MV-20()",
+    "as-bpo-maldives:MV-23()",
+    "as-bpo-maldives:MV-24()",
+    "as-bpo-maldives:MV-25()",
+    "as-bpo-maldives:MV-26()",
+    "as-bpo-maldives:MV-27()",
+    "as-bpo-maldives:MV-28()",
+    "as-bpo-maldives:MV-29()",
+    "as-buk-eastern-bukhara:TJ-GB(RUS)",
+    "as-chn-guangdong:CN-X01~()",
+    "as-dei-bali-and-lombok:ID-NB()",
+    "as-dei-timor-and-flores:ID-NT()",
+    "as-fic-cambodia:KH-1(THA)",
+    "as-fic-cambodia:KH-13(THA)",
+    "as-fic-cambodia:KH-17(THA)",
+    "as-fic-cambodia:KH-19(THA)",
+    "as-fic-cambodia:KH-2(THA)",
+    "as-fic-cambodia:KH-22(THA)",
+    "as-fic-laos:LA-XA(THA)",
+    "as-hkg-hong-kong:HK-X01~()",
+    "as-hkg-hong-kong:HK-X05~()",
+    "as-jpn-kyushu:JP-46()",
+    "as-kuw-kuwait:KW-KU()",
+    "as-mal-british-north-borneo:MY-15()",
+    "as-omn-gwadar:PK-BA(BIN)",
+    "as-ott-lebanon:LB-BA()",
+    "as-phl-mindanao-and-sulu:PH-AGN()",
+    "as-phl-palawan:PH-PLW()",
+    "as-phl-visayas:PH-SLE()",
+    "as-rus-igdir:TR-76(OTT)",
+    "as-rus-wakhan:AF-BDS(AFG)",
+    "as-tib-kham:CN-QH(CHN)",
+    "as-tib-kham:CN-SC(CHN)",
+    "as-tib-kham:CN-YN(CHN)",
+    "as-tru-bahrain:BH-13()",
+    "as-tru-bahrain:BH-15()",
+    "as-twn-taichung:TW-PEN()"
+  ],
+  "crossPolityUnitAssignmentCount": 53
+}

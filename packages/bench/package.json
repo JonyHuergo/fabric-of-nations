@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Headless benchmark harness for the Century simulation core.",
+  "description": "Headless benchmark harness for the Fabric of Nations simulation core.",
   "main": "./dist/bench.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",

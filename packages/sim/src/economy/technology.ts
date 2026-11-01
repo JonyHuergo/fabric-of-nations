@@ -33,13 +33,13 @@ import {
   EDUCATION_ATTENDANCE_BASE,
   EDUCATION_ATTENDANCE_WEALTH_WEIGHT,
   EDUCATION_DAILY_LITERACY_GAIN,
-  EDUCATION_FUNDING_PER_STAFF_PER_YEAR_SUSD,
+  EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD,
   EDUCATION_QUALITY_COVERAGE_WEIGHT,
   EDUCATION_QUALITY_LITERACY_WEIGHT,
   EDUCATION_SCHOOL_AGE_MAX,
   EDUCATION_SCHOOL_AGE_MIN,
   EDUCATION_STUDENTS_PER_TEACHER,
-  MAX_EDUCATION_FUNDING_SUSD_PER_YEAR,
+  MAX_EDUCATION_FUNDING_RUSD_PER_YEAR,
   MAX_TECHNOLOGY_DEFINITIONS,
   MAX_TECHNOLOGY_EDUCATION_BONUS,
   MAX_TECHNOLOGY_PRODUCTIVITY_BONUS,
@@ -298,11 +298,11 @@ export function neutralCountryTechnologyState(): CountryTechnologyState {
 /** Neutral education policy state for worlds without technology definitions. */
 export function neutralEducationState(): EducationState {
   return {
-    fundedAnnualSUSD: 0,
+    fundedAnnualRUSD: 0,
     researchStaffShare: 0,
     lastUpdateDay: null,
-    fundingRequestedMonthToDateSUSD: 0,
-    fundingShortfallMonthToDateSUSD: 0,
+    fundingRequestedMonthToDateRUSD: 0,
+    fundingShortfallMonthToDateRUSD: 0,
   };
 }
 
@@ -335,13 +335,13 @@ export function assertValidCountryTechnologyInput(
       }
     }
   }
-  if (record.educationFundingSUSDPerYear !== undefined) {
+  if (record.educationFundingRUSDPerYear !== undefined) {
     const funding = requireFiniteNumber(
-      record.educationFundingSUSDPerYear,
-      `${path}.educationFundingSUSDPerYear`,
+      record.educationFundingRUSDPerYear,
+      `${path}.educationFundingRUSDPerYear`,
     );
-    if (funding < 0 || funding > MAX_EDUCATION_FUNDING_SUSD_PER_YEAR) {
-      throw new RangeError(`${path}.educationFundingSUSDPerYear is out of range`);
+    if (funding < 0 || funding > MAX_EDUCATION_FUNDING_RUSD_PER_YEAR) {
+      throw new RangeError(`${path}.educationFundingRUSDPerYear is out of range`);
     }
   }
   if (record.researchStaffShare !== undefined) {
@@ -392,7 +392,7 @@ export function createCountryTechnologyState(
       }
     }
   }
-  education.fundedAnnualSUSD = input.educationFundingSUSDPerYear ?? 0;
+  education.fundedAnnualRUSD = input.educationFundingRUSDPerYear ?? 0;
   education.researchStaffShare = input.researchStaffShare ?? 0;
   return { technology, education };
 }
@@ -472,9 +472,9 @@ export function assertValidEducationState(
   dayIndex: Day,
 ): void {
   const record = requireRecord(state, path);
-  const funding = requireFiniteNumber(record.fundedAnnualSUSD, `${path}.fundedAnnualSUSD`);
-  if (funding < 0 || funding > MAX_EDUCATION_FUNDING_SUSD_PER_YEAR) {
-    throw new RangeError(`${path}.fundedAnnualSUSD is out of range`);
+  const funding = requireFiniteNumber(record.fundedAnnualRUSD, `${path}.fundedAnnualRUSD`);
+  if (funding < 0 || funding > MAX_EDUCATION_FUNDING_RUSD_PER_YEAR) {
+    throw new RangeError(`${path}.fundedAnnualRUSD is out of range`);
   }
   const share = requireFiniteNumber(record.researchStaffShare, `${path}.researchStaffShare`);
   if (share < 0 || share > 1) {
@@ -484,18 +484,18 @@ export function assertValidEducationState(
     requireInteger(record.lastUpdateDay, `${path}.lastUpdateDay`, 0, dayIndex);
   }
   const requested = requireFiniteNumber(
-    record.fundingRequestedMonthToDateSUSD,
-    `${path}.fundingRequestedMonthToDateSUSD`,
+    record.fundingRequestedMonthToDateRUSD,
+    `${path}.fundingRequestedMonthToDateRUSD`,
   );
   const shortfall = requireFiniteNumber(
-    record.fundingShortfallMonthToDateSUSD,
-    `${path}.fundingShortfallMonthToDateSUSD`,
+    record.fundingShortfallMonthToDateRUSD,
+    `${path}.fundingShortfallMonthToDateRUSD`,
   );
   if (requested < 0 || shortfall < 0) {
     throw new RangeError(`${path} funding memo must be non-negative`);
   }
   if (shortfall > requested + 1e-6 * Math.max(1, requested)) {
-    throw new RangeError(`${path}.fundingShortfallMonthToDateSUSD must not exceed the request`);
+    throw new RangeError(`${path}.fundingShortfallMonthToDateRUSD must not exceed the request`);
   }
 }
 
@@ -794,10 +794,10 @@ export function deriveEducation(
   }
   const attendanceRate = schoolAgePopulation > 0 ? enrolledStudents / schoolAgePopulation : 0;
   const fundingBenchmark =
-    availableAcademicWorkers * EDUCATION_FUNDING_PER_STAFF_PER_YEAR_SUSD;
+    availableAcademicWorkers * EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD;
   const fundingAdequacy =
     fundingBenchmark > 0
-      ? clamp(country.education.fundedAnnualSUSD / fundingBenchmark, 0, 1)
+      ? clamp(country.education.fundedAnnualRUSD / fundingBenchmark, 0, 1)
       : 0;
   const quality = clamp(
     EDUCATION_QUALITY_COVERAGE_WEIGHT * accessRatio +
@@ -810,7 +810,7 @@ export function deriveEducation(
   const researchBlockedReason =
     availableAcademicWorkers <= 0
       ? "no-academic-staff"
-      : !(country.education.fundedAnnualSUSD > 0)
+      : !(country.education.fundedAnnualRUSD > 0)
         ? "no-funding"
         : country.technology.activeProject === null
           ? "no-active-project"
@@ -818,7 +818,7 @@ export function deriveEducation(
   const educationBlockedReason =
     availableAcademicWorkers <= 0
       ? "no-academic-staff"
-      : !(country.education.fundedAnnualSUSD > 0)
+      : !(country.education.fundedAnnualRUSD > 0)
         ? "no-funding"
         : schoolAgePopulation <= 0
           ? "no-school-age-population"
@@ -846,9 +846,9 @@ export function deriveEducation(
 /** One country's result from the daily education/research phase. */
 export interface EducationCountryResult {
   readonly countryId: Id;
-  readonly requestedSUSD: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
+  readonly requestedRUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
   readonly researchWork: number;
   readonly completedTechnologyId: Id | null;
   readonly literacyGainPopulation: number;
@@ -858,7 +858,7 @@ export interface EducationCountryResult {
 export interface EducationPhaseResult {
   readonly dayIndex: Day;
   readonly countries: readonly EducationCountryResult[];
-  readonly totalPaidSUSD: number;
+  readonly totalPaidRUSD: number;
   readonly completedTechnologyIds: readonly Id[];
 }
 
@@ -893,8 +893,8 @@ function resetEducationMemoIfDue(world: World, day: Day): void {
   for (const country of world.countries) {
     country.education = {
       ...country.education,
-      fundingRequestedMonthToDateSUSD: 0,
-      fundingShortfallMonthToDateSUSD: 0,
+      fundingRequestedMonthToDateRUSD: 0,
+      fundingShortfallMonthToDateRUSD: 0,
     };
   }
 }
@@ -918,7 +918,7 @@ export function runEducationPhase(
     return {
       dayIndex: day,
       countries: [],
-      totalPaidSUSD: 0,
+      totalPaidRUSD: 0,
       completedTechnologyIds: [],
     };
   }
@@ -944,7 +944,7 @@ export function runEducationPhase(
   const academicKeys = new Set(content.academicProfessionKeys);
   const professionKey = professionKeyById(definitions);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    const requested = country.education.fundedAnnualSUSD / yearDays;
+    const requested = country.education.fundedAnnualRUSD / yearDays;
     if (!Number.isFinite(requested) || requested < 0) {
       throw new RangeError(`invalid education funding for country ${String(country.id)}`);
     }
@@ -957,7 +957,7 @@ export function runEducationPhase(
       )
       .map((block) => ({ id: block.id, population: populationTotal(block) }));
     const treasury = index.get("country", country.id, "treasury-cash");
-    const payableCeiling = Math.max(0, treasury.balanceSUSD - country.fiscal.reserveTargetSUSD);
+    const payableCeiling = Math.max(0, treasury.balanceRUSD - country.fiscal.reserveTargetRUSD);
     const payable = eligible.length > 0 ? Math.min(requested, payableCeiling) : 0;
     const allocations = allocateProportionally(payable, eligible);
     const lines: JournalLine[] = [];
@@ -966,13 +966,13 @@ export function runEducationPhase(
       if (!(amount > 0)) continue;
       const cash = index.get("popBlock", block.id, "household-cash");
       const income = index.get("popBlock", block.id, "education-income");
-      lines.push({ accountId: cash.id, side: "debit", amountSUSD: amount });
-      lines.push({ accountId: income.id, side: "credit", amountSUSD: amount });
+      lines.push({ accountId: cash.id, side: "debit", amountRUSD: amount });
+      lines.push({ accountId: income.id, side: "credit", amountRUSD: amount });
     }
     if (payable > 0) {
       const expense = index.get("country", country.id, "education-expense");
-      lines.push({ accountId: expense.id, side: "debit", amountSUSD: payable });
-      lines.push({ accountId: treasury.id, side: "credit", amountSUSD: payable });
+      lines.push({ accountId: expense.id, side: "debit", amountRUSD: payable });
+      lines.push({ accountId: treasury.id, side: "credit", amountRUSD: payable });
       entries.push({
         transactionKind: "education-payroll",
         lines,
@@ -982,8 +982,8 @@ export function runEducationPhase(
     }
     const shortfall = Math.max(0, requested - payable);
     accumulateBudgetMemo(stagedFinance, country.id, {
-      educationRequestedSUSD: requested,
-      educationShortfallSUSD: shortfall,
+      educationRequestedRUSD: requested,
+      educationShortfallRUSD: shortfall,
     });
     countryDrafts.push({
       countryId: country.id,
@@ -1094,28 +1094,28 @@ export function runEducationPhase(
     }
     country.education = {
       ...country.education,
-      fundingRequestedMonthToDateSUSD:
-        country.education.fundingRequestedMonthToDateSUSD + requested,
-      fundingShortfallMonthToDateSUSD:
-        country.education.fundingShortfallMonthToDateSUSD + shortfall,
+      fundingRequestedMonthToDateRUSD:
+        country.education.fundingRequestedMonthToDateRUSD + requested,
+      fundingShortfallMonthToDateRUSD:
+        country.education.fundingShortfallMonthToDateRUSD + shortfall,
       lastUpdateDay: day,
     };
     countryResults.push({
       countryId: country.id,
-      requestedSUSD: roundTo(requested, 6),
-      paidSUSD: roundTo(paid, 6),
-      shortfallSUSD: roundTo(shortfall, 6),
+      requestedRUSD: roundTo(requested, 6),
+      paidRUSD: roundTo(paid, 6),
+      shortfallRUSD: roundTo(shortfall, 6),
       researchWork: roundTo(researchWork, 6),
       completedTechnologyId,
       literacyGainPopulation: gainPopulation,
     });
   }
-  const totalPaidSUSD = countryResults.reduce((total, result) => total + result.paidSUSD, 0);
+  const totalPaidRUSD = countryResults.reduce((total, result) => total + result.paidRUSD, 0);
   if (options.validateWorld !== false) {
     assertTechnologyStateMatchesDefinitions(world, definitions);
     assertValidTechnologyState(world);
   }
-  return { dayIndex: day, countries: countryResults, totalPaidSUSD, completedTechnologyIds };
+  return { dayIndex: day, countries: countryResults, totalPaidRUSD, completedTechnologyIds };
 }
 
 /** Population-weighted adult literacy of the country's academic blocks. */
@@ -1203,15 +1203,15 @@ export function cancelResearch(
 export function validateEducationFunding(
   world: World,
   definitions: EconomyDefinitions | undefined,
-  input: { readonly countryId: Id; readonly annualSUSD: number },
+  input: { readonly countryId: Id; readonly annualRUSD: number },
 ): Country {
   if (definitions?.technology === undefined || !world.technology.enabled) {
     throw new RangeError("M9 technology is not enabled for this world");
   }
   const country = world.countries.find((entry) => entry.id === input.countryId);
   if (country === undefined) throw new RangeError(`unknown country ${String(input.countryId)}`);
-  const annual = requireFiniteNumber(input.annualSUSD, "action.annualSUSD");
-  if (annual < 0 || annual > MAX_EDUCATION_FUNDING_SUSD_PER_YEAR) {
+  const annual = requireFiniteNumber(input.annualRUSD, "action.annualRUSD");
+  if (annual < 0 || annual > MAX_EDUCATION_FUNDING_RUSD_PER_YEAR) {
     throw new RangeError("education funding is out of range");
   }
   return country;

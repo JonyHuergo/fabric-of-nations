@@ -14,12 +14,11 @@
  * documented marker fallback instead of discarding the country.
  */
 
+import { projectLat, projectLon } from "../map/projection";
 import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import type { WorldMapPolity } from "../worldCatalogTypes";
-import { MAP_HEIGHT, MAP_WIDTH } from "./mapViewport";
+import { MAP_WIDTH } from "./mapViewport";
 
-/** Miller projection latitude clamp; keeps the map finite at the poles. */
-const MAX_PROJECTED_LATITUDE = 89.9;
 /** Delta-encoded source coordinates are thousandths of a degree. */
 const COORDINATE_SCALE = 1000;
 /** A drawable ring needs three distinct coordinate pairs. */
@@ -54,20 +53,11 @@ function requireRingArray(value: unknown, path: string): readonly number[] {
   return value as readonly number[];
 }
 
-function miller(latDegrees: number, path: string): number {
-  const latitude = requireFinite(latDegrees, path);
-  const lat = (Math.max(-MAX_PROJECTED_LATITUDE, Math.min(MAX_PROJECTED_LATITUDE, latitude)) * Math.PI) / 180;
-  return 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * lat));
-}
-
-const MILLER_MAX = miller(MAX_PROJECTED_LATITUDE, "projection.maxLatitude");
-
-/** Project one longitude/latitude pair into the 1000x500 map viewBox. */
+/** Project one longitude/latitude pair into the shared map viewBox. */
 export function project(lon: number, lat: number): readonly [number, number] {
-  const longitude = requireFinite(lon, "longitude");
   const projected: readonly [number, number] = [
-    ((longitude + 180) / 360) * MAP_WIDTH,
-    ((MILLER_MAX - miller(lat, "latitude")) / (2 * MILLER_MAX)) * MAP_HEIGHT,
+    projectLon(requireFinite(lon, "longitude")),
+    projectLat(requireFinite(lat, "latitude")),
   ];
   if (!Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) {
     throw new RangeError("projected map coordinate must be finite");

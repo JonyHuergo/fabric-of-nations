@@ -29,11 +29,11 @@ export function m5aScenario(): EconomyScenarioDef {
   const farm = scenario.definitions.buildings.find((building) => building.key === "farm");
   if (farm === undefined) throw new Error("M5a fixture requires the farm definition");
   farm.jobs = [{ professionId: 0, workersPerThroughputUnit: 100 }];
-  farm.dailyUpkeepSUSDAtLevelOne = 1;
+  farm.dailyUpkeepRUSDAtLevelOne = 1;
   farm.ownershipAllowed = ["private", "state"];
   scenario.markets = scenario.markets.map((market) => ({
     ...market,
-    priceSUSD: market.priceSUSD.map((price, goodId) => (goodId === 0 ? 0.5 : price)),
+    priceRUSD: market.priceRUSD.map((price, goodId) => (goodId === 0 ? 0.5 : price)),
   }));
   scenario.buildingInstances = scenario.buildingInstances.map((building) =>
     building.id === M5A_STATE_BUILDING

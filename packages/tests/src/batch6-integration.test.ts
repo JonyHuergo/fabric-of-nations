@@ -95,7 +95,7 @@ describe("Batch 6 integrated multi-country economic run", () => {
       issuerCountryId: debtor.id,
       holderKind: "country",
       holderId: debtor.debt.creditorId,
-      principalSUSD: DEBT_PRINCIPAL,
+      principalRUSD: DEBT_PRINCIPAL,
       annualCouponRate: 0.04,
       termDays: 365,
     });
@@ -139,8 +139,8 @@ describe("Batch 6 integrated multi-country economic run", () => {
       expect(wageIds.length).toBeGreaterThan(0);
       expect(upkeepIds.length).toBeGreaterThan(0);
       for (const wage of economy.settlement.wages) {
-        expect(wage.paidSUSD + wage.unpaidSUSD).toBeCloseTo(wage.obligationSUSD, 6);
-        expect(wage.obligationSUSD).toBeGreaterThan(0);
+        expect(wage.paidRUSD + wage.unpaidRUSD).toBeCloseTo(wage.obligationRUSD, 6);
+        expect(wage.obligationRUSD).toBeGreaterThan(0);
       }
       const definitionById = new Map(
         scenario.definitions.buildings.map((definition) => [definition.id, definition]),
@@ -149,15 +149,15 @@ describe("Batch 6 integrated multi-country economic run", () => {
       for (const building of world.buildings) {
         const definition = definitionById.get(building.definitionId);
         if (definition === undefined || !building.operational) continue;
-        const obligation = definition.dailyUpkeepSUSDAtLevelOne * building.level;
+        const obligation = definition.dailyUpkeepRUSDAtLevelOne * building.level;
         if (obligation > 0) expectedUpkeep.set(building.id, obligation);
       }
       expect(upkeepIds.sort((left, right) => left - right)).toEqual(
         [...expectedUpkeep.keys()].sort((left, right) => left - right),
       );
       for (const upkeep of economy.settlement.upkeep) {
-        expect(upkeep.obligationSUSD).toBeCloseTo(expectedUpkeep.get(upkeep.buildingId) ?? -1, 6);
-        expect(upkeep.paidSUSD + upkeep.unpaidSUSD).toBeCloseTo(upkeep.obligationSUSD, 6);
+        expect(upkeep.obligationRUSD).toBeCloseTo(expectedUpkeep.get(upkeep.buildingId) ?? -1, 6);
+        expect(upkeep.paidRUSD + upkeep.unpaidRUSD).toBeCloseTo(upkeep.obligationRUSD, 6);
       }
       expect(economy.settlement.marketIds).toEqual([0, 1, 2, 3, 4]);
       // Monthly close ordering: the close is recorded on the civil month-end and
@@ -212,24 +212,24 @@ describe("Batch 6 integrated multi-country economic run", () => {
     expect(activeContracts.length).toBeLessThanOrEqual(MAX_ACTIVE_DEBT_CONTRACTS);
     expect(world.finance.debtHistory.length).toBeLessThanOrEqual(MAX_DEBT_HISTORY_AGGREGATES);
     const outstandingPrincipal = activeContracts.reduce(
-      (total, contract) => total + contract.outstandingPrincipalSUSD,
+      (total, contract) => total + contract.outstandingPrincipalRUSD,
       0,
     );
     const accruedInterest = activeContracts.reduce(
-      (total, contract) => total + contract.accruedInterestSUSD,
+      (total, contract) => total + contract.accruedInterestRUSD,
       0,
     );
     expect(
-      account(world, "country", debtor.id, "debt-liability").balanceSUSD,
+      account(world, "country", debtor.id, "debt-liability").balanceRUSD,
     ).toBeCloseTo(outstandingPrincipal, 6);
     expect(
-      account(world, "country", debtor.debt.creditorId, "bond-asset").balanceSUSD,
+      account(world, "country", debtor.debt.creditorId, "bond-asset").balanceRUSD,
     ).toBeCloseTo(outstandingPrincipal, 6);
     expect(
-      account(world, "country", debtor.id, "interest-payable").balanceSUSD,
+      account(world, "country", debtor.id, "interest-payable").balanceRUSD,
     ).toBeCloseTo(accruedInterest, 6);
     expect(
-      account(world, "country", debtor.debt.creditorId, "interest-receivable").balanceSUSD,
+      account(world, "country", debtor.debt.creditorId, "interest-receivable").balanceRUSD,
     ).toBeCloseTo(accruedInterest, 6);
     expect(outstandingPrincipal).toBeGreaterThanOrEqual(DEBT_PRINCIPAL);
 

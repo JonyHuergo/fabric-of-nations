@@ -73,12 +73,12 @@ export interface SimulationContextValue {
   readonly applyFiscalPolicy: (
     countryId: number,
     incomeTaxRate: number,
-    welfareBudgetSUSDPerYear: number,
+    welfareBudgetRUSDPerYear: number,
     schedule?: {
-      readonly incomeTaxAllowanceSUSDPerYear: number;
+      readonly incomeTaxAllowanceRUSDPerYear: number;
       readonly welfareMaxWealthLevel: number;
       readonly businessProfitTaxRate: number;
-      readonly reserveTargetSUSD: number;
+      readonly reserveTargetRUSD: number;
     },
   ) => void;
   /** Send any supported E2 action through the shared validated action path. */
@@ -118,17 +118,17 @@ function appliedActionFromSnapshot(
       return {
         kind: "set-fiscal-policy",
         incomeTaxRate: country.fiscal.incomeTaxRate,
-        incomeTaxAllowanceSUSDPerYear: country.fiscal.incomeTaxAllowanceSUSDPerYear,
-        welfareBudgetSUSDPerYear: country.fiscal.welfareBudgetSUSDPerYear,
+        incomeTaxAllowanceRUSDPerYear: country.fiscal.incomeTaxAllowanceRUSDPerYear,
+        welfareBudgetRUSDPerYear: country.fiscal.welfareBudgetRUSDPerYear,
         welfareMaxWealthLevel: country.fiscal.welfareMaxWealthLevel,
         businessProfitTaxRate: country.fiscal.businessProfitTaxRate,
-        reserveTargetSUSD: country.fiscal.reserveTargetSUSD,
+        reserveTargetRUSD: country.fiscal.reserveTargetRUSD,
       };
     case "set-debt-policy":
       return {
         kind: "set-debt-policy",
         refinanceOnMaturity: country.debtPolicy.refinanceOnMaturity,
-        maxOutstandingPrincipalSUSD: country.debtPolicy.maxOutstandingPrincipalSUSD,
+        maxOutstandingPrincipalRUSD: country.debtPolicy.maxOutstandingPrincipalRUSD,
       };
     case "start-research":
       return {
@@ -139,7 +139,7 @@ function appliedActionFromSnapshot(
     case "set-education-funding":
       return {
         kind: "set-education-funding",
-        annualSUSD: country.education.fundedAnnualSUSD,
+        annualRUSD: country.education.fundedAnnualRUSD,
       };
     case "set-research-staff-share":
       return {
@@ -149,12 +149,12 @@ function appliedActionFromSnapshot(
     case "set-training-budget":
       return {
         kind: "set-training-budget",
-        annualSUSD: country.labor.trainingBudgetSUSDPerYear,
+        annualRUSD: country.labor.trainingBudgetRUSDPerYear,
       };
     case "set-training-stipend":
       return {
         kind: "set-training-stipend",
-        annualSUSD: country.labor.trainingStipendPerTraineeSUSDPerYear,
+        annualRUSD: country.labor.trainingStipendPerTraineeRUSDPerYear,
       };
     case "set-training-staff-share":
       return {
@@ -637,23 +637,23 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     (
       countryId: number,
       incomeTaxRate: number,
-      welfareBudgetSUSDPerYear: number,
+      welfareBudgetRUSDPerYear: number,
       schedule?: {
-        readonly incomeTaxAllowanceSUSDPerYear: number;
+        readonly incomeTaxAllowanceRUSDPerYear: number;
         readonly welfareMaxWealthLevel: number;
         readonly businessProfitTaxRate: number;
-        readonly reserveTargetSUSD: number;
+        readonly reserveTargetRUSD: number;
       },
     ) => {
       applyAction({
         kind: "set-fiscal-policy",
         countryId,
         incomeTaxRate,
-        incomeTaxAllowanceSUSDPerYear: schedule?.incomeTaxAllowanceSUSDPerYear ?? 0,
-        welfareBudgetSUSDPerYear,
+        incomeTaxAllowanceRUSDPerYear: schedule?.incomeTaxAllowanceRUSDPerYear ?? 0,
+        welfareBudgetRUSDPerYear,
         welfareMaxWealthLevel: schedule?.welfareMaxWealthLevel ?? 99,
         businessProfitTaxRate: schedule?.businessProfitTaxRate ?? 0,
-        reserveTargetSUSD: schedule?.reserveTargetSUSD ?? 0,
+        reserveTargetRUSD: schedule?.reserveTargetRUSD ?? 0,
       });
     },
     [applyAction],

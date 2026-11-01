@@ -218,7 +218,7 @@ export const SOURCES = [
   },
   {
     id: "project-authored-1900",
-    title: "Century M11c authored boundary reconstruction",
+    title: "Fabric of Nations M11c authored boundary reconstruction",
     url: "internal:packages/data/data/historical/m11/boundaries_1900.json",
     license: "Project data",
     date: "2026",

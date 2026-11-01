@@ -4,7 +4,7 @@ import {
   countryById,
   fiscalResultLabel,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   marketForCountry,
   type SimulationSnapshot,
   type WorkerCommand,
@@ -197,14 +197,14 @@ describe("M7 simulation worker host", () => {
         kind: "support-public-enterprise",
         countryId: country.id,
         buildingId: 0,
-        amountSUSD: 100,
+        amountRUSD: 100,
       },
     });
     expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(false);
     expect(
       lastSnapshot(events).countries.find((entry) => entry.id === country.id)!
-        .treasuryCashSUSD,
-    ).toBeCloseTo(country.treasuryCashSUSD, 6);
+        .treasuryCashRUSD,
+    ).toBeCloseTo(country.treasuryCashRUSD, 6);
   });
 
   test("round-trips a construction action through the validated worker protocol", () => {
@@ -239,8 +239,8 @@ describe("M7 simulation worker host", () => {
     host.handleCommand(command("STEP", "construct-step-1", { ticks: 2 }));
     const progressing = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
     expect(progressing.constructionProjects[0]?.status).toBe("active");
-    expect(progressing.constructionProjects[0]?.spentSUSD).toBeGreaterThan(0);
-    expect(progressing.constructionInProgressSUSD).toBeGreaterThan(0);
+    expect(progressing.constructionProjects[0]?.spentRUSD).toBeGreaterThan(0);
+    expect(progressing.constructionInProgressRUSD).toBeGreaterThan(0);
 
     host.handleCommand({
       protocolVersion: PROTOCOL_VERSION,
@@ -274,7 +274,7 @@ describe("M7 simulation worker host", () => {
     expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(true);
     const cancelled = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
     expect(cancelled.constructionProjects[0]?.status).toBe("cancelled");
-    expect(cancelled.constructionInProgressSUSD).toBeCloseTo(0, 6);
+    expect(cancelled.constructionInProgressRUSD).toBeCloseTo(0, 6);
   });
 
   test("rejects a construction action with invalid region/definition ids", () => {
@@ -314,11 +314,11 @@ describe("M7 simulation worker host", () => {
         kind: "set-fiscal-policy",
         countryId: countryBefore.id,
         incomeTaxRate: 0.2,
-        incomeTaxAllowanceSUSDPerYear: 0,
-        welfareBudgetSUSDPerYear: 100,
+        incomeTaxAllowanceRUSDPerYear: 0,
+        welfareBudgetRUSDPerYear: 100,
         welfareMaxWealthLevel: 99,
         businessProfitTaxRate: 0,
-        reserveTargetSUSD: 0,
+        reserveTargetRUSD: 0,
       },
     });
     const accepted = lastEvent(events, "ACTION_RESULT");
@@ -336,11 +336,11 @@ describe("M7 simulation worker host", () => {
         kind: "set-fiscal-policy",
         countryId: 99,
         incomeTaxRate: 0.2,
-        incomeTaxAllowanceSUSDPerYear: 0,
-        welfareBudgetSUSDPerYear: 100,
+        incomeTaxAllowanceRUSDPerYear: 0,
+        welfareBudgetRUSDPerYear: 100,
         welfareMaxWealthLevel: 99,
         businessProfitTaxRate: 0,
-        reserveTargetSUSD: 0,
+        reserveTargetRUSD: 0,
       },
     });
     const rejected = lastEvent(events, "ACTION_RESULT");
@@ -414,7 +414,7 @@ describe("M7 simulation worker host", () => {
     const country = countryById(snapshot, snapshot.countries[0]?.id ?? null);
     expect(country).not.toBeNull();
     expect(country?.tag).toBe("USA");
-    expect(formatSUSD(1_500_000)).toBe("1.50M SUSD");
+    expect(formatRUSD(1_500_000)).toBe("1.50M RUSD");
     expect(formatRate(0.125)).toBe("12.5%");
     expect(fiscalResultLabel(-1)).toBe("Deficit");
     expect(marketForCountry(snapshot, country)?.regionIds.length).toBeGreaterThan(0);

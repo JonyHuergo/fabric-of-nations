@@ -36,10 +36,16 @@ describe("M11c.1 rendering contract", () => {
 
   test("the land path is not drawn outside the zoom transform", () => {
     const group = WORLD_MAP.indexOf("<G transform={`translate");
-    const land = WORLD_MAP.indexOf("d={landPath}");
-    // Only one land path should exist, and it must be after the transform group.
-    expect(WORLD_MAP.split("d={landPath}").length - 1).toBe(1);
-    expect(land).toBeGreaterThan(group);
+    // M12a added a second land path: the neutral fill and the coastline re-stroke
+    // that hides the province hairline along the shore. Both must share the zoom
+    // transform; neither may be drawn at world scale outside it.
+    const landPaths = [...WORLD_MAP.matchAll(/d=\{landPath\}/gu)].map(
+      (match) => match.index ?? -1,
+    );
+    expect(landPaths.length).toBe(2);
+    for (const land of landPaths) {
+      expect(land).toBeGreaterThan(group);
+    }
   });
 
   test("wheel, trackpad and pinch zoom are wired, and the maximum is raised", () => {

@@ -72,8 +72,8 @@ values are described as documented approximations.
 | Our World in Data — Population, long-run series | rounded 1900 population totals | CC BY 4.0 | values only |
 | Maddison Project Database 2023 | cross-checks for population totals | CC BY 4.0 | values only |
 | Our World in Data — Employment by sector | broad occupation-structure ranges | CC BY 4.0 | values only |
-| Century M2 1900 world age structure | age/sex expansion for every block | project data | yes (project) |
-| Century M11/M11c authored catalog and boundary transfers | status, capitals, markets, geometry crosswalk, 1900 transfers, boundary provenance, fiscal/technology/building starts | project data | yes (project) |
+| Fabric of Nations M2 1900 world age structure | age/sex expansion for every block | project data | yes (project) |
+| Fabric of Nations M11/M11c authored catalog and boundary transfers | status, capitals, markets, geometry crosswalk, 1900 transfers, boundary provenance, fiscal/technology/building starts | project data | yes (project) |
 | Natural Earth 1:50m cultural vectors | map base geometry | public domain | yes, derived |
 | Natural Earth 1:10m admin-0/admin-1 | historical reconstruction blocks and clipping | public domain | yes, derived |
 | world-atlas 2.0.2 | TopoJSON encoding of Natural Earth | ISC | yes, derived |
@@ -105,7 +105,7 @@ derived map in this project, so no CShapes geometry is included.
 - Market grouping is authored. Imperial markets group a metropole with its
   dependencies; shared markets group independent countries. They are not
   historical trade treaties.
-- Currencies are identities only. All SUSD valuations are explicitly
+- Currencies are identities only. All RUSD valuations are explicitly
   `unavailable`; no 1900 exchange rate is invented.
 - Technology starts are tier-based subsets of the validated technology catalog
   and are not a claim that every country had exactly those capabilities.

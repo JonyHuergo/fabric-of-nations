@@ -9,7 +9,7 @@
 
 import { assertValidDayIndex, civilDateToDayIndex, dayIndexToCivilDate, daysInMonth } from "../calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { workingAgePopulation } from "../population/state.js";
 import {
   requireArray,
@@ -101,7 +101,7 @@ import {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 /** True when `dayIndex` is the last civil day of its Gregorian month. */
@@ -151,7 +151,7 @@ export function assertValidFinancialAccount(account: FinancialAccount): void {
     record.ownerId === null
       ? null
       : requireInteger(record.ownerId, "finance.accounts[].ownerId", 0, 0xffff_ffff);
-  const balance = requireFiniteNumber(record.balanceSUSD, "finance.accounts[].balanceSUSD");
+  const balance = requireFiniteNumber(record.balanceRUSD, "finance.accounts[].balanceRUSD");
 
   if (ownerKind === "system") {
     if (ownerId !== null) {
@@ -192,8 +192,8 @@ function assertPostingLine(
   if (record.side !== "debit" && record.side !== "credit") {
     throw new RangeError(`${path}.side must be debit or credit`);
   }
-  const amount = requireFiniteNumber(record.amountSUSD, `${path}.amountSUSD`);
-  if (!(amount > 0)) throw new RangeError(`${path}.amountSUSD must be strictly positive`);
+  const amount = requireFiniteNumber(record.amountRUSD, `${path}.amountRUSD`);
+  if (!(amount > 0)) throw new RangeError(`${path}.amountRUSD must be strictly positive`);
   // D-047 semantic matrix: applies to revenue/expense lines for every kind.
   assertSemanticJournalLine(transactionKind, account, record.side, path);
   const normalSide = account.category === "asset" || account.category === "expense" ? "debit" : "credit";
@@ -319,10 +319,10 @@ export function assertValidJournalPosting(
       journalLines.push({
         accountId: line.account.id,
         side: line.debit > 0 ? "debit" : "credit",
-        amountSUSD: line.debit > 0 ? line.debit : line.credit,
+        amountRUSD: line.debit > 0 ? line.debit : line.credit,
       });
     }
-    if (Math.abs(debits - credits) > MONEY_TOLERANCE_SUSD) {
+    if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
       throw new RangeError(
         `${path} is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
       );
@@ -332,7 +332,7 @@ export function assertValidJournalPosting(
     }
     if (
       transactionKind !== "correction" &&
-      Math.abs(cashDelta) > MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(cashDelta))
+      Math.abs(cashDelta) > MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(cashDelta))
     ) {
       throw new RangeError(
         `${path} changes aggregate designated cash by ${String(cashDelta)} under a cash-neutral transaction kind`,
@@ -444,17 +444,17 @@ function assertValidAnnualSummary(
             totals[field],
             `${path}.fiscalTotals.${String(countryId)}.${field}`,
           );
-    const tax = valueOf("incomeTaxRevenueSUSD");
-    const businessTax = valueOf("businessTaxRevenueSUSD");
-    const welfare = valueOf("welfareExpenseSUSD");
-    const interest = valueOf("interestExpenseSUSD");
-    const subsidy = valueOf("subsidyExpenseSUSD");
-    const administration = valueOf("administrationExpenseSUSD");
-    const education = valueOf("educationExpenseSUSD");
-    const training = valueOf("trainingExpenseSUSD");
-    const military = valueOf("militaryExpenseSUSD");
-const customs = valueOf("customsDutyRevenueSUSD");
-    const net = valueOf("netFiscalResultSUSD");
+    const tax = valueOf("incomeTaxRevenueRUSD");
+    const businessTax = valueOf("businessTaxRevenueRUSD");
+    const welfare = valueOf("welfareExpenseRUSD");
+    const interest = valueOf("interestExpenseRUSD");
+    const subsidy = valueOf("subsidyExpenseRUSD");
+    const administration = valueOf("administrationExpenseRUSD");
+    const education = valueOf("educationExpenseRUSD");
+    const training = valueOf("trainingExpenseRUSD");
+    const military = valueOf("militaryExpenseRUSD");
+const customs = valueOf("customsDutyRevenueRUSD");
+    const net = valueOf("netFiscalResultRUSD");
     if (
       tax < 0 ||
       businessTax < 0 ||
@@ -520,9 +520,9 @@ const customs = valueOf("customsDutyRevenueSUSD");
     const countryId = parseAccountTotalKey(key, `${path}.closingBalances`);
     const values = requireRecord(balances[key], `${path}.closingBalances.${key}`);
     for (const field of [
-      "treasuryCashSUSD",
-      "debtLiabilitySUSD",
-      "interestPayableSUSD",
+      "treasuryCashRUSD",
+      "debtLiabilityRUSD",
+      "interestPayableRUSD",
     ] as const) {
       const value = requireFiniteNumber(
         values[field],
@@ -574,8 +574,8 @@ function assertValidFinanceCorrection(
     if (line.side !== "debit" && line.side !== "credit") {
       throw new RangeError(`${linePath}.side must be debit or credit`);
     }
-    const amount = requireFiniteNumber(line.amountSUSD, `${linePath}.amountSUSD`);
-    if (!(amount > 0)) throw new RangeError(`${linePath}.amountSUSD must be positive`);
+    const amount = requireFiniteNumber(line.amountRUSD, `${linePath}.amountRUSD`);
+    if (!(amount > 0)) throw new RangeError(`${linePath}.amountRUSD must be positive`);
     if (line.side === "debit") debits += amount;
     else credits += amount;
   }
@@ -784,10 +784,10 @@ export function assertValidFinanceState(finance: FinanceState): void {
       requireInteger(recordHistory[field], `${path}.${field}`, 0, 1_000_000);
     }
     for (const field of [
-      "principalIssuedSUSD",
-      "principalRepaidSUSD",
-      "principalWrittenOffSUSD",
-      "interestWrittenOffSUSD",
+      "principalIssuedRUSD",
+      "principalRepaidRUSD",
+      "principalWrittenOffRUSD",
+      "interestWrittenOffRUSD",
     ] as const) {
       const value = requireFiniteNumber(recordHistory[field], `${path}.${field}`);
       if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
@@ -814,7 +814,7 @@ export function assertValidFinanceState(finance: FinanceState): void {
   const opening = record.opening as FinanceState["opening"];
   if (opening === null || opening === undefined) {
     for (const account of accounts.values()) {
-      if (account.balanceSUSD !== 0) {
+      if (account.balanceRUSD !== 0) {
         throw new RangeError(
           `world.finance.opening is required when account ${String(account.id)} has a non-zero balance`,
         );
@@ -905,17 +905,17 @@ export function assertValidFinancePeriodSummary(
               entry[field],
               `${path}.countryFiscalTotals.${key}.${field}`,
             );
-      const tax = valueOf("incomeTaxRevenueSUSD");
-      const businessTax = valueOf("businessTaxRevenueSUSD");
-      const welfare = valueOf("welfareExpenseSUSD");
-      const interest = valueOf("interestExpenseSUSD");
-      const net = valueOf("netFiscalResultSUSD");
-      const subsidy = valueOf("subsidyExpenseSUSD");
-      const administration = valueOf("administrationExpenseSUSD");
-      const education = valueOf("educationExpenseSUSD");
-      const training = valueOf("trainingExpenseSUSD");
-      const military = valueOf("militaryExpenseSUSD");
-const customs = valueOf("customsDutyRevenueSUSD");
+      const tax = valueOf("incomeTaxRevenueRUSD");
+      const businessTax = valueOf("businessTaxRevenueRUSD");
+      const welfare = valueOf("welfareExpenseRUSD");
+      const interest = valueOf("interestExpenseRUSD");
+      const net = valueOf("netFiscalResultRUSD");
+      const subsidy = valueOf("subsidyExpenseRUSD");
+      const administration = valueOf("administrationExpenseRUSD");
+      const education = valueOf("educationExpenseRUSD");
+      const training = valueOf("trainingExpenseRUSD");
+      const military = valueOf("militaryExpenseRUSD");
+const customs = valueOf("customsDutyRevenueRUSD");
       if (
         tax < 0 ||
         businessTax < 0 ||
@@ -943,7 +943,7 @@ const customs = valueOf("customsDutyRevenueSUSD");
         military;
       if (Math.abs(net - expectedNet) > toleranceMoney(net, expectedNet)) {
         throw new RangeError(
-          `${path}.countryFiscalTotals.${key}.netFiscalResultSUSD ${String(net)} does not equal ${String(expectedNet)}`,
+          `${path}.countryFiscalTotals.${key}.netFiscalResultRUSD ${String(net)} does not equal ${String(expectedNet)}`,
         );
       }
     }
@@ -1292,11 +1292,11 @@ function assertValidMarket(
     seenRegions.add(regionId);
   }
 
-  const rawPrices = requireArray(record.priceSUSD, `${path}.priceSUSD`);
-  if (rawPrices.length === 0) throw new RangeError(`${path}.priceSUSD must not be empty`);
+  const rawPrices = requireArray(record.priceRUSD, `${path}.priceRUSD`);
+  if (rawPrices.length === 0) throw new RangeError(`${path}.priceRUSD must not be empty`);
   for (let index = 0; index < rawPrices.length; index += 1) {
-    const price = requireFiniteNumber(rawPrices[index], `${path}.priceSUSD[${String(index)}]`);
-    if (!(price > 0)) throw new RangeError(`${path}.priceSUSD[${String(index)}] must be positive`);
+    const price = requireFiniteNumber(rawPrices[index], `${path}.priceRUSD[${String(index)}]`);
+    if (!(price > 0)) throw new RangeError(`${path}.priceRUSD[${String(index)}] must be positive`);
   }
 
   const rawLots = requireArray(record.stockLots, `${path}.stockLots`);
@@ -1722,7 +1722,7 @@ export function assertValidEconomyState(
     );
     assertValidTradePolicyState(
       country.trade,
-      world.markets[0]?.priceSUSD.length ?? 0,
+      world.markets[0]?.priceRUSD.length ?? 0,
       `country ${String(country.id)}.trade`,
     );
     if (country.debt.enabled) {

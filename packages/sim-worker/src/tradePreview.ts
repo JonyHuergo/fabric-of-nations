@@ -17,7 +17,7 @@ export interface TradePolicyPreview {
   /** True when the country administers no customs frontier, so tariffs cannot apply. */
   readonly tariffInert: boolean;
   /** Estimated duty on a unit of each good at the current market price, by good id. */
-  readonly estimatedDutyPerUnitSUSD: readonly number[];
+  readonly estimatedDutyPerUnitRUSD: readonly number[];
   /** Goods whose current export ban removes a real flow. */
   readonly exportBannedGoodCount: number;
   readonly notes: readonly string[];
@@ -83,17 +83,17 @@ export function previewTradePolicy(
   // Estimated duty per unit uses the highest current destination price among the
   // administered markets; an observed market price, not a forecast.
   const administeredMarkets = new Set(customsMarketIds);
-  const estimatedDutyPerUnitSUSD: number[] = [];
+  const estimatedDutyPerUnitRUSD: number[] = [];
   for (let goodId = 0; goodId < goodCount; goodId += 1) {
     let referencePrice = 0;
     for (const market of snapshot.markets) {
       if (!administeredMarkets.has(market.id)) continue;
       const price = market.prices.find((entry) => entry.goodId === goodId);
-      if (price !== undefined && price.priceSUSD > referencePrice) {
-        referencePrice = price.priceSUSD;
+      if (price !== undefined && price.priceRUSD > referencePrice) {
+        referencePrice = price.priceRUSD;
       }
     }
-    estimatedDutyPerUnitSUSD.push(
+    estimatedDutyPerUnitRUSD.push(
       Math.round(referencePrice * clampRate(rates[goodId] ?? 0) * 1_000_000) / 1_000_000,
     );
   }
@@ -116,7 +116,7 @@ export function previewTradePolicy(
     errors,
     customsMarketIds,
     tariffInert: customsMarketIds.length === 0,
-    estimatedDutyPerUnitSUSD,
+    estimatedDutyPerUnitRUSD,
     exportBannedGoodCount: restrictions.filter(Boolean).length,
     notes,
   };
@@ -127,5 +127,5 @@ export function describeTradeRoute(
   route: SnapshotTradeRoute,
   marketLabel: (marketId: number) => string,
 ): string {
-  return `${marketLabel(route.marketAId)} ↔ ${marketLabel(route.marketBId)}: distance ${route.distanceUnits.toFixed(1)}, ${route.transitDays} day(s) transit, capacity ${route.capacitySUSDPerDay.toFixed(0)} SUSD/day per direction (base ${route.baseCapacitySUSDPerDay.toFixed(0)})`;
+  return `${marketLabel(route.marketAId)} ↔ ${marketLabel(route.marketBId)}: distance ${route.distanceUnits.toFixed(1)}, ${route.transitDays} day(s) transit, capacity ${route.capacityRUSDPerDay.toFixed(0)} RUSD/day per direction (base ${route.baseCapacityRUSDPerDay.toFixed(0)})`;
 }

@@ -19,7 +19,7 @@ import {
 export function accountBalance(world: World, accountId: number): number {
   const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 export function economyTickContext(scenario: EconomyScenarioDef): TickContext {
@@ -49,7 +49,7 @@ export function totalCash(world: World): number {
  * Set a designated cash balance and adjust the matching owner-equity account by
  * the same delta so the accounting identity stays valid. Test-only helper.
  */
-export function setCashBalance(world: World, accountId: number, balanceSUSD: number): void {
+export function setCashBalance(world: World, accountId: number, balanceRUSD: number): void {
   const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   if (
@@ -68,8 +68,8 @@ export function setCashBalance(world: World, accountId: number, balanceSUSD: num
   if (equity === undefined) {
     throw new Error(`missing owner-equity account for cash account ${String(accountId)}`);
   }
-  equity.balanceSUSD += balanceSUSD - account.balanceSUSD;
-  account.balanceSUSD = balanceSUSD;
+  equity.balanceRUSD += balanceRUSD - account.balanceRUSD;
+  account.balanceRUSD = balanceRUSD;
 }
 
 export interface SettlementCase {

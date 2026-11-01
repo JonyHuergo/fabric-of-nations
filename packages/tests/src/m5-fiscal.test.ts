@@ -25,7 +25,7 @@ function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
 describe("M5 multi-country finance and fiscal integrity", () => {
   test("reconciles each country's treasury with its own residents' income tax", () => {
     const scenario = m5Scenario({
-      fiscal: { [M5_COUNTRY_B]: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 } },
+      fiscal: { [M5_COUNTRY_B]: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 } },
     });
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     runTicks(world, 10, context(scenario));
@@ -58,13 +58,13 @@ describe("M5 multi-country finance and fiscal integrity", () => {
               account.ownerId === block.id &&
               account.subtype === "income-tax-expense",
           );
-          return total + (expense?.balanceSUSD ?? 0);
+          return total + (expense?.balanceRUSD ?? 0);
         }, 0);
-      expect(taxRevenue.balanceSUSD).toBeCloseTo(residentTax, 6);
-      expect(treasury.balanceSUSD).toBeGreaterThanOrEqual(0);
+      expect(taxRevenue.balanceRUSD).toBeCloseTo(residentTax, 6);
+      expect(treasury.balanceRUSD).toBeGreaterThanOrEqual(0);
       if (country.id === M5_COUNTRY_B) {
-        expect(taxRevenue.balanceSUSD).toBe(0);
-        expect(treasury.balanceSUSD).toBeCloseTo(10_000, 6);
+        expect(taxRevenue.balanceRUSD).toBe(0);
+        expect(treasury.balanceRUSD).toBeCloseTo(10_000, 6);
       }
     }
     assertValidWorld(world);
@@ -91,8 +91,8 @@ describe("M5 multi-country finance and fiscal integrity", () => {
     const totals = governmentPeriodTotals(world.finance, summary);
     expect(totals).toHaveLength(world.countries.length);
     for (const country of totals) {
-      expect(country.incomeTaxRevenueSUSD).toBeGreaterThanOrEqual(0);
-      expect(country.welfareExpenseSUSD).toBeGreaterThanOrEqual(0);
+      expect(country.incomeTaxRevenueRUSD).toBeGreaterThanOrEqual(0);
+      expect(country.welfareExpenseRUSD).toBeGreaterThanOrEqual(0);
     }
     assertAccountingIdentity(world.finance);
     assertValidWorld(world);
@@ -107,8 +107,8 @@ describe("M5 multi-country finance and fiscal integrity", () => {
     expect(JSON.stringify(first.finance.periodSummaries)).toBe(
       JSON.stringify(second.finance.periodSummaries),
     );
-    expect(first.finance.accounts.map((account) => account.balanceSUSD)).toEqual(
-      second.finance.accounts.map((account) => account.balanceSUSD),
+    expect(first.finance.accounts.map((account) => account.balanceRUSD)).toEqual(
+      second.finance.accounts.map((account) => account.balanceRUSD),
     );
   });
 
@@ -122,7 +122,7 @@ describe("M5 multi-country finance and fiscal integrity", () => {
           account.ownerKind === "country" &&
           account.ownerId === countryId &&
           account.subtype === "treasury-cash",
-      )?.balanceSUSD ?? 0;
+      )?.balanceRUSD ?? 0;
     expect(treasury(M5_COUNTRY_A)).not.toBe(treasury(M5_COUNTRY_C));
     expect(world.regions.find((region) => region.id === M5_REGION_A1)?.marketId).toBe(0);
     // A market transfer is a goods purchase, not a fiscal flow.

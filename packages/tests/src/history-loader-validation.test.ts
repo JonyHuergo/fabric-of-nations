@@ -66,15 +66,15 @@ describe("historical loader validation consistency", () => {
     const rate = cloneData(loadM5HistoricalData());
     rate.countries[0]!.currency.valuation = {
       status: "specified",
-      susdPerUnit: 1e13,
+      rusdPerUnit: 1e13,
       sourceIds: ["owid-population"],
     };
-    expect(errorsOf(rate).join("\n")).toMatch(/susdPerUnit must be in/);
+    expect(errorsOf(rate).join("\n")).toMatch(/rusdPerUnit must be in/);
     expect(() => buildM5HistoricalScenario(rate)).toThrow(HistoricalDataError);
 
     const budget = cloneData(loadM5HistoricalData());
-    budget.countries[0]!.fiscal.welfareBudgetSUSDPerYear = 1e16;
-    expect(errorsOf(budget).join("\n")).toMatch(/welfareBudgetSUSDPerYear must not exceed/);
+    budget.countries[0]!.fiscal.welfareBudgetRUSDPerYear = 1e16;
+    expect(errorsOf(budget).join("\n")).toMatch(/welfareBudgetRUSDPerYear must not exceed/);
 
     const key = cloneData(loadM5HistoricalData());
     key.countries[0]!.currency.key = `a${"b".repeat(32)}`;

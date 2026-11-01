@@ -142,11 +142,11 @@ describe("M4a-2 serialization and determinism", () => {
   test("rejects a corrupt specified valuation at decode", () => {
     const serialized = serializeWorld(build(ownCurrencyScenario()));
     const parsed = JSON.parse(serialized) as {
-      payload?: { currencyValuations?: { susdPerUnit?: unknown }[] };
+      payload?: { currencyValuations?: { rusdPerUnit?: unknown }[] };
     };
     const valuation = parsed.payload?.currencyValuations?.[0];
     if (valuation === undefined) throw new Error("missing valuation payload");
-    valuation.susdPerUnit = 0;
+    valuation.rusdPerUnit = 0;
     expect(() => deserializeWorld(JSON.stringify(parsed))).toThrow(/checksum/i);
   });
 
@@ -156,7 +156,7 @@ describe("M4a-2 serialization and determinism", () => {
     if (valuation === undefined || valuation.status !== "specified") {
       throw new Error("missing specified valuation");
     }
-    (valuation as unknown as { susdPerUnit: number }).susdPerUnit = 0;
+    (valuation as unknown as { rusdPerUnit: number }).rusdPerUnit = 0;
     expect(() => assertValidWorld(world)).toThrow(/positive|1e-12/i);
   });
 });
@@ -172,8 +172,8 @@ function simulatedForeignScenario(): EconomyScenarioDef {
       monetary: { kind: "own", currencyId: 1 },
       regionIds: [],
       treasuryAccountId: 9001,
-      initialTreasuryCashSUSD: 0,
-      fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
+      initialTreasuryCashRUSD: 0,
+      fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
     },
   ];
   scenario.currencies = [

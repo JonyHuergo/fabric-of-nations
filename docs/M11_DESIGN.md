@@ -2,7 +2,7 @@
 
 Status: implementation design record for M11. This file records the decisions
 that the code and data implement; the authoritative game specification remains
-the GDD (`Century_GDD_v2.18.md`) and `DECISIONS.md`.
+the GDD (`Fabric_of_Nations_GDD.md`) and `DECISIONS.md`.
 
 ## 1. Historical classification and start date
 

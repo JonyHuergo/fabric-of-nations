@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env node
 /**
- * Historical flag asset pipeline for the 1900 Century catalog.
+ * Historical flag asset pipeline for the 1900 Fabric of Nations catalog.
  *
  * The authored approval list lives in
  * `packages/data/data/historical/m11/flags_1900.json`. Every entry records the
@@ -57,7 +57,7 @@ const DOC_PATH = join(ROOT, "docs/FLAG_PROVENANCE.md");
 
 const API = "https://commons.wikimedia.org/w/api.php";
 const USER_AGENT =
-  "CenturyGameFlagAudit/0.1 (https://github.com/century-game; offline 1900 flag asset pipeline)";
+  "FabricOfNationsFlagAudit/0.1 (https://github.com/century-game; offline 1900 flag asset pipeline)";
 const ALLOWED_LICENSE_CODES = new Set(["pd", "cc0"]);
 const PROJECT_LICENSE_CODE = "project";
 const PROJECT_FLAG_WIDTH = 1000;
@@ -406,7 +406,7 @@ async function renderProjectSource(flag) {
     canvas.composite(arms, Math.round((width - targetWidth) / 2), Math.round((height - targetHeight) / 2));
   } else if (project.design === "darfur-user-selected") {
     // User-selected representative design: green/red/black horizontal triband
-    // with a white crescent on the red band. This is an original Century
+    // with a white crescent on the red band. This is an original Fabric of Nations
     // reconstruction from the visible geometry, not the Pax Historia raster.
     const bandHeight = Math.round(height / 3);
     canvas.composite(solidImage(width, bandHeight, "#007b3a"), 0, 0);
@@ -1007,10 +1007,10 @@ function buildDoc(manifest, catalog) {
   }
 
   const lines = [];
-  lines.push("# Historical flag provenance â€” Century 1900");
+  lines.push("# Historical flag provenance â€” Fabric of Nations 1900");
   lines.push("");
   lines.push(
-    "This document records every historical flag bundled for the Century 1900 catalog. The reference date is **1 January 1900**. It is generated from",
+    "This document records every historical flag bundled for the Fabric of Nations 1900 catalog. The reference date is **1 January 1900**. It is generated from",
   );
   lines.push(
     "`packages/data/data/historical/m11/flags_1900.json` by `scripts/m11/build-flags.mjs`; edit the manifest, not this file.",
@@ -1061,7 +1061,7 @@ function buildDoc(manifest, catalog) {
   lines.push("## Project-authored reconstructions");
   lines.push("");
   lines.push(
-    "Four flags are original Century reconstructions rather than externally sourced files: the Spanish restoration flag, the Transvaal Vierkleur, and the two user-selected Darfur and Wadai designs. They are rendered deterministically at build time from documented or user-selected designs and are dedicated to the public domain by the project. Their historical or user-selected sources are recorded separately from Century's authorship; no share-alike or restricted artwork is traced or copied. The Pax Historia rasters were inspected but are not bundled because redistribution permission was not established.",
+    "Four flags are original Fabric of Nations reconstructions rather than externally sourced files: the Spanish restoration flag, the Transvaal Vierkleur, and the two user-selected Darfur and Wadai designs. They are rendered deterministically at build time from documented or user-selected designs and are dedicated to the public domain by the project. Their historical or user-selected sources are recorded separately from Fabric of Nations' authorship; no share-alike or restricted artwork is traced or copied. The Pax Historia rasters were inspected but are not bundled because redistribution permission was not established.",
   );
   lines.push("");
   for (const id of projectIds) {
@@ -1189,7 +1189,7 @@ function buildDoc(manifest, catalog) {
     "- **Australia** â€” `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.",
   );
   lines.push(
-    "- **Transvaal / South African Republic** â€” `transvaal-vierkleur`: an original Century reconstruction of the 1857â€“1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.",
+    "- **Transvaal / South African Republic** â€” `transvaal-vierkleur`: an original Fabric of Nations reconstruction of the 1857â€“1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.",
   );
   lines.push(
     "- **Orange Free State** â€” `orange-free-state`: the 1857â€“1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).",

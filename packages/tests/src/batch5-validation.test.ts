@@ -146,7 +146,7 @@ describe("Batch 5 validation boundary and determinism", () => {
     world.dayIndex = 5;
     const account = world.finance.accounts[0];
     if (account === undefined) throw new Error("fixture has no accounts");
-    account.balanceSUSD = Number.NaN;
+    account.balanceRUSD = Number.NaN;
 
     expect(() => runMigrationPhase(world, scenario.definitions, 5)).toThrow(
       /balance/i,
@@ -259,7 +259,7 @@ describe("Batch 5 validation boundary and determinism", () => {
       issuerCountryId: issuer.id,
       holderKind: "country",
       holderId: issuer.debt.creditorId,
-      principalSUSD: 100_000,
+      principalRUSD: 100_000,
       annualCouponRate: 0.04,
       termDays: 365,
     });
@@ -274,8 +274,8 @@ describe("Batch 5 validation boundary and determinism", () => {
     const validatedResult = runDebtPhase(validated, 30);
     const stagedResult = runDebtPhase(staged, 30, { validateWorld: false });
 
-    expect(validatedResult.interestAccruedSUSD).toBeGreaterThan(0);
-    expect(validatedResult.interestPaidSUSD).toBeGreaterThan(0);
+    expect(validatedResult.interestAccruedRUSD).toBeGreaterThan(0);
+    expect(validatedResult.interestPaidRUSD).toBeGreaterThan(0);
     expect(stagedResult).toEqual(validatedResult);
     expect(hashWorld(staged)).toBe(hashWorld(validated));
     expect(designatedCashTotal(staged.finance)).toBe(designatedCashTotal(validated.finance));

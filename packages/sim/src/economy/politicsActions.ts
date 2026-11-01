@@ -12,7 +12,7 @@ import { requireFiniteNumber } from "../validation.js";
 import type { DayIndex, Id } from "../types.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
-  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+  MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
   MAX_LAW_ENACTMENT_DAYS,
   MAX_LAW_TRANSITIONS_PER_COUNTRY,
   MIN_LAW_ENACTMENT_DAYS,
@@ -181,8 +181,8 @@ export function proposeLaw(
 
 export interface InstitutionFundingResult {
   readonly country: Country;
-  readonly previousAnnualSUSD: number;
-  readonly annualSUSD: number;
+  readonly previousAnnualRUSD: number;
+  readonly annualRUSD: number;
   readonly changed: boolean;
 }
 
@@ -190,15 +190,15 @@ export interface InstitutionFundingResult {
 export function validateInstitutionFunding(
   world: World,
   definitions: EconomyDefinitions | undefined,
-  input: { readonly countryId: Id; readonly annualSUSD: number },
+  input: { readonly countryId: Id; readonly annualRUSD: number },
 ): Country {
   politicsFor(definitions);
   const country = countryFor(world, input.countryId);
-  const annual = requireFiniteNumber(input.annualSUSD, "action.annualSUSD");
+  const annual = requireFiniteNumber(input.annualRUSD, "action.annualRUSD");
   if (annual < 0) throw new RangeError("institution funding must be non-negative");
-  if (annual > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+  if (annual > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError(
-      `institution funding must not exceed ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      `institution funding must not exceed ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
     );
   }
   return country;
@@ -208,7 +208,7 @@ export function validateInstitutionFunding(
 export function setInstitutionFunding(
   world: World,
   definitions: EconomyDefinitions | undefined,
-  input: { readonly countryId: Id; readonly annualSUSD: number },
+  input: { readonly countryId: Id; readonly annualRUSD: number },
   dayIndex: DayIndex,
 ): InstitutionFundingResult {
   assertValidDayIndex(dayIndex);
@@ -217,22 +217,22 @@ export function setInstitutionFunding(
   }
   politicsFor(definitions);
   const country = countryFor(world, input.countryId);
-  const annual = requireFiniteNumber(input.annualSUSD, "action.annualSUSD");
+  const annual = requireFiniteNumber(input.annualRUSD, "action.annualRUSD");
   if (annual < 0) throw new RangeError("institution funding must be non-negative");
-  if (annual > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+  if (annual > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError(
-      `institution funding must not exceed ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      `institution funding must not exceed ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
     );
   }
-  const previous = country.institutions.fundedAnnualSUSD;
+  const previous = country.institutions.fundedAnnualRUSD;
   if (previous === annual) {
-    return { country, previousAnnualSUSD: previous, annualSUSD: annual, changed: false };
+    return { country, previousAnnualRUSD: previous, annualRUSD: annual, changed: false };
   }
   const candidateCountry: Country = {
     ...country,
     institutions: {
       ...country.institutions,
-      fundedAnnualSUSD: annual,
+      fundedAnnualRUSD: annual,
     },
   };
   const candidate: World = {
@@ -246,8 +246,8 @@ export function setInstitutionFunding(
   world.countries = candidate.countries;
   return {
     country: candidateCountry,
-    previousAnnualSUSD: previous,
-    annualSUSD: annual,
+    previousAnnualRUSD: previous,
+    annualRUSD: annual,
     changed: true,
   };
 }

@@ -75,22 +75,22 @@ function actionRecord(
     requested: {
       kind: "set-fiscal-policy",
       incomeTaxRate: 0.1,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 1000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 1000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     },
     accepted,
     applied: accepted
       ? {
           kind: "set-fiscal-policy",
           incomeTaxRate: 0.1,
-          incomeTaxAllowanceSUSDPerYear: 0,
-          welfareBudgetSUSDPerYear: 1000,
+          incomeTaxAllowanceRUSDPerYear: 0,
+          welfareBudgetRUSDPerYear: 1000,
           welfareMaxWealthLevel: 99,
           businessProfitTaxRate: 0,
-          reserveTargetSUSD: 0,
+          reserveTargetRUSD: 0,
         }
       : null,
     errors: accepted ? [] : ["policy rejected by shared validator"],
@@ -105,9 +105,9 @@ describe("E1 economic clarity", () => {
     expect(snapshot.needTiers.some((tier) => tier.tier === "subsistence")).toBe(true);
     for (const country of snapshot.countries) {
       expect(country.productionCapacityByGood).toHaveLength(snapshot.goods.length);
-      expect(country.estimatedDailyWageBaseSUSD).toBeGreaterThanOrEqual(0);
-      expect(country.householdCashSUSD).toBeGreaterThanOrEqual(0);
-      expect(country.debtInterestPayableSUSD).toBeGreaterThanOrEqual(0);
+      expect(country.estimatedDailyWageBaseRUSD).toBeGreaterThanOrEqual(0);
+      expect(country.householdCashRUSD).toBeGreaterThanOrEqual(0);
+      expect(country.debtInterestPayableRUSD).toBeGreaterThanOrEqual(0);
     }
     for (const market of snapshot.markets) {
       for (const price of market.prices) {
@@ -139,13 +139,13 @@ describe("E1 economic clarity", () => {
     if (latest === null) return;
     const period = country.financeHistory[country.financeHistory.length - 1]!;
     expect(latest.periodEndLabel).toBe(period.periodEndLabel);
-    expect(latest.incomeTaxSUSD).toBe(period.incomeTaxSUSD);
-    expect(latest.welfareExpenseSUSD).toBe(period.welfareExpenseSUSD);
-    expect(latest.interestExpenseSUSD).toBe(period.interestExpenseSUSD);
+    expect(latest.incomeTaxRUSD).toBe(period.incomeTaxRUSD);
+    expect(latest.welfareExpenseRUSD).toBe(period.welfareExpenseRUSD);
+    expect(latest.interestExpenseRUSD).toBe(period.interestExpenseRUSD);
     // The most recent summary retains account detail, so close balances exist.
-    expect(period.treasuryCashEndSUSD).not.toBeNull();
-    expect(latest.treasuryCash?.endSUSD).toBe(period.treasuryCashEndSUSD);
-    expect(latest.treasuryCash?.changeSUSD).toBeNull(); // no earlier detailed close
+    expect(period.treasuryCashEndRUSD).not.toBeNull();
+    expect(latest.treasuryCash?.endRUSD).toBe(period.treasuryCashEndRUSD);
+    expect(latest.treasuryCash?.changeRUSD).toBeNull(); // no earlier detailed close
     expect(latest.detailedBalances).toBe(true);
   });
 
@@ -156,13 +156,13 @@ describe("E1 economic clarity", () => {
     if (country === undefined) return;
     const preview = previewFiscalPolicy(snapshot, country, 0.2, 200_000);
     expect(preview.isPlayerCountry).toBe(true);
-    expect(preview.proposedDailyIncomeTaxSUSD).toBeCloseTo(
-      0.2 * preview.estimatedDailyWageBaseSUSD,
+    expect(preview.proposedDailyIncomeTaxRUSD).toBeCloseTo(
+      0.2 * preview.estimatedDailyWageBaseRUSD,
       8,
     );
-    expect(preview.proposedDailyWelfareSUSD).toBeCloseTo(200_000 / 365, 8);
-    expect(preview.monthlyIncomeTaxDeltaSUSD).toBeCloseTo(
-      (0.2 - country.fiscal.incomeTaxRate) * preview.estimatedDailyWageBaseSUSD * 31,
+    expect(preview.proposedDailyWelfareRUSD).toBeCloseTo(200_000 / 365, 8);
+    expect(preview.monthlyIncomeTaxDeltaRUSD).toBeCloseTo(
+      (0.2 - country.fiscal.incomeTaxRate) * preview.estimatedDailyWageBaseRUSD * 31,
       8,
     );
     expect(preview.constraints.length).toBeGreaterThan(0);
@@ -181,8 +181,8 @@ describe("E1 economic clarity", () => {
     country.blocksWithUnmetSubsistence = 2;
     country.blocksWithUnmetBasic = 3;
     country.hardshipPopulationShare = 0.2;
-    country.householdCashSUSD = 1000;
-    country.estimatedDailyWageBaseSUSD = 50;
+    country.householdCashRUSD = 1000;
+    country.estimatedDailyWageBaseRUSD = 50;
     for (const entry of country.productionCapacityByGood) entry.dailyCapacity = 0;
     for (const market of synthetic.markets) {
       for (const price of market.prices) price.stockQuantity = 0;
@@ -212,23 +212,23 @@ describe("E1 economic clarity", () => {
       {
         ...base,
         periodEndDay: base.periodEndDay - 30,
-        treasuryCashEndSUSD: null,
-        debtOutstandingEndSUSD: null,
-        householdCashEndSUSD: null,
+        treasuryCashEndRUSD: null,
+        debtOutstandingEndRUSD: null,
+        householdCashEndRUSD: null,
       },
       {
         ...base,
         periodEndDay: base.periodEndDay,
-        treasuryCashEndSUSD: 120,
-        debtOutstandingEndSUSD: 40,
-        householdCashEndSUSD: 900,
+        treasuryCashEndRUSD: 120,
+        debtOutstandingEndRUSD: 40,
+        householdCashEndRUSD: 900,
       },
     ];
     const reports = buildMonthlyReports(country);
     expect(reports[0]?.detailedBalances).toBe(true);
-    expect(reports[0]?.treasuryCash?.endSUSD).toBe(120);
+    expect(reports[0]?.treasuryCash?.endRUSD).toBe(120);
     // The preceding summary is compacted, so no change is invented.
-    expect(reports[0]?.treasuryCash?.changeSUSD).toBeNull();
+    expect(reports[0]?.treasuryCash?.changeRUSD).toBeNull();
     expect(reports[1]?.detailedBalances).toBe(false);
     expect(reports[1]?.treasuryCash).toBeNull();
     expect(reports[1]?.debtOutstanding).toBeNull();

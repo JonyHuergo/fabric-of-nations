@@ -55,11 +55,11 @@ describe("M3a static economy definitions", () => {
     expect(() => assertValidEconomyDefinitions(duplicateKey)).toThrow(/duplicate|key/i);
 
     const badPrice = cloneDefinitions();
-    badPrice.goods[0]!.basePrice1900SUSD = -1;
+    badPrice.goods[0]!.basePrice1900RUSD = -1;
     expect(() => assertValidEconomyDefinitions(badPrice)).toThrow(/basePrice/i);
 
     const nanPrice = cloneDefinitions();
-    nanPrice.goods[0]!.basePrice1900SUSD = Number.NaN;
+    nanPrice.goods[0]!.basePrice1900RUSD = Number.NaN;
     expect(() => assertValidEconomyDefinitions(nanPrice)).toThrow(/basePrice|finite/i);
 
     const badCategory = cloneDefinitions();
@@ -74,7 +74,7 @@ describe("M3a static economy definitions", () => {
       key: "services",
       name: "Services",
       category: "service",
-      basePrice1900SUSD: 1,
+      basePrice1900RUSD: 1,
       transportCostPerUnit: 0,
       priceElasticity: 1,
       spoilageRateAnnual: 0,

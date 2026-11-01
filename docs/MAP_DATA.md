@@ -128,8 +128,8 @@ node scripts/m11/generate-provenance-doc.mjs
   State use admin-1 province unions. The outer border is an approximation; the
   1900 republican borders differed from the modern provinces.
 - **Antimeridian**: rings are unwrapped; the renderer draws each ring at
-  −360/0/+360 offsets. The Miller projection has linear longitude, so the
-  offsets are exact.
+  −360/0/+360 offsets. The projection has linear longitude, so the offsets
+  are exact.
 - **Small states**: `small` marks polities whose total ring area is below
   0.5 deg². They are drawn as markers at all zoom levels; click targets use the
   marker.
@@ -138,14 +138,18 @@ node scripts/m11/generate-provenance-doc.mjs
 
 ## 5. Projection
 
-Miller cylindrical, implemented in `packages/app/src/components/WorldMap.tsx`:
+Gall stereographic cylindrical, implemented once in
+`packages/app/src/map/projection.ts` (D-111; M11 used Miller):
 
 ```
-y = 1.25 · ln(tan(π/4 + 0.4·φ))
+y = (1 + √2/2) · tan(φ/2)
 x = (λ + 180) / 360
 ```
 
-The map is drawn in a 1000×500 viewBox and letterboxed with
+Rendering is described in `docs/MAP_RENDERING.md`. On the SVG renderer, used by native
+builds and browsers without hardware WebGL2:
+
+The map is drawn in a 1000×657 viewBox and letterboxed with
 `preserveAspectRatio="xMidYMid meet"`. Pan/zoom applies an SVG group transform;
 hit testing inverts that transform and uses even-odd point-in-polygon with a
 bounding-box prefilter.

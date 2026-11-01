@@ -245,14 +245,14 @@ The M3a economy catalog is synthetic and provisional, not historical
 calibration:
 
 - `goods.json`: eight goods. Base prices, transport costs, elasticities, and
-  spoilage rates are provisional units of SUSD per physical unit; spoilage is set
+  spoilage rates are provisional units of RUSD per physical unit; spoilage is set
   to zero because spoilage is deferred. `unitLabel` documents the physical unit.
 - `professions.json`: four professions. Participation rates, qualification
-  thresholds, base annual wages (SUSD/worker-year), training costs, and
+  thresholds, base annual wages (RUSD/worker-year), training costs, and
   dimensionless productivity modifiers are provisional.
 - `buildings.json`: eight definitions. Recipe quantities are physical units per
   TU; staffing coefficients are workers per (TU/day); upkeep and construction
-  costs are SUSD; storage capacities are physical units. Resource requirements
+  costs are RUSD; storage capacities are physical units. Resource requirements
   are empty because regional resource limits are deferred.
 - `m3_needs.json`: per-capita daily basket quantities in the good's physical
   unit. Service lines are omitted because non-storable services are deferred.

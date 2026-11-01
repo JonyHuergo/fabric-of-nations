@@ -36,7 +36,7 @@ function scenarioWithE6b(): EconomyScenarioDef {
       ? {
           currencyId: 0,
           status: "specified" as const,
-          susdPerUnit: 0.2 as never,
+          rusdPerUnit: 0.2 as never,
           setOnDay: 0,
           source: "scenario" as const,
         }
@@ -46,10 +46,10 @@ function scenarioWithE6b(): EconomyScenarioDef {
     currencies: [
       {
         currencyId: 0,
-        paritySusdPerUnit: 0.2,
-        reserveFundingSUSD: 50_000,
+        parityRusdPerUnit: 0.2,
+        reserveFundingRUSD: 50_000,
         currencyIssuedUnits: 100_000,
-        externalCashSUSD: 40_000,
+        externalCashRUSD: 40_000,
       },
     ],
   };
@@ -87,9 +87,9 @@ export function runE6bBenchmarks(): boolean {
       {
         countryId: 0,
         regime: "pegged",
-        paritySusdPerUnit: 0.19,
-        reserveTransferSUSD: 0,
-        currencyConversionSUSD: 0,
+        parityRusdPerUnit: 0.19,
+        reserveTransferRUSD: 0,
+        currencyConversionRUSD: 0,
       },
       phaseWorld.dayIndex,
     );

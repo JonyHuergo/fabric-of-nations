@@ -51,7 +51,7 @@ Greenland, Monaco, San Marino, Andorra and Liechtenstein.
 
 ## 4. Number of provinces created
 
-**570** provinces: a **1,073,306-byte** committed geometry+metadata bundle in
+**570** provinces: a **1,028,377-byte** committed geometry+metadata bundle in
 `packages/data/data/map/provinces_1900.json`;
 boundaries and provenance. The committed app bundle is
 `packages/app/src/generated/provinces1900.ts`.

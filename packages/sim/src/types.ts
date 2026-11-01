@@ -1,5 +1,5 @@
 /**
- * Core primitive types for the Century simulation.
+ * Core primitive types for the Fabric of Nations simulation.
  *
  * These are plain aliases, matching GDD §5.2. They deliberately do not create
  * branded types: the simulation is serialized as JSON-compatible numbers and a
@@ -16,11 +16,11 @@ export type DayIndex = Day;
 export type Id = number;
 
 /**
- * Nominal SUSD unit of account. SUSD is Century's fixed unit of measurement,
+ * Nominal RUSD unit of account. RUSD is Fabric of Nations' fixed unit of measurement,
  * not a national currency or a promise of constant purchasing power. Prices,
  * wages, assets, and currency valuations can change relative to it.
  */
-export type MoneySUSD = number;
+export type MoneyRUSD = number;
 
 /** Normalized ratio, normally in 0..1. */
 export type Rate = number;

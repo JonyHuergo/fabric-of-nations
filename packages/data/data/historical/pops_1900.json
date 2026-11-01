@@ -5,7 +5,7 @@
     "population": 15926000,
     "literacy": 0.75,
     "wealthLevel": 32,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -19,7 +19,7 @@
     "population": 12573000,
     "literacy": 0.82,
     "wealthLevel": 36,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -33,7 +33,7 @@
     "population": 10796200,
     "literacy": 0.95,
     "wealthLevel": 58,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -47,7 +47,7 @@
     "population": 938800,
     "literacy": 0.97,
     "wealthLevel": 60,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -61,7 +61,7 @@
     "population": 1676000,
     "literacy": 0.98,
     "wealthLevel": 88,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -75,7 +75,7 @@
     "population": 13030000,
     "literacy": 0.75,
     "wealthLevel": 32,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -89,7 +89,7 @@
     "population": 10287000,
     "literacy": 0.82,
     "wealthLevel": 36,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -103,7 +103,7 @@
     "population": 8832920,
     "literacy": 0.95,
     "wealthLevel": 58,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -117,7 +117,7 @@
     "population": 768080,
     "literacy": 0.97,
     "wealthLevel": 60,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -131,7 +131,7 @@
     "population": 1372000,
     "literacy": 0.98,
     "wealthLevel": 88,
-    "savingsPerCapitaSUSD": 8,
+    "savingsPerCapitaRUSD": 8,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -145,7 +145,7 @@
     "population": 4482000,
     "literacy": 0.88,
     "wealthLevel": 35,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -159,7 +159,7 @@
     "population": 14940000,
     "literacy": 0.92,
     "wealthLevel": 39,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -173,7 +173,7 @@
     "population": 13744800,
     "literacy": 0.97,
     "wealthLevel": 60,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -187,7 +187,7 @@
     "population": 1195200,
     "literacy": 0.99,
     "wealthLevel": 62,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -201,7 +201,7 @@
     "population": 2988000,
     "literacy": 0.99,
     "wealthLevel": 90,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -215,7 +215,7 @@
     "population": 498000,
     "literacy": 0.88,
     "wealthLevel": 35,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -229,7 +229,7 @@
     "population": 1660000,
     "literacy": 0.92,
     "wealthLevel": 39,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -243,7 +243,7 @@
     "population": 1527200,
     "literacy": 0.97,
     "wealthLevel": 60,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -257,7 +257,7 @@
     "population": 132800,
     "literacy": 0.99,
     "wealthLevel": 62,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -271,7 +271,7 @@
     "population": 332000,
     "literacy": 0.99,
     "wealthLevel": 90,
-    "savingsPerCapitaSUSD": 9,
+    "savingsPerCapitaRUSD": 9,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -285,7 +285,7 @@
     "population": 13440000,
     "literacy": 0.86,
     "wealthLevel": 33,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -299,7 +299,7 @@
     "population": 10752000,
     "literacy": 0.89,
     "wealthLevel": 36,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -313,7 +313,7 @@
     "population": 7418880,
     "literacy": 0.96,
     "wealthLevel": 56,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -327,7 +327,7 @@
     "population": 645120,
     "literacy": 0.98,
     "wealthLevel": 58,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -341,7 +341,7 @@
     "population": 1344000,
     "literacy": 0.98,
     "wealthLevel": 86,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -355,7 +355,7 @@
     "population": 8960000,
     "literacy": 0.86,
     "wealthLevel": 33,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -369,7 +369,7 @@
     "population": 7168000,
     "literacy": 0.89,
     "wealthLevel": 36,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -383,7 +383,7 @@
     "population": 4945920,
     "literacy": 0.96,
     "wealthLevel": 56,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -397,7 +397,7 @@
     "population": 430080,
     "literacy": 0.98,
     "wealthLevel": 58,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -411,7 +411,7 @@
     "population": 896000,
     "literacy": 0.98,
     "wealthLevel": 86,
-    "savingsPerCapitaSUSD": 7,
+    "savingsPerCapitaRUSD": 7,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -425,7 +425,7 @@
     "population": 9841700,
     "literacy": 0.76,
     "wealthLevel": 31,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -439,7 +439,7 @@
     "population": 5990600,
     "literacy": 0.81,
     "wealthLevel": 34,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -453,7 +453,7 @@
     "population": 4330348,
     "literacy": 0.94,
     "wealthLevel": 54,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -467,7 +467,7 @@
     "population": 376552,
     "literacy": 0.96,
     "wealthLevel": 56,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -481,7 +481,7 @@
     "population": 855800,
     "literacy": 0.98,
     "wealthLevel": 85,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -495,7 +495,7 @@
     "population": 8052300,
     "literacy": 0.76,
     "wealthLevel": 31,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -509,7 +509,7 @@
     "population": 4901400,
     "literacy": 0.81,
     "wealthLevel": 34,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -523,7 +523,7 @@
     "population": 3543012,
     "literacy": 0.94,
     "wealthLevel": 54,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -537,7 +537,7 @@
     "population": 308088,
     "literacy": 0.96,
     "wealthLevel": 56,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -551,7 +551,7 @@
     "population": 700200,
     "literacy": 0.98,
     "wealthLevel": 85,
-    "savingsPerCapitaSUSD": 6,
+    "savingsPerCapitaRUSD": 6,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -565,7 +565,7 @@
     "population": 47872000,
     "literacy": 0.2,
     "wealthLevel": 22,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.12,
     "sourceIds": [
       "owid-population",
@@ -579,7 +579,7 @@
     "population": 7180800,
     "literacy": 0.3,
     "wealthLevel": 26,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.14,
     "sourceIds": [
       "owid-population",
@@ -593,7 +593,7 @@
     "population": 3853696,
     "literacy": 0.7,
     "wealthLevel": 46,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -607,7 +607,7 @@
     "population": 335104,
     "literacy": 0.72,
     "wealthLevel": 48,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -621,7 +621,7 @@
     "population": 598400,
     "literacy": 0.9,
     "wealthLevel": 80,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -635,7 +635,7 @@
     "population": 60928000,
     "literacy": 0.2,
     "wealthLevel": 22,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.12,
     "sourceIds": [
       "owid-population",
@@ -649,7 +649,7 @@
     "population": 9139200,
     "literacy": 0.3,
     "wealthLevel": 26,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.14,
     "sourceIds": [
       "owid-population",
@@ -663,7 +663,7 @@
     "population": 4904704,
     "literacy": 0.7,
     "wealthLevel": 46,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -677,7 +677,7 @@
     "population": 426496,
     "literacy": 0.72,
     "wealthLevel": 48,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -691,7 +691,7 @@
     "population": 761600,
     "literacy": 0.9,
     "wealthLevel": 80,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -705,7 +705,7 @@
     "population": 19448000,
     "literacy": 0.52,
     "wealthLevel": 24,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.08,
     "sourceIds": [
       "owid-population",
@@ -719,7 +719,7 @@
     "population": 5984000,
     "literacy": 0.62,
     "wealthLevel": 28,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.09,
     "sourceIds": [
       "owid-population",
@@ -733,7 +733,7 @@
     "population": 3578432,
     "literacy": 0.86,
     "wealthLevel": 48,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -747,7 +747,7 @@
     "population": 311168,
     "literacy": 0.88,
     "wealthLevel": 50,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -761,7 +761,7 @@
     "population": 598400,
     "literacy": 0.95,
     "wealthLevel": 82,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -775,7 +775,7 @@
     "population": 9152000,
     "literacy": 0.52,
     "wealthLevel": 24,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.08,
     "sourceIds": [
       "owid-population",
@@ -789,7 +789,7 @@
     "population": 2816000,
     "literacy": 0.62,
     "wealthLevel": 28,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.09,
     "sourceIds": [
       "owid-population",
@@ -803,7 +803,7 @@
     "population": 1683968,
     "literacy": 0.86,
     "wealthLevel": 48,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -817,7 +817,7 @@
     "population": 146432,
     "literacy": 0.88,
     "wealthLevel": 50,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -831,7 +831,7 @@
     "population": 281600,
     "literacy": 0.95,
     "wealthLevel": 82,
-    "savingsPerCapitaSUSD": 2.5,
+    "savingsPerCapitaRUSD": 2.5,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -845,7 +845,7 @@
     "population": 94248000,
     "literacy": 0.08,
     "wealthLevel": 18,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.14,
     "sourceIds": [
       "owid-population",
@@ -859,7 +859,7 @@
     "population": 23562000,
     "literacy": 0.15,
     "wealthLevel": 22,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.16,
     "sourceIds": [
       "owid-population",
@@ -873,7 +873,7 @@
     "population": 10838520,
     "literacy": 0.5,
     "wealthLevel": 40,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -887,7 +887,7 @@
     "population": 942480,
     "literacy": 0.52,
     "wealthLevel": 42,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -901,7 +901,7 @@
     "population": 1309000,
     "literacy": 0.8,
     "wealthLevel": 76,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -915,7 +915,7 @@
     "population": 77112000,
     "literacy": 0.08,
     "wealthLevel": 18,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.14,
     "sourceIds": [
       "owid-population",
@@ -929,7 +929,7 @@
     "population": 19278000,
     "literacy": 0.15,
     "wealthLevel": 22,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.16,
     "sourceIds": [
       "owid-population",
@@ -943,7 +943,7 @@
     "population": 8867880,
     "literacy": 0.5,
     "wealthLevel": 40,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.07,
     "sourceIds": [
       "owid-population",
@@ -957,7 +957,7 @@
     "population": 771120,
     "literacy": 0.52,
     "wealthLevel": 42,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.06,
     "sourceIds": [
       "owid-population",
@@ -971,7 +971,7 @@
     "population": 1071000,
     "literacy": 0.8,
     "wealthLevel": 76,
-    "savingsPerCapitaSUSD": 1,
+    "savingsPerCapitaRUSD": 1,
     "militancy": 0.03,
     "sourceIds": [
       "owid-population",
@@ -985,7 +985,7 @@
     "population": 7420160,
     "literacy": 0.2,
     "wealthLevel": 20,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.1,
     "sourceIds": [
       "owid-population",
@@ -999,7 +999,7 @@
     "population": 2872320,
     "literacy": 0.26,
     "wealthLevel": 24,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.12,
     "sourceIds": [
       "owid-population",
@@ -1013,7 +1013,7 @@
     "population": 1321267,
     "literacy": 0.6,
     "wealthLevel": 42,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -1027,7 +1027,7 @@
     "population": 114893,
     "literacy": 0.62,
     "wealthLevel": 44,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -1041,7 +1041,7 @@
     "population": 239360,
     "literacy": 0.85,
     "wealthLevel": 78,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",
@@ -1055,7 +1055,7 @@
     "population": 3491840,
     "literacy": 0.2,
     "wealthLevel": 20,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.1,
     "sourceIds": [
       "owid-population",
@@ -1069,7 +1069,7 @@
     "population": 1351680,
     "literacy": 0.26,
     "wealthLevel": 24,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.12,
     "sourceIds": [
       "owid-population",
@@ -1083,7 +1083,7 @@
     "population": 621773,
     "literacy": 0.6,
     "wealthLevel": 42,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.05,
     "sourceIds": [
       "owid-population",
@@ -1097,7 +1097,7 @@
     "population": 54067,
     "literacy": 0.62,
     "wealthLevel": 44,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.04,
     "sourceIds": [
       "owid-population",
@@ -1111,7 +1111,7 @@
     "population": 112640,
     "literacy": 0.85,
     "wealthLevel": 78,
-    "savingsPerCapitaSUSD": 1.5,
+    "savingsPerCapitaRUSD": 1.5,
     "militancy": 0.02,
     "sourceIds": [
       "owid-population",

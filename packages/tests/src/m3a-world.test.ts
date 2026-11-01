@@ -23,7 +23,7 @@ describe("M3a world state and relationships", () => {
     expect(region.marketId).toBe(0);
     expect(region.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     expect(world.finance.accounts).toHaveLength(67);
-    expect(market.priceSUSD).toHaveLength(8);
+    expect(market.priceRUSD).toHaveLength(8);
     expect(market.stockLots.length).toBeGreaterThan(0);
 
     const stock = deriveStockByGood(market, 8);
@@ -116,7 +116,7 @@ describe("M3a world state and relationships", () => {
       ownerId: 999,
       category: "asset",
       subtype: "operating-cash",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
     expect(() => assertValidWorld(world)).toThrow(
       /operating-cash account 4 references unknown building owner/i,
@@ -148,7 +148,7 @@ describe("M3a world state and relationships", () => {
 
   test("rejects malformed prices, lots, and ownership", () => {
     const badPrice = m3World().world;
-    badPrice.markets[0]!.priceSUSD[0] = -1;
+    badPrice.markets[0]!.priceRUSD[0] = -1;
     expect(() => assertValidWorld(badPrice)).toThrow(/price/i);
 
     const zeroLot = m3World().world;

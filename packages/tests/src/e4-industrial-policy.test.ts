@@ -6,7 +6,7 @@
 
 import {
   applyCountryAction,
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   assertAccountingIdentity,
   assertValidWorld,
   constructionMaterialRemaining,
@@ -56,8 +56,8 @@ function fixture(): Fixture {
       monetary: { kind: "own", currencyId: 0 },
       regionIds: [REGION],
       treasuryAccountId: 1000,
-      initialTreasuryCashSUSD: 100_000,
-      fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
+      initialTreasuryCashRUSD: 100_000,
+      fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
     },
   ];
   scenario.currencies = [
@@ -72,7 +72,7 @@ function fixture(): Fixture {
     {
       currencyId: 0,
       status: "specified",
-      susdPerUnit: asSusdPerCurrencyUnit(1),
+      rusdPerUnit: asRusdPerCurrencyUnit(1),
       setOnDay: 0,
       source: "scenario",
     },
@@ -112,7 +112,7 @@ function accountBalance(
       entry.ownerKind === ownerKind && entry.ownerId === ownerId && entry.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind} ${String(ownerId)} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function startFarm(f: Fixture): number {
@@ -149,14 +149,14 @@ function policyAction(rates: readonly number[]): CountryAction {
   };
 }
 
-function supportAction(buildingId: number, amountSUSD: number): CountryAction {
+function supportAction(buildingId: number, amountRUSD: number): CountryAction {
   return {
     kind: "support-public-enterprise",
     countryId: COUNTRY,
     dayIndex: 0,
     source: "player",
     buildingId,
-    amountSUSD,
+    amountRUSD,
   };
 }
 
@@ -197,10 +197,10 @@ describe("E4 sector classification and construction materials", () => {
     const projectId = startFarm(f);
     run(f, 2);
     const started = project(f.world, projectId);
-    expect(started.materialsSpentSUSD).toBeGreaterThan(0);
+    expect(started.materialsSpentRUSD).toBeGreaterThan(0);
     expect(started.materials.every((material) => material.deliveredQuantity > 0)).toBe(true);
     expect(accountBalance(f.world, "country", COUNTRY, "construction-in-progress")).toBeCloseTo(
-      started.spentSUSD + started.materialsSpentSUSD,
+      started.spentRUSD + started.materialsSpentRUSD,
       6,
     );
     runToCompletion(f, projectId);
@@ -212,17 +212,17 @@ describe("E4 sector classification and construction materials", () => {
       ),
     ).toBe(true);
     expect(accountBalance(f.world, "country", COUNTRY, "public-capital")).toBeCloseTo(
-      completed.spentSUSD + completed.materialsSpentSUSD,
+      completed.spentRUSD + completed.materialsSpentRUSD,
       6,
     );
     expect(accountBalance(f.world, "country", COUNTRY, "construction-in-progress")).toBe(0);
     expect(
-      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionMaterialsSpentSUSD ??
+      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionMaterialsSpentRUSD ??
         0,
-    ).toBeCloseTo(completed.materialsSpentSUSD, 6);
+    ).toBeCloseTo(completed.materialsSpentRUSD, 6);
     expect(
-      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionSpentSUSD ?? 0,
-    ).toBeCloseTo(completed.spentSUSD + completed.materialsSpentSUSD, 6);
+      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionSpentRUSD ?? 0,
+    ).toBeCloseTo(completed.spentRUSD + completed.materialsSpentRUSD, 6);
     expect(() => assertAccountingIdentity(f.world.finance)).not.toThrow();
     expect(designatedCashTotal(f.world.finance)).toBeGreaterThan(0);
   });
@@ -238,14 +238,14 @@ describe("E4 sector classification and construction materials", () => {
         (account) =>
           account.ownerKind === "building" && account.subtype === "sales-revenue",
       )
-      .reduce((total, account) => total + account.balanceSUSD, 0);
+      .reduce((total, account) => total + account.balanceRUSD, 0);
     f.world.dayIndex = 1;
     runConstructionPhase(f.world, f.scenario.definitions, 1, undefined, {
       validateWorld: false,
     });
     const first = project(f.world, projectId);
     const delivered = first.materials.map((material) => material.deliveredQuantity);
-    const spent = first.materialsSpentSUSD;
+    const spent = first.materialsSpentRUSD;
     expect(spent).toBeGreaterThan(0);
     const grainAfter = f.world.markets[0]!.stockLots
       .filter((lot) => lot.goodId === 0)
@@ -259,14 +259,14 @@ describe("E4 sector classification and construction materials", () => {
         (account) =>
           account.ownerKind === "building" && account.subtype === "sales-revenue",
       )
-      .reduce((total, account) => total + account.balanceSUSD, 0);
+      .reduce((total, account) => total + account.balanceRUSD, 0);
     expect(sellerRevenueAfter - sellerRevenueBefore).toBeCloseTo(spent, 6);
     runConstructionPhase(f.world, f.scenario.definitions, 1, undefined, {
       validateWorld: false,
     });
     const second = project(f.world, projectId);
     expect(second.materials.map((material) => material.deliveredQuantity)).toEqual(delivered);
-    expect(second.materialsSpentSUSD).toBeCloseTo(spent, 6);
+    expect(second.materialsSpentRUSD).toBeCloseTo(spent, 6);
     expect(
       f.world.markets[0]!.stockLots
         .filter((lot) => lot.goodId === 0)
@@ -294,8 +294,8 @@ describe("E4 sector classification and construction materials", () => {
     const waiting = project(f.world, projectId);
     expect(waiting.status).toBe("waiting");
     expect(waiting.blockedReason).toBe("materials");
-    expect(waiting.spentSUSD).toBe(0);
-    expect(waiting.materialsSpentSUSD).toBe(0);
+    expect(waiting.spentRUSD).toBe(0);
+    expect(waiting.materialsSpentRUSD).toBe(0);
 
     // Deliver actual grain stock through an existing operational warehouse seller.
     f.world.markets[0]!.stockLots.push({
@@ -308,7 +308,7 @@ describe("E4 sector classification and construction materials", () => {
       validateWorld: false,
     });
     const resumed = project(f.world, projectId);
-    expect(resumed.materialsSpentSUSD).toBeGreaterThan(0);
+    expect(resumed.materialsSpentRUSD).toBeGreaterThan(0);
     expect(resumed.materials.every((material) => material.deliveredQuantity > 0)).toBe(true);
     expect(grainBefore).toBeGreaterThanOrEqual(0);
   });
@@ -330,8 +330,8 @@ describe("E4 sectoral production subsidy", () => {
     expect(subsidyExpense).toBeGreaterThan(0);
     expect(afterTreasury).toBeLessThan(beforeTreasury);
     const memo = f.world.finance.budgetMemosThisMonth[COUNTRY]!;
-    expect(memo.subsidyRequestedSUSD).toBeGreaterThan(0);
-    expect(memo.subsidyRequestedSUSD - memo.subsidyShortfallSUSD).toBeCloseTo(
+    expect(memo.subsidyRequestedRUSD).toBeGreaterThan(0);
+    expect(memo.subsidyRequestedRUSD - memo.subsidyShortfallRUSD).toBeCloseTo(
       subsidyExpense,
       6,
     );
@@ -340,7 +340,7 @@ describe("E4 sectoral production subsidy", () => {
         (account) =>
           account.ownerKind === "building" &&
           account.subtype === "subsidy-revenue" &&
-          account.balanceSUSD > 0,
+          account.balanceRUSD > 0,
       ),
     ).toBe(true);
     expect(() => assertAccountingIdentity(f.world.finance)).not.toThrow();
@@ -362,18 +362,18 @@ describe("E4 sectoral production subsidy", () => {
         account.ownerId === COUNTRY &&
         account.subtype === "owner-equity",
     )!;
-    const drain = treasury.balanceSUSD - 0.01;
-    treasury.balanceSUSD -= drain;
-    equity.balanceSUSD -= drain;
+    const drain = treasury.balanceRUSD - 0.01;
+    treasury.balanceRUSD -= drain;
+    equity.balanceRUSD -= drain;
     assertValidWorld(f.world);
     const action = withDay(f, policyAction([1, 0, 0, 0, 0]));
     applyCountryAction(f.world, action, f.scenario.definitions);
     run(f, 1);
     expect(accountBalance(f.world, "country", COUNTRY, "treasury-cash")).toBeGreaterThanOrEqual(0);
     const memo = f.world.finance.budgetMemosThisMonth[COUNTRY]!;
-    expect(memo.subsidyRequestedSUSD).toBeGreaterThan(0);
-    expect(memo.subsidyShortfallSUSD).toBeGreaterThan(0);
-    expect(memo.subsidyRequestedSUSD - memo.subsidyShortfallSUSD).toBeCloseTo(
+    expect(memo.subsidyRequestedRUSD).toBeGreaterThan(0);
+    expect(memo.subsidyShortfallRUSD).toBeGreaterThan(0);
+    expect(memo.subsidyRequestedRUSD - memo.subsidyShortfallRUSD).toBeCloseTo(
       accountBalance(f.world, "country", COUNTRY, "subsidy-expense"),
       6,
     );
@@ -411,7 +411,7 @@ describe("E4 public-enterprise support", () => {
     const beforeBuildingEquity = accountBalance(f.world, "building", buildingId, "owner-equity");
     const beforeSubsidy = accountBalance(f.world, "country", COUNTRY, "subsidy-expense");
     const applied = applyCountryAction(f.world, action, f.scenario.definitions);
-    expect(applied.publicEnterpriseSupport?.amountSUSD).toBe(500);
+    expect(applied.publicEnterpriseSupport?.amountRUSD).toBe(500);
     expect(accountBalance(f.world, "country", COUNTRY, "treasury-cash")).toBeCloseTo(
       beforeTreasury - 500,
       6,
@@ -434,7 +434,7 @@ describe("E4 public-enterprise support", () => {
     );
     expect(designatedCashTotal(f.world.finance)).toBeCloseTo(beforeCash, 6);
     expect(
-      f.world.finance.budgetMemosThisMonth[COUNTRY]?.publicEnterpriseSupportSUSD ?? 0,
+      f.world.finance.budgetMemosThisMonth[COUNTRY]?.publicEnterpriseSupportRUSD ?? 0,
     ).toBeCloseTo(500, 6);
     expect(() => assertAccountingIdentity(f.world.finance)).not.toThrow();
   });
@@ -473,8 +473,8 @@ describe("E4 integration, snapshots, and persistence", () => {
     const country = snapshot.countries[COUNTRY]!;
     const preview = previewConstruction(snapshot, country, FARM, REGION);
     expect(preview.materials.length).toBeGreaterThan(0);
-    expect(preview.estimatedMaterialsCostSUSD).toBeGreaterThan(0);
-    expect(preview.totalInvestmentSUSD).toBeGreaterThan(preview.upfrontRequirementSUSD);
+    expect(preview.estimatedMaterialsCostRUSD).toBeGreaterThan(0);
+    expect(preview.totalInvestmentRUSD).toBeGreaterThan(preview.upfrontRequirementRUSD);
     expect(country.publicEnterprises.length).toBeGreaterThan(0);
     const enterprise = country.publicEnterprises[0]!;
     const supportPreview = previewPublicEnterpriseSupport(
@@ -542,18 +542,18 @@ describe("E4 integration, snapshots, and persistence", () => {
       (entry) => entry.countryId === COUNTRY,
     )!;
     const budget = month.countryBudgetTotals[COUNTRY]!;
-    expect(budget.constructionMaterialsSpentSUSD).toBeGreaterThanOrEqual(0);
-    expect(budget.publicEnterpriseSupportSUSD).toBeCloseTo(500, 6);
-    expect(fiscal.subsidyExpenseSUSD).toBeCloseTo(
-      budget.subsidyRequestedSUSD - budget.subsidyShortfallSUSD,
+    expect(budget.constructionMaterialsSpentRUSD).toBeGreaterThanOrEqual(0);
+    expect(budget.publicEnterpriseSupportRUSD).toBeCloseTo(500, 6);
+    expect(fiscal.subsidyExpenseRUSD).toBeCloseTo(
+      budget.subsidyRequestedRUSD - budget.subsidyShortfallRUSD,
       6,
     );
-    expect(fiscal.netFiscalResultSUSD).toBeCloseTo(
-      fiscal.incomeTaxRevenueSUSD +
-        fiscal.businessTaxRevenueSUSD -
-        fiscal.welfareExpenseSUSD -
-        fiscal.interestExpenseSUSD -
-        fiscal.subsidyExpenseSUSD,
+    expect(fiscal.netFiscalResultRUSD).toBeCloseTo(
+      fiscal.incomeTaxRevenueRUSD +
+        fiscal.businessTaxRevenueRUSD -
+        fiscal.welfareExpenseRUSD -
+        fiscal.interestExpenseRUSD -
+        fiscal.subsidyExpenseRUSD,
       6,
     );
   });

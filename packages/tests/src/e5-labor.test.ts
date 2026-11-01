@@ -7,7 +7,7 @@ import {
   deserializeWorld,
   hashWorld,
   laborHoursFactor,
-  laborMinimumWageSUSDPerYear,
+  laborMinimumWageRUSDPerYear,
   qualificationWageFactor,
   refreshInstitution,
   runEconomicDay,
@@ -61,7 +61,7 @@ function runDay(world: World, context: TickContext): EconomyDayResult {
 
 function totalWageObligation(result: EconomyDayResult): number {
   return result.economy.settlement.wages.reduce(
-    (total, settlement) => total + settlement.obligationSUSD,
+    (total, settlement) => total + settlement.obligationRUSD,
     0,
   );
 }
@@ -80,7 +80,7 @@ describe("E5 training and qualification", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     const country = world.countries.find((entry) => entry.id === M5_COUNTRY_A);
     if (country === undefined) throw new Error("no country A");
-    expect(country.labor.trainingBudgetSUSDPerYear).toBe(0);
+    expect(country.labor.trainingBudgetRUSDPerYear).toBe(0);
     expect(country.labor.trainingParticipation).toBe(0);
     expect(country.institutions.healthStaffShare).toBe(0);
     expect(world.popBlocks.every((block) => block.qualification === 0)).toBe(true);
@@ -115,7 +115,7 @@ describe("E5 training and qualification", () => {
     runLaborMonthStart(world, scenario.definitions, world.dayIndex);
     expect(country.labor.trainingParticipation).toBe(0);
     const phase = runTrainingPhase(world, scenario.definitions, world.dayIndex);
-    expect(phase.totalPaidSUSD).toBe(0);
+    expect(phase.totalPaidRUSD).toBe(0);
     expect(world.popBlocks.every((block) => block.qualification === 0)).toBe(true);
   });
 
@@ -129,27 +129,27 @@ describe("E5 training and qualification", () => {
     const derived = deriveTraining(world, country, scenario.definitions);
     expect(derived.trainees).toBeGreaterThan(0);
     const indexBefore = buildFinanceIndex(world.finance);
-    const treasuryBefore = indexBefore.get("country", country.id, "treasury-cash").balanceSUSD;
+    const treasuryBefore = indexBefore.get("country", country.id, "treasury-cash").balanceRUSD;
     const householdBefore = world.popBlocks
       .filter((block) => country.regionIds.includes(block.regionId))
       .reduce(
         (total, block) =>
-          total + indexBefore.get("popBlock", block.id, "household-cash").balanceSUSD,
+          total + indexBefore.get("popBlock", block.id, "household-cash").balanceRUSD,
         0,
       );
     const phase = runTrainingPhase(world, scenario.definitions, world.dayIndex);
-    expect(phase.totalPaidSUSD).toBeGreaterThan(0);
+    expect(phase.totalPaidRUSD).toBeGreaterThan(0);
     const indexAfter = buildFinanceIndex(world.finance);
-    const treasuryAfter = indexAfter.get("country", country.id, "treasury-cash").balanceSUSD;
+    const treasuryAfter = indexAfter.get("country", country.id, "treasury-cash").balanceRUSD;
     const householdAfter = world.popBlocks
       .filter((block) => country.regionIds.includes(block.regionId))
       .reduce(
         (total, block) =>
-          total + indexAfter.get("popBlock", block.id, "household-cash").balanceSUSD,
+          total + indexAfter.get("popBlock", block.id, "household-cash").balanceRUSD,
         0,
       );
-    expect(treasuryBefore - treasuryAfter).toBeCloseTo(phase.totalPaidSUSD, 4);
-    expect(householdAfter - householdBefore).toBeCloseTo(phase.totalPaidSUSD, 4);
+    expect(treasuryBefore - treasuryAfter).toBeCloseTo(phase.totalPaidRUSD, 4);
+    expect(householdAfter - householdBefore).toBeCloseTo(phase.totalPaidRUSD, 4);
     assertValidWorld(world);
 
     for (let day = 1; day < 60; day += 1) {
@@ -173,15 +173,15 @@ describe("E5 training and qualification", () => {
     const treasury = index.get("country", country.id, "treasury-cash");
     const affordable = Math.max(
       0,
-      treasury.balanceSUSD - country.fiscal.reserveTargetSUSD,
+      treasury.balanceRUSD - country.fiscal.reserveTargetRUSD,
     );
     runLaborMonthStart(world, scenario.definitions, world.dayIndex);
     const phase = runTrainingPhase(world, scenario.definitions, world.dayIndex);
-    expect(phase.totalPaidSUSD).toBeLessThanOrEqual(affordable + 1e-6);
-    expect(country.labor.trainingRequestedMonthToDateSUSD).toBeGreaterThan(
-      phase.totalPaidSUSD,
+    expect(phase.totalPaidRUSD).toBeLessThanOrEqual(affordable + 1e-6);
+    expect(country.labor.trainingRequestedMonthToDateRUSD).toBeGreaterThan(
+      phase.totalPaidRUSD,
     );
-    expect(country.labor.trainingShortfallMonthToDateSUSD).toBeGreaterThan(0);
+    expect(country.labor.trainingShortfallMonthToDateRUSD).toBeGreaterThan(0);
     assertValidWorld(world);
   });
 });
@@ -228,7 +228,7 @@ describe("E5 qualification and labor-law channels", () => {
     const country = lawWorld.countries.find((entry) => entry.id === M5_COUNTRY_A);
     if (country === undefined) throw new Error("no country A");
     country.laws.labor = lawId(lawScenario, "labor-minimum-wage");
-    expect(laborMinimumWageSUSDPerYear(country, lawScenario.definitions)).toBe(300);
+    expect(laborMinimumWageRUSDPerYear(country, lawScenario.definitions)).toBe(300);
     const result = runDay(lawWorld, contextFor(lawScenario));
     expect(totalWageObligation(result)).toBeGreaterThan(totalWageObligation(baseline));
   });

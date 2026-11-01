@@ -38,7 +38,7 @@
       "financialAccountId": 0,
       "literacy": 0.35,
       "wealthLevel": 30,
-      "initialSavingsSUSD": 1000,
+      "initialSavingsRUSD": 1000,
       "militancy": 0.1,
       "maleAgeGroups": [
         32664,
@@ -86,7 +86,7 @@
       "financialAccountId": 1,
       "literacy": 0.5,
       "wealthLevel": 40,
-      "initialSavingsSUSD": 1000,
+      "initialSavingsRUSD": 1000,
       "militancy": 0.1,
       "maleAgeGroups": [
         28581,
@@ -134,7 +134,7 @@
       "financialAccountId": 2,
       "literacy": 0.85,
       "wealthLevel": 60,
-      "initialSavingsSUSD": 1000,
+      "initialSavingsRUSD": 1000,
       "militancy": 0.05,
       "maleAgeGroups": [
         20415,

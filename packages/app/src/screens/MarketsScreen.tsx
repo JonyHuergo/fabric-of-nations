@@ -168,7 +168,7 @@ export function MarketsScreen({
                     </Text>
                     <Text style={styles.goodUnit}>per {price.unitLabel}</Text>
                   </View>
-                  <Text style={styles.price}>{formatPrice(price.priceSUSD)} SUSD</Text>
+                  <Text style={styles.price}>{formatPrice(price.priceRUSD)} RUSD</Text>
                   <Text style={styles.stock}>{formatQuantity(price.stockQuantity)}</Text>
                   <Text style={styles.capacity}>{formatQuantity(price.dailyProductionCapacity)}</Text>
                 </View>

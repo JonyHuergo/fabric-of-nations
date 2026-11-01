@@ -32,7 +32,7 @@ export class AppErrorBoundary extends Component<Props, State> {
 
   public override componentDidCatch(error: unknown, info: ErrorInfo): void {
     // Keep the diagnosis available in development logs without exposing world state.
-    console.error("Century UI render failure", error, info.componentStack);
+    console.error("Fabric of Nations UI render failure", error, info.componentStack);
   }
 
   public override render(): ReactNode {

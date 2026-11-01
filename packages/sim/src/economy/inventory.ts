@@ -5,7 +5,7 @@ import type { Market, StockLot } from "./types.js";
 
 /** Derive aggregate physical stock by good id from the authoritative lots. */
 export function deriveStockByGood(market: Market, goodCount?: number): number[] {
-  const count = goodCount ?? market.priceSUSD.length;
+  const count = goodCount ?? market.priceRUSD.length;
   requireInteger(count, "goodCount", 0, 1_000_000);
   const stock = new Array<number>(count).fill(0);
   for (const lot of market.stockLots) {

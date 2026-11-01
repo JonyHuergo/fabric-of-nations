@@ -23,14 +23,15 @@ import {
   MAX_CURRENCY_KEY_LENGTH,
   MAX_CURRENCY_NAME_LENGTH,
   MAX_FOREIGN_ISSUER_KEY_LENGTH,
-  SUSD_CURRENCY_KEY,
+  LEGACY_SUSD_CURRENCY_KEY,
+  RUSD_CURRENCY_KEY,
 } from "../constants.js";
 import {
   DEFAULT_BUSINESS_PROFIT_TAX_RATE,
-  DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR,
-  DEFAULT_RESERVE_TARGET_SUSD,
+  DEFAULT_INCOME_TAX_ALLOWANCE_RUSD_PER_YEAR,
+  DEFAULT_RESERVE_TARGET_RUSD,
   DEFAULT_WELFARE_MAX_WEALTH_LEVEL,
-  MAX_FISCAL_BUDGET_SUSD_PER_YEAR,
+  MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
   MAX_FISCAL_TAX_RATE,
   MAX_WELFARE_WEALTH_LEVEL,
   MIN_FISCAL_TAX_RATE,
@@ -45,7 +46,7 @@ import {
   requireUint32,
 } from "../validation.js";
 import type { World } from "../world.js";
-import { assertValidSusdPerCurrencyUnit } from "./currency.js";
+import { assertValidRusdPerCurrencyUnit } from "./currency.js";
 import type {
   Country,
   Currency,
@@ -127,7 +128,7 @@ export function buildRegionOwnerMap(world: World): ReadonlyMap<Id, Id> {
 export function fiscalPolicyIsActive(fiscal: FiscalPolicyInput): boolean {
   return (
     fiscal.incomeTaxRate > 0 ||
-    fiscal.welfareBudgetSUSDPerYear > 0 ||
+    fiscal.welfareBudgetRUSDPerYear > 0 ||
     (fiscal.businessProfitTaxRate ?? 0) > 0
   );
 }
@@ -180,16 +181,16 @@ export function assertValidIndustrialPolicy(
 /** Neutral defaults for the E2 fiscal-policy fields, used by scenario input. */
 export function neutralFiscalPolicyDefaults(): Pick<
   FiscalPolicy,
-  | "incomeTaxAllowanceSUSDPerYear"
+  | "incomeTaxAllowanceRUSDPerYear"
   | "welfareMaxWealthLevel"
   | "businessProfitTaxRate"
-  | "reserveTargetSUSD"
+  | "reserveTargetRUSD"
 > {
   return {
-    incomeTaxAllowanceSUSDPerYear: DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR,
+    incomeTaxAllowanceRUSDPerYear: DEFAULT_INCOME_TAX_ALLOWANCE_RUSD_PER_YEAR,
     welfareMaxWealthLevel: DEFAULT_WELFARE_MAX_WEALTH_LEVEL,
     businessProfitTaxRate: DEFAULT_BUSINESS_PROFIT_TAX_RATE,
-    reserveTargetSUSD: DEFAULT_RESERVE_TARGET_SUSD,
+    reserveTargetRUSD: DEFAULT_RESERVE_TARGET_RUSD,
   };
 }
 
@@ -205,12 +206,12 @@ export function createFiscalPolicy(input: FiscalPolicyInput, path = "fiscal"): F
   return assertValidFiscalPolicy(
     {
       incomeTaxRate: record.incomeTaxRate,
-      incomeTaxAllowanceSUSDPerYear:
-        record.incomeTaxAllowanceSUSDPerYear ?? defaults.incomeTaxAllowanceSUSDPerYear,
-      welfareBudgetSUSDPerYear: record.welfareBudgetSUSDPerYear,
+      incomeTaxAllowanceRUSDPerYear:
+        record.incomeTaxAllowanceRUSDPerYear ?? defaults.incomeTaxAllowanceRUSDPerYear,
+      welfareBudgetRUSDPerYear: record.welfareBudgetRUSDPerYear,
       welfareMaxWealthLevel: record.welfareMaxWealthLevel ?? defaults.welfareMaxWealthLevel,
       businessProfitTaxRate: record.businessProfitTaxRate ?? defaults.businessProfitTaxRate,
-      reserveTargetSUSD: record.reserveTargetSUSD ?? defaults.reserveTargetSUSD,
+      reserveTargetRUSD: record.reserveTargetRUSD ?? defaults.reserveTargetRUSD,
     },
     path,
   );
@@ -225,28 +226,28 @@ export function assertValidFiscalPolicy(value: unknown, path: string): FiscalPol
       `${path}.incomeTaxRate must be in ${MIN_FISCAL_TAX_RATE}..${MAX_FISCAL_TAX_RATE}, received ${String(incomeTaxRate)}`,
     );
   }
-  const incomeTaxAllowanceSUSDPerYear = requireFiniteNumber(
-    record.incomeTaxAllowanceSUSDPerYear,
-    `${path}.incomeTaxAllowanceSUSDPerYear`,
+  const incomeTaxAllowanceRUSDPerYear = requireFiniteNumber(
+    record.incomeTaxAllowanceRUSDPerYear,
+    `${path}.incomeTaxAllowanceRUSDPerYear`,
   );
-  if (incomeTaxAllowanceSUSDPerYear < 0) {
-    throw new RangeError(`${path}.incomeTaxAllowanceSUSDPerYear must be non-negative`);
+  if (incomeTaxAllowanceRUSDPerYear < 0) {
+    throw new RangeError(`${path}.incomeTaxAllowanceRUSDPerYear must be non-negative`);
   }
-  if (incomeTaxAllowanceSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+  if (incomeTaxAllowanceRUSDPerYear > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError(
-      `${path}.incomeTaxAllowanceSUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      `${path}.incomeTaxAllowanceRUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
     );
   }
-  const welfareBudgetSUSDPerYear = requireFiniteNumber(
-    record.welfareBudgetSUSDPerYear,
-    `${path}.welfareBudgetSUSDPerYear`,
+  const welfareBudgetRUSDPerYear = requireFiniteNumber(
+    record.welfareBudgetRUSDPerYear,
+    `${path}.welfareBudgetRUSDPerYear`,
   );
-  if (welfareBudgetSUSDPerYear < 0) {
-    throw new RangeError(`${path}.welfareBudgetSUSDPerYear must be non-negative`);
+  if (welfareBudgetRUSDPerYear < 0) {
+    throw new RangeError(`${path}.welfareBudgetRUSDPerYear must be non-negative`);
   }
-  if (welfareBudgetSUSDPerYear > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+  if (welfareBudgetRUSDPerYear > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError(
-      `${path}.welfareBudgetSUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      `${path}.welfareBudgetRUSDPerYear must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
     );
   }
   const welfareMaxWealthLevel = requireInteger(
@@ -267,25 +268,25 @@ export function assertValidFiscalPolicy(value: unknown, path: string): FiscalPol
       `${path}.businessProfitTaxRate must be in ${MIN_FISCAL_TAX_RATE}..${MAX_FISCAL_TAX_RATE}, received ${String(businessProfitTaxRate)}`,
     );
   }
-  const reserveTargetSUSD = requireFiniteNumber(
-    record.reserveTargetSUSD,
-    `${path}.reserveTargetSUSD`,
+  const reserveTargetRUSD = requireFiniteNumber(
+    record.reserveTargetRUSD,
+    `${path}.reserveTargetRUSD`,
   );
-  if (reserveTargetSUSD < 0) {
-    throw new RangeError(`${path}.reserveTargetSUSD must be non-negative`);
+  if (reserveTargetRUSD < 0) {
+    throw new RangeError(`${path}.reserveTargetRUSD must be non-negative`);
   }
-  if (reserveTargetSUSD > MAX_FISCAL_BUDGET_SUSD_PER_YEAR) {
+  if (reserveTargetRUSD > MAX_FISCAL_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError(
-      `${path}.reserveTargetSUSD must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_SUSD_PER_YEAR)}`,
+      `${path}.reserveTargetRUSD must not exceed the numeric-safety bound ${String(MAX_FISCAL_BUDGET_RUSD_PER_YEAR)}`,
     );
   }
   return {
     incomeTaxRate,
-    incomeTaxAllowanceSUSDPerYear,
-    welfareBudgetSUSDPerYear,
+    incomeTaxAllowanceRUSDPerYear,
+    welfareBudgetRUSDPerYear,
     welfareMaxWealthLevel,
     businessProfitTaxRate,
-    reserveTargetSUSD,
+    reserveTargetRUSD,
   };
 }
 
@@ -386,8 +387,9 @@ function assertCurrencyIssuer(value: unknown, path: string): CurrencyIssuer {
 
 function assertCurrencyKey(value: unknown, path: string): string {
   const key = requireString(value, path, { minLength: 1, maxLength: MAX_CURRENCY_KEY_LENGTH });
-  if (key.toLowerCase() === SUSD_CURRENCY_KEY) {
-    throw new RangeError(`${path} is reserved for the SUSD unit of account`);
+  const normalized = key.toLowerCase();
+  if (normalized === RUSD_CURRENCY_KEY || normalized === LEGACY_SUSD_CURRENCY_KEY) {
+    throw new RangeError(`${path} is reserved for the RUSD unit of account`);
   }
   if (!CURRENCY_KEY_PATTERN.test(key)) {
     throw new RangeError(`${path} must be a lower-case identifier such as "gbp"`);
@@ -521,9 +523,9 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
     if (status !== "specified") {
       throw new RangeError(`${path}.status must be "specified" or "unavailable"`);
     }
-    const susdPerUnit = assertValidSusdPerCurrencyUnit(
-      record.susdPerUnit,
-      `${path}.susdPerUnit`,
+    const rusdPerUnit = assertValidRusdPerCurrencyUnit(
+      record.rusdPerUnit,
+      `${path}.rusdPerUnit`,
     );
     const setOnDay = requireInteger(
       record.setOnDay,
@@ -557,7 +559,7 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
     valuations.set(currencyId, {
       currencyId,
       status: "specified",
-      susdPerUnit,
+      rusdPerUnit,
       setOnDay,
       source: source as "scenario" | "policy" | "market",
     });

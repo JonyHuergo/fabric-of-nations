@@ -38,7 +38,7 @@ function militaryPayForBlockOnDay(world: World, dayIndex: number, blockId: numbe
     for (const line of posting.lines) {
       const account = accountById.get(line.accountId);
       if (account?.subtype === "military-income" && line.side === "credit") {
-        total += line.amountSUSD;
+        total += line.amountRUSD;
       }
     }
   }
@@ -51,7 +51,7 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
     scenario.military = {};
     const country = scenario.countries?.find((entry) => entry.id === M5_COUNTRY_A);
     if (country === undefined) throw new Error("missing country A");
-    country.initialTreasuryCashSUSD = 1_000_000;
+    country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
     const home = world.popBlocks
       .filter((block) => block.regionId === M5_REGION_A1)
@@ -89,7 +89,7 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
     if (monthEnd === undefined) throw new Error("missing month-end result");
     const militaryIncome = militaryPayForBlockOnDay(world, 30, blockId);
     expect(militaryIncome).toBeGreaterThan(0);
-    expect(monthEnd.economy.military.paidSUSD).toBeGreaterThan(0);
+    expect(monthEnd.economy.military.paidRUSD).toBeGreaterThan(0);
 
     const wealthUpdate = monthEnd.population.wealthUpdates.find(
       (entry) => entry.popBlockId === blockId,
@@ -106,17 +106,17 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
     const population = populationTotal(home);
     const yearDays = daysInYear(1900);
     const expectedAnnualDisposable =
-      ((household.wagesReceivedSUSD +
-        fiscalBlock.welfareReceivedSUSD -
-        fiscalBlock.incomeTaxSUSD) /
+      ((household.wagesReceivedRUSD +
+        fiscalBlock.welfareReceivedRUSD -
+        fiscalBlock.incomeTaxRUSD) /
         population) *
       yearDays;
-    expect(wealthUpdate.annualDisposableIncomePerCapitaSUSD).toBeCloseTo(
+    expect(wealthUpdate.annualDisposableIncomePerCapitaRUSD).toBeCloseTo(
       expectedAnnualDisposable,
       8,
     );
     const militaryAnnualPerCapita = (militaryIncome / population) * yearDays;
-    expect(wealthUpdate.annualDisposableIncomePerCapitaSUSD).not.toBeCloseTo(
+    expect(wealthUpdate.annualDisposableIncomePerCapitaRUSD).not.toBeCloseTo(
       expectedAnnualDisposable + militaryAnnualPerCapita,
       6,
     );
@@ -125,8 +125,8 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
     if (policy === undefined) throw new Error("missing fiscal policy");
     const expectedTax =
       policy.incomeTaxRate *
-      Math.max(0, household.wagesReceivedSUSD - policy.incomeTaxAllowanceSUSDPerYear / yearDays);
-    expect(fiscalBlock.incomeTaxSUSD).toBeCloseTo(expectedTax, 8);
+      Math.max(0, household.wagesReceivedRUSD - policy.incomeTaxAllowanceRUSDPerYear / yearDays);
+    expect(fiscalBlock.incomeTaxRUSD).toBeCloseTo(expectedTax, 8);
     assertValidWorld(world);
   });
 });

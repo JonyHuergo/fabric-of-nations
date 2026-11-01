@@ -3,24 +3,24 @@
  * board (D-080).
  *
  * Units and directions (never invert them):
- * - `CurrencyValuation.susdPerUnit` is SUSD per ONE currency unit.
- * - `currencyIssuedUnits` is a count of currency units; its SUSD measurement is
+ * - `CurrencyValuation.rusdPerUnit` is RUSD per ONE currency unit.
+ * - `currencyIssuedUnits` is a count of currency units; its RUSD measurement is
  *   `units × valuation`.
- * - All accounts and prices are SUSD. Currency amounts exist only in the monetary
+ * - All accounts and prices are RUSD. Currency amounts exist only in the monetary
  *   window; trade and taxes are never converted.
  *
- * The price index is a pure measurement. It never changes SUSD's definition and never
+ * The price index is a pure measurement. It never changes RUSD's definition and never
  * causes a price, wage, tax, or account to change.
  */
 
 import { dayIndexToCivilDate, daysInMonth } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
 import type { PopulationDefinitions } from "../population/types.js";
 import type { DayIndex, Id } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
-  accountBalanceSUSD,
+  accountBalanceRUSD,
   currencyValuationOf,
   emptyPriceIndexState,
   parseCurrencyRate,
@@ -39,7 +39,7 @@ import {
   MAX_PRICE_INDEX_OBSERVATIONS,
 } from "./constants.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import { asSusdPerCurrencyUnit } from "./currency.js";
+import { asRusdPerCurrencyUnit } from "./currency.js";
 import { lawDefinition } from "./politics.js";
 import type {
   CurrencyValuation,
@@ -49,7 +49,7 @@ import type {
   MonetaryState,
   PriceIndexBasketItem,
   PriceIndexState,
-  SusdPerCurrencyUnit,
+  RusdPerCurrencyUnit,
 } from "./types.js";
 import { MONETARY_REGIMES } from "./types.js";
 export {
@@ -108,7 +108,7 @@ export function buildPriceIndexBasket(
 export function createPriceIndexState(
   definitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions,
-  markets: readonly { readonly id: Id; readonly priceSUSD: readonly number[] }[],
+  markets: readonly { readonly id: Id; readonly priceRUSD: readonly number[] }[],
 ): PriceIndexState {
   if (markets.length === 0) {
     // No prices exist, so there is nothing to measure; the index stays empty.
@@ -119,7 +119,7 @@ export function createPriceIndexState(
     .sort((left, right) => left.id - right.id)
     .map((market) => ({
       marketId: market.id,
-      prices: [...market.priceSUSD],
+      prices: [...market.priceRUSD],
     }));
   return {
     basket,
@@ -155,7 +155,7 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
     let denominator = 0;
     for (const item of basket) {
       const basePrice = base[item.goodId] ?? 0;
-      const currentPrice = market.priceSUSD[item.goodId] ?? 0;
+      const currentPrice = market.priceRUSD[item.goodId] ?? 0;
       if (!(basePrice > 0) || !(currentPrice > 0)) continue;
       numerator += item.weight * (currentPrice / basePrice);
       denominator += item.weight;
@@ -246,7 +246,7 @@ export function priceIndexCoverage(world: World, marketId: Id): number {
   for (const item of basket) {
     total += item.weight;
     const basePrice = base[item.goodId] ?? 0;
-    const currentPrice = market.priceSUSD[item.goodId] ?? 0;
+    const currentPrice = market.priceRUSD[item.goodId] ?? 0;
     if (basePrice > 0 && currentPrice > 0) covered += item.weight;
   }
   return total > 0 ? covered / total : 0;
@@ -294,8 +294,8 @@ export function monetaryCurrencyForCountry(
   return record === undefined || record.issuerCountryId !== countryId ? null : record;
 }
 
-/** SUSD value of one authority's currency in circulation at the current valuation. */
-export function authorityLiabilitySUSD(
+/** RUSD value of one authority's currency in circulation at the current valuation. */
+export function authorityLiabilityRUSD(
   world: World,
   record: MonetaryCurrencyState,
 ): number {
@@ -305,20 +305,20 @@ export function authorityLiabilitySUSD(
   return record.currencyIssuedUnits * valuation;
 }
 
-/** Authority reserve cash in SUSD. */
-export function authorityReservesSUSD(
+/** Authority reserve cash in RUSD. */
+export function authorityReservesRUSD(
   world: World,
   record: MonetaryCurrencyState,
 ): number {
-  return accountBalanceSUSD(world, record.reserveAccountId);
+  return accountBalanceRUSD(world, record.reserveAccountId);
 }
 
-/** External counterparty currency holding in SUSD. */
-export function externalCurrencyHoldingSUSD(
+/** External counterparty currency holding in RUSD. */
+export function externalCurrencyHoldingRUSD(
   world: World,
   record: MonetaryCurrencyState,
 ): number {
-  return accountBalanceSUSD(world, record.externalCurrencyAccountId);
+  return accountBalanceRUSD(world, record.externalCurrencyAccountId);
 }
 
 /** Reserve cover in months of the most recently completed month's realized imports. */
@@ -326,11 +326,11 @@ export function authorityReserveCoverMonths(
   world: World,
   record: MonetaryCurrencyState,
 ): number {
-  const reserves = authorityReservesSUSD(world, record);
-  if (!(record.lastMonthImportsSUSD > 0)) {
+  const reserves = authorityReservesRUSD(world, record);
+  if (!(record.lastMonthImportsRUSD > 0)) {
     return reserves > 0 ? Number.POSITIVE_INFINITY : 0;
   }
-  return reserves / record.lastMonthImportsSUSD;
+  return reserves / record.lastMonthImportsRUSD;
 }
 
 /**
@@ -346,28 +346,28 @@ export function convertibilityState(
 ): {
   readonly state: "no-authority" | "inactive" | "open" | "suspended";
   readonly coverMonths: number;
-  readonly reservesSUSD: number;
+  readonly reservesRUSD: number;
 } {
   const record = monetaryCurrencyForCountry(world, countryId);
   if (record === null || !world.monetary.enabled) {
-    return { state: "no-authority", coverMonths: Number.POSITIVE_INFINITY, reservesSUSD: 0 };
+    return { state: "no-authority", coverMonths: Number.POSITIVE_INFINITY, reservesRUSD: 0 };
   }
   if (!record.active) {
     return {
       state: "inactive",
       coverMonths: Number.POSITIVE_INFINITY,
-      reservesSUSD: authorityReservesSUSD(world, record),
+      reservesRUSD: authorityReservesRUSD(world, record),
     };
   }
-  const reserves = authorityReservesSUSD(world, record);
+  const reserves = authorityReservesRUSD(world, record);
   const coverMonths = authorityReserveCoverMonths(world, record);
   const suspended =
-    reserves <= MONEY_TOLERANCE_SUSD ||
+    reserves <= MONEY_TOLERANCE_RUSD ||
     coverMonths < FX_MIN_RESERVE_COVER_MONTHS;
   return {
     state: suspended ? "suspended" : "open",
     coverMonths,
-    reservesSUSD: reserves,
+    reservesRUSD: reserves,
   };
 }
 
@@ -383,7 +383,7 @@ export function isConvertibilitySuspended(world: World, countryId: Id): boolean 
 export interface MonetaryPhaseResult {
   readonly dayIndex: DayIndex;
   readonly managedCurrenciesUpdated: readonly Id[];
-  readonly revaluationSUSD: number;
+  readonly revaluationRUSD: number;
   readonly priceObservationCaptured: boolean;
   readonly postingIds: readonly number[];
 }
@@ -437,7 +437,7 @@ export function runMonetaryPhase(
   const empty: MonetaryPhaseResult = {
     dayIndex,
     managedCurrenciesUpdated: [],
-    revaluationSUSD: 0,
+    revaluationRUSD: 0,
     priceObservationCaptured: false,
     postingIds: [],
   };
@@ -448,7 +448,7 @@ export function runMonetaryPhase(
   const values = derivePriceIndexes(world);
   const managed: Id[] = [];
   const entries: JournalEntryInput[] = [];
-  let revaluationSUSD = 0;
+  let revaluationRUSD = 0;
 
   for (const record of [...world.monetary.currencies].sort(
     (left, right) => left.currencyId - right.currencyId,
@@ -465,8 +465,8 @@ export function runMonetaryPhase(
       record.regime === "managed" &&
       record.lastManagedUpdateDay !== dayIndex
     ) {
-      const exports = record.lastMonthExportsSUSD;
-      const imports = record.lastMonthImportsSUSD;
+      const exports = record.lastMonthExportsRUSD;
+      const imports = record.lastMonthImportsRUSD;
       const turnover = exports + imports;
       const tradePressure = turnover > 0 ? (exports - imports) / turnover : 0;
       const countryIndex = values.countries.get(country.id) ?? values.world;
@@ -478,7 +478,7 @@ export function runMonetaryPhase(
       const raw =
         FX_KAPPA * (FX_TRADE_WEIGHT * tradePressure + FX_PRICE_WEIGHT * priceGap);
       const change = clamp(raw, -FX_MAX_DAILY_CHANGE, FX_MAX_DAILY_CHANGE);
-      const reference = record.referenceParitySusdPerUnit ?? valuation;
+      const reference = record.referenceParityRusdPerUnit ?? valuation;
       const next = clamp(
         valuation * (1 + change),
         reference * FX_MIN_RATIO,
@@ -486,8 +486,8 @@ export function runMonetaryPhase(
       );
       if (Math.abs(next - valuation) > Math.abs(valuation) * 1e-12) {
         const delta = record.currencyIssuedUnits * (next - valuation);
-        revaluationSUSD += applyRevaluation(record, delta, dayIndex, entries);
-        setCurrencyValuation(world, record.currencyId, asSusdPerCurrencyUnit(next), dayIndex, "market");
+        revaluationRUSD += applyRevaluation(record, delta, dayIndex, entries);
+        setCurrencyValuation(world, record.currencyId, asRusdPerCurrencyUnit(next), dayIndex, "market");
         managed.push(record.currencyId);
       }
       record.lastManagedUpdateDay = dayIndex;
@@ -496,8 +496,8 @@ export function runMonetaryPhase(
     // Month-end capture: the completed month's realized trade feeds reserve cover and the
     // next month's managed rule. It is the only place the memo is frozen.
     if (monthEnd !== null && record.lastMonthEndDay !== dayIndex) {
-      record.lastMonthExportsSUSD = country.trade.exportsValueMonthToDateSUSD;
-      record.lastMonthImportsSUSD = country.trade.importsValueMonthToDateSUSD;
+      record.lastMonthExportsRUSD = country.trade.exportsValueMonthToDateRUSD;
+      record.lastMonthImportsRUSD = country.trade.importsValueMonthToDateRUSD;
       record.lastMonthEndDay = dayIndex;
     }
   }
@@ -513,15 +513,15 @@ export function runMonetaryPhase(
   return {
     dayIndex,
     managedCurrenciesUpdated: managed,
-    revaluationSUSD,
+    revaluationRUSD,
     priceObservationCaptured,
     postingIds: postings.map((posting) => posting.id),
   };
 }
 
 /**
- * Apply a SUSD revaluation delta to the outstanding currency liability and the external
- * holding. Positive delta = the currency is worth more in SUSD.
+ * Apply a RUSD revaluation delta to the outstanding currency liability and the external
+ * holding. Positive delta = the currency is worth more in RUSD.
  */
 function applyRevaluation(
   record: MonetaryCurrencyState,
@@ -529,7 +529,7 @@ function applyRevaluation(
   dayIndex: DayIndex,
   entries: JournalEntryInput[],
 ): number {
-  if (Math.abs(delta) <= MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(delta))) return 0;
+  if (Math.abs(delta) <= MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(delta))) return 0;
   if (
     record.liabilityAccountId === null ||
     record.equityAccountId === null ||
@@ -548,22 +548,22 @@ function applyRevaluation(
       {
         accountId: record.liabilityAccountId,
         side: increase ? "credit" : "debit",
-        amountSUSD: amount,
+        amountRUSD: amount,
       },
       {
         accountId: record.equityAccountId,
         side: increase ? "debit" : "credit",
-        amountSUSD: amount,
+        amountRUSD: amount,
       },
       {
         accountId: record.externalCurrencyAccountId,
         side: increase ? "debit" : "credit",
-        amountSUSD: amount,
+        amountRUSD: amount,
       },
       {
         accountId: record.externalEquityAccountId,
         side: increase ? "credit" : "debit",
-        amountSUSD: amount,
+        amountRUSD: amount,
       },
     ],
     sourceEntityId: record.issuerCountryId,
@@ -576,7 +576,7 @@ function applyRevaluation(
 function setCurrencyValuation(
   world: World,
   currencyId: Id,
-  value: SusdPerCurrencyUnit,
+  value: RusdPerCurrencyUnit,
   dayIndex: DayIndex,
   source: "scenario" | "policy" | "market",
 ): void {
@@ -584,7 +584,7 @@ function setCurrencyValuation(
   const record: CurrencyValuation = {
     currencyId,
     status: "specified",
-    susdPerUnit: value,
+    rusdPerUnit: value,
     setOnDay: dayIndex,
     source,
   };
@@ -603,21 +603,21 @@ function setCurrencyValuation(
 export interface MonetaryPolicyInput {
   readonly countryId: Id;
   readonly regime: MonetaryRegime;
-  readonly paritySusdPerUnit: number | null;
-  readonly reserveTransferSUSD: number;
-  readonly currencyConversionSUSD: number;
+  readonly parityRusdPerUnit: number | null;
+  readonly reserveTransferRUSD: number;
+  readonly currencyConversionRUSD: number;
 }
 
 export interface MonetaryPolicyResult {
   readonly countryId: Id;
   readonly currencyId: Id;
   readonly regime: MonetaryRegime;
-  readonly paritySusdPerUnit: number;
-  readonly valuationSusdPerUnit: number;
-  readonly reserveTransferSUSD: number;
-  readonly currencyConversionSUSD: number;
+  readonly parityRusdPerUnit: number;
+  readonly valuationRusdPerUnit: number;
+  readonly reserveTransferRUSD: number;
+  readonly currencyConversionRUSD: number;
   readonly currencyIssuedUnits: number;
-  readonly revaluationSUSD: number;
+  readonly revaluationRUSD: number;
   readonly postalIds: readonly number[];
 }
 
@@ -668,35 +668,35 @@ export function validateMonetaryPolicy(
     );
   }
   for (const [field, value] of [
-    ["reserveTransferSUSD", input.reserveTransferSUSD],
-    ["currencyConversionSUSD", input.currencyConversionSUSD],
+    ["reserveTransferRUSD", input.reserveTransferRUSD],
+    ["currencyConversionRUSD", input.currencyConversionRUSD],
   ] as const) {
     if (typeof value !== "number" || !Number.isFinite(value)) {
       throw new RangeError(`${path}.${field} must be a finite number`);
     }
   }
   const treasuryCash =
-    accountBalanceSUSD(world, country.treasuryAccountId);
-  const reserves = authorityReservesSUSD(world, record);
-  if (input.reserveTransferSUSD > 0 && input.reserveTransferSUSD > treasuryCash + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.reserveTransferSUSD exceeds the treasury's cash`);
+    accountBalanceRUSD(world, country.treasuryAccountId);
+  const reserves = authorityReservesRUSD(world, record);
+  if (input.reserveTransferRUSD > 0 && input.reserveTransferRUSD > treasuryCash + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.reserveTransferRUSD exceeds the treasury's cash`);
   }
-  if (input.reserveTransferSUSD < 0 && -input.reserveTransferSUSD > reserves + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.reserveTransferSUSD exceeds the authority's reserves`);
+  if (input.reserveTransferRUSD < 0 && -input.reserveTransferRUSD > reserves + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.reserveTransferRUSD exceeds the authority's reserves`);
   }
 
   if (!record.active) {
     if (input.regime === "managed") {
       throw new RangeError(`${path}: a managed regime requires an established authority`);
     }
-    const parity = input.paritySusdPerUnit;
+    const parity = input.parityRusdPerUnit;
     if (parity === null) {
-      throw new RangeError(`${path}.paritySusdPerUnit is required to establish the authority`);
+      throw new RangeError(`${path}.parityRusdPerUnit is required to establish the authority`);
     }
-    parseCurrencyRate(parity, `${path}.paritySusdPerUnit`);
-    if (!(input.reserveTransferSUSD > 0)) {
+    parseCurrencyRate(parity, `${path}.parityRusdPerUnit`);
+    if (!(input.reserveTransferRUSD > 0)) {
       throw new RangeError(
-        `${path}.reserveTransferSUSD must be positive to establish the authority`,
+        `${path}.reserveTransferRUSD must be positive to establish the authority`,
       );
     }
     return;
@@ -706,9 +706,9 @@ export function validateMonetaryPolicy(
   if (valuation === null) {
     throw new RangeError(`${path}: the currency has no specified valuation`);
   }
-  if (input.paritySusdPerUnit !== null) {
-    const parity = parseCurrencyRate(input.paritySusdPerUnit, `${path}.paritySusdPerUnit`);
-    const current = record.paritySusdPerUnit ?? valuation;
+  if (input.parityRusdPerUnit !== null) {
+    const parity = parseCurrencyRate(input.parityRusdPerUnit, `${path}.parityRusdPerUnit`);
+    const current = record.parityRusdPerUnit ?? valuation;
     if (Math.abs(parity - current) > Math.abs(current) * 1e-12) {
       if (input.regime !== "pegged") {
         throw new RangeError(`${path}: a parity may only be set under a pegged regime`);
@@ -716,7 +716,7 @@ export function validateMonetaryPolicy(
       const relative = Math.abs(parity / current - 1);
       if (relative > FX_MAX_PARITY_STEP + 1e-12) {
         throw new RangeError(
-          `${path}.paritySusdPerUnit moves more than ${String(FX_MAX_PARITY_STEP)} of the current parity`,
+          `${path}.parityRusdPerUnit moves more than ${String(FX_MAX_PARITY_STEP)} of the current parity`,
         );
       }
       if (
@@ -729,24 +729,24 @@ export function validateMonetaryPolicy(
       }
     }
   }
-  if (record.regime === "pegged" && input.paritySusdPerUnit === null && input.regime === "pegged") {
+  if (record.regime === "pegged" && input.parityRusdPerUnit === null && input.regime === "pegged") {
     // Keeping the parity is valid; no error.
   }
-  if (input.currencyConversionSUSD > 0) {
-    const externalCash = accountBalanceSUSD(world, record.externalCashAccountId);
-    if (input.currencyConversionSUSD > externalCash + MONEY_TOLERANCE_SUSD) {
-      throw new RangeError(`${path}.currencyConversionSUSD exceeds the external SUSD cash`);
+  if (input.currencyConversionRUSD > 0) {
+    const externalCash = accountBalanceRUSD(world, record.externalCashAccountId);
+    if (input.currencyConversionRUSD > externalCash + MONEY_TOLERANCE_RUSD) {
+      throw new RangeError(`${path}.currencyConversionRUSD exceeds the external RUSD cash`);
     }
   }
-  if (input.currencyConversionSUSD < 0) {
-    const requested = -input.currencyConversionSUSD;
-    if (requested > reserves + MONEY_TOLERANCE_SUSD) {
-      throw new RangeError(`${path}.currencyConversionSUSD exceeds the authority's reserves`);
+  if (input.currencyConversionRUSD < 0) {
+    const requested = -input.currencyConversionRUSD;
+    if (requested > reserves + MONEY_TOLERANCE_RUSD) {
+      throw new RangeError(`${path}.currencyConversionRUSD exceeds the authority's reserves`);
     }
-    const holding = externalCurrencyHoldingSUSD(world, record);
-    if (requested > holding + MONEY_TOLERANCE_SUSD) {
+    const holding = externalCurrencyHoldingRUSD(world, record);
+    if (requested > holding + MONEY_TOLERANCE_RUSD) {
       throw new RangeError(
-        `${path}.currencyConversionSUSD exceeds the external currency holding`,
+        `${path}.currencyConversionRUSD exceeds the external currency holding`,
       );
     }
   }
@@ -797,45 +797,45 @@ export function applyMonetaryPolicy(
   const openingValuations = cloneValuations(world.currencyValuations);
   const openingBalances = new Map<Id, number>();
   for (const account of world.finance.accounts) {
-    openingBalances.set(account.id, account.balanceSUSD);
+    openingBalances.set(account.id, account.balanceRUSD);
   }
   const openingPostings = [...world.finance.postings];
   const openingNextPostingId = world.finance.nextPostingId;
 
   try {
     const entries: JournalEntryInput[] = [];
-    let revaluationSUSD = 0;
+    let revaluationRUSD = 0;
     const oldValuation = currencyValuationOf(world, currencyId);
     const oldUnits = record.currencyIssuedUnits;
-    const oldParity = record.paritySusdPerUnit;
+    const oldParity = record.parityRusdPerUnit;
     const wasActive = record.active;
 
     // 1. Treasury reserve capitalization or withdrawal.
-    if (input.reserveTransferSUSD !== 0) {
+    if (input.reserveTransferRUSD !== 0) {
       if (record.reserveAccountId === null || record.equityAccountId === null) {
         throw new RangeError("monetary authority has no reserve accounts");
       }
       const equityId = accountIdFor(world, "country", country.id, "owner-equity");
-      const amount = Math.abs(input.reserveTransferSUSD);
-      const deposit = input.reserveTransferSUSD > 0;
+      const amount = Math.abs(input.reserveTransferRUSD);
+      const deposit = input.reserveTransferRUSD > 0;
       entries.push({
         transactionKind: "monetary-reserve-contribution",
         lines: [
-          { accountId: equityId, side: deposit ? "debit" : "credit", amountSUSD: amount },
+          { accountId: equityId, side: deposit ? "debit" : "credit", amountRUSD: amount },
           {
             accountId: country.treasuryAccountId,
             side: deposit ? "credit" : "debit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
           {
             accountId: record.reserveAccountId,
             side: deposit ? "debit" : "credit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
           {
             accountId: record.equityAccountId,
             side: deposit ? "credit" : "debit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
         ],
         sourceEntityId: country.id,
@@ -845,10 +845,10 @@ export function applyMonetaryPolicy(
 
     // 2. Resolve the next parity and valuation.
     let nextParity = oldParity;
-    if (input.paritySusdPerUnit !== null) {
-      nextParity = parseCurrencyRate(input.paritySusdPerUnit, "paritySusdPerUnit");
+    if (input.parityRusdPerUnit !== null) {
+      nextParity = parseCurrencyRate(input.parityRusdPerUnit, "parityRusdPerUnit");
     }
-    let nextValuation: SusdPerCurrencyUnit | null;
+    let nextValuation: RusdPerCurrencyUnit | null;
     if (!wasActive) {
       if (nextParity === null) {
         throw new RangeError("establishing the authority requires a parity");
@@ -867,14 +867,14 @@ export function applyMonetaryPolicy(
     // 3. Revalue the circulation that existed before this operation.
     if (oldUnits > 0 && oldValuation !== null) {
       const delta = oldUnits * (nextValuation - oldValuation);
-      revaluationSUSD += applyRevaluation(record, delta, dayIndex, entries);
+      revaluationRUSD += applyRevaluation(record, delta, dayIndex, entries);
     }
     if (oldValuation === null || Math.abs(nextValuation - oldValuation) > Math.abs(nextValuation) * 1e-12) {
       setCurrencyValuation(world, currencyId, nextValuation, dayIndex, "policy");
     }
 
     // 4. Currency issue/redemption at the resulting valuation.
-    if (input.currencyConversionSUSD !== 0) {
+    if (input.currencyConversionRUSD !== 0) {
       if (
         record.reserveAccountId === null ||
         record.liabilityAccountId === null ||
@@ -883,30 +883,30 @@ export function applyMonetaryPolicy(
       ) {
         throw new RangeError("monetary authority has no conversion accounts");
       }
-      const amount = Math.abs(input.currencyConversionSUSD);
-      const issue = input.currencyConversionSUSD > 0;
+      const amount = Math.abs(input.currencyConversionRUSD);
+      const issue = input.currencyConversionRUSD > 0;
       entries.push({
         transactionKind: issue ? "fx-issuance" : "fx-redemption",
         lines: [
           {
             accountId: record.reserveAccountId,
             side: issue ? "debit" : "credit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
           {
             accountId: record.liabilityAccountId,
             side: issue ? "credit" : "debit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
           {
             accountId: record.externalCurrencyAccountId,
             side: issue ? "debit" : "credit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
           {
             accountId: record.externalCashAccountId,
             side: issue ? "credit" : "debit",
-            amountSUSD: amount,
+            amountRUSD: amount,
           },
         ],
         sourceEntityId: issue ? record.externalCashAccountId : record.externalCurrencyAccountId,
@@ -918,9 +918,9 @@ export function applyMonetaryPolicy(
     // 5. Publish the policy state.
     record.active = true;
     record.regime = input.regime;
-    record.paritySusdPerUnit = nextParity;
-    if (record.referenceParitySusdPerUnit === null) {
-      record.referenceParitySusdPerUnit = nextParity;
+    record.parityRusdPerUnit = nextParity;
+    if (record.referenceParityRusdPerUnit === null) {
+      record.referenceParityRusdPerUnit = nextParity;
     }
     const parityChanged =
       !wasActive ||
@@ -935,12 +935,12 @@ export function applyMonetaryPolicy(
       countryId: country.id,
       currencyId,
       regime: record.regime,
-      paritySusdPerUnit: record.paritySusdPerUnit ?? nextValuation,
-      valuationSusdPerUnit: currencyValuationOf(world, currencyId) ?? nextValuation,
-      reserveTransferSUSD: input.reserveTransferSUSD,
-      currencyConversionSUSD: input.currencyConversionSUSD,
+      parityRusdPerUnit: record.parityRusdPerUnit ?? nextValuation,
+      valuationRusdPerUnit: currencyValuationOf(world, currencyId) ?? nextValuation,
+      reserveTransferRUSD: input.reserveTransferRUSD,
+      currencyConversionRUSD: input.currencyConversionRUSD,
       currencyIssuedUnits: record.currencyIssuedUnits,
-      revaluationSUSD,
+      revaluationRUSD,
       postalIds: postings.map((posting) => posting.id),
     };
   } catch (error) {
@@ -951,7 +951,7 @@ export function applyMonetaryPolicy(
       if (balance === undefined) {
         throw new RangeError(`monetary rollback lost account ${String(account.id)}`);
       }
-      account.balanceSUSD = balance;
+      account.balanceRUSD = balance;
     }
     world.finance.postings = openingPostings;
     world.finance.nextPostingId = openingNextPostingId;

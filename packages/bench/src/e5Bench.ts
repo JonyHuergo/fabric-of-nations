@@ -35,8 +35,8 @@ function scenarioWithE5(): EconomyScenarioDef {
       ? {
           ...country,
           labor: {
-            trainingBudgetSUSDPerYear: 200_000,
-            trainingStipendPerTraineeSUSDPerYear: 1,
+            trainingBudgetRUSDPerYear: 200_000,
+            trainingStipendPerTraineeRUSDPerYear: 1,
             trainingStaffShare: 0.2,
             healthStaffShare: 0.2,
           },

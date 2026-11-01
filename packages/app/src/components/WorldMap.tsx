@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentRef,
+  type ReactNode,
+} from "react";
 import {
   PanResponder,
   Platform,
@@ -18,6 +26,10 @@ import Svg, {
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
+import { GlWorldMap } from "../map/GlWorldMap";
+import { supportsMapEngine } from "../map/mapEngine";
+import { politicalColor, rgbToCss } from "../map/politicalPalette";
+import { statusLabel } from "../map/statusLabel";
 import { colors, lighten, nationColor, spacing, type } from "../theme";
 import {
   MAP_HEIGHT,
@@ -33,7 +45,7 @@ import {
   project,
   type DecodedPolityGeometry,
 } from "./worldMapGeometry";
-import { PROVINCES_1900 } from "../generated/provinces1900";
+import { PROVINCE_MAP_1900 } from "../provinceMapBundle";
 import {
   pickProvinceAtPoint,
   planProvinceBorders,
@@ -131,9 +143,64 @@ export interface WorldMapProps {
   readonly onSelectProvince?: (provinceId: number | null) => void;
   /** Provincial boundaries are shown by default for every M12a map. */
   readonly showProvinces?: boolean;
+  /** Fill the parent instead of using `height` (WebGL map). */
+  readonly fill?: boolean;
+  /** Width of a panel docked over the map's right edge (WebGL map). */
+  readonly insetRight?: number;
+  /** Host-screen controls drawn above the map (WebGL map). */
+  readonly overlay?: ReactNode;
 }
 
-export function WorldMap({
+/**
+ * The one world-map entry point. The web build runs the WebGL renderer in
+ * `../map`; native builds, and any browser without WebGL2, use the SVG renderer
+ * below. Both consume the same catalogue, snapshot, projection and palette.
+ */
+export function WorldMap(props: WorldMapProps) {
+  const [engineSupported] = useState(() => Platform.OS === "web" && supportsMapEngine());
+  const [engineFailed, setEngineFailed] = useState(false);
+  const [hostHeight, setHostHeight] = useState(0);
+  if (engineSupported && !engineFailed) {
+    return (
+      <GlWorldMap
+        catalog={props.catalog}
+        snapshot={props.snapshot}
+        selectedTag={props.selectedTag}
+        onSelect={props.onSelect}
+        layer={props.layer ?? "political"}
+        playerTag={props.playerTag ?? null}
+        height={props.height ?? 420}
+        fill={props.fill === true}
+        showLegend={props.showLegend ?? true}
+        highlightMarketId={props.highlightMarketId ?? null}
+        selectedProvinceId={props.selectedProvinceId ?? null}
+        onSelectProvince={props.onSelectProvince}
+        insetRight={props.insetRight ?? 0}
+        overlay={props.overlay ?? null}
+        onUnavailable={() => setEngineFailed(true)}
+      />
+    );
+  }
+  if (props.fill !== true) {
+    return (
+      <View>
+        <SvgWorldMap {...props} />
+        {props.overlay}
+      </View>
+    );
+  }
+  return (
+    <View
+      style={styles.fillHost}
+      onLayout={(event) => setHostHeight(event.nativeEvent.layout.height)}
+    >
+      {hostHeight === 0 ? null : <SvgWorldMap {...props} height={hostHeight} />}
+      {props.overlay}
+    </View>
+  );
+}
+
+function SvgWorldMap({
   catalog,
   map,
   snapshot,
@@ -230,7 +297,7 @@ export function WorldMap({
    * M12a province geometry. Provinces are the sole geographical subdivision in
    * Europe; polity fills remain as the 1900 underlay and for non-European areas.
    */
-  const provinceMap: ProvinceMapData = PROVINCES_1900;
+  const provinceMap: ProvinceMapData = PROVINCE_MAP_1900;
   const provinces = useMemo<readonly DecodedProvince[]>(() => {
     return provinceMap.provinces.map((province) => {
       const [minX = -180, minY = -90, maxX = 180, maxY = 90] = province.bbox;
@@ -590,9 +657,9 @@ export function WorldMap({
         }
       }
       if (playerTag !== null && ownerTag === playerTag) return colors.player;
-      return nationColor(ownerTag);
+      return rgbToCss(politicalColor(province.mapTag, entryByTag));
     },
-    [layer, ownerTagByProvinceId, playerTag, regionByPolityId],
+    [entryByTag, layer, ownerTagByProvinceId, playerTag, regionByPolityId],
   );
 
   const handlePointerMove = useCallback(
@@ -638,16 +705,8 @@ export function WorldMap({
       const fallback = catalog.markets.find((market) => market.key === marketKey);
       return MARKET_COLORS[(fallback?.id ?? 0) % MARKET_COLORS.length] ?? colors.faint;
     }
-    const sovereignTag =
-      (entry.id !== undefined
-        ? countryTagById.get(regionByPolityId.get(entry.id)?.countryId ?? -1)
-        : undefined) ??
-      entry.sovereignTag ??
-      (entry.kind === "state" ? entry.tag : null);
-    const base = nationColor(sovereignTag ?? entry.tag);
-    if (entry.kind === "territory") return lighten(base, 0.3);
     if (playerTag !== null && entry.tag === playerTag) return colors.player;
-    return base;
+    return rgbToCss(politicalColor(entry.tag, entryByTag));
   };
 
   const occupationFor = (polity: DecodedPolity) => {
@@ -1261,32 +1320,7 @@ function MapButton({
   );
 }
 
-export function statusLabel(status: string): string {
-  switch (status) {
-    case "independent":
-      return "Independent state";
-    case "personal-union":
-      return "Personal union";
-    case "autonomous-vassal":
-      return "Autonomous vassal";
-    case "dominion":
-      return "Self-governing dominion";
-    case "self-governing-colony":
-      return "Self-governing colony";
-    case "protectorate":
-      return "Protectorate";
-    case "colony":
-      return "Colony";
-    case "occupation":
-      return "Under occupation";
-    case "autonomous-province":
-      return "Autonomous province";
-    case "dependency":
-      return "Dependency";
-    default:
-      return status;
-  }
-}
+export { statusLabel };
 
 export function marketOfEntry(
   entry: WorldCatalogEntry,
@@ -1306,6 +1340,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     overflow: "hidden",
   },
+  fillHost: { flex: 1 },
   mapFrame: { flex: 1 },
   controls: { position: "absolute", right: 8, top: 8, gap: 4 },
   mapButton: {

@@ -55,11 +55,11 @@ function tickDays(world: World, scenario: EconomyScenarioDef, days: number): voi
 function fiscalPolicy(overrides: Partial<FiscalPolicy> = {}): FiscalPolicy {
   return {
     incomeTaxRate: 0,
-    incomeTaxAllowanceSUSDPerYear: 0,
-    welfareBudgetSUSDPerYear: 0,
+    incomeTaxAllowanceRUSDPerYear: 0,
+    welfareBudgetRUSDPerYear: 0,
     welfareMaxWealthLevel: 99,
     businessProfitTaxRate: 0,
-    reserveTargetSUSD: 0,
+    reserveTargetRUSD: 0,
     ...overrides,
   };
 }
@@ -76,7 +76,7 @@ function observation(overrides: Partial<CountryAIObservation> = {}): CountryAIOb
     countryId: M5_COUNTRY_A,
     dayIndex: 7,
     fiscal: fiscalPolicy(),
-    treasuryCashSUSD: 1_000_000,
+    treasuryCashRUSD: 1_000_000,
     regionIds: [0],
     population: 1_000,
     blocks: [
@@ -93,7 +93,7 @@ function observation(overrides: Partial<CountryAIObservation> = {}): CountryAIOb
       },
     ],
     lastClosedPeriod: null,
-    debt: { enabled: false, outstandingPrincipalSUSD: 0 },
+    debt: { enabled: false, outstandingPrincipalRUSD: 0 },
     ...overrides,
   };
 }
@@ -105,11 +105,11 @@ function action(overrides: Partial<CountryAction> = {}): CountryAction {
     dayIndex: 0,
     source: "player",
     incomeTaxRate: 0.2,
-    incomeTaxAllowanceSUSDPerYear: 0,
-    welfareBudgetSUSDPerYear: 100,
+    incomeTaxAllowanceRUSDPerYear: 0,
+    welfareBudgetRUSDPerYear: 100,
     welfareMaxWealthLevel: 99,
     businessProfitTaxRate: 0,
-    reserveTargetSUSD: 0,
+    reserveTargetRUSD: 0,
     ...overrides,
   } as CountryAction;
 }
@@ -159,16 +159,16 @@ describe("M6 country AI and action validation", () => {
     expect(noHistory.actions).toHaveLength(1);
     const noHistoryAction = fiscalActionOf(noHistory.actions[0]);
     expect(noHistoryAction.incomeTaxRate).toBe(AI_HARDSHIP_MIN_TAX_RATE);
-    expect(noHistoryAction.welfareBudgetSUSDPerYear).toBe(0);
+    expect(noHistoryAction.welfareBudgetRUSDPerYear).toBe(0);
 
     const observed = planCountryActions(
       observation({
         lastClosedPeriod: {
           periodStartDay: 0,
           periodEndDay: 29,
-          incomeTaxSUSD: 100_000,
-          welfarePaidSUSD: 0,
-          interestExpenseSUSD: 0,
+          incomeTaxRUSD: 100_000,
+          welfarePaidRUSD: 0,
+          interestExpenseRUSD: 0,
         },
       }),
     );
@@ -177,7 +177,7 @@ describe("M6 country AI and action validation", () => {
     expect(proposed.kind).toBe("set-fiscal-policy");
     expect(proposed.incomeTaxRate).toBe(AI_HARDSHIP_MIN_TAX_RATE);
     const annualTaxRevenue = (100_000 * 365) / 30;
-    expect(proposed.welfareBudgetSUSDPerYear).toBeCloseTo(
+    expect(proposed.welfareBudgetRUSDPerYear).toBeCloseTo(
       annualTaxRevenue * AI_WELFARE_REVENUE_SHARE,
       2,
     );
@@ -186,14 +186,14 @@ describe("M6 country AI and action validation", () => {
   test("solvency takes priority over relief and cuts unaffordable welfare", () => {
     const decision = planCountryActions(
       observation({
-        fiscal: fiscalPolicy({ incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 60_000 }),
-        treasuryCashSUSD: 100,
+        fiscal: fiscalPolicy({ incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 60_000 }),
+        treasuryCashRUSD: 100,
         lastClosedPeriod: {
           periodStartDay: 0,
           periodEndDay: 29,
-          incomeTaxSUSD: 1_000,
-          welfarePaidSUSD: 5_000,
-          interestExpenseSUSD: 0,
+          incomeTaxRUSD: 1_000,
+          welfarePaidRUSD: 5_000,
+          interestExpenseRUSD: 0,
         },
       }),
     );
@@ -201,7 +201,7 @@ describe("M6 country AI and action validation", () => {
     expect(decision.actions).toHaveLength(1);
     const solvencyAction = fiscalActionOf(decision.actions[0]);
     expect(solvencyAction.incomeTaxRate).toBeCloseTo(0.11, 12);
-    expect(solvencyAction.welfareBudgetSUSDPerYear).toBeLessThan(60_000);
+    expect(solvencyAction.welfareBudgetRUSDPerYear).toBeLessThan(60_000);
     expect(AI_TREASURY_BUFFER_MONTHS).toBeGreaterThan(0);
   });
 
@@ -221,14 +221,14 @@ describe("M6 country AI and action validation", () => {
             comfortFulfilledDays: 10,
           },
         ],
-        fiscal: fiscalPolicy({ incomeTaxRate: 0.05, welfareBudgetSUSDPerYear: 10_000 }),
-        treasuryCashSUSD: 10_000_000,
+        fiscal: fiscalPolicy({ incomeTaxRate: 0.05, welfareBudgetRUSDPerYear: 10_000 }),
+        treasuryCashRUSD: 10_000_000,
         lastClosedPeriod: {
           periodStartDay: 0,
           periodEndDay: 29,
-          incomeTaxSUSD: 100_000,
-          welfarePaidSUSD: 10_000,
-          interestExpenseSUSD: 0,
+          incomeTaxRUSD: 100_000,
+          welfarePaidRUSD: 10_000,
+          interestExpenseRUSD: 0,
         },
       }),
     );
@@ -249,7 +249,7 @@ describe("M6 country AI and action validation", () => {
     // militancy, and the world seed. None may affect country A's decision.
     const otherCountry = second.countries.find((country) => country.id === M5_COUNTRY_B);
     if (otherCountry === undefined) throw new Error("missing country B");
-    otherCountry.fiscal = fiscalPolicy({ incomeTaxRate: 0.9, welfareBudgetSUSDPerYear: 999_999 });
+    otherCountry.fiscal = fiscalPolicy({ incomeTaxRate: 0.9, welfareBudgetRUSDPerYear: 999_999 });
     const countryARegions = new Set(
       second.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds ?? [],
     );
@@ -293,12 +293,12 @@ describe("M6 country AI and action validation", () => {
       action({ countryId: 99 }),
       action({ incomeTaxRate: 1.5 }),
       action({ incomeTaxRate: Number.NaN }),
-      action({ welfareBudgetSUSDPerYear: -1 }),
-      action({ welfareBudgetSUSDPerYear: Number.POSITIVE_INFINITY }),
-      action({ incomeTaxAllowanceSUSDPerYear: -1 }),
+      action({ welfareBudgetRUSDPerYear: -1 }),
+      action({ welfareBudgetRUSDPerYear: Number.POSITIVE_INFINITY }),
+      action({ incomeTaxAllowanceRUSDPerYear: -1 }),
       action({ welfareMaxWealthLevel: 100 }),
       action({ businessProfitTaxRate: 1.5 }),
-      action({ reserveTargetSUSD: -1 }),
+      action({ reserveTargetRUSD: -1 }),
     ];
     for (const invalid of invalidActions) {
       expect(validateCountryAction(world, invalid).valid).toBe(false);

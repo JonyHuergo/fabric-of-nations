@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Platform,
   Pressable,
@@ -20,7 +20,7 @@ import {
 
 import { WORLD_CATALOG } from "../generated/worldCatalog";
 import { WORLD_MAP_1900 } from "../generated/worldMap1900";
-import { PROVINCES_1900 } from "../generated/provinces1900";
+import { PROVINCE_MAP_1900 } from "../provinceMapBundle";
 import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import { colors, radii, spacing, type } from "../theme";
 import type { WorldCatalogEntry } from "../worldCatalogTypes";
@@ -103,7 +103,7 @@ const NAV: readonly NavGroup[] = [
 const TAB_LABEL = new Map<TabId, string>();
 for (const group of NAV) for (const item of group.items) TAB_LABEL.set(item.id, item.label);
 
-function formatSusd(value: number): string {
+function formatRusd(value: number): string {
   const absolute = Math.abs(value);
   if (absolute >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)} bn`;
   if (absolute >= 1_000_000) return `${(value / 1_000_000).toFixed(2)} M`;
@@ -286,10 +286,10 @@ export function GameShell() {
         speed={speedDaysPerSecond}
         achieved={achievedDaysPerSecond}
         controlsDisabled={controlsDisabled}
-        treasury={playerSummary?.treasuryCashSUSD ?? 0}
+        treasury={playerSummary?.treasuryCashRUSD ?? 0}
         population={playerSummary?.population ?? 0}
         hardship={playerSummary?.hardshipPopulationShare ?? 0}
-        netResult={playerSummary?.latestNetFiscalResultSUSD ?? null}
+        netResult={playerSummary?.latestNetFiscalResultRUSD ?? null}
         onStart={start}
         onPause={pause}
         onStep={step}
@@ -317,92 +317,97 @@ export function GameShell() {
         {nav}
         <View style={styles.main}>
           {tab === "world" ? (
-            <ScrollView style={styles.scroll} contentContainerStyle={styles.worldContent}>
-              <View style={[styles.worldGrid, narrow ? styles.worldGridNarrow : null]}>
-                <View style={styles.mapColumn}>
-                  <View style={styles.mapToolbar}>
-                    <Text style={styles.mapTitle}>World map</Text>
-                    <View style={styles.layerChips}>
-                      <Chip label="Political" active={layer === "political"} onPress={() => setLayer("political")} />
-                      <Chip label="Control" active={layer === "control"} onPress={() => setLayer("control")} />
-                      <Chip
-                        label="Markets"
-                        active={layer === "markets"}
-                        onPress={() => {
-                          setLayer("markets");
-                          setHighlightMarketId(null);
-                        }}
-                      />
-                      {highlightMarketId === null ? null : (
+            <WorldStage
+              narrow={narrow}
+              map={(insetRight, fill) => (
+                <WorldMap
+                  catalog={WORLD_CATALOG}
+                  map={WORLD_MAP_1900}
+                  snapshot={snapshot}
+                  selectedTag={selectedTag}
+                  onSelect={setSelectedTag}
+                  layer={layer}
+                  playerTag={playerSummary?.tag ?? null}
+                  height={320}
+                  fill={fill}
+                  insetRight={insetRight}
+                  highlightMarketId={highlightMarketId}
+                  selectedProvinceId={selectedProvinceId}
+                  onSelectProvince={setSelectedProvinceId}
+                  overlay={
+                    <View style={styles.mapToolbar}>
+                      <Text style={styles.mapTitle}>World map</Text>
+                      <View style={styles.layerChips}>
+                        <Chip label="Political" active={layer === "political"} onPress={() => setLayer("political")} />
+                        <Chip label="Control" active={layer === "control"} onPress={() => setLayer("control")} />
                         <Chip
-                          label="Clear market highlight"
-                          active={false}
-                          onPress={() => setHighlightMarketId(null)}
+                          label="Markets"
+                          active={layer === "markets"}
+                          onPress={() => {
+                            setLayer("markets");
+                            setHighlightMarketId(null);
+                          }}
                         />
-                      )}
+                        {highlightMarketId === null ? null : (
+                          <Chip
+                            label="Clear market highlight"
+                            active={false}
+                            onPress={() => setHighlightMarketId(null)}
+                          />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                  <WorldMap
-                    catalog={WORLD_CATALOG}
-                    map={WORLD_MAP_1900}
-                    snapshot={snapshot}
-                    selectedTag={selectedTag}
-                    onSelect={setSelectedTag}
-                    layer={layer}
-                    playerTag={playerSummary?.tag ?? null}
-                    height={narrow ? 320 : 600}
-                    highlightMarketId={highlightMarketId}
-                    selectedProvinceId={selectedProvinceId}
-                    onSelectProvince={setSelectedProvinceId}
-                  />
-                </View>
-                <View style={narrow ? styles.contextColumnNarrow : styles.contextColumn}>
-                  <SelectedPolityPanel
-                    entry={selectedEntry}
-                    summary={selectedSummary}
-                    region={selectedRegion}
-                    market={selectedMarket}
-                    isPlayer={selectedEntry !== null && selectedEntry.tag === playerSummary?.tag}
-                    onOpenOverview={() => setTab("overview")}
-                    onShowMarket={(marketId) => {
-                      setLayer("markets");
-                      setHighlightMarketId(marketId);
-                    }}
-                  />
-                  {selectedProvinceId === null ? null : (
-                    <ProvincePanel
-                      province={
-                        PROVINCES_1900.provinces.find(
-                          (province) => province.id === selectedProvinceId,
-                        ) ?? null
-                      }
-                      ownership={
-                        snapshot?.provinces.find(
-                          (entry) => entry.provinceId === selectedProvinceId,
-                        ) ?? null
-                      }
-                      ownerTag={
-                        (() => {
-                          const ownership = snapshot?.provinces.find(
-                            (entry) => entry.provinceId === selectedProvinceId,
-                          );
-                          if (ownership === undefined) return null;
-                          return (
-                            WORLD_CATALOG.entries.find(
-                              (entry) => entry.id === ownership.ownerPolityId,
-                            )?.tag ??
-                            PROVINCES_1900.futurePolities.find(
-                              (polity) => polity.polityId === ownership.ownerPolityId,
-                            )?.tag ??
-                            null
-                          );
-                        })()
-                      }
-                    />
-                  )}
-                </View>
-              </View>
-            </ScrollView>
+                  }
+                />
+              )}
+              panels={
+                <>
+              <SelectedPolityPanel
+                entry={selectedEntry}
+                summary={selectedSummary}
+                region={selectedRegion}
+                market={selectedMarket}
+                isPlayer={selectedEntry !== null && selectedEntry.tag === playerSummary?.tag}
+                onOpenOverview={() => setTab("overview")}
+                onShowMarket={(marketId) => {
+                  setLayer("markets");
+                  setHighlightMarketId(marketId);
+                }}
+              />
+              {selectedProvinceId === null ? null : (
+                <ProvincePanel
+                  province={
+                    PROVINCE_MAP_1900.provinces.find(
+                      (province) => province.id === selectedProvinceId,
+                    ) ?? null
+                  }
+                  ownership={
+                    snapshot?.provinces.find(
+                      (entry) => entry.provinceId === selectedProvinceId,
+                    ) ?? null
+                  }
+                  ownerTag={
+                    (() => {
+                      const ownership = snapshot?.provinces.find(
+                        (entry) => entry.provinceId === selectedProvinceId,
+                      );
+                      if (ownership === undefined) return null;
+                      return (
+                        WORLD_CATALOG.entries.find(
+                          (entry) => entry.id === ownership.ownerPolityId,
+                        )?.tag ??
+                        PROVINCE_MAP_1900.futurePolities.find(
+                          (polity) => polity.polityId === ownership.ownerPolityId,
+                        )?.tag ??
+                        null
+                      );
+                    })()
+                  }
+                />
+              )}
+                </>
+              }
+            />
           ) : (
             <ScrollView style={styles.scroll} contentContainerStyle={styles.screenContent}>
               <View style={styles.screenHeader}>
@@ -441,6 +446,55 @@ export function GameShell() {
           )}
         </View>
       </View>
+    </View>
+  );
+}
+
+/** Docked width of the context panels over the map on wide screens. */
+const WORLD_PANEL_WIDTH = 348;
+
+/**
+ * The world screen: the map takes the whole stage and the context panels dock
+ * over its right edge. On narrow screens the panels follow it in a scroll view.
+ */
+function WorldStage({
+  narrow,
+  map,
+  panels,
+}: {
+  readonly narrow: boolean;
+  readonly map: (insetRight: number, fill: boolean) => ReactNode;
+  readonly panels: ReactNode;
+}) {
+  const [dockOpen, setDockOpen] = useState(true);
+  if (narrow) {
+    return (
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.worldContent}>
+        {map(0, false)}
+        <View style={styles.contextColumnNarrow}>{panels}</View>
+      </ScrollView>
+    );
+  }
+  return (
+    <View style={styles.worldStage}>
+      {map(dockOpen ? WORLD_PANEL_WIDTH + spacing.md : 0, true)}
+      {dockOpen ? (
+        <ScrollView
+          style={styles.contextDock}
+          contentContainerStyle={styles.contextDockContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {panels}
+        </ScrollView>
+      ) : null}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={dockOpen ? "Hide details panel" : "Show details panel"}
+        onPress={() => setDockOpen((open) => !open)}
+        style={[styles.dockToggle, dockOpen ? styles.dockToggleOpen : null]}
+      >
+        <Text style={styles.dockToggleLabel}>{dockOpen ? "›" : "‹"}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -512,7 +566,7 @@ function ProvincePanel({
   const controllerTag =
     ownership === null || ownership.controllerPolityId === ownership.ownerPolityId
       ? null
-      : (PROVINCES_1900.futurePolities.find(
+      : (PROVINCE_MAP_1900.futurePolities.find(
           (polity) => polity.polityId === ownership.controllerPolityId,
         )?.tag ?? `polity ${String(ownership.controllerPolityId)}`);
   return (
@@ -653,7 +707,7 @@ function SelectedPolityPanel({
           </Text>
           <Text style={styles.regionLine}>
             Population {formatPeople(countrySummary.population)} · Treasury{" "}
-            {formatSusd(countrySummary.treasuryCashSUSD)} SUSD · Hardship{" "}
+            {formatRusd(countrySummary.treasuryCashRUSD)} RUSD · Hardship{" "}
             {(countrySummary.hardshipPopulationShare * 100).toFixed(1)}%
           </Text>
           <Text style={styles.regionLine}>
@@ -776,7 +830,7 @@ function TopBar({
 
       <View style={styles.topMetrics}>
         <Metric label="Date" value={dateLabel} detail={subtitle} />
-        <Metric label="Treasury" value={`${formatSusd(treasury)} SUSD`} />
+        <Metric label="Treasury" value={`${formatRusd(treasury)} RUSD`} />
         <Metric label="Population" value={formatPeople(population)} />
         <Metric
           label="Hardship"
@@ -786,7 +840,7 @@ function TopBar({
         {netResult === null ? null : (
           <Metric
             label="Last month"
-            value={`${netResult >= 0 ? "+" : ""}${formatSusd(netResult)}`}
+            value={`${netResult >= 0 ? "+" : ""}${formatRusd(netResult)}`}
             tone={netResult >= 0 ? "positive" : "negative"}
           />
         )}
@@ -920,15 +974,43 @@ const styles = StyleSheet.create({
   screenHeader: { marginBottom: spacing.sm },
   screenTitle: { ...type.title },
   screenSubtitle: { ...type.small, marginTop: 1 },
-  worldContent: { padding: spacing.sm, paddingBottom: spacing.xxl },
-  worldGrid: { flexDirection: "row", gap: spacing.md },
-  worldGridNarrow: { flexDirection: "column" },
-  mapColumn: { flex: 1, gap: 4 },
-  mapToolbar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm },
+  worldContent: { paddingBottom: spacing.xxl },
+  worldStage: { flex: 1, position: "relative" },
+  mapToolbar: {
+    position: "absolute",
+    left: 10,
+    top: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: "rgba(11, 16, 20, 0.86)",
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
   mapTitle: { ...type.section },
   layerChips: { flexDirection: "row", gap: 3 },
-  contextColumn: { width: 360 },
-  contextColumnNarrow: { width: "100%" },
+  contextDock: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    bottom: 10,
+    width: WORLD_PANEL_WIDTH,
+  },
+  contextDockContent: { gap: spacing.sm },
+  dockToggle: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 22,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(11, 16, 20, 0.86)",
+  },
+  dockToggleOpen: { right: WORLD_PANEL_WIDTH + 10 },
+  dockToggleLabel: { color: colors.text, fontSize: 16, lineHeight: 20 },
+  contextColumnNarrow: { width: "100%", padding: spacing.sm, gap: spacing.sm },
   panelEmpty: { ...type.small },
   polityHeader: { flexDirection: "row", gap: spacing.sm, alignItems: "center" },
   polityHeaderText: { flex: 1 },

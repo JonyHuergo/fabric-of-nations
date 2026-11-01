@@ -1,9 +1,11 @@
-# Century — Project Instructions
+# Fabric of Nations — Project Instructions
 
 ## 1. Purpose and Source of Truth
 
 - This file defines persistent engineering rules for the project.
-- The Century Game Design Document (GDD) defines game mechanics, simulation behavior, scope, and milestone acceptance criteria.
+- The official game name is **Fabric of Nations**. The game was formerly *Century*; historical GDD versions, change reports, milestone reports and the historical decision register retain that name as a historical record. Do not introduce the former name into current player-facing UI, current application or web metadata, or current documentation.
+- The official unit of account is **RUSD — Reference US Dollars**. RUSD is a neutral measurement unit, not a national currency, legal tender, an adoptable currency, or a fixed-rate substitute for the real-world US dollar. Actual national currencies, including USD, remain distinct. The unit was formerly **SUSD (Simulated US Dollars)**; historical reports and legacy save aliases retain that spelling.
+- The Fabric of Nations Game Design Document (`Fabric_of_Nations_GDD.md`) defines game mechanics, simulation behavior, scope, and milestone acceptance criteria.
 - Implement only the milestone explicitly assigned in the current task.
 - Do not silently change the GDD or invent major mechanics. Record unresolved decisions and substantive deviations in `DECISIONS.md`, including the rationale and consequences.
 - For material ambiguities or contradictions, report the issue and propose a resolution before proceeding with affected implementation. For minor, reversible details, choose the simplest compatible behavior and document the assumption.

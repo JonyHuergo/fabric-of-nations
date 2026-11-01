@@ -56,18 +56,18 @@ export function makeInputs(
     const override = overrides.incomeByBlock?.[popBlockId];
     return {
       popBlockId,
-      annualSettledIncomePerCapitaSUSD:
+      annualSettledIncomePerCapitaRUSD:
         override?.income ?? overrides.annualIncomePerCapita ?? BASE_ANNUAL_INCOME_PER_CAPITA,
-      annualMandatoryPaymentsPerCapitaSUSD:
+      annualMandatoryPaymentsPerCapitaRUSD:
         override?.mandatory ??
         overrides.annualMandatoryPerCapita ??
         BASE_ANNUAL_MANDATORY_PER_CAPITA,
     };
   });
   return {
-    prices: Object.entries(prices).map(([goodKey, unitPriceSUSD]) => ({
+    prices: Object.entries(prices).map(([goodKey, unitPriceRUSD]) => ({
       goodKey,
-      unitPriceSUSD,
+      unitPriceRUSD,
     })),
     supply: Object.entries(supply).map(([goodKey, availableQuantityPerCapita]) => ({
       goodKey,
@@ -163,7 +163,7 @@ export function oneBlockScenario(totalPerCohort: Partial<Record<number, number>>
       femaleAgeGroups: split.female,
       literacy: 0.5,
       wealthLevel: 30,
-      initialSavingsSUSD: 1000,
+      initialSavingsRUSD: 1000,
       militancy: 0.1,
     },
   ]);

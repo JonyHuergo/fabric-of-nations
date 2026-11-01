@@ -31,20 +31,20 @@ describe("M6 designated player country", () => {
       dayIndex: world.dayIndex,
       source: "player",
       incomeTaxRate: 0.12,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 2_000_000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 2_000_000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     };
     applyCountryAction(world, action);
     expect(world.countries.find((country) => country.id === player!.id)?.fiscal).toEqual({
       incomeTaxRate: 0.12,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 2_000_000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 2_000_000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     });
 
     // Every country is AI-enabled in the historical sample. Run past the
@@ -55,11 +55,11 @@ describe("M6 designated player country", () => {
     const playerAfter = world.countries.find((country) => country.id === player!.id);
     expect(playerAfter?.fiscal).toEqual({
       incomeTaxRate: 0.12,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 2_000_000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 2_000_000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     });
     expect(playerAfter?.ai.lastDecisionDay).toBeNull();
     const evaluatedAiCountries = world.countries.filter(
@@ -79,11 +79,11 @@ describe("M6 designated player country", () => {
       dayIndex: 0,
       source: "player",
       incomeTaxRate: 0.1,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 1_000_000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 1_000_000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     };
     applyCountryAction(first, action);
     applyCountryAction(second, action);

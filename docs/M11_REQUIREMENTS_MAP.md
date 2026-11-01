@@ -104,7 +104,7 @@ substitute for the GDD.
 
 | Requirement | Document |
 |---|---|
-| GDD history preserved; v2.17 restored; v2.18 created | `Century_GDD_v2.17.md`, `Century_GDD_v2.18.md` |
+| GDD history preserved; v2.17 restored; v2.18 created and renamed by M13 | `Century_GDD_v2.17.md`, `Fabric_of_Nations_GDD.md` |
 | Change report | `GDD_V2.18_CHANGE_REPORT.md` |
 | Decisions | `DECISIONS.md` D-086–D-093 |
 | README | `README.md` |

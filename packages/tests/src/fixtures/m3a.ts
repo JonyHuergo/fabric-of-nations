@@ -31,7 +31,7 @@ export function m3World(seed = M3A_SEED): {
 export function accountBalance(world: World, accountId: number): number {
   const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 export function totalCash(world: World): number {

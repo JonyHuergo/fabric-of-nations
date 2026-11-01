@@ -31,7 +31,7 @@ import {
   daysInYear,
   isTerminalDayIndex,
 } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, DayIndex, Id } from "../types.js";
 import {
   assertValidWorld,
@@ -83,7 +83,7 @@ import type {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 /** One project's result for a processed day. */
@@ -92,9 +92,9 @@ export interface ConstructionProjectResult {
   readonly countryId: Id;
   readonly status: ConstructionProject["status"];
   readonly workersHired: number;
-  readonly spentSUSD: number;
-  readonly materialsSpentSUSD: number;
-  readonly totalCostSUSD: number;
+  readonly spentRUSD: number;
+  readonly materialsSpentRUSD: number;
+  readonly totalCostRUSD: number;
   readonly progress: number;
   readonly materialsProgress: number;
   readonly blockedReason: "labor" | "funds" | "materials" | null;
@@ -107,8 +107,8 @@ export interface ConstructionPhaseResult {
   readonly dayIndex: DayIndex;
   readonly projects: readonly ConstructionProjectResult[];
   readonly completedProjectIds: readonly Id[];
-  readonly spentSUSD: number;
-  readonly materialsSpentSUSD: number;
+  readonly spentRUSD: number;
+  readonly materialsSpentRUSD: number;
   readonly postingIds: readonly number[];
 }
 
@@ -118,8 +118,8 @@ function emptyResult(dayIndex: DayIndex): ConstructionPhaseResult {
     dayIndex,
     projects: [],
     completedProjectIds: [],
-    spentSUSD: 0,
-    materialsSpentSUSD: 0,
+    spentRUSD: 0,
+    materialsSpentRUSD: 0,
     postingIds: [],
   };
 }
@@ -153,7 +153,7 @@ function allocateAccount(
     ownerId,
     category: categoryForSubtype(subtype),
     subtype,
-    balanceSUSD: 0,
+    balanceRUSD: 0,
   };
   finance.accounts.push(account);
   return account;
@@ -201,19 +201,19 @@ function procureProjectMaterials(
   entries: JournalEntryInput[],
 ): {
   readonly cash: number;
-  readonly spentSUSD: number;
+  readonly spentRUSD: number;
   readonly blockedReason: "funds" | "materials" | null;
 } {
   const materials = [...project.materials].sort((left, right) => left.goodId - right.goodId);
   let remainingCash = cash;
-  let spentSUSD = 0;
+  let spentRUSD = 0;
   let blockedReason: "funds" | "materials" | null = null;
   const countryTreasury = index.get("country", project.countryId, "treasury-cash");
   const wip = index.get("country", project.countryId, "construction-in-progress");
   for (const material of materials) {
     let remaining = constructionMaterialRemaining(material);
     if (!(remaining > toleranceMoney(remaining))) continue;
-    const price = market.priceSUSD[material.goodId];
+    const price = market.priceRUSD[material.goodId];
     if (price === undefined || !Number.isFinite(price) || !(price > 0)) {
       throw new RangeError(
         `market ${String(market.id)} has no positive price for construction material ${String(material.goodId)}`,
@@ -264,14 +264,14 @@ function procureProjectMaterials(
         );
         remaining = constructionMaterialRemaining(material);
         remainingCash -= cost;
-        spentSUSD += cost;
+        spentRUSD += cost;
         entries.push({
           transactionKind: "construction-material-purchase",
           lines: [
-            { accountId: wip.id, side: "debit", amountSUSD: cost },
-            { accountId: countryTreasury.id, side: "credit", amountSUSD: cost },
-            { accountId: sellerCash.id, side: "debit", amountSUSD: cost },
-            { accountId: sellerRevenue.id, side: "credit", amountSUSD: cost },
+            { accountId: wip.id, side: "debit", amountRUSD: cost },
+            { accountId: countryTreasury.id, side: "credit", amountRUSD: cost },
+            { accountId: sellerCash.id, side: "debit", amountRUSD: cost },
+            { accountId: sellerRevenue.id, side: "credit", amountRUSD: cost },
           ],
           sourceEntityId: project.countryId,
           targetEntityId: seller.id,
@@ -284,7 +284,7 @@ function procureProjectMaterials(
     if (blockedReason !== null) break;
   }
   market.stockLots = canonicalizeStockLots(market.stockLots);
-  return { cash: remainingCash, spentSUSD, blockedReason };
+  return { cash: remainingCash, spentRUSD, blockedReason };
 }
 
 function createCompletedBuilding(
@@ -359,10 +359,10 @@ function mergeConstructionHistory(
       countryId: project.countryId,
       projectsCompleted: addCompleted,
       projectsCancelled: addCancelled,
-      totalSpentSUSD: project.spentSUSD + project.materialsSpentSUSD,
-      totalWrittenOffSUSD:
+      totalSpentRUSD: project.spentRUSD + project.materialsSpentRUSD,
+      totalWrittenOffRUSD:
         project.status === "cancelled"
-          ? project.spentSUSD + project.materialsSpentSUSD
+          ? project.spentRUSD + project.materialsSpentRUSD
           : 0,
     });
   } else {
@@ -371,12 +371,12 @@ function mergeConstructionHistory(
       ...existing,
       projectsCompleted: existing.projectsCompleted + addCompleted,
       projectsCancelled: existing.projectsCancelled + addCancelled,
-      totalSpentSUSD:
-        existing.totalSpentSUSD + project.spentSUSD + project.materialsSpentSUSD,
-      totalWrittenOffSUSD:
-        existing.totalWrittenOffSUSD +
+      totalSpentRUSD:
+        existing.totalSpentRUSD + project.spentRUSD + project.materialsSpentRUSD,
+      totalWrittenOffRUSD:
+        existing.totalWrittenOffRUSD +
         (project.status === "cancelled"
-          ? project.spentSUSD + project.materialsSpentSUSD
+          ? project.spentRUSD + project.materialsSpentRUSD
           : 0),
     };
   }
@@ -455,7 +455,7 @@ export function runConstructionPhase(
   const stagedMarkets = world.markets.map((market) => ({
     ...market,
     regionIds: [...market.regionIds],
-    priceSUSD: [...market.priceSUSD],
+    priceRUSD: [...market.priceRUSD],
     stockLots: market.stockLots.map((lot) => ({ ...lot })),
   }));
   const staged: World = {
@@ -471,7 +471,7 @@ export function runConstructionPhase(
   const wagesByBlock = new Map<Id, number>();
   if (settlement !== undefined) {
     for (const household of settlement.households) {
-      wagesByBlock.set(household.popBlockId, household.wagesReceivedSUSD);
+      wagesByBlock.set(household.popBlockId, household.wagesReceivedRUSD);
     }
   }
   const idleCache = new Map<Id, Map<Id, number>>();
@@ -509,7 +509,7 @@ export function runConstructionPhase(
     }
     const treasury = index.get("country", country.id, "treasury-cash");
     if (!cashByCountry.has(country.id)) {
-      cashByCountry.set(country.id, treasury.balanceSUSD);
+      cashByCountry.set(country.id, treasury.balanceRUSD);
     }
     let cash = cashByCountry.get(country.id) ?? 0;
     const market = projectMarket(staged, project);
@@ -523,12 +523,12 @@ export function runConstructionPhase(
         entries,
       );
       cash = procurement.cash;
-      totalMaterialsSpent += procurement.spentSUSD;
-      project.materialsSpentSUSD += procurement.spentSUSD;
-      if (procurement.spentSUSD > 0) {
+      totalMaterialsSpent += procurement.spentRUSD;
+      project.materialsSpentRUSD += procurement.spentRUSD;
+      if (procurement.spentRUSD > 0) {
         accumulateBudgetMemo(stagedFinance, country.id, {
-          constructionSpentSUSD: procurement.spentSUSD,
-          constructionMaterialsSpentSUSD: procurement.spentSUSD,
+          constructionSpentRUSD: procurement.spentRUSD,
+          constructionMaterialsSpentRUSD: procurement.spentRUSD,
         });
       }
       if (!constructionMaterialsReady(project)) {
@@ -541,11 +541,11 @@ export function runConstructionPhase(
           countryId: project.countryId,
           status: project.status,
           workersHired: 0,
-          spentSUSD: project.spentSUSD,
-          materialsSpentSUSD: project.materialsSpentSUSD,
-          totalCostSUSD: project.totalCostSUSD,
+          spentRUSD: project.spentRUSD,
+          materialsSpentRUSD: project.materialsSpentRUSD,
+          totalCostRUSD: project.totalCostRUSD,
           progress:
-            project.totalCostSUSD > 0 ? project.spentSUSD / project.totalCostSUSD : 1,
+            project.totalCostRUSD > 0 ? project.spentRUSD / project.totalCostRUSD : 1,
           materialsProgress: constructionMaterialsProgress(project),
           blockedReason: project.blockedReason,
           buildingId: project.buildingId,
@@ -554,7 +554,7 @@ export function runConstructionPhase(
       }
     }
     const remaining = constructionProjectRemaining(project);
-    if (!(remaining > toleranceMoney(remaining, project.totalCostSUSD))) {
+    if (!(remaining > toleranceMoney(remaining, project.totalCostRUSD))) {
       completions.push(project);
       continue;
     }
@@ -622,18 +622,18 @@ export function runConstructionPhase(
       )) {
         const blockCash = index.get("popBlock", popBlockId, "household-cash");
         const wageIncome = index.get("popBlock", popBlockId, "wage-income");
-        wageLines.push({ accountId: blockCash.id, side: "debit" as const, amountSUSD: amount });
-        wageLines.push({ accountId: wageIncome.id, side: "credit" as const, amountSUSD: amount });
+        wageLines.push({ accountId: blockCash.id, side: "debit" as const, amountRUSD: amount });
+        wageLines.push({ accountId: wageIncome.id, side: "credit" as const, amountRUSD: amount });
       }
       wageLines.push({
         accountId: index.get("country", country.id, "construction-in-progress").id,
         side: "debit" as const,
-        amountSUSD: gross,
+        amountRUSD: gross,
       });
       wageLines.push({
         accountId: treasury.id,
         side: "credit" as const,
-        amountSUSD: gross,
+        amountRUSD: gross,
       });
       entries.push({
         transactionKind: "construction-wage",
@@ -641,7 +641,7 @@ export function runConstructionPhase(
         sourceEntityId: country.id,
         targetEntityId: null,
       });
-      const dailyAllowance = country.fiscal.incomeTaxAllowanceSUSDPerYear / yearDays;
+      const dailyAllowance = country.fiscal.incomeTaxAllowanceRUSDPerYear / yearDays;
       const taxLines = [];
       for (const [popBlockId, amount] of [...groupGross.entries()].sort(
         (left, right) => left[0] - right[0],
@@ -654,12 +654,12 @@ export function runConstructionPhase(
         taxLines.push({
           accountId: index.get("popBlock", popBlockId, "income-tax-expense").id,
           side: "debit" as const,
-          amountSUSD: tax,
+          amountRUSD: tax,
         });
         taxLines.push({
           accountId: index.get("popBlock", popBlockId, "household-cash").id,
           side: "credit" as const,
-          amountSUSD: tax,
+          amountRUSD: tax,
         });
         taxTotal += tax;
       }
@@ -667,12 +667,12 @@ export function runConstructionPhase(
         taxLines.push({
           accountId: treasury.id,
           side: "debit" as const,
-          amountSUSD: taxTotal,
+          amountRUSD: taxTotal,
         });
         taxLines.push({
           accountId: index.get("country", country.id, "income-tax-revenue").id,
           side: "credit" as const,
-          amountSUSD: taxTotal,
+          amountRUSD: taxTotal,
         });
         entries.push({
           transactionKind: "income-tax",
@@ -684,13 +684,13 @@ export function runConstructionPhase(
       cash += taxTotal;
       totalSpent += gross;
       accumulateBudgetMemo(stagedFinance, country.id, {
-        constructionSpentSUSD: gross,
+        constructionSpentRUSD: gross,
       });
     }
     cashByCountry.set(country.id, cash);
-    project.spentSUSD += gross;
-    if (project.spentSUSD >= project.totalCostSUSD - toleranceMoney(project.spentSUSD)) {
-      project.spentSUSD = project.totalCostSUSD;
+    project.spentRUSD += gross;
+    if (project.spentRUSD >= project.totalCostRUSD - toleranceMoney(project.spentRUSD)) {
+      project.spentRUSD = project.totalCostRUSD;
       completions.push(project);
       project.status = "active";
       project.lastWorkers = hired;
@@ -714,11 +714,11 @@ export function runConstructionPhase(
       countryId: project.countryId,
       status: project.status,
       workersHired: hired,
-      spentSUSD: project.spentSUSD,
-      materialsSpentSUSD: project.materialsSpentSUSD,
-      totalCostSUSD: project.totalCostSUSD,
+      spentRUSD: project.spentRUSD,
+      materialsSpentRUSD: project.materialsSpentRUSD,
+      totalCostRUSD: project.totalCostRUSD,
       progress:
-        project.totalCostSUSD > 0 ? project.spentSUSD / project.totalCostSUSD : 1,
+        project.totalCostRUSD > 0 ? project.spentRUSD / project.totalCostRUSD : 1,
       materialsProgress: constructionMaterialsProgress(project),
       blockedReason: project.blockedReason,
       buildingId: project.buildingId,
@@ -731,7 +731,7 @@ export function runConstructionPhase(
   const completionCash = new Map<Id, number>();
   for (const project of completions) {
     if (constructionProjectIsTerminal(project.status)) continue;
-    if (project.spentSUSD < project.totalCostSUSD - toleranceMoney(project.spentSUSD)) {
+    if (project.spentRUSD < project.totalCostRUSD - toleranceMoney(project.spentRUSD)) {
       continue;
     }
     if (!constructionMaterialsReady(project)) continue;
@@ -747,7 +747,7 @@ export function runConstructionPhase(
     const treasury = index.get("country", country.id, "treasury-cash");
     const wip = index.get("country", country.id, "construction-in-progress");
     const publicCapital = index.get("country", country.id, "public-capital");
-    const capitalized = project.spentSUSD + project.materialsSpentSUSD;
+    const capitalized = project.spentRUSD + project.materialsSpentRUSD;
     if (capitalized > 0) {
       completionEntries.push({
         transactionKind: "construction-capitalization",
@@ -755,12 +755,12 @@ export function runConstructionPhase(
           {
             accountId: wip.id,
             side: "credit" as const,
-            amountSUSD: capitalized,
+            amountRUSD: capitalized,
           },
           {
             accountId: publicCapital.id,
             side: "debit" as const,
-            amountSUSD: capitalized,
+            amountRUSD: capitalized,
           },
         ],
         sourceEntityId: country.id,
@@ -768,10 +768,10 @@ export function runConstructionPhase(
       });
     }
     if (!completionCash.has(country.id)) {
-      completionCash.set(country.id, Math.max(0, treasury.balanceSUSD));
+      completionCash.set(country.id, Math.max(0, treasury.balanceRUSD));
     }
     const available = completionCash.get(country.id) ?? 0;
-    const paid = Math.min(project.workingCapitalSUSD, available);
+    const paid = Math.min(project.workingCapitalRUSD, available);
     if (paid > 0) {
       completionEntries.push({
         transactionKind: "construction-working-capital",
@@ -779,22 +779,22 @@ export function runConstructionPhase(
           {
             accountId: treasury.id,
             side: "credit" as const,
-            amountSUSD: paid,
+            amountRUSD: paid,
           },
           {
             accountId: created.operatingCashAccountId,
             side: "debit" as const,
-            amountSUSD: paid,
+            amountRUSD: paid,
           },
           {
             accountId: index.get("country", country.id, "owner-equity").id,
             side: "debit" as const,
-            amountSUSD: paid,
+            amountRUSD: paid,
           },
           {
             accountId: created.equityAccountId,
             side: "credit" as const,
-            amountSUSD: paid,
+            amountRUSD: paid,
           },
         ],
         sourceEntityId: country.id,
@@ -802,7 +802,7 @@ export function runConstructionPhase(
       });
       completionCash.set(country.id, available - paid);
     }
-    project.workingCapitalPaidSUSD = paid;
+    project.workingCapitalPaidRUSD = paid;
     project.status = "completed";
     project.completedDay = dayIndex;
     project.buildingId = created.building.id;
@@ -812,9 +812,9 @@ export function runConstructionPhase(
       countryId: project.countryId,
       status: project.status,
       workersHired: project.lastWorkers,
-      spentSUSD: project.spentSUSD,
-      materialsSpentSUSD: project.materialsSpentSUSD,
-      totalCostSUSD: project.totalCostSUSD,
+      spentRUSD: project.spentRUSD,
+      materialsSpentRUSD: project.materialsSpentRUSD,
+      totalCostRUSD: project.totalCostRUSD,
       progress: 1,
       materialsProgress: 1,
       blockedReason: null,
@@ -853,8 +853,8 @@ export function runConstructionPhase(
       .filter((project) => project.status === "completed")
       .map((project) => project.id)
       .sort((left, right) => left - right),
-    spentSUSD: totalSpent,
-    materialsSpentSUSD: totalMaterialsSpent,
+    spentRUSD: totalSpent,
+    materialsSpentRUSD: totalMaterialsSpent,
     postingIds,
   };
 }
@@ -882,7 +882,7 @@ function assertBuildableDefinition(
   if (definition.outputs.length === 0) {
     throw new RangeError(`definition ${String(definitionId)} has no productive output`);
   }
-  if (!(definition.constructionCostSUSD > 0)) {
+  if (!(definition.constructionCostRUSD > 0)) {
     throw new RangeError(`definition ${String(definitionId)} has no construction cost`);
   }
   if (!Number.isInteger(definition.constructionWorkers) || definition.constructionWorkers < 1) {
@@ -937,10 +937,10 @@ export function validateConstructionStart(
   const index = buildFinanceIndex(world.finance);
   const treasury = index.get("country", country.id, "treasury-cash");
   const required =
-    definition.constructionCostSUSD + constructionWorkingCapital(definition);
-  if (treasury.balanceSUSD + toleranceMoney(treasury.balanceSUSD, required) < required) {
+    definition.constructionCostRUSD + constructionWorkingCapital(definition);
+  if (treasury.balanceRUSD + toleranceMoney(treasury.balanceRUSD, required) < required) {
     throw new RangeError(
-      `treasury cash ${String(treasury.balanceSUSD)} does not cover the project cost and working capital ${String(required)}`,
+      `treasury cash ${String(treasury.balanceRUSD)} does not cover the project cost and working capital ${String(required)}`,
     );
   }
   if (world.construction.nextProjectId < 1 || !Number.isSafeInteger(world.construction.nextProjectId)) {
@@ -967,11 +967,11 @@ export function startConstruction(
     startedDay: null,
     completedDay: null,
     cancelledDay: null,
-    totalCostSUSD: definition.constructionCostSUSD,
-    workingCapitalSUSD: constructionWorkingCapital(definition),
-    workingCapitalPaidSUSD: 0,
-    spentSUSD: 0,
-    materialsSpentSUSD: 0,
+    totalCostRUSD: definition.constructionCostRUSD,
+    workingCapitalRUSD: constructionWorkingCapital(definition),
+    workingCapitalPaidRUSD: 0,
+    spentRUSD: 0,
+    materialsSpentRUSD: 0,
     materials: definition.constructionMaterials
       .map((material) => ({
         goodId: material.goodId,
@@ -1035,7 +1035,7 @@ export function cancelConstruction(
   const stagedFinance = cloneFinanceState(world.finance);
   const index = buildFinanceIndex(stagedFinance);
   let postings: { id: number }[] = [];
-  const writtenOff = project.spentSUSD + project.materialsSpentSUSD;
+  const writtenOff = project.spentRUSD + project.materialsSpentRUSD;
   if (writtenOff > toleranceMoney(writtenOff)) {
     const wip = index.get("country", project.countryId, "construction-in-progress");
     const equity = index.get("country", project.countryId, "owner-equity");
@@ -1043,15 +1043,15 @@ export function cancelConstruction(
       {
         transactionKind: "construction-writeoff",
         lines: [
-          { accountId: wip.id, side: "credit", amountSUSD: writtenOff },
-          { accountId: equity.id, side: "debit", amountSUSD: writtenOff },
+          { accountId: wip.id, side: "credit", amountRUSD: writtenOff },
+          { accountId: equity.id, side: "debit", amountRUSD: writtenOff },
         ],
         sourceEntityId: project.countryId,
         targetEntityId: null,
       },
     ]);
     accumulateBudgetMemo(stagedFinance, project.countryId, {
-      constructionWrittenOffSUSD: writtenOff,
+      constructionWrittenOffRUSD: writtenOff,
     });
   }
   const construction: ConstructionState = cloneConstructionState(world.construction);

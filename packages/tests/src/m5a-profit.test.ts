@@ -47,18 +47,18 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const building = allocation.buildings.find((entry) => entry.buildingId === 0);
     expect(building).toBeDefined();
     if (building === undefined) return;
-    expect(building.periodNetSUSD).toBeGreaterThan(0);
-    expect(building.distributedSUSD).toBeCloseTo(building.periodNetSUSD * 0.5, 6);
-    expect(building.retainedProfitAfterSUSD).toBeCloseTo(
-      building.periodNetSUSD - building.distributedSUSD,
+    expect(building.periodNetRUSD).toBeGreaterThan(0);
+    expect(building.distributedRUSD).toBeCloseTo(building.periodNetRUSD * 0.5, 6);
+    expect(building.retainedProfitAfterRUSD).toBeCloseTo(
+      building.periodNetRUSD - building.distributedRUSD,
       6,
     );
-    expect(account(world, "building", 0, "retained-profit")?.balanceSUSD).toBeCloseTo(
-      building.retainedProfitAfterSUSD,
+    expect(account(world, "building", 0, "retained-profit")?.balanceRUSD).toBeCloseTo(
+      building.retainedProfitAfterRUSD,
       6,
     );
-    expect(account(world, "building", 0, "owner-equity")?.balanceSUSD).toBeCloseTo(5_000, 6);
-    expect(account(world, "popBlock", 0, "owner-equity")?.balanceSUSD ?? 0).toBeGreaterThan(0);
+    expect(account(world, "building", 0, "owner-equity")?.balanceRUSD).toBeCloseTo(5_000, 6);
+    expect(account(world, "popBlock", 0, "owner-equity")?.balanceRUSD ?? 0).toBeGreaterThan(0);
     assertAccountingIdentity(world.finance);
     assertValidWorld(world);
   });
@@ -74,11 +74,11 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     if (state === undefined) return;
     expect(state.ownerKind).toBe("state");
     expect(state.ownerId).toBe(M5A_COUNTRY_B);
-    expect(state.periodNetSUSD).toBeGreaterThan(0);
-    expect(state.distributedSUSD).toBeCloseTo(state.periodNetSUSD, 6);
+    expect(state.periodNetRUSD).toBeGreaterThan(0);
+    expect(state.distributedRUSD).toBeCloseTo(state.periodNetRUSD, 6);
     const treasury = account(world, "country", M5A_COUNTRY_B, "treasury-cash");
     expect(treasury).toBeDefined();
-    expect(treasury?.balanceSUSD ?? 0).toBeGreaterThan(10_000);
+    expect(treasury?.balanceRUSD ?? 0).toBeGreaterThan(10_000);
     expect(account(world, "country", M5A_COUNTRY_B, "treasury-cash")?.id).toBe(M5A_TREASURY_B);
     assertValidWorld(world);
   });
@@ -89,13 +89,13 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const allocation = last.economy?.profitDistribution;
     expect(allocation).toBeDefined();
     if (allocation === null || allocation === undefined) return;
-    const loss = allocation.buildings.find((entry) => entry.periodNetSUSD < 0);
+    const loss = allocation.buildings.find((entry) => entry.periodNetRUSD < 0);
     expect(loss).toBeDefined();
     if (loss === undefined) return;
-    expect(loss.distributedSUSD).toBe(0);
-    expect(loss.retainedProfitAfterSUSD).toBeCloseTo(loss.periodNetSUSD, 6);
-    expect(account(world, "building", loss.buildingId, "retained-profit")?.balanceSUSD).toBeCloseTo(
-      loss.periodNetSUSD,
+    expect(loss.distributedRUSD).toBe(0);
+    expect(loss.retainedProfitAfterRUSD).toBeCloseTo(loss.periodNetRUSD, 6);
+    expect(account(world, "building", loss.buildingId, "retained-profit")?.balanceRUSD).toBeCloseTo(
+      loss.periodNetRUSD,
       6,
     );
   });
@@ -116,7 +116,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     world.dayIndex = 30;
     const close = closeFinancePeriod(world);
-    // Set one building's state to a large retained profit with only 100 SUSD cash
+    // Set one building's state to a large retained profit with only 100 RUSD cash
     // while preserving the accounting identity: assets 100 = equity (1000 - 900).
     const cash = world.finance.accounts.find(
       (candidate) =>
@@ -129,19 +129,19 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     if (cash === undefined || equity === undefined || retained === undefined) {
       throw new Error("missing building 0 accounts");
     }
-    cash.balanceSUSD = 100;
-    equity.balanceSUSD = -900;
-    retained.balanceSUSD = 1_000;
+    cash.balanceRUSD = 100;
+    equity.balanceRUSD = -900;
+    retained.balanceRUSD = 1_000;
     assertAccountingIdentity(world.finance);
     const result = runProfitDistributionPhase(world, 30, close);
     const building = result.buildings.find((entry) => entry.buildingId === 0);
     expect(building).toBeDefined();
     if (building === undefined) return;
-    expect(building.distributableSUSD).toBeCloseTo(1_000, 6);
-    expect(building.distributedSUSD).toBeCloseTo(100, 6);
-    expect(building.retainedProfitAfterSUSD).toBeCloseTo(900, 6);
-    expect(account(world, "building", 0, "operating-cash")?.balanceSUSD).toBeCloseTo(0, 6);
-    expect(account(world, "building", 0, "retained-profit")?.balanceSUSD).toBeCloseTo(900, 6);
+    expect(building.distributableRUSD).toBeCloseTo(1_000, 6);
+    expect(building.distributedRUSD).toBeCloseTo(100, 6);
+    expect(building.retainedProfitAfterRUSD).toBeCloseTo(900, 6);
+    expect(account(world, "building", 0, "operating-cash")?.balanceRUSD).toBeCloseTo(0, 6);
+    expect(account(world, "building", 0, "retained-profit")?.balanceRUSD).toBeCloseTo(900, 6);
     assertAccountingIdentity(world.finance);
   });
 
@@ -283,47 +283,47 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
 
     expect(() =>
       postJournalEntry(world.finance, 30, "profit-retention", [
-        { accountId: buildingEquity.id, side: "debit", amountSUSD: 10 },
-        { accountId: retained.id, side: "credit", amountSUSD: 10 },
+        { accountId: buildingEquity.id, side: "debit", amountRUSD: 10 },
+        { accountId: retained.id, side: "credit", amountRUSD: 10 },
       ]),
     ).not.toThrow();
     expect(() =>
       postJournalEntry(world.finance, 30, "profit-distribution", [
-        { accountId: retained.id, side: "debit", amountSUSD: 10 },
-        { accountId: operating.id, side: "credit", amountSUSD: 10 },
-        { accountId: householdCash.id, side: "debit", amountSUSD: 10 },
-        { accountId: householdEquity.id, side: "credit", amountSUSD: 10 },
+        { accountId: retained.id, side: "debit", amountRUSD: 10 },
+        { accountId: operating.id, side: "credit", amountRUSD: 10 },
+        { accountId: householdCash.id, side: "debit", amountRUSD: 10 },
+        { accountId: householdEquity.id, side: "credit", amountRUSD: 10 },
       ]),
     ).not.toThrow();
     expect(() =>
       postJournalEntry(world.finance, 30, "state-enterprise-remittance", [
-        { accountId: stateRetained.id, side: "debit", amountSUSD: 10 },
-        { accountId: stateOperating.id, side: "credit", amountSUSD: 10 },
-        { accountId: treasury.id, side: "debit", amountSUSD: 10 },
-        { accountId: countryEquity.id, side: "credit", amountSUSD: 10 },
+        { accountId: stateRetained.id, side: "debit", amountRUSD: 10 },
+        { accountId: stateOperating.id, side: "credit", amountRUSD: 10 },
+        { accountId: treasury.id, side: "debit", amountRUSD: 10 },
+        { accountId: countryEquity.id, side: "credit", amountRUSD: 10 },
       ]),
     ).not.toThrow();
 
     expect(() =>
       postJournalEntry(world.finance, 30, "profit-retention", [
-        { accountId: buildingEquity.id, side: "credit", amountSUSD: 10 },
-        { accountId: retained.id, side: "credit", amountSUSD: 10 },
+        { accountId: buildingEquity.id, side: "credit", amountRUSD: 10 },
+        { accountId: retained.id, side: "credit", amountRUSD: 10 },
       ]),
     ).toThrow(/opposite sides|unbalanced/);
     expect(() =>
       postJournalEntry(world.finance, 30, "profit-distribution", [
-        { accountId: retained.id, side: "debit", amountSUSD: 10 },
-        { accountId: operating.id, side: "credit", amountSUSD: 10 },
-        { accountId: treasury.id, side: "debit", amountSUSD: 10 },
-        { accountId: householdEquity.id, side: "credit", amountSUSD: 10 },
+        { accountId: retained.id, side: "debit", amountRUSD: 10 },
+        { accountId: operating.id, side: "credit", amountRUSD: 10 },
+        { accountId: treasury.id, side: "debit", amountRUSD: 10 },
+        { accountId: householdEquity.id, side: "credit", amountRUSD: 10 },
       ]),
     ).toThrow(/household-cash debit/);
     expect(() =>
       postJournalEntry(world.finance, 30, "state-enterprise-remittance", [
-        { accountId: stateRetained.id, side: "debit", amountSUSD: 10 },
-        { accountId: stateOperating.id, side: "credit", amountSUSD: 10 },
-        { accountId: householdCash.id, side: "debit", amountSUSD: 10 },
-        { accountId: countryEquity.id, side: "credit", amountSUSD: 10 },
+        { accountId: stateRetained.id, side: "debit", amountRUSD: 10 },
+        { accountId: stateOperating.id, side: "credit", amountRUSD: 10 },
+        { accountId: householdCash.id, side: "debit", amountRUSD: 10 },
+        { accountId: countryEquity.id, side: "credit", amountRUSD: 10 },
       ]),
     ).toThrow(/treasury-cash debit/);
     assertAccountingIdentity(world.finance);
@@ -394,7 +394,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
       ownerId: 0,
       category: "equity",
       subtype: "retained-profit",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
     expect(() => assertValidWorld(world)).toThrow(/retained-profit/);
   });

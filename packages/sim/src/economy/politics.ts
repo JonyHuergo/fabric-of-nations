@@ -27,7 +27,7 @@ import {
 } from "../validation.js";
 import type { World } from "../world.js";
 import {
-  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD,
+  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD,
   ADMIN_TARGET_CLERK_SHARE,
   CONSTRUCTION_MIN_FACTOR,
   CONSTRUCTION_OVERLOAD_PENALTY,
@@ -55,7 +55,7 @@ import {
   INSTITUTION_LITERACY_WEIGHT,
   INSTITUTION_STAFFING_WEIGHT,
   MAX_LABOR_HOURS_PER_WEEK,
-  MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR,
+  MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR,
   MAX_LAW_ENACTMENT_DAYS,
   MAX_LAW_OPTIONS_PER_SLOT,
   MAX_LAW_SUMMARY_LENGTH,
@@ -395,18 +395,18 @@ export function assertValidPoliticsDefinitions(
     if (new Set(requiredTechnologyIds).size !== requiredTechnologyIds.length) {
       throw new RangeError(`${lawPath}.requiredTechnologyIds contains duplicates`);
     }
-    const laborMinimumWageSUSDPerYear =
-      law.laborMinimumWageSUSDPerYear === undefined
+    const laborMinimumWageRUSDPerYear =
+      law.laborMinimumWageRUSDPerYear === undefined
         ? 0
         : requireFiniteNumber(
-            law.laborMinimumWageSUSDPerYear,
-            `${lawPath}.laborMinimumWageSUSDPerYear`,
+            law.laborMinimumWageRUSDPerYear,
+            `${lawPath}.laborMinimumWageRUSDPerYear`,
           );
     if (
-      laborMinimumWageSUSDPerYear < 0 ||
-      laborMinimumWageSUSDPerYear > MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR
+      laborMinimumWageRUSDPerYear < 0 ||
+      laborMinimumWageRUSDPerYear > MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR
     ) {
-      throw new RangeError(`${lawPath}.laborMinimumWageSUSDPerYear is out of range`);
+      throw new RangeError(`${lawPath}.laborMinimumWageRUSDPerYear is out of range`);
     }
     const laborHoursPerWeek =
       law.laborHoursPerWeek === undefined
@@ -478,7 +478,7 @@ export function assertValidPoliticsDefinitions(
       educationAttendanceFloor,
       educationQualityBonus,
       requiredTechnologyIds,
-      laborMinimumWageSUSDPerYear,
+      laborMinimumWageRUSDPerYear,
       laborHoursPerWeek,
       healthStaffFloor,
       currencyRegime,
@@ -648,15 +648,15 @@ export function neutralLaws(): Record<LawSlot, Id> {
 
 export function neutralInstitutionState(): InstitutionState {
   return {
-    fundedAnnualSUSD: 0,
+    fundedAnnualRUSD: 0,
     staffedByProfession: {},
     serviceOutputIndex: 1,
     quality: 1,
     overload: 0,
     disruptionUntilDay: null,
     lastUpdateDay: null,
-    fundingRequestedMonthToDateSUSD: 0,
-    fundingShortfallMonthToDateSUSD: 0,
+    fundingRequestedMonthToDateRUSD: 0,
+    fundingShortfallMonthToDateRUSD: 0,
     healthStaffShare: 0,
   };
 }
@@ -788,13 +788,13 @@ export function assertValidCountryPoliticsInput(
       }
     }
   }
-  if (input.institutionFundingSUSDPerYear !== undefined) {
+  if (input.institutionFundingRUSDPerYear !== undefined) {
     const funding = requireFiniteNumber(
-      input.institutionFundingSUSDPerYear,
-      `${path}.institutionFundingSUSDPerYear`,
+      input.institutionFundingRUSDPerYear,
+      `${path}.institutionFundingRUSDPerYear`,
     );
     if (funding < 0) {
-      throw new RangeError(`${path}.institutionFundingSUSDPerYear must be non-negative`);
+      throw new RangeError(`${path}.institutionFundingRUSDPerYear must be non-negative`);
     }
   }
 }
@@ -843,7 +843,7 @@ export function createCountryPoliticsState(
       laws[law.slot] = law.id;
     }
   }
-  const funding = input?.institutionFundingSUSDPerYear ?? 0;
+  const funding = input?.institutionFundingRUSDPerYear ?? 0;
   if (!Number.isFinite(funding) || funding < 0) {
     throw new RangeError(
       `country ${String(country.id)} institution funding must be finite and non-negative`,
@@ -871,7 +871,7 @@ export function createCountryPoliticsState(
     interestGroups,
     institutions: {
       ...neutralInstitutionState(),
-      fundedAnnualSUSD: funding,
+      fundedAnnualRUSD: funding,
       lastUpdateDay: day,
     },
   };
@@ -1120,10 +1120,10 @@ export function refreshInstitution(
   const infrastructure = regionCount > 0 ? infrastructureWeighted / regionCount : DEFAULT_INFRASTRUCTURE;
   const clerkShare = population > 0 ? staff / population : 0;
   const staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
-  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD;
+  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD;
   const fundingRatio =
     fundingBenchmark > 0
-      ? clamp(country.institutions.fundedAnnualSUSD / fundingBenchmark, 0, 1)
+      ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
       : 0;
   let lawLoad = 0;
   for (const slot of IMPLEMENTED_LAW_SLOTS) {
@@ -1136,8 +1136,8 @@ export function refreshInstitution(
     country.institutions.disruptionUntilDay !== null &&
     day <= country.institutions.disruptionUntilDay;
   const disruptionPenalty = disrupted ? INSTITUTION_DISRUPTION_QUALITY_PENALTY : 0;
-  const priorRequested = country.institutions.fundingRequestedMonthToDateSUSD;
-  const priorShortfall = country.institutions.fundingShortfallMonthToDateSUSD;
+  const priorRequested = country.institutions.fundingRequestedMonthToDateRUSD;
+  const priorShortfall = country.institutions.fundingShortfallMonthToDateRUSD;
   const fundingShortfallRatio =
     priorRequested > 0 ? clamp(priorShortfall / priorRequested, 0, 1) : 0;
   const quality = clamp(
@@ -1438,8 +1438,8 @@ export function runPoliticsDayStart(
       refreshInterestGroups(world, country, definitions);
       country.institutions = {
         ...country.institutions,
-        fundingRequestedMonthToDateSUSD: 0,
-        fundingShortfallMonthToDateSUSD: 0,
+        fundingRequestedMonthToDateRUSD: 0,
+        fundingShortfallMonthToDateRUSD: 0,
       };
       if (country.regime.nextElectionDay !== null && day >= country.regime.nextElectionDay) {
         runElection(world, country, politics, definitions, day);
@@ -1873,8 +1873,8 @@ export function assertValidInstitutionState(
   terminalDay: Day,
 ): void {
   const record = requireRecord(value, path);
-  const funded = requireFiniteNumber(record.fundedAnnualSUSD, `${path}.fundedAnnualSUSD`);
-  if (funded < 0) throw new RangeError(`${path}.fundedAnnualSUSD must be non-negative`);
+  const funded = requireFiniteNumber(record.fundedAnnualRUSD, `${path}.fundedAnnualRUSD`);
+  if (funded < 0) throw new RangeError(`${path}.fundedAnnualRUSD must be non-negative`);
   const staff = requireRecord(record.staffedByProfession, `${path}.staffedByProfession`);
   for (const [professionId, rawCount] of Object.entries(staff)) {
     if (!/^\d+$/.test(professionId)) {
@@ -1898,12 +1898,12 @@ export function assertValidInstitutionState(
     requireInteger(record.lastUpdateDay, `${path}.lastUpdateDay`, 0, terminalDay);
   }
   const requested = requireFiniteNumber(
-    record.fundingRequestedMonthToDateSUSD,
-    `${path}.fundingRequestedMonthToDateSUSD`,
+    record.fundingRequestedMonthToDateRUSD,
+    `${path}.fundingRequestedMonthToDateRUSD`,
   );
   const shortfall = requireFiniteNumber(
-    record.fundingShortfallMonthToDateSUSD,
-    `${path}.fundingShortfallMonthToDateSUSD`,
+    record.fundingShortfallMonthToDateRUSD,
+    `${path}.fundingShortfallMonthToDateRUSD`,
   );
   if (requested < 0 || shortfall < 0 || shortfall > requested + toleranceFor(requested)) {
     throw new RangeError(`${path} funding memo is inconsistent`);
@@ -2150,8 +2150,8 @@ export function institutionFundingRemainingAnnualized(country: Country, day: Day
   const days = daysInYear(dayIndexToCivilDate(day).year);
   return Math.max(
     0,
-    country.institutions.fundedAnnualSUSD / days -
-      country.institutions.fundingShortfallMonthToDateSUSD,
+    country.institutions.fundedAnnualRUSD / days -
+      country.institutions.fundingShortfallMonthToDateRUSD,
   );
 }
 

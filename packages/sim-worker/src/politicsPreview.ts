@@ -79,10 +79,10 @@ export function previewLawProposal(
 export interface InstitutionFundingPreview {
   readonly valid: boolean;
   readonly errors: readonly string[];
-  readonly annualSUSD: number;
-  readonly dailyRequestSUSD: number;
-  readonly currentAnnualSUSD: number;
-  readonly treasuryCashSUSD: number;
+  readonly annualRUSD: number;
+  readonly dailyRequestRUSD: number;
+  readonly currentAnnualRUSD: number;
+  readonly treasuryCashRUSD: number;
   readonly constraints: readonly string[];
 }
 
@@ -90,17 +90,17 @@ export interface InstitutionFundingPreview {
 export function previewInstitutionFunding(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
-  annualSUSD: number,
+  annualRUSD: number,
 ): InstitutionFundingPreview {
   const errors: string[] = [];
   if (snapshot.playerCountryId !== country.id) {
     errors.push("Only the player-controlled country may set administration funding.");
   }
-  if (!Number.isFinite(annualSUSD) || annualSUSD < 0) {
+  if (!Number.isFinite(annualRUSD) || annualRUSD < 0) {
     errors.push("The annual funding target must be a finite non-negative amount.");
   }
-  const dailyRequestSUSD = Number.isFinite(annualSUSD) ? annualSUSD / 365 : 0;
-  if (dailyRequestSUSD > country.treasuryCashSUSD) {
+  const dailyRequestRUSD = Number.isFinite(annualRUSD) ? annualRUSD / 365 : 0;
+  if (dailyRequestRUSD > country.treasuryCashRUSD) {
     errors.push(
       "The daily request exceeds current treasury cash; the fiscal phase would pay only the available amount above the reserve floor.",
     );
@@ -108,10 +108,10 @@ export function previewInstitutionFunding(
   return {
     valid: errors.length === 0,
     errors,
-    annualSUSD,
-    dailyRequestSUSD,
-    currentAnnualSUSD: country.politics.institution.fundedAnnualSUSD,
-    treasuryCashSUSD: country.treasuryCashSUSD,
+    annualRUSD,
+    dailyRequestRUSD,
+    currentAnnualRUSD: country.politics.institution.fundedAnnualRUSD,
+    treasuryCashRUSD: country.treasuryCashRUSD,
     constraints: [
       "Funding is a daily cash-limited payroll transfer to administration households, not money creation.",
       "Unpaid request is an explicit shortfall, not debt or a receivable.",

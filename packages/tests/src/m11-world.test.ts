@@ -435,11 +435,11 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
 
   function fiscal(overrides: Partial<{
     incomeTaxRate: number;
-    incomeTaxAllowanceSUSDPerYear: number;
-    welfareBudgetSUSDPerYear: number;
+    incomeTaxAllowanceRUSDPerYear: number;
+    welfareBudgetRUSDPerYear: number;
     welfareMaxWealthLevel: number;
     businessProfitTaxRate: number;
-    reserveTargetSUSD: number;
+    reserveTargetRUSD: number;
   }>): CountryAction {
     return {
       kind: "set-fiscal-policy",
@@ -447,11 +447,11 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
       dayIndex: 0,
       source: "player",
       incomeTaxRate: 0.05,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 0,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 0,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
       ...overrides,
     };
   }
@@ -466,24 +466,24 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
     expect(validate(fiscal({ welfareMaxWealthLevel: 0 }))).toBe(true);
     expect(validate(fiscal({ welfareMaxWealthLevel: 99 }))).toBe(true);
     expect(validate(fiscal({ welfareMaxWealthLevel: 100 }))).toBe(false);
-    expect(validate(fiscal({ incomeTaxAllowanceSUSDPerYear: -1 }))).toBe(false);
-    expect(validate(fiscal({ welfareBudgetSUSDPerYear: -1 }))).toBe(false);
-    expect(validate(fiscal({ reserveTargetSUSD: -1 }))).toBe(false);
+    expect(validate(fiscal({ incomeTaxAllowanceRUSDPerYear: -1 }))).toBe(false);
+    expect(validate(fiscal({ welfareBudgetRUSDPerYear: -1 }))).toBe(false);
+    expect(validate(fiscal({ reserveTargetRUSD: -1 }))).toBe(false);
   });
 
   test("funding, training, research, subsidy, and trade slider ranges validate", () => {
     const base = { countryId, dayIndex: 0, source: "player" as const };
-    expect(validate({ ...base, kind: "set-institution-funding", annualSUSD: 0 })).toBe(true);
-    expect(validate({ ...base, kind: "set-institution-funding", annualSUSD: -1 })).toBe(false);
-    expect(validate({ ...base, kind: "set-education-funding", annualSUSD: 1_000_000 })).toBe(true);
-    expect(validate({ ...base, kind: "set-education-funding", annualSUSD: -1 })).toBe(false);
+    expect(validate({ ...base, kind: "set-institution-funding", annualRUSD: 0 })).toBe(true);
+    expect(validate({ ...base, kind: "set-institution-funding", annualRUSD: -1 })).toBe(false);
+    expect(validate({ ...base, kind: "set-education-funding", annualRUSD: 1_000_000 })).toBe(true);
+    expect(validate({ ...base, kind: "set-education-funding", annualRUSD: -1 })).toBe(false);
     expect(validate({ ...base, kind: "set-research-staff-share", share: 0 })).toBe(true);
     expect(validate({ ...base, kind: "set-research-staff-share", share: 1 })).toBe(true);
     expect(validate({ ...base, kind: "set-research-staff-share", share: 1.01 })).toBe(false);
-    expect(validate({ ...base, kind: "set-training-budget", annualSUSD: 1_000_000 })).toBe(true);
-    expect(validate({ ...base, kind: "set-training-budget", annualSUSD: -1 })).toBe(false);
-    expect(validate({ ...base, kind: "set-training-stipend", annualSUSD: 0 })).toBe(true);
-    expect(validate({ ...base, kind: "set-training-stipend", annualSUSD: -1 })).toBe(false);
+    expect(validate({ ...base, kind: "set-training-budget", annualRUSD: 1_000_000 })).toBe(true);
+    expect(validate({ ...base, kind: "set-training-budget", annualRUSD: -1 })).toBe(false);
+    expect(validate({ ...base, kind: "set-training-stipend", annualRUSD: 0 })).toBe(true);
+    expect(validate({ ...base, kind: "set-training-stipend", annualRUSD: -1 })).toBe(false);
     expect(validate({ ...base, kind: "set-training-staff-share", share: 0.5 })).toBe(true);
     expect(validate({ ...base, kind: "set-training-staff-share", share: 1.1 })).toBe(false);
     expect(validate({ ...base, kind: "set-health-staff-share", share: 0.5 })).toBe(true);
@@ -513,10 +513,10 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
       }),
     ).toBe(false);
     expect(
-      validate({ ...base, kind: "set-debt-policy", refinanceOnMaturity: true, maxOutstandingPrincipalSUSD: 1_000_000 }),
+      validate({ ...base, kind: "set-debt-policy", refinanceOnMaturity: true, maxOutstandingPrincipalRUSD: 1_000_000 }),
     ).toBe(true);
     expect(
-      validate({ ...base, kind: "set-debt-policy", refinanceOnMaturity: true, maxOutstandingPrincipalSUSD: -1 }),
+      validate({ ...base, kind: "set-debt-policy", refinanceOnMaturity: true, maxOutstandingPrincipalRUSD: -1 }),
     ).toBe(false);
   });
 });

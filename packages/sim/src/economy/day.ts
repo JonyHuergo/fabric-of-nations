@@ -11,7 +11,7 @@ import {
   applyAnnualAgeing,
 } from "../population/ageing.js";
 import {
-  MONEY_TOLERANCE_SUSD,
+  MONEY_TOLERANCE_RUSD,
   NEED_TIER_ORDER,
   type NeedTier,
 } from "../population/constants.js";
@@ -186,7 +186,7 @@ export interface EconomyDayResult {
 function moneyTolerance(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function quantityTolerance(...values: number[]): number {
@@ -226,7 +226,7 @@ export function cloneWorld(
     markets: source.markets.map((market) => ({
       ...market,
       regionIds: [...market.regionIds],
-      priceSUSD: [...market.priceSUSD],
+      priceRUSD: [...market.priceRUSD],
       stockLots: market.stockLots.map((lot) => ({ ...lot })),
     })),
     finance: cloneFinanceState(
@@ -346,7 +346,7 @@ function buildHouseholdDemand(
     const market = marketPrices(world, marketId);
     marketByPopBlock.set(block.id, marketId);
     const account = accountByOwner(index, "popBlock", block.id);
-    let remainingCash = account.balanceSUSD;
+    let remainingCash = account.balanceRUSD;
 
     for (const tier of [1, 3, 6] as const) {
       const itemsByGood = new Map<
@@ -386,15 +386,15 @@ function buildHouseholdDemand(
         .sort((left, right) => left.goodId - right.goodId);
       let desiredCost = 0;
       for (const item of items) {
-        desiredCost += item.desired * (market.priceSUSD[item.goodId] ?? 0);
+        desiredCost += item.desired * (market.priceRUSD[item.goodId] ?? 0);
       }
       if (!(desiredCost > 0)) continue;
-      const spendable = Math.max(0, remainingCash - MONEY_TOLERANCE_SUSD);
+      const spendable = Math.max(0, remainingCash - MONEY_TOLERANCE_RUSD);
       const ratio = spendable >= desiredCost ? 1 : spendable / desiredCost;
       let fundedCost = 0;
       for (const item of items) {
         const funded = item.desired * ratio;
-        const price = market.priceSUSD[item.goodId] ?? 0;
+        const price = market.priceRUSD[item.goodId] ?? 0;
         fundedCost += funded * price;
         records.push({
           popBlockId: block.id,
@@ -488,14 +488,14 @@ function buildProductionDemands(
     const desired = inputs.map((input) => ({
       goodId: input.goodId,
       quantity: input.quantityPerThroughputUnit * capacity.capacityTU,
-      price: market.priceSUSD[input.goodId] ?? 0,
+      price: market.priceRUSD[input.goodId] ?? 0,
     }));
     let desiredCost = 0;
     for (const input of desired) desiredCost += input.quantity * input.price;
     let ratio = 1;
     if (mode === "cash") {
       const account = accountByOwner(index, "building", building.id);
-      const available = Math.max(0, account.balanceSUSD - MONEY_TOLERANCE_SUSD);
+      const available = Math.max(0, account.balanceRUSD - MONEY_TOLERANCE_RUSD);
       ratio = desiredCost > 0 ? Math.min(1, available / desiredCost) : 1;
     }
     const tier = productionTier(definition, critical);
@@ -613,22 +613,22 @@ function buildNeedsResult(
         tier,
         active,
         fullyMet,
-        desiredCostSUSD: active ? desiredCost : 0,
-        fundedCostSUSD: active ? fundedCost : 0,
-        spentSUSD: active ? spent : 0,
+        desiredCostRUSD: active ? desiredCost : 0,
+        fundedCostRUSD: active ? fundedCost : 0,
+        spentRUSD: active ? spent : 0,
       };
       summaries.push(summary);
       tierResults.push({ ...summary, goods: active ? goods : [] });
       if (active && !fullyMet) lowerMet = false;
     }
 
-    const spent = householdSettlement.marketPurchasesSUSD;
+    const spent = householdSettlement.marketPurchasesRUSD;
     blocks.push({
       popBlockId: block.id,
       population,
-      budgetStartBeforeNeedsSUSD: householdSettlement.initialCashSUSD,
-      budgetEndAfterNeedsSUSD: householdSettlement.initialCashSUSD - spent,
-      spentSUSD: spent,
+      budgetStartBeforeNeedsRUSD: householdSettlement.initialCashRUSD,
+      budgetEndAfterNeedsRUSD: householdSettlement.initialCashRUSD - spent,
+      spentRUSD: spent,
       tiers: tierResults,
       tierSummaries: summaries,
     });
@@ -727,7 +727,7 @@ function economicWealthInputs(
   const referenceMarket = markets[0];
   const prices = definitions.goods.map((good) => ({
     goodKey: good.key,
-    unitPriceSUSD: referenceMarket?.updatedPrices[good.id] ?? 0,
+    unitPriceRUSD: referenceMarket?.updatedPrices[good.id] ?? 0,
   }));
   const supply = definitions.goods.map((good) => {
     let closing = 0;
@@ -749,15 +749,15 @@ function economicWealthInputs(
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
     }
     const fiscalBlock = fiscalByBlock.get(block.id);
-    const welfareReceived = fiscalBlock?.welfareReceivedSUSD ?? 0;
-    const incomeTax = fiscalBlock?.incomeTaxSUSD ?? 0;
+    const welfareReceived = fiscalBlock?.welfareReceivedRUSD ?? 0;
+    const incomeTax = fiscalBlock?.incomeTaxRUSD ?? 0;
     return {
       popBlockId: block.id,
-      annualSettledIncomePerCapitaSUSD:
+      annualSettledIncomePerCapitaRUSD:
         population > 0
-          ? ((household.wagesReceivedSUSD + welfareReceived) / population) * daysInYear(year)
+          ? ((household.wagesReceivedRUSD + welfareReceived) / population) * daysInYear(year)
           : 0,
-      annualMandatoryPaymentsPerCapitaSUSD:
+      annualMandatoryPaymentsPerCapitaRUSD:
         population > 0 ? (incomeTax / population) * daysInYear(year) : 0,
     };
   });

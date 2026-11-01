@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Unit, integration, determinism, and serialization tests for Century.",
+  "description": "Unit, integration, determinism, and serialization tests for Fabric of Nations.",
   "scripts": {
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
     "typecheck": "tsc -p tsconfig.json --noEmit"

@@ -5,7 +5,7 @@ import {
   countryById,
   describePlayerAction,
   fiscalResultLabel,
-  formatSUSD,
+  formatRUSD,
   latestAnnualReport,
   recentAnnualReports,
   recentPlayerActions,
@@ -43,7 +43,7 @@ export function LedgerScreen({
   const latest = reports[0] ?? null;
   const latestAnnual = latestAnnualReport(country);
   const annualReports = recentAnnualReports(country, 5);
-  const netValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
+  const netValues = country.financeHistory.map((period) => period.netFiscalResultRUSD);
   const actions = recentPlayerActions(actionHistory, 12);
   const actionsInLatestPeriod =
     latest === null
@@ -66,9 +66,9 @@ export function LedgerScreen({
           </Text>
         ) : (
           <>
-            <Text style={styles.result}>{fiscalResultLabel(latest.netFiscalResultSUSD)}</Text>
+            <Text style={styles.result}>{fiscalResultLabel(latest.netFiscalResultRUSD)}</Text>
             <Text style={styles.resultDetail}>
-              {formatSUSD(latest.netFiscalResultSUSD)} · {latest.periodStartLabel} to{" "}
+              {formatRUSD(latest.netFiscalResultRUSD)} · {latest.periodStartLabel} to{" "}
               {latest.periodEndLabel}
             </Text>
             {netValues.length > 1 ? <MiniBars values={netValues} /> : null}
@@ -86,118 +86,118 @@ export function LedgerScreen({
           <>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Income tax</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.incomeTaxSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latest.incomeTaxRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Business-profit tax</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.businessTaxRevenueSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latest.businessTaxRevenueRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Welfare paid (of requested)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.welfareExpenseSUSD)} /{" "}
-                {formatSUSD(latest.welfareRequestedSUSD)}
+                {formatRUSD(latest.welfareExpenseRUSD)} /{" "}
+                {formatRUSD(latest.welfareRequestedRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Welfare shortfall (unpaid budget)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.welfareShortfallSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latest.welfareShortfallRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Business tax assessed / uncollected</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.businessTaxAssessedSUSD)} /{" "}
-                {formatSUSD(latest.businessTaxUncollectedSUSD)}
+                {formatRUSD(latest.businessTaxAssessedRUSD)} /{" "}
+                {formatRUSD(latest.businessTaxUncollectedRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Interest expense / cash paid</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.interestExpenseSUSD)} / {formatSUSD(latest.interestPaidSUSD)}
+                {formatRUSD(latest.interestExpenseRUSD)} / {formatRUSD(latest.interestPaidRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Borrowed / principal repaid</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.debtIssuedSUSD)} / {formatSUSD(latest.principalRepaidSUSD)}
+                {formatRUSD(latest.debtIssuedRUSD)} / {formatRUSD(latest.principalRepaidRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Unfinanced requirement</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.unfinancedRequirementSUSD)}
+                {formatRUSD(latest.unfinancedRequirementRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction outlay (capital, not expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.constructionSpentSUSD)}
+                {formatRUSD(latest.constructionSpentRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction written off</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.constructionWrittenOffSUSD)}
+                {formatRUSD(latest.constructionWrittenOffRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction materials (capital)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.constructionMaterialsSpentSUSD)}
+                {formatRUSD(latest.constructionMaterialsSpentRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Production subsidies (expense)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latest.subsidyExpenseSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latest.subsidyExpenseRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Subsidy requested / shortfall</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.subsidyRequestedSUSD)} /{" "}
-                {formatSUSD(latest.subsidyShortfallSUSD)}
+                {formatRUSD(latest.subsidyRequestedRUSD)} /{" "}
+                {formatRUSD(latest.subsidyShortfallRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Public-enterprise capital support</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.publicEnterpriseSupportSUSD)}
+                {formatRUSD(latest.publicEnterpriseSupportRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Administration payroll (expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.administrationExpenseSUSD ?? 0)}
+                {formatRUSD(latest.administrationExpenseRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Administration requested / shortfall</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.administrationRequestedSUSD ?? 0)} /{" "}
-                {formatSUSD(latest.administrationShortfallSUSD ?? 0)}
+                {formatRUSD(latest.administrationRequestedRUSD ?? 0)} /{" "}
+                {formatRUSD(latest.administrationShortfallRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Customs duty revenue</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.customsDutyRevenueSUSD)}
+                {formatRUSD(latest.customsDutyRevenueRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Education and research payroll (expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.educationExpenseSUSD)}
+                {formatRUSD(latest.educationExpenseRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Training payroll and stipend (expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.trainingExpenseSUSD)}
+                {formatRUSD(latest.trainingExpenseRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Military pay and procurement (expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latest.militaryExpenseSUSD)}
+                {formatRUSD(latest.militaryExpenseRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -205,10 +205,10 @@ export function LedgerScreen({
               <Text
                 style={[
                   styles.reportValue,
-                  latest.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                  latest.netFiscalResultRUSD >= 0 ? styles.positive : styles.negative,
                 ]}
               >
-                {formatSUSD(latest.netFiscalResultSUSD)}
+                {formatRUSD(latest.netFiscalResultRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -216,16 +216,16 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>
                 {latest.treasuryCash === null
                   ? "Not retained"
-                  : formatSUSD(latest.treasuryCash.endSUSD)}
+                  : formatRUSD(latest.treasuryCash.endRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Treasury change</Text>
               <Text style={styles.reportValue}>
-                {latest.treasuryCash?.changeSUSD === null ||
-                latest.treasuryCash?.changeSUSD === undefined
+                {latest.treasuryCash?.changeRUSD === null ||
+                latest.treasuryCash?.changeRUSD === undefined
                   ? "Not derivable"
-                  : formatSUSD(latest.treasuryCash.changeSUSD)}
+                  : formatRUSD(latest.treasuryCash.changeRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -233,10 +233,10 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>
                 {latest.debtOutstanding === null
                   ? "Not retained"
-                  : `${formatSUSD(latest.debtOutstanding.endSUSD)}${
-                      latest.debtOutstanding.changeSUSD === null
+                  : `${formatRUSD(latest.debtOutstanding.endRUSD)}${
+                      latest.debtOutstanding.changeRUSD === null
                         ? ""
-                        : ` (${formatSUSD(latest.debtOutstanding.changeSUSD)})`
+                        : ` (${formatRUSD(latest.debtOutstanding.changeRUSD)})`
                     }`}
               </Text>
             </View>
@@ -245,7 +245,7 @@ export function LedgerScreen({
               <Text style={styles.reportValue}>
                 {latest.householdCash === null
                   ? "Not retained"
-                  : formatSUSD(latest.householdCash.endSUSD)}
+                  : formatRUSD(latest.householdCash.endRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -291,89 +291,89 @@ export function LedgerScreen({
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Income tax (annual flow)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.incomeTaxSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latestAnnual.incomeTaxRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Business-profit tax (annual flow)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.businessTaxRevenueSUSD)}
+                {formatRUSD(latestAnnual.businessTaxRevenueRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Welfare paid / requested (annual flows)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.welfareExpenseSUSD)} /{" "}
-                {formatSUSD(latestAnnual.welfareRequestedSUSD)}
+                {formatRUSD(latestAnnual.welfareExpenseRUSD)} /{" "}
+                {formatRUSD(latestAnnual.welfareRequestedRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Welfare shortfall (annual flow)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.welfareShortfallSUSD)}
+                {formatRUSD(latestAnnual.welfareShortfallRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Interest expense (annual flow)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.interestExpenseSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latestAnnual.interestExpenseRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Borrowed / principal repaid (annual financing)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.debtIssuedSUSD)} /{" "}
-                {formatSUSD(latestAnnual.principalRepaidSUSD)}
+                {formatRUSD(latestAnnual.debtIssuedRUSD)} /{" "}
+                {formatRUSD(latestAnnual.principalRepaidRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Interest cash paid (annual financing)</Text>
-              <Text style={styles.reportValue}>{formatSUSD(latestAnnual.interestPaidSUSD)}</Text>
+              <Text style={styles.reportValue}>{formatRUSD(latestAnnual.interestPaidRUSD)}</Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Unfinanced requirement (annual)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.unfinancedRequirementSUSD)}
+                {formatRUSD(latestAnnual.unfinancedRequirementRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction outlay (annual capital flow)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.constructionSpentSUSD)}
+                {formatRUSD(latestAnnual.constructionSpentRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction written off (annual)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.constructionWrittenOffSUSD)}
+                {formatRUSD(latestAnnual.constructionWrittenOffRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Construction materials (annual capital)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.constructionMaterialsSpentSUSD)}
+                {formatRUSD(latestAnnual.constructionMaterialsSpentRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Production subsidies (annual expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.subsidyExpenseSUSD)}
+                {formatRUSD(latestAnnual.subsidyExpenseRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Subsidy requested / shortfall (annual)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.subsidyRequestedSUSD)} /{" "}
-                {formatSUSD(latestAnnual.subsidyShortfallSUSD)}
+                {formatRUSD(latestAnnual.subsidyRequestedRUSD)} /{" "}
+                {formatRUSD(latestAnnual.subsidyShortfallRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Public-enterprise capital support (annual)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.publicEnterpriseSupportSUSD)}
+                {formatRUSD(latestAnnual.publicEnterpriseSupportRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Administration payroll (annual expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.administrationExpenseSUSD ?? 0)}
+                {formatRUSD(latestAnnual.administrationExpenseRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -381,32 +381,32 @@ export function LedgerScreen({
                 Administration requested / shortfall (annual)
               </Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.administrationRequestedSUSD ?? 0)} /{" "}
-                {formatSUSD(latestAnnual.administrationShortfallSUSD ?? 0)}
+                {formatRUSD(latestAnnual.administrationRequestedRUSD ?? 0)} /{" "}
+                {formatRUSD(latestAnnual.administrationShortfallRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Customs duty revenue (annual flow)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.customsDutyRevenueSUSD ?? 0)}
+                {formatRUSD(latestAnnual.customsDutyRevenueRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Education and research payroll (annual expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.educationExpenseSUSD ?? 0)}
+                {formatRUSD(latestAnnual.educationExpenseRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Training payroll and stipend (annual expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.trainingExpenseSUSD ?? 0)}
+                {formatRUSD(latestAnnual.trainingExpenseRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Military pay and procurement (annual expense)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.militaryExpenseSUSD ?? 0)}
+                {formatRUSD(latestAnnual.militaryExpenseRUSD ?? 0)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -414,28 +414,28 @@ export function LedgerScreen({
               <Text
                 style={[
                   styles.reportValue,
-                  latestAnnual.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                  latestAnnual.netFiscalResultRUSD >= 0 ? styles.positive : styles.negative,
                 ]}
               >
-                {formatSUSD(latestAnnual.netFiscalResultSUSD)}
+                {formatRUSD(latestAnnual.netFiscalResultRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Treasury at year-end (balance)</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.treasuryCashEndSUSD)}
+                {formatRUSD(latestAnnual.treasuryCashEndRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Debt principal liability at year-end</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.debtLiabilityEndSUSD)}
+                {formatRUSD(latestAnnual.debtLiabilityEndRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Interest payable at year-end</Text>
               <Text style={styles.reportValue}>
-                {formatSUSD(latestAnnual.interestPayableEndSUSD)}
+                {formatRUSD(latestAnnual.interestPayableEndRUSD)}
               </Text>
             </View>
             <View style={styles.reportRow}>
@@ -460,8 +460,8 @@ export function LedgerScreen({
                       {report.complete ? "" : " partial"}
                     </Text>
                     <Text style={styles.annualNet}>
-                      Net {formatSUSD(report.netFiscalResultSUSD)} · Treasury{" "}
-                      {formatSUSD(report.treasuryCashEndSUSD)}
+                      Net {formatRUSD(report.netFiscalResultRUSD)} · Treasury{" "}
+                      {formatRUSD(report.treasuryCashEndRUSD)}
                     </Text>
                   </View>
                 ))}
@@ -484,23 +484,23 @@ export function LedgerScreen({
                 {report.periodStartLabel} → {report.periodEndLabel}
               </Text>
               <View style={styles.columns}>
-                <Text style={styles.cell}>Tax {formatSUSD(report.incomeTaxSUSD)}</Text>
-                <Text style={styles.cell}>Welfare {formatSUSD(report.welfareExpenseSUSD)}</Text>
-                <Text style={styles.cell}>Interest {formatSUSD(report.interestExpenseSUSD)}</Text>
+                <Text style={styles.cell}>Tax {formatRUSD(report.incomeTaxRUSD)}</Text>
+                <Text style={styles.cell}>Welfare {formatRUSD(report.welfareExpenseRUSD)}</Text>
+                <Text style={styles.cell}>Interest {formatRUSD(report.interestExpenseRUSD)}</Text>
                 <Text style={styles.cell}>
                   Treasury{" "}
                   {report.treasuryCash === null
                     ? "n/a"
-                    : formatSUSD(report.treasuryCash.endSUSD)}
+                    : formatRUSD(report.treasuryCash.endRUSD)}
                 </Text>
               </View>
               <Text
                 style={[
                   styles.net,
-                  report.netFiscalResultSUSD >= 0 ? styles.positive : styles.negative,
+                  report.netFiscalResultRUSD >= 0 ? styles.positive : styles.negative,
                 ]}
               >
-                {formatSUSD(report.netFiscalResultSUSD)}
+                {formatRUSD(report.netFiscalResultRUSD)}
               </Text>
             </View>
           ))
@@ -552,7 +552,7 @@ export function LedgerScreen({
           Object.entries(latest.grossFlowTotals).map(([kind, value]) => (
             <View key={kind} style={styles.flowRow}>
               <Text style={styles.flowLabel}>{FLOW_LABELS[kind] ?? kind}</Text>
-              <Text style={styles.flowValue}>{formatSUSD(value)}</Text>
+              <Text style={styles.flowValue}>{formatRUSD(value)}</Text>
             </View>
           ))
         )}

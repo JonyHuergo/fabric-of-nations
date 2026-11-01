@@ -1,0 +1,1887 @@
+{
+  "generatedBy": "scripts/m12c/build-africa-provinces.mjs",
+  "referenceDate": "1900-01-01",
+  "toleranceDegrees": 0.02,
+  "provinceCount": 260,
+  "plannedProvinceCount": 260,
+  "residualProvinceCount": 0,
+  "politiesCovered": [
+    "BEL",
+    "DAR",
+    "DEU",
+    "ESP",
+    "ETH",
+    "FRA",
+    "GBR",
+    "ITA",
+    "LBR",
+    "MAR",
+    "ORF",
+    "OTT",
+    "PRT",
+    "SOK",
+    "WAD",
+    "ZAR"
+  ],
+  "mapFeaturesCovered": 39,
+  "duplicateProvinceIds": 0,
+  "duplicateKeys": 0,
+  "unmatchedBorderSegments": 0,
+  "borderSegmentCount": 71494,
+  "borderPairCount": 838,
+  "coverage": [
+    {
+      "tag": "ALG",
+      "scopeArea": 213.6457,
+      "coveredArea": 212.3706,
+      "residualArea": 1.2752,
+      "estimated": false
+    },
+    {
+      "tag": "ANG",
+      "scopeArea": 103.5657,
+      "coveredArea": 103.1069,
+      "residualArea": 0.4588,
+      "estimated": false
+    },
+    {
+      "tag": "BEA",
+      "scopeArea": 76.9975,
+      "coveredArea": 76.2614,
+      "residualArea": 0.7361,
+      "estimated": false
+    },
+    {
+      "tag": "BPO",
+      "scopeArea": 0.3506,
+      "coveredArea": 0.3375,
+      "residualArea": 0.0132,
+      "estimated": false
+    },
+    {
+      "tag": "BSA",
+      "scopeArea": 0.0143,
+      "coveredArea": 0.0138,
+      "residualArea": 0.0005,
+      "estimated": false
+    },
+    {
+      "tag": "BSO",
+      "scopeArea": 14.8378,
+      "coveredArea": 14.6453,
+      "residualArea": 0.1925,
+      "estimated": false
+    },
+    {
+      "tag": "BWA",
+      "scopeArea": 73.3785,
+      "coveredArea": 72.7768,
+      "residualArea": 0.6017,
+      "estimated": false
+    },
+    {
+      "tag": "CAP",
+      "scopeArea": 63.3849,
+      "coveredArea": 63.3471,
+      "residualArea": 0.0378,
+      "estimated": false
+    },
+    {
+      "tag": "CFS",
+      "scopeArea": 189.6119,
+      "coveredArea": 188.982,
+      "residualArea": 0.6299,
+      "estimated": true
+    },
+    {
+      "tag": "CRA",
+      "scopeArea": 106.2124,
+      "coveredArea": 105.674,
+      "residualArea": 0.5383,
+      "estimated": false
+    },
+    {
+      "tag": "DAR",
+      "scopeArea": 42.7715,
+      "coveredArea": 42.7156,
+      "residualArea": 0.0559,
+      "estimated": false
+    },
+    {
+      "tag": "EGY",
+      "scopeArea": 90.8056,
+      "coveredArea": 90.4777,
+      "residualArea": 0.3279,
+      "estimated": false
+    },
+    {
+      "tag": "ERI",
+      "scopeArea": 10.3751,
+      "coveredArea": 10.1901,
+      "residualArea": 0.1849,
+      "estimated": false
+    },
+    {
+      "tag": "ETH",
+      "scopeArea": 92.6468,
+      "coveredArea": 92.3596,
+      "residualArea": 0.2873,
+      "estimated": false
+    },
+    {
+      "tag": "FEA",
+      "scopeArea": 151.1451,
+      "coveredArea": 147.6448,
+      "residualArea": 3.5004,
+      "estimated": false
+    },
+    {
+      "tag": "FRA",
+      "scopeArea": 0.2499,
+      "coveredArea": 0.2393,
+      "residualArea": 0.0106,
+      "estimated": false
+    },
+    {
+      "tag": "FSO",
+      "scopeArea": 1.7822,
+      "coveredArea": 1.7665,
+      "residualArea": 0.0157,
+      "estimated": false
+    },
+    {
+      "tag": "FWA",
+      "scopeArea": 392.1909,
+      "coveredArea": 391.2645,
+      "residualArea": 0.9264,
+      "estimated": false
+    },
+    {
+      "tag": "GEA",
+      "scopeArea": 81.1845,
+      "coveredArea": 80.8487,
+      "residualArea": 0.3358,
+      "estimated": false
+    },
+    {
+      "tag": "GSW",
+      "scopeArea": 71.9814,
+      "coveredArea": 71.7695,
+      "residualArea": 0.2119,
+      "estimated": false
+    },
+    {
+      "tag": "HCT",
+      "scopeArea": 54.9592,
+      "coveredArea": 54.8065,
+      "residualArea": 0.1527,
+      "estimated": false
+    },
+    {
+      "tag": "ITS",
+      "scopeArea": 28.2434,
+      "coveredArea": 26.599,
+      "residualArea": 1.6444,
+      "estimated": true
+    },
+    {
+      "tag": "KAM",
+      "scopeArea": 37.9242,
+      "coveredArea": 37.6273,
+      "residualArea": 0.2969,
+      "estimated": false
+    },
+    {
+      "tag": "LBR",
+      "scopeArea": 7.7998,
+      "coveredArea": 7.6716,
+      "residualArea": 0.1282,
+      "estimated": false
+    },
+    {
+      "tag": "MAD",
+      "scopeArea": 51.1633,
+      "coveredArea": 50.7482,
+      "residualArea": 0.4151,
+      "estimated": false
+    },
+    {
+      "tag": "MAR",
+      "scopeArea": 38.5265,
+      "coveredArea": 37.7901,
+      "residualArea": 0.7365,
+      "estimated": false
+    },
+    {
+      "tag": "MOZ",
+      "scopeArea": 67.0194,
+      "coveredArea": 66.5717,
+      "residualArea": 0.4476,
+      "estimated": false
+    },
+    {
+      "tag": "NAT",
+      "scopeArea": 8.6759,
+      "coveredArea": 8.673,
+      "residualArea": 0.0029,
+      "estimated": false
+    },
+    {
+      "tag": "ORF",
+      "scopeArea": 11.9706,
+      "coveredArea": 11.9475,
+      "residualArea": 0.0232,
+      "estimated": false
+    },
+    {
+      "tag": "OTT",
+      "scopeArea": 147.7855,
+      "coveredArea": 147.7032,
+      "residualArea": 0.0822,
+      "estimated": false
+    },
+    {
+      "tag": "PAI",
+      "scopeArea": 3.0125,
+      "coveredArea": 2.8503,
+      "residualArea": 0.1622,
+      "estimated": false
+    },
+    {
+      "tag": "SAH",
+      "scopeArea": 8.0586,
+      "coveredArea": 8.0496,
+      "residualArea": 0.0089,
+      "estimated": false
+    },
+    {
+      "tag": "SGG",
+      "scopeArea": 2.149,
+      "coveredArea": 2.1274,
+      "residualArea": 0.0216,
+      "estimated": false
+    },
+    {
+      "tag": "SOK",
+      "scopeArea": 26.0269,
+      "coveredArea": 26.0108,
+      "residualArea": 0.0161,
+      "estimated": false
+    },
+    {
+      "tag": "SUD",
+      "scopeArea": 165.1338,
+      "coveredArea": 164.6829,
+      "residualArea": 0.4509,
+      "estimated": false
+    },
+    {
+      "tag": "TOG",
+      "scopeArea": 6.3051,
+      "coveredArea": 6.2505,
+      "residualArea": 0.0546,
+      "estimated": false
+    },
+    {
+      "tag": "TUN",
+      "scopeArea": 15.3099,
+      "coveredArea": 15.1266,
+      "residualArea": 0.1833,
+      "estimated": false
+    },
+    {
+      "tag": "WAD",
+      "scopeArea": 55.3721,
+      "coveredArea": 55.3555,
+      "residualArea": 0.0166,
+      "estimated": false
+    },
+    {
+      "tag": "ZAR",
+      "scopeArea": 29.0877,
+      "coveredArea": 29.0335,
+      "residualArea": 0.0542,
+      "estimated": false
+    }
+  ],
+  "overlaps": [
+    {
+      "left": "af-egy-sohag-and-qena",
+      "right": "af-egy-the-western-desert",
+      "area": 0.0145,
+      "bbox": [
+        31.3,
+        25.146,
+        32.93,
+        26.935
+      ]
+    },
+    {
+      "left": "af-alg-bechar-and-the-west-sahara",
+      "right": "af-alg-ouargla-and-the-east-sahara",
+      "area": 0.0128,
+      "bbox": [
+        -8.682,
+        18.989,
+        3.79,
+        32.327
+      ]
+    },
+    {
+      "left": "af-alg-constantine-and-the-east",
+      "right": "af-alg-laghouat-and-the-southern-territories",
+      "area": 0.0118,
+      "bbox": [
+        3.38,
+        34.114,
+        8.602,
+        37.09
+      ]
+    },
+    {
+      "left": "af-egy-cairo",
+      "right": "af-egy-minya-and-asyut",
+      "area": 0.0106,
+      "bbox": [
+        27.325,
+        27.668,
+        31.936,
+        30.588
+      ]
+    },
+    {
+      "left": "af-fwa-niger-the-sahel",
+      "right": "af-fwa-niger-the-sahara",
+      "area": 0.0098,
+      "bbox": [
+        3.874,
+        12.811,
+        12,
+        18.645
+      ]
+    },
+    {
+      "left": "af-egy-aswan-and-the-red-sea",
+      "right": "af-egy-the-western-desert",
+      "area": 0.0095,
+      "bbox": [
+        30.815,
+        21.996,
+        36.87,
+        29.299
+      ]
+    },
+    {
+      "left": "af-sud-blue-nile-and-sennar",
+      "right": "af-sud-kassala-and-the-red-sea",
+      "area": 0.0091,
+      "bbox": [
+        31.518,
+        9.455,
+        35.701,
+        15.432
+      ]
+    },
+    {
+      "left": "af-sud-khartoum",
+      "right": "af-sud-northern-province",
+      "area": 0.0082,
+      "bbox": [
+        31.602,
+        15.178,
+        34.362,
+        16.671
+      ]
+    },
+    {
+      "left": "af-cfs-kwango-and-bandundu",
+      "right": "af-cfs-kasai",
+      "area": 0.0082,
+      "bbox": [
+        15.888,
+        -8.108,
+        21.002,
+        -0.746
+      ]
+    },
+    {
+      "left": "af-cfs-maniema",
+      "right": "af-cfs-south-kivu",
+      "area": 0.008,
+      "bbox": [
+        24.451,
+        -5,
+        28.825,
+        -0.09
+      ]
+    },
+    {
+      "left": "af-fwa-french-sudan-kayes-bamako-and-koulikoro",
+      "right": "af-fwa-guinea-the-upper-niger",
+      "area": 0.0074,
+      "bbox": [
+        -12.264,
+        11.456,
+        -5.945,
+        15.698
+      ]
+    },
+    {
+      "left": "af-moz-nampula",
+      "right": "af-moz-zambezia",
+      "area": 0.0072,
+      "bbox": [
+        36.715,
+        -16.877,
+        40.844,
+        -13.448
+      ]
+    },
+    {
+      "left": "af-ott-benghazi-and-the-jabal-al-akhdar",
+      "right": "af-ott-derna-butnan-and-ajdabiya",
+      "area": 0.0072,
+      "bbox": [
+        19.917,
+        31.025,
+        22.112,
+        32.937
+      ]
+    },
+    {
+      "left": "af-cfs-kasai",
+      "right": "af-cfs-katanga",
+      "area": 0.0071,
+      "bbox": [
+        19.69,
+        -7.938,
+        26.269,
+        -1.746
+      ]
+    },
+    {
+      "left": "af-ang-huila",
+      "right": "af-ang-cunene",
+      "area": 0.0062,
+      "bbox": [
+        13.221,
+        -16.367,
+        16.748,
+        -13.341
+      ]
+    },
+    {
+      "left": "af-sud-kordofan",
+      "right": "af-sud-upper-nile",
+      "area": 0.0061,
+      "bbox": [
+        26.917,
+        9.325,
+        32.435,
+        16.679
+      ]
+    },
+    {
+      "left": "af-fwa-senegal-the-communes-and-the-coast",
+      "right": "af-fwa-senegal-the-interior",
+      "area": 0.0061,
+      "bbox": [
+        -17.534,
+        13.587,
+        -14.586,
+        15.475
+      ]
+    },
+    {
+      "left": "af-eth-amhara-and-begemder",
+      "right": "af-eth-oromia",
+      "area": 0.0058,
+      "bbox": [
+        35.252,
+        8.756,
+        40.196,
+        13.776
+      ]
+    },
+    {
+      "left": "af-cra-northern-rhodesia-southern",
+      "right": "af-cra-southern-rhodesia-mashonaland",
+      "area": 0.0058,
+      "bbox": [
+        24.97,
+        -18.069,
+        33.527,
+        -11.644
+      ]
+    },
+    {
+      "left": "af-fwa-guinea-conakry-and-the-coast",
+      "right": "af-fwa-guinea-boke",
+      "area": 0.0058,
+      "bbox": [
+        -14.145,
+        9.047,
+        -12.11,
+        11.364
+      ]
+    },
+    {
+      "left": "af-fwa-upper-volta-bobo-dioulasso",
+      "right": "af-fwa-upper-volta-dedougou",
+      "area": 0.0058,
+      "bbox": [
+        -5.507,
+        10.689,
+        -2.829,
+        12.072
+      ]
+    },
+    {
+      "left": "af-eth-oromia",
+      "right": "af-eth-sidamo-and-the-southern-provinces",
+      "area": 0.0057,
+      "bbox": [
+        34.085,
+        3.52,
+        42.913,
+        10.382
+      ]
+    },
+    {
+      "left": "af-fea-ubangi-shari-the-west",
+      "right": "af-fea-ubangi-shari-the-centre",
+      "area": 0.0056,
+      "bbox": [
+        14.431,
+        2.236,
+        19.107,
+        7.87
+      ]
+    },
+    {
+      "left": "af-fea-ubangi-shari-the-centre",
+      "right": "af-fea-ubangi-shari-the-east",
+      "area": 0.0056,
+      "bbox": [
+        16.679,
+        4.231,
+        22.147,
+        8.632
+      ]
+    },
+    {
+      "left": "af-kam-central-kamerun",
+      "right": "af-kam-southern-kamerun",
+      "area": 0.0055,
+      "bbox": [
+        9.345,
+        3.134,
+        13.238,
+        6.291
+      ]
+    },
+    {
+      "left": "af-bwa-lagos-colony",
+      "right": "af-bwa-southern-nigeria-the-west",
+      "area": 0.0055,
+      "bbox": [
+        2.705,
+        6.37,
+        4.346,
+        6.705
+      ]
+    },
+    {
+      "left": "af-fwa-guinea-the-upper-niger",
+      "right": "af-fwa-guinea-faranah",
+      "area": 0.0055,
+      "bbox": [
+        -10.898,
+        8.911,
+        -7.968,
+        12.498
+      ]
+    },
+    {
+      "left": "af-fea-chad-the-chari-and-the-lake",
+      "right": "af-fea-chad-the-east",
+      "area": 0.0053,
+      "bbox": [
+        13.449,
+        9.816,
+        20.169,
+        16.904
+      ]
+    },
+    {
+      "left": "af-eth-oromia",
+      "right": "af-eth-benishangul",
+      "area": 0.0052,
+      "bbox": [
+        34.085,
+        3.52,
+        42.913,
+        10.382
+      ]
+    },
+    {
+      "left": "af-sud-kassala-and-the-red-sea",
+      "right": "af-sud-northern-province",
+      "area": 0.0051,
+      "bbox": [
+        33.16,
+        12.665,
+        38.604,
+        21.996
+      ]
+    },
+    {
+      "left": "af-fea-gabon-the-estuary-and-the-coast",
+      "right": "af-fea-gabon-the-interior",
+      "area": 0.0051,
+      "bbox": [
+        8.703,
+        -2.737,
+        10.97,
+        1.06
+      ]
+    },
+    {
+      "left": "af-eth-oromia",
+      "right": "af-eth-ogaden",
+      "area": 0.005,
+      "bbox": [
+        34.085,
+        3.52,
+        42.913,
+        10.382
+      ]
+    },
+    {
+      "left": "af-fwa-french-sudan-tombouctou-gao-and-kidal",
+      "right": "af-fwa-upper-volta-dori",
+      "area": 0.005,
+      "bbox": [
+        -6.593,
+        14.911,
+        4.236,
+        24.995
+      ]
+    }
+  ],
+  "overlapCount": 33,
+  "residuals": [],
+  "warnings": [
+    "1 province code assignments have a label point outside the province map feature (boundary units)",
+    "33 province pairs overlap (largest 0.0145 square degrees: af-egy-sohag-and-qena / af-egy-the-western-desert)",
+    "coverage gap ALG: 1.275 square degrees remain outside the authored provinces",
+    "coverage gap ANG: 0.459 square degrees remain outside the authored provinces",
+    "coverage gap BEA: 0.736 square degrees remain outside the authored provinces",
+    "coverage gap BPO: 0.013 square degrees remain outside the authored provinces",
+    "coverage gap BSO: 0.192 square degrees remain outside the authored provinces",
+    "coverage gap BWA: 0.602 square degrees remain outside the authored provinces",
+    "coverage gap CAP: 0.038 square degrees remain outside the authored provinces",
+    "coverage gap CRA: 0.538 square degrees remain outside the authored provinces",
+    "coverage gap DAR: 0.056 square degrees remain outside the authored provinces",
+    "coverage gap EGY: 0.328 square degrees remain outside the authored provinces",
+    "coverage gap ERI: 0.185 square degrees remain outside the authored provinces",
+    "coverage gap ETH: 0.287 square degrees remain outside the authored provinces",
+    "coverage gap FEA: 3.500 square degrees remain outside the authored provinces",
+    "coverage gap FRA: 0.011 square degrees remain outside the authored provinces",
+    "coverage gap FSO: 0.016 square degrees remain outside the authored provinces",
+    "coverage gap FWA: 0.926 square degrees remain outside the authored provinces",
+    "coverage gap GEA: 0.336 square degrees remain outside the authored provinces",
+    "coverage gap GSW: 0.212 square degrees remain outside the authored provinces",
+    "coverage gap HCT: 0.153 square degrees remain outside the authored provinces",
+    "coverage gap KAM: 0.297 square degrees remain outside the authored provinces",
+    "coverage gap LBR: 0.128 square degrees remain outside the authored provinces",
+    "coverage gap MAD: 0.415 square degrees remain outside the authored provinces",
+    "coverage gap MAR: 0.736 square degrees remain outside the authored provinces",
+    "coverage gap MOZ: 0.448 square degrees remain outside the authored provinces",
+    "coverage gap ORF: 0.023 square degrees remain outside the authored provinces",
+    "coverage gap OTT: 0.082 square degrees remain outside the authored provinces",
+    "coverage gap PAI: 0.162 square degrees remain outside the authored provinces",
+    "coverage gap SGG: 0.022 square degrees remain outside the authored provinces",
+    "coverage gap SOK: 0.016 square degrees remain outside the authored provinces",
+    "coverage gap SUD: 0.451 square degrees remain outside the authored provinces",
+    "coverage gap TOG: 0.055 square degrees remain outside the authored provinces",
+    "coverage gap TUN: 0.183 square degrees remain outside the authored provinces",
+    "coverage gap WAD: 0.017 square degrees remain outside the authored provinces",
+    "coverage gap ZAR: 0.054 square degrees remain outside the authored provinces",
+    "coverage subtraction failed for CFS; residual estimated by area (Error: Unable to complete output ring starting at [17.391449470436164, -7.839444960334575]. Last matching segment found ends at [17.391449470436164, -7.839444960334572].)",
+    "coverage subtraction failed for ITS; residual estimated by area (Error: Unable to complete output ring starting at [45.51976702929368, 5.537579068427728]. Last matching segment found ends at [45.710006, 5.109947].)"
+  ],
+  "sourceCount": 20,
+  "crossFeatureSeamBorders": [
+    {
+      "a": 200001,
+      "b": 200183,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200001,
+      "b": 200232,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200002,
+      "b": 200183,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200008,
+      "b": 200181,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200009,
+      "b": 200181,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200009,
+      "b": 200195,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200010,
+      "b": 200195,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200015,
+      "b": 200090,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200015,
+      "b": 200216,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200015,
+      "b": 200217,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200030,
+      "b": 200033,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200030,
+      "b": 200246,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200032,
+      "b": 200045,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200033,
+      "b": 200045,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200034,
+      "b": 200038,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200035,
+      "b": 200038,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200035,
+      "b": 200061,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200036,
+      "b": 200038,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200036,
+      "b": 200040,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200036,
+      "b": 200061,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200037,
+      "b": 200246,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200039,
+      "b": 200060,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200039,
+      "b": 200061,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200040,
+      "b": 200246,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200042,
+      "b": 200066,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200042,
+      "b": 200159,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200043,
+      "b": 200065,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200043,
+      "b": 200066,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200043,
+      "b": 200159,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200043,
+      "b": 200161,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200045,
+      "b": 200159,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200045,
+      "b": 200167,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200045,
+      "b": 200246,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200046,
+      "b": 200060,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200046,
+      "b": 200066,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200047,
+      "b": 200066,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200056,
+      "b": 200062,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200058,
+      "b": 200062,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200058,
+      "b": 200257,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200062,
+      "b": 200258,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200064,
+      "b": 200223,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200065,
+      "b": 200105,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200065,
+      "b": 200165,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200065,
+      "b": 200223,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200068,
+      "b": 200223,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200068,
+      "b": 200226,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200070,
+      "b": 200215,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200071,
+      "b": 200212,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200071,
+      "b": 200213,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200071,
+      "b": 200214,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200072,
+      "b": 200214,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200074,
+      "b": 200088,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200075,
+      "b": 200158,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200076,
+      "b": 200158,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200076,
+      "b": 200161,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200077,
+      "b": 200161,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200081,
+      "b": 200107,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200081,
+      "b": 200110,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200082,
+      "b": 200166,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200083,
+      "b": 200107,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200083,
+      "b": 200133,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200083,
+      "b": 200137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200084,
+      "b": 200124,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200084,
+      "b": 200125,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200084,
+      "b": 200133,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200085,
+      "b": 200109,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200085,
+      "b": 200110,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200085,
+      "b": 200166,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200086,
+      "b": 200110,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200087,
+      "b": 200176,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200087,
+      "b": 200177,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200088,
+      "b": 200177,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200088,
+      "b": 200178,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200090,
+      "b": 200217,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200090,
+      "b": 200219,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200090,
+      "b": 200221,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200092,
+      "b": 200211,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200092,
+      "b": 200212,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200093,
+      "b": 200170,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200093,
+      "b": 200212,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200094,
+      "b": 200170,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200094,
+      "b": 200204,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200094,
+      "b": 200208,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200094,
+      "b": 200212,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200098,
+      "b": 200143,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200099,
+      "b": 200120,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200100,
+      "b": 200119,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200100,
+      "b": 200120,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200101,
+      "b": 200121,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200101,
+      "b": 200136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200101,
+      "b": 200139,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200101,
+      "b": 200143,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200102,
+      "b": 200114,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200102,
+      "b": 200115,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200102,
+      "b": 200218,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200102,
+      "b": 200220,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200103,
+      "b": 200114,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200103,
+      "b": 200123,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200103,
+      "b": 200218,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200103,
+      "b": 200220,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 200219,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 200220,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 200221,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 200222,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200104,
+      "b": 200223,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200105,
+      "b": 200165,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200105,
+      "b": 200223,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200106,
+      "b": 200123,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200107,
+      "b": 200122,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200107,
+      "b": 200123,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200107,
+      "b": 200136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200107,
+      "b": 200138,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200109,
+      "b": 200166,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200115,
+      "b": 200220,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200121,
+      "b": 200136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200125,
+      "b": 200133,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200125,
+      "b": 200134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200125,
+      "b": 200135,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200127,
+      "b": 200135,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200134,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200135,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200138,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200139,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200140,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200128,
+      "b": 200142,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200129,
+      "b": 200142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200131,
+      "b": 200142,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200132,
+      "b": 200148,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200132,
+      "b": 200154,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200141,
+      "b": 200155,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200144,
+      "b": 200155,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200145,
+      "b": 200151,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200145,
+      "b": 200156,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200146,
+      "b": 200150,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200147,
+      "b": 200150,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200168,
+      "b": 200196,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200168,
+      "b": 200197,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200169,
+      "b": 200197,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200170,
+      "b": 200197,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200170,
+      "b": 200202,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200170,
+      "b": 200203,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200170,
+      "b": 200204,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200171,
+      "b": 200180,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200171,
+      "b": 200181,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200173,
+      "b": 200193,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200173,
+      "b": 200194,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200173,
+      "b": 200252,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200175,
+      "b": 200211,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200175,
+      "b": 200212,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200177,
+      "b": 200212,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200178,
+      "b": 200214,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200178,
+      "b": 200215,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200178,
+      "b": 200224,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200179,
+      "b": 200212,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200194,
+      "b": 200251,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200194,
+      "b": 200252,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200196,
+      "b": 200249,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200196,
+      "b": 200250,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200196,
+      "b": 200251,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200215,
+      "b": 200224,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200215,
+      "b": 200226,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200215,
+      "b": 200260,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200226,
+      "b": 200260,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200229,
+      "b": 200235,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200230,
+      "b": 200245,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200231,
+      "b": 200235,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200231,
+      "b": 200237,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200231,
+      "b": 200245,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200232,
+      "b": 200241,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200232,
+      "b": 200244,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200232,
+      "b": 200245,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200233,
+      "b": 200237,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200233,
+      "b": 200259,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200233,
+      "b": 200260,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200236,
+      "b": 200254,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200236,
+      "b": 200255,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200237,
+      "b": 200255,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 200004,
+      "b": 200078,
+      "lines": 3,
+      "kind": "polity-frontier"
+    },
+    {
+      "a": 200004,
+      "b": 200075,
+      "lines": 1,
+      "kind": "polity-frontier"
+    },
+    {
+      "a": 200005,
+      "b": 200075,
+      "lines": 2,
+      "kind": "polity-frontier"
+    },
+    {
+      "a": 200068,
+      "b": 200069,
+      "lines": 2,
+      "kind": "polity-frontier"
+    },
+    {
+      "a": 200132,
+      "b": 200152,
+      "lines": 1,
+      "kind": "polity-frontier"
+    },
+    {
+      "a": 200183,
+      "b": 200232,
+      "lines": 1,
+      "kind": "province-outline"
+    }
+  ],
+  "crossFeatureSeamBorderCount": 183,
+  "crossFeaturePolityFrontierSeams": [
+    {
+      "kind": "polity-frontier",
+      "a": 200004,
+      "b": 200078,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200004,
+      "b": 200078,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200004,
+      "b": 200075,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200004,
+      "b": 200078,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200005,
+      "b": 200075,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200005,
+      "b": 200075,
+      "source": "BPO/GEA"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200068,
+      "b": 200069,
+      "source": "DAR/WAD"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200068,
+      "b": 200069,
+      "source": "DAR/WAD"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200132,
+      "b": 200152,
+      "source": "MOZ/NAT"
+    },
+    {
+      "kind": "polity-frontier",
+      "a": 200232,
+      "b": 200183,
+      "source": "ALG/FWA"
+    }
+  ],
+  "crossFeaturePolityFrontierSeamCount": 10,
+  "unassignedUnits": [],
+  "unassignedUnitCount": 0,
+  "crossPolityUnitAssignments": [
+    "af-fwa-mauritania-dakhlet-nouadhibou:MR-08(SAH)"
+  ],
+  "crossPolityUnitAssignmentCount": 1,
+  "duplicateUnitClaims": [],
+  "duplicateUnitClaimCount": 0
+}

@@ -155,7 +155,7 @@ export const SOURCES = [
   },
   {
     id: "project-authored-1900",
-    title: "Century M11c authored 1900 boundary reconstruction",
+    title: "Fabric of Nations M11c authored 1900 boundary reconstruction",
     url: "internal:packages/data/data/historical/m11/boundaries_1900.json",
     license: "Project data",
     date: "2026",
@@ -164,7 +164,7 @@ export const SOURCES = [
   },
   {
     id: "project-authored-m12",
-    title: "Century M12a authored provincial partition",
+    title: "Fabric of Nations M12a authored provincial partition",
     url: "internal:scripts/m12/province-plan.mjs",
     license: "Project data",
     date: "2026",
@@ -1668,6 +1668,27 @@ export function buildProvincePlan(units) {
       codes: [code],
     });
   }
+  // The 1920 North Schleswig plebiscite boundary, approximated by the
+  // Tønder-Flensburg line. Using a line instead of a rectangle avoids the
+  // artificial east/west cuts that showed up near the Danish border.
+  const northSchleswigBoundary = [
+    [8.0, 54.95],
+    [8.55, 54.95],
+    [8.95, 54.92],
+    [9.2, 54.89],
+    [9.4, 54.86],
+    [9.65, 54.84],
+    [9.9, 54.82],
+    [10.5, 54.8],
+    [10.5, 56.0],
+    [8.0, 56.0],
+  ];
+  const schleswigHolstein = provinces.find(
+    (province) => province.key === "deu-schleswig-holstein",
+  );
+  if (schleswigHolstein !== undefined) {
+    schleswigHolstein.exclude = [{ polygon: northSchleswigBoundary }];
+  }
   add({
     key: "deu-baden",
     name: "Baden",
@@ -1870,9 +1891,9 @@ export function buildProvincePlan(units) {
     affiliation: "Prussian Province of Schleswig-Holstein",
     confidence: "medium",
     notes:
-      "The northern part of Schleswig, German until the 1920 plebiscite and transferred to Denmark. The 1864 line is generalized.",
+      "The northern part of Schleswig, German until the 1920 plebiscite and transferred to Denmark. The southern boundary follows the approximate Tønder-Flensburg plebiscite line; the northern limit is the 1864 frontier in the M11c base.",
     codes: ["DK-83"],
-    clip: [{ polygon: [[8.3, 54.8], [9.9, 54.8], [9.9, 55.45], [8.3, 55.45]] }],
+    clip: [{ polygon: northSchleswigBoundary }],
   });
   add({
     key: "deu-eupen-malmedy",

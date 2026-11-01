@@ -7,7 +7,7 @@ import {
   formatCount,
   formatQuantity,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   latestMonthlyReport,
   marketsForCountry,
   productionCapacityForGood,
@@ -104,13 +104,13 @@ export function CountryScreen({
         />
         <StatRow
           label="Treasury cash"
-          value={formatSUSD(country.treasuryCashSUSD)}
+          value={formatRUSD(country.treasuryCashRUSD)}
           detail="Country treasury asset balance; stock."
         />
         <StatRow
           label="Public debt"
-          value={formatSUSD(country.debtOutstandingPrincipalSUSD)}
-          detail={`Principal outstanding. Interest payable ${formatSUSD(country.debtInterestPayableSUSD)}.`}
+          value={formatRUSD(country.debtOutstandingPrincipalRUSD)}
+          detail={`Principal outstanding. Interest payable ${formatRUSD(country.debtInterestPayableRUSD)}.`}
         />
       </Section>
 
@@ -227,7 +227,7 @@ export function CountryScreen({
               const price = market.prices.find((entry) => entry.goodId === goodId);
               if (price === undefined) continue;
               stock += price.stockQuantity;
-              prices.push(price.priceSUSD);
+              prices.push(price.priceRUSD);
             }
             const minPrice = prices.length === 0 ? null : Math.min(...prices);
             const maxPrice = prices.length === 0 ? null : Math.max(...prices);
@@ -235,8 +235,8 @@ export function CountryScreen({
               minPrice === null || maxPrice === null
                 ? "no market price"
                 : minPrice === maxPrice
-                  ? `${minPrice.toFixed(4)} SUSD`
-                  : `${minPrice.toFixed(4)}–${maxPrice.toFixed(4)} SUSD`;
+                  ? `${minPrice.toFixed(4)} RUSD`
+                  : `${minPrice.toFixed(4)}–${maxPrice.toFixed(4)} RUSD`;
             return (
               <View key={goodId} style={styles.goodRow}>
                 <View style={styles.goodMain}>
@@ -265,34 +265,34 @@ export function CountryScreen({
           <Text style={styles.empty}>Advance to the end of the first civil month.</Text>
         ) : (
           <>
-            <StatRow label="Income tax" value={formatSUSD(latest.incomeTaxSUSD)} detail="flow" />
+            <StatRow label="Income tax" value={formatRUSD(latest.incomeTaxRUSD)} detail="flow" />
             <StatRow
               label="Welfare expense"
-              value={formatSUSD(latest.welfareExpenseSUSD)}
+              value={formatRUSD(latest.welfareExpenseRUSD)}
               detail="flow"
             />
             <StatRow
               label="Interest expense"
-              value={formatSUSD(latest.interestExpenseSUSD)}
+              value={formatRUSD(latest.interestExpenseRUSD)}
               detail="flow; distinct from principal"
             />
             <StatRow
               label="Net fiscal result"
-              value={formatSUSD(latest.netFiscalResultSUSD)}
+              value={formatRUSD(latest.netFiscalResultRUSD)}
               detail="revenue minus expense for the closed month"
             />
             <StatRow
               label="Treasury at close"
               value={
-                latest.treasuryCash?.endSUSD === undefined
+                latest.treasuryCash?.endRUSD === undefined
                   ? "Not retained"
-                  : formatSUSD(latest.treasuryCash.endSUSD)
+                  : formatRUSD(latest.treasuryCash.endRUSD)
               }
               detail={
-                latest.treasuryCash?.changeSUSD === undefined ||
-                latest.treasuryCash?.changeSUSD === null
+                latest.treasuryCash?.changeRUSD === undefined ||
+                latest.treasuryCash?.changeRUSD === null
                   ? "Balance change not derivable from the retained window"
-                  : `Change ${formatSUSD(latest.treasuryCash.changeSUSD)} vs prior close`
+                  : `Change ${formatRUSD(latest.treasuryCash.changeRUSD)} vs prior close`
               }
             />
             <Text style={styles.note}>

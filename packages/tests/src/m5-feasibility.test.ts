@@ -60,9 +60,9 @@ function recipeMarginAtPrices(
   for (const job of definition.jobs) {
     const profession = professionsById.get(job.professionId);
     if (profession === undefined) throw new Error(`unknown profession ${String(job.professionId)}`);
-    wages += (job.workersPerThroughputUnit * profession.baseWage1900SUSDPerYear) / DAYS_PER_YEAR;
+    wages += (job.workersPerThroughputUnit * profession.baseWage1900RUSDPerYear) / DAYS_PER_YEAR;
   }
-  return revenue - inputCost - wages - definition.dailyUpkeepSUSDAtLevelOne;
+  return revenue - inputCost - wages - definition.dailyUpkeepRUSDAtLevelOne;
 }
 
 function computeMarketCapacities(
@@ -165,8 +165,8 @@ describe("M5 historical scenario feasibility", () => {
   test("all building recipes are profitable at base and opening prices", () => {
     const openingMultiplier = Math.min(
       ...scenario.markets.map((market) => {
-        const prices = market.priceSUSD;
-        const bases = scenario.definitions.goods.map((good) => good.basePrice1900SUSD);
+        const prices = market.priceRUSD;
+        const bases = scenario.definitions.goods.map((good) => good.basePrice1900RUSD);
         return Math.min(...prices.map((price, index) => price / (bases[index] ?? 1)));
       }),
     );
@@ -177,13 +177,13 @@ describe("M5 historical scenario feasibility", () => {
         definition,
         goodsById,
         professionsById,
-        (good) => good.basePrice1900SUSD,
+        (good) => good.basePrice1900RUSD,
       );
       const openingMargin = recipeMarginAtPrices(
         definition,
         goodsById,
         professionsById,
-        (good) => good.basePrice1900SUSD * openingMultiplier,
+        (good) => good.basePrice1900RUSD * openingMultiplier,
       );
       expect(baseMargin).toBeGreaterThan(0);
       expect(openingMargin).toBeGreaterThan(0);
@@ -202,13 +202,13 @@ describe("M5 historical scenario feasibility", () => {
         const profession = professionsById.get(job.professionId);
         if (profession === undefined) throw new Error("missing profession");
         dailyWage +=
-          (job.workersPerThroughputUnit * profession.baseWage1900SUSDPerYear * throughput) /
+          (job.workersPerThroughputUnit * profession.baseWage1900RUSDPerYear * throughput) /
           DAYS_PER_YEAR;
       }
       if (definition.inputs.length > 0) {
         // Input-using buildings cannot earn revenue on their first day because
         // newly produced output cannot serve as an input until the next tick.
-        expect(instance.initialOperatingCashSUSD).toBeGreaterThanOrEqual(dailyWage);
+        expect(instance.initialOperatingCashRUSD).toBeGreaterThanOrEqual(dailyWage);
       } else {
         let dailyRevenue = 0;
         for (const output of definition.outputs) {
@@ -217,11 +217,11 @@ describe("M5 historical scenario feasibility", () => {
           dailyRevenue +=
             output.quantityPerThroughputUnit *
             throughput *
-            good.basePrice1900SUSD *
+            good.basePrice1900RUSD *
             0.25;
         }
-        expect(instance.initialOperatingCashSUSD + dailyRevenue).toBeGreaterThanOrEqual(
-          dailyWage + definition.dailyUpkeepSUSDAtLevelOne * instance.level,
+        expect(instance.initialOperatingCashRUSD + dailyRevenue).toBeGreaterThanOrEqual(
+          dailyWage + definition.dailyUpkeepRUSDAtLevelOne * instance.level,
         );
       }
     }
@@ -246,10 +246,10 @@ describe("M5 historical scenario feasibility", () => {
       .reduce((total, block) => total + populationTotal(block), 0);
     expect(unmetPopulation / before).toBeLessThan(0.1);
     for (const market of world.markets) {
-      for (let goodId = 0; goodId < market.priceSUSD.length; goodId += 1) {
-        const base = scenario.definitions.goods[goodId]!.basePrice1900SUSD;
-        expect(market.priceSUSD[goodId]).toBeGreaterThanOrEqual(base * 0.25 - 1e-12);
-        expect(market.priceSUSD[goodId]).toBeLessThanOrEqual(base * 4 + 1e-12);
+      for (let goodId = 0; goodId < market.priceRUSD.length; goodId += 1) {
+        const base = scenario.definitions.goods[goodId]!.basePrice1900RUSD;
+        expect(market.priceRUSD[goodId]).toBeGreaterThanOrEqual(base * 0.25 - 1e-12);
+        expect(market.priceRUSD[goodId]).toBeLessThanOrEqual(base * 4 + 1e-12);
       }
     }
   });

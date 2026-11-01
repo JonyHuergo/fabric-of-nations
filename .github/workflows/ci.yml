@@ -36,6 +36,12 @@ jobs:
       - name: Boundary checks
         run: pnpm run lint
 
+      - name: Branding audit
+        run: pnpm run audit:branding
+
+      - name: Monetary terminology audit
+        run: pnpm run audit:monetary
+
       - name: Generated artifact checks
         # Runs before typecheck and before the benchmark job's build so a stale
         # committed worker bundle or scenario module fails the correctness job.

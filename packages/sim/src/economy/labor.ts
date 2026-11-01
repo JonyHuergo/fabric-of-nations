@@ -17,9 +17,9 @@
  */
 
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD, RATE_DECIMAL_PLACES } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, workingAgePopulation } from "../population/state.js";
-import type { Day, Id, MoneySUSD, Rate } from "../types.js";
+import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import {
   requireFiniteNumber,
   requireInteger,
@@ -30,7 +30,7 @@ import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import {
-  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD,
+  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD,
   E5_RATE_DECIMALS,
   HEALTH_MAX_MORTALITY_REDUCTION,
   HEALTH_QUALITY_FUNDING_WEIGHT,
@@ -42,15 +42,15 @@ import {
   LABOR_MIN_HOURS_PER_WEEK,
   LABOR_STANDARD_HOURS_PER_WEEK,
   MAX_LABOR_HOURS_PER_WEEK,
-  MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR,
-  MAX_TRAINING_BUDGET_SUSD_PER_YEAR,
-  MAX_TRAINING_STIPEND_SUSD_PER_YEAR,
+  MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR,
+  MAX_TRAINING_BUDGET_RUSD_PER_YEAR,
+  MAX_TRAINING_STIPEND_RUSD_PER_YEAR,
   MIN_COMBINED_MORTALITY_FACTOR,
   QUALIFICATION_PRODUCTIVITY_PREMIUM,
   QUALIFICATION_WAGE_PREMIUM,
   TRAINEES_PER_INSTRUCTOR,
   TRAINING_DAILY_QUALIFICATION_GAIN,
-  TRAINING_INSTRUCTOR_COST_PER_YEAR_SUSD,
+  TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD,
   TRAINING_MAX_PARTICIPATION,
   TRAINING_MIN_LITERACY,
   TRAINING_QUALITY_FUNDING_WEIGHT,
@@ -102,13 +102,13 @@ function lawInSlot(
 /** Neutral E5 policy for worlds without labor/health inputs. */
 export function neutralLaborPolicyState(): LaborPolicyState {
   return {
-    trainingBudgetSUSDPerYear: 0,
-    trainingStipendPerTraineeSUSDPerYear: 0,
+    trainingBudgetRUSDPerYear: 0,
+    trainingStipendPerTraineeRUSDPerYear: 0,
     trainingStaffShare: 0,
     trainingParticipation: 0,
     lastUpdateDay: null,
-    trainingRequestedMonthToDateSUSD: 0,
-    trainingShortfallMonthToDateSUSD: 0,
+    trainingRequestedMonthToDateRUSD: 0,
+    trainingShortfallMonthToDateRUSD: 0,
   };
 }
 
@@ -119,23 +119,23 @@ export function assertValidLaborPolicyInput(
 ): void {
   if (input === undefined) return;
   const record = requireRecord(input, path);
-  if (record.trainingBudgetSUSDPerYear !== undefined) {
+  if (record.trainingBudgetRUSDPerYear !== undefined) {
     const value = requireFiniteNumber(
-      record.trainingBudgetSUSDPerYear,
-      `${path}.trainingBudgetSUSDPerYear`,
+      record.trainingBudgetRUSDPerYear,
+      `${path}.trainingBudgetRUSDPerYear`,
     );
-    if (value < 0 || value > MAX_TRAINING_BUDGET_SUSD_PER_YEAR) {
-      throw new RangeError(`${path}.trainingBudgetSUSDPerYear is out of range`);
+    if (value < 0 || value > MAX_TRAINING_BUDGET_RUSD_PER_YEAR) {
+      throw new RangeError(`${path}.trainingBudgetRUSDPerYear is out of range`);
     }
   }
-  if (record.trainingStipendPerTraineeSUSDPerYear !== undefined) {
+  if (record.trainingStipendPerTraineeRUSDPerYear !== undefined) {
     const value = requireFiniteNumber(
-      record.trainingStipendPerTraineeSUSDPerYear,
-      `${path}.trainingStipendPerTraineeSUSDPerYear`,
+      record.trainingStipendPerTraineeRUSDPerYear,
+      `${path}.trainingStipendPerTraineeRUSDPerYear`,
     );
-    if (value < 0 || value > MAX_TRAINING_STIPEND_SUSD_PER_YEAR) {
+    if (value < 0 || value > MAX_TRAINING_STIPEND_RUSD_PER_YEAR) {
       throw new RangeError(
-        `${path}.trainingStipendPerTraineeSUSDPerYear is out of range`,
+        `${path}.trainingStipendPerTraineeRUSDPerYear is out of range`,
       );
     }
   }
@@ -166,9 +166,9 @@ export function createLaborPolicyState(
 ): { labor: LaborPolicyState; healthStaffShare: Rate } {
   assertValidLaborPolicyInput(input, path);
   const labor = neutralLaborPolicyState();
-  labor.trainingBudgetSUSDPerYear = input?.trainingBudgetSUSDPerYear ?? 0;
-  labor.trainingStipendPerTraineeSUSDPerYear =
-    input?.trainingStipendPerTraineeSUSDPerYear ?? 0;
+  labor.trainingBudgetRUSDPerYear = input?.trainingBudgetRUSDPerYear ?? 0;
+  labor.trainingStipendPerTraineeRUSDPerYear =
+    input?.trainingStipendPerTraineeRUSDPerYear ?? 0;
   labor.trainingStaffShare = input?.trainingStaffShare ?? 0;
   return { labor, healthStaffShare: input?.healthStaffShare ?? 0 };
 }
@@ -181,18 +181,18 @@ export function assertValidLaborPolicyState(
 ): void {
   const record = requireRecord(state, path);
   const budget = requireFiniteNumber(
-    record.trainingBudgetSUSDPerYear,
-    `${path}.trainingBudgetSUSDPerYear`,
+    record.trainingBudgetRUSDPerYear,
+    `${path}.trainingBudgetRUSDPerYear`,
   );
-  if (budget < 0 || budget > MAX_TRAINING_BUDGET_SUSD_PER_YEAR) {
-    throw new RangeError(`${path}.trainingBudgetSUSDPerYear is out of range`);
+  if (budget < 0 || budget > MAX_TRAINING_BUDGET_RUSD_PER_YEAR) {
+    throw new RangeError(`${path}.trainingBudgetRUSDPerYear is out of range`);
   }
   const stipend = requireFiniteNumber(
-    record.trainingStipendPerTraineeSUSDPerYear,
-    `${path}.trainingStipendPerTraineeSUSDPerYear`,
+    record.trainingStipendPerTraineeRUSDPerYear,
+    `${path}.trainingStipendPerTraineeRUSDPerYear`,
   );
-  if (stipend < 0 || stipend > MAX_TRAINING_STIPEND_SUSD_PER_YEAR) {
-    throw new RangeError(`${path}.trainingStipendPerTraineeSUSDPerYear is out of range`);
+  if (stipend < 0 || stipend > MAX_TRAINING_STIPEND_RUSD_PER_YEAR) {
+    throw new RangeError(`${path}.trainingStipendPerTraineeRUSDPerYear is out of range`);
   }
   const share = requireFiniteNumber(record.trainingStaffShare, `${path}.trainingStaffShare`);
   if (share < 0 || share > 1) {
@@ -209,29 +209,29 @@ export function assertValidLaborPolicyState(
     requireInteger(record.lastUpdateDay, `${path}.lastUpdateDay`, 0, dayIndex);
   }
   const requested = requireFiniteNumber(
-    record.trainingRequestedMonthToDateSUSD,
-    `${path}.trainingRequestedMonthToDateSUSD`,
+    record.trainingRequestedMonthToDateRUSD,
+    `${path}.trainingRequestedMonthToDateRUSD`,
   );
   const shortfall = requireFiniteNumber(
-    record.trainingShortfallMonthToDateSUSD,
-    `${path}.trainingShortfallMonthToDateSUSD`,
+    record.trainingShortfallMonthToDateRUSD,
+    `${path}.trainingShortfallMonthToDateRUSD`,
   );
   if (requested < 0 || shortfall < 0) {
     throw new RangeError(`${path} training memo must be non-negative`);
   }
-  if (shortfall > requested + MONEY_TOLERANCE_SUSD * Math.max(1, requested)) {
-    throw new RangeError(`${path}.trainingShortfallMonthToDateSUSD must not exceed the request`);
+  if (shortfall > requested + MONEY_TOLERANCE_RUSD * Math.max(1, requested)) {
+    throw new RangeError(`${path}.trainingShortfallMonthToDateRUSD must not exceed the request`);
   }
 }
 
 /** Statutory minimum-wage floor for a country, or 0 when none applies. */
-export function laborMinimumWageSUSDPerYear(
+export function laborMinimumWageRUSDPerYear(
   country: Country,
   definitions: EconomyDefinitions | undefined,
-): MoneySUSD {
+): MoneyRUSD {
   const law = lawInSlot(country, definitions, "labor");
   if (law === null) return 0;
-  return clamp(law.laborMinimumWageSUSDPerYear, 0, MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR);
+  return clamp(law.laborMinimumWageRUSDPerYear, 0, MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR);
 }
 
 /**
@@ -318,10 +318,10 @@ export function deriveHealth(
     population > 0
       ? clamp(healthStaff / population / HEALTH_TARGET_STAFF_PER_CAPITA, 0, 1)
       : 0;
-  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD;
+  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD;
   const fundingRatio =
     fundingBenchmark > 0
-      ? clamp(country.institutions.fundedAnnualSUSD / fundingBenchmark, 0, 1)
+      ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
       : 0;
   const literacy = population > 0 ? literacyWeighted / population : 0;
   const quality = clamp(
@@ -395,7 +395,7 @@ export function deriveTraining(
   const instructors = Math.max(0, education.trainingStaff);
   const capacityTrainees = Math.floor(instructors * TRAINEES_PER_INSTRUCTOR);
   const labor = country.labor ?? neutralLaborPolicyState();
-  const funded = labor.trainingBudgetSUSDPerYear > 0;
+  const funded = labor.trainingBudgetRUSDPerYear > 0;
   const rawParticipation =
     funded && instructors > 0 && eligibleWorkingAge > 0
       ? clamp(
@@ -422,11 +422,11 @@ export interface TrainingCountryResult {
   readonly countryId: Id;
   readonly instructors: number;
   readonly trainees: number;
-  readonly requestedSUSD: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
-  readonly payrollPaidSUSD: number;
-  readonly stipendPaidSUSD: number;
+  readonly requestedRUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
+  readonly payrollPaidRUSD: number;
+  readonly stipendPaidRUSD: number;
   readonly quality: Rate;
   readonly qualifiedBlocks: number;
 }
@@ -435,8 +435,8 @@ export interface TrainingCountryResult {
 export interface TrainingPhaseResult {
   readonly dayIndex: Day;
   readonly countries: readonly TrainingCountryResult[];
-  readonly totalPaidSUSD: number;
-  readonly totalRequestedSUSD: number;
+  readonly totalPaidRUSD: number;
+  readonly totalRequestedRUSD: number;
 }
 
 function allocateExact(
@@ -475,8 +475,8 @@ export function runLaborMonthStart(
       ...neutralLaborPolicyState(),
       ...country.labor,
       trainingParticipation: derived.participation,
-      trainingRequestedMonthToDateSUSD: 0,
-      trainingShortfallMonthToDateSUSD: 0,
+      trainingRequestedMonthToDateRUSD: 0,
+      trainingShortfallMonthToDateRUSD: 0,
       lastUpdateDay: day,
     };
   }
@@ -493,7 +493,7 @@ export function runTrainingPhase(
   day: Day,
 ): TrainingPhaseResult {
   if (definitions === undefined) {
-    return { dayIndex: day, countries: [], totalPaidSUSD: 0, totalRequestedSUSD: 0 };
+    return { dayIndex: day, countries: [], totalPaidRUSD: 0, totalRequestedRUSD: 0 };
   }
   const yearDays = daysInYear(dayIndexToCivilDate(day).year);
   const derivedByCountry = new Map<Id, TrainingDerived>();
@@ -526,13 +526,13 @@ export function runTrainingPhase(
     if (!(derived.participation > 0)) continue;
     const labor = country.labor ?? neutralLaborPolicyState();
     const eligible = trainingEligibleBlocks(world, country);
-    const requestedPayroll = labor.trainingBudgetSUSDPerYear / yearDays;
+    const requestedPayroll = labor.trainingBudgetRUSDPerYear / yearDays;
     const requestedStipend =
-      (labor.trainingStipendPerTraineeSUSDPerYear * derived.trainees) / yearDays;
+      (labor.trainingStipendPerTraineeRUSDPerYear * derived.trainees) / yearDays;
     const requested = requestedPayroll + requestedStipend;
     if (!(requested > 0)) continue;
     const treasury = index.get("country", country.id, "treasury-cash");
-    const ceiling = Math.max(0, treasury.balanceSUSD - country.fiscal.reserveTargetSUSD);
+    const ceiling = Math.max(0, treasury.balanceRUSD - country.fiscal.reserveTargetRUSD);
     const paid = Math.min(requested, ceiling);
     const scale = requested > 0 ? paid / requested : 0;
     const payrollPaid = requestedPayroll * scale;
@@ -554,24 +554,24 @@ export function runTrainingPhase(
         lines.push({
           accountId: index.get("popBlock", block.id, "household-cash").id,
           side: "debit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         });
         lines.push({
           accountId: index.get("popBlock", block.id, "training-income").id,
           side: "credit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         });
       }
       if (lines.length > 0) {
         lines.push({
           accountId: index.get("country", country.id, "training-expense").id,
           side: "debit",
-          amountSUSD: payrollPaid,
+          amountRUSD: payrollPaid,
         });
         lines.push({
           accountId: treasury.id,
           side: "credit",
-          amountSUSD: payrollPaid,
+          amountRUSD: payrollPaid,
         });
         entries.push({
           transactionKind: "training-payroll",
@@ -594,24 +594,24 @@ export function runTrainingPhase(
         lines.push({
           accountId: index.get("popBlock", entry.block.id, "household-cash").id,
           side: "debit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         });
         lines.push({
           accountId: index.get("popBlock", entry.block.id, "training-income").id,
           side: "credit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         });
       }
       if (lines.length > 0) {
         lines.push({
           accountId: index.get("country", country.id, "training-expense").id,
           side: "debit",
-          amountSUSD: stipendPaid,
+          amountRUSD: stipendPaid,
         });
         lines.push({
           accountId: treasury.id,
           side: "credit",
-          amountSUSD: stipendPaid,
+          amountRUSD: stipendPaid,
         });
         entries.push({
           transactionKind: "training-stipend",
@@ -624,11 +624,11 @@ export function runTrainingPhase(
 
     const shortfall = Math.max(0, requested - paid);
     accumulateBudgetMemo(stagedFinance, country.id, {
-      trainingRequestedSUSD: requested,
-      trainingShortfallSUSD: shortfall,
+      trainingRequestedRUSD: requested,
+      trainingShortfallRUSD: shortfall,
     });
     const instructorBenchmark =
-      derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_SUSD;
+      derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD;
     const fundingAdequacy =
       instructorBenchmark > 0 ? clamp(payrollPaid / instructorBenchmark, 0, 1) : 0;
     const quality = clamp(
@@ -667,7 +667,7 @@ export function runTrainingPhase(
           draft.quality *
           // Funding adequacy gates the service: a nominally staffed but unfunded
           // program cannot produce qualification gains.
-          (draft.payrollPaid / Math.max(1e-12, draft.derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_SUSD)) *
+          (draft.payrollPaid / Math.max(1e-12, draft.derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD)) *
           gap;
         if (gain <= 0) continue;
         block.qualification = roundTo(
@@ -680,10 +680,10 @@ export function runTrainingPhase(
     draft.country.labor = {
       ...neutralLaborPolicyState(),
       ...draft.country.labor,
-      trainingRequestedMonthToDateSUSD:
-        draft.country.labor.trainingRequestedMonthToDateSUSD + draft.requested,
-      trainingShortfallMonthToDateSUSD:
-        draft.country.labor.trainingShortfallMonthToDateSUSD +
+      trainingRequestedMonthToDateRUSD:
+        draft.country.labor.trainingRequestedMonthToDateRUSD + draft.requested,
+      trainingShortfallMonthToDateRUSD:
+        draft.country.labor.trainingShortfallMonthToDateRUSD +
         Math.max(0, draft.requested - draft.paid),
       lastUpdateDay: day,
     };
@@ -691,21 +691,21 @@ export function runTrainingPhase(
       countryId: draft.country.id,
       instructors: draft.derived.instructors,
       trainees: roundTo(draft.derived.trainees, 2),
-      requestedSUSD: roundTo(draft.requested, 6),
-      paidSUSD: roundTo(draft.paid, 6),
-      shortfallSUSD: roundTo(Math.max(0, draft.requested - draft.paid), 6),
-      payrollPaidSUSD: roundTo(draft.payrollPaid, 6),
-      stipendPaidSUSD: roundTo(draft.stipendPaid, 6),
+      requestedRUSD: roundTo(draft.requested, 6),
+      paidRUSD: roundTo(draft.paid, 6),
+      shortfallRUSD: roundTo(Math.max(0, draft.requested - draft.paid), 6),
+      payrollPaidRUSD: roundTo(draft.payrollPaid, 6),
+      stipendPaidRUSD: roundTo(draft.stipendPaid, 6),
       quality: roundTo(draft.quality, E5_RATE_DECIMALS),
       qualifiedBlocks,
     });
   }
-  const totalPaidSUSD = results.reduce((total, result) => total + result.paidSUSD, 0);
-  const totalRequestedSUSD = results.reduce(
-    (total, result) => total + result.requestedSUSD,
+  const totalPaidRUSD = results.reduce((total, result) => total + result.paidRUSD, 0);
+  const totalRequestedRUSD = results.reduce(
+    (total, result) => total + result.requestedRUSD,
     0,
   );
-  return { dayIndex: day, countries: results, totalPaidSUSD, totalRequestedSUSD };
+  return { dayIndex: day, countries: results, totalPaidRUSD, totalRequestedRUSD };
 }
 
 /** Qualification wage multiplier for one block. */
@@ -753,12 +753,12 @@ function countryForAction(world: World, countryId: Id): Country {
 export function validateTrainingBudget(
   world: World,
   definitions: EconomyDefinitions | undefined,
-  input: { readonly countryId: Id; readonly annualSUSD: number },
+  input: { readonly countryId: Id; readonly annualRUSD: number },
 ): Country {
   void definitions;
   const country = countryForAction(world, input.countryId);
-  const annual = requireFiniteNumber(input.annualSUSD, "action.annualSUSD");
-  if (annual < 0 || annual > MAX_TRAINING_BUDGET_SUSD_PER_YEAR) {
+  const annual = requireFiniteNumber(input.annualRUSD, "action.annualRUSD");
+  if (annual < 0 || annual > MAX_TRAINING_BUDGET_RUSD_PER_YEAR) {
     throw new RangeError("training budget is out of range");
   }
   return country;
@@ -768,12 +768,12 @@ export function validateTrainingBudget(
 export function validateTrainingStipend(
   world: World,
   definitions: EconomyDefinitions | undefined,
-  input: { readonly countryId: Id; readonly annualSUSD: number },
+  input: { readonly countryId: Id; readonly annualRUSD: number },
 ): Country {
   void definitions;
   const country = countryForAction(world, input.countryId);
-  const annual = requireFiniteNumber(input.annualSUSD, "action.annualSUSD");
-  if (annual < 0 || annual > MAX_TRAINING_STIPEND_SUSD_PER_YEAR) {
+  const annual = requireFiniteNumber(input.annualRUSD, "action.annualRUSD");
+  if (annual < 0 || annual > MAX_TRAINING_STIPEND_RUSD_PER_YEAR) {
     throw new RangeError("training stipend is out of range");
   }
   return country;

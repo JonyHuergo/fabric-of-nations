@@ -118,9 +118,9 @@ function summaryFor(
     tier,
     active,
     fullyMet,
-    desiredCostSUSD: desiredCost,
-    fundedCostSUSD: fundedCost,
-    spentSUSD: spent,
+    desiredCostRUSD: desiredCost,
+    fundedCostRUSD: fundedCost,
+    spentRUSD: spent,
   };
 }
 
@@ -160,11 +160,11 @@ export function settlePopulationNeeds(
   }
   const priceByGood = new Map<string, number>();
   for (const price of inputs.prices) {
-    priceByGood.set(price.goodKey, price.unitPriceSUSD);
+    priceByGood.set(price.goodKey, price.unitPriceRUSD);
   }
   const incomeById = new Map<
     Id,
-    { annualSettledIncomePerCapitaSUSD: number; annualMandatoryPaymentsPerCapitaSUSD: number }
+    { annualSettledIncomePerCapitaRUSD: number; annualMandatoryPaymentsPerCapitaRUSD: number }
   >();
   for (const income of inputs.income) {
     incomeById.set(income.popBlockId, income);
@@ -180,8 +180,8 @@ export function settlePopulationNeeds(
       throw new RangeError(`missing income fixture for popBlock ${String(block.id)}`);
     }
     const daily = dailyDisposablePerCapita(
-      income.annualSettledIncomePerCapitaSUSD,
-      income.annualMandatoryPaymentsPerCapitaSUSD,
+      income.annualSettledIncomePerCapitaRUSD,
+      income.annualMandatoryPaymentsPerCapitaRUSD,
       days,
     );
     const budgetStart = daily * blockPopulation;
@@ -363,9 +363,9 @@ export function settlePopulationNeeds(
     results.push({
       popBlockId: block.id,
       population: draft.population,
-      budgetStartBeforeNeedsSUSD: draft.budgetStart,
-      budgetEndAfterNeedsSUSD: draft.budget,
-      spentSUSD: draft.spent,
+      budgetStartBeforeNeedsRUSD: draft.budgetStart,
+      budgetEndAfterNeedsRUSD: draft.budget,
+      spentRUSD: draft.spent,
       tiers: collectNeedDetails ? draft.tierResults : [],
       tierSummaries: draft.tierSummaries,
     });

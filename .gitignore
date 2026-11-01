@@ -12,3 +12,5 @@ dist-ios/
 dist-android/
 .cache-m11/
 .cache-m11d/
+.cache-m12e/
+.cache-map/

@@ -29,8 +29,8 @@ export function e5Scenario(options: E5FixtureOptions = {}): EconomyScenarioDef {
     return {
       ...country,
       labor: {
-        trainingBudgetSUSDPerYear: options.trainingBudgetA ?? E5_TRAINING_BUDGET,
-        trainingStipendPerTraineeSUSDPerYear:
+        trainingBudgetRUSDPerYear: options.trainingBudgetA ?? E5_TRAINING_BUDGET,
+        trainingStipendPerTraineeRUSDPerYear:
           options.trainingStipendA ?? E5_TRAINING_STIPEND,
         trainingStaffShare: options.trainingStaffShareA ?? E5_TRAINING_STAFF_SHARE,
         healthStaffShare: options.healthStaffShareA ?? E5_HEALTH_STAFF_SHARE,

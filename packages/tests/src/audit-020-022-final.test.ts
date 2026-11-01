@@ -35,7 +35,7 @@ function militaryScenario(): EconomyScenarioDef {
   const scenario = m5Scenario();
   scenario.military = {};
   for (const country of scenario.countries ?? []) {
-    country.initialTreasuryCashSUSD = 1_000_000;
+    country.initialTreasuryCashRUSD = 1_000_000;
   }
   return scenario;
 }

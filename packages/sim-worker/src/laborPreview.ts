@@ -18,7 +18,7 @@ import type { CountrySnapshot, SimulationSnapshot } from "./protocol.js";
 export interface TrainingPolicyPreview {
   readonly valid: boolean;
   readonly errors: readonly string[];
-  readonly annualCostSUSD: number;
+  readonly annualCostRUSD: number;
   readonly instructors: number;
   readonly capacityTrainees: number;
   readonly participation: number;
@@ -50,8 +50,8 @@ export function previewTrainingPolicy(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
   proposed: {
-    readonly trainingBudgetSUSDPerYear?: number;
-    readonly trainingStipendPerTraineeSUSDPerYear?: number;
+    readonly trainingBudgetRUSDPerYear?: number;
+    readonly trainingStipendPerTraineeRUSDPerYear?: number;
     readonly trainingStaffShare?: number;
   },
 ): TrainingPolicyPreview {
@@ -60,10 +60,10 @@ export function previewTrainingPolicy(
     errors.push("Only the player-controlled country may change labor policy.");
   }
   const labor = country.labor;
-  const budget = proposed.trainingBudgetSUSDPerYear ?? labor.trainingBudgetSUSDPerYear;
+  const budget = proposed.trainingBudgetRUSDPerYear ?? labor.trainingBudgetRUSDPerYear;
   const stipend =
-    proposed.trainingStipendPerTraineeSUSDPerYear ??
-    labor.trainingStipendPerTraineeSUSDPerYear;
+    proposed.trainingStipendPerTraineeRUSDPerYear ??
+    labor.trainingStipendPerTraineeRUSDPerYear;
   const share = proposed.trainingStaffShare ?? labor.trainingStaffShare;
   if (budget < 0 || stipend < 0) errors.push("Training amounts must be non-negative.");
   if (share < 0 || share > 1) errors.push("Training staff share must be in 0..1.");
@@ -102,7 +102,7 @@ export function previewTrainingPolicy(
   return {
     valid: errors.length === 0,
     errors,
-    annualCostSUSD: annualCost,
+    annualCostRUSD: annualCost,
     instructors,
     capacityTrainees,
     participation,

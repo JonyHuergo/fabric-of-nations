@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatSUSD,
+  formatRUSD,
   previewHealthPolicy,
   previewTrainingPolicy,
   type SimulationSnapshot,
@@ -35,15 +35,15 @@ export function LaborScreen({
 
   useEffect(() => {
     if (country === null) return;
-    setBudgetText(country.labor.trainingBudgetSUSDPerYear.toFixed(0));
-    setStipendText(country.labor.trainingStipendPerTraineeSUSDPerYear.toFixed(2));
+    setBudgetText(country.labor.trainingBudgetRUSDPerYear.toFixed(0));
+    setStipendText(country.labor.trainingStipendPerTraineeRUSDPerYear.toFixed(2));
     setTrainingShareText(country.labor.trainingStaffShare.toFixed(2));
     setHealthShareText(country.labor.healthStaffShare.toFixed(2));
     setLocalError(null);
   }, [
     countryId,
-    country?.labor.trainingBudgetSUSDPerYear,
-    country?.labor.trainingStipendPerTraineeSUSDPerYear,
+    country?.labor.trainingBudgetRUSDPerYear,
+    country?.labor.trainingStipendPerTraineeRUSDPerYear,
     country?.labor.trainingStaffShare,
     country?.labor.healthStaffShare,
   ]);
@@ -75,28 +75,28 @@ export function LaborScreen({
   }) => {
     if (country === null) return null;
     return previewTrainingPolicy(snapshot, country, {
-      trainingBudgetSUSDPerYear: overrides.budget ?? Number(budgetText),
-      trainingStipendPerTraineeSUSDPerYear: overrides.stipend ?? Number(stipendText),
+      trainingBudgetRUSDPerYear: overrides.budget ?? Number(budgetText),
+      trainingStipendPerTraineeRUSDPerYear: overrides.stipend ?? Number(stipendText),
       trainingStaffShare: overrides.share ?? Number(trainingShareText),
     });
   };
 
-  const applyTrainingBudget = (annualSUSDOverride?: number): void => {
+  const applyTrainingBudget = (annualRUSDOverride?: number): void => {
     if (country === null) return;
-    const annualSUSD = annualSUSDOverride ?? Number(budgetText);
-    const preview = trainingPreviewFor({ budget: annualSUSD });
+    const annualRUSD = annualRUSDOverride ?? Number(budgetText);
+    const preview = trainingPreviewFor({ budget: annualRUSD });
     submit(
-      { kind: "set-training-budget", countryId: country.id, annualSUSD },
+      { kind: "set-training-budget", countryId: country.id, annualRUSD },
       preview !== null && preview.errors.length > 0 ? preview.errors.join(" ") : null,
     );
   };
 
-  const applyTrainingStipend = (annualSUSDOverride?: number): void => {
+  const applyTrainingStipend = (annualRUSDOverride?: number): void => {
     if (country === null) return;
-    const annualSUSD = annualSUSDOverride ?? Number(stipendText);
-    const preview = trainingPreviewFor({ stipend: annualSUSD });
+    const annualRUSD = annualRUSDOverride ?? Number(stipendText);
+    const preview = trainingPreviewFor({ stipend: annualRUSD });
     submit(
-      { kind: "set-training-stipend", countryId: country.id, annualSUSD },
+      { kind: "set-training-stipend", countryId: country.id, annualRUSD },
       preview !== null && preview.errors.length > 0 ? preview.errors.join(" ") : null,
     );
   };
@@ -141,8 +141,8 @@ export function LaborScreen({
   const parsedTrainingShare = Number(trainingShareText);
   const parsedHealthShare = Number(healthShareText);
   const trainingPreview = previewTrainingPolicy(snapshot, country, {
-    trainingBudgetSUSDPerYear: parsedBudget,
-    trainingStipendPerTraineeSUSDPerYear: parsedStipend,
+    trainingBudgetRUSDPerYear: parsedBudget,
+    trainingStipendPerTraineeRUSDPerYear: parsedStipend,
     trainingStaffShare: parsedTrainingShare,
   });
   const healthPreview = previewHealthPolicy(snapshot, country, parsedHealthShare);
@@ -151,13 +151,13 @@ export function LaborScreen({
   // The annual step is 1% of the slider maximum; share steps are 0.01.
   const budgetMax = Math.max(
     1_000_000,
-    Math.round(country.treasuryCashSUSD * 0.5),
-    Math.round(country.labor.trainingBudgetSUSDPerYear * 2),
+    Math.round(country.treasuryCashRUSD * 0.5),
+    Math.round(country.labor.trainingBudgetRUSDPerYear * 2),
   );
   const budgetStep = Math.max(1_000, Math.round(budgetMax / 100));
   const stipendMax = Math.max(
     10_000,
-    Math.round(country.labor.trainingStipendPerTraineeSUSDPerYear * 2),
+    Math.round(country.labor.trainingStipendPerTraineeRUSDPerYear * 2),
   );
   const stipendStep = Math.max(100, Math.round(stipendMax / 100));
   // Authoritative validation also caps training at 1 - researchStaffShare.
@@ -200,19 +200,19 @@ export function LaborScreen({
       />
       <StatRow
         label="Training budget"
-        value={`${formatSUSD(country.labor.trainingBudgetSUSDPerYear)}/year`}
+        value={`${formatRUSD(country.labor.trainingBudgetRUSDPerYear)}/year`}
       />
       <StatRow
         label="Stipend per trainee"
-        value={`${formatSUSD(country.labor.trainingStipendPerTraineeSUSDPerYear)}/year`}
+        value={`${formatRUSD(country.labor.trainingStipendPerTraineeRUSDPerYear)}/year`}
       />
       <StatRow
         label="Month-to-date requested"
-        value={formatSUSD(country.labor.trainingRequestedMonthToDateSUSD)}
+        value={formatRUSD(country.labor.trainingRequestedMonthToDateRUSD)}
       />
       <StatRow
         label="Month-to-date shortfall"
-        value={formatSUSD(country.labor.trainingShortfallMonthToDateSUSD)}
+        value={formatRUSD(country.labor.trainingShortfallMonthToDateRUSD)}
       />
       {country.labor.trainingBlockedReason !== null ? (
         <Notice title="Training blocked" tone="warning">
@@ -237,7 +237,7 @@ export function LaborScreen({
         max={budgetMax}
         step={budgetStep}
         precision={0}
-        unit="SUSD/yr"
+        unit="RUSD/yr"
         disabled={!canAct}
         pending={budgetCommit.hasPending}
         onChange={(value) => setBudgetText(value.toFixed(0))}
@@ -251,7 +251,7 @@ export function LaborScreen({
         max={stipendMax}
         step={stipendStep}
         precision={0}
-        unit="SUSD/yr"
+        unit="RUSD/yr"
         disabled={!canAct}
         pending={stipendCommit.hasPending}
         onChange={(value) => setStipendText(value.toFixed(2))}
@@ -287,7 +287,7 @@ export function LaborScreen({
         />
         <StatRow
           label="Annual cost (budget + stipend)"
-          value={`${formatSUSD(trainingPreview.annualCostSUSD)}/year`}
+          value={`${formatRUSD(trainingPreview.annualCostRUSD)}/year`}
         />
         <StatRow
           label="Qualification gain (first year)"
@@ -392,8 +392,8 @@ export function LaborScreen({
       <StatRow
         label="Statutory minimum wage"
         value={
-          country.labor.minimumWageSUSDPerYear > 0
-            ? `${formatSUSD(country.labor.minimumWageSUSDPerYear)}/year`
+          country.labor.minimumWageRUSDPerYear > 0
+            ? `${formatRUSD(country.labor.minimumWageRUSDPerYear)}/year`
             : "No floor enacted"
         }
       />

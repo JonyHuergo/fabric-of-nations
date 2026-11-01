@@ -1,5 +1,5 @@
 /**
- * Public API for the pure Century simulation package.
+ * Public API for the pure Fabric of Nations simulation package.
  *
  * M1 provides core types, calendar, keyed randomness, the minimal world state,
  * the tick driver, versioned serialization, and the test state digest. M2.1 adds

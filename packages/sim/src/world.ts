@@ -6,7 +6,7 @@
  * authoritative stock lots, and a minimal cash ledger. M3b adds the persisted
  * employment-dirty scheduling marker. M4a-1 adds category-aware accounts.
  * M4a-2 adds authoritative country, currency-issuer, monetary-arrangement, and
- * SUSD-relative valuation state. Later systems (debt, armies, events, history)
+ * RUSD-relative valuation state. Later systems (debt, armies, events, history)
  * remain future milestones and are not invented here.
  */
 
@@ -95,7 +95,7 @@ export interface World {
   countries: Country[];
   /** M4a-2 currency identity and issuer. */
   currencies: Currency[];
-  /** M4a-2 SUSD-relative valuations, one per registered currency. */
+  /** M4a-2 RUSD-relative valuations, one per registered currency. */
   currencyValuations: CurrencyValuation[];
   popBlocks: PopBlock[];
   /** M3 building instances. Empty for population-only M2 worlds. */

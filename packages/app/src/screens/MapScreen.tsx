@@ -5,7 +5,7 @@ import {
   countryColor,
   formatCount,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   latestMonthlyReport,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -91,15 +91,15 @@ export function MapScreen({
           }`}
         >
           <StatRow label="Population" value={formatCount(selected.population)} />
-          <StatRow label="Treasury cash" value={formatSUSD(selected.treasuryCashSUSD)} />
+          <StatRow label="Treasury cash" value={formatRUSD(selected.treasuryCashRUSD)} />
           <StatRow
             label="Public debt principal"
-            value={formatSUSD(selected.debtOutstandingPrincipalSUSD)}
+            value={formatRUSD(selected.debtOutstandingPrincipalRUSD)}
           />
           <StatRow label="Income tax" value={formatRate(selected.fiscal.incomeTaxRate)} />
           <StatRow
             label="Welfare budget"
-            value={`${formatSUSD(selected.fiscal.welfareBudgetSUSDPerYear)}/yr`}
+            value={`${formatRUSD(selected.fiscal.welfareBudgetRUSDPerYear)}/yr`}
           />
           <StatRow
             label="Hardship"
@@ -111,7 +111,7 @@ export function MapScreen({
             value={
               selectedLatest === null
                 ? "No close yet"
-                : formatSUSD(selectedLatest.netFiscalResultSUSD)
+                : formatRUSD(selectedLatest.netFiscalResultRUSD)
             }
             detail="Net fiscal result (flow)"
           />

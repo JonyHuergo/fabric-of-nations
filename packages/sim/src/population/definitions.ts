@@ -5,7 +5,7 @@
 
 import { daysInYear } from "../calendar.js";
 import { MAX_SCENARIO_ID_LENGTH } from "../constants.js";
-import type { MoneySUSD } from "../types.js";
+import type { MoneyRUSD } from "../types.js";
 import {
   requireArray,
   requireFiniteNumber,
@@ -18,7 +18,7 @@ import {
   AGE_BAND_WIDTH,
   AGE_COHORT_COUNT,
   MATERNAL_AGE_GROUP_COUNT,
-  MONEY_TOLERANCE_SUSD,
+  MONEY_TOLERANCE_RUSD,
   NEED_TIER_ORDER,
   QUANTITY_TOLERANCE,
   SINGLE_AGE_COUNT,
@@ -267,7 +267,7 @@ export function assertValidPopulationInputs(
       throw new RangeError(`duplicate fixture price for good ${JSON.stringify(key)}`);
     }
     priceKeys.add(key);
-    assertNonNegative(item.unitPriceSUSD, `population inputs.prices[${String(index)}].unitPriceSUSD`);
+    assertNonNegative(item.unitPriceRUSD, `population inputs.prices[${String(index)}].unitPriceRUSD`);
   }
   for (const good of neededGoods) {
     if (!priceKeys.has(good)) {
@@ -323,12 +323,12 @@ export function assertValidPopulationInputs(
     }
     incomeIds.add(popBlockId);
     assertNonNegative(
-      item.annualSettledIncomePerCapitaSUSD,
-      `population inputs.income[${String(index)}].annualSettledIncomePerCapitaSUSD`,
+      item.annualSettledIncomePerCapitaRUSD,
+      `population inputs.income[${String(index)}].annualSettledIncomePerCapitaRUSD`,
     );
     assertNonNegative(
-      item.annualMandatoryPaymentsPerCapitaSUSD,
-      `population inputs.income[${String(index)}].annualMandatoryPaymentsPerCapitaSUSD`,
+      item.annualMandatoryPaymentsPerCapitaRUSD,
+      `population inputs.income[${String(index)}].annualMandatoryPaymentsPerCapitaRUSD`,
     );
   }
   for (const block of world.popBlocks) {
@@ -496,7 +496,7 @@ export function orderedTier(
 export function priceForGood(inputs: PopulationInputs, goodKey: string): number {
   const found = inputs.prices.find((price) => price.goodKey === goodKey);
   if (found === undefined) throw new RangeError(`missing fixture price for ${JSON.stringify(goodKey)}`);
-  return found.unitPriceSUSD;
+  return found.unitPriceRUSD;
 }
 
 /** Per-capita supply for a good, or a clear error. */
@@ -508,8 +508,8 @@ export function supplyForGood(inputs: PopulationInputs, goodKey: string): number
 
 /** Daily per-capita disposable income; never negative. */
 export function dailyDisposablePerCapita(
-  annualIncomePerCapita: MoneySUSD,
-  annualMandatoryPerCapita: MoneySUSD,
+  annualIncomePerCapita: MoneyRUSD,
+  annualMandatoryPerCapita: MoneyRUSD,
   daysInCivilYear: number,
 ): number {
   if (daysInCivilYear <= 0) throw new RangeError("daysInCivilYear must be positive");
@@ -523,11 +523,11 @@ export function quantityTolerance(...values: number[]): number {
   return QUANTITY_TOLERANCE * scale;
 }
 
-/** Tolerance for SUSD invariant checks. */
+/** Tolerance for RUSD invariant checks. */
 export function moneyTolerance(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 /** Saturating pressure in [0,1). */

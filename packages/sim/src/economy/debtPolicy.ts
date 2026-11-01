@@ -4,14 +4,14 @@
  */
 
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
 import { requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import {
   DEFAULT_DEBT_POLICY,
   MAX_DEBT_ARREARS_GRACE_DAYS,
   MAX_DEBT_COUPON_RATE,
-  MAX_DEBT_PRINCIPAL_SUSD,
+  MAX_DEBT_PRINCIPAL_RUSD,
   MAX_DEBT_TERM_DAYS,
   MIN_DEBT_COUPON_RATE,
   MIN_DEBT_TERM_DAYS,
@@ -26,8 +26,8 @@ export function createDebtPolicy(input?: Partial<DebtPolicy>): DebtPolicy {
     creditorId: input?.creditorId ?? DEFAULT_DEBT_POLICY.creditorId,
     annualCouponRate: input?.annualCouponRate ?? DEFAULT_DEBT_POLICY.annualCouponRate,
     termDays: input?.termDays ?? DEFAULT_DEBT_POLICY.termDays,
-    maxOutstandingPrincipalSUSD:
-      input?.maxOutstandingPrincipalSUSD ?? DEFAULT_DEBT_POLICY.maxOutstandingPrincipalSUSD,
+    maxOutstandingPrincipalRUSD:
+      input?.maxOutstandingPrincipalRUSD ?? DEFAULT_DEBT_POLICY.maxOutstandingPrincipalRUSD,
     refinanceOnMaturity: input?.refinanceOnMaturity ?? DEFAULT_DEBT_POLICY.refinanceOnMaturity,
     arrearsGraceDays: input?.arrearsGraceDays ?? DEFAULT_DEBT_POLICY.arrearsGraceDays,
   };
@@ -59,16 +59,16 @@ export function assertValidDebtPolicy(value: unknown, path: string): DebtPolicy 
     MIN_DEBT_TERM_DAYS,
     MAX_DEBT_TERM_DAYS,
   );
-  const maxOutstandingPrincipalSUSD = requireFiniteNumber(
-    record.maxOutstandingPrincipalSUSD,
-    `${path}.maxOutstandingPrincipalSUSD`,
+  const maxOutstandingPrincipalRUSD = requireFiniteNumber(
+    record.maxOutstandingPrincipalRUSD,
+    `${path}.maxOutstandingPrincipalRUSD`,
   );
   if (
-    maxOutstandingPrincipalSUSD < 0 ||
-    maxOutstandingPrincipalSUSD > MAX_DEBT_PRINCIPAL_SUSD
+    maxOutstandingPrincipalRUSD < 0 ||
+    maxOutstandingPrincipalRUSD > MAX_DEBT_PRINCIPAL_RUSD
   ) {
     throw new RangeError(
-      `${path}.maxOutstandingPrincipalSUSD must be in 0..${String(MAX_DEBT_PRINCIPAL_SUSD)}`,
+      `${path}.maxOutstandingPrincipalRUSD must be in 0..${String(MAX_DEBT_PRINCIPAL_RUSD)}`,
     );
   }
   if (typeof record.refinanceOnMaturity !== "boolean") {
@@ -86,7 +86,7 @@ export function assertValidDebtPolicy(value: unknown, path: string): DebtPolicy 
     creditorId,
     annualCouponRate,
     termDays,
-    maxOutstandingPrincipalSUSD,
+    maxOutstandingPrincipalRUSD,
     refinanceOnMaturity: record.refinanceOnMaturity,
     arrearsGraceDays,
   };
@@ -104,14 +104,14 @@ export function assertValidDebtContract(contract: DebtContract, path: string): v
     throw new RangeError(`${path}.holderKind must be "country" or "popBlock"`);
   }
   requireInteger(record.holderId, `${path}.holderId`, 0, 0xffff_ffff);
-  const principal = requireFiniteNumber(record.principalSUSD, `${path}.principalSUSD`);
-  if (!(principal > 0)) throw new RangeError(`${path}.principalSUSD must be positive`);
+  const principal = requireFiniteNumber(record.principalRUSD, `${path}.principalRUSD`);
+  if (!(principal > 0)) throw new RangeError(`${path}.principalRUSD must be positive`);
   const outstanding = requireFiniteNumber(
-    record.outstandingPrincipalSUSD,
-    `${path}.outstandingPrincipalSUSD`,
+    record.outstandingPrincipalRUSD,
+    `${path}.outstandingPrincipalRUSD`,
   );
-  if (outstanding < 0 || outstanding > principal + MONEY_TOLERANCE_SUSD * principal) {
-    throw new RangeError(`${path}.outstandingPrincipalSUSD must be in 0..principalSUSD`);
+  if (outstanding < 0 || outstanding > principal + MONEY_TOLERANCE_RUSD * principal) {
+    throw new RangeError(`${path}.outstandingPrincipalRUSD must be in 0..principalRUSD`);
   }
   const coupon = requireFiniteNumber(record.annualCouponRate, `${path}.annualCouponRate`);
   if (coupon < MIN_DEBT_COUPON_RATE || coupon > MAX_DEBT_COUPON_RATE) {
@@ -127,8 +127,8 @@ export function assertValidDebtContract(contract: DebtContract, path: string): v
   if (maturityDay <= issueDay) {
     throw new RangeError(`${path}.maturityDay must be after issueDay`);
   }
-  const accrued = requireFiniteNumber(record.accruedInterestSUSD, `${path}.accruedInterestSUSD`);
-  if (!(accrued >= 0)) throw new RangeError(`${path}.accruedInterestSUSD must be non-negative`);
+  const accrued = requireFiniteNumber(record.accruedInterestRUSD, `${path}.accruedInterestRUSD`);
+  if (!(accrued >= 0)) throw new RangeError(`${path}.accruedInterestRUSD must be non-negative`);
   if (
     record.status !== "active" &&
     record.status !== "arrears" &&
@@ -142,11 +142,11 @@ export function assertValidDebtContract(contract: DebtContract, path: string): v
   }
   if (
     record.status === "repaid" &&
-    (outstanding > MONEY_TOLERANCE_SUSD || accrued > MONEY_TOLERANCE_SUSD)
+    (outstanding > MONEY_TOLERANCE_RUSD || accrued > MONEY_TOLERANCE_RUSD)
   ) {
     throw new RangeError(`${path} repaid contract must have no outstanding principal or interest`);
   }
-  if (record.status === "defaulted" && outstanding > MONEY_TOLERANCE_SUSD) {
+  if (record.status === "defaulted" && outstanding > MONEY_TOLERANCE_RUSD) {
     throw new RangeError(`${path} defaulted contract must have no outstanding principal`);
   }
 }
@@ -165,7 +165,7 @@ export function debtOutstandingPrincipal(
   for (const contract of contracts) {
     if (contract.issuerCountryId !== issuerCountryId) continue;
     if (contract.status === "active" || contract.status === "arrears") {
-      total += contract.outstandingPrincipalSUSD;
+      total += contract.outstandingPrincipalRUSD;
     }
   }
   return total;

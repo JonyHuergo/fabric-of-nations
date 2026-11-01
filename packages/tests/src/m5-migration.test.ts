@@ -53,10 +53,10 @@ describe("M5 migration", () => {
     const destinationBefore = populationTotal(destination);
     const sourceCashBefore = world.finance.accounts.find(
       (account) => account.id === source.financialAccountId,
-    )?.balanceSUSD;
+    )?.balanceRUSD;
     const destinationCashBefore = world.finance.accounts.find(
       (account) => account.id === destination.financialAccountId,
-    )?.balanceSUSD;
+    )?.balanceRUSD;
     const cashBefore = designatedCashTotal(world.finance);
     const sourceAttributes = {
       literacy: source.literacy,
@@ -94,10 +94,10 @@ describe("M5 migration", () => {
 
     const sourceCashAfter = world.finance.accounts.find(
       (account) => account.id === source.financialAccountId,
-    )?.balanceSUSD;
+    )?.balanceRUSD;
     const destinationCashAfter = world.finance.accounts.find(
       (account) => account.id === destination.financialAccountId,
-    )?.balanceSUSD;
+    )?.balanceRUSD;
     expect(sourceCashAfter).toBeDefined();
     expect(destinationCashAfter).toBeDefined();
     if (
@@ -113,10 +113,10 @@ describe("M5 migration", () => {
     expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 9);
     const destinationTransfer = result.flows
       .filter((candidate) => candidate.destinationPopBlockId === 5)
-      .reduce((total, candidate) => total + candidate.financialTransferSUSD, 0);
-    expect(sourceCashBefore - sourceCashAfter).toBeCloseTo(flow.financialTransferSUSD, 9);
+      .reduce((total, candidate) => total + candidate.financialTransferRUSD, 0);
+    expect(sourceCashBefore - sourceCashAfter).toBeCloseTo(flow.financialTransferRUSD, 9);
     expect(destinationCashAfter - destinationCashBefore).toBeCloseTo(destinationTransfer, 9);
-    expect(flow.financialTransferSUSD).toBeGreaterThan(0);
+    expect(flow.financialTransferRUSD).toBeGreaterThan(0);
     assertValidWorld(world);
   });
 

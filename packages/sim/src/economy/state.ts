@@ -57,7 +57,7 @@ import { createLaborPolicyState } from "./labor.js";
 import { createTradePolicyState, createTradeState } from "./trade.js";
 import { createPriceIndexState } from "./monetary.js";
 import { createMilitaryState } from "./military.js";
-import { asSusdPerCurrencyUnit } from "./currency.js";
+import { asRusdPerCurrencyUnit } from "./currency.js";
 import {
   assertValidCountryPoliticsInput,
   createCountryPoliticsState,
@@ -148,9 +148,9 @@ function assertCountryInitialDefs(
   const countries = scenario.countries ?? [];
   for (const country of countries as readonly CountryInitialDef[]) {
     const path = `countries[${String(country.id)}]`;
-    requireFiniteNumber(country.initialTreasuryCashSUSD, `${path}.initialTreasuryCashSUSD`);
-    if (country.initialTreasuryCashSUSD < 0) {
-      throw new RangeError(`${path}.initialTreasuryCashSUSD must be non-negative`);
+    requireFiniteNumber(country.initialTreasuryCashRUSD, `${path}.initialTreasuryCashRUSD`);
+    if (country.initialTreasuryCashRUSD < 0) {
+      throw new RangeError(`${path}.initialTreasuryCashRUSD must be non-negative`);
     }
     if (country.immigrationOpen !== undefined && typeof country.immigrationOpen !== "boolean") {
       throw new TypeError(`${path}.immigrationOpen must be a boolean when provided`);
@@ -282,9 +282,9 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
     if (!accountIds.has(instance.operatingCashAccountId)) {
       throw new RangeError(`${path}.operatingCashAccountId references unknown account`);
     }
-    requireFiniteNumber(instance.initialOperatingCashSUSD, `${path}.initialOperatingCashSUSD`);
-    if (instance.initialOperatingCashSUSD < 0) {
-      throw new RangeError(`${path}.initialOperatingCashSUSD must be non-negative`);
+    requireFiniteNumber(instance.initialOperatingCashRUSD, `${path}.initialOperatingCashRUSD`);
+    if (instance.initialOperatingCashRUSD < 0) {
+      throw new RangeError(`${path}.initialOperatingCashRUSD must be non-negative`);
     }
     if (definition.ownershipAllowed.length === 0) {
       throw new RangeError(`${path} definition has no permitted ownership`);
@@ -307,18 +307,18 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
       throw new RangeError(`duplicate market id ${String(market.id)}`);
     }
     marketIds.add(market.id);
-    if (market.priceSUSD.length !== goods.length) {
+    if (market.priceRUSD.length !== goods.length) {
       throw new RangeError(
-        `market ${String(market.id)} priceSUSD must contain exactly ${String(goods.length)} prices`,
+        `market ${String(market.id)} priceRUSD must contain exactly ${String(goods.length)} prices`,
       );
     }
-    for (let index = 0; index < market.priceSUSD.length; index += 1) {
+    for (let index = 0; index < market.priceRUSD.length; index += 1) {
       const price = requireFiniteNumber(
-        market.priceSUSD[index],
-        `market ${String(market.id)} priceSUSD[${String(index)}]`,
+        market.priceRUSD[index],
+        `market ${String(market.id)} priceRUSD[${String(index)}]`,
       );
       if (!(price > 0)) {
-        throw new RangeError(`market ${String(market.id)} priceSUSD[${String(index)}] must be positive`);
+        throw new RangeError(`market ${String(market.id)} priceRUSD[${String(index)}] must be positive`);
       }
     }
     const seenRegions = new Set<number>();
@@ -750,36 +750,36 @@ function assertValidMonetaryInputs(scenario: EconomyScenarioDef): void {
     }
     const valuation = valuationByCurrency.get(currency.id);
     const parity =
-      input.paritySusdPerUnit ??
+      input.parityRusdPerUnit ??
       (valuation !== undefined && valuation.status === "specified"
-        ? valuation.susdPerUnit
+        ? valuation.rusdPerUnit
         : undefined);
     if (parity === undefined) {
       throw new RangeError(`${path} requires a specified valuation or an explicit parity`);
     }
     if (!Number.isFinite(parity) || !(parity > 0)) {
-      throw new RangeError(`${path}.paritySusdPerUnit must be positive`);
+      throw new RangeError(`${path}.parityRusdPerUnit must be positive`);
     }
-    const funding = input.reserveFundingSUSD ?? 0;
+    const funding = input.reserveFundingRUSD ?? 0;
     if (!Number.isFinite(funding) || funding < 0) {
-      throw new RangeError(`${path}.reserveFundingSUSD must be finite and non-negative`);
+      throw new RangeError(`${path}.reserveFundingRUSD must be finite and non-negative`);
     }
-    if (funding > country.initialTreasuryCashSUSD + QUANTITY_TOLERANCE) {
+    if (funding > country.initialTreasuryCashRUSD + QUANTITY_TOLERANCE) {
       throw new RangeError(
-        `${path}.reserveFundingSUSD exceeds the country's opening treasury cash`,
+        `${path}.reserveFundingRUSD exceeds the country's opening treasury cash`,
       );
     }
     const units = input.currencyIssuedUnits ?? 0;
     if (!Number.isFinite(units) || units < 0) {
       throw new RangeError(`${path}.currencyIssuedUnits must be finite and non-negative`);
     }
-    const externalCash = input.externalCashSUSD ?? units * parity;
+    const externalCash = input.externalCashRUSD ?? units * parity;
     if (!Number.isFinite(externalCash) || externalCash < 0) {
-      throw new RangeError(`${path}.externalCashSUSD must be finite and non-negative`);
+      throw new RangeError(`${path}.externalCashRUSD must be finite and non-negative`);
     }
     if (units * parity > externalCash + QUANTITY_TOLERANCE) {
       throw new RangeError(
-        `${path}.externalCashSUSD must cover the initial currency holding`,
+        `${path}.externalCashRUSD must cover the initial currency holding`,
       );
     }
   }
@@ -793,7 +793,7 @@ function monetaryFundingByCountry(scenario: EconomyScenarioDef): Map<number, num
   for (const input of scenario.monetary.currencies ?? []) {
     const currency = currencyById.get(input.currencyId);
     if (currency === undefined || currency.issuer.kind !== "country") continue;
-    const amount = input.reserveFundingSUSD ?? 0;
+    const amount = input.reserveFundingRUSD ?? 0;
     if (!(amount > 0)) continue;
     funding.set(currency.issuer.countryId, (funding.get(currency.issuer.countryId) ?? 0) + amount);
   }
@@ -999,14 +999,14 @@ export function createEconomyWorld(
       ownerId,
       category: categoryForSubtype(subtype),
       subtype,
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
     return id;
   };
 
   const opening: OpeningBalanceEntry[] = [];
   const initialSavingsByBlock = new Map(
-    scenario.population.popBlocks.map((block) => [block.id, block.initialSavingsSUSD]),
+    scenario.population.popBlocks.map((block) => [block.id, block.initialSavingsRUSD]),
   );
   const equityByBlock = new Map<Id, Id>();
   for (const account of world.finance.accounts) {
@@ -1027,8 +1027,8 @@ export function createEconomyWorld(
     if (equityId === undefined) {
       throw new RangeError(`missing owner-equity account for popBlock ${String(block.id)}`);
     }
-    opening.push({ accountId: block.financialAccountId, balanceSUSD: savings });
-    opening.push({ accountId: equityId, balanceSUSD: savings });
+    opening.push({ accountId: block.financialAccountId, balanceRUSD: savings });
+    opening.push({ accountId: equityId, balanceRUSD: savings });
   }
 
   for (const account of scenario.systemAccounts) {
@@ -1038,7 +1038,7 @@ export function createEconomyWorld(
       ownerId: null,
       category: "asset",
       subtype: "system-reserve-cash",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
   }
   if (scenario.systemAccounts.length > 0) {
@@ -1046,10 +1046,10 @@ export function createEconomyWorld(
     allocate("system", null, "system-income");
     let systemTotal = 0;
     for (const account of scenario.systemAccounts) {
-      systemTotal += account.balanceSUSD;
-      opening.push({ accountId: account.id, balanceSUSD: account.balanceSUSD });
+      systemTotal += account.balanceRUSD;
+      opening.push({ accountId: account.id, balanceRUSD: account.balanceRUSD });
     }
-    opening.push({ accountId: equityId, balanceSUSD: systemTotal });
+    opening.push({ accountId: equityId, balanceRUSD: systemTotal });
   }
 
   // M4c government accounts. The treasury cash id is scenario-declared; the
@@ -1068,7 +1068,7 @@ export function createEconomyWorld(
       ownerId: country.id,
       category: "asset",
       subtype: "treasury-cash",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
     const equityId = allocate("country", country.id, "owner-equity");
     allocate("country", country.id, "income-tax-revenue");
@@ -1083,13 +1083,13 @@ export function createEconomyWorld(
     }
     opening.push({
       accountId: country.treasuryAccountId,
-      balanceSUSD:
-        initial.initialTreasuryCashSUSD - (reserveFundingByCountry.get(country.id) ?? 0),
+      balanceRUSD:
+        initial.initialTreasuryCashRUSD - (reserveFundingByCountry.get(country.id) ?? 0),
     });
     opening.push({
       accountId: equityId,
-      balanceSUSD:
-        initial.initialTreasuryCashSUSD - (reserveFundingByCountry.get(country.id) ?? 0),
+      balanceRUSD:
+        initial.initialTreasuryCashRUSD - (reserveFundingByCountry.get(country.id) ?? 0),
     });
   }
 
@@ -1189,8 +1189,8 @@ export function createEconomyWorld(
           currencyId: currency.id,
           issuerCountryId: null,
           regime: "pegged",
-          paritySusdPerUnit: null,
-          referenceParitySusdPerUnit: null,
+          parityRusdPerUnit: null,
+          referenceParityRusdPerUnit: null,
           currencyIssuedUnits: 0,
           active: false,
           reserveAccountId: null,
@@ -1202,8 +1202,8 @@ export function createEconomyWorld(
           lastParityChangeDay: null,
           lastManagedUpdateDay: null,
           lastMonthEndDay: null,
-          lastMonthExportsSUSD: 0,
-          lastMonthImportsSUSD: 0,
+          lastMonthExportsRUSD: 0,
+          lastMonthImportsRUSD: 0,
         });
         continue;
       }
@@ -1216,54 +1216,54 @@ export function createEconomyWorld(
       const valuation = valuationByCurrency.get(currency.id);
       const scenarioValuation =
         valuation !== undefined && valuation.status === "specified"
-          ? valuation.susdPerUnit
+          ? valuation.rusdPerUnit
           : null;
       const input = inputByCurrency.get(currency.id);
       const active = input !== undefined;
       const parity = active
-        ? (input.paritySusdPerUnit ?? scenarioValuation)
+        ? (input.parityRusdPerUnit ?? scenarioValuation)
         : scenarioValuation;
       if (active) {
         if (parity === null) {
           throw new RangeError(
             `monetary authority for currency ${String(currency.id)} requires a parity`,
           );
-        }        const funding = input.reserveFundingSUSD ?? 0;
+        }        const funding = input.reserveFundingRUSD ?? 0;
         const units = input.currencyIssuedUnits ?? 0;
         const holdingValue = units * parity;
-        const externalCash = input.externalCashSUSD ?? holdingValue;
-        // The external counterparty buys the opening circulation with SUSD, so those
+        const externalCash = input.externalCashRUSD ?? holdingValue;
+        // The external counterparty buys the opening circulation with RUSD, so those
         // reserves join the treasury capitalization on the authority's balance sheet:
         // reserves = funding + holding value; equity = funding; liability = holding value.
         if (funding > 0 || holdingValue > 0) {
           opening.push({
             accountId: reserveAccountId,
-            balanceSUSD: funding + holdingValue,
+            balanceRUSD: funding + holdingValue,
           });
         }
         if (funding > 0) {
-          opening.push({ accountId: equityAccountId, balanceSUSD: funding });
+          opening.push({ accountId: equityAccountId, balanceRUSD: funding });
         }
         if (units > 0) {
-          opening.push({ accountId: liabilityAccountId, balanceSUSD: holdingValue });
-          opening.push({ accountId: externalCurrencyAccountId, balanceSUSD: holdingValue });
+          opening.push({ accountId: liabilityAccountId, balanceRUSD: holdingValue });
+          opening.push({ accountId: externalCurrencyAccountId, balanceRUSD: holdingValue });
           opening.push({
             accountId: externalCashAccountId,
-            balanceSUSD: externalCash - holdingValue,
+            balanceRUSD: externalCash - holdingValue,
           });
-          opening.push({ accountId: externalEquityAccountId, balanceSUSD: externalCash });
+          opening.push({ accountId: externalEquityAccountId, balanceRUSD: externalCash });
         } else if (externalCash > 0) {
-          opening.push({ accountId: externalCashAccountId, balanceSUSD: externalCash });
-          opening.push({ accountId: externalEquityAccountId, balanceSUSD: externalCash });
+          opening.push({ accountId: externalCashAccountId, balanceRUSD: externalCash });
+          opening.push({ accountId: externalEquityAccountId, balanceRUSD: externalCash });
         }
       }
-      const brandedParity = parity === null ? null : asSusdPerCurrencyUnit(parity);
+      const brandedParity = parity === null ? null : asRusdPerCurrencyUnit(parity);
       monetaryRecords.push({
         currencyId: currency.id,
         issuerCountryId,
         regime: "pegged",
-        paritySusdPerUnit: brandedParity,
-        referenceParitySusdPerUnit: active ? brandedParity : null,
+        parityRusdPerUnit: brandedParity,
+        referenceParityRusdPerUnit: active ? brandedParity : null,
         currencyIssuedUnits: active ? (input.currencyIssuedUnits ?? 0) : 0,
         active,
         reserveAccountId,
@@ -1275,8 +1275,8 @@ export function createEconomyWorld(
         lastParityChangeDay: null,
         lastManagedUpdateDay: null,
         lastMonthEndDay: null,
-        lastMonthExportsSUSD: 0,
-        lastMonthImportsSUSD: 0,
+        lastMonthExportsRUSD: 0,
+        lastMonthImportsRUSD: 0,
       });
     }
     world.monetary = {
@@ -1292,7 +1292,7 @@ export function createEconomyWorld(
       ownerId: instance.id,
       category: "asset",
       subtype: "operating-cash",
-      balanceSUSD: 0,
+      balanceRUSD: 0,
     });
     const equityId = allocate("building", instance.id, "owner-equity");
     allocate("building", instance.id, "sales-revenue");
@@ -1316,9 +1316,9 @@ export function createEconomyWorld(
     }
     opening.push({
       accountId: instance.operatingCashAccountId,
-      balanceSUSD: instance.initialOperatingCashSUSD,
+      balanceRUSD: instance.initialOperatingCashRUSD,
     });
-    opening.push({ accountId: equityId, balanceSUSD: instance.initialOperatingCashSUSD });
+    opening.push({ accountId: equityId, balanceRUSD: instance.initialOperatingCashRUSD });
     world.buildings.push({
       id: instance.id,
       definitionId: instance.definitionId,
@@ -1341,7 +1341,7 @@ export function createEconomyWorld(
     const built: Market = {
       id: market.id,
       regionIds: [...market.regionIds].sort((left, right) => left - right),
-      priceSUSD: [...market.priceSUSD],
+      priceRUSD: [...market.priceRUSD],
       stockLots: canonicalizeStockLots(market.stockLots),
       customsCountryId: customsCountryByMarket.get(market.id) ?? null,
     };

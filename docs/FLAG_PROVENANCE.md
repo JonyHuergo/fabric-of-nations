@@ -1,6 +1,6 @@
-# Historical flag provenance â€” Century 1900
+# Historical flag provenance â€” Fabric of Nations 1900
 
-This document records every historical flag bundled for the Century 1900 catalog. The reference date is **1 January 1900**. It is generated from
+This document records every historical flag bundled for the Fabric of Nations 1900 catalog. The reference date is **1 January 1900**. It is generated from
 `packages/data/data/historical/m11/flags_1900.json` by `scripts/m11/build-flags.mjs`; edit the manifest, not this file.
 
 ## Summary
@@ -10,7 +10,7 @@ This document records every historical flag bundled for the Century 1900 catalog
 - Polities displaying a bundled historical flag: **133**
 - Polities using the monogram fallback: **0**
 - Reference date: **1 January 1900**; assets retrieved **2026-10-30**
-- Artwork source: **Wikimedia Commons plus project-authored reconstructions**; licence policy: Externally sourced files are individually verified through the Wikimedia Commons API as Public Domain or CC0. Project-authored reconstructions and the two user-selected representative flag reconstructions are Century-authored, dedicated to the public domain, and recorded separately from their historical or user-selected sources. No share-alike or restricted artwork is bundled.
+- Artwork source: **Wikimedia Commons plus project-authored reconstructions**; licence policy: Externally sourced files are individually verified through the Wikimedia Commons API as Public Domain or CC0. Project-authored reconstructions and the two user-selected representative flag reconstructions are Fabric of Nations-authored, dedicated to the public domain, and recorded separately from their historical or user-selected sources. No share-alike or restricted artwork is bundled.
 
 ### Flag-kind counts
 
@@ -58,13 +58,13 @@ The pipeline downloads Wikimedia's PNG rendition of each approved file at a norm
 
 ## Project-authored reconstructions
 
-Four flags are original Century reconstructions rather than externally sourced files: the Spanish restoration flag, the Transvaal Vierkleur, and the two user-selected Darfur and Wadai designs. They are rendered deterministically at build time from documented or user-selected designs and are dedicated to the public domain by the project. Their historical or user-selected sources are recorded separately from Century's authorship; no share-alike or restricted artwork is traced or copied. The Pax Historia rasters were inspected but are not bundled because redistribution permission was not established.
+Four flags are original Fabric of Nations reconstructions rather than externally sourced files: the Spanish restoration flag, the Transvaal Vierkleur, and the two user-selected Darfur and Wadai designs. They are rendered deterministically at build time from documented or user-selected designs and are dedicated to the public domain by the project. Their historical or user-selected sources are recorded separately from Fabric of Nations' authorship; no share-alike or restricted artwork is traced or copied. The Pax Historia rasters were inspected but are not bundled because redistribution permission was not established.
 
-- **`darfur-user-selected`** â€” User-selected representative flag of the Sultanate of Darfur. User-selected design (green-red-black horizontal triband with a white crescent on the red stripe). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Century reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
-- **`spain-restoration`** â€” Restoration-era Spanish state flag (red–yellow–red with the coat of arms). The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Century's work, not a copy of any share-alike flag file.
+- **`darfur-user-selected`** â€” User-selected representative flag of the Sultanate of Darfur. User-selected design (green-red-black horizontal triband with a white crescent on the red stripe). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Fabric of Nations reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
+- **`spain-restoration`** â€” Restoration-era Spanish state flag (red–yellow–red with the coat of arms). The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Fabric of Nations' work, not a copy of any share-alike flag file.
   - Component: coat-of-arms â€” [File:Flag version of the Coat of arms of Spain (1785-1873 & 1875-1931.png](https://commons.wikimedia.org/wiki/File:Flag_version_of_the_Coat_of_arms_of_Spain_(1785-1873_%26_1875-1931.png); Public domain (pd); author Buho07.
 - **`transvaal-vierkleur`** â€” Vierkleur of the South African Republic (Transvaal). The South African Republic (Transvaal) Vierkleur: a green vertical stripe at the hoist and red, white and blue horizontal stripes in the fly. This is an original project-authored reconstruction from the documented 1857–1902 design. The available Commons Vierkleur vector is CC BY-SA and was not used or traced.
-- **`wadai-user-selected`** â€” User-selected representative flag of the Sultanate of Wadai. User-selected design (white field enclosed by a thin black border). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Century reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
+- **`wadai-user-selected`** â€” User-selected representative flag of the Sultanate of Wadai. User-selected design (white field enclosed by a thin black border). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Fabric of Nations reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
 
 ## Bundled flags
 
@@ -242,11 +242,11 @@ Four flags are original Century reconstructions rather than externally sourced f
 - **Polities:** `DAR` (ID 64)
 - **Validity:** 1900 â€“ no end date recorded (in use on 1 January 1900)
 - **Source:** project-authored reconstruction (design `darfur-user-selected`), not an externally sourced image.
-- **License:** Project-authored reconstruction; dedicated to the public domain by Century (project) â€” internal:docs/FLAG_PROVENANCE.md#user-selected-representative-flags
-- **Author:** Century project (original geometric reconstruction; design selected by the user from Pax Historia)
+- **License:** Project-authored reconstruction; dedicated to the public domain by Fabric of Nations (project) â€” internal:docs/FLAG_PROVENANCE.md#user-selected-representative-flags
+- **Author:** Fabric of Nations project (original geometric reconstruction; design selected by the user from Pax Historia)
 - **Retrieved:** 2026-10-30
 - **Source file:** built by `scripts/m11/build-flags.mjs` at 1000Ã—667; no external flag file is redistributed.
-- **Historical accuracy:** User-selected design (green-red-black horizontal triband with a white crescent on the red stripe). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Century reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
+- **Historical accuracy:** User-selected design (green-red-black horizontal triband with a white crescent on the red stripe). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Fabric of Nations reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
 
 ### `denmark` â€” Dannebrog, the Danish national flag
 
@@ -747,11 +747,11 @@ Four flags are original Century reconstructions rather than externally sourced f
 - **Validity:** 1875-01-01 â€“ 1931-04-14
 - **Source:** project-authored reconstruction (design `spain-restoration`), not an externally sourced image.
 - **License:** Project-authored (CC0 dedication) (project) â€” internal:docs/FLAG_PROVENANCE.md#project-artwork
-- **Author:** Century project (reconstruction)
+- **Author:** Fabric of Nations project (reconstruction)
 - **Retrieved:** 2026-10-30
 - **Component:** coat-of-arms â€” [File:Flag version of the Coat of arms of Spain (1785-1873 & 1875-1931.png](https://commons.wikimedia.org/wiki/File:Flag_version_of_the_Coat_of_arms_of_Spain_(1785-1873_%26_1875-1931.png); Public domain (pd); author Buho07; SHA-256 `fc319cf7a0dff915cb188ba37abe9481f887f65e133fd7f6b6a30ad4005596d9`.
 - **Source file:** built by `scripts/m11/build-flags.mjs` at 1000Ã—667; no external flag file is redistributed.
-- **Historical accuracy:** The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Century's work, not a copy of any share-alike flag file.
+- **Historical accuracy:** The Spanish state flag of the Restoration (1875–1931) was red–yellow–red with the royal coat of arms. No Public Domain or CC0 file of that exact state flag was available; the plain triband was not the 1900 state flag (it became the merchant flag only in 1927). This is a project-authored composition: a red–yellow–red field with the individually verified Public Domain flag-version coat of arms (Castile–León and the royal crown). The composition and its raster rendering are Fabric of Nations' work, not a copy of any share-alike flag file.
 
 ### `sweden-1844` â€” Swedish union flag with the Norway-Sweden union badge
 
@@ -796,7 +796,7 @@ Four flags are original Century reconstructions rather than externally sourced f
 - **Validity:** 1857-02-28 â€“ 1902-05-31
 - **Source:** project-authored reconstruction (design `transvaal-vierkleur`), not an externally sourced image.
 - **License:** Project-authored (CC0 dedication) (project) â€” internal:docs/FLAG_PROVENANCE.md#project-artwork
-- **Author:** Century project (reconstruction)
+- **Author:** Fabric of Nations project (reconstruction)
 - **Retrieved:** 2026-10-30
 - **Source file:** built by `scripts/m11/build-flags.mjs` at 1000Ã—667; no external flag file is redistributed.
 - **Historical accuracy:** The South African Republic (Transvaal) Vierkleur: a green vertical stripe at the hoist and red, white and blue horizontal stripes in the fly. This is an original project-authored reconstruction from the documented 1857–1902 design. The available Commons Vierkleur vector is CC BY-SA and was not used or traced.
@@ -855,11 +855,11 @@ Four flags are original Century reconstructions rather than externally sourced f
 - **Polities:** `WAD` (ID 63)
 - **Validity:** 1900 â€“ no end date recorded (in use on 1 January 1900)
 - **Source:** project-authored reconstruction (design `wadai-user-selected`), not an externally sourced image.
-- **License:** Project-authored reconstruction; dedicated to the public domain by Century (project) â€” internal:docs/FLAG_PROVENANCE.md#user-selected-representative-flags
-- **Author:** Century project (original geometric reconstruction; design selected by the user from Pax Historia)
+- **License:** Project-authored reconstruction; dedicated to the public domain by Fabric of Nations (project) â€” internal:docs/FLAG_PROVENANCE.md#user-selected-representative-flags
+- **Author:** Fabric of Nations project (original geometric reconstruction; design selected by the user from Pax Historia)
 - **Retrieved:** 2026-10-30
 - **Source file:** built by `scripts/m11/build-flags.mjs` at 1000Ã—667; no external flag file is redistributed.
-- **Historical accuracy:** User-selected design (white field enclosed by a thin black border). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Century reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
+- **Historical accuracy:** User-selected design (white field enclosed by a thin black border). It is a representative design chosen for the 1900 scenario, not an exact historical national flag with contemporary documentation. The original Pax Historia raster is not bundled; Fabric of Nations reconstructed the simple geometric design independently because redistribution permission for the raster could not be established.
 
 ## Monogram fallbacks
 
@@ -953,7 +953,7 @@ Dependent territories do not receive invented national flags. By default they di
 - **Ottoman Empire** â€” `ottoman-1844`: red field with white crescent and five-pointed star, the 1844â€“1922 design.
 - **Canada** â€” `canada-red-ensign-1868`: the Red Ensign with the 1868 shield, used unofficially from 1870 and approved for use at sea in 1892; the Union Jack remained the official national flag, and the modern maple-leaf flag is not used.
 - **Australia** â€” `uk-union-1801`: the Union Jack. Australian federation took effect on 1 January 1901, and the Commonwealth blue ensign first flew on 3 September 1901.
-- **Transvaal / South African Republic** â€” `transvaal-vierkleur`: an original Century reconstruction of the 1857â€“1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.
+- **Transvaal / South African Republic** â€” `transvaal-vierkleur`: an original Fabric of Nations reconstruction of the 1857â€“1902 Vierkleur, built from the documented design. The Commons Vierkleur file is CC BY-SA and was neither used nor traced.
 - **Orange Free State** â€” `orange-free-state`: the 1857â€“1902 Orange Free State flag (orange and white stripes with the Netherlands flag in the canton).
 - **Austria-Hungary** â€” `austria-hungary-civil-ensign`: the common civil ensign of 1869â€“1918, combining the Austrian red-white-red and Hungarian red-white-green halves with both coats of arms. The dual monarchy had no single unified national flag; the manifest and this document record that distinction. The polity is a single catalog state, not two independent countries.
 - **Spain** â€” `spain-restoration`: a project-authored redâ€“yellowâ€“red reconstruction with the individually verified PD Restoration-era coat of arms. The Spanish colonies SAH and SGG use the same sovereign flag with their colony status badges.

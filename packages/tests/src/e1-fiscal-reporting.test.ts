@@ -25,17 +25,17 @@ const SEED = 20_261_107;
 const COUNTRY_ID = 0;
 
 const TOTALS: FinancePeriodFiscalTotals = {
-  incomeTaxRevenueSUSD: 1_000,
-  businessTaxRevenueSUSD: 200,
-  welfareExpenseSUSD: 300,
-  interestExpenseSUSD: 50,
-  subsidyExpenseSUSD: 70,
-  administrationExpenseSUSD: 110,
-  educationExpenseSUSD: 130,
-  trainingExpenseSUSD: 170,
-  customsDutyRevenueSUSD: 190,
-  militaryExpenseSUSD: 230,
-  netFiscalResultSUSD:
+  incomeTaxRevenueRUSD: 1_000,
+  businessTaxRevenueRUSD: 200,
+  welfareExpenseRUSD: 300,
+  interestExpenseRUSD: 50,
+  subsidyExpenseRUSD: 70,
+  administrationExpenseRUSD: 110,
+  educationExpenseRUSD: 130,
+  trainingExpenseRUSD: 170,
+  customsDutyRevenueRUSD: 190,
+  militaryExpenseRUSD: 230,
+  netFiscalResultRUSD:
     1_000 + 200 + 190 - 300 - 50 - 70 - 110 - 130 - 170 - 230,
 };
 
@@ -110,35 +110,35 @@ describe("fiscal reporting completeness", () => {
 
     const latest = country.latestFiscal;
     if (latest === null) throw new Error("missing latest fiscal totals");
-    expect(latest.educationExpenseSUSD ?? 0).toBeCloseTo(130, 6);
-    expect(latest.trainingExpenseSUSD ?? 0).toBeCloseTo(170, 6);
-    expect(latest.customsDutyRevenueSUSD ?? 0).toBeCloseTo(190, 6);
-    expect(latest.militaryExpenseSUSD ?? 0).toBeCloseTo(230, 6);
+    expect(latest.educationExpenseRUSD ?? 0).toBeCloseTo(130, 6);
+    expect(latest.trainingExpenseRUSD ?? 0).toBeCloseTo(170, 6);
+    expect(latest.customsDutyRevenueRUSD ?? 0).toBeCloseTo(190, 6);
+    expect(latest.militaryExpenseRUSD ?? 0).toBeCloseTo(230, 6);
     const history = country.financeHistory[country.financeHistory.length - 1];
     if (history === undefined) throw new Error("missing finance history");
-    expect(history.militaryExpenseSUSD ?? 0).toBeCloseTo(230, 6);
-    expect(history.educationExpenseSUSD ?? 0).toBeCloseTo(130, 6);
-    expect(history.trainingExpenseSUSD ?? 0).toBeCloseTo(170, 6);
-    expect(history.customsDutyRevenueSUSD ?? 0).toBeCloseTo(190, 6);
-    expect(history.netFiscalResultSUSD).toBeCloseTo(
-      history.incomeTaxSUSD +
-        history.businessTaxRevenueSUSD +
-        (history.customsDutyRevenueSUSD ?? 0) -
-        history.welfareExpenseSUSD -
-        history.interestExpenseSUSD -
-        history.subsidyExpenseSUSD -
-        (history.administrationExpenseSUSD ?? 0) -
-        (history.educationExpenseSUSD ?? 0) -
-        (history.trainingExpenseSUSD ?? 0) -
-        (history.militaryExpenseSUSD ?? 0),
+    expect(history.militaryExpenseRUSD ?? 0).toBeCloseTo(230, 6);
+    expect(history.educationExpenseRUSD ?? 0).toBeCloseTo(130, 6);
+    expect(history.trainingExpenseRUSD ?? 0).toBeCloseTo(170, 6);
+    expect(history.customsDutyRevenueRUSD ?? 0).toBeCloseTo(190, 6);
+    expect(history.netFiscalResultRUSD).toBeCloseTo(
+      history.incomeTaxRUSD +
+        history.businessTaxRevenueRUSD +
+        (history.customsDutyRevenueRUSD ?? 0) -
+        history.welfareExpenseRUSD -
+        history.interestExpenseRUSD -
+        history.subsidyExpenseRUSD -
+        (history.administrationExpenseRUSD ?? 0) -
+        (history.educationExpenseRUSD ?? 0) -
+        (history.trainingExpenseRUSD ?? 0) -
+        (history.militaryExpenseRUSD ?? 0),
       6,
     );
 
     const annual = country.annualReports[0];
     if (annual === undefined) throw new Error("missing annual report");
-    expect(annual.educationExpenseSUSD ?? 0).toBeCloseTo(130, 6);
-    expect(annual.trainingExpenseSUSD ?? 0).toBeCloseTo(170, 6);
-    expect(annual.customsDutyRevenueSUSD ?? 0).toBeCloseTo(190, 6);
-    expect(annual.militaryExpenseSUSD ?? 0).toBeCloseTo(230, 6);
+    expect(annual.educationExpenseRUSD ?? 0).toBeCloseTo(130, 6);
+    expect(annual.trainingExpenseRUSD ?? 0).toBeCloseTo(170, 6);
+    expect(annual.customsDutyRevenueRUSD ?? 0).toBeCloseTo(190, 6);
+    expect(annual.militaryExpenseRUSD ?? 0).toBeCloseTo(230, 6);
   });
 });

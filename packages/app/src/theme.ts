@@ -1,5 +1,5 @@
 /**
- * Century M11 design tokens.
+ * Fabric of Nations M11 design tokens.
  *
  * A restrained atlas palette: deep ink backgrounds, parchment text, a single
  * brass accent, and muted national colours. Numbers use tabular figures.

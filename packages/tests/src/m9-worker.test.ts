@@ -71,7 +71,7 @@ describe("M9 worker protocol and snapshots", () => {
     expect(country.technology.productivityBySector.length).toBe(5);
     expect(country.education.enabled).toBe(true);
     expect(country.education.academicPopulation).toBeGreaterThan(0);
-    expect(country.education.fundedAnnualSUSD).toBe(M9_EDUCATION_FUNDING);
+    expect(country.education.fundedAnnualRUSD).toBe(M9_EDUCATION_FUNDING);
     expect(country.education.availableAcademicWorkers).toBeGreaterThan(0);
 
     const research = previewResearchStart(snap, country, M9_STEAM_POWER);
@@ -131,11 +131,11 @@ describe("M9 worker protocol and snapshots", () => {
     const funding = apply(host, events, "funding", {
       kind: "set-education-funding",
       countryId: M5_COUNTRY_A,
-      annualSUSD: 9_000,
+      annualRUSD: 9_000,
     });
     if (funding?.type !== "ACTION_RESULT") throw new Error("no funding result");
     expect(funding.accepted).toBe(true);
-    expect(snapshot().countries[0]?.education.fundedAnnualSUSD).toBe(9_000);
+    expect(snapshot().countries[0]?.education.fundedAnnualRUSD).toBe(9_000);
 
     const share = apply(host, events, "share", {
       kind: "set-research-staff-share",
@@ -168,7 +168,7 @@ describe("M9 worker protocol and snapshots", () => {
     const negative = apply(host, events, "negative", {
       kind: "set-education-funding",
       countryId: M5_COUNTRY_A,
-      annualSUSD: -1,
+      annualRUSD: -1,
     });
     // The protocol rejects the value before it reaches the simulation.
     expect(negative).toBeUndefined();

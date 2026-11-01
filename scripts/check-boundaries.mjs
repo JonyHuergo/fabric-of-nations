@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Dependency-free boundary checks for the Century monorepo.
+ * Dependency-free boundary checks for the Fabric of Nations monorepo.
  *
  * This is a guardrail, not a replacement for tests or TypeScript. It inspects
  * source after removing comments and string/template contents so documentation

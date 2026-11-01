@@ -5,7 +5,7 @@ import {
   countryById,
   fiscalResultLabel,
   formatRate,
-  formatSUSD,
+  formatRUSD,
   latestFinancePeriod,
   latestMonthlyReport,
   previewDebtIssuance,
@@ -56,24 +56,24 @@ export function BudgetScreen({
   useEffect(() => {
     if (fiscal === undefined || debtPolicy === undefined) return;
     setTaxText((fiscal.incomeTaxRate * 100).toFixed(2));
-    setAllowanceText(fiscal.incomeTaxAllowanceSUSDPerYear.toFixed(0));
-    setWelfareText(fiscal.welfareBudgetSUSDPerYear.toFixed(0));
+    setAllowanceText(fiscal.incomeTaxAllowanceRUSDPerYear.toFixed(0));
+    setWelfareText(fiscal.welfareBudgetRUSDPerYear.toFixed(0));
     setWealthText(String(fiscal.welfareMaxWealthLevel));
     setBusinessText((fiscal.businessProfitTaxRate * 100).toFixed(2));
-    setReserveText(fiscal.reserveTargetSUSD.toFixed(0));
-    setCeilingText(debtPolicy.maxOutstandingPrincipalSUSD.toFixed(0));
+    setReserveText(fiscal.reserveTargetRUSD.toFixed(0));
+    setCeilingText(debtPolicy.maxOutstandingPrincipalRUSD.toFixed(0));
     setRefinanceOn(debtPolicy.refinanceOnMaturity);
     setRepayTexts({});
     setBorrowText("");
   }, [
     countryId,
     fiscal?.incomeTaxRate,
-    fiscal?.incomeTaxAllowanceSUSDPerYear,
-    fiscal?.welfareBudgetSUSDPerYear,
+    fiscal?.incomeTaxAllowanceRUSDPerYear,
+    fiscal?.welfareBudgetRUSDPerYear,
     fiscal?.welfareMaxWealthLevel,
     fiscal?.businessProfitTaxRate,
-    fiscal?.reserveTargetSUSD,
-    debtPolicy?.maxOutstandingPrincipalSUSD,
+    fiscal?.reserveTargetRUSD,
+    debtPolicy?.maxOutstandingPrincipalRUSD,
     debtPolicy?.refinanceOnMaturity,
   ]);
 
@@ -89,7 +89,7 @@ export function BudgetScreen({
 
   const latest = latestFinancePeriod(country);
   const latestMonthly = latestMonthlyReport(country);
-  const historyValues = country.financeHistory.map((period) => period.netFiscalResultSUSD);
+  const historyValues = country.financeHistory.map((period) => period.netFiscalResultRUSD);
 
   const proposedTax = parseNumber(taxText) / 100;
   const proposedAllowance = parseNumber(allowanceText);
@@ -103,10 +103,10 @@ export function BudgetScreen({
     proposedTax,
     proposedWelfare,
     {
-      incomeTaxAllowanceSUSDPerYear: proposedAllowance,
+      incomeTaxAllowanceRUSDPerYear: proposedAllowance,
       welfareMaxWealthLevel: proposedWealth,
       businessProfitTaxRate: proposedBusiness,
-      reserveTargetSUSD: proposedReserve,
+      reserveTargetRUSD: proposedReserve,
     },
   );
 
@@ -133,11 +133,11 @@ export function BudgetScreen({
       return;
     }
     if (!Number.isFinite(allowance) || allowance < 0) {
-      setLocalError("The income-tax exemption must be a non-negative annual SUSD amount.");
+      setLocalError("The income-tax exemption must be a non-negative annual RUSD amount.");
       return;
     }
     if (!Number.isFinite(welfare) || welfare < 0) {
-      setLocalError("Welfare budget must be a non-negative annual SUSD amount.");
+      setLocalError("Welfare budget must be a non-negative annual RUSD amount.");
       return;
     }
     if (!Number.isInteger(wealth) || wealth < 0 || wealth > 99) {
@@ -149,7 +149,7 @@ export function BudgetScreen({
       return;
     }
     if (!Number.isFinite(reserve) || reserve < 0) {
-      setLocalError("The reserve target must be a non-negative SUSD amount.");
+      setLocalError("The reserve target must be a non-negative RUSD amount.");
       return;
     }
     setLocalError(null);
@@ -157,11 +157,11 @@ export function BudgetScreen({
       kind: "set-fiscal-policy",
       countryId: country.id,
       incomeTaxRate: tax,
-      incomeTaxAllowanceSUSDPerYear: allowance,
-      welfareBudgetSUSDPerYear: welfare,
+      incomeTaxAllowanceRUSDPerYear: allowance,
+      welfareBudgetRUSDPerYear: welfare,
       welfareMaxWealthLevel: wealth,
       businessProfitTaxRate: business,
-      reserveTargetSUSD: reserve,
+      reserveTargetRUSD: reserve,
     });
   };
   const taxCommit = useDeferredCommit((value) => applyFiscal({ tax: value / 100 }), busy);
@@ -192,7 +192,7 @@ export function BudgetScreen({
       kind: "set-debt-policy",
       countryId: country.id,
       refinanceOnMaturity: overrides?.refinance ?? refinanceOn,
-      maxOutstandingPrincipalSUSD: overrides?.ceiling ?? proposedCeiling,
+      maxOutstandingPrincipalRUSD: overrides?.ceiling ?? proposedCeiling,
     });
   };
 
@@ -210,7 +210,7 @@ export function BudgetScreen({
       return;
     }
     setLocalError(null);
-    applyAction({ kind: "issue-debt", countryId: country.id, amountSUSD: amount });
+    applyAction({ kind: "issue-debt", countryId: country.id, amountRUSD: amount });
   };
 
   const mtd = country.budgetMonthToDate;
@@ -223,31 +223,31 @@ export function BudgetScreen({
       >
         <StatRow
           label="Treasury cash (stock)"
-          value={formatSUSD(country.treasuryCashSUSD)}
-          detail={`Reserve target ${formatSUSD(fiscal.reserveTargetSUSD)} · cash above target ${formatSUSD(Math.max(0, country.treasuryCashSUSD - fiscal.reserveTargetSUSD))}`}
+          value={formatRUSD(country.treasuryCashRUSD)}
+          detail={`Reserve target ${formatRUSD(fiscal.reserveTargetRUSD)} · cash above target ${formatRUSD(Math.max(0, country.treasuryCashRUSD - fiscal.reserveTargetRUSD))}`}
         />
         <StatRow
           label="Latest closed result"
-          value={latest === null ? "Awaiting first close" : fiscalResultLabel(latest.netFiscalResultSUSD)}
+          value={latest === null ? "Awaiting first close" : fiscalResultLabel(latest.netFiscalResultRUSD)}
           detail={
             latest === null
               ? "No closed period yet"
-              : `${formatSUSD(latest.netFiscalResultSUSD)} · all recorded revenue − all recorded expense`
+              : `${formatRUSD(latest.netFiscalResultRUSD)} · all recorded revenue − all recorded expense`
           }
         />
         <StatRow
           label="Debt principal (stock)"
-          value={formatSUSD(country.debtOutstandingPrincipalSUSD)}
+          value={formatRUSD(country.debtOutstandingPrincipalRUSD)}
           detail={
             debtPolicy.enabled
-              ? `Ceiling ${formatSUSD(debtPolicy.maxOutstandingPrincipalSUSD)} · creditor ${debtPolicy.creditorLabel} · coupon ${formatRate(debtPolicy.annualCouponRate)}`
+              ? `Ceiling ${formatRUSD(debtPolicy.maxOutstandingPrincipalRUSD)} · creditor ${debtPolicy.creditorLabel} · coupon ${formatRate(debtPolicy.annualCouponRate)}`
               : "No enabled debt policy for this country"
           }
         />
         <StatRow
           label="This month so far (flows)"
-          value={`Tax ${formatSUSD(latestMonthly?.incomeTaxSUSD ?? 0)} · Welfare requested ${formatSUSD(mtd.welfareRequestedSUSD)}`}
-          detail={`Welfare shortfall ${formatSUSD(mtd.welfareShortfallSUSD)} · business tax assessed ${formatSUSD(mtd.businessTaxAssessedSUSD)} · borrowed ${formatSUSD(mtd.debtIssuedSUSD)} · principal repaid ${formatSUSD(mtd.principalRepaidSUSD)} · interest paid ${formatSUSD(mtd.interestPaidSUSD)}`}
+          value={`Tax ${formatRUSD(latestMonthly?.incomeTaxRUSD ?? 0)} · Welfare requested ${formatRUSD(mtd.welfareRequestedRUSD)}`}
+          detail={`Welfare shortfall ${formatRUSD(mtd.welfareShortfallRUSD)} · business tax assessed ${formatRUSD(mtd.businessTaxAssessedRUSD)} · borrowed ${formatRUSD(mtd.debtIssuedRUSD)} · principal repaid ${formatRUSD(mtd.principalRepaidRUSD)} · interest paid ${formatRUSD(mtd.interestPaidRUSD)}`}
         />
       </Section>
 
@@ -276,12 +276,12 @@ export function BudgetScreen({
           min={0}
           max={Math.max(
             1000,
-            Math.round(country.treasuryCashSUSD),
-            Math.round(preview.estimatedDailyTaxableWageBaseSUSD * 365),
+            Math.round(country.treasuryCashRUSD),
+            Math.round(preview.estimatedDailyTaxableWageBaseRUSD * 365),
           )}
           step={100}
           precision={0}
-          unit="SUSD/yr"
+          unit="RUSD/yr"
           disabled={!canAct}
           pending={allowanceCommit.hasPending}
           onChange={(value) => setAllowanceText(value.toFixed(0))}
@@ -305,12 +305,12 @@ export function BudgetScreen({
         />
         <StatRow
           label="Current-base income-tax base"
-          value={formatSUSD(preview.estimatedDailyTaxableWageBaseSUSD)}
+          value={formatRUSD(preview.estimatedDailyTaxableWageBaseRUSD)}
           detail="Estimated exact current base at the current exemption; not realized wages."
         />
         <StatRow
           label="Month-to-date enterprise profit base"
-          value={formatSUSD(mtd.businessTaxBaseMonthToDateSUSD)}
+          value={formatRUSD(mtd.businessTaxBaseMonthToDateRUSD)}
           detail="Sum of positive building results so far this month, before assessment."
         />
       </Section>
@@ -323,10 +323,10 @@ export function BudgetScreen({
           label="Welfare budget"
           value={Number.isFinite(proposedWelfare) ? proposedWelfare : 0}
           min={0}
-          max={Math.max(10_000_000, Math.round(country.treasuryCashSUSD * 0.5))}
+          max={Math.max(10_000_000, Math.round(country.treasuryCashRUSD * 0.5))}
           step={100_000}
           precision={0}
-          unit="SUSD/yr"
+          unit="RUSD/yr"
           disabled={!canAct}
           pending={welfareCommit.hasPending}
           onChange={(value) => setWelfareText(value.toFixed(0))}
@@ -352,10 +352,10 @@ export function BudgetScreen({
           label="Treasury reserve target"
           value={Number.isFinite(proposedReserve) ? proposedReserve : 0}
           min={0}
-          max={Math.max(1000, Math.round(country.treasuryCashSUSD))}
+          max={Math.max(1000, Math.round(country.treasuryCashRUSD))}
           step={1000}
           precision={0}
-          unit="SUSD"
+          unit="RUSD"
           disabled={!canAct}
           pending={reserveCommit.hasPending}
           onChange={(value) => setReserveText(value.toFixed(0))}
@@ -371,41 +371,41 @@ export function BudgetScreen({
         <StatRow
           label="Income tax rate now → proposed"
           value={`${formatRate(preview.currentIncomeTaxRate)} → ${formatRate(preview.proposedIncomeTaxRate)}`}
-          detail={`Estimated tax ${formatSUSD(preview.currentDailyIncomeTaxSUSD)} → ${formatSUSD(preview.proposedDailyIncomeTaxSUSD)} per day.`}
+          detail={`Estimated tax ${formatRUSD(preview.currentDailyIncomeTaxRUSD)} → ${formatRUSD(preview.proposedDailyIncomeTaxRUSD)} per day.`}
         />
         <StatRow
           label="Taxable base now → proposed"
-          value={`${formatSUSD(preview.estimatedDailyTaxableWageBaseSUSD)} → ${formatSUSD(preview.proposedDailyTaxableWageBaseSUSD)}`}
+          value={`${formatRUSD(preview.estimatedDailyTaxableWageBaseRUSD)} → ${formatRUSD(preview.proposedDailyTaxableWageBaseRUSD)}`}
           detail={preview.taxableBaseIsEstimate ? "Proposed base is an upper-bound estimate assuming every wage-earning block exceeds the exemption." : "Exact current-base calculation under the current exemption."}
         />
         <StatRow
           label="Monthly income-tax effect"
-          value={formatSUSD(preview.monthlyIncomeTaxDeltaSUSD)}
+          value={formatRUSD(preview.monthlyIncomeTaxDeltaRUSD)}
           detail="Static change for the current civil month's day count, before behaviour changes."
         />
         <StatRow
           label="Welfare now → proposed"
-          value={`${formatSUSD(preview.currentWelfareBudgetSUSDPerYear)}/yr → ${formatSUSD(preview.proposedWelfareBudgetSUSDPerYear)}/yr`}
-          detail={`Daily request ${formatSUSD(preview.currentDailyWelfareSUSD)} → ${formatSUSD(preview.proposedDailyWelfareSUSD)}; cash ceiling above reserve ${formatSUSD(preview.currentWelfareCashCeilingSUSD)} → ${formatSUSD(preview.proposedWelfareCashCeilingSUSD)}.`}
+          value={`${formatRUSD(preview.currentWelfareBudgetRUSDPerYear)}/yr → ${formatRUSD(preview.proposedWelfareBudgetRUSDPerYear)}/yr`}
+          detail={`Daily request ${formatRUSD(preview.currentDailyWelfareRUSD)} → ${formatRUSD(preview.proposedDailyWelfareRUSD)}; cash ceiling above reserve ${formatRUSD(preview.currentWelfareCashCeilingRUSD)} → ${formatRUSD(preview.proposedWelfareCashCeilingRUSD)}.`}
         />
         <StatRow
           label="Monthly welfare effect"
-          value={formatSUSD(preview.monthlyWelfareDeltaSUSD)}
+          value={formatRUSD(preview.monthlyWelfareDeltaRUSD)}
           detail={`Eligibility ceiling ${String(preview.currentWelfareMaxWealthLevel)} → ${String(preview.proposedWelfareMaxWealthLevel)}; the per-capita eligibility effect is not retained per threshold and is not predicted.`}
         />
         <StatRow
           label="Business tax at current month base"
-          value={`${formatSUSD(preview.currentBusinessTaxAtCurrentBaseSUSD)} → ${formatSUSD(preview.proposedBusinessTaxAtCurrentBaseSUSD)}`}
-          detail={`Rate ${formatRate(preview.currentBusinessProfitTaxRate)} → ${formatRate(preview.proposedBusinessProfitTaxRate)} on ${formatSUSD(preview.businessTaxBaseMonthToDateSUSD)} month-to-date profit; collection is limited by each building's cash.`}
+          value={`${formatRUSD(preview.currentBusinessTaxAtCurrentBaseRUSD)} → ${formatRUSD(preview.proposedBusinessTaxAtCurrentBaseRUSD)}`}
+          detail={`Rate ${formatRate(preview.currentBusinessProfitTaxRate)} → ${formatRate(preview.proposedBusinessProfitTaxRate)} on ${formatRUSD(preview.businessTaxBaseMonthToDateRUSD)} month-to-date profit; collection is limited by each building's cash.`}
         />
         <StatRow
           label="Reserve target now → proposed"
-          value={`${formatSUSD(preview.currentReserveTargetSUSD)} → ${formatSUSD(preview.proposedReserveTargetSUSD)}`}
+          value={`${formatRUSD(preview.currentReserveTargetRUSD)} → ${formatRUSD(preview.proposedReserveTargetRUSD)}`}
           detail="Changes the welfare cash ceiling and the repayment floor; it is not a spending authorization."
         />
         <StatRow
           label="Estimated net monthly fiscal change"
-          value={formatSUSD(preview.estimatedMonthlyFiscalDeltaSUSD)}
+          value={formatRUSD(preview.estimatedMonthlyFiscalDeltaRUSD)}
           detail="Income-tax change minus welfare change; excludes business tax, interest, borrowing, principal, and economic response."
         />
         {preview.constraints.map((constraint) => (
@@ -431,11 +431,11 @@ export function BudgetScreen({
         <StatRow
           label="Creditor"
           value={debtPolicy.enabled ? debtPolicy.creditorLabel : "No creditor (debt disabled)"}
-          detail={`Kind ${debtPolicy.creditorKind} · creditor cash ${formatSUSD(debtPolicy.creditorCashSUSD)} · headroom ${formatSUSD(debtPolicy.headroomSUSD)} · term ${String(debtPolicy.termDays)} days`}
+          detail={`Kind ${debtPolicy.creditorKind} · creditor cash ${formatRUSD(debtPolicy.creditorCashRUSD)} · headroom ${formatRUSD(debtPolicy.headroomRUSD)} · term ${String(debtPolicy.termDays)} days`}
         />
         <StatRow
           label="Interest payable (stock)"
-          value={formatSUSD(country.debtInterestPayableSUSD)}
+          value={formatRUSD(country.debtInterestPayableRUSD)}
           detail={`Annual coupon ${formatRate(debtPolicy.annualCouponRate)}; interest accrues daily and pays at month-end.`}
         />
 
@@ -443,10 +443,10 @@ export function BudgetScreen({
           label="Borrow principal"
           value={Number.isFinite(borrowAmount) ? borrowAmount : 0}
           min={0}
-          max={Math.max(1000, Math.round(debtPolicy.headroomSUSD))}
+          max={Math.max(1000, Math.round(debtPolicy.headroomRUSD))}
           step={1000}
           precision={0}
-          unit="SUSD"
+          unit="RUSD"
           disabled={!canAct || !debtPolicy.enabled}
           onChange={(value) => setBorrowText(value.toFixed(0))}
           onCommit={(value) => applyBorrow(value)}
@@ -454,9 +454,9 @@ export function BudgetScreen({
         />
         {borrowPreview.valid ? (
           <Text style={styles.hint}>
-            Treasury {formatSUSD(country.treasuryCashSUSD)} → {formatSUSD(borrowPreview.treasuryAfterSUSD)};
-            debt {formatSUSD(country.debtOutstandingPrincipalSUSD)} → {formatSUSD(borrowPreview.outstandingAfterSUSD)};
-            interest {formatSUSD(borrowPreview.annualInterestSUSD)}/yr.
+            Treasury {formatRUSD(country.treasuryCashRUSD)} → {formatRUSD(borrowPreview.treasuryAfterRUSD)};
+            debt {formatRUSD(country.debtOutstandingPrincipalRUSD)} → {formatRUSD(borrowPreview.outstandingAfterRUSD)};
+            interest {formatRUSD(borrowPreview.annualInterestRUSD)}/yr.
           </Text>
         ) : (
           borrowPreview.errors.map((error) => (
@@ -485,19 +485,19 @@ export function BudgetScreen({
                   Contract {String(contract.id)} · {contract.holderLabel} · {contract.status}
                 </Text>
                 <Text style={styles.contractDetail}>
-                  Principal {formatSUSD(contract.principalSUSD)} · outstanding{" "}
-                  {formatSUSD(contract.outstandingPrincipalSUSD)} · accrued interest{" "}
-                  {formatSUSD(contract.accruedInterestSUSD)} · matures day{" "}
+                  Principal {formatRUSD(contract.principalRUSD)} · outstanding{" "}
+                  {formatRUSD(contract.outstandingPrincipalRUSD)} · accrued interest{" "}
+                  {formatRUSD(contract.accruedInterestRUSD)} · matures day{" "}
                   {String(contract.maturityDay)}
                 </Text>
                 <SliderField
                   label="Repay principal"
                   value={Number.isFinite(amount) ? Math.max(0, amount) : 0}
                   min={0}
-                  max={Math.max(1, Math.round(contract.outstandingPrincipalSUSD))}
+                  max={Math.max(1, Math.round(contract.outstandingPrincipalRUSD))}
                   step={100}
                   precision={0}
-                  unit="SUSD"
+                  unit="RUSD"
                   disabled={!canAct}
                   onChange={(value) =>
                     setRepayTexts((current) => ({ ...current, [contract.id]: value.toFixed(0) }))
@@ -514,17 +514,17 @@ export function BudgetScreen({
                       kind: "repay-debt",
                       countryId: country.id,
                       contractId: contract.id,
-                      amountSUSD: value,
+                      amountRUSD: value,
                     });
                   }}
                   hint="Principal repayment is a financing movement, not an expense."
                 />
                 {repayment === null ? null : repayment.valid ? (
                   <Text style={styles.hint}>
-                    Outstanding {formatSUSD(repayment.outstandingBeforeSUSD)} →{" "}
-                    {formatSUSD(repayment.outstandingAfterSUSD)} · treasury{" "}
-                    {formatSUSD(country.treasuryCashSUSD)} → {formatSUSD(repayment.treasuryAfterSUSD)}{" "}
-                    · reserve floor {formatSUSD(repayment.reserveTargetSUSD)}
+                    Outstanding {formatRUSD(repayment.outstandingBeforeRUSD)} →{" "}
+                    {formatRUSD(repayment.outstandingAfterRUSD)} · treasury{" "}
+                    {formatRUSD(country.treasuryCashRUSD)} → {formatRUSD(repayment.treasuryAfterRUSD)}{" "}
+                    · reserve floor {formatRUSD(repayment.reserveTargetRUSD)}
                   </Text>
                 ) : (
                   repayment.errors.map((error) => (
@@ -546,7 +546,7 @@ export function BudgetScreen({
                         kind: "repay-debt",
                         countryId: country.id,
                         contractId: contract.id,
-                        amountSUSD: amount,
+                        amountRUSD: amount,
                       });
                     }}
                     disabled={!canAct || repayment === null || !repayment.valid}
@@ -561,10 +561,10 @@ export function BudgetScreen({
           label="Outstanding-principal ceiling"
           value={Number.isFinite(proposedCeiling) ? proposedCeiling : 0}
           min={0}
-          max={Math.max(1_000_000, Math.round(debtPolicy.maxOutstandingPrincipalSUSD * 2))}
+          max={Math.max(1_000_000, Math.round(debtPolicy.maxOutstandingPrincipalRUSD * 2))}
           step={100_000}
           precision={0}
-          unit="SUSD"
+          unit="RUSD"
           disabled={!canAct || !debtPolicy.enabled}
           onChange={(value) => setCeilingText(value.toFixed(0))}
           onCommit={(value) => applyDebtPolicy({ ceiling: value })}
@@ -607,73 +607,73 @@ export function BudgetScreen({
           <>
             <StatRow
               label="Personal income tax (revenue)"
-              value={formatSUSD(latestMonthly.incomeTaxSUSD)}
+              value={formatRUSD(latestMonthly.incomeTaxRUSD)}
               detail="Recognized revenue for the closed period."
             />
             <StatRow
               label="Business-profit tax (revenue)"
-              value={formatSUSD(latestMonthly.businessTaxRevenueSUSD)}
-              detail={`Assessed ${formatSUSD(latestMonthly.businessTaxAssessedSUSD)} · uncollected ${formatSUSD(latestMonthly.businessTaxUncollectedSUSD)}`}
+              value={formatRUSD(latestMonthly.businessTaxRevenueRUSD)}
+              detail={`Assessed ${formatRUSD(latestMonthly.businessTaxAssessedRUSD)} · uncollected ${formatRUSD(latestMonthly.businessTaxUncollectedRUSD)}`}
             />
             <StatRow
               label="Customs duty (revenue)"
-              value={formatSUSD(latestMonthly.customsDutyRevenueSUSD)}
+              value={formatRUSD(latestMonthly.customsDutyRevenueRUSD)}
               detail="Duty collected by this country's customs administration."
             />
             <StatRow
               label="Welfare"
-              value={`${formatSUSD(latestMonthly.welfareExpenseSUSD)} paid`}
-              detail={`Requested ${formatSUSD(latestMonthly.welfareRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.welfareShortfallSUSD)}`}
+              value={`${formatRUSD(latestMonthly.welfareExpenseRUSD)} paid`}
+              detail={`Requested ${formatRUSD(latestMonthly.welfareRequestedRUSD)} · shortfall ${formatRUSD(latestMonthly.welfareShortfallRUSD)}`}
             />
             <StatRow
               label="Interest"
-              value={`${formatSUSD(latestMonthly.interestExpenseSUSD)} expense`}
-              detail={`Cash interest paid ${formatSUSD(latestMonthly.interestPaidSUSD)} (accrual and payment are distinct).`}
+              value={`${formatRUSD(latestMonthly.interestExpenseRUSD)} expense`}
+              detail={`Cash interest paid ${formatRUSD(latestMonthly.interestPaidRUSD)} (accrual and payment are distinct).`}
             />
             <StatRow
               label="Production subsidies"
-              value={formatSUSD(latestMonthly.subsidyExpenseSUSD)}
-              detail={`Requested ${formatSUSD(latestMonthly.subsidyRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.subsidyShortfallSUSD)}`}
+              value={formatRUSD(latestMonthly.subsidyExpenseRUSD)}
+              detail={`Requested ${formatRUSD(latestMonthly.subsidyRequestedRUSD)} · shortfall ${formatRUSD(latestMonthly.subsidyShortfallRUSD)}`}
             />
             <StatRow
               label="Administration payroll"
-              value={formatSUSD(latestMonthly.administrationExpenseSUSD)}
-              detail={`Requested ${formatSUSD(latestMonthly.administrationRequestedSUSD)} · shortfall ${formatSUSD(latestMonthly.administrationShortfallSUSD)}`}
+              value={formatRUSD(latestMonthly.administrationExpenseRUSD)}
+              detail={`Requested ${formatRUSD(latestMonthly.administrationRequestedRUSD)} · shortfall ${formatRUSD(latestMonthly.administrationShortfallRUSD)}`}
             />
             <StatRow
               label="Education and research payroll"
-              value={formatSUSD(latestMonthly.educationExpenseSUSD)}
+              value={formatRUSD(latestMonthly.educationExpenseRUSD)}
             />
             <StatRow
               label="Training payroll and stipend"
-              value={formatSUSD(latestMonthly.trainingExpenseSUSD)}
+              value={formatRUSD(latestMonthly.trainingExpenseRUSD)}
             />
             <StatRow
               label="Military pay and procurement"
-              value={formatSUSD(latestMonthly.militaryExpenseSUSD)}
+              value={formatRUSD(latestMonthly.militaryExpenseRUSD)}
               detail="Daily army pay, equipment upkeep, garrison cost, and recruitment equipment purchases."
             />
             <StatRow
               label="Net fiscal result"
-              value={formatSUSD(latestMonthly.netFiscalResultSUSD)}
+              value={formatRUSD(latestMonthly.netFiscalResultRUSD)}
               detail="Income tax + business tax + customs duty − welfare − interest − subsidies − administration − education − training − military; financing is excluded."
             />
             <StatRow
               label="Financing"
-              value={`${formatSUSD(latestMonthly.debtIssuedSUSD)} borrowed · ${formatSUSD(latestMonthly.principalRepaidSUSD)} principal repaid`}
-              detail={`Unfinanced requirement ${formatSUSD(latestMonthly.unfinancedRequirementSUSD)}; shortfall is explicit, never money-created.`}
+              value={`${formatRUSD(latestMonthly.debtIssuedRUSD)} borrowed · ${formatRUSD(latestMonthly.principalRepaidRUSD)} principal repaid`}
+              detail={`Unfinanced requirement ${formatRUSD(latestMonthly.unfinancedRequirementRUSD)}; shortfall is explicit, never money-created.`}
             />
             <StatRow
               label="Balances at close"
               value={
                 latestMonthly.treasuryCash === null
                   ? "Not retained (compacted month)"
-                  : formatSUSD(latestMonthly.treasuryCash.endSUSD)
+                  : formatRUSD(latestMonthly.treasuryCash.endRUSD)
               }
               detail={
                 latestMonthly.debtOutstanding === null
                   ? "Debt balance not retained for this month."
-                  : `Debt principal ${formatSUSD(latestMonthly.debtOutstanding.endSUSD)}.`
+                  : `Debt principal ${formatRUSD(latestMonthly.debtOutstanding.endRUSD)}.`
               }
             />
           </>
@@ -694,8 +694,8 @@ export function BudgetScreen({
                 <StatRow
                   key={period.periodEndDay}
                   label={`Period ending day ${String(period.periodEndDay)}`}
-                  value={formatSUSD(period.netFiscalResultSUSD)}
-                  detail={`Tax ${formatSUSD(period.incomeTaxSUSD)} · business ${formatSUSD(period.businessTaxRevenueSUSD)} · welfare requested ${formatSUSD(period.welfareRequestedSUSD)} paid ${formatSUSD(period.welfareExpenseSUSD)}`}
+                  value={formatRUSD(period.netFiscalResultRUSD)}
+                  detail={`Tax ${formatRUSD(period.incomeTaxRUSD)} · business ${formatRUSD(period.businessTaxRevenueRUSD)} · welfare requested ${formatRUSD(period.welfareRequestedRUSD)} paid ${formatRUSD(period.welfareExpenseRUSD)}`}
                 />
               ))}
           </>

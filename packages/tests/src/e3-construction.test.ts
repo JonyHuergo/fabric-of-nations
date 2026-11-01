@@ -10,7 +10,7 @@
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   applyCountryAction,
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   assertAccountingIdentity,
   assertValidWorld,
   constructionPlannedJobs,
@@ -63,8 +63,8 @@ function fixture(): Fixture {
       monetary: { kind: "own", currencyId: 0 },
       regionIds: [REGION],
       treasuryAccountId: 1000,
-      initialTreasuryCashSUSD: 100_000,
-      fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 0 },
+      initialTreasuryCashRUSD: 100_000,
+      fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
     },
   ];
   scenario.currencies = [
@@ -79,7 +79,7 @@ function fixture(): Fixture {
     {
       currencyId: 0,
       status: "specified",
-      susdPerUnit: asSusdPerCurrencyUnit(1),
+      rusdPerUnit: asRusdPerCurrencyUnit(1),
       setOnDay: 0,
       source: "scenario",
     },
@@ -153,7 +153,7 @@ function accountBalance(
   if (account === undefined) {
     throw new Error(`missing ${ownerKind} ${String(ownerId)} ${subtype}`);
   }
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 describe("E3 construction selection and authorization", () => {
@@ -163,7 +163,7 @@ describe("E3 construction selection and authorization", () => {
       (definition) =>
         definition.ownershipAllowed.includes("state") &&
         definition.outputs.length > 0 &&
-        definition.constructionCostSUSD > 0,
+        definition.constructionCostRUSD > 0,
     );
     expect(buildable.length).toBeGreaterThan(0);
     expect(
@@ -181,9 +181,9 @@ describe("E3 construction selection and authorization", () => {
     const created = project(f.world, projectId);
     const definition = f.scenario.definitions.buildings[FARM]!;
     expect(created.status).toBe("authorized");
-    expect(created.totalCostSUSD).toBe(definition.constructionCostSUSD);
-    expect(created.workingCapitalSUSD).toBe(definition.dailyUpkeepSUSDAtLevelOne * 30);
-    expect(created.spentSUSD).toBe(0);
+    expect(created.totalCostRUSD).toBe(definition.constructionCostRUSD);
+    expect(created.workingCapitalRUSD).toBe(definition.dailyUpkeepRUSDAtLevelOne * 30);
+    expect(created.spentRUSD).toBe(0);
     expect(created.buildingId).toBeNull();
     expect(f.world.construction.nextProjectId).toBe(projectId + 1);
     expect(f.world.buildings).toHaveLength(8);
@@ -234,9 +234,9 @@ describe("E3 construction selection and authorization", () => {
         entry.ownerId === COUNTRY &&
         entry.subtype === "owner-equity",
     )!;
-    const drain = treasury.balanceSUSD;
-    treasury.balanceSUSD -= drain;
-    equity.balanceSUSD -= drain;
+    const drain = treasury.balanceRUSD;
+    treasury.balanceRUSD -= drain;
+    equity.balanceRUSD -= drain;
     assertValidWorld(poor.world);
     expect(
       validateCountryAction(
@@ -274,19 +274,19 @@ describe("E3 construction progress and completion", () => {
     // Authorization day: no progress.
     run(f, 1);
     expect(project(f.world, projectId).status).toBe("authorized");
-    expect(project(f.world, projectId).spentSUSD).toBe(0);
+    expect(project(f.world, projectId).spentRUSD).toBe(0);
     expect(hashWorld(f.world)).not.toBe(beforeHash);
 
     run(f, 1); // first construction day
     const first = project(f.world, projectId);
-    const spentAfterFirst = first.spentSUSD;
+    const spentAfterFirst = first.spentRUSD;
     expect(first.status).toBe("active");
     expect(first.lastWorkers).toBeGreaterThan(0);
     expect(first.startedDay).toBe(1);
 
     run(f, 1);
     const second = project(f.world, projectId);
-    expect(second.spentSUSD).toBeGreaterThan(spentAfterFirst);
+    expect(second.spentRUSD).toBeGreaterThan(spentAfterFirst);
     expect(second.lastWorkers).toBeGreaterThan(0);
     // No worker is double-assigned: construction workers are not in world.employment.
     expect(
@@ -300,7 +300,7 @@ describe("E3 construction progress and completion", () => {
     }
     const completed = project(f.world, projectId);
     expect(completed.status).toBe("completed");
-    expect(completed.spentSUSD).toBeCloseTo(completed.totalCostSUSD, 9);
+    expect(completed.spentRUSD).toBeCloseTo(completed.totalCostRUSD, 9);
     expect(completed.completedDay).not.toBeNull();
     expect(completed.buildingId).not.toBeNull();
     expect(ticks).toBeGreaterThan(2);
@@ -320,14 +320,14 @@ describe("E3 construction progress and completion", () => {
     ).toContain(building.id);
     expect(accountBalance(f.world, "country", COUNTRY, "construction-in-progress")).toBe(0);
     expect(accountBalance(f.world, "country", COUNTRY, "public-capital")).toBeCloseTo(
-      completed.totalCostSUSD + completed.materialsSpentSUSD,
+      completed.totalCostRUSD + completed.materialsSpentRUSD,
       6,
     );
     expect(accountBalance(f.world, "building", building.id, "operating-cash")).toBeCloseTo(
-      completed.workingCapitalPaidSUSD,
+      completed.workingCapitalPaidRUSD,
       6,
     );
-    expect(completed.workingCapitalPaidSUSD).toBeGreaterThan(0);
+    expect(completed.workingCapitalPaidRUSD).toBeGreaterThan(0);
 
     // The new building participates in ordinary production and employment.
     run(f, 40);
@@ -341,7 +341,7 @@ describe("E3 construction progress and completion", () => {
           entry.ownerKind === "building" &&
           entry.ownerId === building.id &&
           entry.subtype === "sales-revenue",
-      )?.balanceSUSD ?? 0,
+      )?.balanceRUSD ?? 0,
     ).toBeGreaterThan(0);
     expect(designatedCashTotal(f.world.finance)).toBeCloseTo(beforeCash, 6);
   });
@@ -368,7 +368,7 @@ describe("E3 construction progress and completion", () => {
     run(f, 2); // day 0 authorization, day 1 blocked
     expect(project(f.world, projectId).status).toBe("waiting");
     expect(project(f.world, projectId).blockedReason).toBe("labor");
-    expect(project(f.world, projectId).spentSUSD).toBe(0);
+    expect(project(f.world, projectId).spentRUSD).toBe(0);
 
     // Restore a single block as a peasant; no monthly refresh occurs on day 2,
     // so the construction queue sees it as idle and resumes.
@@ -380,26 +380,26 @@ describe("E3 construction progress and completion", () => {
     run(f, 1);
     expect(project(f.world, projectId).status).toBe("active");
     expect(project(f.world, projectId).lastWorkers).toBeGreaterThan(0);
-    expect(project(f.world, projectId).spentSUSD).toBeGreaterThan(0);
+    expect(project(f.world, projectId).spentRUSD).toBeGreaterThan(0);
   });
 
   test("a project can wait for funds and resume after the treasury recovers", () => {
     const f = fixture();
     const projectId = start(f);
     run(f, 2);
-    expect(project(f.world, projectId).spentSUSD).toBeGreaterThan(0);
+    expect(project(f.world, projectId).spentRUSD).toBeGreaterThan(0);
     const country = f.world.countries.find((entry) => entry.id === COUNTRY)!;
-    country.fiscal.welfareBudgetSUSDPerYear = 1_000_000_000;
+    country.fiscal.welfareBudgetRUSDPerYear = 1_000_000_000;
     assertValidWorld(f.world);
     run(f, 1);
     expect(project(f.world, projectId).status).toBe("waiting");
     expect(project(f.world, projectId).blockedReason).toBe("funds");
-    const stalled = project(f.world, projectId).spentSUSD;
+    const stalled = project(f.world, projectId).spentRUSD;
     expect(accountBalance(f.world, "country", COUNTRY, "treasury-cash")).toBeGreaterThanOrEqual(
       0,
     );
 
-    f.world.countries.find((entry) => entry.id === COUNTRY)!.fiscal.welfareBudgetSUSDPerYear = 0;
+    f.world.countries.find((entry) => entry.id === COUNTRY)!.fiscal.welfareBudgetRUSDPerYear = 0;
     // Fixture recapitalization: restore treasury liquidity and matching country
     // equity after the deliberately exhaustive welfare draw.
     const treasury = f.world.finance.accounts.find(
@@ -414,12 +414,12 @@ describe("E3 construction progress and completion", () => {
         entry.ownerId === COUNTRY &&
         entry.subtype === "owner-equity",
     )!;
-    treasury.balanceSUSD += 50_000;
-    equity.balanceSUSD += 50_000;
+    treasury.balanceRUSD += 50_000;
+    equity.balanceRUSD += 50_000;
     assertValidWorld(f.world);
     run(f, 1);
     expect(project(f.world, projectId).status).toBe("active");
-    expect(project(f.world, projectId).spentSUSD).toBeGreaterThan(stalled);
+    expect(project(f.world, projectId).spentRUSD).toBeGreaterThan(stalled);
   });
 });
 
@@ -428,8 +428,8 @@ describe("E3 cancellation, suspension, and reporting", () => {
     const f = fixture();
     const projectId = start(f);
     run(f, 4);
-    const laborSpent = project(f.world, projectId).spentSUSD;
-    const materialSpent = project(f.world, projectId).materialsSpentSUSD;
+    const laborSpent = project(f.world, projectId).spentRUSD;
+    const materialSpent = project(f.world, projectId).materialsSpentRUSD;
     const spent = laborSpent + materialSpent;
     expect(laborSpent).toBeGreaterThan(0);
     expect(materialSpent).toBeGreaterThan(0);
@@ -463,7 +463,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
     );
     expect(designatedCashTotal(f.world.finance)).toBeCloseTo(cashBefore, 6);
     expect(
-      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionWrittenOffSUSD,
+      f.world.finance.budgetMemosThisMonth[COUNTRY]?.constructionWrittenOffRUSD,
     ).toBeCloseTo(spent, 6);
     assertValidWorld(f.world);
 
@@ -475,8 +475,8 @@ describe("E3 cancellation, suspension, and reporting", () => {
 
     // The cancelled project never progresses or spends again.
     run(f, 3);
-    expect(project(f.world, projectId).spentSUSD).toBeCloseTo(laborSpent, 9);
-    expect(project(f.world, projectId).materialsSpentSUSD).toBeCloseTo(
+    expect(project(f.world, projectId).spentRUSD).toBeCloseTo(laborSpent, 9);
+    expect(project(f.world, projectId).materialsSpentRUSD).toBeCloseTo(
       materialSpent,
       9,
     );
@@ -496,16 +496,16 @@ describe("E3 cancellation, suspension, and reporting", () => {
     };
     applyCountryAction(f.world, pause, f.scenario.definitions);
     expect(project(f.world, projectId).status).toBe("paused");
-    const spent = project(f.world, projectId).spentSUSD;
+    const spent = project(f.world, projectId).spentRUSD;
     run(f, 4);
     expect(project(f.world, projectId).status).toBe("paused");
-    expect(project(f.world, projectId).spentSUSD).toBeCloseTo(spent, 9);
+    expect(project(f.world, projectId).spentRUSD).toBeCloseTo(spent, 9);
 
     const resume: CountryAction = { ...pause, paused: false, dayIndex: f.world.dayIndex };
     applyCountryAction(f.world, resume, f.scenario.definitions);
     expect(project(f.world, projectId).status).toBe("active");
     run(f, 1);
-    expect(project(f.world, projectId).spentSUSD).toBeGreaterThan(spent);
+    expect(project(f.world, projectId).spentRUSD).toBeGreaterThan(spent);
   });
 
   test("monthly and annual reports carry construction outlays separately from expense", () => {
@@ -515,32 +515,32 @@ describe("E3 cancellation, suspension, and reporting", () => {
     expect(project(f.world, projectId).status).toBe("completed");
     const monthly = f.world.finance.periodSummaries[0]!;
     const budget = monthly.countryBudgetTotals[COUNTRY]!;
-    expect(budget.constructionSpentSUSD).toBeCloseTo(
-      project(f.world, projectId).spentSUSD +
-        project(f.world, projectId).materialsSpentSUSD,
+    expect(budget.constructionSpentRUSD).toBeCloseTo(
+      project(f.world, projectId).spentRUSD +
+        project(f.world, projectId).materialsSpentRUSD,
       6,
     );
     const fiscal = governmentPeriodTotals(f.world.finance, monthly).find(
       (entry) => entry.countryId === COUNTRY,
     )!;
     // Construction spending is capitalized, not a welfare/interest expense.
-    expect(fiscal.welfareExpenseSUSD).toBe(0);
-    expect(fiscal.interestExpenseSUSD).toBe(0);
-    expect(fiscal.netFiscalResultSUSD).toBe(0);
+    expect(fiscal.welfareExpenseRUSD).toBe(0);
+    expect(fiscal.interestExpenseRUSD).toBe(0);
+    expect(fiscal.netFiscalResultRUSD).toBe(0);
 
     run(f, 334); // complete the calendar year
     expect(f.world.finance.annualSummaries).toHaveLength(1);
     const annual = f.world.finance.annualSummaries[0]!;
     let monthlySpent = 0;
     for (const summary of f.world.finance.periodSummaries) {
-      monthlySpent += summary.countryBudgetTotals[COUNTRY]?.constructionSpentSUSD ?? 0;
+      monthlySpent += summary.countryBudgetTotals[COUNTRY]?.constructionSpentRUSD ?? 0;
     }
-    expect(annual.budgetTotals[COUNTRY]?.constructionSpentSUSD ?? 0).toBeCloseTo(
+    expect(annual.budgetTotals[COUNTRY]?.constructionSpentRUSD ?? 0).toBeCloseTo(
       monthlySpent,
       6,
     );
-    expect(annual.budgetTotals[COUNTRY]?.constructionSpentSUSD ?? 0).toBeCloseTo(
-      budget.constructionSpentSUSD,
+    expect(annual.budgetTotals[COUNTRY]?.constructionSpentRUSD ?? 0).toBeCloseTo(
+      budget.constructionSpentRUSD,
       6,
     );
   });
@@ -590,7 +590,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
     expect(snapshot.constructionEnabled).toBe(true);
     expect(snapshot.projectTypes.length).toBeGreaterThan(0);
     const farmType = snapshot.projectTypes.find((type) => type.definitionId === FARM)!;
-    expect(farmType.constructionCostSUSD).toBeGreaterThan(0);
+    expect(farmType.constructionCostRUSD).toBeGreaterThan(0);
     expect(farmType.constructionWorkers).toBeGreaterThan(0);
     expect(farmType.outputs.length).toBeGreaterThan(0);
     expect(farmType.outputs[0]?.dailyCapacityAtLevelOne).toBeGreaterThan(0);
@@ -602,13 +602,13 @@ describe("E3 cancellation, suspension, and reporting", () => {
     expect(country.constructionProjects).toHaveLength(1);
     expect(country.constructionProjects[0]?.id).toBe(projectId);
     expect(country.constructionLabor.idleWorkers).toBeGreaterThan(0);
-    expect(country.constructionLabor.dailyWageSUSD).toBeGreaterThan(0);
-    expect(country.constructionInProgressSUSD).toBeGreaterThan(0);
-    expect(country.budgetMonthToDate.constructionSpentSUSD).toBeGreaterThan(0);
+    expect(country.constructionLabor.dailyWageRUSD).toBeGreaterThan(0);
+    expect(country.constructionInProgressRUSD).toBeGreaterThan(0);
+    expect(country.budgetMonthToDate.constructionSpentRUSD).toBeGreaterThan(0);
 
     const preview = previewConstruction(snapshot, country, FARM, REGION);
     expect(preview.valid).toBe(true);
-    expect(preview.upfrontRequirementSUSD).toBeGreaterThan(preview.costSUSD);
+    expect(preview.upfrontRequirementRUSD).toBeGreaterThan(preview.costRUSD);
     expect(preview.estimatedDays).not.toBeNull();
     expect(() =>
       parseWorkerEvent({
@@ -638,11 +638,11 @@ describe("E3 cancellation, suspension, and reporting", () => {
         startedDay: null,
         completedDay: null,
         cancelledDay: 0,
-        totalCostSUSD: 1000,
-        workingCapitalSUSD: 600,
-        workingCapitalPaidSUSD: 0,
-        spentSUSD: 0,
-        materialsSpentSUSD: 0,
+        totalCostRUSD: 1000,
+        workingCapitalRUSD: 600,
+        workingCapitalPaidRUSD: 0,
+        spentRUSD: 0,
+        materialsSpentRUSD: 0,
         materials: [],
         lastWorkers: 0,
         blockedReason: null,
@@ -664,7 +664,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
     expect(f.world.construction.history).toHaveLength(1);
     expect(f.world.construction.history[0]?.countryId).toBe(COUNTRY);
     expect(f.world.construction.history[0]?.projectsCancelled).toBe(1);
-    expect(f.world.construction.history[0]?.totalWrittenOffSUSD).toBe(0);
+    expect(f.world.construction.history[0]?.totalWrittenOffRUSD).toBe(0);
     expect(f.world.construction.projects[0]?.id).toBe(2);
     assertValidWorld(f.world);
   });

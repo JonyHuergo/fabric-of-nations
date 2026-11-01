@@ -18,8 +18,8 @@
 
 import { assertValidDayIndex } from "../calendar.js";
 import { checksumOfJson } from "../hash.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
-import type { Day, Id, MoneySUSD } from "../types.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
+import type { Day, Id, MoneyRUSD } from "../types.js";
 import {
   requireArray,
   requireFiniteNumber,
@@ -402,7 +402,7 @@ export function assertFiscalPostingStructure(
         `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
       );
     }
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -414,7 +414,7 @@ export function assertFiscalPostingStructure(
         }
         blockExpense.set(
           account.ownerId,
-          (blockExpense.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (blockExpense.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "household-cash" && line.side === "credit") {
         if (account.ownerKind !== "popBlock" || account.ownerId === null) {
@@ -422,7 +422,7 @@ export function assertFiscalPostingStructure(
         }
         blockCash.set(
           account.ownerId,
-          (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (blockCash.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "treasury-cash" && line.side === "debit") {
         if (account.ownerKind !== "country" || account.ownerId === null) {
@@ -431,7 +431,7 @@ export function assertFiscalPostingStructure(
         countryOwners.add(account.ownerId);
         countryDebits.set(
           account.ownerId,
-          (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (countryDebits.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "income-tax-revenue" && line.side === "credit") {
         if (account.ownerKind !== "country" || account.ownerId === null) {
@@ -440,7 +440,7 @@ export function assertFiscalPostingStructure(
         countryOwners.add(account.ownerId);
         countryCredits.set(
           account.ownerId,
-          (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (countryCredits.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else {
         throw new RangeError(
@@ -455,7 +455,7 @@ export function assertFiscalPostingStructure(
         countryOwners.add(account.ownerId);
         countryDebits.set(
           account.ownerId,
-          (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (countryDebits.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "treasury-cash" && line.side === "credit") {
         if (account.ownerKind !== "country" || account.ownerId === null) {
@@ -464,7 +464,7 @@ export function assertFiscalPostingStructure(
         countryOwners.add(account.ownerId);
         countryCredits.set(
           account.ownerId,
-          (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (countryCredits.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "household-cash" && line.side === "debit") {
         if (account.ownerKind !== "popBlock" || account.ownerId === null) {
@@ -472,7 +472,7 @@ export function assertFiscalPostingStructure(
         }
         blockCash.set(
           account.ownerId,
-          (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (blockCash.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else if (account.subtype === "welfare-income" && line.side === "credit") {
         if (account.ownerKind !== "popBlock" || account.ownerId === null) {
@@ -480,7 +480,7 @@ export function assertFiscalPostingStructure(
         }
         blockIncome.set(
           account.ownerId,
-          (blockIncome.get(account.ownerId) ?? 0) + line.amountSUSD,
+          (blockIncome.get(account.ownerId) ?? 0) + line.amountRUSD,
         );
       } else {
         throw new RangeError(
@@ -495,7 +495,7 @@ export function assertFiscalPostingStructure(
   const owner = [...countryOwners][0];
   if (owner === undefined) throw new RangeError(`${path} fiscal entry has no country owner`);
   const tolerance = (left: number, right: number): number =>
-    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+    MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(left), Math.abs(right));
   const countryDebitTotal = countryDebits.get(owner) ?? 0;
   const countryCreditTotal = countryCredits.get(owner) ?? 0;
   if (!(countryDebitTotal > 0) || !(countryCreditTotal > 0)) {
@@ -586,7 +586,7 @@ function assertPayrollPostingStructure(
         `${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`,
       );
     }
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -598,7 +598,7 @@ function assertPayrollPostingStructure(
       countryOwners.add(account.ownerId);
       countryDebits.set(
         account.ownerId,
-        (countryDebits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        (countryDebits.get(account.ownerId) ?? 0) + line.amountRUSD,
       );
     } else if (account.subtype === "treasury-cash" && line.side === "credit") {
       if (account.ownerKind !== "country" || account.ownerId === null) {
@@ -607,7 +607,7 @@ function assertPayrollPostingStructure(
       countryOwners.add(account.ownerId);
       countryCredits.set(
         account.ownerId,
-        (countryCredits.get(account.ownerId) ?? 0) + line.amountSUSD,
+        (countryCredits.get(account.ownerId) ?? 0) + line.amountRUSD,
       );
     } else if (account.subtype === incomeSubtype && line.side === "credit") {
       if (account.ownerKind !== "popBlock" || account.ownerId === null) {
@@ -615,7 +615,7 @@ function assertPayrollPostingStructure(
       }
       blockIncome.set(
         account.ownerId,
-        (blockIncome.get(account.ownerId) ?? 0) + line.amountSUSD,
+        (blockIncome.get(account.ownerId) ?? 0) + line.amountRUSD,
       );
     } else if (account.subtype === "household-cash" && line.side === "debit") {
       if (account.ownerKind !== "popBlock" || account.ownerId === null) {
@@ -623,7 +623,7 @@ function assertPayrollPostingStructure(
       }
       blockCash.set(
         account.ownerId,
-        (blockCash.get(account.ownerId) ?? 0) + line.amountSUSD,
+        (blockCash.get(account.ownerId) ?? 0) + line.amountRUSD,
       );
     } else {
       throw new RangeError(
@@ -637,7 +637,7 @@ function assertPayrollPostingStructure(
   const owner = [...countryOwners][0];
   if (owner === undefined) throw new RangeError(`${path} ${label} has no country`);
   const tolerance = (left: number, right: number): number =>
-    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+    MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(left), Math.abs(right));
   const countryDebitTotal = countryDebits.get(owner) ?? 0;
   const countryCreditTotal = countryCredits.get(owner) ?? 0;
   if (!(countryDebitTotal > 0) || !(countryCreditTotal > 0)) {
@@ -741,7 +741,7 @@ export function assertBusinessTaxPostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -757,25 +757,25 @@ export function assertBusinessTaxPostingStructure(
         throw new RangeError(`${path} business-tax-expense must belong to a building`);
       }
       buildings.add(account.ownerId);
-      expenseTotal += line.amountSUSD;
+      expenseTotal += line.amountRUSD;
     } else if (account.subtype === "operating-cash" && line.side === "credit") {
       if (account.ownerKind !== "building" || account.ownerId === null) {
         throw new RangeError(`${path} operating-cash must belong to a building`);
       }
       buildings.add(account.ownerId);
-      cashOutTotal += line.amountSUSD;
+      cashOutTotal += line.amountRUSD;
     } else if (account.subtype === "treasury-cash" && line.side === "debit") {
       if (account.ownerKind !== "country" || account.ownerId === null) {
         throw new RangeError(`${path} treasury-cash must belong to a country`);
       }
       countries.add(account.ownerId);
-      cashInTotal += line.amountSUSD;
+      cashInTotal += line.amountRUSD;
     } else if (account.subtype === "business-tax-revenue" && line.side === "credit") {
       if (account.ownerKind !== "country" || account.ownerId === null) {
         throw new RangeError(`${path} business-tax-revenue must belong to a country`);
       }
       countries.add(account.ownerId);
-      revenueTotal += line.amountSUSD;
+      revenueTotal += line.amountRUSD;
     } else {
       throw new RangeError(
         `${path} has an invalid business-profit-tax line for ${account.subtype} on the ${line.side} side`,
@@ -789,7 +789,7 @@ export function assertBusinessTaxPostingStructure(
     throw new RangeError(`${path} business-profit-tax entry must reference exactly one country`);
   }
   const tolerance = (left: number, right: number): number =>
-    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+    MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(left), Math.abs(right));
   if (!(expenseTotal > 0) || !(revenueTotal > 0)) {
     throw new RangeError(`${path} business-profit-tax entry has no positive total`);
   }
@@ -839,7 +839,7 @@ export function assertConstructionPostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -856,10 +856,10 @@ export function assertConstructionPostingStructure(
     if (account.ownerKind === "building" && account.ownerId !== null) {
       buildings.add(account.ownerId);
     }
-    add(`${account.subtype}:${line.side}`, line.amountSUSD);
+    add(`${account.subtype}:${line.side}`, line.amountRUSD);
   }
   const tolerance = (left: number, right: number): number =>
-    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+    MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(left), Math.abs(right));
   const value = (key: string): number => totals.get(key) ?? 0;
   if (kind === "construction-wage") {
     if (countries.size !== 1) {
@@ -916,9 +916,9 @@ export function assertConstructionPostingStructure(
     const account = accounts.get(line.accountId);
     if (account === undefined || account.subtype !== "owner-equity") continue;
     if (account.ownerKind === "country" && line.side === "debit") {
-      countryEquityDebit += line.amountSUSD;
+      countryEquityDebit += line.amountRUSD;
     } else if (account.ownerKind === "building" && line.side === "credit") {
-      buildingEquityCredit += line.amountSUSD;
+      buildingEquityCredit += line.amountRUSD;
     } else {
       throw new RangeError(`${path} construction-working-capital has an invalid owner-equity leg`);
     }
@@ -967,7 +967,7 @@ export function assertIndustrialPostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -984,10 +984,10 @@ export function assertIndustrialPostingStructure(
     if (account.ownerKind === "building" && account.ownerId !== null) {
       buildings.add(account.ownerId);
     }
-    add(`${account.subtype}:${line.side}`, line.amountSUSD);
+    add(`${account.subtype}:${line.side}`, line.amountRUSD);
   }
   const tolerance = (left: number, right: number): number =>
-    MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(left), Math.abs(right));
+    MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(left), Math.abs(right));
   const value = (key: string): number => totals.get(key) ?? 0;
   if (countries.size !== 1 || buildings.size !== 1) {
     throw new RangeError(
@@ -1048,9 +1048,9 @@ export function assertIndustrialPostingStructure(
  *
  * - `monetary-reserve-contribution`: treasury cash and country equity exchange against
  *   the authority's reserve cash and monetary equity (capitalization or withdrawal).
- * - `fx-issuance`: the authority receives SUSD reserves and credits its currency
- *   liability; the external counterparty receives currency (SUSD-measured) and pays
- *   SUSD cash.
+ * - `fx-issuance`: the authority receives RUSD reserves and credits its currency
+ *   liability; the external counterparty receives currency (RUSD-measured) and pays
+ *   RUSD cash.
  * - `fx-redemption`: the reverse.
  * - `fx-revaluation`: a valuation change only — the currency liability and monetary
  *   equity adjust, and the external holding and external equity adjust oppositely. No
@@ -1092,7 +1092,7 @@ export function assertMonetaryPostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -1110,13 +1110,13 @@ export function assertMonetaryPostingStructure(
     } else {
       throw new RangeError(`${path} ${kind} may only reference country and system accounts`);
     }
-    if (index === 0) amount = line.amountSUSD;
-    if (Math.abs(line.amountSUSD - amount) > toleranceMoney(amount, line.amountSUSD)) {
+    if (index === 0) amount = line.amountRUSD;
+    if (Math.abs(line.amountRUSD - amount) > toleranceMoney(amount, line.amountRUSD)) {
       throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
     }
     totals.set(
       `${account.subtype}:${line.side}`,
-      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountRUSD,
     );
   }
   if (countryIds.size !== 1) {
@@ -1173,7 +1173,7 @@ export function assertOwnerCapitalInjectionStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -1191,7 +1191,7 @@ export function assertOwnerCapitalInjectionStructure(
     }
     totals.set(
       `${account.subtype}:${line.side}`,
-      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountRUSD,
     );
   }
   const value = (key: string): number => totals.get(key) ?? 0;
@@ -1238,9 +1238,9 @@ export function assertOwnerCapitalInjectionStructure(
     if (account === undefined || account.subtype !== "owner-equity") continue;
     if (line.side !== "credit" && line.side !== "debit") continue;
     if (account.ownerKind === "building" && line.side === "credit") {
-      buildingEquity += line.amountSUSD;
+      buildingEquity += line.amountRUSD;
     } else if (account.ownerKind !== "building" && line.side === "debit") {
-      ownerEquity += line.amountSUSD;
+      ownerEquity += line.amountRUSD;
     }
   }
   if (
@@ -1266,7 +1266,7 @@ export function assertTradePostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -1285,7 +1285,7 @@ export function assertTradePostingStructure(
     }
     totals.set(
       `${account.subtype}:${line.side}`,
-      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountRUSD,
     );
   }
   const value = (key: string): number => totals.get(key) ?? 0;
@@ -1338,7 +1338,7 @@ export function assertMilitaryPostingStructure(
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(
         `${path}.lines[${String(index)}] requires a strictly positive finite amount`,
       );
@@ -1357,7 +1357,7 @@ export function assertMilitaryPostingStructure(
     }
     totals.set(
       `${account.subtype}:${line.side}`,
-      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountSUSD,
+      (totals.get(`${account.subtype}:${line.side}`) ?? 0) + line.amountRUSD,
     );
   }
   const value = (key: string): number => totals.get(key) ?? 0;
@@ -1419,14 +1419,14 @@ export function assertProfitAllocationStructure(
     if (account === undefined) {
       throw new RangeError(`${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`);
     }
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(`${path}.lines[${String(index)}] requires a strictly positive finite amount`);
     }
     return { line, account };
   });
-  const amount = resolved[0]?.line.amountSUSD ?? 0;
+  const amount = resolved[0]?.line.amountRUSD ?? 0;
   for (const entry of resolved) {
-    if (Math.abs(entry.line.amountSUSD - amount) > toleranceMoney(amount, entry.line.amountSUSD)) {
+    if (Math.abs(entry.line.amountRUSD - amount) > toleranceMoney(amount, entry.line.amountRUSD)) {
       throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
     }
   }
@@ -1583,7 +1583,7 @@ export function assertDebtPostingStructure(
     if (account === undefined) {
       throw new RangeError(`${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`);
     }
-    if (!Number.isFinite(line.amountSUSD) || !(line.amountSUSD > 0)) {
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
       throw new RangeError(`${path}.lines[${String(index)}] requires a strictly positive finite amount`);
     }
     return { line, account };
@@ -1635,14 +1635,14 @@ export function assertDebtPostingStructure(
       throw new RangeError(`${path} ${kind} requires issuer debit and holder credit legs`);
     }
     const sum = (entries: readonly (typeof resolved)[number][]): number =>
-      entries.reduce((total, entry) => total + entry.line.amountSUSD, 0);
+      entries.reduce((total, entry) => total + entry.line.amountRUSD, 0);
     const issuerDebitTotal = sum(issuerDebits);
     const holderCreditTotal = sum(holderCredits);
     if (
-      Math.abs(issuerDebitTotal - issuerEquity.line.amountSUSD) >
-        toleranceMoney(issuerDebitTotal, issuerEquity.line.amountSUSD) ||
-      Math.abs(holderCreditTotal - holderEquity.line.amountSUSD) >
-        toleranceMoney(holderCreditTotal, holderEquity.line.amountSUSD)
+      Math.abs(issuerDebitTotal - issuerEquity.line.amountRUSD) >
+        toleranceMoney(issuerDebitTotal, issuerEquity.line.amountRUSD) ||
+      Math.abs(holderCreditTotal - holderEquity.line.amountRUSD) >
+        toleranceMoney(holderCreditTotal, holderEquity.line.amountRUSD)
     ) {
       throw new RangeError(`${path} ${kind} write-down legs do not balance to owner equity`);
     }
@@ -1651,9 +1651,9 @@ export function assertDebtPostingStructure(
   if (lines.length !== 4) {
     throw new RangeError(`${path} ${kind} must contain exactly four lines`);
   }
-  const amount = resolved[0]?.line.amountSUSD ?? 0;
+  const amount = resolved[0]?.line.amountRUSD ?? 0;
   for (const entry of resolved) {
-    if (Math.abs(entry.line.amountSUSD - amount) > toleranceMoney(amount, entry.line.amountSUSD)) {
+    if (Math.abs(entry.line.amountRUSD - amount) > toleranceMoney(amount, entry.line.amountRUSD)) {
       throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
     }
   }
@@ -1971,18 +1971,18 @@ export function assertOwnerEquityInvariant(finance: FinanceState): void {
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 /** Totals derived from authoritative account balances. */
 export interface AccountingTotals {
-  readonly assets: MoneySUSD;
-  readonly liabilities: MoneySUSD;
-  readonly equity: MoneySUSD;
-  readonly revenues: MoneySUSD;
-  readonly expenses: MoneySUSD;
+  readonly assets: MoneyRUSD;
+  readonly liabilities: MoneyRUSD;
+  readonly equity: MoneyRUSD;
+  readonly revenues: MoneyRUSD;
+  readonly expenses: MoneyRUSD;
   /** assets - liabilities */
-  readonly netWorth: MoneySUSD;
+  readonly netWorth: MoneyRUSD;
 }
 
 /** Sum authoritative balances by category. Never clamps or repairs. */
@@ -1995,7 +1995,7 @@ export function accountingTotals(finance: FinanceState): AccountingTotals {
   let expenses = 0;
   for (const value of accounts) {
     const account = value as FinancialAccount;
-    const balance = requireFiniteNumber(account.balanceSUSD, `account ${String(account.id)}.balanceSUSD`);
+    const balance = requireFiniteNumber(account.balanceRUSD, `account ${String(account.id)}.balanceRUSD`);
     switch (account.category) {
       case "asset":
         assets += balance;
@@ -2038,13 +2038,13 @@ export function assertAccountingIdentity(finance: FinanceState): AccountingTotal
  * Monetary issuance/redemption are the only authorized exceptions and are not
  * implemented in M4a-1.
  */
-export function designatedCashTotal(finance: FinanceState): MoneySUSD {
+export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
   const accounts = requireArray(finance.accounts, "finance.accounts");
   let total = 0;
   for (const value of accounts) {
     const account = value as FinancialAccount;
     if (!isCashAccount(account)) continue;
-    total += requireFiniteNumber(account.balanceSUSD, `account ${String(account.id)}.balanceSUSD`);
+    total += requireFiniteNumber(account.balanceRUSD, `account ${String(account.id)}.balanceRUSD`);
   }
   return total;
 }
@@ -2126,7 +2126,7 @@ export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
 /** One opening balance to apply. */
 export interface OpeningBalanceEntry {
   readonly accountId: Id;
-  readonly balanceSUSD: MoneySUSD;
+  readonly balanceRUSD: MoneyRUSD;
 }
 
 /**
@@ -2162,9 +2162,9 @@ export function applyOpeningBalances(
       throw new RangeError(`duplicate finance account id ${String(account.id)}`);
     }
     byId.set(account.id, account);
-    if (account.balanceSUSD !== 0) {
+    if (account.balanceRUSD !== 0) {
       throw new RangeError(
-        `opening balances require zeroed account ${String(account.id)}; found ${String(account.balanceSUSD)}`,
+        `opening balances require zeroed account ${String(account.id)}; found ${String(account.balanceRUSD)}`,
       );
     }
   }
@@ -2188,8 +2188,8 @@ export function applyOpeningBalances(
       throw new RangeError(`opening balance references unknown account ${String(accountId)}`);
     }
     const balance = requireFiniteNumber(
-      record.balanceSUSD,
-      `opening[${String(index)}].balanceSUSD`,
+      record.balanceRUSD,
+      `opening[${String(index)}].balanceRUSD`,
     );
     if (!categoryAllowsNegativeBalance(account.category) && balance < 0) {
       throw new RangeError(
@@ -2220,7 +2220,7 @@ export function applyOpeningBalances(
     }
     normalized.push({
       accountId,
-      balanceSUSD: Object.is(balance, -0) ? 0 : balance,
+      balanceRUSD: Object.is(balance, -0) ? 0 : balance,
     });
   }
 
@@ -2236,12 +2236,20 @@ export function applyOpeningBalances(
   for (const entry of normalized) {
     const account = byId.get(entry.accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(entry.accountId)}`);
-    account.balanceSUSD = entry.balanceSUSD;
+    account.balanceRUSD = entry.balanceRUSD;
   }
+  // M14 compatibility: the opening-balance checksum is a derived integrity
+  // value that predates the RUSD rename. Hash it with the former field spelling
+  // so unchanged balances produce the same historical checksum and world hash;
+  // the authoritative account field remains balanceRUSD.
+  const openingChecksumEntries = normalized.map((entry) => ({
+    accountId: entry.accountId,
+    balanceSUSD: entry.balanceRUSD,
+  }));
   const opening: OpeningBalanceRecord = {
     dayIndex,
     accountCount: accounts.length,
-    checksum: checksumOfJson(normalized),
+    checksum: checksumOfJson(openingChecksumEntries),
   };
   finance.opening = opening;
   return opening;

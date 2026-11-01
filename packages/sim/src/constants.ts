@@ -134,7 +134,7 @@ export const MAX_WARNING_LENGTH = 500;
 export const SAVE_CHECKSUM_PREFIX = "fnv1a32:";
 
 /**
- * Provisional inclusive bounds for a currency's SUSD valuation. These are
+ * Provisional inclusive bounds for a currency's RUSD valuation. These are
  * numerical safety bounds, not historically calibrated economics.
  */
 export const CURRENCY_RATE_MIN = 1e-12;
@@ -142,12 +142,25 @@ export const CURRENCY_RATE_MAX = 1e12;
 
 /**
  * Dimensionless relative tolerance for currency valuation and cross-rate
- * comparisons. Money comparisons use the SUSD money tolerance instead.
+ * comparisons. Money comparisons use the RUSD money tolerance instead.
  */
 export const CURRENCY_RATE_RELATIVE_TOLERANCE = 1e-12;
 
-/** Reserved key for the SUSD unit of account; never a registered currency. */
-export const SUSD_CURRENCY_KEY = "susd";
+/** Reserved key for the RUSD unit of account; never a registered currency. */
+export const RUSD_CURRENCY_KEY = "rusd";
+
+/** Official full name of the RUSD reference unit of account. */
+export const RUSD_UNIT_NAME = "Reference US Dollars";
+
+/** Official abbreviation of the reference unit of account. */
+export const RUSD_UNIT_ABBREVIATION = "RUSD";
+
+/**
+ * Legacy pre-M14 key for the reference unit. Retained only so old scenario or
+ * save data that used the former vocabulary is rejected as a currency, never
+ * accepted as a national currency.
+ */
+export const LEGACY_SUSD_CURRENCY_KEY = "susd";
 
 /** Maximum accepted length of a registered currency key. */
 export const MAX_CURRENCY_KEY_LENGTH = 32;

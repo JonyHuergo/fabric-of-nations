@@ -5,7 +5,7 @@
     "definitionKey": "subsistence-farm",
     "level": 137,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -14,7 +14,7 @@
     "definitionKey": "commercial-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -23,7 +23,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -32,7 +32,7 @@
     "definitionKey": "food-processing",
     "level": 20,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -41,7 +41,7 @@
     "definitionKey": "textile-mill",
     "level": 31,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -50,7 +50,7 @@
     "definitionKey": "workshop",
     "level": 29,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -59,7 +59,7 @@
     "definitionKey": "ranch",
     "level": 21,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -68,7 +68,7 @@
     "definitionKey": "fishery",
     "level": 21,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -77,7 +77,7 @@
     "definitionKey": "subsistence-farm",
     "level": 112,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -86,7 +86,7 @@
     "definitionKey": "commercial-farm",
     "level": 14,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -95,7 +95,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -104,7 +104,7 @@
     "definitionKey": "food-processing",
     "level": 17,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -113,7 +113,7 @@
     "definitionKey": "ranch",
     "level": 17,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -122,7 +122,7 @@
     "definitionKey": "fishery",
     "level": 17,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -131,7 +131,7 @@
     "definitionKey": "subsistence-farm",
     "level": 122,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -140,7 +140,7 @@
     "definitionKey": "commercial-farm",
     "level": 15,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -149,7 +149,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -158,7 +158,7 @@
     "definitionKey": "food-processing",
     "level": 18,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -167,7 +167,7 @@
     "definitionKey": "textile-mill",
     "level": 27,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -176,7 +176,7 @@
     "definitionKey": "workshop",
     "level": 26,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -185,7 +185,7 @@
     "definitionKey": "ranch",
     "level": 19,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -194,7 +194,7 @@
     "definitionKey": "fishery",
     "level": 19,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -203,7 +203,7 @@
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -212,7 +212,7 @@
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -221,7 +221,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -230,7 +230,7 @@
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -239,7 +239,7 @@
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -248,7 +248,7 @@
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -257,7 +257,7 @@
     "definitionKey": "subsistence-farm",
     "level": 110,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -266,7 +266,7 @@
     "definitionKey": "commercial-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -275,7 +275,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -284,7 +284,7 @@
     "definitionKey": "food-processing",
     "level": 16,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -293,7 +293,7 @@
     "definitionKey": "textile-mill",
     "level": 28,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -302,7 +302,7 @@
     "definitionKey": "workshop",
     "level": 19,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -311,7 +311,7 @@
     "definitionKey": "ranch",
     "level": 17,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -320,7 +320,7 @@
     "definitionKey": "fishery",
     "level": 17,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -329,7 +329,7 @@
     "definitionKey": "subsistence-farm",
     "level": 74,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -338,7 +338,7 @@
     "definitionKey": "commercial-farm",
     "level": 9,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -347,7 +347,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -356,7 +356,7 @@
     "definitionKey": "food-processing",
     "level": 11,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -365,7 +365,7 @@
     "definitionKey": "workshop",
     "level": 13,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -374,7 +374,7 @@
     "definitionKey": "ranch",
     "level": 11,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -383,7 +383,7 @@
     "definitionKey": "fishery",
     "level": 11,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -392,7 +392,7 @@
     "definitionKey": "subsistence-farm",
     "level": 70,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -401,7 +401,7 @@
     "definitionKey": "commercial-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -410,7 +410,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -419,7 +419,7 @@
     "definitionKey": "food-processing",
     "level": 10,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -428,7 +428,7 @@
     "definitionKey": "textile-mill",
     "level": 18,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -437,7 +437,7 @@
     "definitionKey": "workshop",
     "level": 12,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -446,7 +446,7 @@
     "definitionKey": "ranch",
     "level": 11,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -455,7 +455,7 @@
     "definitionKey": "fishery",
     "level": 11,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -464,7 +464,7 @@
     "definitionKey": "subsistence-farm",
     "level": 57,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -473,7 +473,7 @@
     "definitionKey": "commercial-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -482,7 +482,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -491,7 +491,7 @@
     "definitionKey": "food-processing",
     "level": 9,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -500,7 +500,7 @@
     "definitionKey": "ranch",
     "level": 9,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -509,7 +509,7 @@
     "definitionKey": "fishery",
     "level": 9,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -518,7 +518,7 @@
     "definitionKey": "subsistence-farm",
     "level": 196,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -527,7 +527,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 23,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -536,7 +536,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -545,7 +545,7 @@
     "definitionKey": "food-processing",
     "level": 29,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -554,7 +554,7 @@
     "definitionKey": "ranch",
     "level": 30,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -563,7 +563,7 @@
     "definitionKey": "fishery",
     "level": 30,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -572,7 +572,7 @@
     "definitionKey": "subsistence-farm",
     "level": 249,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -581,7 +581,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 30,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -590,7 +590,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -599,7 +599,7 @@
     "definitionKey": "food-processing",
     "level": 36,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -608,7 +608,7 @@
     "definitionKey": "textile-mill",
     "level": 66,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -617,7 +617,7 @@
     "definitionKey": "workshop-peasant",
     "level": 63,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -626,7 +626,7 @@
     "definitionKey": "ranch",
     "level": 38,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -635,7 +635,7 @@
     "definitionKey": "fishery",
     "level": 38,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -644,7 +644,7 @@
     "definitionKey": "subsistence-farm",
     "level": 98,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -653,7 +653,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 12,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -662,7 +662,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -671,7 +671,7 @@
     "definitionKey": "food-processing",
     "level": 14,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -680,7 +680,7 @@
     "definitionKey": "textile-mill",
     "level": 25,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -689,7 +689,7 @@
     "definitionKey": "workshop-peasant",
     "level": 24,
     "ownerProfessionKey": "capitalists",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -698,7 +698,7 @@
     "definitionKey": "ranch",
     "level": 15,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -707,7 +707,7 @@
     "definitionKey": "fishery",
     "level": 15,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -716,7 +716,7 @@
     "definitionKey": "subsistence-farm",
     "level": 46,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -725,7 +725,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 5,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -734,7 +734,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -743,7 +743,7 @@
     "definitionKey": "food-processing",
     "level": 7,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -752,7 +752,7 @@
     "definitionKey": "ranch",
     "level": 7,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -761,7 +761,7 @@
     "definitionKey": "fishery",
     "level": 7,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -770,7 +770,7 @@
     "definitionKey": "subsistence-farm",
     "level": 427,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -779,7 +779,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 51,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -788,7 +788,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -797,7 +797,7 @@
     "definitionKey": "food-processing",
     "level": 63,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -806,7 +806,7 @@
     "definitionKey": "textile-mill",
     "level": 112,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -815,7 +815,7 @@
     "definitionKey": "workshop-peasant",
     "level": 107,
     "ownerProfessionKey": "capitalists",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -824,7 +824,7 @@
     "definitionKey": "ranch",
     "level": 65,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -833,7 +833,7 @@
     "definitionKey": "fishery",
     "level": 65,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -842,7 +842,7 @@
     "definitionKey": "subsistence-farm",
     "level": 350,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -851,7 +851,7 @@
     "definitionKey": "commercial-farm-peasant",
     "level": 42,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -860,7 +860,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -869,7 +869,7 @@
     "definitionKey": "food-processing",
     "level": 51,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -878,7 +878,7 @@
     "definitionKey": "ranch",
     "level": 54,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -887,7 +887,7 @@
     "definitionKey": "fishery",
     "level": 54,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -896,7 +896,7 @@
     "definitionKey": "subsistence-farm",
     "level": 39,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -905,7 +905,7 @@
     "definitionKey": "commercial-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -914,7 +914,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -923,7 +923,7 @@
     "definitionKey": "food-processing",
     "level": 6,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -932,7 +932,7 @@
     "definitionKey": "textile-mill",
     "level": 10,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -941,7 +941,7 @@
     "definitionKey": "workshop",
     "level": 9,
     "ownerProfessionKey": "capitalists",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -950,7 +950,7 @@
     "definitionKey": "ranch",
     "level": 6,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -959,7 +959,7 @@
     "definitionKey": "fishery",
     "level": 6,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -968,7 +968,7 @@
     "definitionKey": "subsistence-farm",
     "level": 18,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -977,7 +977,7 @@
     "definitionKey": "commercial-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -986,7 +986,7 @@
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 50000,
+    "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
@@ -995,7 +995,7 @@
     "definitionKey": "food-processing",
     "level": 3,
     "ownerProfessionKey": "clerks",
-    "operatingCashSUSD": 3000000,
+    "operatingCashRUSD": 3000000,
     "status": "provisional"
   },
   {
@@ -1004,7 +1004,7 @@
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   },
   {
@@ -1013,7 +1013,7 @@
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
-    "operatingCashSUSD": 200000,
+    "operatingCashRUSD": 200000,
     "status": "provisional"
   }
 ]

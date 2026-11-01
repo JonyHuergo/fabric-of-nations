@@ -5,6 +5,7 @@
  * `SimulationSnapshot` contract.
  */
 
+import { RUSD_UNIT_ABBREVIATION } from "@century/sim";
 import type {
   CountrySnapshot,
   GoodSnapshot,
@@ -12,6 +13,8 @@ import type {
   RegionSnapshot,
   SimulationSnapshot,
 } from "./protocol.js";
+
+export { RUSD_UNIT_ABBREVIATION, RUSD_UNIT_NAME } from "@century/sim";
 
 export const COUNTRY_COLORS = [
   "#356859",
@@ -60,13 +63,14 @@ export function countryColor(countryId: number | null): string {
   return COUNTRY_COLORS[countryId % COUNTRY_COLORS.length] ?? "#6f756f";
 }
 
-export function formatSUSD(value: number): string {
+export function formatRUSD(value: number): string {
   const absolute = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (absolute >= 1_000_000_000) return `${sign}${(absolute / 1_000_000_000).toFixed(2)}B SUSD`;
-  if (absolute >= 1_000_000) return `${sign}${(absolute / 1_000_000).toFixed(2)}M SUSD`;
-  if (absolute >= 1_000) return `${sign}${(absolute / 1_000).toFixed(1)}k SUSD`;
-  return `${sign}${absolute.toFixed(2)} SUSD`;
+  const unit = RUSD_UNIT_ABBREVIATION;
+  if (absolute >= 1_000_000_000) return `${sign}${(absolute / 1_000_000_000).toFixed(2)}B ${unit}`;
+  if (absolute >= 1_000_000) return `${sign}${(absolute / 1_000_000).toFixed(2)}M ${unit}`;
+  if (absolute >= 1_000) return `${sign}${(absolute / 1_000).toFixed(1)}k ${unit}`;
+  return `${sign}${absolute.toFixed(2)} ${unit}`;
 }
 
 export function formatCount(value: number): string {
@@ -98,9 +102,9 @@ export function formatSpeed(value: number): string {
 }
 
 /** Human label for the most important budget line. */
-export function fiscalResultLabel(netFiscalResultSUSD: number): string {
-  if (netFiscalResultSUSD > 0) return "Surplus";
-  if (netFiscalResultSUSD < 0) return "Deficit";
+export function fiscalResultLabel(netFiscalResultRUSD: number): string {
+  if (netFiscalResultRUSD > 0) return "Surplus";
+  if (netFiscalResultRUSD < 0) return "Deficit";
   return "Balanced";
 }
 

@@ -1,8 +1,21 @@
-# Century — M0–M10 plus M11 historical world, country selection, map, sliders, and UI overhaul
+# Fabric of Nations — M0–M14 grand-strategy simulation
 
-Century is a historically grounded grand-strategy simulation covering
+Fabric of Nations is a historically grounded grand-strategy simulation covering
 **1900-01-01 through the boundary at 2000-01-01**, with one simulated civil day
 per tick.
+
+> **Name.** The game was formerly *Century*. M13 rebranded the
+> player-facing game, application metadata and current documentation to
+> **Fabric of Nations**. Historical GDD versions, change reports and milestone
+> reports keep their original wording as historical records. The implementation
+> record is [`docs/M13_REBRANDING_REPORT.md`](./docs/M13_REBRANDING_REPORT.md).
+>
+> **Unit name.** The unit of account was formerly **SUSD (Simulated US Dollars)**
+> and is now **RUSD (Reference US Dollars)**. M14 changed the terminology, not
+> the monetary model: all numeric values, scales, conversions and starting
+> conditions are unchanged. Historical completion reports and archived GDD
+> versions retain the former term as historical records. The implementation
+> record is [`docs/M14_RUSD_RENAMING_REPORT.md`](./docs/M14_RUSD_RENAMING_REPORT.md).
 
 The repository currently implements **M0 (project foundation)**, **M1
 (simulation core)**, **M2.1 (corrected population core)**, **M3a (economy
@@ -12,7 +25,7 @@ movement)**, **M3d (deterministic two-pass market clearing with bounded
 prices)**, **M3e (cash settlement, wages, upkeep, retained producer profit, and
 household cash)**, **M3f (integrated daily economic tick)**, **M4a-1
 (category-aware double-entry accounts, opening balances, and recognition legs)**,
-**M4a-2 (country/currency identity, monetary arrangements, and SUSD-relative
+**M4a-2 (country/currency identity, monetary arrangements, and RUSD-relative
 valuation)**, **M4b (monthly finance period close and immutable finance
 summaries)**, and **M4c (per-country treasury, daily income tax, and budgeted
 welfare transfers)**, **M5 (multi-region/multi-country worlds, shared
@@ -84,9 +97,12 @@ warfare also implemented (see
 The **Economic Management Overhaul (E0–E6)** is also adopted as the player-facing
 economic program; **E0, E1, E2, E3, E4, E5, E6a, and E6b are implemented in GDD v2.17
 §17A/§17E/§17F/§17G, M8 is implemented in §17C, and M9 is implemented in §17D**, and
-**M10 diplomacy, warfare, and territorial control is implemented in §17H (D-081)**. The
-design authority is the [Century GDD
-v2.17](./Century_GDD_v2.17.md); v2.16 is retained as
+**M10 diplomacy, warfare, and territorial control is implemented in §17H (D-081)**, with
+**M11 historical world content implemented in [the current GDD](./Fabric_of_Nations_GDD.md)**.
+The design authority is the
+[Fabric of Nations GDD](./Fabric_of_Nations_GDD.md); v2.18 is the current
+authoritative document, and v2.17 is retained as
+[M11 historical documentation](./Century_GDD_v2.17.md), v2.16 as
 [historical E6b documentation](./Century_GDD_v2.16.md), v2.15 as
 [historical E6a documentation](./Century_GDD_v2.15.md), v2.14 as
 [historical E5 documentation](./Century_GDD_v2.14.md), v2.13 as
@@ -105,7 +121,7 @@ rules are in [`AGENTS.md`](./AGENTS.md), and implementation decisions are in
 
 ## M11 historical world, country selection, map, and UI
 
-M11 turns Century into a map-driven grand-strategy game. The playable world is an
+M11 turns Fabric of Nations into a map-driven grand-strategy game. The playable world is an
 authored 1900 catalog of **67 states** and **66 dependent territories** in
 **133 regions**, grouped into **20 documented markets**; **66 states are
 selectable** and every one can start a valid campaign. The previous eight-polity
@@ -147,9 +163,9 @@ claimed for the M11 world size.
 
 Contracts: `EconomyScenarioDef.countryMeta/marketMeta/regionMeta`; bounded
 snapshots (full player + focus country, compact summaries for all others);
-worker protocol **14** (`CREATE_GAME`, `SET_FOCUS`, `NEW_GAME_RESULT`). World
+worker protocol **16** (`CREATE_GAME`, `SET_FOCUS`, `NEW_GAME_RESULT`). World
 schema stays **26**, save format **1**, simulation **0.27.0**, data
-**`m3-economy-v12`**. The GDD is [`Century_GDD_v2.18.md`](./Century_GDD_v2.18.md);
+**`m3-economy-v12`**. The GDD is [`Fabric_of_Nations_GDD.md`](./Fabric_of_Nations_GDD.md);
 decisions are D-086–D-093.
 
 ### Regenerating the M11 data
@@ -194,17 +210,20 @@ through `TickContext`; they are not serialized into `World`.
 | `pnpm run lint` | Boundary checks: no ambient RNG, no forbidden APIs in `sim`, ES2022-only config, no runtime deps in `sim`. |
 | `pnpm run typecheck` | Build the workspace libraries in dependency order, then typecheck every package in strict mode, including the app and worker. |
 | `pnpm run check:worker` | Build the workspace libraries, then verify the committed worker scenario and app worker bundle without overwriting them. |
-| `pnpm test` | Run the Jest suite, including M7 worker/protocol/snapshot/save tests. |
+| `pnpm run audit:branding` | Verify the Fabric of Nations player-facing branding, app/PWA metadata, current GDD/README and retained save identifiers. |
+| `pnpm run audit:branding:dist` | Run the branding audit against the exported `packages/app/dist-web` output (run after `export:web`). |
+| `pnpm run audit:monetary` | Verify current RUSD terminology, the USD/RUSD distinction and documented legacy save aliases. |
+| `pnpm test` | Run the Jest suite, including M7 worker/protocol/snapshot/save tests and the M13 rebranding regression tests. |
 | `pnpm run bench` | Build all benchmark cases (M1 through M7) and report timings, hashes, and invariant gates. |
 | `pnpm run bench:campaign` | Opt-in M6 full 36,524-tick campaign benchmark with per-tick p50/p95/p99, AI counts, bounded-state checkpoints, and final save size. Long-running; part of `pnpm run ci` only indirectly through M6/M7 bounded benchmarks. |
 | `pnpm -F @century/app web` | Start the Expo web development server. |
 | `pnpm -F @century/app export:web` | Produce the static Expo web export. |
 | `pnpm -F @century/app export:ios` / `export:android` | Produce iOS/Android Hermes JS bundles (not native release builds). |
 | `pnpm run app:export` | Export web, iOS, and Android JS bundles; included in `pnpm run ci`. |
-| `pnpm run ci` | Local CI path: lint, worker checks, typecheck, test, benchmark, and web/iOS/Android app exports. |
+| `pnpm run ci` | Local CI path: lint, branding and monetary audits, worker checks, typecheck, test, benchmark, and web/iOS/Android app exports. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
-runs boundary checks, generated-artifact checks, typechecking, and the test suite in a
+runs boundary checks, the branding and monetary terminology audits, generated-artifact checks, typechecking, and the test suite in a
 correctness job, then the bounded benchmark in a separate job that depends on it, with a
 frozen lockfile.
 
@@ -456,14 +475,14 @@ daily economic tick.
   market funds reject the entire market batch with no balance or posting changes.
   Market purchases are never partially settled and create no debt.
 - Wages use actual employment assignments, not building capacity. Daily wages are
-  `baseWage1900SUSDPerYear / daysInYear(civil year)`. Unfilled slots are unpaid,
+  `baseWage1900RUSDPerYear / daysInYear(civil year)`. Unfilled slots are unpaid,
   and no worker is paid twice.
 - Wages are paid after market settlement from the employer operating account. If
   an employer is short, workers receive a deterministic pro-rata payment and the
   unpaid remainder is reported. No negative balance, debt, or liability is
   created.
 - Every operational building also pays daily upkeep of
-  `dailyUpkeepSUSDAtLevelOne × level` from its operating account to the single
+  `dailyUpkeepRUSDAtLevelOne × level` from its operating account to the single
   system-reserve account. Upkeep is paid after wages. Condition and staffing do
   not scale upkeep because the data/GDD define only the level-one daily value.
   Underfunded upkeep is partially paid and the shortfall is reported; no debt,
@@ -476,7 +495,7 @@ daily economic tick.
   is implemented.
 - Household accounts change only through settled purchases and wage receipts.
   `wealthLevel` remains a welfare indicator, not cash.
-- SUSD amounts are not rounded per transaction, worker, or upkeep obligation; the
+- RUSD amounts are not rounded per transaction, worker, or upkeep obligation; the
   existing `1e-6` monetary tolerance is used for invariants. Postings balance and
   total cash is conserved.
 - `MarketDayResult.settled` is a transient duplicate guard for the same result
@@ -616,17 +635,19 @@ settlement; the M3f economic-day benchmark remains the relevant Node diagnostic.
 ## M4a-2 country and currency identity
 
 M4a-2 adds the minimum country, currency-issuer, monetary-arrangement, and
-SUSD-relative valuation model needed by later finance stages. It does not add
+RUSD-relative valuation model needed by later finance stages. It does not add
 dynamic FX, monetary policy, issuance, central banks, treasury accounts, native
 balances, inflation, or trade settlement.
 
-### SUSD measurement rule
+### RUSD measurement rule
 
-SUSD is Century's fixed unit of measurement. The unit's definition does not
-change; the SUSD-denominated value of currencies, goods, wages, and assets can
-change. SUSD is not a registered currency, an issuer, a legal tender, or a
-promise of constant purchasing power. Nominal SUSD is distinct from any future
-real/inflation-adjusted measure.
+**RUSD — Reference US Dollars** is Fabric of Nations' fixed unit of measurement.
+It is a neutral reference unit for comparing currencies, prices, wages and other
+economic values across countries. It is not a national currency, legal tender,
+an issuer, or an adoptable currency, and it is not a fixed-rate substitute for
+the real-world US dollar. The unit's definition does not change; the
+RUSD-denominated value of currencies, goods, wages, and assets can change.
+Nominal RUSD is distinct from any future real/inflation-adjusted measure.
 
 ### Authoritative state
 
@@ -639,13 +660,13 @@ valid.
 Country  { id, tag, name, monetary, regionIds }
 Currency { id, key, name, issuer }
 CurrencyValuation =
-  | { currencyId, status: "specified", susdPerUnit, setOnDay, source: "scenario" }
+  | { currencyId, status: "specified", rusdPerUnit, setOnDay, source: "scenario" }
   | { currencyId, status: "unavailable" }
 ```
 
 - `Country.monetary` is the sole domestic arrangement; there is no duplicate
   `Country.currencyId`.
-- `SusdPerCurrencyUnit` is a branded numeric type with a validated constructor;
+- `RusdPerCurrencyUnit` is a branded numeric type with a validated constructor;
   serialized state remains a plain number.
 - `Country.regionIds` is the sole country-to-region ownership authority.
   Unassigned regions are allowed; `regionOwner` returns the owner, `null` for a
@@ -665,24 +686,24 @@ Issuance is independent of the domestic arrangement:
 - A foreign-issued currency must be adopted by at least one country.
 - Every currency has exactly one issuer and exactly one valuation record.
 - Shared-currency arrangements and union issuers are rejected.
-- Currency keys are unique lower-case identifiers; `susd` is reserved in any
+- Currency keys are unique lower-case identifiers; `rusd` is reserved in any
   casing.
 
 ### Valuation and conversion
 
-`CurrencyValuation.susdPerUnit` is the SUSD value of one unit of the currency.
+`CurrencyValuation.rusdPerUnit` is the RUSD value of one unit of the currency.
 Cross rates are derived and never stored:
 
 ```
-crossRate(from, to) = from.susdPerUnit / to.susdPerUnit
+crossRate(from, to) = from.rusdPerUnit / to.rusdPerUnit
 // units of `to` per one unit of `from`
 ```
 
-At 0.25 SUSD/A and 2.00 SUSD/B, A→B is 0.125 and B→A is 8. Conversions validate
+At 0.25 RUSD/A and 2.00 RUSD/B, A→B is 0.125 and B→A is 8. Conversions validate
 finite non-negative amounts, finite positive rates in `[1e-12, 1e12]`, and
 finite results; overflow and positive underflow are rejected. Missing or
 unavailable valuations raise `CurrencyValuationError`; they never default to
-parity. Rate comparisons use a dimensionless relative tolerance; SUSD amounts
+parity. Rate comparisons use a dimensionless relative tolerance; RUSD amounts
 use the existing money tolerance. Bounds and tolerances are provisional
 numerical safety choices, not calibration.
 
@@ -818,7 +839,7 @@ close/reopen/reversal.
   fixtures keep their original account set and have no fiscal system; validation
   requires the fiscal accounts whenever a country exists.
 - `Country.treasuryAccountId` and `Country.fiscal`
-  (`incomeTaxRate` 0..1, `welfareBudgetSUSDPerYear` finite and nonnegative) are
+  (`incomeTaxRate` 0..1, `welfareBudgetRUSDPerYear` finite and nonnegative) are
   authoritative state. Fiscal policy is provisional scenario-initialised state,
   not law-bounded and not mutable by an action in M4c.
 
@@ -834,7 +855,7 @@ timing is unchanged.
   collection efficiency is fixed at 1.0. Partial wages produce partial tax;
   multiple employers are combined by settlement. Tax cannot exceed received
   wages or household cash.
-- **Welfare:** `requested = welfareBudgetSUSDPerYear / daysInYear(current civil
+- **Welfare:** `requested = welfareBudgetRUSDPerYear / daysInYear(current civil
   year)`. Payable is the lesser of requested and treasury cash after same-day
   tax; it is allocated across the country's pop blocks in proportion to
   population with an exact deterministic remainder. Insufficient treasury cash
@@ -852,7 +873,7 @@ timing is unchanged.
   settlement, and invalid world/treasury state before any staging.
 - The transient fiscal result reports per-country income tax, requested/paid
   welfare, shortfall, start/end treasury cash, and per-block tax/welfare plus
-  `endingCashAfterFiscalSUSD`, read from the authoritative staged account. No
+  `endingCashAfterFiscalRUSD`, read from the authoritative staged account. No
   redundant fiscal counters are persisted.
 
 ### Accounting, close, and wealth
@@ -871,12 +892,12 @@ timing is unchanged.
   revenue, welfare expense, and net fiscal result from the frozen `accountTotals`
   plus account metadata without storing redundant totals.
 - Transient cash fields are phase-qualified: settlement reports
-  `endingCashAfterSettlementSUSD` (before fiscal), needs reports
-  `budgetStartBeforeNeedsSUSD` / `budgetEndAfterNeedsSUSD` (before/after needs
-  spending), and fiscal blocks report `endingCashAfterFiscalSUSD`. The
+  `endingCashAfterSettlementRUSD` (before fiscal), needs reports
+  `budgetStartBeforeNeedsRUSD` / `budgetEndAfterNeedsRUSD` (before/after needs
+  spending), and fiscal blocks report `endingCashAfterFiscalRUSD`. The
   authoritative account ledger is final end-of-day cash.
-- SUSD uses continuous floating-point arithmetic in a fixed deterministic order;
-  there is no cent quantization. `MONEY_TOLERANCE_SUSD = 1e-6` is an invariant
+- RUSD uses continuous floating-point arithmetic in a fixed deterministic order;
+  there is no cent quantization. `MONEY_TOLERANCE_RUSD = 1e-6` is an invariant
   tolerance, not a rounding operation. D-049 records the precision policy,
   residual allocation rule, and phase-qualified result semantics.
 - The month-end wealth update refines the provisional M3f convention:
@@ -1071,7 +1092,7 @@ It does not change M4b close semantics or M4c fiscal behavior.
 M5b adds versioned public-debt contracts and a deterministic debt-service phase on
 top of M5a. It is a public-finance system, not a banking or monetary system.
 
-- **Issuer and holders.** A country issues SUSD debt to an explicitly identified
+- **Issuer and holders.** A country issues RUSD debt to an explicitly identified
   simulated creditor: another country treasury or a pop-block household cash
   account. The issuer cannot hold its own debt. No bank, central bank, external
   investor pool, or bond market exists.
@@ -1080,7 +1101,7 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
   outstanding principal, refinance-on-maturity, and arrears grace days. Legacy
   fixtures default it off. The shipped eight-polity scenario enables it only for
   the USA player country (GBR creditor, 4% coupon, 365-day term, 1,000,000 ceiling,
-  refinance on maturity, 365-day grace) with a provisional 2,000,000 SUSD/year
+  refinance on maturity, 365-day grace) with a provisional 2,000,000 RUSD/year
   welfare budget and 100,000 opening treasury. Rates, terms, ceilings, and the
   scenario activation are provisional, not calibrated or player/AI controls.
 - **Contracts and bounds.** Active/arrears contracts persist in
@@ -1110,7 +1131,7 @@ top of M5a. It is a public-finance system, not a banking or monetary system.
   state-enterprise remittances, which are liquidity rather than tax revenue.
 - **Constraints and reporting.** New issuance is limited by the designated
   creditor's actual cash, the issuer's outstanding-principal ceiling, and the active
-  contract cap. An unissued requirement is reported as `unfinancedDeficitSUSD`; no
+  contract cap. An unissued requirement is reported as `unfinancedDeficitRUSD`; no
   invisible liability is created. The accounting fiscal result remains tax revenue
   minus actual welfare and interest expense; the two measures are distinct.
 - **Scenario activity.** A bounded 31-day run of the shipped scenario issues a
@@ -1200,7 +1221,7 @@ in [the benchmark section](#benchmark-scope-and-recorded-node-results) and the
 
 ## M7 playable Expo shell and worker protocol
 
-M7 adds the first user-facing Century shell. It is a playable client over the
+M7 adds the first user-facing game shell. It is a playable client over the
 existing deterministic simulation, not a new simulation subsystem. **Web and
 Hermes JS bundles are verified; native release builds and real-device performance
 are not.** M7 therefore carries an explicit acceptance exception (D-061).
@@ -1607,13 +1628,13 @@ separately.
 
 | Workload | Blocks | Buildings | Transactions | Wage settlements | Upkeep | Postings | Settlements | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| M3e small | 4 | 8 | 11 | 7 | 250 SUSD | 26 | 50 | 0.396 ms | 0.306 ms | 0.650 ms | 2.839 ms | `67728eb2e9c69218` |
-| M3e stress | 40 | 80 | 1,100 | 70 | 2,500 SUSD | 1,250 | 20 | 7.745 ms | 7.509 ms | 9.501 ms | 11.542 ms | `25f6e0a414108bb6` |
+| M3e small | 4 | 8 | 11 | 7 | 250 RUSD | 26 | 50 | 0.396 ms | 0.306 ms | 0.650 ms | 2.839 ms | `67728eb2e9c69218` |
+| M3e stress | 40 | 80 | 1,100 | 70 | 2,500 RUSD | 1,250 | 20 | 7.745 ms | 7.509 ms | 9.501 ms | 11.542 ms | `25f6e0a414108bb6` |
 
-The small case settled `3,836.875` SUSD of purchases, `98,904.110` SUSD of
-wages, and `250` SUSD of upkeep, with a `96,014.110` SUSD producer cash-basis
-loss. The stress case settled `38,368.750` SUSD of purchases, `989,041.096` SUSD
-of wages, and `2,500` SUSD of upkeep, with a `960,141.096` SUSD producer loss. No
+The small case settled `3,836.875` RUSD of purchases, `98,904.110` RUSD of
+wages, and `250` RUSD of upkeep, with a `96,014.110` RUSD producer cash-basis
+loss. The stress case settled `38,368.750` RUSD of purchases, `989,041.096` RUSD
+of wages, and `2,500` RUSD of upkeep, with a `960,141.096` RUSD producer loss. No
 wages or upkeep were unpaid in the cash-backed benchmark. Settlement times exclude
 market-day setup, reset, and hashing; settlement validation is included. These are
 Node diagnostics, not mobile-performance evidence.
@@ -1664,7 +1685,7 @@ cash conservation, accounting identity, positive tax/welfare, and cross-run hash
 determinism. Warm-up and measured ticks are timed; setup and hashing are excluded.
 Representative Node `v22.12.0` results on the same machine:
 
-| Workload | Blocks | Buildings | Days | Tax SUSD | Welfare SUSD | Shortfall | Treasury start → end | Avg | p50 | p95 | p99 | Hash |
+| Workload | Blocks | Buildings | Days | Tax RUSD | Welfare RUSD | Shortfall | Treasury start → end | Avg | p50 | p95 | p99 | Hash |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | M4c small | 4 | 8 | 10 | 21,183.3067 | 27,397.2603 | 0 | 5,001,045.21 → 4,994,831.26 | 9.712 ms | 9.502 ms | 12.452 ms | 12.452 ms | `0a0a1d318ff8ef2b` |
 | M4c stress | 12 | 24 | 5 | 31,863.4956 | 13,698.6301 | 0 | 5,008,865.44 → 5,027,030.30 | 18.524 ms | 18.870 ms | 19.802 ms | 19.802 ms | `eba2c5dd2b7bd647` |
@@ -1696,8 +1717,8 @@ simulation 0.12.0; the current M6 run uses schema 13 / simulation 0.13.0.
 | Combined eight-polity tick | avg 92.95 ms, p50 90.38 ms, p95 113.9 ms, p99 113.9 ms |
 | Validation + serialize/deserialize round trip | avg 60.22 ms, p50 59.70 ms, p95 62.36 ms |
 | Monthly migration phase (clone excluded) | avg 71.62 ms, p50 73.39 ms, p95 79.33 ms; 932,314 people moved in the sample |
-| M5a month-end allocation (close/clone excluded) | avg 5.933 ms, p50 5.603 ms, p95 7.355 ms; 81 buildings, 19,700,176.29 SUSD distributed |
-| M5b debt phase (daily accrual + month-end coupon) | avg 5.232 ms, p50 4.952 ms, p95 7.242 ms; 2 contracts, 511.64 SUSD interest accrued |
+| M5a month-end allocation (close/clone excluded) | avg 5.933 ms, p50 5.603 ms, p95 7.355 ms; 81 buildings, 19,700,176.29 RUSD distributed |
+| M5b debt phase (daily accrual + month-end coupon) | avg 5.232 ms, p50 4.952 ms, p95 7.242 ms; 2 contracts, 511.64 RUSD interest accrued |
 | Projected full 36,524-tick campaign | about 0.94 h at the sample average; **not executed** and not mobile evidence |
 
 The M5 full campaign was projected, not run, in the historical M5 table above. M6
@@ -1794,7 +1815,7 @@ evidence and does not satisfy the 8 ms mobile target.
   balances only. Distributions, remittances, debt, inflation, and dynamic FX are
   not implemented; the income tax added by M4c is the only tax.
 - M4a-2 adds country/currency identity, monetary arrangements, and
-  SUSD-relative valuations only. It has no issuance, central bank,
+  RUSD-relative valuations only. It has no issuance, central bank,
   native-currency balances, dynamic FX, currency regimes, inflation, monetary
   policy, or trade settlement. M4c adds treasury accounts for fiscal flows, not
   monetary policy.
@@ -1866,7 +1887,7 @@ evidence and does not satisfy the 8 ms mobile target.
   same day's price.
 - M3e uses base annual wages without wage index, labor scarcity, inflation, law,
   or wage-productivity adjustments; producer profit is cash-basis and retained.
-  Upkeep is `dailyUpkeepSUSDAtLevelOne × level` for operational buildings and is
+  Upkeep is `dailyUpkeepRUSDAtLevelOne × level` for operational buildings and is
   not condition- or staffing-scaled. Underfunded employers/building accounts pay
   pro-rata wages/upkeep and report shortfalls without creating debt. Owner profit
   distribution remains deferred.
@@ -2215,7 +2236,7 @@ fisheries) and 316 initial employment assignments.
 ### Recipe economics
 
 All seven legacy recipes were negative at base prices and wages, from −0.34 to
-−1.00 SUSD per worker-day. The historical catalog is positive at **both** base
+−1.00 RUSD per worker-day. The historical catalog is positive at **both** base
 prices and the opening lower-bound prices for every recipe. Examples at base
 prices per throughput unit: subsistence farm +33,390; commercial farm +49,753
 (laborer variant) / +57,425 (peasant variant); ranch +29,534; fishery +27,945;
@@ -2239,7 +2260,7 @@ Provisional calibration choices:
   production-chain lag; there is no inter-market trade.
 - Operating cash: three days of wage cover for input-using buildings; smaller
   buffers for farms/ranches/fisheries, which sell on the same day.
-- Participation/wages: peasants 0.60/60 SUSD/yr, laborers 0.40/130, clerks
+- Participation/wages: peasants 0.60/60 RUSD/yr, laborers 0.40/130, clerks
   0.55/250; private payout rate 1.0 to avoid stranded retained cash without an
   investment system.
 
@@ -2627,12 +2648,12 @@ scenario:
 
 | Input | Value |
 |---|---:|
-| Welfare budget | 2,000,000 SUSD/year |
-| Opening treasury | 100,000 SUSD |
+| Welfare budget | 2,000,000 RUSD/year |
+| Opening treasury | 100,000 RUSD |
 | Creditor | GBR country treasury (id 1) |
 | Annual coupon | 4% |
 | Term | 365 civil days |
-| Outstanding ceiling | 1,000,000 SUSD |
+| Outstanding ceiling | 1,000,000 RUSD |
 | Refinance on maturity | true |
 | Arrears grace | 365 days |
 
@@ -2659,7 +2680,7 @@ expense and interest expense. The separate financing requirement is:
 - Treasury cash includes prior state-enterprise remittances. Those remittances are
   liquidity, not tax revenue; sufficient cash prevents unnecessary borrowing.
 - The requirement is capped by creditor cash, outstanding headroom, and the active
-  contract cap. Unissued requirement is reported as `unfinancedDeficitSUSD`.
+  contract cap. Unissued requirement is reported as `unfinancedDeficitRUSD`.
 - Borrowing/principal remain financing movements, not revenue/expense. Interest is
   an expense; the M4b four flow kinds are unchanged.
 
@@ -2935,7 +2956,7 @@ batch and keeps its behavior.
 ### Integrated evidence
 
 The new integration test starts at day 28 on the shipped eight-polity sample (8
-countries, 16 regions, 5 markets, 113 buildings), issues an explicit 100,000 SUSD
+countries, 16 regions, 5 markets, 113 buildings), issues an explicit 100,000 RUSD
 public-debt contract, and processes days 28–61. It covers the January close (day 30),
 February migration (day 31), February close (day 58), and March migration (day 59).
 Every tick asserts population conservation, global designated-cash invariance, the
@@ -3033,7 +3054,7 @@ changed. `CEN-AUDIT-016` (sovereignty) remains unresolved and is not addressed h
 - Country, region, market, and employment ids must be unsigned 32-bit values.
 - Country tags/names, currency keys/names, and currency formats use the same limits
   as `assertValidCountryCurrencyState`.
-- `susdPerUnit` must be inside `CURRENCY_RATE_MIN..CURRENCY_RATE_MAX`; specified
+- `rusdPerUnit` must be inside `CURRENCY_RATE_MIN..CURRENCY_RATE_MAX`; specified
   valuations still require known sources.
 - Welfare budgets, debt coupons, terms, grace periods, principal ceilings, creditor
   ids, and country-creditor existence use the debt/fiscal safe bounds.
@@ -3287,13 +3308,13 @@ pre-existing century correctness regressions. Implementation commit:
 
 E2 completes the public-budget loop on the existing M4c/M5b foundation:
 
-- **Income-tax schedule.** `incomeTaxAllowanceSUSDPerYear` is a per-pop-block annual
+- **Income-tax schedule.** `incomeTaxAllowanceRUSDPerYear` is a per-pop-block annual
   exemption pro-rated to the civil year and subtracted from the block's actual daily
   wage receipt; `incomeTaxRate` applies to the remainder. Withholding, posting, and
   cash limits are unchanged.
 - **Welfare eligibility and reserve.** `welfareMaxWealthLevel` restricts the daily
   transfer to blocks at or below a wealth ceiling (99 is universal), allocated in
-  proportion to eligible population. `reserveTargetSUSD` is a treasury floor: welfare
+  proportion to eligible population. `reserveTargetRUSD` is a treasury floor: welfare
   may not draw cash below it, and discretionary principal repayment may not either.
   Unpaid welfare remains an explicit shortfall, never a liability.
 - **Business-profit tax.** At each civil month-end the country assesses
@@ -3441,5 +3462,7 @@ no benchmark code, thresholds, or reports were changed. Implementation commit:
 4. Keep tuning coefficients in constants/data with units and calibration status.
 5. Record substantive decisions/deviations in `DECISIONS.md`.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
+   Map changes also use `pnpm map:check`, and `pnpm map:verify` on a machine with a GPU
+   (`docs/MAP_RENDERING.md`).
 7. Do not begin the next milestone until the current one is reviewed and the next
    phase is explicitly authorized in the GDD and task assignment.

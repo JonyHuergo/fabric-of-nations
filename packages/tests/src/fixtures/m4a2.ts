@@ -1,6 +1,6 @@
 import { loadM3SmallEconomy } from "@century/data";
 import {
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   type CountryInitialDef,
   type Currency,
   type CurrencyIssuer,
@@ -18,11 +18,11 @@ export function baseScenario(): EconomyScenarioDef {
 export function zeroFiscal(): FiscalPolicy {
   return {
     incomeTaxRate: 0,
-    incomeTaxAllowanceSUSDPerYear: 0,
-    welfareBudgetSUSDPerYear: 0,
+    incomeTaxAllowanceRUSDPerYear: 0,
+    welfareBudgetRUSDPerYear: 0,
     welfareMaxWealthLevel: 99,
     businessProfitTaxRate: 0,
-    reserveTargetSUSD: 0,
+    reserveTargetRUSD: 0,
   };
 }
 
@@ -38,7 +38,7 @@ export function country(
     monetary,
     regionIds,
     treasuryAccountId: 9000 + id,
-    initialTreasuryCashSUSD: 0,
+    initialTreasuryCashRUSD: 0,
     fiscal: zeroFiscal(),
   };
 }
@@ -75,7 +75,7 @@ export function specified(
   return {
     currencyId,
     status: "specified",
-    susdPerUnit: asSusdPerCurrencyUnit(rate),
+    rusdPerUnit: asRusdPerCurrencyUnit(rate),
     setOnDay,
     source: "scenario",
   };

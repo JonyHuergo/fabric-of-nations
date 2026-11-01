@@ -37,7 +37,7 @@ export function MainMenuScreen({
         <View style={styles.heroShade} pointerEvents="none" />
         <View style={styles.heroTitle}>
           <Text style={styles.kicker}>GRAND STRATEGY · 1900–2000</Text>
-          <Text style={[styles.title, narrow ? styles.titleNarrow : null]}>CENTURY</Text>
+          <Text style={[styles.title, narrow ? styles.titleNarrow : null]}>FABRIC OF NATIONS</Text>
           <Text style={styles.tagline}>
             One world. {String(playable)} playable states. A century of industry, empire and
             upheaval begins on 1 January 1900.
@@ -107,7 +107,7 @@ export function MainMenuScreen({
           <View style={styles.sideColumn}>
             <Panel title="Historical map" tone="quiet">
               <Text style={styles.sideBody}>
-                The map is offline vector geometry assembled from Natural Earth 1:50m and an
+                The map is offline vector geometry assembled from Natural Earth 1:10m and an
                 authored 1900 crosswalk. Political fill shows sovereignty; occupation is a control
                 overlay; markets are a separate economic layer. CShapes 2.0 is used only as a
                 classification reference because its non-commercial licence is not compatible
@@ -157,15 +157,16 @@ const styles = StyleSheet.create({
   kicker: { ...type.label, color: colors.accentStrong },
   title: {
     ...type.display,
-    fontSize: 64,
-    lineHeight: 66,
-    letterSpacing: 10,
+    fontSize: 58,
+    lineHeight: 60,
+    letterSpacing: 4.5,
     color: colors.textStrong,
+    maxWidth: "100%",
     textShadowColor: "rgba(0,0,0,0.6)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   },
-  titleNarrow: { fontSize: 42, lineHeight: 46, letterSpacing: 7 },
+  titleNarrow: { fontSize: 36, lineHeight: 40, letterSpacing: 2.5 },
   tagline: { ...type.body, color: colors.text, maxWidth: 640, marginTop: 2 },
   body: {
     width: "100%",

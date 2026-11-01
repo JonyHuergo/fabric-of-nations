@@ -1,0 +1,1827 @@
+{
+  "generatedBy": "scripts/m12d/build-americas-provinces.mjs",
+  "referenceDate": "1900-01-01",
+  "toleranceDegrees": 0.02,
+  "provinceCount": 469,
+  "plannedProvinceCount": 469,
+  "residualProvinceCount": 0,
+  "politiesCovered": [
+    "ARG",
+    "BOL",
+    "BRA",
+    "CAN",
+    "CHL",
+    "COL",
+    "COS",
+    "DNK",
+    "DOM",
+    "ECU",
+    "FRA",
+    "GBR",
+    "GUA",
+    "HON",
+    "HTI",
+    "MEX",
+    "NFD",
+    "NIC",
+    "NLD",
+    "PRU",
+    "PRY",
+    "SAL",
+    "URY",
+    "USA",
+    "VEN"
+  ],
+  "mapFeaturesCovered": 31,
+  "duplicateProvinceIds": 0,
+  "duplicateKeys": 0,
+  "unmatchedBorderSegments": 0,
+  "borderSegmentCount": 188180,
+  "borderPairCount": 1369,
+  "coverage": [
+    {
+      "tag": "ARG",
+      "scopeArea": 278.4716,
+      "coveredArea": 277.438,
+      "residualArea": 1.0336,
+      "estimated": true
+    },
+    {
+      "tag": "BOL",
+      "scopeArea": 104.8152,
+      "coveredArea": 104.59,
+      "residualArea": 0.2252,
+      "estimated": true
+    },
+    {
+      "tag": "BRA",
+      "scopeArea": 693.9596,
+      "coveredArea": 692.3548,
+      "residualArea": 1.6048,
+      "estimated": false
+    },
+    {
+      "tag": "BSA",
+      "scopeArea": 1.9913,
+      "coveredArea": 1.7552,
+      "residualArea": 0.2362,
+      "estimated": false
+    },
+    {
+      "tag": "BWI",
+      "scopeArea": 21.8756,
+      "coveredArea": 21.4482,
+      "residualArea": 0.4275,
+      "estimated": false
+    },
+    {
+      "tag": "CAN",
+      "scopeArea": 1633.2912,
+      "coveredArea": 1616.494,
+      "residualArea": 16.7972,
+      "estimated": true
+    },
+    {
+      "tag": "CHL",
+      "scopeArea": 78.1794,
+      "coveredArea": 74.633,
+      "residualArea": 3.5464,
+      "estimated": true
+    },
+    {
+      "tag": "COL",
+      "scopeArea": 98.5632,
+      "coveredArea": 97.984,
+      "residualArea": 0.5792,
+      "estimated": true
+    },
+    {
+      "tag": "COS",
+      "scopeArea": 4.2238,
+      "coveredArea": 4.134,
+      "residualArea": 0.0898,
+      "estimated": true
+    },
+    {
+      "tag": "CUB",
+      "scopeArea": 9.5007,
+      "coveredArea": 9.2294,
+      "residualArea": 0.2713,
+      "estimated": false
+    },
+    {
+      "tag": "DGC",
+      "scopeArea": 0.048,
+      "coveredArea": 0.0466,
+      "residualArea": 0.0014,
+      "estimated": false
+    },
+    {
+      "tag": "DOM",
+      "scopeArea": 4.1448,
+      "coveredArea": 4.05,
+      "residualArea": 0.0948,
+      "estimated": false
+    },
+    {
+      "tag": "DWI",
+      "scopeArea": 0.0246,
+      "coveredArea": 0.0171,
+      "residualArea": 0.0075,
+      "estimated": false
+    },
+    {
+      "tag": "ECU",
+      "scopeArea": 20.6981,
+      "coveredArea": 20.429,
+      "residualArea": 0.2691,
+      "estimated": false
+    },
+    {
+      "tag": "FCA",
+      "scopeArea": 0.0274,
+      "coveredArea": 0.0226,
+      "residualArea": 0.0048,
+      "estimated": false
+    },
+    {
+      "tag": "FRA",
+      "scopeArea": 6.9777,
+      "coveredArea": 6.8965,
+      "residualArea": 0.0812,
+      "estimated": false
+    },
+    {
+      "tag": "GRL",
+      "scopeArea": 663.712,
+      "coveredArea": 651.552,
+      "residualArea": 12.16,
+      "estimated": true
+    },
+    {
+      "tag": "GUA",
+      "scopeArea": 9.1212,
+      "coveredArea": 9.0281,
+      "residualArea": 0.0932,
+      "estimated": false
+    },
+    {
+      "tag": "HON",
+      "scopeArea": 9.4901,
+      "coveredArea": 9.2936,
+      "residualArea": 0.1965,
+      "estimated": false
+    },
+    {
+      "tag": "HTI",
+      "scopeArea": 2.2822,
+      "coveredArea": 2.1798,
+      "residualArea": 0.1024,
+      "estimated": false
+    },
+    {
+      "tag": "MEX",
+      "scopeArea": 174.1905,
+      "coveredArea": 173.34,
+      "residualArea": 0.8505,
+      "estimated": true
+    },
+    {
+      "tag": "NFD",
+      "scopeArea": 52.6341,
+      "coveredArea": 52.5423,
+      "residualArea": 0.0918,
+      "estimated": false
+    },
+    {
+      "tag": "NIC",
+      "scopeArea": 10.7213,
+      "coveredArea": 10.5703,
+      "residualArea": 0.151,
+      "estimated": false
+    },
+    {
+      "tag": "PRI",
+      "scopeArea": 0.7612,
+      "coveredArea": 0.7265,
+      "residualArea": 0.0347,
+      "estimated": false
+    },
+    {
+      "tag": "PRU",
+      "scopeArea": 105.1278,
+      "coveredArea": 104.721,
+      "residualArea": 0.4068,
+      "estimated": true
+    },
+    {
+      "tag": "PRY",
+      "scopeArea": 35.3252,
+      "coveredArea": 35.1055,
+      "residualArea": 0.2197,
+      "estimated": false
+    },
+    {
+      "tag": "SAL",
+      "scopeArea": 1.6833,
+      "coveredArea": 1.6417,
+      "residualArea": 0.0417,
+      "estimated": false
+    },
+    {
+      "tag": "SUR",
+      "scopeArea": 11.8059,
+      "coveredArea": 11.7101,
+      "residualArea": 0.0958,
+      "estimated": false
+    },
+    {
+      "tag": "URY",
+      "scopeArea": 17.1167,
+      "coveredArea": 16.9613,
+      "residualArea": 0.1555,
+      "estimated": false
+    },
+    {
+      "tag": "USA",
+      "scopeArea": 1114.9336,
+      "coveredArea": 1110.281,
+      "residualArea": 4.6526,
+      "estimated": true
+    },
+    {
+      "tag": "VEN",
+      "scopeArea": 74.6016,
+      "coveredArea": 74.0615,
+      "residualArea": 0.5401,
+      "estimated": false
+    }
+  ],
+  "overlaps": [
+    {
+      "left": "am-arg-rio-negro",
+      "right": "am-arg-chubut",
+      "area": 0.0347,
+      "bbox": [
+        -71.913,
+        -42.011,
+        -62.802,
+        -37.557
+      ]
+    },
+    {
+      "left": "am-can-ontario",
+      "right": "am-can-manitoba",
+      "area": 0.0258,
+      "bbox": [
+        -95.161,
+        41.675,
+        -74.346,
+        56.84
+      ]
+    },
+    {
+      "left": "am-usa-virginia",
+      "right": "am-usa-west-virginia",
+      "area": 0.0153,
+      "bbox": [
+        -83.667,
+        36.54,
+        -75.243,
+        39.451
+      ]
+    },
+    {
+      "left": "am-usa-oregon",
+      "right": "am-usa-washington",
+      "area": 0.0124,
+      "bbox": [
+        -124.539,
+        42,
+        -116.456,
+        46.223
+      ]
+    },
+    {
+      "left": "am-bra-bahia",
+      "right": "am-bra-minas-gerais",
+      "area": 0.0116,
+      "bbox": [
+        -46.572,
+        -18.323,
+        -37.415,
+        -8.529
+      ]
+    },
+    {
+      "left": "am-bra-sao-paulo",
+      "right": "am-bra-minas-gerais",
+      "area": 0.0106,
+      "bbox": [
+        -53.168,
+        -25.307,
+        -44.162,
+        -19.781
+      ]
+    },
+    {
+      "left": "am-arg-salta",
+      "right": "am-arg-jujuy",
+      "area": 0.0101,
+      "bbox": [
+        -68.561,
+        -26.387,
+        -62.334,
+        -22.001
+      ]
+    },
+    {
+      "left": "am-bra-maranhao",
+      "right": "am-bra-piaui",
+      "area": 0.0098,
+      "bbox": [
+        -48.743,
+        -10.318,
+        -41.813,
+        -1.128
+      ]
+    },
+    {
+      "left": "am-bol-chuquisaca",
+      "right": "am-bol-potosi",
+      "area": 0.0095,
+      "bbox": [
+        -65.694,
+        -21.535,
+        -62.211,
+        -18.355
+      ]
+    },
+    {
+      "left": "am-arg-entre-rios",
+      "right": "am-arg-santa-fe",
+      "area": 0.0086,
+      "bbox": [
+        -60.769,
+        -34.049,
+        -57.811,
+        -30.153
+      ]
+    },
+    {
+      "left": "am-pru-cusco",
+      "right": "am-pru-madre-de-dios",
+      "area": 0.0083,
+      "bbox": [
+        -73.961,
+        -15.334,
+        -70.356,
+        -11.2
+      ]
+    },
+    {
+      "left": "am-can-ontario",
+      "right": "am-can-quebec",
+      "area": 0.0082,
+      "bbox": [
+        -95.161,
+        41.675,
+        -74.346,
+        56.84
+      ]
+    },
+    {
+      "left": "am-arg-san-luis",
+      "right": "am-arg-san-juan",
+      "area": 0.008,
+      "bbox": [
+        -67.396,
+        -35.999,
+        -64.883,
+        -31.847
+      ]
+    },
+    {
+      "left": "am-mex-hidalgo",
+      "right": "am-mex-veracruz",
+      "area": 0.0076,
+      "bbox": [
+        -99.844,
+        19.586,
+        -98,
+        21.399
+      ]
+    },
+    {
+      "left": "am-mex-jalisco",
+      "right": "am-mex-zacatecas",
+      "area": 0.0075,
+      "bbox": [
+        -105.67,
+        18.954,
+        -101.523,
+        22.772
+      ]
+    },
+    {
+      "left": "am-arg-la-rioja",
+      "right": "am-arg-san-juan",
+      "area": 0.0071,
+      "bbox": [
+        -69.644,
+        -31.934,
+        -65.402,
+        -27.736
+      ]
+    },
+    {
+      "left": "am-bra-bahia",
+      "right": "am-bra-goias",
+      "area": 0.0071,
+      "bbox": [
+        -46.572,
+        -18.323,
+        -37.415,
+        -8.529
+      ]
+    },
+    {
+      "left": "am-fca-guadeloupe-basse-terre",
+      "right": "am-fca-guadeloupe-grande-terre",
+      "area": 0.0071,
+      "bbox": [
+        -61.793,
+        15.961,
+        -61.5,
+        16.4
+      ]
+    },
+    {
+      "left": "am-arg-buenos-aires",
+      "right": "am-arg-la-pampa",
+      "area": 0.0069,
+      "bbox": [
+        -63.389,
+        -41.044,
+        -56.674,
+        -33.257
+      ]
+    },
+    {
+      "left": "am-mex-durango",
+      "right": "am-mex-sinaloa",
+      "area": 0.0065,
+      "bbox": [
+        -107.126,
+        22.319,
+        -102.49,
+        26.839
+      ]
+    },
+    {
+      "left": "am-pru-cajamarca",
+      "right": "am-pru-la-libertad",
+      "area": 0.0062,
+      "bbox": [
+        -79.464,
+        -7.766,
+        -77.754,
+        -4.585
+      ]
+    },
+    {
+      "left": "am-usa-minnesota",
+      "right": "am-usa-wisconsin",
+      "area": 0.006,
+      "bbox": [
+        -97.229,
+        43.5,
+        -89.499,
+        49.368
+      ]
+    },
+    {
+      "left": "am-col-arauca",
+      "right": "am-col-casanare",
+      "area": 0.006,
+      "bbox": [
+        -72.351,
+        6.026,
+        -69.432,
+        7.09
+      ]
+    },
+    {
+      "left": "am-bra-rio-de-janeiro",
+      "right": "am-bra-minas-gerais",
+      "area": 0.006,
+      "bbox": [
+        -44.866,
+        -23.347,
+        -40.968,
+        -20.777
+      ]
+    },
+    {
+      "left": "am-bra-sergipe",
+      "right": "am-bra-bahia",
+      "area": 0.0058,
+      "bbox": [
+        -38.245,
+        -11.569,
+        -36.411,
+        -9.527
+      ]
+    },
+    {
+      "left": "am-pru-amazonas",
+      "right": "am-pru-loreto",
+      "area": 0.0057,
+      "bbox": [
+        -78.775,
+        -7.013,
+        -77.164,
+        -2.967
+      ]
+    },
+    {
+      "left": "am-bra-piaui",
+      "right": "am-bra-ceara",
+      "area": 0.0057,
+      "bbox": [
+        -45.981,
+        -10.896,
+        -40.414,
+        -2.765
+      ]
+    },
+    {
+      "left": "am-bra-minas-gerais",
+      "right": "am-bra-goias",
+      "area": 0.0056,
+      "bbox": [
+        -51.028,
+        -22.893,
+        -39.862,
+        -14.246
+      ]
+    },
+    {
+      "left": "am-usa-montana",
+      "right": "am-usa-north-dakota",
+      "area": 0.0055,
+      "bbox": [
+        -116.049,
+        44.377,
+        -104.039,
+        48.992
+      ]
+    },
+    {
+      "left": "am-usa-new-jersey",
+      "right": "am-usa-pennsylvania",
+      "area": 0.0054,
+      "bbox": [
+        -75.523,
+        38.95,
+        -73.925,
+        41.356
+      ]
+    },
+    {
+      "left": "am-arg-salta",
+      "right": "am-arg-catamarca",
+      "area": 0.0053,
+      "bbox": [
+        -68.561,
+        -26.387,
+        -62.334,
+        -22.001
+      ]
+    },
+    {
+      "left": "am-arg-catamarca",
+      "right": "am-arg-tucuman",
+      "area": 0.0053,
+      "bbox": [
+        -69.118,
+        -30.14,
+        -64.882,
+        -25.163
+      ]
+    },
+    {
+      "left": "am-grl-north-greenland",
+      "right": "am-grl-south-greenland",
+      "area": 0.0053,
+      "bbox": [
+        -72.808,
+        67.495,
+        -11.425,
+        83.6
+      ]
+    },
+    {
+      "left": "am-mex-san-luis-potosi",
+      "right": "am-mex-tamaulipas",
+      "area": 0.0052,
+      "bbox": [
+        -102.3,
+        21.174,
+        -98.357,
+        24.565
+      ]
+    },
+    {
+      "left": "am-usa-maryland",
+      "right": "am-usa-west-virginia",
+      "area": 0.0051,
+      "bbox": [
+        -79.488,
+        37.966,
+        -75.044,
+        39.722
+      ]
+    },
+    {
+      "left": "am-usa-new-hampshire",
+      "right": "am-usa-vermont",
+      "area": 0.0051,
+      "bbox": [
+        -72.556,
+        42.701,
+        -70.735,
+        45.291
+      ]
+    },
+    {
+      "left": "am-mex-nuevo-leon",
+      "right": "am-mex-tamaulipas",
+      "area": 0.0051,
+      "bbox": [
+        -101.216,
+        23.19,
+        -98.446,
+        27.794
+      ]
+    },
+    {
+      "left": "am-bra-goias",
+      "right": "am-bra-mato-grosso",
+      "area": 0.0051,
+      "bbox": [
+        -53.245,
+        -19.486,
+        -45.758,
+        -5.164
+      ]
+    }
+  ],
+  "overlapCount": 38,
+  "residuals": [],
+  "warnings": [
+    "32 province code assignments have a label point outside the province map feature (boundary units)",
+    "38 province pairs overlap (largest 0.0347 square degrees: am-arg-rio-negro / am-arg-chubut)",
+    "coverage gap BRA: 1.605 square degrees remain outside the authored provinces",
+    "coverage gap BSA: 0.236 square degrees remain outside the authored provinces",
+    "coverage gap BWI: 0.427 square degrees remain outside the authored provinces",
+    "coverage gap CUB: 0.271 square degrees remain outside the authored provinces",
+    "coverage gap DOM: 0.095 square degrees remain outside the authored provinces",
+    "coverage gap ECU: 0.269 square degrees remain outside the authored provinces",
+    "coverage gap FRA: 0.081 square degrees remain outside the authored provinces",
+    "coverage gap GUA: 0.093 square degrees remain outside the authored provinces",
+    "coverage gap HON: 0.196 square degrees remain outside the authored provinces",
+    "coverage gap HTI: 0.102 square degrees remain outside the authored provinces",
+    "coverage gap NFD: 0.092 square degrees remain outside the authored provinces",
+    "coverage gap NIC: 0.151 square degrees remain outside the authored provinces",
+    "coverage gap PRI: 0.035 square degrees remain outside the authored provinces",
+    "coverage gap PRY: 0.220 square degrees remain outside the authored provinces",
+    "coverage gap SAL: 0.042 square degrees remain outside the authored provinces",
+    "coverage gap SUR: 0.096 square degrees remain outside the authored provinces",
+    "coverage gap URY: 0.155 square degrees remain outside the authored provinces",
+    "coverage gap VEN: 0.540 square degrees remain outside the authored provinces",
+    "coverage subtraction failed for ARG; residual estimated by area (Error: Unable to complete output ring starting at [-69.85676404153925, -34.17860818802881]. Last matching segment found ends at [-69.85676404153925, -34.17860818802879].)",
+    "coverage subtraction failed for BOL; residual estimated by area (Error: Unable to complete output ring starting at [-64.71049892894011, -12.113628503574683]. Last matching segment found ends at [-64.514, -12.25].)",
+    "coverage subtraction failed for CAN; residual estimated by area (Error: Unable to complete output ring starting at [-128.38905882265612, 53.47881237987388]. Last matching segment found ends at [-128.0720635626879, 53.40316337854339].)",
+    "coverage subtraction failed for CHL; residual estimated by area (Error: Unable to complete output ring starting at [-73.983, -40.974]. Last matching segment found ends at [-72.875727, -43.695886].)",
+    "coverage subtraction failed for COL; residual estimated by area (RangeError: Maximum call stack size exceeded)",
+    "coverage subtraction failed for COS; residual estimated by area (Error: Unable to complete output ring starting at [-85.89051784187896, 10.919122466424055]. Last matching segment found ends at [-85.710561, 10.92829].)",
+    "coverage subtraction failed for GRL; residual estimated by area (Error: Unable to find segment #6518899 [-20.907, 75.157] -> [-20.70487028764891, 75.23237853881025] in SweepLine tree.)",
+    "coverage subtraction failed for MEX; residual estimated by area (Error: Unable to complete output ring starting at [-96.81746111271966, 15.732036832050197]. Last matching segment found ends at [-96.81746111271966, 15.7320368320502].)",
+    "coverage subtraction failed for PRU; residual estimated by area (Error: Unable to find segment #6569302 [-78.55172284459869, -9.179203584498312] -> [-78.497411, -9.189538] in SweepLine tree.)",
+    "coverage subtraction failed for USA; residual estimated by area (Error: Unable to complete output ring starting at [-160.815, 58.872]. Last matching segment found ends at [-160.362, 59.051].)"
+  ],
+  "sourceCount": 10,
+  "crossFeatureSeamBorders": [
+    {
+      "a": 300001,
+      "b": 300059,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300004,
+      "b": 300088,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300005,
+      "b": 300065,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300014,
+      "b": 300057,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300022,
+      "b": 300053,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300022,
+      "b": 300055,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300023,
+      "b": 300052,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300024,
+      "b": 300056,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300031,
+      "b": 300053,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300033,
+      "b": 300067,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300035,
+      "b": 300052,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300035,
+      "b": 300053,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300036,
+      "b": 300052,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300039,
+      "b": 300052,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300044,
+      "b": 300067,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300044,
+      "b": 300069,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300044,
+      "b": 300090,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300048,
+      "b": 300057,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300060,
+      "b": 300063,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300066,
+      "b": 300105,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300068,
+      "b": 300105,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300085,
+      "b": 300175,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300085,
+      "b": 300176,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300089,
+      "b": 300105,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300098,
+      "b": 300121,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300098,
+      "b": 300130,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300098,
+      "b": 300137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300098,
+      "b": 300142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300102,
+      "b": 300121,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300102,
+      "b": 300122,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300102,
+      "b": 300132,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300102,
+      "b": 300178,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300104,
+      "b": 300130,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300104,
+      "b": 300135,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300104,
+      "b": 300137,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300104,
+      "b": 300142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300118,
+      "b": 300153,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300118,
+      "b": 300159,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300118,
+      "b": 300163,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300123,
+      "b": 300157,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300123,
+      "b": 300159,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300123,
+      "b": 300163,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300124,
+      "b": 300147,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300125,
+      "b": 300149,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300127,
+      "b": 300136,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300127,
+      "b": 300140,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300127,
+      "b": 300143,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300128,
+      "b": 300136,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300128,
+      "b": 300137,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300128,
+      "b": 300138,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300129,
+      "b": 300140,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300129,
+      "b": 300147,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300130,
+      "b": 300137,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300130,
+      "b": 300142,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300131,
+      "b": 300149,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300131,
+      "b": 300157,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300133,
+      "b": 300147,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300164,
+      "b": 300168,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300165,
+      "b": 300166,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300170,
+      "b": 300181,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300171,
+      "b": 300181,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300185,
+      "b": 300280,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300187,
+      "b": 300218,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300195,
+      "b": 300236,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300199,
+      "b": 300240,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300199,
+      "b": 300377,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300202,
+      "b": 300236,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300205,
+      "b": 300243,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300205,
+      "b": 300245,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300205,
+      "b": 300260,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300206,
+      "b": 300218,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300206,
+      "b": 300233,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300206,
+      "b": 300236,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300207,
+      "b": 300260,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300207,
+      "b": 300280,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300215,
+      "b": 300218,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300215,
+      "b": 300221,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300215,
+      "b": 300240,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300221,
+      "b": 300377,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300221,
+      "b": 300397,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300221,
+      "b": 300398,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300239,
+      "b": 300397,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300240,
+      "b": 300377,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300244,
+      "b": 300280,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300250,
+      "b": 300284,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300250,
+      "b": 300287,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300253,
+      "b": 300287,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300256,
+      "b": 300265,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300256,
+      "b": 300280,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300260,
+      "b": 300280,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300263,
+      "b": 300280,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300264,
+      "b": 300265,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300264,
+      "b": 300270,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300264,
+      "b": 300284,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300280,
+      "b": 300298,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300280,
+      "b": 300377,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300281,
+      "b": 300292,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300285,
+      "b": 300292,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300288,
+      "b": 300298,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300289,
+      "b": 300377,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300292,
+      "b": 300301,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300293,
+      "b": 300377,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300294,
+      "b": 300301,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300294,
+      "b": 300313,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300295,
+      "b": 300300,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300295,
+      "b": 300313,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300295,
+      "b": 300316,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300295,
+      "b": 300338,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300296,
+      "b": 300366,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300296,
+      "b": 300367,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300296,
+      "b": 300377,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300297,
+      "b": 300316,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300297,
+      "b": 300367,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300299,
+      "b": 300334,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300299,
+      "b": 300339,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300300,
+      "b": 300316,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300300,
+      "b": 300325,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300300,
+      "b": 300338,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300303,
+      "b": 300321,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300303,
+      "b": 300324,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300303,
+      "b": 300325,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300304,
+      "b": 300330,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300305,
+      "b": 300324,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300306,
+      "b": 300327,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300307,
+      "b": 300330,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300307,
+      "b": 300331,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300307,
+      "b": 300334,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300308,
+      "b": 300330,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300309,
+      "b": 300335,
+      "lines": 5,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300309,
+      "b": 300339,
+      "lines": 6,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300310,
+      "b": 300327,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300310,
+      "b": 300330,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300311,
+      "b": 300330,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300312,
+      "b": 300327,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300314,
+      "b": 300327,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300316,
+      "b": 300367,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300320,
+      "b": 300340,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300320,
+      "b": 300350,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300320,
+      "b": 300354,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300323,
+      "b": 300362,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300328,
+      "b": 300360,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300328,
+      "b": 300373,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300328,
+      "b": 300394,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300328,
+      "b": 300395,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300328,
+      "b": 300396,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300329,
+      "b": 300361,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300329,
+      "b": 300362,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300329,
+      "b": 300367,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300329,
+      "b": 300376,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300336,
+      "b": 300340,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300336,
+      "b": 300362,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300336,
+      "b": 300373,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300336,
+      "b": 300374,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300336,
+      "b": 300396,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300340,
+      "b": 300396,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300342,
+      "b": 300396,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300352,
+      "b": 300396,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300353,
+      "b": 300396,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300359,
+      "b": 300393,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300360,
+      "b": 300394,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300363,
+      "b": 300393,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300364,
+      "b": 300393,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300364,
+      "b": 300394,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300366,
+      "b": 300393,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300377,
+      "b": 300397,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300377,
+      "b": 300398,
+      "lines": 3,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300378,
+      "b": 300398,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300378,
+      "b": 300402,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300378,
+      "b": 300404,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300398,
+      "b": 300401,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300398,
+      "b": 300402,
+      "lines": 4,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300402,
+      "b": 300404,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300413,
+      "b": 300423,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300413,
+      "b": 300425,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300416,
+      "b": 300423,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300416,
+      "b": 300425,
+      "lines": 1,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300419,
+      "b": 300425,
+      "lines": 2,
+      "kind": "province-outline"
+    },
+    {
+      "a": 300421,
+      "b": 300425,
+      "lines": 1,
+      "kind": "province-outline"
+    }
+  ],
+  "crossFeatureSeamBorderCount": 178,
+  "crossFeaturePolityFrontierSeams": [],
+  "crossFeaturePolityFrontierSeamCount": 0,
+  "unassignedUnits": [],
+  "unassignedUnitCount": 0,
+  "crossPolityUnitAssignments": [
+    "am-bwi-aia-anguilla:AI-X00()",
+    "am-bwi-aia-anguilla:AI-X01~()",
+    "am-bwi-aia-anguilla:AI-X04~()",
+    "am-bwi-atg-antigua:AG-11()",
+    "am-bwi-bhs-out-islands:BS-AK()",
+    "am-bwi-bhs-out-islands:BS-BI()",
+    "am-bwi-bhs-out-islands:BS-BP()",
+    "am-bwi-bhs-out-islands:BS-BY()",
+    "am-bwi-bhs-out-islands:BS-HI()",
+    "am-bwi-bhs-out-islands:BS-MI()",
+    "am-bwi-bhs-out-islands:BS-RC()",
+    "am-bwi-bhs-out-islands:BS-RI()",
+    "am-bwi-bhs-out-islands:BS-SW()",
+    "am-bwi-bmu-bermuda:BM-HAM()",
+    "am-bwi-bmu-bermuda:BM-PEM()",
+    "am-bwi-bmu-bermuda:BM-SAN()",
+    "am-bwi-bmu-bermuda:BM-SGE()",
+    "am-bwi-bmu-bermuda:BM-SOU()",
+    "am-bwi-brb-barbados:BB-07()",
+    "am-bwi-dma-dominica:DM-08()",
+    "am-bwi-grd-grenada:GD-10()",
+    "am-bwi-jam-middlesex:JM-14()",
+    "am-bwi-kna-saint-kitts:KN-09()",
+    "am-bwi-lca-saint-lucia:LC-06()",
+    "am-bwi-tca-turks-and-caicos:TC-X04~()",
+    "am-bwi-tca-turks-and-caicos:TC-X05~()",
+    "am-bwi-tca-turks-and-caicos:TC-X06~()",
+    "am-chl-magallanes:CL-MA()",
+    "am-dwi-saint-john:VI-X03~()",
+    "am-grl-north-greenland:GL-QA()",
+    "am-hon-islas-de-la-bahia:HN-IB()",
+    "am-ven-nueva-esparta:VE-O()"
+  ],
+  "crossPolityUnitAssignmentCount": 32,
+  "duplicateUnitClaims": [],
+  "duplicateUnitClaimCount": 0
+}

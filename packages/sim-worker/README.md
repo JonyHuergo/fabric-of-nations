@@ -1,6 +1,6 @@
 # @century/sim-worker
 
-Century's versioned simulation worker boundary.
+Fabric of Nations versioned simulation worker boundary.
 
 - `protocol` (root export) — protocol version 4 commands/events, immutable snapshot
   types, parsing/validation, and pure selectors. App-safe; no simulation import.

@@ -1,6 +1,6 @@
 # @century/data
 
-Canonical static definitions for Century, stored as JSON under `data/`.
+Canonical static definitions for Fabric of Nations, stored as JSON under `data/`.
 
 M3a includes all M2.1 population content plus:
 

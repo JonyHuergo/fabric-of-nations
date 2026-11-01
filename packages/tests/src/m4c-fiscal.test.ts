@@ -4,7 +4,7 @@ import {
   FLOW_TRANSACTION_KINDS,
   accountingTotals,
   applyOpeningBalances,
-  asSusdPerCurrencyUnit,
+  asRusdPerCurrencyUnit,
   assertAccountingIdentity,
   assertValidJournalPosting,
   assertValidWorld,
@@ -112,7 +112,7 @@ function settlementWithWages(
     ...settlement,
     households: settlement.households.map((household) => ({
       ...household,
-      wagesReceivedSUSD: wagesByBlock.get(household.popBlockId) ?? 0,
+      wagesReceivedRUSD: wagesByBlock.get(household.popBlockId) ?? 0,
     })),
   };
 }
@@ -138,7 +138,7 @@ function withPopulatedUnemployedBlock(
           femaleAgeGroups: Array.from({ length: 17 }, () => 100),
           literacy: 0.2,
           wealthLevel: 30,
-          initialSavingsSUSD: 100,
+          initialSavingsRUSD: 100,
           militancy: 0.1,
         },
       ],
@@ -156,22 +156,22 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(country.treasuryAccountId).toBe(FISCAL_TREASURY_ACCOUNT_ID);
     expect(country.fiscal).toEqual({
       incomeTaxRate: 0.1,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 36_500,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 36_500,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     });
     expect(account(world, "country", country.id, "treasury-cash").id).toBe(
       FISCAL_TREASURY_ACCOUNT_ID,
     );
-    expect(account(world, "country", country.id, "treasury-cash").balanceSUSD).toBe(500);
-    expect(account(world, "country", country.id, "owner-equity").balanceSUSD).toBe(500);
-    expect(account(world, "country", country.id, "income-tax-revenue").balanceSUSD).toBe(0);
-    expect(account(world, "country", country.id, "welfare-expense").balanceSUSD).toBe(0);
+    expect(account(world, "country", country.id, "treasury-cash").balanceRUSD).toBe(500);
+    expect(account(world, "country", country.id, "owner-equity").balanceRUSD).toBe(500);
+    expect(account(world, "country", country.id, "income-tax-revenue").balanceRUSD).toBe(0);
+    expect(account(world, "country", country.id, "welfare-expense").balanceRUSD).toBe(0);
     for (const block of world.popBlocks) {
-      expect(account(world, "popBlock", block.id, "income-tax-expense").balanceSUSD).toBe(0);
-      expect(account(world, "popBlock", block.id, "welfare-income").balanceSUSD).toBe(0);
+      expect(account(world, "popBlock", block.id, "income-tax-expense").balanceRUSD).toBe(0);
+      expect(account(world, "popBlock", block.id, "welfare-income").balanceRUSD).toBe(0);
     }
     expect(world.finance.opening).not.toBeNull();
     expect(() => applyOpeningBalances(world.finance, 0, [])).toThrow(/already been applied/i);
@@ -200,8 +200,8 @@ describe("M4c fiscal accounts, construction, and validation", () => {
 
     const fiscal = buildWorld(fiscalScenario({ rate: 0, budget: 0 }));
     for (const block of fiscal.popBlocks) {
-      expect(account(fiscal, "popBlock", block.id, "income-tax-expense").balanceSUSD).toBe(0);
-      expect(account(fiscal, "popBlock", block.id, "welfare-income").balanceSUSD).toBe(0);
+      expect(account(fiscal, "popBlock", block.id, "income-tax-expense").balanceRUSD).toBe(0);
+      expect(account(fiscal, "popBlock", block.id, "welfare-income").balanceRUSD).toBe(0);
     }
     expect(fiscal.finance.accounts.some((candidate) => candidate.ownerKind === "country")).toBe(
       true,
@@ -217,33 +217,33 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(zero.countries[0]?.regionIds).toEqual([]);
 
     const unowned = fiscalScenario({
-      countries: [fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 0 } })],
+      countries: [fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 0 } })],
     });
     expect(() => buildWorld(unowned)).toThrow(/owned by exactly one country/i);
 
     const unownedBudget = fiscalScenario({
       countries: [
-        fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 10 } }),
+        fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 10 } }),
       ],
     });
     expect(() => buildWorld(unownedBudget)).toThrow(/owned by exactly one country/i);
   });
 
   test("rejects invalid fiscal values and treasury declarations", () => {
-    const bad = (fiscal: { incomeTaxRate: number; welfareBudgetSUSDPerYear: number }): void => {
+    const bad = (fiscal: { incomeTaxRate: number; welfareBudgetRUSDPerYear: number }): void => {
       expect(() => buildWorld(fiscalScenario({ countries: [fiscalCountry({ fiscal })] }))).toThrow();
     };
-    bad({ incomeTaxRate: Number.NaN, welfareBudgetSUSDPerYear: 0 });
-    bad({ incomeTaxRate: Number.POSITIVE_INFINITY, welfareBudgetSUSDPerYear: 0 });
-    bad({ incomeTaxRate: -0.01, welfareBudgetSUSDPerYear: 0 });
-    bad({ incomeTaxRate: 1.01, welfareBudgetSUSDPerYear: 0 });
-    bad({ incomeTaxRate: 0, welfareBudgetSUSDPerYear: -1 });
-    bad({ incomeTaxRate: 0, welfareBudgetSUSDPerYear: Number.NaN });
-    bad({ incomeTaxRate: 0, welfareBudgetSUSDPerYear: Number.POSITIVE_INFINITY });
-    bad({ incomeTaxRate: 0, welfareBudgetSUSDPerYear: 1e16 });
+    bad({ incomeTaxRate: Number.NaN, welfareBudgetRUSDPerYear: 0 });
+    bad({ incomeTaxRate: Number.POSITIVE_INFINITY, welfareBudgetRUSDPerYear: 0 });
+    bad({ incomeTaxRate: -0.01, welfareBudgetRUSDPerYear: 0 });
+    bad({ incomeTaxRate: 1.01, welfareBudgetRUSDPerYear: 0 });
+    bad({ incomeTaxRate: 0, welfareBudgetRUSDPerYear: -1 });
+    bad({ incomeTaxRate: 0, welfareBudgetRUSDPerYear: Number.NaN });
+    bad({ incomeTaxRate: 0, welfareBudgetRUSDPerYear: Number.POSITIVE_INFINITY });
+    bad({ incomeTaxRate: 0, welfareBudgetRUSDPerYear: 1e16 });
 
     const negativeCash = fiscalScenario({
-      countries: [fiscalCountry({ initialTreasuryCashSUSD: -1 })],
+      countries: [fiscalCountry({ initialTreasuryCashRUSD: -1 })],
     });
     expect(() => buildWorld(negativeCash)).toThrow(/non-negative/i);
 
@@ -309,18 +309,18 @@ describe("M4c fiscal accounts, construction, and validation", () => {
       payload: {
         countries: {
           treasuryAccountId: number;
-          fiscal: { incomeTaxRate: number; welfareBudgetSUSDPerYear: number };
+          fiscal: { incomeTaxRate: number; welfareBudgetRUSDPerYear: number };
         }[];
       };
     };
     expect(parsed.payload.countries[0]?.treasuryAccountId).toBe(FISCAL_TREASURY_ACCOUNT_ID);
     expect(parsed.payload.countries[0]?.fiscal).toEqual({
       incomeTaxRate: 0.15,
-      incomeTaxAllowanceSUSDPerYear: 0,
-      welfareBudgetSUSDPerYear: 12_000,
+      incomeTaxAllowanceRUSDPerYear: 0,
+      welfareBudgetRUSDPerYear: 12_000,
       welfareMaxWealthLevel: 99,
       businessProfitTaxRate: 0,
-      reserveTargetSUSD: 0,
+      reserveTargetRUSD: 0,
     });
 
     const restored = deserializeWorld(serialized);
@@ -352,7 +352,7 @@ describe("M4c fiscal accounts, construction, and validation", () => {
       checksum: string;
       payload: {
         countries: {
-          fiscal?: { incomeTaxRate: number; welfareBudgetSUSDPerYear: number };
+          fiscal?: { incomeTaxRate: number; welfareBudgetRUSDPerYear: number };
         }[];
       };
     };
@@ -372,47 +372,47 @@ describe("M4c daily income tax", () => {
   test("withholds the flat rate on wages actually received and reconciles cash", () => {
     const scenario = fiscalScenario({ rate: 0.125 });
     const world = buildWorld(scenario);
-    const treasuryBefore = account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD;
+    const treasuryBefore = account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD;
     const economy = runDay(world, scenario);
     const fiscal = economy.fiscal;
     const wagesByBlock = new Map(
       economy.settlement.households.map((household) => [
         household.popBlockId,
-        household.wagesReceivedSUSD,
+        household.wagesReceivedRUSD,
       ]),
     );
     const endingByBlock = new Map(
       economy.settlement.households.map((household) => [
         household.popBlockId,
-        household.endingCashAfterSettlementSUSD,
+        household.endingCashAfterSettlementRUSD,
       ]),
     );
     let taxTotal = 0;
     for (const block of fiscal.blocks) {
       const wages = wagesByBlock.get(block.popBlockId) ?? 0;
-      expect(block.incomeTaxSUSD).toBeCloseTo(0.125 * wages, 9);
-      expect(account(world, "popBlock", block.popBlockId, "income-tax-expense").balanceSUSD).toBeCloseTo(
-        block.incomeTaxSUSD,
+      expect(block.incomeTaxRUSD).toBeCloseTo(0.125 * wages, 9);
+      expect(account(world, "popBlock", block.popBlockId, "income-tax-expense").balanceRUSD).toBeCloseTo(
+        block.incomeTaxRUSD,
         9,
       );
-      expect(account(world, "popBlock", block.popBlockId, "household-cash").balanceSUSD).toBeCloseTo(
-        (endingByBlock.get(block.popBlockId) ?? 0) - block.incomeTaxSUSD,
+      expect(account(world, "popBlock", block.popBlockId, "household-cash").balanceRUSD).toBeCloseTo(
+        (endingByBlock.get(block.popBlockId) ?? 0) - block.incomeTaxRUSD,
         9,
       );
-      expect(block.endingCashAfterFiscalSUSD).toBeCloseTo(
-        account(world, "popBlock", block.popBlockId, "household-cash").balanceSUSD,
+      expect(block.endingCashAfterFiscalRUSD).toBeCloseTo(
+        account(world, "popBlock", block.popBlockId, "household-cash").balanceRUSD,
         9,
       );
-      taxTotal += block.incomeTaxSUSD;
+      taxTotal += block.incomeTaxRUSD;
     }
     for (const household of economy.settlement.households) {
       const fiscalBlock = fiscal.blocks.find(
         (entry) => entry.popBlockId === household.popBlockId,
       );
-      expect(household.endingCashAfterSettlementSUSD).toBeCloseTo(
-        account(world, "popBlock", household.popBlockId, "household-cash").balanceSUSD +
-          (fiscalBlock?.incomeTaxSUSD ?? 0) -
-          (fiscalBlock?.welfareReceivedSUSD ?? 0),
+      expect(household.endingCashAfterSettlementRUSD).toBeCloseTo(
+        account(world, "popBlock", household.popBlockId, "household-cash").balanceRUSD +
+          (fiscalBlock?.incomeTaxRUSD ?? 0) -
+          (fiscalBlock?.welfareReceivedRUSD ?? 0),
         9,
       );
     }
@@ -421,32 +421,32 @@ describe("M4c daily income tax", () => {
       (entry) => entry.popBlockId === needsBlock?.popBlockId,
     );
     if (needsBlock !== undefined && firstHousehold !== undefined) {
-      expect(needsBlock.budgetStartBeforeNeedsSUSD).toBeCloseTo(
-        firstHousehold.initialCashSUSD,
+      expect(needsBlock.budgetStartBeforeNeedsRUSD).toBeCloseTo(
+        firstHousehold.initialCashRUSD,
         9,
       );
-      expect(needsBlock.budgetEndAfterNeedsSUSD).toBeCloseTo(
-        firstHousehold.initialCashSUSD - firstHousehold.marketPurchasesSUSD,
+      expect(needsBlock.budgetEndAfterNeedsRUSD).toBeCloseTo(
+        firstHousehold.initialCashRUSD - firstHousehold.marketPurchasesRUSD,
         9,
       );
     }
-    expect(fiscal.totals.incomeTaxSUSD).toBeCloseTo(taxTotal, 9);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(fiscal.totals.incomeTaxRUSD).toBeCloseTo(taxTotal, 9);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBeCloseTo(
       treasuryBefore + taxTotal,
       9,
     );
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "income-tax-revenue").balanceSUSD).toBeCloseTo(
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "income-tax-revenue").balanceRUSD).toBeCloseTo(
       taxTotal,
       9,
     );
     // Gross wage income is recorded at the full settled amount.
     let wageIncome = 0;
     for (const block of world.popBlocks) {
-      wageIncome += account(world, "popBlock", block.id, "wage-income").balanceSUSD;
+      wageIncome += account(world, "popBlock", block.id, "wage-income").balanceRUSD;
     }
-    expect(wageIncome).toBeCloseTo(economy.settlement.totals.wagesPaidSUSD, 9);
+    expect(wageIncome).toBeCloseTo(economy.settlement.totals.wagesPaidRUSD, 9);
     expect(designatedCashTotal(world.finance)).toBeCloseTo(
-      economy.settlement.totals.endingCashAfterSettlementSUSD,
+      economy.settlement.totals.endingCashAfterSettlementRUSD,
       9,
     );
   });
@@ -458,23 +458,23 @@ describe("M4c daily income tax", () => {
     const wagesByBlock = new Map(
       economy.settlement.households.map((household) => [
         household.popBlockId,
-        household.wagesReceivedSUSD,
+        household.wagesReceivedRUSD,
       ]),
     );
     let taxTotal = 0;
     for (const block of economy.fiscal.blocks) {
       const wages = wagesByBlock.get(block.popBlockId) ?? 0;
-      expect(block.incomeTaxSUSD).toBeCloseTo(wages, 9);
-      expect(account(world, "popBlock", block.popBlockId, "household-cash").balanceSUSD).toBeCloseTo(
+      expect(block.incomeTaxRUSD).toBeCloseTo(wages, 9);
+      expect(account(world, "popBlock", block.popBlockId, "household-cash").balanceRUSD).toBeCloseTo(
         (economy.settlement.households.find(
           (entry) => entry.popBlockId === block.popBlockId,
-        )?.endingCashAfterSettlementSUSD ?? 0) - block.incomeTaxSUSD,
+        )?.endingCashAfterSettlementRUSD ?? 0) - block.incomeTaxRUSD,
         9,
       );
-      taxTotal += block.incomeTaxSUSD;
+      taxTotal += block.incomeTaxRUSD;
     }
-    expect(economy.fiscal.totals.incomeTaxSUSD).toBeCloseTo(taxTotal, 9);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(economy.fiscal.totals.incomeTaxRUSD).toBeCloseTo(taxTotal, 9);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBeCloseTo(
       taxTotal,
       9,
     );
@@ -485,21 +485,21 @@ describe("M4c daily income tax", () => {
     const zeroRate = fiscalScenario({ rate: 0 });
     const world = buildWorld(zeroRate);
     const economy = runDay(world, zeroRate);
-    expect(economy.fiscal.totals.incomeTaxSUSD).toBe(0);
+    expect(economy.fiscal.totals.incomeTaxRUSD).toBe(0);
     expect(postingsOfKind(world, "income-tax")).toHaveLength(0);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBe(0);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBe(0);
 
     const rateScenario = withPopulatedUnemployedBlock(fiscalScenario({ rate: 0.5 }));
     const noWageWorld = buildWorld(rateScenario);
     const noWageEconomy = runDay(noWageWorld, rateScenario);
     const unemployed = noWageEconomy.settlement.households.find(
-      (household) => household.wagesReceivedSUSD === 0,
+      (household) => household.wagesReceivedRUSD === 0,
     );
     if (unemployed === undefined) throw new Error("expected a genuinely unemployed block");
     const fiscalBlock = noWageEconomy.fiscal.blocks.find(
       (entry) => entry.popBlockId === unemployed.popBlockId,
     );
-    expect(fiscalBlock?.incomeTaxSUSD).toBe(0);
+    expect(fiscalBlock?.incomeTaxRUSD).toBe(0);
     expect(postingsOfKind(noWageWorld, "income-tax").length).toBeGreaterThan(0);
   });
 
@@ -520,7 +520,7 @@ describe("M4c daily income tax", () => {
     );
     if (household === undefined) throw new Error("missing household settlement");
     const fiscalBlock = economy.fiscal.blocks.find((entry) => entry.popBlockId === blockId);
-    expect(fiscalBlock?.incomeTaxSUSD).toBeCloseTo(0.2 * household.wagesReceivedSUSD, 9);
+    expect(fiscalBlock?.incomeTaxRUSD).toBeCloseTo(0.2 * household.wagesReceivedRUSD, 9);
   });
 
   test("uses a genuine employer funding shortfall as the tax base", () => {
@@ -531,10 +531,10 @@ describe("M4c daily income tax", () => {
     const settlement = runSettlement(scenario, world).settlement;
     const wage = settlement.wages.find((entry) => entry.buildingId === 0);
     if (wage === undefined) throw new Error("missing building wage settlement");
-    expect(wage.unpaidSUSD).toBeGreaterThan(0);
+    expect(wage.unpaidRUSD).toBeGreaterThan(0);
     const fiscal = runFiscalPhase(world, settlement, world.dayIndex);
     const fiscalBlock = fiscal.blocks.find((entry) => entry.popBlockId === 0);
-    expect(fiscalBlock?.incomeTaxSUSD).toBeCloseTo(0.5 * wage.paidSUSD, 9);
+    expect(fiscalBlock?.incomeTaxRUSD).toBeCloseTo(0.5 * wage.paidRUSD, 9);
   });
 
   test("does not tax welfare or wealth at a nonzero rate", () => {
@@ -546,22 +546,22 @@ describe("M4c daily income tax", () => {
     const economy = runDay(world, scenario);
     const unemployed = economy.settlement.households.find((household) => {
       const block = world.popBlocks.find((candidate) => candidate.id === household.popBlockId);
-      return household.wagesReceivedSUSD === 0 && block !== undefined && populationTotal(block) > 0;
+      return household.wagesReceivedRUSD === 0 && block !== undefined && populationTotal(block) > 0;
     });
     if (unemployed === undefined) throw new Error("expected a populated unemployed block");
     const fiscalBlock = economy.fiscal.blocks.find(
       (entry) => entry.popBlockId === unemployed.popBlockId,
     );
-    expect(fiscalBlock?.incomeTaxSUSD).toBe(0);
-    expect(fiscalBlock?.welfareReceivedSUSD).toBeGreaterThan(0);
+    expect(fiscalBlock?.incomeTaxRUSD).toBe(0);
+    expect(fiscalBlock?.welfareReceivedRUSD).toBeGreaterThan(0);
     const paidHousehold = economy.settlement.households.find(
-      (household) => household.wagesReceivedSUSD > 0,
+      (household) => household.wagesReceivedRUSD > 0,
     );
     if (paidHousehold === undefined) throw new Error("expected an employed block");
     const paidFiscal = economy.fiscal.blocks.find(
       (entry) => entry.popBlockId === paidHousehold.popBlockId,
     );
-    expect(paidFiscal?.incomeTaxSUSD).toBeCloseTo(0.5 * paidHousehold.wagesReceivedSUSD, 9);
+    expect(paidFiscal?.incomeTaxRUSD).toBeCloseTo(0.5 * paidHousehold.wagesReceivedRUSD, 9);
   });
 
   test("fails without mutation when tax would exceed available household cash", () => {
@@ -586,14 +586,14 @@ describe("M4c budgeted welfare transfers", () => {
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
     const result = economy.fiscal.countries[0]!;
-    expect(result.welfareRequestedSUSD).toBeCloseTo(100, 9);
-    expect(result.welfarePaidSUSD).toBeCloseTo(100, 9);
-    expect(result.welfareShortfallSUSD).toBe(0);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(result.welfareRequestedRUSD).toBeCloseTo(100, 9);
+    expect(result.welfarePaidRUSD).toBeCloseTo(100, 9);
+    expect(result.welfareShortfallRUSD).toBe(0);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBeCloseTo(
       900,
       9,
     );
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "welfare-expense").balanceSUSD).toBeCloseTo(
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "welfare-expense").balanceRUSD).toBeCloseTo(
       100,
       9,
     );
@@ -607,13 +607,13 @@ describe("M4c budgeted welfare transfers", () => {
     let allocated = 0;
     for (const block of world.popBlocks) {
       const received =
-        economy.fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.welfareReceivedSUSD ?? 0;
+        economy.fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.welfareReceivedRUSD ?? 0;
       const population =
         block.maleByAge.reduce((sum, value) => sum + value, 0) +
         block.femaleByAge.reduce((sum, value) => sum + value, 0);
       expect(received).toBeCloseTo((100 * population) / totalPopulation, 6);
       allocated += received;
-      expect(account(world, "popBlock", block.id, "welfare-income").balanceSUSD).toBeCloseTo(
+      expect(account(world, "popBlock", block.id, "welfare-income").balanceRUSD).toBeCloseTo(
         received,
         9,
       );
@@ -625,10 +625,10 @@ describe("M4c budgeted welfare transfers", () => {
     const scenario = fiscalScenario({ rate: 0, budget: 365, treasuryCash: 1 });
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
-    const allocations = economy.fiscal.blocks.map((block) => block.welfareReceivedSUSD);
+    const allocations = economy.fiscal.blocks.map((block) => block.welfareReceivedRUSD);
     expect(allocations.reduce((total, value) => total + value, 0)).toBeCloseTo(1, 12);
     expect(allocations.some((value) => value > 0)).toBe(true);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBe(0);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBe(0);
   });
 
   test("uses the leap civil year's day count", () => {
@@ -641,8 +641,8 @@ describe("M4c budgeted welfare transfers", () => {
     });
     const world = buildWorld(scenario, { startDayIndex: leapStart });
     const economy = runDay(world, scenario);
-    expect(economy.fiscal.countries[0]?.welfareRequestedSUSD).toBeCloseTo(100, 9);
-    expect(economy.fiscal.countries[0]?.welfarePaidSUSD).toBeCloseTo(100, 9);
+    expect(economy.fiscal.countries[0]?.welfareRequestedRUSD).toBeCloseTo(100, 9);
+    expect(economy.fiscal.countries[0]?.welfarePaidRUSD).toBeCloseTo(100, 9);
   });
 
   test("reduces transfers proportionally when treasury cash is insufficient", () => {
@@ -650,26 +650,26 @@ describe("M4c budgeted welfare transfers", () => {
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
     const result = economy.fiscal.countries[0]!;
-    expect(result.welfareRequestedSUSD).toBeCloseTo(10_000, 6);
-    expect(result.welfarePaidSUSD).toBeCloseTo(30, 9);
-    expect(result.welfareShortfallSUSD).toBeCloseTo(10_000 - 30, 6);
-    expect(result.treasuryCashEndSUSD).toBeCloseTo(0, 9);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(result.welfareRequestedRUSD).toBeCloseTo(10_000, 6);
+    expect(result.welfarePaidRUSD).toBeCloseTo(30, 9);
+    expect(result.welfareShortfallRUSD).toBeCloseTo(10_000 - 30, 6);
+    expect(result.treasuryCashEndRUSD).toBeCloseTo(0, 9);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBeCloseTo(
       0,
       9,
     );
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "welfare-expense").balanceSUSD).toBeCloseTo(
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "welfare-expense").balanceRUSD).toBeCloseTo(
       30,
       9,
     );
     // No debt, arrears, or negative cash is created.
     for (const candidate of world.finance.accounts) {
       if (candidate.category !== "equity") {
-        expect(candidate.balanceSUSD).toBeGreaterThanOrEqual(0);
+        expect(candidate.balanceRUSD).toBeGreaterThanOrEqual(0);
       }
     }
     let paid = 0;
-    for (const block of economy.fiscal.blocks) paid += block.welfareReceivedSUSD;
+    for (const block of economy.fiscal.blocks) paid += block.welfareReceivedRUSD;
     expect(paid).toBeCloseTo(30, 9);
   });
 
@@ -678,12 +678,12 @@ describe("M4c budgeted welfare transfers", () => {
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
     const result = economy.fiscal.countries[0]!;
-    expect(result.incomeTaxSUSD).toBeGreaterThan(0);
-    expect(result.welfareRequestedSUSD).toBeCloseTo(1_000, 6);
-    expect(result.welfarePaidSUSD).toBeCloseTo(result.incomeTaxSUSD, 9);
-    expect(result.treasuryCashEndSUSD).toBeCloseTo(0, 9);
-    expect(result.welfareShortfallSUSD).toBeCloseTo(1_000 - result.incomeTaxSUSD, 6);
-    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(result.incomeTaxRUSD).toBeGreaterThan(0);
+    expect(result.welfareRequestedRUSD).toBeCloseTo(1_000, 6);
+    expect(result.welfarePaidRUSD).toBeCloseTo(result.incomeTaxRUSD, 9);
+    expect(result.treasuryCashEndRUSD).toBeCloseTo(0, 9);
+    expect(result.welfareShortfallRUSD).toBeCloseTo(1_000 - result.incomeTaxRUSD, 6);
+    expect(account(world, "country", FISCAL_COUNTRY_ID, "treasury-cash").balanceRUSD).toBeCloseTo(
       0,
       9,
     );
@@ -692,7 +692,7 @@ describe("M4c budgeted welfare transfers", () => {
   test("zero budget or zero population creates no invalid posting", () => {
     const zeroBudget = buildWorld(fiscalScenario({ rate: 0, budget: 0 }));
     const zeroEconomy = runDay(zeroBudget, fiscalScenario({ rate: 0, budget: 0 }));
-    expect(zeroEconomy.fiscal.totals.welfarePaidSUSD).toBe(0);
+    expect(zeroEconomy.fiscal.totals.welfarePaidRUSD).toBe(0);
     expect(postingsOfKind(zeroBudget, "welfare-transfer")).toHaveLength(0);
 
     const scenario = fiscalScenario({
@@ -703,19 +703,19 @@ describe("M4c budgeted welfare transfers", () => {
           tag: "T1",
           regionIds: [],
           treasuryAccountId: 1001,
-          initialTreasuryCashSUSD: 100,
+          initialTreasuryCashRUSD: 100,
           monetary: { kind: "adopted", currencyId: 0 },
-          fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 36_500 },
+          fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 36_500 },
         }),
       ],
     });
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
     const second = economy.fiscal.countries.find((country) => country.countryId === 1);
-    expect(second?.welfareRequestedSUSD).toBeCloseTo(100, 9);
-    expect(second?.welfarePaidSUSD).toBe(0);
-    expect(second?.welfareShortfallSUSD).toBeCloseTo(100, 9);
-    expect(account(world, "country", 1, "treasury-cash").balanceSUSD).toBe(100);
+    expect(second?.welfareRequestedRUSD).toBeCloseTo(100, 9);
+    expect(second?.welfarePaidRUSD).toBe(0);
+    expect(second?.welfareShortfallRUSD).toBeCloseTo(100, 9);
+    expect(account(world, "country", 1, "treasury-cash").balanceRUSD).toBe(100);
   });
 
   test("excludes a zero-population block from welfare and tax", () => {
@@ -729,7 +729,7 @@ describe("M4c budgeted welfare transfers", () => {
       femaleAgeGroups: Array.from({ length: 17 }, () => 0),
       literacy: 0,
       wealthLevel: 0,
-      initialSavingsSUSD: 0,
+      initialSavingsRUSD: 0,
       militancy: 0,
     };
     const scenario: EconomyScenarioDef = {
@@ -742,11 +742,11 @@ describe("M4c budgeted welfare transfers", () => {
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
     const zeroFiscal = economy.fiscal.blocks.find((entry) => entry.popBlockId === 4);
-    expect(zeroFiscal?.welfareReceivedSUSD).toBe(0);
-    expect(zeroFiscal?.incomeTaxSUSD).toBe(0);
-    expect(zeroFiscal?.endingCashAfterFiscalSUSD).toBe(0);
+    expect(zeroFiscal?.welfareReceivedRUSD).toBe(0);
+    expect(zeroFiscal?.incomeTaxRUSD).toBe(0);
+    expect(zeroFiscal?.endingCashAfterFiscalRUSD).toBe(0);
     expect(populationTotal(world.popBlocks.find((block) => block.id === 4)!)).toBe(0);
-    expect(account(world, "popBlock", 4, "household-cash").balanceSUSD).toBe(0);
+    expect(account(world, "popBlock", 4, "household-cash").balanceRUSD).toBe(0);
   });
 
   test("prevents cross-country tax or welfare leakage", () => {
@@ -755,25 +755,25 @@ describe("M4c budgeted welfare transfers", () => {
       budget: 36_500,
       treasuryCash: 500,
       countries: [
-        fiscalCountry({ id: 0, fiscal: { incomeTaxRate: 0.1, welfareBudgetSUSDPerYear: 36_500 }, initialTreasuryCashSUSD: 500 }),
+        fiscalCountry({ id: 0, fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 36_500 }, initialTreasuryCashRUSD: 500 }),
         fiscalCountry({
           id: 1,
           tag: "T1",
           regionIds: [],
           treasuryAccountId: 1001,
           monetary: { kind: "adopted", currencyId: 0 },
-          fiscal: { incomeTaxRate: 0.2, welfareBudgetSUSDPerYear: 7_300 },
+          fiscal: { incomeTaxRate: 0.2, welfareBudgetRUSDPerYear: 7_300 },
         }),
       ],
     });
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
-    expect(account(world, "country", 1, "treasury-cash").balanceSUSD).toBe(0);
-    expect(account(world, "country", 1, "income-tax-revenue").balanceSUSD).toBe(0);
+    expect(account(world, "country", 1, "treasury-cash").balanceRUSD).toBe(0);
+    expect(account(world, "country", 1, "income-tax-revenue").balanceRUSD).toBe(0);
     const second = economy.fiscal.countries.find((country) => country.countryId === 1);
-    expect(second?.incomeTaxSUSD).toBe(0);
-    expect(second?.welfarePaidSUSD).toBe(0);
-    expect(second?.welfareRequestedSUSD).toBeCloseTo(20, 9);
+    expect(second?.incomeTaxRUSD).toBe(0);
+    expect(second?.welfarePaidRUSD).toBe(0);
+    expect(second?.welfareRequestedRUSD).toBeCloseTo(20, 9);
   });
 });
 
@@ -799,18 +799,18 @@ describe("M4c accounting, close, and summaries", () => {
       expect(() => postJournalEntry(world.finance, 0, kind, lines)).toThrow(/semantic matrix/i);
     };
     wrongKind("income-tax", [
-      { accountId: account(world, "popBlock", 0, "household-cash").id, side: "credit", amountSUSD: 1 },
-      { accountId: account(world, "country", 0, "welfare-expense").id, side: "debit", amountSUSD: 1 },
-      { accountId: account(world, "country", 0, "treasury-cash").id, side: "debit", amountSUSD: 1 },
-      { accountId: account(world, "country", 0, "income-tax-revenue").id, side: "credit", amountSUSD: 1 },
+      { accountId: account(world, "popBlock", 0, "household-cash").id, side: "credit", amountRUSD: 1 },
+      { accountId: account(world, "country", 0, "welfare-expense").id, side: "debit", amountRUSD: 1 },
+      { accountId: account(world, "country", 0, "treasury-cash").id, side: "debit", amountRUSD: 1 },
+      { accountId: account(world, "country", 0, "income-tax-revenue").id, side: "credit", amountRUSD: 1 },
     ]);
     expect(() =>
       postJournalBatch(world.finance, 0, [
         {
           transactionKind: "welfare-transfer",
           lines: [
-            { accountId: account(world, "country", 0, "treasury-cash").id, side: "credit", amountSUSD: 1 },
-            { accountId: account(world, "popBlock", 0, "welfare-income").id, side: "debit", amountSUSD: 1 },
+            { accountId: account(world, "country", 0, "treasury-cash").id, side: "credit", amountRUSD: 1 },
+            { accountId: account(world, "popBlock", 0, "welfare-income").id, side: "debit", amountRUSD: 1 },
           ],
         },
       ]),
@@ -818,15 +818,15 @@ describe("M4c accounting, close, and summaries", () => {
 
     const fiscalClone = cloneWorld(world);
     const posting = postJournalEntry(fiscalClone.finance, 0, "income-tax", [
-      { accountId: account(fiscalClone, "popBlock", 0, "income-tax-expense").id, side: "debit", amountSUSD: 1 },
-      { accountId: account(fiscalClone, "popBlock", 0, "household-cash").id, side: "credit", amountSUSD: 1 },
-      { accountId: account(fiscalClone, "country", 0, "treasury-cash").id, side: "debit", amountSUSD: 1 },
-      { accountId: account(fiscalClone, "country", 0, "income-tax-revenue").id, side: "credit", amountSUSD: 1 },
+      { accountId: account(fiscalClone, "popBlock", 0, "income-tax-expense").id, side: "debit", amountRUSD: 1 },
+      { accountId: account(fiscalClone, "popBlock", 0, "household-cash").id, side: "credit", amountRUSD: 1 },
+      { accountId: account(fiscalClone, "country", 0, "treasury-cash").id, side: "debit", amountRUSD: 1 },
+      { accountId: account(fiscalClone, "country", 0, "income-tax-revenue").id, side: "credit", amountRUSD: 1 },
     ]);
     expect(posting.transactionKind).toBe("income-tax");
-    expect(account(fiscalClone, "country", 0, "treasury-cash").balanceSUSD).toBe(1);
-    expect(account(fiscalClone, "country", 0, "income-tax-revenue").balanceSUSD).toBe(1);
-    expect(account(fiscalClone, "popBlock", 0, "income-tax-expense").balanceSUSD).toBe(1);
+    expect(account(fiscalClone, "country", 0, "treasury-cash").balanceRUSD).toBe(1);
+    expect(account(fiscalClone, "country", 0, "income-tax-revenue").balanceRUSD).toBe(1);
+    expect(account(fiscalClone, "popBlock", 0, "income-tax-expense").balanceRUSD).toBe(1);
     expect(() => assertValidWorld(fiscalClone)).not.toThrow();
   });
 
@@ -839,8 +839,8 @@ describe("M4c accounting, close, and summaries", () => {
       dayIndex: 0,
       transactionKind: "welfare-transfer",
       lines: [
-        { accountId: account(world, "country", 0, "treasury-cash").id, side: "debit", amountSUSD: 1 },
-        { accountId: account(world, "system", null, "system-income").id, side: "credit", amountSUSD: 1 },
+        { accountId: account(world, "country", 0, "treasury-cash").id, side: "debit", amountRUSD: 1 },
+        { accountId: account(world, "system", null, "system-income").id, side: "credit", amountRUSD: 1 },
       ],
       sourceEntityId: null,
       targetEntityId: null,
@@ -856,8 +856,8 @@ describe("M4c accounting, close, and summaries", () => {
     let close: ReturnType<typeof runDay>["financeClose"] = null;
     for (let day = 0; day < 31; day += 1) {
       const economy = runDay(world, scenario);
-      tax += economy.fiscal.totals.incomeTaxSUSD;
-      welfare += economy.fiscal.totals.welfarePaidSUSD;
+      tax += economy.fiscal.totals.incomeTaxRUSD;
+      welfare += economy.fiscal.totals.welfarePaidRUSD;
       if (economy.financeClose !== null) close = economy.financeClose;
     }
     expect(close).not.toBeNull();
@@ -878,13 +878,13 @@ describe("M4c accounting, close, and summaries", () => {
       welfare,
       6,
     );
-    expect(account(world, "country", 0, "income-tax-revenue").balanceSUSD).toBe(0);
-    expect(account(world, "country", 0, "welfare-expense").balanceSUSD).toBe(0);
-    expect(account(world, "country", 0, "owner-equity").balanceSUSD).toBeCloseTo(
+    expect(account(world, "country", 0, "income-tax-revenue").balanceRUSD).toBe(0);
+    expect(account(world, "country", 0, "welfare-expense").balanceRUSD).toBe(0);
+    expect(account(world, "country", 0, "owner-equity").balanceRUSD).toBeCloseTo(
       5_000 + tax - welfare,
       6,
     );
-    expect(account(world, "country", 0, "treasury-cash").balanceSUSD).toBeCloseTo(
+    expect(account(world, "country", 0, "treasury-cash").balanceRUSD).toBeCloseTo(
       5_000 + tax - welfare,
       6,
     );
@@ -902,18 +902,18 @@ describe("M4c accounting, close, and summaries", () => {
     const cash1 = account(world, "popBlock", 1, "household-cash");
 
     const cashOnly = [
-      { accountId: treasury.id, side: "debit" as const, amountSUSD: 1 },
-      { accountId: cash0.id, side: "credit" as const, amountSUSD: 1 },
+      { accountId: treasury.id, side: "debit" as const, amountRUSD: 1 },
+      { accountId: cash0.id, side: "credit" as const, amountRUSD: 1 },
     ];
     expect(() => postJournalEntry(world.finance, 0, "income-tax", cashOnly)).toThrow(
       /fiscal|income-tax/i,
     );
     expect(() =>
       postJournalEntry(world.finance, 0, "income-tax", [
-        { accountId: expense0.id, side: "credit", amountSUSD: 1 },
-        { accountId: cash0.id, side: "debit", amountSUSD: 1 },
-        { accountId: treasury.id, side: "credit", amountSUSD: 1 },
-        { accountId: revenue.id, side: "debit", amountSUSD: 1 },
+        { accountId: expense0.id, side: "credit", amountRUSD: 1 },
+        { accountId: cash0.id, side: "debit", amountRUSD: 1 },
+        { accountId: treasury.id, side: "credit", amountRUSD: 1 },
+        { accountId: revenue.id, side: "debit", amountRUSD: 1 },
       ]),
     ).toThrow(/semantic|fiscal/i);
     expect(() =>
@@ -923,19 +923,19 @@ describe("M4c accounting, close, and summaries", () => {
     ).toThrow(/fiscal|income-tax/i);
     expect(() =>
       postJournalEntry(world.finance, 0, "income-tax", [
-        { accountId: expense0.id, side: "debit", amountSUSD: 1 },
-        { accountId: treasury.id, side: "debit", amountSUSD: 1 },
-        { accountId: revenue.id, side: "credit", amountSUSD: 2 },
+        { accountId: expense0.id, side: "debit", amountRUSD: 1 },
+        { accountId: treasury.id, side: "debit", amountRUSD: 1 },
+        { accountId: revenue.id, side: "credit", amountRUSD: 2 },
       ]),
     ).toThrow(/fiscal|income-tax/i);
 
     const mismatched = [
-      { accountId: expense0.id, side: "debit" as const, amountSUSD: 1 },
-      { accountId: cash0.id, side: "credit" as const, amountSUSD: 2 },
-      { accountId: expense1.id, side: "debit" as const, amountSUSD: 2 },
-      { accountId: cash1.id, side: "credit" as const, amountSUSD: 1 },
-      { accountId: treasury.id, side: "debit" as const, amountSUSD: 3 },
-      { accountId: revenue.id, side: "credit" as const, amountSUSD: 3 },
+      { accountId: expense0.id, side: "debit" as const, amountRUSD: 1 },
+      { accountId: cash0.id, side: "credit" as const, amountRUSD: 2 },
+      { accountId: expense1.id, side: "debit" as const, amountRUSD: 2 },
+      { accountId: cash1.id, side: "credit" as const, amountRUSD: 1 },
+      { accountId: treasury.id, side: "debit" as const, amountRUSD: 3 },
+      { accountId: revenue.id, side: "credit" as const, amountRUSD: 3 },
     ];
     expect(() => postJournalEntry(world.finance, 0, "income-tax", mismatched)).toThrow(
       /do not match/i,
@@ -946,12 +946,12 @@ describe("M4c accounting, close, and summaries", () => {
       {
         transactionKind: "income-tax",
         lines: [
-          { accountId: expense0.id, side: "debit", amountSUSD: 1 },
-          { accountId: cash0.id, side: "credit", amountSUSD: 1 },
-          { accountId: expense1.id, side: "debit", amountSUSD: 1 },
-          { accountId: cash1.id, side: "credit", amountSUSD: 1 },
-          { accountId: treasury.id, side: "debit", amountSUSD: 2 },
-          { accountId: revenue.id, side: "credit", amountSUSD: 2 },
+          { accountId: expense0.id, side: "debit", amountRUSD: 1 },
+          { accountId: cash0.id, side: "credit", amountRUSD: 1 },
+          { accountId: expense1.id, side: "debit", amountRUSD: 1 },
+          { accountId: cash1.id, side: "credit", amountRUSD: 1 },
+          { accountId: treasury.id, side: "debit", amountRUSD: 2 },
+          { accountId: revenue.id, side: "credit", amountRUSD: 2 },
         ],
       },
     ]);
@@ -969,10 +969,10 @@ describe("M4c accounting, close, and summaries", () => {
       {
         transactionKind: "welfare-transfer",
         lines: [
-          { accountId: welfareExpense.id, side: "debit", amountSUSD: 1 },
-          { accountId: welfareIncome.id, side: "credit", amountSUSD: 1 },
-          { accountId: cash0.id, side: "debit", amountSUSD: 1 },
-          { accountId: treasury.id, side: "credit", amountSUSD: 1 },
+          { accountId: welfareExpense.id, side: "debit", amountRUSD: 1 },
+          { accountId: welfareIncome.id, side: "credit", amountRUSD: 1 },
+          { accountId: cash0.id, side: "debit", amountRUSD: 1 },
+          { accountId: treasury.id, side: "credit", amountRUSD: 1 },
         ],
       },
     ]);
@@ -985,21 +985,21 @@ describe("M4c accounting, close, and summaries", () => {
     ).not.toThrow();
     expect(() =>
       postJournalEntry(world.finance, 0, "welfare-transfer", [
-        { accountId: welfareExpense.id, side: "debit", amountSUSD: 1 },
-        { accountId: welfareIncome.id, side: "credit", amountSUSD: 1 },
+        { accountId: welfareExpense.id, side: "debit", amountRUSD: 1 },
+        { accountId: welfareIncome.id, side: "credit", amountRUSD: 1 },
       ]),
     ).toThrow(/fiscal|welfare/i);
 
     const precisionClone = cloneWorld(world);
     const third = 1 / 3;
     postJournalEntry(precisionClone.finance, 0, "income-tax", [
-      { accountId: expense0.id, side: "debit", amountSUSD: third },
-      { accountId: cash0.id, side: "credit", amountSUSD: third },
-      { accountId: treasury.id, side: "debit", amountSUSD: third },
-      { accountId: revenue.id, side: "credit", amountSUSD: third },
+      { accountId: expense0.id, side: "debit", amountRUSD: third },
+      { accountId: cash0.id, side: "credit", amountRUSD: third },
+      { accountId: treasury.id, side: "debit", amountRUSD: third },
+      { accountId: revenue.id, side: "credit", amountRUSD: third },
     ]);
-    expect(account(precisionClone, "country", 0, "treasury-cash").balanceSUSD).toBe(10 + third);
-    expect(account(precisionClone, "popBlock", 0, "income-tax-expense").balanceSUSD).toBe(third);
+    expect(account(precisionClone, "country", 0, "treasury-cash").balanceRUSD).toBe(10 + third);
+    expect(account(precisionClone, "popBlock", 0, "income-tax-expense").balanceRUSD).toBe(third);
 
     const index = buildFinanceIndex(world.finance);
     const invalidPersisted: JournalPosting = {
@@ -1024,16 +1024,16 @@ describe("M4c accounting, close, and summaries", () => {
     const totals = governmentPeriodTotals(world.finance, summary);
     const country = totals.find((entry) => entry.countryId === FISCAL_COUNTRY_ID);
     if (country === undefined) throw new Error("missing derived government totals");
-    expect(country.incomeTaxRevenueSUSD).toBeCloseTo(
+    expect(country.incomeTaxRevenueRUSD).toBeCloseTo(
       summary.accountTotals[account(world, "country", 0, "income-tax-revenue").id] ?? 0,
       9,
     );
-    expect(country.welfareExpenseSUSD).toBeCloseTo(
+    expect(country.welfareExpenseRUSD).toBeCloseTo(
       summary.accountTotals[account(world, "country", 0, "welfare-expense").id] ?? 0,
       9,
     );
-    expect(country.netFiscalResultSUSD).toBeCloseTo(
-      country.incomeTaxRevenueSUSD - country.welfareExpenseSUSD,
+    expect(country.netFiscalResultRUSD).toBeCloseTo(
+      country.incomeTaxRevenueRUSD - country.welfareExpenseRUSD,
       9,
     );
   });
@@ -1045,7 +1045,7 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
     const world = buildWorld(scenario);
     const settlement = runSettlement(scenario, world).settlement;
     const first = runFiscalPhase(world, settlement, world.dayIndex);
-    expect(first.totals.incomeTaxSUSD).toBeGreaterThan(0);
+    expect(first.totals.incomeTaxRUSD).toBeGreaterThan(0);
     const before = hashWorld(world);
     expect(() => runFiscalPhase(world, settlement, world.dayIndex)).toThrow(
       /already been applied/i,
@@ -1099,12 +1099,12 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
     const settlement = runSettlement(scenario, world).settlement;
     const treasury = account(world, "country", 0, "treasury-cash");
     const beforePostings = world.finance.postings.length;
-    treasury.balanceSUSD = Number.NaN;
+    treasury.balanceRUSD = Number.NaN;
     const beforeAccounts = world.finance.accounts.map((candidate) => ({ ...candidate }));
     expect(() => runFiscalPhase(world, settlement, world.dayIndex)).toThrow(/finite/i);
     expect(world.finance.postings).toHaveLength(beforePostings);
-    expect(world.finance.accounts.map((candidate) => candidate.balanceSUSD)).toEqual(
-      beforeAccounts.map((candidate) => candidate.balanceSUSD),
+    expect(world.finance.accounts.map((candidate) => candidate.balanceRUSD)).toEqual(
+      beforeAccounts.map((candidate) => candidate.balanceRUSD),
     );
   });
 
@@ -1128,7 +1128,7 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
             (candidate) => candidate.ownerKind === "country" && candidate.subtype === "treasury-cash",
           );
           if (treasury === undefined) throw new Error("missing staged treasury");
-          treasury.balanceSUSD = Number.NaN;
+          treasury.balanceRUSD = Number.NaN;
         },
       }),
     ).toThrow(/finite/i);
@@ -1162,7 +1162,7 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
     let januaryFirst: ReturnType<typeof runDay> | null = null;
     for (let index = 0; index < 3; index += 1) januaryFirst = runDay(world, scenario);
     expect(januaryFirst?.population.aged).toBe(true);
-    expect(januaryFirst?.fiscal.totals.incomeTaxSUSD).toBeGreaterThan(0);
+    expect(januaryFirst?.fiscal.totals.incomeTaxRUSD).toBeGreaterThan(0);
     expect(dayIndexToCivilDate(world.dayIndex).year).toBe(1904);
   });
 
@@ -1197,12 +1197,12 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
       (entry) => entry.popBlockId === block.id,
     );
     const population = populationTotal(block);
-    expect(update.annualDisposableIncomePerCapitaSUSD).toBeCloseTo(
+    expect(update.annualDisposableIncomePerCapitaRUSD).toBeCloseTo(
       Math.max(
         0,
-        ((household.wagesReceivedSUSD +
-          (fiscalBlock?.welfareReceivedSUSD ?? 0) -
-          (fiscalBlock?.incomeTaxSUSD ?? 0)) /
+        ((household.wagesReceivedRUSD +
+          (fiscalBlock?.welfareReceivedRUSD ?? 0) -
+          (fiscalBlock?.incomeTaxRUSD ?? 0)) /
           population) *
           366,
       ),
@@ -1222,13 +1222,13 @@ describe("M4c integration, wealth effect, and determinism", () => {
       const openingCash = new Map(
         world.popBlocks.map((block) => [
           block.id,
-          account(world, "popBlock", block.id, "household-cash").balanceSUSD,
+          account(world, "popBlock", block.id, "household-cash").balanceRUSD,
         ]),
       );
       const economy = runDay(world, scenario);
       const fiscal = economy.fiscal;
-      expectedTreasury += fiscal.totals.incomeTaxSUSD - fiscal.totals.welfarePaidSUSD;
-      expect(account(world, "country", 0, "treasury-cash").balanceSUSD).toBeCloseTo(
+      expectedTreasury += fiscal.totals.incomeTaxRUSD - fiscal.totals.welfarePaidRUSD;
+      expect(account(world, "country", 0, "treasury-cash").balanceRUSD).toBeCloseTo(
         expectedTreasury,
         6,
       );
@@ -1238,18 +1238,18 @@ describe("M4c integration, wealth effect, and determinism", () => {
           (entry) => entry.popBlockId === block.id,
         );
         if (settlementHousehold === undefined) continue;
-        expect(account(world, "popBlock", block.id, "household-cash").balanceSUSD).toBeCloseTo(
+        expect(account(world, "popBlock", block.id, "household-cash").balanceRUSD).toBeCloseTo(
           (openingCash.get(block.id) ?? 0) +
-            settlementHousehold.wagesReceivedSUSD -
-            settlementHousehold.marketPurchasesSUSD +
-            (fiscalBlock?.welfareReceivedSUSD ?? 0) -
-            (fiscalBlock?.incomeTaxSUSD ?? 0),
+            settlementHousehold.wagesReceivedRUSD -
+            settlementHousehold.marketPurchasesRUSD +
+            (fiscalBlock?.welfareReceivedRUSD ?? 0) -
+            (fiscalBlock?.incomeTaxRUSD ?? 0),
           6,
         );
       }
       for (const candidate of world.finance.accounts) {
         if (candidate.category !== "equity") {
-          expect(candidate.balanceSUSD).toBeGreaterThanOrEqual(0);
+          expect(candidate.balanceRUSD).toBeGreaterThanOrEqual(0);
         }
       }
     }
@@ -1260,7 +1260,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
     const poor = marketScenario();
     poor.employment = [];
     for (const block of poor.population.popBlocks) {
-      block.initialSavingsSUSD = 0;
+      block.initialSavingsRUSD = 0;
     }
     const currency = {
       id: 0,
@@ -1271,7 +1271,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
     const valuation = {
       currencyId: 0,
       status: "specified" as const,
-      susdPerUnit: asSusdPerCurrencyUnit(1),
+      rusdPerUnit: asRusdPerCurrencyUnit(1),
       setOnDay: 0,
       source: "scenario" as const,
     };
@@ -1279,8 +1279,8 @@ describe("M4c integration, wealth effect, and determinism", () => {
       ...poor,
       countries: [
         fiscalCountry({
-          initialTreasuryCashSUSD: 1_000,
-          fiscal: { incomeTaxRate: 0, welfareBudgetSUSDPerYear: 365_000 },
+          initialTreasuryCashRUSD: 1_000,
+          fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 365_000 },
         }),
       ],
       currencies: [currency],
@@ -1299,16 +1299,16 @@ describe("M4c integration, wealth effect, and determinism", () => {
     const fundedDay = runDay(fundedWorld, funded);
     const unfundedDay = runDay(unfundedWorld, unfunded);
     const fundedSpend = fundedDay.population.needs.blocks.reduce(
-      (total, block) => total + block.budgetStartBeforeNeedsSUSD,
+      (total, block) => total + block.budgetStartBeforeNeedsRUSD,
       0,
     );
     const unfundedSpend = unfundedDay.population.needs.blocks.reduce(
-      (total, block) => total + block.budgetStartBeforeNeedsSUSD,
+      (total, block) => total + block.budgetStartBeforeNeedsRUSD,
       0,
     );
     expect(fundedSpend).toBeGreaterThan(0);
     expect(fundedSpend).toBeGreaterThan(unfundedSpend);
-    expect(fundedDay.population.needs.blocks.some((block) => block.spentSUSD > 0)).toBe(true);
+    expect(fundedDay.population.needs.blocks.some((block) => block.spentRUSD > 0)).toBe(true);
   });
 
   test("month-end wealth uses wages plus welfare and mandatory income tax", () => {
@@ -1328,14 +1328,14 @@ describe("M4c integration, wealth effect, and determinism", () => {
       const block = world.popBlocks.find((candidate) => candidate.id === update.popBlockId)!;
       const wages = fiscalDay.settlement.households.find(
         (entry) => entry.popBlockId === block.id,
-      )!.wagesReceivedSUSD;
-      const welfare = fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.welfareReceivedSUSD ?? 0;
-      const tax = fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.incomeTaxSUSD ?? 0;
+      )!.wagesReceivedRUSD;
+      const welfare = fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.welfareReceivedRUSD ?? 0;
+      const tax = fiscal.blocks.find((entry) => entry.popBlockId === block.id)?.incomeTaxRUSD ?? 0;
       const population =
         block.maleByAge.reduce((sum, value) => sum + value, 0) +
         block.femaleByAge.reduce((sum, value) => sum + value, 0);
       if (population === 0) continue;
-      expect(update.annualDisposableIncomePerCapitaSUSD).toBeCloseTo(
+      expect(update.annualDisposableIncomePerCapitaRUSD).toBeCloseTo(
         Math.max(0, ((wages + welfare - tax) / population) * 365),
         6,
       );
@@ -1373,7 +1373,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
     const fiscalSecond = runFiscalPhase(second, settlementSecond, second.dayIndex);
     expect(fiscalSecond.totals).toEqual(fiscalFirst.totals);
     const balanceOf = (world: World, blockId: number, subtype: Parameters<typeof accountOf>[3]): number =>
-      account(world, "popBlock", blockId, subtype).balanceSUSD;
+      account(world, "popBlock", blockId, subtype).balanceRUSD;
     for (const block of first.popBlocks) {
       expect(balanceOf(second, block.id, "household-cash")).toBeCloseTo(
         balanceOf(first, block.id, "household-cash"),

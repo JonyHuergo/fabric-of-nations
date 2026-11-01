@@ -80,7 +80,7 @@ function accountBalance(
       candidate.subtype === subtype,
   );
   if (account === undefined) throw new Error(`missing ${ownerKind} ${subtype}`);
-  return account.balanceSUSD;
+  return account.balanceRUSD;
 }
 
 function professionKey(scenario: EconomyScenarioDef, block: PopBlock): string {
@@ -161,7 +161,7 @@ function militaryPayByBlock(world: World, dayIndex: number): Map<Id, number> {
     for (const line of posting.lines) {
       const account = accountById.get(line.accountId);
       if (account?.subtype === "military-income" && line.side === "credit") {
-        amount += line.amountSUSD;
+        amount += line.amountRUSD;
       }
     }
     if (amount > 0) {
@@ -303,12 +303,12 @@ describe("AUDIT-006 explicit military allocation", () => {
     expect(militaryPeopleOutsideCivilian(world)).toBe(outsideBefore + 10_000);
     // All money moved, none was created: the treasury paid exactly the reported cost.
     expect(treasuryBefore - accountBalance(world, "country", countryId, "treasury-cash")).toBeCloseTo(
-      result.spentSUSD,
+      result.spentRUSD,
       6,
     );
     expect(
       accountBalance(world, "country", countryId, "military-expense"),
-    ).toBeCloseTo(result.spentSUSD, 6);
+    ).toBeCloseTo(result.spentRUSD, 6);
     assertValidWorld(world);
   });
 
@@ -375,7 +375,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       { maleEligible: 100, femaleEligible: 100, childPopulation: 400 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 500 },
     ]);
-    country.initialTreasuryCashSUSD = 1_000_000;
+    country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
     const before = snapshots(world, regionId);
     recruit(world, country.id, regionId, 2);
@@ -407,7 +407,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       { maleEligible: 100, femaleEligible: 100, childPopulation: 400 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 500 },
     ]);
-    repeatCountry.initialTreasuryCashSUSD = 1_000_000;
+    repeatCountry.initialTreasuryCashRUSD = 1_000_000;
     const repeatWorld = createEconomyWorld(repeatScenario, { seed: SEED });
     const repeatBefore = snapshots(repeatWorld, repeatRegionId);
     recruit(repeatWorld, repeatCountry.id, repeatRegionId, 2);
@@ -435,7 +435,7 @@ describe("AUDIT-006 explicit military allocation", () => {
         pools.push({ maleEligible: 100, femaleEligible: 100, childPopulation: 100 });
       }
       setRegionPools(scenario, regionId, pools);
-      country.initialTreasuryCashSUSD = 1_000_000;
+      country.initialTreasuryCashRUSD = 1_000_000;
       const world = createEconomyWorld(scenario, { seed: SEED });
       if (reverse) world.popBlocks = [...world.popBlocks].reverse();
       const before = snapshots(world, regionId);
@@ -480,7 +480,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       { maleEligible: 60, femaleEligible: 40, childPopulation: 0 },
       { maleEligible: 60, femaleEligible: 40, childPopulation: 0 },
     ]);
-    country.initialTreasuryCashSUSD = 1_000_000;
+    country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
     const before = snapshots(world, regionId);
     // 300 male-eligible people exist; the remaining 50 must come from females.
@@ -522,8 +522,8 @@ describe("AUDIT-006 explicit military allocation", () => {
     if (homeRegion === undefined || targetRegion === undefined) {
       throw new Error("shipped countries need regions");
     }
-    firstCountry.initialTreasuryCashSUSD = 1_000_000_000;
-    secondCountry.initialTreasuryCashSUSD = 1_000_000_000;
+    firstCountry.initialTreasuryCashRUSD = 1_000_000_000;
+    secondCountry.initialTreasuryCashRUSD = 1_000_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
     applyMilitaryAction(
       world,
@@ -567,7 +567,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     );
     const phaseDay = world.dayIndex;
     const phase = runMilitaryPhase(world, phaseDay, { validateWorld: false });
-    expect(phase.paidSUSD).toBeGreaterThan(0);
+    expect(phase.paidRUSD).toBeGreaterThan(0);
     const paid = militaryPayByBlock(world, phaseDay);
     let totalPaid = 0;
     for (const amount of paid.values()) totalPaid += amount;
@@ -598,7 +598,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     if (populationCountry === undefined) throw new Error("shipped scenario has no country");
     const populationRegion = populationCountry.regionIds[0];
     if (populationRegion === undefined) throw new Error("shipped country has no region");
-    populationCountry.initialTreasuryCashSUSD = 1_000_000_000_000;
+    populationCountry.initialTreasuryCashRUSD = 1_000_000_000_000;
     const populationWorld = createEconomyWorld(populationScenario, { seed: SEED });
     const populationHash = hashWorld(populationWorld);
     const available = recruitablePeople(populationWorld, populationRegion);
@@ -614,7 +614,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     if (treasuryCountry === undefined) throw new Error("shipped scenario has no country");
     const treasuryRegion = treasuryCountry.regionIds[0];
     if (treasuryRegion === undefined) throw new Error("shipped country has no region");
-    treasuryCountry.initialTreasuryCashSUSD = 0;
+    treasuryCountry.initialTreasuryCashRUSD = 0;
     const treasuryWorld = createEconomyWorld(treasuryScenario, { seed: SEED });
     const treasuryHash = hashWorld(treasuryWorld);
     expect(() => recruit(treasuryWorld, treasuryCountry.id, treasuryRegion, 1)).toThrow(/treasury/);
@@ -636,8 +636,8 @@ describe("AUDIT-006 explicit military allocation", () => {
       for (const line of posting.lines) {
         const account = accountById.get(line.accountId);
         if (account === undefined) throw new Error("posting references an unknown account");
-        if (line.side === "debit") debits += line.amountSUSD;
-        else credits += line.amountSUSD;
+        if (line.side === "debit") debits += line.amountRUSD;
+        else credits += line.amountRUSD;
       }
       expect(debits).toBeCloseTo(credits, 6);
     }

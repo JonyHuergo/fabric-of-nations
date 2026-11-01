@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Validated JSON static definitions and loaders for Century.",
+  "description": "Validated JSON static definitions and loaders for Fabric of Nations.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

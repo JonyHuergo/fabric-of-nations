@@ -46,15 +46,15 @@ import {
   M10_CASUALTY_STRENGTH_SCALE,
   M10_DEATH_SHARE,
   M10_DEPLOYMENT_DAYS,
-  M10_EQUIPMENT_DAILY_UPKEEP_SUSD,
-  M10_EQUIPMENT_PRICE_SUSD,
+  M10_EQUIPMENT_DAILY_UPKEEP_RUSD,
+  M10_EQUIPMENT_PRICE_RUSD,
   M10_MAX_CASUALTY_FRACTION,
   M10_MIN_ORGANIZATION,
-  M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD,
+  M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD,
   M10_OCCUPATION_UNREST_PER_DAY,
   M10_PEACE_RELATION_SCORE,
-  M10_RECRUITMENT_COST_PER_SOLDIER_SUSD,
-  M10_SOLDIER_DAILY_PAY_SUSD,
+  M10_RECRUITMENT_COST_PER_SOLDIER_RUSD,
+  M10_SOLDIER_DAILY_PAY_RUSD,
   M10_SOLDIERS_PER_EQUIPMENT_UNIT,
   M10_SUPPLY_LOSS_PER_DAY,
   M10_SUPPLY_RECOVERY_PER_DAY,
@@ -73,7 +73,7 @@ import { cloneFinanceState } from "./accounts.js";
 import { drawUint32 } from "../rng.js";
 import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
 import {
-  MONEY_TOLERANCE_SUSD,
+  MONEY_TOLERANCE_RUSD,
   WORKING_AGE_END,
   WORKING_AGE_START,
 } from "../population/constants.js";
@@ -110,7 +110,7 @@ interface PayRecipient {
 /** One block's share of a military payment. */
 interface MilitaryPayShare {
   readonly popBlockId: Id;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 /** Outcome of one military action. */
@@ -124,7 +124,7 @@ export interface MilitaryActionResult {
   readonly regionId: Id | null;
   readonly personnel: number;
   readonly equipmentUnits: number;
-  readonly spentSUSD: number;
+  readonly spentRUSD: number;
 }
 
 export interface DeclareWarInput {
@@ -192,8 +192,8 @@ export interface MilitaryPhaseResult {
   readonly liberatedRegionIds: readonly Id[];
   readonly movedArmyIds: readonly Id[];
   readonly recoveredWounded: number;
-  readonly paidSUSD: number;
-  readonly shortfallSUSD: number;
+  readonly paidRUSD: number;
+  readonly shortfallRUSD: number;
   readonly endedWarIds: readonly Id[];
 }
 
@@ -206,8 +206,8 @@ function emptyPhaseResult(dayIndex: Day): MilitaryPhaseResult {
     liberatedRegionIds: [],
     movedArmyIds: [],
     recoveredWounded: 0,
-    paidSUSD: 0,
-    shortfallSUSD: 0,
+    paidRUSD: 0,
+    shortfallRUSD: 0,
     endedWarIds: [],
   };
 }
@@ -702,7 +702,7 @@ function treasuryCash(world: World, countryId: Id): number {
   const account = world.finance.accounts.find(
     (candidate) => candidate.id === country.treasuryAccountId,
   );
-  return account?.balanceSUSD ?? 0;
+  return account?.balanceRUSD ?? 0;
 }
 
 /**
@@ -723,7 +723,7 @@ function postMilitaryPay(
   const ordered = [...shares].sort((left, right) => left.popBlockId - right.popBlockId);
   const entries: JournalEntryInput[] = [];
   for (const share of ordered) {
-    if (!(share.amountSUSD > 0)) continue;
+    if (!(share.amountRUSD > 0)) continue;
     entries.push({
       transactionKind: "military-pay",
       sourceEntityId: countryId,
@@ -732,22 +732,22 @@ function postMilitaryPay(
         {
           accountId: accountId(world, "country", countryId, "military-expense"),
           side: "debit",
-          amountSUSD: share.amountSUSD,
+          amountRUSD: share.amountRUSD,
         },
         {
           accountId: accountId(world, "country", countryId, "treasury-cash"),
           side: "credit",
-          amountSUSD: share.amountSUSD,
+          amountRUSD: share.amountRUSD,
         },
         {
           accountId: accountId(world, "popBlock", share.popBlockId, "household-cash"),
           side: "debit",
-          amountSUSD: share.amountSUSD,
+          amountRUSD: share.amountRUSD,
         },
         {
           accountId: accountId(world, "popBlock", share.popBlockId, "military-income"),
           side: "credit",
-          amountSUSD: share.amountSUSD,
+          amountRUSD: share.amountRUSD,
         },
       ],
     });
@@ -772,22 +772,22 @@ function postMilitaryProcurement(
         {
           accountId: accountId(world, "country", countryId, "military-expense"),
           side: "debit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         },
         {
           accountId: accountId(world, "country", countryId, "treasury-cash"),
           side: "credit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         },
         {
           accountId: accountId(world, "system", null, "system-reserve-cash"),
           side: "debit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         },
         {
           accountId: accountId(world, "system", null, "system-income"),
           side: "credit",
-          amountSUSD: amount,
+          amountRUSD: amount,
         },
       ],
     },
@@ -847,29 +847,29 @@ function allocateMoneyAcrossBlocks(
   if (!(totalWeight > 0)) return [];
   const shares = usable.map((recipient) => ({
     ...recipient,
-    amountSUSD: (total * recipient.weight) / totalWeight,
+    amountRUSD: (total * recipient.weight) / totalWeight,
   }));
-  const positive = shares.filter((share) => share.amountSUSD > 0);
+  const positive = shares.filter((share) => share.amountRUSD > 0);
   if (positive.length === 0) {
     const best = bestRecipient(usable);
-    return [{ popBlockId: best.popBlockId, amountSUSD: total }];
+    return [{ popBlockId: best.popBlockId, amountRUSD: total }];
   }
-  const allocated = positive.reduce((sum, share) => sum + share.amountSUSD, 0);
+  const allocated = positive.reduce((sum, share) => sum + share.amountRUSD, 0);
   const residual = total - allocated;
-  const tolerance = MONEY_TOLERANCE_SUSD * Math.max(1, Math.abs(total));
+  const tolerance = MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(total));
   if (Math.abs(residual) > tolerance) {
     throw new RangeError("military pay allocation did not sum to the payable total");
   }
   if (residual !== 0) {
     const target = bestRecipient(positive);
-    target.amountSUSD += residual;
-    if (!(target.amountSUSD > 0)) {
+    target.amountRUSD += residual;
+    if (!(target.amountRUSD > 0)) {
       throw new RangeError("military pay allocation produced a non-positive share");
     }
   }
   return positive.map((share) => ({
     popBlockId: share.popBlockId,
-    amountSUSD: share.amountSUSD,
+    amountRUSD: share.amountRUSD,
   }));
 }
 
@@ -1058,8 +1058,8 @@ export function validateRecruitArmy(world: World, input: RecruitArmyInput): Mili
     }
     if (errors.length === 0) {
       const cost =
-        input.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_SUSD +
-        equipment * M10_EQUIPMENT_PRICE_SUSD;
+        input.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD +
+        equipment * M10_EQUIPMENT_PRICE_RUSD;
       if (cost > treasuryCash(world, country.id) + 1e-9) {
         fail(errors, "the treasury cannot fund recruitment and equipment");
       }
@@ -1435,7 +1435,7 @@ function executeMilitaryAction(
         regionId: null,
         personnel: 0,
         equipmentUnits: 0,
-        spentSUSD: 0,
+        spentRUSD: 0,
       };
     }
     case "offer-peace": {
@@ -1465,7 +1465,7 @@ function executeMilitaryAction(
         regionId: null,
         personnel: 0,
         equipmentUnits: 0,
-        spentSUSD: 0,
+        spentRUSD: 0,
       };
     }
     case "accept-peace": {
@@ -1485,15 +1485,15 @@ function executeMilitaryAction(
         regionId: null,
         personnel: 0,
         equipmentUnits: 0,
-        spentSUSD: 0,
+        spentRUSD: 0,
       };
     }
     case "recruit-army": {
       const equipmentUnits =
         action.equipmentUnits ??
         Math.ceil(action.personnel / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
-      const recruitmentCost = action.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_SUSD;
-      const equipmentCost = equipmentUnits * M10_EQUIPMENT_PRICE_SUSD;
+      const recruitmentCost = action.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD;
+      const equipmentCost = equipmentUnits * M10_EQUIPMENT_PRICE_RUSD;
       const region = regionById(world, action.regionId);
       if (region === undefined) throw new RangeError("missing recruitment region");
       const removals = removePeople(world, region.id, action.personnel, dayIndex);
@@ -1507,7 +1507,7 @@ function executeMilitaryAction(
         if (recruits <= 0) continue;
         signingShares.push({
           popBlockId: removal.popBlockId,
-          amountSUSD: recruits * M10_RECRUITMENT_COST_PER_SOLDIER_SUSD,
+          amountRUSD: recruits * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD,
         });
       }
       postMilitaryPay(world, dayIndex, action.countryId, signingShares);
@@ -1543,7 +1543,7 @@ function executeMilitaryAction(
         regionId: region.id,
         personnel: action.personnel,
         equipmentUnits,
-        spentSUSD: recruitmentCost + equipmentCost,
+        spentRUSD: recruitmentCost + equipmentCost,
       };
     }
     case "deploy-army": {
@@ -1561,7 +1561,7 @@ function executeMilitaryAction(
         regionId: action.targetRegionId,
         personnel: army.personnel,
         equipmentUnits: army.equipmentUnits,
-        spentSUSD: 0,
+        spentRUSD: 0,
       };
     }
   }
@@ -1747,8 +1747,8 @@ function payUpkeep(
   army: Army,
   dayIndex: Day,
 ): { paid: number; shortfall: number } {
-  const payRequired = army.personnel * M10_SOLDIER_DAILY_PAY_SUSD;
-  const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_SUSD;
+  const payRequired = army.personnel * M10_SOLDIER_DAILY_PAY_RUSD;
+  const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_RUSD;
   const required = payRequired + equipmentRequired;
   if (!(required > 0)) return { paid: 0, shortfall: 0 };
   const recipients = payRecipients(world, army.regionId, dayIndex);
@@ -1824,8 +1824,8 @@ export function runMilitaryPhase(
     liberatedRegionIds: [] as Id[],
     movedArmyIds: [] as Id[],
     recoveredWounded: 0,
-    paidSUSD: 0,
-    shortfallSUSD: 0,
+    paidRUSD: 0,
+    shortfallRUSD: 0,
     endedWarIds: [] as Id[],
   };
 
@@ -1914,12 +1914,12 @@ export function runMilitaryPhase(
       .filter((army) => army.countryId === controller)
       .sort((left, right) => left.id - right.id)[0];
     if (occupier === undefined) continue;
-    const requested = occupier.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD;
+    const requested = occupier.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD;
     const recipients = payRecipients(world, region.id, dayIndex);
     if (recipients.length === 0) {
       // No occupied-region household can receive the payment, so no treasury
       // cash moves and the full amount is an honest shortfall.
-      result.shortfallSUSD += requested;
+      result.shortfallRUSD += requested;
       continue;
     }
     const available = treasuryCash(world, controller);
@@ -1932,15 +1932,15 @@ export function runMilitaryPhase(
         allocateMoneyAcrossBlocks(paid, recipients),
       );
     }
-    result.paidSUSD += paid;
-    result.shortfallSUSD += requested - paid;
+    result.paidRUSD += paid;
+    result.shortfallRUSD += requested - paid;
   }
 
   // 5. Upkeep and wounded recovery.
   for (const army of [...world.military.armies].sort((left, right) => left.id - right.id)) {
     const upkeep = payUpkeep(world, army, dayIndex);
-    result.paidSUSD += upkeep.paid;
-    result.shortfallSUSD += upkeep.shortfall;
+    result.paidRUSD += upkeep.paid;
+    result.shortfallRUSD += upkeep.shortfall;
     if (army.woundedReturnDay !== null && dayIndex >= army.woundedReturnDay) {
       const record = recordCasualty(world.military, army.countryId);
       record.woundedReturned += army.wounded;

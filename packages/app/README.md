@@ -1,15 +1,15 @@
 # @century/app
 
-Century's M7 Expo / React Native playable shell, updated for E1 economic clarity.
+Fabric of Nations M7 Expo / React Native playable shell, updated for E1 economic clarity.
 
 ## Screens
 
 1. **Overview** (default) — player/AI identity, population/working-age/employment/
    hardship, treasury/debt, evidence-based problems, estimated production capacity,
    essential-goods stock/prices/capacity, latest closed month, and drill-down guidance.
-2. **Map** — stylized 4×4 vector-grid prototype of the 16 authored regions, with
-   country colors, player marker, selection, and a compact current summary. The
-   500-region production map and pan/zoom are not implemented.
+2. **World** — the 1900 world map, full stage, with political, control and market modes,
+   province selection and a docked details panel. See `docs/MAP_RENDERING.md`. The web
+   build uses WebGL2; native builds and software-rendered browsers use SVG.
 3. **Budget** — treasury, income tax, welfare, latest result, compact net-fiscal history,
    the `set-fiscal-policy` action, and a pure pre-commitment preview (current estimated
    wage base, tax/welfare deltas, constraints).

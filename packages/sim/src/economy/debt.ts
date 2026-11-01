@@ -1,6 +1,6 @@
-/** * M5b public debt and deficit financing. * * Scope: country-issued SUSD debt held by an explicitly identified simulated * creditor (another country treasury or a pop-block household). There is no bank, * central bank, bond market, or external investor pool. * * Accounting: * - issuance: issuer treasury cash / debt liability; holder bond asset / cash. * - interest accrual: issuer interest expense / interest payable; holder interest *   receivable / interest income. * - interest payment: issuer interest payable / treasury cash; holder cash / *   interest receivable. * - principal repayment: issuer debt liability / treasury cash; holder cash / bond *   asset. * - default write-down: remaining liability/interest and holder asset/receivable *   are written off against owner equity on both sides. * * Deficit financing: at a month-end, after daily interest accrual, a country with * an enabled debt policy may issue debt up to its accrued fiscal deficit, the * designated creditor's cash, and its outstanding-principal ceiling. Borrowing is * not revenue; principal repayment is not expense; both are kept outside the M4b * gross flow kinds. */ import { assertValidDayIndex, dayIndexToCivilDate, daysInMonth, daysInYear, isTerminalDayIndex } from "../calendar.js";
+/** * M5b public debt and deficit financing. * * Scope: country-issued RUSD debt held by an explicitly identified simulated * creditor (another country treasury or a pop-block household). There is no bank, * central bank, bond market, or external investor pool. * * Accounting: * - issuance: issuer treasury cash / debt liability; holder bond asset / cash. * - interest accrual: issuer interest expense / interest payable; holder interest *   receivable / interest income. * - interest payment: issuer interest payable / treasury cash; holder cash / *   interest receivable. * - principal repayment: issuer debt liability / treasury cash; holder cash / bond *   asset. * - default write-down: remaining liability/interest and holder asset/receivable *   are written off against owner equity on both sides. * * Deficit financing: at a month-end, after daily interest accrual, a country with * an enabled debt policy may issue debt up to its accrued fiscal deficit, the * designated creditor's cash, and its outstanding-principal ceiling. Borrowing is * not revenue; principal repayment is not expense; both are kept outside the M4b * gross flow kinds. */ import { assertValidDayIndex, dayIndexToCivilDate, daysInMonth, daysInYear, isTerminalDayIndex } from "../calendar.js";
 
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 
 import type { Day, DayIndex, Id } from "../types.js";
 
@@ -51,16 +51,16 @@ function issuanceEntry(index: FinanceIndex, contract: DebtContract): JournalEntr
     const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     return {
         transactionKind: "debt-issuance", lines: [{
-                accountId: issuer.treasury.id, side: "debit", amountSUSD: contract.principalSUSD
+                accountId: issuer.treasury.id, side: "debit", amountRUSD: contract.principalRUSD
             },
             {
-                accountId: issuer.liability.id, side: "credit", amountSUSD: contract.principalSUSD
+                accountId: issuer.liability.id, side: "credit", amountRUSD: contract.principalRUSD
             },
             {
-                accountId: holder.bond.id, side: "debit", amountSUSD: contract.principalSUSD
+                accountId: holder.bond.id, side: "debit", amountRUSD: contract.principalRUSD
             },
             {
-                accountId: holder.cash.id, side: "credit", amountSUSD: contract.principalSUSD
+                accountId: holder.cash.id, side: "credit", amountRUSD: contract.principalRUSD
             },
         ], sourceEntityId: contract.issuerCountryId, targetEntityId: contract.holderId,
     };
@@ -71,16 +71,16 @@ function principalRepaymentEntry(index: FinanceIndex, contract: DebtContract, am
     const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     return {
         transactionKind: "debt-principal-repayment", lines: [{
-                accountId: issuer.liability.id, side: "debit", amountSUSD: amount
+                accountId: issuer.liability.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: issuer.treasury.id, side: "credit", amountSUSD: amount
+                accountId: issuer.treasury.id, side: "credit", amountRUSD: amount
             },
             {
-                accountId: holder.cash.id, side: "debit", amountSUSD: amount
+                accountId: holder.cash.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: holder.bond.id, side: "credit", amountSUSD: amount
+                accountId: holder.bond.id, side: "credit", amountRUSD: amount
             },
         ], sourceEntityId: contract.issuerCountryId, targetEntityId: contract.holderId,
     };
@@ -91,16 +91,16 @@ function interestAccrualEntry(index: FinanceIndex, contract: DebtContract, amoun
     const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     return {
         transactionKind: "interest-accrual", lines: [{
-                accountId: issuer.expense.id, side: "debit", amountSUSD: amount
+                accountId: issuer.expense.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: issuer.payable.id, side: "credit", amountSUSD: amount
+                accountId: issuer.payable.id, side: "credit", amountRUSD: amount
             },
             {
-                accountId: holder.receivable.id, side: "debit", amountSUSD: amount
+                accountId: holder.receivable.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: holder.income.id, side: "credit", amountSUSD: amount
+                accountId: holder.income.id, side: "credit", amountRUSD: amount
             },
         ], sourceEntityId: contract.issuerCountryId, targetEntityId: contract.holderId,
     };
@@ -111,16 +111,16 @@ function interestPaymentEntry(index: FinanceIndex, contract: DebtContract, amoun
     const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     return {
         transactionKind: "interest-payment", lines: [{
-                accountId: issuer.payable.id, side: "debit", amountSUSD: amount
+                accountId: issuer.payable.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: issuer.treasury.id, side: "credit", amountSUSD: amount
+                accountId: issuer.treasury.id, side: "credit", amountRUSD: amount
             },
             {
-                accountId: holder.cash.id, side: "debit", amountSUSD: amount
+                accountId: holder.cash.id, side: "debit", amountRUSD: amount
             },
             {
-                accountId: holder.receivable.id, side: "credit", amountSUSD: amount
+                accountId: holder.receivable.id, side: "credit", amountRUSD: amount
             },
         ], sourceEntityId: contract.issuerCountryId, targetEntityId: contract.holderId,
     };
@@ -132,36 +132,36 @@ function defaultWriteoffEntry(index: FinanceIndex, contract: DebtContract): Jour
     // Contract-level accrued amounts can differ from aggregate posting-account
     // balances by a floating residual. Never write off more than both sides hold.
     const principal = Math.min(
-        contract.outstandingPrincipalSUSD,
-        issuer.liability.balanceSUSD,
-        holder.bond.balanceSUSD,
+        contract.outstandingPrincipalRUSD,
+        issuer.liability.balanceRUSD,
+        holder.bond.balanceRUSD,
     );
     const interest = Math.min(
-        contract.accruedInterestSUSD,
-        issuer.payable.balanceSUSD,
-        holder.receivable.balanceSUSD,
+        contract.accruedInterestRUSD,
+        issuer.payable.balanceRUSD,
+        holder.receivable.balanceRUSD,
     );
     const total = principal + interest;
     if (!(total > 0))
         return null;
     const holderEquity = index.get(contract.holderKind, contract.holderId, "owner-equity");
     const lines = [...(principal > 0 ? [{
-                accountId: issuer.liability.id, side: "debit" as const, amountSUSD: principal
+                accountId: issuer.liability.id, side: "debit" as const, amountRUSD: principal
             }
         ] : []), ...(interest > 0 ? [{
-                accountId: issuer.payable.id, side: "debit" as const, amountSUSD: interest
+                accountId: issuer.payable.id, side: "debit" as const, amountRUSD: interest
             }
         ] : []), {
-            accountId: index.get("country", contract.issuerCountryId, "owner-equity").id, side: "credit" as const, amountSUSD: total
+            accountId: index.get("country", contract.issuerCountryId, "owner-equity").id, side: "credit" as const, amountRUSD: total
         },
         ...(principal > 0 ? [{
-                accountId: holder.bond.id, side: "credit" as const, amountSUSD: principal
+                accountId: holder.bond.id, side: "credit" as const, amountRUSD: principal
             }
         ] : []), ...(interest > 0 ? [{
-                accountId: holder.receivable.id, side: "credit" as const, amountSUSD: interest
+                accountId: holder.receivable.id, side: "credit" as const, amountRUSD: interest
             }
         ] : []), {
-            accountId: holderEquity.id, side: "debit" as const, amountSUSD: total
+            accountId: holderEquity.id, side: "debit" as const, amountRUSD: total
         },
     ];
     return {
@@ -193,10 +193,10 @@ function recordRetiredContract(
             issuerCountryId: contract.issuerCountryId,
             contractsRetired: 0,
             contractsDefaulted: 0,
-            principalIssuedSUSD: 0,
-            principalRepaidSUSD: 0,
-            principalWrittenOffSUSD: 0,
-            interestWrittenOffSUSD: 0,
+            principalIssuedRUSD: 0,
+            principalRepaidRUSD: 0,
+            principalWrittenOffRUSD: 0,
+            interestWrittenOffRUSD: 0,
         };
         finance.debtHistory.push(aggregate);
         finance.debtHistory.sort((left, right) => left.issuerCountryId - right.issuerCountryId);
@@ -205,16 +205,16 @@ function recordRetiredContract(
         ...aggregate,
         contractsRetired: aggregate.contractsRetired + (defaulted ? 0 : 1),
         contractsDefaulted: aggregate.contractsDefaulted + (defaulted ? 1 : 0),
-        principalIssuedSUSD: aggregate.principalIssuedSUSD + contract.principalSUSD,
-        principalRepaidSUSD:
-            aggregate.principalRepaidSUSD +
+        principalIssuedRUSD: aggregate.principalIssuedRUSD + contract.principalRUSD,
+        principalRepaidRUSD:
+            aggregate.principalRepaidRUSD +
             (defaulted
-                ? Math.max(0, contract.principalSUSD - principalBefore)
-                : contract.principalSUSD),
-        principalWrittenOffSUSD:
-            aggregate.principalWrittenOffSUSD + (defaulted ? principalBefore : 0),
-        interestWrittenOffSUSD:
-            aggregate.interestWrittenOffSUSD + (defaulted ? interestBefore : 0),
+                ? Math.max(0, contract.principalRUSD - principalBefore)
+                : contract.principalRUSD),
+        principalWrittenOffRUSD:
+            aggregate.principalWrittenOffRUSD + (defaulted ? principalBefore : 0),
+        interestWrittenOffRUSD:
+            aggregate.interestWrittenOffRUSD + (defaulted ? interestBefore : 0),
     };
     const index = finance.debtHistory.findIndex(
         (entry) => entry.issuerCountryId === contract.issuerCountryId,
@@ -242,11 +242,11 @@ function compactDebtContracts(finance: FinanceState): number {
     return remove.size;
 }
 
-function newContract(finance: FinanceState, issuerCountryId: Id, holderKind: "country" | "popBlock", holderId: Id, principalSUSD: number, annualCouponRate: number, issueDay: Day, termDays: number): DebtContract {
+function newContract(finance: FinanceState, issuerCountryId: Id, holderKind: "country" | "popBlock", holderId: Id, principalRUSD: number, annualCouponRate: number, issueDay: Day, termDays: number): DebtContract {
     const id = requireInteger(finance.nextContractId, "finance.nextContractId", 1, Number.MAX_SAFE_INTEGER);
     finance.nextContractId = id + 1;
     return {
-        id, contractVersion: 1, issuerCountryId, holderKind, holderId, principalSUSD, outstandingPrincipalSUSD: principalSUSD, annualCouponRate, issueDay, maturityDay: debtMaturityFor(issueDay, termDays), accruedInterestSUSD: 0, status: "active", arrearsSinceDay: null,
+        id, contractVersion: 1, issuerCountryId, holderKind, holderId, principalRUSD, outstandingPrincipalRUSD: principalRUSD, annualCouponRate, issueDay, maturityDay: debtMaturityFor(issueDay, termDays), accruedInterestRUSD: 0, status: "active", arrearsSinceDay: null,
     };
 }
 
@@ -269,7 +269,7 @@ export interface DebtIssuanceInput {
     readonly issuerCountryId: Id;
     readonly holderKind: "country" | "popBlock";
     readonly holderId: Id;
-    readonly principalSUSD: number;
+    readonly principalRUSD: number;
     readonly annualCouponRate: number;
     readonly termDays: number;
 }
@@ -292,7 +292,7 @@ export function validateDebtIssuance(world: World, input: DebtIssuanceInput): vo
     if (input.holderKind !== issuerCountry.debt.creditorKind || input.holderId !== issuerCountry.debt.creditorId) {
         throw new RangeError("explicit issuance must use the country's designated debt creditor");
     }
-    const principal = requireFiniteNumber(input.principalSUSD, "debt.principalSUSD");
+    const principal = requireFiniteNumber(input.principalRUSD, "debt.principalRUSD");
     if (!(principal > 0))
         throw new RangeError("debt principal must be positive");
     const coupon = requireFiniteNumber(input.annualCouponRate, "debt.annualCouponRate");
@@ -302,11 +302,11 @@ export function validateDebtIssuance(world: World, input: DebtIssuanceInput): vo
     requireInteger(input.termDays, "debt.termDays", MIN_DEBT_TERM_DAYS, MAX_DEBT_TERM_DAYS);
     const index = buildFinanceIndex(world.finance);
     const holder = holderAccounts(index, input.holderKind, input.holderId);
-    if (holder.cash.balanceSUSD < principal - MONEY_TOLERANCE_SUSD) {
+    if (holder.cash.balanceRUSD < principal - MONEY_TOLERANCE_RUSD) {
         throw new RangeError("debt creditor has insufficient cash");
     }
-    const ceiling = issuerCountry.debt.maxOutstandingPrincipalSUSD;
-    if (debtOutstandingPrincipal(world.finance.debtContracts, issuerCountry.id) + principal > ceiling + MONEY_TOLERANCE_SUSD) {
+    const ceiling = issuerCountry.debt.maxOutstandingPrincipalRUSD;
+    if (debtOutstandingPrincipal(world.finance.debtContracts, issuerCountry.id) + principal > ceiling + MONEY_TOLERANCE_RUSD) {
         throw new RangeError("debt issuance exceeds the outstanding-principal ceiling");
     }
     if (activeDebtContractCount(world.finance.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
@@ -321,10 +321,10 @@ export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): Deb
     validateDebtIssuance(world, input);
     const staged = cloneFinanceState(world.finance);
     const index = buildFinanceIndex(staged);
-    const contract = newContract(staged, input.issuerCountryId, input.holderKind, input.holderId, input.principalSUSD, input.annualCouponRate, world.dayIndex, input.termDays);
+    const contract = newContract(staged, input.issuerCountryId, input.holderKind, input.holderId, input.principalRUSD, input.annualCouponRate, world.dayIndex, input.termDays);
     const postings = postJournalBatch(staged, world.dayIndex, [issuanceEntry(index, contract)]);
     appendContract(staged, contract);
-    accumulateBudgetMemo(staged, input.issuerCountryId, { debtIssuedSUSD: input.principalSUSD });
+    accumulateBudgetMemo(staged, input.issuerCountryId, { debtIssuedRUSD: input.principalRUSD });
     assertValidFinanceState(staged);
     const candidate: World = {
         ...world, finance: staged
@@ -340,13 +340,13 @@ export function issueGovernmentDebt(world: World, input: DebtIssuanceInput): Deb
 export interface DebtRepaymentInput {
     readonly issuerCountryId: Id;
     readonly contractId: Id;
-    readonly amountSUSD: number;
+    readonly amountRUSD: number;
 }
 
 /** Result of one explicit early principal repayment. */
 export interface DebtRepaymentResult {
     readonly contract: DebtContract;
-    readonly principalPaidSUSD: number;
+    readonly principalPaidRUSD: number;
     readonly postingIds: readonly number[];
 }
 
@@ -366,23 +366,23 @@ export function validateDebtRepayment(world: World, input: DebtRepaymentInput): 
     if (contract.status !== "active" && contract.status !== "arrears") {
         throw new RangeError(`debt contract ${String(contract.id)} is not outstanding`);
     }
-    const amount = requireFiniteNumber(input.amountSUSD, "debt.repayment.amountSUSD");
+    const amount = requireFiniteNumber(input.amountRUSD, "debt.repayment.amountRUSD");
     if (!(amount > 0))
         throw new RangeError("debt repayment amount must be positive");
-    if (amount > contract.outstandingPrincipalSUSD + MONEY_TOLERANCE_SUSD) {
+    if (amount > contract.outstandingPrincipalRUSD + MONEY_TOLERANCE_RUSD) {
         throw new RangeError(
-            `debt repayment ${String(amount)} exceeds outstanding principal ${String(contract.outstandingPrincipalSUSD)}`,
+            `debt repayment ${String(amount)} exceeds outstanding principal ${String(contract.outstandingPrincipalRUSD)}`,
         );
     }
     const index = buildFinanceIndex(world.finance);
     const treasury = index.get("country", issuerCountry.id, "treasury-cash");
-    if (amount > treasury.balanceSUSD + MONEY_TOLERANCE_SUSD) {
+    if (amount > treasury.balanceRUSD + MONEY_TOLERANCE_RUSD) {
         throw new RangeError("debt repayment exceeds available treasury cash");
     }
-    const reserve = issuerCountry.fiscal.reserveTargetSUSD;
-    if (treasury.balanceSUSD - amount < reserve - MONEY_TOLERANCE_SUSD) {
+    const reserve = issuerCountry.fiscal.reserveTargetRUSD;
+    if (treasury.balanceRUSD - amount < reserve - MONEY_TOLERANCE_RUSD) {
         throw new RangeError(
-            `debt repayment would take treasury cash below the ${String(reserve)} SUSD reserve target`,
+            `debt repayment would take treasury cash below the ${String(reserve)} RUSD reserve target`,
         );
     }
 }
@@ -395,20 +395,20 @@ export function repayGovernmentDebt(world: World, input: DebtRepaymentInput): De
     const contract = staged.debtContracts.find((candidate) => candidate.id === input.contractId);
     if (contract === undefined)
         throw new RangeError(`unknown debt contract ${String(input.contractId)}`);
-    const amount = Math.min(input.amountSUSD, contract.outstandingPrincipalSUSD);
-    const principalBefore = contract.outstandingPrincipalSUSD;
+    const amount = Math.min(input.amountRUSD, contract.outstandingPrincipalRUSD);
+    const principalBefore = contract.outstandingPrincipalRUSD;
     const posting = postJournalEntry(staged, world.dayIndex, "debt-principal-repayment", principalRepaymentEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
-    contract.outstandingPrincipalSUSD -= amount;
-    if (contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD)) {
-        contract.outstandingPrincipalSUSD = 0;
+    contract.outstandingPrincipalRUSD -= amount;
+    if (contract.outstandingPrincipalRUSD <= toleranceMoney(contract.outstandingPrincipalRUSD)) {
+        contract.outstandingPrincipalRUSD = 0;
     }
-    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidSUSD: amount });
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidRUSD: amount });
     if (
-        contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD) &&
-        contract.accruedInterestSUSD <= toleranceMoney(contract.accruedInterestSUSD)
+        contract.outstandingPrincipalRUSD <= toleranceMoney(contract.outstandingPrincipalRUSD) &&
+        contract.accruedInterestRUSD <= toleranceMoney(contract.accruedInterestRUSD)
     ) {
-        contract.outstandingPrincipalSUSD = 0;
-        contract.accruedInterestSUSD = 0;
+        contract.outstandingPrincipalRUSD = 0;
+        contract.accruedInterestRUSD = 0;
         contract.status = "repaid";
         contract.arrearsSinceDay = null;
         recordRetiredContract(staged, contract, principalBefore, 0);
@@ -422,7 +422,7 @@ export function repayGovernmentDebt(world: World, input: DebtRepaymentInput): De
     world.finance = staged;
     return {
         contract: { ...contract },
-        principalPaidSUSD: amount,
+        principalPaidRUSD: amount,
         postingIds: [posting.id],
     };
 }
@@ -433,13 +433,13 @@ export interface DebtContractResult {
     readonly issuerCountryId: Id;
     readonly holderKind: "country" | "popBlock";
     readonly holderId: Id;
-    readonly interestAccruedSUSD: number;
-    readonly interestPaidSUSD: number;
-    readonly principalPaidSUSD: number;
-    readonly debtIssuedSUSD: number;
+    readonly interestAccruedRUSD: number;
+    readonly interestPaidRUSD: number;
+    readonly principalPaidRUSD: number;
+    readonly debtIssuedRUSD: number;
     readonly refinancedContractId: Id | null;
     readonly status: DebtContract["status"];
-    readonly outstandingPrincipalSUSD: number;
+    readonly outstandingPrincipalRUSD: number;
 }
 
 /** M5b month-end/daily debt phase result. */
@@ -447,20 +447,20 @@ export interface DebtPhaseResult {
     readonly ran: boolean;
     readonly dayIndex: DayIndex;
     readonly contracts: readonly DebtContractResult[];
-    readonly interestAccruedSUSD: number;
-    readonly interestPaidSUSD: number;
-    readonly principalRepaidSUSD: number;
-    readonly debtIssuedForDeficitSUSD: number;
+    readonly interestAccruedRUSD: number;
+    readonly interestPaidRUSD: number;
+    readonly principalRepaidRUSD: number;
+    readonly debtIssuedForDeficitRUSD: number;
     /** Month-to-date budget/interest gap not covered by treasury liquidity. */
-    readonly financingRequirementSUSD: number;
-    readonly unfinancedDeficitSUSD: number;
-    readonly principalWrittenOffSUSD: number;
-    readonly interestWrittenOffSUSD: number;
+    readonly financingRequirementRUSD: number;
+    readonly unfinancedDeficitRUSD: number;
+    readonly principalWrittenOffRUSD: number;
+    readonly interestWrittenOffRUSD: number;
 }
 
 function emptyDebtResult(dayIndex: DayIndex): DebtPhaseResult {
     return {
-        ran: false, dayIndex, contracts: [], interestAccruedSUSD: 0, interestPaidSUSD: 0, principalRepaidSUSD: 0, debtIssuedForDeficitSUSD: 0, financingRequirementSUSD: 0, unfinancedDeficitSUSD: 0, principalWrittenOffSUSD: 0, interestWrittenOffSUSD: 0,
+        ran: false, dayIndex, contracts: [], interestAccruedRUSD: 0, interestPaidRUSD: 0, principalRepaidRUSD: 0, debtIssuedForDeficitRUSD: 0, financingRequirementRUSD: 0, unfinancedDeficitRUSD: 0, principalWrittenOffRUSD: 0, interestWrittenOffRUSD: 0,
     };
 }
 
@@ -468,7 +468,7 @@ function toleranceMoney(...values: number[]): number {
     let scale = 1;
     for (const value of values)
         scale = Math.max(scale, Math.abs(value));
-    return MONEY_TOLERANCE_SUSD * scale;
+    return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function isLastCivilDayOfMonth(dayIndex: DayIndex): boolean {
@@ -488,11 +488,11 @@ function countryFinancingRequirement(
     index: FinanceIndex,
     countryId: Id,
 ): number {
-    const incomeTax = index.get("country", countryId, "income-tax-revenue").balanceSUSD;
-    const businessTax = index.get("country", countryId, "business-tax-revenue").balanceSUSD;
-    const requestedWelfare = readBudgetMemo(finance, countryId).welfareRequestedSUSD;
-    const interest = index.get("country", countryId, "interest-expense").balanceSUSD;
-    const treasuryCash = index.get("country", countryId, "treasury-cash").balanceSUSD;
+    const incomeTax = index.get("country", countryId, "income-tax-revenue").balanceRUSD;
+    const businessTax = index.get("country", countryId, "business-tax-revenue").balanceRUSD;
+    const requestedWelfare = readBudgetMemo(finance, countryId).welfareRequestedRUSD;
+    const interest = index.get("country", countryId, "interest-expense").balanceRUSD;
+    const treasuryCash = index.get("country", countryId, "treasury-cash").balanceRUSD;
     // The memo includes welfare paid and unpaid. Subtracting actual treasury
     // liquidity means a country with cash (including prior state-enterprise
     // remittances) does not borrow solely because the accounting formula is
@@ -505,35 +505,35 @@ function countryFinancingRequirement(
 function accrueInterest(staged: FinanceState, index: FinanceIndex, contract: DebtContract, dayIndex: DayIndex): number {
     if (contract.status !== "active" && contract.status !== "arrears")
         return 0;
-    if (contract.outstandingPrincipalSUSD <= 0 || contract.annualCouponRate <= 0)
+    if (contract.outstandingPrincipalRUSD <= 0 || contract.annualCouponRate <= 0)
         return 0;
     if (contract.issueDay >= dayIndex)
         return 0;
     const year = dayIndexToCivilDate(dayIndex).year;
-    const amount = (contract.outstandingPrincipalSUSD * contract.annualCouponRate) / daysInYear(year);
+    const amount = (contract.outstandingPrincipalRUSD * contract.annualCouponRate) / daysInYear(year);
     if (!(amount > 0))
         return 0;
     postJournalEntry(staged, dayIndex, "interest-accrual", interestAccrualEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
-    contract.accruedInterestSUSD += amount;
+    contract.accruedInterestRUSD += amount;
     return amount;
 }
 
 function payAccruedInterest(staged: FinanceState, index: FinanceIndex, contract: DebtContract, dayIndex: DayIndex): number {
-    if (contract.accruedInterestSUSD <= 0)
+    if (contract.accruedInterestRUSD <= 0)
         return 0;
     const treasury = index.get("country", contract.issuerCountryId, "treasury-cash");
     const payable = index.get("country", contract.issuerCountryId, "interest-payable");
     // Contract-level accrued interest and the posting account can differ by a
     // floating residual; never debit more payable than actually exists.
-    const amount = Math.min(contract.accruedInterestSUSD, payable.balanceSUSD, treasury.balanceSUSD);
+    const amount = Math.min(contract.accruedInterestRUSD, payable.balanceRUSD, treasury.balanceRUSD);
     if (!(amount > 0))
         return 0;
     postJournalEntry(staged, dayIndex, "interest-payment", interestPaymentEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
-    contract.accruedInterestSUSD -= amount;
-    if (contract.accruedInterestSUSD <= toleranceMoney(contract.accruedInterestSUSD)) {
-        contract.accruedInterestSUSD = 0;
+    contract.accruedInterestRUSD -= amount;
+    if (contract.accruedInterestRUSD <= toleranceMoney(contract.accruedInterestRUSD)) {
+        contract.accruedInterestRUSD = 0;
     }
-    accumulateBudgetMemo(staged, contract.issuerCountryId, { interestPaidSUSD: amount });
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { interestPaidRUSD: amount });
     return amount;
 }
 
@@ -541,39 +541,39 @@ function repayPrincipal(staged: FinanceState, index: FinanceIndex, contract: Deb
     if (!(amount > 0))
         return 0;
     postJournalEntry(staged, dayIndex, "debt-principal-repayment", principalRepaymentEntry(index, contract, amount).lines, contract.issuerCountryId, contract.holderId);
-    contract.outstandingPrincipalSUSD -= amount;
-    if (contract.outstandingPrincipalSUSD <= toleranceMoney(contract.outstandingPrincipalSUSD)) {
-        contract.outstandingPrincipalSUSD = 0;
+    contract.outstandingPrincipalRUSD -= amount;
+    if (contract.outstandingPrincipalRUSD <= toleranceMoney(contract.outstandingPrincipalRUSD)) {
+        contract.outstandingPrincipalRUSD = 0;
     }
-    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidSUSD: amount });
+    accumulateBudgetMemo(staged, contract.issuerCountryId, { principalRepaidRUSD: amount });
     return amount;
 }
 
 function refinanceContract(staged: FinanceState, index: FinanceIndex, contract: DebtContract, dayIndex: DayIndex, issuerCountry: Country): Id | null {
     if (!issuerCountry.debt.enabled || !issuerCountry.debt.refinanceOnMaturity)
         return null;
-    if (contract.accruedInterestSUSD > 0)
+    if (contract.accruedInterestRUSD > 0)
         return null;
-    const principal = contract.outstandingPrincipalSUSD;
+    const principal = contract.outstandingPrincipalRUSD;
     if (!(principal > 0))
         return null;
     const current = debtOutstandingPrincipal(staged.debtContracts, issuerCountry.id);
     const after = current - principal + principal;
-    if (after > issuerCountry.debt.maxOutstandingPrincipalSUSD + MONEY_TOLERANCE_SUSD)
+    if (after > issuerCountry.debt.maxOutstandingPrincipalRUSD + MONEY_TOLERANCE_RUSD)
         return null;
     const replacement = newContract(staged, issuerCountry.id, contract.holderKind, contract.holderId, principal, issuerCountry.debt.annualCouponRate, dayIndex, issuerCountry.debt.termDays);
     const entries = [issuanceEntry(index, replacement), principalRepaymentEntry(index, contract, principal),];
     postJournalBatch(staged, dayIndex, entries);
     appendContract(staged, replacement);
     accumulateBudgetMemo(staged, issuerCountry.id, {
-        debtIssuedSUSD: replacement.principalSUSD,
-        principalRepaidSUSD: principal,
+        debtIssuedRUSD: replacement.principalRUSD,
+        principalRepaidRUSD: principal,
     });
-    const principalBefore = contract.outstandingPrincipalSUSD;
-    contract.outstandingPrincipalSUSD = 0;
+    const principalBefore = contract.outstandingPrincipalRUSD;
+    contract.outstandingPrincipalRUSD = 0;
     contract.status = "repaid";
     contract.arrearsSinceDay = null;
-    recordRetiredContract(staged, contract, principalBefore, contract.accruedInterestSUSD);
+    recordRetiredContract(staged, contract, principalBefore, contract.accruedInterestRUSD);
     return replacement.id;
 }
 
@@ -584,20 +584,20 @@ function defaultContract(staged: FinanceState, index: FinanceIndex, contract: De
     const issuer = issuerAccounts(index, contract.issuerCountryId);
     const holder = holderAccounts(index, contract.holderKind, contract.holderId);
     const principal = Math.min(
-        contract.outstandingPrincipalSUSD,
-        issuer.liability.balanceSUSD,
-        holder.bond.balanceSUSD,
+        contract.outstandingPrincipalRUSD,
+        issuer.liability.balanceRUSD,
+        holder.bond.balanceRUSD,
     );
     const interest = Math.min(
-        contract.accruedInterestSUSD,
-        issuer.payable.balanceSUSD,
-        holder.receivable.balanceSUSD,
+        contract.accruedInterestRUSD,
+        issuer.payable.balanceRUSD,
+        holder.receivable.balanceRUSD,
     );
     const entry = defaultWriteoffEntry(index, contract);
     if (entry !== null)
         postJournalEntry(staged, dayIndex, "debt-default-writeoff", entry.lines, contract.issuerCountryId, contract.holderId);
-    contract.outstandingPrincipalSUSD = 0;
-    contract.accruedInterestSUSD = 0;
+    contract.outstandingPrincipalRUSD = 0;
+    contract.accruedInterestRUSD = 0;
     contract.status = "defaulted";
     contract.arrearsSinceDay = null;
     recordRetiredContract(staged, contract, principal, interest);
@@ -634,7 +634,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
     const record = (contract: DebtContract, patch: Partial<DebtContractResult>): void => {
         const previous = results.get(contract.id);
         results.set(contract.id, {
-            contractId: contract.id, issuerCountryId: contract.issuerCountryId, holderKind: contract.holderKind, holderId: contract.holderId, interestAccruedSUSD: previous?.interestAccruedSUSD ?? 0, interestPaidSUSD: previous?.interestPaidSUSD ?? 0, principalPaidSUSD: previous?.principalPaidSUSD ?? 0, debtIssuedSUSD: previous?.debtIssuedSUSD ?? 0, refinancedContractId: previous?.refinancedContractId ?? null, outstandingPrincipalSUSD: contract.outstandingPrincipalSUSD, status: contract.status, ...patch,
+            contractId: contract.id, issuerCountryId: contract.issuerCountryId, holderKind: contract.holderKind, holderId: contract.holderId, interestAccruedRUSD: previous?.interestAccruedRUSD ?? 0, interestPaidRUSD: previous?.interestPaidRUSD ?? 0, principalPaidRUSD: previous?.principalPaidRUSD ?? 0, debtIssuedRUSD: previous?.debtIssuedRUSD ?? 0, refinancedContractId: previous?.refinancedContractId ?? null, outstandingPrincipalRUSD: contract.outstandingPrincipalRUSD, status: contract.status, ...patch,
         });
     };
     for (const contract of [...staged.debtContracts].sort((left, right) => left.id - right.id)) {
@@ -642,7 +642,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
         if (accrued > 0) {
             interestAccrued += accrued;
             record(contract, {
-                interestAccruedSUSD: accrued
+                interestAccruedRUSD: accrued
             });
         }
     }
@@ -658,15 +658,15 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             assertIssuerAndHolder(world, policy, country);
             if (activeDebtContractCount(staged.debtContracts) >= MAX_ACTIVE_DEBT_CONTRACTS) {
                 unfinanced += requirement;
-                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementSUSD: requirement });
+                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementRUSD: requirement });
                 continue;
             }
             const holder = holderAccounts(index, policy.creditorKind, policy.creditorId);
-            const headroom = policy.maxOutstandingPrincipalSUSD - debtOutstandingPrincipal(staged.debtContracts, country.id);
-            const amount = Math.min(requirement, holder.cash.balanceSUSD, headroom);
+            const headroom = policy.maxOutstandingPrincipalRUSD - debtOutstandingPrincipal(staged.debtContracts, country.id);
+            const amount = Math.min(requirement, holder.cash.balanceRUSD, headroom);
             if (!(amount > 0)) {
                 unfinanced += requirement;
-                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementSUSD: requirement });
+                accumulateBudgetMemo(staged, country.id, { unfinancedRequirementRUSD: requirement });
                 continue;
             }
             const contract = newContract(staged, country.id, policy.creditorKind, policy.creditorId, amount, policy.annualCouponRate, dayIndex, policy.termDays);
@@ -675,11 +675,11 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             debtIssued += amount;
             unfinanced += Math.max(0, requirement - amount);
             accumulateBudgetMemo(staged, country.id, {
-                debtIssuedSUSD: amount,
-                unfinancedRequirementSUSD: Math.max(0, requirement - amount),
+                debtIssuedRUSD: amount,
+                unfinancedRequirementRUSD: Math.max(0, requirement - amount),
             });
             record(contract, {
-                debtIssuedSUSD: amount
+                debtIssuedRUSD: amount
             });
         }
         for (const contract of [...staged.debtContracts].sort((left, right) => left.id - right.id)) {
@@ -689,10 +689,10 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             if (paid > 0) {
                 interestPaid += paid;
                 record(contract, {
-                    interestPaidSUSD: paid
+                    interestPaidRUSD: paid
                 });
             }
-            if (contract.accruedInterestSUSD > toleranceMoney(contract.accruedInterestSUSD)) {
+            if (contract.accruedInterestRUSD > toleranceMoney(contract.accruedInterestRUSD)) {
                 markArrears(contract, dayIndex);
             }
             else if (contract.status === "arrears" && contract.maturityDay > dayIndex) {
@@ -709,15 +709,15 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             continue;
         if (contract.status === "repaid" || contract.status === "defaulted")
             continue;
-        if (contract.outstandingPrincipalSUSD <= 0) {
-            if (contract.accruedInterestSUSD > 0) {
+        if (contract.outstandingPrincipalRUSD <= 0) {
+            if (contract.accruedInterestRUSD > 0) {
                 const paid = payAccruedInterest(staged, index, contract, dayIndex);
                 if (paid > 0) {
                     interestPaid += paid;
-                    record(contract, { interestPaidSUSD: paid });
+                    record(contract, { interestPaidRUSD: paid });
                 }
             }
-            if (contract.accruedInterestSUSD > toleranceMoney(contract.accruedInterestSUSD)) {
+            if (contract.accruedInterestRUSD > toleranceMoney(contract.accruedInterestRUSD)) {
                 markArrears(contract, dayIndex);
             }
             else {
@@ -730,16 +730,16 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             });
             continue;
         }
-        if (contract.accruedInterestSUSD > 0) {
+        if (contract.accruedInterestRUSD > 0) {
             const paid = payAccruedInterest(staged, index, contract, dayIndex);
             if (paid > 0) {
                 interestPaid += paid;
                 record(contract, {
-                    interestPaidSUSD: paid
+                    interestPaidRUSD: paid
                 });
             }
         }
-        if (contract.accruedInterestSUSD > toleranceMoney(contract.accruedInterestSUSD)) {
+        if (contract.accruedInterestRUSD > toleranceMoney(contract.accruedInterestRUSD)) {
             markArrears(contract, dayIndex);
             record(contract, {
                 status: contract.status
@@ -754,34 +754,34 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
             const replacement = staged.debtContracts.find((candidate) => candidate.id === replacementId);
             if (replacement !== undefined)
                 record(replacement, {
-                    debtIssuedSUSD: replacement.principalSUSD
+                    debtIssuedRUSD: replacement.principalRUSD
                 });
             record(contract, {
                 refinancedContractId: replacementId, status: contract.status
             });
             continue;
         }
-        const principalBefore = contract.outstandingPrincipalSUSD;
+        const principalBefore = contract.outstandingPrincipalRUSD;
         const treasury = index.get("country", contract.issuerCountryId, "treasury-cash");
-        const pay = Math.min(contract.outstandingPrincipalSUSD, treasury.balanceSUSD);
+        const pay = Math.min(contract.outstandingPrincipalRUSD, treasury.balanceRUSD);
         if (pay > 0) {
             const paid = repayPrincipal(staged, index, contract, dayIndex, pay);
             principalRepaid += paid;
             record(contract, {
-                principalPaidSUSD: paid
+                principalPaidRUSD: paid
             });
         }
-        if (contract.outstandingPrincipalSUSD > toleranceMoney(contract.outstandingPrincipalSUSD)) {
+        if (contract.outstandingPrincipalRUSD > toleranceMoney(contract.outstandingPrincipalRUSD)) {
             markArrears(contract, dayIndex);
         }
         else {
-            contract.outstandingPrincipalSUSD = 0;
+            contract.outstandingPrincipalRUSD = 0;
             contract.status = "repaid";
             contract.arrearsSinceDay = null;
             recordRetiredContract(staged, contract, principalBefore, 0);
         }
         record(contract, {
-            status: contract.status, outstandingPrincipalSUSD: contract.outstandingPrincipalSUSD
+            status: contract.status, outstandingPrincipalRUSD: contract.outstandingPrincipalRUSD
         });
     }
     for (const contract of [...staged.debtContracts].sort((left, right) => left.id - right.id)) {
@@ -796,7 +796,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
         principalWrittenOff += written.principal;
         interestWrittenOff += written.interest;
         record(contract, {
-            status: contract.status, outstandingPrincipalSUSD: 0, interestAccruedSUSD: 0,
+            status: contract.status, outstandingPrincipalRUSD: 0, interestAccruedRUSD: 0,
         });
     }
     compactDebtContracts(staged);
@@ -813,7 +813,7 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
     world.finance = staged;
     const contracts = [...results.values()].sort((left, right) => left.contractId - right.contractId);
     return {
-        ran: true, dayIndex, contracts, interestAccruedSUSD: interestAccrued, interestPaidSUSD: interestPaid, principalRepaidSUSD: principalRepaid, debtIssuedForDeficitSUSD: debtIssued, financingRequirementSUSD: financingRequirement, unfinancedDeficitSUSD: unfinanced, principalWrittenOffSUSD: principalWrittenOff, interestWrittenOffSUSD: interestWrittenOff,
+        ran: true, dayIndex, contracts, interestAccruedRUSD: interestAccrued, interestPaidRUSD: interestPaid, principalRepaidRUSD: principalRepaid, debtIssuedForDeficitRUSD: debtIssued, financingRequirementRUSD: financingRequirement, unfinancedDeficitRUSD: unfinanced, principalWrittenOffRUSD: principalWrittenOff, interestWrittenOffRUSD: interestWrittenOff,
     };
 }
 

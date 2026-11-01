@@ -17,8 +17,8 @@
  */
 
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
-import type { Day, Id, MoneySUSD } from "../types.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
+import type { Day, Id, MoneyRUSD } from "../types.js";
 import { requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
 import type {
   FinanceBudgetMemo,
@@ -29,26 +29,26 @@ import type {
 /** The zero memo for a country with no current-period activity. */
 export function emptyFinanceBudgetMemo(): FinanceBudgetMemo {
   return {
-    welfareRequestedSUSD: 0,
-    welfareShortfallSUSD: 0,
-    businessTaxAssessedSUSD: 0,
-    businessTaxUncollectedSUSD: 0,
-    debtIssuedSUSD: 0,
-    principalRepaidSUSD: 0,
-    interestPaidSUSD: 0,
-    unfinancedRequirementSUSD: 0,
-    constructionSpentSUSD: 0,
-    constructionWrittenOffSUSD: 0,
-    constructionMaterialsSpentSUSD: 0,
-    subsidyRequestedSUSD: 0,
-    subsidyShortfallSUSD: 0,
-    publicEnterpriseSupportSUSD: 0,
-    administrationRequestedSUSD: 0,
-    administrationShortfallSUSD: 0,
-    educationRequestedSUSD: 0,
-    educationShortfallSUSD: 0,
-    trainingRequestedSUSD: 0,
-    trainingShortfallSUSD: 0,
+    welfareRequestedRUSD: 0,
+    welfareShortfallRUSD: 0,
+    businessTaxAssessedRUSD: 0,
+    businessTaxUncollectedRUSD: 0,
+    debtIssuedRUSD: 0,
+    principalRepaidRUSD: 0,
+    interestPaidRUSD: 0,
+    unfinancedRequirementRUSD: 0,
+    constructionSpentRUSD: 0,
+    constructionWrittenOffRUSD: 0,
+    constructionMaterialsSpentRUSD: 0,
+    subsidyRequestedRUSD: 0,
+    subsidyShortfallRUSD: 0,
+    publicEnterpriseSupportRUSD: 0,
+    administrationRequestedRUSD: 0,
+    administrationShortfallRUSD: 0,
+    educationRequestedRUSD: 0,
+    educationShortfallRUSD: 0,
+    trainingRequestedRUSD: 0,
+    trainingShortfallRUSD: 0,
     businessTaxAssessedDay: null,
   };
 }
@@ -79,130 +79,130 @@ export function accumulateBudgetMemo(
   finance: FinanceState,
   countryId: Id,
   delta: {
-    readonly welfareRequestedSUSD?: MoneySUSD;
-    readonly welfareShortfallSUSD?: MoneySUSD;
-    readonly businessTaxAssessedSUSD?: MoneySUSD;
-    readonly businessTaxUncollectedSUSD?: MoneySUSD;
-    readonly debtIssuedSUSD?: MoneySUSD;
-    readonly principalRepaidSUSD?: MoneySUSD;
-    readonly interestPaidSUSD?: MoneySUSD;
-    readonly unfinancedRequirementSUSD?: MoneySUSD;
-    readonly constructionSpentSUSD?: MoneySUSD;
-    readonly constructionWrittenOffSUSD?: MoneySUSD;
-    readonly constructionMaterialsSpentSUSD?: MoneySUSD;
-    readonly subsidyRequestedSUSD?: MoneySUSD;
-    readonly subsidyShortfallSUSD?: MoneySUSD;
-    readonly publicEnterpriseSupportSUSD?: MoneySUSD;
-    readonly administrationRequestedSUSD?: MoneySUSD;
-    readonly administrationShortfallSUSD?: MoneySUSD;
-    readonly educationRequestedSUSD?: MoneySUSD;
-    readonly educationShortfallSUSD?: MoneySUSD;
-    readonly trainingRequestedSUSD?: MoneySUSD;
-    readonly trainingShortfallSUSD?: MoneySUSD;
+    readonly welfareRequestedRUSD?: MoneyRUSD;
+    readonly welfareShortfallRUSD?: MoneyRUSD;
+    readonly businessTaxAssessedRUSD?: MoneyRUSD;
+    readonly businessTaxUncollectedRUSD?: MoneyRUSD;
+    readonly debtIssuedRUSD?: MoneyRUSD;
+    readonly principalRepaidRUSD?: MoneyRUSD;
+    readonly interestPaidRUSD?: MoneyRUSD;
+    readonly unfinancedRequirementRUSD?: MoneyRUSD;
+    readonly constructionSpentRUSD?: MoneyRUSD;
+    readonly constructionWrittenOffRUSD?: MoneyRUSD;
+    readonly constructionMaterialsSpentRUSD?: MoneyRUSD;
+    readonly subsidyRequestedRUSD?: MoneyRUSD;
+    readonly subsidyShortfallRUSD?: MoneyRUSD;
+    readonly publicEnterpriseSupportRUSD?: MoneyRUSD;
+    readonly administrationRequestedRUSD?: MoneyRUSD;
+    readonly administrationShortfallRUSD?: MoneyRUSD;
+    readonly educationRequestedRUSD?: MoneyRUSD;
+    readonly educationShortfallRUSD?: MoneyRUSD;
+    readonly trainingRequestedRUSD?: MoneyRUSD;
+    readonly trainingShortfallRUSD?: MoneyRUSD;
     readonly businessTaxAssessedDay?: Day;
   },
 ): FinanceBudgetMemo {
   const current = readBudgetMemo(finance, countryId);
   const next: FinanceBudgetMemo = {
-    welfareRequestedSUSD: addAmount(
-      current.welfareRequestedSUSD,
-      delta.welfareRequestedSUSD ?? 0,
-      "welfareRequestedSUSD",
+    welfareRequestedRUSD: addAmount(
+      current.welfareRequestedRUSD,
+      delta.welfareRequestedRUSD ?? 0,
+      "welfareRequestedRUSD",
     ),
-    welfareShortfallSUSD: addAmount(
-      current.welfareShortfallSUSD,
-      delta.welfareShortfallSUSD ?? 0,
-      "welfareShortfallSUSD",
+    welfareShortfallRUSD: addAmount(
+      current.welfareShortfallRUSD,
+      delta.welfareShortfallRUSD ?? 0,
+      "welfareShortfallRUSD",
     ),
-    businessTaxAssessedSUSD: addAmount(
-      current.businessTaxAssessedSUSD,
-      delta.businessTaxAssessedSUSD ?? 0,
-      "businessTaxAssessedSUSD",
+    businessTaxAssessedRUSD: addAmount(
+      current.businessTaxAssessedRUSD,
+      delta.businessTaxAssessedRUSD ?? 0,
+      "businessTaxAssessedRUSD",
     ),
-    businessTaxUncollectedSUSD: addAmount(
-      current.businessTaxUncollectedSUSD,
-      delta.businessTaxUncollectedSUSD ?? 0,
-      "businessTaxUncollectedSUSD",
+    businessTaxUncollectedRUSD: addAmount(
+      current.businessTaxUncollectedRUSD,
+      delta.businessTaxUncollectedRUSD ?? 0,
+      "businessTaxUncollectedRUSD",
     ),
-    debtIssuedSUSD: addAmount(
-      current.debtIssuedSUSD,
-      delta.debtIssuedSUSD ?? 0,
-      "debtIssuedSUSD",
+    debtIssuedRUSD: addAmount(
+      current.debtIssuedRUSD,
+      delta.debtIssuedRUSD ?? 0,
+      "debtIssuedRUSD",
     ),
-    principalRepaidSUSD: addAmount(
-      current.principalRepaidSUSD,
-      delta.principalRepaidSUSD ?? 0,
-      "principalRepaidSUSD",
+    principalRepaidRUSD: addAmount(
+      current.principalRepaidRUSD,
+      delta.principalRepaidRUSD ?? 0,
+      "principalRepaidRUSD",
     ),
-    interestPaidSUSD: addAmount(
-      current.interestPaidSUSD,
-      delta.interestPaidSUSD ?? 0,
-      "interestPaidSUSD",
+    interestPaidRUSD: addAmount(
+      current.interestPaidRUSD,
+      delta.interestPaidRUSD ?? 0,
+      "interestPaidRUSD",
     ),
-    unfinancedRequirementSUSD: addAmount(
-      current.unfinancedRequirementSUSD,
-      delta.unfinancedRequirementSUSD ?? 0,
-      "unfinancedRequirementSUSD",
+    unfinancedRequirementRUSD: addAmount(
+      current.unfinancedRequirementRUSD,
+      delta.unfinancedRequirementRUSD ?? 0,
+      "unfinancedRequirementRUSD",
     ),
-    constructionSpentSUSD: addAmount(
-      current.constructionSpentSUSD,
-      delta.constructionSpentSUSD ?? 0,
-      "constructionSpentSUSD",
+    constructionSpentRUSD: addAmount(
+      current.constructionSpentRUSD,
+      delta.constructionSpentRUSD ?? 0,
+      "constructionSpentRUSD",
     ),
-    constructionWrittenOffSUSD: addAmount(
-      current.constructionWrittenOffSUSD,
-      delta.constructionWrittenOffSUSD ?? 0,
-      "constructionWrittenOffSUSD",
+    constructionWrittenOffRUSD: addAmount(
+      current.constructionWrittenOffRUSD,
+      delta.constructionWrittenOffRUSD ?? 0,
+      "constructionWrittenOffRUSD",
     ),
-    constructionMaterialsSpentSUSD: addAmount(
-      current.constructionMaterialsSpentSUSD,
-      delta.constructionMaterialsSpentSUSD ?? 0,
-      "constructionMaterialsSpentSUSD",
+    constructionMaterialsSpentRUSD: addAmount(
+      current.constructionMaterialsSpentRUSD,
+      delta.constructionMaterialsSpentRUSD ?? 0,
+      "constructionMaterialsSpentRUSD",
     ),
-    subsidyRequestedSUSD: addAmount(
-      current.subsidyRequestedSUSD,
-      delta.subsidyRequestedSUSD ?? 0,
-      "subsidyRequestedSUSD",
+    subsidyRequestedRUSD: addAmount(
+      current.subsidyRequestedRUSD,
+      delta.subsidyRequestedRUSD ?? 0,
+      "subsidyRequestedRUSD",
     ),
-    subsidyShortfallSUSD: addAmount(
-      current.subsidyShortfallSUSD,
-      delta.subsidyShortfallSUSD ?? 0,
-      "subsidyShortfallSUSD",
+    subsidyShortfallRUSD: addAmount(
+      current.subsidyShortfallRUSD,
+      delta.subsidyShortfallRUSD ?? 0,
+      "subsidyShortfallRUSD",
     ),
-    publicEnterpriseSupportSUSD: addAmount(
-      current.publicEnterpriseSupportSUSD,
-      delta.publicEnterpriseSupportSUSD ?? 0,
-      "publicEnterpriseSupportSUSD",
+    publicEnterpriseSupportRUSD: addAmount(
+      current.publicEnterpriseSupportRUSD,
+      delta.publicEnterpriseSupportRUSD ?? 0,
+      "publicEnterpriseSupportRUSD",
     ),
-    administrationRequestedSUSD: addAmount(
-      current.administrationRequestedSUSD ?? 0,
-      delta.administrationRequestedSUSD ?? 0,
-      "administrationRequestedSUSD",
+    administrationRequestedRUSD: addAmount(
+      current.administrationRequestedRUSD ?? 0,
+      delta.administrationRequestedRUSD ?? 0,
+      "administrationRequestedRUSD",
     ),
-    administrationShortfallSUSD: addAmount(
-      current.administrationShortfallSUSD ?? 0,
-      delta.administrationShortfallSUSD ?? 0,
-      "administrationShortfallSUSD",
+    administrationShortfallRUSD: addAmount(
+      current.administrationShortfallRUSD ?? 0,
+      delta.administrationShortfallRUSD ?? 0,
+      "administrationShortfallRUSD",
     ),
-    educationRequestedSUSD: addAmount(
-      current.educationRequestedSUSD ?? 0,
-      delta.educationRequestedSUSD ?? 0,
-      "educationRequestedSUSD",
+    educationRequestedRUSD: addAmount(
+      current.educationRequestedRUSD ?? 0,
+      delta.educationRequestedRUSD ?? 0,
+      "educationRequestedRUSD",
     ),
-    educationShortfallSUSD: addAmount(
-      current.educationShortfallSUSD ?? 0,
-      delta.educationShortfallSUSD ?? 0,
-      "educationShortfallSUSD",
+    educationShortfallRUSD: addAmount(
+      current.educationShortfallRUSD ?? 0,
+      delta.educationShortfallRUSD ?? 0,
+      "educationShortfallRUSD",
     ),
-    trainingRequestedSUSD: addAmount(
-      current.trainingRequestedSUSD ?? 0,
-      delta.trainingRequestedSUSD ?? 0,
-      "trainingRequestedSUSD",
+    trainingRequestedRUSD: addAmount(
+      current.trainingRequestedRUSD ?? 0,
+      delta.trainingRequestedRUSD ?? 0,
+      "trainingRequestedRUSD",
     ),
-    trainingShortfallSUSD: addAmount(
-      current.trainingShortfallSUSD ?? 0,
-      delta.trainingShortfallSUSD ?? 0,
-      "trainingShortfallSUSD",
+    trainingShortfallRUSD: addAmount(
+      current.trainingShortfallRUSD ?? 0,
+      delta.trainingShortfallRUSD ?? 0,
+      "trainingShortfallRUSD",
     ),
     businessTaxAssessedDay:
       delta.businessTaxAssessedDay ?? current.businessTaxAssessedDay,
@@ -214,26 +214,26 @@ export function accumulateBudgetMemo(
 /** Frozen period budget totals from a month-to-date memo. */
 export function budgetTotalsFromMemo(memo: FinanceBudgetMemo): FinancePeriodBudgetTotals {
   return {
-    welfareRequestedSUSD: memo.welfareRequestedSUSD,
-    welfareShortfallSUSD: memo.welfareShortfallSUSD,
-    businessTaxAssessedSUSD: memo.businessTaxAssessedSUSD,
-    businessTaxUncollectedSUSD: memo.businessTaxUncollectedSUSD,
-    debtIssuedSUSD: memo.debtIssuedSUSD,
-    principalRepaidSUSD: memo.principalRepaidSUSD,
-    interestPaidSUSD: memo.interestPaidSUSD,
-    unfinancedRequirementSUSD: memo.unfinancedRequirementSUSD,
-    constructionSpentSUSD: memo.constructionSpentSUSD,
-    constructionWrittenOffSUSD: memo.constructionWrittenOffSUSD,
-    constructionMaterialsSpentSUSD: memo.constructionMaterialsSpentSUSD,
-    subsidyRequestedSUSD: memo.subsidyRequestedSUSD,
-    subsidyShortfallSUSD: memo.subsidyShortfallSUSD,
-    publicEnterpriseSupportSUSD: memo.publicEnterpriseSupportSUSD,
-    administrationRequestedSUSD: memo.administrationRequestedSUSD ?? 0,
-    administrationShortfallSUSD: memo.administrationShortfallSUSD ?? 0,
-    educationRequestedSUSD: memo.educationRequestedSUSD ?? 0,
-    educationShortfallSUSD: memo.educationShortfallSUSD ?? 0,
-    trainingRequestedSUSD: memo.trainingRequestedSUSD ?? 0,
-    trainingShortfallSUSD: memo.trainingShortfallSUSD ?? 0,
+    welfareRequestedRUSD: memo.welfareRequestedRUSD,
+    welfareShortfallRUSD: memo.welfareShortfallRUSD,
+    businessTaxAssessedRUSD: memo.businessTaxAssessedRUSD,
+    businessTaxUncollectedRUSD: memo.businessTaxUncollectedRUSD,
+    debtIssuedRUSD: memo.debtIssuedRUSD,
+    principalRepaidRUSD: memo.principalRepaidRUSD,
+    interestPaidRUSD: memo.interestPaidRUSD,
+    unfinancedRequirementRUSD: memo.unfinancedRequirementRUSD,
+    constructionSpentRUSD: memo.constructionSpentRUSD,
+    constructionWrittenOffRUSD: memo.constructionWrittenOffRUSD,
+    constructionMaterialsSpentRUSD: memo.constructionMaterialsSpentRUSD,
+    subsidyRequestedRUSD: memo.subsidyRequestedRUSD,
+    subsidyShortfallRUSD: memo.subsidyShortfallRUSD,
+    publicEnterpriseSupportRUSD: memo.publicEnterpriseSupportRUSD,
+    administrationRequestedRUSD: memo.administrationRequestedRUSD ?? 0,
+    administrationShortfallRUSD: memo.administrationShortfallRUSD ?? 0,
+    educationRequestedRUSD: memo.educationRequestedRUSD ?? 0,
+    educationShortfallRUSD: memo.educationShortfallRUSD ?? 0,
+    trainingRequestedRUSD: memo.trainingRequestedRUSD ?? 0,
+    trainingShortfallRUSD: memo.trainingShortfallRUSD ?? 0,
   };
 }
 
@@ -243,69 +243,69 @@ export function addBudgetTotals(
   right: FinancePeriodBudgetTotals,
 ): FinancePeriodBudgetTotals {
   return {
-    welfareRequestedSUSD: left.welfareRequestedSUSD + right.welfareRequestedSUSD,
-    welfareShortfallSUSD: left.welfareShortfallSUSD + right.welfareShortfallSUSD,
-    businessTaxAssessedSUSD:
-      left.businessTaxAssessedSUSD + right.businessTaxAssessedSUSD,
-    businessTaxUncollectedSUSD:
-      left.businessTaxUncollectedSUSD + right.businessTaxUncollectedSUSD,
-    debtIssuedSUSD: left.debtIssuedSUSD + right.debtIssuedSUSD,
-    principalRepaidSUSD: left.principalRepaidSUSD + right.principalRepaidSUSD,
-    interestPaidSUSD: left.interestPaidSUSD + right.interestPaidSUSD,
-    unfinancedRequirementSUSD:
-      left.unfinancedRequirementSUSD + right.unfinancedRequirementSUSD,
-    constructionSpentSUSD:
-      left.constructionSpentSUSD + right.constructionSpentSUSD,
-    constructionWrittenOffSUSD:
-      left.constructionWrittenOffSUSD + right.constructionWrittenOffSUSD,
-    constructionMaterialsSpentSUSD:
-      left.constructionMaterialsSpentSUSD + right.constructionMaterialsSpentSUSD,
-    subsidyRequestedSUSD:
-      left.subsidyRequestedSUSD + right.subsidyRequestedSUSD,
-    subsidyShortfallSUSD:
-      left.subsidyShortfallSUSD + right.subsidyShortfallSUSD,
-    publicEnterpriseSupportSUSD:
-      left.publicEnterpriseSupportSUSD + right.publicEnterpriseSupportSUSD,
-    administrationRequestedSUSD:
-      (left.administrationRequestedSUSD ?? 0) +
-      (right.administrationRequestedSUSD ?? 0),
-    administrationShortfallSUSD:
-      (left.administrationShortfallSUSD ?? 0) +
-      (right.administrationShortfallSUSD ?? 0),
-    educationRequestedSUSD:
-      (left.educationRequestedSUSD ?? 0) + (right.educationRequestedSUSD ?? 0),
-    educationShortfallSUSD:
-      (left.educationShortfallSUSD ?? 0) + (right.educationShortfallSUSD ?? 0),
-    trainingRequestedSUSD:
-      (left.trainingRequestedSUSD ?? 0) + (right.trainingRequestedSUSD ?? 0),
-    trainingShortfallSUSD:
-      (left.trainingShortfallSUSD ?? 0) + (right.trainingShortfallSUSD ?? 0),
+    welfareRequestedRUSD: left.welfareRequestedRUSD + right.welfareRequestedRUSD,
+    welfareShortfallRUSD: left.welfareShortfallRUSD + right.welfareShortfallRUSD,
+    businessTaxAssessedRUSD:
+      left.businessTaxAssessedRUSD + right.businessTaxAssessedRUSD,
+    businessTaxUncollectedRUSD:
+      left.businessTaxUncollectedRUSD + right.businessTaxUncollectedRUSD,
+    debtIssuedRUSD: left.debtIssuedRUSD + right.debtIssuedRUSD,
+    principalRepaidRUSD: left.principalRepaidRUSD + right.principalRepaidRUSD,
+    interestPaidRUSD: left.interestPaidRUSD + right.interestPaidRUSD,
+    unfinancedRequirementRUSD:
+      left.unfinancedRequirementRUSD + right.unfinancedRequirementRUSD,
+    constructionSpentRUSD:
+      left.constructionSpentRUSD + right.constructionSpentRUSD,
+    constructionWrittenOffRUSD:
+      left.constructionWrittenOffRUSD + right.constructionWrittenOffRUSD,
+    constructionMaterialsSpentRUSD:
+      left.constructionMaterialsSpentRUSD + right.constructionMaterialsSpentRUSD,
+    subsidyRequestedRUSD:
+      left.subsidyRequestedRUSD + right.subsidyRequestedRUSD,
+    subsidyShortfallRUSD:
+      left.subsidyShortfallRUSD + right.subsidyShortfallRUSD,
+    publicEnterpriseSupportRUSD:
+      left.publicEnterpriseSupportRUSD + right.publicEnterpriseSupportRUSD,
+    administrationRequestedRUSD:
+      (left.administrationRequestedRUSD ?? 0) +
+      (right.administrationRequestedRUSD ?? 0),
+    administrationShortfallRUSD:
+      (left.administrationShortfallRUSD ?? 0) +
+      (right.administrationShortfallRUSD ?? 0),
+    educationRequestedRUSD:
+      (left.educationRequestedRUSD ?? 0) + (right.educationRequestedRUSD ?? 0),
+    educationShortfallRUSD:
+      (left.educationShortfallRUSD ?? 0) + (right.educationShortfallRUSD ?? 0),
+    trainingRequestedRUSD:
+      (left.trainingRequestedRUSD ?? 0) + (right.trainingRequestedRUSD ?? 0),
+    trainingShortfallRUSD:
+      (left.trainingShortfallRUSD ?? 0) + (right.trainingShortfallRUSD ?? 0),
   };
 }
 
 /** Zero period budget totals. */
 export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
   return {
-    welfareRequestedSUSD: 0,
-    welfareShortfallSUSD: 0,
-    businessTaxAssessedSUSD: 0,
-    businessTaxUncollectedSUSD: 0,
-    debtIssuedSUSD: 0,
-    principalRepaidSUSD: 0,
-    interestPaidSUSD: 0,
-    unfinancedRequirementSUSD: 0,
-    constructionSpentSUSD: 0,
-    constructionWrittenOffSUSD: 0,
-    constructionMaterialsSpentSUSD: 0,
-    subsidyRequestedSUSD: 0,
-    subsidyShortfallSUSD: 0,
-    publicEnterpriseSupportSUSD: 0,
-    administrationRequestedSUSD: 0,
-    administrationShortfallSUSD: 0,
-    educationRequestedSUSD: 0,
-    educationShortfallSUSD: 0,
-    trainingRequestedSUSD: 0,
-    trainingShortfallSUSD: 0,
+    welfareRequestedRUSD: 0,
+    welfareShortfallRUSD: 0,
+    businessTaxAssessedRUSD: 0,
+    businessTaxUncollectedRUSD: 0,
+    debtIssuedRUSD: 0,
+    principalRepaidRUSD: 0,
+    interestPaidRUSD: 0,
+    unfinancedRequirementRUSD: 0,
+    constructionSpentRUSD: 0,
+    constructionWrittenOffRUSD: 0,
+    constructionMaterialsSpentRUSD: 0,
+    subsidyRequestedRUSD: 0,
+    subsidyShortfallRUSD: 0,
+    publicEnterpriseSupportRUSD: 0,
+    administrationRequestedRUSD: 0,
+    administrationShortfallRUSD: 0,
+    educationRequestedRUSD: 0,
+    educationShortfallRUSD: 0,
+    trainingRequestedRUSD: 0,
+    trainingShortfallRUSD: 0,
   };
 }
 
@@ -313,122 +313,122 @@ export function emptyBudgetTotals(): FinancePeriodBudgetTotals {
 export function assertValidFinanceBudgetMemo(memo: FinanceBudgetMemo, path: string): void {
   const record = requireRecord(memo, path);
   const welfareRequested = requireFiniteNumber(
-    record.welfareRequestedSUSD,
-    `${path}.welfareRequestedSUSD`,
+    record.welfareRequestedRUSD,
+    `${path}.welfareRequestedRUSD`,
   );
   const welfareShortfall = requireFiniteNumber(
-    record.welfareShortfallSUSD,
-    `${path}.welfareShortfallSUSD`,
+    record.welfareShortfallRUSD,
+    `${path}.welfareShortfallRUSD`,
   );
   const businessTaxAssessed = requireFiniteNumber(
-    record.businessTaxAssessedSUSD,
-    `${path}.businessTaxAssessedSUSD`,
+    record.businessTaxAssessedRUSD,
+    `${path}.businessTaxAssessedRUSD`,
   );
   const businessTaxUncollected = requireFiniteNumber(
-    record.businessTaxUncollectedSUSD,
-    `${path}.businessTaxUncollectedSUSD`,
+    record.businessTaxUncollectedRUSD,
+    `${path}.businessTaxUncollectedRUSD`,
   );
   for (const field of [
-    "debtIssuedSUSD",
-    "principalRepaidSUSD",
-    "interestPaidSUSD",
-    "unfinancedRequirementSUSD",
-    "constructionSpentSUSD",
-    "constructionWrittenOffSUSD",
-    "constructionMaterialsSpentSUSD",
-    "subsidyRequestedSUSD",
-    "subsidyShortfallSUSD",
-    "publicEnterpriseSupportSUSD",
+    "debtIssuedRUSD",
+    "principalRepaidRUSD",
+    "interestPaidRUSD",
+    "unfinancedRequirementRUSD",
+    "constructionSpentRUSD",
+    "constructionWrittenOffRUSD",
+    "constructionMaterialsSpentRUSD",
+    "subsidyRequestedRUSD",
+    "subsidyShortfallRUSD",
+    "publicEnterpriseSupportRUSD",
   ] as const) {
     const value = requireFiniteNumber(record[field], `${path}.${field}`);
     if (value < 0) throw new RangeError(`${path}.${field} must be non-negative`);
   }
   for (const [label, value] of [
-    ["welfareRequestedSUSD", welfareRequested],
-    ["welfareShortfallSUSD", welfareShortfall],
-    ["businessTaxAssessedSUSD", businessTaxAssessed],
-    ["businessTaxUncollectedSUSD", businessTaxUncollected],
+    ["welfareRequestedRUSD", welfareRequested],
+    ["welfareShortfallRUSD", welfareShortfall],
+    ["businessTaxAssessedRUSD", businessTaxAssessed],
+    ["businessTaxUncollectedRUSD", businessTaxUncollected],
   ] as const) {
     if (value < 0) throw new RangeError(`${path}.${label} must be non-negative`);
   }
-  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.welfareShortfallSUSD must not exceed the request`);
+  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.welfareShortfallRUSD must not exceed the request`);
   }
-  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
+  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.businessTaxUncollectedRUSD must not exceed the assessment`);
   }
   const subsidyRequested = requireFiniteNumber(
-    record.subsidyRequestedSUSD,
-    `${path}.subsidyRequestedSUSD`,
+    record.subsidyRequestedRUSD,
+    `${path}.subsidyRequestedRUSD`,
   );
   const subsidyShortfall = requireFiniteNumber(
-    record.subsidyShortfallSUSD,
-    `${path}.subsidyShortfallSUSD`,
+    record.subsidyShortfallRUSD,
+    `${path}.subsidyShortfallRUSD`,
   );
-  if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
+  if (subsidyShortfall > subsidyRequested + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.subsidyShortfallRUSD must not exceed the request`);
   }
   const administrationRequested =
-    record.administrationRequestedSUSD === undefined
+    record.administrationRequestedRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.administrationRequestedSUSD,
-          `${path}.administrationRequestedSUSD`,
+          record.administrationRequestedRUSD,
+          `${path}.administrationRequestedRUSD`,
         );
   const administrationShortfall =
-    record.administrationShortfallSUSD === undefined
+    record.administrationShortfallRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.administrationShortfallSUSD,
-          `${path}.administrationShortfallSUSD`,
+          record.administrationShortfallRUSD,
+          `${path}.administrationShortfallRUSD`,
         );
   if (administrationRequested < 0 || administrationShortfall < 0) {
     throw new RangeError(`${path} administration memo must be non-negative`);
   }
-  if (administrationShortfall > administrationRequested + MONEY_TOLERANCE_SUSD) {
+  if (administrationShortfall > administrationRequested + MONEY_TOLERANCE_RUSD) {
     throw new RangeError(
-      `${path}.administrationShortfallSUSD must not exceed the request`,
+      `${path}.administrationShortfallRUSD must not exceed the request`,
     );
   }
   const educationRequested =
-    record.educationRequestedSUSD === undefined
+    record.educationRequestedRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.educationRequestedSUSD,
-          `${path}.educationRequestedSUSD`,
+          record.educationRequestedRUSD,
+          `${path}.educationRequestedRUSD`,
         );
   const educationShortfall =
-    record.educationShortfallSUSD === undefined
+    record.educationShortfallRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.educationShortfallSUSD,
-          `${path}.educationShortfallSUSD`,
+          record.educationShortfallRUSD,
+          `${path}.educationShortfallRUSD`,
         );
   if (educationRequested < 0 || educationShortfall < 0) {
     throw new RangeError(`${path} education memo must be non-negative`);
   }
-  if (educationShortfall > educationRequested + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.educationShortfallSUSD must not exceed the request`);
+  if (educationShortfall > educationRequested + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.educationShortfallRUSD must not exceed the request`);
   }
   const trainingRequested =
-    record.trainingRequestedSUSD === undefined
+    record.trainingRequestedRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.trainingRequestedSUSD,
-          `${path}.trainingRequestedSUSD`,
+          record.trainingRequestedRUSD,
+          `${path}.trainingRequestedRUSD`,
         );
   const trainingShortfall =
-    record.trainingShortfallSUSD === undefined
+    record.trainingShortfallRUSD === undefined
       ? 0
       : requireFiniteNumber(
-          record.trainingShortfallSUSD,
-          `${path}.trainingShortfallSUSD`,
+          record.trainingShortfallRUSD,
+          `${path}.trainingShortfallRUSD`,
         );
   if (trainingRequested < 0 || trainingShortfall < 0) {
     throw new RangeError(`${path} training memo must be non-negative`);
   }
-  if (trainingShortfall > trainingRequested + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.trainingShortfallSUSD must not exceed the request`);
+  if (trainingShortfall > trainingRequested + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.trainingShortfallRUSD must not exceed the request`);
   }
   if (record.businessTaxAssessedDay !== null) {
     requireInteger(
@@ -450,64 +450,64 @@ export function assertValidBudgetTotals(
     record[field] === undefined
       ? 0
       : requireFiniteNumber(record[field], `${path}.${field}`);
-  const welfareRequested = valueOf("welfareRequestedSUSD");
-  const welfareShortfall = valueOf("welfareShortfallSUSD");
-  const businessTaxAssessed = valueOf("businessTaxAssessedSUSD");
-  const businessTaxUncollected = valueOf("businessTaxUncollectedSUSD");
+  const welfareRequested = valueOf("welfareRequestedRUSD");
+  const welfareShortfall = valueOf("welfareShortfallRUSD");
+  const businessTaxAssessed = valueOf("businessTaxAssessedRUSD");
+  const businessTaxUncollected = valueOf("businessTaxUncollectedRUSD");
   for (const field of [
-    "welfareRequestedSUSD",
-    "welfareShortfallSUSD",
-    "businessTaxAssessedSUSD",
-    "businessTaxUncollectedSUSD",
-    "debtIssuedSUSD",
-    "principalRepaidSUSD",
-    "interestPaidSUSD",
-    "unfinancedRequirementSUSD",
-    "constructionSpentSUSD",
-    "constructionWrittenOffSUSD",
-    "constructionMaterialsSpentSUSD",
-    "subsidyRequestedSUSD",
-    "subsidyShortfallSUSD",
-    "publicEnterpriseSupportSUSD",
-    "administrationRequestedSUSD",
-    "administrationShortfallSUSD",
-    "educationRequestedSUSD",
-    "educationShortfallSUSD",
-    "trainingRequestedSUSD",
-    "trainingShortfallSUSD",
+    "welfareRequestedRUSD",
+    "welfareShortfallRUSD",
+    "businessTaxAssessedRUSD",
+    "businessTaxUncollectedRUSD",
+    "debtIssuedRUSD",
+    "principalRepaidRUSD",
+    "interestPaidRUSD",
+    "unfinancedRequirementRUSD",
+    "constructionSpentRUSD",
+    "constructionWrittenOffRUSD",
+    "constructionMaterialsSpentRUSD",
+    "subsidyRequestedRUSD",
+    "subsidyShortfallRUSD",
+    "publicEnterpriseSupportRUSD",
+    "administrationRequestedRUSD",
+    "administrationShortfallRUSD",
+    "educationRequestedRUSD",
+    "educationShortfallRUSD",
+    "trainingRequestedRUSD",
+    "trainingShortfallRUSD",
   ] as const) {
     if (valueOf(field) < 0) {
       throw new RangeError(`${path}.${field} must be non-negative`);
     }
   }
-  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.welfareShortfallSUSD must not exceed the request`);
+  if (welfareShortfall > welfareRequested + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.welfareShortfallRUSD must not exceed the request`);
   }
-  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_SUSD) {
-    throw new RangeError(`${path}.businessTaxUncollectedSUSD must not exceed the assessment`);
-  }
-  if (
-    valueOf("subsidyShortfallSUSD") >
-    valueOf("subsidyRequestedSUSD") + MONEY_TOLERANCE_SUSD
-  ) {
-    throw new RangeError(`${path}.subsidyShortfallSUSD must not exceed the request`);
+  if (businessTaxUncollected > businessTaxAssessed + MONEY_TOLERANCE_RUSD) {
+    throw new RangeError(`${path}.businessTaxUncollectedRUSD must not exceed the assessment`);
   }
   if (
-    valueOf("administrationShortfallSUSD") >
-    valueOf("administrationRequestedSUSD") + MONEY_TOLERANCE_SUSD
+    valueOf("subsidyShortfallRUSD") >
+    valueOf("subsidyRequestedRUSD") + MONEY_TOLERANCE_RUSD
   ) {
-    throw new RangeError(`${path}.administrationShortfallSUSD must not exceed the request`);
+    throw new RangeError(`${path}.subsidyShortfallRUSD must not exceed the request`);
   }
   if (
-    valueOf("educationShortfallSUSD") >
-    valueOf("educationRequestedSUSD") + MONEY_TOLERANCE_SUSD
+    valueOf("administrationShortfallRUSD") >
+    valueOf("administrationRequestedRUSD") + MONEY_TOLERANCE_RUSD
   ) {
-    throw new RangeError(`${path}.educationShortfallSUSD must not exceed the request`);
+    throw new RangeError(`${path}.administrationShortfallRUSD must not exceed the request`);
   }
   if (
-    valueOf("trainingShortfallSUSD") >
-    valueOf("trainingRequestedSUSD") + MONEY_TOLERANCE_SUSD
+    valueOf("educationShortfallRUSD") >
+    valueOf("educationRequestedRUSD") + MONEY_TOLERANCE_RUSD
   ) {
-    throw new RangeError(`${path}.trainingShortfallSUSD must not exceed the request`);
+    throw new RangeError(`${path}.educationShortfallRUSD must not exceed the request`);
+  }
+  if (
+    valueOf("trainingShortfallRUSD") >
+    valueOf("trainingRequestedRUSD") + MONEY_TOLERANCE_RUSD
+  ) {
+    throw new RangeError(`${path}.trainingShortfallRUSD must not exceed the request`);
   }
 }

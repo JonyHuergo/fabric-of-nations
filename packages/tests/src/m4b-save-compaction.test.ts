@@ -164,7 +164,7 @@ describe("monthly finance history compaction (D-065)", () => {
     const before = governmentPeriodTotals(world.finance, baseSummary).find(
       (entry) => entry.countryId === 0,
     );
-    expect(before?.militaryExpenseSUSD ?? 0).toBeGreaterThan(0);
+    expect(before?.militaryExpenseRUSD ?? 0).toBeGreaterThan(0);
 
     // Reproduce the 13th-close boundary: thirteen detailed periods become one
     // compacted period plus the retained detailed window.
@@ -188,18 +188,18 @@ describe("monthly finance history compaction (D-065)", () => {
     const compacted = world.finance.periodSummaries[0];
     const totals = compacted?.countryFiscalTotals?.[0];
     if (totals === undefined) throw new Error("fixture did not compact a country");
-    expect(totals.militaryExpenseSUSD).toBeCloseTo(before?.militaryExpenseSUSD ?? -1, 6);
-    expect(totals.netFiscalResultSUSD).toBeCloseTo(
-      totals.incomeTaxRevenueSUSD +
-        totals.businessTaxRevenueSUSD +
-        (totals.customsDutyRevenueSUSD ?? 0) -
-        totals.welfareExpenseSUSD -
-        totals.interestExpenseSUSD -
-        (totals.subsidyExpenseSUSD ?? 0) -
-        (totals.administrationExpenseSUSD ?? 0) -
-        (totals.educationExpenseSUSD ?? 0) -
-        (totals.trainingExpenseSUSD ?? 0) -
-        (totals.militaryExpenseSUSD ?? 0),
+    expect(totals.militaryExpenseRUSD).toBeCloseTo(before?.militaryExpenseRUSD ?? -1, 6);
+    expect(totals.netFiscalResultRUSD).toBeCloseTo(
+      totals.incomeTaxRevenueRUSD +
+        totals.businessTaxRevenueRUSD +
+        (totals.customsDutyRevenueRUSD ?? 0) -
+        totals.welfareExpenseRUSD -
+        totals.interestExpenseRUSD -
+        (totals.subsidyExpenseRUSD ?? 0) -
+        (totals.administrationExpenseRUSD ?? 0) -
+        (totals.educationExpenseRUSD ?? 0) -
+        (totals.trainingExpenseRUSD ?? 0) -
+        (totals.militaryExpenseRUSD ?? 0),
       6,
     );
     assertValidWorld(world);
@@ -237,7 +237,7 @@ describe("monthly finance history compaction (D-065)", () => {
     const first = world.finance.periodSummaries[0];
     expect(first?.countryFiscalTotals).toBeDefined();
     expect(
-      first?.countryFiscalTotals?.[0]?.militaryExpenseSUSD ?? 0,
+      first?.countryFiscalTotals?.[0]?.militaryExpenseRUSD ?? 0,
     ).toBeGreaterThan(0);
     // The tick pipeline advances the day before publishing a closed world.
     world.dayIndex += 1;
@@ -296,14 +296,14 @@ describe("monthly finance history compaction (D-065)", () => {
       payload: {
         finance: {
           periodSummaries: {
-            countryFiscalTotals: Record<string, { netFiscalResultSUSD: number }>;
+            countryFiscalTotals: Record<string, { netFiscalResultRUSD: number }>;
           }[];
         };
       };
     };
     const first = parsed.payload.finance.periodSummaries[0];
     if (first === undefined) throw new Error("fixture has no encoded summary");
-    first.countryFiscalTotals[countryId]!.netFiscalResultSUSD = 1;
+    first.countryFiscalTotals[countryId]!.netFiscalResultRUSD = 1;
     expect(() => deserializeWorld(JSON.stringify(parsed))).toThrow();
   });
 });

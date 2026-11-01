@@ -39,13 +39,13 @@ export const M3_DEFERRED_GOOD_KEYS = ["services"] as const;
 /**
  * M4c/E2 fiscal numeric-safety bounds. These are validation limits, not
  * calibrated economics: a tax rate is dimensionless in [0, 1], a budget,
- * exemption, or reserve target is a finite nominal SUSD amount below the
+ * exemption, or reserve target is a finite nominal RUSD amount below the
  * documented safe bound, and the welfare wealth ceiling is a population wealth
  * level (0..99, where 99 covers every block and is therefore universal).
  */
 export const MIN_FISCAL_TAX_RATE = 0;
 export const MAX_FISCAL_TAX_RATE = 1;
-export const MAX_FISCAL_BUDGET_SUSD_PER_YEAR = 1e15;
+export const MAX_FISCAL_BUDGET_RUSD_PER_YEAR = 1e15;
 
 /** Highest population wealth level; mirrors `WEALTH_MAX` (0..99). */
 export const MAX_WELFARE_WEALTH_LEVEL = 99;
@@ -57,10 +57,10 @@ export const MAX_WELFARE_WEALTH_LEVEL = 99;
  * and no treasury reserve floor. A neutral policy preserves the accepted M4c/M5b
  * behavior exactly; the player changes these through validated actions.
  */
-export const DEFAULT_INCOME_TAX_ALLOWANCE_SUSD_PER_YEAR = 0;
+export const DEFAULT_INCOME_TAX_ALLOWANCE_RUSD_PER_YEAR = 0;
 export const DEFAULT_WELFARE_MAX_WEALTH_LEVEL = MAX_WELFARE_WEALTH_LEVEL;
 export const DEFAULT_BUSINESS_PROFIT_TAX_RATE = 0;
-export const DEFAULT_RESERVE_TARGET_SUSD = 0;
+export const DEFAULT_RESERVE_TARGET_RUSD = 0;
 
 /**
  * M3d provisional bounded price-update coefficients, not calibrated.
@@ -135,7 +135,7 @@ export const MAX_TRADE_QUOTA_QUANTITY = 1e15;
 /** Bounds for authored route content. Distances and capacities must be positive. */
 export const MIN_TRADE_ROUTE_DISTANCE = 0.1;
 export const MAX_TRADE_ROUTE_DISTANCE = 100;
-export const MAX_TRADE_ROUTE_CAPACITY_SUSD_PER_DAY = 1e12;
+export const MAX_TRADE_ROUTE_CAPACITY_RUSD_PER_DAY = 1e12;
 
 /**
  * Trade uses only direct authored market pairs, so the route count is bounded by the
@@ -175,7 +175,7 @@ export const FX_PARITY_COOLDOWN_DAYS = 180;
 
 /**
  * Convertibility rule: the authority must hold at least this many months of the most
- * recently completed month's realized imports in SUSD reserves. Below it, convertibility
+ * recently completed month's realized imports in RUSD reserves. Below it, convertibility
  * is suspended and imports into the country's market are blocked (D-080).
  */
 export const FX_MIN_RESERVE_COVER_MONTHS = 0.5;
@@ -190,15 +190,15 @@ export const MAX_MILITARY_RELATIONS = 256;
 /** Maximum pending peace offers across all wars. */
 export const MAX_PEACE_OFFERS = 100;
 /** Recruitment signing cost per soldier, paid to the soldiers' region households. */
-export const M10_RECRUITMENT_COST_PER_SOLDIER_SUSD = 5;
+export const M10_RECRUITMENT_COST_PER_SOLDIER_RUSD = 5;
 /** Imported equipment price per equipment unit, paid to the system supplier. */
-export const M10_EQUIPMENT_PRICE_SUSD = 20;
+export const M10_EQUIPMENT_PRICE_RUSD = 20;
 /** Soldiers supported by one equipment unit. */
 export const M10_SOLDIERS_PER_EQUIPMENT_UNIT = 50;
 /** Daily pay per soldier while the formation exists. */
-export const M10_SOLDIER_DAILY_PAY_SUSD = 0.05;
+export const M10_SOLDIER_DAILY_PAY_RUSD = 0.05;
 /** Daily equipment upkeep per equipment unit. */
-export const M10_EQUIPMENT_DAILY_UPKEEP_SUSD = 0.02;
+export const M10_EQUIPMENT_DAILY_UPKEEP_RUSD = 0.02;
 /** Formation delay after recruitment before deployment is allowed. */
 export const M10_ARMY_FORMATION_DAYS = 14;
 /** Strategic deployment delay to any legal target region. */
@@ -206,7 +206,7 @@ export const M10_DEPLOYMENT_DAYS = 10;
 /** Days before wounded soldiers return to the roster. */
 export const M10_WOUND_RECOVERY_DAYS = 30;
 /** Daily garrison procurement per occupying soldier, paid in the occupied region. */
-export const M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_SUSD = 0.02;
+export const M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD = 0.02;
 /** Daily unrest increment in an occupied region. */
 export const M10_OCCUPATION_UNREST_PER_DAY = 0.002;
 /** Minimum organization when unpaid supply erodes cohesion. */
@@ -267,7 +267,7 @@ export const DEFAULT_DEBT_POLICY: Readonly<{
   creditorId: number;
   annualCouponRate: number;
   termDays: number;
-  maxOutstandingPrincipalSUSD: number;
+  maxOutstandingPrincipalRUSD: number;
   refinanceOnMaturity: boolean;
   arrearsGraceDays: number;
 }> = {
@@ -276,7 +276,7 @@ export const DEFAULT_DEBT_POLICY: Readonly<{
   creditorId: 0,
   annualCouponRate: 0.03,
   termDays: 1825,
-  maxOutstandingPrincipalSUSD: 0,
+  maxOutstandingPrincipalRUSD: 0,
   refinanceOnMaturity: false,
   arrearsGraceDays: 90,
 };
@@ -286,7 +286,7 @@ export const MAX_DEBT_COUPON_RATE = 1;
 export const MIN_DEBT_TERM_DAYS = 1;
 export const MAX_DEBT_TERM_DAYS = 36_500;
 export const MAX_DEBT_ARREARS_GRACE_DAYS = 3_650;
-export const MAX_DEBT_PRINCIPAL_SUSD = 1e15;
+export const MAX_DEBT_PRINCIPAL_RUSD = 1e15;
 
 /** Hard cap on simultaneously active/arrears debt contracts. */
 export const MAX_ACTIVE_DEBT_CONTRACTS = 64;
@@ -317,7 +317,7 @@ export const CONSTRUCTION_WORKING_CAPITAL_DAYS = 30;
  * contribution. This is a structural bound, not a budget target or calibrated
  * policy value; actual affordability remains the country treasury cash balance.
  */
-export const MAX_PUBLIC_ENTERPRISE_SUPPORT_SUSD = 1_000_000_000;
+export const MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD = 1_000_000_000;
 
 /**
  * M6 country-AI v1 constants. PROVISIONAL policy rules, not calibrated
@@ -373,7 +373,7 @@ export const DEFAULT_COUNTRY_AI_ENABLED = false;
 /**
  * M8 political-institution constants. PROVISIONAL structural rules and
  * coefficients, not historical calibration. All rates are dimensionless 0..1 or
- * documented SUSD amounts; no value is a spendable political pool.
+ * documented RUSD amounts; no value is a spendable political pool.
  */
 export const MAX_LAW_TRANSITIONS_PER_COUNTRY = 4;
 export const MAX_SCRIPTED_EVENTS = 256;
@@ -404,7 +404,7 @@ export const SUFFRAGE_MIN_AGE = 21;
  * funding-adequacy ratio is `fundedAnnual / (population * benchmark)`, clamped to
  * 1. This is a structural normaliser, not a claim about historical budgets.
  */
-export const ADMIN_FUNDING_PER_CAPITA_PER_YEAR_SUSD = 0.002;
+export const ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD = 0.002;
 
 /**
  * Provisional target share of clerks in the population. The staffing ratio is
@@ -475,7 +475,7 @@ export const MAX_INTEREST_GROUP_PROFESSION_WEIGHTS = 64;
 /**
  * M9 technology/education constants. PROVISIONAL structural rules, normalisers,
  * and coefficients, not historical calibration (D-077). Research work is measured
- * in researcher-days; education rates are dimensionless. All SUSD values are
+ * in researcher-days; education rates are dimensionless. All RUSD values are
  * nominal and use the same synthetic fiscal scale as the other policy normalisers.
  */
 
@@ -500,12 +500,12 @@ export const EDUCATION_SCHOOL_AGE_MAX = 14;
 export const EDUCATION_STUDENTS_PER_TEACHER = 25;
 
 /**
- * Provisional annual SUSD funding benchmark per academic staff member. Funding
+ * Provisional annual RUSD funding benchmark per academic staff member. Funding
  * adequacy is `fundedAnnual / (academicStaff × benchmark)`, clamped to 1. The
  * authored scenario's nominal fiscal scale is synthetic, so this normalises
  * funding to staff size rather than claiming a historical teacher salary.
  */
-export const EDUCATION_FUNDING_PER_STAFF_PER_YEAR_SUSD = 1;
+export const EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD = 1;
 
 /** Household attendance from wealth: base + weight × (wealthLevel / 99). */
 export const EDUCATION_ATTENDANCE_BASE = 0.45;
@@ -527,7 +527,7 @@ export const EDUCATION_QUALITY_LITERACY_WEIGHT = 0.4;
 export const EDUCATION_DAILY_LITERACY_GAIN = 0.0015;
 
 /** Numeric-safety bound for an education funding target. */
-export const MAX_EDUCATION_FUNDING_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+export const MAX_EDUCATION_FUNDING_RUSD_PER_YEAR = MAX_FISCAL_BUDGET_RUSD_PER_YEAR;
 
 /**
  * E5 labor/social constants. PROVISIONAL structural rules, normalisers, and
@@ -539,7 +539,7 @@ export const LABOR_STANDARD_HOURS_PER_WEEK = 60;
 /** Shortest recognized statutory week; keeps the hours factor in 0.4..1. */
 export const LABOR_MIN_HOURS_PER_WEEK = 24;
 /** Numeric-safety bound for an authored minimum-wage floor. */
-export const MAX_LABOR_MINIMUM_WAGE_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+export const MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR = MAX_FISCAL_BUDGET_RUSD_PER_YEAR;
 /** Numeric-safety bound for an authored working week. */
 export const MAX_LABOR_HOURS_PER_WEEK = 168;
 /** Fraction of output/income lost per hour removed from the baseline week. */
@@ -567,7 +567,7 @@ export const TRAINING_TIME_SHARE = 0.2;
  */
 export const TRAINING_DAILY_QUALIFICATION_GAIN = 0.01;
 /** Provisional annual provider cost per academic instructor. */
-export const TRAINING_INSTRUCTOR_COST_PER_YEAR_SUSD = 1;
+export const TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD = 1;
 /** Training-quality weights; they sum to 1. */
 export const TRAINING_QUALITY_FUNDING_WEIGHT = 0.5;
 export const TRAINING_QUALITY_LITERACY_WEIGHT = 0.3;
@@ -577,8 +577,8 @@ export const QUALIFICATION_WAGE_PREMIUM = 0.25;
 /** Labour-productivity premium at qualification 1. PROVISIONAL. */
 export const QUALIFICATION_PRODUCTIVITY_PREMIUM = 0.2;
 /** Numeric-safety bounds for training/stipend policy values. */
-export const MAX_TRAINING_BUDGET_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
-export const MAX_TRAINING_STIPEND_SUSD_PER_YEAR = MAX_FISCAL_BUDGET_SUSD_PER_YEAR;
+export const MAX_TRAINING_BUDGET_RUSD_PER_YEAR = MAX_FISCAL_BUDGET_RUSD_PER_YEAR;
+export const MAX_TRAINING_STIPEND_RUSD_PER_YEAR = MAX_FISCAL_BUDGET_RUSD_PER_YEAR;
 
 /**
  * E5 public-health constants. Public health is a share of the existing

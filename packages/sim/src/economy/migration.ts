@@ -21,7 +21,7 @@
  */
 
 import { assertValidDayIndex, dayIndexToCivilDate, isTerminalDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from "../population/constants.js";
 import {
   mergeBlockLiteracyByAge,
   populationTotal,
@@ -67,7 +67,7 @@ export interface MigrationFlow {
   readonly destinationRegionId: Id;
   readonly professionId: Id;
   readonly people: number;
-  readonly financialTransferSUSD: number;
+  readonly financialTransferRUSD: number;
 }
 
 export interface MigrationDayResult {
@@ -75,7 +75,7 @@ export interface MigrationDayResult {
   readonly dayIndex: DayIndex;
   readonly flows: readonly MigrationFlow[];
   readonly totalPeople: number;
-  readonly totalFinancialTransferSUSD: number;
+  readonly totalFinancialTransferRUSD: number;
   readonly sourceBlocksConsidered: number;
   readonly destinationsCappedByInflowLimit: number;
   /**
@@ -93,7 +93,7 @@ function emptyResult(dayIndex: DayIndex): MigrationDayResult {
     dayIndex,
     flows: [],
     totalPeople: 0,
-    totalFinancialTransferSUSD: 0,
+    totalFinancialTransferRUSD: 0,
     sourceBlocksConsidered: 0,
     destinationsCappedByInflowLimit: 0,
     employmentRefresh: null,
@@ -595,17 +595,17 @@ export function runMigrationPhase(
   }
 
   let totalPeople = 0;
-  let totalFinancialTransferSUSD = 0;
+  let totalFinancialTransferRUSD = 0;
   for (const flow of flows) {
     totalPeople += flow.people;
-    totalFinancialTransferSUSD += flow.financialTransferSUSD;
+    totalFinancialTransferRUSD += flow.financialTransferRUSD;
   }
   return {
     ran: true,
     dayIndex,
     flows,
     totalPeople,
-    totalFinancialTransferSUSD,
+    totalFinancialTransferRUSD,
     sourceBlocksConsidered,
     destinationsCappedByInflowLimit,
     employmentRefresh,
@@ -637,13 +637,13 @@ function applyFlow(
   const sourceAccount = householdAccount(world, source.id);
   const destinationAccount = householdAccount(world, destination.id);
   const transfer = Math.min(
-    sourceAccount.balanceSUSD,
+    sourceAccount.balanceRUSD,
     sourcePopulationBefore > 0
-      ? (sourceAccount.balanceSUSD * people) / sourcePopulationBefore
+      ? (sourceAccount.balanceRUSD * people) / sourcePopulationBefore
       : 0,
   );
   if (transfer < 0) throw new RangeError("migration transfer cannot be negative");
-  if (transfer > sourceAccount.balanceSUSD + MONEY_TOLERANCE_SUSD * Math.max(1, sourceAccount.balanceSUSD)) {
+  if (transfer > sourceAccount.balanceRUSD + MONEY_TOLERANCE_RUSD * Math.max(1, sourceAccount.balanceRUSD)) {
     throw new RangeError("migration transfer exceeds the source household's cash");
   }
   const cells = splitMigrantsByCell(source, people, sourcePopulationBefore, world, dayIndex);
@@ -653,8 +653,8 @@ function applyFlow(
       {
         transactionKind: "migration-transfer",
         lines: [
-          { accountId: destinationAccount.id, side: "debit", amountSUSD: transfer },
-          { accountId: sourceAccount.id, side: "credit", amountSUSD: transfer },
+          { accountId: destinationAccount.id, side: "debit", amountRUSD: transfer },
+          { accountId: sourceAccount.id, side: "credit", amountRUSD: transfer },
         ],
         sourceEntityId: source.id,
         targetEntityId: destination.id,
@@ -718,7 +718,7 @@ function applyFlow(
     destinationRegionId: destination.regionId,
     professionId: source.professionId,
     people,
-    financialTransferSUSD: transfer,
+    financialTransferRUSD: transfer,
   });
 }
 

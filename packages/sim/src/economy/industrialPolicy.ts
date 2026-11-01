@@ -11,7 +11,7 @@
  */
 
 import { assertValidDayIndex } from "../calendar.js";
-import { MONEY_TOLERANCE_SUSD } from "../population/constants.js";
+import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { requireFiniteNumber } from "../validation.js";
 import type { DayIndex, Id } from "../types.js";
 import { assertValidWorld, type World } from "../world.js";
@@ -24,7 +24,7 @@ import {
 } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import {
-  MAX_PUBLIC_ENTERPRISE_SUPPORT_SUSD,
+  MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD,
 } from "./constants.js";
 import { assertValidIndustrialPolicy } from "./country.js";
 import { assertValidFinanceState } from "./validation.js";
@@ -33,7 +33,7 @@ import type { BuildingInstance, Country, IndustrialPolicy } from "./types.js";
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
   for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_SUSD * scale;
+  return MONEY_TOLERANCE_RUSD * scale;
 }
 
 function countryFor(world: World, countryId: Id): Country {
@@ -78,7 +78,7 @@ export function setIndustrialPolicy(
 export interface PublicEnterpriseSupportInput {
   readonly countryId: Id;
   readonly buildingId: Id;
-  readonly amountSUSD: number;
+  readonly amountRUSD: number;
 }
 
 /** Validate a public-enterprise capital contribution without mutating. */
@@ -100,18 +100,18 @@ export function validatePublicEnterpriseSupport(
   if (building.ownerAccountId !== country.treasuryAccountId) {
     throw new RangeError("the state-owned building must be owned by this country treasury");
   }
-  const amount = requireFiniteNumber(input.amountSUSD, "action.amountSUSD");
+  const amount = requireFiniteNumber(input.amountRUSD, "action.amountRUSD");
   if (!(amount > 0)) {
     throw new RangeError("public-enterprise support amount must be positive");
   }
-  if (amount > MAX_PUBLIC_ENTERPRISE_SUPPORT_SUSD) {
+  if (amount > MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD) {
     throw new RangeError(
-      `public-enterprise support amount must not exceed ${String(MAX_PUBLIC_ENTERPRISE_SUPPORT_SUSD)}`,
+      `public-enterprise support amount must not exceed ${String(MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD)}`,
     );
   }
   const index = buildFinanceIndex(world.finance);
   const treasury = index.get("country", country.id, "treasury-cash");
-  if (treasury.balanceSUSD + toleranceMoney(treasury.balanceSUSD, amount) < amount) {
+  if (treasury.balanceRUSD + toleranceMoney(treasury.balanceRUSD, amount) < amount) {
     throw new RangeError("treasury cash does not cover the public-enterprise support");
   }
   return building;
@@ -122,7 +122,7 @@ export function supportPublicEnterprise(
   world: World,
   input: PublicEnterpriseSupportInput,
   dayIndex: DayIndex,
-): { building: BuildingInstance; amountSUSD: number; postingIds: readonly number[] } {
+): { building: BuildingInstance; amountRUSD: number; postingIds: readonly number[] } {
   assertValidDayIndex(dayIndex);
   if (world.dayIndex !== dayIndex) {
     throw new RangeError("public-enterprise support day must match the world day");
@@ -139,17 +139,17 @@ export function supportPublicEnterprise(
     {
       transactionKind: "public-enterprise-capital-contribution",
       lines: [
-        { accountId: treasury.id, side: "credit", amountSUSD: input.amountSUSD },
-        { accountId: countryEquity.id, side: "debit", amountSUSD: input.amountSUSD },
-        { accountId: buildingCash.id, side: "debit", amountSUSD: input.amountSUSD },
-        { accountId: buildingEquity.id, side: "credit", amountSUSD: input.amountSUSD },
+        { accountId: treasury.id, side: "credit", amountRUSD: input.amountRUSD },
+        { accountId: countryEquity.id, side: "debit", amountRUSD: input.amountRUSD },
+        { accountId: buildingCash.id, side: "debit", amountRUSD: input.amountRUSD },
+        { accountId: buildingEquity.id, side: "credit", amountRUSD: input.amountRUSD },
       ],
       sourceEntityId: country.id,
       targetEntityId: building.id,
     },
   ]);
   accumulateBudgetMemo(stagedFinance, country.id, {
-    publicEnterpriseSupportSUSD: input.amountSUSD,
+    publicEnterpriseSupportRUSD: input.amountRUSD,
   });
   assertValidFinanceState(stagedFinance);
   assertAccountingIdentity(stagedFinance);
@@ -163,7 +163,7 @@ export function supportPublicEnterprise(
   world.finance = stagedFinance;
   return {
     building,
-    amountSUSD: input.amountSUSD,
+    amountRUSD: input.amountRUSD,
     postingIds: postings.map((posting) => posting.id),
   };
 }

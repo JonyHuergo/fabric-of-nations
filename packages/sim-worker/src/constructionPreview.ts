@@ -15,8 +15,8 @@ export interface ConstructionMaterialPreview {
   readonly unitLabel: string;
   readonly requiredQuantity: number;
   readonly marketStock: number;
-  readonly unitPriceSUSD: number;
-  readonly estimatedCostSUSD: number;
+  readonly unitPriceRUSD: number;
+  readonly estimatedCostRUSD: number;
   readonly shortfallQuantity: number;
 }
 
@@ -26,19 +26,19 @@ export interface ConstructionPreview {
   readonly regionId: number;
   readonly valid: boolean;
   readonly errors: readonly string[];
-  readonly costSUSD: number;
-  readonly workingCapitalSUSD: number;
-  readonly treasuryCashSUSD: number;
-  readonly upfrontRequirementSUSD: number;
+  readonly costRUSD: number;
+  readonly workingCapitalRUSD: number;
+  readonly treasuryCashRUSD: number;
+  readonly upfrontRequirementRUSD: number;
   readonly materials: readonly ConstructionMaterialPreview[];
-  readonly estimatedMaterialsCostSUSD: number;
-  readonly totalInvestmentSUSD: number;
+  readonly estimatedMaterialsCostRUSD: number;
+  readonly totalInvestmentRUSD: number;
   readonly activeProjects: number;
   readonly maxActiveProjects: number;
   readonly idleWorkers: number;
   readonly desiredCrew: number;
-  readonly dailyWageEstimateSUSD: number;
-  readonly estimatedDailyPayrollSUSD: number;
+  readonly dailyWageEstimateRUSD: number;
+  readonly estimatedDailyPayrollRUSD: number;
   /** Whole days at the current idle crew, or null when no worker is available. */
   readonly estimatedDays: number | null;
   readonly constraints: readonly string[];
@@ -79,17 +79,17 @@ export function previewConstruction(
       `The active-project cap of ${String(MAX_ACTIVE_CONSTRUCTION_PROJECTS)} is reached.`,
     );
   }
-  const cost = projectType?.constructionCostSUSD ?? 0;
-  const workingCapital = projectType?.workingCapitalSUSD ?? 0;
+  const cost = projectType?.constructionCostRUSD ?? 0;
+  const workingCapital = projectType?.workingCapitalRUSD ?? 0;
   const upfront = cost + workingCapital;
-  if (country.treasuryCashSUSD + 1e-6 < upfront) {
+  if (country.treasuryCashRUSD + 1e-6 < upfront) {
     errors.push(
-      `Treasury cash ${country.treasuryCashSUSD.toFixed(2)} does not cover the ${upfront.toFixed(2)} SUSD cost plus working capital.`,
+      `Treasury cash ${country.treasuryCashRUSD.toFixed(2)} does not cover the ${upfront.toFixed(2)} RUSD cost plus working capital.`,
     );
   }
   const idleWorkers = country.constructionLabor.idleWorkers;
   const desiredCrew = Math.min(projectType?.constructionWorkers ?? 0, idleWorkers);
-  const dailyWage = country.constructionLabor.dailyWageSUSD;
+  const dailyWage = country.constructionLabor.dailyWageRUSD;
   const dailyPayroll = desiredCrew * dailyWage;
   const estimatedDays =
     dailyPayroll > 0 && cost > 0 ? Math.ceil(cost / dailyPayroll) : null;
@@ -99,7 +99,7 @@ export function previewConstruction(
   );
   const materials = (projectType?.materials ?? []).map((material) => {
     const marketPrice = priceByGood.get(material.goodId);
-    const unitPrice = marketPrice?.priceSUSD ?? 0;
+    const unitPrice = marketPrice?.priceRUSD ?? 0;
     const marketStock = marketPrice?.stockQuantity ?? 0;
     return {
       goodId: material.goodId,
@@ -107,13 +107,13 @@ export function previewConstruction(
       unitLabel: material.unitLabel,
       requiredQuantity: material.quantity,
       marketStock,
-      unitPriceSUSD: unitPrice,
-      estimatedCostSUSD: material.quantity * unitPrice,
+      unitPriceRUSD: unitPrice,
+      estimatedCostRUSD: material.quantity * unitPrice,
       shortfallQuantity: Math.max(0, material.quantity - marketStock),
     };
   });
   const estimatedMaterialsCost = materials.reduce(
-    (total, material) => total + material.estimatedCostSUSD,
+    (total, material) => total + material.estimatedCostRUSD,
     0,
   );
   const totalInvestment = cost + workingCapital + estimatedMaterialsCost;
@@ -143,19 +143,19 @@ export function previewConstruction(
     regionId,
     valid: errors.length === 0,
     errors,
-    costSUSD: cost,
-    workingCapitalSUSD: workingCapital,
-    treasuryCashSUSD: country.treasuryCashSUSD,
-    upfrontRequirementSUSD: upfront,
+    costRUSD: cost,
+    workingCapitalRUSD: workingCapital,
+    treasuryCashRUSD: country.treasuryCashRUSD,
+    upfrontRequirementRUSD: upfront,
     materials,
-    estimatedMaterialsCostSUSD: estimatedMaterialsCost,
-    totalInvestmentSUSD: totalInvestment,
+    estimatedMaterialsCostRUSD: estimatedMaterialsCost,
+    totalInvestmentRUSD: totalInvestment,
     activeProjects,
     maxActiveProjects: MAX_ACTIVE_CONSTRUCTION_PROJECTS,
     idleWorkers,
     desiredCrew,
-    dailyWageEstimateSUSD: dailyWage,
-    estimatedDailyPayrollSUSD: dailyPayroll,
+    dailyWageEstimateRUSD: dailyWage,
+    estimatedDailyPayrollRUSD: dailyPayroll,
     estimatedDays,
     constraints,
   };

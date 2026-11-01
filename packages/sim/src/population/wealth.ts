@@ -55,8 +55,8 @@ function tierSummary(
 
 function luxuryFulfillmentRatio(blockNeeds: PopBlockNeedsResult | undefined): number {
   const summary = tierSummary(blockNeeds, "luxury");
-  if (summary === undefined || !summary.active || summary.desiredCostSUSD <= 0) return 0;
-  return clamp(summary.spentSUSD / summary.desiredCostSUSD, 0, 1);
+  if (summary === undefined || !summary.active || summary.desiredCostRUSD <= 0) return 0;
+  return clamp(summary.spentRUSD / summary.desiredCostRUSD, 0, 1);
 }
 
 /**
@@ -82,7 +82,7 @@ export function updateMonthlyWealth(
   for (const blockNeeds of needs.blocks) needsByBlock.set(blockNeeds.popBlockId, blockNeeds);
   const incomeById = new Map<
     number,
-    { annualSettledIncomePerCapitaSUSD: number; annualMandatoryPaymentsPerCapitaSUSD: number }
+    { annualSettledIncomePerCapitaRUSD: number; annualMandatoryPaymentsPerCapitaRUSD: number }
   >();
   for (const income of inputs.income) incomeById.set(income.popBlockId, income);
 
@@ -104,7 +104,7 @@ export function updateMonthlyWealth(
     }
     const annualDisposable = Math.max(
       0,
-      income.annualSettledIncomePerCapitaSUSD - income.annualMandatoryPaymentsPerCapitaSUSD,
+      income.annualSettledIncomePerCapitaRUSD - income.annualMandatoryPaymentsPerCapitaRUSD,
     );
     const ratio = annualDisposable / subsistenceCost;
     const baseTarget = clamp(
@@ -129,8 +129,8 @@ export function updateMonthlyWealth(
       oldWealthLevel: block.wealthLevel,
       targetWealthLevel: roundTo(baseTarget, WEALTH_DECIMAL_PLACES),
       newWealthLevel: newWealth,
-      annualDisposableIncomePerCapitaSUSD: annualDisposable,
-      annualSubsistenceCostPerCapitaSUSD: subsistenceCost,
+      annualDisposableIncomePerCapitaRUSD: annualDisposable,
+      annualSubsistenceCostPerCapitaRUSD: subsistenceCost,
     });
     block.wealthLevel = newWealth;
   }
@@ -151,7 +151,7 @@ export function updateDailyMilitancy(
     const comfortRelief = saturate(block.comfortFulfilledDays, MILITANCY_SCALE_DAYS);
     const luxuryRelief =
       luxury !== undefined && luxury.active
-        ? clamp(luxury.spentSUSD / Math.max(luxury.desiredCostSUSD, WEALTH_TARGET_EPSILON), 0, 1)
+        ? clamp(luxury.spentRUSD / Math.max(luxury.desiredCostRUSD, WEALTH_TARGET_EPSILON), 0, 1)
         : 0;
 
     const target = clamp(
