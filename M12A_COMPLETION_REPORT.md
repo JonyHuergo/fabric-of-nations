@@ -258,6 +258,12 @@ population/economy simulation and the player-facing treaty UI are future work.
 
 ## 20. Commit hashes and working-tree status
 
-See the final answer / git log for the implementation commit hash and the
-working-tree status after the verification run.
+- Implementation commit: **5bf68c1** (`feat: implement M12a European provincial
+  system`).
+- Working tree after the implementation commit: clean except the two pre-existing
+  untracked cache notes `.cache-regions.md` and `.cache-regions-utf8.md`, which
+  were not created by this milestone and are deliberately not committed.
+- Verification was run against commit 5bf68c1 plus this report-only follow-up;
+  no source or data file changed after the recorded test, typecheck, lint and
+  export runs other than the report text.
 
