@@ -39454,5 +39454,11197 @@ export const WORLD_SCENARIO = ({
       "confidence": "low",
       "notes": "British protectorate, not independent. M11c separates Sarawak from British Malaya using the modern Malaysian state boundary. Population is a rounded estimate."
     }
-  ]
+  ],
+  "provinces": {
+    "definitions": [
+      {
+        "provinceId": 1001,
+        "key": "gbr-northumberland-and-durham",
+        "historicalName": "Northumberland and Durham",
+        "displayName": "Northumberland and Durham",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1002,
+        "key": "gbr-lancashire-and-cheshire",
+        "historicalName": "Lancashire and Cheshire",
+        "displayName": "Lancashire and Cheshire",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1003,
+        "key": "gbr-yorkshire",
+        "historicalName": "Yorkshire",
+        "displayName": "Yorkshire",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1004,
+        "key": "gbr-derbyshire-and-nottinghamshire",
+        "historicalName": "Derbyshire and Nottinghamshire",
+        "displayName": "Derbyshire and Nottinghamshire",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1005,
+        "key": "gbr-staffordshire-and-warwickshire",
+        "historicalName": "Staffordshire and Warwickshire",
+        "displayName": "Staffordshire and Warwickshire",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1006,
+        "key": "gbr-east-anglia-and-essex",
+        "historicalName": "East Anglia and Essex",
+        "displayName": "East Anglia and Essex",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1007,
+        "key": "gbr-middlesex-and-london",
+        "historicalName": "Middlesex and London",
+        "displayName": "Middlesex and London",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1008,
+        "key": "gbr-surrey-kent-and-sussex",
+        "historicalName": "Surrey, Kent and Sussex",
+        "displayName": "Surrey, Kent and Sussex",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic English counties for map legibility; the 1900 boundary follows the M11c United Kingdom polygon."
+      },
+      {
+        "provinceId": 1009,
+        "key": "gbr-devon-and-cornwall",
+        "historicalName": "Devon and Cornwall",
+        "displayName": "Devon and Cornwall",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The south-western English peninsula of Devon and Cornwall, grouped from historic counties for map legibility."
+      },
+      {
+        "provinceId": 1010,
+        "key": "gbr-wessex",
+        "historicalName": "Wessex",
+        "displayName": "Wessex",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic English county grouping",
+        "historicalGrouping": "England",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Wessex group of historic southern English counties (Dorset, Somerset, Wiltshire, Hampshire, Berkshire and Gloucestershire)."
+      },
+      {
+        "provinceId": 1011,
+        "key": "gbr-north-wales",
+        "historicalName": "North Wales",
+        "displayName": "North Wales",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Welsh county grouping",
+        "historicalGrouping": "Wales",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Welsh counties; Wales is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1012,
+        "key": "gbr-mid-wales",
+        "historicalName": "Mid Wales",
+        "displayName": "Mid Wales",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Welsh county grouping",
+        "historicalGrouping": "Wales",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Welsh counties; Wales is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1013,
+        "key": "gbr-south-wales",
+        "historicalName": "South Wales",
+        "displayName": "South Wales",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Welsh county grouping",
+        "historicalGrouping": "Wales",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Welsh counties; Wales is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1014,
+        "key": "gbr-highlands-and-islands",
+        "historicalName": "Highlands and Islands",
+        "displayName": "Highlands and Islands",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Scottish county grouping",
+        "historicalGrouping": "Scotland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Scottish counties; Scotland is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1015,
+        "key": "gbr-north-east-scotland",
+        "historicalName": "North East Scotland",
+        "displayName": "North East Scotland",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Scottish county grouping",
+        "historicalGrouping": "Scotland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Scottish counties; Scotland is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1016,
+        "key": "gbr-east-scotland",
+        "historicalName": "East Scotland",
+        "displayName": "East Scotland",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Scottish county grouping",
+        "historicalGrouping": "Scotland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Scottish counties; Scotland is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1017,
+        "key": "gbr-south-west-scotland",
+        "historicalName": "South West Scotland",
+        "displayName": "South West Scotland",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Scottish county grouping",
+        "historicalGrouping": "Scotland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of historic Scottish counties; Scotland is a distinct 1900 constituent country."
+      },
+      {
+        "provinceId": 1018,
+        "key": "gbr-ni-antrim",
+        "historicalName": "County Antrim",
+        "displayName": "County Antrim",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1019,
+        "key": "gbr-ni-down",
+        "historicalName": "County Down",
+        "displayName": "County Down",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1020,
+        "key": "gbr-ni-armagh",
+        "historicalName": "County Armagh",
+        "displayName": "County Armagh",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1021,
+        "key": "gbr-ni-fermanagh",
+        "historicalName": "County Fermanagh",
+        "displayName": "County Fermanagh",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1022,
+        "key": "gbr-ni-londonderry",
+        "historicalName": "County Londonderry",
+        "displayName": "County Londonderry",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1023,
+        "key": "gbr-ni-tyrone",
+        "historicalName": "County Tyrone",
+        "displayName": "County Tyrone",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland (Northern Ireland)",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the six counties that formed Northern Ireland under the Government of Ireland Act 1920. In 1900 it is an ordinary Irish county of the United Kingdom."
+      },
+      {
+        "provinceId": 1024,
+        "key": "gbr-ie-clare",
+        "historicalName": "County Clare",
+        "displayName": "County Clare",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1025,
+        "key": "gbr-ie-cavan",
+        "historicalName": "County Cavan",
+        "displayName": "County Cavan",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1026,
+        "key": "gbr-ie-cork",
+        "historicalName": "County Cork",
+        "displayName": "County Cork",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1027,
+        "key": "gbr-ie-carlow",
+        "historicalName": "County Carlow",
+        "displayName": "County Carlow",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1028,
+        "key": "gbr-ie-dublin",
+        "historicalName": "County Dublin",
+        "displayName": "County Dublin",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1029,
+        "key": "gbr-ie-donegal",
+        "historicalName": "County Donegal",
+        "displayName": "County Donegal",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1030,
+        "key": "gbr-ie-galway",
+        "historicalName": "County Galway",
+        "displayName": "County Galway",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1031,
+        "key": "gbr-ie-kildare",
+        "historicalName": "County Kildare",
+        "displayName": "County Kildare",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1032,
+        "key": "gbr-ie-kilkenny",
+        "historicalName": "County Kilkenny",
+        "displayName": "County Kilkenny",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1033,
+        "key": "gbr-ie-kerry",
+        "historicalName": "County Kerry",
+        "displayName": "County Kerry",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1034,
+        "key": "gbr-ie-longford",
+        "historicalName": "County Longford",
+        "displayName": "County Longford",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1035,
+        "key": "gbr-ie-louth",
+        "historicalName": "County Louth",
+        "displayName": "County Louth",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1036,
+        "key": "gbr-ie-limerick",
+        "historicalName": "County Limerick",
+        "displayName": "County Limerick",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1037,
+        "key": "gbr-ie-leitrim",
+        "historicalName": "County Leitrim",
+        "displayName": "County Leitrim",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1038,
+        "key": "gbr-ie-laois",
+        "historicalName": "County Laois",
+        "displayName": "County Laois",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1039,
+        "key": "gbr-ie-meath",
+        "historicalName": "County Meath",
+        "displayName": "County Meath",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1040,
+        "key": "gbr-ie-monaghan",
+        "historicalName": "County Monaghan",
+        "displayName": "County Monaghan",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1041,
+        "key": "gbr-ie-mayo",
+        "historicalName": "County Mayo",
+        "displayName": "County Mayo",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1042,
+        "key": "gbr-ie-offaly",
+        "historicalName": "County Offaly",
+        "displayName": "County Offaly",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1043,
+        "key": "gbr-ie-roscommon",
+        "historicalName": "County Roscommon",
+        "displayName": "County Roscommon",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1044,
+        "key": "gbr-ie-sligo",
+        "historicalName": "County Sligo",
+        "displayName": "County Sligo",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1045,
+        "key": "gbr-ie-tipperary",
+        "historicalName": "County Tipperary",
+        "displayName": "County Tipperary",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1046,
+        "key": "gbr-ie-waterford",
+        "historicalName": "County Waterford",
+        "displayName": "County Waterford",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1047,
+        "key": "gbr-ie-westmeath",
+        "historicalName": "County Westmeath",
+        "displayName": "County Westmeath",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1048,
+        "key": "gbr-ie-wicklow",
+        "historicalName": "County Wicklow",
+        "displayName": "County Wicklow",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 1049,
+        "key": "gbr-ie-wexford",
+        "historicalName": "County Wexford",
+        "displayName": "County Wexford",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 1,
+        "historicalAdminAffiliation": "Historic Irish county",
+        "historicalGrouping": "Ireland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "One of the twenty-six counties that formed the Irish Free State in 1922. In 1900 Ireland is part of the United Kingdom."
+      },
+      {
+        "provinceId": 3001,
+        "key": "fra-nord",
+        "historicalName": "Nord",
+        "displayName": "Nord",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3002,
+        "key": "fra-ardennes",
+        "historicalName": "Ardennes",
+        "displayName": "Ardennes",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3003,
+        "key": "fra-aisne",
+        "historicalName": "Aisne",
+        "displayName": "Aisne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3004,
+        "key": "fra-meuse",
+        "historicalName": "Meuse",
+        "displayName": "Meuse",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3005,
+        "key": "fra-meurthe-et-moselle",
+        "historicalName": "Meurthe-et-Moselle",
+        "displayName": "Meurthe-et-Moselle",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3006,
+        "key": "fra-alpes-maritimes",
+        "historicalName": "Alpes-Maritimes",
+        "displayName": "Alpes-Maritimes",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3007,
+        "key": "fra-alpes-de-haute-provence",
+        "historicalName": "Alpes-de-Haute-Provence",
+        "displayName": "Alpes-de-Haute-Provence",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3008,
+        "key": "fra-hautes-alpes",
+        "historicalName": "Hautes-Alpes",
+        "displayName": "Hautes-Alpes",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3009,
+        "key": "fra-savoie",
+        "historicalName": "Savoie",
+        "displayName": "Savoie",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3010,
+        "key": "fra-haute-savoie",
+        "historicalName": "Haute-Savoie",
+        "displayName": "Haute-Savoie",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3011,
+        "key": "fra-pyrenees-atlantiques",
+        "historicalName": "Pyrénées-Atlantiques",
+        "displayName": "Pyrénées-Atlantiques",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3012,
+        "key": "fra-haute-garonne",
+        "historicalName": "Haute-Garonne",
+        "displayName": "Haute-Garonne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3013,
+        "key": "fra-hautes-pyrenees",
+        "historicalName": "Hautes-Pyrénées",
+        "displayName": "Hautes-Pyrénées",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3014,
+        "key": "fra-ariege",
+        "historicalName": "Ariège",
+        "displayName": "Ariège",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3015,
+        "key": "fra-pyrenees-orientales",
+        "historicalName": "Pyrénées-Orientales",
+        "displayName": "Pyrénées-Orientales",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3016,
+        "key": "fra-territoire-de-belfort",
+        "historicalName": "Territoire de Belfort",
+        "displayName": "Territoire de Belfort",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3017,
+        "key": "fra-doubs",
+        "historicalName": "Doubs",
+        "displayName": "Doubs",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3018,
+        "key": "fra-ain",
+        "historicalName": "Ain",
+        "displayName": "Ain",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3019,
+        "key": "fra-jura",
+        "historicalName": "Jura",
+        "displayName": "Jura",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3020,
+        "key": "fra-var",
+        "historicalName": "Var",
+        "displayName": "Var",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3021,
+        "key": "fra-bouches-du-rhone",
+        "historicalName": "Bouches-du-Rhône",
+        "displayName": "Bouches-du-Rhône",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3022,
+        "key": "fra-gard",
+        "historicalName": "Gard",
+        "displayName": "Gard",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3023,
+        "key": "fra-herault",
+        "historicalName": "Hérault",
+        "displayName": "Hérault",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3024,
+        "key": "fra-aude",
+        "historicalName": "Aude",
+        "displayName": "Aude",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3025,
+        "key": "fra-landes",
+        "historicalName": "Landes",
+        "displayName": "Landes",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3026,
+        "key": "fra-gironde",
+        "historicalName": "Gironde",
+        "displayName": "Gironde",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3027,
+        "key": "fra-charente-maritime",
+        "historicalName": "Charente-Maritime",
+        "displayName": "Charente-Maritime",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3028,
+        "key": "fra-vendee",
+        "historicalName": "Vendée",
+        "displayName": "Vendée",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3029,
+        "key": "fra-loire-atlantique",
+        "historicalName": "Loire-Atlantique",
+        "displayName": "Loire-Atlantique",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3030,
+        "key": "fra-morbihan",
+        "historicalName": "Morbihan",
+        "displayName": "Morbihan",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3031,
+        "key": "fra-finistere",
+        "historicalName": "Finistère",
+        "displayName": "Finistère",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3032,
+        "key": "fra-cotes-d-armor",
+        "historicalName": "Côtes-d'Armor",
+        "displayName": "Côtes-d'Armor",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3033,
+        "key": "fra-ille-et-vilaine",
+        "historicalName": "Ille-et-Vilaine",
+        "displayName": "Ille-et-Vilaine",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3034,
+        "key": "fra-manche",
+        "historicalName": "Manche",
+        "displayName": "Manche",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3035,
+        "key": "fra-calvados",
+        "historicalName": "Calvados",
+        "displayName": "Calvados",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3036,
+        "key": "fra-eure",
+        "historicalName": "Eure",
+        "displayName": "Eure",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3037,
+        "key": "fra-seine-maritime",
+        "historicalName": "Seine-Maritime",
+        "displayName": "Seine-Maritime",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3038,
+        "key": "fra-somme",
+        "historicalName": "Somme",
+        "displayName": "Somme",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3039,
+        "key": "fra-pas-de-calais",
+        "historicalName": "Pas-de-Calais",
+        "displayName": "Pas-de-Calais",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3040,
+        "key": "fra-haute-corse",
+        "historicalName": "Haute-Corse",
+        "displayName": "Haute-Corse",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3041,
+        "key": "fra-corse-du-sud",
+        "historicalName": "Corse-du-Sud",
+        "displayName": "Corse-du-Sud",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3042,
+        "key": "fra-gers",
+        "historicalName": "Gers",
+        "displayName": "Gers",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3043,
+        "key": "fra-haute-vienne",
+        "historicalName": "Haute-Vienne",
+        "displayName": "Haute-Vienne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3044,
+        "key": "fra-correze",
+        "historicalName": "Corrèze",
+        "displayName": "Corrèze",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3045,
+        "key": "fra-tarn-et-garonne",
+        "historicalName": "Tarn-et-Garonne",
+        "displayName": "Tarn-et-Garonne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3046,
+        "key": "fra-tarn",
+        "historicalName": "Tarn",
+        "displayName": "Tarn",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3047,
+        "key": "fra-isere",
+        "historicalName": "Isère",
+        "displayName": "Isère",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3048,
+        "key": "fra-drome",
+        "historicalName": "Drôme",
+        "displayName": "Drôme",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3049,
+        "key": "fra-aveyron",
+        "historicalName": "Aveyron",
+        "displayName": "Aveyron",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3050,
+        "key": "fra-lot",
+        "historicalName": "Lot",
+        "displayName": "Lot",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3051,
+        "key": "fra-indre-et-loire",
+        "historicalName": "Indre-et-Loire",
+        "displayName": "Indre-et-Loire",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3052,
+        "key": "fra-indre",
+        "historicalName": "Indre",
+        "displayName": "Indre",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3053,
+        "key": "fra-loir-et-cher",
+        "historicalName": "Loir-et-Cher",
+        "displayName": "Loir-et-Cher",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3054,
+        "key": "fra-creuse",
+        "historicalName": "Creuse",
+        "displayName": "Creuse",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3055,
+        "key": "fra-mayenne",
+        "historicalName": "Mayenne",
+        "displayName": "Mayenne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3056,
+        "key": "fra-sarthe",
+        "historicalName": "Sarthe",
+        "displayName": "Sarthe",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3057,
+        "key": "fra-vaucluse",
+        "historicalName": "Vaucluse",
+        "displayName": "Vaucluse",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3058,
+        "key": "fra-haute-marne",
+        "historicalName": "Haute-Marne",
+        "displayName": "Haute-Marne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3059,
+        "key": "fra-marne",
+        "historicalName": "Marne",
+        "displayName": "Marne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3060,
+        "key": "fra-dordogne",
+        "historicalName": "Dordogne",
+        "displayName": "Dordogne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3061,
+        "key": "fra-rhone",
+        "historicalName": "Rhône",
+        "displayName": "Rhône",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3062,
+        "key": "fra-vosges",
+        "historicalName": "Vosges",
+        "displayName": "Vosges",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3063,
+        "key": "fra-ardeche",
+        "historicalName": "Ardèche",
+        "displayName": "Ardèche",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3064,
+        "key": "fra-loire",
+        "historicalName": "Loire",
+        "displayName": "Loire",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3065,
+        "key": "fra-puy-de-dome",
+        "historicalName": "Puy-de-Dôme",
+        "displayName": "Puy-de-Dôme",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3066,
+        "key": "fra-allier",
+        "historicalName": "Allier",
+        "displayName": "Allier",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3067,
+        "key": "fra-loiret",
+        "historicalName": "Loiret",
+        "displayName": "Loiret",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3068,
+        "key": "fra-maine-et-loire",
+        "historicalName": "Maine-et-Loire",
+        "displayName": "Maine-et-Loire",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3069,
+        "key": "fra-aube",
+        "historicalName": "Aube",
+        "displayName": "Aube",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3070,
+        "key": "fra-paris",
+        "historicalName": "Paris",
+        "displayName": "Paris",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3071,
+        "key": "fra-hauts-de-seine",
+        "historicalName": "Hauts-de-Seine",
+        "displayName": "Hauts-de-Seine",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3072,
+        "key": "fra-seine-saint-denis",
+        "historicalName": "Seine-Saint-Denis",
+        "displayName": "Seine-Saint-Denis",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3073,
+        "key": "fra-val-d-oise",
+        "historicalName": "Val-d'Oise",
+        "displayName": "Val-d'Oise",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3074,
+        "key": "fra-yvelines",
+        "historicalName": "Yvelines",
+        "displayName": "Yvelines",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3075,
+        "key": "fra-charente",
+        "historicalName": "Charente",
+        "displayName": "Charente",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3076,
+        "key": "fra-cher",
+        "historicalName": "Cher",
+        "displayName": "Cher",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3077,
+        "key": "fra-eure-et-loir",
+        "historicalName": "Eure-et-Loir",
+        "displayName": "Eure-et-Loir",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3078,
+        "key": "fra-haute-loire",
+        "historicalName": "Haute-Loire",
+        "displayName": "Haute-Loire",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3079,
+        "key": "fra-cantal",
+        "historicalName": "Cantal",
+        "displayName": "Cantal",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3080,
+        "key": "fra-lot-et-garonne",
+        "historicalName": "Lot-et-Garonne",
+        "displayName": "Lot-et-Garonne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3081,
+        "key": "fra-lozere",
+        "historicalName": "Lozère",
+        "displayName": "Lozère",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3082,
+        "key": "fra-nievre",
+        "historicalName": "Nièvre",
+        "displayName": "Nièvre",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3083,
+        "key": "fra-cote-d-or",
+        "historicalName": "Côte-d'Or",
+        "displayName": "Côte-d'Or",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3084,
+        "key": "fra-oise",
+        "historicalName": "Oise",
+        "displayName": "Oise",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3085,
+        "key": "fra-orne",
+        "historicalName": "Orne",
+        "displayName": "Orne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3086,
+        "key": "fra-haute-saone",
+        "historicalName": "Haute-Saône",
+        "displayName": "Haute-Saône",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3087,
+        "key": "fra-saone-et-loire",
+        "historicalName": "Saône-et-Loire",
+        "displayName": "Saône-et-Loire",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3088,
+        "key": "fra-deux-sevres",
+        "historicalName": "Deux-Sèvres",
+        "displayName": "Deux-Sèvres",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3089,
+        "key": "fra-vienne",
+        "historicalName": "Vienne",
+        "displayName": "Vienne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3090,
+        "key": "fra-yonne",
+        "historicalName": "Yonne",
+        "displayName": "Yonne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3091,
+        "key": "fra-essonne",
+        "historicalName": "Essonne",
+        "displayName": "Essonne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3092,
+        "key": "fra-seien-et-marne",
+        "historicalName": "Seien-et-Marne",
+        "displayName": "Seien-et-Marne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 3093,
+        "key": "fra-val-de-marne",
+        "historicalName": "Val-de-Marne",
+        "displayName": "Val-de-Marne",
+        "aliases": [],
+        "initialOwnerPolityId": 3,
+        "simulationRegionId": 3,
+        "historicalAdminAffiliation": "French department",
+        "historicalGrouping": "Metropolitan France",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A French department on the 1900 map; the department boundary is a modern proxy for the historical department."
+      },
+      {
+        "provinceId": 6001,
+        "key": "ita-piedmont",
+        "historicalName": "Piedmont",
+        "displayName": "Piedmont",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6002,
+        "key": "ita-aosta",
+        "historicalName": "Aosta",
+        "displayName": "Aosta",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6003,
+        "key": "ita-liguria",
+        "historicalName": "Liguria",
+        "displayName": "Liguria",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6004,
+        "key": "ita-lombardy",
+        "historicalName": "Lombardy",
+        "displayName": "Lombardy",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6005,
+        "key": "ita-venetia",
+        "historicalName": "Venetia",
+        "displayName": "Venetia",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6006,
+        "key": "ita-emilia-romagna",
+        "historicalName": "Emilia-Romagna",
+        "displayName": "Emilia-Romagna",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6007,
+        "key": "ita-tuscany",
+        "historicalName": "Tuscany",
+        "displayName": "Tuscany",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6008,
+        "key": "ita-umbria",
+        "historicalName": "Umbria",
+        "displayName": "Umbria",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6009,
+        "key": "ita-marche",
+        "historicalName": "Marche",
+        "displayName": "Marche",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6010,
+        "key": "ita-lazio",
+        "historicalName": "Lazio",
+        "displayName": "Lazio",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6011,
+        "key": "ita-abruzzo",
+        "historicalName": "Abruzzo",
+        "displayName": "Abruzzo",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6012,
+        "key": "ita-molise",
+        "historicalName": "Molise",
+        "displayName": "Molise",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6013,
+        "key": "ita-campania",
+        "historicalName": "Campania",
+        "displayName": "Campania",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6014,
+        "key": "ita-apulia",
+        "historicalName": "Apulia",
+        "displayName": "Apulia",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6015,
+        "key": "ita-basilicata",
+        "historicalName": "Basilicata",
+        "displayName": "Basilicata",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6016,
+        "key": "ita-calabria",
+        "historicalName": "Calabria",
+        "displayName": "Calabria",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6017,
+        "key": "ita-sicily",
+        "historicalName": "Sicily",
+        "displayName": "Sicily",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6018,
+        "key": "ita-sardinia",
+        "historicalName": "Sardinia",
+        "displayName": "Sardinia",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Italian region composed of modern provinces; the 1900 boundary is the M11c Italian polygon."
+      },
+      {
+        "provinceId": 6019,
+        "key": "ita-friuli",
+        "historicalName": "Friuli",
+        "displayName": "Friuli",
+        "aliases": [],
+        "initialOwnerPolityId": 6,
+        "simulationRegionId": 6,
+        "historicalAdminAffiliation": "Historic Italian region",
+        "historicalGrouping": "Kingdom of Italy",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Friuli, the Italian part of the historic Patria del Friuli. Gorizia and Trieste were Austrian in 1900."
+      },
+      {
+        "provinceId": 7001,
+        "key": "esp-navarra",
+        "historicalName": "Navarra",
+        "displayName": "Navarra",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7002,
+        "key": "esp-gipuzkoa",
+        "historicalName": "Gipuzkoa",
+        "displayName": "Gipuzkoa",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7003,
+        "key": "esp-huesca",
+        "historicalName": "Huesca",
+        "displayName": "Huesca",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7004,
+        "key": "esp-lerida",
+        "historicalName": "Lérida",
+        "displayName": "Lérida",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7005,
+        "key": "esp-gerona",
+        "historicalName": "Gerona",
+        "displayName": "Gerona",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7006,
+        "key": "esp-badajoz",
+        "historicalName": "Badajoz",
+        "displayName": "Badajoz",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7007,
+        "key": "esp-cadiz",
+        "historicalName": "Cádiz",
+        "displayName": "Cádiz",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7008,
+        "key": "esp-orense",
+        "historicalName": "Orense",
+        "displayName": "Orense",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7009,
+        "key": "esp-caceres",
+        "historicalName": "Cáceres",
+        "displayName": "Cáceres",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7010,
+        "key": "esp-salamanca",
+        "historicalName": "Salamanca",
+        "displayName": "Salamanca",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7011,
+        "key": "esp-zamora",
+        "historicalName": "Zamora",
+        "displayName": "Zamora",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7012,
+        "key": "esp-pontevedra",
+        "historicalName": "Pontevedra",
+        "displayName": "Pontevedra",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7013,
+        "key": "esp-huelva",
+        "historicalName": "Huelva",
+        "displayName": "Huelva",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7014,
+        "key": "esp-barcelona",
+        "historicalName": "Barcelona",
+        "displayName": "Barcelona",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7015,
+        "key": "esp-tarragona",
+        "historicalName": "Tarragona",
+        "displayName": "Tarragona",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7016,
+        "key": "esp-castellon",
+        "historicalName": "Castellón",
+        "displayName": "Castellón",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7017,
+        "key": "esp-valencia",
+        "historicalName": "Valencia",
+        "displayName": "Valencia",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7018,
+        "key": "esp-alicante",
+        "historicalName": "Alicante",
+        "displayName": "Alicante",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7019,
+        "key": "esp-murcia",
+        "historicalName": "Murcia",
+        "displayName": "Murcia",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7020,
+        "key": "esp-almeria",
+        "historicalName": "Almería",
+        "displayName": "Almería",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7021,
+        "key": "esp-granada",
+        "historicalName": "Granada",
+        "displayName": "Granada",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7022,
+        "key": "esp-malaga",
+        "historicalName": "Málaga",
+        "displayName": "Málaga",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7023,
+        "key": "esp-sevilla",
+        "historicalName": "Sevilla",
+        "displayName": "Sevilla",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7024,
+        "key": "esp-la-coruna",
+        "historicalName": "La Coruña",
+        "displayName": "La Coruña",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7025,
+        "key": "esp-lugo",
+        "historicalName": "Lugo",
+        "displayName": "Lugo",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7026,
+        "key": "esp-asturias",
+        "historicalName": "Asturias",
+        "displayName": "Asturias",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7027,
+        "key": "esp-cantabria",
+        "historicalName": "Cantabria",
+        "displayName": "Cantabria",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7028,
+        "key": "esp-bizkaia",
+        "historicalName": "Bizkaia",
+        "displayName": "Bizkaia",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7029,
+        "key": "esp-santa-cruz-de-tenerife",
+        "historicalName": "Santa Cruz de Tenerife",
+        "displayName": "Santa Cruz de Tenerife",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7030,
+        "key": "esp-las-palmas",
+        "historicalName": "Las Palmas",
+        "displayName": "Las Palmas",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7031,
+        "key": "esp-baleares",
+        "historicalName": "Baleares",
+        "displayName": "Baleares",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7032,
+        "key": "esp-zaragoza",
+        "historicalName": "Zaragoza",
+        "displayName": "Zaragoza",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7033,
+        "key": "esp-la-rioja",
+        "historicalName": "La Rioja",
+        "displayName": "La Rioja",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7034,
+        "key": "esp-alava",
+        "historicalName": "Álava",
+        "displayName": "Álava",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7035,
+        "key": "esp-albacete",
+        "historicalName": "Albacete",
+        "displayName": "Albacete",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7036,
+        "key": "esp-teruel",
+        "historicalName": "Teruel",
+        "displayName": "Teruel",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7037,
+        "key": "esp-cuenca",
+        "historicalName": "Cuenca",
+        "displayName": "Cuenca",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7038,
+        "key": "esp-toledo",
+        "historicalName": "Toledo",
+        "displayName": "Toledo",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7039,
+        "key": "esp-leon",
+        "historicalName": "León",
+        "displayName": "León",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7040,
+        "key": "esp-soria",
+        "historicalName": "Soria",
+        "displayName": "Soria",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7041,
+        "key": "esp-burgos",
+        "historicalName": "Burgos",
+        "displayName": "Burgos",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7042,
+        "key": "esp-avila",
+        "historicalName": "Ávila",
+        "displayName": "Ávila",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7043,
+        "key": "esp-palencia",
+        "historicalName": "Palencia",
+        "displayName": "Palencia",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7044,
+        "key": "esp-ciudad-real",
+        "historicalName": "Ciudad Real",
+        "displayName": "Ciudad Real",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7045,
+        "key": "esp-cordoba",
+        "historicalName": "Córdoba",
+        "displayName": "Córdoba",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7046,
+        "key": "esp-guadalajara",
+        "historicalName": "Guadalajara",
+        "displayName": "Guadalajara",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7047,
+        "key": "esp-jaen",
+        "historicalName": "Jaén",
+        "displayName": "Jaén",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7048,
+        "key": "esp-madrid",
+        "historicalName": "Madrid",
+        "displayName": "Madrid",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7049,
+        "key": "esp-segovia",
+        "historicalName": "Segovia",
+        "displayName": "Segovia",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 7050,
+        "key": "esp-valladolid",
+        "historicalName": "Valladolid",
+        "displayName": "Valladolid",
+        "aliases": [],
+        "initialOwnerPolityId": 7,
+        "simulationRegionId": 7,
+        "historicalAdminAffiliation": "Spanish province",
+        "historicalGrouping": "Kingdom of Spain",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Spanish province; most 1900 provincial boundaries survive in the modern units."
+      },
+      {
+        "provinceId": 8001,
+        "key": "prt-evora",
+        "historicalName": "Évora",
+        "displayName": "Évora",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8002,
+        "key": "prt-portalegre",
+        "historicalName": "Portalegre",
+        "displayName": "Portalegre",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8003,
+        "key": "prt-viana-do-castelo",
+        "historicalName": "Viana do Castelo",
+        "displayName": "Viana do Castelo",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8004,
+        "key": "prt-castelo-branco",
+        "historicalName": "Castelo Branco",
+        "displayName": "Castelo Branco",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8005,
+        "key": "prt-guarda",
+        "historicalName": "Guarda",
+        "displayName": "Guarda",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8006,
+        "key": "prt-braganca",
+        "historicalName": "Bragança",
+        "displayName": "Bragança",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8007,
+        "key": "prt-vila-real",
+        "historicalName": "Vila Real",
+        "displayName": "Vila Real",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8008,
+        "key": "prt-braga",
+        "historicalName": "Braga",
+        "displayName": "Braga",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8009,
+        "key": "prt-faro",
+        "historicalName": "Faro",
+        "displayName": "Faro",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8010,
+        "key": "prt-beja",
+        "historicalName": "Beja",
+        "displayName": "Beja",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8011,
+        "key": "prt-setubal",
+        "historicalName": "Setúbal",
+        "displayName": "Setúbal",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8012,
+        "key": "prt-lisboa",
+        "historicalName": "Lisboa",
+        "displayName": "Lisboa",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8013,
+        "key": "prt-santarem",
+        "historicalName": "Santarém",
+        "displayName": "Santarém",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8014,
+        "key": "prt-leiria",
+        "historicalName": "Leiria",
+        "displayName": "Leiria",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8015,
+        "key": "prt-coimbra",
+        "historicalName": "Coimbra",
+        "displayName": "Coimbra",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8016,
+        "key": "prt-aveiro",
+        "historicalName": "Aveiro",
+        "displayName": "Aveiro",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8017,
+        "key": "prt-porto",
+        "historicalName": "Porto",
+        "displayName": "Porto",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8018,
+        "key": "prt-madeira",
+        "historicalName": "Madeira",
+        "displayName": "Madeira",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8019,
+        "key": "prt-azores",
+        "historicalName": "Azores",
+        "displayName": "Azores",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 8020,
+        "key": "prt-viseu",
+        "historicalName": "Viseu",
+        "displayName": "Viseu",
+        "aliases": [],
+        "initialOwnerPolityId": 8,
+        "simulationRegionId": 8,
+        "historicalAdminAffiliation": "Portuguese district",
+        "historicalGrouping": "Kingdom of Portugal",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Portuguese district; the 1900 mainland and island districts are retained."
+      },
+      {
+        "provinceId": 9001,
+        "key": "nld-groningen",
+        "historicalName": "Groningen",
+        "displayName": "Groningen",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9002,
+        "key": "nld-drenthe",
+        "historicalName": "Drenthe",
+        "displayName": "Drenthe",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9003,
+        "key": "nld-overijssel",
+        "historicalName": "Overijssel",
+        "displayName": "Overijssel",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9004,
+        "key": "nld-gelderland",
+        "historicalName": "Gelderland",
+        "displayName": "Gelderland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9005,
+        "key": "nld-limburg",
+        "historicalName": "Limburg",
+        "displayName": "Limburg",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9006,
+        "key": "nld-zeeland",
+        "historicalName": "Zeeland",
+        "displayName": "Zeeland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9007,
+        "key": "nld-noord-brabant",
+        "historicalName": "Noord-Brabant",
+        "displayName": "Noord-Brabant",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9008,
+        "key": "nld-zuid-holland",
+        "historicalName": "Zuid-Holland",
+        "displayName": "Zuid-Holland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9009,
+        "key": "nld-noord-holland",
+        "historicalName": "Noord-Holland",
+        "displayName": "Noord-Holland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9010,
+        "key": "nld-friesland",
+        "historicalName": "Friesland",
+        "displayName": "Friesland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 9011,
+        "key": "nld-flevoland",
+        "historicalName": "Flevoland",
+        "displayName": "Flevoland",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Flevoland is post-1900 reclaimed land included in the modern base outline; the province is retained as a low-confidence modern overlay."
+      },
+      {
+        "provinceId": 9012,
+        "key": "nld-utrecht",
+        "historicalName": "Utrecht",
+        "displayName": "Utrecht",
+        "aliases": [],
+        "initialOwnerPolityId": 9,
+        "simulationRegionId": 9,
+        "historicalAdminAffiliation": "Dutch province",
+        "historicalGrouping": "Kingdom of the Netherlands",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Dutch province on the 1900 map."
+      },
+      {
+        "provinceId": 10001,
+        "key": "bel-west-flanders",
+        "historicalName": "West Flanders",
+        "displayName": "West Flanders",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10002,
+        "key": "bel-hainaut",
+        "historicalName": "Hainaut",
+        "displayName": "Hainaut",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10003,
+        "key": "bel-namur",
+        "historicalName": "Namur",
+        "displayName": "Namur",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10004,
+        "key": "bel-luxembourg",
+        "historicalName": "Luxembourg",
+        "displayName": "Luxembourg",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10005,
+        "key": "bel-liege",
+        "historicalName": "Liege",
+        "displayName": "Liege",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10006,
+        "key": "bel-east-flanders",
+        "historicalName": "East Flanders",
+        "displayName": "East Flanders",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10007,
+        "key": "bel-antwerp",
+        "historicalName": "Antwerp",
+        "displayName": "Antwerp",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10008,
+        "key": "bel-limburg",
+        "historicalName": "Limburg",
+        "displayName": "Limburg",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10009,
+        "key": "bel-brussels",
+        "historicalName": "Brussels",
+        "displayName": "Brussels",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10010,
+        "key": "bel-flemish-brabant",
+        "historicalName": "Flemish Brabant",
+        "displayName": "Flemish Brabant",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 10011,
+        "key": "bel-walloon-brabant",
+        "historicalName": "Walloon Brabant",
+        "displayName": "Walloon Brabant",
+        "aliases": [],
+        "initialOwnerPolityId": 10,
+        "simulationRegionId": 10,
+        "historicalAdminAffiliation": "Belgian province",
+        "historicalGrouping": "Kingdom of Belgium",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Belgian province; the 1900 polygon excludes Eupen-Malmedy, which is German."
+      },
+      {
+        "provinceId": 21001,
+        "key": "lux-diekirch",
+        "historicalName": "Diekirch",
+        "displayName": "Diekirch",
+        "aliases": [],
+        "initialOwnerPolityId": 21,
+        "simulationRegionId": 21,
+        "historicalAdminAffiliation": "Luxembourg district",
+        "historicalGrouping": "Grand Duchy of Luxembourg",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Luxembourg district; the grand duchy was in personal union with the Netherlands until 1890 and independent in 1900."
+      },
+      {
+        "provinceId": 21002,
+        "key": "lux-grevenmacher",
+        "historicalName": "Grevenmacher",
+        "displayName": "Grevenmacher",
+        "aliases": [],
+        "initialOwnerPolityId": 21,
+        "simulationRegionId": 21,
+        "historicalAdminAffiliation": "Luxembourg district",
+        "historicalGrouping": "Grand Duchy of Luxembourg",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Luxembourg district; the grand duchy was in personal union with the Netherlands until 1890 and independent in 1900."
+      },
+      {
+        "provinceId": 21003,
+        "key": "lux-luxembourg",
+        "historicalName": "Luxembourg",
+        "displayName": "Luxembourg",
+        "aliases": [],
+        "initialOwnerPolityId": 21,
+        "simulationRegionId": 21,
+        "historicalAdminAffiliation": "Luxembourg district",
+        "historicalGrouping": "Grand Duchy of Luxembourg",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Luxembourg district; the grand duchy was in personal union with the Netherlands until 1890 and independent in 1900."
+      },
+      {
+        "provinceId": 11001,
+        "key": "che-valais",
+        "historicalName": "Valais",
+        "displayName": "Valais",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11002,
+        "key": "che-ticino",
+        "historicalName": "Ticino",
+        "displayName": "Ticino",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11003,
+        "key": "che-graubunden",
+        "historicalName": "Graubünden",
+        "displayName": "Graubünden",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11004,
+        "key": "che-schaffhausen",
+        "historicalName": "Schaffhausen",
+        "displayName": "Schaffhausen",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11005,
+        "key": "che-thurgau",
+        "historicalName": "Thurgau",
+        "displayName": "Thurgau",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11006,
+        "key": "che-zurich",
+        "historicalName": "Zürich",
+        "displayName": "Zürich",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11007,
+        "key": "che-aargau",
+        "historicalName": "Aargau",
+        "displayName": "Aargau",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11008,
+        "key": "che-basel-stadt",
+        "historicalName": "Basel-Stadt",
+        "displayName": "Basel-Stadt",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11009,
+        "key": "che-basel-landschaft",
+        "historicalName": "Basel-Landschaft",
+        "displayName": "Basel-Landschaft",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11010,
+        "key": "che-sankt-gallen",
+        "historicalName": "Sankt Gallen",
+        "displayName": "Sankt Gallen",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11011,
+        "key": "che-solothurn",
+        "historicalName": "Solothurn",
+        "displayName": "Solothurn",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11012,
+        "key": "che-jura",
+        "historicalName": "Jura",
+        "displayName": "Jura",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11013,
+        "key": "che-geneve",
+        "historicalName": "Genève",
+        "displayName": "Genève",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11014,
+        "key": "che-vaud",
+        "historicalName": "Vaud",
+        "displayName": "Vaud",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11015,
+        "key": "che-neuchatel",
+        "historicalName": "Neuchâtel",
+        "displayName": "Neuchâtel",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11016,
+        "key": "che-bern",
+        "historicalName": "Bern",
+        "displayName": "Bern",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11017,
+        "key": "che-lucerne",
+        "historicalName": "Lucerne",
+        "displayName": "Lucerne",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11018,
+        "key": "che-zug",
+        "historicalName": "Zug",
+        "displayName": "Zug",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11019,
+        "key": "che-uri",
+        "historicalName": "Uri",
+        "displayName": "Uri",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11020,
+        "key": "che-schwyz",
+        "historicalName": "Schwyz",
+        "displayName": "Schwyz",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11021,
+        "key": "che-glarus",
+        "historicalName": "Glarus",
+        "displayName": "Glarus",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11022,
+        "key": "che-nidwalden",
+        "historicalName": "Nidwalden",
+        "displayName": "Nidwalden",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11023,
+        "key": "che-fribourg",
+        "historicalName": "Fribourg",
+        "displayName": "Fribourg",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11024,
+        "key": "che-obwalden",
+        "historicalName": "Obwalden",
+        "displayName": "Obwalden",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11025,
+        "key": "che-appenzell-ausserrhoden",
+        "historicalName": "Appenzell Ausserrhoden",
+        "displayName": "Appenzell Ausserrhoden",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 11026,
+        "key": "che-appenzell-innerrhoden",
+        "historicalName": "Appenzell Innerrhoden",
+        "displayName": "Appenzell Innerrhoden",
+        "aliases": [],
+        "initialOwnerPolityId": 11,
+        "simulationRegionId": 11,
+        "historicalAdminAffiliation": "Swiss canton",
+        "historicalGrouping": "Swiss Confederation",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swiss canton; cantonal boundaries were stable in 1900."
+      },
+      {
+        "provinceId": 12001,
+        "key": "swe-norrbotten",
+        "historicalName": "Norrbotten",
+        "displayName": "Norrbotten",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12002,
+        "key": "swe-vasterbotten",
+        "historicalName": "Västerbotten",
+        "displayName": "Västerbotten",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12003,
+        "key": "swe-jamtland",
+        "historicalName": "Jämtland",
+        "displayName": "Jämtland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12004,
+        "key": "swe-dalarna",
+        "historicalName": "Dalarna",
+        "displayName": "Dalarna",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12005,
+        "key": "swe-varmland",
+        "historicalName": "Värmland",
+        "displayName": "Värmland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12006,
+        "key": "swe-vastra-gotaland",
+        "historicalName": "Västra Götaland",
+        "displayName": "Västra Götaland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12007,
+        "key": "swe-vasternorrland",
+        "historicalName": "Västernorrland",
+        "displayName": "Västernorrland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12008,
+        "key": "swe-gavleborg",
+        "historicalName": "Gävleborg",
+        "displayName": "Gävleborg",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12009,
+        "key": "swe-uppsala",
+        "historicalName": "Uppsala",
+        "displayName": "Uppsala",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12010,
+        "key": "swe-stockholm",
+        "historicalName": "Stockholm",
+        "displayName": "Stockholm",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12011,
+        "key": "swe-sodermanland",
+        "historicalName": "Södermanland",
+        "displayName": "Södermanland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12012,
+        "key": "swe-ostergotland",
+        "historicalName": "Östergötland",
+        "displayName": "Östergötland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12013,
+        "key": "swe-kalmar",
+        "historicalName": "Kalmar",
+        "displayName": "Kalmar",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12014,
+        "key": "swe-blekinge",
+        "historicalName": "Blekinge",
+        "displayName": "Blekinge",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12015,
+        "key": "swe-skane",
+        "historicalName": "Skåne",
+        "displayName": "Skåne",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12016,
+        "key": "swe-halland",
+        "historicalName": "Halland",
+        "displayName": "Halland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12017,
+        "key": "swe-gotland",
+        "historicalName": "Gotland",
+        "displayName": "Gotland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12018,
+        "key": "swe-vastmanland",
+        "historicalName": "Västmanland",
+        "displayName": "Västmanland",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12019,
+        "key": "swe-jonkoping",
+        "historicalName": "Jönköping",
+        "displayName": "Jönköping",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12020,
+        "key": "swe-orebro",
+        "historicalName": "Orebro",
+        "displayName": "Orebro",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 12021,
+        "key": "swe-kronoberg",
+        "historicalName": "Kronoberg",
+        "displayName": "Kronoberg",
+        "aliases": [],
+        "initialOwnerPolityId": 12,
+        "simulationRegionId": 12,
+        "historicalAdminAffiliation": "Swedish county (län)",
+        "historicalGrouping": "Kingdom of Sweden",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Swedish county (län)."
+      },
+      {
+        "provinceId": 13001,
+        "key": "nor-troms",
+        "historicalName": "Troms",
+        "displayName": "Troms",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13002,
+        "key": "nor-nordland",
+        "historicalName": "Nordland",
+        "displayName": "Nordland",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13003,
+        "key": "nor-nord-tr-ndelag",
+        "historicalName": "Nord-Trøndelag",
+        "displayName": "Nord-Trøndelag",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13004,
+        "key": "nor-s-r-tr-ndelag",
+        "historicalName": "Sør-Trøndelag",
+        "displayName": "Sør-Trøndelag",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13005,
+        "key": "nor-hedmark",
+        "historicalName": "Hedmark",
+        "displayName": "Hedmark",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13006,
+        "key": "nor-akershus",
+        "historicalName": "Akershus",
+        "displayName": "Akershus",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13007,
+        "key": "nor-stfold",
+        "historicalName": "Østfold",
+        "displayName": "Østfold",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13008,
+        "key": "nor-finnmark",
+        "historicalName": "Finnmark",
+        "displayName": "Finnmark",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13009,
+        "key": "nor-oslo",
+        "historicalName": "Oslo",
+        "displayName": "Oslo",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13010,
+        "key": "nor-buskerud",
+        "historicalName": "Buskerud",
+        "displayName": "Buskerud",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13011,
+        "key": "nor-vestfold",
+        "historicalName": "Vestfold",
+        "displayName": "Vestfold",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13012,
+        "key": "nor-telemark",
+        "historicalName": "Telemark",
+        "displayName": "Telemark",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13013,
+        "key": "nor-aust-agder",
+        "historicalName": "Aust-Agder",
+        "displayName": "Aust-Agder",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13014,
+        "key": "nor-vest-agder",
+        "historicalName": "Vest-Agder",
+        "displayName": "Vest-Agder",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13015,
+        "key": "nor-rogaland",
+        "historicalName": "Rogaland",
+        "displayName": "Rogaland",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13016,
+        "key": "nor-hordaland",
+        "historicalName": "Hordaland",
+        "displayName": "Hordaland",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13017,
+        "key": "nor-sogn-og-fjordane",
+        "historicalName": "Sogn og Fjordane",
+        "displayName": "Sogn og Fjordane",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13018,
+        "key": "nor-m-re-og-romsdal",
+        "historicalName": "Møre og Romsdal",
+        "displayName": "Møre og Romsdal",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 13019,
+        "key": "nor-oppland",
+        "historicalName": "Oppland",
+        "displayName": "Oppland",
+        "aliases": [],
+        "initialOwnerPolityId": 13,
+        "simulationRegionId": 13,
+        "historicalAdminAffiliation": "Norwegian county (amt/fylke)",
+        "historicalGrouping": "Kingdom of Norway",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A Norwegian county; Norway was in personal union with Sweden in 1900."
+      },
+      {
+        "provinceId": 14001,
+        "key": "dnk-north-jutland",
+        "historicalName": "North Jutland",
+        "displayName": "North Jutland",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 14,
+        "historicalAdminAffiliation": "Danish region (amt)",
+        "historicalGrouping": "Kingdom of Denmark",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Danish regional grouping; 1900 Denmark used amter rather than the modern regions."
+      },
+      {
+        "provinceId": 14002,
+        "key": "dnk-central-jutland",
+        "historicalName": "Central Jutland",
+        "displayName": "Central Jutland",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 14,
+        "historicalAdminAffiliation": "Danish region (amt)",
+        "historicalGrouping": "Kingdom of Denmark",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Danish regional grouping; 1900 Denmark used amter rather than the modern regions."
+      },
+      {
+        "provinceId": 14003,
+        "key": "dnk-south-jutland",
+        "historicalName": "South Jutland",
+        "displayName": "South Jutland",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 14,
+        "historicalAdminAffiliation": "Danish region (amt)",
+        "historicalGrouping": "Kingdom of Denmark",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Danish regional grouping; 1900 Denmark used amter rather than the modern regions."
+      },
+      {
+        "provinceId": 14004,
+        "key": "dnk-copenhagen",
+        "historicalName": "Copenhagen",
+        "displayName": "Copenhagen",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 14,
+        "historicalAdminAffiliation": "Danish region (amt)",
+        "historicalGrouping": "Kingdom of Denmark",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Danish regional grouping; 1900 Denmark used amter rather than the modern regions."
+      },
+      {
+        "provinceId": 14005,
+        "key": "dnk-zealand",
+        "historicalName": "Zealand",
+        "displayName": "Zealand",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 14,
+        "historicalAdminAffiliation": "Danish region (amt)",
+        "historicalGrouping": "Kingdom of Denmark",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Danish regional grouping; 1900 Denmark used amter rather than the modern regions."
+      },
+      {
+        "provinceId": 15001,
+        "key": "grc-attica",
+        "historicalName": "Attica",
+        "displayName": "Attica",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15002,
+        "key": "grc-peloponnese",
+        "historicalName": "Peloponnese",
+        "displayName": "Peloponnese",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15003,
+        "key": "grc-thessaly",
+        "historicalName": "Thessaly",
+        "displayName": "Thessaly",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15004,
+        "key": "grc-central-greece",
+        "historicalName": "Central Greece",
+        "displayName": "Central Greece",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15005,
+        "key": "grc-ionian-islands",
+        "historicalName": "Ionian Islands",
+        "displayName": "Ionian Islands",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15006,
+        "key": "grc-northern-aegean-islands",
+        "historicalName": "Northern Aegean Islands",
+        "displayName": "Northern Aegean Islands",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15007,
+        "key": "grc-southern-aegean-islands",
+        "historicalName": "Southern Aegean Islands",
+        "displayName": "Southern Aegean Islands",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A historic Greek region; the modern unit is a proxy for the 1900 extent."
+      },
+      {
+        "provinceId": 15008,
+        "key": "grc-epirus",
+        "historicalName": "Epirus",
+        "displayName": "Epirus",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Only the part inside the 1900 Greek polygon is Greek; the remainder of this modern unit was Ottoman until 1912-13 and is assigned to the Ottoman vilayets."
+      },
+      {
+        "provinceId": 15009,
+        "key": "grc-macedonia",
+        "historicalName": "Macedonia",
+        "displayName": "Macedonia",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Only the part inside the 1900 Greek polygon is Greek; the remainder of this modern unit was Ottoman until 1912-13 and is assigned to the Ottoman vilayets."
+      },
+      {
+        "provinceId": 15010,
+        "key": "grc-western-macedonia",
+        "historicalName": "Western Macedonia",
+        "displayName": "Western Macedonia",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Only the part inside the 1900 Greek polygon is Greek; the remainder of this modern unit was Ottoman until 1912-13 and is assigned to the Ottoman vilayets."
+      },
+      {
+        "provinceId": 15011,
+        "key": "grc-thrace",
+        "historicalName": "Thrace",
+        "displayName": "Thrace",
+        "aliases": [],
+        "initialOwnerPolityId": 15,
+        "simulationRegionId": 15,
+        "historicalAdminAffiliation": "Historic Greek region",
+        "historicalGrouping": "Kingdom of Greece",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Only the part inside the 1900 Greek polygon is Greek; the remainder of this modern unit was Ottoman until 1912-13 and is assigned to the Ottoman vilayets."
+      },
+      {
+        "provinceId": 16001,
+        "key": "srb-belgrade",
+        "historicalName": "Belgrade",
+        "displayName": "Belgrade",
+        "aliases": [],
+        "initialOwnerPolityId": 16,
+        "simulationRegionId": 16,
+        "historicalAdminAffiliation": "Serbian district (okrug)",
+        "historicalGrouping": "Kingdom of Serbia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Serbian districts; the 1900 kingdom was smaller than modern Serbia."
+      },
+      {
+        "provinceId": 16002,
+        "key": "srb-sumadija",
+        "historicalName": "Šumadija",
+        "displayName": "Šumadija",
+        "aliases": [],
+        "initialOwnerPolityId": 16,
+        "simulationRegionId": 16,
+        "historicalAdminAffiliation": "Serbian district (okrug)",
+        "historicalGrouping": "Kingdom of Serbia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Serbian districts; the 1900 kingdom was smaller than modern Serbia."
+      },
+      {
+        "provinceId": 16003,
+        "key": "srb-podrinje",
+        "historicalName": "Podrinje",
+        "displayName": "Podrinje",
+        "aliases": [],
+        "initialOwnerPolityId": 16,
+        "simulationRegionId": 16,
+        "historicalAdminAffiliation": "Serbian district (okrug)",
+        "historicalGrouping": "Kingdom of Serbia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Serbian districts; the 1900 kingdom was smaller than modern Serbia."
+      },
+      {
+        "provinceId": 16004,
+        "key": "srb-nis",
+        "historicalName": "Niš",
+        "displayName": "Niš",
+        "aliases": [],
+        "initialOwnerPolityId": 16,
+        "simulationRegionId": 16,
+        "historicalAdminAffiliation": "Serbian district (okrug)",
+        "historicalGrouping": "Kingdom of Serbia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Serbian districts; the 1900 kingdom was smaller than modern Serbia."
+      },
+      {
+        "provinceId": 16005,
+        "key": "srb-timok",
+        "historicalName": "Timok",
+        "displayName": "Timok",
+        "aliases": [],
+        "initialOwnerPolityId": 16,
+        "simulationRegionId": 16,
+        "historicalAdminAffiliation": "Serbian district (okrug)",
+        "historicalGrouping": "Kingdom of Serbia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Serbian districts; the 1900 kingdom was smaller than modern Serbia."
+      },
+      {
+        "provinceId": 17001,
+        "key": "mnt-montenegro",
+        "historicalName": "Montenegro",
+        "displayName": "Montenegro",
+        "aliases": [],
+        "initialOwnerPolityId": 17,
+        "simulationRegionId": 17,
+        "historicalAdminAffiliation": "Montenegrin district",
+        "historicalGrouping": "Principality of Montenegro",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Montenegrin municipalities for the 1900 principality."
+      },
+      {
+        "provinceId": 17002,
+        "key": "mnt-brda",
+        "historicalName": "Brda",
+        "displayName": "Brda",
+        "aliases": [],
+        "initialOwnerPolityId": 17,
+        "simulationRegionId": 17,
+        "historicalAdminAffiliation": "Montenegrin district",
+        "historicalGrouping": "Principality of Montenegro",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Montenegrin municipalities for the 1900 principality."
+      },
+      {
+        "provinceId": 17003,
+        "key": "mnt-old-herzegovina",
+        "historicalName": "Old Herzegovina",
+        "displayName": "Old Herzegovina",
+        "aliases": [],
+        "initialOwnerPolityId": 17,
+        "simulationRegionId": 17,
+        "historicalAdminAffiliation": "Montenegrin district",
+        "historicalGrouping": "Principality of Montenegro",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Montenegrin municipalities for the 1900 principality."
+      },
+      {
+        "provinceId": 18001,
+        "key": "rom-muntenia",
+        "historicalName": "Muntenia",
+        "displayName": "Muntenia",
+        "aliases": [],
+        "initialOwnerPolityId": 18,
+        "simulationRegionId": 18,
+        "historicalAdminAffiliation": "Historic Romanian province",
+        "historicalGrouping": "Kingdom of Romania",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "One of the Old Kingdom provinces. Transylvania, Banat, Bukovina and the Székely land are Austrian-Hungarian in 1900."
+      },
+      {
+        "provinceId": 18002,
+        "key": "rom-oltenia",
+        "historicalName": "Oltenia",
+        "displayName": "Oltenia",
+        "aliases": [],
+        "initialOwnerPolityId": 18,
+        "simulationRegionId": 18,
+        "historicalAdminAffiliation": "Historic Romanian province",
+        "historicalGrouping": "Kingdom of Romania",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "One of the Old Kingdom provinces. Transylvania, Banat, Bukovina and the Székely land are Austrian-Hungarian in 1900."
+      },
+      {
+        "provinceId": 18003,
+        "key": "rom-moldavia",
+        "historicalName": "Moldavia",
+        "displayName": "Moldavia",
+        "aliases": [],
+        "initialOwnerPolityId": 18,
+        "simulationRegionId": 18,
+        "historicalAdminAffiliation": "Historic Romanian province",
+        "historicalGrouping": "Kingdom of Romania",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "One of the Old Kingdom provinces. Transylvania, Banat, Bukovina and the Székely land are Austrian-Hungarian in 1900."
+      },
+      {
+        "provinceId": 18004,
+        "key": "rom-dobruja",
+        "historicalName": "Dobruja",
+        "displayName": "Dobruja",
+        "aliases": [],
+        "initialOwnerPolityId": 18,
+        "simulationRegionId": 18,
+        "historicalAdminAffiliation": "Historic Romanian province",
+        "historicalGrouping": "Kingdom of Romania",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "One of the Old Kingdom provinces. Transylvania, Banat, Bukovina and the Székely land are Austrian-Hungarian in 1900."
+      },
+      {
+        "provinceId": 19001,
+        "key": "bgr-sofia",
+        "historicalName": "Sofia",
+        "displayName": "Sofia",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 19002,
+        "key": "bgr-plovdiv",
+        "historicalName": "Plovdiv",
+        "displayName": "Plovdiv",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 19003,
+        "key": "bgr-stara-zagora",
+        "historicalName": "Stara Zagora",
+        "displayName": "Stara Zagora",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 19004,
+        "key": "bgr-ruse",
+        "historicalName": "Ruse",
+        "displayName": "Ruse",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 19005,
+        "key": "bgr-varna",
+        "historicalName": "Varna",
+        "displayName": "Varna",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 19006,
+        "key": "bgr-pleven",
+        "historicalName": "Pleven",
+        "displayName": "Pleven",
+        "aliases": [],
+        "initialOwnerPolityId": 19,
+        "simulationRegionId": 19,
+        "historicalAdminAffiliation": "Bulgarian okrug grouping",
+        "historicalGrouping": "Principality of Bulgaria",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Bulgarian oblasts. Bulgaria was an autonomous vassal of the Ottoman Empire until 1908; Eastern Rumelia had been united with it in 1885."
+      },
+      {
+        "provinceId": 20001,
+        "key": "ott-constantinople",
+        "historicalName": "Constantinople",
+        "displayName": "Constantinople",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20002,
+        "key": "ott-adrianople",
+        "historicalName": "Adrianople",
+        "displayName": "Adrianople",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20003,
+        "key": "ott-salonika",
+        "historicalName": "Salonika",
+        "displayName": "Salonika",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20004,
+        "key": "ott-monastir",
+        "historicalName": "Monastir",
+        "displayName": "Monastir",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20005,
+        "key": "ott-kosovo",
+        "historicalName": "Kosovo",
+        "displayName": "Kosovo",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20006,
+        "key": "ott-scutari",
+        "historicalName": "Scutari",
+        "displayName": "Scutari",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 20007,
+        "key": "ott-janina",
+        "historicalName": "Janina",
+        "displayName": "Janina",
+        "aliases": [],
+        "initialOwnerPolityId": 20,
+        "simulationRegionId": 20,
+        "historicalAdminAffiliation": "Ottoman vilayet grouping",
+        "historicalGrouping": "European Ottoman Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of modern units around a 1900 Ottoman vilayet capital; only the part inside the M11c Ottoman polygon is Ottoman. Albania, Macedonia and Thrace gained independence or changed hands in 1912-23. Anatolia and the Arab provinces are outside the M12a European provincial scope."
+      },
+      {
+        "provinceId": 60001,
+        "key": "aut-vienna",
+        "historicalName": "Vienna",
+        "displayName": "Vienna",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60002,
+        "key": "aut-lower-austria",
+        "historicalName": "Lower Austria",
+        "displayName": "Lower Austria",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60003,
+        "key": "aut-upper-austria",
+        "historicalName": "Upper Austria",
+        "displayName": "Upper Austria",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60004,
+        "key": "aut-salzburg",
+        "historicalName": "Salzburg",
+        "displayName": "Salzburg",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60005,
+        "key": "aut-styria",
+        "historicalName": "Styria",
+        "displayName": "Styria",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60006,
+        "key": "aut-carinthia",
+        "historicalName": "Carinthia",
+        "displayName": "Carinthia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60007,
+        "key": "aut-tyrol",
+        "historicalName": "Tyrol",
+        "displayName": "Tyrol",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60008,
+        "key": "aut-vorarlberg",
+        "historicalName": "Vorarlberg",
+        "displayName": "Vorarlberg",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "An Austrian crown land of the dual monarchy on 1 January 1900."
+      },
+      {
+        "provinceId": 60009,
+        "key": "aut-prague",
+        "historicalName": "Prague",
+        "displayName": "Prague",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Bohemia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The royal capital of Bohemia, administered separately for this partition."
+      },
+      {
+        "provinceId": 60010,
+        "key": "aut-bohemia",
+        "historicalName": "Bohemia",
+        "displayName": "Bohemia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Kingdom of Bohemia. Modern Czech regions approximate the 1900 crown land."
+      },
+      {
+        "provinceId": 60011,
+        "key": "aut-moravia",
+        "historicalName": "Moravia",
+        "displayName": "Moravia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Margraviate of Moravia; modern regions approximate the 1900 crown land."
+      },
+      {
+        "provinceId": 60012,
+        "key": "aut-austrian-silesia",
+        "historicalName": "Austrian Silesia",
+        "displayName": "Austrian Silesia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Duchy of Upper and Lower Silesia, excluding the Hultschin district."
+      },
+      {
+        "provinceId": 60013,
+        "key": "aut-hultschin",
+        "historicalName": "Hultschin",
+        "displayName": "Hultschin",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Silesia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Hlučín (Hultschin) district of Austrian Silesia, transferred to Czechoslovakia in 1920. The exact district boundary is approximated by a small clip."
+      },
+      {
+        "provinceId": 60014,
+        "key": "aut-western-galicia",
+        "historicalName": "Western Galicia",
+        "displayName": "Western Galicia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Galicia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The western part of the Kingdom of Galicia and Lodomeria around Kraków."
+      },
+      {
+        "provinceId": 60015,
+        "key": "aut-eastern-galicia",
+        "historicalName": "Eastern Galicia",
+        "displayName": "Eastern Galicia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Galicia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The eastern part of Galicia around Lemberg (Lviv), with a Ukrainian majority in 1900."
+      },
+      {
+        "provinceId": 60016,
+        "key": "aut-tarnopol",
+        "historicalName": "Tarnopol",
+        "displayName": "Tarnopol",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Galicia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The eastern Galician district of Tarnopol, separated for the post-1918 Polish-Soviet border."
+      },
+      {
+        "provinceId": 60017,
+        "key": "aut-northern-bukovina",
+        "historicalName": "Northern Bukovina",
+        "displayName": "Northern Bukovina",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Bukovina)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Northern Bukovina around Chernivtsi; transferred to Romania in 1918 and to the USSR in 1940."
+      },
+      {
+        "provinceId": 60018,
+        "key": "aut-southern-bukovina",
+        "historicalName": "Southern Bukovina",
+        "displayName": "Southern Bukovina",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Bukovina)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Southern Bukovina around Suceava, retained by Romania after 1918."
+      },
+      {
+        "provinceId": 60019,
+        "key": "aut-carpathian-ruthenia",
+        "historicalName": "Carpathian Ruthenia",
+        "displayName": "Carpathian Ruthenia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county (Ung, Bereg, Ugocsa, Máramaros)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Subcarpathian Ruthenia, part of Hungary in 1900 and of Czechoslovakia after 1919."
+      },
+      {
+        "provinceId": 60020,
+        "key": "aut-carniola",
+        "historicalName": "Carniola",
+        "displayName": "Carniola",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Duchy of Carniola; Slovenian municipalities are grouped around Ljubljana."
+      },
+      {
+        "provinceId": 60021,
+        "key": "aut-lower-styria",
+        "historicalName": "Lower Styria",
+        "displayName": "Lower Styria",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Styria)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Slovenian part of the Duchy of Styria, grouped around Maribor."
+      },
+      {
+        "provinceId": 60022,
+        "key": "aut-gorizia-gradisca",
+        "historicalName": "Gorizia and Gradisca",
+        "displayName": "Gorizia and Gradisca",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Littoral",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Princely County of Gorizia and Gradisca, including the Soča valley."
+      },
+      {
+        "provinceId": 60023,
+        "key": "aut-istria",
+        "historicalName": "Istria",
+        "displayName": "Istria",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Littoral",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Margraviate of Istria, including the Slovenian and Croatian coast."
+      },
+      {
+        "provinceId": 60024,
+        "key": "aut-trieste",
+        "historicalName": "Trieste",
+        "displayName": "Trieste",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Littoral",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The free imperial city and port of Trieste."
+      },
+      {
+        "provinceId": 60025,
+        "key": "aut-south-tyrol",
+        "historicalName": "South Tyrol",
+        "displayName": "South Tyrol",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Tyrol)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The German-speaking southern part of Tyrol, transferred to Italy in 1919."
+      },
+      {
+        "provinceId": 60026,
+        "key": "aut-trentino",
+        "historicalName": "Trentino",
+        "displayName": "Trentino",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Tyrol)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The Italian-speaking Welsch Tyrol (Trentino), transferred to Italy in 1919."
+      },
+      {
+        "provinceId": 60027,
+        "key": "aut-northern-dalmatia",
+        "historicalName": "Northern Dalmatia",
+        "displayName": "Northern Dalmatia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Dalmatia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Northern Dalmatia around Zadar and Šibenik."
+      },
+      {
+        "provinceId": 60028,
+        "key": "aut-southern-dalmatia",
+        "historicalName": "Southern Dalmatia",
+        "displayName": "Southern Dalmatia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Dalmatia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Southern Dalmatia around Split, Dubrovnik and the Bay of Kotor (Cattaro), which the M11c reconstruction places in Austria-Hungary."
+      },
+      {
+        "provinceId": 60029,
+        "key": "aut-fiume",
+        "historicalName": "Fiume",
+        "displayName": "Fiume",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian corpus separatum",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The corpus separatum of Fiume (Rijeka), directly under the Hungarian crown rather than Croatia-Slavonia. The exact city boundary is approximated."
+      },
+      {
+        "provinceId": 60030,
+        "key": "aut-bosnia",
+        "historicalName": "Bosnia",
+        "displayName": "Bosnia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Bosnia and Herzegovina (joint administration)",
+        "historicalGrouping": "Joint Austro-Hungarian administration",
+        "initialSpecialStatus": "joint-administration",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Bosnia proper. Formally under Ottoman sovereignty until 1908 and jointly administered by Austria and Hungary; never an ordinary province of either half."
+      },
+      {
+        "provinceId": 60031,
+        "key": "aut-herzegovina",
+        "historicalName": "Herzegovina",
+        "displayName": "Herzegovina",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Bosnia and Herzegovina (joint administration)",
+        "historicalGrouping": "Joint Austro-Hungarian administration",
+        "initialSpecialStatus": "joint-administration",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Herzegovina, the southern part of the jointly administered territory. Annexed by Austria-Hungary in 1908."
+      },
+      {
+        "provinceId": 60032,
+        "key": "aut-croatia-proper",
+        "historicalName": "Croatia Proper",
+        "displayName": "Croatia Proper",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Kingdom of Croatia-Slavonia",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Croatia-Slavonia was an autonomous kingdom within the Hungarian half of the monarchy."
+      },
+      {
+        "provinceId": 60033,
+        "key": "aut-slavonia",
+        "historicalName": "Slavonia",
+        "displayName": "Slavonia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Kingdom of Croatia-Slavonia",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The eastern part of Croatia-Slavonia between the Drava and the Danube."
+      },
+      {
+        "provinceId": 60034,
+        "key": "aut-hun-central-hungary",
+        "historicalName": "Central Hungary",
+        "displayName": "Central Hungary",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Hungarian counties of the Kingdom of Hungary. Burgenland, Slovakia, Transylvania, Banat and Vojvodina are separate provinces."
+      },
+      {
+        "provinceId": 60035,
+        "key": "aut-hun-transdanubia",
+        "historicalName": "Transdanubia",
+        "displayName": "Transdanubia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Hungarian counties of the Kingdom of Hungary. Burgenland, Slovakia, Transylvania, Banat and Vojvodina are separate provinces."
+      },
+      {
+        "provinceId": 60036,
+        "key": "aut-hun-northern-hungary",
+        "historicalName": "Northern Hungary",
+        "displayName": "Northern Hungary",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Hungarian counties of the Kingdom of Hungary. Burgenland, Slovakia, Transylvania, Banat and Vojvodina are separate provinces."
+      },
+      {
+        "provinceId": 60037,
+        "key": "aut-hun-great-hungarian-plain",
+        "historicalName": "Great Hungarian Plain",
+        "displayName": "Great Hungarian Plain",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A grouping of Hungarian counties of the Kingdom of Hungary. Burgenland, Slovakia, Transylvania, Banat and Vojvodina are separate provinces."
+      },
+      {
+        "provinceId": 60038,
+        "key": "aut-burgenland",
+        "historicalName": "Burgenland",
+        "displayName": "Burgenland",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian western border counties",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The German-speaking western borderland of Hungary, transferred to Austria in 1921. In 1900 it is part of the Hungarian half, not of Austria."
+      },
+      {
+        "provinceId": 60039,
+        "key": "aut-svk-pressburg",
+        "historicalName": "Pressburg",
+        "displayName": "Pressburg",
+        "aliases": [
+          "Bratislavský"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60040,
+        "key": "aut-svk-nagyszombat",
+        "historicalName": "Nagyszombat",
+        "displayName": "Nagyszombat",
+        "aliases": [
+          "Trnavský"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60041,
+        "key": "aut-svk-nyitra",
+        "historicalName": "Nyitra",
+        "displayName": "Nyitra",
+        "aliases": [
+          "Nitriansky"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60042,
+        "key": "aut-svk-trencsen",
+        "historicalName": "Trencsén",
+        "displayName": "Trencsén",
+        "aliases": [
+          "Trenciansky"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60043,
+        "key": "aut-svk-turoc",
+        "historicalName": "Turóc",
+        "displayName": "Turóc",
+        "aliases": [
+          "Žilinský"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60044,
+        "key": "aut-svk-besztercebanya",
+        "historicalName": "Besztercebánya",
+        "displayName": "Besztercebánya",
+        "aliases": [
+          "Banskobystrický"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60045,
+        "key": "aut-svk-kassa",
+        "historicalName": "Kassa",
+        "displayName": "Kassa",
+        "aliases": [
+          "Košický"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60046,
+        "key": "aut-svk-eperjes",
+        "historicalName": "Eperjes",
+        "displayName": "Eperjes",
+        "aliases": [
+          "Prešov"
+        ],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Upper Hungary)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Upper Hungary (Slovakia), part of the Kingdom of Hungary in 1900 and of Czechoslovakia after 1918. The province name is the 1900 Hungarian/German name."
+      },
+      {
+        "provinceId": 60047,
+        "key": "aut-transylvania",
+        "historicalName": "Transylvania",
+        "displayName": "Transylvania",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Transylvania)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Transylvanian counties around Cluj, Sibiu and Brașov, transferred to Romania in 1918-20."
+      },
+      {
+        "provinceId": 60048,
+        "key": "aut-szekely-land",
+        "historicalName": "Székely Land",
+        "displayName": "Székely Land",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Transylvania)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Székely counties of Harghita and Covasna in eastern Transylvania."
+      },
+      {
+        "provinceId": 60049,
+        "key": "aut-partium",
+        "historicalName": "Partium",
+        "displayName": "Partium",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Partium)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The north-western Transylvanian counties (Bihor, Sălaj, Satu Mare, Maramureș)."
+      },
+      {
+        "provinceId": 60050,
+        "key": "aut-banat",
+        "historicalName": "Banat",
+        "displayName": "Banat",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Banat)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Banat of Temesvár, divided between Romania and Yugoslavia after 1918. The modern county units are a proxy for the historical boundary."
+      },
+      {
+        "provinceId": 60051,
+        "key": "aut-backa",
+        "historicalName": "Bačka",
+        "displayName": "Bačka",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Bács-Bodrog)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Bačka (Bácska) region of southern Hungary, divided between Yugoslavia and Hungary after 1918."
+      },
+      {
+        "provinceId": 60052,
+        "key": "aut-syrmia",
+        "historicalName": "Syrmia",
+        "displayName": "Syrmia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Hungarian county grouping (Szerém)",
+        "historicalGrouping": "Hungarian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Syrmian county between the Danube and the Sava, transferred to Yugoslavia in 1918."
+      },
+      {
+        "provinceId": 2001,
+        "key": "deu-bavaria",
+        "historicalName": "Bavaria",
+        "displayName": "Bavaria",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Kingdom of Bavaria",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2002,
+        "key": "deu-saxony",
+        "historicalName": "Saxony",
+        "displayName": "Saxony",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Kingdom of Saxony",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2003,
+        "key": "deu-prussian-saxony",
+        "historicalName": "Prussian Saxony",
+        "displayName": "Prussian Saxony",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Saxony",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2004,
+        "key": "deu-thuringia",
+        "historicalName": "Thuringia",
+        "displayName": "Thuringia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Thuringian states",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2005,
+        "key": "deu-hesse",
+        "historicalName": "Hesse",
+        "displayName": "Hesse",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Hesse and Hesse-Nassau",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2006,
+        "key": "deu-hamburg",
+        "historicalName": "Hamburg",
+        "displayName": "Hamburg",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Free and Hanseatic City of Hamburg",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2007,
+        "key": "deu-bremen",
+        "historicalName": "Bremen",
+        "displayName": "Bremen",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Free Hanseatic City of Bremen",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2008,
+        "key": "deu-berlin",
+        "historicalName": "Berlin",
+        "displayName": "Berlin",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Royal capital and residence city",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2009,
+        "key": "deu-brandenburg",
+        "historicalName": "Brandenburg",
+        "displayName": "Brandenburg",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Brandenburg",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2010,
+        "key": "deu-brandenburg-lebus",
+        "historicalName": "Brandenburg (Lebus)",
+        "displayName": "Brandenburg (Lebus)",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Brandenburg (Lebus)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The Lebus district east of the Oder, part of Prussian Brandenburg in 1900; the modern Lubusz voivodeship is the geometric proxy."
+      },
+      {
+        "provinceId": 2011,
+        "key": "deu-schleswig-holstein",
+        "historicalName": "Schleswig-Holstein",
+        "displayName": "Schleswig-Holstein",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Schleswig-Holstein",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "A constituent state or Prussian province of the German Empire on 1 January 1900."
+      },
+      {
+        "provinceId": 2012,
+        "key": "deu-saar",
+        "historicalName": "Saar",
+        "displayName": "Saar",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Rhine Province (Saar district)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Saar district, which received a special League of Nations status in 1920. It is part of the Prussian Rhine Province in 1900."
+      },
+      {
+        "provinceId": 2013,
+        "key": "deu-baden",
+        "historicalName": "Baden",
+        "displayName": "Baden",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Grand Duchy of Baden",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Baden is separated from Württemberg by an approximate north-south clip through the modern Baden-Württemberg unit."
+      },
+      {
+        "provinceId": 2014,
+        "key": "deu-wurttemberg",
+        "historicalName": "Württemberg",
+        "displayName": "Württemberg",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Kingdom of Württemberg",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Württemberg is separated from Baden by an approximate clip through the modern Baden-Württemberg unit; the Hohenzollern exclave is a separate province."
+      },
+      {
+        "provinceId": 2015,
+        "key": "deu-hohenzollern",
+        "historicalName": "Hohenzollern",
+        "displayName": "Hohenzollern",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of the Rhine (Hohenzollern)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The small Prussian exclave of Hohenzollern in southern Württemberg."
+      },
+      {
+        "provinceId": 2016,
+        "key": "deu-mecklenburg",
+        "historicalName": "Mecklenburg",
+        "displayName": "Mecklenburg",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Grand Duchies of Mecklenburg-Schwerin and Mecklenburg-Strelitz",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Mecklenburg west of the historical Pomeranian border, approximated by 12.8°E."
+      },
+      {
+        "provinceId": 2017,
+        "key": "deu-pomerania",
+        "historicalName": "Pomerania",
+        "displayName": "Pomerania",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Pomerania",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Prussian Pomerania including Vorpommern (the part of modern Mecklenburg-Vorpommern east of 12.8°E) and modern West Pomerania."
+      },
+      {
+        "provinceId": 2018,
+        "key": "deu-west-prussia",
+        "historicalName": "West Prussia",
+        "displayName": "West Prussia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of West Prussia",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Vistula corridor province, including the part of modern Kuyavian-Pomeranian north of 52.9°N. The Free City of Danzig is a separate province."
+      },
+      {
+        "provinceId": 2019,
+        "key": "deu-danzig",
+        "historicalName": "Danzig",
+        "displayName": "Danzig",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of West Prussia (Danzig)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Danzig city district, which became the Free City of Danzig in 1920. The exact city boundary is approximated by a small clip."
+      },
+      {
+        "provinceId": 2020,
+        "key": "deu-posen",
+        "historicalName": "Posen",
+        "displayName": "Posen",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Posen",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Province of Posen, including the southern part of modern Kuyavian-Pomeranian, transferred to Poland in 1919-20."
+      },
+      {
+        "provinceId": 2021,
+        "key": "deu-lower-silesia",
+        "historicalName": "Lower Silesia",
+        "displayName": "Lower Silesia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Silesia (Lower Silesia)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Lower Silesia around Breslau, retained by Germany after 1919 and transferred to Poland in 1945."
+      },
+      {
+        "provinceId": 2022,
+        "key": "deu-middle-silesia",
+        "historicalName": "Middle Silesia",
+        "displayName": "Middle Silesia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Upper Silesia (Oppeln)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Oppeln administrative district, the part of Upper Silesia that remained German after the 1921 plebiscite."
+      },
+      {
+        "provinceId": 2023,
+        "key": "deu-upper-silesia",
+        "historicalName": "Upper Silesia",
+        "displayName": "Upper Silesia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Upper Silesia (Katowice)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The industrial Upper Silesian district around Katowice, awarded to Poland in 1922 after the plebiscite."
+      },
+      {
+        "provinceId": 60053,
+        "key": "aut-cieszyn-silesia",
+        "historicalName": "Cieszyn Silesia",
+        "displayName": "Cieszyn Silesia",
+        "aliases": [],
+        "initialOwnerPolityId": 60,
+        "simulationRegionId": 60,
+        "historicalAdminAffiliation": "Austrian Crown Land (Silesia)",
+        "historicalGrouping": "Austrian half",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Cieszyn (Teschen) Silesia and Bielsko, Austrian until 1918 and divided between Poland and Czechoslovakia in 1920. The M11c 1900 reconstruction places it in Austria-Hungary."
+      },
+      {
+        "provinceId": 2024,
+        "key": "deu-east-prussia-north",
+        "historicalName": "Königsberg",
+        "displayName": "Königsberg",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of East Prussia",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Northern East Prussia around Königsberg, assigned to the Soviet Union in 1945 (modern Kaliningrad Oblast)."
+      },
+      {
+        "provinceId": 2025,
+        "key": "deu-east-prussia-south",
+        "historicalName": "Allenstein",
+        "displayName": "Allenstein",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of East Prussia",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Southern East Prussia around Allenstein, transferred to Poland in 1945 (modern Warmian-Masurian Voivodeship)."
+      },
+      {
+        "provinceId": 2026,
+        "key": "deu-memel",
+        "historicalName": "Memel",
+        "displayName": "Memel",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of East Prussia (Memel)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Memel (Klaipėda) district of East Prussia, placed under Allied administration in 1920 and annexed by Lithuania in 1923."
+      },
+      {
+        "provinceId": 2027,
+        "key": "deu-north-schleswig",
+        "historicalName": "North Schleswig",
+        "displayName": "North Schleswig",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Schleswig-Holstein",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The northern part of Schleswig, German until the 1920 plebiscite and transferred to Denmark. The 1864 line is generalized."
+      },
+      {
+        "provinceId": 2028,
+        "key": "deu-eupen-malmedy",
+        "historicalName": "Eupen-Malmedy",
+        "displayName": "Eupen-Malmedy",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Rhine Province (Eupen, Malmedy, Sankt Vith)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Eupen-Malmedy districts, transferred to Belgium in 1920. The rectangle includes Neutral Moresnet, a known small over-inclusion inherited from the M11c reconstruction."
+      },
+      {
+        "provinceId": 2029,
+        "key": "deu-alsace",
+        "historicalName": "Alsace",
+        "displayName": "Alsace",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Reichsland Alsace-Lorraine (Bas-Rhin and Haut-Rhin)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The Alsatian districts of the Reichsland, transferred to France in 1918-19."
+      },
+      {
+        "provinceId": 2030,
+        "key": "deu-lorraine",
+        "historicalName": "Lorraine",
+        "displayName": "Lorraine",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Reichsland Alsace-Lorraine (Moselle)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The Moselle district of the Reichsland, transferred to France in 1918-19."
+      },
+      {
+        "provinceId": 2031,
+        "key": "deu-hanover",
+        "historicalName": "Hanover",
+        "displayName": "Hanover",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Hanover",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The Prussian Province of Hanover. Smaller constituent states inside the modern Lower Saxony unit (Oldenburg, Brunswick, Anhalt-Lippe) are merged into this province for map legibility."
+      },
+      {
+        "provinceId": 2032,
+        "key": "deu-westphalia",
+        "historicalName": "Westphalia",
+        "displayName": "Westphalia",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Province of Westphalia",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Westphalia is separated from the Rhine Province by an approximate north-south clip at 7.5°E through the modern North Rhine-Westphalia unit."
+      },
+      {
+        "provinceId": 2033,
+        "key": "deu-rhine-province",
+        "historicalName": "Rhine Province",
+        "displayName": "Rhine Province",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Prussian Rhine Province",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Prussian Rhine Province west of 7.5°E plus the northern Rhenish part of modern Rhineland-Palatinate. The boundary with Westphalia and the Palatinate is approximate."
+      },
+      {
+        "provinceId": 2034,
+        "key": "deu-palatinate",
+        "historicalName": "Palatinate",
+        "displayName": "Palatinate",
+        "aliases": [],
+        "initialOwnerPolityId": 2,
+        "simulationRegionId": 2,
+        "historicalAdminAffiliation": "Kingdom of Bavaria (Palatinate)",
+        "historicalGrouping": "German Empire",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "The Bavarian Palatinate (Pfalz) south of 49.9°N, a separate Bavarian district."
+      },
+      {
+        "provinceId": 4001,
+        "key": "rus-fin-uusimaa",
+        "historicalName": "Uusimaa",
+        "displayName": "Uusimaa",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4002,
+        "key": "rus-fin-finland-proper",
+        "historicalName": "Finland Proper",
+        "displayName": "Finland Proper",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4003,
+        "key": "rus-fin-hame",
+        "historicalName": "Häme",
+        "displayName": "Häme",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4004,
+        "key": "rus-fin-kymi",
+        "historicalName": "Kymi",
+        "displayName": "Kymi",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4005,
+        "key": "rus-fin-mikkeli",
+        "historicalName": "Mikkeli",
+        "displayName": "Mikkeli",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4006,
+        "key": "rus-fin-kuopio",
+        "historicalName": "Kuopio",
+        "displayName": "Kuopio",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4007,
+        "key": "rus-fin-vaasa",
+        "historicalName": "Vaasa",
+        "displayName": "Vaasa",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4008,
+        "key": "rus-fin-oulu",
+        "historicalName": "Oulu",
+        "displayName": "Oulu",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4009,
+        "key": "rus-fin-lapland",
+        "historicalName": "Lapland",
+        "displayName": "Lapland",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A province of the autonomous Grand Duchy of Finland. Finland is a Russian territory in 1900 and becomes independent in 1917."
+      },
+      {
+        "provinceId": 4010,
+        "key": "rus-fin-aland",
+        "historicalName": "Åland",
+        "displayName": "Åland",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 160,
+        "historicalAdminAffiliation": "Finnish lääni (Åland)",
+        "historicalGrouping": "Grand Duchy of Finland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The demilitarized Åland islands, part of the Grand Duchy of Finland. The modern admin-1 source does not separate Åland, so the province is cut from the 1900 Finnish polygon by a small clip."
+      },
+      {
+        "provinceId": 4011,
+        "key": "rus-est-harju",
+        "historicalName": "Harju",
+        "displayName": "Harju",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4012,
+        "key": "rus-est-jarva",
+        "historicalName": "Järva",
+        "displayName": "Järva",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4013,
+        "key": "rus-est-viru",
+        "historicalName": "Viru",
+        "displayName": "Viru",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4014,
+        "key": "rus-est-tartu",
+        "historicalName": "Tartu",
+        "displayName": "Tartu",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4015,
+        "key": "rus-est-voru",
+        "historicalName": "Võru",
+        "displayName": "Võru",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4016,
+        "key": "rus-est-viljandi",
+        "historicalName": "Viljandi",
+        "displayName": "Viljandi",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4017,
+        "key": "rus-est-parnu",
+        "historicalName": "Pärnu",
+        "displayName": "Pärnu",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4018,
+        "key": "rus-est-laane",
+        "historicalName": "Lääne",
+        "displayName": "Lääne",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4019,
+        "key": "rus-est-saare",
+        "historicalName": "Saare",
+        "displayName": "Saare",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Estonian governorate (Estlyandskaya)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of the Russian governorate of Estonia; independent Estonia is a future polity."
+      },
+      {
+        "provinceId": 4020,
+        "key": "rus-lva-riga",
+        "historicalName": "Riga",
+        "displayName": "Riga",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Baltic governorate (Courland, Livonia or Vitebsk)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Latvian municipalities around a historical centre. Courland and southern Livonia were in the Baltic Provinces; Latgale belonged to Vitebsk governorate."
+      },
+      {
+        "provinceId": 4021,
+        "key": "rus-lva-vidzeme",
+        "historicalName": "Vidzeme",
+        "displayName": "Vidzeme",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Baltic governorate (Courland, Livonia or Vitebsk)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Latvian municipalities around a historical centre. Courland and southern Livonia were in the Baltic Provinces; Latgale belonged to Vitebsk governorate."
+      },
+      {
+        "provinceId": 4022,
+        "key": "rus-lva-kurzeme",
+        "historicalName": "Kurzeme",
+        "displayName": "Kurzeme",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Baltic governorate (Courland, Livonia or Vitebsk)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Latvian municipalities around a historical centre. Courland and southern Livonia were in the Baltic Provinces; Latgale belonged to Vitebsk governorate."
+      },
+      {
+        "provinceId": 4023,
+        "key": "rus-lva-zemgale",
+        "historicalName": "Zemgale",
+        "displayName": "Zemgale",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Baltic governorate (Courland, Livonia or Vitebsk)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Latvian municipalities around a historical centre. Courland and southern Livonia were in the Baltic Provinces; Latgale belonged to Vitebsk governorate."
+      },
+      {
+        "provinceId": 4024,
+        "key": "rus-lva-latgale",
+        "historicalName": "Latgale",
+        "displayName": "Latgale",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Baltic governorate (Courland, Livonia or Vitebsk)",
+        "historicalGrouping": "Baltic Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A grouping of Latvian municipalities around a historical centre. Courland and southern Livonia were in the Baltic Provinces; Latgale belonged to Vitebsk governorate."
+      },
+      {
+        "provinceId": 4025,
+        "key": "rus-ltu-vilnius",
+        "historicalName": "Vilnius",
+        "displayName": "Vilnius",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4026,
+        "key": "rus-ltu-kaunas",
+        "historicalName": "Kaunas",
+        "displayName": "Kaunas",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4027,
+        "key": "rus-ltu-siauliai",
+        "historicalName": "Šiauliai",
+        "displayName": "Šiauliai",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4028,
+        "key": "rus-ltu-panevezys",
+        "historicalName": "Panevėžys",
+        "displayName": "Panevėžys",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4029,
+        "key": "rus-ltu-alytus",
+        "historicalName": "Alytus",
+        "displayName": "Alytus",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4030,
+        "key": "rus-ltu-marijampole",
+        "historicalName": "Marijampolė",
+        "displayName": "Marijampolė",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4031,
+        "key": "rus-ltu-taurage",
+        "historicalName": "Tauragė",
+        "displayName": "Tauragė",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4032,
+        "key": "rus-ltu-telsiai",
+        "historicalName": "Telšiai",
+        "displayName": "Telšiai",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4033,
+        "key": "rus-ltu-utena",
+        "historicalName": "Utena",
+        "displayName": "Utena",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Lithuanian governorate (Kovno, Vilna or Suwalki)",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Lithuanian district of the Russian Empire; Lithuania is a future polity."
+      },
+      {
+        "provinceId": 4034,
+        "key": "rus-pol-warsaw",
+        "historicalName": "Warsaw",
+        "displayName": "Warsaw",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4035,
+        "key": "rus-pol-odz",
+        "historicalName": "Łódź",
+        "displayName": "Łódź",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4036,
+        "key": "rus-pol-lublin",
+        "historicalName": "Lublin",
+        "displayName": "Lublin",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4037,
+        "key": "rus-pol-siedlce",
+        "historicalName": "Siedlce",
+        "displayName": "Siedlce",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4038,
+        "key": "rus-pol-kielce",
+        "historicalName": "Kielce",
+        "displayName": "Kielce",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4039,
+        "key": "rus-pol-kalisz",
+        "historicalName": "Kalisz",
+        "displayName": "Kalisz",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Polish governorate (Vistula Land)",
+        "historicalGrouping": "Congress Poland",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "Part of Congress Poland (Vistula Land) in the Russian Empire. Only the part inside the M11c Russian polygon is Russian; western Kuyavia is Prussian."
+      },
+      {
+        "provinceId": 4040,
+        "key": "rus-blr-brest",
+        "historicalName": "Brest",
+        "displayName": "Brest",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4041,
+        "key": "rus-blr-grodno",
+        "historicalName": "Grodno",
+        "displayName": "Grodno",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4042,
+        "key": "rus-blr-minsk",
+        "historicalName": "Minsk",
+        "displayName": "Minsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4043,
+        "key": "rus-blr-mogilev",
+        "historicalName": "Mogilev",
+        "displayName": "Mogilev",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4044,
+        "key": "rus-blr-gomel",
+        "historicalName": "Gomel",
+        "displayName": "Gomel",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4045,
+        "key": "rus-blr-vitebsk",
+        "historicalName": "Vitebsk",
+        "displayName": "Vitebsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Belarusian governorate",
+        "historicalGrouping": "Western Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Belarusian governorate of the Russian Empire; Belarus is a future polity."
+      },
+      {
+        "provinceId": 4046,
+        "key": "rus-ukr-kiev",
+        "historicalName": "Kiev",
+        "displayName": "Kiev",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4047,
+        "key": "rus-ukr-volhynia",
+        "historicalName": "Volhynia",
+        "displayName": "Volhynia",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4048,
+        "key": "rus-ukr-podolia",
+        "historicalName": "Podolia",
+        "displayName": "Podolia",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4049,
+        "key": "rus-ukr-kherson",
+        "historicalName": "Kherson",
+        "displayName": "Kherson",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4050,
+        "key": "rus-ukr-yekaterinoslav",
+        "historicalName": "Yekaterinoslav",
+        "displayName": "Yekaterinoslav",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4051,
+        "key": "rus-ukr-taurida",
+        "historicalName": "Taurida",
+        "displayName": "Taurida",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4052,
+        "key": "rus-ukr-kharkov",
+        "historicalName": "Kharkov",
+        "displayName": "Kharkov",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4053,
+        "key": "rus-ukr-poltava",
+        "historicalName": "Poltava",
+        "displayName": "Poltava",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4054,
+        "key": "rus-ukr-chernigov",
+        "historicalName": "Chernigov",
+        "displayName": "Chernigov",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4055,
+        "key": "rus-ukr-donetsk",
+        "historicalName": "Donetsk",
+        "displayName": "Donetsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4056,
+        "key": "rus-ukr-odessa",
+        "historicalName": "Odessa",
+        "displayName": "Odessa",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Ukrainian governorate",
+        "historicalGrouping": "Ukrainian Provinces",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A Ukrainian governorate of the Russian Empire; Ukraine is a future polity."
+      },
+      {
+        "provinceId": 4057,
+        "key": "rus-mda-kishinev",
+        "historicalName": "Kishinev",
+        "displayName": "Kishinev",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Bessarabian district",
+        "historicalGrouping": "Bessarabia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A Bessarabian district of the Russian Empire. The southern Budjak and the eastern bank are approximated by modern raion boundaries."
+      },
+      {
+        "provinceId": 4058,
+        "key": "rus-mda-bender",
+        "historicalName": "Bender",
+        "displayName": "Bender",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Bessarabian district",
+        "historicalGrouping": "Bessarabia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A Bessarabian district of the Russian Empire. The southern Budjak and the eastern bank are approximated by modern raion boundaries."
+      },
+      {
+        "provinceId": 4059,
+        "key": "rus-mda-izmail",
+        "historicalName": "Izmail",
+        "displayName": "Izmail",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Bessarabian district",
+        "historicalGrouping": "Bessarabia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A Bessarabian district of the Russian Empire. The southern Budjak and the eastern bank are approximated by modern raion boundaries."
+      },
+      {
+        "provinceId": 4060,
+        "key": "rus-moscow",
+        "historicalName": "Moscow",
+        "displayName": "Moscow",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4061,
+        "key": "rus-saint-petersburg",
+        "historicalName": "Saint Petersburg",
+        "displayName": "Saint Petersburg",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4062,
+        "key": "rus-novgorod",
+        "historicalName": "Novgorod",
+        "displayName": "Novgorod",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4063,
+        "key": "rus-pskov",
+        "historicalName": "Pskov",
+        "displayName": "Pskov",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4064,
+        "key": "rus-smolensk",
+        "historicalName": "Smolensk",
+        "displayName": "Smolensk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4065,
+        "key": "rus-tver",
+        "historicalName": "Tver",
+        "displayName": "Tver",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4066,
+        "key": "rus-yaroslavl",
+        "historicalName": "Yaroslavl",
+        "displayName": "Yaroslavl",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4067,
+        "key": "rus-kostroma",
+        "historicalName": "Kostroma",
+        "displayName": "Kostroma",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4068,
+        "key": "rus-vladimir",
+        "historicalName": "Vladimir",
+        "displayName": "Vladimir",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4069,
+        "key": "rus-ivanovo",
+        "historicalName": "Ivanovo",
+        "displayName": "Ivanovo",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4070,
+        "key": "rus-nizhny-novgorod",
+        "historicalName": "Nizhny Novgorod",
+        "displayName": "Nizhny Novgorod",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4071,
+        "key": "rus-ryazan",
+        "historicalName": "Ryazan",
+        "displayName": "Ryazan",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4072,
+        "key": "rus-tula",
+        "historicalName": "Tula",
+        "displayName": "Tula",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4073,
+        "key": "rus-kaluga",
+        "historicalName": "Kaluga",
+        "displayName": "Kaluga",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4074,
+        "key": "rus-bryansk",
+        "historicalName": "Bryansk",
+        "displayName": "Bryansk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4075,
+        "key": "rus-orel",
+        "historicalName": "Orel",
+        "displayName": "Orel",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4076,
+        "key": "rus-kursk",
+        "historicalName": "Kursk",
+        "displayName": "Kursk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4077,
+        "key": "rus-belgorod",
+        "historicalName": "Belgorod",
+        "displayName": "Belgorod",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4078,
+        "key": "rus-voronezh",
+        "historicalName": "Voronezh",
+        "displayName": "Voronezh",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4079,
+        "key": "rus-tsaritsyn",
+        "historicalName": "Tsaritsyn",
+        "displayName": "Tsaritsyn",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4080,
+        "key": "rus-kurgan",
+        "historicalName": "Kurgan",
+        "displayName": "Kurgan",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4081,
+        "key": "rus-lipetsk",
+        "historicalName": "Lipetsk",
+        "displayName": "Lipetsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4082,
+        "key": "rus-tambov",
+        "historicalName": "Tambov",
+        "displayName": "Tambov",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4083,
+        "key": "rus-penza",
+        "historicalName": "Penza",
+        "displayName": "Penza",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4084,
+        "key": "rus-saratov",
+        "historicalName": "Saratov",
+        "displayName": "Saratov",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4085,
+        "key": "rus-samara",
+        "historicalName": "Samara",
+        "displayName": "Samara",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4086,
+        "key": "rus-simbirsk",
+        "historicalName": "Simbirsk",
+        "displayName": "Simbirsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4087,
+        "key": "rus-kazan",
+        "historicalName": "Kazan",
+        "displayName": "Kazan",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4088,
+        "key": "rus-chuvash",
+        "historicalName": "Chuvash",
+        "displayName": "Chuvash",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4089,
+        "key": "rus-mari-el",
+        "historicalName": "Mari El",
+        "displayName": "Mari El",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4090,
+        "key": "rus-mordovia",
+        "historicalName": "Mordovia",
+        "displayName": "Mordovia",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4091,
+        "key": "rus-udmurt",
+        "historicalName": "Udmurt",
+        "displayName": "Udmurt",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4092,
+        "key": "rus-vyatka",
+        "historicalName": "Vyatka",
+        "displayName": "Vyatka",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4093,
+        "key": "rus-perm",
+        "historicalName": "Perm",
+        "displayName": "Perm",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4094,
+        "key": "rus-vologda",
+        "historicalName": "Vologda",
+        "displayName": "Vologda",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4095,
+        "key": "rus-arkhangelsk",
+        "historicalName": "Arkhangelsk",
+        "displayName": "Arkhangelsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4096,
+        "key": "rus-olonets",
+        "historicalName": "Olonets",
+        "displayName": "Olonets",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4097,
+        "key": "rus-ust-sysolsk",
+        "historicalName": "Ust-Sysolsk",
+        "displayName": "Ust-Sysolsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4098,
+        "key": "rus-orenburg",
+        "historicalName": "Orenburg",
+        "displayName": "Orenburg",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4099,
+        "key": "rus-ufa",
+        "historicalName": "Ufa",
+        "displayName": "Ufa",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4100,
+        "key": "rus-yekaterinburg",
+        "historicalName": "Yekaterinburg",
+        "displayName": "Yekaterinburg",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4101,
+        "key": "rus-chelyabinsk",
+        "historicalName": "Chelyabinsk",
+        "displayName": "Chelyabinsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4102,
+        "key": "rus-don",
+        "historicalName": "Don",
+        "displayName": "Don",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4103,
+        "key": "rus-kuban",
+        "historicalName": "Kuban",
+        "displayName": "Kuban",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4104,
+        "key": "rus-stavropol",
+        "historicalName": "Stavropol",
+        "displayName": "Stavropol",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4105,
+        "key": "rus-terek",
+        "historicalName": "Terek",
+        "displayName": "Terek",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4106,
+        "key": "rus-dagestan",
+        "historicalName": "Dagestan",
+        "displayName": "Dagestan",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4107,
+        "key": "rus-astrakhan",
+        "historicalName": "Astrakhan",
+        "displayName": "Astrakhan",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4108,
+        "key": "rus-kalmykia",
+        "historicalName": "Kalmykia",
+        "displayName": "Kalmykia",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "A European Russian governorate-scale province of the Russian Empire. Modern oblast boundaries are a proxy for the 1900 governorate."
+      },
+      {
+        "provinceId": 4109,
+        "key": "rus-alexandrovsk",
+        "historicalName": "Alexandrovsk",
+        "displayName": "Alexandrovsk",
+        "aliases": [],
+        "initialOwnerPolityId": 4,
+        "simulationRegionId": 4,
+        "historicalAdminAffiliation": "Russian governorate or oblast",
+        "historicalGrouping": "European Russia",
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "Murmansk (Alexandrovsk before 1917) was a small Arctic port district of Arkhangelsk governorate; the modern unit is a proxy."
+      },
+      {
+        "provinceId": 22001,
+        "key": "mco-monaco",
+        "historicalName": "Monaco",
+        "displayName": "Monaco",
+        "aliases": [],
+        "initialOwnerPolityId": 22,
+        "simulationRegionId": 22,
+        "historicalAdminAffiliation": "Principality of Monaco",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 23001,
+        "key": "smr-san-marino",
+        "historicalName": "San Marino",
+        "displayName": "San Marino",
+        "aliases": [],
+        "initialOwnerPolityId": 23,
+        "simulationRegionId": 23,
+        "historicalAdminAffiliation": "Most Serene Republic of San Marino",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 24001,
+        "key": "and-andorra",
+        "historicalName": "Andorra",
+        "displayName": "Andorra",
+        "aliases": [],
+        "initialOwnerPolityId": 24,
+        "simulationRegionId": 24,
+        "historicalAdminAffiliation": "Co-Principality of Andorra",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 25001,
+        "key": "lie-liechtenstein",
+        "historicalName": "Liechtenstein",
+        "displayName": "Liechtenstein",
+        "aliases": [],
+        "initialOwnerPolityId": 25,
+        "simulationRegionId": 25,
+        "historicalAdminAffiliation": "Principality of Liechtenstein",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 66001,
+        "key": "crt-crete",
+        "historicalName": "Crete",
+        "displayName": "Crete",
+        "aliases": [],
+        "initialOwnerPolityId": 66,
+        "simulationRegionId": 66,
+        "historicalAdminAffiliation": "Cretan State",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 1050,
+        "key": "cyp-cyprus",
+        "historicalName": "Cyprus",
+        "displayName": "Cyprus",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 106,
+        "historicalAdminAffiliation": "British Cyprus",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 1051,
+        "key": "mlt-malta",
+        "historicalName": "Malta",
+        "displayName": "Malta",
+        "aliases": [],
+        "initialOwnerPolityId": 1,
+        "simulationRegionId": 107,
+        "historicalAdminAffiliation": "British Malta",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 14006,
+        "key": "isl-iceland",
+        "historicalName": "Iceland",
+        "displayName": "Iceland",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 154,
+        "historicalAdminAffiliation": "Danish Iceland",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 14007,
+        "key": "fro-faroe-islands",
+        "historicalName": "Faroe Islands",
+        "displayName": "Faroe Islands",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 156,
+        "historicalAdminAffiliation": "Danish Faroe Islands",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
+      },
+      {
+        "provinceId": 14008,
+        "key": "grl-greenland",
+        "historicalName": "Greenland",
+        "displayName": "Greenland",
+        "aliases": [],
+        "initialOwnerPolityId": 14,
+        "simulationRegionId": 155,
+        "historicalAdminAffiliation": "Danish Arctic dependency",
+        "historicalGrouping": null,
+        "initialSpecialStatus": "ordinary",
+        "sourceIds": [
+          "natural-earth-10m-admin1",
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "low",
+        "notes": "A single province for the whole Arctic dependency. It lies outside the European provincial geometry scope but is retained as the catalog's Danish dependency."
+      }
+    ],
+    "polityRegistry": [
+      {
+        "polityId": 1000,
+        "tag": "POL",
+        "historicalName": "Republic of Poland",
+        "commonName": "Poland",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6888,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Warsaw",
+        "flagKey": "POL",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Restored after the First World War from Congress Poland, Galicia, Posen, West Prussia and Upper Silesia."
+      },
+      {
+        "polityId": 1001,
+        "tag": "CZE",
+        "historicalName": "Czechoslovak Republic",
+        "commonName": "Czechoslovakia",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6874,
+        "activeToDay": 33967,
+        "selectable1900": false,
+        "capitalName": "Prague",
+        "flagKey": "CZE",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Bohemia, Moravia, Austrian Silesia (including Hultschin), Slovakia and Carpathian Ruthenia."
+      },
+      {
+        "polityId": 1002,
+        "tag": "YUG",
+        "historicalName": "Kingdom of Serbs, Croats and Slovenes",
+        "commonName": "Yugoslavia",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6908,
+        "activeToDay": 36524,
+        "selectable1900": false,
+        "capitalName": "Belgrade",
+        "flagKey": "YUG",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Serbia, Montenegro, Croatia-Slavonia, Slovenia, Bosnia-Herzegovina, Vojvodina and the Dalmatian coast."
+      },
+      {
+        "polityId": 1003,
+        "tag": "FIN",
+        "historicalName": "Republic of Finland",
+        "commonName": "Finland",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6548,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Helsinki",
+        "flagKey": "FIN",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Independent successor to the Grand Duchy of Finland; the 1900 Grand Duchy itself remains a Russian territory."
+      },
+      {
+        "polityId": 1004,
+        "tag": "EST",
+        "historicalName": "Republic of Estonia",
+        "commonName": "Estonia",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6628,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Tallinn",
+        "flagKey": "EST",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Estonian governorate of the Russian Empire."
+      },
+      {
+        "polityId": 1005,
+        "tag": "LVA",
+        "historicalName": "Republic of Latvia",
+        "commonName": "Latvia",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6895,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Riga",
+        "flagKey": "LVA",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Courland, southern Livonia and Latgale (Vitebsk governorate)."
+      },
+      {
+        "polityId": 1006,
+        "tag": "LTU",
+        "historicalName": "Republic of Lithuania",
+        "commonName": "Lithuania",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6620,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Vilnius",
+        "flagKey": "LTU",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Kovno, Vilna and Suwalki governorates; the Memel Territory was added in 1923."
+      },
+      {
+        "polityId": 1007,
+        "tag": "DDR",
+        "historicalName": "German Democratic Republic",
+        "commonName": "East Germany",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 18176,
+        "activeToDay": 33147,
+        "selectable1900": false,
+        "capitalName": "East Berlin",
+        "flagKey": "DDR",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Soviet occupation zone; the five eastern Länder. Reunified with the Federal Republic in 1990."
+      },
+      {
+        "polityId": 1008,
+        "tag": "FRG",
+        "historicalName": "Federal Republic of Germany",
+        "commonName": "West Germany",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 18039,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Bonn",
+        "flagKey": "FRG",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The three western occupation zones; reunified Germany keeps this polity and does not regain the eastern territories."
+      },
+      {
+        "polityId": 1009,
+        "tag": "IRL",
+        "historicalName": "Irish Free State",
+        "commonName": "Ireland",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 8374,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Dublin",
+        "flagKey": "IRL",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "The twenty-six counties; the Republic of Ireland was declared in 1949. Northern Ireland remains with the United Kingdom."
+      },
+      {
+        "polityId": 1010,
+        "tag": "AUT",
+        "historicalName": "Republic of Austria",
+        "commonName": "Austria",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6889,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Vienna",
+        "flagKey": "AUT",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Successor to the Austrian half of the monarchy; the 1900 polity id 60 remains the Austro-Hungarian Monarchy."
+      },
+      {
+        "polityId": 1011,
+        "tag": "HUN",
+        "historicalName": "Kingdom of Hungary",
+        "commonName": "Hungary",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6893,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Budapest",
+        "flagKey": "HUN",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Successor to the Hungarian half of the monarchy after the 1920 Trianon settlement."
+      },
+      {
+        "polityId": 1012,
+        "tag": "DAN",
+        "historicalName": "Free City of Danzig",
+        "commonName": "Danzig",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 7623,
+        "activeToDay": 14487,
+        "selectable1900": false,
+        "capitalName": "Danzig",
+        "flagKey": "DAN",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "medium",
+        "notes": "League of Nations free city under Polish customs administration; the free-city condition is represented with the province special status."
+      },
+      {
+        "polityId": 1013,
+        "tag": "ALB",
+        "historicalName": "Principality of Albania",
+        "commonName": "Albania",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 4714,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Tirana",
+        "flagKey": "ALB",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Independent from the Ottoman Empire in 1912; the 1900 Albanian provinces belong to the Ottoman Empire."
+      },
+      {
+        "polityId": 1014,
+        "tag": "UKR",
+        "historicalName": "Ukrainian People's Republic",
+        "commonName": "Ukraine",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6532,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Kyiv",
+        "flagKey": "UKR",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Ukrainian governorates and Galicia; independence was contested until 1991."
+      },
+      {
+        "polityId": 1015,
+        "tag": "BLR",
+        "historicalName": "Belarusian People's Republic",
+        "commonName": "Belarus",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6657,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Minsk",
+        "flagKey": "BLR",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Belarusian governorates of the Russian Empire; independent statehood was restored in 1991."
+      },
+      {
+        "polityId": 1016,
+        "tag": "MDA",
+        "historicalName": "Moldavian Democratic Republic",
+        "commonName": "Moldova",
+        "kind": "future-state",
+        "status": "independent",
+        "sovereignPolityId": null,
+        "activeFromDay": 6557,
+        "activeToDay": null,
+        "selectable1900": false,
+        "capitalName": "Chișinău",
+        "flagKey": "MDA",
+        "sourceIds": [
+          "project-authored-1900",
+          "project-authored-m12"
+        ],
+        "confidence": "high",
+        "notes": "Bessarabia; union with Romania in 1918 and independence in 1991 are alternative historical paths."
+      }
+    ]
+  }
 }) as EconomyScenarioDef;

@@ -41,6 +41,19 @@ export interface Region {
   occupiedSinceDay: Day | null;
 }
 
+/**
+ * Explicit alias for the historical `Region` concept.
+ *
+ * A SimulationRegion is a population/economy accounting unit. It is NOT a
+ * geographical subdivision: since M12a the sole geographical layer beneath a
+ * polity is the permanent `Province`. The runtime field keeps the name
+ * `regions` for save compatibility, but new code should use this alias.
+ */
+export type SimulationRegion = Region;
+
+/** Explicit alias for the simulation-region scenario input (not geography). */
+export type SimulationRegionInitialDef = RegionInitialDef;
+
 /** Authoritative population block state. */
 export interface PopBlock {
   id: Id;

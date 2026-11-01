@@ -21,6 +21,7 @@ import {
   requireUint32,
 } from "../validation.js";
 import type { World, CreateWorldOptions } from "../world.js";
+import { emptyProvinceState } from "../provinces/state.js";
 import {
   ADULT_LITERACY_MIN_AGE,
   AGE_BAND_WIDTH,
@@ -711,6 +712,7 @@ export function createPopulationWorld(
       nextOfferId: 1,
       lastPhaseDay: null,
     },
+    provinces: emptyProvinceState(),
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,

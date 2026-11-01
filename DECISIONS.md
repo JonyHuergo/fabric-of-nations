@@ -5523,3 +5523,81 @@ any future stricter DOM runtime.
   touch behavior is unchanged.
 - Map data, historical borders, simulation state, saves, determinism and the
   public API are unchanged.
+
+## D-103 — M12a: permanent provinces replace geographical regions
+
+**Status:** implemented (M12a).
+
+### Context
+
+The M11 world had one map polygon per 1900 polity/territory and one simulation
+`Region` per catalog entry. The simulation `Region` is a population/economy
+accounting unit: it owns pop blocks, buildings, a market and a controller. It was
+never a separately modelled geographical subdivision, but because one map polygon
+corresponded to one region, the two concepts were easy to confuse. M12a requires
+that the sole geographical subdivision beneath a polity be a permanent province
+whose ownership can change without rebuilding country polygons.
+
+### Decision
+
+1. **Province is the only geographical layer.** A committed province bundle
+   (`packages/data/data/map/provinces_1900.json`) carries stable ids, historical
+   names, 1900 owners, administrative metadata, provenance, confidence and
+   simplified geometry. There is no geographical region entity in the province
+   hierarchy and no Region → Province nesting.
+2. **The simulation Region is preserved, not repurposed.** It remains the
+   population/economy accounting unit with the existing serialized field name
+   `regions` for save compatibility. Explicit aliases `SimulationRegion`,
+   `SimulationRegionInitialDef`, `SimulationRegionMetaDef` and
+   `SimulationRegionSnapshot` document the distinction. Provinces reference the
+   simulation region that currently contains their population
+   (`simulationRegionId`). Province geometry is never derived from it.
+3. **Mutable political state is separate from permanent geography.**
+   `World.provinces` stores legal ownership, effective control, the control date,
+   formal claims and special status for every province. Mutations
+   (`transferProvinceOwnership`, `setProvinceControl`, claims, special status)
+   never touch geometry, names or ids. Occupation changes only the controller.
+4. **Country borders are derived from current provincial ownership.** The app
+   draws every province edge as a thin white dotted line and overlays a stronger
+   solid line only where the two provinces have different current owners. A
+   1900 polity whose territory is covered by provinces does not draw its static
+   1900 outline, so a transferred province cannot leave a stale border behind.
+5. **Geometry source.** Natural Earth 1:10m admin-1 units are internal blocks
+   only; every province is clipped to the authored M11c 1900 polity polygon.
+   Later borders that cut a 1900 unit are reconstructed as separate provinces
+   (East Prussia north/south, Silesia thirds, West Prussia/Posen, Schleswig,
+   Alsace/Lorraine, Galicia/Bukovina, Transylvania/Banat, Ireland's 26 + 6
+   counties, and the Baltic/Ukrainian/Belarusian governorate groups).
+6. **Stable ids.** Province ids are assigned deterministically as
+   `ownerPolityId * 1000 + order` in the authored plan and never renumbered.
+   Future polity ids start at 1000 and never collide with the 0..165 catalog ids.
+7. **Future successors are a registry, not 1900 countries.** Poland,
+   Czechoslovakia, Yugoslavia, Finland, Estonia, Latvia, Lithuania, East/West
+   Germany, Ireland, Austria/Hungary successors, Danzig, Albania, Ukraine,
+   Belarus and Moldova are registered with activation dates and remain absent
+   from the 1900 selectable-country list.
+8. **Schema and version.** `World` schema 26 → 27 (adds `World.provinces`),
+   simulation version 0.27.0 → 0.28.0, worker protocol 14 → 15 (adds the
+   `provinces` snapshot array). The save envelope and round-trip format are
+   unchanged; the project keeps its existing strict same-version save policy.
+   The data content version stays `m3-economy-v12` because existing definition
+   and scenario meanings are unchanged and the province content is additive.
+9. **No population/economic redistribution.** Existing simulation regions,
+   populations and buildings are untouched so determinism and starting
+   conditions are preserved. Province-level simulation is explicitly deferred.
+
+### Consequences
+
+- Austria-Hungary, Germany, Russia and the United Kingdom can lose, gain and
+  exchange territory through province ownership without changing any polygon.
+- Reference snapshots for 1900, 1918–1920, 1945, 1949 and 1990–1991 are
+  reproducible via transfers; the tests demonstrate the key sequences.
+- The old geographical dependency is gone: map rendering, hit-testing,
+  selection and country composition use provinces. The simulation region only
+  supplies population/economy totals to the UI.
+- Known approximation: modern admin-1 units are proxies for historical internal
+  boundaries, and a handful of authored clip lines approximate borders. These are
+  labelled low/medium confidence in the inventory and in
+  `docs/EUROPE_PROVINCIALIZATION.md`; they are not presented as surveyed lines.
+- Province geometry adds about 1 MiB to the committed offline bundle and about
+  1,300 paths to the map. The map remains a single offline SVG render.

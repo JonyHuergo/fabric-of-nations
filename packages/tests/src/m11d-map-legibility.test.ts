@@ -102,10 +102,13 @@ describe("M11d map typography", () => {
     expect(WORLD_MAP).toContain('strokeWidth={1.1 / scale}');
   });
 
-  test("the land mask no longer draws a second coastline", () => {
+  test("the land mask is the single coastline source", () => {
     const landStart = WORLD_MAP.indexOf("d={landPath}");
     expect(landStart).toBeGreaterThan(0);
-    const landBlock = WORLD_MAP.slice(landStart, landStart + 500);
-    expect(landBlock).toContain('stroke="none"');
+    const landBlock = WORLD_MAP.slice(landStart, landStart + 700);
+    // The land mask now carries the single coastline stroke; province-owning
+    // 1900 polities skip their own outline so no second coastline is drawn.
+    expect(landBlock).toContain("stroke={colors.mapBorder}");
+    expect(WORLD_MAP).toContain("provinceOwnerTags.has(polity.tag)");
   });
 });

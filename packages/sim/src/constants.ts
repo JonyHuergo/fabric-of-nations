@@ -25,9 +25,11 @@
  * public-health allocation state, training payroll/stipend, and the labor/health
  * policy actions. E6a adds per-country trade policy, market customs administration,
  * authored transport routes, in-transit consignments, freight/customs postings, and
- * the trade-policy action.
+ * the trade-policy action. M12a adds permanent provincial ownership, effective
+ * control, claims and special-status state plus the deterministic ownership and
+ * control mutations.
  */
-export const SIM_VERSION = "0.27.0";
+export const SIM_VERSION = "0.28.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -51,8 +53,12 @@ export const SIM_VERSION = "0.27.0";
  * training payroll/stipend posting kinds, and the labor/health law fields (D-078).
  * E6a adds `Market.customsCountryId`, `Country.trade`, `World.trade`, the freight/
  * customs posting kinds and account subtypes, and the customs fiscal total (D-079).
+ * M12a adds `World.provinces`: the authoritative, mutable ownership, control,
+ * claim and special-status record of every permanent geographical province.
+ * Province geometry and definitions are static scenario content and are never
+ * serialized (D-103).
  */
-export const WORLD_SCHEMA_VERSION = 26;
+export const WORLD_SCHEMA_VERSION = 27;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -157,3 +163,21 @@ export const MAX_COUNTRY_NAME_LENGTH = 128;
 
 /** Maximum accepted length of an external issuer key. */
 export const MAX_FOREIGN_ISSUER_KEY_LENGTH = 64;
+
+/** Maximum number of permanent province definitions in a scenario. */
+export const MAX_PROVINCES = 4096;
+
+/** Maximum length of a province key (the stable non-numeric identifier). */
+export const MAX_PROVINCE_KEY_LENGTH = 96;
+
+/** Maximum length of a province historical or display name. */
+export const MAX_PROVINCE_NAME_LENGTH = 128;
+
+/** Maximum length of a province note or transfer reason. */
+export const MAX_PROVINCE_NOTE_LENGTH = 500;
+
+/** Maximum number of formal claimants recorded on one province. */
+export const MAX_PROVINCE_CLAIMS = 16;
+
+/** Maximum number of provincial change records retained for audit. */
+export const MAX_PROVINCE_TRANSFERS = 512;

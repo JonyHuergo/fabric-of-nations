@@ -18,6 +18,11 @@ import type { Day, Id } from "../types.js";
 import { requireFiniteNumber, requireInteger } from "../validation.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
+  assertValidProvinceScenario,
+  createProvinceState,
+  emptyProvinceState,
+} from "../provinces/state.js";
+import {
   applyOpeningBalances,
   categoryForSubtype,
   type OpeningBalanceEntry,
@@ -853,6 +858,12 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
     allowLegacyFiscalDefaults: true,
   });
   assertFiscalRegionOwnership(scenario);
+  if (scenario.provinces !== undefined) {
+    assertValidProvinceScenario(scenario.provinces, {
+      countryIds: new Set((scenario.countries ?? []).map((country) => country.id)),
+      regionIds: new Set(scenario.population.regions.map((region) => region.id)),
+    });
+  }
 }
 
 /** Build an M3 world from a validated economy scenario. */
@@ -1376,6 +1387,13 @@ export function createEconomyWorld(
   world.employmentDirty = true;
   world.construction.nextBuildingId =
     world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;
+
+  // M12a provincial geography. Disabled for legacy scenarios; when present every
+  // province starts with its authored 1900 owner and effective controller.
+  world.provinces =
+    scenario.provinces === undefined
+      ? emptyProvinceState()
+      : createProvinceState(scenario.provinces, world.startDayIndex);
 
   assertValidWorld(world);
   return world;

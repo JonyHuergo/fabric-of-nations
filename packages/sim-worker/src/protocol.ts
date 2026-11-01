@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 14 as const;
+export const PROTOCOL_VERSION = 15 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1200,6 +1200,24 @@ export interface RegionSnapshot {
   readonly meta: RegionMetaSnapshot | null;
 }
 
+/**
+ * Mutable M12a political state of one permanent province.
+ *
+ * Static province metadata (historical name, grouping, geometry) is committed
+ * app content; the snapshot carries only the political facts that can change.
+ */
+export interface ProvinceOwnershipSnapshot {
+  readonly provinceId: number;
+  readonly ownerPolityId: number;
+  readonly controllerPolityId: number;
+  readonly controlledSinceDay: number | null;
+  readonly claimantPolityIds: readonly number[];
+  readonly specialStatus: string;
+}
+
+/** Explicit alias: a simulation region is not a geographical province. */
+export type SimulationRegionSnapshot = RegionSnapshot;
+
 export interface GoodSnapshot {
   readonly id: number;
   readonly key: string;
@@ -1273,6 +1291,8 @@ export interface SimulationSnapshot {
   /** Compact record for every country in the world. */
   readonly countrySummaries: readonly CountrySummarySnapshot[];
   readonly regions: readonly RegionSnapshot[];
+  /** M12a permanent provincial ownership and effective control, ascending by id. */
+  readonly provinces: readonly ProvinceOwnershipSnapshot[];
   readonly markets: readonly MarketSnapshot[];
   readonly goods: readonly GoodSnapshot[];
   /** Static authored need tiers, used for evidence-based diagnosis. */
@@ -2573,6 +2593,19 @@ function isRegionSnapshot(value: unknown): value is RegionSnapshot {
   );
 }
 
+function isProvinceOwnershipSnapshot(value: unknown): value is ProvinceOwnershipSnapshot {
+  if (!isRecord(value)) return false;
+  if (!isIntegerIn(value.provinceId, 0, 0xffff_ffff)) return false;
+  if (!isIntegerIn(value.ownerPolityId, 0, 0xffff_ffff)) return false;
+  if (!isIntegerIn(value.controllerPolityId, 0, 0xffff_ffff)) return false;
+  if (value.controlledSinceDay !== null && !isIntegerIn(value.controlledSinceDay, 0, 36_524)) {
+    return false;
+  }
+  if (!Array.isArray(value.claimantPolityIds)) return false;
+  if (!value.claimantPolityIds.every((id) => isIntegerIn(id, 0, 0xffff_ffff))) return false;
+  return isString(value.specialStatus, 32);
+}
+
 function isGoodSnapshot(value: unknown): value is GoodSnapshot {
   if (!isRecord(value)) return false;
   return (
@@ -2707,6 +2740,12 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
     return false;
   }
   if (!Array.isArray(value.regions) || !value.regions.every(isRegionSnapshot)) return false;
+  if (
+    !Array.isArray(value.provinces) ||
+    !value.provinces.every(isProvinceOwnershipSnapshot)
+  ) {
+    return false;
+  }
   if (!Array.isArray(value.markets) || !value.markets.every(isMarketSnapshot)) return false;
   if (!Array.isArray(value.goods) || !value.goods.every(isGoodSnapshot)) return false;
   if (!Array.isArray(value.needTiers) || !value.needTiers.every(isNeedTier)) return false;

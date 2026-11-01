@@ -14,6 +14,7 @@
 
 import type { Day, Id, MoneySUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
+import type { ProvinceScenarioInput } from "../provinces/types.js";
 
 export const GOOD_CATEGORIES = ["food", "raw", "industrial", "luxury", "service"] as const;
 export type GoodCategory = (typeof GOOD_CATEGORIES)[number];
@@ -1947,6 +1948,13 @@ export interface RegionMetaDef {
   readonly notes: string;
 }
 
+/**
+ * Simulation-region metadata (formerly "region meta"). This describes a
+ * population/economy region and is not a geographical layer; provinces are the
+ * sole geography beneath polities in M12a.
+ */
+export type SimulationRegionMetaDef = RegionMetaDef;
+
 export interface EconomyScenarioDef {
   population: PopulationScenarioDef;
   definitions: EconomyDefinitions;
@@ -1962,7 +1970,14 @@ export interface EconomyScenarioDef {
    */
   countryMeta?: CountryMetaDef[];
   marketMeta?: MarketMetaDef[];
+  /** Simulation-region metadata (formerly "region meta"); not geography. */
   regionMeta?: RegionMetaDef[];
+  /**
+   * M12a permanent provincial geography and its initial political ownership.
+   * Omitted for scenarios that predate M12a. Province geometry lives in the
+   * app/data map bundle, never in the simulation; this is static content.
+   */
+  provinces?: ProvinceScenarioInput;
   currencies?: Currency[];
   currencyValuations?: CurrencyValuation[];
   /** M5a profit-allocation policy. Omitted means disabled defaults. */

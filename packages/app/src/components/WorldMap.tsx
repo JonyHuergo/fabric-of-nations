@@ -28,10 +28,21 @@ import {
 } from "./mapViewport";
 import {
   decodePolityGeometry,
+  decodeProvinceGeometry,
   pathForRings,
   project,
   type DecodedPolityGeometry,
 } from "./worldMapGeometry";
+import { PROVINCES_1900 } from "../generated/provinces1900";
+import {
+  pickProvinceAtPoint,
+  planProvinceBorders,
+  pointInRing,
+} from "./provinceRenderPlan";
+import type {
+  ProvinceMapData,
+  ProvinceMapProvince,
+} from "../provinceCatalogTypes";
 
 export { MAP_MAX_SCALE, MAP_MIN_SCALE, MAP_PREVIOUS_MAX_SCALE } from "./mapViewport";
 import type {
@@ -78,23 +89,23 @@ interface DecodedPolity extends WorldMapPolity {
   readonly points: DecodedPolityGeometry["points"];
 }
 
+interface DecodedProvince extends ProvinceMapProvince {
+  readonly path: string | null;
+  readonly centroid: readonly [number, number];
+  readonly screenBox: readonly [number, number, number, number];
+  readonly points: DecodedPolityGeometry["points"];
+}
+
+/** Provincial boundaries are thin white dotted lines; country borders are stronger. */
+const PROVINCE_BORDER_COLOR = "#f4f1e6";
+const PROVINCE_BORDER_WIDTH = 0.9;
+const PROVINCE_DASH_ON = 1.5;
+const PROVINCE_DASH_OFF = 1.7;
+const COUNTRY_BORDER_WIDTH = 1.7;
+
 function centroidOf(polity: WorldMapPolity): readonly [number, number] {
   const [lon, lat] = polity.label;
   return project(lon, lat);
-}
-
-function pointInRing(
-  x: number,
-  y: number,
-  points: readonly (readonly number[])[],
-): boolean {
-  let inside = false;
-  for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
-    const [xi = 0, yi = 0] = points[i] ?? [];
-    const [xj = 0, yj = 0] = points[j] ?? [];
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
-  }
-  return inside;
 }
 
 export interface WorldMapProps {
@@ -109,6 +120,11 @@ export interface WorldMapProps {
   readonly showLegend?: boolean;
   /** In the market layer, dim every polity outside this market. */
   readonly highlightMarketId?: number | null;
+  /** M12a selected province, when the host screen exposes province selection. */
+  readonly selectedProvinceId?: number | null;
+  readonly onSelectProvince?: (provinceId: number | null) => void;
+  /** Provincial boundaries are shown by default for every M12a map. */
+  readonly showProvinces?: boolean;
 }
 
 export function WorldMap({
@@ -122,11 +138,15 @@ export function WorldMap({
   height = 420,
   showLegend = true,
   highlightMarketId = null,
+  selectedProvinceId = null,
+  onSelectProvince,
+  showProvinces = true,
 }: WorldMapProps) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [hoveredTag, setHoveredTag] = useState<string | null>(null);
+  const [hoveredProvinceId, setHoveredProvinceId] = useState<number | null>(null);
   const gestureRef = useRef({ x: 0, y: 0, distance: 0 });
   /** DOM node used to attach a non-passive web wheel listener. */
   const containerRef = useRef<ComponentRef<typeof View> | null>(null);
@@ -199,6 +219,100 @@ export function WorldMap({
       };
     });
   }, [entryByTag, map.polities]);
+
+  /**
+   * M12a province geometry. Provinces are the sole geographical subdivision in
+   * Europe; polity fills remain as the 1900 underlay and for non-European areas.
+   */
+  const provinceMap: ProvinceMapData = PROVINCES_1900;
+  const provinces = useMemo<readonly DecodedProvince[]>(() => {
+    return provinceMap.provinces.map((province) => {
+      const [minX = -180, minY = -90, maxX = 180, maxY = 90] = province.bbox;
+      const topLeft = project(minX, maxY);
+      const bottomRight = project(maxX, minY);
+      const geometry = decodeProvinceGeometry(province);
+      const [lon = 0, lat = 0] = province.label;
+      return {
+        ...province,
+        path: geometry.path,
+        centroid: project(lon, lat),
+        screenBox: [topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]],
+        points: geometry.points,
+      };
+    });
+  }, [provinceMap.provinces]);
+
+  const provinceById = useMemo(
+    () => new Map(provinceMap.provinces.map((province) => [province.id, province])),
+    [provinceMap.provinces],
+  );
+  const futurePolityTagById = useMemo(() => {
+    const byId = new Map<number, string>();
+    for (const polity of provinceMap.futurePolities) byId.set(polity.polityId, polity.tag);
+    return byId;
+  }, [provinceMap.futurePolities]);
+  const ownershipByProvinceId = useMemo(() => {
+    const byId = new Map<number, SimulationSnapshot["provinces"][number]>();
+    if (snapshot !== null) {
+      for (const entry of snapshot.provinces) byId.set(entry.provinceId, entry);
+    }
+    return byId;
+  }, [snapshot]);
+  const catalogTagById = useMemo(
+    () => new Map(catalog.entries.map((entry) => [entry.id, entry.tag] as const)),
+    [catalog.entries],
+  );
+  const provinceOwnerPolityId = useCallback(
+    (province: ProvinceMapProvince): number =>
+      ownershipByProvinceId.get(province.id)?.ownerPolityId ??
+      province.initialOwnerPolityId,
+    [ownershipByProvinceId],
+  );
+  const tagForPolityId = useCallback(
+    (polityId: number): string | null =>
+      futurePolityTagById.get(polityId) ?? catalogTagById.get(polityId) ?? null,
+    [catalogTagById, futurePolityTagById],
+  );
+
+  const ownerTagByProvinceId = useMemo(() => {
+    const byId = new Map<number, string>();
+    for (const province of provinces) {
+      const polityId = provinceOwnerPolityId(province);
+      const tag = tagForPolityId(polityId) ?? province.initialOwnerTag;
+      byId.set(province.id, tag);
+    }
+    return byId;
+  }, [provinceOwnerPolityId, provinces, tagForPolityId]);
+
+  const provinceOwnerTags = useMemo(
+    () => new Set(provinces.map((province) => province.initialOwnerTag)),
+    [provinces],
+  );
+
+  const provinceBorderPlan = useMemo(
+    () => planProvinceBorders(provinceMap.borders, ownerTagByProvinceId),
+    [ownerTagByProvinceId, provinceMap.borders],
+  );
+  const provinceBorderPaths = useMemo(() => {
+    const dotted: string[] = [];
+    const national: string[] = [];
+    for (const border of provinceBorderPlan) {
+      if (border.path === null) continue;
+      dotted.push(border.path);
+      if (border.national) national.push(border.path);
+    }
+    return { dotted: dotted.join(""), national: national.join("") };
+  }, [provinceBorderPlan]);
+
+  const selectedCountryProvincePath = useMemo(() => {
+    if (selectedTag === null) return null;
+    const parts: string[] = [];
+    for (const province of provinces) {
+      if (province.path === null) continue;
+      if (ownerTagByProvinceId.get(province.id) === selectedTag) parts.push(province.path);
+    }
+    return parts.length === 0 ? null : parts.join("");
+  }, [ownerTagByProvinceId, provinces, selectedTag]);
 
   const landPath = useMemo(
     () => pathForRings(map.land, "world.land") ?? "",
@@ -407,6 +521,43 @@ export function WorldMap({
     [polities],
   );
 
+  const pickProvinceAt = useCallback(
+    (worldX: number, worldY: number): DecodedProvince | null => {
+      if (!showProvinces) return null;
+      const candidates = provinces.filter(
+        (province) =>
+          province.path !== null &&
+          worldX >= province.screenBox[0] - 4 &&
+          worldX <= province.screenBox[2] + 4 &&
+          worldY >= province.screenBox[1] - 4 &&
+          worldY <= province.screenBox[3] + 4,
+      );
+      const id = pickProvinceAtPoint(candidates, worldX, worldY, [
+        -MAP_WIDTH,
+        0,
+        MAP_WIDTH,
+      ]);
+      return id === null ? null : (candidates.find((province) => province.id === id) ?? null);
+    },
+    [provinces, showProvinces],
+  );
+
+  const provinceFillFor = useCallback(
+    (province: DecodedProvince): string => {
+      const ownerTag = ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag;
+      if (layer === "markets") {
+        const region = regionByPolityId.get(province.simulationRegionId);
+        const marketId = region?.marketId ?? null;
+        if (marketId !== null) {
+          return MARKET_COLORS[marketId % MARKET_COLORS.length] ?? colors.faint;
+        }
+      }
+      if (playerTag !== null && ownerTag === playerTag) return colors.player;
+      return nationColor(ownerTag);
+    },
+    [layer, ownerTagByProvinceId, playerTag, regionByPolityId],
+  );
+
   const handlePointerMove = useCallback(
     (event: {
       nativeEvent: { locationX?: number; locationY?: number; offsetX?: number; offsetY?: number };
@@ -418,10 +569,17 @@ export function WorldMap({
       setHoverPoint({ x: localX, y: localY });
       const world = screenToWorld(localX, localY);
       if (world === null) return;
+      const province = pickProvinceAt(world[0], world[1]);
+      if (province !== null) {
+        setHoveredProvinceId(province.id);
+        setHoveredTag(ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag);
+        return;
+      }
+      setHoveredProvinceId(null);
       const polity = pickAt(world[0], world[1]);
       setHoveredTag(polity?.tag ?? null);
     },
-    [pickAt, screenToWorld],
+    [ownerTagByProvinceId, pickAt, pickProvinceAt, screenToWorld],
   );
 
   const marketIdFor = (polity: DecodedPolity): number | null => {
@@ -491,6 +649,34 @@ export function WorldMap({
           onPress: () => onSelect(tag),
           onPressIn: () => setHoveredTag(tag),
         };
+
+  const provincePressProps = (province: DecodedProvince): object => {
+    const ownerTag = ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag;
+    const ownership = ownershipByProvinceId.get(province.id);
+    const ownerPolityId = ownership?.ownerPolityId ?? province.initialOwnerPolityId;
+    // A future successor polity has no active simulation country to open. The
+    // province can still be inspected; country selection stays on the last
+    // active country instead of resolving a same-tag 1900 territory incorrectly.
+    const selectOwner = ownerPolityId < 1000;
+    const select = (): void => {
+      onSelectProvince?.(province.id);
+      if (selectOwner) onSelect(ownerTag);
+    };
+    return Platform.OS === "web"
+      ? {
+          onClickCapture: () => {
+            if (suppressClickRef.current) return;
+            select();
+          },
+        }
+      : {
+          onPress: select,
+          onPressIn: () => {
+            setHoveredProvinceId(province.id);
+            setHoveredTag(ownerTag);
+          },
+        };
+  };
 
   /**
    * Screen-constant country labels with a simple collision cull.
@@ -595,6 +781,23 @@ export function WorldMap({
     return placed;
   }, [playerTag, polities, scale, screenScale, selectedTag, translate.x, translate.y]);
 
+  const hoveredProvince =
+    hoveredProvinceId === null ? null : (provinceById.get(hoveredProvinceId) ?? null);
+  const hoveredProvinceOwner =
+    hoveredProvince === null ? null : (ownerTagByProvinceId.get(hoveredProvince.id) ?? null);
+  const hoveredProvinceControllerTag =
+    hoveredProvince === null
+      ? null
+      : (() => {
+          const ownership = ownershipByProvinceId.get(hoveredProvince.id);
+          if (
+            ownership === undefined ||
+            ownership.controllerPolityId === ownership.ownerPolityId
+          ) {
+            return null;
+          }
+          return tagForPolityId(ownership.controllerPolityId);
+        })();
   const hovered = hoveredTag === null ? null : (entryByTag.get(hoveredTag) ?? null);
   const tooltipLeft = hoverPoint === null ? 0 : Math.min(Math.max(hoverPoint.x + 12, 8), Math.max(size.width - 220, 8));
   const tooltipTop = hoverPoint === null ? 0 : Math.min(Math.max(hoverPoint.y + 12, 8), Math.max(size.height - 90, 8));
@@ -609,6 +812,7 @@ export function WorldMap({
             onPointerMove: handlePointerMove,
             onPointerLeave: () => {
               setHoveredTag(null);
+              setHoveredProvinceId(null);
               setHoverPoint(null);
             },
           } as object)
@@ -630,11 +834,13 @@ export function WorldMap({
                 fill={colors.mapLand}
                 fillRule="evenodd"
                 /*
-                 * No stroke: the polity border pass below already strokes every
-                 * coastline. Stroking the land mask too produced a second,
-                 * slightly offset coastline because it is simplified separately.
+                 * The land mask is the single coastline source. Polity borders
+                 * are skipped for province-owning 1900 polities, so this stroke
+                 * is not duplicated along Europe; non-European polities share
+                 * the identical outline rather than a separate simplified one.
                  */
-                stroke="none"
+                stroke={colors.mapBorder}
+                strokeWidth={0.9 / scale}
                 pointerEvents="none"
               />
               {polities.map((polity) => {
@@ -660,13 +866,109 @@ export function WorldMap({
                   />
                 );
               })}
+              {showProvinces
+                ? provinces.map((province) => {
+                    if (province.path === null) return null;
+                    const isSelected =
+                      selectedProvinceId !== null && province.id === selectedProvinceId;
+                    const isHovered =
+                      hoveredProvinceId !== null && province.id === hoveredProvinceId;
+                    const dimmed =
+                      layer === "markets" &&
+                      highlightMarketId !== null &&
+                      (regionByPolityId.get(province.simulationRegionId)?.marketId ?? null) !==
+                        highlightMarketId;
+                    return (
+                      <Path
+                        key={`province-${String(province.id)}`}
+                        d={province.path}
+                        fill={provinceFillFor(province)}
+                        fillRule="evenodd"
+                        stroke={provinceFillFor(province)}
+                        strokeWidth={0.35 / scale}
+                        {...provincePressProps(province)}
+                        accessibilityLabel={`${province.displayName}, ${
+                          ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag
+                        }`}
+                        opacity={dimmed ? 0.18 : isHovered && !isSelected ? 0.94 : 1}
+                      />
+                    );
+                  })
+                : null}
+              {/*
+                Provincial boundaries: one dotted white layer for every internal
+                province edge, including neighbours of the same country. A
+                stronger solid layer is drawn only where the current owners of the
+                two provinces differ, so national borders remain derived from
+                provincial ownership rather than from the 1900 polity outlines.
+              */}
+              {showProvinces && provinceBorderPaths.dotted.length > 0 ? (
+                <Path
+                  d={provinceBorderPaths.dotted}
+                  fill="none"
+                  stroke={PROVINCE_BORDER_COLOR}
+                  strokeWidth={PROVINCE_BORDER_WIDTH / scale}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeDasharray={`${PROVINCE_DASH_ON / scale} ${PROVINCE_DASH_OFF / scale}`}
+                  opacity={scale >= 2 ? 0.78 : scale >= 1.25 ? 0.62 : 0.42}
+                  pointerEvents="none"
+                />
+              ) : null}
+              {showProvinces && provinceBorderPaths.national.length > 0 ? (
+                <Path
+                  d={provinceBorderPaths.national}
+                  fill="none"
+                  stroke={colors.mapBorder}
+                  strokeWidth={COUNTRY_BORDER_WIDTH / scale}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  pointerEvents="none"
+                />
+              ) : null}
+              {selectedProvinceId === null
+                ? null
+                : (() => {
+                    const selected = provinceById.get(selectedProvinceId);
+                    if (selected === undefined) return null;
+                    const path = provinces.find(
+                      (province) => province.id === selected.id,
+                    )?.path;
+                    if (path === null || path === undefined) return null;
+                    return (
+                      <Path
+                        d={path}
+                        fill="none"
+                        fillRule="evenodd"
+                        stroke={colors.accentStrong}
+                        strokeWidth={1.4 / scale}
+                        strokeLinejoin="round"
+                        pointerEvents="none"
+                      />
+                    );
+                  })()}
+              {showProvinces && selectedCountryProvincePath !== null ? (
+                <Path
+                  d={selectedCountryProvincePath}
+                  fill="none"
+                  fillRule="evenodd"
+                  stroke={colors.accentStrong}
+                  strokeWidth={1.15 / scale}
+                  strokeLinejoin="round"
+                  opacity={0.9}
+                  pointerEvents="none"
+                />
+              ) : null}
               {/*
                 Borders are a separate layer after every fill. Drawing them while
                 filling each polity lets a later neighbour's fill cover a shared
-                border and makes lines appear/disappear with draw order.
+                border and makes lines appear/disappear with draw order. A 1900
+                polity whose territory is covered by provinces is skipped: its
+                international borders are reconstructed from current provincial
+                ownership above, so a stale 1900 line never survives a transfer.
               */}
               {polities.map((polity) =>
-                polity.path === null ? null : (
+                polity.path === null || (showProvinces && provinceOwnerTags.has(polity.tag)) ? null : (
                   <Path
                     key={`border-${polity.tag}`}
                     d={polity.path}
@@ -684,7 +986,13 @@ export function WorldMap({
                 ? null
                 : (() => {
                     const selected = polities.find((polity) => polity.tag === selectedTag);
-                    if (selected === undefined || selected.path === null) return null;
+                    if (
+                      selected === undefined ||
+                      selected.path === null ||
+                      (showProvinces && provinceOwnerTags.has(selected.tag))
+                    ) {
+                      return null;
+                    }
                     return (
                       <Path
                         d={selected.path}
@@ -714,6 +1022,33 @@ export function WorldMap({
                   />
                 );
               })}
+              {showProvinces
+                ? provinces.map((province) => {
+                    if (province.path === null) return null;
+                    const ownership = ownershipByProvinceId.get(province.id);
+                    if (
+                      ownership === undefined ||
+                      ownership.controllerPolityId === ownership.ownerPolityId
+                    ) {
+                      return null;
+                    }
+                    const controllerTag = tagForPolityId(ownership.controllerPolityId);
+                    if (controllerTag === null) return null;
+                    return (
+                      <Path
+                        key={`province-occ-${String(province.id)}`}
+                        d={province.path}
+                        fill={nationColor(controllerTag)}
+                        fillOpacity={0.38}
+                        fillRule="evenodd"
+                        stroke={nationColor(controllerTag)}
+                        strokeWidth={1 / scale}
+                        strokeDasharray={`${2 / scale} ${1.4 / scale}`}
+                        pointerEvents="none"
+                      />
+                    );
+                  })
+                : null}
               {labelLayout.map((label) => (
                 <G key={`label-${label.tag}`} pointerEvents="none">
                   <SvgText
@@ -781,7 +1116,30 @@ export function WorldMap({
         ) : null}
       </View>
 
-      {hovered === null ? null : (
+      {hoveredProvince !== null ? (
+        <View style={[styles.tooltip, { left: tooltipLeft, top: tooltipTop }]} pointerEvents="none">
+          <Text style={styles.tooltipTitle}>{hoveredProvince.displayName}</Text>
+          <Text style={styles.tooltipMeta}>
+            Province · owner {hoveredProvinceOwner ?? hoveredProvince.initialOwnerTag}
+          </Text>
+          <Text style={styles.tooltipMeta}>
+            1900 owner: {hoveredProvince.initialOwnerTag} · {hoveredProvince.confidence} confidence
+          </Text>
+          <Text style={styles.tooltipMeta} numberOfLines={2}>
+            {hoveredProvince.historicalAdminAffiliation}
+          </Text>
+          {hoveredProvince.historicalGrouping === null ? null : (
+            <Text style={styles.tooltipMeta} numberOfLines={1}>
+              Grouping: {hoveredProvince.historicalGrouping}
+            </Text>
+          )}
+          {hoveredProvinceControllerTag === null ? null : (
+            <Text style={styles.tooltipMeta}>
+              Controlled by {hoveredProvinceControllerTag}
+            </Text>
+          )}
+        </View>
+      ) : hovered === null ? null : (
         <View style={[styles.tooltip, { left: tooltipLeft, top: tooltipTop }]} pointerEvents="none">
           <Text style={styles.tooltipTitle}>{hovered.name}</Text>
           <Text style={styles.tooltipMeta}>
@@ -816,6 +1174,18 @@ export function WorldMap({
             <View style={[styles.swatch, { backgroundColor: lighten("#b08a63", 0.3) }]} />
             <Text style={styles.legendText}>Dependent territory</Text>
           </View>
+          {showProvinces ? (
+            <>
+              <View style={styles.legendRow}>
+                <View style={[styles.provinceLineSwatch]} />
+                <Text style={styles.legendText}>Province boundary (dotted)</Text>
+              </View>
+              <View style={styles.legendRow}>
+                <View style={[styles.countryLineSwatch]} />
+                <Text style={styles.legendText}>Country border (from provinces)</Text>
+              </View>
+            </>
+          ) : null}
           {layer === "political" || layer === "control" ? (
             <View style={styles.legendRow}>
               <View style={[styles.swatch, styles.occSwatch]} />
@@ -926,6 +1296,19 @@ const styles = StyleSheet.create({
   legendText: { ...type.tiny, color: colors.muted },
   legendHint: { ...type.tiny, color: colors.faint, marginTop: 2 },
   swatch: { width: 10, height: 10, borderRadius: 1 },
+  provinceLineSwatch: {
+    width: 18,
+    height: 0,
+    borderTopWidth: 1,
+    borderTopColor: "#f4f1e6",
+    borderStyle: "dotted",
+  },
+  countryLineSwatch: {
+    width: 18,
+    height: 0,
+    borderTopWidth: 2,
+    borderTopColor: colors.mapBorder,
+  },
   occSwatch: {
     backgroundColor: colors.red,
     opacity: 0.5,

@@ -55,9 +55,10 @@ const SEED = 20_261_023;
  * change simulation behavior; only the serialized state shape changed.
  */
 // E6a (schema 24) adds `World.trade` and `Market.customsCountryId` to the encoded
-// state shape, so this earlier-run digest is intentionally re-pinned. The Batch 5
-// validation optimization must not change simulation behavior.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "7ae63aaf089f2a15";
+// state shape, and M12a (schema 27) adds `World.provinces` (disabled for this
+// legacy fixture), so the digest is intentionally re-pinned again. The Batch 5
+// validation optimization and M12a do not change simulation behavior.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "22eefa09ff274493";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

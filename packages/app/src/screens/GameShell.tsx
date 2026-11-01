@@ -13,12 +13,15 @@ import {
   SPEED_VALUES,
   formatSpeed,
   type CountrySummarySnapshot,
+  type ProvinceOwnershipSnapshot,
   type RegionSnapshot,
   type SpeedDaysPerSecond,
 } from "@century/sim-worker";
 
 import { WORLD_CATALOG } from "../generated/worldCatalog";
 import { WORLD_MAP_1900 } from "../generated/worldMap1900";
+import { PROVINCES_1900 } from "../generated/provinces1900";
+import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import { colors, radii, spacing, type } from "../theme";
 import type { WorldCatalogEntry } from "../worldCatalogTypes";
 import { CountryFlag } from "../components/CountryFlag";
@@ -140,6 +143,7 @@ export function GameShell() {
   const narrow = width < 900;
   const [tab, setTab] = useState<TabId>("world");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
   const [layer, setLayer] = useState<MapLayer>("political");
   const [highlightMarketId, setHighlightMarketId] = useState<number | null>(null);
 
@@ -348,6 +352,8 @@ export function GameShell() {
                     playerTag={playerSummary?.tag ?? null}
                     height={narrow ? 320 : 600}
                     highlightMarketId={highlightMarketId}
+                    selectedProvinceId={selectedProvinceId}
+                    onSelectProvince={setSelectedProvinceId}
                   />
                 </View>
                 <View style={narrow ? styles.contextColumnNarrow : styles.contextColumn}>
@@ -363,6 +369,37 @@ export function GameShell() {
                       setHighlightMarketId(marketId);
                     }}
                   />
+                  {selectedProvinceId === null ? null : (
+                    <ProvincePanel
+                      province={
+                        PROVINCES_1900.provinces.find(
+                          (province) => province.id === selectedProvinceId,
+                        ) ?? null
+                      }
+                      ownership={
+                        snapshot?.provinces.find(
+                          (entry) => entry.provinceId === selectedProvinceId,
+                        ) ?? null
+                      }
+                      ownerTag={
+                        (() => {
+                          const ownership = snapshot?.provinces.find(
+                            (entry) => entry.provinceId === selectedProvinceId,
+                          );
+                          if (ownership === undefined) return null;
+                          return (
+                            WORLD_CATALOG.entries.find(
+                              (entry) => entry.id === ownership.ownerPolityId,
+                            )?.tag ??
+                            PROVINCES_1900.futurePolities.find(
+                              (polity) => polity.polityId === ownership.ownerPolityId,
+                            )?.tag ??
+                            null
+                          );
+                        })()
+                      }
+                    />
+                  )}
                 </View>
               </View>
             </ScrollView>
@@ -459,6 +496,66 @@ function Screen({
     default:
       return null;
   }
+}
+
+function ProvincePanel({
+  province,
+  ownership,
+  ownerTag,
+}: {
+  readonly province: ProvinceMapProvince | null;
+  readonly ownership: ProvinceOwnershipSnapshot | null;
+  readonly ownerTag: string | null;
+}) {
+  if (province === null) return null;
+  const owner = ownerTag ?? province.initialOwnerTag;
+  const controllerTag =
+    ownership === null || ownership.controllerPolityId === ownership.ownerPolityId
+      ? null
+      : (PROVINCES_1900.futurePolities.find(
+          (polity) => polity.polityId === ownership.controllerPolityId,
+        )?.tag ?? `polity ${String(ownership.controllerPolityId)}`);
+  return (
+    <Panel
+      title={province.displayName}
+      subtitle={`Province ${String(province.id)} · ${province.confidence} confidence`}
+    >
+      <Metric label="Current owner" value={owner} detail="Legal territorial ownership" />
+      <Metric
+        label="1900 owner"
+        value={province.initialOwnerTag}
+        detail="Historical owner on 1 January 1900"
+      />
+      <Metric
+        label="Administrative affiliation"
+        value={province.historicalAdminAffiliation}
+        detail={
+          province.historicalGrouping === null
+            ? "No optional historical grouping"
+            : province.historicalGrouping
+        }
+      />
+      <Metric
+        label="Special status"
+        value={(ownership?.specialStatus ?? province.initialSpecialStatus).replace(/-/g, " ")}
+      />
+      {controllerTag === null ? null : (
+        <Metric
+          label="Effective control"
+          value={controllerTag}
+          detail="Occupation changes control, not legal ownership"
+        />
+      )}
+      {ownership === null || ownership.claimantPolityIds.length === 0 ? null : (
+        <Metric
+          label="Claims"
+          value={ownership.claimantPolityIds.join(", ")}
+          detail="Recorded claims do not imply ownership"
+        />
+      )}
+      <Text style={styles.provinceNote}>{province.notes}</Text>
+    </Panel>
+  );
 }
 
 function SelectedPolityPanel({
@@ -731,6 +828,7 @@ function TopBar({
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
+  provinceNote: { ...type.tiny, color: colors.muted, marginTop: spacing.sm, lineHeight: 16 },
   topBar: {
     flexDirection: "row",
     flexWrap: "wrap",

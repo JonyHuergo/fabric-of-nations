@@ -65,6 +65,7 @@ import {
   type TradeRouteInitialDef,
 } from "@century/sim";
 
+import { loadM11Provinces } from "./provinces.js";
 import { DATA_PACKAGE_VERSION } from "./version.js";
 
 const DATA_ROOT = fileURLToPath(new URL("../data/", import.meta.url));
@@ -2366,5 +2367,8 @@ export function loadM5EightPolities(): EconomyScenarioDef {
 /** Load and build the M11 1900 world used by the playable game. */
 export function loadM11World(): EconomyScenarioDef {
   const data = loadHistoricalData(WORLD_SCENARIO_FILE);
-  return buildM5HistoricalScenario(data);
+  const scenario = buildM5HistoricalScenario(data);
+  // M12a: attach the permanent European province definitions and the future
+  // successor-polity registry. Geometry is app-side static content.
+  return { ...scenario, provinces: loadM11Provinces() };
 }

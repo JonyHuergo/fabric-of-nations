@@ -28,6 +28,7 @@ export { checksumOfJson } from "./hash.js";
 export * from "./world.js";
 export * from "./validationStats.js";
 export * from "./population/index.js";
+export * from "./provinces/index.js";
 export * from "./economy/index.js";
 export * from "./tick.js";
 export * from "./serialization.js";

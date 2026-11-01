@@ -78,6 +78,7 @@ import {
   type CountrySummarySnapshot,
   type GoodSnapshot,
   type MarketSnapshot,
+  type ProvinceOwnershipSnapshot,
   type RegionSnapshot,
   type SimulationSnapshot,
   type SnapshotAnnualReport,
@@ -1734,6 +1735,24 @@ function regionSnapshots(
     });
 }
 
+/**
+ * M12a: expose only mutable provincial political state. Static province names,
+ * grouping metadata and geometry stay in the committed app content, so the
+ * snapshot does not grow with historical strings.
+ */
+function provinceSnapshots(world: World): readonly ProvinceOwnershipSnapshot[] {
+  return [...world.provinces.ownership]
+    .sort((left, right) => left.provinceId - right.provinceId)
+    .map((entry) => ({
+      provinceId: entry.provinceId,
+      ownerPolityId: entry.ownerPolityId,
+      controllerPolityId: entry.controllerPolityId,
+      controlledSinceDay: entry.controlledSinceDay,
+      claimantPolityIds: [...entry.claimantPolityIds],
+      specialStatus: entry.specialStatus,
+    }));
+}
+
 function goodsSnapshots(definitions: EconomyDefinitions): readonly GoodSnapshot[] {
   return [...definitions.goods]
     .sort((left, right) => left.id - right.id)
@@ -2059,6 +2078,7 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   }
   Object.freeze(snapshot.countries);
   Object.freeze(snapshot.regions);
+  Object.freeze(snapshot.provinces);
   Object.freeze(snapshot.markets);
   Object.freeze(snapshot.goods);
   return Object.freeze(snapshot);
@@ -2155,6 +2175,7 @@ export function buildSimulationSnapshot(
     countries,
     countrySummaries,
     regions: regionSnapshots(world, regionMetaById),
+    provinces: provinceSnapshots(world),
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
     goods: goodsSnapshots(definitions),
     needTiers: needTierSnapshots(populationDefinitions, definitions),

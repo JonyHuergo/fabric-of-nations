@@ -52,6 +52,8 @@ import {
 } from "./economy/monetaryState.js";
 import { assertValidMilitaryState } from "./economy/militaryState.js";
 import type { PopBlock, Region } from "./population/types.js";
+import type { ProvinceState } from "./provinces/types.js";
+import { assertValidProvinceState, emptyProvinceState } from "./provinces/state.js";
 import { emptyMilitaryState } from "./economy/militaryState.js";
 import type { Day, Id, Seed } from "./types.js";
 import {
@@ -133,6 +135,12 @@ export interface World {
   monetary: MonetaryState;
   /** M10 diplomacy, armies, wars, and occupation (D-081). */
   military: MilitaryState;
+  /**
+   * M12a permanent provincial ownership, effective control, formal claims and
+   * special administrative status. Disabled and empty for legacy scenarios.
+   * Province geometry and names are static content and are not serialized.
+   */
+  provinces: ProvinceState;
   /**
    * Post-M7 designated player country. Null for legacy fixtures and for worlds
    * with no player-control designation. The AI skips fiscal decisions for this
@@ -255,6 +263,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
       lastUpdateDay: null,
     },
     military: emptyMilitaryState(),
+    provinces: emptyProvinceState(),
     playerCountryId: null,
     diagnostics: {
       invariantFailureCount: 0,
@@ -373,6 +382,7 @@ export function assertValidWorld(
   assertValidPriceIndexState(world);
   assertValidMonetaryState(world);
   assertValidMilitaryState(world);
+  assertValidProvinceState(world.provinces);
 }
 
 /**

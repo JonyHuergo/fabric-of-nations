@@ -14,6 +14,7 @@
  * documented marker fallback instead of discarding the country.
  */
 
+import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import type { WorldMapPolity } from "../worldCatalogTypes";
 import { MAP_HEIGHT, MAP_WIDTH } from "./mapViewport";
 
@@ -80,17 +81,18 @@ export function project(lon: number, lat: number): readonly [number, number] {
  * `path` labels the ring in validation errors and should include the polity tag
  * and ring index.
  */
-export function decodeRing(
+function decodeFlatPoints(
   flat: readonly number[],
   path: string,
+  minimumPoints: number,
 ): readonly (readonly number[])[] {
   const coordinates = requireRingArray(flat, path);
   if (coordinates.length % 2 !== 0) {
     throw new RangeError(`${path} has an odd coordinate count ${String(coordinates.length)}`);
   }
-  if (coordinates.length / 2 < MIN_RING_POINTS) {
+  if (coordinates.length / 2 < minimumPoints) {
     throw new RangeError(
-      `${path} must contain at least ${String(MIN_RING_POINTS)} points, found ${String(
+      `${path} must contain at least ${String(minimumPoints)} points, found ${String(
         coordinates.length / 2,
       )}`,
     );
@@ -105,6 +107,21 @@ export function decodeRing(
     points.push([px, py]);
   }
   return points;
+}
+
+export function decodeRing(
+  flat: readonly number[],
+  path: string,
+): readonly (readonly number[])[] {
+  return decodeFlatPoints(flat, path, MIN_RING_POINTS);
+}
+
+/** Decode one open border polyline; two points are a valid segment. */
+export function decodeLine(
+  flat: readonly number[],
+  path: string,
+): readonly (readonly number[])[] {
+  return decodeFlatPoints(flat, path, 2);
 }
 
 function pathCommands(
@@ -145,6 +162,70 @@ export function pathForRings(
     commands.push(...pathCommands(decodeRing(flat, `${path}[${String(index)}]`)));
   }
   return commands.length === 0 ? null : commands.join("");
+}
+
+/**
+ * Build open path data for province border polylines.
+ *
+ * Unlike a polygon ring, a border line is not closed: adding `Z` would draw an
+ * unintended segment back to the start. Every line is validated with the same
+ * explicit decoding contract as province fills.
+ */
+export function pathForLines(
+  lines: readonly (readonly number[])[],
+  path: string,
+): string | null {
+  if (!Array.isArray(lines)) {
+    throw new TypeError(`${path} must be an array of lines`);
+  }
+  if (lines.length === 0) return null;
+  const commands: string[] = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const flat = lines[index];
+    if (flat === undefined) throw new RangeError(`${path}[${String(index)}] is missing`);
+    const points = decodeLine(flat, `${path}[${String(index)}]`);
+    for (const offset of ANTIMERIDIAN_OFFSETS) {
+      const [startX = 0, startY = 0] = points[0] ?? [];
+      commands.push(`M${(startX + offset).toFixed(1)} ${startY.toFixed(1)}`);
+      for (let pointIndex = 1; pointIndex < points.length; pointIndex += 1) {
+        const [x = 0, y = 0] = points[pointIndex] ?? [];
+        commands.push(`L${(x + offset).toFixed(1)} ${y.toFixed(1)}`);
+      }
+    }
+  }
+  return commands.length === 0 ? null : commands.join("");
+}
+
+/** Decode one province once for fills, validation and web hit testing. */
+export function decodeProvinceGeometry(
+  province: ProvinceMapProvince,
+): DecodedPolityGeometry {
+  const rings = province.rings;
+  if (!Array.isArray(rings)) {
+    throw new TypeError(`province[${province.key}].rings must be an array`);
+  }
+  if (rings.length === 0) {
+    return { path: null, points: [], drawableRingCount: 0 };
+  }
+  const points: (readonly (readonly number[])[])[] = [];
+  const commands: string[] = [];
+  for (let index = 0; index < rings.length; index += 1) {
+    const flat = rings[index];
+    if (flat === undefined) {
+      throw new RangeError(`province[${province.key}].rings[${String(index)}] is missing`);
+    }
+    const decoded = decodeRing(
+      flat,
+      `province[${province.key}].rings[${String(index)}]`,
+    );
+    points.push(decoded);
+    commands.push(...pathCommands(decoded));
+  }
+  return {
+    path: commands.length === 0 ? null : commands.join(""),
+    points,
+    drawableRingCount: rings.length,
+  };
 }
 
 /** Decode a polity once for rendering, validation and web hit testing. */

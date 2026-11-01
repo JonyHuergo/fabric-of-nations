@@ -1,0 +1,717 @@
+{
+  "generatedBy": "scripts/m12/build-provinces.mjs",
+  "referenceDate": "1900-01-01",
+  "toleranceDegrees": 0.02,
+  "provinceCount": 570,
+  "plannedProvinceCount": 570,
+  "residualProvinceCount": 0,
+  "politiesCovered": [
+    "AND",
+    "AUT",
+    "BEL",
+    "BGR",
+    "CHE",
+    "CRT",
+    "DEU",
+    "DNK",
+    "ESP",
+    "FRA",
+    "GBR",
+    "GRC",
+    "ITA",
+    "LIE",
+    "LUX",
+    "MCO",
+    "MNT",
+    "NLD",
+    "NOR",
+    "OTT",
+    "PRT",
+    "ROM",
+    "RUS",
+    "SMR",
+    "SRB",
+    "SWE"
+  ],
+  "mapFeaturesCovered": 32,
+  "duplicateProvinceIds": 0,
+  "duplicateKeys": 0,
+  "unmatchedBorderSegments": 2,
+  "borderSegmentCount": 32981,
+  "borderPairCount": 1528,
+  "coverage": [
+    {
+      "tag": "AND",
+      "scopeArea": 0.0469,
+      "coveredArea": 0.0469,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "AUT",
+      "scopeArea": 81.3566,
+      "coveredArea": 80.4522,
+      "residualArea": 0.9044,
+      "estimated": false
+    },
+    {
+      "tag": "BEL",
+      "scopeArea": 3.7563,
+      "coveredArea": 3.6747,
+      "residualArea": 0.0816,
+      "estimated": false
+    },
+    {
+      "tag": "BGR",
+      "scopeArea": 11.519,
+      "coveredArea": 11.4093,
+      "residualArea": 0.1098,
+      "estimated": false
+    },
+    {
+      "tag": "CHE",
+      "scopeArea": 4.8685,
+      "coveredArea": 4.7321,
+      "residualArea": 0.1364,
+      "estimated": false
+    },
+    {
+      "tag": "CRT",
+      "scopeArea": 0.7755,
+      "coveredArea": 0.7755,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "CYP",
+      "scopeArea": 0.9019,
+      "coveredArea": 0.8989,
+      "residualArea": 0.0029,
+      "estimated": false
+    },
+    {
+      "tag": "DEU",
+      "scopeArea": 70.7715,
+      "coveredArea": 69.2855,
+      "residualArea": 1.486,
+      "estimated": false
+    },
+    {
+      "tag": "DNK",
+      "scopeArea": 5.4639,
+      "coveredArea": 5.0925,
+      "residualArea": 0.3714,
+      "estimated": false
+    },
+    {
+      "tag": "ESP",
+      "scopeArea": 53.0358,
+      "coveredArea": 52.5596,
+      "residualArea": 0.4763,
+      "estimated": false
+    },
+    {
+      "tag": "FIN",
+      "scopeArea": 62.287,
+      "coveredArea": 61.78,
+      "residualArea": 0.507,
+      "estimated": false
+    },
+    {
+      "tag": "FRA",
+      "scopeArea": 62.5033,
+      "coveredArea": 23.362,
+      "residualArea": 39.1413,
+      "estimated": true
+    },
+    {
+      "tag": "FRO",
+      "scopeArea": 0.173,
+      "coveredArea": 0.173,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "GBR",
+      "scopeArea": 42.3883,
+      "coveredArea": 25.034,
+      "residualArea": 17.3543,
+      "estimated": true
+    },
+    {
+      "tag": "GRC",
+      "scopeArea": 6.6858,
+      "coveredArea": 5.256,
+      "residualArea": 1.4298,
+      "estimated": true
+    },
+    {
+      "tag": "GRL",
+      "scopeArea": 663.712,
+      "coveredArea": 663.6979,
+      "residualArea": 0.0141,
+      "estimated": false
+    },
+    {
+      "tag": "ISL",
+      "scopeArea": 19.3297,
+      "coveredArea": 19.3253,
+      "residualArea": 0.0044,
+      "estimated": false
+    },
+    {
+      "tag": "ITA",
+      "scopeArea": 31.4927,
+      "coveredArea": 6.61,
+      "residualArea": 24.8827,
+      "estimated": true
+    },
+    {
+      "tag": "LIE",
+      "scopeArea": 0.0171,
+      "coveredArea": 0.0171,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "LUX",
+      "scopeArea": 0.3329,
+      "coveredArea": 0.318,
+      "residualArea": 0.0149,
+      "estimated": false
+    },
+    {
+      "tag": "MCO",
+      "scopeArea": 0.0006,
+      "coveredArea": 0.0006,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "MLT",
+      "scopeArea": 0.0261,
+      "coveredArea": 0.0261,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "MNT",
+      "scopeArea": 1.0627,
+      "coveredArea": 1.0332,
+      "residualArea": 0.0295,
+      "estimated": false
+    },
+    {
+      "tag": "NLD",
+      "scopeArea": 4.8577,
+      "coveredArea": 4.7359,
+      "residualArea": 0.1218,
+      "estimated": false
+    },
+    {
+      "tag": "NOR",
+      "scopeArea": 86.3155,
+      "coveredArea": 47.877,
+      "residualArea": 38.4385,
+      "estimated": true
+    },
+    {
+      "tag": "OTT",
+      "scopeArea": 18.0174,
+      "coveredArea": 16.488,
+      "residualArea": 1.5294,
+      "estimated": false
+    },
+    {
+      "tag": "PRT",
+      "scopeArea": 9.2367,
+      "coveredArea": 9.0608,
+      "residualArea": 0.1759,
+      "estimated": false
+    },
+    {
+      "tag": "ROM",
+      "scopeArea": 15.4477,
+      "coveredArea": 13.8,
+      "residualArea": 1.6477,
+      "estimated": false
+    },
+    {
+      "tag": "RUS",
+      "scopeArea": 703.381,
+      "coveredArea": 679.7989,
+      "residualArea": 23.5822,
+      "estimated": false
+    },
+    {
+      "tag": "SMR",
+      "scopeArea": 0.007,
+      "coveredArea": 0.007,
+      "residualArea": 0,
+      "estimated": false
+    },
+    {
+      "tag": "SRB",
+      "scopeArea": 5.8003,
+      "coveredArea": 5.713,
+      "residualArea": 0.0873,
+      "estimated": false
+    },
+    {
+      "tag": "SWE",
+      "scopeArea": 78.4584,
+      "coveredArea": 77.7348,
+      "residualArea": 0.7236,
+      "estimated": false
+    }
+  ],
+  "overlaps": [
+    {
+      "left": "deu-rhine-province",
+      "right": "deu-palatinate",
+      "area": 0.174,
+      "bbox": [
+        5.859,
+        49.5,
+        8.15,
+        52.363
+      ]
+    },
+    {
+      "left": "deu-westphalia",
+      "right": "deu-rhine-province",
+      "area": 0.0731,
+      "bbox": [
+        7.5,
+        50.684,
+        9.462,
+        52.524
+      ]
+    },
+    {
+      "left": "aut-carinthia",
+      "right": "aut-lower-styria",
+      "area": 0.0132,
+      "bbox": [
+        12.634,
+        45.715,
+        15.333,
+        47.136
+      ]
+    },
+    {
+      "left": "deu-east-prussia-north",
+      "right": "deu-east-prussia-south",
+      "area": 0.0106,
+      "bbox": [
+        19.61,
+        54.343,
+        22.844,
+        55.29
+      ]
+    },
+    {
+      "left": "swe-jamtland",
+      "right": "swe-vasternorrland",
+      "area": 0.0097,
+      "bbox": [
+        12.001,
+        61.582,
+        16.969,
+        65.115
+      ]
+    },
+    {
+      "left": "rus-blr-brest",
+      "right": "rus-blr-grodno",
+      "area": 0.0093,
+      "bbox": [
+        23.166,
+        51.513,
+        27.6,
+        53.393
+      ]
+    },
+    {
+      "left": "rus-yekaterinburg",
+      "right": "rus-chelyabinsk",
+      "area": 0.0083,
+      "bbox": [
+        57.219,
+        56.059,
+        66.197,
+        61.993
+      ]
+    },
+    {
+      "left": "rus-novgorod",
+      "right": "rus-tver",
+      "area": 0.0079,
+      "bbox": [
+        29.653,
+        56.931,
+        36.237,
+        59.43
+      ]
+    },
+    {
+      "left": "swe-jamtland",
+      "right": "swe-dalarna",
+      "area": 0.0075,
+      "bbox": [
+        12.001,
+        61.582,
+        16.969,
+        65.115
+      ]
+    },
+    {
+      "left": "aut-western-galicia",
+      "right": "aut-eastern-galicia",
+      "area": 0.0074,
+      "bbox": [
+        19.112,
+        48.994,
+        23.659,
+        50.83
+      ]
+    },
+    {
+      "left": "rus-kazan",
+      "right": "rus-udmurt",
+      "area": 0.0073,
+      "bbox": [
+        47.242,
+        53.97,
+        54.231,
+        56.676
+      ]
+    },
+    {
+      "left": "rus-chuvash",
+      "right": "rus-mari-el",
+      "area": 0.0067,
+      "bbox": [
+        45.92,
+        54.63,
+        48.412,
+        56.335
+      ]
+    },
+    {
+      "left": "aut-carinthia",
+      "right": "aut-carniola",
+      "area": 0.0064,
+      "bbox": [
+        12.634,
+        45.715,
+        15.333,
+        47.136
+      ]
+    },
+    {
+      "left": "rus-ukr-kharkov",
+      "right": "rus-bryansk",
+      "area": 0.0064,
+      "bbox": [
+        32.94,
+        48.528,
+        38.081,
+        52.358
+      ]
+    },
+    {
+      "left": "rus-ukr-odessa",
+      "right": "rus-mda-kishinev",
+      "area": 0.0063,
+      "bbox": [
+        28.201,
+        45.234,
+        31.304,
+        48.222
+      ]
+    },
+    {
+      "left": "rus-tsaritsyn",
+      "right": "rus-saratov",
+      "area": 0.0063,
+      "bbox": [
+        41.166,
+        47.446,
+        47.434,
+        51.239
+      ]
+    },
+    {
+      "left": "rus-vyatka",
+      "right": "rus-ust-sysolsk",
+      "area": 0.0062,
+      "bbox": [
+        46.3,
+        56.073,
+        53.922,
+        61.059
+      ]
+    },
+    {
+      "left": "rus-fin-oulu",
+      "right": "rus-fin-lapland",
+      "area": 0.0059,
+      "bbox": [
+        23.715,
+        63.43,
+        30.527,
+        66.484
+      ]
+    },
+    {
+      "left": "rus-ukr-kherson",
+      "right": "rus-ukr-yekaterinoslav",
+      "area": 0.0059,
+      "bbox": [
+        30.209,
+        45.722,
+        35.28,
+        48.219
+      ]
+    },
+    {
+      "left": "rus-vladimir",
+      "right": "rus-ivanovo",
+      "area": 0.0059,
+      "bbox": [
+        38.293,
+        55.109,
+        42.948,
+        56.822
+      ]
+    },
+    {
+      "left": "rus-arkhangelsk",
+      "right": "rus-ust-sysolsk",
+      "area": 0.0059,
+      "bbox": [
+        35.857,
+        60.646,
+        68.942,
+        81.854
+      ]
+    },
+    {
+      "left": "prt-evora",
+      "right": "prt-santarem",
+      "area": 0.0057,
+      "bbox": [
+        -8.652,
+        38.184,
+        -7.117,
+        39.024
+      ]
+    },
+    {
+      "left": "nor-troms",
+      "right": "nor-finnmark",
+      "area": 0.0057,
+      "bbox": [
+        15.639,
+        68.356,
+        22.933,
+        70.274
+      ]
+    },
+    {
+      "left": "rom-muntenia",
+      "right": "rom-dobruja",
+      "area": 0.0057,
+      "bbox": [
+        24.438,
+        43.672,
+        28.178,
+        46.174
+      ]
+    },
+    {
+      "left": "aut-hun-northern-hungary",
+      "right": "aut-hun-great-hungarian-plain",
+      "area": 0.0057,
+      "bbox": [
+        18.934,
+        47.425,
+        22.158,
+        48.569
+      ]
+    },
+    {
+      "left": "rus-fin-hame",
+      "right": "rus-fin-vaasa",
+      "area": 0.0057,
+      "bbox": [
+        22.549,
+        60.553,
+        26.766,
+        63.601
+      ]
+    },
+    {
+      "left": "rus-ltu-vilnius",
+      "right": "rus-blr-grodno",
+      "area": 0.0057,
+      "bbox": [
+        24.389,
+        54.128,
+        26.74,
+        55.523
+      ]
+    },
+    {
+      "left": "rom-muntenia",
+      "right": "rom-moldavia",
+      "area": 0.0056,
+      "bbox": [
+        24.438,
+        43.672,
+        28.178,
+        46.174
+      ]
+    },
+    {
+      "left": "fra-oise",
+      "right": "fra-seien-et-marne",
+      "area": 0.0055,
+      "bbox": [
+        1.679,
+        49.068,
+        3.169,
+        49.766
+      ]
+    },
+    {
+      "left": "rus-ryazan",
+      "right": "rus-tambov",
+      "area": 0.0055,
+      "bbox": [
+        38.672,
+        53.335,
+        42.7,
+        55.339
+      ]
+    },
+    {
+      "left": "rus-vologda",
+      "right": "rus-arkhangelsk",
+      "area": 0.0054,
+      "bbox": [
+        34.73,
+        58.49,
+        47.137,
+        61.594
+      ]
+    },
+    {
+      "left": "swe-dalarna",
+      "right": "swe-varmland",
+      "area": 0.0053,
+      "bbox": [
+        12.162,
+        59.883,
+        16.719,
+        62.272
+      ]
+    },
+    {
+      "left": "swe-dalarna",
+      "right": "swe-gavleborg",
+      "area": 0.0053,
+      "bbox": [
+        12.162,
+        59.883,
+        16.719,
+        62.272
+      ]
+    },
+    {
+      "left": "rus-ryazan",
+      "right": "rus-mordovia",
+      "area": 0.0053,
+      "bbox": [
+        38.672,
+        53.335,
+        42.7,
+        55.339
+      ]
+    },
+    {
+      "left": "rus-kurgan",
+      "right": "rus-chelyabinsk",
+      "area": 0.0052,
+      "bbox": [
+        61.967,
+        54.163,
+        68.734,
+        56.842
+      ]
+    },
+    {
+      "left": "rus-orenburg",
+      "right": "rus-ufa",
+      "area": 0.0052,
+      "bbox": [
+        50.767,
+        50.475,
+        61.664,
+        54.377
+      ]
+    },
+    {
+      "left": "rus-ufa",
+      "right": "rus-chelyabinsk",
+      "area": 0.0052,
+      "bbox": [
+        53.14,
+        51.572,
+        59.975,
+        56.538
+      ]
+    },
+    {
+      "left": "esp-toledo",
+      "right": "esp-ciudad-real",
+      "area": 0.005,
+      "bbox": [
+        -5.391,
+        39.26,
+        -2.908,
+        40.309
+      ]
+    }
+  ],
+  "overlapCount": 38,
+  "residuals": [],
+  "warnings": [
+    "38 province pairs overlap (largest 0.174 square degrees: deu-rhine-province / deu-palatinate)",
+    "coverage gap AUT: 0.904 square degrees remain outside the authored provinces",
+    "coverage gap BEL: 0.082 square degrees remain outside the authored provinces",
+    "coverage gap BGR: 0.110 square degrees remain outside the authored provinces",
+    "coverage gap CHE: 0.136 square degrees remain outside the authored provinces",
+    "coverage gap DEU: 1.486 square degrees remain outside the authored provinces",
+    "coverage gap DNK: 0.371 square degrees remain outside the authored provinces",
+    "coverage gap ESP: 0.476 square degrees remain outside the authored provinces",
+    "coverage gap FIN: 0.507 square degrees remain outside the authored provinces",
+    "coverage gap GRL: 0.014 square degrees remain outside the authored provinces",
+    "coverage gap LUX: 0.015 square degrees remain outside the authored provinces",
+    "coverage gap MNT: 0.030 square degrees remain outside the authored provinces",
+    "coverage gap NLD: 0.122 square degrees remain outside the authored provinces",
+    "coverage gap OTT: 1.529 square degrees remain outside the authored provinces",
+    "coverage gap PRT: 0.176 square degrees remain outside the authored provinces",
+    "coverage gap ROM: 1.648 square degrees remain outside the authored provinces",
+    "coverage gap RUS: 23.582 square degrees remain outside the authored provinces",
+    "coverage gap SRB: 0.087 square degrees remain outside the authored provinces",
+    "coverage gap SWE: 0.724 square degrees remain outside the authored provinces",
+    "coverage subtraction failed for FRA; residual estimated by area (RangeError: Maximum call stack size exceeded)",
+    "coverage subtraction failed for GBR; residual estimated by area (Error: Unable to find segment #1926614 [-6.494443314810523, 57.99081000793836] -> [-6.494443314810485, 57.99081000793836] in SweepLine tree.)",
+    "coverage subtraction failed for GRC; residual estimated by area (Error: Unable to find segment #1938854 [21.876, 39.833] -> [21.884425489404112, 39.88202102926027] in SweepLine tree.)",
+    "coverage subtraction failed for ITA; residual estimated by area (RangeError: Maximum call stack size exceeded)",
+    "coverage subtraction failed for NOR; residual estimated by area (Error: Unable to find segment #1992766 [5.620003416066605, 59.94010215538807] -> [5.620003416066614, 59.94010215538807] in SweepLine tree.)"
+  ],
+  "sourceCount": 17
+}

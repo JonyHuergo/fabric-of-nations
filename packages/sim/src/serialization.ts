@@ -105,6 +105,18 @@ import {
 } from "./economy/aiState.js";
 import { asSusdPerCurrencyUnit } from "./economy/currency.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
+import { assertValidProvinceState } from "./provinces/state.js";
+import type {
+  ProvinceOwnership,
+  ProvinceSpecialStatus,
+  ProvinceState,
+  ProvinceTransferKind,
+  ProvinceTransferRecord,
+} from "./provinces/types.js";
+import {
+  PROVINCE_SPECIAL_STATUSES,
+  PROVINCE_TRANSFER_KINDS,
+} from "./provinces/types.js";
 import { assertValidFiscalPolicy, assertValidIndustrialPolicy } from "./economy/country.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
@@ -910,6 +922,35 @@ export type SerializedPopBlock = {
   readonly fractionalDeathRemainder: number;
 };
 
+/** Encoded M12a province ownership record. */
+export type SerializedProvinceOwnership = {
+  readonly provinceId: number;
+  readonly ownerPolityId: number;
+  readonly controllerPolityId: number;
+  readonly controlledSinceDay: number | null;
+  readonly claimantPolityIds: readonly number[];
+  readonly specialStatus: ProvinceSpecialStatus;
+};
+
+/** Encoded M12a province ownership change record. */
+export type SerializedProvinceTransfer = {
+  readonly id: number;
+  readonly day: number;
+  readonly provinceIds: readonly number[];
+  readonly fromPolityId: number | null;
+  readonly toPolityId: number;
+  readonly kind: ProvinceTransferKind;
+  readonly note: string;
+};
+
+/** Encoded M12a provincial state. */
+export type SerializedProvinceState = {
+  readonly enabled: boolean;
+  readonly ownership: readonly SerializedProvinceOwnership[];
+  readonly transfers: readonly SerializedProvinceTransfer[];
+  readonly nextTransferId: number;
+};
+
 /** Complete encoded world payload. */
 export type SerializedWorld = {
   readonly schemaVersion: number;
@@ -938,6 +979,8 @@ export type SerializedWorld = {
   readonly priceIndex: SerializedPriceIndexState;
   readonly monetary: SerializedMonetaryState;
   readonly military: SerializedMilitaryState;
+  /** M12a provincial ownership/control state; definitions and geometry are static. */
+  readonly provinces: SerializedProvinceState;
   readonly playerCountryId: number | null;
   readonly diagnostics: SerializedDiagnostics;
 };
@@ -1766,6 +1809,27 @@ export function encodeWorld(world: World): SerializedWorld {
       nextWarId: world.military.nextWarId,
       nextOfferId: world.military.nextOfferId,
       lastPhaseDay: world.military.lastPhaseDay,
+    },
+    provinces: {
+      enabled: world.provinces.enabled,
+      ownership: world.provinces.ownership.map((entry) => ({
+        provinceId: entry.provinceId,
+        ownerPolityId: entry.ownerPolityId,
+        controllerPolityId: entry.controllerPolityId,
+        controlledSinceDay: entry.controlledSinceDay,
+        claimantPolityIds: [...entry.claimantPolityIds],
+        specialStatus: entry.specialStatus,
+      })),
+      transfers: world.provinces.transfers.map((transfer) => ({
+        id: transfer.id,
+        day: transfer.day,
+        provinceIds: [...transfer.provinceIds],
+        fromPolityId: transfer.fromPolityId,
+        toPolityId: transfer.toPolityId,
+        kind: transfer.kind,
+        note: transfer.note,
+      })),
+      nextTransferId: world.provinces.nextTransferId,
     },
     playerCountryId: world.playerCountryId,
     diagnostics: {
@@ -3825,6 +3889,121 @@ function decodeConstructionState(value: unknown): ConstructionState {
   };
 }
 
+function decodeProvinceSpecialStatus(
+  value: unknown,
+  path: string,
+): ProvinceSpecialStatus {
+  const status = requireString(value, path, { minLength: 1, maxLength: 32 });
+  if (!(PROVINCE_SPECIAL_STATUSES as readonly string[]).includes(status)) {
+    throw new SaveFormatError(`${path} is not a supported province special status`);
+  }
+  return status as ProvinceSpecialStatus;
+}
+
+function decodeProvinceTransferKind(
+  value: unknown,
+  path: string,
+): ProvinceTransferKind {
+  const kind = requireString(value, path, { minLength: 1, maxLength: 32 });
+  if (!(PROVINCE_TRANSFER_KINDS as readonly string[]).includes(kind)) {
+    throw new SaveFormatError(`${path} is not a supported province transfer kind`);
+  }
+  return kind as ProvinceTransferKind;
+}
+
+function decodeProvinceState(value: unknown): ProvinceState {
+  const record = requireRecord(value, "save payload.provinces");
+  if (typeof record.enabled !== "boolean") {
+    throw new SaveFormatError("save payload.provinces.enabled must be a boolean");
+  }
+  const rawOwnership = requireArray(
+    record.ownership,
+    "save payload.provinces.ownership",
+  );
+  const ownership: ProvinceOwnership[] = [];
+  for (let index = 0; index < rawOwnership.length; index += 1) {
+    const path = `save payload.provinces.ownership[${String(index)}]`;
+    const entry = requireRecord(rawOwnership[index], path);
+    const rawClaims = requireArray(entry.claimantPolityIds, `${path}.claimantPolityIds`);
+    const claims: number[] = [];
+    for (let claimIndex = 0; claimIndex < rawClaims.length; claimIndex += 1) {
+      claims.push(
+        requireUint32(
+          rawClaims[claimIndex],
+          `${path}.claimantPolityIds[${String(claimIndex)}]`,
+        ),
+      );
+    }
+    ownership.push({
+      provinceId: requireUint32(entry.provinceId, `${path}.provinceId`),
+      ownerPolityId: requireUint32(entry.ownerPolityId, `${path}.ownerPolityId`),
+      controllerPolityId: requireUint32(
+        entry.controllerPolityId,
+        `${path}.controllerPolityId`,
+      ),
+      controlledSinceDay:
+        entry.controlledSinceDay === null
+          ? null
+          : requireInteger(
+              entry.controlledSinceDay,
+              `${path}.controlledSinceDay`,
+              0,
+              CAMPAIGN_TERMINAL_DAY_INDEX,
+            ),
+      claimantPolityIds: claims,
+      specialStatus: decodeProvinceSpecialStatus(
+        entry.specialStatus,
+        `${path}.specialStatus`,
+      ),
+    });
+  }
+  const rawTransfers = requireArray(
+    record.transfers,
+    "save payload.provinces.transfers",
+  );
+  const transfers: ProvinceTransferRecord[] = [];
+  for (let index = 0; index < rawTransfers.length; index += 1) {
+    const path = `save payload.provinces.transfers[${String(index)}]`;
+    const entry = requireRecord(rawTransfers[index], path);
+    const rawIds = requireArray(entry.provinceIds, `${path}.provinceIds`);
+    const ids: number[] = [];
+    for (let idIndex = 0; idIndex < rawIds.length; idIndex += 1) {
+      ids.push(requireUint32(rawIds[idIndex], `${path}.provinceIds[${String(idIndex)}]`));
+    }
+    transfers.push({
+      id: requireUint32(entry.id, `${path}.id`),
+      day: requireInteger(entry.day, `${path}.day`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+      provinceIds: ids,
+      fromPolityId:
+        entry.fromPolityId === null
+          ? null
+          : requireUint32(entry.fromPolityId, `${path}.fromPolityId`),
+      toPolityId: requireUint32(entry.toPolityId, `${path}.toPolityId`),
+      kind: decodeProvinceTransferKind(entry.kind, `${path}.kind`),
+      note: requireString(entry.note, `${path}.note`, { maxLength: 500 }),
+    });
+  }
+  const state: ProvinceState = {
+    enabled: record.enabled,
+    ownership,
+    transfers,
+    nextTransferId: requireInteger(
+      record.nextTransferId,
+      "save payload.provinces.nextTransferId",
+      1,
+      Number.MAX_SAFE_INTEGER,
+    ),
+  };
+  try {
+    assertValidProvinceState(state);
+  } catch (error) {
+    throw new SaveFormatError(
+      `save payload.provinces is invalid: ${errorMessage(error)}`,
+    );
+  }
+  return state;
+}
+
 function decodeWorldPayload(value: unknown): World {
   const payload = requireRecord(value, "save payload");
 
@@ -3989,6 +4168,7 @@ function decodeWorldPayload(value: unknown): World {
   const priceIndex = decodePriceIndexState(payload.priceIndex, "save payload.priceIndex");
   const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
   const military = decodeMilitaryState(payload.military, "save payload.military");
+  const provinces = decodeProvinceState(payload.provinces);
   const playerCountryId =
     payload.playerCountryId === null
       ? null
@@ -4021,6 +4201,7 @@ function decodeWorldPayload(value: unknown): World {
     priceIndex,
     monetary,
     military,
+    provinces,
     playerCountryId,
     diagnostics: {
       invariantFailureCount,
