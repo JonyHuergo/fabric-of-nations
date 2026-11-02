@@ -6,7 +6,7 @@
     "year": 1900,
     "units": "people",
     "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
-    "target": 84662000,
+    "target": 84659676,
     "toleranceRelative": 0.000001,
     "sourceIds": [
       "owid-population",
@@ -23,7 +23,7 @@
     "year": 1900,
     "units": "share of population",
     "definition": "Share of the country's modelled population in the peasant profession.",
-    "target": 0.2986974085185798,
+    "target": 0.29868309441675633,
     "toleranceAbsolute": 0.000001,
     "sourceIds": [
       "owid-employment-by-sector",
@@ -74,7 +74,7 @@
     "year": 1900,
     "units": "people",
     "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
-    "target": 67167000,
+    "target": 67165500,
     "toleranceRelative": 0.000001,
     "sourceIds": [
       "owid-population",
@@ -91,7 +91,7 @@
     "year": 1900,
     "units": "share of population",
     "definition": "Share of the country's modelled population in the peasant profession.",
-    "target": 0.3332600830765108,
+    "target": 0.3332492127654823,
     "toleranceAbsolute": 0.000001,
     "sourceIds": [
       "owid-employment-by-sector",
@@ -2148,7 +2148,7 @@
     "year": 1900,
     "units": "people",
     "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
-    "target": 2000000,
+    "target": 1000000,
     "toleranceRelative": 0.000001,
     "sourceIds": [
       "owid-population",
@@ -2182,7 +2182,7 @@
     "year": 1900,
     "units": "people",
     "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
-    "target": 2000000,
+    "target": 600000,
     "toleranceRelative": 0.000001,
     "sourceIds": [
       "owid-population",

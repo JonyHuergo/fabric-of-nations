@@ -54,6 +54,17 @@ function monthlyPeriods(count: number): FinancePeriodSummary[] {
   return periods;
 }
 
+/**
+ * The fixtures jump the calendar past the simulated month. A consignment dispatched in
+ * that month stays in transit and arrives on the jumped day instead of before it.
+ */
+function keepShipmentsInTransit(world: World): void {
+  world.trade.shipments = world.trade.shipments.map((shipment) => ({
+    ...shipment,
+    arrivalDay: Math.max(shipment.arrivalDay, world.dayIndex),
+  }));
+}
+
 let cachedFixture: World | null = null;
 
 function worldWithRepresentativeHistory(): {
@@ -87,6 +98,7 @@ function worldWithRepresentativeHistory(): {
     }));
     world.finance.closedThroughDay = periods.at(-1)?.periodEndDay ?? null;
     world.dayIndex = (periods.at(-1)?.periodEndDay ?? 0) + 1;
+    keepShipmentsInTransit(world);
     cachedFixture = world;
   }
   const world = cloneWorld(cachedFixture);
@@ -182,6 +194,7 @@ describe("monthly finance history compaction (D-065)", () => {
     world.finance.periodSummaries = periods;
     world.finance.closedThroughDay = periods.at(-1)?.periodEndDay ?? null;
     world.dayIndex = (periods.at(-1)?.periodEndDay ?? 0) + 1;
+    keepShipmentsInTransit(world);
     assertValidWorld(world);
 
     expect(compactFinanceHistory(world.finance)).toBe(1);
@@ -231,6 +244,7 @@ describe("monthly finance history compaction (D-065)", () => {
       const year = 1900 + Math.floor(index / 12);
       const month = ((index % 12) + 1) as Month;
       world.dayIndex = civilDateToDayIndex(year, month, daysInMonth(year, month));
+      keepShipmentsInTransit(world);
       closeFinancePeriod(world);
     }
     expect(world.finance.periodSummaries).toHaveLength(13);
@@ -241,6 +255,7 @@ describe("monthly finance history compaction (D-065)", () => {
     ).toBeGreaterThan(0);
     // The tick pipeline advances the day before publishing a closed world.
     world.dayIndex += 1;
+    keepShipmentsInTransit(world);
     assertValidWorld(world);
   });
 
@@ -251,6 +266,7 @@ describe("monthly finance history compaction (D-065)", () => {
       const year = 1900 + Math.floor(index / 12);
       const month = ((index % 12) + 1) as Month;
       world.dayIndex = civilDateToDayIndex(year, month, daysInMonth(year, month));
+      keepShipmentsInTransit(world);
       closeFinancePeriod(world);
     }
     expect(world.finance.periodSummaries).toHaveLength(13);

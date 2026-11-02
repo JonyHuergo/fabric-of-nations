@@ -1,0 +1,11388 @@
+[
+ {
+  "correction": "Hohenzollern Lands",
+  "target": "deu-hohenzollern",
+  "areaSqDeg": 0.1538
+ },
+ {
+  "correction": "Danzig",
+  "target": "deu-danzig",
+  "areaSqDeg": 0.207
+ },
+ {
+  "correction": "Eupen-Malmedy",
+  "target": "deu-eupen-malmedy",
+  "areaSqDeg": 0.1454
+ },
+ {
+  "correction": "Silesian coverage gap",
+  "target": "deu-upper-silesia",
+  "areaSqDeg": 0.8872
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-marijampole",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0678,
+  "bbox": [
+   22.57,
+   54.36,
+   22.9,
+   55.07
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-taurage",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0152,
+  "bbox": [
+   21.81,
+   55.41,
+   22.04,
+   55.58
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-taurage",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0269,
+  "bbox": [
+   21.9,
+   55.15,
+   22.17,
+   55.41
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-taurage",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0098,
+  "bbox": [
+   22.27,
+   55.06,
+   22.61,
+   55.11
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-telsiai",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   21.52,
+   55.81,
+   21.54,
+   55.82
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ltu-telsiai",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   21.62,
+   55.75,
+   21.69,
+   55.78
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-warsaw",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0344,
+  "bbox": [
+   20.51,
+   53.19,
+   21.54,
+   53.44
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-odz",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.0249,
+  "bbox": [
+   18.07,
+   51.07,
+   18.38,
+   51.35
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-lublin",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0058,
+  "bbox": [
+   22.53,
+   50.37,
+   22.68,
+   50.45
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-lublin",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0106,
+  "bbox": [
+   23.54,
+   50.33,
+   23.99,
+   50.44
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-siedlce",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0315,
+  "bbox": [
+   21.52,
+   53.4,
+   22.43,
+   53.72
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-siedlce",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0522,
+  "bbox": [
+   22.35,
+   53.99,
+   22.72,
+   54.3
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-kielce",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   20.59,
+   50.17,
+   20.66,
+   50.2
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-kalisz",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.0349,
+  "bbox": [
+   17.95,
+   51.32,
+   18.15,
+   51.85
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-kalisz",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.0041,
+  "bbox": [
+   18.09,
+   51.12,
+   18.15,
+   51.24
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-pol-kalisz",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0067,
+  "bbox": [
+   18.72,
+   52.81,
+   18.85,
+   52.95
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ukr-volhynia",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0031,
+  "bbox": [
+   25.19,
+   50.01,
+   25.37,
+   50.11
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ukr-podolia",
+  "to": "aut-tarnopol",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   26.15,
+   49.49,
+   26.16,
+   49.52
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "rus-ukr-podolia",
+  "to": "aut-tarnopol",
+  "areaSqDeg": 0.0056,
+  "bbox": [
+   26.23,
+   48.58,
+   26.37,
+   48.78
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   14.2,
+   53.93,
+   14.24,
+   53.95
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   14.26,
+   53.71,
+   14.3,
+   53.73
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0096,
+  "bbox": [
+   14.36,
+   53.73,
+   14.63,
+   53.91
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   14.37,
+   53.92,
+   14.76,
+   54.03
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   14.53,
+   53.6,
+   14.62,
+   53.69
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   14.96,
+   50.97,
+   14.99,
+   51.01
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   14.97,
+   54.07,
+   15.6,
+   54.2
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   14.99,
+   51.01,
+   15.04,
+   51.02
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   15.12,
+   50.96,
+   15.25,
+   51.01
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   15.43,
+   50.79,
+   15.46,
+   50.8
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   15.74,
+   50.71,
+   15.82,
+   50.74
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   15.93,
+   50.63,
+   15.99,
+   50.68
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.04,
+   50.62,
+   16.13,
+   50.64
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0022,
+  "bbox": [
+   16.07,
+   54.26,
+   16.21,
+   54.3
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   16.21,
+   50.65,
+   16.27,
+   50.66
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.25,
+   54.33,
+   16.32,
+   54.37
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.29,
+   50.62,
+   16.36,
+   50.65
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.33,
+   50.35,
+   16.35,
+   50.37
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.38,
+   50.52,
+   16.43,
+   50.57
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   16.4,
+   50.19,
+   16.54,
+   50.31
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.002,
+  "bbox": [
+   16.53,
+   54.54,
+   16.85,
+   54.59
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.9,
+   50.42,
+   16.96,
+   50.42
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   16.95,
+   54.63,
+   17.02,
+   54.65
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.21,
+   54.72,
+   17.27,
+   54.73
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   17.26,
+   50.29,
+   17.34,
+   50.33
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.38,
+   50.26,
+   17.4,
+   50.27
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   17.68,
+   50.05,
+   17.75,
+   50.1
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.7,
+   50.3,
+   17.71,
+   50.31
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   17.71,
+   50.19,
+   17.74,
+   50.23
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   17.86,
+   49.97,
+   17.91,
+   49.98
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   17.96,
+   54.83,
+   18.34,
+   54.84
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   18.39,
+   54.72,
+   18.66,
+   54.82
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0133,
+  "bbox": [
+   18.42,
+   54.63,
+   18.8,
+   54.78
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   18.52,
+   49.81,
+   18.59,
+   49.9
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0077,
+  "bbox": [
+   18.54,
+   54.35,
+   18.95,
+   54.59
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-aut-residual",
+  "areaSqDeg": 0.0749,
+  "bbox": [
+   18.85,
+   49.4,
+   19.53,
+   49.84
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   19.17,
+   54.37,
+   19.4,
+   54.39
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.59,
+   54.45,
+   19.64,
+   54.48
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   19.86,
+   54.64,
+   19.96,
+   54.81
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   20.08,
+   53.15,
+   20.26,
+   53.18
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "oc-gap-deu-residual",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   20.14,
+   54.95,
+   20.28,
+   54.96
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   20.45,
+   54.97,
+   20.55,
+   55.01
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   20.49,
+   53.19,
+   20.7,
+   53.28
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0064,
+  "bbox": [
+   20.54,
+   54.94,
+   20.86,
+   55.19
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0083,
+  "bbox": [
+   20.55,
+   55.01,
+   21,
+   55.39
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.93,
+   55.28,
+   20.96,
+   55.28
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   21.03,
+   55.42,
+   21.08,
+   55.57
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0025,
+  "bbox": [
+   21.05,
+   54.91,
+   21.23,
+   55.05
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   21.18,
+   55.45,
+   21.24,
+   55.59
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0094,
+  "bbox": [
+   21.2,
+   55.2,
+   21.29,
+   55.37
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   21.21,
+   55.38,
+   21.25,
+   55.45
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   21.4,
+   53.44,
+   21.55,
+   53.45
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0155,
+  "bbox": [
+   21.7,
+   53.47,
+   22.37,
+   53.7
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   21.81,
+   55.56,
+   21.87,
+   55.59
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.05,
+   55.15,
+   22.08,
+   55.23
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.32,
+   55.06,
+   22.57,
+   55.07
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.44,
+   54.26,
+   22.7,
+   54.29
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   22.53,
+   50.42,
+   22.59,
+   50.46
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   22.69,
+   54.59,
+   22.73,
+   54.72
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   22.7,
+   54.3,
+   22.74,
+   54.34
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.83,
+   54.78,
+   22.84,
+   54.83
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.54,
+   50.33,
+   23.64,
+   50.38
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-rus-residual",
+  "to": "aut-northern-bukovina",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   26.27,
+   48.11,
+   26.49,
+   48.24
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-west-prussia",
+  "to": "rus-pol-kalisz",
+  "areaSqDeg": 0.0858,
+  "bbox": [
+   18.78,
+   52.95,
+   19.6,
+   53.24
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-posen",
+  "to": "rus-pol-kalisz",
+  "areaSqDeg": 0.2662,
+  "bbox": [
+   17.6,
+   51.85,
+   18.6,
+   52.75
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-upper-silesia",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0.4139,
+  "bbox": [
+   18.38,
+   50.17,
+   19.5,
+   51.08
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-east-prussia-north",
+  "to": "rus-ltu-marijampole",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.75,
+   54.35,
+   22.77,
+   54.36
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-east-prussia-south",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0179,
+  "bbox": [
+   19.7,
+   53.14,
+   20.08,
+   53.22
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-east-prussia-south",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0037,
+  "bbox": [
+   20.26,
+   53.14,
+   20.49,
+   53.19
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-east-prussia-south",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0.0214,
+  "bbox": [
+   22.43,
+   53.72,
+   22.62,
+   53.99
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-memel",
+  "to": "rus-ltu-telsiai",
+  "areaSqDeg": 0.2598,
+  "bbox": [
+   21.05,
+   55.82,
+   21.99,
+   56.38
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-memel",
+  "to": "rus-ltu-telsiai",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   21.54,
+   55.78,
+   21.62,
+   55.81
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-memel",
+  "to": "rus-ltu-telsiai",
+  "areaSqDeg": 0.0036,
+  "bbox": [
+   21.69,
+   55.59,
+   21.88,
+   55.76
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "deu-memel",
+  "to": "rus-ltu-taurage",
+  "areaSqDeg": 0.0042,
+  "bbox": [
+   22.17,
+   55.11,
+   22.3,
+   55.17
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-deu-residual",
+  "to": "rus-pol-kalisz",
+  "areaSqDeg": 0.0143,
+  "bbox": [
+   18.6,
+   52.5,
+   18.72,
+   52.81
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-deu-residual",
+  "to": "rus-pol-kalisz",
+  "areaSqDeg": 0.0103,
+  "bbox": [
+   19.6,
+   53.13,
+   19.74,
+   53.22
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-deu-residual",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   21.33,
+   56.22,
+   21.96,
+   56.38
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-deu-residual",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   22.74,
+   54.34,
+   22.77,
+   54.36
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-western-galicia",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.2775,
+  "bbox": [
+   19.31,
+   50.08,
+   20.59,
+   50.48
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-western-galicia",
+  "to": "rus-pol-kielce",
+  "areaSqDeg": 0.1269,
+  "bbox": [
+   20.66,
+   50.2,
+   22.66,
+   50.83
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-western-galicia",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   22.68,
+   50.34,
+   22.76,
+   50.38
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-western-galicia",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0469,
+  "bbox": [
+   22.72,
+   50.24,
+   23.54,
+   50.43
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-eastern-galicia",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0.1499,
+  "bbox": [
+   23.99,
+   50.11,
+   25.21,
+   50.64
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-tarnopol",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.3812,
+  "bbox": [
+   25.37,
+   49.52,
+   26.27,
+   50.27
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-tarnopol",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.0255,
+  "bbox": [
+   26.15,
+   48.78,
+   26.26,
+   49.49
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-tarnopol",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   26.33,
+   48.52,
+   26.38,
+   48.58
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-northern-bukovina",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.2699,
+  "bbox": [
+   26.25,
+   48.22,
+   27.5,
+   48.63
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-cieszyn-silesia",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.3,
+   50.17,
+   19.41,
+   50.25
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-cieszyn-silesia",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   19.41,
+   50.26,
+   19.46,
+   50.32
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "aut-cieszyn-silesia",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.79,
+   50.39,
+   19.84,
+   50.39
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-pol-kielce",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   22.57,
+   50.46,
+   22.66,
+   50.48
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.68,
+   50.37,
+   22.73,
+   50.38
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   22.99,
+   50.31,
+   23.11,
+   50.32
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   23.23,
+   50.37,
+   23.39,
+   50.43
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   24.72,
+   50.34,
+   24.93,
+   50.37
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.93,
+   50.28,
+   25.07,
+   50.37
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   25.07,
+   50.25,
+   25.21,
+   50.29
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   26.19,
+   48.84,
+   26.22,
+   48.94
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   26.2,
+   48.98,
+   26.23,
+   49.08
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   26.2,
+   49.08,
+   26.23,
+   49.2
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   26.33,
+   48.51,
+   26.47,
+   48.54
+  ]
+ },
+ {
+  "correction": "Russian frontier of 1900",
+  "from": "oc-gap-aut-residual",
+  "to": "rus-ukr-podolia",
+  "areaSqDeg": 0,
+  "bbox": [
+   26.6,
+   48.45,
+   26.61,
+   48.46
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   6.13,
+   51.86,
+   6.23,
+   51.88
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.632,
+  "bbox": [
+   6.47,
+   51.16,
+   7.5,
+   52.36
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   7.96,
+   50.82,
+   7.97,
+   50.84
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0128,
+  "bbox": [
+   8.05,
+   49.9,
+   8.15,
+   50.04
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0044,
+  "bbox": [
+   8.05,
+   50.25,
+   8.12,
+   50.37
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0128,
+  "bbox": [
+   8.05,
+   50.53,
+   8.15,
+   50.71
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-rhine-province",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   8.13,
+   50.77,
+   8.15,
+   50.79
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-westphalia",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0883,
+  "bbox": [
+   7.5,
+   50.72,
+   7.85,
+   51.16
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-westphalia",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   7.85,
+   50.84,
+   7.96,
+   50.92
+  ]
+ },
+ {
+  "correction": "Rhine Province-Westphalia border",
+  "from": "deu-westphalia",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   7.97,
+   50.7,
+   8.05,
+   50.82
+  ]
+ },
+ {
+  "correction": "Palatinate border",
+  "from": "deu-palatinate",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.3633,
+  "bbox": [
+   7,
+   49.51,
+   8.48,
+   49.9
+  ]
+ },
+ {
+  "correction": "Palatinate border",
+  "from": "deu-palatinate",
+  "to": "deu-saar",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   7.25,
+   49.42,
+   7.28,
+   49.46
+  ]
+ },
+ {
+  "correction": "Palatinate border",
+  "from": "deu-saar",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0.0573,
+  "bbox": [
+   7.05,
+   49.1,
+   7.39,
+   49.42
+  ]
+ },
+ {
+  "correction": "Palatinate border",
+  "from": "deu-saar",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   7.29,
+   49.47,
+   7.31,
+   49.51
+  ]
+ },
+ {
+  "correction": "Hultschin",
+  "target": "aut-hultschin",
+  "areaSqDeg": 0.0485
+ },
+ {
+  "correction": "Hultschin owner",
+  "target": "aut-hultschin",
+  "owner": "DEU"
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-pomerania",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.4407,
+  "bbox": [
+   12.8,
+   53.17,
+   13.81,
+   54.06
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-pomerania",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0164,
+  "bbox": [
+   13.89,
+   53.26,
+   14.27,
+   53.47
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-pomerania",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   14.25,
+   53,
+   14.3,
+   53.02
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-mecklenburg",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0797,
+  "bbox": [
+   12.44,
+   54.06,
+   12.8,
+   54.41
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-mecklenburg",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0097,
+  "bbox": [
+   12.46,
+   54.37,
+   12.8,
+   54.46
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-brandenburg",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.003,
+  "bbox": [
+   13.78,
+   53.47,
+   13.89,
+   53.54
+  ]
+ },
+ {
+  "correction": "Pomerania-Mecklenburg border",
+  "from": "deu-brandenburg",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0296,
+  "bbox": [
+   14.27,
+   53.03,
+   14.44,
+   53.33
+  ]
+ },
+ {
+  "correction": "Pomerania southern border",
+  "from": "deu-pomerania",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.6722,
+  "bbox": [
+   14.25,
+   53,
+   17,
+   53.77
+  ]
+ },
+ {
+  "correction": "Pomerania southern border",
+  "from": "deu-brandenburg",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0625,
+  "bbox": [
+   12.8,
+   53.7,
+   13.3,
+   54.06
+  ]
+ },
+ {
+  "correction": "Pomerania southern border",
+  "from": "deu-west-prussia",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.7012,
+  "bbox": [
+   16.79,
+   53.77,
+   17.99,
+   54.83
+  ]
+ },
+ {
+  "correction": "Pomerania southern border",
+  "from": "deu-west-prussia",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.21,
+   54.72,
+   17.27,
+   54.73
+  ]
+ },
+ {
+  "correction": "Baden-Wuerttemberg border",
+  "from": "deu-baden",
+  "to": "deu-wurttemberg",
+  "areaSqDeg": 0.2548,
+  "bbox": [
+   8.32,
+   47.94,
+   8.7,
+   48.87
+  ]
+ },
+ {
+  "correction": "Baden-Wuerttemberg border",
+  "from": "deu-wurttemberg",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0935,
+  "bbox": [
+   8.7,
+   47.59,
+   9.39,
+   47.94
+  ]
+ },
+ {
+  "correction": "Baden-Wuerttemberg border",
+  "from": "deu-wurttemberg",
+  "to": "deu-baden",
+  "areaSqDeg": 0.3899,
+  "bbox": [
+   8.7,
+   48.87,
+   9.78,
+   49.78
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-posen",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.1062,
+  "bbox": [
+   16.67,
+   51.07,
+   18.07,
+   51.62
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-west-prussia",
+  "to": "deu-posen",
+  "areaSqDeg": 0.4643,
+  "bbox": [
+   17.33,
+   52.81,
+   18.85,
+   53.38
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-brandenburg-lebus",
+  "to": "deu-posen",
+  "areaSqDeg": 0.3174,
+  "bbox": [
+   15.4,
+   51.72,
+   16.37,
+   52.94
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-brandenburg-lebus",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0478,
+  "bbox": [
+   15.95,
+   52.96,
+   16.71,
+   53.22
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-lower-silesia",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0201,
+  "bbox": [
+   16.34,
+   51.61,
+   16.67,
+   51.75
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-lower-silesia",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.43,
+   51.57,
+   17.48,
+   51.58
+  ]
+ },
+ {
+  "correction": "Posen-West Prussia border",
+  "from": "deu-middle-silesia",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   18.07,
+   51.1,
+   18.12,
+   51.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0,
+  "bbox": [
+   5.86,
+   50.98,
+   5.94,
+   51.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lorraine",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   5.92,
+   49.38,
+   5.93,
+   49.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   5.94,
+   51.04,
+   6.16,
+   51.18
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   5.94,
+   50.94,
+   6,
+   50.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   5.95,
+   51.75,
+   5.96,
+   51.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   5.95,
+   51.8,
+   6.16,
+   51.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-eupen-malmedy",
+  "areaSqDeg": 0.0045,
+  "bbox": [
+   5.95,
+   50.25,
+   6.01,
+   50.34
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-eupen-malmedy",
+  "areaSqDeg": 0.117,
+  "bbox": [
+   5.95,
+   50.09,
+   6.4,
+   50.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0083,
+  "bbox": [
+   5.96,
+   51.23,
+   6.21,
+   51.75
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   6,
+   50.8,
+   6.06,
+   50.94
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   6.17,
+   51.82,
+   6.5,
+   51.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lorraine",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   6.17,
+   49.45,
+   6.34,
+   49.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   6.22,
+   49.59,
+   6.5,
+   49.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saar",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   6.34,
+   49.45,
+   6.4,
+   49.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   6.65,
+   51.89,
+   6.81,
+   51.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   6.69,
+   52.53,
+   6.74,
+   52.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   6.72,
+   52.04,
+   6.76,
+   52.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   6.75,
+   52.63,
+   7.03,
+   52.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   6.75,
+   52.4,
+   7.02,
+   52.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   6.76,
+   52.1,
+   6.96,
+   52.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   6.97,
+   49.57,
+   7.2,
+   49.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0024,
+  "bbox": [
+   6.98,
+   52.21,
+   7.05,
+   52.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   7.02,
+   47.54,
+   7.13,
+   47.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   7.03,
+   52.65,
+   7.14,
+   52.89
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0066,
+  "bbox": [
+   7.05,
+   53.25,
+   7.37,
+   53.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   7.05,
+   53.38,
+   7.17,
+   53.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   7.11,
+   48.79,
+   7.2,
+   48.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   7.11,
+   48.3,
+   7.21,
+   48.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   7.18,
+   52.97,
+   7.2,
+   53.23
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   7.18,
+   47.43,
+   7.21,
+   47.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   7.2,
+   53.65,
+   7.65,
+   53.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saar",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.2,
+   49.56,
+   7.25,
+   49.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   7.25,
+   49.43,
+   7.31,
+   49.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lorraine",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   7.26,
+   48.69,
+   7.32,
+   48.75
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.27,
+   49.55,
+   7.29,
+   49.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   7.27,
+   49.1,
+   7.5,
+   49.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.29,
+   49.23,
+   7.29,
+   49.23
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   7.51,
+   47.71,
+   7.56,
+   47.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.57,
+   52.38,
+   7.58,
+   52.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   7.58,
+   52.43,
+   7.61,
+   52.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.58,
+   48.12,
+   7.6,
+   48.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0035,
+  "bbox": [
+   7.59,
+   47.56,
+   7.92,
+   47.6
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-palatinate",
+  "areaSqDeg": 0,
+  "bbox": [
+   7.64,
+   49.04,
+   7.66,
+   49.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0025,
+  "bbox": [
+   7.76,
+   50.9,
+   7.86,
+   50.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   7.77,
+   50.05,
+   7.86,
+   50.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-alsace",
+  "areaSqDeg": 0.0058,
+  "bbox": [
+   7.83,
+   48.95,
+   8.22,
+   49.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0033,
+  "bbox": [
+   7.92,
+   47.56,
+   8.45,
+   47.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0124,
+  "bbox": [
+   8.01,
+   53.41,
+   8.33,
+   53.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.11,
+   50.53,
+   8.12,
+   50.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   8.12,
+   50.57,
+   8.16,
+   50.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.12,
+   50.65,
+   8.17,
+   50.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0209,
+  "bbox": [
+   8.15,
+   49.9,
+   8.34,
+   50.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.15,
+   50.74,
+   8.17,
+   50.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   8.24,
+   48.97,
+   8.36,
+   49.11
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0105,
+  "bbox": [
+   8.29,
+   54.77,
+   8.63,
+   54.89
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0074,
+  "bbox": [
+   8.29,
+   54.77,
+   8.63,
+   55.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   8.36,
+   49.47,
+   8.46,
+   49.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.36,
+   50.86,
+   8.54,
+   51.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-rhine-province",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   8.38,
+   49.7,
+   8.48,
+   49.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   8.39,
+   47.64,
+   8.56,
+   47.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   8.42,
+   54.74,
+   8.54,
+   54.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0064,
+  "bbox": [
+   8.44,
+   47.7,
+   8.73,
+   47.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   8.5,
+   53.36,
+   8.52,
+   53.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   8.51,
+   53.67,
+   8.54,
+   53.79
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   8.52,
+   53.6,
+   8.63,
+   53.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   8.52,
+   53.5,
+   8.56,
+   53.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bremen",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   8.52,
+   53.55,
+   8.55,
+   53.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   8.54,
+   54.69,
+   8.59,
+   54.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bremen",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.56,
+   53.49,
+   8.6,
+   53.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   8.58,
+   51.24,
+   8.61,
+   51.27
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   8.58,
+   51.28,
+   8.69,
+   51.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   8.59,
+   55.4,
+   8.64,
+   55.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.6,
+   49.61,
+   8.68,
+   49.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.6,
+   55.13,
+   8.68,
+   55.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   8.62,
+   53.83,
+   9.21,
+   53.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   8.63,
+   54.35,
+   8.7,
+   54.4
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.63,
+   53.52,
+   8.64,
+   53.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0392,
+  "bbox": [
+   8.64,
+   54.7,
+   10,
+   55.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0082,
+  "bbox": [
+   8.65,
+   54.4,
+   9.01,
+   54.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.66,
+   55.16,
+   8.69,
+   55.26
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.68,
+   51.26,
+   8.72,
+   51.27
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   8.68,
+   49.55,
+   8.71,
+   49.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   8.73,
+   47.7,
+   8.82,
+   47.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   8.76,
+   49.5,
+   8.89,
+   49.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.002,
+  "bbox": [
+   8.78,
+   54.27,
+   8.96,
+   54.32
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   8.81,
+   49.41,
+   8.83,
+   49.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   8.82,
+   49.4,
+   8.94,
+   49.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-baden",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.86,
+   47.66,
+   8.89,
+   47.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   8.9,
+   51.39,
+   8.94,
+   51.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0105,
+  "bbox": [
+   8.9,
+   54,
+   9.02,
+   54.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.95,
+   51.49,
+   8.97,
+   51.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0,
+  "bbox": [
+   8.98,
+   50.05,
+   9.02,
+   50.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0088,
+  "bbox": [
+   8.98,
+   53.6,
+   9.63,
+   53.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.05,
+   51.47,
+   9.09,
+   51.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   9.07,
+   49.57,
+   9.25,
+   49.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.1,
+   52.48,
+   9.13,
+   52.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.14,
+   51.44,
+   9.18,
+   51.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0043,
+  "bbox": [
+   9.18,
+   47.52,
+   9.65,
+   47.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0046,
+  "bbox": [
+   9.32,
+   53.55,
+   9.82,
+   53.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.33,
+   51.55,
+   9.33,
+   51.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.33,
+   51.6,
+   9.34,
+   51.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.35,
+   51.61,
+   9.46,
+   51.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-westphalia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.37,
+   51.66,
+   9.39,
+   51.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.46,
+   51.86,
+   9.46,
+   51.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   9.47,
+   51.63,
+   9.57,
+   51.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.49,
+   55.16,
+   9.62,
+   55.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   9.54,
+   51.29,
+   9.73,
+   51.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   9.59,
+   55.27,
+   9.67,
+   55.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.61,
+   51.4,
+   9.64,
+   51.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.64,
+   51.57,
+   9.69,
+   51.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.71,
+   51.34,
+   9.79,
+   51.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.73,
+   51.37,
+   9.8,
+   51.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   9.75,
+   47.54,
+   9.87,
+   47.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   9.77,
+   53.43,
+   9.88,
+   53.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.79,
+   54.92,
+   9.85,
+   54.97
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   9.84,
+   54.48,
+   10.03,
+   54.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   9.86,
+   50.4,
+   9.99,
+   50.44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.86,
+   51.37,
+   9.87,
+   51.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.86,
+   51.41,
+   9.9,
+   51.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0024,
+  "bbox": [
+   9.88,
+   47.48,
+   10.03,
+   47.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   9.91,
+   53.41,
+   10.08,
+   53.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.92,
+   51.3,
+   9.95,
+   51.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   9.93,
+   54.58,
+   10.03,
+   54.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.94,
+   51.37,
+   10.04,
+   51.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.95,
+   50.63,
+   9.96,
+   50.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.95,
+   50.88,
+   10.06,
+   50.94
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   9.97,
+   50.66,
+   10.06,
+   50.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   10.02,
+   50.47,
+   10.13,
+   50.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   10.04,
+   47.4,
+   10.07,
+   47.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   10.06,
+   50.61,
+   10.08,
+   50.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   10.07,
+   47.28,
+   10.21,
+   47.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.12,
+   47.68,
+   10.13,
+   47.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   10.14,
+   54.32,
+   10.22,
+   54.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.17,
+   53.53,
+   10.19,
+   53.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   10.19,
+   53.4,
+   10.34,
+   53.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hesse",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.2,
+   51.12,
+   10.23,
+   51.18
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   10.27,
+   51.49,
+   10.35,
+   51.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0,
+  "bbox": [
+   10.36,
+   49.02,
+   10.37,
+   49.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.36,
+   51.54,
+   10.38,
+   51.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   10.36,
+   54.28,
+   11.06,
+   54.44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0045,
+  "bbox": [
+   10.37,
+   47.37,
+   10.87,
+   47.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.38,
+   51.56,
+   10.64,
+   51.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0,
+  "bbox": [
+   10.4,
+   50.39,
+   10.41,
+   50.4
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   10.43,
+   48.76,
+   10.47,
+   48.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   10.57,
+   53.36,
+   10.71,
+   53.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.58,
+   51.8,
+   10.58,
+   51.83
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.58,
+   51.85,
+   10.64,
+   51.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   10.59,
+   50.23,
+   10.62,
+   50.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   10.75,
+   53.76,
+   10.76,
+   53.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0113,
+  "bbox": [
+   10.75,
+   53.92,
+   11.1,
+   54.18
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   10.76,
+   53.68,
+   10.94,
+   53.75
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   11.01,
+   54.42,
+   11.13,
+   54.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   11.04,
+   54.51,
+   11.09,
+   54.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   11.1,
+   53.94,
+   11.33,
+   54.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0078,
+  "bbox": [
+   11.11,
+   47.4,
+   12.18,
+   47.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   11.14,
+   54.42,
+   11.28,
+   54.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   11.16,
+   53.07,
+   11.34,
+   53.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0,
+  "bbox": [
+   11.27,
+   53.12,
+   11.53,
+   53.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0039,
+  "bbox": [
+   11.33,
+   53.91,
+   11.49,
+   53.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   11.43,
+   51.1,
+   11.67,
+   51.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-hanover",
+  "areaSqDeg": 0.002,
+  "bbox": [
+   11.44,
+   53.01,
+   11.63,
+   53.08
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   11.5,
+   52.94,
+   11.51,
+   53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   11.53,
+   53.2,
+   11.59,
+   53.23
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   11.61,
+   53.23,
+   11.72,
+   53.25
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   11.88,
+   50.41,
+   11.92,
+   50.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   11.9,
+   52.85,
+   12.21,
+   52.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-thuringia",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   11.93,
+   50.47,
+   11.99,
+   50.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   11.95,
+   50.35,
+   11.99,
+   50.4
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-mecklenburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   11.99,
+   53.29,
+   12.03,
+   53.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0103,
+  "bbox": [
+   11.99,
+   50,
+   12.38,
+   50.35
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0261,
+  "bbox": [
+   12.09,
+   54.15,
+   12.95,
+   54.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   12.11,
+   53.36,
+   12.18,
+   53.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   12.16,
+   51.34,
+   12.19,
+   51.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   12.18,
+   47.68,
+   12.27,
+   47.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   12.19,
+   51.5,
+   12.23,
+   51.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   12.19,
+   53.27,
+   12.43,
+   53.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   12.2,
+   52.18,
+   12.25,
+   52.25
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   12.2,
+   50.93,
+   12.28,
+   51.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   12.21,
+   52.25,
+   12.25,
+   52.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0,
+  "bbox": [
+   12.21,
+   51.09,
+   12.22,
+   51.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   12.26,
+   50.79,
+   12.46,
+   50.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   12.26,
+   52.03,
+   12.4,
+   52.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0032,
+  "bbox": [
+   12.31,
+   47.64,
+   12.48,
+   47.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.007,
+  "bbox": [
+   12.38,
+   49.33,
+   12.81,
+   49.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   12.39,
+   49.9,
+   12.51,
+   50
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-prussian-saxony",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   12.44,
+   51.97,
+   12.58,
+   52.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   12.48,
+   50.36,
+   12.94,
+   50.44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   12.53,
+   50.91,
+   12.63,
+   50.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0036,
+  "bbox": [
+   12.56,
+   54.42,
+   12.87,
+   54.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   12.61,
+   50.89,
+   12.65,
+   50.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   12.66,
+   51.6,
+   12.87,
+   51.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   12.71,
+   47.6,
+   12.81,
+   47.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   12.74,
+   48.09,
+   12.9,
+   48.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   12.74,
+   53.19,
+   12.95,
+   53.22
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   12.89,
+   47.72,
+   12.96,
+   47.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0034,
+  "bbox": [
+   12.91,
+   49.07,
+   13.32,
+   49.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   12.94,
+   50.41,
+   13.17,
+   50.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0032,
+  "bbox": [
+   12.95,
+   48.22,
+   13.38,
+   48.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   13,
+   51.57,
+   13.17,
+   51.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0061,
+  "bbox": [
+   13.02,
+   54.16,
+   13.4,
+   54.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.09,
+   52.41,
+   13.29,
+   52.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0038,
+  "bbox": [
+   13.16,
+   54.38,
+   13.27,
+   54.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0045,
+  "bbox": [
+   13.16,
+   54.44,
+   13.27,
+   54.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   13.17,
+   50.51,
+   13.44,
+   50.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.18,
+   51.51,
+   13.2,
+   51.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   13.19,
+   54.25,
+   13.35,
+   54.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0185,
+  "bbox": [
+   13.2,
+   54.49,
+   13.52,
+   54.64
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0123,
+  "bbox": [
+   13.24,
+   54.56,
+   13.66,
+   54.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   13.28,
+   53.27,
+   13.4,
+   53.29
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.35,
+   48.98,
+   13.4,
+   49.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0022,
+  "bbox": [
+   13.36,
+   54.25,
+   13.47,
+   54.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0082,
+  "bbox": [
+   13.4,
+   53.99,
+   13.83,
+   54.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   13.4,
+   48.94,
+   13.54,
+   48.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.43,
+   53.29,
+   13.47,
+   53.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   13.44,
+   50.6,
+   13.88,
+   50.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   13.46,
+   48.52,
+   13.49,
+   48.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0032,
+  "bbox": [
+   13.49,
+   54.31,
+   13.71,
+   54.35
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   13.5,
+   48.53,
+   13.69,
+   48.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0024,
+  "bbox": [
+   13.53,
+   51.35,
+   13.94,
+   51.36
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   13.58,
+   54.39,
+   13.7,
+   54.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.66,
+   54.28,
+   13.71,
+   54.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   13.69,
+   48.53,
+   13.79,
+   48.6
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.7,
+   54.32,
+   13.73,
+   54.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.71,
+   54.29,
+   13.72,
+   54.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.72,
+   54.3,
+   13.74,
+   54.32
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-bavaria",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   13.78,
+   48.6,
+   13.81,
+   48.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0049,
+  "bbox": [
+   13.82,
+   53.72,
+   14.23,
+   53.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0141,
+  "bbox": [
+   13.83,
+   53.93,
+   14.24,
+   54.13
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.005,
+  "bbox": [
+   13.88,
+   50.76,
+   14.36,
+   50.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   13.9,
+   53.88,
+   13.93,
+   53.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.96,
+   51.36,
+   13.99,
+   51.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.2825,
+  "bbox": [
+   14.12,
+   52.6,
+   15.75,
+   53.05
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   14.2,
+   53.92,
+   14.39,
+   53.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0032,
+  "bbox": [
+   14.22,
+   53.67,
+   14.5,
+   53.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   14.24,
+   50.9,
+   14.37,
+   51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0028,
+  "bbox": [
+   14.27,
+   51,
+   14.53,
+   51.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   14.37,
+   53.92,
+   14.76,
+   54.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0083,
+  "bbox": [
+   14.47,
+   53.94,
+   15.36,
+   54.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   14.54,
+   52.29,
+   14.58,
+   52.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   14.54,
+   52.42,
+   14.63,
+   52.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   14.55,
+   53.64,
+   14.62,
+   53.71
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.003,
+  "bbox": [
+   14.57,
+   51.45,
+   14.93,
+   51.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   14.58,
+   50.85,
+   14.63,
+   50.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   14.58,
+   51.81,
+   14.69,
+   51.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   14.61,
+   51.66,
+   14.73,
+   51.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   14.62,
+   50.82,
+   14.8,
+   50.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0035,
+  "bbox": [
+   14.92,
+   51.01,
+   15.02,
+   51.26
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-saxony",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   14.95,
+   51.3,
+   15,
+   51.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   14.97,
+   54.07,
+   15.6,
+   54.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   15.14,
+   50.96,
+   15.26,
+   51.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   15.38,
+   54.15,
+   16.12,
+   54.28
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   15.8,
+   53.03,
+   15.89,
+   53.09
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   15.83,
+   52.46,
+   15.88,
+   52.64
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0,
+  "bbox": [
+   15.83,
+   52.67,
+   15.84,
+   52.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   15.89,
+   52.71,
+   15.97,
+   52.74
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   15.89,
+   50.68,
+   15.97,
+   50.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-brandenburg-lebus",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.96,
+   53.1,
+   16.03,
+   53.11
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0.5424,
+  "bbox": [
+   16.02,
+   52.9,
+   17.49,
+   53.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0032,
+  "bbox": [
+   16.07,
+   54.26,
+   16.24,
+   54.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.21,
+   50.37,
+   16.34,
+   50.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.29,
+   54.36,
+   16.53,
+   54.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.32,
+   54.36,
+   16.34,
+   54.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   16.34,
+   50.1,
+   16.65,
+   50.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.37,
+   51.75,
+   16.48,
+   51.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.53,
+   54.54,
+   16.84,
+   54.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0.002,
+  "bbox": [
+   16.53,
+   54.54,
+   16.85,
+   54.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   16.65,
+   50.1,
+   16.87,
+   50.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-pomerania",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.84,
+   54.59,
+   16.84,
+   54.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.87,
+   50.41,
+   16.88,
+   50.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   17.26,
+   51.58,
+   17.4,
+   51.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.71,
+   50.27,
+   17.72,
+   50.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.72,
+   50.23,
+   17.73,
+   50.27
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   17.73,
+   49.99,
+   17.84,
+   50.09
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   17.98,
+   50,
+   18.02,
+   50.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   18.01,
+   49.95,
+   18.25,
+   50.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0101,
+  "bbox": [
+   18.41,
+   54.35,
+   18.95,
+   54.74
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0134,
+  "bbox": [
+   18.42,
+   54.63,
+   18.8,
+   54.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-danzig",
+  "areaSqDeg": 0.0023,
+  "bbox": [
+   18.59,
+   54.35,
+   18.89,
+   54.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-posen",
+  "areaSqDeg": 0.0155,
+  "bbox": [
+   18.6,
+   52.75,
+   18.75,
+   52.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-danzig",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   18.89,
+   54.35,
+   19.38,
+   54.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   19.25,
+   53.94,
+   19.39,
+   54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.59,
+   54.45,
+   19.64,
+   54.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0048,
+  "bbox": [
+   19.6,
+   53.22,
+   19.7,
+   53.28
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0227,
+  "bbox": [
+   19.6,
+   54.35,
+   21.37,
+   54.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   19.61,
+   54.46,
+   19.9,
+   54.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.003,
+  "bbox": [
+   19.98,
+   54.92,
+   20.25,
+   54.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   20.14,
+   54.95,
+   20.28,
+   54.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.53,
+   54.96,
+   20.54,
+   54.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0042,
+  "bbox": [
+   20.65,
+   54.9,
+   20.99,
+   54.95
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   20.93,
+   55.28,
+   21.06,
+   55.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0,
+  "bbox": [
+   21.23,
+   54.94,
+   21.24,
+   55.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   21.26,
+   55.21,
+   21.29,
+   55.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-memel",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.05,
+   55.03,
+   22.06,
+   55.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.58,
+   54.96,
+   22.63,
+   55.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   22.7,
+   54.62,
+   22.73,
+   54.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-deu-residual",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   22.7,
+   54.34,
+   22.75,
+   54.35
+  ]
+ },
+ {
+  "correction": "coverage residual fully dissolved",
+  "target": "oc-gap-deu-residual"
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0054,
+  "bbox": [
+   9.52,
+   47.27,
+   9.74,
+   47.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   9.53,
+   47.06,
+   9.62,
+   47.27
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   9.58,
+   46.94,
+   9.88,
+   47.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   9.75,
+   47.46,
+   10.04,
+   47.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   9.88,
+   46.85,
+   10.13,
+   46.94
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-vorarlberg",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   10.07,
+   47.36,
+   10.2,
+   47.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0081,
+  "bbox": [
+   10.15,
+   47.25,
+   10.45,
+   47.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   10.36,
+   46.9,
+   10.46,
+   47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.44,
+   46.79,
+   10.47,
+   46.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.46,
+   45.97,
+   10.5,
+   45.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   10.51,
+   45.8,
+   10.69,
+   45.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0,
+  "bbox": [
+   10.53,
+   46.34,
+   10.62,
+   46.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0,
+  "bbox": [
+   10.62,
+   46.44,
+   10.63,
+   46.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   10.62,
+   46.38,
+   10.63,
+   46.4
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0033,
+  "bbox": [
+   10.85,
+   47.39,
+   11.02,
+   47.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0,
+  "bbox": [
+   11.13,
+   46.49,
+   11.14,
+   46.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   11.14,
+   45.72,
+   11.28,
+   45.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   11.21,
+   47.39,
+   11.38,
+   47.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.004,
+  "bbox": [
+   11.72,
+   47.58,
+   12.21,
+   47.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   11.73,
+   46.97,
+   12.15,
+   47.08
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   11.82,
+   46.51,
+   12.02,
+   46.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0,
+  "bbox": [
+   11.83,
+   46.45,
+   11.9,
+   46.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trentino",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   11.89,
+   46.14,
+   11.96,
+   46.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   12.02,
+   46.54,
+   12.1,
+   46.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   12.08,
+   47.08,
+   12.13,
+   47.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   12.1,
+   50.1,
+   12.21,
+   50.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-south-tyrol",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   12.19,
+   47.05,
+   12.4,
+   47.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   12.21,
+   47.68,
+   12.31,
+   47.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0066,
+  "bbox": [
+   12.21,
+   49.74,
+   12.52,
+   50.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   12.28,
+   50.16,
+   12.31,
+   50.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   12.31,
+   47.63,
+   12.57,
+   47.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   12.31,
+   47.33,
+   12.45,
+   47.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0033,
+  "bbox": [
+   12.39,
+   49.41,
+   12.68,
+   49.74
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   12.4,
+   47.15,
+   12.53,
+   47.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   12.43,
+   50.33,
+   12.55,
+   50.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0,
+  "bbox": [
+   12.46,
+   46.68,
+   12.47,
+   46.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   12.54,
+   46.65,
+   12.72,
+   46.75
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   12.55,
+   50.39,
+   12.76,
+   50.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   12.6,
+   47.41,
+   12.68,
+   47.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   12.61,
+   47.05,
+   12.75,
+   47.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0,
+  "bbox": [
+   12.63,
+   47.11,
+   12.67,
+   47.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-gorizia-gradisca",
+  "areaSqDeg": 0.0127,
+  "bbox": [
+   12.68,
+   46.31,
+   13.98,
+   46.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tyrol",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   12.74,
+   46.77,
+   12.95,
+   46.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0.0092,
+  "bbox": [
+   12.76,
+   47.47,
+   13.07,
+   47.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   12.76,
+   50.4,
+   13.02,
+   50.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0035,
+  "bbox": [
+   12.81,
+   49.16,
+   13.15,
+   49.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   12.9,
+   47.7,
+   13.03,
+   47.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   12.9,
+   47.72,
+   12.99,
+   47.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0075,
+  "bbox": [
+   12.94,
+   48.22,
+   13.48,
+   48.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   13.02,
+   50.49,
+   13.17,
+   50.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   13.24,
+   50.58,
+   13.38,
+   50.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-salzburg",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.28,
+   47.85,
+   13.29,
+   47.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   13.28,
+   47.96,
+   13.35,
+   47.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.3,
+   47.99,
+   13.35,
+   48.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   13.32,
+   48.98,
+   13.4,
+   49.07
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   13.38,
+   50.6,
+   13.56,
+   50.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-gorizia-gradisca",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.38,
+   46.23,
+   13.4,
+   46.26
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-gorizia-gradisca",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   13.4,
+   46.05,
+   13.64,
+   46.23
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-gorizia-gradisca",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.41,
+   45.72,
+   13.43,
+   45.89
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-gorizia-gradisca",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.49,
+   45.99,
+   13.49,
+   46.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.49,
+   48.58,
+   13.51,
+   48.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   13.52,
+   45.27,
+   13.61,
+   45.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0045,
+  "bbox": [
+   13.55,
+   45.5,
+   13.75,
+   45.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0055,
+  "bbox": [
+   13.56,
+   48.6,
+   13.82,
+   48.95
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0126,
+  "bbox": [
+   13.56,
+   50.7,
+   14.36,
+   50.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trieste",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   13.56,
+   45.78,
+   13.6,
+   45.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   13.56,
+   47.33,
+   13.62,
+   47.45
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trieste",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.59,
+   45.74,
+   13.78,
+   45.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   13.62,
+   45.11,
+   13.73,
+   45.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.67,
+   47.28,
+   13.69,
+   47.29
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   13.67,
+   47.47,
+   13.73,
+   47.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   13.68,
+   47.53,
+   13.73,
+   47.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trieste",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   13.68,
+   45.61,
+   13.81,
+   45.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   13.69,
+   48.52,
+   13.76,
+   48.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.72,
+   45.59,
+   13.85,
+   45.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.83,
+   46.92,
+   13.86,
+   46.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-trieste",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.85,
+   45.59,
+   13.89,
+   45.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   13.89,
+   45.84,
+   13.96,
+   45.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   13.93,
+   46.96,
+   14.16,
+   47.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   13.97,
+   44.87,
+   14.23,
+   45.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0,
+  "bbox": [
+   13.99,
+   48.67,
+   14.03,
+   48.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.99,
+   46.2,
+   14.01,
+   46.24
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   13.99,
+   46.45,
+   14.02,
+   46.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   14.02,
+   48.61,
+   14.03,
+   48.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-istria",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   14.05,
+   45.84,
+   14.15,
+   45.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   14.06,
+   48.57,
+   14.23,
+   48.6
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   14.1,
+   46.27,
+   14.18,
+   46.29
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.2009,
+  "bbox": [
+   14.12,
+   44.71,
+   15.36,
+   45.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carinthia",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   14.15,
+   46.42,
+   14.5,
+   46.44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   14.26,
+   50.9,
+   14.38,
+   51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   14.27,
+   45.75,
+   14.31,
+   45.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-fiume",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   14.32,
+   45.3,
+   14.53,
+   45.35
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0,
+  "bbox": [
+   14.32,
+   48.56,
+   14.33,
+   48.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   14.39,
+   45.58,
+   14.44,
+   45.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-fiume",
+  "areaSqDeg": 0,
+  "bbox": [
+   14.53,
+   45.3,
+   14.55,
+   45.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   14.54,
+   48.18,
+   14.68,
+   48.24
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.1815,
+  "bbox": [
+   14.54,
+   46.03,
+   15.38,
+   46.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   14.55,
+   50.91,
+   14.63,
+   50.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   14.57,
+   48.6,
+   14.62,
+   48.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   14.61,
+   50.83,
+   14.69,
+   50.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   14.69,
+   48.58,
+   14.72,
+   48.59
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   14.73,
+   50.81,
+   14.9,
+   50.86
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0092,
+  "bbox": [
+   14.74,
+   44.35,
+   15.24,
+   44.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   14.9,
+   50.86,
+   15,
+   51.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0,
+  "bbox": [
+   14.91,
+   48.51,
+   14.92,
+   48.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   14.91,
+   44.33,
+   15.13,
+   44.49
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   14.94,
+   43.9,
+   15.2,
+   44.13
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-upper-austria",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   14.95,
+   48.36,
+   14.96,
+   48.4
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   14.98,
+   48.98,
+   15,
+   49.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0042,
+  "bbox": [
+   14.98,
+   44.25,
+   15.53,
+   44.6
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0,
+  "bbox": [
+   15.06,
+   44.06,
+   15.23,
+   44.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.1,
+   46,
+   15.14,
+   46.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carinthia",
+  "areaSqDeg": 0.0046,
+  "bbox": [
+   15.11,
+   46.6,
+   15.45,
+   46.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.12,
+   44.17,
+   15.19,
+   44.26
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   15.13,
+   44.31,
+   15.22,
+   44.34
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   15.16,
+   44.34,
+   15.24,
+   44.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   15.17,
+   45.88,
+   15.3,
+   45.97
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   15.19,
+   44.88,
+   15.57,
+   45.13
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carniola",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   15.25,
+   45.64,
+   15.37,
+   45.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   15.26,
+   50.82,
+   15.35,
+   50.95
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   15.28,
+   48.86,
+   15.69,
+   48.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   15.3,
+   45.74,
+   15.43,
+   45.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   15.32,
+   43.9,
+   15.44,
+   43.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.005,
+  "bbox": [
+   15.35,
+   50.67,
+   15.95,
+   50.82
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   15.47,
+   46.62,
+   15.55,
+   46.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.47,
+   44.69,
+   15.53,
+   44.74
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   15.49,
+   43.57,
+   15.95,
+   43.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   15.59,
+   44.42,
+   15.63,
+   44.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0,
+  "bbox": [
+   15.62,
+   44.39,
+   15.63,
+   44.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   15.63,
+   46.2,
+   15.69,
+   46.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   15.72,
+   44.7,
+   15.81,
+   44.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.73,
+   44.93,
+   15.77,
+   44.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   15.77,
+   45.01,
+   15.79,
+   45.18
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   15.79,
+   46.24,
+   16.02,
+   46.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   15.8,
+   45.19,
+   16.02,
+   45.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   15.92,
+   47.51,
+   16.09,
+   47.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   15.95,
+   50.6,
+   16.27,
+   50.67
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   15.99,
+   43.51,
+   16.13,
+   43.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   16.01,
+   46.9,
+   16.1,
+   46.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   16.02,
+   47.38,
+   16.18,
+   47.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.05,
+   43.59,
+   16.06,
+   43.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-styria",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   16.09,
+   47.03,
+   16.14,
+   47.08
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0092,
+  "bbox": [
+   16.12,
+   43.39,
+   16.9,
+   43.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   16.17,
+   45,
+   16.32,
+   45.07
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0041,
+  "bbox": [
+   16.19,
+   50.36,
+   16.36,
+   50.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   16.2,
+   48.24,
+   16.45,
+   48.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-dalmatia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   16.24,
+   43.67,
+   16.34,
+   43.71
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   16.24,
+   46.49,
+   16.32,
+   46.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.27,
+   46.37,
+   16.29,
+   46.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.27,
+   50.57,
+   16.42,
+   50.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   16.3,
+   46.74,
+   16.32,
+   46.82
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   16.32,
+   44.99,
+   16.38,
+   45.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.32,
+   46.84,
+   16.32,
+   46.84
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0025,
+  "bbox": [
+   16.33,
+   50.1,
+   16.64,
+   50.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-styria",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.35,
+   46.54,
+   16.37,
+   46.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0034,
+  "bbox": [
+   16.38,
+   43.19,
+   16.66,
+   43.23
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   16.38,
+   46.55,
+   16.5,
+   46.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.39,
+   45.11,
+   16.4,
+   45.13
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   16.39,
+   46.66,
+   16.41,
+   46.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.42,
+   43.33,
+   16.45,
+   43.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   16.43,
+   47.4,
+   16.61,
+   47.44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.45,
+   48.8,
+   16.47,
+   48.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   16.45,
+   43.36,
+   16.79,
+   43.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   16.45,
+   43.12,
+   17.2,
+   43.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   16.48,
+   43.84,
+   16.68,
+   44
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.51,
+   45.2,
+   16.57,
+   45.22
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   16.51,
+   44.48,
+   16.57,
+   44.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   16.51,
+   44.34,
+   16.76,
+   44.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-burgenland",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   16.59,
+   47.93,
+   16.73,
+   48.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.62,
+   48.78,
+   16.63,
+   48.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   16.64,
+   47.48,
+   16.69,
+   47.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   16.65,
+   46.38,
+   16.75,
+   46.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.0031,
+  "bbox": [
+   16.65,
+   50.09,
+   16.87,
+   50.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0,
+  "bbox": [
+   16.65,
+   42.99,
+   16.67,
+   43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   16.66,
+   42.93,
+   16.71,
+   42.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   16.68,
+   42.96,
+   17.09,
+   42.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   16.7,
+   42.9,
+   16.98,
+   42.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   16.75,
+   46.37,
+   16.85,
+   46.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   16.8,
+   43.31,
+   16.89,
+   43.35
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-pressburg",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   16.86,
+   48.46,
+   16.95,
+   48.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   16.87,
+   50.22,
+   17.02,
+   50.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-lower-austria",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   16.87,
+   48.57,
+   16.95,
+   48.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   16.93,
+   45.42,
+   17.06,
+   45.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nagyszombat",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   16.95,
+   48.55,
+   17.09,
+   48.57
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   16.98,
+   48.66,
+   17.08,
+   48.79
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   16.98,
+   42.92,
+   17.19,
+   42.97
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-burgenland",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   17,
+   48.1,
+   17.08,
+   48.11
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0025,
+  "bbox": [
+   17.03,
+   45.5,
+   17.32,
+   45.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   17.04,
+   42.97,
+   17.25,
+   43.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   17.06,
+   45.33,
+   17.19,
+   45.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   17.08,
+   45.22,
+   17.2,
+   45.29
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.09,
+   47.97,
+   17.16,
+   48.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   17.1,
+   45.15,
+   17.19,
+   45.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.005,
+  "bbox": [
+   17.13,
+   43.02,
+   17.45,
+   43.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   17.14,
+   45.92,
+   17.21,
+   45.97
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   17.14,
+   49.78,
+   17.3,
+   49.85
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nagyszombat",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   17.15,
+   48.84,
+   17.19,
+   48.86
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0041,
+  "bbox": [
+   17.21,
+   42.84,
+   17.74,
+   43.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-pressburg",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   17.23,
+   48.57,
+   17.34,
+   48.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   17.23,
+   45.97,
+   17.34,
+   46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   17.28,
+   50.25,
+   17.39,
+   50.32
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-pressburg",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.31,
+   48.56,
+   17.33,
+   48.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0064,
+  "bbox": [
+   17.34,
+   42.7,
+   17.74,
+   42.8
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nagyszombat",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   17.34,
+   48.63,
+   17.38,
+   48.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nagyszombat",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   17.36,
+   48.78,
+   17.42,
+   48.83
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   17.37,
+   42.84,
+   17.6,
+   42.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0041,
+  "bbox": [
+   17.39,
+   50.24,
+   17.7,
+   50.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-croatia-proper",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.42,
+   45.52,
+   17.43,
+   45.54
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   17.45,
+   43,
+   17.5,
+   43.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   17.53,
+   47.8,
+   17.65,
+   47.86
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   17.58,
+   50.04,
+   17.75,
+   50.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   17.62,
+   42.77,
+   17.89,
+   42.83
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.7,
+   50.3,
+   17.71,
+   50.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.7,
+   50.23,
+   17.73,
+   50.31
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   17.84,
+   44.63,
+   17.86,
+   44.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0036,
+  "bbox": [
+   17.86,
+   42.59,
+   18.33,
+   42.82
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.002,
+  "bbox": [
+   17.86,
+   49.97,
+   18.04,
+   50.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.88,
+   47.92,
+   17.89,
+   48.05
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0047,
+  "bbox": [
+   17.89,
+   42.59,
+   18.22,
+   42.76
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.92,
+   44.72,
+   17.95,
+   44.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-trencsen",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   18,
+   48.66,
+   18.02,
+   48.71
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18,
+   48.63,
+   18.02,
+   48.64
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   18.02,
+   48.62,
+   18.24,
+   48.72
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   18.03,
+   44.58,
+   18.14,
+   44.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18.04,
+   50.01,
+   18.09,
+   50.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.08,
+   44.73,
+   18.09,
+   44.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.09,
+   49.98,
+   18.15,
+   50.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   18.13,
+   49.91,
+   18.29,
+   49.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   18.16,
+   49.26,
+   18.39,
+   49.34
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   18.21,
+   45.74,
+   18.41,
+   45.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.23,
+   48.56,
+   18.24,
+   48.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   18.25,
+   48.49,
+   18.37,
+   48.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18.29,
+   49.9,
+   18.52,
+   49.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   18.37,
+   48.49,
+   18.5,
+   48.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18.38,
+   49.34,
+   18.39,
+   49.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-turoc",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   18.41,
+   49.39,
+   18.47,
+   49.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.44,
+   42.55,
+   18.44,
+   42.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0.0014,
+  "bbox": [
+   18.44,
+   42.43,
+   18.52,
+   42.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   18.45,
+   42.78,
+   18.47,
+   43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   18.47,
+   42.64,
+   18.54,
+   42.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   18.51,
+   44.87,
+   18.68,
+   44.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18.54,
+   45.08,
+   18.55,
+   45.09
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.56,
+   49.8,
+   18.59,
+   49.88
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.58,
+   45.1,
+   18.61,
+   45.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   18.62,
+   49.67,
+   18.79,
+   49.71
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   18.62,
+   43.03,
+   18.63,
+   43.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0023,
+  "bbox": [
+   18.64,
+   43.18,
+   18.85,
+   43.34
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.68,
+   45.02,
+   18.74,
+   45.09
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.68,
+   47.56,
+   18.77,
+   47.64
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-nyitra",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   18.69,
+   47.78,
+   18.88,
+   47.89
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-dalmatia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.71,
+   42.39,
+   18.73,
+   42.43
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.73,
+   44.55,
+   18.84,
+   44.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   18.73,
+   44.65,
+   18.8,
+   44.74
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   18.75,
+   44.74,
+   18.8,
+   44.84
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.78,
+   45.88,
+   18.84,
+   45.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   18.78,
+   44.87,
+   18.88,
+   44.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   18.79,
+   46.1,
+   18.83,
+   46.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   18.8,
+   49.5,
+   18.94,
+   49.52
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-besztercebanya",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.82,
+   48.17,
+   18.82,
+   48.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-transdanubia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.82,
+   46.04,
+   18.84,
+   46.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.84,
+   45.82,
+   18.86,
+   45.86
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0796,
+  "bbox": [
+   18.85,
+   49.39,
+   19.56,
+   49.84
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.86,
+   43.34,
+   18.91,
+   43.35
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   18.91,
+   43.36,
+   19.08,
+   43.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   18.97,
+   46.99,
+   18.99,
+   47.07
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   18.97,
+   44.86,
+   19.21,
+   44.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.98,
+   43.29,
+   19.03,
+   43.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-besztercebanya",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   19,
+   48.18,
+   19.06,
+   48.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-northern-hungary",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.01,
+   48.06,
+   19.03,
+   48.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-besztercebanya",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   19.02,
+   48.06,
+   19.07,
+   48.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   19.08,
+   46.01,
+   19.11,
+   46.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0035,
+  "bbox": [
+   19.11,
+   44.3,
+   19.29,
+   44.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   19.14,
+   49.97,
+   19.18,
+   50
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   19.15,
+   44.23,
+   19.34,
+   44.3
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.18,
+   44.93,
+   19.19,
+   44.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-herzegovina",
+  "areaSqDeg": 0.004,
+  "bbox": [
+   19.19,
+   43.53,
+   19.5,
+   43.64
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-slavonia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   19.2,
+   45.15,
+   19.42,
+   45.22
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.22,
+   44.91,
+   19.24,
+   44.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-bosnia",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   19.23,
+   43.7,
+   19.58,
+   44.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-backa",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   19.42,
+   45.15,
+   19.46,
+   45.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.6,
+   45.14,
+   19.77,
+   45.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-central-hungary",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   19.6,
+   47.54,
+   19.68,
+   47.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.7,
+   44.81,
+   19.75,
+   44.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-besztercebanya",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   19.75,
+   48.9,
+   20.18,
+   48.91
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-turoc",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.75,
+   49.21,
+   19.76,
+   49.21
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-backa",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.77,
+   45.9,
+   19.81,
+   45.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   19.89,
+   46.15,
+   20.1,
+   46.16
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-backa",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.93,
+   45.15,
+   19.93,
+   45.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   19.93,
+   44.64,
+   19.96,
+   44.65
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.96,
+   44.64,
+   20.09,
+   44.71
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-eperjes",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   20.01,
+   49.02,
+   20.03,
+   49.11
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   20.08,
+   47.56,
+   20.13,
+   47.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   20.17,
+   47.6,
+   20.2,
+   47.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-besztercebanya",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   20.18,
+   48.69,
+   20.26,
+   48.75
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   20.18,
+   45.03,
+   20.36,
+   45.19
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-kassa",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.2,
+   48.8,
+   20.2,
+   48.82
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-syrmia",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.29,
+   44.93,
+   20.32,
+   44.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-eperjes",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.3,
+   48.95,
+   20.3,
+   48.95
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-northern-hungary",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   20.31,
+   48.28,
+   20.48,
+   48.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-backa",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.31,
+   45.2,
+   20.32,
+   45.22
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-northern-hungary",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   20.31,
+   47.45,
+   20.35,
+   47.46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0021,
+  "bbox": [
+   20.4,
+   44.89,
+   20.6,
+   45.05
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.001,
+  "bbox": [
+   20.41,
+   47.43,
+   20.69,
+   47.58
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   20.47,
+   46.13,
+   20.64,
+   46.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-kassa",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   20.52,
+   48.95,
+   20.64,
+   49.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   20.69,
+   46.16,
+   20.71,
+   46.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   20.74,
+   46.22,
+   20.79,
+   46.26
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.005,
+  "bbox": [
+   20.78,
+   44.67,
+   21.21,
+   44.79
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0017,
+  "bbox": [
+   20.81,
+   46.23,
+   21.05,
+   46.27
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-kassa",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.98,
+   48.91,
+   21.03,
+   48.95
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   21.19,
+   46.39,
+   21.28,
+   46.42
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-kassa",
+  "areaSqDeg": 0.0013,
+  "bbox": [
+   21.3,
+   48.53,
+   21.43,
+   48.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-northern-hungary",
+  "areaSqDeg": 0.0016,
+  "bbox": [
+   21.45,
+   48.49,
+   21.59,
+   48.55
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0,
+  "bbox": [
+   21.45,
+   46.03,
+   21.47,
+   46.04
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-eperjes",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   21.54,
+   48.76,
+   21.69,
+   48.79
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   21.55,
+   45.98,
+   21.59,
+   46
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   21.59,
+   46.91,
+   21.67,
+   46.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-northern-hungary",
+  "areaSqDeg": 0.0027,
+  "bbox": [
+   21.76,
+   48.31,
+   22.19,
+   48.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   21.86,
+   44.66,
+   21.99,
+   44.7
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   21.99,
+   44.6,
+   22.17,
+   44.66
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0012,
+  "bbox": [
+   22.04,
+   49.16,
+   22.21,
+   49.2
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.16,
+   44.69,
+   22.23,
+   44.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.23,
+   44.76,
+   22.43,
+   44.81
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   22.45,
+   45.65,
+   22.47,
+   45.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   22.5,
+   45.53,
+   22.62,
+   45.61
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.51,
+   45.74,
+   22.54,
+   45.77
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-svk-eperjes",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   22.52,
+   48.99,
+   22.55,
+   49.08
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   22.55,
+   50.45,
+   22.58,
+   50.47
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   22.58,
+   50.36,
+   22.68,
+   50.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carpathian-ruthenia",
+  "areaSqDeg": 0.0029,
+  "bbox": [
+   22.6,
+   49.02,
+   22.81,
+   49.06
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   22.67,
+   45.4,
+   22.7,
+   45.5
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   22.7,
+   49.6,
+   22.8,
+   49.69
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-banat",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.7,
+   45.32,
+   22.71,
+   45.33
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-hun-great-hungarian-plain",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   22.75,
+   48.05,
+   22.86,
+   48.12
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0.0007,
+  "bbox": [
+   22.76,
+   47.88,
+   22.92,
+   47.96
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   22.85,
+   48.92,
+   22.9,
+   49.03
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carpathian-ruthenia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   22.91,
+   48.86,
+   22.98,
+   48.92
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carpathian-ruthenia",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.01,
+   47.98,
+   23.03,
+   47.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   23.11,
+   48.78,
+   23.2,
+   48.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0.0009,
+  "bbox": [
+   23.95,
+   47.07,
+   24.14,
+   47.17
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-carpathian-ruthenia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   24.13,
+   48.46,
+   24.14,
+   48.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   24.15,
+   48.35,
+   24.23,
+   48.37
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   24.2,
+   46.76,
+   24.3,
+   46.78
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   24.23,
+   48.35,
+   24.32,
+   48.39
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   24.47,
+   46.77,
+   24.58,
+   46.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   24.53,
+   48.05,
+   24.64,
+   48.15
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.57,
+   47.94,
+   24.57,
+   47.94
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-partium",
+  "areaSqDeg": 0.0008,
+  "bbox": [
+   24.66,
+   47.82,
+   24.74,
+   47.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   24.71,
+   49.49,
+   24.73,
+   49.56
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.81,
+   47.02,
+   24.83,
+   47.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.87,
+   47.72,
+   24.88,
+   47.73
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   24.93,
+   47.84,
+   24.98,
+   47.99
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   25.25,
+   47.07,
+   25.3,
+   47.1
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-bukovina",
+  "areaSqDeg": 0.0023,
+  "bbox": [
+   25.26,
+   47.9,
+   25.97,
+   47.97
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-bukovina",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   25.33,
+   48.35,
+   25.41,
+   48.38
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0,
+  "bbox": [
+   25.36,
+   47.13,
+   25.38,
+   47.14
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tarnopol",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   25.37,
+   49.94,
+   25.43,
+   50.01
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tarnopol",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   25.38,
+   49.88,
+   25.39,
+   49.93
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0,
+  "bbox": [
+   25.45,
+   48.86,
+   25.47,
+   48.87
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   25.45,
+   45.46,
+   25.63,
+   45.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-northern-bukovina",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   25.51,
+   48.39,
+   25.59,
+   48.41
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0,
+  "bbox": [
+   25.57,
+   48.58,
+   25.58,
+   48.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   25.6,
+   48.65,
+   25.64,
+   48.68
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-eastern-galicia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   25.6,
+   48.49,
+   25.61,
+   48.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   25.64,
+   45.44,
+   25.86,
+   45.48
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   25.82,
+   46.87,
+   25.87,
+   46.9
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-transylvania",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   25.92,
+   45.48,
+   26.05,
+   45.51
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-bukovina",
+  "areaSqDeg": 0.0003,
+  "bbox": [
+   25.97,
+   47.97,
+   26.1,
+   47.98
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-tarnopol",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   26.18,
+   48.51,
+   26.33,
+   48.53
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0,
+  "bbox": [
+   26.2,
+   45.58,
+   26.22,
+   45.62
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   26.22,
+   45.61,
+   26.32,
+   45.63
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-szekely-land",
+  "areaSqDeg": 0,
+  "bbox": [
+   26.41,
+   45.92,
+   26.48,
+   46.02
+  ]
+ },
+ {
+  "correction": "coverage residual dissolved",
+  "from": "oc-gap-aut-residual",
+  "to": "aut-southern-bukovina",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   26.5,
+   47.35,
+   26.66,
+   47.35
+  ]
+ },
+ {
+  "correction": "Rheinhessen",
+  "target": "deu-hesse",
+  "areaSqDeg": 0.1433
+ },
+ {
+  "correction": "Mecklenburg-Strelitz",
+  "target": "deu-mecklenburg",
+  "areaSqDeg": 0.4214
+ },
+ {
+  "correction": "Fiume",
+  "target": "aut-fiume",
+  "areaSqDeg": 0.0044
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-upper-silesia",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0035,
+  "bbox": [
+   18.34,
+   49.9,
+   18.56,
+   49.95
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-upper-silesia",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.0026,
+  "bbox": [
+   18.4,
+   49.95,
+   18.57,
+   49.98
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-upper-silesia",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.024,
+  "bbox": [
+   19.13,
+   50,
+   19.4,
+   50.23
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-middle-silesia",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.0085,
+  "bbox": [
+   16.98,
+   50.25,
+   17.43,
+   50.42
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-middle-silesia",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.006,
+  "bbox": [
+   17.59,
+   49.98,
+   17.89,
+   50.16
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "deu-middle-silesia",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   17.68,
+   50.05,
+   17.75,
+   50.1
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-hultschin",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0094,
+  "bbox": [
+   17.93,
+   49.86,
+   18.22,
+   49.96
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-austrian-silesia",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0238,
+  "bbox": [
+   17.43,
+   50.17,
+   17.73,
+   50.31
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-austrian-silesia",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.7,
+   50.3,
+   17.71,
+   50.31
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-austrian-silesia",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.9,
+   49.98,
+   17.91,
+   49.98
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-austrian-silesia",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0023,
+  "bbox": [
+   17.9,
+   49.96,
+   18.04,
+   50.03
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-austrian-silesia",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.0019,
+  "bbox": [
+   18.22,
+   49.87,
+   18.34,
+   49.91
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-moravia",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0011,
+  "bbox": [
+   16.87,
+   50.38,
+   16.98,
+   50.42
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-moravia",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   16.9,
+   50.42,
+   16.96,
+   50.42
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-cieszyn-silesia",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   18.04,
+   49.98,
+   18.16,
+   50.03
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-cieszyn-silesia",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0015,
+  "bbox": [
+   18.13,
+   49.91,
+   18.31,
+   49.99
+  ]
+ },
+ {
+  "correction": "Silesian border",
+  "from": "aut-cieszyn-silesia",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.0256,
+  "bbox": [
+   18.57,
+   49.93,
+   19.13,
+   50
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "deu-north-schleswig",
+  "to": "dnk-south-jutland",
+  "areaSqDeg": 0.0687,
+  "bbox": [
+   8.59,
+   55.22,
+   9.09,
+   55.45
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "deu-north-schleswig",
+  "to": "dnk-south-jutland",
+  "areaSqDeg": 0.0052,
+  "bbox": [
+   9.86,
+   55.28,
+   9.9,
+   55.45
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0005,
+  "bbox": [
+   8.64,
+   55.02,
+   8.68,
+   55.13
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   8.66,
+   55.17,
+   8.68,
+   55.24
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0045,
+  "bbox": [
+   9.1,
+   55.45,
+   9.44,
+   55.47
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0018,
+  "bbox": [
+   9.45,
+   55.45,
+   9.61,
+   55.47
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.5,
+   55.13,
+   9.51,
+   55.14
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-schleswig-holstein",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.54,
+   54.88,
+   9.57,
+   54.9
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.6,
+   55.39,
+   9.61,
+   55.41
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.6,
+   55.43,
+   9.62,
+   55.44
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.61,
+   54.9,
+   9.64,
+   54.91
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   9.63,
+   55.33,
+   9.64,
+   55.36
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   9.78,
+   54.98,
+   9.83,
+   55.02
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   9.8,
+   54.9,
+   9.89,
+   54.92
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.82,
+   55.05,
+   9.83,
+   55.06
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0,
+  "bbox": [
+   9.83,
+   54.95,
+   9.85,
+   54.97
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   9.88,
+   54.88,
+   9.98,
+   54.9
+  ]
+ },
+ {
+  "correction": "Danish-German border",
+  "from": "dnk-south-jutland",
+  "to": "deu-north-schleswig",
+  "areaSqDeg": 0.0146,
+  "bbox": [
+   9.89,
+   54.88,
+   10.06,
+   55.03
+  ]
+ },
+ {
+  "correction": "Eupen-Malmedy (after residuals)",
+  "target": "deu-eupen-malmedy",
+  "areaSqDeg": 0.1831
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.00174,
+  "bbox": [
+   16.34,
+   50.09,
+   16.7,
+   50.37
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-bohemia",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   16.65,
+   50.09,
+   16.87,
+   50.19
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.00288,
+  "bbox": [
+   16.87,
+   50.29,
+   17.33,
+   50.42
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.14,
+   49.84,
+   17.14,
+   49.85
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "deu-lower-silesia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   17.26,
+   51.59,
+   17.35,
+   51.59
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-moravia",
+  "areaSqDeg": 0.00019,
+  "bbox": [
+   17.34,
+   50.25,
+   17.41,
+   50.3
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.00044,
+  "bbox": [
+   17.41,
+   50.25,
+   17.71,
+   50.31
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.00355,
+  "bbox": [
+   17.58,
+   50,
+   17.82,
+   50.15
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.00058,
+  "bbox": [
+   17.59,
+   50.15,
+   17.74,
+   50.23
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "deu-middle-silesia",
+  "areaSqDeg": 0.0001,
+  "bbox": [
+   17.7,
+   50.27,
+   17.72,
+   50.31
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0.0006,
+  "bbox": [
+   17.85,
+   49.97,
+   17.94,
+   49.99
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0,
+  "bbox": [
+   17.98,
+   50,
+   18.01,
+   50.04
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0.0002,
+  "bbox": [
+   18.02,
+   49.95,
+   18.25,
+   50.04
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.04,
+   50.01,
+   18.09,
+   50.03
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.13,
+   49.98,
+   18.16,
+   49.99
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "deu-upper-silesia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   18.25,
+   49.95,
+   18.55,
+   49.96
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-hultschin",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.26,
+   49.93,
+   18.26,
+   49.93
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-austrian-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   18.62,
+   49.71,
+   18.62,
+   49.71
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   18.8,
+   49.51,
+   18.83,
+   49.52
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.00009,
+  "bbox": [
+   18.83,
+   49.5,
+   18.94,
+   49.51
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   19.14,
+   49.97,
+   19.16,
+   50
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.00005,
+  "bbox": [
+   19.17,
+   49.99,
+   19.41,
+   50.17
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.19,
+   49.83,
+   19.2,
+   49.84
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   19.3,
+   50.25,
+   19.4,
+   50.26
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.41,
+   49.61,
+   19.44,
+   49.64
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.41,
+   50.26,
+   19.41,
+   50.27
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "aut-cieszyn-silesia",
+  "areaSqDeg": 0.00023,
+  "bbox": [
+   19.44,
+   49.51,
+   19.53,
+   49.61
+  ]
+ },
+ {
+  "correction": "gap filled (Silesia)",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.46,
+   50.32,
+   19.5,
+   50.36
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.00055,
+  "bbox": [
+   18.42,
+   54.67,
+   18.48,
+   54.76
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-west-prussia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   18.43,
+   54.7,
+   18.71,
+   54.78
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   19.25,
+   53.94,
+   19.39,
+   54
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   19.6,
+   54.35,
+   19.71,
+   54.39
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   19.83,
+   50.39,
+   19.84,
+   50.39
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.00103,
+  "bbox": [
+   19.86,
+   54.64,
+   19.96,
+   54.77
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.00057,
+  "bbox": [
+   20.45,
+   54.97,
+   20.63,
+   55.05
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.46,
+   51.87,
+   20.48,
+   51.88
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-warsaw",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.48,
+   51.86,
+   20.51,
+   51.88
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-warsaw",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   20.49,
+   51.25,
+   20.5,
+   51.28
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-warsaw",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   20.5,
+   51.44,
+   20.52,
+   51.45
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-warsaw",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.5,
+   51.38,
+   20.51,
+   51.4
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.51,
+   51.42,
+   20.52,
+   51.44
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.0004,
+  "bbox": [
+   20.53,
+   54.94,
+   20.66,
+   54.96
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-odz",
+  "areaSqDeg": 0,
+  "bbox": [
+   20.6,
+   51.72,
+   20.61,
+   51.73
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-kielce",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   20.93,
+   51.12,
+   21.01,
+   51.12
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-kielce",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   21.01,
+   51.12,
+   21.07,
+   51.15
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-memel",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   21.23,
+   55.2,
+   21.27,
+   55.21
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0,
+  "bbox": [
+   21.52,
+   53.44,
+   21.55,
+   53.45
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0.00246,
+  "bbox": [
+   21.67,
+   53.46,
+   22.49,
+   53.74
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-kielce",
+  "areaSqDeg": 0,
+  "bbox": [
+   21.81,
+   51.04,
+   21.81,
+   51.05
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-memel",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   21.81,
+   55.56,
+   21.87,
+   55.59
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   21.96,
+   52,
+   22.07,
+   52.01
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-memel",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.03,
+   55.03,
+   22.08,
+   55.04
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-taurage",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.04,
+   55.41,
+   22.05,
+   55.41
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-telsiai",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.07,
+   55.66,
+   22.07,
+   55.66
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-telsiai",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   22.08,
+   55.66,
+   22.17,
+   55.68
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.19,
+   50.78,
+   22.21,
+   50.79
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.00013,
+  "bbox": [
+   22.27,
+   55.06,
+   22.57,
+   55.07
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   22.38,
+   52.04,
+   22.6,
+   52.06
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-south",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.46,
+   53.99,
+   22.54,
+   54.04
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.51,
+   53.77,
+   22.57,
+   53.83
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "aut-western-galicia",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   22.53,
+   50.36,
+   22.59,
+   50.42
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "deu-east-prussia-north",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   22.58,
+   54.96,
+   22.63,
+   55.06
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-kaunas",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   22.65,
+   55.42,
+   22.71,
+   55.47
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00007,
+  "bbox": [
+   22.72,
+   50.31,
+   23.08,
+   50.34
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-taurage",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.73,
+   55.39,
+   22.75,
+   55.4
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   22.75,
+   54.35,
+   22.77,
+   54.36
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00004,
+  "bbox": [
+   22.76,
+   54.34,
+   22.8,
+   54.37
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0.00004,
+  "bbox": [
+   22.9,
+   52.1,
+   23.09,
+   52.28
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0,
+  "bbox": [
+   22.92,
+   52.36,
+   22.95,
+   52.37
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-marijampole",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   23,
+   55.05,
+   23.55,
+   55.1
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-warsaw",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   23.02,
+   52.28,
+   23.06,
+   52.33
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.08,
+   50.31,
+   23.11,
+   50.32
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.11,
+   50.32,
+   23.39,
+   50.43
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-blr-brest",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   23.21,
+   52.18,
+   23.49,
+   52.24
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.3,
+   52.41,
+   23.39,
+   52.51
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.32,
+   54.13,
+   23.46,
+   54.23
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-marijampole",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.37,
+   54.34,
+   23.46,
+   54.38
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-siedlce",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.39,
+   52.51,
+   23.45,
+   52.53
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-alytus",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.46,
+   53.94,
+   23.49,
+   53.99
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-alytus",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.49,
+   54.04,
+   23.5,
+   54.05
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0.00002,
+  "bbox": [
+   23.6,
+   51.61,
+   23.75,
+   51.64
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-pol-lublin",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.62,
+   51.51,
+   23.62,
+   51.51
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-kaunas",
+  "areaSqDeg": 0.00003,
+  "bbox": [
+   23.81,
+   54.47,
+   23.99,
+   54.5
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   23.99,
+   54.5,
+   24,
+   54.53
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-kaunas",
+  "areaSqDeg": 0,
+  "bbox": [
+   23.99,
+   54.53,
+   24.01,
+   54.54
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-alytus",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.02,
+   54.55,
+   24.05,
+   54.55
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-kaunas",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.03,
+   54.55,
+   24.07,
+   54.55
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ukr-volhynia",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.09,
+   50.6,
+   24.11,
+   50.63
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-panevezys",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   24.21,
+   55.44,
+   24.35,
+   55.47
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.45,
+   54.43,
+   24.47,
+   54.44
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "rus-ltu-alytus",
+  "areaSqDeg": 0,
+  "bbox": [
+   24.45,
+   54.43,
+   24.49,
+   54.44
+  ]
+ },
+ {
+  "correction": "gap filled (Russian frontier)",
+  "to": "oc-gap-rus-residual",
+  "areaSqDeg": 0.00001,
+  "bbox": [
+   24.47,
+   54.62,
+   24.5,
+   54.69
+  ]
+ }
+]

@@ -33,3 +33,5 @@ export * from "./economy/index.js";
 export * from "./tick.js";
 export * from "./serialization.js";
 export * from "./stateHash.js";
+export * from "./integrity.js";
+export * from "./rollback.js";

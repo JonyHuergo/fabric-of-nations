@@ -2,8 +2,8 @@
 
 **Official name:** *Fabric of Nations*\
 **Document type:** Game Design Document and Agent Implementation Specification\
-**Version:** 2.18\
-**Revision date:** 2026-10-30\
+**Version:** 2.19\
+**Revision date:** 2026-11-02\
 **Rebranding revision:** 2026-11-01 (M13)\
 **Target platform:** iOS and Android\
 **Application stack:** React Native / Expo with a versioned worker/snapshot bus (M7 implementation; native release verification pending)\
@@ -16,6 +16,25 @@
 > historical starting conditions. This document keeps GDD version 2.18 because
 > no game-design content changed; earlier GDD versions retain their original
 > titles as archived historical documents.
+
+> **v2.19 alignment note (Prosperity Program, P0).** The designer approved a
+> peacetime economy and demography overhaul so that a country that never fights
+> or negotiates is still a rewarding game. This revision adds **§17J** (binding
+> summary of the program, stages P0–P15) and records the approved foundational
+> decisions **D-115 to D-124**: phase validation with checkpoint rollback replaces
+> whole-day staged cloning (D-116); sparse province × profession population
+> blocks (D-117); provinces replace simulation regions (D-118); customs
+> territories make markets national by default (D-119); the breaking schema
+> change is accepted under D-013 (D-120); HYDE 3.3 and USGS are the province,
+> land and resource sources (D-121); RUSD is defined as 1990 reference dollars
+> and players see their own currency (D-122); companies and capital markets are
+> staged after the real economy (D-123); demography becomes cause-driven
+> (D-124). The rules these decisions supersede are marked in place
+> (§4.2 whole-day atomicity, §6.6, §7.4, §17A.10.1, §20.1 #1/#14/#19). **No
+> implementation changed in v2.19**: the marked rules remain the current
+> implementation until their stage is accepted. The detailed plan is
+> `docs/PROSPERITY_PROGRAM.md`; the companies proposal is
+> `docs/COMPANIES_AND_CAPITAL_MARKETS_PROPOSAL.md`.
 
 > **v2.18 alignment note.** This revision records **M11 — Historical
 > World, Country Selection, and Complete UI Overhaul** as implemented. The
@@ -401,6 +420,7 @@ The agent must not silently resolve a contradiction that changes game behavior. 
 16. Determinism, invariants, and test strategy
 17. Build order and milestone acceptance criteria
     - 17A. Economic Management Overhaul — detailed specification (E0–E6)
+    - 17J. Prosperity Program — peacetime economy and demography (P0–P15)
 18. Code-agent execution contract
 19. Explicit non-goals for v1
 20. Decision register and handoff procedure
@@ -597,7 +617,9 @@ binding for economic worlds:
 5. **Refresh dirty labor supply and employment assignments.** Run the existing
    monthly/dirty employment refresh. If daily demographic change makes existing
    assignments invalid before the next monthly refresh, mark employment dirty and
-   repair immediately. *(Current M3b/M3f implementation.)*
+   repair immediately. *(Current M3b/M3f implementation.)* **v2.19 (D-126, P1b):** the
+   immediate repair trims only the over-assigned blocks; a full reassignment runs only
+   when the trim cannot make the state valid.
 5a. **Apply monthly migration when due.** On the first civil day of a month (not
    the scenario start day), move eligible people between existing same-profession
    blocks in different regions when the documented vacancy/wealth pressure is
@@ -613,7 +635,9 @@ binding for economic worlds:
    M3e's atomic same-batch sales receipts to fund input purchases. If that attempt
    would overdraw a buyer, the staged day is restored and production demand is
    retried with each building's input cost capped by opening operating cash.
-   *(Current M3c/M3d/M3e/M3f implementation; market-scoped by M5.)*
+   *(Current M3c/M3d/M3e/M3f implementation; market-scoped by M5.)* **v2.19 (D-125, P1b):**
+   the day now runs the cash-capped attempt once; same-day receipts no longer fund
+   inputs beyond opening cash, and market postings are aggregated per kind and good.
 8. **Produce goods.** Execute production using inputs actually allocated. New
    output becomes available to the market for final demand on the same day, but
    cannot serve as an input to another production stage until the next tick. This
@@ -680,6 +704,14 @@ M3f, but would weaken the rule that physical market clearing determines prices a
 would create an unnecessary future coupling between financial flows and current
 prices. Future financial systems must not retroactively change established
 transaction prices.
+
+> **Superseded direction (v2.19, D-116, assigned to P1).** Whole-day staged
+> cloning is replaced by per-phase precondition validation, daily cheap global
+> invariants, month-end full validation, and checkpoint rollback with
+> deterministic replay to the start of a failed day (§17J.4). No partial day is
+> ever accepted. **P1a implemented this for the worker host** (`TickContext.integrity
+> = "phase"` through `runTicksWithRollback`; D-116 implementation record). The
+> paragraph below remains the default `tick` behaviour for direct callers and tests.
 
 **Whole-day atomicity.** For an economic world, the complete day is staged on a
 structural deep clone of the authoritative world. Population, employment,
@@ -2026,6 +2058,13 @@ Wealth level may affect need activation, health, birth/death rates, literacy att
 
 ### 6.6 Demographics
 
+> **Superseded direction (v2.19, D-124, assigned to P4).** World-level WPP
+> schedules will supply only the age *pattern*; the *level* of each block's
+> fertility and mortality becomes state derived from simulated causes, starting
+> from source-backed country-specific 1900 levels. Historical series become
+> calibration and validation targets only (§17J.3 P4). The text below remains
+> the current implementation until P4 is accepted.
+
 Demography is age-specific and sex-specific. Population changes only through explicitly counted births, deaths, and later migration. The authoritative state is the single-year `maleByAge`/`femaleByAge` arrays in §5.4; five-year bands are derived for reporting and source comparison.
 
 #### Fertility
@@ -2182,6 +2221,13 @@ For multiple inputs, feasible output is the minimum quantity allowed by each req
 Production input demand is posted before production. Each day’s newly produced outputs may be purchased for final demand that same day, but they cannot supply another building’s inputs until the following day. This one-day production-chain lag removes accidental benefits from building iteration order.
 
 ### 7.4 Markets and trade zones
+
+> **Superseded direction (v2.19, D-119, assigned to P2).** A market becomes a
+> **customs territory** with one tariff authority. Independent states, dominions
+> and tariff-autonomous vassals have their own; colonies and protectorates join
+> their overlord; the 1900 customs unions are explicit. Political subordination
+> never implies economic integration by itself (§17J.3 P2). The text below
+> remains the current implementation until P2 is accepted.
 
 A market is a pool of available goods, prices, and demand for a defined set of regions. In the first implementation, a country may use one market; additional markets and trade links are introduced when multi-country simulation is working. **Current M5:** multiple markets exist, each covering one or more regions; every region belongs to exactly one market and a country's regions belong to one market in M5. Several countries' regions may share a market (the current trade connection). Every market is cleared independently and exactly once per day with market-scoped production, storage, prices, and inventory. M5 has no imports/exports between markets, tariffs, cross-market transport charges, or external rest-of-world counterparty; those are explicit non-goals, not zero-valued placeholders in a transaction stream.
 
@@ -3797,6 +3843,16 @@ last resort, external debt, domestic currency-denominated ledgers, or an FX orde
 those remain recorded missing prerequisites rather than faked controls.
 
 #### 17A.10.1 RUSD convention
+
+> **Amended in v2.19 (D-122).** One RUSD has the purchasing power of one
+> real-world US dollar of 1990: a constant-purchasing-power reference and
+> measurement unit for the simulation. It is not a national currency, legal
+> tender, issuer or adoptable currency, and it is not the simulated United States
+> dollar. Players see money in their country’s currency (or another chosen
+> display currency) converted at display time; display never changes simulation
+> state. Authored content is rebased to 1990 dollars in P2 and local display is
+> delivered in P3. Where the bullets below say RUSD is "not a promise of constant
+> purchasing power", this amendment governs.
 
 - **RUSD is the fixed unit of measurement and accounting denomination.** It is not a
   national legal tender, not necessarily an actual U.S. dollar, and not a promise of
@@ -6569,6 +6625,112 @@ land-layer rendering bug and raises the maximum zoom.
   `docs/HISTORICAL_MAP_PROVENANCE.md`, `docs/MAP_DATA.md`,
   `docs/FLAG_PROVENANCE.md` and `docs/images/m11c1/`.
 
+## 17J. Prosperity Program — peacetime economy and demography (P0–P15)
+
+**Status:** P0 (design) approved 2026-11-02. P1 is implemented with a documented
+performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
+market postings and one cash-capped market attempt (D-125), minimal employment repair
+(D-126) and exact work-in-progress capitalization (D-127) make the 1900 world day about
+3.9× faster in Node, short of the 10× target. The province-scale benchmark and the
+typed-array population pool move into P2. Every later stage is assigned and accepted
+separately. The detailed plan with
+dependencies, tests and benchmarks is `docs/PROSPERITY_PROGRAM.md`; decisions are
+D-115 to D-124. Until a stage is accepted, the earlier sections remain the current
+implementation.
+
+### 17J.1 Objective
+
+A country that never goes to war and never engages in diplomacy must still be a
+rewarding game. The internal game rests on a realistic, legible, causally driven
+demographic and economic simulation in which the player sets conditions and
+households and firms respond. The economic core is a dual economy with Engel
+demand: a land-constrained agrarian sector with surplus labour, a capitalist sector
+that reinvests profits where returns are high and draws workers into towns, demand
+that moves from food to manufactures to services as incomes rise, and a
+demographic transition driven by literacy, urbanisation, income, child survival and
+health. Every country starts from its own 1900 position and may diverge from
+history. §2 (no gameplay pools) binds every stage.
+
+### 17J.2 Binding foundational rules
+
+1. **Population (D-117).** A population block is (province, profession), sparse,
+   with full single-year male/female age arrays. Profession-specific demography,
+   wages, wealth and political interests are preserved. The model is not simplified
+   to meet a performance budget; performance is engineered and benchmarked.
+2. **Geography (D-118).** Provinces are the only unit beneath a country for
+   population, buildings, construction, unrest, infrastructure, land and resources.
+   The simulation-region layer is removed. Country territory derives from province
+   ownership; occupation is province control.
+3. **Markets (D-119).** A market is a customs territory with one tariff authority.
+   Independent states, dominions and tariff-autonomous vassals have their own;
+   colonies and protectorates join their overlord's; historical customs unions are
+   explicit. Membership follows historical customs arrangements, never political
+   status alone.
+4. **Integrity (D-116).** Each phase validates its preconditions; cheap global
+   invariants run daily; full validation runs at month end, on load/save/actions and
+   in tests. A failed day is rolled back to its start through checkpoint and
+   deterministic replay; no partial day is ever accepted, and no subsystem can be
+   restored separately from the others.
+5. **Demography (D-124).** Fertility and mortality levels are caused by simulated
+   conditions; historical series are calibration and validation targets only.
+6. **Money (D-122).** RUSD is the simulation unit with the purchasing power of a
+   1990 US dollar. Players see their own currency, or a chosen display currency,
+   converted at display time. RUSD is for the simulation; local currency is for the
+   player.
+7. **Saves (D-120).** The schema break is accepted; older saves are listed as
+   incompatible with the reason and are never deleted or overwritten automatically.
+8. **Data (D-121).** HYDE 3.3 distributes population and land within countries;
+   USGS deposit data plus authored historical fields place resources; provenance,
+   version, coverage and limitations are documented.
+
+### 17J.3 Stages
+
+| Stage | Scope | Principal acceptance |
+|---|---|---|
+| P0 | Design, GDD v2.19, decisions D-115–D-124, plan, companies proposal | Designer approval (given 2026-11-02) |
+| P1 | Performance foundation: world-scale benchmarks, hot-path fixes, phase validation and checkpoint rollback, typed-array population pool | Identical hashes on all fixtures and 365 days of the 1900 world; ≥10× faster 1900 world day in Node; province-scale synthetic world measured; rollback tests |
+| P2 | Provinces replace regions; customs territories; generated trade routes; HYDE province data; schema break | No region layer remains; conservation through province transfer; national tariff schedules; all selectable countries initialise; province panel and lenses on phone |
+| P2b | Historical money and productivity calibration: every money value re-derived from a 1900 source and converted to 1990 dollars; per-country wage levels (D-130) | Every value traces to a source row; before/after report against sources |
+| P3 | Local-currency display and display-currency choice | All money labels formatted through one converter; display choice changes no world hash |
+| P4 | Cause-driven demography, urban/rural split | Country-specific 1900 levels; transition caused by literacy/urbanisation in isolating fixtures; WPP comparison report |
+| P5 | Land, diminishing returns, own consumption, harvest variance, deposits and discovery | Falling marginal product; famine only through food shortfall; deposit conservation |
+| P6 | Goods catalogue (~22), Engel/LES demand with substitution, saving, housing | Food share falls with income; housing conservation |
+| P7 | Labour market, wages, nine professions, mobility, urbanisation | Agricultural share falls in a growing no-input economy; people conserved |
+| P8 | Railways, roads, ports; provincial transport wedge on the national price | Railway raises farm-gate prices in its province; wedge is real freight cost |
+| P9 | Companies and company finance | Consolidation equals building sum; dividends conserve cash |
+| P10 | Private investment, expansion, contraction, closure, bankruptcy | Tariff fixture raises protected-sector investment; bankruptcy conserves assets |
+| P11 | Banks, deposits, loans, bonds, emergent interest rate | Bank balance-sheet identity; default path |
+| P12 | State and mixed ownership, nationalisation, privatisation | Ownership shares conserved; compensation balances |
+| P13 | Exchanges, share trading, market capitalisation, mergers | Shares and cash conserved; bounded deterministic prices |
+| P14 | Story layer: causal report, events, goals, history, AI levers | Scripted no-war playtest produces distinct causal stories |
+| P15 | Hundred-year calibration against Maddison, urbanisation, sector shares, e0, TFR | Documented tolerance bands met or deviations explained |
+
+### 17J.4 Rollback mechanism (P1)
+
+The runner keeps a last good checkpoint, taken at month start and before each
+accepted action, and a journal of accepted actions since it. A failing phase aborts
+the day; the runner restores the checkpoint, replays to the start of the failed day,
+checks the replayed world hash against the hash recorded at that day's start, and
+reports the error. A mismatch is an integrity failure and the run does not continue.
+
+### 17J.5 Companies and capital markets
+
+The feasibility and architecture proposal is
+`docs/COMPANIES_AND_CAPITAL_MARKETS_PROPOSAL.md` (D-123). Companies own buildings and
+keep balance sheets; production, markets and settlement are unchanged. The player is
+the state and has no private fortune. Implementation is P9–P13, after the real
+economy (P1–P8).
+
+### 17J.6 Performance
+
+Each stage reports Node per-day p50/p95/p99 and a per-phase breakdown at full scale.
+Node results are diagnostics; on-device performance is measured by the designer and
+is not claimed by implementation reports. Baseline on 2026-11-02 (current 1900 world,
+359 blocks, 548 buildings, Node 22 on Windows desktop): p50 657 ms, p95 1,026 ms per
+simulated day.
+
+---
+
 ## 18. Code-agent execution contract
 
 
@@ -6657,10 +6819,10 @@ in the accepted M0–M7 baseline.
 
 The following choices are resolved in this version:
 
-1. **Population grouping:** aggregate region × principal occupation blocks, including dependents, with authoritative single-year male/female age state (`Uint32Array(81)`; index 80 = 80+) and derived 17 five-year reporting bands.
+1. **Population grouping:** aggregate region × principal occupation blocks, including dependents, with authoritative single-year male/female age state (`Uint32Array(81)`; index 80 = 80+) and derived 17 five-year reporting bands. **Superseded direction (v2.19, D-117/D-118, P2):** sparse province × profession blocks with the same age state; the region layer is removed.
 2. **Employment:** explicit quantitative assignments; no single `employedAt` per pop block.
 3. **Market stock:** physical inventory requires storage capacity; the Warehouse is included in v1.
-4. **Accounting unit:** RUSD is the fixed unit of measurement/accounting denomination, not a national currency. M4a-1 balances are nominal RUSD. M4a-2 adds currency identity and scenario-provided or unavailable RUSD-relative valuation; it does not implement dynamic FX, inflation, monetary policy, native-currency balances, or currency conversion in settlement. Future regime/FX effects remain aggregate and simplified.
+4. **Accounting unit:** RUSD is the fixed unit of measurement/accounting denomination, not a national currency. M4a-1 balances are nominal RUSD. M4a-2 adds currency identity and scenario-provided or unavailable RUSD-relative valuation; it does not implement dynamic FX, inflation, monetary policy, native-currency balances, or currency conversion in settlement. Future regime/FX effects remain aggregate and simplified. **Amended (v2.19, D-122):** RUSD is defined as 1990 reference dollars; local-currency display is P3.
 5. **Accounting integrity:** financial flows use balanced double-entry postings. M4a-1 adds category-aware accounts, normal-side balances, recognition legs, and opening balances. M4b adds the monthly period close, immutable monthly finance summaries, the semantic posting matrix, and the internal `period-close` kind (§5.4.2, D-047). M4c adds country treasury and fiscal accounts, the cash-neutral `income-tax` and `welfare-transfer` kinds, and fiscal close into country equity (§5.4.3, D-048). Annual close and controlled correction/reversal entries are planned in M7a; long-term history compaction remains future.
 6. **Randomness:** keyed/counter-based deterministic random draws, not one shared mutable PRNG stream.
 7. **Daily ordering:** the pipeline in §4.2 is binding unless changed with tests and a decision record. In particular, M3d market clearing includes bounded price adjustment before M3e settlement; settlement uses established transaction prices (D-043). Moving price adjustment after settlement requires a new decision and regression tests.
@@ -6670,12 +6832,12 @@ The following choices are resolved in this version:
 11. **Historical calibration:** target values are provisional until metric definition, date convention, and source provenance are complete. Post-1950 WPP validation is source-backed; 1900–1949 population composition and schedules remain provisional; the 1900 campaign is not a historical-validation success.
 12. **Performance:** Node benchmarking is diagnostic; mobile performance is unverified and must be confirmed on a named reference device in a release build. No mobile target has passed. The mobile p95 target is **NOT EVALUATED**. M6 executes a full 36,524-tick Node campaign in opt-in mode and reports p50/p95/p99, but it remains a Node diagnostic. M7's worker host measured complete tick plus snapshot at Node p95 80.46 ms and produced web/iOS/Android JS bundles, but no native release build or real-device measurement exists.
 13. **M2-only finance fixture:** on the M2-only path, needs are funded from annual disposable income only, with no savings drawdown and no account mutation. M3f economic worlds instead use opening household cash and actual settlement; the full intended model remains household financial assets plus settled income less mandatory payments.
-14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate.
+14. **Economic-day atomicity:** for worlds with buildings or markets, the complete day is staged on a structural clone and published only after all phases and final validation succeed. The M4c fiscal batch is itself atomic. The M2-only path is separate. **Superseded direction (v2.19, D-116, P1):** per-phase precondition validation and checkpoint rollback with deterministic replay; no partial day is ever accepted.
 15. **Catalog scope:** the current M3 data subset is eight goods and eight building types; the fifteen-good/thirteen-building v1 target remains design intent, not current completeness.
 16. **Country and currency identity:** M4a-2 uses `World.countries`, `World.currencies`, and `World.currencyValuations`; `Country.monetary` is the sole domestic monetary arrangement, `Currency.issuer` is issuer identity, and `Country.regionIds` is the sole country-to-region ownership mapping. There is no `Region.countryId`, `Country.currencyId`, or `fxToUSD`. D-044/D-045 record the approved RUSD/currency decisions. The one-issued-currency limit is a current scope restriction, not a permanent design commitment; the foreign-adoption requirement is a current M4a-2 validation rule recorded in D-045.
 17. **Government fiscal policy:** M4c makes `Country.fiscal` and `Country.treasuryAccountId` authoritative; E2 extends `Country.fiscal` with the income-tax exemption, welfare eligibility ceiling, business-profit tax rate, and treasury reserve target. The personal rate is a provisional hard-bounded tax on the taxable part of actual wages, not law-bounded; collection efficiency is fixed at 1.0; welfare is a single budgeted transfer with a wealth-eligibility ceiling and proportional funding reduction. The business-profit tax is assessed at month-end on each building's positive recognized period result and limited by its operating cash. D-048 records the M4c scope, timing, and limitations; D-073 records the E2 extension. M5a adds scenario-initialised `World.profitDistribution` and balanced private distributions/state-enterprise remittances (D-056); it does not make state receipts income-tax revenue. M5b adds scenario-initialised `Country.debt`, versioned contracts, deficit financing, interest, maturity/refinancing, arrears, and explicit default (D-057); borrowing is not revenue and principal repayment is not expenditure. M6 adds the shared `set-fiscal-policy` player/AI action and `World.countryAI`/`Country.ai` state (D-058). E2 extends that action to the complete fiscal policy and adds validated `issue-debt`, `repay-debt`, and `set-debt-policy` actions; none creates money or a posting without a balanced counterpart. The budget memo and period/annual budget totals separate requested/paid/shortfall and revenue/borrowing/principal/interest. Consumption/excise, property/land, customs, and education/health/administration/procurement spending remain unimplemented dependencies (E5/E6a/E4 and prerequisite systems). Inflation/FX/monetary-policy foundations remain planned in M8a/E6b (§17.3/§17A.10).
 18. **Monetary precision and result phases:** authoritative RUSD uses continuous binary64 arithmetic in a fixed order with no cent quantization; `MONEY_TOLERANCE_RUSD = 1e-6` is an invariant tolerance, not a rounding operation. Transient settlement, needs, and fiscal cash fields are phase-qualified; the authoritative ledger is final cash. D-049 records the policy and its known-answer/residual rules.
-19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. **E6a adds real inter-market trade (D-079):** authored directional routes, capacity derived from the two markets' M8 infrastructure, producer-consignment shipments with transit, exact-once delivery, and a market-level customs boundary with an explicit administration. Intra-market pooled allocation remains shared-market clearing and is not dutiable. A non-simulated rest-of-world sector and foreign-exchange settlement are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052/D-079 record the rules and non-goals.
+19. **Multi-region/multi-market ownership and access:** `Country.regionIds` owns regions; `Market.regionIds` owns market membership and `Region.marketId` is validated to it; one market per country and one market per region in M5. Each market is cleared once with market-scoped production/storage/prices/inventory; shared-market regions pool once. **E6a adds real inter-market trade (D-079):** authored directional routes, capacity derived from the two markets' M8 infrastructure, producer-consignment shipments with transit, exact-once delivery, and a market-level customs boundary with an explicit administration. Intra-market pooled allocation remains shared-market clearing and is not dutiable. A non-simulated rest-of-world sector and foreign-exchange settlement are not implemented. `Country.immigrationOpen` is provisional scenario state controlling cross-country migration and cross-country employment; internal migration/labor is unrestricted and emigration is unrestricted in M5. D-051/D-052/D-079 record the rules and non-goals. **Superseded direction (v2.19, D-118/D-119, P2):** provinces own population and buildings; customs territories are the markets, national by default.
 20. **Historical data pipeline:** the M5 sample is eight authored 1900 polities in source-annotated tables with a deterministic validator/loader. Population totals are rounded source-referenced estimates; occupation composition and other structure are provisional. No century-scale historical population/occupation-trend calibration is claimed, no FX rates are invented, and no simulation code reads calibration totals to force outcomes. D-053 records the contracts and limitations.
 21. **Country AI:** M6 makes `World.countryAI.enabled` a scenario-provided policy and `Country.ai` the fixed-size persisted schedule/goal state. The AI decision function receives only `CountryAIObservation`; it has one action, `set-fiscal-policy`, shared with a player through `validateCountryAction`/`applyCountryAction`. The AI is deterministic, uses no random draw, and never borrows, issues money, or mutates debt. Construction, infrastructure priority, laws, diplomacy, and military actions remain unimplemented. D-058 records the rules and non-goals; D-059 records the hot-path summary-validation optimization.
 22. **Playable shell and worker bus:** M7 implements `packages/sim-worker` protocol version 2 at M7 completion (version 3 after E1's additive snapshot fields, version 4 after M7a's annual reports), the `SimulationHost`, bounded immutable snapshots, and Web Worker/WebView/Node transports. The Expo app has the six specified screens and sends only protocol commands; it never imports the simulation implementation or the live world. The map is a 16-region authored-sample grid without pan/zoom or 500-region geometry. Saves are gzip-compressed only at AsyncStorage storage boundary. Native iOS/Android release builds and real-device performance are **NOT VERIFIED**; M7 carries that documented acceptance exception. D-060/D-061 record the architecture and limitations.

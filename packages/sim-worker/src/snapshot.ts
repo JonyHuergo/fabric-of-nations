@@ -9,6 +9,7 @@
 import {
   AI_HARDSHIP_SUBSISTENCE_DAYS,
   BUILDING_SECTORS,
+  buildBuildingCapacityIndex,
   buildFinanceIndex,
   computeBuildingCapacity,
   constructionDailyWage,
@@ -164,10 +165,11 @@ function productionCapacities(
   );
   const byCountry = new Map<number, Map<number, number>>();
   const byMarket = new Map<number, Map<number, number>>();
+  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined || definition.outputs.length === 0) continue;
-    const capacity = computeBuildingCapacity(world, definitions, building.id);
+    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     if (!(capacity.capacityTU > 0)) continue;
     const countryId = ownerByRegion.get(building.regionId);
     const marketId = marketByRegion.get(building.regionId);
@@ -664,13 +666,14 @@ function countrySectorValueEstimates(
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
+  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const building of world.buildings) {
     if (!regionIds.has(building.regionId)) continue;
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
     const market = marketByRegion.get(building.regionId);
     if (market === undefined) continue;
-    const capacity = computeBuildingCapacity(world, definitions, building.id);
+    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     let value = 0;
     for (const output of definition.outputs) {
       const price = market.priceRUSD[output.goodId] ?? 0;

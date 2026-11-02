@@ -260,7 +260,14 @@ function endHaitianOccupation1934(world: World): void {
 
 /** 1902: the Republic of Cuba takes over from the United States occupation. */
 function cubanIndependence1902(world: World): void {
-  transfer(world, idsFor("am-cub-"), 59 as Id, "independence", "Cuban independence", day(1902, 5, 20));
+  // D-129: Cuba already owns its provinces in 1900; independence ends United States control.
+  setProvinceControl(world, {
+    provinceIds: idsFor("am-cub-"),
+    controllerPolityId: null,
+    day: day(1902, 5, 20),
+    note: "Cuban independence ends the United States military government",
+    kind: "liberation",
+  });
 }
 
 /** 1903: Panama separates from Colombia. */
@@ -809,7 +816,11 @@ describe("M12d authoritative provincial ownership", () => {
         AMERICAS.provinces.length +
         OCEANIA.provinces.length,
     );
-    for (const key of ["am-usa-alaska", "am-cub-oriente", "am-nfd-newfoundland-and-labrador"]) {
+    // D-129: Cuba is owned by Cuba and controlled by the United States on 1 January 1900.
+    const cuba = ownershipOf(world, "am-cub-oriente");
+    expect(cuba?.ownerPolityId).toBe(59);
+    expect(cuba?.controllerPolityId).toBe(0);
+    for (const key of ["am-usa-alaska", "am-nfd-newfoundland-and-labrador"]) {
       const entry = ownershipOf(world, key);
       expect(entry).toBeDefined();
       expect(entry?.ownerPolityId).toBe(entry?.controllerPolityId);
@@ -1014,7 +1025,10 @@ describe("M12d historical reference snapshots", () => {
     expect(ownerOf(world, "am-usa-alaska")).toBe(0);
     expect(ownerOf(world, "am-usa-hawaii")).toBe(0);
     expect(ownerOf(world, "am-pri-puerto-rico")).toBe(0);
-    expect(ownerOf(world, "am-cub-oriente")).toBe(0);
+    // D-129: Cuba is owned by the 1900 Cuba country and controlled by the United States
+    // military government (1899-1902), not owned by the United States.
+    expect(ownerOf(world, "am-cub-oriente")).toBe(59);
+    expect(controllerOf(world, "am-cub-oriente")).toBe(0);
     expect(ownerOf(world, "am-can-ontario")).toBe(56);
     expect(ownerOf(world, "am-nfd-newfoundland-and-labrador")).toBe(futureId("NFD"));
     expect(ownerOf(world, "am-bwi-guy-essequibo")).toBe(1);

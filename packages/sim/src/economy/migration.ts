@@ -37,7 +37,7 @@ import {
   type World,
 } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
-import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
+import { cloneFinanceState } from "./accounts.js";
 import { buildRegionOwnerMap } from "./country.js";
 import {
   MIGRATION_MONTHLY_INFLOW_CAP_FRACTION,
@@ -266,9 +266,18 @@ function addCells(
   }
 }
 
+/**
+ * One block's household cash account. A single scan instead of building the full
+ * finance index for every flow (P1); the account set is validated for uniqueness
+ * by world validation, so the first match is the only match.
+ */
 function householdAccount(world: World, popBlockId: Id): FinancialAccount {
-  const index = buildFinanceIndex(world.finance);
-  const account = index.find("popBlock", popBlockId, "household-cash");
+  const account = world.finance.accounts.find(
+    (candidate) =>
+      candidate.ownerKind === "popBlock" &&
+      candidate.ownerId === popBlockId &&
+      candidate.subtype === "household-cash",
+  );
   if (account === undefined) {
     throw new RangeError(`popBlock ${String(popBlockId)} has no household cash account`);
   }

@@ -220,10 +220,24 @@ export interface EconomyTickContext {
   readonly definitions: EconomyDefinitions;
 }
 
+/**
+ * D-116 integrity mode for economic worlds.
+ *
+ * - `staged` (default): the M3f whole-day clone with whole-world validation at both
+ *   day boundaries; a failure leaves the caller's world untouched.
+ * - `phase`: the day runs in place. Phases check their own preconditions, cheap
+ *   global invariants run every day and the whole world is validated at month end.
+ *   A failure leaves the world partly advanced, so this mode is only valid through
+ *   `runTicksWithRollback`, which restores the start of the failed day.
+ */
+export type TickIntegrityMode = "staged" | "phase";
+
 export interface TickContext {
   population?: PopulationTickContext;
   /** Present only for integrated M3f economic worlds. */
   economy?: EconomyTickContext;
+  /** Economic-world integrity mode; defaults to `staged`. */
+  integrity?: TickIntegrityMode;
 }
 
 export interface NeedGoodResult {

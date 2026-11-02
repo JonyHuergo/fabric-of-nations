@@ -3068,7 +3068,7 @@
   {
     "regionId": 63,
     "professionKey": "peasants",
-    "population": 1640000,
+    "population": 820000,
     "literacy": 0.024,
     "wealthLevel": 11,
     "savingsPerCapitaRUSD": 3,
@@ -3082,7 +3082,7 @@
   {
     "regionId": 63,
     "professionKey": "laborers",
-    "population": 360000,
+    "population": 180000,
     "literacy": 0.0485,
     "wealthLevel": 17,
     "savingsPerCapitaRUSD": 3,
@@ -3096,7 +3096,7 @@
   {
     "regionId": 64,
     "professionKey": "peasants",
-    "population": 1640000,
+    "population": 492000,
     "literacy": 0.04,
     "wealthLevel": 11,
     "savingsPerCapitaRUSD": 3,
@@ -3110,7 +3110,7 @@
   {
     "regionId": 64,
     "professionKey": "laborers",
-    "population": 360000,
+    "population": 108000,
     "literacy": 0.0675,
     "wealthLevel": 17,
     "savingsPerCapitaRUSD": 3,
@@ -4188,7 +4188,7 @@
   {
     "regionId": 136,
     "professionKey": "peasants",
-    "population": 49200,
+    "population": 47970,
     "literacy": 0.08,
     "wealthLevel": 11,
     "savingsPerCapitaRUSD": 3,
@@ -4202,7 +4202,7 @@
   {
     "regionId": 136,
     "professionKey": "laborers",
-    "population": 10800,
+    "population": 10530,
     "literacy": 0.115,
     "wealthLevel": 17,
     "savingsPerCapitaRUSD": 3,
@@ -4636,7 +4636,7 @@
   {
     "regionId": 152,
     "professionKey": "peasants",
-    "population": 9840,
+    "population": 7934,
     "literacy": 0.32,
     "wealthLevel": 11,
     "savingsPerCapitaRUSD": 3,
@@ -4650,7 +4650,7 @@
   {
     "regionId": 152,
     "professionKey": "laborers",
-    "population": 2160,
+    "population": 1742,
     "literacy": 0.4,
     "wealthLevel": 17,
     "savingsPerCapitaRUSD": 3,

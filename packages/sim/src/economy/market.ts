@@ -246,7 +246,8 @@ function validateMarketDayInput(
   readonly blockIds: Set<number>;
 } {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }

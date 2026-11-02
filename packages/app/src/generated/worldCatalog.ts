@@ -1809,7 +1809,7 @@ export const WORLD_CATALOG = ({
         "lat": 13.83,
         "lon": 20.83
       },
-      "population1900": 2000000,
+      "population1900": 1000000,
       "market": "african-independent",
       "description": "Sahelian sultanate east of Lake Chad, independent until the French conquest of 1909–1911.",
       "confidence": "low",
@@ -1838,7 +1838,7 @@ export const WORLD_CATALOG = ({
         "lat": 13.63,
         "lon": 25.35
       },
-      "population1900": 2000000,
+      "population1900": 600000,
       "market": "african-independent",
       "description": "Independent sultanate in the western Sudan, conquered by Britain only in 1916.",
       "confidence": "low",
@@ -2849,7 +2849,7 @@ export const WORLD_CATALOG = ({
         "lat": 5.63,
         "lon": 169.64
       },
-      "population1900": 60000,
+      "population1900": 58500,
       "market": null,
       "description": "Marshall, Caroline, Palau, Mariana and Nauru possessions.",
       "confidence": "low",
@@ -3241,7 +3241,7 @@ export const WORLD_CATALOG = ({
         "lat": 13.47,
         "lon": 144.75
       },
-      "population1900": 12000,
+      "population1900": 9676,
       "market": null,
       "description": "Pacific coaling station ceded by Spain.",
       "confidence": "low",

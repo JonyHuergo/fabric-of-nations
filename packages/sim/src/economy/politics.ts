@@ -1719,6 +1719,15 @@ export function runUnrestPhase(
   void day;
   if (definitions?.politics === undefined || !world.politics.enabled) return;
   const politics = definitions.politics;
+  // P1: employed workers per block, summed in `world.employment` order exactly as the
+  // per-block scan this replaces.
+  const employedByBlock = new Map<Id, number>();
+  for (const assignment of world.employment) {
+    employedByBlock.set(
+      assignment.popBlockId,
+      (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
+    );
+  }
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const blocks = countryBlocks(world, country);
     const labor = lawDefinition(politics, country.laws.labor);
@@ -1742,9 +1751,7 @@ export function runUnrestPhase(
           blockWorkingAge += (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
         }
         workingAge += blockWorkingAge;
-        for (const assignment of world.employment) {
-          if (assignment.popBlockId === block.id) employed += assignment.workers;
-        }
+        employed += employedByBlock.get(block.id) ?? 0;
       }
       if (!(regionPopulation > 0)) {
         region.unrest = roundTo(

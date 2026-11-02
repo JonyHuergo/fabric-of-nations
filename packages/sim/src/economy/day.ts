@@ -33,7 +33,7 @@ import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
-import { computeBuildingCapacity } from "./production.js";
+import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
@@ -88,7 +88,11 @@ import {
   technologyMortalityFactor,
   type EducationPhaseResult,
 } from "./technology.js";
-import { assertValidEmploymentState, refreshEmploymentIfDue } from "./employment.js";
+import {
+  assertValidEmploymentState,
+  refreshEmploymentIfDue,
+  repairEmploymentAfterDemography,
+} from "./employment.js";
 import type {
   BuildingDef,
   EconomyDefinitions,
@@ -131,13 +135,6 @@ function marketPrices(world: World, marketId: Id): Market {
   const market = world.markets.find((candidate) => candidate.id === marketId);
   if (market === undefined) throw new RangeError(`missing market ${String(marketId)}`);
   return market;
-}
-
-function isMarketFundingFailure(error: unknown): boolean {
-  return (
-    error instanceof RangeError &&
-    /insufficient funds; market settlement would overdraw account/.test(error.message)
-  );
 }
 
 export interface EconomyDayResult {
@@ -305,10 +302,6 @@ export function cloneWorldForTick(source: World): World {
   return cloneWorld(source, { validate: false, shareImmutableSummaries: true });
 }
 
-function restoreWorld(target: World, source: World): void {
-  Object.assign(target, source);
-}
-
 function accountByOwner(
   index: FinanceIndex,
   ownerKind: "popBlock" | "building",
@@ -466,12 +459,14 @@ function buildProductionDemands(
   populationDefinitions: PopulationDefinitions,
   mode: "full" | "cash",
   index: FinanceIndex,
+  cap: { cappedBuildings: number } = { cappedBuildings: 0 },
 ): ProductionDemandRecord[] {
   const regionToMarket = marketByRegion(world);
   const critical = criticalGoodIds(definitions, populationDefinitions.needs);
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const records: ProductionDemandRecord[] = [];
 
+  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
     if (!building.operational) continue;
     const definition = definitionById.get(building.definitionId);
@@ -481,7 +476,7 @@ function buildProductionDemands(
       throw new RangeError(`building ${String(building.id)} is in a region with no market`);
     }
     const market = marketPrices(world, marketId);
-    const capacity = computeBuildingCapacity(world, definitions, building.id);
+    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
     const inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
     if (inputs.length === 0) continue;
@@ -497,6 +492,7 @@ function buildProductionDemands(
       const account = accountByOwner(index, "building", building.id);
       const available = Math.max(0, account.balanceRUSD - MONEY_TOLERANCE_RUSD);
       ratio = desiredCost > 0 ? Math.min(1, available / desiredCost) : 1;
+      if (ratio < 1) cap.cappedBuildings += 1;
     }
     const tier = productionTier(definition, critical);
     for (const input of desired) {
@@ -823,6 +819,8 @@ function updateEconomicWealth(
 interface MarketAttempt {
   readonly household: HouseholdDemandBuild;
   readonly production: readonly ProductionDemandRecord[];
+  /** Buildings whose input demand the opening-cash cap reduced (D-125). */
+  readonly cappedBuildings: number;
   readonly markets: readonly MarketDayResult[];
   readonly settlement: MarketSettlementResult;
 }
@@ -841,12 +839,14 @@ function runMarketAttempt(
     populationDefinitions,
     index,
   );
+  const cap = { cappedBuildings: 0 };
   const production = buildProductionDemands(
     world,
     definitions,
     populationDefinitions,
     mode,
     index,
+    cap,
   );
   const buildingRegion = new Map(world.buildings.map((building) => [building.id, building.regionId]));
   const results: MarketDayResult[] = [];
@@ -875,7 +875,13 @@ function runMarketAttempt(
     );
   }
   const settlement = settleMarketDays(world, definitions, results, { validateWorld: false });
-  return { household, production, markets: results, settlement };
+  return {
+    household,
+    production,
+    cappedBuildings: cap.cappedBuildings,
+    markets: results,
+    settlement,
+  };
 }
 
 /**
@@ -898,7 +904,11 @@ export function runEconomicDay(
   populationDefinitions: PopulationDefinitions,
   economyDefinitions: EconomyDefinitions,
   dayIndex: DayIndex,
-  options: { readonly validateWorld?: boolean } = {},
+  options: {
+    readonly validateWorld?: boolean;
+    /** D-116 mode of the calling tick; `phase` skips per-AI-action world validation. */
+    readonly integrity?: "staged" | "phase";
+  } = {},
 ): EconomyDayResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidPopulationDefinitions(populationDefinitions);
@@ -941,7 +951,10 @@ export function runEconomicDay(
   // its staggered day and applies only validated fiscal-policy actions. The
   // staged day is already validated above, so the phase skips a duplicate full
   // validation; every applied action still validates its candidate world.
-  const ai = runCountryAIPhase(world, dayIndex, { validateWorld: false });
+  const ai = runCountryAIPhase(world, dayIndex, {
+    validateWorld: false,
+    validateActionWorlds: options.integrity !== "phase",
+  });
 
   const populationStart = world.popBlocks.reduce(
     (total, block) => total + populationTotal(block),
@@ -979,11 +992,14 @@ export function runEconomicDay(
     { mortalityFactorByBlock },
   );
   // Population decline can invalidate assignments before the next monthly
-  // refresh. The existing dirty marker is the intended immediate-repair path.
+  // refresh. D-126: trim the over-assigned blocks first; only a state that the
+  // trim cannot make valid falls back to the dirty full refresh.
   try {
     assertValidEmploymentState(world, economyDefinitions);
   } catch {
-    world.employmentDirty = true;
+    if (!repairEmploymentAfterDemography(world, economyDefinitions)) {
+      world.employmentDirty = true;
+    }
   }
   let employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
   // M5 migration: monthly, after the initial labor allocation and before the
@@ -1004,31 +1020,19 @@ export function runEconomicDay(
     validateWorld: false,
   });
 
-  const afterPopulation = cloneWorldForTick(world);
-  let fallbackUsed = false;
-  let attempt: MarketAttempt;
-  try {
-    attempt = runMarketAttempt(
-      world,
-      economyDefinitions,
-      populationDefinitions,
-      dayIndex,
-      buildFinanceIndex(world.finance),
-      "full",
-    );
-  } catch (error) {
-    if (!isMarketFundingFailure(error)) throw error;
-    fallbackUsed = true;
-    restoreWorld(world, afterPopulation);
-    attempt = runMarketAttempt(
-      world,
-      economyDefinitions,
-      populationDefinitions,
-      dayIndex,
-      buildFinanceIndex(world.finance),
-      "cash",
-    );
-  }
+  // D-125: one market attempt per day. Production input demand is capped by each
+  // building’s opening operating cash, so settlement cannot overdraw a buyer and the
+  // market is cleared once. A building whose full input cost fits in its opening cash
+  // is not capped; `fallbackUsed` reports whether the cap bound for any building.
+  const attempt = runMarketAttempt(
+    world,
+    economyDefinitions,
+    populationDefinitions,
+    dayIndex,
+    buildFinanceIndex(world.finance),
+    "cash",
+  );
+  const fallbackUsed = attempt.cappedBuildings > 0;
   const household = attempt.household;
   const productionRecords = attempt.production;
   const marketResults = attempt.markets;

@@ -58,7 +58,10 @@ const SEED = 20_261_023;
 // state shape, and M12a (schema 27) adds `World.provinces` (disabled for this
 // legacy fixture), so the digest is intentionally re-pinned again. The Batch 5
 // validation optimization and M12a do not change simulation behavior.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "22eefa09ff274493";
+// P1b re-pins it because D-125 (one cash-capped market attempt, aggregated market
+// postings) and D-126 (minimal employment repair) intentionally change the trajectory;
+// the P1a optimizations before them reproduced "22eefa09ff274493" exactly.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "b400f2babc5af078";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
@@ -83,7 +86,7 @@ function cashConserved(before: number, after: number): boolean {
 }
 
 describe("Batch 5 validation boundary and determinism", () => {
-  test("the pre-optimization state hash is unchanged after 22 ticks", () => {
+  test("the state hash after 22 ticks matches the D-125/D-126 known answer", () => {
     const scenario = eightPolities();
     const world = createEconomyWorld(scenario, { seed: SEED });
     runTicks(world, 22, contextFor(scenario));

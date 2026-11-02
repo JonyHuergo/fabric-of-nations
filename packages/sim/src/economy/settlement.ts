@@ -55,6 +55,7 @@ import type {
 import type {
   BuildingInstance,
   EconomyDefinitions,
+  EmploymentAssignment,
   FinancialAccount,
   JournalLine,
   JournalPosting,
@@ -246,6 +247,88 @@ function transactionKey(transaction: PendingTransaction): string {
   return `${transaction.kind}:${buyer}:${String(transaction.sellerBuildingId)}:${String(transaction.goodId)}:${String(transaction.tier)}:${transaction.phase}`;
 }
 
+/**
+ * D-125 aggregated market postings: one balanced entry per (transaction kind, good)
+ * instead of one per buyer × seller lot × tier × phase.
+ *
+ * Each buyer account gets one debit-expense/credit-cash pair and each seller account
+ * one debit-cash/credit-revenue pair, with amounts summed over the prepared
+ * transactions in their canonical key order. Pairs keep debits and credits summing
+ * the same sequence of amounts, so every entry balances exactly. Quantities,
+ * allocations and each account's net cash change are those of the individual
+ * transactions; only the posting count and floating summation order differ.
+ */
+function aggregatedMarketEntries(transactions: readonly PreparedTransaction[]): JournalEntryInput[] {
+  interface Group {
+    readonly transactionKind: PreparedTransaction["transactionKind"];
+    readonly goodId: number;
+    readonly buyers: Map<Id, { expenseAccountId: Id; amount: number }>;
+    readonly sellers: Map<Id, { revenueAccountId: Id; amount: number }>;
+  }
+  const groups = new Map<string, Group>();
+  for (const transaction of transactions) {
+    const key = `${transaction.transactionKind}:${String(transaction.goodId)}`;
+    let group = groups.get(key);
+    if (group === undefined) {
+      group = {
+        transactionKind: transaction.transactionKind,
+        goodId: transaction.goodId,
+        buyers: new Map(),
+        sellers: new Map(),
+      };
+      groups.set(key, group);
+    }
+    const buyer = group.buyers.get(transaction.buyerAccountId);
+    if (buyer === undefined) {
+      group.buyers.set(transaction.buyerAccountId, {
+        expenseAccountId: transaction.buyerExpenseAccountId,
+        amount: transaction.totalRUSD,
+      });
+    } else {
+      buyer.amount += transaction.totalRUSD;
+    }
+    const seller = group.sellers.get(transaction.sellerAccountId);
+    if (seller === undefined) {
+      group.sellers.set(transaction.sellerAccountId, {
+        revenueAccountId: transaction.sellerRevenueAccountId,
+        amount: transaction.totalRUSD,
+      });
+    } else {
+      seller.amount += transaction.totalRUSD;
+    }
+  }
+  const ordered = [...groups.values()].sort((left, right) =>
+    left.transactionKind === right.transactionKind
+      ? left.goodId - right.goodId
+      : left.transactionKind < right.transactionKind
+        ? -1
+        : 1,
+  );
+  const entries: JournalEntryInput[] = [];
+  for (const group of ordered) {
+    const lines: JournalLine[] = [];
+    for (const [accountId, buyer] of [...group.buyers].sort((left, right) => left[0] - right[0])) {
+      if (!(buyer.amount > 0)) continue;
+      lines.push({ accountId: buyer.expenseAccountId, side: "debit", amountRUSD: buyer.amount });
+      lines.push({ accountId, side: "credit", amountRUSD: buyer.amount });
+    }
+    for (const [accountId, seller] of [...group.sellers].sort((left, right) => left[0] - right[0])) {
+      if (!(seller.amount > 0)) continue;
+      lines.push({ accountId, side: "debit", amountRUSD: seller.amount });
+      lines.push({ accountId: seller.revenueAccountId, side: "credit", amountRUSD: seller.amount });
+    }
+    if (lines.length > 0) {
+      entries.push({
+        transactionKind: group.transactionKind,
+        lines,
+        sourceEntityId: null,
+        targetEntityId: null,
+      });
+    }
+  }
+  return entries;
+}
+
 function prepareTransactions(
   world: World,
   definitions: EconomyDefinitions,
@@ -365,8 +448,39 @@ function allocateMoney(
   return allocations;
 }
 
+/**
+ * P1 lookup tables for daily wage settlement. Assignments keep `world.employment`
+ * order per building and the owner is the first country in `world.countries` order,
+ * matching the linear scans they replace.
+ */
+interface WageLookup {
+  readonly assignmentsByBuilding: ReadonlyMap<Id, readonly EmploymentAssignment[]>;
+  readonly blockById: ReadonlyMap<Id, World["popBlocks"][number]>;
+  readonly ownerByRegion: ReadonlyMap<Id, World["countries"][number]>;
+}
+
+function buildWageLookup(world: World): WageLookup {
+  const assignmentsByBuilding = new Map<Id, EmploymentAssignment[]>();
+  for (const assignment of world.employment) {
+    const list = assignmentsByBuilding.get(assignment.buildingInstanceId);
+    if (list === undefined) assignmentsByBuilding.set(assignment.buildingInstanceId, [assignment]);
+    else list.push(assignment);
+  }
+  const blockById = new Map<Id, World["popBlocks"][number]>();
+  for (const block of world.popBlocks) {
+    if (!blockById.has(block.id)) blockById.set(block.id, block);
+  }
+  const ownerByRegion = new Map<Id, World["countries"][number]>();
+  for (const country of world.countries) {
+    for (const regionId of country.regionIds) {
+      if (!ownerByRegion.has(regionId)) ownerByRegion.set(regionId, country);
+    }
+  }
+  return { assignmentsByBuilding, blockById, ownerByRegion };
+}
+
 function buildWageGroups(
-  world: World,
+  lookup: WageLookup,
   building: BuildingInstance,
   professions: ReadonlyMap<Id, ProfessionDef>,
   index: FinanceIndex,
@@ -377,9 +491,8 @@ function buildWageGroups(
   },
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
-  for (const assignment of world.employment) {
-    if (assignment.buildingInstanceId !== building.id) continue;
-    const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
+  for (const assignment of lookup.assignmentsByBuilding.get(building.id) ?? []) {
+    const block = lookup.blockById.get(assignment.popBlockId);
     if (block === undefined) throw new RangeError("employment assignment references an unknown block");
     const profession = professions.get(assignment.professionId);
     if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
@@ -555,34 +668,9 @@ function settleMarketDaysInternal(
   const postings: JournalPosting[] = [];
   try {
     if (transactions.length > 0) {
-      const marketEntries: JournalEntryInput[] = transactions.map((transaction) => ({
-        transactionKind: transaction.transactionKind,
-        lines: [
-          {
-            accountId: transaction.buyerExpenseAccountId,
-            side: "debit",
-            amountRUSD: transaction.totalRUSD,
-          },
-          {
-            accountId: transaction.sellerAccountId,
-            side: "debit",
-            amountRUSD: transaction.totalRUSD,
-          },
-          {
-            accountId: transaction.buyerAccountId,
-            side: "credit",
-            amountRUSD: transaction.totalRUSD,
-          },
-          {
-            accountId: transaction.sellerRevenueAccountId,
-            side: "credit",
-            amountRUSD: transaction.totalRUSD,
-          },
-        ],
-        sourceEntityId: transaction.buyerPopBlockId ?? transaction.buyerBuildingId,
-        targetEntityId: transaction.sellerBuildingId,
-      }));
-      postings.push(...postJournalBatch(world.finance, dayIndex, marketEntries));
+      postings.push(
+        ...postJournalBatch(world.finance, dayIndex, aggregatedMarketEntries(transactions)),
+      );
     }
 
     const professions = new Map(definitions.professions.map((profession) => [profession.id, profession]));
@@ -591,6 +679,7 @@ function settleMarketDaysInternal(
     );
     const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
     const wageSettlements: WageSettlement[] = [];
+    const wageLookup = buildWageLookup(world);
     const wageEntries: JournalEntryInput[] = [];
     for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
       if (!building.operational) continue;
@@ -599,15 +688,13 @@ function settleMarketDaysInternal(
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
       const groups = buildWageGroups(
-        world,
+        wageLookup,
         building,
         professions,
         index,
         yearDays,
         (() => {
-          const owner = world.countries.find((country) =>
-            country.regionIds.includes(building.regionId),
-          );
+          const owner = wageLookup.ownerByRegion.get(building.regionId);
           return owner === undefined
             ? { minimumWageRUSDPerYear: 0, hoursFactor: 1 }
             : {

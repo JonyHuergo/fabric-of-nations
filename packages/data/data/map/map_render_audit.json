@@ -1,11 +1,11 @@
 {
   "generatedBy": "scripts/map/build-render-bundle.mjs",
-  "provinceCount": 1689,
+  "provinceCount": 1687,
   "fill": {
-    "vertices": 242531,
-    "triangles": 190867,
+    "vertices": 231088,
+    "triangles": 194012,
     "untriangulatedProvinces": [],
-    "worstAreaDeviation": 0.105371
+    "worstAreaDeviation": 0.076037
   },
   "lakes": {
     "polygons": 698,
@@ -36,7 +36,7 @@
       "landVertices": 392995,
       "landTriangles": 374617,
       "lakeVertices": 70164,
-      "coastPieces": 37355,
+      "coastPieces": 33216,
       "minimalIslands": 0
     },
     {
@@ -44,7 +44,7 @@
       "landVertices": 137562,
       "landTriangles": 118216,
       "lakeVertices": 16063,
-      "coastPieces": 26307,
+      "coastPieces": 23461,
       "minimalIslands": 3881
     },
     {
@@ -52,37 +52,37 @@
       "landVertices": 73908,
       "landTriangles": 54594,
       "lakeVertices": 4227,
-      "coastPieces": 18670,
+      "coastPieces": 17225,
       "minimalIslands": 7272
     }
   ],
   "borders": {
-    "sharedInputLines": 14506,
-    "mergedChains": 11888,
-    "recoveredPairs": 1526,
-    "recoveredSegments": 32577,
-    "coastSegmentsReplacedByLandLayer": 106001
+    "sharedInputLines": 10009,
+    "mergedChains": 8974,
+    "recoveredPairs": 4032,
+    "recoveredSegments": 113997,
+    "coastSegmentsReplacedByLandLayer": 117091
   },
   "borderLods": [
     {
       "lod": 0,
-      "segments": 73061,
-      "pieces": 12061
+      "segments": 60810,
+      "pieces": 9104
     },
     {
       "lod": 1,
-      "segments": 66531,
-      "pieces": 12047
+      "segments": 54288,
+      "pieces": 9072
     },
     {
       "lod": 2,
-      "segments": 39200,
-      "pieces": 11920
+      "segments": 30087,
+      "pieces": 8983
     }
   ],
-  "bundleBytes": 9113264,
-  "bundleSha256": "d609846f66aebe76ad4df352ecc0a12e31e4ecd2f74c5bc2c48c26013d8220df",
-  "provinceSourceHash": "028da30cba6237d92310e1e8fc726a5755c8aaa9a8ecd236a8fa6cf06fc580c3",
+  "bundleBytes": 8846773,
+  "bundleSha256": "5db9c483c2223093aaf5a99b9f3fd267a4798afb06549af8cc71f2bc92dc262b",
+  "provinceSourceHash": "857b89d16e3b8097eb9f2e1d60faf8bdebd17d99dc4d92d6239c4c68b8f6f547",
   "projection": {
     "id": "gall-stereographic",
     "width": 1000,
@@ -92,5 +92,5 @@
   },
   "reliefBytes": 1108751,
   "oceanBytes": 765335,
-  "compressedBytes": 5833091
+  "compressedBytes": 5661191
 }

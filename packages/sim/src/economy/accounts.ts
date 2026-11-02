@@ -2065,11 +2065,39 @@ export interface FinanceIndex {
   cash(): readonly FinancialAccount[];
 }
 
+const OWNER_KIND_CODES: Readonly<Record<FinancialAccountOwnerKind, number>> = {
+  popBlock: 0,
+  building: 1,
+  country: 2,
+  system: 3,
+};
+const SUBTYPE_CODES: ReadonlyMap<string, number> = new Map(
+  ACCOUNT_SUBTYPES.map((subtype, index) => [subtype, index]),
+);
+/** Owner ids below this bound get a collision-free numeric key. */
+const NUMERIC_OWNER_KEY_LIMIT = 2 ** 40;
+
+/**
+ * Owner/subtype lookup key. P1: a numeric key avoids building a string for every
+ * lookup on the settlement hot path; unusual owner ids fall back to the string form,
+ * which can never equal a number, so the two key spaces cannot collide.
+ */
 function ownerKey(
   ownerKind: FinancialAccountOwnerKind,
   ownerId: Id | null,
   subtype: AccountSubtype,
-): string {
+): number | string {
+  const subtypeCode = SUBTYPE_CODES.get(subtype);
+  const ownerCode = ownerId === null ? 0 : ownerId + 1;
+  if (
+    subtypeCode !== undefined &&
+    subtypeCode < 64 &&
+    Number.isInteger(ownerCode) &&
+    ownerCode >= 0 &&
+    ownerCode < NUMERIC_OWNER_KEY_LIMIT
+  ) {
+    return (ownerCode * 64 + subtypeCode) * 4 + OWNER_KIND_CODES[ownerKind];
+  }
   return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}:${subtype}`;
 }
 
@@ -2077,7 +2105,7 @@ function ownerKey(
 export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
   const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
   const byId = new Map<Id, FinancialAccount>();
-  const byOwner = new Map<string, FinancialAccount>();
+  const byOwner = new Map<number | string, FinancialAccount>();
   const cash: FinancialAccount[] = [];
   for (const account of accounts) {
     if (byId.has(account.id)) {

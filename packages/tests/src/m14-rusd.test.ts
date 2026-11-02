@@ -95,25 +95,15 @@ describe("M14 monetary equivalence and determinism", () => {
   const scenario = loadM11World();
   const world = createEconomyWorld(scenario, { seed: 20_261_023 });
 
-  test("the pre-M14 deterministic world hash is unchanged", () => {
-    expect(hashWorld(world)).toBe("0c99bb73270294e5");
-  });
-
-  test("starting monetary values match the pre-M14 save exactly", () => {
-    const fixture = JSON.parse(
-      readFileSync(join(HERE, "fixtures/century-era-save.json"), "utf8"),
-    ) as { stored: string; worldHash: string };
-    const legacy = deserializeWorld(decompressSaveFromStorage(fixture.stored));
-    expect(hashWorld(legacy)).toBe(fixture.worldHash);
-    expect(hashWorld(legacy)).toBe(hashWorld(world));
-    expect(legacy.finance.accounts.map((account) => account.balanceRUSD)).toEqual(
-      world.finance.accounts.map((account) => account.balanceRUSD),
-    );
-    expect(legacy.finance.opening).toEqual(world.finance.opening);
-    expect(legacy.markets.map((market) => market.priceRUSD)).toEqual(
-      world.markets.map((market) => market.priceRUSD),
-    );
-    expect(legacy.currencyValuations).toEqual(world.currencyValuations);
+  // Re-pinned 2026-11-02: the M14 rename left this hash unchanged (0c99bb73270294e5);
+  // the D-128 province repair (1,687 provinces, Hultschin, Cuba owner/controller) and the
+  // D-129 sourced population corrections (Wadai, Darfur, German Pacific islands, Guam)
+  // changed the 1900 world afterwards. Prices and currency valuations were verified equal
+  // to the pre-M14 save before re-pinning. The test comparing this world with the pre-M14
+  // save was retired with the designer's approval: the save predates D-128/D-129, and the
+  // P2 schema break (D-120) makes it incompatible.
+  test("the 1900 world hash is pinned", () => {
+    expect(hashWorld(world)).toBe("6779e9a79c440401");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

@@ -664,6 +664,83 @@ export function refreshEmployment(
   };
 }
 
+/**
+ * D-126 minimal repair after daily demography.
+ *
+ * Deaths can leave a block with more assigned workers than its eligible workforce.
+ * Instead of a full reassignment, each such block's assignments are trimmed by the
+ * excess, proportionally to their workers with largest-remainder rounding (ties to
+ * the lower assignment id); emptied assignments are removed. The freed job slots are
+ * refilled by the next monthly or dirty refresh. Returns false, after restoring the
+ * original assignments, when the state still fails validation for any other reason;
+ * the caller then requests a full refresh.
+ */
+export function repairEmploymentAfterDemography(
+  world: World,
+  definitions: EconomyDefinitions,
+): boolean {
+  const professionById = new Map(definitions.professions.map((p) => [p.id, p]));
+  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
+  const byBlock = new Map<Id, EmploymentAssignment[]>();
+  for (const assignment of world.employment) {
+    const list = byBlock.get(assignment.popBlockId);
+    if (list === undefined) byBlock.set(assignment.popBlockId, [assignment]);
+    else list.push(assignment);
+  }
+  const reductions = new Map<Id, number>();
+  for (const [blockId, assignments] of [...byBlock].sort((left, right) => left[0] - right[0])) {
+    const block = blockById.get(blockId);
+    const profession = block === undefined ? undefined : professionById.get(block.professionId);
+    if (block === undefined || profession === undefined) continue;
+    let assigned = 0;
+    for (const assignment of assignments) assigned += assignment.workers;
+    const eligible = eligibleWorkforceForBlock(block, profession);
+    const excess = assigned - eligible;
+    if (excess <= 0 || eligible <= 0) continue;
+    const ordered = [...assignments].sort((left, right) => left.id - right.id);
+    const shares = ordered.map((assignment) => {
+      const exact = (excess * assignment.workers) / assigned;
+      const whole = Math.min(assignment.workers, Math.floor(exact));
+      return { assignment, whole, fraction: exact - Math.floor(exact) };
+    });
+    let remaining = excess - shares.reduce((total, share) => total + share.whole, 0);
+    const byRemainder = [...shares].sort((left, right) =>
+      right.fraction !== left.fraction
+        ? right.fraction - left.fraction
+        : left.assignment.id - right.assignment.id,
+    );
+    while (remaining > 0) {
+      let progressed = false;
+      for (const share of byRemainder) {
+        if (remaining <= 0) break;
+        if (share.whole >= share.assignment.workers) continue;
+        share.whole += 1;
+        remaining -= 1;
+        progressed = true;
+      }
+      if (!progressed) break;
+    }
+    for (const share of shares) {
+      if (share.whole > 0) reductions.set(share.assignment.id, share.whole);
+    }
+  }
+  if (reductions.size === 0) return false;
+  const original = world.employment;
+  world.employment = original
+    .map((assignment) => {
+      const reduction = reductions.get(assignment.id) ?? 0;
+      return reduction === 0 ? assignment : { ...assignment, workers: assignment.workers - reduction };
+    })
+    .filter((assignment) => assignment.workers > 0);
+  try {
+    validateAssignments(world, definitions, world.employment);
+    return true;
+  } catch {
+    world.employment = original;
+    return false;
+  }
+}
+
 /** Run employment evaluation only when the calendar or dirty state requires it. */
 export function refreshEmploymentIfDue(
   world: World,

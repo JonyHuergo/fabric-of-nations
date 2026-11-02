@@ -747,7 +747,26 @@ export function runConstructionPhase(
     const treasury = index.get("country", country.id, "treasury-cash");
     const wip = index.get("country", country.id, "construction-in-progress");
     const publicCapital = index.get("country", country.id, "public-capital");
-    const capitalized = project.spentRUSD + project.materialsSpentRUSD;
+    let capitalized = project.spentRUSD + project.materialsSpentRUSD;
+    // D-127: the work-in-progress balance and the project's running totals add the
+    // same amounts in a different order. When no other project of the country carries
+    // work in progress, the account balance is this project's alone, so it is
+    // capitalized exactly (after checking it agrees within the money tolerance) and no
+    // floating residue is left behind.
+    const othersInProgress = staged.construction.projects.some(
+      (other) =>
+        other.id !== project.id &&
+        other.countryId === project.countryId &&
+        !constructionProjectIsTerminal(other.status) &&
+        other.spentRUSD + other.materialsSpentRUSD > 0,
+    );
+    if (
+      !othersInProgress &&
+      wip.balanceRUSD > 0 &&
+      Math.abs(wip.balanceRUSD - capitalized) <= toleranceMoney(wip.balanceRUSD, capitalized)
+    ) {
+      capitalized = wip.balanceRUSD;
+    }
     if (capitalized > 0) {
       completionEntries.push({
         transactionKind: "construction-capitalization",

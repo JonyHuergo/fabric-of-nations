@@ -186,7 +186,6 @@ function dissolveAustriaHungary(world: World): void {
     "aut-bohemia",
     "aut-moravia",
     "aut-austrian-silesia",
-    "aut-hultschin",
     "aut-svk-pressburg",
     "aut-svk-nagyszombat",
     "aut-svk-nyitra",
@@ -345,6 +344,16 @@ function settleGermany1919(world: World): void {
     "cession",
     "Schleswig plebiscite: northern Schleswig to Denmark",
     at,
+  );
+  // D-128: the Hultschin region was Prussian (Ratibor district), so it leaves with the
+  // German settlement under Versailles, not with Austria-Hungary.
+  transfer(
+    world,
+    idsFor((key) => key === "aut-hultschin"),
+    FUTURE_ID.get("CZE") as Id,
+    "cession",
+    "Treaty of Versailles: Hultschin region to Czechoslovakia",
+    day(1920, 2, 4),
   );
   transfer(
     world,
@@ -796,7 +805,13 @@ describe("M12a authoritative provincial ownership", () => {
     expect(new Set(world.provinces.ownership.map((entry) => entry.provinceId)).size).toBe(
       world.provinces.ownership.length,
     );
+    // D-129: Cuba is the only 1900 province group whose controller (the United States
+    // military government) differs from its owner.
+    const cuban = new Set(
+      definitions.filter((definition) => definition.key.startsWith("am-cub-")).map((definition) => definition.provinceId),
+    );
     for (const entry of world.provinces.ownership) {
+      if (cuban.has(entry.provinceId)) continue;
       expect(entry.ownerPolityId).toBe(entry.controllerPolityId);
       expect(entry.controlledSinceDay).toBeNull();
       expect(entry.claimantPolityIds).toEqual([]);

@@ -1292,11 +1292,17 @@ function validateDebtPolicyChange(
  *
  * The action is validated first, then the complete candidate world is validated
  * before publication. A failed validation leaves the original world unchanged.
+ *
+ * `options.validateWorld` defaults to true. The integrated day's AI phase passes
+ * false (D-067/D-116 staged mode): a fiscal-policy action changes only the
+ * country's fiscal policy, so the candidate policy is validated structurally and
+ * the rest of the world is covered by the day's boundary validation.
  */
 export function applyCountryAction(
   world: World,
   action: CountryAction,
   definitions?: EconomyDefinitions,
+  options: { readonly validateWorld?: boolean } = {},
 ): CountryActionApplication {
   const validation = validateCountryAction(world, action, definitions);
   if (!validation.valid) {
@@ -1337,13 +1343,17 @@ export function applyCountryAction(
       };
     }
     const candidateCountry: Country = { ...country, fiscal };
-    const candidateWorld: World = {
-      ...world,
-      countries: world.countries.map((entry, entryIndex) =>
-        entryIndex === index ? candidateCountry : entry,
-      ),
-    };
-    assertValidWorld(candidateWorld);
+    if (options.validateWorld === false) {
+      assertValidFiscalPolicy(fiscal, `countries[${String(index)}].fiscal`);
+    } else {
+      const candidateWorld: World = {
+        ...world,
+        countries: world.countries.map((entry, entryIndex) =>
+          entryIndex === index ? candidateCountry : entry,
+        ),
+      };
+      assertValidWorld(candidateWorld);
+    }
     world.countries[index] = candidateCountry;
     return {
       countryId: country.id,
@@ -1990,7 +2000,15 @@ function recordRejectedAction(world: World, message: string): void {
 export function runCountryAIPhase(
   world: World,
   dayIndex: Day,
-  options: { readonly validateWorld?: boolean } = {},
+  options: {
+    readonly validateWorld?: boolean;
+    /**
+     * Whole-world validation of every applied action's candidate world (D-067).
+     * Defaults to true; D-116 phase-mode days pass false and validate the candidate
+     * fiscal policy structurally, relying on the day's month-end validation.
+     */
+    readonly validateActionWorlds?: boolean;
+  } = {},
 ): CountryAIPhaseResult {
   assertValidDayIndex(dayIndex);
   if (isTerminalDayIndex(dayIndex)) {
@@ -2032,7 +2050,9 @@ export function runCountryAIPhase(
         recordRejectedAction(world, validation.errors.join("; "));
         continue;
       }
-      applyCountryAction(world, action);
+      applyCountryAction(world, action, undefined, {
+        validateWorld: options.validateActionWorlds !== false,
+      });
       applied += 1;
     }
     appliedActionCount += applied;

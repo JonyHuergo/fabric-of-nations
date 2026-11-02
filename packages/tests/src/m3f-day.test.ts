@@ -143,10 +143,13 @@ describe("M3f integrated economic day", () => {
     expect(household?.endingCashAfterSettlementRUSD).toBeGreaterThan(0);
   });
 
-  test("uses valid same-batch sales receipts to fund a production-input purchase", () => {
+  test("caps production inputs by opening cash even when same-day sales would cover them (D-125)", () => {
+    // Before D-125 a first attempt let same-batch sales receipts fund this mill's input
+    // purchase. The single market attempt caps input demand by opening operating cash,
+    // so a mill with no opening cash buys no input that day but still sells its stock.
     const scenario = fullScenario();
     const block = scenario.population.popBlocks.find((candidate) => candidate.id === 1);
-    if (block === undefined) throw new Error("missing block 1");
+    if (block === undefined) throw new Error("missing household block");
     block.wealthLevel = 80;
     scenario.employment = scenario.employment.filter(
       (assignment) => assignment.buildingInstanceId !== 4,
@@ -154,24 +157,17 @@ describe("M3f integrated economic day", () => {
     const world = worldFor(scenario, [0, 5, 7]);
     const millId = buildingAccountId(world, 5);
     setCashBalance(world, millId, 0);
-    const openingMillCash = 0;
-    const sellerId = buildingAccountId(world, 0);
-    const openingSellerCash = balance(world, sellerId);
     const grainFlowBefore = world.markets[0]?.stockLots
       .filter((lot) => lot.goodId === GRAIN_ID)
       .reduce((total, lot) => total + lot.quantity, 0) ?? 0;
-    const textileFlowBefore = world.markets[0]?.stockLots
-      .filter((lot) => lot.goodId === TEXTILES_ID)
-      .reduce((total, lot) => total + lot.quantity, 0) ?? 0;
 
     const result = tick(world, contextFor(scenario));
-    expect(result.economy?.fallbackUsed).toBe(false);
+    expect(result.economy?.fallbackUsed).toBe(true);
     const millInput = result.economy?.settlement.transactions.find(
       (transaction) =>
-        transaction.kind === "input-purchase" &&
-        transaction.buyerBuildingId === 5 &&
-        transaction.sellerBuildingId === 0,
+        transaction.kind === "input-purchase" && transaction.buyerBuildingId === 5,
     );
+    expect(millInput).toBeUndefined();
     const millSale = result.economy?.settlement.transactions.find(
       (transaction) =>
         transaction.kind === "household-purchase" &&
@@ -181,62 +177,25 @@ describe("M3f integrated economic day", () => {
     const millProducer = result.economy?.settlement.producers.find(
       (producer) => producer.buildingId === 5,
     );
-    const sellerProducer = result.economy?.settlement.producers.find(
-      (producer) => producer.buildingId === 0,
-    );
-    if (
-      millInput === undefined ||
-      millSale === undefined ||
-      millProducer === undefined ||
-      sellerProducer === undefined
-    ) {
-      throw new Error("missing receipt-funded transactions");
+    if (millSale === undefined || millProducer === undefined) {
+      throw new Error("missing mill sale or producer settlement");
     }
-
-    expect(openingMillCash).toBeLessThan(millInput.totalRUSD);
-    expect(millSale.totalRUSD).toBeGreaterThanOrEqual(millInput.totalRUSD);
-    expect(millInput.buyerAccountId).toBe(millId);
-    expect(millInput.sellerAccountId).toBe(sellerId);
-    expect(millProducer.initialCashRUSD).toBe(openingMillCash);
+    expect(millProducer.initialCashRUSD).toBe(0);
+    expect(millProducer.inputCostsRUSD).toBe(0);
     expect(millProducer.revenueRUSD).toBeCloseTo(millSale.totalRUSD, 9);
-    expect(millProducer.inputCostsRUSD).toBeCloseTo(millInput.totalRUSD, 9);
     expect(millProducer.endingCashAfterSettlementRUSD).toBeCloseTo(
-      millProducer.initialCashRUSD +
-        millProducer.revenueRUSD -
-        millProducer.inputCostsRUSD -
-        millProducer.wagesPaidRUSD -
-        millProducer.upkeepPaidRUSD,
+      millProducer.revenueRUSD - millProducer.wagesPaidRUSD - millProducer.upkeepPaidRUSD,
       9,
     );
     expect(millProducer.endingCashAfterSettlementRUSD).toBeGreaterThanOrEqual(0);
-    expect(sellerProducer.initialCashRUSD).toBe(openingSellerCash);
-    expect(sellerProducer.revenueRUSD).toBeGreaterThanOrEqual(millInput.totalRUSD);
-    expect(balance(world, sellerId)).toBeCloseTo(sellerProducer.endingCashAfterSettlementRUSD, 9);
     expect(balance(world, millId)).toBeCloseTo(millProducer.endingCashAfterSettlementRUSD, 9);
 
     const grainFlow = result.economy?.market.inventory.find(
       (flow) => flow.goodId === GRAIN_ID,
     );
-    const textileFlow = result.economy?.market.inventory.find(
-      (flow) => flow.goodId === TEXTILES_ID,
-    );
-    if (grainFlow === undefined || textileFlow === undefined) {
-      throw new Error("missing inventory flows");
-    }
+    if (grainFlow === undefined) throw new Error("missing grain flow");
     expect(grainFlow.openingStock).toBe(grainFlowBefore);
-    expect(grainFlow.usedAsInput).toBeGreaterThanOrEqual(millInput.quantity - 1e-9);
-    expect(textileFlow.openingStock).toBe(textileFlowBefore);
-    expect(textileFlow.householdConsumption).toBeGreaterThanOrEqual(
-      millSale.quantity - 1e-9,
-    );
-    expect(textileFlow.closingStock).toBeCloseTo(
-      textileFlow.openingStock +
-        textileFlow.production -
-        textileFlow.usedAsInput -
-        textileFlow.householdConsumption -
-        textileFlow.recordedLoss,
-      9,
-    );
+    expect(grainFlow.usedAsInput).toBe(0);
   });
 
   test("falls back to cash-funded production when expected sales do not materialize", () => {

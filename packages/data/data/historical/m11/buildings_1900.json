@@ -3045,7 +3045,7 @@
     "key": "wad-home-subsistence-farm",
     "regionId": 63,
     "definitionKey": "subsistence-farm",
-    "level": 7,
+    "level": 4,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
@@ -3063,7 +3063,7 @@
     "key": "wad-home-warehouse",
     "regionId": 63,
     "definitionKey": "warehouse",
-    "level": 4,
+    "level": 2,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
@@ -3072,7 +3072,7 @@
     "key": "dar-home-subsistence-farm",
     "regionId": 64,
     "definitionKey": "subsistence-farm",
-    "level": 7,
+    "level": 2,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
@@ -3090,7 +3090,7 @@
     "key": "dar-home-warehouse",
     "regionId": 64,
     "definitionKey": "warehouse",
-    "level": 4,
+    "level": 1,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"

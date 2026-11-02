@@ -902,7 +902,7 @@
         "capitalName": "Abéché",
         "regionName": "Wadai (home territory)",
         "selectable": true,
-        "population1900Estimate": 2000000,
+        "population1900Estimate": 1000000,
         "confidence": "low",
         "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
       },
@@ -914,7 +914,7 @@
         "capitalName": "El Fasher",
         "regionName": "Darfur (home territory)",
         "selectable": true,
-        "population1900Estimate": 2000000,
+        "population1900Estimate": 600000,
         "confidence": "low",
         "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
       },

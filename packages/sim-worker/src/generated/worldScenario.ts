@@ -11362,46 +11362,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 1,
         "financialAccountId": 1219,
         "maleAgeGroups": [
-          29398,
-          23906,
-          22078,
-          19208,
-          17246,
-          14268,
-          12509,
-          10647,
-          8903,
-          7088,
-          5262,
-          3797,
-          2705,
-          1807,
-          959,
-          462,
-          277
+          14699,
+          11953,
+          11039,
+          9604,
+          8623,
+          7134,
+          6254,
+          5323,
+          4451,
+          3544,
+          2631,
+          1899,
+          1353,
+          904,
+          480,
+          231,
+          139
         ],
         "femaleAgeGroups": [
-          28202,
-          22894,
-          21122,
-          18592,
-          16954,
-          14532,
-          12691,
-          10953,
-          9097,
-          7312,
-          5538,
-          4123,
-          3055,
-          2153,
-          1201,
-          618,
-          443
+          14101,
+          11447,
+          10561,
+          9296,
+          8477,
+          7266,
+          6346,
+          5477,
+          4549,
+          3656,
+          2769,
+          2061,
+          1527,
+          1076,
+          600,
+          309,
+          221
         ],
         "literacy": 0.0485,
         "wealthLevel": 17,
-        "initialSavingsRUSD": 1080000,
+        "initialSavingsRUSD": 540000,
         "militancy": 0.09
       },
       {
@@ -11410,46 +11410,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 0,
         "financialAccountId": 1220,
         "maleAgeGroups": [
-          133923,
-          108904,
-          100578,
-          87501,
-          78565,
-          64999,
-          56985,
-          48502,
-          40557,
-          32292,
-          23974,
-          17298,
-          12323,
-          8232,
-          4370,
-          2104,
-          1264
+          66962,
+          54452,
+          50289,
+          43751,
+          39283,
+          32500,
+          28492,
+          24251,
+          20278,
+          16146,
+          11987,
+          8649,
+          6162,
+          4116,
+          2185,
+          1052,
+          632
         ],
         "femaleAgeGroups": [
-          128477,
-          104296,
-          96222,
-          84699,
-          77235,
-          66201,
-          57815,
-          49898,
-          41443,
-          33308,
-          25226,
-          18782,
-          13917,
-          9808,
-          5470,
-          2816,
-          2016
+          64238,
+          52148,
+          48111,
+          42349,
+          38617,
+          33100,
+          28908,
+          24949,
+          20722,
+          16654,
+          12613,
+          9391,
+          6958,
+          4904,
+          2735,
+          1408,
+          1008
         ],
         "literacy": 0.024,
         "wealthLevel": 11,
-        "initialSavingsRUSD": 4920000,
+        "initialSavingsRUSD": 2460000,
         "militancy": 0.1
       },
       {
@@ -11458,46 +11458,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 1,
         "financialAccountId": 1221,
         "maleAgeGroups": [
-          29398,
-          23906,
-          22078,
-          19208,
-          17246,
-          14268,
-          12509,
-          10647,
-          8903,
-          7088,
-          5262,
-          3797,
-          2705,
-          1807,
-          959,
-          462,
-          277
+          8819,
+          7172,
+          6623,
+          5762,
+          5174,
+          4280,
+          3753,
+          3194,
+          2671,
+          2127,
+          1579,
+          1139,
+          812,
+          542,
+          288,
+          139,
+          83
         ],
         "femaleAgeGroups": [
-          28202,
-          22894,
-          21122,
-          18592,
-          16954,
-          14532,
-          12691,
-          10953,
-          9097,
-          7312,
-          5538,
-          4123,
-          3055,
-          2153,
-          1201,
-          618,
-          443
+          8461,
+          6868,
+          6337,
+          5578,
+          5086,
+          4360,
+          3807,
+          3286,
+          2729,
+          2193,
+          1661,
+          1237,
+          916,
+          646,
+          360,
+          185,
+          133
         ],
         "literacy": 0.0675,
         "wealthLevel": 17,
-        "initialSavingsRUSD": 1080000,
+        "initialSavingsRUSD": 324000,
         "militancy": 0.09
       },
       {
@@ -11506,46 +11506,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 0,
         "financialAccountId": 1222,
         "maleAgeGroups": [
-          133923,
-          108904,
-          100578,
-          87501,
-          78565,
-          64999,
-          56985,
-          48502,
-          40557,
-          32292,
-          23974,
-          17298,
-          12323,
-          8232,
-          4370,
-          2104,
-          1264
+          40177,
+          32671,
+          30173,
+          26250,
+          23570,
+          19500,
+          17095,
+          14551,
+          12167,
+          9688,
+          7192,
+          5189,
+          3697,
+          2470,
+          1311,
+          631,
+          379
         ],
         "femaleAgeGroups": [
-          128477,
-          104296,
-          96222,
-          84699,
-          77235,
-          66201,
-          57815,
-          49898,
-          41443,
-          33308,
-          25226,
-          18782,
-          13917,
-          9808,
-          5470,
-          2816,
-          2016
+          38543,
+          31289,
+          28867,
+          25410,
+          23170,
+          19860,
+          17345,
+          14969,
+          12433,
+          9992,
+          7568,
+          5635,
+          4175,
+          2942,
+          1641,
+          845,
+          605
         ],
         "literacy": 0.04,
         "wealthLevel": 11,
-        "initialSavingsRUSD": 4920000,
+        "initialSavingsRUSD": 1476000,
         "militancy": 0.1
       },
       {
@@ -15202,46 +15202,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 1,
         "financialAccountId": 1299,
         "maleAgeGroups": [
-          882,
-          717,
-          662,
-          576,
-          517,
-          428,
-          375,
-          319,
-          267,
-          213,
-          158,
-          114,
-          81,
-          54,
-          29,
+          860,
+          699,
+          646,
+          562,
+          505,
+          417,
+          366,
+          311,
+          260,
+          207,
+          154,
+          111,
+          79,
+          53,
+          28,
           14,
           8
         ],
         "femaleAgeGroups": [
-          846,
-          687,
-          634,
-          558,
-          509,
-          436,
-          381,
-          329,
-          273,
-          219,
-          166,
-          124,
-          92,
-          65,
-          36,
+          825,
+          670,
+          618,
+          544,
+          496,
+          425,
+          371,
+          320,
+          266,
+          214,
+          162,
+          121,
+          89,
+          63,
+          35,
           18,
           13
         ],
         "literacy": 0.115,
         "wealthLevel": 17,
-        "initialSavingsRUSD": 32400,
+        "initialSavingsRUSD": 31590,
         "militancy": 0.09
       },
       {
@@ -15250,46 +15250,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 0,
         "financialAccountId": 1300,
         "maleAgeGroups": [
-          4018,
-          3267,
-          3017,
-          2625,
-          2357,
-          1950,
-          1710,
-          1455,
-          1217,
-          969,
-          719,
-          519,
-          370,
-          247,
-          131,
-          63,
-          38
+          3917,
+          3185,
+          2942,
+          2559,
+          2298,
+          1901,
+          1667,
+          1419,
+          1186,
+          945,
+          701,
+          506,
+          361,
+          241,
+          128,
+          62,
+          37
         ],
         "femaleAgeGroups": [
-          3854,
-          3129,
-          2887,
-          2541,
-          2317,
-          1986,
-          1734,
-          1497,
-          1243,
-          999,
-          757,
-          563,
-          418,
-          294,
-          164,
-          85,
-          60
+          3758,
+          3051,
+          2815,
+          2477,
+          2259,
+          1936,
+          1691,
+          1460,
+          1212,
+          974,
+          738,
+          549,
+          407,
+          287,
+          160,
+          82,
+          59
         ],
         "literacy": 0.08,
         "wealthLevel": 11,
-        "initialSavingsRUSD": 147600,
+        "initialSavingsRUSD": 143910,
         "militancy": 0.1
       },
       {
@@ -16738,46 +16738,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 1,
         "financialAccountId": 1331,
         "maleAgeGroups": [
-          176,
-          143,
-          132,
-          115,
-          103,
-          86,
-          75,
-          64,
+          142,
+          116,
+          107,
+          93,
+          83,
+          69,
+          61,
+          52,
+          43,
+          34,
+          26,
+          18,
+          13,
+          9,
+          5,
+          2,
+          1
+        ],
+        "femaleAgeGroups": [
+          137,
+          111,
+          102,
+          90,
+          82,
+          70,
+          61,
           53,
-          42,
-          32,
-          23,
-          16,
-          11,
+          44,
+          35,
+          27,
+          20,
+          15,
+          10,
           6,
           3,
           2
         ],
-        "femaleAgeGroups": [
-          169,
-          137,
-          127,
-          112,
-          102,
-          87,
-          76,
-          66,
-          55,
-          44,
-          33,
-          25,
-          18,
-          13,
-          7,
-          4,
-          3
-        ],
         "literacy": 0.4,
         "wealthLevel": 17,
-        "initialSavingsRUSD": 6480,
+        "initialSavingsRUSD": 5226,
         "militancy": 0.09
       },
       {
@@ -16786,46 +16786,46 @@ export const WORLD_SCENARIO = ({
         "professionId": 0,
         "financialAccountId": 1332,
         "maleAgeGroups": [
-          804,
-          653,
-          603,
-          525,
-          471,
-          390,
-          342,
-          291,
-          243,
-          194,
-          144,
-          104,
-          74,
-          49,
-          26,
-          13,
-          8
+          648,
+          527,
+          487,
+          423,
+          380,
+          314,
+          276,
+          235,
+          196,
+          156,
+          116,
+          84,
+          60,
+          40,
+          21,
+          10,
+          6
         ],
         "femaleAgeGroups": [
-          771,
-          626,
-          577,
-          508,
-          463,
-          397,
-          347,
-          299,
-          249,
+          622,
+          505,
+          465,
+          410,
+          374,
+          320,
+          280,
+          241,
           200,
-          151,
-          113,
-          84,
-          59,
-          33,
-          17,
-          12
+          161,
+          122,
+          91,
+          67,
+          47,
+          26,
+          14,
+          10
         ],
         "literacy": 0.32,
         "wealthLevel": 11,
-        "initialSavingsRUSD": 29520,
+        "initialSavingsRUSD": 23802,
         "militancy": 0.1
       },
       {
@@ -29222,7 +29222,7 @@ export const WORLD_SCENARIO = ({
       "id": 339,
       "definitionId": 0,
       "regionId": 63,
-      "level": 7,
+      "level": 4,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1220,
@@ -29235,7 +29235,7 @@ export const WORLD_SCENARIO = ({
       "id": 340,
       "definitionId": 7,
       "regionId": 63,
-      "level": 4,
+      "level": 2,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1220,
@@ -29261,7 +29261,7 @@ export const WORLD_SCENARIO = ({
       "id": 342,
       "definitionId": 0,
       "regionId": 64,
-      "level": 7,
+      "level": 2,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1222,
@@ -29274,7 +29274,7 @@ export const WORLD_SCENARIO = ({
       "id": 343,
       "definitionId": 7,
       "regionId": 64,
-      "level": 4,
+      "level": 1,
       "condition": 1,
       "ownerKind": "private",
       "ownerAccountId": 1222,
@@ -38524,7 +38524,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "Abéché",
       "regionName": "Wadai (home territory)",
       "selectable": true,
-      "population1900Estimate": 2000000,
+      "population1900Estimate": 1000000,
       "confidence": "low",
       "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
     },
@@ -38536,7 +38536,7 @@ export const WORLD_SCENARIO = ({
       "capitalName": "El Fasher",
       "regionName": "Darfur (home territory)",
       "selectable": true,
-      "population1900Estimate": 2000000,
+      "population1900Estimate": 600000,
       "confidence": "low",
       "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
     },
@@ -46607,10 +46607,10 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Hultschin",
         "displayName": "Hultschin",
         "aliases": [],
-        "initialOwnerPolityId": 60,
+        "initialOwnerPolityId": 2,
         "simulationRegionId": 60,
-        "historicalAdminAffiliation": "Austrian Crown Land (Silesia)",
-        "historicalGrouping": "Austrian half",
+        "historicalAdminAffiliation": "Prussian Province of Silesia (Ratibor district)",
+        "historicalGrouping": "German Empire",
         "initialSpecialStatus": "ordinary",
         "sourceIds": [
           "natural-earth-10m-admin1",
@@ -46618,7 +46618,7 @@ export const WORLD_SCENARIO = ({
           "project-authored-m12"
         ],
         "confidence": "low",
-        "notes": "The Hlučín (Hultschin) district of Austrian Silesia, transferred to Czechoslovakia in 1920. The exact district boundary is approximated by a small clip."
+        "notes": "The Hultschin (Hlucin) region of Prussian Upper Silesia, part of the Ratibor district from 1742; transferred to Czechoslovakia in 1920 under the Treaty of Versailles."
       },
       {
         "provinceId": 60014,
@@ -50283,25 +50283,6 @@ export const WORLD_SCENARIO = ({
         ],
         "confidence": "high",
         "notes": "The whole 1900 territory is one province; no separate historical first-level unit is distinguishable at this map scale."
-      },
-      {
-        "provinceId": 14008,
-        "key": "grl-greenland",
-        "historicalName": "Greenland",
-        "displayName": "Greenland",
-        "aliases": [],
-        "initialOwnerPolityId": 14,
-        "simulationRegionId": 155,
-        "historicalAdminAffiliation": "Danish Arctic dependency",
-        "historicalGrouping": null,
-        "initialSpecialStatus": "ordinary",
-        "sourceIds": [
-          "natural-earth-10m-admin1",
-          "project-authored-1900",
-          "project-authored-m12"
-        ],
-        "confidence": "low",
-        "notes": "A single province for the whole Arctic dependency. It lies outside the European provincial geometry scope but is retained as the catalog's Danish dependency."
       },
       {
         "provinceId": 100001,
@@ -67466,7 +67447,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Pinar del Río",
         "displayName": "Pinar del Río",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67485,7 +67466,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "La Habana",
         "displayName": "La Habana",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67504,7 +67485,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Matanzas",
         "displayName": "Matanzas",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67523,7 +67504,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Santa Clara",
         "displayName": "Santa Clara",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67542,7 +67523,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Camagüey",
         "displayName": "Camagüey",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67561,7 +67542,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Oriente",
         "displayName": "Oriente",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -67580,7 +67561,7 @@ export const WORLD_SCENARIO = ({
         "historicalName": "Isle of Pines",
         "displayName": "Isle of Pines",
         "aliases": [],
-        "initialOwnerPolityId": 0,
+        "initialOwnerPolityId": 59,
         "simulationRegionId": 59,
         "historicalAdminAffiliation": "United States military occupation",
         "historicalGrouping": "Cuba",
@@ -71249,25 +71230,6 @@ export const WORLD_SCENARIO = ({
         "aliases": [],
         "initialOwnerPolityId": 18,
         "simulationRegionId": 18,
-        "historicalAdminAffiliation": "Coverage residual",
-        "historicalGrouping": null,
-        "initialSpecialStatus": "ordinary",
-        "sourceIds": [
-          "project-authored-1900",
-          "project-authored-m12",
-          "m12e-land-mask"
-        ],
-        "confidence": "low",
-        "notes": "M12e coverage residual: the authored 1900 feature polygon is not completely covered by the continental provinces. This province is the remaining area, owned by the feature's 1900 sovereign so the residual stays the correct underlay colour. It is coverage geometry, not a reviewed frontier."
-      },
-      {
-        "provinceId": 400136,
-        "key": "oc-gap-deu-residual",
-        "historicalName": "German residual",
-        "displayName": "German residual",
-        "aliases": [],
-        "initialOwnerPolityId": 2,
-        "simulationRegionId": 2,
         "historicalAdminAffiliation": "Coverage residual",
         "historicalGrouping": null,
         "initialSpecialStatus": "ordinary",
@@ -75385,6 +75347,6763 @@ export const WORLD_SCENARIO = ({
         ],
         "confidence": "low",
         "notes": "A 1970-2020 Australian secessionist micronation in Western Australia. Its historical end (2020) is outside the 1900-2000 calendar, so the registry end is clamped to 2000-01-01. Semihistorical; low confidence."
+      }
+    ],
+    "ownership": [
+      {
+        "provinceId": 1001,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1002,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1003,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1004,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1005,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1006,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1007,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1008,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1009,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1010,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1011,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1012,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1013,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1014,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1015,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1016,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1017,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1018,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1019,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1020,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1021,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1022,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1023,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1024,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1025,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1026,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1027,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1028,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1029,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1030,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1031,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1032,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1033,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1034,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1035,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1036,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1037,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1038,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1039,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1040,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1041,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1042,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1043,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1044,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1045,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1046,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1047,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1048,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1049,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 3001,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3002,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3003,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3004,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3005,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3006,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3007,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3008,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3009,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3010,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3011,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3012,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3013,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3014,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3015,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3016,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3017,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3018,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3019,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3020,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3021,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3022,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3023,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3024,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3025,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3026,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3027,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3028,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3029,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3030,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3031,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3032,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3033,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3034,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3035,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3036,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3037,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3038,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3039,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3040,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3041,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3042,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3043,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3044,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3045,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3046,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3047,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3048,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3049,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3050,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3051,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3052,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3053,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3054,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3055,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3056,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3057,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3058,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3059,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3060,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3061,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3062,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3063,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3064,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3065,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3066,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3067,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3068,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3069,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3070,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3071,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3072,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3073,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3074,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3075,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3076,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3077,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3078,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3079,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3080,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3081,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3082,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3083,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3084,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3085,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3086,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3087,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3088,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3089,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3090,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3091,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3092,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 3093,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 6001,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6002,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6003,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6004,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6005,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6006,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6007,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6008,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6009,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6010,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6011,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6012,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6013,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6014,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6015,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6016,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6017,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6018,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 6019,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 7001,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7002,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7003,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7004,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7005,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7006,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7007,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7008,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7009,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7010,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7011,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7012,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7013,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7014,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7015,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7016,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7017,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7018,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7019,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7020,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7021,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7022,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7023,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7024,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7025,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7026,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7027,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7028,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7029,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7030,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7031,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7032,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7033,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7034,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7035,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7036,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7037,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7038,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7039,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7040,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7041,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7042,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7043,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7044,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7045,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7046,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7047,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7048,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7049,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 7050,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 8001,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8002,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8003,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8004,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8005,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8006,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8007,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8008,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8009,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8010,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8011,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8012,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8013,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8014,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8015,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8016,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8017,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8018,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8019,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 8020,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 9001,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9002,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9003,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9004,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9005,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9006,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9007,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9008,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9009,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9010,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9011,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 9012,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 10001,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10002,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10003,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10004,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10005,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10006,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10007,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10008,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10009,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10010,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 10011,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 21001,
+        "ownerPolityId": 21
+      },
+      {
+        "provinceId": 21002,
+        "ownerPolityId": 21
+      },
+      {
+        "provinceId": 21003,
+        "ownerPolityId": 21
+      },
+      {
+        "provinceId": 11001,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11002,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11003,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11004,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11005,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11006,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11007,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11008,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11009,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11010,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11011,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11012,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11013,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11014,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11015,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11016,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11017,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11018,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11019,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11020,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11021,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11022,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11023,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11024,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11025,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 11026,
+        "ownerPolityId": 11
+      },
+      {
+        "provinceId": 12001,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12002,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12003,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12004,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12005,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12006,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12007,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12008,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12009,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12010,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12011,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12012,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12013,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12014,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12015,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12016,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12017,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12018,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12019,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12020,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 12021,
+        "ownerPolityId": 12
+      },
+      {
+        "provinceId": 13001,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13002,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13003,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13004,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13005,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13006,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13007,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13008,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13009,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13010,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13011,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13012,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13013,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13014,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13015,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13016,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13017,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13018,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 13019,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 14001,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 14002,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 14003,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 14004,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 14005,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 15001,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15002,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15003,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15004,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15005,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15006,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15007,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15008,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15009,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15010,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 15011,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 16001,
+        "ownerPolityId": 16
+      },
+      {
+        "provinceId": 16002,
+        "ownerPolityId": 16
+      },
+      {
+        "provinceId": 16003,
+        "ownerPolityId": 16
+      },
+      {
+        "provinceId": 16004,
+        "ownerPolityId": 16
+      },
+      {
+        "provinceId": 16005,
+        "ownerPolityId": 16
+      },
+      {
+        "provinceId": 17001,
+        "ownerPolityId": 17
+      },
+      {
+        "provinceId": 17002,
+        "ownerPolityId": 17
+      },
+      {
+        "provinceId": 17003,
+        "ownerPolityId": 17
+      },
+      {
+        "provinceId": 18001,
+        "ownerPolityId": 18
+      },
+      {
+        "provinceId": 18002,
+        "ownerPolityId": 18
+      },
+      {
+        "provinceId": 18003,
+        "ownerPolityId": 18
+      },
+      {
+        "provinceId": 18004,
+        "ownerPolityId": 18
+      },
+      {
+        "provinceId": 19001,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 19002,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 19003,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 19004,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 19005,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 19006,
+        "ownerPolityId": 19
+      },
+      {
+        "provinceId": 20001,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20002,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20003,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20004,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20005,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20006,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 20007,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 60001,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60002,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60003,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60004,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60005,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60006,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60007,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60008,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60009,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60010,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60011,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60012,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60013,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 60014,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60015,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60016,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60017,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60018,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60019,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60020,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60021,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60022,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60023,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60024,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60025,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60026,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60027,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60028,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60029,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60030,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60031,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60032,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60033,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60034,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60035,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60036,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60037,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60038,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60039,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60040,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60041,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60042,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60043,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60044,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60045,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60046,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60047,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60048,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60049,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60050,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60051,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 60052,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 2001,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2002,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2003,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2004,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2005,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2006,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2007,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2008,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2009,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2010,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2011,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2012,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2013,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2014,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2015,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2016,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2017,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2018,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2019,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2020,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2021,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2022,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2023,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 60053,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 2024,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2025,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2026,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2027,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2028,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2029,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2030,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2031,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2032,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2033,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 2034,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 4001,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4002,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4003,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4004,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4005,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4006,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4007,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4008,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4009,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4010,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4011,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4012,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4013,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4014,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4015,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4016,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4017,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4018,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4019,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4020,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4021,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4022,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4023,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4024,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4025,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4026,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4027,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4028,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4029,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4030,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4031,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4032,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4033,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4034,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4035,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4036,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4037,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4038,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4039,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4040,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4041,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4042,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4043,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4044,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4045,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4046,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4047,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4048,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4049,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4050,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4051,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4052,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4053,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4054,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4055,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4056,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4057,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4058,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4059,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4060,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4061,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4062,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4063,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4064,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4065,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4066,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4067,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4068,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4069,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4070,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4071,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4072,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4073,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4074,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4075,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4076,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4077,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4078,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4079,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4080,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4081,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4082,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4083,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4084,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4085,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4086,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4087,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4088,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4089,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4090,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4091,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4092,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4093,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4094,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4095,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4096,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4097,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4098,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4099,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4100,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4101,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4102,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4103,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4104,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4105,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4106,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4107,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4108,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 4109,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 22001,
+        "ownerPolityId": 22
+      },
+      {
+        "provinceId": 23001,
+        "ownerPolityId": 23
+      },
+      {
+        "provinceId": 24001,
+        "ownerPolityId": 24
+      },
+      {
+        "provinceId": 25001,
+        "ownerPolityId": 25
+      },
+      {
+        "provinceId": 66001,
+        "ownerPolityId": 66
+      },
+      {
+        "provinceId": 1050,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 1051,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 14006,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 14007,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 100001,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100002,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100003,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100004,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100005,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100006,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100007,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100008,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100009,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100010,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100011,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100012,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100013,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100014,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100015,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100016,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100017,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100018,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100019,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100020,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100021,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100022,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100023,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100024,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100025,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100026,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100027,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100028,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100029,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100030,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 100031,
+        "ownerPolityId": 65
+      },
+      {
+        "provinceId": 100032,
+        "ownerPolityId": 65
+      },
+      {
+        "provinceId": 100033,
+        "ownerPolityId": 65
+      },
+      {
+        "provinceId": 100034,
+        "ownerPolityId": 32
+      },
+      {
+        "provinceId": 100035,
+        "ownerPolityId": 32
+      },
+      {
+        "provinceId": 100036,
+        "ownerPolityId": 32
+      },
+      {
+        "provinceId": 100037,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100038,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100039,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100040,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100041,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100042,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100043,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100044,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100045,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100046,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100047,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100048,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100049,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100050,
+        "ownerPolityId": 28
+      },
+      {
+        "provinceId": 100051,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100052,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100053,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100054,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100055,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100056,
+        "ownerPolityId": 29
+      },
+      {
+        "provinceId": 100057,
+        "ownerPolityId": 30
+      },
+      {
+        "provinceId": 100058,
+        "ownerPolityId": 30
+      },
+      {
+        "provinceId": 100059,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100060,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100061,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100062,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100063,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100064,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100065,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100066,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100067,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100068,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100069,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100070,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100071,
+        "ownerPolityId": 31
+      },
+      {
+        "provinceId": 100072,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100073,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100074,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100075,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100076,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100077,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100078,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100079,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100080,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100081,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100082,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100083,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100084,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100085,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100086,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100087,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100088,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100089,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100090,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100091,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100092,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100093,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100094,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100095,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100096,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100097,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100098,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100099,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100100,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100101,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100102,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 100103,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100104,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100105,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100106,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100107,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100108,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100109,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100110,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100111,
+        "ownerPolityId": 27
+      },
+      {
+        "provinceId": 100112,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100113,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100114,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100115,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100116,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100117,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100118,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100119,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100120,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100121,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100122,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100123,
+        "ownerPolityId": 5
+      },
+      {
+        "provinceId": 100124,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100125,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100126,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100127,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100128,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100129,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100130,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100131,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100132,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100133,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100134,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100135,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100136,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100137,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100138,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100139,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100140,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100141,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100142,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100143,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100144,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100145,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100146,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100147,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100148,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100149,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100150,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100151,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100152,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100153,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100154,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100155,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100156,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100157,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100158,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100159,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100160,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100161,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100162,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100163,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100164,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100165,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100166,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100167,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100168,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 100169,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100170,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100171,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100172,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100173,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100174,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100175,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100176,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100177,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100178,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100179,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100180,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100181,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100182,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100183,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100184,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100185,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100186,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100187,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100188,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100189,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100190,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100191,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100192,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100193,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100194,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100195,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100196,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 100197,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100198,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100199,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100200,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100201,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100202,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100203,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100204,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100205,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100206,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100207,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 100208,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 100209,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100210,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100211,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100212,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100213,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100214,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 100215,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100216,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100217,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100218,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100219,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100220,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100221,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100222,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100223,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100224,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100225,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100226,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100227,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100228,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100229,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100230,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100231,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100232,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 100233,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 100234,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 100235,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 100236,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 100237,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 100238,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 100239,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200001,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 200002,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 200003,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200004,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200005,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200006,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200007,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200008,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200009,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200010,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200011,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200012,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200013,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200014,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200015,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 200016,
+        "ownerPolityId": 7
+      },
+      {
+        "provinceId": 200017,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200018,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200019,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200020,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200021,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200022,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200023,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200024,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200025,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200026,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200027,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200028,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200029,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200030,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200031,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200032,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200033,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200034,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200035,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200036,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200037,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 200038,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200039,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200040,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200041,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200042,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200043,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200044,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200045,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200046,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200047,
+        "ownerPolityId": 33
+      },
+      {
+        "provinceId": 200048,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200049,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200050,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200051,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200052,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200053,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200054,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200055,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200056,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200057,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200058,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200059,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200060,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200061,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200062,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200063,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200064,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200065,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200066,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200067,
+        "ownerPolityId": 64
+      },
+      {
+        "provinceId": 200068,
+        "ownerPolityId": 64
+      },
+      {
+        "provinceId": 200069,
+        "ownerPolityId": 63
+      },
+      {
+        "provinceId": 200070,
+        "ownerPolityId": 63
+      },
+      {
+        "provinceId": 200071,
+        "ownerPolityId": 62
+      },
+      {
+        "provinceId": 200072,
+        "ownerPolityId": 62
+      },
+      {
+        "provinceId": 200073,
+        "ownerPolityId": 62
+      },
+      {
+        "provinceId": 200074,
+        "ownerPolityId": 62
+      },
+      {
+        "provinceId": 200075,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200076,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200077,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200078,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200079,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200080,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200081,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200082,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200083,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200084,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200085,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200086,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200087,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200088,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200089,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200090,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200091,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200092,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200093,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200094,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200095,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200096,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200097,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200098,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200099,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200100,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200101,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 200102,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200103,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200104,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200105,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200106,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200107,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200108,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200109,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200110,
+        "ownerPolityId": 10
+      },
+      {
+        "provinceId": 200111,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200112,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200113,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200114,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200115,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200116,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200117,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200118,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200119,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200120,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200121,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200122,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200123,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200124,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200125,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200126,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200127,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200128,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200129,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200130,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200131,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200132,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 200133,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200134,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200135,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200136,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200137,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200138,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200139,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200140,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200141,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200142,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200143,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200144,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200145,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200146,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200147,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200148,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200149,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200150,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200151,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200152,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200153,
+        "ownerPolityId": 36
+      },
+      {
+        "provinceId": 200154,
+        "ownerPolityId": 36
+      },
+      {
+        "provinceId": 200155,
+        "ownerPolityId": 36
+      },
+      {
+        "provinceId": 200156,
+        "ownerPolityId": 36
+      },
+      {
+        "provinceId": 200157,
+        "ownerPolityId": 37
+      },
+      {
+        "provinceId": 200158,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200159,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200160,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200161,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200162,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200163,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200164,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200165,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200166,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200167,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200168,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200169,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200170,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200171,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200172,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200173,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200174,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200175,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200176,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200177,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200178,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200179,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 200180,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200181,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200182,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200183,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200184,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200185,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200186,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200187,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200188,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200189,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200190,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200191,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200192,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200193,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200194,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200195,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200196,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200197,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200198,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200199,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200200,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200201,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200202,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200203,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200204,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200205,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200206,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200207,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200208,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200209,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200210,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200211,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200212,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200213,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200214,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200215,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200216,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200217,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200218,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200219,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200220,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200221,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200222,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200223,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200224,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200225,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200226,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200227,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200228,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200229,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200230,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200231,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200232,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200233,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200234,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200235,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200236,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200237,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200238,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200239,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200240,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200241,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200242,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200243,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200244,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200245,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 200246,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 200247,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200248,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200249,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200250,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200251,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200252,
+        "ownerPolityId": 34
+      },
+      {
+        "provinceId": 200253,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200254,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200255,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200256,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200257,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200258,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200259,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 200260,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 300001,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300002,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300003,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300004,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300005,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300006,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300007,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300008,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300009,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300010,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300011,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300012,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300013,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300014,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300015,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300016,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300017,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300018,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300019,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300020,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300021,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300022,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300023,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300024,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300025,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300026,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300027,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300028,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300029,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300030,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300031,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300032,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300033,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300034,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300035,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300036,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300037,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300038,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300039,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300040,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300041,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300042,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300043,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300044,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300045,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300046,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300047,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300048,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300049,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300050,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300051,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 300052,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300053,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300054,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300055,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300056,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300057,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300058,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300059,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300060,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300061,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300062,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 300063,
+        "ownerPolityId": 1300
+      },
+      {
+        "provinceId": 300064,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300065,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300066,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300067,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300068,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300069,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300070,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300071,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300072,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300073,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300074,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300075,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300076,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300077,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300078,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300079,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300080,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300081,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300082,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300083,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300084,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300085,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300086,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300087,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300088,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300089,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300090,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300091,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300092,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300093,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300094,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 300095,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300096,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300097,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300098,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300099,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300100,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300101,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300102,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300103,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300104,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300105,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300106,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300107,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300108,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300109,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300110,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300111,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300112,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300113,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300114,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300115,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300116,
+        "ownerPolityId": 39
+      },
+      {
+        "provinceId": 300117,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300118,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300119,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300120,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300121,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300122,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300123,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300124,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300125,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300126,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300127,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300128,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300129,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300130,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300131,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300132,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300133,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300134,
+        "ownerPolityId": 40
+      },
+      {
+        "provinceId": 300135,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300136,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300137,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300138,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300139,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300140,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300141,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300142,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300143,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300144,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300145,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300146,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300147,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300148,
+        "ownerPolityId": 41
+      },
+      {
+        "provinceId": 300149,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300150,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300151,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300152,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300153,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300154,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300155,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300156,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300157,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300158,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300159,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300160,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300161,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300162,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300163,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300164,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300165,
+        "ownerPolityId": 42
+      },
+      {
+        "provinceId": 300166,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300167,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300168,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300169,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300170,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300171,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300172,
+        "ownerPolityId": 43
+      },
+      {
+        "provinceId": 300173,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300174,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300175,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300176,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300177,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300178,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300179,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300180,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300181,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300182,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300183,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300184,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300185,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300186,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300187,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300188,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300189,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300190,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300191,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300192,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300193,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300194,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300195,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300196,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300197,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300198,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300199,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300200,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300201,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300202,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300203,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300204,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300205,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300206,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300207,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300208,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300209,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300210,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300211,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300212,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300213,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300214,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300215,
+        "ownerPolityId": 44
+      },
+      {
+        "provinceId": 300216,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300217,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300218,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300219,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300220,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300221,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300222,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300223,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300224,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300225,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300226,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300227,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300228,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300229,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300230,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300231,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300232,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300233,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300234,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300235,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300236,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300237,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300238,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300239,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300240,
+        "ownerPolityId": 45
+      },
+      {
+        "provinceId": 300241,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300242,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300243,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300244,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300245,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300246,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300247,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300248,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300249,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300250,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300251,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300252,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300253,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300254,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300255,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300256,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300257,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300258,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300259,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300260,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300261,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300262,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300263,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300264,
+        "ownerPolityId": 46
+      },
+      {
+        "provinceId": 300265,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300266,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300267,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300268,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300269,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300270,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300271,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300272,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300273,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300274,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300275,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300276,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300277,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300278,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300279,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300280,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300281,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300282,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300283,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300284,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300285,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300286,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300287,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300288,
+        "ownerPolityId": 47
+      },
+      {
+        "provinceId": 300289,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300290,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300291,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300292,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300293,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300294,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300295,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300296,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300297,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300298,
+        "ownerPolityId": 48
+      },
+      {
+        "provinceId": 300299,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300300,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300301,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300302,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300303,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300304,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300305,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300306,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300307,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300308,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300309,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300310,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300311,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300312,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300313,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300314,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300315,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 300316,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300317,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300318,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300319,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300320,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300321,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300322,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300323,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300324,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300325,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300326,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300327,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300328,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300329,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300330,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300331,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300332,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300333,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300334,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300335,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300336,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300337,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300338,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300339,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 300340,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300341,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300342,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300343,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300344,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300345,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300346,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300347,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300348,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300349,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300350,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300351,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300352,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300353,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300354,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300355,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300356,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300357,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300358,
+        "ownerPolityId": 51
+      },
+      {
+        "provinceId": 300359,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300360,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300361,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300362,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300363,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300364,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300365,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300366,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300367,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300368,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300369,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300370,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300371,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300372,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300373,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300374,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300375,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300376,
+        "ownerPolityId": 52
+      },
+      {
+        "provinceId": 300377,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300378,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300379,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300380,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300381,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300382,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300383,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300384,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300385,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300386,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300387,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300388,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300389,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300390,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300391,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300392,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300393,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300394,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300395,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300396,
+        "ownerPolityId": 53
+      },
+      {
+        "provinceId": 300397,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300398,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300399,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300400,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300401,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300402,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300403,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300404,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300405,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300406,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300407,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300408,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300409,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300410,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300411,
+        "ownerPolityId": 59,
+        "controllerPolityId": 0
+      },
+      {
+        "provinceId": 300412,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300413,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300414,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300415,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300416,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300417,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300418,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300419,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300420,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300421,
+        "ownerPolityId": 54
+      },
+      {
+        "provinceId": 300422,
+        "ownerPolityId": 55
+      },
+      {
+        "provinceId": 300423,
+        "ownerPolityId": 55
+      },
+      {
+        "provinceId": 300424,
+        "ownerPolityId": 55
+      },
+      {
+        "provinceId": 300425,
+        "ownerPolityId": 55
+      },
+      {
+        "provinceId": 300426,
+        "ownerPolityId": 55
+      },
+      {
+        "provinceId": 300427,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300428,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300429,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300430,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300431,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300432,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300433,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300434,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300435,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300436,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300437,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300438,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300439,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300440,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300441,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300442,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300443,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300444,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300445,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300446,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300447,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300448,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300449,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300450,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300451,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300452,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300453,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300454,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300455,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300456,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300457,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300458,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 300459,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300460,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300461,
+        "ownerPolityId": 9
+      },
+      {
+        "provinceId": 300462,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 300463,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 300464,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 300465,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300466,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 300467,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 300468,
+        "ownerPolityId": 14
+      },
+      {
+        "provinceId": 300469,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400001,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400002,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400003,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400004,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400005,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400006,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400007,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400008,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400009,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400010,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400011,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400012,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400013,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400014,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400015,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400016,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400017,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400018,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400019,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400020,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400021,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400022,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400023,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400024,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400025,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400026,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400027,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400028,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400029,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400030,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400031,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400032,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400033,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400034,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400035,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400036,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400037,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400038,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400039,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400040,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400041,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400042,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400043,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400044,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400045,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400046,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400047,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400048,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400049,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400050,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400051,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400052,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400053,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400054,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400055,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400056,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400057,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400058,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400059,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400060,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400061,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400062,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400063,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400064,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400065,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400066,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400067,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400068,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400069,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400070,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400071,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400072,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400073,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400074,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400075,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400076,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400077,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400078,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400079,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400080,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400081,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400082,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400083,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400084,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400085,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400086,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400087,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400088,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400089,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400090,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400091,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400092,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400093,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400094,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400095,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400096,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400097,
+        "ownerPolityId": 61
+      },
+      {
+        "provinceId": 400098,
+        "ownerPolityId": 61
+      },
+      {
+        "provinceId": 400099,
+        "ownerPolityId": 61
+      },
+      {
+        "provinceId": 400100,
+        "ownerPolityId": 61
+      },
+      {
+        "provinceId": 400101,
+        "ownerPolityId": 61
+      },
+      {
+        "provinceId": 400102,
+        "ownerPolityId": 2
+      },
+      {
+        "provinceId": 400103,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400104,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400105,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400106,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400107,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400108,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400109,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400110,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400111,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400112,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400113,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400114,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400115,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400116,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400117,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400118,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 400119,
+        "ownerPolityId": 49
+      },
+      {
+        "provinceId": 400120,
+        "ownerPolityId": 38
+      },
+      {
+        "provinceId": 400121,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400122,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400123,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400124,
+        "ownerPolityId": 13
+      },
+      {
+        "provinceId": 400125,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 400126,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 400127,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400128,
+        "ownerPolityId": 35
+      },
+      {
+        "provinceId": 400129,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400130,
+        "ownerPolityId": 20
+      },
+      {
+        "provinceId": 400131,
+        "ownerPolityId": 15
+      },
+      {
+        "provinceId": 400132,
+        "ownerPolityId": 60
+      },
+      {
+        "provinceId": 400133,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400134,
+        "ownerPolityId": 4
+      },
+      {
+        "provinceId": 400135,
+        "ownerPolityId": 18
+      },
+      {
+        "provinceId": 400137,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400138,
+        "ownerPolityId": 26
+      },
+      {
+        "provinceId": 400139,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400140,
+        "ownerPolityId": 6
+      },
+      {
+        "provinceId": 400141,
+        "ownerPolityId": 8
+      },
+      {
+        "provinceId": 400142,
+        "ownerPolityId": 50
+      },
+      {
+        "provinceId": 400143,
+        "ownerPolityId": 56
+      },
+      {
+        "provinceId": 400144,
+        "ownerPolityId": 0
+      },
+      {
+        "provinceId": 400145,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400146,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400147,
+        "ownerPolityId": 3
+      },
+      {
+        "provinceId": 400148,
+        "ownerPolityId": 57
+      },
+      {
+        "provinceId": 400149,
+        "ownerPolityId": 58
+      },
+      {
+        "provinceId": 400150,
+        "ownerPolityId": 1
+      },
+      {
+        "provinceId": 400153,
+        "ownerPolityId": 2
       }
     ]
   }
