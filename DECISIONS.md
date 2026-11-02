@@ -6442,3 +6442,220 @@ numerical rules for simulation coefficients.
 - Headless runs on SwiftShader exercise the SVG path. Verifying the WebGL path needs a
   GPU, so `pnpm map:verify` is a manual step, not part of `pnpm ci`.
 - See `docs/MAP_RENDERING.md` for architecture, sources and limitations.
+
+## D-112 — M16: The Living Atlas, mobile-first, one map runtime
+
+**Status:** implemented. iOS and Android bundles export, and the designer reports that the game
+runs on their mobile device; no device measurements exist (see Consequences). Supersedes D-111
+items 4 and 10 and the native SVG rule of D-092 items 5 and 7. D-111's bundle, projection, style table and period
+corrections stand.
+
+### Context
+
+D-111 delivered the WebGL map to the web build only. Phones kept the old SVG renderer, and
+`public/map/` did not ship in native builds. The product is a mobile game, so the best map
+reached no player. The interface was a desktop layout (sidebar, large top bar, map as one tab
+among fourteen) that stacked awkwardly on narrow screens, and the app was locked to portrait.
+
+### Decision
+
+1. **iOS and Android are primary; landscape is mandatory.** Recorded in `AGENTS.md`. Phones in
+   landscape are the design target at 844 × 390, and tablets and desktop web receive the same
+   layout with more room.
+2. **One map runtime on every platform.** The WebGL engine runs in one self-contained page,
+   `public/map/atlas-v1.html`, built by `scripts/map/build-atlas.mjs`. iOS and Android load it
+   in a `react-native-webview` under the native interface; the web build loads the same file in
+   an iframe. Web development therefore exercises the artifact a phone receives. Rendering code
+   is no longer in the React Native bundle on any platform.
+3. **One file, inline payloads.** Code, decode worker, render bundle, rasters, label fonts and
+   catalogue are embedded, 8.7 MiB in all. The alternative, separate files read with `file://`
+   XHR, depends on WKWebView and Android WebView file-access settings that could not be tested
+   here, plus universal file access for WebGL textures. A single file needs only "load this
+   file", and its Content-Security-Policy forbids the network. The cost is about 33% base64
+   overhead on the bundle.
+4. **Packaged through Metro as an asset,** resolved with `expo-asset`, which yields a real file
+   for the WebView in Expo Go, development builds and release builds alike. A config-plugin
+   embed was rejected because it does not work in Expo Go, the designer's quickest route to a
+   phone.
+5. **Gestures stay inside the page.** Pan, pinch, double-tap and the loupe never cross the
+   bridge. The bridge carries only theme, lens, ownership changes, selection, insets and
+   presses, in a validated JSON protocol (`map/bridge/protocol.ts`). An unchanged snapshot sends
+   nothing, and a transfer sends one province.
+6. **Phone-sized assets.** Rasters go from 4096 to 2048 texels and upload as `R8`, a quarter of
+   RGBA's GPU memory. The bundle decodes in a worker with the page as fallback, and rasters
+   decode through `createImageBitmap` where available. The existing render-on-demand loop stays.
+7. **No duplicate province geometry in the phone's JavaScript.** A generated rings-free
+   `provinceCatalog.ts` replaces `PROVINCE_MAP_1900` in the interface, and the runtime picks from
+   the bundle's fill triangles (`createMeshHitIndex`), tested equivalent to the authoritative
+   rings. Native resolves `provinceGeometry.native.ts`, so about 5 MB of rings leave the native
+   bundle.
+8. **The SVG renderer remains as the fallback,** for a page that reports no hardware WebGL2 or
+   fails to start. It uses the same tokens, palette, era saturation and borders. On native it
+   draws polities without province lines, because the rings are no longer there. This is a
+   deliberate trade: a rare emergency path loses province picking so the normal path saves 5 MB.
+9. **One token module.** `design/tokens.ts` holds the four era themes, derived colours, type
+   scale, layout metrics and label rules, and imports nothing from React Native or the DOM so the
+   runtime can bundle it. `theme.ts` is a live view of it, and `themedSheet` resolves stylesheets
+   against the active theme, so era changes needed no rewrite of every screen. A test fails if
+   any source outside the tokens and authored map data spells a colour.
+10. **Eras are presentation only.** Selected from the snapshot date, never stored, never read by
+    the simulation. The cross-fade runs in the page for the map and in eight steps for the
+    interface over 1.6 seconds.
+11. **The map surface slides, the camera does not.** A selection on the map must not move the
+    camera, yet the place must stay visible beside the sheet. The surface translates, with the
+    native driver on phones, so neither requirement bends.
+12. **One map, mounted once.** `MapStageProvider` mounts the only map under every screen, so the
+    WebView starts once and menus, briefing and country selection all slide over it.
+13. **Dispatches derive only from snapshot changes.** Wars, peace offers, ownership, occupation,
+    research, construction and the monthly close. They are display state: unsaved, and free of
+    clocks and random sources. The simulation has no event feed, so there are no dispatches for
+    elections, treaties, disasters or history at large. The monthly close reads the player's
+    `financeHistory`, because `CountrySummarySnapshot.latestNetFiscalResultRUSD` stays null until
+    the worker compacts a period (see Consequences).
+14. **The former polity hash palette is gone.** All 67 sovereign states and 191 future polities
+    have authored colours. Twenty-one are the designer's values. The rest were derived in the same
+    matte band and adjusted until the unchanged separation test passed. Colonies lift 14% toward
+    paper (was 24%), because at 24% British and Italian East Africa fell below the deuteranopia
+    threshold.
+
+### Assumptions and provisional values
+
+All colours beyond the designer's 21, derived tokens, label budgets, zoom thresholds, line
+weights and timings are display-only and provisional. None reach the simulation.
+
+### Consequences
+
+- **Device evidence is the designer's.** Automated checks ran in desktop Chrome with emulated
+  touch, including the page from a `file://` origin with a native-bridge shim. The designer
+  reports that the game runs on their mobile device. No frame-rate, memory or battery figures
+  exist. Older systems without `DecompressionStream` (iOS before 16.4) take the fallback.
+- **`latestNetFiscalResultRUSD` is null for recent months.** The snapshot reads it from
+  `countryFiscalTotals`, which exists only on compacted period summaries. The former top bar
+  therefore showed no "Last month" until compaction, and no country reports a recent result in
+  its summary. The interface now reads the player's `financeHistory`. The summary field itself is
+  unchanged, because this work does not change the worker contract; it is an open defect.
+- Android emulators on software GL take the SVG fallback by design.
+- Paper labels reach at least 2.1:1 against every fill in every era and about 2.4:1 against the
+  lightest sovereign state, below the 3:1 usual for large text, so labels carry a thin soft
+  shadow rather than a heavy halo. The designer's matte fills fix this range; a test holds the
+  floor at 2:1.
+- The native bundle no longer contains province rings, so a device that falls back cannot pick
+  provinces.
+- `react-native-svg`, already a dependency, also draws the interface icons, so one drawing serves
+  every platform.
+- The `e1-ui-wiring` navigation assertions moved to `navigation.ts`, and the map-first assertion
+  now checks that no sheet is open at start, because the map is no longer a tab.
+- New dependencies, all within Expo SDK 58's versions: `expo-font`, `expo-asset` (MIT) and
+  `react-native-safe-area-context` (MIT). Fonts are OFL-1.1; see `docs/FONT_PROVENANCE.md`.
+- GDD's line describing desktop and narrow layouts is superseded by this decision. The GDD now
+  points here.
+
+## D-113 — Title screen: the saved world turning behind the menu
+
+**Status:** implemented on the shared code path for web, iOS and Android. Verified in the web
+build at 844 × 390; no device run was made for this change (device testing is the designer's).
+
+### Context
+
+The main menu was the entry panel over a still 1900 map. The designer asked for a title screen
+in the manner of a large commercial game, with the map turning slowly behind it like the Earth
+seen from above, showing the world of the last saved campaign or of 1900 when there is none,
+and allowed the rest of the interface to change for cohesion.
+
+### Decision
+
+1. **The menu shows the saved world without loading it.** A new worker command, `PREVIEW_SAVE`,
+   deserializes and validates a save exactly as `LOAD` does (same compatibility checks) and answers
+   `SAVE_PREVIEW` with a snapshot of it, or `accepted: false` and no snapshot. The authoritative
+   world, pacing and snapshot sequence are untouched. The app requests it once per save text while
+   on the menu, and the map, its era colours and the menu caption read it. Brief and country
+   selection still show 1900. The command is additive, so `PROTOCOL_VERSION` stays 16; worker and
+   app ship in one bundle. A preview is not critical (it never blocks save, load or an action) but
+   gets the critical timeout, because it decodes a whole save.
+2. **The map turns by one bridge command.** `set-drift { degreesPerSecond }` (|v| ≤ 30) starts or
+   stops a rotation inside the runtime; nothing crosses the bridge per frame. Positive moves the map
+   to the right. Starting eases to a closer framing (1.22 × the whole-world scale, centred on 26° N)
+   and fades the labels out; a hand on the map, a throw or a flight holds the turn. Stopping fades
+   the labels back and flies to the home view. The title screen turns at 1.5° per second, one
+   revolution in four minutes, and stands still when the system asks for reduced motion.
+3. **The title screen** is a full-screen layer over the map that takes no gesture to the map: the
+   name in spaced serif capitals, an ornamented rule, a menu of Continue (flag, nation and date),
+   New campaign, The world of 1900 (the former disclosures, now a dialog) and Sources & licensing,
+   and a caption naming the shown world, its era and the player's nation, which is outlined in
+   gold. The left side is shaded by an SVG vignette.
+4. **One look for every window.** New tokens: `accentLine`, `vignette`, and the type styles `hero`,
+   `menu` and `eyebrow`. The house rule (`Ornament`) sits under the title-screen name, every entry
+   panel title and every dialog title. Entry panels and game sheets carry an accent hairline on
+   their open edge; floating controls, panels and buttons carry a hairline frame; large buttons
+   use spaced capitals. All App dialogs use one `Dialog` component.
+5. **Fixes found on the way.** An immediate `focus-unit` now ends any flight under way. Continue
+   opens the game before the worker answers, so the shell first saw the default world and selected
+   its nation; it now reselects whenever the player's nation changes. The Realm identity card no
+   longer squeezes the country name into one letter per line on a phone.
+
+### Assumptions and provisional values
+
+Drift speed, drift framing, label fade time, vignette stops, ornament size and the new type
+metrics are display-only and provisional. None reach the simulation.
+
+### Consequences
+
+- Opening the menu with a save costs one extra deserialization in the worker; on a large late
+  save this is the same cost as Continue, and a Continue pressed meanwhile waits behind it.
+- While the title screen is up the map renders every frame. Battery cost on devices is unmeasured.
+- The SVG fallback map does not turn.
+
+## D-114 — Saved games: one slot per campaign, and Load Game
+
+**Status:** implemented on the shared code path for web, iOS and Android. Verified in the web
+build at 844 × 390 (adoption of an existing save, two campaigns, re-save into the same slot,
+select, load, delete); no device run was made. Supersedes the single-campaign storage and the
+overwrite confirmation of D-065's campaign lifecycle; D-065's replace-safe writes stand, now
+per slot.
+
+### Context
+
+The designer asked for a Load Game entry that lists the saved games and loads or deletes them,
+and for the ornamental rules to change colour with the era of the save, as the map's outline of
+the player's nation does. Storage held exactly one campaign (primary, staging, previous), so
+there was nothing to list: starting a new campaign could only replace the old one, which is why
+D-065 asked before the first save of a new campaign.
+
+### Decision
+
+1. **One slot per campaign.** `SaveLibrary` (`sim-worker/persistence`) keeps an index of slots;
+   each slot is its own `SaveStore`, so every slot keeps the staged write and the previous copy as
+   its recovery save. A new campaign saves to a new slot on its first save; later saves, manual or
+   automatic, replace that slot only. Manual saves do not create extra entries; one entry per
+   campaign is the whole list. A store counter in the index orders the list (most recent first);
+   the wall-clock time shown in the list is a display label supplied by the app.
+2. **The overwrite prompt is gone,** because nothing can be overwritten: a new campaign never
+   touches another campaign's slot, and autosave arms as soon as a campaign starts.
+3. **The old single save is adopted in place** as the first slot the first time the index is
+   read; its keys are not moved. Its nation was never recorded, so it is written into the index
+   the first time the worker reads the save for display. A save this build cannot read is still
+   listed, refuses to load with the reason, and can be deleted.
+4. **Writes are ordered and fail closed.** Slot data is written before the index; deletion unlists
+   before removing keys; so an interruption can leave an unlisted slot behind but never a listed
+   slot without its save. Library operations are serialized, and the app chains its storage
+   writes, so a second save cannot start a second slot for one campaign.
+5. **Load Game** is a screen over the turning map: the list (flag, nation, date, era, when it was
+   saved), Load, and Delete behind a confirmation. The backdrop shows the selected save's world,
+   read through `PREVIEW_SAVE` (D-113) and kept for the last six saves shown. Continue loads the
+   most recent slot. Loading now leaves the menu only when the worker accepts the save, so the game
+   opens on the loaded world and a refused save leaves the player where they were. The in-game
+   Load button is now "Load last save" and returns the campaign in play to its own slot.
+6. **Era colour follows the save shown.** The title and load screens take their era from the save
+   envelope's date, so the interface tokens (every ornamental rule, accent edge and the menu) and
+   the map's outline of the player's nation change together and at once, before the world itself
+   is read, with the same cross-fade. To keep the title menu at four entries on a phone, Sources
+   & licensing moved into the Codex dialog.
+
+### Consequences
+
+- Saves now accumulate, one per campaign, until the player deletes them. There is no cap.
+- Index writes are not transactional across keys; a crash between a slot write and the index
+  write leaves an unlisted slot that only a manual cleanup would find.
+- The source guards in `m7-app-lifecycle` and `m11d-provider-lifecycle` that required the
+  overwrite prompt and the single-envelope ref now require the slot behaviour that replaces them;
+  `save-library.test.ts` covers the library's behaviour directly.

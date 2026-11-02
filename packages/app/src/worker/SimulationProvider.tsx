@@ -27,9 +27,12 @@ import {
 } from "@century/sim-worker";
 
 import {
+  deleteSave as deleteStoredSave,
+  listSaves,
   readStoredCampaign,
+  recordSaveNation,
   storeSave,
-  type StoredCampaign,
+  type SaveSlot,
 } from "../storage/saveStorage";
 import {
   NativeWorkerHost,
@@ -55,17 +58,28 @@ export interface SimulationContextValue {
   /** True while a save, load, or policy action is awaiting a reply. */
   readonly busy: boolean;
   readonly startup: CampaignStartup;
-  readonly savedCampaign: StoredCampaign | null;
-  readonly overwritePrompt: boolean;
+  /** Every saved campaign, most recently saved first. */
+  readonly saves: readonly SaveSlot[];
+  /**
+   * A saved campaign's world as the worker reads it, for the title and load
+   * screens. Display only: the live world is not replaced. Undefined until it has
+   * been read, null when it could not be read.
+   */
+  readonly savedWorldOf: (slot: SaveSlot) => SimulationSnapshot | null | undefined;
+  /** Ask the worker to read a saved campaign for display; each save is read once. */
+  readonly previewSave: (slot: SaveSlot) => void;
   /** Presentation focus whose full country record is in the snapshot. */
   readonly focusCountryId: number | null;
+  /** Continue the most recently saved campaign. */
   readonly resumeSavedGame: () => void;
+  /** Load one saved campaign and play it. */
+  readonly loadSave: (slotId: string) => void;
+  /** Delete one saved campaign and its recovery copies. */
+  readonly deleteSave: (slotId: string) => Promise<void>;
   /** Create a fresh 1900 world with an explicitly selected player country. */
   readonly createGame: (playerCountryId: number) => void;
   /** Ask the worker to include another country's full record in snapshots. */
   readonly setFocus: (countryId: number) => void;
-  readonly confirmOverwrite: () => void;
-  readonly cancelOverwrite: () => void;
   readonly start: () => void;
   readonly pause: () => void;
   readonly step: () => void;
@@ -97,6 +111,18 @@ export function useSimulation(): SimulationContextValue {
   const value = useContext(SimulationContext);
   if (value === null) throw new Error("useSimulation must be used inside SimulationProvider");
   return value;
+}
+
+/** Saved worlds kept in memory for the title and load screens. */
+const MAX_SAVED_WORLD_PREVIEWS = 6;
+
+/** A preview belongs to one save of a slot; a newer save of the slot is read again. */
+function previewKey(slot: SaveSlot): string {
+  return `${slot.id}#${String(slot.order)}`;
+}
+
+function slotIdOfPreview(key: string): string {
+  return key.slice(0, key.lastIndexOf("#"));
 }
 
 function messageOf(error: unknown): string {
@@ -216,21 +242,31 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const [achievedDaysPerSecond, setAchievedDaysPerSecond] = useState(0);
   const [busy, setBusy] = useState(false);
   const [startup, setStartup] = useState<CampaignStartup>("checking");
-  const [savedCampaign, setSavedCampaign] = useState<StoredCampaign | null>(null);
-  const [overwritePrompt, setOverwritePrompt] = useState(false);
+  const [saves, setSaves] = useState<readonly SaveSlot[]>([]);
+  /** Saved worlds read for display, by `previewKey`; null when unreadable. */
+  const [previews, setPreviews] = useState<ReadonlyMap<string, SimulationSnapshot | null>>(new Map());
+  /** Preview keys already asked for, and the preview each command answers. */
+  const previewRequestsRef = useRef(new Set<string>());
+  const pendingPreviewsRef = useRef(new Map<string, string>());
+  /** The slot the campaign in play saves to; null until a new campaign first saves. */
+  const activeSlotIdRef = useRef<string | null>(null);
+  /** The slot a LOAD in flight came from, adopted only when the worker accepts it. */
+  const pendingLoadSlotRef = useRef<string | null>(null);
+  /** Storage writes run one after another, so each sees the slot the last one made. */
+  const storeChainRef = useRef<Promise<void>>(Promise.resolve());
   const [webEpoch, setWebEpoch] = useState(0);
   const [nativeEpoch, setNativeEpoch] = useState(0);
 
   /**
-   * The saved-campaign envelope is also mirrored into a ref because the worker
-   * event handler must read its current value without becoming a dependency of
-   * the worker-lifecycle effect. Re-creating the worker when a save completes
-   * would silently rebuild the campaign and reset the simulated date.
+   * The saved games are also mirrored into a ref because the worker event handler
+   * must read their current value without becoming a dependency of the
+   * worker-lifecycle effect. Re-creating the worker when a save completes would
+   * silently rebuild the campaign and reset the simulated date.
    */
-  const savedCampaignRef = useRef<StoredCampaign | null>(null);
-  const updateSavedCampaign = useCallback((campaign: StoredCampaign | null) => {
-    savedCampaignRef.current = campaign;
-    setSavedCampaign(campaign);
+  const savesRef = useRef<readonly SaveSlot[]>([]);
+  const updateSaves = useCallback((next: readonly SaveSlot[]) => {
+    savesRef.current = next;
+    setSaves(next);
   }, []);
 
   useEffect(() => {
@@ -255,17 +291,10 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
 
   useEffect(() => {
     let cancelled = false;
-    void readStoredCampaign()
-      .then((campaign) => {
+    void listSaves()
+      .then((stored) => {
         if (cancelled) return;
-        if (campaign === null) {
-          updateSavedCampaign(null);
-          setStartup("menu");
-          startupRef.current = "menu";
-          autosaveArmedRef.current = false;
-          return;
-        }
-        updateSavedCampaign(campaign);
+        updateSaves(stored);
         setStartup("menu");
         startupRef.current = "menu";
         autosaveArmedRef.current = false;
@@ -402,20 +431,22 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           const generation = sessionRef.current;
           const kind = saveKindRef.current ?? "manual";
           saveKindRef.current = null;
-          // Keep busy through the storage write so a second save cannot race
-          // the same storage key.
-          void storeSave(event.save)
+          // Keep busy through the storage write, and chain the writes, so a second
+          // save cannot race the first or start a second slot for one campaign.
+          storeChainRef.current = storeChainRef.current
+            .then(() =>
+              storeSave(event.save, {
+                slotId: activeSlotIdRef.current,
+                playerCountryId: activePlayerCountryIdRef.current,
+              }),
+            )
             .then((info) => {
               if (generation !== sessionRef.current) return;
               setBusy(false);
               setError(null);
               autosaveArmedRef.current = true;
-              updateSavedCampaign({
-                save: event.save,
-                metadata: info.metadata,
-                source: "primary",
-                storedBytes: info.compressedBytes,
-              });
+              activeSlotIdRef.current = info.slot.id;
+              updateSaves([info.slot, ...savesRef.current.filter((slot) => slot.id !== info.slot.id)]);
               setSaveStatus(
                 `${kind === "autosave" ? "Autosaved" : "Saved"} ${info.metadata.dateLabel} · ${String(
                   Math.round(info.saveBytes / 1024),
@@ -424,6 +455,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             })
             .catch((saveError: unknown) => {
               if (generation !== sessionRef.current) return;
+              // The chain stays usable for the next save.
               setBusy(false);
               setError(
                 `${kind === "autosave" ? "Autosave failed" : "Save failed"}: ${messageOf(saveError)}`,
@@ -449,6 +481,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setStartup("playing");
             startupRef.current = "playing";
             autosaveArmedRef.current = true;
+            activeSlotIdRef.current = pendingLoadSlotRef.current;
+            pendingLoadSlotRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             focusRequestRef.current = null;
             // A successful load replaces the unreadable-save diagnosis.
@@ -460,11 +494,32 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
           } else {
             setError(event.errors.join("; ") || "The save could not be loaded.");
             setSaveStatus(null);
+            pendingLoadSlotRef.current = null;
             // Do not silently overwrite a save that this build could not load.
             autosaveArmedRef.current = false;
           }
           saveKindRef.current = null;
           setBusy(false);
+          return;
+        }
+        case "SAVE_PREVIEW": {
+          // A save the worker will not read is shown as unreadable; loading it reports why.
+          const key = pendingPreviewsRef.current.get(event.commandId);
+          if (key === undefined) return;
+          pendingPreviewsRef.current.delete(event.commandId);
+          rememberPreview(key, event.accepted ? event.snapshot : null);
+          // An adopted save did not record its nation; the world it holds does.
+          const slotId = slotIdOfPreview(key);
+          const playerCountryId = event.snapshot?.playerCountryId ?? null;
+          const slot = savesRef.current.find((candidate) => candidate.id === slotId);
+          if (slot !== undefined && slot.playerCountryId === null && playerCountryId !== null) {
+            void recordSaveNation(slot.id, playerCountryId)
+              .then((updated) => {
+                if (updated === null) return;
+                updateSaves(savesRef.current.map((candidate) => (candidate.id === updated.id ? updated : candidate)));
+              })
+              .catch(() => undefined);
+          }
           return;
         }
         case "NEW_GAME_RESULT": {
@@ -488,15 +543,14 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             focusRequestRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             startupStorageErrorRef.current = null;
-            if (savedCampaignRef.current === null) {
-              autosaveArmedRef.current = true;
-              setSaveStatus("New 1900 campaign started.");
-            } else {
-              autosaveArmedRef.current = false;
-              setSaveStatus(
-                "New campaign started. The previous saved game is preserved until you explicitly save.",
-              );
-            }
+            // A new campaign saves to a slot of its own: no other save is at risk.
+            activeSlotIdRef.current = null;
+            autosaveArmedRef.current = true;
+            setSaveStatus(
+              savesRef.current.length === 0
+                ? "New 1900 campaign started."
+                : "New 1900 campaign started. It saves as a new campaign; your other saves are kept.",
+            );
             setError(null);
           } else {
             setError(event.errors.join("; ") || "The campaign could not be created.");
@@ -700,41 +754,73 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   }, [requestAutosave]);
 
   const saveGame = useCallback(() => {
-    if (savedCampaign !== null && !autosaveArmedRef.current) {
-      setOverwritePrompt(true);
-      return;
-    }
-    doSave("manual");
-  }, [doSave, savedCampaign]);
-
-  const confirmOverwrite = useCallback(() => {
-    setOverwritePrompt(false);
-    // Arm only after the replacement is verified; a failed overwrite must not
-    // enable autosave over the still-valid old campaign.
-    autosaveArmedRef.current = false;
     doSave("manual");
   }, [doSave]);
 
-  const cancelOverwrite = useCallback(() => {
-    setOverwritePrompt(false);
-  }, []);
+  /**
+   * Read a slot and LOAD it. The menu stays up until the worker accepts the save,
+   * so the game opens on the loaded world and a refused save leaves the player on
+   * the screen they loaded from.
+   */
+  const loadSave = useCallback(
+    (slotId: string) => {
+      const generation = sessionRef.current;
+      setSaveStatus("Reading save…");
+      void readStoredCampaign(slotId)
+        .then((campaign) => {
+          if (generation !== sessionRef.current) return;
+          if (campaign === null) {
+            setError("That saved game no longer exists.");
+            setSaveStatus(null);
+            return;
+          }
+          pendingLoadSlotRef.current = slotId;
+          const accepted = send({
+            protocolVersion: PROTOCOL_VERSION,
+            type: "LOAD",
+            commandId: nextCommandId("load"),
+            save: campaign.save,
+          });
+          if (!accepted) pendingLoadSlotRef.current = null;
+          setSaveStatus(
+            accepted
+              ? campaign.source === "primary"
+                ? "Loading saved game…"
+                : "Loading the recovery copy of this saved game…"
+              : null,
+          );
+        })
+        .catch((loadError: unknown) => {
+          if (generation !== sessionRef.current) return;
+          setError(`Saved game could not be read: ${messageOf(loadError)}`);
+          setSaveStatus(null);
+        });
+    },
+    [nextCommandId, send],
+  );
 
   const resumeSavedGame = useCallback(() => {
-    if (savedCampaign === null) {
+    const latest = savesRef.current[0];
+    if (latest === undefined) {
       setError("No saved game is available to continue.");
       return;
     }
-    setStartup("playing");
-    startupRef.current = "playing";
-    autosaveArmedRef.current = true;
-    const accepted = send({
-      protocolVersion: PROTOCOL_VERSION,
-      type: "LOAD",
-      commandId: nextCommandId("load"),
-      save: savedCampaign.save,
-    });
-    setSaveStatus(accepted ? "Loading saved game…" : null);
-  }, [nextCommandId, savedCampaign, send]);
+    loadSave(latest.id);
+  }, [loadSave]);
+
+  const deleteSave = useCallback(
+    async (slotId: string) => {
+      try {
+        await deleteStoredSave(slotId);
+        if (activeSlotIdRef.current === slotId) activeSlotIdRef.current = null;
+        updateSaves(savesRef.current.filter((slot) => slot.id !== slotId));
+        setSaveStatus("Saved game deleted.");
+      } catch (deleteError) {
+        setError(`Saved game could not be deleted: ${messageOf(deleteError)}`);
+      }
+    },
+    [updateSaves],
+  );
 
   const createGame = useCallback(
     (playerCountryId: number) => {
@@ -767,33 +853,69 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     [nextCommandId, send],
   );
 
-  const loadGame = useCallback(async () => {
-    const generation = sessionRef.current;
-    setSaveStatus("Reading save…");
-    try {
-      const campaign = await readStoredCampaign();
-      if (generation !== sessionRef.current) return;
-      if (campaign === null) {
-        setError("No saved game was found.");
-        setSaveStatus(null);
-        return;
-      }
-      updateSavedCampaign(campaign);
-      setStartup("playing");
-      startupRef.current = "playing";
-      autosaveArmedRef.current = true;
-      const accepted = send({
-        protocolVersion: PROTOCOL_VERSION,
-        type: "LOAD",
-        commandId: nextCommandId("load"),
-        save: campaign.save,
-      });
-      setSaveStatus(accepted ? "Loading saved game…" : null);
-    } catch (loadError) {
-      setError(messageOf(loadError));
-      setSaveStatus(null);
+  /** Return the campaign in play to its last save. */
+  const loadGame = useCallback(() => {
+    const slotId = activeSlotIdRef.current;
+    if (slotId === null) {
+      setError("This campaign has not been saved yet.");
+      return;
     }
-  }, [nextCommandId, send]);
+    loadSave(slotId);
+  }, [loadSave]);
+
+  const rememberPreview = useCallback((key: string, world: SimulationSnapshot | null) => {
+    setPreviews((current) => {
+      const next = new Map(current);
+      next.set(key, world);
+      // A handful of saved worlds is plenty for the screens that show them.
+      while (next.size > MAX_SAVED_WORLD_PREVIEWS) {
+        const oldest = next.keys().next().value;
+        if (oldest === undefined) break;
+        next.delete(oldest);
+        previewRequestsRef.current.delete(oldest);
+      }
+      return next;
+    });
+  }, []);
+
+  const previewSave = useCallback(
+    (slot: SaveSlot) => {
+      const key = previewKey(slot);
+      if (connectionRef.current !== "ready" || previewRequestsRef.current.has(key)) return;
+      previewRequestsRef.current.add(key);
+      const generation = sessionRef.current;
+      void readStoredCampaign(slot.id)
+        .then((campaign) => {
+          if (generation !== sessionRef.current) return;
+          if (campaign === null) {
+            rememberPreview(key, null);
+            return;
+          }
+          const commandId = nextCommandId("preview");
+          pendingPreviewsRef.current.set(commandId, key);
+          if (
+            !send({
+              protocolVersion: PROTOCOL_VERSION,
+              type: "PREVIEW_SAVE",
+              commandId,
+              save: campaign.save,
+            })
+          ) {
+            pendingPreviewsRef.current.delete(commandId);
+            previewRequestsRef.current.delete(key);
+          }
+        })
+        .catch(() => {
+          if (generation === sessionRef.current) rememberPreview(key, null);
+        });
+    },
+    [nextCommandId, rememberPreview, send],
+  );
+
+  const savedWorldOf = useCallback(
+    (slot: SaveSlot) => previews.get(previewKey(slot)),
+    [previews],
+  );
 
   // Re-create the remembered campaign after a worker restart. Player identity is
   // never silently replaced by the scenario's default country.
@@ -964,14 +1086,15 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       achievedDaysPerSecond,
       busy,
       startup,
-      savedCampaign,
-      overwritePrompt,
+      saves,
+      savedWorldOf,
+      previewSave,
       focusCountryId: snapshot?.focusCountryId ?? null,
       resumeSavedGame,
+      loadSave,
+      deleteSave,
       createGame,
       setFocus,
-      confirmOverwrite,
-      cancelOverwrite,
       start,
       pause,
       step,
@@ -996,13 +1119,14 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       achievedDaysPerSecond,
       busy,
       startup,
-      savedCampaign,
-      overwritePrompt,
+      saves,
+      savedWorldOf,
+      previewSave,
       resumeSavedGame,
+      loadSave,
+      deleteSave,
       createGame,
       setFocus,
-      confirmOverwrite,
-      cancelOverwrite,
       start,
       pause,
       step,

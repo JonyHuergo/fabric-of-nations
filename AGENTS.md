@@ -10,7 +10,17 @@
 - Do not silently change the GDD or invent major mechanics. Record unresolved decisions and substantive deviations in `DECISIONS.md`, including the rationale and consequences.
 - For material ambiguities or contradictions, report the issue and propose a resolution before proceeding with affected implementation. For minor, reversible details, choose the simplest compatible behavior and document the assumption.
 
-## 2. Hard Rules
+## 2. Product Rules
+
+- Fabric of Nations is a mobile game. iOS and Android are the primary platforms, and web is the development environment.
+- Landscape is mandatory on every device.
+- A feature is not finished until it reaches a phone. Anything added to the web build must reach iOS and Android in the same work, through the same code path wherever possible.
+- One style everywhere: colour, type and layout come from `packages/app/src/design/tokens.ts`, and no platform may keep a different look or a reduced style.
+- Phones in landscape are the primary design target, with 844 × 390 points as the reference. Tablets and desktop receive the same layout with more room. Every control is at least 44 points, and nothing may depend on hover.
+- The map is always the screen. It is mounted once, and everything else slides over it.
+- Device performance testing belongs to the designer. Do not claim that device performance or behaviour was verified unless it was.
+
+## 3. Hard Rules
 
 ### Simulation isolation
 
@@ -46,7 +56,7 @@
 - Validate inputs and reject NaN, infinity, invalid identifiers, and impossible authoritative states.
 - Do not use arbitrary clamping to conceal accounting, population, employment, or inventory conservation failures.
 
-## 3. Testing and Verification
+## 4. Testing and Verification
 
 - Every new simulation subsystem must include relevant unit tests and regression tests.
 - Changes to state transitions, stochastic behavior, or the tick pipeline must include deterministic tests.
@@ -56,19 +66,20 @@
 - Run the relevant existing tests after making changes, along with the required typecheck and benchmarks for the assigned milestone.
 - Never claim that a test, benchmark, device build, or calibration passed unless it was actually executed and its result is available.
 
-## 4. Commands and Dependencies
+## 5. Commands and Dependencies
 
 - Package manager: `pnpm`. Never use `npm` or `yarn` for project operations.
 - Test: `pnpm test`
 - Typecheck: `pnpm typecheck`
 - Benchmark: `pnpm bench`
+- Map runtime: `pnpm map:atlas` after changing design tokens or anything in `packages/app/src/map`; `pnpm map:atlas:check` verifies it is current
 
 These commands must be defined as working project scripts. If a command is missing, inspect the workspace configuration and add or correct the appropriate script when within the assigned milestone. Do not silently substitute a different command or claim a missing command succeeded.
 
 - Avoid adding dependencies unless they are necessary for the assigned task. Explain any new dependency and its compatibility implications.
 - Preserve the existing lockfile and workspace configuration unless a change is required.
 
-## 5. TypeScript and Coding Style
+## 6. TypeScript and Coding Style
 
 - Use TypeScript strict mode.
 - Do not use `any` in `packages/sim`. Prefer explicit types, discriminated unions, and validated boundaries.
@@ -79,7 +90,7 @@ These commands must be defined as working project scripts. If a command is missi
 - Floating-point comparisons must use a documented tolerance where appropriate. Do not apply arbitrary epsilon rules to integer values or identifiers.
 - Optimize based on profiling. Avoid unnecessary allocations in performance-critical loops, but do not sacrifice correctness or readability for speculative micro-optimization.
 
-## 6. Agent Execution Workflow
+## 7. Agent Execution Workflow
 
 Before implementation:
 

@@ -115,7 +115,7 @@ const report = { label: LABEL, gpu: process.env.PLAYTEST_GPU === "1", viewport: 
 
 try {
   await enterCampaign();
-  report.renderer = (await app.evaluate(`document.querySelector('canvas') !== null`)) ? "webgl" : "svg";
+  report.renderer = (await app.evaluate(`document.querySelector('iframe') !== null`)) ? "webgl" : "svg";
   report.gl = await app.evaluate(`(() => {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2');
@@ -126,7 +126,7 @@ try {
   console.log("renderer", report.renderer, report.gl);
 
   const box = await app.evaluate(`(() => {
-    const node = document.querySelector('canvas') ?? document.querySelector('svg[viewBox]');
+    const node = document.querySelector('iframe') ?? document.querySelector('svg[viewBox]');
     const rect = node.getBoundingClientRect();
     return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   })()`);
@@ -180,7 +180,7 @@ try {
     ["south-germany", [11, 48.6, 34]],
   ];
   if (process.env.MAP_SKIP_SHOTS !== "1" && report.renderer === "webgl") {
-    const engine = `document.querySelector('canvas').parentElement.__mapEngine`;
+    const engine = `document.querySelector('iframe').contentWindow.__mapEngine`;
     for (const [name, view] of views) {
       await app.evaluate(
         view === null ? `${engine}.resetView()` : `${engine}.setView(${view[0]}, ${view[1]}, ${view[2]})`,

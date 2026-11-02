@@ -3,18 +3,18 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
-  useWindowDimensions,
 } from "react-native";
 
-import { colors, radii, spacing, type } from "../theme";
-import type { WorldCatalogData, WorldCatalogEntry, WorldMapData } from "../worldCatalogTypes";
-import { WorldMap, statusLabel } from "../components/WorldMap";
+import { TOUCH_TARGET, colors, fonts, radii, spacing, themedSheet, type } from "../theme";
+import type { WorldCatalogData, WorldCatalogEntry } from "../worldCatalogTypes";
+import { statusLabel } from "../components/WorldMap";
 import { CountryFlag } from "../components/CountryFlag";
-import { Badge, Button, Chip, Divider, Panel } from "../components/ui";
+import { EntryPanel, useEntryPanelWidth } from "../components/EntryPanel";
+import { Badge, Button, Chip, Disclosure, Divider, Panel } from "../components/ui";
+import { useMapView } from "../map/host/MapStage";
 
 const CONTINENTS = ["All", "Europe", "Asia", "Africa", "Americas", "Oceania"] as const;
 type Continent = (typeof CONTINENTS)[number];
@@ -63,26 +63,31 @@ function statusTone(entry: WorldCatalogEntry): "positive" | "accent" | "muted" |
 
 export function CountrySelectionScreen({
   catalog,
-  map,
   onBack,
   onConfirm,
   creating,
 }: {
   readonly catalog: WorldCatalogData;
-  readonly map: WorldMapData;
   readonly onBack: () => void;
   readonly onConfirm: (countryId: number) => void;
   readonly creating: boolean;
 }) {
-  const { width } = useWindowDimensions();
-  const narrow = width < 760;
-  const medium = width >= 760 && width < 1080;
+  const panelWidth = useEntryPanelWidth();
   const [selectedTag, setSelectedTag] = useState<string>("USA");
   const [query, setQuery] = useState("");
   const [continent, setContinent] = useState<Continent>("All");
   const [playableOnly, setPlayableOnly] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Any status");
-  const [mobilePane, setMobilePane] = useState<"map" | "list">("map");
+  const [pane, setPane] = useState<"list" | "details">("list");
+  useMapView(
+    { selectedTag, insetRight: panelWidth },
+    {
+      onSelect: (tag) => {
+        setSelectedTag(tag);
+        setPane("details");
+      },
+    },
+  );
 
   const selected = useMemo(
     () => catalog.entries.find((entry) => entry.tag === selectedTag) ?? null,
@@ -139,47 +144,48 @@ export function CountrySelectionScreen({
           autoCapitalize="none"
         />
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-        {CONTINENTS.map((entry) => (
-          <Chip
-            key={entry}
-            label={entry}
-            active={continent === entry}
-            onPress={() => setContinent(entry)}
-          />
-        ))}
-      </ScrollView>
-      <View style={styles.toggleRow}>
-        {STATUS_FILTERS.map((entry) => (
-          <Chip
-            key={entry}
-            label={entry}
-            active={statusFilter === entry}
-            onPress={() => {
-              setStatusFilter(entry);
-              if (entry === "Dependencies") setPlayableOnly(false);
-              if (entry === "Independent" || entry === "Semi-sovereign") setPlayableOnly(true);
-            }}
-          />
-        ))}
-      </View>
-      <View style={styles.toggleRow}>
-        <Chip
-          label={`Playable only · ${String(playableCount)}`}
-          active={playableOnly}
-          onPress={() => setPlayableOnly(true)}
-        />
-        <Chip
-          label="All territories"
-          active={!playableOnly}
-          onPress={() => setPlayableOnly(false)}
-        />
-      </View>
-      <Text style={styles.listHint}>
-        {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
-        {playableOnly ? " · dependencies hidden" : " · selectable states and dependent territories"}
-      </Text>
-      <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
+      <ScrollView style={styles.list} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
+        <Disclosure title={`Filter · ${String(filtered.length)} ${filtered.length === 1 ? "entry" : "entries"}`}>
+          <View style={styles.toggleRow}>
+            {CONTINENTS.map((entry) => (
+              <Chip
+                key={entry}
+                label={entry}
+                active={continent === entry}
+                onPress={() => setContinent(entry)}
+              />
+            ))}
+          </View>
+          <View style={styles.toggleRow}>
+            {STATUS_FILTERS.map((entry) => (
+              <Chip
+                key={entry}
+                label={entry}
+                active={statusFilter === entry}
+                onPress={() => {
+                  setStatusFilter(entry);
+                  if (entry === "Dependencies") setPlayableOnly(false);
+                  if (entry === "Independent" || entry === "Semi-sovereign") setPlayableOnly(true);
+                }}
+              />
+            ))}
+          </View>
+          <View style={styles.toggleRow}>
+            <Chip
+              label={`Playable only · ${String(playableCount)}`}
+              active={playableOnly}
+              onPress={() => setPlayableOnly(true)}
+            />
+            <Chip
+              label="All territories"
+              active={!playableOnly}
+              onPress={() => setPlayableOnly(false)}
+            />
+          </View>
+          <Text style={styles.listHint}>
+            {playableOnly ? "Dependencies hidden" : "Selectable states and dependent territories"}
+          </Text>
+        </Disclosure>
         {filtered.map((entry) => {
           const active = entry.tag === selectedTag;
           return (
@@ -222,7 +228,7 @@ export function CountrySelectionScreen({
   );
 
   const detail = (
-    <View style={styles.detailColumn}>
+    <ScrollView style={styles.list} showsVerticalScrollIndicator={false} contentContainerStyle={styles.detailContent}>
       {selected === null ? (
         <Panel title="Selection">
           <Text style={styles.empty}>Choose a country on the map or in the list.</Text>
@@ -294,15 +300,7 @@ export function CountrySelectionScreen({
           )}
 
           <Divider />
-          {selected.selectable ? (
-            <Button
-              label={creating ? "Creating campaign…" : `Play as ${selected.commonName}`}
-              tone="primary"
-              size="lg"
-              disabled={creating}
-              onPress={() => onConfirm(selected.id)}
-            />
-          ) : (
+          {selected.selectable ? null : (
             <View style={styles.blocked}>
               <Badge label="Not selectable" tone="danger" />
               <Text style={styles.blockedText}>
@@ -319,72 +317,54 @@ export function CountrySelectionScreen({
           </Text>
         </Panel>
       )}
-    </View>
+    </ScrollView>
   );
 
   return (
-    <View style={styles.root}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Button label="← Back" tone="ghost" size="sm" onPress={onBack} />
-          <View>
-            <Text style={styles.kicker}>NEW CAMPAIGN · 1 JANUARY 1900</Text>
-            <Text style={styles.title}>Choose a country</Text>
+    <EntryPanel
+      kicker="New campaign · 1 January 1900"
+      title="Choose a country"
+      onBack={onBack}
+      scroll={false}
+      footer={
+        selected === null ? undefined : (
+          <View style={styles.footerRow}>
+            <CountryFlag
+              polityId={selected.id}
+              tag={selected.tag}
+              monogramTag={selected.sovereignTag ?? selected.tag}
+              size="topBar"
+            />
+            <View style={styles.footerAction}>
+              {selected.selectable ? (
+                <Button
+                  label={creating ? "Creating campaign…" : `Play as ${selected.commonName}`}
+                  tone="primary"
+                  size="lg"
+                  disabled={creating}
+                  onPress={() => onConfirm(selected.id)}
+                />
+              ) : (
+                <Text style={styles.footerBlocked} numberOfLines={2}>
+                  {selected.commonName} is a dependent territory and cannot be played.
+                </Text>
+              )}
+            </View>
           </View>
-        </View>
-        <View style={styles.headerRight}>
-          <Text style={styles.headerMeta}>{playableCount} playable states</Text>
-          <Text style={styles.headerMeta}>
-            {String(catalog.entries.filter((entry) => entry.kind === "territory").length)} dependent
-            territories shown
-          </Text>
-        </View>
+        )
+      }
+    >
+      <View style={styles.paneToggle}>
+        <Chip label="List" active={pane === "list"} onPress={() => setPane("list")} />
+        <Chip label="Details" active={pane === "details"} onPress={() => setPane("details")} />
+        <Text style={styles.headerMeta} numberOfLines={2}>
+          {playableCount} playable states ·{" "}
+          {String(catalog.entries.filter((entry) => entry.kind === "territory").length)} dependent
+          territories
+        </Text>
       </View>
-
-      {narrow ? (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.narrowContent}>
-          <View style={styles.paneToggle}>
-            <Chip label="Map" active={mobilePane === "map"} onPress={() => setMobilePane("map")} />
-            <Chip label="List" active={mobilePane === "list"} onPress={() => setMobilePane("list")} />
-          </View>
-          {mobilePane === "map" ? (
-            <WorldMap
-              catalog={catalog}
-              map={map}
-              snapshot={null}
-              selectedTag={selectedTag}
-              onSelect={setSelectedTag}
-              height={300}
-              showLegend
-            />
-          ) : (
-            list
-          )}
-          {detail}
-        </ScrollView>
-      ) : (
-        <View style={styles.columns}>
-          {list}
-          <View style={styles.mapColumn}>
-            <WorldMap
-              catalog={catalog}
-              map={map}
-              snapshot={null}
-              selectedTag={selectedTag}
-              onSelect={setSelectedTag}
-              height={medium ? 480 : 620}
-              showLegend
-            />
-            <Text style={styles.mapHint}>
-              Click a territory to select it. Small states appear as markers at world zoom; use the
-              list or zoom controls to reach them.
-            </Text>
-          </View>
-          {medium ? null : detail}
-        </View>
-      )}
-      {medium ? <View style={styles.mediumDetail}>{detail}</View> : null}
-    </View>
+      {pane === "list" ? list : detail}
+    </EntryPanel>
   );
 }
 
@@ -406,89 +386,61 @@ function Fact({
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    gap: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomColor: colors.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerLeft: { flexDirection: "row", alignItems: "center", gap: spacing.md, flexShrink: 1 },
-  headerRight: { alignItems: "flex-end", gap: 1 },
-  kicker: { ...type.label, color: colors.accentStrong },
-  title: { ...type.title, fontSize: 24 },
-  headerMeta: { ...type.tiny },
-  columns: { flex: 1, flexDirection: "row", gap: spacing.md, padding: spacing.md },
-  listColumn: {
-    width: 320,
-    borderRightColor: colors.border,
-    borderRightWidth: StyleSheet.hairlineWidth,
-    paddingRight: spacing.md,
-    gap: spacing.sm,
-  },
+const styles = themedSheet(() => ({
+  listColumn: { flex: 1, gap: spacing.xs, minHeight: 0 },
   searchWrap: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.borderStrong,
     borderRadius: radii.sm,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.sm,
+    minHeight: TOUCH_TARGET,
+    justifyContent: "center",
   },
-  search: { ...type.body, paddingVertical: spacing.sm, color: colors.text },
-  chipRow: { gap: spacing.xs, paddingVertical: 2 },
-  toggleRow: { flexDirection: "row", gap: spacing.xs, flexWrap: "wrap" },
+  search: { ...type.body, minHeight: TOUCH_TARGET, color: colors.text },
+  toggleRow: { flexDirection: "row", gap: spacing.xs, flexWrap: "wrap", paddingBottom: spacing.xs },
   listHint: { ...type.tiny },
-  list: { flex: 1 },
-  listContent: { gap: 2, paddingBottom: spacing.xl },
+  list: { flex: 1, minHeight: 0 },
+  listContent: { gap: 2, paddingBottom: spacing.md },
   listRow: {
+    minHeight: TOUCH_TARGET,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    paddingVertical: 6,
-    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.xs,
     borderRadius: radii.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "transparent",
   },
-  listRowActive: { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong },
+  listRowActive: { backgroundColor: colors.surfaceHover },
   listRowMuted: { opacity: 0.75 },
-  listText: { flex: 1 },
-  listName: { ...type.body, color: colors.text },
-  listNameActive: { color: colors.accentStrong, fontWeight: "700" },
+  listText: { flex: 1, minWidth: 0 },
+  listName: { ...type.section, fontSize: 15, lineHeight: 19, color: colors.text },
+  listNameActive: { color: colors.accentStrong },
   listMeta: { ...type.tiny },
-  mapColumn: { flex: 1, gap: 4 },
-  mapHint: { ...type.tiny, paddingHorizontal: 2 },
-  detailColumn: { width: 360 },
-  mediumDetail: { paddingHorizontal: spacing.md, paddingBottom: spacing.lg },
-  narrowContent: { padding: spacing.sm, gap: spacing.sm },
-  paneToggle: { flexDirection: "row", gap: spacing.xs },
+  detailContent: { paddingBottom: spacing.md },
+  paneToggle: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  headerMeta: { ...type.tiny, flex: 1 },
   detailHeader: { flexDirection: "row", alignItems: "center", gap: spacing.md },
   detailHeaderText: { flex: 1 },
-  detailCommon: { ...type.title, fontSize: 18, color: colors.textStrong },
+  detailCommon: { ...type.title, fontSize: 18 },
   detailTag: { ...type.tiny, marginTop: 1 },
   description: { ...type.body, marginTop: spacing.sm },
   factGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: spacing.sm },
   fact: { width: "50%", paddingVertical: 5, paddingRight: spacing.sm },
   factValue: { ...type.body, color: colors.textStrong, marginTop: 1 },
   factDetail: { ...type.tiny },
-  notes: { ...type.small, color: colors.muted, marginTop: spacing.sm, lineHeight: 17 },
+  notes: { ...type.small, marginTop: spacing.sm },
   marketLabel: { ...type.label, marginBottom: 3 },
-  marketBody: { ...type.small, lineHeight: 17 },
+  marketBody: { ...type.small },
   marketMeta: { ...type.tiny, marginTop: 3 },
   blocked: {
     gap: 4,
     padding: spacing.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.red,
     borderRadius: radii.sm,
-    backgroundColor: "rgba(197,122,107,0.08)",
+    backgroundColor: colors.redSoft,
   },
-  blockedText: { ...type.small, lineHeight: 16 },
-  sourceNote: { ...type.tiny, marginTop: spacing.sm, lineHeight: 14 },
+  blockedText: { ...type.small },
+  sourceNote: { ...type.tiny, marginTop: spacing.sm },
   empty: { ...type.body, color: colors.muted, paddingVertical: spacing.sm },
-  scroll: { flex: 1 },
-});
+  footerRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  footerAction: { flex: 1 },
+  footerBlocked: { ...type.small, fontFamily: fonts.sansMedium },
+}));

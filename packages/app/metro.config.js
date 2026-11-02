@@ -11,4 +11,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
+// The map runtime ships as one packaged page; see scripts/map/build-atlas.mjs.
+config.resolver.assetExts = [...config.resolver.assetExts, "html"];
+
 module.exports = config;

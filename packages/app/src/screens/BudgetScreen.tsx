@@ -15,9 +15,9 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { ActionButton, Chip, MiniBars, Section, StatRow } from "../components/ui";
+import { ActionButton, Chip, Headline, MiniBars, Section, StatRow } from "../components/ui";
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { colors, radii, spacing } from "../theme";
+import { colors, fonts, radii, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 function parseNumber(text: string): number {
@@ -217,6 +217,13 @@ export function BudgetScreen({
 
   return (
     <View>
+      <Headline
+        label="Treasury"
+        value={formatRUSD(country.treasuryCashRUSD)}
+        tone={country.treasuryCashRUSD >= 0 ? "default" : "negative"}
+        trend={historyValues}
+        detail="Bars show the net result of closed months"
+      />
       <Section
         title="Budget"
         subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · every change is a validated action. There are no silent overrides.`}
@@ -251,7 +258,7 @@ export function BudgetScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Taxation"
         subtitle="Every instrument below uses a modeled base. Rates and amounts are provisional policy, not enacted law."
       >
@@ -315,7 +322,7 @@ export function BudgetScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Spending and reserve"
         subtitle="Welfare is paid daily from treasury cash subject to the reserve floor and wealth eligibility ceiling. Other implemented spending categories are set by their own policy screens and reported in Budget execution."
       >
@@ -364,7 +371,7 @@ export function BudgetScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Before you commit the budget"
         subtitle="Static current-base estimates. They hold today's wage base, employment, prices, and month-to-date profit constant and are not forecasts."
       >
@@ -424,7 +431,7 @@ export function BudgetScreen({
         </View>
       </Section>
 
-      <Section
+      <Section folded
         title="Financing: borrowing, repayment, refinancing"
         subtitle="Borrowing and principal repayment are financing movements. They are not revenue or expenditure and do not change the fiscal result."
       >
@@ -597,7 +604,7 @@ export function BudgetScreen({
         ) : null}
       </Section>
 
-      <Section
+      <Section folded
         title="Budget execution"
         subtitle="Latest closed month: requested, paid, and shortfall are separate from borrowing, principal, and interest."
       >
@@ -680,7 +687,7 @@ export function BudgetScreen({
         )}
       </Section>
 
-      <Section title="Net fiscal history" subtitle="Last closed months; bars show surplus or deficit.">
+      <Section folded title="Net fiscal history" subtitle="Last closed months; bars show surplus or deficit.">
         {historyValues.length === 0 ? (
           <Text style={styles.empty}>No monthly close has run yet.</Text>
         ) : (
@@ -705,9 +712,9 @@ export function BudgetScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
-  inputLabel: { color: colors.muted, fontSize: 12, marginTop: spacing.sm, marginBottom: spacing.xs },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, paddingVertical: spacing.sm },
+  inputLabel: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm, marginBottom: spacing.xs },
   input: {
     backgroundColor: colors.background,
     borderColor: colors.border,
@@ -721,16 +728,16 @@ const styles = StyleSheet.create({
   },
   quickRow: { flexDirection: "row", flexWrap: "wrap", marginTop: spacing.sm, rowGap: spacing.xs },
   applyRow: { marginTop: spacing.md },
-  error: { color: colors.red, fontSize: 12, marginTop: spacing.sm },
-  hint: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },
-  previewNote: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },
-  note: { color: colors.faint, fontSize: 11, marginTop: spacing.sm, lineHeight: 16 },
+  error: { color: colors.red, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm },
+  hint: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, lineHeight: 15, marginTop: 4 },
+  previewNote: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, lineHeight: 15, marginTop: 4 },
+  note: { color: colors.faint, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm, lineHeight: 16 },
   contractRow: {
     borderTopColor: colors.border,
     borderTopWidth: StyleSheet.hairlineWidth,
     marginTop: spacing.md,
     paddingTop: spacing.sm,
   },
-  contractTitle: { color: colors.text, fontSize: 12, fontWeight: "600" },
-  contractDetail: { color: colors.muted, fontSize: 10, marginTop: 2, lineHeight: 14 },
-});
+  contractTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  contractDetail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, marginTop: 2, lineHeight: 14 },
+}));

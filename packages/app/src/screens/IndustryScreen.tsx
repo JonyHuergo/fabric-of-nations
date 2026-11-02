@@ -10,8 +10,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Headline, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /**
@@ -155,6 +155,11 @@ export function IndustryScreen({
 
   return (
     <View>
+      <Headline
+        label="Buildings"
+        value={country.buildingCount.toLocaleString()}
+        detail={`${String(country.publicEnterprises.length)} public enterprises`}
+      />
       <Section
         title="Industry"
         subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · sector subsidies are paid against verified output from actual treasury cash, not capacity or a policy score.`}
@@ -171,7 +176,7 @@ export function IndustryScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Sector production subsidies"
         subtitle="Rates are ad-valorem percentages of verified gross output value. A subsidy is a treasury expense and taxable enterprise revenue; an unpaid entitlement is a reported shortfall."
       >
@@ -233,7 +238,7 @@ export function IndustryScreen({
         </View>
       </Section>
 
-      <Section
+      <Section folded
         title="Public enterprises"
         subtitle="Existing state-owned productive buildings. Capital support changes operating cash and equity; it does not guarantee inputs, sales, or profit, and ordinary wages, upkeep, tax, and state remittance still apply."
       >
@@ -297,7 +302,7 @@ export function IndustryScreen({
         {localError === null ? null : <Text style={styles.error}>{localError}</Text>}
       </Section>
 
-      <Section title="Deliberately not implemented">
+      <Section folded title="Deliberately not implemented">
         <Text style={styles.note}>
           Private co-financing, subsidies paid to private investors, loans, guarantees,
           procurement contracts beyond construction materials, and public-enterprise expansion or
@@ -310,18 +315,18 @@ export function IndustryScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, paddingVertical: spacing.sm },
   sector: {
     borderTopColor: colors.border,
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingVertical: spacing.sm,
   },
   rowText: { flex: 1 },
-  label: { color: colors.text, fontSize: 12, fontWeight: "700" },
-  detail: { color: colors.muted, fontSize: 10, lineHeight: 14, marginTop: 2 },
-  error: { color: colors.red, fontSize: 12, marginTop: spacing.sm },
-  note: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },
+  label: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  detail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, lineHeight: 14, marginTop: 2 },
+  error: { color: colors.red, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm },
+  note: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, lineHeight: 15, marginTop: 4 },
   applyRow: { marginTop: spacing.md },
   enterprise: {
     borderTopColor: colors.border,
@@ -329,5 +334,5 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     marginTop: spacing.sm,
   },
-  enterpriseTitle: { color: colors.text, fontSize: 12, fontWeight: "700" },
-});
+  enterpriseTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+}));

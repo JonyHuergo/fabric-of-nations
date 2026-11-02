@@ -14,9 +14,9 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Badge, Notice, Section, StatRow } from "../components/ui";
+import { Badge, Headline, Notice, Section, StatRow } from "../components/ui";
 import { CountryFlag } from "../components/CountryFlag";
-import { colors, radii, spacing, type } from "../theme";
+import { colors, fonts, radii, spacing, themedSheet, type } from "../theme";
 import { statusLabel } from "../components/WorldMap";
 
 export function CountryScreen({
@@ -51,26 +51,36 @@ export function CountryScreen({
   return (
     <View>
       <View style={styles.identityPanel}>
-        <CountryFlag polityId={country.id} tag={country.tag} size="detail" />
-        <View style={styles.identityText}>
-          <Text style={styles.identityName}>{country.name}</Text>
-          <Text style={styles.identityMeta}>
-            {meta === null ? country.tag : `${statusLabel(meta.status)} · ${meta.capitalName}`}
-            {meta !== null && meta.historicalName !== country.name ? ` · ${meta.historicalName}` : ""}
-          </Text>
-          <Text style={styles.identityMeta}>
-            {sovereign !== null && sovereign.id !== country.id
-              ? `Sovereign power: ${sovereign.name}`
-              : "Sovereign state"}
-            {" · "}
-            {isPlayerCountry ? "Player-controlled" : "AI-controlled"}
-          </Text>
+        <View style={styles.identityTop}>
+          <CountryFlag polityId={country.id} tag={country.tag} size="detail" />
+          <View style={styles.identityText}>
+            <Text style={styles.identityName}>{country.name}</Text>
+            <Text style={styles.identityMeta}>
+              {meta === null ? country.tag : `${statusLabel(meta.status)} · ${meta.capitalName}`}
+              {meta !== null && meta.historicalName !== country.name ? ` · ${meta.historicalName}` : ""}
+            </Text>
+            <Text style={styles.identityMeta}>
+              {sovereign !== null && sovereign.id !== country.id
+                ? `Sovereign power: ${sovereign.name}`
+                : "Sovereign state"}
+              {" · "}
+              {isPlayerCountry ? "Player-controlled" : "AI-controlled"}
+            </Text>
+          </View>
         </View>
         <View style={styles.identityBadges}>
           <Badge label={isPlayerCountry ? "Player country" : "AI country"} tone={isPlayerCountry ? "accent" : "muted"} />
           {meta === null ? null : <Badge label={meta.status} tone="muted" />}
         </View>
       </View>
+
+      <Headline
+        label="Treasury"
+        value={formatRUSD(country.treasuryCashRUSD)}
+        tone={country.treasuryCashRUSD >= 0 ? "default" : "negative"}
+        trend={country.financeHistory.map((period) => period.netFiscalResultRUSD)}
+        detail={`${formatCount(country.population)} people · hardship ${(country.hardshipPopulationShare * 100).toFixed(1)}%`}
+      />
 
       <Section
         title="Economic overview"
@@ -114,7 +124,7 @@ export function CountryScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Market and customs"
         subtitle="Market membership is an economic relationship, not a sovereignty claim. A dependent territory keeps its own region and market."
       >
@@ -154,7 +164,7 @@ export function CountryScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="What needs attention"
         subtitle="Evidence from the current snapshot. These are observations and supported contributing constraints, not proof of a single cause."
       >
@@ -188,7 +198,7 @@ export function CountryScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Production capacity by good"
         subtitle="Estimated current daily output at building level, condition, staffing, and productivity. This is capacity, not realized production or demand."
       >
@@ -211,7 +221,7 @@ export function CountryScreen({
         ) : null}
       </Section>
 
-      <Section
+      <Section folded
         title="Essential goods now"
         subtitle="Current stock and prices in the country's markets. Stock is a balance; capacity is an estimated daily flow. Historical market series are not retained."
       >
@@ -253,7 +263,7 @@ export function CountryScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Latest closed month"
         subtitle={
           latest === null
@@ -303,7 +313,7 @@ export function CountryScreen({
         )}
       </Section>
 
-      <Section title="Where to investigate">
+      <Section folded title="Where to investigate">
         {country.employedWorkers === 0 && snapshot.dayIndex === 0 ? (
           <Notice title="Workforce assigned on the first simulated day">
             Buildings and population are initialized, but employment and staffing are assigned by
@@ -333,12 +343,11 @@ function labelForTarget(target: "markets" | "population" | "budget" | "ledger"):
   }
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, paddingVertical: spacing.sm },
+  // A sheet is narrow on a phone: flag and name share a row, the badges get their own.
   identityPanel: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
+    gap: spacing.sm,
     padding: spacing.md,
     marginBottom: spacing.md,
     backgroundColor: colors.panel,
@@ -346,10 +355,11 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.md,
   },
-  identityText: { flex: 1 },
+  identityTop: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  identityText: { flex: 1, minWidth: 0 },
   identityName: { ...type.title, fontSize: 18 },
   identityMeta: { ...type.tiny, marginTop: 1 },
-  identityBadges: { gap: 4, alignItems: "flex-end" },
+  identityBadges: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
   marketRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -360,9 +370,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   marketMain: { flex: 1 },
-  marketName: { ...type.body, color: colors.textStrong, fontWeight: "700" },
+  marketName: { ...type.body, color: colors.textStrong, fontFamily: fonts.sansSemiBold },
   marketMeta: { ...type.tiny, marginTop: 1 },
-  note: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: spacing.sm },
+  note: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, lineHeight: 15, marginTop: spacing.sm },
   goodRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -371,13 +381,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   goodMain: { flex: 1, paddingRight: spacing.sm },
-  goodName: { color: colors.text, fontSize: 12, fontWeight: "600" },
-  goodDetail: { color: colors.faint, fontSize: 9, marginTop: 2 },
+  goodName: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  goodDetail: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, marginTop: 2 },
   goodPrice: {
     color: colors.accent,
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "right",
     fontVariant: ["tabular-nums"],
     maxWidth: 130,
   },
-});
+}));

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 
 import {
   RUSD_UNIT_NAME,
@@ -10,8 +10,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Notice, Pill, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Disclosure, Headline, Notice, Pill, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 function percent(value: number): string {
@@ -186,6 +186,13 @@ export function MoneyScreen({
         </Notice>
       ) : null}
 
+      <Headline
+        label="Price index, base 100"
+        value={index.value.toFixed(2)}
+        trend={snapshot.priceIndex.observations.map((observation) => observation.world - 100)}
+        detail={`Year on year ${index.yearOnYearInflation === null ? "insufficient history" : percent(index.yearOnYearInflation)}`}
+      />
+
       <Text style={styles.heading}>Currency and exchange rate</Text>
       {monetary.hasAuthority ? (
         <>
@@ -261,7 +268,7 @@ export function MoneyScreen({
         It never changes prices, wages, taxes, or accounts.
       </Text>
 
-      <Text style={styles.heading}>World basket ({snapshot.priceIndex.basket.length} goods)</Text>
+      <Disclosure title={`World basket · ${String(snapshot.priceIndex.basket.length)} goods`}>
       {snapshot.priceIndex.basket.map((item) => (
         <StatRow
           key={item.goodId}
@@ -299,7 +306,9 @@ export function MoneyScreen({
         ))
       )}
 
-      <Text style={styles.heading}>Currencies</Text>
+      </Disclosure>
+
+      <Disclosure title={`Currencies · ${String(snapshot.currencies.length)}`}>
       {snapshot.currencies.map((currency) => (
         <StatRow
           key={currency.id}
@@ -311,6 +320,7 @@ export function MoneyScreen({
           }
         />
       ))}
+      </Disclosure>
 
       <Text style={styles.heading}>Policy</Text>
       <Text style={styles.help}>
@@ -425,7 +435,7 @@ export function MoneyScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   empty: {
     color: colors.muted,
   },
@@ -433,18 +443,18 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
     color: colors.text,
   },
   help: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
     lineHeight: 17,
     marginTop: spacing.xs,
   },
   warning: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.red,
   },
   row: {
@@ -455,7 +465,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: spacing.sm,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
   },
   input: {
@@ -478,9 +488,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   estimateTitle: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 13,
+    fontFamily: fonts.sansSemiBold,
     color: colors.muted,
     marginBottom: 4,
   },
-});
+}));

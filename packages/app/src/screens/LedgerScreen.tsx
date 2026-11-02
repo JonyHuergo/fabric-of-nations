@@ -12,8 +12,8 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { MiniBars, Notice, Section } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { Headline, MiniBars, Notice, Section } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 const FLOW_LABELS: Readonly<Record<string, string>> = {
@@ -56,6 +56,13 @@ export function LedgerScreen({
         );
   return (
     <View>
+      <Headline
+        label="Last closed month"
+        value={netValues.length === 0 ? "No month closed" : formatRUSD(netValues[netValues.length - 1] ?? 0)}
+        tone={(netValues[netValues.length - 1] ?? 0) >= 0 ? "default" : "negative"}
+        trend={netValues}
+        detail="Net fiscal result"
+      />
       <Section
         title="Ledger / financial summary"
         subtitle={`${country.name} · immutable monthly summaries. Closed periods are never rewritten.`}
@@ -76,7 +83,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Monthly economic report"
         subtitle="Closed-period flows and end-of-close balances. A closing balance is not a period flow."
       >
@@ -266,7 +273,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Annual accounting"
         subtitle="Closed calendar-year summaries. Annual flows are sums of that year's monthly closes; year-end balances are separate."
       >
@@ -471,7 +478,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Recent monthly closes"
         subtitle="Newest first. Detailed balances appear only for the retained detailed window."
       >
@@ -507,7 +514,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Confirmed player actions"
         subtitle="Appended only from authoritative worker ACTION_RESULT replies. Session-only; cleared on load or worker restart."
       >
@@ -542,7 +549,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="World gross flows"
         subtitle="The four M4b flow kinds; reported for the world, not allocated per country."
       >
@@ -558,7 +565,7 @@ export function LedgerScreen({
         )}
       </Section>
 
-      <Section title="Debug diagnostics" subtitle="Bounded authoritative counters from the world.">
+      <Section folded title="Debug diagnostics" subtitle="Bounded authoritative counters from the world.">
         <View style={styles.flowRow}>
           <Text style={styles.flowLabel}>Rejected player/AI actions</Text>
           <Text style={styles.flowValue}>{String(snapshot.diagnostics.invalidActionCount)}</Text>
@@ -577,10 +584,10 @@ export function LedgerScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
-  result: { color: colors.text, fontSize: 22, fontWeight: "700" },
-  resultDetail: { color: colors.muted, fontSize: 12, marginTop: spacing.xs },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, paddingVertical: spacing.sm },
+  result: { color: colors.text, fontSize: 22, fontFamily: fonts.sansSemiBold },
+  resultDetail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.xs },
   reportRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -588,11 +595,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  reportLabel: { color: colors.muted, fontSize: 12, flexShrink: 1, paddingRight: spacing.sm },
+  reportLabel: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, flexShrink: 1, paddingRight: spacing.sm },
   reportValue: {
     color: colors.text,
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 13,
+    fontFamily: fonts.sansSemiBold,
     fontVariant: ["tabular-nums"],
     textAlign: "right",
   },
@@ -601,10 +608,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     paddingVertical: spacing.sm,
   },
-  periodDate: { color: colors.text, fontSize: 12, fontWeight: "600" },
+  periodDate: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
   columns: { flexDirection: "row", flexWrap: "wrap", marginTop: 3, columnGap: spacing.sm },
-  cell: { color: colors.muted, fontSize: 10 },
-  net: { fontSize: 12, fontWeight: "700", marginTop: 3, fontVariant: ["tabular-nums"] },
+  cell: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11 },
+  net: { fontSize: 13, fontFamily: fonts.sansSemiBold, marginTop: 3, fontVariant: ["tabular-nums"] },
   positive: { color: colors.green },
   negative: { color: colors.red },
   actionRow: {
@@ -613,29 +620,29 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   actionHeader: { flexDirection: "row", justifyContent: "space-between" },
-  actionDate: { color: colors.text, fontSize: 11, fontWeight: "600" },
-  actionStatus: { fontSize: 9, fontWeight: "800", letterSpacing: 0.6 },
-  actionDetail: { color: colors.muted, fontSize: 10, marginTop: 2, lineHeight: 14 },
-  actionError: { color: colors.red, fontSize: 10, marginTop: 2, lineHeight: 14 },
+  actionDate: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  actionStatus: { fontSize: 11, fontFamily: fonts.sansSemiBold, letterSpacing: 0.6 },
+  actionDetail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, marginTop: 2, lineHeight: 14 },
+  actionError: { color: colors.red, fontFamily: fonts.sans, fontSize: 11, marginTop: 2, lineHeight: 14 },
   flowRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 5,
   },
-  flowLabel: { color: colors.muted, fontSize: 12 },
+  flowLabel: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13 },
   flowValue: {
     color: colors.text,
-    fontSize: 12,
+    fontSize: 13,
     fontVariant: ["tabular-nums"],
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
   },
-  warning: { color: colors.faint, fontSize: 10, marginTop: 4 },
+  warning: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, marginTop: 4 },
   annualList: { marginTop: spacing.sm },
   annualRow: {
     borderTopColor: colors.border,
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingVertical: 5,
   },
-  annualYear: { color: colors.text, fontSize: 11, fontWeight: "600" },
-  annualNet: { color: colors.muted, fontSize: 10, marginTop: 2, fontVariant: ["tabular-nums"] },
-});
+  annualYear: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  annualNet: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, marginTop: 2, fontVariant: ["tabular-nums"] },
+}));

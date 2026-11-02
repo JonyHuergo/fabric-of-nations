@@ -13,8 +13,8 @@
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
-import type { ProvinceMapData, ProvinceMapProvince } from "../provinceCatalogTypes";
-import type { WorldCatalogData, WorldCatalogEntry } from "../worldCatalogTypes";
+import type { ProvinceMapProvince } from "../provinceCatalogTypes";
+import type { WorldCatalogEntry, WorldCatalogMarket } from "../worldCatalogTypes";
 import {
   hexToRgb,
   mixRgb,
@@ -50,10 +50,29 @@ export interface ProvinceState {
   readonly marketId: number | null;
 }
 
+/** The fields of a province the map reads; geometry is not among them. */
+export type MapProvince = Pick<
+  ProvinceMapProvince,
+  | "id"
+  | "key"
+  | "displayName"
+  | "mapTag"
+  | "initialOwnerTag"
+  | "initialOwnerPolityId"
+  | "simulationRegionId"
+  | "residual"
+  | "area"
+  | "bbox"
+  | "label"
+>;
+
+/** The fields of a catalogue entry that colour and name a polity. */
+export type MapEntry = Pick<WorldCatalogEntry, "tag" | "kind" | "status" | "sovereignTag" | "commonName">;
+
 export interface MapDataContext {
-  readonly provinces: readonly ProvinceMapProvince[];
+  readonly provinces: readonly MapProvince[];
   readonly states: readonly ProvinceState[];
-  readonly entryByTag: ReadonlyMap<string, WorldCatalogEntry>;
+  readonly entryByTag: ReadonlyMap<string, MapEntry>;
   readonly marketNames: ReadonlyMap<number, string>;
   readonly highlightMarketId: number | null;
 }
@@ -65,33 +84,36 @@ export interface MapMode {
   readonly legend: (context: MapDataContext) => readonly MapLegendEntry[];
 }
 
-const NO_DATA_FILL: Rgb = [176, 178, 172];
+export const NO_DATA_FILL: Rgb = [84, 90, 94];
 const LEGEND_MARKET_LIMIT = 8;
-const CONTROL_NEUTRAL: Rgb = [198, 196, 184];
+const CONTROL_NEUTRAL: Rgb = [96, 104, 108];
+/** Stripe base over an occupied province, so hatching reads on a matte fill. */
+const OCCUPATION_SHADE: Rgb = [24, 26, 28];
 
+/** Matte market colours in the same band as the political palette. */
 const MARKET_COLORS: readonly string[] = [
-  "#7fb9b2",
-  "#d4807c",
-  "#7296cf",
-  "#e3c66e",
-  "#9bb886",
-  "#c39ccb",
-  "#cc9b63",
-  "#86b0d8",
-  "#d9779b",
-  "#a4bf72",
-  "#ec9a56",
-  "#a39ad6",
-  "#6fb48d",
-  "#c9716f",
-  "#dab683",
-  "#88b8ab",
-  "#bda2d7",
-  "#b4c46f",
+  "#5f9490",
+  "#9c5a5e",
+  "#4a6c9c",
+  "#ad9650",
+  "#56775f",
+  "#7f6796",
+  "#9a7550",
+  "#5f86ab",
+  "#a35877",
+  "#7f9c66",
+  "#b0774a",
+  "#6f6aa0",
+  "#4b8a76",
+  "#a2595a",
+  "#a08560",
+  "#648a7f",
+  "#8790b8",
+  "#8f9658",
 ];
 
 export function marketColor(marketId: number): Rgb {
-  return hexToRgb(MARKET_COLORS[marketId % MARKET_COLORS.length] ?? "#7fb9b2");
+  return hexToRgb(MARKET_COLORS[marketId % MARKET_COLORS.length] ?? "#5f9490");
 }
 
 const politicalMode: MapMode = {
@@ -109,9 +131,9 @@ const politicalMode: MapMode = {
       dimmed: false,
     };
   },
-  legend: () => [
+  legend: (context) => [
     { label: "Sovereign state", color: stateColor("GBR") },
-    { label: "Dependent territory", color: mixRgb(stateColor("GBR"), [240, 232, 212], 0.28) },
+    { label: "Dependent territory", color: politicalColor("BIN", context.entryByTag) },
     { label: "Military occupation", color: stateColor("RUS"), hatched: true },
   ],
 };
@@ -131,7 +153,7 @@ const controlMode: MapMode = {
     }
     return {
       fill: politicalColor(state.controllerTag, context.entryByTag),
-      stripe: mixRgb(politicalColor(state.ownerTag, context.entryByTag), [36, 32, 28], 0.2),
+      stripe: mixRgb(politicalColor(state.ownerTag, context.entryByTag), OCCUPATION_SHADE, 0.2),
       dimmed: false,
     };
   },
@@ -184,9 +206,18 @@ export const MAP_MODES: Readonly<Record<MapModeId, MapMode>> = {
 
 /** Resolve authoritative ownership for every province, in bundle order. */
 export function buildProvinceStates(
-  provinceMap: ProvinceMapData,
-  catalog: WorldCatalogData,
-  snapshot: SimulationSnapshot | null,
+  provinceMap: {
+    readonly provinces: readonly Pick<
+      ProvinceMapProvince,
+      "id" | "initialOwnerPolityId" | "initialOwnerTag" | "mapTag" | "simulationRegionId"
+    >[];
+    readonly futurePolities: readonly { readonly polityId: number; readonly tag: string }[];
+  },
+  catalog: {
+    readonly entries: readonly Pick<WorldCatalogEntry, "id" | "tag" | "market">[];
+    readonly markets: readonly Pick<WorldCatalogMarket, "id" | "key">[];
+  },
+  snapshot: Pick<SimulationSnapshot, "provinces" | "regions"> | null,
 ): readonly ProvinceState[] {
   const tagByPolityId = new Map<number, string>();
   for (const entry of catalog.entries) tagByPolityId.set(entry.id, entry.tag);

@@ -1,12 +1,27 @@
 /**
- * The interactive map runtime (web): owns the canvases, camera, input, picking
- * and frame loop, outside React. Camera movement and hover touch no React state;
- * the component layer hears about a change only when the hovered province or the
- * selection actually changes.
+ * The interactive map: owns the canvases, camera, input, picking and frame loop.
+ * It runs inside the map runtime page, so gestures and camera movement never
+ * cross a bridge. The host hears only about presses and hover changes.
+ *
+ * Nothing is drawn unless something changed: `requestFrame` is called by input,
+ * data and animations, and an idle map costs nothing.
  */
 
-import type { ProvinceMapData } from "../provinceCatalogTypes";
-import type { WorldCatalogData } from "../worldCatalogTypes";
+import {
+  ERA_THEMES,
+  ERA_TRANSITION_MS,
+  FONTS,
+  MOUSE_PICK_RADIUS,
+  TOUCH_PICK_RADIUS,
+  blendMapTokens,
+  resolveEra,
+  rgbToCss,
+  rgbaToCss,
+  zoomLevelForScale,
+  type EraId,
+  type MapTokens,
+  type MapZoomLevel,
+} from "../design/tokens";
 import {
   cameraForBounds,
   clampCamera,
@@ -16,6 +31,7 @@ import {
   shortestDeltaX,
   smoothingAlpha,
   worldToScreen,
+  CAMERA_MAX_SCALE,
   wrapX,
   zoomCameraAt,
   type Camera,
@@ -23,13 +39,14 @@ import {
   type MapViewportSize,
 } from "./camera";
 import { MapGlRenderer } from "./glRenderer";
-import { createProvinceHitIndex, type ProvinceHitIndex } from "./hitTest";
+import { createMeshHitIndex, type ProvinceHitIndex } from "./hitTest";
 import {
   placeLabels,
   seaLabels,
   type LabelInputs,
   type PlacedLabel,
   type PointLabel,
+  type ReservedBox,
 } from "./labels";
 import {
   STYLE_FLAG_DIMMED,
@@ -43,26 +60,33 @@ import {
   type ProvinceStyleTable,
 } from "./mapModes";
 import { paintLabels } from "./labelPainter";
+import { levelOfDetail, mapPalette } from "./mapStyle";
 import { politicalColor, type Rgb } from "./politicalPalette";
 import { buildUnitLabels, neighbourPairs } from "./unitLabels";
 import { MAP_HEIGHT, MAP_WIDTH, projectLat, projectLon, unprojectX, unprojectY } from "./projection";
-import {
-  OCEAN_TEXTURE_PATH,
-  RELIEF_TEXTURE_PATH,
-  loadRenderBundle,
-  type RenderBundle,
-} from "./renderBundle";
+import type { RenderBundle } from "./renderBundle";
+import type { MapRuntimeCatalog } from "./runtimeCatalog";
 
-/** Pointer travel, in CSS pixels, separating a click from a drag. */
+/** Pointer travel, in CSS pixels, separating a tap from a drag. */
 const DRAG_THRESHOLD = 4;
+/** A fingertip wobbles further than a mouse while tapping. */
+const TOUCH_DRAG_THRESHOLD = 9;
+/** Holding this long without moving opens the loupe. */
+const LONG_PRESS_MS = 360;
+const DOUBLE_TAP_MS = 320;
+const DOUBLE_TAP_DISTANCE = 30;
+const LOUPE_SIZE = 132;
+const LOUPE_ZOOM = 3;
+/** The loupe sits above the finger, so the finger never hides what it picks. */
+const LOUPE_OFFSET = 104;
+/** The top interface controls; a loupe that would reach them opens below instead. */
+const LOUPE_TOP_CLEARANCE = 60;
 const WHEEL_SENSITIVITY = 0.0016;
 const PINCH_WHEEL_SENSITIVITY = 0.008;
 const ZOOM_TIME_CONSTANT_MS = 70;
 const FLIGHT_MS = 520;
 const INERTIA_DECAY_MS = 190;
 const INERTIA_MIN_SPEED = 0.03;
-/** Pick tolerance around tiny islands, in CSS pixels. */
-const PICK_RADIUS_PX = 5;
 /** Panning this far re-places labels; less just translates the overlay. */
 const LABEL_REPLACE_PAN_PX = 90;
 const BUTTON_ZOOM = 1.6;
@@ -71,6 +95,12 @@ const KEY_PAN_PX = 90;
 const FOCUS_MAX_SCALE = 22;
 /** Map units squared below which a unit keeps a locating dot at strategic zoom. */
 const SMALL_UNIT_AREA = 1.4;
+/** A turning backdrop sits this much closer than the whole-world view... */
+const DRIFT_ZOOM = 1.22;
+/** ...and centred on this latitude, where most of the land is. */
+const DRIFT_CENTRE_LAT = 26;
+/** Labels fade out of, and back into, a turning backdrop over this long. */
+const DRIFT_LABEL_FADE_MS = 700;
 
 export interface MapHoverEvent {
   readonly provinceIndex: number;
@@ -79,12 +109,13 @@ export interface MapHoverEvent {
 }
 
 export interface MapEngineCallbacks {
-  /** Fired only when the hovered province changes. */
-  readonly onHoverChange: (provinceIndex: number | null) => void;
-  /** Fired on every hover move so the card can follow the pointer. */
-  readonly onHoverMove: (x: number, y: number) => void;
-  readonly onProvincePress: (provinceIndex: number) => void;
+  /** Fired only when the hovered province changes; mouse only. */
+  readonly onHoverChange: (provinceIndex: number | null, x: number, y: number) => void;
+  /** `x` and `y` are where the press landed, in map-surface pixels. */
+  readonly onProvincePress: (provinceIndex: number, x: number, y: number) => void;
   readonly onSeaPress: () => void;
+  /** The GPU context is gone; the host reloads the page. */
+  readonly onContextLost: () => void;
 }
 
 export interface MapEngineData {
@@ -93,7 +124,19 @@ export interface MapEngineData {
   readonly selectedTag: string | null;
   readonly playerTag: string | null;
   readonly selectedProvinceIndex: number | null;
-  readonly catalog: WorldCatalogData;
+}
+
+/** Where the runtime gets its heavy assets; the textures are optional extras. */
+export interface MapEngineAssets {
+  readonly loadBundle: () => Promise<RenderBundle>;
+  readonly loadTexture: (kind: "relief" | "ocean") => Promise<ImageBitmap | HTMLImageElement>;
+}
+
+export interface MapInsets {
+  readonly left: number;
+  readonly right: number;
+  /** Interface controls over the map; labels stay out of them. */
+  readonly reserved: readonly ReservedBox[];
 }
 
 export interface MapEngineStats {
@@ -118,13 +161,16 @@ interface Flight {
   elapsed: number;
 }
 
-function loadImage(path: string): Promise<ImageBitmap | HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(`could not load ${path}`));
-    image.src = path;
-  });
+interface ThemeFade {
+  readonly from: MapTokens;
+  readonly to: MapTokens;
+  elapsed: number;
+}
+
+interface LoupeState {
+  x: number;
+  y: number;
+  index: number;
 }
 
 let cachedSupport: boolean | null = null;
@@ -155,9 +201,13 @@ export function supportsMapEngine(): boolean {
 export class MapEngine {
   private readonly container: HTMLElement;
   private readonly callbacks: MapEngineCallbacks;
-  private readonly provinceMap: ProvinceMapData;
+  private readonly catalog: MapRuntimeCatalog;
+  private readonly assets: MapEngineAssets;
   private readonly glCanvas: HTMLCanvasElement;
   private readonly labelCanvas: HTMLCanvasElement;
+  private readonly loupeRoot: HTMLDivElement;
+  private readonly loupeCanvas: HTMLCanvasElement;
+  private readonly loupeNameNode: HTMLDivElement;
   private readonly seas = seaLabels();
   private bundle: RenderBundle | null = null;
   private renderer: MapGlRenderer | null = null;
@@ -182,8 +232,18 @@ export class MapEngine {
   private zoomRemaining = 0;
   private zoomFocus = { x: 0, y: 0 };
   private flight: Flight | null = null;
+  /** Degrees of longitude per second the backdrop turns; 0 is a still map. */
+  private drift = 0;
+  private tokens: MapTokens = resolveEra(ERA_THEMES.imperial).map;
+  private themeFade: ThemeFade | null = null;
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private loupe: LoupeState | null = null;
+  private lastTap = { x: 0, y: 0, time: -Infinity };
+  private touchActive = false;
 
   private insetRight = 0;
+  private insetLeft = 0;
+  private reserved: readonly ReservedBox[] = [];
   private data: MapEngineData | null = null;
   private styleTable: ProvinceStyleTable | null = null;
   private baseFlags: Uint8Array | null = null;
@@ -203,15 +263,26 @@ export class MapEngine {
   private styleUploads = 0;
   private labelPlacements = 0;
 
-  constructor(container: HTMLElement, provinceMap: ProvinceMapData, callbacks: MapEngineCallbacks) {
+  constructor(
+    container: HTMLElement,
+    catalog: MapRuntimeCatalog,
+    assets: MapEngineAssets,
+    callbacks: MapEngineCallbacks,
+  ) {
     this.container = container;
-    this.provinceMap = provinceMap;
+    this.catalog = catalog;
+    this.assets = assets;
     this.callbacks = callbacks;
     this.glCanvas = this.createCanvas();
     this.labelCanvas = this.createCanvas();
     this.labelCanvas.style.pointerEvents = "none";
+    this.labelCanvas.style.transition = `opacity ${String(DRIFT_LABEL_FADE_MS)}ms ease`;
     this.container.prepend(this.labelCanvas);
     this.container.prepend(this.glCanvas);
+    this.loupeRoot = document.createElement("div");
+    this.loupeCanvas = document.createElement("canvas");
+    this.loupeNameNode = document.createElement("div");
+    this.buildLoupe();
     this.container.setAttribute("tabindex", "0");
     this.container.style.touchAction = "none";
     this.container.style.outline = "none";
@@ -231,15 +302,42 @@ export class MapEngine {
     return canvas;
   }
 
-  /** Load data and start rendering; rejects so the caller can fall back to SVG. */
+  private buildLoupe(): void {
+    const { style } = this.loupeRoot;
+    style.position = "absolute";
+    style.left = "0";
+    style.top = "0";
+    style.width = `${String(LOUPE_SIZE)}px`;
+    style.display = "none";
+    style.pointerEvents = "none";
+    const lens = this.loupeCanvas.style;
+    lens.display = "block";
+    lens.width = `${String(LOUPE_SIZE)}px`;
+    lens.height = `${String(LOUPE_SIZE)}px`;
+    lens.borderRadius = "50%";
+    lens.boxSizing = "border-box";
+    const name = this.loupeNameNode.style;
+    name.marginTop = "6px";
+    name.padding = "3px 8px";
+    name.borderRadius = "10px";
+    name.textAlign = "center";
+    name.font = `13px/17px ${FONTS.sansSemiBold}`;
+    name.overflow = "hidden";
+    name.whiteSpace = "nowrap";
+    name.textOverflow = "ellipsis";
+    this.loupeRoot.append(this.loupeCanvas, this.loupeNameNode);
+    this.container.append(this.loupeRoot);
+  }
+
+  /** Load data and start rendering; rejects so the host can fall back to SVG. */
   async start(): Promise<void> {
-    const bundle = await loadRenderBundle();
+    const bundle = await this.assets.loadBundle();
     if (this.disposed) return;
-    if (bundle.provinceCount !== this.provinceMap.provinces.length) {
+    if (bundle.provinceCount !== this.catalog.provinces.length) {
       throw new Error("render bundle: province count does not match the catalogue");
     }
     bundle.provinceIds.forEach((id, index) => {
-      if (this.provinceMap.provinces[index]?.id !== id) {
+      if (this.catalog.provinces[index]?.id !== id) {
         throw new Error(`render bundle: province ${String(index)} does not match the catalogue`);
       }
     });
@@ -252,10 +350,13 @@ export class MapEngine {
     });
     if (gl === null) throw new Error("WebGL2 context unavailable");
     this.bundle = bundle;
-    this.renderer = new MapGlRenderer(gl, bundle);
-    this.hitIndex = createProvinceHitIndex(this.provinceMap.provinces, bundle.raster);
+    this.renderer = new MapGlRenderer(gl, bundle, mapPalette(this.tokens));
+    this.hitIndex = createMeshHitIndex(this.catalog.provinces, bundle);
     this.neighbours = neighbourPairs(bundle.borders[0]?.ids ?? new Uint16Array());
-    this.glCanvas.addEventListener("webglcontextlost", (event) => event.preventDefault());
+    this.glCanvas.addEventListener("webglcontextlost", (event) => {
+      event.preventDefault();
+      this.callbacks.onContextLost();
+    });
     this.attachInput();
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(this.container);
@@ -264,11 +365,9 @@ export class MapEngine {
     this.requestFrame();
     // Terrain and sea-floor textures arrive progressively; the map is complete
     // and correct without them, so they never hold up the first frame.
-    for (const [kind, path] of [
-      ["relief", RELIEF_TEXTURE_PATH],
-      ["ocean", OCEAN_TEXTURE_PATH],
-    ] as const) {
-      void loadImage(path)
+    for (const kind of ["relief", "ocean"] as const) {
+      void this.assets
+        .loadTexture(kind)
         .then((image) => {
           if (this.disposed) return;
           this.renderer?.setImageTexture(kind, image);
@@ -282,11 +381,13 @@ export class MapEngine {
   destroy(): void {
     this.disposed = true;
     if (this.frameHandle !== null) cancelAnimationFrame(this.frameHandle);
+    this.cancelLongPress();
     this.resizeObserver?.disconnect();
     this.detachInput?.();
     this.renderer?.dispose();
     this.glCanvas.remove();
     this.labelCanvas.remove();
+    this.loupeRoot.remove();
   }
 
   // ---- data -----------------------------------------------------------------
@@ -356,7 +457,7 @@ export class MapEngine {
     const { data, bundle, neighbours } = this;
     if (data === null || bundle === null || neighbours === null) return;
     const { states, provinces, entryByTag } = data.context;
-    const futureNames = new Map(this.provinceMap.futurePolities.map((polity) => [polity.tag, polity.commonName]));
+    const futureNames = new Map(this.catalog.futurePolities.map((polity) => [polity.tag, polity.commonName]));
     const { labels: units, bounds: unitBounds } = buildUnitLabels({
       provinces,
       unitTags: states.map((state) => state.unitTag),
@@ -383,7 +484,7 @@ export class MapEngine {
         halfWidth: Math.sqrt(area) * 0.6,
       });
     });
-    const capitals: PointLabel[] = data.catalog.entries
+    const capitals: PointLabel[] = this.catalog.entries
       .filter((entry) => entry.capital.name !== "")
       .map((entry) => ({
         key: entry.tag,
@@ -465,6 +566,14 @@ export class MapEngine {
 
   private advanceAnimations(elapsed: number): boolean {
     let animating = false;
+    if (this.themeFade !== null) {
+      const fade = this.themeFade;
+      fade.elapsed += elapsed;
+      const t = Math.min(1, fade.elapsed / ERA_TRANSITION_MS);
+      this.applyTokens(blendMapTokens(fade.from, fade.to, t * t * (3 - 2 * t)));
+      if (t >= 1) this.themeFade = null;
+      else animating = true;
+    }
     if (this.flight !== null) {
       const flight = this.flight;
       flight.elapsed += elapsed;
@@ -492,6 +601,18 @@ export class MapEngine {
     } else {
       this.zoomRemaining = 0;
     }
+    if (this.drift !== 0) {
+      // A hand on the map, a throw or a flight holds the turn; it resumes after.
+      const held =
+        this.pointers.size > 0 ||
+        this.flight !== null ||
+        Math.hypot(this.velocity.x, this.velocity.y) > INERTIA_MIN_SPEED;
+      if (!held) {
+        const travel = ((this.drift * elapsed) / 1000) * (MAP_WIDTH / 360);
+        this.camera = clampCamera({ ...this.camera, x: this.camera.x - travel }, this.viewport);
+      }
+      animating = true;
+    }
     const speed = Math.hypot(this.velocity.x, this.velocity.y);
     if (speed > INERTIA_MIN_SPEED && this.pointers.size === 0) {
       this.camera = panCamera(this.camera, this.viewport, this.velocity.x * elapsed, this.velocity.y * elapsed);
@@ -508,8 +629,10 @@ export class MapEngine {
     const { renderer, data } = this;
     if (renderer === null || data === null || this.styleTable === null) return;
     const started = performance.now();
+    if (this.loupe !== null) this.drawLoupe(this.loupe);
     renderer.render(this.camera, this.viewport, this.dpr);
-    this.updateLabels();
+    // A turning backdrop has no labels to place; they return when it stops.
+    if (this.drift === 0) this.updateLabels();
     this.dirty = false;
     const duration = performance.now() - started;
     this.frames += 1;
@@ -556,11 +679,31 @@ export class MapEngine {
       this.camera,
       this.viewport,
       this.insetRight,
+      { insetLeft: this.insetLeft, reserved: this.reserved },
     );
     this.placedCamera = this.camera;
     this.labelsDirty = false;
     this.labelPlacements += 1;
-    paintLabels(context, this.placed, this.markers, this.camera, this.viewport, this.dpr);
+    paintLabels(context, this.placed, this.markers, this.camera, this.viewport, this.dpr, this.tokens);
+  }
+
+  private applyTokens(tokens: MapTokens): void {
+    this.tokens = tokens;
+    this.renderer?.setPalette(mapPalette(tokens));
+    this.labelsDirty = true;
+    this.dirty = true;
+  }
+
+  /** Move to an era's look: a slow cross-fade, unless told to jump. */
+  setTheme(eraId: EraId, immediate: boolean): void {
+    const target = resolveEra(ERA_THEMES[eraId]).map;
+    if (immediate) {
+      this.themeFade = null;
+      this.applyTokens(target);
+    } else {
+      this.themeFade = { from: this.tokens, to: target, elapsed: 0 };
+    }
+    this.requestFrame();
   }
 
   private isMoving(): boolean {
@@ -583,26 +726,59 @@ export class MapEngine {
     this.flyTo(this.homeCamera());
   }
 
-  setInsetRight(pixels: number): void {
-    if (pixels === this.insetRight) return;
-    this.insetRight = pixels;
+  /**
+   * Turn the world under a still camera: a backdrop, not a view to read. Starting
+   * eases to a closer framing and fades the labels out; stopping fades them back
+   * and returns to the home view the next screen expects.
+   */
+  setDrift(degreesPerSecond: number): void {
+    const was = this.drift;
+    this.drift = degreesPerSecond;
+    if (was === 0 && degreesPerSecond !== 0) {
+      this.labelCanvas.style.opacity = "0";
+      this.setHover(null);
+      if (this.viewport.width > 0) {
+        const scale = minimumScale(this.viewport) * DRIFT_ZOOM;
+        this.flyTo(clampCamera({ x: this.camera.x, y: projectLat(DRIFT_CENTRE_LAT), scale }, this.viewport));
+      }
+    } else if (was !== 0 && degreesPerSecond === 0) {
+      this.labelCanvas.style.opacity = "1";
+      this.labelsDirty = true;
+      this.dirty = true;
+      this.flyTo(this.homeCamera());
+    }
+    this.requestFrame();
+  }
+
+  /** Screen space the interface covers; framing and labels stay clear of it. */
+  setInsets(insets: MapInsets): void {
+    this.insetLeft = insets.left;
+    this.insetRight = insets.right;
+    this.reserved = insets.reserved;
     this.labelsDirty = true;
     this.dirty = true;
     this.requestFrame();
+  }
+
+  zoomLevel(): MapZoomLevel {
+    return zoomLevelForScale(this.camera.scale);
   }
 
   /** Frame a political unit, staying clear of any docked panel. */
   focusUnit(tag: string, immediate = false): void {
     const bounds = this.unitBounds.get(tag);
     if (bounds === undefined || this.viewport.width === 0) return;
-    const usable = { ...this.viewport, width: Math.max(320, this.viewport.width - this.insetRight) };
+    const covered = this.insetRight + this.insetLeft;
+    const usable = { ...this.viewport, width: Math.max(320, this.viewport.width - covered) };
     const framed = cameraForBounds(bounds, usable, 0.2);
     const scale = Math.max(minimumScale(this.viewport), Math.min(framed.scale, FOCUS_MAX_SCALE));
     const capped = clampCamera(
-      { x: framed.x + this.insetRight / 2 / scale, y: framed.y, scale },
+      { x: framed.x + (this.insetRight - this.insetLeft) / 2 / scale, y: framed.y, scale },
       this.viewport,
     );
     if (immediate) {
+      // A jump also ends any flight still under way, such as the return from a turning backdrop.
+      this.flight = null;
       this.camera = capped;
       this.labelsDirty = true;
       this.dirty = true;
@@ -614,6 +790,15 @@ export class MapEngine {
 
   focusPoint(worldX: number, worldY: number, scale: number): void {
     this.flyTo(clampCamera({ x: worldX, y: worldY, scale }, this.viewport));
+  }
+
+  /** Fly to a province chosen from a list, at province zoom if not already there. */
+  focusProvince(index: number): void {
+    const province = this.catalog.provinces[index];
+    if (province === undefined || this.viewport.width === 0) return;
+    const [lon = 0, lat = 0] = province.label;
+    const scale = Math.max(this.camera.scale, 9);
+    this.focusPoint(projectLon(lon) + (this.insetRight - this.insetLeft) / 2 / scale, projectLat(lat), scale);
   }
 
   private flyTo(target: Camera): void {
@@ -651,15 +836,34 @@ export class MapEngine {
       this.flight = null;
       this.velocity = { x: 0, y: 0 };
       this.travelled = 0;
+      this.touchActive = event.pointerType !== "mouse";
       this.pinchDistance = this.currentPinchDistance();
       this.lastMoveTime = event.timeStamp;
-      if (this.pointers.size > 1) this.dragging = true;
+      if (this.pointers.size > 1) {
+        // A second finger always means a pinch, even mid-loupe.
+        this.dragging = true;
+        this.cancelLongPress();
+        this.closeLoupe();
+      } else if (this.touchActive) {
+        this.setHover(null);
+        this.cancelLongPress();
+        this.longPressTimer = setTimeout(() => {
+          this.longPressTimer = null;
+          if (this.pointers.size === 1 && !this.dragging) this.openLoupe(point.x, point.y);
+        }, LONG_PRESS_MS);
+      }
     };
     const onPointerMove = (event: PointerEvent): void => {
       const point = this.localPoint(event);
       const record = this.pointers.get(event.pointerId);
       if (record === undefined) {
         if (event.pointerType === "mouse") this.updateHover(point.x, point.y);
+        return;
+      }
+      if (this.loupe !== null) {
+        record.x = point.x;
+        record.y = point.y;
+        this.moveLoupe(point.x, point.y);
         return;
       }
       if (this.pointers.size >= 2) {
@@ -681,9 +885,11 @@ export class MapEngine {
       record.x = point.x;
       record.y = point.y;
       this.travelled += Math.hypot(deltaX, deltaY);
-      if (!this.dragging && this.travelled < DRAG_THRESHOLD) return;
+      const threshold = event.pointerType === "mouse" ? DRAG_THRESHOLD : TOUCH_DRAG_THRESHOLD;
+      if (!this.dragging && this.travelled < threshold) return;
       if (!this.dragging) {
         this.dragging = true;
+        this.cancelLongPress();
         node.style.cursor = "grabbing";
         this.setHover(null);
       }
@@ -702,6 +908,16 @@ export class MapEngine {
       const record = this.pointers.get(event.pointerId);
       if (record === undefined) return;
       this.pointers.delete(event.pointerId);
+      this.cancelLongPress();
+      if (this.loupe !== null) {
+        const { index, x, y } = this.loupe;
+        this.closeLoupe();
+        if (event.type === "pointerup") {
+          if (index >= 0) this.callbacks.onProvincePress(index, x, y);
+          else this.callbacks.onSeaPress();
+        }
+        return;
+      }
       const wasDragging = this.dragging;
       if (this.pointers.size === 0) {
         this.dragging = false;
@@ -712,6 +928,7 @@ export class MapEngine {
       this.pinchDistance = this.currentPinchDistance();
       if (!wasDragging && event.type === "pointerup" && (event.pointerType !== "mouse" || event.button === 0)) {
         this.press(record.x, record.y);
+        if (event.pointerType !== "mouse") this.noteTap(record.x, record.y, event.timeStamp);
       } else {
         this.labelsDirty = true;
         this.dirty = true;
@@ -788,6 +1005,94 @@ export class MapEngine {
     };
   }
 
+  /** A browser sends no reliable dblclick for touch, so double-tap is detected here. */
+  private noteTap(x: number, y: number, time: number): void {
+    const previous = this.lastTap;
+    if (time - previous.time < DOUBLE_TAP_MS && Math.hypot(x - previous.x, y - previous.y) < DOUBLE_TAP_DISTANCE) {
+      this.queueZoom(Math.log(2), x, y);
+      this.lastTap = { x, y, time: -Infinity };
+      return;
+    }
+    this.lastTap = { x, y, time };
+  }
+
+  private cancelLongPress(): void {
+    if (this.longPressTimer !== null) clearTimeout(this.longPressTimer);
+    this.longPressTimer = null;
+  }
+
+  private openLoupe(x: number, y: number): void {
+    const size = Math.round(LOUPE_SIZE * this.dpr);
+    this.loupeCanvas.width = size;
+    this.loupeCanvas.height = size;
+    this.loupeCanvas.style.border = `2px solid ${rgbToCss(this.tokens.selection)}`;
+    this.loupeNameNode.style.color = rgbToCss(this.tokens.label);
+    this.loupeNameNode.style.backgroundColor = rgbaToCss(this.tokens.labelBack, 0.9);
+    this.loupeRoot.style.display = "block";
+    this.loupe = { x, y, index: -1 };
+    this.moveLoupe(x, y);
+  }
+
+  private moveLoupe(x: number, y: number): void {
+    const { loupe } = this;
+    if (loupe === null) return;
+    loupe.x = x;
+    loupe.y = y;
+    loupe.index = this.pick(x, y, TOUCH_PICK_RADIUS / LOUPE_ZOOM);
+    const left = Math.max(4, Math.min(this.viewport.width - LOUPE_SIZE - 4, x - LOUPE_SIZE / 2));
+    const above = y - LOUPE_OFFSET - LOUPE_SIZE / 2;
+    const top = above < LOUPE_TOP_CLEARANCE ? y + LOUPE_OFFSET - LOUPE_SIZE / 2 : above;
+    this.loupeRoot.style.transform = `translate(${left.toFixed(1)}px, ${top.toFixed(1)}px)`;
+    this.loupeNameNode.textContent = this.catalog.provinces[loupe.index]?.displayName ?? "Open sea";
+    this.setHover(loupe.index >= 0 ? loupe.index : null);
+    this.dirty = true;
+    this.requestFrame();
+  }
+
+  private closeLoupe(): void {
+    if (this.loupe === null) return;
+    this.loupe = null;
+    this.loupeRoot.style.display = "none";
+    this.setHover(null);
+  }
+
+  /**
+   * Draw the magnified view into the corner of the drawing buffer and copy it out
+   * before the main view overwrites it, all within one task, so the canvas needs
+   * no preserved buffer. A real render stays sharp where a scaled copy would blur.
+   */
+  private drawLoupe(loupe: LoupeState): void {
+    const { renderer } = this;
+    const context = this.loupeCanvas.getContext("2d");
+    if (renderer === null || context === null) return;
+    const world = screenToWorld(this.camera, this.viewport, loupe.x, loupe.y);
+    const size = Math.round(LOUPE_SIZE * this.dpr);
+    const scale = Math.min(CAMERA_MAX_SCALE, this.camera.scale * LOUPE_ZOOM);
+    renderer.render(
+      { x: wrapX(world.x), y: world.y, scale },
+      { width: LOUPE_SIZE, height: LOUPE_SIZE },
+      this.dpr,
+      levelOfDetail(this.camera.scale * this.dpr),
+    );
+    context.clearRect(0, 0, size, size);
+    context.save();
+    context.beginPath();
+    context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    context.clip();
+    context.drawImage(this.glCanvas, 0, this.glCanvas.height - size, size, size, 0, 0, size, size);
+    context.restore();
+    // A clean crosshair marks exactly what lifting the finger will pick.
+    context.strokeStyle = rgbToCss(this.tokens.selection);
+    context.lineWidth = this.dpr;
+    context.beginPath();
+    const reach = 9 * this.dpr;
+    context.moveTo(size / 2 - reach, size / 2);
+    context.lineTo(size / 2 + reach, size / 2);
+    context.moveTo(size / 2, size / 2 - reach);
+    context.lineTo(size / 2, size / 2 + reach);
+    context.stroke();
+  }
+
   private currentPinchDistance(): number {
     const [a, b] = [...this.pointers.values()];
     return a === undefined || b === undefined ? 0 : Math.hypot(a.x - b.x, a.y - b.y);
@@ -798,12 +1103,13 @@ export class MapEngine {
     return a === undefined || b === undefined ? { x: 0, y: 0 } : { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
 
-  private pick(screenX: number, screenY: number): number {
+  private pick(screenX: number, screenY: number, radiusPx?: number): number {
     const { hitIndex } = this;
     if (hitIndex === null) return -1;
     const started = performance.now();
     const world = screenToWorld(this.camera, this.viewport, screenX, screenY);
-    const index = hitIndex.pickNear(wrapX(world.x), world.y, PICK_RADIUS_PX / this.camera.scale);
+    const radius = radiusPx ?? (this.touchActive ? TOUCH_PICK_RADIUS : MOUSE_PICK_RADIUS);
+    const index = hitIndex.pickNear(wrapX(world.x), world.y, radius / this.camera.scale);
     this.pickMs += performance.now() - started;
     this.pickCount += 1;
     return index;
@@ -811,22 +1117,22 @@ export class MapEngine {
 
   private press(screenX: number, screenY: number): void {
     const index = this.pick(screenX, screenY);
-    if (index >= 0) this.callbacks.onProvincePress(index);
+    if (index >= 0) this.callbacks.onProvincePress(index, screenX, screenY);
     else this.callbacks.onSeaPress();
   }
 
   private updateHover(screenX: number, screenY: number): void {
-    if (this.dragging || Math.abs(this.zoomRemaining) > 0.02) return;
+    if (this.dragging || this.drift !== 0 || Math.abs(this.zoomRemaining) > 0.02) return;
+    this.touchActive = false;
     const index = this.pick(screenX, screenY);
-    this.setHover(index >= 0 ? index : null);
-    if (index >= 0) this.callbacks.onHoverMove(screenX, screenY);
+    this.setHover(index >= 0 ? index : null, screenX, screenY);
   }
 
-  private setHover(index: number | null): void {
+  private setHover(index: number | null, x = 0, y = 0): void {
     if (index === this.hoverIndex) return;
     this.hoverIndex = index;
     this.container.style.cursor = index === null ? "grab" : "pointer";
-    this.callbacks.onHoverChange(index);
+    if (this.loupe === null) this.callbacks.onHoverChange(index, x, y);
     if (this.styleTable !== null) {
       this.composeFlags();
       this.renderer?.updateFlagsRow(this.styleTable);
@@ -837,6 +1143,18 @@ export class MapEngine {
   }
 
   // ---- inspection (runtime verification scripts) ----------------------------
+
+  labelCount(): number {
+    return this.placed.length;
+  }
+
+  loupeOpen(): boolean {
+    return this.loupe !== null;
+  }
+
+  loupeName(): string {
+    return this.loupeNameNode.textContent ?? "";
+  }
 
   stats(): MapEngineStats {
     return {
@@ -884,7 +1202,7 @@ export class MapEngine {
   /** The province key at a screen point, without changing any state. */
   provinceKeyAt(screenX: number, screenY: number): string | null {
     const index = this.pick(screenX, screenY);
-    return index >= 0 ? (this.provinceMap.provinces[index]?.key ?? null) : null;
+    return index >= 0 ? (this.catalog.provinces[index]?.key ?? null) : null;
   }
 }
 

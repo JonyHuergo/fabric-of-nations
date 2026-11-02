@@ -34,10 +34,12 @@ describe("M11d simulation provider lifecycle", () => {
 
   test("the save envelope is read through a ref inside the event handler", () => {
     const source = providerSource();
-    expect(source).toContain("savedCampaignRef.current === null");
-    expect(source).toContain("updateSavedCampaign({");
+    // D-114: the saved games replaced the single envelope, under the same rule.
+    expect(source).toContain("savesRef.current.length === 0");
+    expect(source).toContain("updateSaves([info.slot, ...savesRef.current");
     // The old dependency array that made a completed save rebuild the worker.
     expect(source).not.toContain("[savedCampaign, setRunningState]");
+    expect(source).not.toContain("[saves, setRunningState]");
   });
 
   test("a fresh campaign is only recreated after a real worker replacement", () => {

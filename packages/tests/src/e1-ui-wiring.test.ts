@@ -20,11 +20,13 @@ function source(relativePath: string): string {
 
 describe("E1 UI wiring", () => {
   test("the M11 shell is map-first and the overview uses the explanation selector", () => {
-    const shell = source("src/screens/GameShell.tsx");
-    expect(shell).toMatch(/id: "world", label: "World"/);
-    expect(shell).toMatch(/id: "overview", label: "Overview"/);
-    expect(shell).toMatch(/useState<TabId>\("world"\)/);
-    expect(shell).toContain("<WorldMap");
+    // M16: the map stopped being a tab. It is mounted once under every screen, and
+    // the shell opens with no sheet over it, which is what map-first now means.
+    const navigation = source("src/screens/navigation.ts");
+    expect(navigation).toMatch(/id: "world",\s+label: "World"/);
+    expect(navigation).toMatch(/id: "overview", label: "Overview"/);
+    expect(source("src/screens/GameShell.tsx")).toMatch(/useState<SheetState \| null>\(null\)/);
+    expect(source("src/map/host/MapStage.tsx")).toContain("<WorldMap");
 
     const overview = source("src/screens/CountryScreen.tsx");
     expect(overview).toContain("buildEconomicExplanations");
@@ -64,8 +66,7 @@ describe("E1 UI wiring", () => {
   });
 
   test("the construction screen is wired to snapshots and the shared action path", () => {
-    const shell = source("src/screens/GameShell.tsx");
-    expect(shell).toContain('id: "construction", label: "Construction"');
+    expect(source("src/screens/navigation.ts")).toContain('id: "construction", label: "Construction"');
     const construction = source("src/screens/ConstructionScreen.tsx");
     expect(construction).toContain("previewConstruction");
     expect(construction).toContain("start-construction");
@@ -80,8 +81,7 @@ describe("E1 UI wiring", () => {
   });
 
   test("the industry screen is wired to snapshot policy and enterprise actions", () => {
-    const shell = source("src/screens/GameShell.tsx");
-    expect(shell).toContain('id: "industry", label: "Industry"');
+    expect(source("src/screens/navigation.ts")).toContain('id: "industry", label: "Industry"');
     const industry = source("src/screens/IndustryScreen.tsx");
     expect(industry).toContain("previewIndustrialPolicy");
     expect(industry).toContain("previewPublicEnterpriseSupport");
@@ -93,8 +93,7 @@ describe("E1 UI wiring", () => {
   });
 
   test("the politics screen is wired to snapshot previews and validated actions", () => {
-    const shell = source("src/screens/GameShell.tsx");
-    expect(shell).toContain('id: "politics", label: "Politics"');
+    expect(source("src/screens/navigation.ts")).toContain('id: "politics", label: "Politics"');
     const politics = source("src/screens/PoliticsScreen.tsx");
     expect(politics).toContain("previewLawProposal");
     expect(politics).toContain("previewInstitutionFunding");

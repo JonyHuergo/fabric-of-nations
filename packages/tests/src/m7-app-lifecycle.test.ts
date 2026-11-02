@@ -23,13 +23,18 @@ describe("campaign startup and autosave wiring", () => {
     expect(app).toContain("CountrySelectionScreen");
     expect(app).toContain("onNewGame");
     expect(app).toContain("onContinue");
-    expect(app).toContain("Replace the saved campaign?");
+    // D-114: saved games are listed, loaded and deleted from Load Game.
+    expect(app).toContain("LoadGameScreen");
+    expect(source("src/screens/LoadGameScreen.tsx")).toContain("Delete this saved game?");
   });
 
-  test("overwrite confirmation, autosave debounce, and failure feedback are present", () => {
+  test("campaigns save to their own slots; autosave debounce and failure feedback are present", () => {
     const provider = source("src/worker/SimulationProvider.tsx");
-    expect(provider).toContain("overwritePrompt");
-    expect(provider).toContain("confirmOverwrite");
+    // D-114 replaces the overwrite prompt: a new campaign starts a slot of its
+    // own, so saving it can never replace another campaign.
+    expect(provider).toContain("activeSlotIdRef.current = null");
+    expect(provider).toContain("slotId: activeSlotIdRef.current");
+    expect(provider).toContain("storeChainRef");
     expect(provider).toContain("AutosaveScheduler");
     expect(provider).toContain("requestAutosave");
     expect(provider).toContain('kind === "autosave"');
@@ -37,9 +42,9 @@ describe("campaign startup and autosave wiring", () => {
     expect(provider).toContain('"Autosaved"');
   });
 
-  test("the storage adapter uses the current schema and replace-safe SaveStore", () => {
+  test("the storage adapter uses the current schema and the replace-safe SaveLibrary", () => {
     const storage = source("src/storage/saveStorage.ts");
-    expect(storage).toContain("SaveStore");
+    expect(storage).toContain("SaveLibrary");
     expect(storage).toContain("readStoredCampaign");
     // The app cannot import simulation internals, so its schema literal must be
     // checked against the authoritative constant instead of pinning an old value.

@@ -101,3 +101,14 @@ export interface ProvinceMapData {
   readonly provinces: readonly ProvinceMapProvince[];
   readonly borders: readonly ProvinceMapBorder[];
 }
+
+/** Province metadata without geometry, in render-bundle order. */
+export type ProvinceCatalogEntry = Omit<
+  ProvinceMapProvince,
+  "rings" | "holes" | "aliases" | "sourceIds" | "historicalName"
+>;
+
+export interface ProvinceCatalogData {
+  readonly provinces: readonly ProvinceCatalogEntry[];
+  readonly futurePolities: readonly Pick<ProvinceFuturePolity, "polityId" | "tag" | "commonName">[];
+}

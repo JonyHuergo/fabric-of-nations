@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import {
   countryById,
@@ -10,8 +10,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Notice, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 function percent(value: number): string {
@@ -179,6 +179,12 @@ export function LaborScreen({
           {localError}
         </Notice>
       ) : null}
+
+      <Headline
+        label="Qualification"
+        value={percent(country.labor.qualificationAverage)}
+        detail={`${percent(country.labor.trainingParticipation)} of eligible people in training`}
+      />
 
       <Text style={styles.heading}>Vocational training — actual state</Text>
       <StatRow
@@ -420,7 +426,7 @@ export function LaborScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   empty: {
     color: colors.muted,
   },
@@ -428,11 +434,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
     color: colors.text,
   },
   help: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
     lineHeight: 17,
   },
@@ -446,14 +452,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   estimateTitle: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 13,
+    fontFamily: fonts.sansSemiBold,
     color: colors.muted,
     marginBottom: 4,
   },
   warning: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.red,
   },
-});
+}));

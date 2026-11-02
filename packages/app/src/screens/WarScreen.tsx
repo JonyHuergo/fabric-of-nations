@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Notice, Pill, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Headline, Notice, Pill, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 function countryName(snapshot: SimulationSnapshot, countryId: number | null): string {
@@ -176,6 +176,12 @@ export function WarScreen({
           the player-controlled country can act.
         </Notice>
       ) : null}
+
+      <Headline
+        label="Wars under way"
+        value={String(snapshot.military.wars.filter((war) => war.endedDay === null).length)}
+        detail={`${String(country.military.occupiedRegionIds.length)} regions occupied · ${String(country.military.controlledRegionIds.length)} controlled abroad`}
+      />
 
       <Text style={styles.heading}>Wars</Text>
       {snapshot.military.wars.length === 0 ? (
@@ -464,7 +470,7 @@ export function WarScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   empty: {
     color: colors.muted,
   },
@@ -472,23 +478,23 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
     color: colors.text,
   },
   label: {
     marginTop: spacing.sm,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
   },
   help: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
     lineHeight: 17,
     marginTop: spacing.xs,
   },
   warning: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.red,
   },
   row: {
@@ -515,4 +521,4 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     color: colors.text,
   },
-});
+}));

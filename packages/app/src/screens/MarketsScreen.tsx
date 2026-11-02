@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   essentialGoodIds,
@@ -9,8 +9,8 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Badge, Button, Divider, Notice, Panel } from "../components/ui";
-import { colors, radii, spacing, type } from "../theme";
+import { Badge, Button, DataRow, Disclosure, Divider, Headline, Notice, Panel } from "../components/ui";
+import { colors, radii, spacing, themedSheet, type } from "../theme";
 
 function marketKindLabel(kind: string): string {
   switch (kind) {
@@ -42,10 +42,20 @@ export function MarketsScreen({
   const currencyByCountry = new Map(
     snapshot.currencies.map((currency) => [currency.issuerCountryId, currency]),
   );
-  const markets = sortedMarkets(snapshot);
+  // The market the player trades in comes first; the world follows, folded.
+  const markets = [...sortedMarkets(snapshot)].sort(
+    (left, right) => Number(right.id === homeMarket?.id) - Number(left.id === homeMarket?.id),
+  );
 
   return (
     <View>
+      {homeMarket === null ? null : (
+        <Headline
+          label="Home market"
+          value={homeMarket.name}
+          detail={`${String(homeMarket.prices.length)} goods · ${String(homeMarket.memberCountryIds.length)} member ${homeMarket.memberCountryIds.length === 1 ? "country" : "countries"}`}
+        />
+      )}
       <Panel
         title="Markets and prices"
         subtitle={`${country?.name ?? "No country selected"} · each market clears once per economic day. Prices are bounded daily adjustments, not equilibrium prices.`}
@@ -78,7 +88,7 @@ export function MarketsScreen({
             ),
           ];
           const isHome = homeMarket !== null && homeMarket.id === market.id;
-          return (
+          const card = (
             <View key={market.id} style={[styles.market, isHome ? styles.marketHome : null]}>
               <View style={styles.marketHeader}>
                 <View style={styles.marketTitleWrap}>
@@ -118,17 +128,12 @@ export function MarketsScreen({
               <Text style={[type.label, styles.memberLabel]}>Member countries</Text>
               <View style={styles.memberWrap}>
                 {members.map((member) => (
-                  <Pressable
-                    key={member.id}
-                    style={styles.memberChip}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Member country ${member.name}`}
-                  >
+                  <View key={member.id} style={styles.memberChip}>
                     <View style={[styles.memberDot, { backgroundColor: colors.accent }]} />
                     <Text style={styles.memberText}>
                       {member.name} ({member.tag})
                     </Text>
-                  </Pressable>
+                  </View>
                 ))}
               </View>
 
@@ -153,27 +158,23 @@ export function MarketsScreen({
               )}
 
               <Divider />
-              <View style={styles.tableHeader}>
-                <Text style={[styles.headerCell, styles.goodCell]}>Good</Text>
-                <Text style={[styles.headerCell, styles.numberCell]}>Price</Text>
-                <Text style={[styles.headerCell, styles.numberCell]}>Stock</Text>
-                <Text style={[styles.headerCell, styles.capacityCell]}>Capacity/day</Text>
-              </View>
               {market.prices.map((price) => (
-                <View key={price.goodId} style={styles.tableRow}>
-                  <View style={styles.goodCell}>
-                    <Text style={styles.goodName}>
-                      {price.goodName}
-                      {essential.has(price.goodId) ? " · essential" : ""}
-                    </Text>
-                    <Text style={styles.goodUnit}>per {price.unitLabel}</Text>
-                  </View>
-                  <Text style={styles.price}>{formatPrice(price.priceRUSD)} RUSD</Text>
-                  <Text style={styles.stock}>{formatQuantity(price.stockQuantity)}</Text>
-                  <Text style={styles.capacity}>{formatQuantity(price.dailyProductionCapacity)}</Text>
-                </View>
+                <DataRow
+                  key={price.goodId}
+                  title={`${price.goodName}${essential.has(price.goodId) ? " · essential" : ""}`}
+                  value={`${formatPrice(price.priceRUSD)} RUSD`}
+                  valueTone="accent"
+                  note={`per ${price.unitLabel} · stock ${formatQuantity(price.stockQuantity)} · capacity/day ${formatQuantity(price.dailyProductionCapacity)}`}
+                />
               ))}
             </View>
+          );
+          return isHome ? (
+            card
+          ) : (
+            <Disclosure key={market.id} title={`${market.name} · ${String(members.length)}`}>
+              {card}
+            </Disclosure>
           );
         })}
       </Panel>
@@ -181,7 +182,7 @@ export function MarketsScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   market: {
     borderColor: colors.border,
     borderWidth: StyleSheet.hairlineWidth,
@@ -217,21 +218,4 @@ const styles = StyleSheet.create({
   regionText: { ...type.tiny, lineHeight: 15 },
   marketActions: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.sm, flexWrap: "wrap" },
   actionHint: { ...type.tiny, flexShrink: 1 },
-  tableHeader: { flexDirection: "row", paddingBottom: spacing.xs },
-  headerCell: { ...type.label, fontSize: 8.5 },
-  tableRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 4,
-    borderTopColor: colors.border,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  goodCell: { flex: 1, paddingRight: spacing.sm },
-  numberCell: { width: 86, textAlign: "right" },
-  capacityCell: { width: 92, textAlign: "right" },
-  goodName: { ...type.body, fontSize: 11.5 },
-  goodUnit: { ...type.tiny },
-  price: { ...type.mono, color: colors.accentStrong, width: 86, textAlign: "right" },
-  stock: { ...type.mono, color: colors.muted, width: 86, textAlign: "right" },
-  capacity: { ...type.mono, color: colors.muted, width: 92, textAlign: "right" },
-});
+}));

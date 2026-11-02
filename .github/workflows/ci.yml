@@ -47,6 +47,9 @@ jobs:
         # committed worker bundle or scenario module fails the correctness job.
         run: pnpm run check:worker
 
+      - name: Verify the map runtime is current
+        run: pnpm run map:atlas:check
+
       - name: Typecheck
         # `pnpm run typecheck` first builds @century/sim, @century/data, and
         # @century/sim-worker in dependency order, so a clean checkout never

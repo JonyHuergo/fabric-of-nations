@@ -1,10 +1,12 @@
 /**
  * Province picking in map units.
  *
- * A uniform grid narrows a point to a handful of provinces, whose rings are
- * decoded lazily and tested with the even-odd rule the fills use. Zoom plays no
- * part: picking is a pure function of the world point, so a province selects the
- * same way at every scale. Display-only land that the authoritative rings do not
+ * A uniform grid narrows a point to a handful of provinces, each then tested
+ * exactly. The ring index decodes authoritative rings; the mesh index tests the
+ * render bundle's fill triangles, the same triangles the player sees, so the map
+ * runtime needs no second copy of province geometry. Zoom plays no part: picking
+ * is a pure function of the world point, so a province selects the same way at
+ * every scale. Display-only land that the authoritative rings do not
  * reach (the 1:10m coast beyond 1:50m rings) resolves through the bundle's
  * nearest-province raster, and open sea picks nothing.
  */
@@ -12,7 +14,7 @@
 import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import { wrapX } from "./camera";
 import { MAP_HEIGHT, MAP_WIDTH, projectLat, projectLon } from "./projection";
-import { LAND_MASK, PROVINCE_ID_MASK, type ProvinceRaster } from "./renderBundle";
+import { LAND_MASK, PROVINCE_ID_MASK, type ProvinceRaster, type RenderBundle } from "./renderBundle";
 
 const CELL_SIZE = 10;
 const COLUMNS = Math.ceil(MAP_WIDTH / CELL_SIZE);
@@ -71,10 +73,91 @@ function insideRing(x: number, y: number, points: Float32Array): boolean {
   return inside;
 }
 
-/** Build the index. `provinces` must be in bundle order. */
+/** Build the index from authoritative rings. `provinces` must be in bundle order. */
 export function createProvinceHitIndex(
   provinces: readonly ProvinceMapProvince[],
   raster: ProvinceRaster | null,
+): ProvinceHitIndex {
+  const decodedRings = new Map<number, readonly DecodedRing[]>();
+  const ringsOf = (index: number): readonly DecodedRing[] => {
+    let rings = decodedRings.get(index);
+    if (rings === undefined) {
+      const province = provinces[index];
+      rings = province === undefined ? [] : decodeRings(province);
+      decodedRings.set(index, rings);
+    }
+    return rings;
+  };
+  const contains = (index: number, x: number, y: number): boolean => {
+    let inside = false;
+    for (const ring of ringsOf(index)) {
+      if (x < ring.minX || x > ring.maxX || y < ring.minY || y > ring.maxY) continue;
+      if (insideRing(x, y, ring.points)) inside = !inside;
+    }
+    return inside;
+  };
+  return buildHitIndex(provinces, raster, contains);
+}
+
+/** What the grid needs of a province; `rings` is not among it. */
+export type HitTestProvince = Pick<ProvinceMapProvince, "bbox" | "area">;
+
+/**
+ * Build the index from the bundle's fill triangles. Triangles are grouped per
+ * province once, at load, in one flat array.
+ */
+export function createMeshHitIndex(
+  provinces: readonly HitTestProvince[],
+  bundle: Pick<RenderBundle, "fill" | "fillProvince" | "raster">,
+): ProvinceHitIndex {
+  const { positions, indices } = bundle.fill;
+  const offsets = new Int32Array(provinces.length + 3);
+  const triangleCount = Math.floor(indices.length / 3);
+  const ownerOf = (triangle: number): number => bundle.fillProvince[indices[triangle * 3] ?? 0] ?? 0;
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const owner = ownerOf(triangle);
+    offsets[owner + 1] = (offsets[owner + 1] ?? 0) + 1;
+  }
+  for (let index = 1; index < offsets.length; index += 1) {
+    offsets[index] = (offsets[index] ?? 0) + (offsets[index - 1] ?? 0);
+  }
+  const grouped = new Int32Array(triangleCount);
+  const cursor = offsets.slice();
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const owner = ownerOf(triangle);
+    grouped[cursor[owner] ?? 0] = triangle;
+    cursor[owner] = (cursor[owner] ?? 0) + 1;
+  }
+  const contains = (index: number, x: number, y: number): boolean => {
+    const owner = index + 1;
+    const last = offsets[owner + 1] ?? 0;
+    for (let at = offsets[owner] ?? 0; at < last; at += 1) {
+      const triangle = (grouped[at] ?? 0) * 3;
+      const a = (indices[triangle] ?? 0) * 2;
+      const b = (indices[triangle + 1] ?? 0) * 2;
+      const c = (indices[triangle + 2] ?? 0) * 2;
+      const ax = positions[a] ?? 0;
+      const ay = positions[a + 1] ?? 0;
+      const bx = positions[b] ?? 0;
+      const by = positions[b + 1] ?? 0;
+      const cx = positions[c] ?? 0;
+      const cy = positions[c + 1] ?? 0;
+      const first = (bx - ax) * (y - ay) - (by - ay) * (x - ax);
+      const second = (cx - bx) * (y - by) - (cy - by) * (x - bx);
+      const third = (ax - cx) * (y - cy) - (ay - cy) * (x - cx);
+      if ((first >= 0 && second >= 0 && third >= 0) || (first <= 0 && second <= 0 && third <= 0)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  return buildHitIndex(provinces, bundle.raster, contains);
+}
+
+function buildHitIndex(
+  provinces: readonly HitTestProvince[],
+  raster: ProvinceRaster | null,
+  contains: (index: number, x: number, y: number) => boolean,
 ): ProvinceHitIndex {
   const cells: number[][] = Array.from({ length: COLUMNS * ROWS }, () => []);
   provinces.forEach((province, index) => {
@@ -90,26 +173,6 @@ export function createProvinceHitIndex(
       }
     }
   });
-
-  const decodedRings = new Map<number, readonly DecodedRing[]>();
-  const ringsOf = (index: number): readonly DecodedRing[] => {
-    let rings = decodedRings.get(index);
-    if (rings === undefined) {
-      const province = provinces[index];
-      rings = province === undefined ? [] : decodeRings(province);
-      decodedRings.set(index, rings);
-    }
-    return rings;
-  };
-
-  const contains = (index: number, x: number, y: number): boolean => {
-    let inside = false;
-    for (const ring of ringsOf(index)) {
-      if (x < ring.minX || x > ring.maxX || y < ring.minY || y > ring.maxY) continue;
-      if (insideRing(x, y, ring.points)) inside = !inside;
-    }
-    return inside;
-  };
 
   const pickRing = (x: number, y: number): number => {
     const row = Math.floor(y / CELL_SIZE);

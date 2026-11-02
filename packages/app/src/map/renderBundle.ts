@@ -5,15 +5,12 @@
  * meshes, polylines and rasters derived from the authoritative province data.
  * Geographic integers are projected here, by the one projection module, so the
  * build never has to ship projected coordinates. Validation is strict: a wrong
- * format, projection or province count throws, and the caller falls back to the
- * SVG renderer rather than drawing a mismatched map.
+ * format, projection or province count throws, and the host falls back to the
+ * SVG renderer rather than drawing a mismatched map. This module is pure, so the
+ * map runtime can run it in a worker, off the page's main thread.
  */
 
 import { MAP_HEIGHT, MAP_NORTH_LAT, MAP_SOUTH_LAT, MAP_WIDTH, projectLat, projectLon } from "./projection";
-
-export const RENDER_BUNDLE_PATH = "map/world-render-v1.bin";
-export const RELIEF_TEXTURE_PATH = "map/relief-v1.jpg";
-export const OCEAN_TEXTURE_PATH = "map/ocean-v1.jpg";
 
 /** One culling chunk: [start, count, minX, minY, maxX, maxY]. */
 export type RenderChunk = readonly [number, number, number, number, number, number];
@@ -273,23 +270,23 @@ export function parseRenderBundle(bytes: Uint8Array): RenderBundle {
   };
 }
 
-let cachedBundle: Promise<RenderBundle> | null = null;
-
-/** Fetch and inflate the same-origin bundle once; every map instance shares it. */
-export function loadRenderBundle(baseUrl = ""): Promise<RenderBundle> {
-  cachedBundle ??= (async () => {
-    if (typeof DecompressionStream !== "function") {
-      throw new Error("render bundle: gzip decompression is unavailable");
-    }
-    const response = await fetch(`${baseUrl}${RENDER_BUNDLE_PATH}`);
-    if (!response.ok || response.body === null) {
-      throw new Error(`render bundle: HTTP ${String(response.status)}`);
-    }
-    const inflated = response.body.pipeThrough(new DecompressionStream("gzip"));
-    return parseRenderBundle(new Uint8Array(await new Response(inflated).arrayBuffer()));
-  })().catch((error: unknown) => {
-    cachedBundle = null;
-    throw error;
-  });
-  return cachedBundle;
+/** The typed arrays of a bundle, so a worker can transfer them instead of copying. */
+export function bundleTransferList(bundle: RenderBundle): ArrayBuffer[] {
+  const buffers = new Set<ArrayBuffer>();
+  const add = (array: { readonly buffer: ArrayBufferLike }): void => {
+    buffers.add(array.buffer as ArrayBuffer);
+  };
+  add(bundle.provinceIds);
+  add(bundle.fillProvince);
+  add(bundle.stats);
+  add(bundle.raster.cells);
+  for (const layer of [bundle.fill, ...bundle.land, ...bundle.lakes]) {
+    add(layer.positions);
+    add(layer.indices);
+  }
+  for (const layer of [...bundle.coast, ...bundle.borders, ...bundle.rivers]) {
+    add(layer.segments);
+    add(layer.ids);
+  }
+  return [...buffers];
 }

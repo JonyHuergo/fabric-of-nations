@@ -35,6 +35,12 @@ const CRITICAL_COMMANDS: ReadonlySet<WorkerCommand["type"]> = new Set([
   "CREATE_GAME",
 ]);
 
+/**
+ * Not critical, so they never block a save, load or action, but they decode a
+ * whole save and get the same time to answer as one.
+ */
+const SLOW_COMMANDS: ReadonlySet<WorkerCommand["type"]> = new Set(["PREVIEW_SAVE"]);
+
 export interface WorkerSupervisorOptions {
   readonly send: (command: WorkerCommand) => void;
   readonly onEvent: (event: WorkerEvent) => void;
@@ -131,7 +137,7 @@ export class WorkerSupervisor {
       this.options.onError(error instanceof Error ? error.message : String(error));
       return false;
     }
-    const timeout = critical
+    const timeout = critical || SLOW_COMMANDS.has(command.type)
       ? (this.options.criticalTimeoutMs ?? DEFAULT_CRITICAL_TIMEOUT_MS)
       : (this.options.commandTimeoutMs ?? DEFAULT_COMMAND_TIMEOUT_MS);
     const timer = this.scheduler.setTimeout(() => {
@@ -188,7 +194,11 @@ export class WorkerSupervisor {
       this.options.onEvent(event);
       return;
     }
-    if (event.type === "LOAD_RESULT" || event.type === "NEW_GAME_RESULT") {
+    if (
+      event.type === "LOAD_RESULT" ||
+      event.type === "NEW_GAME_RESULT" ||
+      event.type === "SAVE_PREVIEW"
+    ) {
       if (!this.settle(event.commandId)) return;
       this.options.onEvent(event);
       return;

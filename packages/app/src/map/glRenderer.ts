@@ -1,5 +1,6 @@
 /**
- * WebGL2 world-map renderer (web only; native uses the SVG renderer).
+ * WebGL2 world-map renderer. It runs in the map runtime, the same page on every
+ * platform: a WebView on iOS and Android, an iframe on the web.
  *
  * All static geometry lives in GPU buffers and never changes. Everything that
  * does change reads one "style table" texture with a texel per province:
@@ -23,7 +24,14 @@ import type { Camera, MapBounds, MapViewportSize } from "./camera";
 import { visibleBounds, visibleWorldOffsets } from "./camera";
 import { MAP_HEIGHT, MAP_WIDTH } from "./projection";
 import type { LineLayer, MeshLayer, RenderBundle, RenderChunk } from "./renderBundle";
-import { PALETTE, ZOOM_BANDS, bandMix, levelOfDetail } from "./mapStyle";
+import {
+  GRATICULE_STRENGTH,
+  RELIEF_STRENGTH,
+  ZOOM_BANDS,
+  bandMix,
+  levelOfDetail,
+  type MapPalette,
+} from "./mapStyle";
 import {
   STYLE_FLAG_HOVER,
   STYLE_FLAG_PLAYER,
@@ -56,6 +64,9 @@ uniform sampler2D u_relief;
 uniform vec2 u_mapSize;
 uniform float u_pixelRatio;
 uniform float u_reliefStrength;
+uniform float u_landSaturation;
+uniform vec3 u_tint;
+uniform vec3 u_dim;
 const int F_HOVER = 1, F_PROVINCE = 2, F_UNIT = 4, F_OWNER = 8, F_DIM = 16;
 const float RELIEF_FLAT = 0.81;
 vec3 shade(int id, vec2 world) {
@@ -68,11 +79,13 @@ vec3 shade(int id, vec2 world) {
     float band = mod(gl_FragCoord.x + gl_FragCoord.y, period) / period;
     color = mix(color, stripe.rgb, step(0.5, band) * 0.86);
   }
-  if ((flags & F_DIM) != 0) color = mix(color, vec3(0.60, 0.62, 0.60), 0.74);
-  if ((flags & F_OWNER) != 0) color = mix(color, vec3(1.0, 0.97, 0.86), 0.09);
-  if ((flags & F_UNIT) != 0) color = mix(color, vec3(1.0, 0.97, 0.86), 0.20);
-  if ((flags & F_PROVINCE) != 0) color = mix(color, vec3(1.0, 0.98, 0.90), 0.30);
-  if ((flags & F_HOVER) != 0) color = mix(color, vec3(1.0, 1.0, 0.96), 0.22);
+  // The era takes saturation from the land as a whole.
+  color = mix(vec3(dot(color, vec3(0.2126, 0.7152, 0.0722))), color, u_landSaturation);
+  if ((flags & F_DIM) != 0) color = mix(color, u_dim, 0.72);
+  if ((flags & F_OWNER) != 0) color = mix(color, u_tint, 0.04);
+  if ((flags & F_UNIT) != 0) color = mix(color, u_tint, 0.09);
+  if ((flags & F_PROVINCE) != 0) color = mix(color, u_tint, 0.15);
+  if ((flags & F_HOVER) != 0) color = mix(color, u_tint, 0.1);
   float relief = texture(u_relief, world / u_mapSize).r - RELIEF_FLAT;
   // Mountains darken on the shadow side and only faintly lift on the lit side.
   color *= 1.0 + u_reliefStrength * (relief < 0.0 ? relief : relief * 0.55);
@@ -178,19 +191,15 @@ uniform sampler2D u_style;
 uniform int u_mode;
 uniform float u_halfWidth;
 uniform vec3 u_color;
-uniform float u_colorMix;
 in vec4 a_segment;
 in uvec2 a_ids;
 out vec3 v_color;
-out vec3 v_colorB;
 out float v_across;
 out float v_half;
-const int M_ALL = 0, M_PROVINCE = 1, M_UNIT = 2, M_NATIONAL = 3, M_WASH = 4;
+const int M_ALL = 0, M_PROVINCE = 1, M_UNIT = 2, M_NATIONAL = 3;
 void main() {
   int a = int(a_ids.x);
   int b = int(a_ids.y);
-  vec4 styleA = texelFetch(u_style, ivec2(a, 0), 0);
-  vec4 styleB = texelFetch(u_style, ivec2(b, 0), 0);
   vec4 groupA = texelFetch(u_style, ivec2(a, 2), 0);
   vec4 groupB = texelFetch(u_style, ivec2(b, 2), 0);
   bool sameOwner = groupA.rg == groupB.rg;
@@ -198,14 +207,13 @@ void main() {
   bool keep;
   if (u_mode == M_PROVINCE) keep = sameOwner && sameUnit;
   else if (u_mode == M_UNIT) keep = sameOwner && !sameUnit;
-  else if (u_mode == M_NATIONAL || u_mode == M_WASH) keep = !sameOwner;
+  else if (u_mode == M_NATIONAL) keep = !sameOwner;
   else keep = true;
   if (!keep) {
     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
     return;
   }
-  v_color = mix(u_color, styleA.rgb * 0.56, u_colorMix);
-  v_colorB = mix(u_color, styleB.rgb * 0.56, u_colorMix);
+  v_color = u_color;
   vec2 from = (a_segment.xy + vec2(u_offset, 0.0) - u_center) * u_scale;
   vec2 to = (a_segment.zw + vec2(u_offset, 0.0) - u_center) * u_scale;
   vec2 delta = to - from;
@@ -226,19 +234,12 @@ void main() {
 const LINE_FRAGMENT = `#version 300 es
 precision highp float;
 uniform float u_alpha;
-uniform float u_soft;
 in vec3 v_color;
-in vec3 v_colorB;
 in float v_across;
 in float v_half;
 out vec4 fragColor;
 void main() {
   float distanceOut = abs(v_across);
-  if (u_soft > 0.5) {
-    float wash = clamp(1.0 - distanceOut / v_half, 0.0, 1.0);
-    fragColor = vec4(v_across > 0.0 ? v_colorB : v_color, wash * wash * u_alpha);
-    return;
-  }
   float coverage = clamp(v_half + 0.5 - distanceOut, 0.0, 1.0);
   fragColor = vec4(v_color, coverage * u_alpha);
 }
@@ -249,16 +250,15 @@ const LINE_MODE = {
   province: 1,
   unit: 2,
   national: 3,
-  wash: 4,
 } as const;
 
 /** Accent outlines, drawn in this order; each traces one province-flag edge. */
 const ACCENT_STYLES = [
-  { flag: STYLE_FLAG_SELECTED_OWNER, excludeFlag: STYLE_FLAG_SELECTED_UNIT, width: 1, color: "ownerRealm", alpha: 0.75 },
-  { flag: STYLE_FLAG_PLAYER, excludeFlag: 0, width: 1.3, color: "player", alpha: 0.9 },
-  { flag: STYLE_FLAG_SELECTED_UNIT, excludeFlag: 0, width: 2, color: "selection", alpha: 1 },
-  { flag: STYLE_FLAG_HOVER, excludeFlag: 0, width: 1.3, color: "hover", alpha: 0.95 },
-  { flag: STYLE_FLAG_SELECTED_PROVINCE, excludeFlag: 0, width: 2.1, color: "selectedProvince", alpha: 1 },
+  { flag: STYLE_FLAG_SELECTED_OWNER, excludeFlag: STYLE_FLAG_SELECTED_UNIT, width: 0.9, color: "ownerRealm", alpha: 0.6 },
+  { flag: STYLE_FLAG_PLAYER, excludeFlag: 0, width: 1, color: "player", alpha: 0.75 },
+  { flag: STYLE_FLAG_SELECTED_UNIT, excludeFlag: 0, width: 1.8, color: "selection", alpha: 1 },
+  { flag: STYLE_FLAG_HOVER, excludeFlag: 0, width: 1.1, color: "hover", alpha: 0.9 },
+  { flag: STYLE_FLAG_SELECTED_PROVINCE, excludeFlag: 0, width: 2.2, color: "selectedProvince", alpha: 1 },
 ] as const;
 
 interface AccentRange {
@@ -361,11 +361,13 @@ export class MapGlRenderer {
   private accentRanges: readonly AccentRange[] = [];
   /** Level of detail the accent buffers were built for; -1 means stale. */
   private accentLod = -1;
+  private palette: MapPalette;
   readonly counters: FrameCounters = { drawCalls: 0, renderedSegments: 0 };
 
-  constructor(gl: WebGL2RenderingContext, bundle: RenderBundle) {
+  constructor(gl: WebGL2RenderingContext, bundle: RenderBundle, palette: MapPalette) {
     this.gl = gl;
     this.bundle = bundle;
+    this.palette = palette;
     this.fillProgram = link(gl, FILL_VERTEX, FILL_FRAGMENT);
     this.landProgram = link(gl, LAND_VERTEX, LAND_FRAGMENT);
     this.solidProgram = link(gl, LAND_VERTEX, SOLID_FRAGMENT);
@@ -417,9 +419,15 @@ export class MapGlRenderer {
 
     this.reliefTexture = this.createTexture();
     this.oceanTexture = this.createTexture();
-    for (const texture of [this.reliefTexture, this.oceanTexture]) {
+    // Until a raster arrives the land reads flat and the sea reads deep.
+    for (const [texture, value] of [
+      [this.reliefTexture, 207],
+      [this.oceanTexture, 96],
+    ] as const) {
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([207, 207, 207, 255]));
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([value]));
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -563,12 +571,19 @@ export class MapGlRenderer {
     this.accentRanges = ranges;
   }
 
+  /** Upload a raster as one channel: a quarter of the GPU memory of RGBA. */
   setImageTexture(kind: "relief" | "ocean", image: ImageBitmap | HTMLImageElement): void {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, kind === "relief" ? this.reliefTexture : this.oceanTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, image);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  }
+
+  setPalette(palette: MapPalette): void {
+    this.palette = palette;
   }
 
   private bindCommon(program: Program, camera: Camera, viewport: MapViewportSize, dpr: number): void {
@@ -584,6 +599,9 @@ export class MapGlRenderer {
     gl.uniform1i(uniform("u_relief"), 1);
     gl.uniform1i(uniform("u_ids"), 2);
     gl.uniform1i(uniform("u_ocean"), 3);
+    gl.uniform1f(uniform("u_landSaturation"), this.palette.landSaturation);
+    gl.uniform3fv(uniform("u_tint"), this.palette.hover);
+    gl.uniform3fv(uniform("u_dim"), this.palette.seaDeep);
   }
 
   private drawMesh(buffers: MeshBuffers, program: Program, view: MapBounds, offsets: readonly number[]): void {
@@ -648,8 +666,14 @@ export class MapGlRenderer {
     }
   }
 
-  render(camera: Camera, viewport: MapViewportSize, dpr: number): void {
+  /**
+   * Draw one view into the lower-left of the drawing buffer. `lodOverride` lets
+   * the loupe share the main view's geometry level, so one frame never rebuilds
+   * the accent buffers twice.
+   */
+  render(camera: Camera, viewport: MapViewportSize, dpr: number, lodOverride?: number): void {
     const gl = this.gl;
+    const PALETTE = this.palette;
     this.counters.drawCalls = 0;
     this.counters.renderedSegments = 0;
     const deviceWidth = Math.round(viewport.width * dpr);
@@ -671,7 +695,7 @@ export class MapGlRenderer {
 
     const view = visibleBounds(camera, viewport);
     const deviceScale = camera.scale * dpr;
-    const lod = levelOfDetail(deviceScale);
+    const lod = lodOverride ?? levelOfDetail(deviceScale);
     const offsets = visibleWorldOffsets(view, this.bundle.extentMinX, this.bundle.extentMaxX);
     const coastLod = this.coast[lod];
     const borderLod = this.borders[lod];
@@ -691,7 +715,7 @@ export class MapGlRenderer {
     gl.uniform3fv(seaUniform("u_graticule"), PALETTE.graticule);
     gl.uniform1f(
       seaUniform("u_graticuleStrength"),
-      0.42 * (1 - bandMix(deviceScale / dpr, ZOOM_BANDS.graticuleFadeStart, ZOOM_BANDS.graticuleFadeEnd)),
+      GRATICULE_STRENGTH * (1 - bandMix(deviceScale / dpr, ZOOM_BANDS.graticuleFadeStart, ZOOM_BANDS.graticuleFadeEnd)),
     );
     gl.bindVertexArray(this.seaVao);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -703,7 +727,7 @@ export class MapGlRenderer {
     gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
     this.bindCommon(this.landProgram, camera, viewport, dpr);
     const relief =
-      PALETTE.reliefStrength * (1 - 0.72 * bandMix(camera.scale, ZOOM_BANDS.reliefFadeStart, ZOOM_BANDS.reliefFadeEnd));
+      RELIEF_STRENGTH * (1 - 0.9 * bandMix(camera.scale, ZOOM_BANDS.reliefFadeStart, ZOOM_BANDS.reliefFadeEnd));
     gl.uniform1f(this.landProgram.uniforms.get("u_reliefStrength") ?? null, relief);
     this.drawMesh(landLod, this.landProgram, view, offsets);
 
@@ -731,16 +755,12 @@ export class MapGlRenderer {
       widthPx: number,
       color: Float32Array,
       alpha: number,
-      colorMix = 0,
-      soft = false,
     ): void => {
       if (alpha <= 0.01) return;
       gl.uniform1i(uniforms.get("u_mode") ?? null, mode);
       gl.uniform1f(uniforms.get("u_halfWidth") ?? null, (widthPx * dpr) / 2);
       gl.uniform3fv(uniforms.get("u_color") ?? null, color);
       gl.uniform1f(uniforms.get("u_alpha") ?? null, alpha);
-      gl.uniform1f(uniforms.get("u_colorMix") ?? null, colorMix);
-      gl.uniform1f(uniforms.get("u_soft") ?? null, soft ? 1 : 0);
       this.drawLines(buffers, view, offsets);
     };
     const inside = (): void => {
@@ -755,29 +775,23 @@ export class MapGlRenderer {
 
     inside();
     const riverAmount = bandMix(scale, ZOOM_BANDS.riverStart, ZOOM_BANDS.riverFull);
-    drawLine(riverLod, LINE_MODE.all, 0.6 + riverAmount * 0.5, PALETTE.river, 0.25 + riverAmount * 0.6);
-
-    // Hand-tinted border wash: a soft band of each country's own colour.
-    const washAmount = bandMix(scale, ZOOM_BANDS.washStart, ZOOM_BANDS.washFull);
-    drawLine(borderLod, LINE_MODE.wash, 6 + washAmount * 3, PALETTE.borderInk, 0.2 * washAmount, 1, true);
+    drawLine(riverLod, LINE_MODE.all, 0.6 + riverAmount * 0.4, PALETTE.river, 0.2 + riverAmount * 0.5);
 
     const provinceAmount = bandMix(scale, ZOOM_BANDS.provinceStart, ZOOM_BANDS.provinceFull);
-    drawLine(borderLod, LINE_MODE.province, 0.7 + provinceAmount * 0.3, PALETTE.provinceLine, provinceAmount * 0.85, 1);
+    drawLine(borderLod, LINE_MODE.province, 0.6 + provinceAmount * 0.2, PALETTE.provinceLine, provinceAmount * 0.24);
     const unitAmount = bandMix(scale, ZOOM_BANDS.unitStart, ZOOM_BANDS.unitFull);
-    drawLine(borderLod, LINE_MODE.unit, 0.9 + unitAmount * 0.3, PALETTE.borderInk, 0.32 + unitAmount * 0.33);
+    drawLine(borderLod, LINE_MODE.unit, 0.7 + unitAmount * 0.2, PALETTE.border, 0.22 + unitAmount * 0.18);
 
     free();
-    drawLine(coastLod, LINE_MODE.all, 0.8 + unitAmount * 0.3, PALETTE.coast, 0.9);
+    drawLine(coastLod, LINE_MODE.all, 0.7 + unitAmount * 0.2, PALETTE.coast, 0.8);
 
     inside();
     const nationalAmount = bandMix(scale, ZOOM_BANDS.nationalThin, ZOOM_BANDS.nationalFull);
-    drawLine(borderLod, LINE_MODE.national, 1 + nationalAmount * 0.55, PALETTE.borderInk, 0.9);
+    drawLine(borderLod, LINE_MODE.national, 0.8 + nationalAmount * 0.5, PALETTE.border, 0.62 + nationalAmount * 0.18);
 
     // Selection, always above the map's own line work.
     this.prepareAccents(lod);
     gl.uniform1i(uniforms.get("u_mode") ?? null, LINE_MODE.all);
-    gl.uniform1f(uniforms.get("u_colorMix") ?? null, 0);
-    gl.uniform1f(uniforms.get("u_soft") ?? null, 0);
     gl.uniform1f(offsetUniform(this.lineProgram), 0);
     gl.bindVertexArray(this.accentVao);
     const drawAccent = (start: number, count: number, widthPx: number, color: Float32Array, alpha: number): void => {
@@ -800,10 +814,10 @@ export class MapGlRenderer {
       if (range === undefined) continue;
       const color = PALETTE[style.color];
       inside();
-      drawAccent(range.borderStart, range.borderCount, style.width + 1.6, PALETTE.casing, style.alpha * 0.5);
+      drawAccent(range.borderStart, range.borderCount, style.width + 1.4, PALETTE.casing, style.alpha * 0.4);
       drawAccent(range.borderStart, range.borderCount, style.width, color, style.alpha);
       free();
-      drawAccent(range.coastStart, range.coastCount, style.width + 1.6, PALETTE.casing, style.alpha * 0.5);
+      drawAccent(range.coastStart, range.coastCount, style.width + 1.4, PALETTE.casing, style.alpha * 0.4);
       drawAccent(range.coastStart, range.coastCount, style.width, color, style.alpha);
     }
 

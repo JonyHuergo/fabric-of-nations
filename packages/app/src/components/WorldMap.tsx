@@ -1,11 +1,12 @@
 import {
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ComponentRef,
-  type ReactNode,
+  type Ref,
 } from "react";
 import {
   PanResponder,
@@ -26,11 +27,13 @@ import Svg, {
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
-import { GlWorldMap } from "../map/GlWorldMap";
-import { supportsMapEngine } from "../map/mapEngine";
-import { politicalColor, rgbToCss } from "../map/politicalPalette";
+import { ERA_THEMES, FONTS, MAP_LABELS, desaturate, labelBudget, type EraId } from "../design/tokens";
+import { AtlasMap, type AtlasMapHandle, type MapPress } from "../map/host/AtlasMap";
+import type { ReservedBox } from "../map/labels";
+import { marketColor } from "../map/mapModes";
+import { politicalColor, rgbToCss, stateColor, type Rgb } from "../map/politicalPalette";
 import { statusLabel } from "../map/statusLabel";
-import { colors, lighten, nationColor, spacing, type } from "../theme";
+import { TOUCH_TARGET, colors, nationColor, radii, spacing, themedSheet, type } from "../theme";
 import {
   MAP_HEIGHT,
   MAP_MAX_SCALE,
@@ -45,7 +48,7 @@ import {
   project,
   type DecodedPolityGeometry,
 } from "./worldMapGeometry";
-import { PROVINCE_MAP_1900 } from "../provinceMapBundle";
+import { FALLBACK_PROVINCE_MAP as PROVINCE_MAP_1900 } from "./provinceGeometry";
 import {
   pickProvinceAtPoint,
   planProvinceBorders,
@@ -69,27 +72,6 @@ import { Badge } from "./ui";
 const MIN_SCALE = MAP_MIN_SCALE;
 const MAX_SCALE = MAP_MAX_SCALE;
 
-const MARKET_COLORS = [
-  "#7f9c7a",
-  "#b08a63",
-  "#8e8ab5",
-  "#b57e7a",
-  "#6f8fa8",
-  "#a8936a",
-  "#8a9c8f",
-  "#a97f9a",
-  "#7c8fa0",
-  "#a19062",
-  "#7e9d94",
-  "#9a7f6d",
-  "#8c8fa8",
-  "#a58f7f",
-  "#6f9a8a",
-  "#b09a7a",
-  "#8f9a6a",
-  "#a07a8c",
-] as const;
-
 export type MapLayer = "political" | "control" | "markets";
 
 interface DecodedPolity extends WorldMapPolity {
@@ -109,17 +91,17 @@ interface DecodedProvince extends ProvinceMapProvince {
 }
 
 /**
- * Visual hierarchy (revised after playtest review):
- * - international borders are thick near-black lines and have absolute priority;
+ * Visual hierarchy, shared with the WebGL map:
+ * - international borders are fine paper-coloured lines and have absolute priority;
  * - province boundaries are quiet solid hairlines, never dashed, so they read as
  *   a subtle internal grid instead of competing with the national borders;
  * - only internal province edges are drawn (no coastline/outer-edge clutter).
  * Widths are screen pixels, converted to viewBox units in the renderer.
  */
-const PROVINCE_BORDER_COLOR = "#ffffff";
-const COUNTRY_BORDER_WIDTH_PX = 1.25;
-const COASTLINE_WIDTH_PX = 0.9;
-const SELECTION_WIDTH_PX = 1.4;
+const COUNTRY_BORDER_WIDTH_PX = 1;
+const COASTLINE_WIDTH_PX = 0.7;
+const COASTLINE_OPACITY = 0.45;
+const SELECTION_WIDTH_PX = 1.8;
 
 function centroidOf(polity: WorldMapPolity): readonly [number, number] {
   const [lon, lat] = polity.label;
@@ -140,65 +122,71 @@ export interface WorldMapProps {
   readonly highlightMarketId?: number | null;
   /** M12a selected province, when the host screen exposes province selection. */
   readonly selectedProvinceId?: number | null;
-  readonly onSelectProvince?: (provinceId: number | null) => void;
+  readonly onSelectProvince?: (provinceId: number | null, press: MapPress | null) => void;
+  readonly onSeaPress?: () => void;
   /** Provincial boundaries are shown by default for every M12a map. */
   readonly showProvinces?: boolean;
-  /** Fill the parent instead of using `height` (WebGL map). */
+  /** Fill the parent instead of using `height`. */
   readonly fill?: boolean;
-  /** Width of a panel docked over the map's right edge (WebGL map). */
+  /** Width of a panel over the map's left edge. */
+  readonly insetLeft?: number;
+  /** Width of a panel over the map's right edge. */
   readonly insetRight?: number;
-  /** Host-screen controls drawn above the map (WebGL map). */
-  readonly overlay?: ReactNode;
+  /** Interface controls over the map; labels stay out of them. */
+  readonly reserved?: readonly ReservedBox[];
+  /** Era tokens for the map; presentation only, derived from the date. */
+  readonly eraId?: EraId;
+  /** Degrees of longitude per second the world turns as a backdrop; 0 is still. */
+  readonly drift?: number;
 }
 
 /**
- * The one world-map entry point. The web build runs the WebGL renderer in
- * `../map`; native builds, and any browser without WebGL2, use the SVG renderer
- * below. Both consume the same catalogue, snapshot, projection and palette.
+ * The one world-map entry point. Every platform runs the WebGL atlas page: in a
+ * WebView on iOS and Android, in an iframe on the web. If that cannot run, the SVG
+ * renderer below takes over, from the same catalogue, snapshot, projection, palette
+ * and tokens. The SVG map carries no relief and, on native, draws polities without
+ * province lines, because province rings are not in the native bundle.
  */
-export function WorldMap(props: WorldMapProps) {
-  const [engineSupported] = useState(() => Platform.OS === "web" && supportsMapEngine());
-  const [engineFailed, setEngineFailed] = useState(false);
+export const WorldMap = forwardRef(function WorldMap(props: WorldMapProps, ref: Ref<AtlasMapHandle>) {
+  const [fallbackReason, setFallbackReason] = useState<string | null>(null);
   const [hostHeight, setHostHeight] = useState(0);
-  if (engineSupported && !engineFailed) {
+  if (fallbackReason === null) {
     return (
-      <GlWorldMap
+      <AtlasMap
+        ref={ref}
         catalog={props.catalog}
         snapshot={props.snapshot}
-        selectedTag={props.selectedTag}
-        onSelect={props.onSelect}
-        layer={props.layer ?? "political"}
-        playerTag={props.playerTag ?? null}
-        height={props.height ?? 420}
-        fill={props.fill === true}
-        showLegend={props.showLegend ?? true}
+        eraId={props.eraId ?? "imperial"}
+        lens={props.layer ?? "political"}
         highlightMarketId={props.highlightMarketId ?? null}
+        selectedTag={props.selectedTag}
         selectedProvinceId={props.selectedProvinceId ?? null}
-        onSelectProvince={props.onSelectProvince}
+        playerTag={props.playerTag ?? null}
+        insetLeft={props.insetLeft ?? 0}
         insetRight={props.insetRight ?? 0}
-        overlay={props.overlay ?? null}
-        onUnavailable={() => setEngineFailed(true)}
+        reserved={props.reserved ?? NO_RESERVED}
+        drift={props.drift ?? 0}
+        onSelect={props.onSelect}
+        onSelectProvince={props.onSelectProvince}
+        onSeaPress={props.onSeaPress}
+        onUnavailable={(reason) => {
+          console.warn("WebGL map unavailable, using the SVG map:", reason);
+          setFallbackReason(reason);
+        }}
       />
-    );
-  }
-  if (props.fill !== true) {
-    return (
-      <View>
-        <SvgWorldMap {...props} />
-        {props.overlay}
-      </View>
     );
   }
   return (
     <View
-      style={styles.fillHost}
+      style={StyleSheet.absoluteFill}
       onLayout={(event) => setHostHeight(event.nativeEvent.layout.height)}
     >
       {hostHeight === 0 ? null : <SvgWorldMap {...props} height={hostHeight} />}
-      {props.overlay}
     </View>
   );
-}
+});
+
+const NO_RESERVED: readonly ReservedBox[] = [];
 
 function SvgWorldMap({
   catalog,
@@ -214,7 +202,15 @@ function SvgWorldMap({
   selectedProvinceId = null,
   onSelectProvince,
   showProvinces = true,
+  eraId = "imperial",
+  insetLeft = 0,
+  insetRight = 0,
+  reserved = NO_RESERVED,
 }: WorldMapProps) {
+  /** Land as the era shows it: the same saturation the WebGL map's shader applies. */
+  const landSaturation = ERA_THEMES[eraId].landSaturation;
+  const land = (color: Rgb): string => rgbToCss(desaturate(color, landSaturation));
+  const PROVINCE_BORDER_COLOR = colors.mapProvinceLine;
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
@@ -652,14 +648,13 @@ function SvgWorldMap({
       if (layer === "markets") {
         const region = regionByPolityId.get(province.simulationRegionId);
         const marketId = region?.marketId ?? null;
-        if (marketId !== null) {
-          return MARKET_COLORS[marketId % MARKET_COLORS.length] ?? colors.faint;
-        }
+        if (marketId !== null) return land(marketColor(marketId));
       }
-      if (playerTag !== null && ownerTag === playerTag) return colors.player;
-      return rgbToCss(politicalColor(province.mapTag, entryByTag));
+      return land(politicalColor(ownerTag === province.initialOwnerTag ? province.mapTag : ownerTag, entryByTag));
     },
-    [entryByTag, layer, ownerTagByProvinceId, playerTag, regionByPolityId],
+    // `land` closes over the era's saturation only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [entryByTag, layer, ownerTagByProvinceId, regionByPolityId, landSaturation],
   );
 
   const handlePointerMove = useCallback(
@@ -698,15 +693,12 @@ function SvgWorldMap({
     if (layer === "markets") {
       const region = regionByPolityId.get(entry.id);
       const marketId = region?.marketId;
-      if (marketId !== undefined && marketId !== null) {
-        return MARKET_COLORS[marketId % MARKET_COLORS.length] ?? colors.faint;
-      }
+      if (marketId !== undefined && marketId !== null) return land(marketColor(marketId));
       const marketKey = entry.market ?? marketByKey.get(entry.market ?? "")?.key;
       const fallback = catalog.markets.find((market) => market.key === marketKey);
-      return MARKET_COLORS[(fallback?.id ?? 0) % MARKET_COLORS.length] ?? colors.faint;
+      return land(marketColor(fallback?.id ?? 0));
     }
-    if (playerTag !== null && entry.tag === playerTag) return colors.player;
-    return rgbToCss(politicalColor(entry.tag, entryByTag));
+    return land(politicalColor(entry.tag, entryByTag));
   };
 
   const occupationFor = (polity: DecodedPolity) => {
@@ -755,7 +747,7 @@ function SvgWorldMap({
     // active country instead of resolving a same-tag 1900 territory incorrectly.
     const selectOwner = ownerPolityId < 1000;
     const select = (): void => {
-      onSelectProvince?.(province.id);
+      onSelectProvince?.(province.id, null);
       if (selectOwner) onSelect(ownerTag);
     };
     return Platform.OS === "web"
@@ -785,10 +777,19 @@ function SvgWorldMap({
   const screenScale = Math.max(viewScale * scale, 0.0001);
   const labelLayout = useMemo(() => {
     const visible = {
-      left: -translate.x / scale,
-      right: (MAP_WIDTH - translate.x) / scale,
+      left: -translate.x / scale + insetLeft / screenScale,
+      right: (MAP_WIDTH - translate.x) / scale - insetRight / screenScale,
       top: -translate.y / scale,
       bottom: (MAP_HEIGHT - translate.y) / scale,
+    };
+    // The same budget and clearances the WebGL labels obey, in map coordinates.
+    const budget = labelBudget(size.width, size.height);
+    const toMapBox = (box: ReservedBox) => {
+      const originX = (size.width - MAP_WIDTH * viewScale) / 2;
+      const originY = (size.height - MAP_HEIGHT * viewScale) / 2;
+      const left = ((box.left - originX) / viewScale - translate.x) / scale;
+      const top = ((box.top - originY) / viewScale - translate.y) / scale;
+      return { left, top, right: left + box.width / screenScale, bottom: top + box.height / screenScale };
     };
     const placed: {
       readonly tag: string;
@@ -798,7 +799,7 @@ function SvgWorldMap({
       readonly fontSize: number;
       readonly selected: boolean;
     }[] = [];
-    const boxes: { left: number; right: number; top: number; bottom: number }[] = [];
+    const boxes: { left: number; right: number; top: number; bottom: number }[] = reserved.map(toMapBox);
     const candidates = polities.filter((polity) => {
       if (polity.markerOnly === true) return false;
       if (polity.tag === selectedTag) return true;
@@ -815,8 +816,9 @@ function SvgWorldMap({
       return right.area - left.area;
     });
     for (const polity of candidates) {
+      if (placed.length >= budget) break;
       const selected = polity.tag === selectedTag;
-      const name = polity.entry.commonName;
+      const name = polity.entry.commonName.toUpperCase();
       const [x, y] = polity.centroid;
       /*
        * Size the label to the country on screen. A large state gets a large
@@ -832,15 +834,17 @@ function SvgWorldMap({
         (polity.screenBox[3] - polity.screenBox[1]) * screenScale,
         1,
       );
-      const fitByWidth = countryWidth / (Math.max(name.length, 1) * 0.68);
+      const fitByWidth = countryWidth / (Math.max(name.length, 1) * 0.56);
       const fitByHeight = countryHeight * 0.48;
       const areaBased = Math.sqrt(countryWidth * countryHeight) * 0.14;
+      // A name that cannot fit its country waits for a closer zoom.
+      if (!selected && fitByWidth < MAP_LABELS.minSize) continue;
       const screenFontSize = Math.max(
-        7,
-        Math.min(24, fitByWidth, fitByHeight, areaBased),
+        MAP_LABELS.minSize,
+        Math.min(MAP_LABELS.maxSize, fitByWidth, fitByHeight, areaBased),
       );
       const fontSize = (screenFontSize + (selected ? 1.5 : 0)) / screenScale;
-      const width = name.length * fontSize * 0.68 + 8 / screenScale;
+      const width = name.length * fontSize * 0.56 + 8 / screenScale;
       const height = fontSize * 1.35;
       const box = {
         left: x - width / 2,
@@ -875,7 +879,21 @@ function SvgWorldMap({
       placed.push({ tag: polity.tag, name, x, y, fontSize, selected });
     }
     return placed;
-  }, [playerTag, polities, scale, screenScale, selectedTag, translate.x, translate.y]);
+  }, [
+    insetLeft,
+    insetRight,
+    playerTag,
+    polities,
+    reserved,
+    scale,
+    screenScale,
+    selectedTag,
+    size.height,
+    size.width,
+    translate.x,
+    translate.y,
+    viewScale,
+  ]);
 
   const hoveredProvince =
     hoveredProvinceId === null ? null : (provinceById.get(hoveredProvinceId) ?? null);
@@ -936,6 +954,7 @@ function SvgWorldMap({
                  * the identical outline rather than a separate simplified one.
                  */
                 stroke={colors.mapBorder}
+                strokeOpacity={COASTLINE_OPACITY}
                 strokeWidth={strokePx(COASTLINE_WIDTH_PX)}
                 pointerEvents="none"
               />
@@ -1004,6 +1023,7 @@ function SvgWorldMap({
                 d={landPath}
                 fill="none"
                 stroke={colors.mapBorder}
+                strokeOpacity={COASTLINE_OPACITY}
                 strokeWidth={strokePx(COASTLINE_WIDTH_PX)}
                 pointerEvents="none"
               />
@@ -1038,7 +1058,7 @@ function SvgWorldMap({
                         d={path}
                         fill="none"
                         fillRule="evenodd"
-                        stroke={colors.accentStrong}
+                        stroke={colors.accent}
                         strokeWidth={strokePx(SELECTION_WIDTH_PX)}
                         strokeLinejoin="round"
                         pointerEvents="none"
@@ -1050,7 +1070,7 @@ function SvgWorldMap({
                   d={selectedCountryProvincePath}
                   fill="none"
                   fillRule="evenodd"
-                  stroke={colors.accentStrong}
+                  stroke={colors.accent}
                   strokeWidth={strokePx(1.4)}
                   strokeLinejoin="round"
                   opacity={0.9}
@@ -1075,6 +1095,7 @@ function SvgWorldMap({
                     fill="none"
                     fillRule="evenodd"
                     stroke={colors.mapBorder}
+                    strokeOpacity={COASTLINE_OPACITY}
                     strokeWidth={strokePx(COUNTRY_BORDER_WIDTH_PX)}
                     strokeLinejoin="round"
                     strokeLinecap="round"
@@ -1098,7 +1119,7 @@ function SvgWorldMap({
                         d={selected.path}
                         fill="none"
                         fillRule="evenodd"
-                        stroke={colors.accentStrong}
+                        stroke={colors.accent}
                         strokeWidth={strokePx(SELECTION_WIDTH_PX)}
                         strokeLinejoin="round"
                         pointerEvents="none"
@@ -1154,24 +1175,10 @@ function SvgWorldMap({
                   <SvgText
                     x={label.x}
                     y={label.y}
-                    fill="none"
-                    stroke={colors.mapOcean}
-                    strokeWidth={3 / scale}
-                    strokeLinejoin="round"
+                    fill={colors.mapLabel}
+                    fontFamily={label.selected ? FONTS.sansSemiBold : FONTS.sansMedium}
                     fontSize={label.fontSize}
-                    fontWeight="700"
                     textAnchor="middle"
-                  >
-                    {label.name}
-                  </SvgText>
-                  <SvgText
-                    x={label.x}
-                    y={label.y}
-                    fill={colors.textStrong}
-                    fontSize={label.fontSize}
-                    fontWeight={label.selected ? "800" : "700"}
-                    textAnchor="middle"
-                    opacity={0.98}
                   >
                     {label.name}
                   </SvgText>
@@ -1187,8 +1194,8 @@ function SvgWorldMap({
                     cx={cx}
                     cy={cy}
                     r={(isSelected ? 2.6 : 1.8) / scale}
-                    fill={colors.mapOcean}
-                    stroke={isSelected ? colors.accentStrong : colors.textStrong}
+                    fill={colors.mapLabel}
+                    stroke={isSelected ? colors.accent : colors.mapOcean}
                     strokeWidth={strokePx(1)}
                     pointerEvents="none"
                   />
@@ -1204,8 +1211,8 @@ function SvgWorldMap({
                     cx={x}
                     cy={y}
                     r={(isSelected ? 5 : 3.2) / Math.max(scale, 0.8)}
-                    fill={isSelected ? colors.accentStrong : colors.textStrong}
-                    stroke={colors.mapBorder}
+                    fill={isSelected ? colors.accent : colors.mapLabel}
+                    stroke={colors.mapOcean}
                     strokeWidth={strokePx(0.8)}
                     {...polityPressProps(polity.tag)}
                   />
@@ -1253,7 +1260,7 @@ function SvgWorldMap({
         </View>
       )}
 
-      <View style={styles.controls}>
+      <View style={[styles.controls, { right: insetRight + spacing.sm }]}>
         <MapButton label="+" accessibilityLabel="Zoom in" onPress={() => zoomBy(1.5)} />
         <MapButton label="−" accessibilityLabel="Zoom out" onPress={() => zoomBy(1 / 1.5)} />
         <MapButton label="⤢" accessibilityLabel="Reset map view" onPress={resetView} />
@@ -1263,15 +1270,11 @@ function SvgWorldMap({
         <View style={styles.legend}>
           <Badge label={layer === "markets" ? "Market layer" : layer === "control" ? "Control layer" : "Political layer"} tone="accent" />
           <View style={styles.legendRow}>
-            <View style={[styles.swatch, { backgroundColor: colors.player }]} />
-            <Text style={styles.legendText}>Player</Text>
-          </View>
-          <View style={styles.legendRow}>
-            <View style={[styles.swatch, { backgroundColor: "#b08a63" }]} />
+            <View style={[styles.swatch, { backgroundColor: rgbToCss(stateColor("GBR")) }]} />
             <Text style={styles.legendText}>Sovereign state</Text>
           </View>
           <View style={styles.legendRow}>
-            <View style={[styles.swatch, { backgroundColor: lighten("#b08a63", 0.3) }]} />
+            <View style={[styles.swatch, { backgroundColor: rgbToCss(politicalColor("BIN", entryByTag)) }]} />
             <Text style={styles.legendText}>Dependent territory</Text>
           </View>
           {showProvinces ? (
@@ -1330,39 +1333,31 @@ export function marketOfEntry(
   return catalog.markets.find((market) => market.key === entry.market) ?? null;
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   container: {
     position: "relative",
     width: "100%",
     backgroundColor: colors.mapOcean,
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 4,
     overflow: "hidden",
   },
-  fillHost: { flex: 1 },
   mapFrame: { flex: 1 },
-  controls: { position: "absolute", right: 8, top: 8, gap: 4 },
+  controls: { position: "absolute", right: spacing.sm, top: "28%", gap: spacing.xs },
   mapButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 3,
-    backgroundColor: "rgba(11, 16, 20, 0.82)",
-    borderColor: colors.borderStrong,
-    borderWidth: StyleSheet.hairlineWidth,
+    width: TOUCH_TARGET,
+    height: TOUCH_TARGET,
+    borderRadius: radii.pill,
+    backgroundColor: colors.chrome,
     alignItems: "center",
     justifyContent: "center",
   },
   mapButtonPressed: { backgroundColor: colors.surfaceHover },
-  mapButtonLabel: { color: colors.text, fontSize: 15, lineHeight: 18 },
+  mapButtonLabel: { ...type.section, color: colors.textStrong },
   legend: {
     position: "absolute",
-    left: 8,
-    bottom: 8,
-    backgroundColor: "rgba(11, 16, 20, 0.88)",
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 3,
+    left: spacing.sm,
+    bottom: spacing.sm,
+    backgroundColor: colors.chrome,
+    borderRadius: radii.md,
     paddingHorizontal: spacing.sm,
     paddingVertical: 6,
     gap: 3,
@@ -1376,12 +1371,12 @@ const styles = StyleSheet.create({
     width: 18,
     height: 0,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.45)",
+    borderTopColor: colors.mapProvinceLine,
   },
   countryLineSwatch: {
     width: 18,
     height: 0,
-    borderTopWidth: 3,
+    borderTopWidth: 1,
     borderTopColor: colors.mapBorder,
   },
   occSwatch: {
@@ -1394,14 +1389,12 @@ const styles = StyleSheet.create({
   tooltip: {
     position: "absolute",
     maxWidth: 210,
-    backgroundColor: "rgba(8, 12, 16, 0.95)",
-    borderColor: colors.borderStrong,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 3,
+    backgroundColor: colors.chrome,
+    borderRadius: radii.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 5,
     gap: 1,
   },
-  tooltipTitle: { ...type.body, color: colors.textStrong, fontWeight: "700" },
+  tooltipTitle: { ...type.section },
   tooltipMeta: { ...type.tiny, color: colors.muted },
-});
+}));

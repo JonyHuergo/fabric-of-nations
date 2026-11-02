@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
+  Animated,
   Platform,
   Pressable,
   ScrollView,
@@ -8,6 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   SPEED_VALUES,
@@ -15,93 +17,71 @@ import {
   type CountrySummarySnapshot,
   type ProvinceOwnershipSnapshot,
   type RegionSnapshot,
+  type SimulationSnapshot,
   type SpeedDaysPerSecond,
 } from "@century/sim-worker";
 
-import { WORLD_CATALOG } from "../generated/worldCatalog";
-import { WORLD_MAP_1900 } from "../generated/worldMap1900";
-import { PROVINCE_MAP_1900 } from "../provinceMapBundle";
-import type { ProvinceMapProvince } from "../provinceCatalogTypes";
-import { colors, radii, spacing, type } from "../theme";
-import type { WorldCatalogEntry } from "../worldCatalogTypes";
 import { CountryFlag } from "../components/CountryFlag";
-import { statusLabel, WorldMap, type MapLayer } from "../components/WorldMap";
-import { Badge, Button, Chip, Divider, Metric, Panel } from "../components/ui";
+import { Icon, type IconName } from "../components/icons";
+import { statusLabel } from "../components/WorldMap";
+import { Badge, Button, Chip, Divider, Metric, Panel, StatRow } from "../components/ui";
+import { shellMetrics, type ShellMetrics } from "../design/tokens";
+import { PROVINCE_CATALOG } from "../generated/provinceCatalog";
+import { WORLD_CATALOG } from "../generated/worldCatalog";
+import type { MapPress } from "../map/host/AtlasMap";
+import { useMapStage, useMapView } from "../map/host/MapStage";
+import type { ReservedBox } from "../map/labels";
+import { availableLenses } from "../map/lenses";
+import { MAP_MODES, type MapDataContext, type MapModeId } from "../map/mapModes";
+import { rgbToCss } from "../map/politicalPalette";
+import type { ProvinceCatalogEntry } from "../provinceCatalogTypes";
+import { TOUCH_TARGET, colors, fonts, getActiveTheme, radii, spacing, themedSheet, type } from "../theme";
+import type { WorldCatalogEntry } from "../worldCatalogTypes";
 import { useSimulation } from "../worker/SimulationProvider";
 import { BudgetScreen } from "./BudgetScreen";
 import { ConstructionScreen } from "./ConstructionScreen";
 import { CountryScreen } from "./CountryScreen";
+import { appendDispatches, deriveDispatches, type Dispatch, type DispatchSource } from "./dispatches";
 import { IndustryScreen } from "./IndustryScreen";
 import { LaborScreen } from "./LaborScreen";
 import { LedgerScreen } from "./LedgerScreen";
 import { MarketsScreen } from "./MarketsScreen";
 import { MoneyScreen } from "./MoneyScreen";
+import { DOMAINS, domainOf, type DomainId, type NavDomain, type ScreenId } from "./navigation";
 import { PoliticsScreen } from "./PoliticsScreen";
 import { PopulationScreen } from "./PopulationScreen";
 import { TechnologyScreen } from "./TechnologyScreen";
 import { TradeScreen } from "./TradeScreen";
 import { WarScreen } from "./WarScreen";
 
-type TabId =
-  | "world"
-  | "overview"
-  | "budget"
-  | "markets"
-  | "industry"
-  | "construction"
-  | "trade"
-  | "labor"
-  | "money"
-  | "population"
-  | "politics"
-  | "technology"
-  | "war"
-  | "ledger";
+const DOMAIN_ICON: Readonly<Record<DomainId, IconName>> = {
+  realm: "realm",
+  economy: "economy",
+  society: "society",
+  world: "world",
+};
 
-interface NavGroup {
-  readonly title: string;
-  readonly items: readonly { readonly id: TabId; readonly label: string; readonly glyph: string }[];
-}
+const SHEET_MS = 240;
+const DISPATCH_SHOW_MS = 6_000;
+const STATUS_SHOW_MS = 3_500;
+/** Keep this much clear water between a tapped place and the sheet's edge. */
+const SHEET_CLEARANCE = 28;
 
-const NAV: readonly NavGroup[] = [
-  {
-    title: "Realm",
-    items: [
-      { id: "world", label: "World", glyph: "◍" },
-      { id: "overview", label: "Overview", glyph: "▤" },
-    ],
-  },
-  {
-    title: "Economy",
-    items: [
-      { id: "budget", label: "Budget", glyph: "◫" },
-      { id: "markets", label: "Markets", glyph: "⇄" },
-      { id: "industry", label: "Industry", glyph: "▦" },
-      { id: "construction", label: "Construction", glyph: "⌂" },
-      { id: "trade", label: "Trade", glyph: "⛴" },
-      { id: "labor", label: "Labor & health", glyph: "⚒" },
-      { id: "money", label: "Money", glyph: "◉" },
-    ],
-  },
-  {
-    title: "Society",
-    items: [
-      { id: "population", label: "Population", glyph: "☰" },
-      { id: "politics", label: "Politics", glyph: "⚖" },
-      { id: "technology", label: "Technology", glyph: "✦" },
-    ],
-  },
-  {
-    title: "World",
-    items: [
-      { id: "war", label: "War & diplomacy", glyph: "⚔" },
-      { id: "ledger", label: "Ledger", glyph: "☰" },
-    ],
-  },
-];
+type SheetState =
+  | { readonly kind: "screen"; readonly screen: ScreenId }
+  | { readonly kind: "place" }
+  | { readonly kind: "campaign" };
 
-const TAB_LABEL = new Map<TabId, string>();
-for (const group of NAV) for (const item of group.items) TAB_LABEL.set(item.id, item.label);
+const PROVINCE_BY_ID = new Map(PROVINCE_CATALOG.provinces.map((province) => [province.id, province] as const));
+const ENTRY_BY_ID = new Map(WORLD_CATALOG.entries.map((entry) => [entry.id, entry] as const));
+const ENTRY_BY_TAG = new Map(WORLD_CATALOG.entries.map((entry) => [entry.tag, entry] as const));
+const FUTURE_BY_ID = new Map(PROVINCE_CATALOG.futurePolities.map((polity) => [polity.polityId, polity] as const));
+
+const DISPATCH_NAMES = {
+  province: (provinceId: number): string => PROVINCE_BY_ID.get(provinceId)?.displayName ?? `Province ${String(provinceId)}`,
+  polity: (polityId: number): string =>
+    ENTRY_BY_ID.get(polityId)?.commonName ?? FUTURE_BY_ID.get(polityId)?.commonName ?? `Polity ${String(polityId)}`,
+};
 
 function formatRusd(value: number): string {
   const absolute = Math.abs(value);
@@ -117,6 +97,22 @@ function formatPeople(value: number): string {
   return String(Math.round(value));
 }
 
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function displayDate(date: { readonly year: number; readonly month: number; readonly day: number }): string {
+  return `${String(date.day)} ${MONTH_NAMES[date.month - 1] ?? ""} ${String(date.year)}`;
+}
+
+/**
+ * The player's last closed month. Read from the player's own history because a
+ * country summary's result stays null until the worker compacts that month.
+ */
+function latestClosedResult(snapshot: SimulationSnapshot | null): number | null {
+  const player = snapshot?.countries.find((country) => country.id === snapshot.playerCountryId);
+  const history = player?.financeHistory ?? [];
+  return history[history.length - 1]?.netFiscalResultRUSD ?? null;
+}
+
 export function GameShell() {
   const {
     snapshot,
@@ -128,7 +124,6 @@ export function GameShell() {
     achievedDaysPerSecond,
     busy,
     focusCountryId,
-    savedCampaign,
     start,
     pause,
     step,
@@ -139,13 +134,17 @@ export function GameShell() {
     restartWorker,
     clearError,
   } = useSimulation();
-  const { width } = useWindowDimensions();
-  const narrow = width < 900;
-  const [tab, setTab] = useState<TabId>("world");
+  const { width, height } = useWindowDimensions();
+  const safe = useSafeAreaInsets();
+  const metrics = shellMetrics(width, height);
+  const stage = useMapStage();
+  const [sheet, setSheet] = useState<SheetState | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
-  const [layer, setLayer] = useState<MapLayer>("political");
+  const [layer, setLayer] = useState<MapModeId>("political");
   const [highlightMarketId, setHighlightMarketId] = useState<number | null>(null);
+  const [shift, setShift] = useState(0);
+  const lastPress = useRef<MapPress | null>(null);
 
   const playerSummary = useMemo(
     () =>
@@ -159,9 +158,15 @@ export function GameShell() {
     [playerSummary?.tag],
   );
 
+  // Select the player's nation, and select it again when another campaign arrives:
+  // Continue opens the shell before the worker answers with the loaded world.
+  const seenPlayerTag = useRef<string | null>(null);
   useEffect(() => {
-    if (selectedTag === null && playerSummary !== null) setSelectedTag(playerSummary.tag);
-  }, [playerSummary, selectedTag]);
+    const tag = playerSummary?.tag ?? null;
+    if (tag === null || tag === seenPlayerTag.current) return;
+    seenPlayerTag.current = tag;
+    setSelectedTag(tag);
+  }, [playerSummary?.tag]);
 
   useEffect(() => {
     const entry = WORLD_CATALOG.entries.find((candidate) => candidate.tag === selectedTag);
@@ -232,270 +237,800 @@ export function GameShell() {
         null);
 
   const controlsDisabled = busy || connection !== "ready";
-  const headerSubtitle =
-    snapshot === null
-      ? "Connecting to the simulation…"
-      : `${snapshot.date.label} · ${snapshot.scenarioId} · ${connection}`;
 
-  const nav = (
-    <View style={narrow ? styles.mobileNav : styles.rail}>
-      <ScrollView
-        horizontal={narrow}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={narrow ? styles.mobileNavContent : styles.railContent}
-      >
-        {NAV.map((group) => (
-          <View key={group.title} style={narrow ? styles.mobileNavGroup : styles.railGroup}>
-            {narrow ? null : <Text style={styles.railGroupTitle}>{group.title}</Text>}
-            {group.items.map((item) => {
-              const active = tab === item.id;
-              return (
-                <Pressable
-                  key={item.id}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                  // RNW does not forward `selected` for buttons; aria-current
-                  // communicates the active screen to assistive technology.
-                  {...(Platform.OS === "web" ? ({ "aria-current": active ? "page" : undefined } as object) : {})}
-                  onPress={() => setTab(item.id)}
-                  style={[narrow ? styles.mobileNavItem : styles.railItem, active ? styles.navItemActive : null]}
-                >
-                  <Text style={[styles.navGlyph, active ? styles.navGlyphActive : null]}>{item.glyph}</Text>
-                  <Text style={[styles.navLabel, active ? styles.navLabelActive : null]}>{item.label}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+  // ---- dispatches -----------------------------------------------------------
+
+  const previousFrame = useRef<DispatchSource | null>(null);
+  const [dispatches, setDispatches] = useState<readonly Dispatch[]>([]);
+  const [shownDispatch, setShownDispatch] = useState<Dispatch | null>(null);
+  useEffect(() => {
+    if (snapshot === null) return;
+    const added = deriveDispatches(previousFrame.current, snapshot, DISPATCH_NAMES);
+    previousFrame.current = snapshot;
+    const latest = added[added.length - 1];
+    if (latest === undefined) return;
+    setDispatches((history) => appendDispatches(history, added));
+    setShownDispatch(latest);
+  }, [snapshot]);
+  useEffect(() => {
+    if (shownDispatch === null) return;
+    const timer = setTimeout(() => setShownDispatch(null), DISPATCH_SHOW_MS);
+    return () => clearTimeout(timer);
+  }, [shownDispatch]);
+  const [statusVisible, setStatusVisible] = useState(false);
+  useEffect(() => {
+    if (saveStatus === null) {
+      setStatusVisible(false);
+      return;
+    }
+    setStatusVisible(true);
+    const timer = setTimeout(() => setStatusVisible(false), STATUS_SHOW_MS);
+    return () => clearTimeout(timer);
+  }, [saveStatus]);
+
+  // ---- map and sheet --------------------------------------------------------
+
+  const sheetOpen = sheet !== null;
+  const animateShift = useCallback(
+    (value: number) => {
+      setShift(value);
+      Animated.timing(stage.shift, {
+        toValue: value,
+        duration: SHEET_MS,
+        useNativeDriver: Platform.OS !== "web",
+      }).start();
+    },
+    [stage.shift],
   );
 
+  /**
+   * The map surface slides aside rather than the camera moving: a selection made
+   * on the map keeps its camera, and the place tapped stays clear of the sheet.
+   */
+  const openSheet = useCallback(
+    (next: SheetState, press: MapPress | null) => {
+      setSheet(next);
+      const edge = width - safe.right - metrics.sheetWidth - SHEET_CLEARANCE;
+      const clearance = press === null ? -metrics.sheetWidth / 2 : Math.min(0, edge - press.x);
+      animateShift(Math.max(-metrics.sheetWidth, clearance));
+    },
+    [animateShift, metrics.sheetWidth, safe.right, width],
+  );
+  const closeSheet = useCallback(() => {
+    setSheet(null);
+    animateShift(0);
+  }, [animateShift]);
+
+  useEffect(() => {
+    return () => stage.shift.setValue(0);
+  }, [stage.shift]);
+
+  const onSelectProvince = useCallback(
+    (provinceId: number | null, press: MapPress | null) => {
+      setSelectedProvinceId(provinceId);
+      lastPress.current = press;
+      if (provinceId !== null) openSheet({ kind: "place" }, press);
+    },
+    [openSheet],
+  );
+
+  const showMarket = useCallback(
+    (marketId: number) => {
+      setLayer("markets");
+      setHighlightMarketId(marketId);
+      closeSheet();
+    },
+    [closeSheet],
+  );
+
+  const railRight = safe.left + metrics.gutter + TOUCH_TARGET;
+  const surfaceOffset = -shift;
+  const insetLeft = railRight + surfaceOffset;
+  const insetRight = sheetOpen ? Math.max(0, metrics.sheetWidth - surfaceOffset) : 0;
+  const reserved = useMemo<readonly ReservedBox[]>(
+    () => hudBoxes(width, height, metrics, safe, surfaceOffset, sheetOpen),
+    [height, metrics, safe, sheetOpen, surfaceOffset, width],
+  );
+
+  useMapView(
+    {
+      selectedTag,
+      selectedProvinceId,
+      playerTag: playerSummary?.tag ?? null,
+      lens: layer,
+      highlightMarketId,
+      insetLeft,
+      insetRight,
+      reserved,
+    },
+    {
+      onSelect: setSelectedTag,
+      onSelectProvince,
+      onSeaPress: () => {
+        if (sheet?.kind === "place") closeSheet();
+      },
+    },
+  );
+
+  const lenses = useMemo(() => availableLenses(snapshot), [snapshot]);
+
+  const domain = sheet?.kind === "screen" ? domainOf(sheet.screen) : null;
+  const sheetTitle =
+    sheet === null
+      ? ""
+      : sheet.kind === "screen"
+        ? (domain?.label ?? "")
+        : sheet.kind === "campaign"
+          ? "Campaign"
+          : (selectedEntry?.commonName ?? "Selection");
+  const sheetSubtitle =
+    sheet?.kind === "screen"
+      ? selectedEntry === null
+        ? (playerSummary?.name ?? "")
+        : `${selectedEntry.name} · ${statusLabel(selectedEntry.status)}`
+      : undefined;
+
+  const sideGap = sheetOpen ? metrics.sheetWidth : safe.right;
+
   return (
-    <View style={styles.root}>
-      <TopBar
-        playerName={playerSummary?.name ?? "No player country"}
-        playerHistoricalName={playerEntry?.name ?? ""}
-        playerTag={playerSummary?.tag ?? ""}
-        playerId={playerSummary?.id ?? null}
-        status={playerEntry?.status ?? null}
-        capital={playerEntry?.capital.name ?? ""}
-        subtitle={headerSubtitle}
-        dateLabel={snapshot?.date.label ?? "—"}
+    <View style={styles.root} pointerEvents="box-none">
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${playerSummary?.name ?? "No player country"}, open campaign`}
+        onPress={() => openSheet({ kind: "campaign" }, null)}
+        style={[styles.pill, { top: safe.top + metrics.gutter, left: safe.left + metrics.gutter }]}
+      >
+        <CountryFlag polityId={playerSummary?.id ?? null} tag={playerSummary?.tag ?? ""} size="topBar" />
+        <Text style={styles.pillName} numberOfLines={1}>
+          {playerEntry?.commonName ?? playerSummary?.name ?? "No player country"}
+        </Text>
+      </Pressable>
+
+      <View
+        pointerEvents="none"
+        style={[
+          styles.topCentre,
+          {
+            top: safe.top + metrics.gutter,
+            left: safe.left + metrics.gutter + PILL_MAX_WIDTH + spacing.sm,
+            right: sideGap + metrics.gutter,
+          },
+        ]}
+      >
+        <View style={styles.readout}>
+          <Text style={styles.readoutDate} numberOfLines={1}>
+            {snapshot === null ? "—" : displayDate(snapshot.date)}
+          </Text>
+          {sheetOpen && metrics.compact ? null : (
+            <>
+              <Readout label="Treasury" value={formatRusd(playerSummary?.treasuryCashRUSD ?? 0)} />
+              <Readout label="People" value={formatPeople(playerSummary?.population ?? 0)} />
+              <Readout
+                label="Hardship"
+                value={`${((playerSummary?.hardshipPopulationShare ?? 0) * 100).toFixed(1)}%`}
+                tone={(playerSummary?.hardshipPopulationShare ?? 0) > 0.1 ? "negative" : "default"}
+              />
+            </>
+          )}
+        </View>
+        {error !== null ? null : statusVisible && saveStatus !== null ? (
+          <DispatchStrip medium="Status" dateLabel={null} headline={saveStatus} />
+        ) : shownDispatch === null ? null : (
+          <DispatchStrip
+            medium={getActiveTheme().dispatchMedium}
+            dateLabel={shownDispatch.dateLabel}
+            headline={shownDispatch.headline}
+          />
+        )}
+      </View>
+
+      <View
+        style={[
+          styles.rail,
+          { left: safe.left + metrics.gutter, top: safe.top + metrics.gutter + TOUCH_TARGET + spacing.sm },
+        ]}
+      >
+        {DOMAINS.map((entry) => (
+          <DomainButton
+            key={entry.id}
+            domain={entry}
+            active={domain?.id === entry.id}
+            onPress={() => {
+              if (domain?.id === entry.id) closeSheet();
+              else openSheet({ kind: "screen", screen: entry.items[0]?.id ?? "overview" }, null);
+            }}
+          />
+        ))}
+      </View>
+
+      <LensSwitch
+        lenses={lenses}
+        layer={layer}
+        highlightMarketId={highlightMarketId}
+        marketNames={snapshot?.markets ?? WORLD_CATALOG.markets}
+        bottom={safe.bottom + metrics.gutter}
+        left={safe.left + metrics.gutter}
+        width={metrics.lensPanelWidth}
+        onLayer={(next) => {
+          setLayer(next);
+          if (next === "markets") setHighlightMarketId(null);
+        }}
+        onClearHighlight={() => setHighlightMarketId(null)}
+        onZoom={(direction) => stage.map()?.zoom(direction)}
+        onReset={() => stage.map()?.resetView()}
+      />
+
+      <TimeControl
         running={running}
         speed={speedDaysPerSecond}
         achieved={achievedDaysPerSecond}
-        controlsDisabled={controlsDisabled}
-        treasury={playerSummary?.treasuryCashRUSD ?? 0}
-        population={playerSummary?.population ?? 0}
-        hardship={playerSummary?.hardshipPopulationShare ?? 0}
-        netResult={playerSummary?.latestNetFiscalResultRUSD ?? null}
+        disabled={controlsDisabled}
+        right={sideGap + metrics.gutter}
+        bottom={safe.bottom + metrics.gutter}
+        playSize={metrics.playButton}
         onStart={start}
         onPause={pause}
         onStep={step}
-        onSpeed={(speedValue) => setSpeed(speedValue as SpeedDaysPerSecond)}
-        onSave={saveGame}
-        onLoad={loadGame}
-        onRestart={restartWorker}
-        canSave={snapshot !== null}
-        saveLabel={savedCampaign === null ? "Save" : "Save / replace"}
+        onSpeed={(value) => setSpeed(value as SpeedDaysPerSecond)}
       />
 
       {error === null ? null : (
-        <Pressable onPress={clearError} style={styles.banner} accessibilityRole="button">
-          <Text style={styles.bannerText}>{error}</Text>
+        <Pressable
+          onPress={clearError}
+          style={[styles.banner, { left: safe.left + 72, right: sideGap + metrics.gutter, top: safe.top + 58 }]}
+          accessibilityRole="button"
+        >
+          <Text style={styles.bannerText} numberOfLines={3}>
+            {error}
+          </Text>
           <Text style={styles.bannerDismiss}>Dismiss</Text>
         </Pressable>
       )}
-      {saveStatus === null ? null : (
-        <View style={styles.statusBar}>
-          <Text style={styles.statusText}>{saveStatus}</Text>
-        </View>
-      )}
 
-      <View style={[styles.shell, narrow ? styles.shellNarrow : null]}>
-        {nav}
-        <View style={styles.main}>
-          {tab === "world" ? (
-            <WorldStage
-              narrow={narrow}
-              map={(insetRight, fill) => (
-                <WorldMap
-                  catalog={WORLD_CATALOG}
-                  map={WORLD_MAP_1900}
-                  snapshot={snapshot}
-                  selectedTag={selectedTag}
-                  onSelect={setSelectedTag}
-                  layer={layer}
-                  playerTag={playerSummary?.tag ?? null}
-                  height={320}
-                  fill={fill}
-                  insetRight={insetRight}
-                  highlightMarketId={highlightMarketId}
-                  selectedProvinceId={selectedProvinceId}
-                  onSelectProvince={setSelectedProvinceId}
-                  overlay={
-                    <View style={styles.mapToolbar}>
-                      <Text style={styles.mapTitle}>World map</Text>
-                      <View style={styles.layerChips}>
-                        <Chip label="Political" active={layer === "political"} onPress={() => setLayer("political")} />
-                        <Chip label="Control" active={layer === "control"} onPress={() => setLayer("control")} />
-                        <Chip
-                          label="Markets"
-                          active={layer === "markets"}
-                          onPress={() => {
-                            setLayer("markets");
-                            setHighlightMarketId(null);
-                          }}
-                        />
-                        {highlightMarketId === null ? null : (
-                          <Chip
-                            label="Clear market highlight"
-                            active={false}
-                            onPress={() => setHighlightMarketId(null)}
-                          />
-                        )}
-                      </View>
-                    </View>
-                  }
-                />
-              )}
-              panels={
-                <>
-              <SelectedPolityPanel
-                entry={selectedEntry}
-                summary={selectedSummary}
-                region={selectedRegion}
-                market={selectedMarket}
-                isPlayer={selectedEntry !== null && selectedEntry.tag === playerSummary?.tag}
-                onOpenOverview={() => setTab("overview")}
-                onShowMarket={(marketId) => {
-                  setLayer("markets");
-                  setHighlightMarketId(marketId);
-                }}
+      <SideSheet
+        open={sheetOpen}
+        width={metrics.sheetWidth}
+        safeRight={safe.right}
+        safeTop={safe.top}
+        safeBottom={safe.bottom}
+        title={sheetTitle}
+        subtitle={sheetSubtitle}
+        onClose={closeSheet}
+        tabs={
+          domain === null || domain.items.length < 2 || sheet?.kind !== "screen" ? null : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.tabStrip}
+              contentContainerStyle={styles.tabs}
+            >
+              {domain.items.map((item) => {
+                const active = sheet.screen === item.id;
+                return (
+                  <Pressable
+                    key={item.id}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    // RNW does not forward `selected` for buttons; aria-current
+                    // communicates the active screen to assistive technology.
+                    {...(Platform.OS === "web" ? ({ "aria-current": active ? "page" : undefined } as object) : {})}
+                    onPress={() => setSheet({ kind: "screen", screen: item.id })}
+                    style={[styles.tab, active ? styles.tabActive : null]}
+                  >
+                    <Text style={[styles.tabLabel, active ? styles.tabLabelActive : null]}>{item.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          )
+        }
+      >
+        {sheet === null ? null : sheet.kind === "campaign" ? (
+          <CampaignPanel
+            playerName={playerSummary?.name ?? "No player country"}
+            playerHistoricalName={playerEntry?.name ?? ""}
+            status={playerEntry?.status ?? null}
+            capital={playerEntry?.capital.name ?? ""}
+            scenarioLine={
+              snapshot === null
+                ? "Connecting to the simulation…"
+                : `${snapshot.date.label} · ${snapshot.scenarioId} · ${connection}`
+            }
+            netResult={latestClosedResult(snapshot)}
+            speedLine={`${formatSpeed(speedDaysPerSecond)}${running && achievedDaysPerSecond > 0 ? ` · ~${achievedDaysPerSecond.toFixed(1)}/s` : ""} · best effort`}
+            saveStatus={saveStatus}
+            dispatches={dispatches}
+            medium={getActiveTheme().dispatchMedium}
+            canSave={snapshot !== null}
+            controlsDisabled={controlsDisabled}
+            saveLabel="Save"
+            onSave={saveGame}
+            onLoad={loadGame}
+            onRestart={restartWorker}
+          />
+        ) : sheet.kind === "place" ? (
+          <>
+            {selectedProvinceId === null ? null : (
+              <ProvincePanel
+                province={PROVINCE_BY_ID.get(selectedProvinceId) ?? null}
+                ownership={
+                  snapshot?.provinces.find((entry) => entry.provinceId === selectedProvinceId) ?? null
+                }
               />
-              {selectedProvinceId === null ? null : (
-                <ProvincePanel
-                  province={
-                    PROVINCE_MAP_1900.provinces.find(
-                      (province) => province.id === selectedProvinceId,
-                    ) ?? null
-                  }
-                  ownership={
-                    snapshot?.provinces.find(
-                      (entry) => entry.provinceId === selectedProvinceId,
-                    ) ?? null
-                  }
-                  ownerTag={
-                    (() => {
-                      const ownership = snapshot?.provinces.find(
-                        (entry) => entry.provinceId === selectedProvinceId,
-                      );
-                      if (ownership === undefined) return null;
-                      return (
-                        WORLD_CATALOG.entries.find(
-                          (entry) => entry.id === ownership.ownerPolityId,
-                        )?.tag ??
-                        PROVINCE_MAP_1900.futurePolities.find(
-                          (polity) => polity.polityId === ownership.ownerPolityId,
-                        )?.tag ??
-                        null
-                      );
-                    })()
-                  }
-                />
-              )}
-                </>
-              }
+            )}
+            <SelectedPolityPanel
+              entry={selectedEntry}
+              summary={selectedSummary}
+              region={selectedRegion}
+              market={selectedMarket}
+              isPlayer={selectedEntry !== null && selectedEntry.tag === playerSummary?.tag}
+              onOpenOverview={() => setSheet({ kind: "screen", screen: "overview" })}
+              onShowMarket={showMarket}
             />
-          ) : (
-            <ScrollView style={styles.scroll} contentContainerStyle={styles.screenContent}>
-              <View style={styles.screenHeader}>
-                <Text style={styles.screenTitle}>{TAB_LABEL.get(tab) ?? ""}</Text>
-                <Text style={styles.screenSubtitle}>
-                  {selectedEntry === null
-                    ? playerSummary?.name ?? ""
-                    : `${selectedEntry.name} · ${statusLabel(selectedEntry.status)}`}
+          </>
+        ) : focusedCountryId === null ? null : detailReady ? (
+          <Screen
+            tab={sheet.screen}
+            countryId={focusedCountryId}
+            onSelectCountry={(countryId) => {
+              const tag = snapshot?.countrySummaries.find((candidate) => candidate.id === countryId)?.tag;
+              if (tag !== undefined) setSelectedTag(tag);
+            }}
+            onShowMarket={showMarket}
+          />
+        ) : (
+          <Panel title="Loading country detail" subtitle="The worker is preparing this country's full record.">
+            <Text style={styles.panelEmpty}>
+              Country summaries are already available; the selected country's detailed record arrives in
+              the next snapshot.
+            </Text>
+          </Panel>
+        )}
+      </SideSheet>
+    </View>
+  );
+}
+
+const PILL_MAX_WIDTH = 196;
+const READOUT_WIDTH = 330;
+const LENS_BUTTON_WIDTH = 112;
+const TIME_CONTROL_WIDTH = 176;
+
+/** Where the controls sit, in map-surface pixels, so labels stay out from under them. */
+function hudBoxes(
+  width: number,
+  height: number,
+  metrics: ShellMetrics,
+  safe: { readonly top: number; readonly left: number; readonly right: number; readonly bottom: number },
+  surfaceOffset: number,
+  sheetOpen: boolean,
+): readonly ReservedBox[] {
+  const top = safe.top + metrics.gutter;
+  const left = safe.left + metrics.gutter + surfaceOffset;
+  const right = (sheetOpen ? metrics.sheetWidth : safe.right) + metrics.gutter;
+  const bottom = safe.bottom + metrics.gutter;
+  const usableWidth = width - (sheetOpen ? metrics.sheetWidth : 0);
+  return [
+    { left, top, width: PILL_MAX_WIDTH, height: TOUCH_TARGET },
+    { left: usableWidth / 2 - READOUT_WIDTH / 2 + surfaceOffset, top, width: READOUT_WIDTH, height: TOUCH_TARGET },
+    { left, top: height - bottom - TOUCH_TARGET, width: LENS_BUTTON_WIDTH, height: TOUCH_TARGET },
+    {
+      left: width - right - TIME_CONTROL_WIDTH + surfaceOffset,
+      top: height - bottom - metrics.playButton,
+      width: TIME_CONTROL_WIDTH,
+      height: metrics.playButton,
+    },
+  ];
+}
+
+function Readout({
+  label,
+  value,
+  tone = "default",
+}: {
+  readonly label: string;
+  readonly value: string;
+  readonly tone?: "default" | "negative";
+}) {
+  return (
+    <View style={styles.readoutItem}>
+      <Text style={styles.readoutLabel}>{label}</Text>
+      <Text style={[styles.readoutValue, tone === "negative" ? { color: colors.red } : null]} numberOfLines={1}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+/** The news strip. It has no touch target, so it can never block the map. */
+function DispatchStrip({
+  medium,
+  dateLabel,
+  headline,
+}: {
+  readonly medium: string;
+  readonly dateLabel: string | null;
+  readonly headline: string;
+}) {
+  return (
+    <View style={styles.dispatch}>
+      <Text style={styles.dispatchMedium} numberOfLines={1}>
+        {medium}
+        {dateLabel === null ? "" : ` · ${dateLabel}`}
+      </Text>
+      <Text style={styles.dispatchHeadline} numberOfLines={2}>
+        {headline}
+      </Text>
+    </View>
+  );
+}
+
+function DomainButton({
+  domain,
+  active,
+  onPress,
+}: {
+  readonly domain: NavDomain;
+  readonly active: boolean;
+  readonly onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={domain.label}
+      accessibilityState={{ selected: active }}
+      {...(Platform.OS === "web" ? ({ "aria-pressed": active } as object) : {})}
+      onPress={onPress}
+      style={({ pressed }) => [styles.round, active ? styles.roundActive : null, pressed ? styles.pressed : null]}
+    >
+      <Icon name={DOMAIN_ICON[domain.id]} color={active ? colors.accentText : colors.textStrong} />
+    </Pressable>
+  );
+}
+
+function LensSwitch({
+  lenses,
+  layer,
+  highlightMarketId,
+  marketNames,
+  bottom,
+  left,
+  width,
+  onLayer,
+  onClearHighlight,
+  onZoom,
+  onReset,
+}: {
+  readonly lenses: readonly { readonly id: MapModeId; readonly label: string }[];
+  readonly layer: MapModeId;
+  readonly highlightMarketId: number | null;
+  readonly marketNames: readonly { readonly id: number; readonly name: string }[];
+  readonly bottom: number;
+  readonly left: number;
+  readonly width: number;
+  readonly onLayer: (layer: MapModeId) => void;
+  readonly onClearHighlight: () => void;
+  readonly onZoom: (direction: "in" | "out") => void;
+  readonly onReset: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const mode = MAP_MODES[layer];
+  const legend = useMemo(() => {
+    const context: Pick<MapDataContext, "entryByTag" | "marketNames" | "highlightMarketId"> = {
+      entryByTag: ENTRY_BY_TAG,
+      marketNames: new Map(marketNames.map((market) => [market.id, market.name] as const)),
+      highlightMarketId,
+    };
+    return mode.legend(context as MapDataContext);
+  }, [highlightMarketId, marketNames, mode]);
+  return (
+    <View style={[styles.lensWrap, { left, bottom }]} pointerEvents="box-none">
+      {open ? (
+        <View style={[styles.lensPanel, { width }]}>
+          <View style={styles.lensChoices}>
+            {lenses.map((lens) => (
+              <Chip key={lens.id} label={lens.label} active={layer === lens.id} onPress={() => onLayer(lens.id)} />
+            ))}
+          </View>
+          {highlightMarketId === null ? null : (
+            <Chip label="Clear market highlight" active={false} onPress={onClearHighlight} />
+          )}
+          <View style={styles.legend}>
+            {legend.map((entry) => (
+              <View key={entry.label} style={styles.legendRow}>
+                <View
+                  style={[
+                    styles.swatch,
+                    { backgroundColor: rgbToCss(entry.color) },
+                    entry.hatched === true ? styles.swatchHatched : null,
+                  ]}
+                />
+                <Text style={styles.legendText} numberOfLines={1}>
+                  {entry.label}
                 </Text>
               </View>
-              {focusedCountryId === null ? null : detailReady ? (
-                <Screen
-                  tab={tab}
-                  countryId={focusedCountryId}
-                  onSelectCountry={(countryId) => {
-                    const tag = snapshot?.countrySummaries.find(
-                      (candidate) => candidate.id === countryId,
-                    )?.tag;
-                    if (tag !== undefined) setSelectedTag(tag);
-                  }}
-                  onShowMarket={(marketId) => {
-                    setLayer("markets");
-                    setHighlightMarketId(marketId);
-                    setTab("world");
-                  }}
-                />
-              ) : (
-                <Panel title="Loading country detail" subtitle="The worker is preparing this country's full record.">
-                  <Text style={styles.panelEmpty}>
-                    Country summaries are already available; the selected country's detailed
-                    record arrives in the next snapshot.
-                  </Text>
-                </Panel>
-              )}
-            </ScrollView>
-          )}
+            ))}
+          </View>
+          <View style={styles.lensChoices}>
+            <MapControl icon="plus" label="Zoom in" onPress={() => onZoom("in")} />
+            <MapControl icon="minus" label="Zoom out" onPress={() => onZoom("out")} />
+            <MapControl icon="home" label="Reset map view" onPress={onReset} />
+          </View>
         </View>
+      ) : null}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Map lens: ${mode.label}`}
+        accessibilityState={{ expanded: open }}
+        onPress={() => setOpen((value) => !value)}
+        style={({ pressed }) => [styles.lensButton, pressed ? styles.pressed : null]}
+      >
+        <Icon name="lens" size={20} color={colors.accentStrong} />
+        <Text style={styles.lensLabel}>{mode.label}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function MapControl({
+  icon,
+  label,
+  onPress,
+}: {
+  readonly icon: IconName;
+  readonly label: string;
+  readonly onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => [styles.round, styles.roundFlat, pressed ? styles.pressed : null]}
+    >
+      <Icon name={icon} size={20} />
+    </Pressable>
+  );
+}
+
+function TimeControl({
+  running,
+  speed,
+  achieved,
+  disabled,
+  right,
+  bottom,
+  playSize,
+  onStart,
+  onPause,
+  onStep,
+  onSpeed,
+}: {
+  readonly running: boolean;
+  readonly speed: number;
+  readonly achieved: number;
+  readonly disabled: boolean;
+  readonly right: number;
+  readonly bottom: number;
+  readonly playSize: number;
+  readonly onStart: () => void;
+  readonly onPause: () => void;
+  readonly onStep: () => void;
+  readonly onSpeed: (speed: number) => void;
+}) {
+  const [speedsOpen, setSpeedsOpen] = useState(false);
+  return (
+    <View style={[styles.timeWrap, { right, bottom }]} pointerEvents="box-none">
+      {speedsOpen ? (
+        <View style={styles.speedPanel}>
+          {SPEED_VALUES.map((value) => (
+            <Chip
+              key={value}
+              label={`${String(value)}×`}
+              active={speed === value}
+              disabled={disabled}
+              onPress={() => {
+                onSpeed(value);
+                setSpeedsOpen(false);
+              }}
+            />
+          ))}
+          <Text style={styles.speedMeta}>
+            {formatSpeed(speed)}
+            {running && achieved > 0 ? ` · ~${achieved.toFixed(1)}/s` : ""} · best effort
+          </Text>
+        </View>
+      ) : null}
+      <View style={styles.timeRow}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Advance one day"
+          accessibilityState={{ disabled }}
+          disabled={disabled}
+          onPress={onStep}
+          style={({ pressed }) => [styles.round, disabled ? styles.dimmed : null, pressed ? styles.pressed : null]}
+        >
+          <Icon name="step" size={20} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Speed ${String(speed)} times, change speed`}
+          accessibilityState={{ expanded: speedsOpen }}
+          onPress={() => setSpeedsOpen((value) => !value)}
+          style={({ pressed }) => [styles.round, pressed ? styles.pressed : null]}
+        >
+          <Text style={styles.speedLabel}>{`${String(speed)}×`}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={running ? "Pause" : "Play"}
+          accessibilityState={{ disabled }}
+          disabled={disabled}
+          onPress={running ? onPause : onStart}
+          style={({ pressed }) => [
+            styles.play,
+            { width: playSize, height: playSize },
+            disabled ? styles.dimmed : null,
+            pressed ? styles.pressed : null,
+          ]}
+        >
+          <Icon name={running ? "pause" : "play"} size={playSize * 0.5} color={colors.accentText} />
+        </Pressable>
       </View>
     </View>
   );
 }
 
-/** Docked width of the context panels over the map on wide screens. */
-const WORLD_PANEL_WIDTH = 348;
-
-/**
- * The world screen: the map takes the whole stage and the context panels dock
- * over its right edge. On narrow screens the panels follow it in a scroll view.
- */
-function WorldStage({
-  narrow,
-  map,
-  panels,
+/** Slides over the map from the right. Everything except the map lives in one. */
+function SideSheet({
+  open,
+  width,
+  safeRight,
+  safeTop,
+  safeBottom,
+  title,
+  subtitle,
+  tabs,
+  onClose,
+  children,
 }: {
-  readonly narrow: boolean;
-  readonly map: (insetRight: number, fill: boolean) => ReactNode;
-  readonly panels: ReactNode;
+  readonly open: boolean;
+  readonly width: number;
+  readonly safeRight: number;
+  readonly safeTop: number;
+  readonly safeBottom: number;
+  readonly title: string;
+  readonly subtitle: string | undefined;
+  readonly tabs: ReactNode;
+  readonly onClose: () => void;
+  readonly children: ReactNode;
 }) {
-  const [dockOpen, setDockOpen] = useState(true);
-  if (narrow) {
-    return (
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.worldContent}>
-        {map(0, false)}
-        <View style={styles.contextColumnNarrow}>{panels}</View>
-      </ScrollView>
-    );
-  }
+  const total = width + safeRight;
+  const slide = useRef(new Animated.Value(total)).current;
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: open ? 0 : total,
+      duration: SHEET_MS,
+      useNativeDriver: Platform.OS !== "web",
+    }).start();
+  }, [open, slide, total]);
   return (
-    <View style={styles.worldStage}>
-      {map(dockOpen ? WORLD_PANEL_WIDTH + spacing.md : 0, true)}
-      {dockOpen ? (
-        <ScrollView
-          style={styles.contextDock}
-          contentContainerStyle={styles.contextDockContent}
-          showsVerticalScrollIndicator={false}
+    <Animated.View
+      pointerEvents={open ? "auto" : "none"}
+      style={[
+        styles.sheet,
+        { width: total, paddingRight: safeRight, paddingTop: safeTop, transform: [{ translateX: slide }] },
+      ]}
+    >
+      <View style={styles.sheetHeader}>
+        <View style={styles.sheetTitleWrap}>
+          <Text style={styles.sheetTitle} numberOfLines={1}>
+            {title}
+          </Text>
+          {subtitle === undefined ? null : (
+            <Text style={styles.sheetSubtitle} numberOfLines={1}>
+              {subtitle}
+            </Text>
+          )}
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close sheet"
+          onPress={onClose}
+          style={({ pressed }) => [styles.sheetClose, pressed ? styles.pressed : null]}
         >
-          {panels}
-        </ScrollView>
-      ) : null}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={dockOpen ? "Hide details panel" : "Show details panel"}
-        onPress={() => setDockOpen((open) => !open)}
-        style={[styles.dockToggle, dockOpen ? styles.dockToggleOpen : null]}
+          <Icon name="close" size={20} />
+        </Pressable>
+      </View>
+      {tabs}
+      <ScrollView
+        testID="side-sheet"
+        style={styles.sheetBody}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.sheetContent, { paddingBottom: safeBottom + spacing.lg }]}
       >
-        <Text style={styles.dockToggleLabel}>{dockOpen ? "›" : "‹"}</Text>
-      </Pressable>
-    </View>
+        {children}
+      </ScrollView>
+    </Animated.View>
+  );
+}
+
+function CampaignPanel({
+  playerName,
+  playerHistoricalName,
+  status,
+  capital,
+  scenarioLine,
+  netResult,
+  speedLine,
+  saveStatus,
+  dispatches,
+  medium,
+  canSave,
+  controlsDisabled,
+  saveLabel,
+  onSave,
+  onLoad,
+  onRestart,
+}: {
+  readonly playerName: string;
+  readonly playerHistoricalName: string;
+  readonly status: string | null;
+  readonly capital: string;
+  readonly scenarioLine: string;
+  readonly netResult: number | null;
+  readonly speedLine: string;
+  readonly saveStatus: string | null;
+  readonly dispatches: readonly Dispatch[];
+  readonly medium: string;
+  readonly canSave: boolean;
+  readonly controlsDisabled: boolean;
+  readonly saveLabel: string;
+  readonly onSave: () => void;
+  readonly onLoad: () => void;
+  readonly onRestart: () => void;
+}) {
+  return (
+    <>
+      <Panel
+        title={playerName}
+        subtitle={[
+          status === null ? "" : statusLabel(status),
+          capital,
+          playerHistoricalName !== "" && playerHistoricalName !== playerName ? playerHistoricalName : "",
+        ]
+          .filter((part) => part !== "")
+          .join(" · ")}
+      >
+        {netResult === null ? null : (
+          <Metric
+            label="Last month"
+            value={`${netResult >= 0 ? "+" : ""}${formatRusd(netResult)} RUSD`}
+            tone={netResult >= 0 ? "positive" : "negative"}
+          />
+        )}
+        <Text style={styles.panelEmpty}>{scenarioLine}</Text>
+        <Text style={styles.panelEmpty}>{speedLine}</Text>
+        {saveStatus === null ? null : <Text style={styles.statusText}>{saveStatus}</Text>}
+      </Panel>
+      <Panel title="Saved game">
+        <View style={styles.panelActions}>
+          <Button label={saveLabel} tone="primary" onPress={onSave} disabled={!canSave || controlsDisabled} />
+          <Button label="Load last save" onPress={onLoad} disabled={controlsDisabled} />
+        </View>
+        <Divider />
+        <Button label="Restart worker" tone="danger" onPress={onRestart} />
+      </Panel>
+      <Panel title={`${medium} log`} subtitle="Reports of this session, newest first.">
+        {dispatches.length === 0 ? (
+          <Text style={styles.panelEmpty}>Nothing has been reported yet.</Text>
+        ) : (
+          [...dispatches].reverse().map((dispatch) => (
+            <StatRow key={dispatch.id} label={dispatch.headline} value="" detail={dispatch.dateLabel} mono={false} />
+          ))
+        )}
+      </Panel>
+    </>
   );
 }
 
@@ -505,7 +1040,7 @@ function Screen({
   onSelectCountry,
   onShowMarket,
 }: {
-  readonly tab: TabId;
+  readonly tab: ScreenId;
   readonly countryId: number;
   readonly onSelectCountry: (countryId: number) => void;
   readonly onShowMarket: (marketId: number) => void;
@@ -555,53 +1090,51 @@ function Screen({
 function ProvincePanel({
   province,
   ownership,
-  ownerTag,
 }: {
-  readonly province: ProvinceMapProvince | null;
+  readonly province: ProvinceCatalogEntry | null;
   readonly ownership: ProvinceOwnershipSnapshot | null;
-  readonly ownerTag: string | null;
 }) {
   if (province === null) return null;
-  const owner = ownerTag ?? province.initialOwnerTag;
+  const tagOf = (polityId: number): string =>
+    ENTRY_BY_ID.get(polityId)?.tag ?? FUTURE_BY_ID.get(polityId)?.tag ?? `polity ${String(polityId)}`;
+  const owner = ownership === null ? province.initialOwnerTag : tagOf(ownership.ownerPolityId);
   const controllerTag =
     ownership === null || ownership.controllerPolityId === ownership.ownerPolityId
       ? null
-      : (PROVINCE_MAP_1900.futurePolities.find(
-          (polity) => polity.polityId === ownership.controllerPolityId,
-        )?.tag ?? `polity ${String(ownership.controllerPolityId)}`);
+      : tagOf(ownership.controllerPolityId);
   return (
     <Panel
       title={province.displayName}
       subtitle={`Province ${String(province.id)} · ${province.confidence} confidence`}
     >
-      <Metric label="Current owner" value={owner} detail="Legal territorial ownership" />
-      <Metric
+      <StatRow label="Current owner" value={owner} detail="Legal territorial ownership" />
+      <StatRow
         label="1900 owner"
         value={province.initialOwnerTag}
         detail="Historical owner on 1 January 1900"
       />
-      <Metric
+      <StatRow
         label="Administrative affiliation"
-        value={province.historicalAdminAffiliation}
+        value=""
         detail={
           province.historicalGrouping === null
-            ? "No optional historical grouping"
-            : province.historicalGrouping
+            ? province.historicalAdminAffiliation
+            : `${province.historicalAdminAffiliation} · ${province.historicalGrouping}`
         }
       />
-      <Metric
+      <StatRow
         label="Special status"
         value={(ownership?.specialStatus ?? province.initialSpecialStatus).replace(/-/g, " ")}
       />
       {controllerTag === null ? null : (
-        <Metric
+        <StatRow
           label="Effective control"
           value={controllerTag}
           detail="Occupation changes control, not legal ownership"
         />
       )}
       {ownership === null || ownership.claimantPolityIds.length === 0 ? null : (
-        <Metric
+        <StatRow
           label="Claims"
           value={ownership.claimantPolityIds.join(", ")}
           detail="Recorded claims do not imply ownership"
@@ -640,10 +1173,10 @@ function SelectedPolityPanel({
   const { snapshot } = useSimulation();
   if (entry === null) {
     return (
-      <Panel title="Inspect" subtitle="Select a country or territory on the map.">
+      <Panel title="Inspect" subtitle="Tap a country or territory on the map.">
         <Text style={styles.panelEmpty}>
-          Political fill shows sovereignty. The control layer shows military occupation without
-          changing ownership; the market layer shows economic membership.
+          Political fill shows sovereignty. The control lens shows military occupation without
+          changing ownership; the market lens shows economic membership.
         </Text>
       </Panel>
     );
@@ -757,270 +1290,182 @@ function SelectedPolityPanel({
   );
 }
 
-function TopBar({
-  playerName,
-  playerHistoricalName,
-  playerTag,
-  playerId,
-  status,
-  capital,
-  subtitle,
-  dateLabel,
-  running,
-  speed,
-  achieved,
-  controlsDisabled,
-  treasury,
-  population,
-  hardship,
-  netResult,
-  onStart,
-  onPause,
-  onStep,
-  onSpeed,
-  onSave,
-  onLoad,
-  onRestart,
-  canSave,
-  saveLabel,
-}: {
-  readonly playerName: string;
-  readonly playerHistoricalName: string;
-  readonly playerTag: string;
-  readonly playerId: number | null;
-  readonly status: string | null;
-  readonly capital: string;
-  readonly subtitle: string;
-  readonly dateLabel: string;
-  readonly running: boolean;
-  readonly speed: number;
-  readonly achieved: number;
-  readonly controlsDisabled: boolean;
-  readonly treasury: number;
-  readonly population: number;
-  readonly hardship: number;
-  readonly netResult: number | null;
-  readonly onStart: () => void;
-  readonly onPause: () => void;
-  readonly onStep: () => void;
-  readonly onSpeed: (speed: number) => void;
-  readonly onSave: () => void;
-  readonly onLoad: () => void;
-  readonly onRestart: () => void;
-  readonly canSave: boolean;
-  readonly saveLabel: string;
-}) {
-  return (
-    <View style={styles.topBar}>
-      <View style={styles.topIdentity}>
-        <CountryFlag polityId={playerId} tag={playerTag} size="topBar" />
-        <View style={styles.topIdentityText}>
-          <Text style={styles.playerName} numberOfLines={1}>
-            {playerName}
-          </Text>
-          <Text style={styles.playerMeta} numberOfLines={1}>
-            {status === null ? "" : `${statusLabel(status)} · `}
-            {capital}
-            {playerHistoricalName !== "" && playerHistoricalName !== playerName
-              ? ` · ${playerHistoricalName}`
-              : ""}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.topMetrics}>
-        <Metric label="Date" value={dateLabel} detail={subtitle} />
-        <Metric label="Treasury" value={`${formatRusd(treasury)} RUSD`} />
-        <Metric label="Population" value={formatPeople(population)} />
-        <Metric
-          label="Hardship"
-          value={`${(hardship * 100).toFixed(1)}%`}
-          tone={hardship > 0.1 ? "negative" : "default"}
-        />
-        {netResult === null ? null : (
-          <Metric
-            label="Last month"
-            value={`${netResult >= 0 ? "+" : ""}${formatRusd(netResult)}`}
-            tone={netResult >= 0 ? "positive" : "negative"}
-          />
-        )}
-      </View>
-
-      <View style={styles.topControls}>
-        <View style={styles.speedRow}>
-          <Button
-            label={running ? "Pause" : "Play"}
-            tone={running ? "default" : "primary"}
-            size="sm"
-            disabled={controlsDisabled}
-            onPress={running ? onPause : onStart}
-          />
-          <Button label="+1 day" size="sm" disabled={controlsDisabled} onPress={onStep} />
-          {SPEED_VALUES.map((value) => (
-            <Chip
-              key={value}
-              label={`${String(value)}×`}
-              active={speed === value}
-              disabled={controlsDisabled}
-              onPress={() => onSpeed(value)}
-            />
-          ))}
-          <Text style={styles.speedMeta}>
-            {formatSpeed(speed)}
-            {running && achieved > 0 ? ` · ~${achieved.toFixed(1)}/s` : ""} · best effort
-          </Text>
-        </View>
-        <View style={styles.saveRow}>
-          <Button label={saveLabel} size="sm" onPress={onSave} disabled={!canSave || controlsDisabled} />
-          <Button label="Load" size="sm" onPress={onLoad} disabled={controlsDisabled} />
-          <Button label="Restart worker" size="sm" tone="danger" onPress={onRestart} />
-        </View>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
-  provinceNote: { ...type.tiny, color: colors.muted, marginTop: spacing.sm, lineHeight: 16 },
-  topBar: {
+const styles = themedSheet(() => ({
+  root: { ...StyleSheet.absoluteFill },
+  pressed: { opacity: 0.72 },
+  dimmed: { opacity: 0.42 },
+  provinceNote: { ...type.tiny, marginTop: spacing.sm },
+  pill: {
+    position: "absolute",
+    height: TOUCH_TARGET,
+    maxWidth: PILL_MAX_WIDTH,
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingLeft: spacing.sm,
+    paddingRight: spacing.md,
+    borderRadius: radii.pill,
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  pillName: { ...type.section, flexShrink: 1 },
+  topCentre: { position: "absolute", alignItems: "center", gap: spacing.xs },
+  readout: {
+    height: TOUCH_TARGET,
+    flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomColor: colors.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: colors.backgroundAlt,
+    borderRadius: radii.pill,
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  topIdentity: { flexDirection: "row", alignItems: "center", gap: spacing.sm, minWidth: 240 },
-  topIdentityText: { flexShrink: 1 },
-  playerName: { ...type.title, fontSize: 16, lineHeight: 20 },
-  playerMeta: { ...type.tiny },
-  topMetrics: { flexDirection: "row", flexWrap: "wrap", flex: 1, gap: spacing.sm },
-  topControls: { gap: 4 },
-  speedRow: { flexDirection: "row", alignItems: "center", gap: 3, flexWrap: "wrap" },
-  saveRow: { flexDirection: "row", gap: 4, justifyContent: "flex-end" },
-  speedMeta: { ...type.tiny, marginLeft: 4 },
-  banner: {
-    backgroundColor: "rgba(197,122,107,0.12)",
-    borderBottomColor: colors.red,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  readoutDate: { ...type.section, letterSpacing: 0.4 },
+  readoutItem: { alignItems: "flex-start" },
+  readoutLabel: { ...type.label, fontSize: 11, lineHeight: 13, letterSpacing: 0.5 },
+  readoutValue: { ...type.number, lineHeight: 17 },
+  dispatch: {
+    maxWidth: 420,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.md,
+    backgroundColor: colors.chrome,
+    borderLeftWidth: 2,
+    borderLeftColor: colors.accent,
+  },
+  dispatchMedium: { ...type.eyebrow },
+  dispatchHeadline: { ...type.section, fontFamily: fonts.serif },
+  rail: { position: "absolute", gap: 6 },
+  round: {
+    width: TOUCH_TARGET,
+    height: TOUCH_TARGET,
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  roundFlat: { backgroundColor: colors.surfaceRaised },
+  roundActive: { backgroundColor: colors.accent, borderColor: colors.accentStrong },
+  lensWrap: { position: "absolute", alignItems: "flex-start", gap: spacing.xs },
+  lensButton: {
+    height: TOUCH_TARGET,
     flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.pill,
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  lensLabel: { ...type.small, color: colors.textStrong, fontFamily: fonts.sansMedium },
+  lensPanel: {
+    padding: spacing.sm,
+    gap: spacing.xs,
+    borderRadius: radii.lg,
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  lensChoices: { flexDirection: "row", gap: spacing.xs, flexWrap: "wrap" },
+  legend: { gap: 3, paddingVertical: spacing.xs },
+  legendRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  legendText: { ...type.tiny, color: colors.muted, flexShrink: 1 },
+  swatch: { width: 11, height: 11, borderRadius: 2 },
+  swatchHatched: { opacity: 0.7, borderWidth: 1, borderColor: colors.text, borderStyle: "dashed" },
+  timeWrap: { position: "absolute", alignItems: "flex-end", gap: spacing.xs },
+  timeRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  play: {
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accent,
+  },
+  speedLabel: { ...type.number, fontFamily: fonts.sansSemiBold },
+  speedPanel: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    gap: spacing.xs,
+    padding: spacing.xs,
+    maxWidth: 260,
+    borderRadius: radii.lg,
+    backgroundColor: colors.chrome,
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  speedMeta: { ...type.tiny, paddingHorizontal: spacing.xs },
+  banner: {
+    position: "absolute",
+    backgroundColor: colors.chrome,
+    borderLeftColor: colors.red,
+    borderLeftWidth: 2,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    minHeight: TOUCH_TARGET,
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: spacing.sm,
   },
-  bannerText: { ...type.small, flex: 1 },
-  bannerDismiss: { ...type.tiny, color: colors.red, fontWeight: "700" },
-  statusBar: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: 3,
-    backgroundColor: colors.surface,
-    borderBottomColor: colors.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  statusText: { ...type.tiny, color: colors.accentStrong },
-  shell: { flex: 1, flexDirection: "row" },
-  shellNarrow: { flexDirection: "column" },
-  rail: {
-    width: 158,
-    borderRightColor: colors.border,
-    borderRightWidth: StyleSheet.hairlineWidth,
-    backgroundColor: colors.backgroundAlt,
-  },
-  railContent: { paddingVertical: spacing.sm, gap: spacing.sm },
-  railGroup: { paddingHorizontal: 4 },
-  railGroupTitle: {
-    ...type.label,
-    color: colors.faint,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  railItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    paddingVertical: 5,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radii.sm,
-  },
-  mobileNav: {
-    borderBottomColor: colors.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: colors.backgroundAlt,
-    maxHeight: 46,
-  },
-  mobileNavContent: { paddingHorizontal: spacing.xs, alignItems: "center" },
-  mobileNavGroup: { flexDirection: "row" },
-  mobileNavItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 8,
-    borderRadius: radii.sm,
-  },
-  navItemActive: { backgroundColor: colors.surfaceRaised },
-  navGlyph: { color: colors.faint, fontSize: 12 },
-  navGlyphActive: { color: colors.accentStrong },
-  navLabel: { ...type.small, color: colors.muted },
-  navLabelActive: { color: colors.accentStrong, fontWeight: "700" },
-  main: { flex: 1 },
-  scroll: { flex: 1 },
-  screenContent: { padding: spacing.md, paddingBottom: spacing.xxl, maxWidth: 1180, width: "100%", alignSelf: "center" },
-  screenHeader: { marginBottom: spacing.sm },
-  screenTitle: { ...type.title },
-  screenSubtitle: { ...type.small, marginTop: 1 },
-  worldContent: { paddingBottom: spacing.xxl },
-  worldStage: { flex: 1, position: "relative" },
-  mapToolbar: {
+  bannerText: { ...type.small, color: colors.text, flex: 1, paddingVertical: spacing.xs },
+  bannerDismiss: { ...type.small, color: colors.red, fontFamily: fonts.sansSemiBold },
+  statusText: { ...type.tiny, color: colors.accentStrong, marginTop: spacing.xs },
+  sheet: {
     position: "absolute",
-    left: 10,
-    top: 10,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.chrome,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.accentLine,
+  },
+  sheetHeader: {
+    minHeight: TOUCH_TARGET + spacing.xs,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    backgroundColor: "rgba(11, 16, 20, 0.86)",
+    gap: spacing.xs,
     paddingLeft: spacing.md,
     paddingRight: spacing.xs,
-    paddingVertical: spacing.xs,
   },
-  mapTitle: { ...type.section },
-  layerChips: { flexDirection: "row", gap: 3 },
-  contextDock: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    bottom: 10,
-    width: WORLD_PANEL_WIDTH,
-  },
-  contextDockContent: { gap: spacing.sm },
-  dockToggle: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 22,
-    height: 44,
+  sheetTitleWrap: { flex: 1, minWidth: 0 },
+  sheetTitle: { ...type.title },
+  sheetSubtitle: { ...type.tiny },
+  sheetClose: {
+    width: TOUCH_TARGET,
+    height: TOUCH_TARGET,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(11, 16, 20, 0.86)",
   },
-  dockToggleOpen: { right: WORLD_PANEL_WIDTH + 10 },
-  dockToggleLabel: { color: colors.text, fontSize: 16, lineHeight: 20 },
-  contextColumnNarrow: { width: "100%", padding: spacing.sm, gap: spacing.sm },
+  tabStrip: { flexGrow: 0, flexShrink: 0 },
+  tabs: { paddingHorizontal: spacing.sm, gap: spacing.xxs },
+  tab: {
+    minHeight: TOUCH_TARGET,
+    justifyContent: "center",
+    paddingHorizontal: spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  tabActive: { borderBottomColor: colors.accent },
+  tabLabel: { ...type.small, fontFamily: fonts.sansMedium },
+  tabLabelActive: { color: colors.textStrong },
+  sheetBody: { flex: 1 },
+  sheetContent: { padding: spacing.sm },
   panelEmpty: { ...type.small },
   polityHeader: { flexDirection: "row", gap: spacing.sm, alignItems: "center" },
   polityHeaderText: { flex: 1 },
-  polityCommon: { ...type.title, fontSize: 17 },
+  polityCommon: { ...type.section },
   polityMeta: { ...type.tiny, marginTop: 1 },
   occupied: { ...type.tiny, color: colors.red, marginTop: 2 },
   regionLine: { ...type.small, marginTop: 2 },
   spacedLabel: { marginTop: spacing.sm },
-  marketName: { ...type.body, color: colors.textStrong, fontWeight: "700", marginTop: 1 },
+  marketName: { ...type.body, color: colors.textStrong, fontFamily: fonts.sansSemiBold, marginTop: 1 },
   marketBody: { ...type.small, marginTop: 2 },
   marketMeta: { ...type.tiny, marginVertical: 3 },
   panelActions: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.sm, flexWrap: "wrap" },
-});
+}));

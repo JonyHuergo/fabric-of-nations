@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import {
   countryById,
@@ -9,8 +9,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField } from "../components/Slider";
-import { ActionButton, Chip, Notice, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Chip, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import { TOUCH_TARGET, colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /** Mirrors the simulation's numeric-safety bound for a monthly import quota. */
@@ -197,7 +197,18 @@ export function TradeScreen({
         </Notice>
       ) : null}
 
-      <Text style={styles.heading}>Observed trade network</Text>
+      <Headline
+        label="Net cargo this month"
+        value={formatRUSD(country.trade.exportsValueMonthToDateRUSD - country.trade.importsValueMonthToDateRUSD)}
+        tone={
+          country.trade.exportsValueMonthToDateRUSD >= country.trade.importsValueMonthToDateRUSD
+            ? "positive"
+            : "negative"
+        }
+        detail={`Exports ${formatRUSD(country.trade.exportsValueMonthToDateRUSD)} · imports ${formatRUSD(country.trade.importsValueMonthToDateRUSD)}`}
+      />
+
+      <Disclosure title={`Observed trade network · ${String(snapshot.trade.routes.length)} routes`}>
       <StatRow
         label="Inter-market trade"
         value={snapshot.trade.enabled ? "Enabled (authored routes)" : "No authored routes"}
@@ -231,8 +242,9 @@ export function TradeScreen({
           }`}
         />
       ))}
+      </Disclosure>
 
-      <Text style={styles.heading}>Last processed day</Text>
+      <Disclosure title="Last processed day">
       {lastDay === null ? (
         <Text style={styles.empty}>No processed day yet.</Text>
       ) : (
@@ -262,8 +274,9 @@ export function TradeScreen({
           ) : null}
         </>
       )}
+      </Disclosure>
 
-      <Text style={styles.heading}>In transit</Text>
+      <Disclosure title={`In transit · ${String(snapshot.trade.shipments.length)}`}>
       {snapshot.trade.shipments.length === 0 ? (
         <Text style={styles.empty}>No consignments are in transit.</Text>
       ) : (
@@ -280,6 +293,7 @@ export function TradeScreen({
       {snapshot.trade.shipmentsTruncated ? (
         <Text style={styles.help}>Older consignments are omitted; the list is bounded.</Text>
       ) : null}
+      </Disclosure>
 
       <Text style={styles.heading}>Your customs frontier</Text>
       <StatRow
@@ -352,8 +366,11 @@ export function TradeScreen({
         );
         const quotaStep = Math.max(1, Math.round(quotaLimit / 100));
         return (
-          <View key={good.id} style={styles.goodRow}>
-            <Text style={styles.goodName}>{good.name}</Text>
+          <Disclosure
+            key={good.id}
+            title={`${good.name} · ${tariffPercent.toFixed(1)}% · ${quota === null ? "no quota" : `quota ${quotaValue.toFixed(0)}`}${parsedBans[index] ? " · export ban" : ""}`}
+          >
+          <View style={styles.goodRow}>
             <SliderField
               label={`${good.name} tariff rate`}
               value={tariffPercent}
@@ -440,6 +457,7 @@ export function TradeScreen({
               </Pressable>
             </View>
           </View>
+          </Disclosure>
         );
       })}
 
@@ -449,13 +467,15 @@ export function TradeScreen({
           label="Export-banned goods"
           value={`${preview.exportBannedGoodCount}`}
         />
-        {preview.estimatedDutyPerUnitRUSD.map((duty, goodId) => (
-          <StatRow
-            key={goodId}
-            label={`Estimated duty per ${goodLabel(snapshot, goodId)} unit`}
-            value={formatRUSD(duty)}
-          />
-        ))}
+        <Disclosure title="Estimated duty per unit">
+          {preview.estimatedDutyPerUnitRUSD.map((duty, goodId) => (
+            <StatRow
+              key={goodId}
+              label={`Estimated duty per ${goodLabel(snapshot, goodId)} unit`}
+              value={formatRUSD(duty)}
+            />
+          ))}
+        </Disclosure>
         {preview.notes.map((note) => (
           <Text key={note} style={styles.help}>
             {note}
@@ -481,7 +501,7 @@ export function TradeScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   empty: {
     color: colors.muted,
   },
@@ -489,23 +509,23 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
     color: colors.text,
   },
   help: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
     lineHeight: 17,
     marginTop: spacing.xs,
   },
   shipment: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.text,
     marginTop: spacing.xs,
   },
   warning: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.red,
   },
   goodRow: {
@@ -517,7 +537,7 @@ const styles = StyleSheet.create({
   goodName: {
     fontSize: 13,
     color: colors.text,
-    fontWeight: "600",
+    fontFamily: fonts.sansSemiBold,
   },
   goodToggles: {
     flexDirection: "row",
@@ -526,6 +546,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   banButton: {
+    minHeight: TOUCH_TARGET,
+    justifyContent: "center",
     flex: 1,
     borderWidth: 1,
     borderColor: colors.border,
@@ -538,7 +560,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceRaised,
   },
   banText: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.text,
   },
   estimate: {
@@ -551,9 +573,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   estimateTitle: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 13,
+    fontFamily: fonts.sansSemiBold,
     color: colors.muted,
     marginBottom: 4,
   },
-});
+}));

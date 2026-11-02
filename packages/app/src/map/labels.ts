@@ -7,8 +7,10 @@
  *   hand-lettered atlas. Moments come from the render bundle, so a label follows
  *   ownership after a transfer without any new geometry;
  * - sea labels are fixed gazetteer points;
- * - province labels appear only once their province is large enough on screen;
- * - capitals appear at provincial zoom.
+ * - the three zoom levels of the design tokens decide what is named: powers and
+ *   empires at world zoom, countries and capitals at nation zoom, provinces and
+ *   their names at province zoom;
+ * - a budget keeps a phone screen to about 25 labels, whichever level it is on.
  *
  * Placement is greedy by priority against a screen-space grid. It is pure and
  * deterministic for a camera, and the engine reruns it only when the camera has
@@ -20,6 +22,7 @@
 
 import type { Camera, MapViewportSize } from "./camera";
 import { shortestDeltaX } from "./camera";
+import { MAP_LABELS, MAP_ZOOM, labelBudget } from "../design/tokens";
 import { MAP_HEIGHT, projectLat, projectLon } from "./projection";
 
 export interface UnitLabel {
@@ -63,7 +66,6 @@ export type PlacedLabel =
       readonly angle: number;
       readonly size: number;
       readonly spacing: number;
-      readonly bow: number;
       readonly emphasised: boolean;
       readonly opacity: number;
     }
@@ -85,19 +87,21 @@ export type PlacedLabel =
     };
 
 const MAX_LABEL_ANGLE = (32 * Math.PI) / 180;
-const MIN_UNIT_FONT = 9.5;
-const MAX_UNIT_FONT = 30;
+const MIN_UNIT_FONT = MAP_LABELS.minSize;
+const MAX_UNIT_FONT = MAP_LABELS.maxSize;
 /** A unit far larger than the view stops naming the screen it fills. */
 const UNIT_FADE_START_RATIO = 1.5;
 const UNIT_FADE_END_RATIO = 3.2;
 /** Cross-axis share of a unit's width that its lettering may occupy. */
 const UNIT_HEIGHT_SHARE = 0.5;
-const PROVINCE_MIN_SCALE = 9;
-const CAPITAL_MIN_SCALE = 7;
+const PROVINCE_MIN_SCALE = MAP_ZOOM.provinceFrom;
+const CAPITAL_MIN_SCALE = MAP_ZOOM.nationFrom;
 const GRID_SIZE = 28;
+/** Below this on-map area a territory waits for nation zoom to be named. */
+const WORLD_UNIT_MIN_AREA = 26;
 
-/** Average glyph advance of the label serif, in ems, for planning only. */
-const ADVANCE_EM = 0.62;
+/** Average advance of a condensed capital, in ems, for planning only. */
+const ADVANCE_EM = 0.5;
 
 export interface LabelMoments {
   area: number;
@@ -148,24 +152,24 @@ export function unitLabelFromMoments(
 /** Gazetteer of major seas under their usual English names of the period. */
 const SEA_GAZETTEER: readonly (readonly [string, number, number, number, number, number])[] = [
   // name, lon, lat, min scale, max scale, size
-  ["NORTH ATLANTIC OCEAN", -40, 32, 0, 5, 15],
-  ["SOUTH ATLANTIC OCEAN", -16, -28, 0, 5, 15],
-  ["NORTH PACIFIC OCEAN", -160, 26, 0, 5, 15],
-  ["SOUTH PACIFIC OCEAN", -125, -30, 0, 5, 15],
-  ["INDIAN OCEAN", 78, -24, 0, 5, 15],
+  ["NORTH ATLANTIC OCEAN", -40, 32, 0, 5, 13],
+  ["SOUTH ATLANTIC OCEAN", -16, -28, 0, 5, 13],
+  ["NORTH PACIFIC OCEAN", -160, 26, 0, 5, 13],
+  ["SOUTH PACIFIC OCEAN", -125, -30, 0, 5, 13],
+  ["INDIAN OCEAN", 78, -24, 0, 5, 13],
   ["ARCTIC OCEAN", -10, 79, 0, 5, 12],
   ["SOUTHERN OCEAN", 60, -56, 0, 5, 12],
   ["Mediterranean Sea", 17.5, 34.6, 2.4, 22, 12],
   ["North Sea", 3.2, 56.4, 2.6, 26, 11.5],
   ["Baltic Sea", 19.2, 57, 3, 26, 11],
   ["Black Sea", 34.5, 43.3, 2.6, 24, 11.5],
-  ["Caspian Sea", 50.7, 42, 2.8, 26, 10.5],
-  ["Red Sea", 37.8, 21.2, 3, 26, 10.5],
+  ["Caspian Sea", 50.7, 42, 2.8, 26, 11],
+  ["Red Sea", 37.8, 21.2, 3, 26, 11],
   ["Arabian Sea", 63, 15, 2, 14, 12],
   ["Bay of Bengal", 89, 14, 2, 14, 12],
   ["South China Sea", 114, 14, 2, 14, 12],
   ["Sea of Japan", 135, 40.5, 2.6, 18, 11],
-  ["Yellow Sea", 123.4, 35.8, 3, 20, 10.5],
+  ["Yellow Sea", 123.4, 35.8, 3, 20, 11],
   ["Sea of Okhotsk", 149, 54.2, 2, 14, 11.5],
   ["Bering Sea", -178, 58, 2, 14, 11.5],
   ["Caribbean Sea", -75, 15, 2, 14, 12],
@@ -173,10 +177,10 @@ const SEA_GAZETTEER: readonly (readonly [string, number, number, number, number,
   ["Hudson Bay", -86, 59.5, 2, 14, 11.5],
   ["Coral Sea", 155, -17, 2, 14, 11.5],
   ["Tasman Sea", 161, -39, 2, 14, 11.5],
-  ["Persian Gulf", 51.4, 26.8, 4.5, 26, 10],
-  ["Bay of Biscay", -5, 45.6, 4, 26, 10.5],
-  ["Adriatic Sea", 15.6, 42.7, 6.5, 30, 10],
-  ["Aegean Sea", 25, 38.2, 6.5, 30, 10],
+  ["Persian Gulf", 51.4, 26.8, 4.5, 26, 11],
+  ["Bay of Biscay", -5, 45.6, 4, 26, 11],
+  ["Adriatic Sea", 15.6, 42.7, 6.5, 30, 11],
+  ["Aegean Sea", 25, 38.2, 6.5, 30, 11],
 ];
 
 export function seaLabels(): readonly SeaLabel[] {
@@ -188,6 +192,22 @@ export function seaLabels(): readonly SeaLabel[] {
     maxScale,
     size,
   }));
+}
+
+export interface ReservedBox {
+  readonly left: number;
+  readonly top: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface LabelPlacementOptions {
+  /** Screen width covered along the left edge. */
+  readonly insetLeft?: number;
+  /** Interface controls drawn over the map; labels stay out of them. */
+  readonly reserved?: readonly ReservedBox[];
+  /** Overrides the budget the viewport size implies. */
+  readonly budget?: number;
 }
 
 export interface LabelInputs {
@@ -289,17 +309,24 @@ export function placeLabels(
   camera: Camera,
   viewport: MapViewportSize,
   insetRight = 0,
+  options: LabelPlacementOptions = {},
 ): readonly PlacedLabel[] {
   const placed: PlacedLabel[] = [];
   const grid = new OccupancyGrid();
+  // Interface controls over the map take their place in the grid before any label.
+  for (const box of options.reserved ?? []) {
+    grid.add(box.left, box.top, box.left + box.width, box.top + box.height);
+  }
+  let budget = options.budget ?? labelBudget(viewport.width, viewport.height);
   const toScreen = (x: number, y: number): { x: number; y: number } => ({
     x: viewport.width / 2 + shortestDeltaX(camera.x, x) * camera.scale,
     y: viewport.height / 2 + (y - camera.y) * camera.scale,
   });
   const margin = 12;
+  const usableLeft = margin + (options.insetLeft ?? 0);
   const usableRight = viewport.width - insetRight - margin;
   const onScreen = (x: number, y: number, halfWidth: number, halfHeight: number): boolean =>
-    x - halfWidth > margin &&
+    x - halfWidth > usableLeft &&
     x + halfWidth < usableRight &&
     y - halfHeight > margin &&
     y + halfHeight < viewport.height - margin;
@@ -318,13 +345,24 @@ export function placeLabels(
     const rightEmphasis = inputs.emphasisedTags.has(right.tag) ? 1 : 0;
     return rightEmphasis - leftEmphasis || right.area - left.area || left.tag.localeCompare(right.tag);
   });
+  // Each level keeps room for what it adds: a province-level screen must not spend
+  // the whole budget on the country names underneath.
+  const unitBudget =
+    camera.scale >= PROVINCE_MIN_SCALE
+      ? Math.ceil(budget * 0.3)
+      : camera.scale >= CAPITAL_MIN_SCALE
+        ? Math.ceil(budget * 0.6)
+        : Math.ceil(budget * 0.85);
+  let unitsPlaced = 0;
   for (const unit of units) {
     const emphasised = inputs.emphasisedTags.has(unit.tag);
+    if (!emphasised && unitsPlaced >= unitBudget) continue;
+    if (!emphasised && camera.scale < CAPITAL_MIN_SCALE && unit.area < WORLD_UNIT_MIN_AREA) continue;
     const text = unit.name.toUpperCase();
     const center = toScreen(unit.x, unit.y);
     const lengthPx = unit.halfLength * 2 * camera.scale;
     const widthPx = unit.halfWidth * 2 * camera.scale;
-    const spacingEm = text.length > 12 ? 0.07 : 0.14;
+    const spacingEm = text.length > 12 ? 0.04 : 0.09;
     const textPerEm = text.length * (ADVANCE_EM + spacingEm);
     // Only the part of the baseline on screen can carry the name.
     const visible = clipBaseline(
@@ -332,7 +370,7 @@ export function placeLabels(
       center.y,
       unit.angle,
       lengthPx / 2,
-      margin,
+      usableLeft,
       margin,
       usableRight,
       viewport.height - margin,
@@ -365,19 +403,22 @@ export function placeLabels(
       angle: unit.angle,
       size: finalSize,
       spacing: spacingEm * finalSize,
-      bow: textWidth > 110 ? textWidth * 0.035 : 0,
       emphasised,
       opacity,
     });
+    unitsPlaced += 1;
+    budget -= 1;
   }
 
   for (const sea of inputs.seas) {
     if (camera.scale < sea.minScale || camera.scale > sea.maxScale) continue;
+    if (budget <= 0) break;
     const anchor = toScreen(sea.x, sea.y);
     const halfWidth = sea.name.length * sea.size * 0.34;
     if (sea.y > MAP_HEIGHT || !onScreen(anchor.x, anchor.y, halfWidth, sea.size)) continue;
     if (!reserve([[anchor.x - halfWidth, anchor.y - sea.size, anchor.x + halfWidth, anchor.y + sea.size]])) continue;
     placed.push({ kind: "sea", text: sea.name, x: anchor.x, y: anchor.y, size: sea.size });
+    budget -= 1;
   }
 
   if (camera.scale >= CAPITAL_MIN_SCALE) {
@@ -385,8 +426,9 @@ export function placeLabels(
       (left, right) => right.priority - left.priority || left.key.localeCompare(right.key),
     );
     for (const capital of capitals) {
+      if (budget <= 0) break;
       const anchor = toScreen(capital.x, capital.y);
-      const size = 10.5;
+      const size = MAP_LABELS.minSize;
       const width = capital.name.length * size * 0.56;
       const textX = anchor.x + 6 + width / 2;
       if (!onScreen(textX, anchor.y, width / 2, size)) continue;
@@ -400,6 +442,7 @@ export function placeLabels(
         dotX: anchor.x,
         dotY: anchor.y,
       });
+      budget -= 1;
     }
   }
 
@@ -408,8 +451,9 @@ export function placeLabels(
       (left, right) => right.priority - left.priority || left.key.localeCompare(right.key),
     );
     for (const province of provinces) {
+      if (budget <= 0) break;
       const available = province.halfWidth * 2 * camera.scale;
-      const size = Math.min(12, 9.5 + (available - 60) / 90);
+      const size = Math.max(MAP_LABELS.minSize, Math.min(13, 11 + (available - 60) / 90));
       const width = province.name.length * size * 0.54;
       if (width > available * 1.15) continue;
       const anchor = toScreen(province.x, province.y);
@@ -424,6 +468,7 @@ export function placeLabels(
         dotX: anchor.x,
         dotY: anchor.y,
       });
+      budget -= 1;
     }
   }
   return placed;

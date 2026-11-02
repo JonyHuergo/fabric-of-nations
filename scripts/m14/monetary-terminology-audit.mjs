@@ -76,6 +76,30 @@ function lineNumberAt(text, index) {
   return line;
 }
 
+/**
+ * The atlas page embeds binary payloads as base64, where any short word can occur
+ * by chance. Long runs are blanked; its code and catalogue text are still scanned.
+ */
+function withoutBase64Runs(text) {
+  const isBase64 = (code) =>
+    (code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || code === 43 || code === 47 || code === 61;
+  let output = "";
+  let kept = 0;
+  let run = -1;
+  for (let index = 0; index <= text.length; index += 1) {
+    if (index < text.length && isBase64(text.charCodeAt(index))) {
+      if (run < 0) run = index;
+    } else {
+      if (run >= 0 && index - run >= 1000) {
+        output += text.slice(kept, run);
+        kept = index;
+      }
+      run = -1;
+    }
+  }
+  return output + text.slice(kept);
+}
+
 function scanFile(path) {
   const relativePath = relative(ROOT, path).replaceAll("\\", "/");
   if (isHistorical(relativePath)) return;
@@ -83,7 +107,7 @@ function scanFile(path) {
   // minified legacy alias string is checked by check:worker, and the 2 MB line
   // is not useful audit output.
   if (relativePath === "packages/app/src/generated/simWorker.ts") return;
-  const text = readFileSync(path, "utf8");
+  const text = withoutBase64Runs(readFileSync(path, "utf8"));
   checked.push(relativePath);
   const pattern = /SUSD|Susd|susd|Simulated US Dollars|Simulated USD|simulated US Dollars|simulated USD/g;
   let match;

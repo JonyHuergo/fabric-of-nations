@@ -1,7 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import { colors, spacing } from "../theme";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { ActionButton } from "./ui";
 
 interface State {
@@ -66,7 +66,7 @@ export class AppErrorBoundary extends Component<Props, State> {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: fonts.sansSemiBold,
   },
   message: {
     color: colors.red,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   note: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 18,
   },
-});
+}));

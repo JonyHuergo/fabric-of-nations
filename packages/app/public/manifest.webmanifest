@@ -7,9 +7,9 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0b1014",
-  "theme_color": "#0b1014",
+  "orientation": "landscape",
+  "background_color": "#0d1419",
+  "theme_color": "#0d1419",
   "categories": ["games", "strategy"],
   "icons": [
     {

@@ -11,8 +11,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Notice, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
@@ -203,6 +203,12 @@ export function TechnologyScreen({
 
   return (
     <View>
+      <Headline
+        label="Researched"
+        value={`${String(technology.researchedCount)} / ${String(catalog.length)}`}
+        tone="accent"
+        detail={activeEntry === null ? "No active project" : `Researching ${activeEntry.name}`}
+      />
       <Section
         title="Technology"
         subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · research progresses only from funded academic work, never from time alone.`}
@@ -223,13 +229,15 @@ export function TechnologyScreen({
               : `${activeStatus.workCompleted.toFixed(0)} / ${activeEntry.researchWork.toFixed(0)} researcher-days (${((activeStatus.workCompleted / activeEntry.researchWork) * 100).toFixed(1)}%).`
           }
         />
-        {technology.productivityBySector.map((sector) => (
-          <StatRow
-            key={sector.sector}
-            label={`${sector.sector} output factor`}
-            value={`×${sector.factor.toFixed(3)}`}
-          />
-        ))}
+        <Disclosure title="Output factors by sector">
+          {technology.productivityBySector.map((sector) => (
+            <StatRow
+              key={sector.sector}
+              label={`${sector.sector} output factor`}
+              value={`×${sector.factor.toFixed(3)}`}
+            />
+          ))}
+        </Disclosure>
         {activeEntry === null ? null : (
           <ActionButton
             label="Cancel research"
@@ -244,6 +252,7 @@ export function TechnologyScreen({
         title="Education"
         subtitle="Academic staff, funding, and the enacted education law set capacity and quality. Attendance is limited by teaching capacity and household resources. Reported values are current derived state, not a forecast."
       >
+        <Disclosure title="Academics, schooling and funding">
         <StatRow
           label="Academics"
           value={country.education.academicPopulation.toLocaleString()}
@@ -264,6 +273,7 @@ export function TechnologyScreen({
           value={`${formatRUSD(country.education.fundedAnnualRUSD)}/yr`}
           detail={`Requested ${formatRUSD(country.education.fundingRequestedMonthToDateRUSD)} · shortfall ${formatRUSD(country.education.fundingShortfallMonthToDateRUSD)}`}
         />
+        </Disclosure>
         {country.education.educationBlockedReason === null ? null : (
           <Text style={styles.detail}>
             Schooling constrained: {country.education.educationBlockedReason}.
@@ -343,10 +353,11 @@ export function TechnologyScreen({
         subtitle="Prerequisites are validated data. Locked technologies require earlier research; a technology completed today applies from the next civil day."
       >
         {[...new Set(catalog.map((entry) => entry.era))].map((era) => (
-          <View key={era} style={styles.era}>
-            <Text style={styles.eraTitle}>
-              Era {era}: {snapshot.technologyEraNames[era - 1] ?? ""}
-            </Text>
+          <Disclosure
+            key={era}
+            title={`Era ${String(era)}: ${snapshot.technologyEraNames[era - 1] ?? ""}`}
+            initiallyOpen={activeEntry?.era === era}
+          >
             {catalog
               .filter((entry) => entry.era === era)
               .map((entry) => {
@@ -394,7 +405,7 @@ export function TechnologyScreen({
                 </View>
                 );
               })}
-          </View>
+          </Disclosure>
         ))}
         {selected === null || researchPreview === null ? null : (
           <View style={styles.preview}>
@@ -422,8 +433,8 @@ export function TechnologyScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 12 },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13 },
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -431,11 +442,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   rowText: { flex: 1 },
-  label: { color: colors.text, fontSize: 13, fontWeight: "600" },
-  detail: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 2 },
-  error: { color: colors.red, fontSize: 11, lineHeight: 16, marginTop: spacing.xs },
+  label: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  detail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, lineHeight: 16, marginTop: 2 },
+  error: { color: colors.red, fontFamily: fonts.sans, fontSize: 13, lineHeight: 16, marginTop: spacing.xs },
   era: { marginTop: spacing.md, gap: spacing.xs },
-  eraTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },
+  eraTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
   tech: {
     flexDirection: "row",
     alignItems: "center",
@@ -451,5 +462,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     gap: spacing.xs,
   },
-  previewTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },
-});
+  previewTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+}));

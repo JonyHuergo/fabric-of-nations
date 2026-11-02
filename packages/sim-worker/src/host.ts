@@ -219,6 +219,9 @@ export class SimulationHost {
       case "LOAD":
         this.load(command.commandId, command.save);
         return;
+      case "PREVIEW_SAVE":
+        this.previewSave(command.commandId, command.save);
+        return;
       case "SHUTDOWN":
         this.shutdown(command.commandId);
         return;
@@ -441,22 +444,8 @@ export class SimulationHost {
     });
   }
 
-  private load(commandId: string, save: string): void {
-    let loaded: World;
-    try {
-      loaded = deserializeWorld(save);
-      assertValidWorld(loaded);
-    } catch (error) {
-      this.emitEvent({
-        protocolVersion: PROTOCOL_VERSION,
-        type: "LOAD_RESULT",
-        commandId,
-        accepted: false,
-        errors: [errorMessage(error)],
-        snapshot: this.snapshot(),
-      });
-      return;
-    }
+  /** Reasons a deserialized save does not belong to this scenario; empty when it does. */
+  private saveCompatibilityErrors(loaded: World): string[] {
     const expectedStart = this.scenario.population.startDayIndex ?? 0;
     const expectedScenarioId = this.scenario.definitions.scenarioId;
     const errors: string[] = [];
@@ -475,6 +464,74 @@ export class SimulationHost {
         `save startDayIndex ${String(loaded.startDayIndex)} does not match ${String(expectedStart)}`,
       );
     }
+    return errors;
+  }
+
+  /**
+   * Describe a stored save without adopting it, for the main-menu backdrop. The
+   * save goes through the same validation as LOAD, but the authoritative world,
+   * pacing and snapshot sequence are untouched.
+   */
+  private previewSave(commandId: string, save: string): void {
+    const reject = (errors: readonly string[]): void => {
+      this.emitEvent({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SAVE_PREVIEW",
+        commandId,
+        accepted: false,
+        errors,
+        snapshot: null,
+      });
+    };
+    let loaded: World;
+    try {
+      loaded = deserializeWorld(save);
+      assertValidWorld(loaded);
+    } catch (error) {
+      reject([errorMessage(error)]);
+      return;
+    }
+    const errors = this.saveCompatibilityErrors(loaded);
+    if (errors.length > 0) {
+      reject(errors);
+      return;
+    }
+    this.emitEvent({
+      protocolVersion: PROTOCOL_VERSION,
+      type: "SAVE_PREVIEW",
+      commandId,
+      accepted: true,
+      errors: [],
+      snapshot: buildSimulationSnapshot(loaded, this.scenario.definitions, {
+        sequence: this.sequence,
+        running: false,
+        speedDaysPerSecond: this.speed,
+        achievedDaysPerSecond: 0,
+        focusCountryId: null,
+        ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
+        ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
+        ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
+      }, this.scenario.population.definitions),
+    });
+  }
+
+  private load(commandId: string, save: string): void {
+    let loaded: World;
+    try {
+      loaded = deserializeWorld(save);
+      assertValidWorld(loaded);
+    } catch (error) {
+      this.emitEvent({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "LOAD_RESULT",
+        commandId,
+        accepted: false,
+        errors: [errorMessage(error)],
+        snapshot: this.snapshot(),
+      });
+      return;
+    }
+    const errors = this.saveCompatibilityErrors(loaded);
     if (errors.length > 0) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,

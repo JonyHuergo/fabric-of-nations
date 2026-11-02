@@ -1,195 +1,123 @@
 /**
- * Fabric of Nations M11 design tokens.
+ * The React Native face of the Living Atlas tokens in `design/tokens.ts`.
  *
- * A restrained atlas palette: deep ink backgrounds, parchment text, a single
- * brass accent, and muted national colours. Numbers use tabular figures.
+ * `colors` and `type` always answer with the active theme. The active theme moves
+ * with the game date, so stylesheets are built by `themedSheet`, which resolves a
+ * screen's styles against the theme current at render time. Colour literals do not
+ * belong in screens: `m16-design-tokens.test.ts` fails if one appears.
  */
-import { Platform, type TextStyle } from "react-native";
+import { StyleSheet, type ImageStyle, type TextStyle, type ViewStyle } from "react-native";
 
-export const colors = {
-  background: "#0b1014",
-  backgroundAlt: "#0e151a",
-  surface: "#121a20",
-  surfaceRaised: "#172129",
-  surfaceHover: "#1d2932",
-  panel: "#111920",
-  border: "#26333c",
-  borderStrong: "#35464f",
-  text: "#e7e1d2",
-  textStrong: "#f7f1e1",
-  muted: "#9caaa7",
-  faint: "#6e7d7b",
-  accent: "#c9a227",
-  accentStrong: "#e2bd4a",
-  accentText: "#181204",
-  green: "#81a982",
-  red: "#c57a6b",
-  blue: "#7f9fc4",
-  amber: "#c9a227",
-  purple: "#a08bbd",
-  shadow: "#000000",
-  mapOcean: "#08111a",
-  mapLand: "#1a2328",
-  mapBorder: "#05090c",
-  mapGraticule: "#16222b",
-  player: "#d8b34a",
-  overlay: "rgba(6, 9, 12, 0.72)",
-} as const;
+import {
+  FONTS,
+  RADII,
+  SPACING,
+  TYPE_SCALE,
+  resolveEra,
+  ERA_THEMES,
+  type ResolvedColors,
+  type ResolvedTheme,
+  type TypeMetric,
+} from "./design/tokens";
+import { rgbToCss, stateColor } from "./map/politicalPalette";
 
-export const spacing = {
-  xxs: 2,
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
-  xxxl: 48,
-} as const;
+export { TOUCH_TARGET } from "./design/tokens";
 
-export const radii = {
-  sm: 3,
-  md: 6,
-  lg: 10,
-  pill: 999,
-} as const;
+let activeTheme: ResolvedTheme = resolveEra(ERA_THEMES.imperial);
 
-export const fonts = {
-  display: Platform.select({
-    web: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
-    ios: "Georgia",
-    android: "serif",
-    default: "serif",
-  }),
-  body: Platform.select({
-    web: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
-    ios: "System",
-    android: "sans-serif",
-    default: "System",
-  }),
-  mono: Platform.select({
-    web: "'SFMono-Regular', 'Cascadia Mono', Consolas, monospace",
-    ios: "Menlo",
-    android: "monospace",
-    default: "monospace",
-  }),
-} as const;
-
-export const type = {
-  display: {
-    fontFamily: fonts.display,
-    fontSize: 30,
-    lineHeight: 34,
-    fontWeight: "600",
-    letterSpacing: 0.4,
-    color: colors.textStrong,
-  } as TextStyle,
-  title: {
-    fontFamily: fonts.display,
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: "600",
-    letterSpacing: 0.2,
-    color: colors.textStrong,
-  } as TextStyle,
-  section: {
-    fontFamily: fonts.display,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: "600",
-    letterSpacing: 0.2,
-    color: colors.textStrong,
-  } as TextStyle,
-  label: {
-    fontFamily: fonts.body,
-    fontSize: 9.5,
-    lineHeight: 13,
-    fontWeight: "700",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.faint,
-  } as TextStyle,
-  body: {
-    fontFamily: fonts.body,
-    fontSize: 12.5,
-    lineHeight: 18,
-    color: colors.text,
-  } as TextStyle,
-  small: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    lineHeight: 16,
-    color: colors.muted,
-  } as TextStyle,
-  tiny: {
-    fontFamily: fonts.body,
-    fontSize: 9.5,
-    lineHeight: 13,
-    color: colors.faint,
-  } as TextStyle,
-  number: {
-    fontFamily: fonts.mono,
-    fontSize: 12.5,
-    lineHeight: 18,
-    color: colors.textStrong,
-    fontVariant: ["tabular-nums"],
-  } as TextStyle,
-  numberLarge: {
-    fontFamily: fonts.mono,
-    fontSize: 19,
-    lineHeight: 24,
-    color: colors.textStrong,
-    fontVariant: ["tabular-nums"],
-  } as TextStyle,
-  mono: {
-    fontFamily: fonts.mono,
-    fontSize: 10.5,
-    lineHeight: 15,
-    color: colors.muted,
-    fontVariant: ["tabular-nums"],
-  } as TextStyle,
-} as const;
-
-/** Curated national colours, stable by polity tag hash. */
-export const NATION_COLORS = [
-  "#b08a63",
-  "#7f9c7a",
-  "#8e8ab5",
-  "#b57e7a",
-  "#6f8fa8",
-  "#a8936a",
-  "#8a9c8f",
-  "#a97f9a",
-  "#7c8fa0",
-  "#a19062",
-  "#7e9d94",
-  "#9a7f6d",
-  "#8c8fa8",
-  "#a58f7f",
-  "#6f9a8a",
-  "#b09a7a",
-] as const;
-
-export function hashTag(tag: string): number {
-  let hash = 2166136261;
-  for (let index = 0; index < tag.length; index += 1) {
-    hash ^= tag.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
+/** Install the theme the next render reads. */
+export function setActiveTheme(theme: ResolvedTheme): void {
+  activeTheme = theme;
 }
 
+export function getActiveTheme(): ResolvedTheme {
+  return activeTheme;
+}
+
+function liveRecord<T extends object>(read: (theme: ResolvedTheme) => T): T {
+  return new Proxy({} as T, {
+    get: (_target, key) => (read(activeTheme) as Record<string | symbol, unknown>)[key],
+    has: (_target, key) => key in read(activeTheme),
+    ownKeys: () => Reflect.ownKeys(read(activeTheme)),
+    getOwnPropertyDescriptor: (_target, key) => {
+      const value = (read(activeTheme) as Record<string | symbol, unknown>)[key];
+      return value === undefined ? undefined : { configurable: true, enumerable: true, value };
+    },
+  });
+}
+
+/** The colours of the active theme. */
+export const colors: ResolvedColors = liveRecord((theme) => theme.colors);
+
+export const spacing = SPACING;
+export const radii = RADII;
+export const fonts = FONTS;
+
+function textStyle(metric: TypeMetric, color: string): TextStyle {
+  return {
+    fontFamily: metric.fontFamily,
+    fontSize: metric.fontSize,
+    lineHeight: metric.lineHeight,
+    color,
+    ...(metric.letterSpacing === undefined ? {} : { letterSpacing: metric.letterSpacing }),
+    ...(metric.uppercase === true ? { textTransform: "uppercase" as const } : {}),
+    ...(metric.tabular === true ? { fontVariant: ["tabular-nums" as const] } : {}),
+  };
+}
+
+type TypeName = keyof typeof TYPE_SCALE;
+
+function typeFor(theme: ResolvedTheme): Readonly<Record<TypeName, TextStyle>> {
+  const { colors: palette } = theme;
+  return {
+    hero: textStyle(TYPE_SCALE.hero, palette.textStrong),
+    menu: textStyle(TYPE_SCALE.menu, palette.text),
+    eyebrow: textStyle(TYPE_SCALE.eyebrow, palette.accentStrong),
+    display: textStyle(TYPE_SCALE.display, palette.textStrong),
+    title: textStyle(TYPE_SCALE.title, palette.textStrong),
+    section: textStyle(TYPE_SCALE.section, palette.textStrong),
+    label: textStyle(TYPE_SCALE.label, palette.muted),
+    body: textStyle(TYPE_SCALE.body, palette.text),
+    small: textStyle(TYPE_SCALE.small, palette.muted),
+    tiny: textStyle(TYPE_SCALE.tiny, palette.faint),
+    number: textStyle(TYPE_SCALE.number, palette.textStrong),
+    numberLarge: textStyle(TYPE_SCALE.numberLarge, palette.textStrong),
+    mono: textStyle(TYPE_SCALE.mono, palette.muted),
+  };
+}
+
+let typeCache: { readonly key: string; readonly styles: Readonly<Record<TypeName, TextStyle>> } | null = null;
+
+/** Text styles of the active theme. */
+export const type: Readonly<Record<TypeName, TextStyle>> = liveRecord((theme) => {
+  if (typeCache?.key !== theme.key) typeCache = { key: theme.key, styles: typeFor(theme) };
+  return typeCache.styles;
+});
+
+type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
+// The same shape `StyleSheet.create` takes, so style literals keep their exact types.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyStyles = NamedStyles<any>;
+
+/**
+ * `StyleSheet.create` for a stylesheet that reads theme colours. The factory runs
+ * once per theme, on first use; between era changes a style is one cache lookup.
+ */
+export function themedSheet<T extends NamedStyles<T> | AnyStyles>(factory: () => T & AnyStyles): T {
+  let cached: { readonly key: string; readonly sheet: T } | null = null;
+  const current = (): T => {
+    if (cached?.key !== activeTheme.key) {
+      cached = { key: activeTheme.key, sheet: StyleSheet.create(factory()) as T };
+    }
+    return cached.sheet;
+  };
+  return new Proxy({} as T, {
+    get: (_target, key) => (current() as Record<string | symbol, unknown>)[key],
+  });
+}
+
+/** The authored colour of a polity, for monograms and dots outside the map. */
 export function nationColor(tag: string | null | undefined): string {
-  if (tag === null || tag === undefined) return colors.faint;
-  return NATION_COLORS[hashTag(tag) % NATION_COLORS.length] ?? colors.faint;
-}
-
-/** Lighten a hex colour toward parchment (for dependent territories). */
-export function lighten(hex: string, amount = 0.32): string {
-  const value = hex.replace("#", "");
-  const r = Number.parseInt(value.slice(0, 2), 16);
-  const g = Number.parseInt(value.slice(2, 4), 16);
-  const b = Number.parseInt(value.slice(4, 6), 16);
-  const mix = (channel: number): number => Math.round(channel + (235 - channel) * amount);
-  return `#${[mix(r), mix(g), mix(b)].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+  if (tag === null || tag === undefined) return activeTheme.colors.faint;
+  return rgbToCss(stateColor(tag));
 }

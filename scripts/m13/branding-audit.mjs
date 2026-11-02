@@ -96,6 +96,30 @@ function lineNumberAt(text, index) {
   return line;
 }
 
+/**
+ * The atlas page embeds binary payloads as base64, where any short word can occur
+ * by chance. Long runs are blanked; its code and catalogue text are still scanned.
+ */
+function withoutBase64Runs(text) {
+  const isBase64 = (code) =>
+    (code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || code === 43 || code === 47 || code === 61;
+  let output = "";
+  let kept = 0;
+  let run = -1;
+  for (let index = 0; index <= text.length; index += 1) {
+    if (index < text.length && isBase64(text.charCodeAt(index))) {
+      if (run < 0) run = index;
+    } else {
+      if (run >= 0 && index - run >= 1000) {
+        output += text.slice(kept, run);
+        kept = index;
+      }
+      run = -1;
+    }
+  }
+  return output + text.slice(kept);
+}
+
 function scanFile(path) {
   const relativePath = relative(ROOT, path).replaceAll("\\", "/");
   if (isHistorical(relativePath)) return;
@@ -103,7 +127,7 @@ function scanFile(path) {
   // only old-name token is the internal __centuryReceive bridge, which is
   // deliberately retained. Scanning it line-wise would only print a 2 MB line.
   if (relativePath === "packages/app/src/generated/simWorker.ts") return;
-  const text = readFileSync(path, "utf8");
+  const text = withoutBase64Runs(readFileSync(path, "utf8"));
   checked.push(relativePath);
   const pattern = /CENTURY|Century/g;
   let match;
@@ -209,7 +233,7 @@ const manifest = JSON.parse(readFileSync(join(appRoot, "public/manifest.webmanif
 requireEqual("PWA manifest name", manifest.name, BRAND);
 requireEqual("PWA manifest short_name", manifest.short_name, BRAND);
 requireEqual("PWA manifest display", manifest.display, "standalone");
-requireEqual("PWA manifest theme_color", manifest.theme_color, "#0b1014");
+requireEqual("PWA manifest theme_color", manifest.theme_color, "#0d1419");
 if (!Array.isArray(manifest.icons) || manifest.icons.length < 3) {
   errors.push("PWA manifest must declare any, 512px and maskable icons");
 }
@@ -266,7 +290,7 @@ if (checkDist) {
     const exported = readFileSync(indexPath, "utf8");
     requireIncludes("exported browser tab title", exported, `<title>${BRAND}</title>`);
     requireIncludes("exported PWA manifest link", exported, "manifest.webmanifest");
-    requireIncludes("exported theme colour", exported, 'name="theme-color" content="#0b1014"');
+    requireIncludes("exported theme colour", exported, 'name="theme-color" content="#0d1419"');
     for (const path of [
       join(distRoot, "manifest.webmanifest"),
       join(distRoot, "favicon.ico"),

@@ -8,8 +8,8 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Notice, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 
 export function PopulationScreen({
   snapshot,
@@ -23,36 +23,13 @@ export function PopulationScreen({
   const country = countryById(snapshot, countryId);
   return (
     <View>
-      <Section
-        title="Population and employment"
-        subtitle="Country aggregates derived from the authoritative single-year sex/age blocks."
-      >
-        {snapshot.countrySummaries.map((entry) => (
-          <Pressable
-            key={entry.id}
-            accessibilityRole="button"
-            onPress={() => onSelectCountry(entry.id)}
-            style={[styles.countryRow, entry.id === countryId ? styles.countrySelected : null]}
-          >
-            <Text style={styles.countryTag}>{entry.tag}</Text>
-            <Text style={styles.countryName} numberOfLines={1}>
-              {entry.name}
-              {entry.id === snapshot.playerCountryId ? " · Player" : ""}
-            </Text>
-            <View style={styles.numbers}>
-              <Text style={styles.number}>{formatCount(entry.population)}</Text>
-              <Text style={styles.numberMuted}>{formatCount(entry.workingAgePopulation)}</Text>
-              <Text style={styles.numberMuted}>{formatCount(entry.employedWorkers)}</Text>
-              <Text style={styles.numberMuted}>{formatRate(entry.hardshipPopulationShare)}</Text>
-            </View>
-          </Pressable>
-        ))}
-        <View style={styles.headerRow}>
-          <Text style={styles.headerText}>Country</Text>
-          <Text style={styles.headerText}>Population · working-age · employed · hardship</Text>
-        </View>
-      </Section>
-
+      {country === null ? null : (
+        <Headline
+          label="Population"
+          value={formatCount(country.population)}
+          detail={`${formatCount(country.employedWorkers)} employed · hardship ${formatRate(country.hardshipPopulationShare)}`}
+        />
+      )}
       {country === null ? null : (
         <Section title={`${country.name} detail`} subtitle={snapshot.date.label}>
           <StatRow label="Population" value={formatCount(country.population)} detail="people" />
@@ -105,11 +82,43 @@ export function PopulationScreen({
           </Notice>
         </Section>
       )}
+      <Section
+        title="Population and employment"
+        subtitle="Country aggregates derived from the authoritative single-year sex/age blocks."
+      >
+        <Disclosure title={`All countries · ${String(snapshot.countrySummaries.length)}`}>
+        {snapshot.countrySummaries.map((entry) => (
+          <Pressable
+            key={entry.id}
+            accessibilityRole="button"
+            onPress={() => onSelectCountry(entry.id)}
+            style={[styles.countryRow, entry.id === countryId ? styles.countrySelected : null]}
+          >
+            <Text style={styles.countryTag}>{entry.tag}</Text>
+            <Text style={styles.countryName} numberOfLines={1}>
+              {entry.name}
+              {entry.id === snapshot.playerCountryId ? " · Player" : ""}
+            </Text>
+            <View style={styles.numbers}>
+              <Text style={styles.number}>{formatCount(entry.population)}</Text>
+              <Text style={styles.numberMuted}>{formatCount(entry.workingAgePopulation)}</Text>
+              <Text style={styles.numberMuted}>{formatCount(entry.employedWorkers)}</Text>
+              <Text style={styles.numberMuted}>{formatRate(entry.hardshipPopulationShare)}</Text>
+            </View>
+          </Pressable>
+        ))}
+        <View style={styles.headerRow}>
+          <Text style={styles.headerText}>Country</Text>
+          <Text style={styles.headerText}>Population · working-age · employed · hardship</Text>
+        </View>
+        </Disclosure>
+      </Section>
+
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   countryRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -118,15 +127,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   countrySelected: { backgroundColor: colors.surfaceRaised },
-  countryTag: { color: colors.text, fontSize: 11, fontWeight: "700", width: 40 },
-  countryName: { color: colors.muted, fontSize: 11, flex: 1, paddingRight: spacing.xs },
+  countryTag: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold, width: 40 },
+  countryName: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, flex: 1, paddingRight: spacing.xs },
   numbers: { alignItems: "flex-end" },
-  number: { color: colors.text, fontSize: 12, fontVariant: ["tabular-nums"] },
-  numberMuted: { color: colors.muted, fontSize: 10, fontVariant: ["tabular-nums"] },
+  number: { color: colors.text, fontFamily: fonts.sans, fontSize: 13, fontVariant: ["tabular-nums"] },
+  numberMuted: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, fontVariant: ["tabular-nums"] },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: spacing.sm,
   },
-  headerText: { color: colors.faint, fontSize: 9 },
-});
+  headerText: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11 },
+}));

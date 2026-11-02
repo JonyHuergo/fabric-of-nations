@@ -395,3 +395,330 @@ export class SaveStore {
     }
   }
 }
+
+// ---- save library ---------------------------------------------------------------
+
+/**
+ * One campaign's saved game. Each slot is its own replace-safe `SaveStore`: the
+ * slot key holds the save, and `<key>.previous` and `<key>.staging` its recovery
+ * copies.
+ */
+export interface SaveSlot {
+  readonly id: string;
+  readonly key: string;
+  /** Library-wide store counter at the slot's last save; larger is more recent. */
+  readonly order: number;
+  /** Wall-clock time of the last save as supplied by the caller; display only. */
+  readonly savedAtMs: number | null;
+  /** The campaign's player country, when the caller knew it. */
+  readonly playerCountryId: number | null;
+  /** Envelope of the last stored save; null when an adopted save could not be read. */
+  readonly metadata: SaveMetadata | null;
+  readonly storedBytes: number;
+}
+
+/** What the caller knows about a save that the save envelope does not record. */
+export interface SaveSlotDetails {
+  readonly playerCountryId: number | null;
+  readonly savedAtMs: number | null;
+}
+
+export interface StoredSlotInfo extends StoredSaveInfo {
+  readonly slot: SaveSlot;
+}
+
+export interface SaveLibraryOptions {
+  readonly expectedSchemaVersion: number;
+  readonly expectedFormatVersion?: number;
+  readonly indexKey?: string;
+  /** Prefix of the keys of new slots. */
+  readonly slotKeyPrefix?: string;
+  /** Key of the single-campaign store that predates the library; adopted as a slot. */
+  readonly legacyKey?: string;
+}
+
+interface SaveLibraryIndex {
+  readonly version: 1;
+  readonly nextSlot: number;
+  readonly nextOrder: number;
+  readonly slots: readonly SaveSlot[];
+}
+
+const SAVE_LIBRARY_INDEX_VERSION = 1;
+const LEGACY_SLOT_ID = "legacy";
+
+function isRecordValue(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+const isCount = (value: unknown): value is number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 0;
+const isFilledString = (value: unknown): value is string =>
+  typeof value === "string" && value.length > 0;
+
+function isSaveMetadata(value: unknown): value is SaveMetadata {
+  return (
+    isRecordValue(value) &&
+    isCount(value.formatVersion) &&
+    isCount(value.schemaVersion) &&
+    isFilledString(value.simVersion) &&
+    isFilledString(value.dataVersion) &&
+    isFilledString(value.scenarioId) &&
+    isCount(value.dayIndex) &&
+    value.dayIndex <= 36_524 &&
+    value.dateLabel === saveDateLabel(value.dayIndex) &&
+    typeof value.seed === "number" &&
+    Number.isInteger(value.seed) &&
+    isFilledString(value.checksum)
+  );
+}
+
+function isSaveSlot(value: unknown): value is SaveSlot {
+  return (
+    isRecordValue(value) &&
+    isFilledString(value.id) &&
+    isFilledString(value.key) &&
+    isCount(value.order) &&
+    (value.savedAtMs === null || (typeof value.savedAtMs === "number" && Number.isFinite(value.savedAtMs))) &&
+    (value.playerCountryId === null || isCount(value.playerCountryId)) &&
+    (value.metadata === null || isSaveMetadata(value.metadata)) &&
+    isCount(value.storedBytes)
+  );
+}
+
+function parseLibraryIndex(raw: string): SaveLibraryIndex {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw) as unknown;
+  } catch (error) {
+    throw new RangeError(
+      `the saved-game index is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+  if (
+    !isRecordValue(parsed) ||
+    parsed.version !== SAVE_LIBRARY_INDEX_VERSION ||
+    !isCount(parsed.nextSlot) ||
+    !isCount(parsed.nextOrder) ||
+    !Array.isArray(parsed.slots) ||
+    !parsed.slots.every(isSaveSlot)
+  ) {
+    throw new RangeError("the saved-game index is malformed");
+  }
+  const nextOrder = parsed.nextOrder;
+  const slots = parsed.slots as readonly SaveSlot[];
+  const ids = new Set(slots.map((slot) => slot.id));
+  const keys = new Set(slots.map((slot) => slot.key));
+  if (ids.size !== slots.length || keys.size !== slots.length) {
+    throw new RangeError("the saved-game index repeats a slot");
+  }
+  if (slots.some((slot) => slot.order >= nextOrder)) {
+    throw new RangeError("the saved-game index orders a slot after its own counter");
+  }
+  return { version: SAVE_LIBRARY_INDEX_VERSION, nextSlot: parsed.nextSlot, nextOrder, slots };
+}
+
+/**
+ * Every saved campaign, one slot each, over the same key/value backend.
+ *
+ * A campaign's saves always go to its own slot, so starting a new campaign never
+ * replaces another. Slot writes keep the staging and previous-copy guarantees of
+ * `SaveStore`; the index is one more verified key written after the slot, so an
+ * interrupted index write can at worst leave an unlisted slot behind, never a
+ * listed slot without its save. Operations are serialized, because the index is
+ * read, changed and written back.
+ *
+ * The single store used before the library existed is adopted in place as the
+ * first slot the first time the index is read; its keys are not moved.
+ */
+export class SaveLibrary {
+  private readonly backend: SaveStorageBackend;
+  private readonly expectedSchemaVersion: number;
+  private readonly expectedFormatVersion: number;
+  private readonly indexKey: string;
+  private readonly slotKeyPrefix: string;
+  private readonly legacyKey: string;
+  private queue: Promise<unknown> = Promise.resolve();
+
+  public constructor(backend: SaveStorageBackend, options: SaveLibraryOptions) {
+    this.backend = backend;
+    this.expectedSchemaVersion = options.expectedSchemaVersion;
+    this.expectedFormatVersion = options.expectedFormatVersion ?? 1;
+    this.indexKey = options.indexKey ?? "fon.saves.index.v1";
+    this.slotKeyPrefix = options.slotKeyPrefix ?? "fon.saves.slot.";
+    this.legacyKey = options.legacyKey ?? "century.m7.save.v1";
+  }
+
+  /** Every slot, most recently saved first. */
+  public list(): Promise<readonly SaveSlot[]> {
+    return this.serial(async () => [...(await this.readIndex()).slots].sort((a, b) => b.order - a.order));
+  }
+
+  /** Store a save as a new campaign slot. */
+  public create(save: string, details: SaveSlotDetails): Promise<StoredSlotInfo> {
+    return this.serial(async () => {
+      const index = await this.readIndex();
+      const id = `c${String(index.nextSlot)}`;
+      const key = `${this.slotKeyPrefix}${id}`;
+      const info = await this.storeFor(key).store(save);
+      const slot = this.slotRecord(id, key, index.nextOrder, details, info);
+      await this.writeIndex({
+        version: SAVE_LIBRARY_INDEX_VERSION,
+        nextSlot: index.nextSlot + 1,
+        nextOrder: index.nextOrder + 1,
+        slots: [...index.slots, slot],
+      });
+      return { ...info, slot };
+    });
+  }
+
+  /** Replace the save in an existing slot; its previous save stays as the recovery copy. */
+  public store(slotId: string, save: string, details: SaveSlotDetails): Promise<StoredSlotInfo> {
+    return this.serial(async () => {
+      const index = await this.readIndex();
+      const existing = index.slots.find((slot) => slot.id === slotId);
+      if (existing === undefined) throw new RangeError(`no saved game ${JSON.stringify(slotId)}`);
+      const info = await this.storeFor(existing.key).store(save);
+      const slot = this.slotRecord(
+        existing.id,
+        existing.key,
+        index.nextOrder,
+        { playerCountryId: details.playerCountryId ?? existing.playerCountryId, savedAtMs: details.savedAtMs },
+        info,
+      );
+      await this.writeIndex({
+        ...index,
+        nextOrder: index.nextOrder + 1,
+        slots: index.slots.map((candidate) => (candidate.id === slotId ? slot : candidate)),
+      });
+      return { ...info, slot };
+    });
+  }
+
+  /**
+   * Record the player country of a slot that did not know it, such as an adopted
+   * save, once the worker has read the save. A slot that knows its country keeps it.
+   */
+  public annotate(slotId: string, playerCountryId: number): Promise<SaveSlot | null> {
+    return this.serial(async () => {
+      const index = await this.readIndex();
+      const existing = index.slots.find((slot) => slot.id === slotId);
+      if (existing === undefined) return null;
+      if (existing.playerCountryId !== null) return existing;
+      const slot: SaveSlot = { ...existing, playerCountryId };
+      await this.writeIndex({
+        ...index,
+        slots: index.slots.map((candidate) => (candidate.id === slotId ? slot : candidate)),
+      });
+      return slot;
+    });
+  }
+
+  /** The newest readable save of a slot, falling back to its recovery copies. */
+  public load(slotId: string): Promise<StoredCampaign | null> {
+    return this.serial(async () => {
+      const slot = (await this.readIndex()).slots.find((candidate) => candidate.id === slotId);
+      if (slot === undefined) return null;
+      return this.storeFor(slot.key).load();
+    });
+  }
+
+  /** Delete a slot and its recovery copies; unlisting comes first, so a half-done delete only leaves keys behind. */
+  public remove(slotId: string): Promise<void> {
+    return this.serial(async () => {
+      const index = await this.readIndex();
+      const slot = index.slots.find((candidate) => candidate.id === slotId);
+      if (slot === undefined) return;
+      await this.writeIndex({ ...index, slots: index.slots.filter((candidate) => candidate.id !== slotId) });
+      await this.storeFor(slot.key).clear();
+    });
+  }
+
+  /** Delete every slot and the index. */
+  public clear(): Promise<void> {
+    return this.serial(async () => {
+      const index = await this.readIndex();
+      await this.backend.removeItem(this.indexKey);
+      for (const slot of index.slots) await this.storeFor(slot.key).clear();
+      await this.storeFor(this.legacyKey).clear();
+    });
+  }
+
+  private serial<T>(work: () => Promise<T>): Promise<T> {
+    const result = this.queue.then(work, work);
+    this.queue = result.catch(() => undefined);
+    return result;
+  }
+
+  private storeFor(key: string): SaveStore {
+    return new SaveStore(this.backend, {
+      expectedSchemaVersion: this.expectedSchemaVersion,
+      expectedFormatVersion: this.expectedFormatVersion,
+      keys: { primary: key, previous: `${key}.previous`, staging: `${key}.staging` },
+    });
+  }
+
+  private slotRecord(
+    id: string,
+    key: string,
+    order: number,
+    details: SaveSlotDetails,
+    info: StoredSaveInfo,
+  ): SaveSlot {
+    return {
+      id,
+      key,
+      order,
+      savedAtMs: details.savedAtMs,
+      playerCountryId: details.playerCountryId,
+      metadata: info.metadata,
+      storedBytes: info.compressedBytes,
+    };
+  }
+
+  private async readIndex(): Promise<SaveLibraryIndex> {
+    const raw = await this.backend.getItem(this.indexKey);
+    if (raw !== null) return parseLibraryIndex(raw);
+    const adopted = await this.adoptLegacy();
+    const index: SaveLibraryIndex = {
+      version: SAVE_LIBRARY_INDEX_VERSION,
+      nextSlot: 1,
+      nextOrder: adopted === null ? 1 : adopted.order + 1,
+      slots: adopted === null ? [] : [adopted],
+    };
+    if (adopted !== null) await this.writeIndex(index);
+    return index;
+  }
+
+  /** The pre-library single store as a slot, or null when it holds nothing. */
+  private async adoptLegacy(): Promise<SaveSlot | null> {
+    for (const key of [this.legacyKey, `${this.legacyKey}.staging`, `${this.legacyKey}.previous`]) {
+      const stored = await this.backend.getItem(key);
+      if (stored === null) continue;
+      let metadata: SaveMetadata | null = null;
+      try {
+        metadata = readSaveMetadata(decompressSaveFromStorage(stored));
+      } catch {
+        // Still listed, so it can be deleted; loading it reports why it cannot be read.
+      }
+      return {
+        id: LEGACY_SLOT_ID,
+        key: this.legacyKey,
+        order: 0,
+        savedAtMs: null,
+        playerCountryId: null,
+        metadata,
+        storedBytes: stored.length,
+      };
+    }
+    return null;
+  }
+
+  private async writeIndex(index: SaveLibraryIndex): Promise<void> {
+    const raw = JSON.stringify(index);
+    await this.backend.setItem(this.indexKey, raw);
+    if ((await this.backend.getItem(this.indexKey)) !== raw) {
+      throw new Error("saved-game index verification failed");
+    }
+  }
+}

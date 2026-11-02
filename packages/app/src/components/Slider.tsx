@@ -13,7 +13,7 @@ import {
   type GestureResponderEvent,
 } from "react-native";
 
-import { colors, radii, spacing, type } from "../theme";
+import { TOUCH_TARGET, colors, radii, spacing, themedSheet, type } from "../theme";
 import { Badge } from "./ui";
 
 /**
@@ -286,44 +286,39 @@ export function SliderField({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   field: {
     paddingVertical: spacing.sm,
     borderBottomColor: colors.border,
     borderBottomWidth: StyleSheet.hairlineWidth,
     gap: 4,
   },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
+  header: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: spacing.sm },
   label: { ...type.body, flexShrink: 1 },
-  valueRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  valueRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs, marginLeft: "auto" },
   numericWrap: { flexDirection: "row", alignItems: "center", gap: 4 },
   numeric: {
     ...type.number,
     minWidth: 74,
+    minHeight: TOUCH_TARGET,
     textAlign: "right",
-    paddingVertical: 3,
     paddingHorizontal: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.borderStrong,
     borderRadius: radii.sm,
     backgroundColor: colors.background,
   },
   unit: { ...type.tiny, minWidth: 18 },
   sliderRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   stepButton: {
-    width: 26,
-    height: 26,
+    ...type.section,
+    width: TOUCH_TARGET,
+    height: TOUCH_TARGET,
     textAlign: "center",
-    lineHeight: 24,
-    color: colors.text,
-    fontSize: 15,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    lineHeight: TOUCH_TARGET,
     borderRadius: radii.sm,
     backgroundColor: colors.surfaceRaised,
     overflow: "hidden",
   },
-  trackHitArea: { flex: 1, height: 30, justifyContent: "center" },
+  trackHitArea: { flex: 1, height: TOUCH_TARGET, justifyContent: "center" },
   track: {
     height: 4,
     backgroundColor: colors.surfaceRaised,
@@ -347,10 +342,10 @@ const styles = StyleSheet.create({
   },
   thumb: {
     position: "absolute",
-    width: 14,
-    height: 14,
-    marginLeft: -7,
-    borderRadius: 7,
+    width: 18,
+    height: 18,
+    marginLeft: -9,
+    borderRadius: 9,
     backgroundColor: colors.accentStrong,
     borderWidth: 2,
     borderColor: colors.background,
@@ -359,6 +354,6 @@ const styles = StyleSheet.create({
   scaleText: { ...type.tiny },
   tickLabels: { flexDirection: "row", gap: spacing.sm, flexWrap: "wrap", justifyContent: "center" },
   tickLabel: { ...type.tiny, color: colors.faint },
-  hintText: { ...type.tiny, lineHeight: 14, marginTop: 2 },
+  hintText: { ...type.tiny, marginTop: 2 },
   disabled: { opacity: 0.45 },
-});
+}));

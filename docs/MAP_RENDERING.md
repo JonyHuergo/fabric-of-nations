@@ -10,8 +10,10 @@ polity and province data; this document covers the display layer built on top of
   gameplay granularity are not changed by anything described here.
 - **Display geometry may be finer than authoritative geometry.** The 1:10m coast
   defines what the player sees; the authoritative province decides who owns a point.
-- **No remote services at runtime.** Every map asset ships with the application and
-  is served from the same origin.
+- **No remote services at runtime.** Every map asset ships with the application, and the
+  page that draws the map forbids network access in its Content-Security-Policy.
+- **One map on every platform.** The same page runs in a WebView on iOS and Android and in
+  an iframe on the web. Colour comes only from `packages/app/src/design/tokens.ts`.
 
 ## 2. Pipeline
 
@@ -71,6 +73,22 @@ not show:
 - The Aral Sea and Lake Chad use the Natural Earth historic-lake polygons instead of
   their modern remnants.
 
+### The atlas page
+
+`pnpm map:atlas` runs `scripts/map/build-atlas.mjs`, which writes two files.
+`pnpm map:atlas:check` rebuilds in memory and fails if either differs, and a Jest test
+compares the hashes the page records with the current bundle, tokens and fonts.
+
+| File | Contents |
+|---|---|
+| `public/map/atlas-v1.html` | The whole map runtime in one page, 8.7 MiB |
+| `src/generated/provinceCatalog.ts` | Province metadata without rings, for the interface |
+
+The page inlines the runtime, the decode worker, the render bundle, the rasters reduced to
+2048 texels, the two label fonts and a small catalogue. Run `pnpm map:atlas` after changing
+tokens, anything in `src/map`, or the bundle. `world-render-v1.bin` and the two JPEGs remain
+the compiled inputs and are not read at runtime.
+
 ## 3. Runtime architecture
 
 Everything lives in `packages/app/src/map/`. Module boundaries follow the separation
@@ -83,16 +101,21 @@ the map needs for future modes:
 | Geometry | `renderBundle.ts` (decoder, pure) |
 | Political ownership | `mapModes.ts` `buildProvinceStates` (pure, from the snapshot) |
 | Map-mode data | `mapModes.ts` `MapMode` (pure) |
-| Colour | `politicalPalette.ts` (pure), `mapStyle.ts` (pure) |
+| Colour | `politicalPalette.ts` (pure), `mapStyle.ts` (pure), `design/tokens.ts` |
 | Picking | `hitTest.ts` (pure) |
 | Label placement | `labels.ts` (pure) |
+| Lenses | `lenses.ts` (pure) |
 | Rendering | `glRenderer.ts` (WebGL2), `labelPainter.ts` (canvas) |
-| Input, frame loop | `mapEngine.ts` (web, outside React) |
-| Interface | `GlWorldMap.tsx` |
+| Input, frame loop | `mapEngine.ts` |
+| The page | `runtime/main.ts`, `runtime/decodeWorker.ts` |
+| Bridge | `bridge/protocol.ts` (pure), `host/mapHostState.ts` (pure) |
+| Host | `host/AtlasMap.tsx`, `host/AtlasSurface.tsx` (iframe), `host/AtlasSurface.native.tsx` (WebView) |
+| Staging | `host/MapStage.tsx`, the one mounted map |
 
-`components/WorldMap.tsx` is the single entry point. It selects the WebGL map on the web
-when a hardware-accelerated WebGL2 context exists, and the SVG renderer otherwise. Native
-builds always use SVG. Both share the projection, palette and catalogue.
+`components/WorldMap.tsx` is the single entry point. It runs the atlas page and takes the
+SVG renderer below it only if the page reports it cannot run. Rendering code is not in the
+React Native bundle: the host speaks to the page over the bridge. The camera and every
+gesture stay in the page, so moving the map sends nothing across the bridge.
 
 ### Why WebGL2
 
@@ -127,13 +150,23 @@ Bands are in `mapStyle.ts`. Geometry level is chosen so simplification stays und
 
 ### Interaction
 
-Drag to pan, with a brief throw; wheel, trackpad or pinch to zoom toward the pointer;
-double-click to zoom in, shift for out; arrows, `+`, `-` and `0` on the keyboard. The
-world wraps horizontally without limit. A press that travels under 4 pixels is a click.
+Touch is the primary model. Tap selects a province and opens its summary. A long press
+opens a loupe, a real render at three times the zoom, for picking in dense areas, and lifting
+the finger picks what it shows. Drag pans with a brief throw, pinch zooms, and double-tap
+zooms in. A mouse adds hover, the wheel and double-click, and the keyboard adds arrows, `+`,
+`-` and `0`. Nothing depends on hover. The world wraps horizontally without limit.
 
-Picking is a uniform grid over province bounding boxes with lazily decoded rings, using
-the same even-odd rule as the fills, then the raster for fine-coast land. Tiny islands
-have a 5 pixel tolerance. Mean pick cost is under 0.2 ms.
+Picking is a uniform grid over province bounding boxes, then the bundle's fill triangles,
+then the raster for fine-coast land. A fingertip gets 18 pixels of tolerance around tiny
+islands and a mouse 5. A press that travels under 9 pixels on touch, or 4 with a mouse, is
+a tap.
+
+A selection on the map never moves the camera. When a sheet opens, the map surface slides
+aside so the place stays visible. A selection from a list flies to the place.
+
+Behind the title screen the world turns (`set-drift`, D-113): one command starts a rotation
+that runs inside the runtime, labels fade out while it turns, and stopping it returns to the
+home view. A hand on the map holds the turn.
 
 ## 4. Adding a map mode
 
@@ -153,10 +186,15 @@ renderer changes. A mode must use real data: a province with no value takes `NO_
 
 ## 5. Colour
 
-`STATE_COLORS` is authored by tag. The great powers follow period atlas convention; a
-dependent territory lifts its sovereign's colour toward parchment by status, so an empire
-reads as one family. Colours depend only on the tag, so adding a polity changes no other
-colour, and a tag with no entry derives a colour from its own hash.
+`STATE_COLORS` and `FUTURE_COLORS` are authored by tag, matte and dark so paper-coloured
+borders and labels read on them. The great powers follow period atlas convention; a dependent
+territory lifts its sovereign's colour toward paper by status, so an empire reads as one
+family. Colours depend only on the tag, so adding a polity changes no other colour. Every
+polity that can appear has an authored colour, and a test keeps it so; an unknown tag draws a
+stable data-error tone.
+
+The era takes saturation from the land as a whole, in the shader on the WebGL path and in
+`desaturate` on the SVG path, so a tag's colour never changes with the date.
 
 `m15-map-style.test.ts` requires neighbouring polities of different realms to differ by
 at least 0.04 in OKLab, and 0.022 under simulated deuteranopia (Machado et al., 2009).
@@ -181,7 +219,7 @@ ignored `.cache-map/` directory and verified against SHA-256 values in
 
 Build-only dependency: `earcut` 3.0.2 (ISC), root `devDependencies`. It does not ship in
 the application. `jimp-compact` was already present. Sea names are an authored gazetteer
-of usual English names; fonts are the existing system stacks.
+of usual English names. Fonts are in `docs/FONT_PROVENANCE.md`.
 
 ## 7. Known limitations
 
@@ -195,10 +233,12 @@ of usual English names; fonts are the existing system stacks.
   about 10 km, so where two provinces meet at the sea the colour change can step slightly
   at very high zoom.
 - **Labels.** One label per political unit, on its largest landmass, so an archipelago is
-  named on one island. Labels avoid each other but not interface panels. Sea names use
-  usual English forms, not period-specific ones such as "German Ocean".
-- **Native.** iOS and Android use the SVG renderer. It shares the palette and projection
-  but not the 1:10m coast, relief, or multiscale labels, and it has not been run on a device.
-- **Software rendering.** Without hardware acceleration the application uses the SVG map,
-  as software WebGL takes seconds per frame on this geometry.
-- **Bundle size.** The map adds about 7.4 MB of static assets to the web build.
+  named on one island. Sea names use usual English forms, not period-specific ones such as
+  "German Ocean".
+- **Devices.** Automated checks run in desktop Chrome with emulated touch, including the page
+  from a `file://` origin with a native-bridge shim. The designer reports that the game runs on
+  their mobile device; no frame-rate or memory figures exist.
+- **Software rendering.** Without hardware acceleration, or on a system without
+  `DecompressionStream`, the application uses the SVG map, which has no relief. On native it
+  draws polities only, because province rings are not in the native bundle.
+- **Size.** The atlas page adds 8.7 MiB to the application.

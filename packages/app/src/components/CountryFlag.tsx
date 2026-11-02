@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "r
 import { fitFlagInBox } from "../flags/flagLayout";
 import { flagAssetForPolity } from "../flags/flagRegistry";
 import { COUNTRY_FLAG_SIZES, type CountryFlagSize } from "../flags/flagSizes";
-import { colors, nationColor } from "../theme";
+import { colors, fonts, nationColor, themedSheet } from "../theme";
 
 /**
  * A bundled historical flag for a 1900 polity.
@@ -48,7 +48,7 @@ export function CountryFlag({
         accessibilityLabel={accessibilityLabel ?? `${tag} monogram`}
       >
         <Text
-          style={[styles.monogramText, { fontSize: monogramFontSize(box.height) }]}
+          style={[styles.monogramText, { fontFamily: fonts.sans, fontSize: monogramFontSize(box.height) }]}
           numberOfLines={1}
         >
           {monogramLabel(tag)}
@@ -80,12 +80,12 @@ function monogramFontSize(height: number): number {
   return Math.max(8, Math.min(Math.round(height * 0.46), 18));
 }
 
-const styles = StyleSheet.create({
+const styles = themedSheet(() => ({
   frame: {
     alignItems: "center",
     justifyContent: "center",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(0,0,0,0.45)",
+    borderColor: colors.border,
     borderRadius: 2,
     overflow: "hidden",
     backgroundColor: colors.backgroundAlt,
@@ -94,9 +94,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   monogramText: {
-    color: "#f7f1e1",
-    fontWeight: "800",
+    color: colors.textStrong,
+    fontFamily: fonts.sansSemiBold,
     letterSpacing: 1,
     textAlign: "center",
   },
-});
+}));

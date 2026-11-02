@@ -1,5 +1,9 @@
 # @century/app
 
+iOS and Android are the product and the game runs in landscape on every device. Web is the
+development environment. Colour, type and layout come from `src/design/tokens.ts`. After
+changing tokens or anything in `src/map`, run `pnpm map:atlas`.
+
 Fabric of Nations M7 Expo / React Native playable shell, updated for E1 economic clarity.
 
 ## Screens
@@ -7,9 +11,10 @@ Fabric of Nations M7 Expo / React Native playable shell, updated for E1 economic
 1. **Overview** (default) — player/AI identity, population/working-age/employment/
    hardship, treasury/debt, evidence-based problems, estimated production capacity,
    essential-goods stock/prices/capacity, latest closed month, and drill-down guidance.
-2. **World** — the 1900 world map, full stage, with political, control and market modes,
-   province selection and a docked details panel. See `docs/MAP_RENDERING.md`. The web
-   build uses WebGL2; native builds and software-rendered browsers use SVG.
+2. **World** (the World domain, and the map beneath everything) — the 1900 world map is always
+   the screen, mounted once, with political, control and market lenses and province selection.
+   Every platform runs the same atlas page: a WebView on iOS and Android, an iframe on the web.
+   See `docs/MAP_RENDERING.md`. Software-rendered systems use the SVG fallback in the same style.
 3. **Budget** — treasury, income tax, welfare, latest result, compact net-fiscal history,
    the `set-fiscal-policy` action, and a pure pre-commitment preview (current estimated
    wage base, tax/welfare deltas, constraints).

@@ -220,6 +220,8 @@ through `TickContext`; they are not serialized into `World`.
 | `pnpm -F @century/app export:web` | Produce the static Expo web export. |
 | `pnpm -F @century/app export:ios` / `export:android` | Produce iOS/Android Hermes JS bundles (not native release builds). |
 | `pnpm run app:export` | Export web, iOS, and Android JS bundles; included in `pnpm run ci`. |
+| `pnpm map:atlas` / `map:atlas:check` | Build or verify the one-page map runtime every platform runs. Run after changing design tokens or `packages/app/src/map`. |
+| `pnpm map:verify` / `map:verify:file` / `map:audit:sheets` | Browser checks of the map, touch, sheets and the page from a file origin. They need a GPU and `export:web`. |
 | `pnpm run ci` | Local CI path: lint, branding and monetary audits, worker checks, typecheck, test, benchmark, and web/iOS/Android app exports. |
 
 The GitHub Actions workflow in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)

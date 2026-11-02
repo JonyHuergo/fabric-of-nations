@@ -12,7 +12,11 @@
     "lint": "node scripts/check-boundaries.mjs",
     "map:build": "node --max-old-space-size=8192 scripts/map/build-render-bundle.mjs",
     "map:check": "node --max-old-space-size=8192 scripts/map/build-render-bundle.mjs --check",
+    "map:atlas": "node scripts/map/build-atlas.mjs",
+    "map:atlas:check": "node scripts/map/build-atlas.mjs --check",
     "map:verify": "node scripts/map/verify-map.mjs",
+    "map:verify:file": "node scripts/map/verify-file-origin.mjs",
+    "map:audit:sheets": "node scripts/map/audit-sheets.mjs",
     "map:measure": "node scripts/map/measure-map.mjs",
     "flags:build": "node scripts/m11/build-flags.mjs",
     "flags:check": "node scripts/m11/build-flags.mjs --check",
@@ -28,7 +32,7 @@
     "bench": "pnpm build && pnpm -F @century/bench start",
     "bench:campaign": "pnpm build && pnpm -F @century/bench campaign",
     "app:export": "pnpm -F @century/app export:web && pnpm -F @century/app export:ios && pnpm -F @century/app export:android",
-    "ci": "pnpm lint && pnpm audit:branding && pnpm audit:monetary && pnpm run check:worker && pnpm run check:sim-deps && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
+    "ci": "pnpm lint && pnpm audit:branding && pnpm audit:monetary && pnpm run check:worker && pnpm run check:sim-deps && pnpm map:atlas:check && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
   "devDependencies": {
     "earcut": "3.0.2",

@@ -1,109 +1,84 @@
 /**
  * Paints placed labels onto the 2D overlay above the WebGL canvas.
  *
- * Unit names are set letter by letter along a shallow bow in a spaced serif, as
- * on an engraved atlas. Everything else is horizontal. Text on land is dark ink
- * with a parchment halo; text on water is pale. The overlay does not repaint
- * during a pure pan: the engine translates the canvas instead.
+ * Every name is clean condensed capitals in the era's paper colour. There are no
+ * heavy halos: a thin soft shadow is enough to lift paper off a matte fill. The
+ * overlay does not repaint during a pure pan: the engine translates the canvas.
  */
 
+import { FONTS, rgbToCss, rgbaToCss, type MapTokens, type Rgb } from "../design/tokens";
 import type { Camera, MapViewportSize } from "./camera";
 import { worldToScreen } from "./camera";
 import type { PlacedLabel } from "./labels";
-import { rgbToCss, type Rgb } from "./politicalPalette";
 
-const SERIF = "Georgia, 'Iowan Old Style', 'Times New Roman', serif";
-const SANS = "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif";
-const INK = "#241f18";
-const HALO = "rgba(246, 240, 226, 0.58)";
-const SEA_INK = "rgba(203, 224, 232, 0.8)";
-const SEA_HALO = "rgba(16, 38, 50, 0.45)";
 /** Below this scale tiny territories are drawn as locating dots. */
 const MARKER_MAX_SCALE = 7;
+const SEA_ALPHA = 0.62;
+const PROVINCE_ALPHA = 0.9;
+
+/** Set capitals along a baseline, one glyph at a time, for even tracking. */
+function drawTracked(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  angle: number,
+  tracking: number,
+): void {
+  const glyphs = [...text];
+  const advances = glyphs.map((glyph) => context.measureText(glyph).width + tracking);
+  const total = advances.reduce((sum, advance) => sum + advance, 0) - tracking;
+  context.save();
+  context.translate(x, y);
+  context.rotate(angle);
+  let cursor = -total / 2;
+  for (let index = 0; index < glyphs.length; index += 1) {
+    const advance = advances[index] ?? 0;
+    context.fillText(glyphs[index] ?? "", cursor + (advance - tracking) / 2, 0);
+    cursor += advance;
+  }
+  context.restore();
+}
 
 function paintUnit(
   context: CanvasRenderingContext2D,
   label: Extract<PlacedLabel, { kind: "unit" }>,
+  tokens: MapTokens,
 ): void {
-  const { text, size, spacing, bow, angle, emphasised, opacity } = label;
-  context.font = `${emphasised ? "600" : "500"} ${size.toFixed(1)}px ${SERIF}`;
-  const glyphs = [...text];
-  const advances = glyphs.map((glyph) => context.measureText(glyph).width + spacing);
-  const total = advances.reduce((sum, advance) => sum + advance, 0) - spacing;
-  const halfWidth = total / 2;
-  const curvature = halfWidth > 0 ? (bow * 2) / (halfWidth * halfWidth) / 2 : 0;
-  context.save();
-  context.translate(label.x, label.y);
-  context.rotate(angle);
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.lineJoin = "round";
-  context.miterLimit = 2;
-  const pass = (stroke: boolean): void => {
-    let cursor = -halfWidth;
-    for (let index = 0; index < glyphs.length; index += 1) {
-      const glyph = glyphs[index] ?? "";
-      const advance = advances[index] ?? 0;
-      const along = cursor + (advance - spacing) / 2;
-      const drop = curvature * along * along - bow / 2;
-      context.save();
-      context.translate(along, drop);
-      context.rotate(Math.atan(2 * curvature * along));
-      if (stroke) context.strokeText(glyph, 0, 0);
-      else context.fillText(glyph, 0, 0);
-      context.restore();
-      cursor += advance;
-    }
-  };
+  const { text, size, spacing, angle, emphasised, opacity } = label;
+  context.font = `${size.toFixed(1)}px ${emphasised ? FONTS.sansSemiBold : FONTS.sansMedium}`;
   context.globalAlpha = opacity;
-  context.strokeStyle = HALO;
-  context.lineWidth = Math.min(3, Math.max(1.8, size * 0.1));
-  pass(true);
-  // Large names read as a wash over the country; small ones need full contrast.
-  const inkAlpha = emphasised ? 1 : 1 - Math.min(0.22, Math.max(0, (size - 14) * 0.016));
-  context.globalAlpha = opacity * inkAlpha;
-  context.fillStyle = INK;
-  pass(false);
-  context.restore();
+  context.fillStyle = rgbToCss(tokens.label);
+  drawTracked(context, text, label.x, label.y, angle, spacing);
+  context.globalAlpha = 1;
 }
 
-function paintSea(context: CanvasRenderingContext2D, label: Extract<PlacedLabel, { kind: "sea" }>): void {
-  const upper = label.text === label.text.toUpperCase();
-  context.font = `italic ${upper ? "500" : "400"} ${label.size.toFixed(1)}px ${SERIF}`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  const text = upper ? [...label.text].join(" ") : label.text;
-  context.lineJoin = "round";
-  context.strokeStyle = SEA_HALO;
-  context.lineWidth = 2.6;
-  context.strokeText(text, label.x, label.y);
-  context.fillStyle = SEA_INK;
-  context.fillText(text, label.x, label.y);
+function paintSea(
+  context: CanvasRenderingContext2D,
+  label: Extract<PlacedLabel, { kind: "sea" }>,
+  tokens: MapTokens,
+): void {
+  context.font = `${label.size.toFixed(1)}px ${FONTS.sansMedium}`;
+  context.fillStyle = rgbaToCss(tokens.label, SEA_ALPHA);
+  drawTracked(context, label.text.toUpperCase(), label.x, label.y, 0, label.size * 0.14);
 }
 
 function paintPoint(
   context: CanvasRenderingContext2D,
   label: Extract<PlacedLabel, { kind: "province" | "capital" }>,
+  tokens: MapTokens,
 ): void {
   const capital = label.kind === "capital";
-  context.font = capital
-    ? `600 ${label.size.toFixed(1)}px ${SERIF}`
-    : `500 ${label.size.toFixed(1)}px ${SANS}`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.lineJoin = "round";
-  context.strokeStyle = HALO;
-  context.lineWidth = 2.4;
-  context.strokeText(label.text, label.x, label.y);
-  context.fillStyle = capital ? INK : "rgba(36, 31, 24, 0.86)";
-  context.fillText(label.text, label.x, label.y);
+  context.font = `${label.size.toFixed(1)}px ${capital ? FONTS.sansSemiBold : FONTS.sansMedium}`;
+  context.fillStyle = capital ? rgbToCss(tokens.label) : rgbaToCss(tokens.label, PROVINCE_ALPHA);
+  drawTracked(context, label.text.toUpperCase(), label.x, label.y, 0, label.size * 0.05);
   if (capital) {
     context.beginPath();
-    context.arc(label.dotX, label.dotY, 2.6, 0, Math.PI * 2);
-    context.fillStyle = "#fffaf0";
+    context.arc(label.dotX, label.dotY, 2.4, 0, Math.PI * 2);
+    context.fillStyle = rgbToCss(tokens.label);
     context.fill();
-    context.lineWidth = 1.3;
-    context.strokeStyle = INK;
+    context.lineWidth = 1;
+    context.strokeStyle = rgbToCss(tokens.labelBack);
     context.stroke();
   }
 }
@@ -115,6 +90,7 @@ export function paintLabels(
   camera: Camera,
   viewport: MapViewportSize,
   dpr: number,
+  tokens: MapTokens,
 ): void {
   context.setTransform(dpr, 0, 0, dpr, 0, 0);
   context.clearRect(0, 0, viewport.width, viewport.height);
@@ -126,14 +102,22 @@ export function paintLabels(
       context.arc(point.x, point.y, 2.4, 0, Math.PI * 2);
       context.fillStyle = rgbToCss(marker.color);
       context.fill();
-      context.lineWidth = 0.9;
-      context.strokeStyle = "rgba(20, 17, 13, 0.85)";
+      context.lineWidth = 0.8;
+      context.strokeStyle = rgbaToCss(tokens.label, 0.7);
       context.stroke();
     }
   }
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.shadowColor = rgbaToCss(tokens.labelBack, 0.6);
+  context.shadowBlur = 3 * dpr;
+  context.shadowOffsetY = 0.5 * dpr;
   for (const label of placed) {
-    if (label.kind === "unit") paintUnit(context, label);
-    else if (label.kind === "sea") paintSea(context, label);
-    else paintPoint(context, label);
+    if (label.kind === "unit") paintUnit(context, label, tokens);
+    else if (label.kind === "sea") paintSea(context, label, tokens);
+    else paintPoint(context, label, tokens);
   }
+  context.shadowColor = "transparent";
+  context.shadowBlur = 0;
+  context.shadowOffsetY = 0;
 }

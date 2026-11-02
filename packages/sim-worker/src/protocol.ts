@@ -317,6 +317,13 @@ export type WorkerCommand =
       readonly commandId: string;
       readonly save: string;
     }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      /** Read a save for display only; the authoritative world is not replaced. */
+      readonly type: "PREVIEW_SAVE";
+      readonly commandId: string;
+      readonly save: string;
+    }
   | { readonly protocolVersion: typeof PROTOCOL_VERSION; readonly type: "SHUTDOWN"; readonly commandId: string };
 
 export interface SnapshotCivilDate {
@@ -1361,6 +1368,15 @@ export type WorkerEvent =
     }
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "SAVE_PREVIEW";
+      readonly commandId: string;
+      readonly accepted: boolean;
+      readonly errors: readonly string[];
+      /** The saved world as it would load; null when the save was rejected. */
+      readonly snapshot: SimulationSnapshot | null;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
       readonly type: "NEW_GAME_RESULT";
       readonly commandId: string;
       readonly accepted: boolean;
@@ -2002,6 +2018,7 @@ export function parseWorkerCommand(value: unknown): WorkerCommand {
         countryId: requireInteger(record.countryId, "command.countryId", 0, 0xffff_ffff),
       };
     case "LOAD":
+    case "PREVIEW_SAVE":
       return {
         protocolVersion: PROTOCOL_VERSION,
         type,
@@ -2848,6 +2865,28 @@ export function parseWorkerEvent(value: unknown): WorkerEvent {
           maxLength: MAX_LOAD_SAVE_LENGTH,
         }),
       };
+    case "SAVE_PREVIEW": {
+      if (record.snapshot !== null && !isSnapshot(record.snapshot)) {
+        throw new ProtocolError("invalid_snapshot", "event.snapshot is not a valid snapshot");
+      }
+      const errors = Array.isArray(record.errors)
+        ? record.errors.map((error, index) => requireString(error, `event.errors[${String(index)}]`, { maxLength: 2_000 }))
+        : (() => {
+            throw new ProtocolError("invalid_message", "event.errors must be an array");
+          })();
+      const accepted = record.accepted === true;
+      if (accepted === (record.snapshot === null)) {
+        throw new ProtocolError("invalid_message", "event.snapshot must be present exactly when accepted");
+      }
+      return {
+        protocolVersion: PROTOCOL_VERSION,
+        type,
+        commandId: requireString(record.commandId, "event.commandId", { minLength: 1 }),
+        accepted,
+        errors,
+        snapshot: record.snapshot,
+      };
+    }
     case "LOAD_RESULT":
     case "NEW_GAME_RESULT": {
       if (!isSnapshot(record.snapshot)) {

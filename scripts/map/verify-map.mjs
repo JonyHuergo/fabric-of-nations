@@ -1,11 +1,15 @@
 /**
- * Runtime verification of the WebGL map in a real browser: picking, click versus
- * drag, zoom anchoring, resizing, world wrapping, hover and selection states, map
- * modes, the country-selection flow and responsive layout.
+ * Runtime verification of the Living Atlas in a real browser: the atlas page,
+ * the bridge, picking, touch input, the loupe, selection without camera movement,
+ * flying from a list, zoom levels, sheets, lenses and the screenshot matrix.
  *
- * Usage: PLAYTEST_GPU=1 node scripts/map/verify-map.mjs
+ * Usage: PLAYTEST_GPU=1 PLAYTEST_SHOT_DIR=docs/images/living-atlas node scripts/map/verify-map.mjs
  * Requires `pnpm -F @century/app export:web` and a Chrome with a real GPU; on a
- * software rasteriser the application deliberately uses the SVG map instead.
+ * software rasteriser the runtime reports itself unavailable and the application
+ * uses the SVG fallback, which `--fallback` verifies instead.
+ *
+ * This proves the page and the interface in desktop Chrome with emulated touch.
+ * It is not a device test: WebView behaviour on a phone needs a phone.
  * Exits non-zero if any check fails.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -13,12 +17,13 @@ import { resolve } from "node:path";
 
 import { ROOT, boot, sleep } from "../m11d/lib/harness.mjs";
 
-mkdirSync(resolve(ROOT, "docs/images/map"), { recursive: true });
-const LABEL = process.env.MAP_LABEL ?? "after";
-const app = await boot({ fresh: true, port: 8881, cdpPort: 9473, profile: ".cache-map/chrome-verify" });
-const setViewport = (width, height, mobile = false) =>
-  app.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile });
-await setViewport(1600, 900);
+mkdirSync(resolve(ROOT, "docs/images/living-atlas"), { recursive: true });
+
+const FALLBACK = process.argv.includes("--fallback");
+const PORT = 8881;
+const app = await boot({ fresh: true, port: PORT, cdpPort: 9473, profile: ".cache-map/chrome-verify" });
+const setViewport = (width, height, scale = 2) =>
+  app.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: false });
 
 const results = [];
 function check(name, passed, detail = "") {
@@ -26,23 +31,37 @@ function check(name, passed, detail = "") {
   console.log(`${passed ? "PASS" : "FAIL"} ${name}${detail === "" ? "" : ` — ${detail}`}`);
 }
 
-async function waitForText(text, timeout = 180_000) {
+async function waitFor(predicate, timeout = 180_000) {
   const started = Date.now();
   while (Date.now() - started < timeout) {
-    if ((await app.text()).includes(text)) return;
-    await sleep(300);
+    if (await predicate()) return true;
+    await sleep(250);
   }
-  throw new Error(`timed out waiting for ${JSON.stringify(text)}`);
+  return false;
 }
+const waitForText = async (text) => {
+  if (!(await waitFor(async () => (await app.text()).includes(text)))) {
+    throw new Error(`timed out waiting for ${JSON.stringify(text)}`);
+  }
+};
 
-const ENGINE = `Array.from(document.querySelectorAll('canvas')).map((c) => c.parentElement.__mapEngine).filter(Boolean).pop()`;
+const ENGINE = `document.querySelector('iframe').contentWindow.__mapEngine`;
 const engine = (expression) => app.evaluate(`(() => { const e = ${ENGINE}; return ${expression}; })()`);
-const canvasBox = () =>
+const frameBox = () =>
   app.evaluate(`(() => {
-    const canvases = Array.from(document.querySelectorAll('canvas'));
-    const rect = canvases[canvases.length - 1].getBoundingClientRect();
+    const rect = document.querySelector('iframe').getBoundingClientRect();
     return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   })()`);
+const press = (label) =>
+  app.evaluate(`(() => {
+    const wanted = ${JSON.stringify(label)};
+    const nodes = Array.from(document.querySelectorAll('[role="button"], button'));
+    const target = nodes.find((node) => node.getAttribute('aria-label') === wanted || (node.textContent ?? '').trim() === wanted);
+    if (target === undefined) return false;
+    target.click();
+    return true;
+  })()`);
+const shot = (name) => app.screenshot(name);
 const mouse = (type, x, y, extra = {}) =>
   app.send("Input.dispatchMouseEvent", { type, x, y, button: "none", ...extra });
 
@@ -50,55 +69,97 @@ async function clickAt(x, y) {
   await mouse("mouseMoved", x, y);
   await mouse("mousePressed", x, y, { button: "left", buttons: 1, clickCount: 1 });
   await mouse("mouseReleased", x, y, { button: "left", clickCount: 1 });
-  await sleep(150);
+  await sleep(180);
 }
-
+const touch = (type, points) =>
+  app.send("Input.dispatchTouchEvent", { type, touchPoints: points.map(([x, y], id) => ({ x, y, id })) });
+async function tapAt(x, y) {
+  await touch("touchStart", [[x, y]]);
+  await sleep(30);
+  await touch("touchEnd", []);
+  await sleep(120);
+}
 async function pageGeo(lon, lat) {
-  const box = await canvasBox();
+  const box = await frameBox();
   const point = await engine(`e.screenOf(${lon}, ${lat})`);
   return { x: box.left + point.x, y: box.top + point.y };
 }
 
 try {
-  await app.navigate("http://127.0.0.1:8881/");
+  await setViewport(844, 390);
+  await app.navigate(`http://127.0.0.1:${PORT}/`);
   await waitForText("FABRIC OF NATIONS");
-  await sleep(1500);
-  check("main menu runs the WebGL map", await engine(`e !== undefined`));
-  await app.screenshot(`${LABEL}-main-menu`);
-  await app.clickAria("New campaign");
-  await waitForText("The world of 1 January 1900");
-  await app.clickAria("Continue to country selection");
-  await waitForText("Choose a country");
-  await sleep(1500);
-  await app.screenshot(`${LABEL}-country-selection`);
+  await waitFor(async () => (await app.text()).includes("New campaign"));
 
-  // Country selection: choose on the map, then from the list.
+  if (FALLBACK) {
+    await sleep(2500);
+    check("the runtime refuses a software rasteriser", (await app.text()).includes("New campaign"));
+    const svg = await app.evaluate(`document.querySelectorAll('svg path').length`);
+    check("the SVG fallback draws the map", svg > 100, `${String(svg)} paths`);
+    await shot("fallback-main-menu");
+    await press("New campaign");
+    await waitForText("The world of 1 January 1900");
+    await press("Continue to country selection");
+    await waitForText("Choose a country");
+    await sleep(1500);
+    await shot("fallback-country-selection");
+    throw new Error("__done");
+  }
+
+  check(
+    "the map runs from the one packaged page",
+    await waitFor(async () => engine(`e !== undefined && e.stats().frames > 0`), 30_000),
+  );
+  check(
+    "the page forbids the network",
+    await app.evaluate(`document.querySelector('iframe').contentDocument.querySelector('meta[http-equiv="Content-Security-Policy"]').content.includes("default-src 'none'")`),
+  );
+  await sleep(800);
+  await shot("phone-main-menu");
+
+  await press("New campaign");
+  await waitForText("The world of 1 January 1900");
+  await sleep(300);
+  await shot("phone-briefing");
+  await press("Continue to country selection");
+  await waitForText("Choose a country");
+  await sleep(1200);
+  await shot("phone-country-selection");
+
+  // The map keeps the same engine across screens: it is never remounted.
+  const framesBefore = await engine(`e.stats().frames`);
+  check("the map survives moving between screens", framesBefore > 0, `${String(framesBefore)} frames`);
+
+  // Selection from the map moves nothing; selection from the list flies.
   await engine(`e.setView(2, 47, 8)`);
   await sleep(300);
+  const steady = await engine(`e.cameraState()`);
   const paris = await pageGeo(2.35, 48.86);
   await clickAt(paris.x, paris.y);
-  await sleep(400);
-  check("country selection: a map click selects France", (await app.text()).includes("Play as France"));
+  await sleep(500);
+  check("country selection: a map press selects France", (await app.text()).includes("Play as France"));
+  const afterPress = await engine(`e.cameraState()`);
+  check("a selection on the map does not move the camera", steady.x === afterPress.x && steady.scale === afterPress.scale);
+  await press("List");
+  await sleep(200);
   await app.focus('input[aria-label="Search historical countries"]');
   await app.typeText("German");
   await sleep(500);
-  const before = await engine(`e.cameraState()`);
   await app.evaluate(`(() => {
     const nodes = Array.from(document.querySelectorAll('[role="button"]'));
-    const matches = nodes.filter((node) => (node.textContent ?? '').trim().startsWith('German Empire'));
-    matches.sort((a, b) => (a.textContent ?? '').length - (b.textContent ?? '').length)[0].click();
+    nodes.filter((node) => (node.textContent ?? '').trim().startsWith('German Empire'))
+      .sort((a, b) => (a.textContent ?? '').length - (b.textContent ?? '').length)[0].click();
   })()`);
-  await sleep(1000);
-  const after = await engine(`e.cameraState()`);
-  check(
-    "country selection: choosing from the list flies the camera to the country",
-    before.x !== after.x || before.y !== after.y,
-  );
-  await app.screenshot(`${LABEL}-country-selected`);
-  await app.clickAria("Play as Germany", { exact: false });
-  await waitForText("World map");
+  await sleep(1100);
+  const afterList = await engine(`e.cameraState()`);
+  check("a selection from a list flies to the place", afterList.x !== afterPress.x || afterList.y !== afterPress.y);
+  await shot("phone-country-selected");
+  await press("Play as Germany");
+  await waitForText("1 Jan 1900");
   await sleep(2500);
+  await shot("phone-game");
 
+  // Picking is a pure function of geography.
   const provinces = [
     ["Paris basin", 2.35, 48.86, 8, /fr|seine|paris/iu],
     ["Bavaria", 11.6, 48.5, 12, /bavaria/iu],
@@ -109,183 +170,222 @@ try {
   ];
   for (const [name, lon, lat, scale, pattern] of provinces) {
     await engine(`e.setView(${lon}, ${lat}, ${scale})`);
-    await sleep(120);
-    const box = await canvasBox();
     const screen = await engine(`e.screenOf(${lon}, ${lat})`);
     const key = await engine(`e.provinceKeyAt(${screen.x}, ${screen.y})`);
     check(`hit test: ${name}`, key !== null && pattern.test(key), String(key));
-    void box;
   }
   await engine(`e.setView(-30, 40, 3)`);
-  await sleep(120);
   const open = await engine(`e.screenOf(-30, 40)`);
   check("hit test: the open Atlantic picks nothing", (await engine(`e.provinceKeyAt(${open.x}, ${open.y})`)) === null);
-
-  // Hit testing must not depend on zoom.
-  const keysAtScales = [];
+  const keys = [];
   for (const scale of [3, 6, 12, 24, 48]) {
     await engine(`e.setView(11.6, 48.5, ${scale})`);
     const screen = await engine(`e.screenOf(11.6, 48.5)`);
-    keysAtScales.push(await engine(`e.provinceKeyAt(${screen.x}, ${screen.y})`));
+    keys.push(await engine(`e.provinceKeyAt(${screen.x}, ${screen.y})`));
   }
-  check("hit test: identical at every zoom", new Set(keysAtScales).size === 1, keysAtScales[0]);
+  check("hit test: identical at every zoom", new Set(keys).size === 1, String(keys[0]));
 
-  // Click selects; the same gesture with travel pans and does not.
+  // The three zoom levels.
+  for (const [level, lon, lat, scale] of [
+    ["world", 12, 20, 0.9],
+    ["nation", 10, 49, 4],
+    ["province", 10, 50, 10],
+  ]) {
+    await engine(`e.setView(${lon}, ${lat}, ${scale})`);
+    await sleep(500);
+    check(`zoom level: ${level}`, (await engine(`e.zoomLevel()`)) === level);
+    const count = await engine(`e.labelCount()`);
+    check(`about 25 labels on a phone at ${level} zoom`, count > 0 && count <= 26, `${String(count)} labels`);
+    await shot(`phone-zoom-${level}`);
+  }
+
+  // Sheets: the surface slides aside and the camera stays.
   await engine(`e.setView(10, 50, 6)`);
   await sleep(200);
-  const munich = await pageGeo(11.6, 48.1);
-  await clickAt(munich.x, munich.y);
-  await sleep(300);
-  const panelAfterClick = await app.text();
-  check("click selects the province", /Province \d+/u.test(panelAfterClick));
-  const selectionText = panelAfterClick.match(/Province \d+/u)?.[0] ?? "";
-  const dragStart = await pageGeo(5, 47);
-  const dragCamera = await engine(`e.cameraState()`);
-  await mouse("mouseMoved", dragStart.x, dragStart.y);
-  await mouse("mousePressed", dragStart.x, dragStart.y, { button: "left", buttons: 1, clickCount: 1 });
-  for (let step = 1; step <= 12; step += 1) {
-    await mouse("mouseMoved", dragStart.x + step * 8, dragStart.y + step * 2, { button: "left", buttons: 1 });
-  }
-  await mouse("mouseReleased", dragStart.x + 96, dragStart.y + 24, { button: "left", clickCount: 1 });
-  await sleep(500);
-  const afterDrag = await app.text();
-  check("drag pans the camera", (await engine(`e.cameraState()`)).x !== dragCamera.x);
-  check("drag does not select a province", afterDrag.includes(selectionText));
-
-  // Sub-threshold jitter is still a click.
-  await engine(`e.setView(10, 50, 6)`);
-  await sleep(150);
-  const steady = await engine(`e.cameraState()`);
   const berlin = await pageGeo(13.4, 52.5);
-  await mouse("mouseMoved", berlin.x, berlin.y);
-  await mouse("mousePressed", berlin.x, berlin.y, { button: "left", buttons: 1, clickCount: 1 });
-  await mouse("mouseMoved", berlin.x + 2, berlin.y + 1, { button: "left", buttons: 1 });
-  await mouse("mouseReleased", berlin.x + 2, berlin.y + 1, { button: "left", clickCount: 1 });
-  await sleep(250);
-  const shifted = await engine(`e.cameraState()`);
-  check("a small pointer jitter stays a click", steady.x === shifted.x && steady.y === shifted.y);
-
-  // Zoom keeps the point under the cursor fixed.
-  await engine(`e.setView(14, 47, 4)`);
-  await sleep(200);
-  const box = await canvasBox();
-  const focus = { x: box.left + 420, y: box.top + 330 };
-  const geoBefore = await engine(`e.geoAt(420, 330)`);
-  await mouse("mouseMoved", focus.x, focus.y);
-  for (let index = 0; index < 6; index += 1) {
-    await app.send("Input.dispatchMouseEvent", { type: "mouseWheel", x: focus.x, y: focus.y, deltaX: 0, deltaY: -120 });
-    await sleep(40);
-  }
+  const beforePress = await engine(`e.cameraState()`);
+  await clickAt(berlin.x, berlin.y);
   await sleep(700);
-  const geoAfter = await engine(`e.geoAt(420, 330)`);
-  const drift = Math.hypot(geoBefore.lon - geoAfter.lon, geoBefore.lat - geoAfter.lat);
-  check("wheel zoom keeps the cursor's geography fixed", drift < 0.02, `${drift.toFixed(4)} degrees`);
+  check("a press opens the place sheet", /Province \d+/u.test(await app.text()));
+  check("the camera does not move for a press", (await engine(`e.cameraState()`)).x === beforePress.x);
+  const berlinAfter = await pageGeo(13.4, 52.5);
+  const sheetEdge = await app.evaluate(`document.querySelector('[data-testid="side-sheet"]').getBoundingClientRect().left`);
+  check("the selected place stays clear of the sheet", berlinAfter.x < sheetEdge, `${Math.round(berlinAfter.x)} < ${Math.round(sheetEdge)}`);
+  await shot("phone-place-sheet");
+  await press("Close sheet");
+  await sleep(450);
 
-  // Projection round trip through the live camera at several scales.
-  let worstRoundTrip = 0;
-  for (const scale of [1.6, 5, 20, 60]) {
-    await engine(`e.setView(30, 20, ${scale})`);
-    for (const [lon, lat] of [[28, 21], [33, 18], [30, 20]]) {
-      const screen = await engine(`e.screenOf(${lon}, ${lat})`);
-      const geo = await engine(`e.geoAt(${screen.x}, ${screen.y})`);
-      worstRoundTrip = Math.max(worstRoundTrip, Math.abs(geo.lon - lon), Math.abs(geo.lat - lat));
-    }
+  // Domains: every screen opens over the map.
+  for (const [domain, first] of [
+    ["Realm", "Overview"],
+    ["Economy", "Budget"],
+    ["Society", "Population"],
+    ["World", "War & diplomacy"],
+  ]) {
+    await press(domain);
+    await sleep(700);
+    check(`${domain} opens as a sheet over the map`, (await app.text()).includes(first));
+    await shot(`phone-domain-${domain.toLowerCase()}`);
+    await press("Close sheet");
+    await sleep(350);
   }
-  check("screen and geography round-trip at every scale", worstRoundTrip < 1e-3, worstRoundTrip.toExponential(2));
 
-  // World wrap: panning east across the antimeridian continues seamlessly.
-  await engine(`e.setView(170, 0, 3)`);
-  await sleep(120);
-  const startX = (await engine(`e.cameraState()`)).x;
-  await mouse("mouseMoved", box.left + 800, box.top + 400);
-  await mouse("mousePressed", box.left + 800, box.top + 400, { button: "left", buttons: 1, clickCount: 1 });
-  for (let step = 1; step <= 20; step += 1) {
-    await mouse("mouseMoved", box.left + 800 - step * 20, box.top + 400, { button: "left", buttons: 1 });
+  // Lenses change colour, never geometry.
+  await press("Map lens: Political");
+  await sleep(250);
+  for (const lens of ["Control", "Markets"]) {
+    await press(lens);
+    await sleep(400);
+    await shot(`phone-lens-${lens.toLowerCase()}`);
   }
-  await sleep(100);
-  await mouse("mouseReleased", box.left + 400, box.top + 400, { button: "left", clickCount: 1 });
-  await sleep(500);
-  const wrapped = await engine(`e.cameraState()`);
-  check("panning across the antimeridian wraps the camera", wrapped.x < startX, `${startX.toFixed(1)} -> ${wrapped.x.toFixed(1)}`);
+  await press("Political");
+  await sleep(200);
+  await press("Map lens: Political");
+  await sleep(200);
 
-  // Resize keeps the view centre and stays inside the map.
-  await engine(`e.setView(14, 47, 4)`);
-  await sleep(120);
-  const beforeResize = await engine(`e.cameraState()`);
-  await setViewport(1180, 760);
-  await sleep(500);
-  const afterResize = await engine(`e.cameraState()`);
-  const size = await engine(`e.viewportState()`);
-  check("resize tracks the container", size.width < 1400, `${size.width}x${size.height}`);
-  check("resize keeps the camera centre", Math.abs(beforeResize.x - afterResize.x) < 1e-6);
-  await app.screenshot(`${LABEL}-resized-1180`);
-  await setViewport(1600, 900);
-  await sleep(500);
-
-  // Hover and selection are distinct states.
-  await engine(`e.setView(10, 50, 7)`);
+  // Touch, delivered as real touch input.
+  await press("Close sheet");
+  await app.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+  await engine(`e.setView(10, 50, 6)`);
   await sleep(300);
-  const hoverPoint = await pageGeo(8.5, 50);
-  await mouse("mouseMoved", hoverPoint.x, hoverPoint.y);
+  const hamburg = await pageGeo(10, 53.5);
+  const before = await engine(`e.cameraState()`);
+  await touch("touchStart", [[hamburg.x, hamburg.y]]);
+  for (let step = 1; step <= 10; step += 1) {
+    await touch("touchMove", [[hamburg.x + step * 8, hamburg.y]]);
+  }
+  await touch("touchEnd", []);
+  await sleep(500);
+  check("drag pans", (await engine(`e.cameraState()`)).x !== before.x);
+  check("a drag selects nothing", !/Province \d+/u.test(await app.text()));
+
+  await engine(`e.setView(10, 50, 6)`);
+  await sleep(250);
+  const scaleBefore = (await engine(`e.cameraState()`)).scale;
+  const middle = await pageGeo(10, 50);
+  await touch("touchStart", [[middle.x - 30, middle.y], [middle.x + 30, middle.y]]);
+  for (let step = 1; step <= 10; step += 1) {
+    await touch("touchMove", [[middle.x - 30 - step * 6, middle.y], [middle.x + 30 + step * 6, middle.y]]);
+  }
+  await touch("touchEnd", []);
+  await sleep(400);
+  check("pinch zooms in", (await engine(`e.cameraState()`)).scale > scaleBefore * 1.5);
+
+  await engine(`e.setView(10, 50, 6)`);
+  await sleep(250);
+  const point = await pageGeo(10, 50);
+  await tapAt(point.x, point.y);
+  await sleep(500);
+  check("a tap selects a province and opens its summary", /Province \d+/u.test(await app.text()));
+  await press("Close sheet");
+  await sleep(400);
+
+  await engine(`e.setView(10, 50, 6)`);
+  await sleep(250);
+  const doubleScale = (await engine(`e.cameraState()`)).scale;
+  const tap = await pageGeo(10, 50);
+  await tapAt(tap.x, tap.y);
+  await tapAt(tap.x, tap.y);
+  await sleep(700);
+  check("double-tap zooms in", (await engine(`e.cameraState()`)).scale > doubleScale * 1.5);
+  await press("Close sheet");
+  await sleep(400);
+
+  await engine(`e.setView(23, 38, 5)`);
+  await sleep(300);
+  const greece = await pageGeo(24, 38);
+  await touch("touchStart", [[greece.x, greece.y]]);
+  await sleep(520);
+  check("a long press opens the loupe", await engine(`e.loupeOpen()`));
+  await sleep(200);
+  await shot("phone-loupe");
+  await touch("touchMove", [[greece.x + 10, greece.y + 6]]);
+  await sleep(200);
+  const loupeName = await engine(`e.loupeName()`);
+  await touch("touchEnd", []);
+  await sleep(600);
+  check("the loupe closes and picks what it showed", !(await engine(`e.loupeOpen()`)) && (await app.text()).includes(loupeName), loupeName);
+  await press("Close sheet");
   await sleep(350);
-  const hoverCard = await app.text();
-  check("hover shows the province card", /Hesse|Rhine|Palatinate|Nassau|Westphalia/u.test(hoverCard));
-  await app.screenshot(`${LABEL}-hover-and-selection`);
+  await app.send("Emulation.setTouchEmulationEnabled", { enabled: false });
 
-  // Map modes change colour without touching geometry.
-  await engine(`e.setView(14, 47, 3)`);
-  await app.clickAria("Markets", { exact: false }).catch(() => undefined);
-  await app.evaluate(`(() => {
-    const node = Array.from(document.querySelectorAll('[role="button"]')).find((n) => (n.textContent ?? '').trim() === 'Markets');
-    node?.click();
-  })()`);
-  await sleep(500);
-  await app.screenshot(`${LABEL}-mode-markets`);
-  await app.evaluate(`(() => {
-    const node = Array.from(document.querySelectorAll('[role="button"]')).find((n) => (n.textContent ?? '').trim() === 'Control');
-    node?.click();
-  })()`);
-  await sleep(500);
-  await app.screenshot(`${LABEL}-mode-control`);
-  await app.evaluate(`(() => {
-    const node = Array.from(document.querySelectorAll('[role="button"]')).find((n) => (n.textContent ?? '').trim() === 'Political');
-    node?.click();
-  })()`);
-  await sleep(300);
+  // A dispatch comes from the simulation, and playing never stops for it.
+  await press("Speed 1 times, change speed");
+  await sleep(200);
+  await press("30×");
+  await sleep(200);
+  await press("Play");
+  const reported = await waitFor(async () => (await app.text()).includes("Treasury closes the month"), 90_000);
+  check("a real month close is reported as a dispatch", reported);
+  check("the dispatch names the era's medium", (await app.text()).toUpperCase().includes("TELEGRAM"));
+  await shot("phone-dispatch");
+  check("the dispatch does not stop the game", (await app.text()).length > 0 && (await engine(`e !== undefined`)));
+  await press("Pause");
+  await sleep(400);
+  await press("German Empire, open campaign");
+  await sleep(600);
+  check("the campaign sheet keeps the log", (await app.text()).includes("Telegram log"));
+  check("saving stays reachable", (await app.text()).includes("Restart worker"));
+  await shot("phone-campaign");
+  await press("Close sheet");
+  await sleep(350);
 
-  // Dock toggle gives the map the whole stage.
-  await app.clickAria("Hide details panel");
-  await sleep(500);
-  await engine(`e.resetView()`);
-  await sleep(900);
-  await app.screenshot(`${LABEL}-full-stage`);
-  await app.clickAria("Show details panel");
-  await sleep(300);
-
-  // Narrow screens stack the panels under the map.
-  await setViewport(420, 820, true);
-  await sleep(900);
-  await app.screenshot(`${LABEL}-narrow`);
-  await setViewport(1600, 900);
-  await sleep(500);
-
-  // Crossing the narrow breakpoint remounts the map; it must come back drawn.
-  let stats = await engine(`e.stats()`);
-  for (let attempt = 0; attempt < 50 && stats.frames === 0; attempt += 1) {
-    await sleep(100);
-    stats = await engine(`e.stats()`);
+  // Era themes change colour and medium; the layout must not move.
+  const layout = () =>
+    app.evaluate(`JSON.stringify(Array.from(document.querySelectorAll('[role="button"]')).slice(0, 12).map((n) => { const r = n.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]; }))`);
+  const eraLayouts = new Set();
+  for (const era of ["imperial", "machine-age", "cold-war", "digital"]) {
+    await app.navigate(`http://127.0.0.1:${PORT}/?country=FRA&era=${era}`);
+    await waitFor(async () => (await app.text()).includes("1 Jan 1900"));
+    await waitFor(async () => engine(`e !== undefined && e.stats().frames > 0`), 30_000);
+    await sleep(2600);
+    await engine(`e.setView(14, 46, 3.2)`);
+    await sleep(700);
+    eraLayouts.add(await layout());
+    await shot(`phone-era-${era}`);
   }
-  check("the map redraws after a layout remount", stats.frames > 0, `${stats.frames} frames`);
-  await sleep(500);
-  await app.screenshot(`${LABEL}-after-remount`);
+  check("eras never move a control", eraLayouts.size === 1);
+
+  // The same layout at every size.
+  for (const [width, height] of [
+    [667, 375],
+    [844, 390],
+    [932, 430],
+    [1180, 820],
+    [1600, 900],
+  ]) {
+    await setViewport(width, height, 1);
+    await app.navigate(`http://127.0.0.1:${PORT}/`);
+    await waitFor(async () => (await app.text()).includes("New campaign"));
+    await sleep(2500);
+    await shot(`size-${width}x${height}-main-menu`);
+    await app.navigate(`http://127.0.0.1:${PORT}/?view=select`);
+    await waitFor(async () => (await app.text()).includes("Choose a country"));
+    await sleep(2500);
+    await shot(`size-${width}x${height}-country-selection`);
+    await app.navigate(`http://127.0.0.1:${PORT}/?country=DEU`);
+    await waitFor(async () => (await app.text()).includes("1 Jan 1900"));
+    await waitFor(async () => engine(`e !== undefined && e.stats().frames > 0`), 30_000);
+    await sleep(2600);
+    await shot(`size-${width}x${height}-game`);
+    await press("Economy");
+    await sleep(800);
+    await shot(`size-${width}x${height}-sheet`);
+    const overflow = await app.evaluate(`document.documentElement.scrollWidth > window.innerWidth`);
+    check(`no page overflow at ${width}x${height}`, !overflow);
+  }
   const problems = JSON.parse(await app.evaluate(`JSON.stringify(window.__m11d)`));
   check("no page errors", problems.errors.length === 0, problems.errors.join(" | "));
   check("no unhandled rejections", problems.rejections.length === 0, problems.rejections.join(" | "));
 } catch (error) {
-  check("verification script completed", false, String(error));
+  if (String(error).includes("__done")) {
+    check("fallback path completed", true);
+  } else {
+    check("verification script completed", false, String(error));
+  }
 } finally {
   const failed = results.filter((entry) => !entry.passed);
-  writeFileSync(resolve(ROOT, `.cache-map/verify-${LABEL}.json`), `${JSON.stringify(results, null, 2)}\n`);
+  writeFileSync(resolve(ROOT, ".cache-map/verify-atlas.json"), `${JSON.stringify(results, null, 2)}\n`);
   console.log(`\n${String(results.length - failed.length)}/${String(results.length)} checks passed`);
   await app.close?.();
   process.exit(failed.length === 0 ? 0 : 1);

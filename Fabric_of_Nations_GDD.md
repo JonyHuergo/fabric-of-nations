@@ -6393,6 +6393,10 @@ Responsive layouts are desktop/tablet (rail + columns) and narrow (stacked,
 horizontal navigation, map 300–320 px tall). Native export was not re-verified
 in this milestone; web export is the verified target.
 
+> **Superseded by D-112 (Living Atlas).** The game runs in landscape on every device.
+> iOS and Android are primary, the map is always the screen, and every screen opens as
+> a sheet over it, in four domains: Realm, Economy, Society and World.
+
 ### 17I.9 Contracts, state and versioning
 
 - `EconomyScenarioDef` gains optional static `countryMeta`, `marketMeta` and

@@ -10,8 +10,8 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { ActionButton, Pill, Section, StatRow } from "../components/ui";
-import { colors, radii, spacing } from "../theme";
+import { ActionButton, Headline, Pill, Section, StatRow } from "../components/ui";
+import { colors, fonts, radii, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 export function ConstructionScreen({
@@ -109,6 +109,11 @@ export function ConstructionScreen({
 
   return (
     <View>
+      <Headline
+        label="Public capital"
+        value={formatRUSD(country.publicCapitalRUSD)}
+        detail={`${formatRUSD(country.constructionInProgressRUSD)} in progress · ${String(projects.filter((project) => project.status === "active").length)} active projects`}
+      />
       <Section
         title="Construction"
         subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · real public investment: idle labor, treasury cash, and time create a state-owned productive building.`}
@@ -141,7 +146,7 @@ export function ConstructionScreen({
         ) : null}
       </Section>
 
-      <Section
+      <Section folded
         title="Choose a public project"
         subtitle="Only validated productive building definitions that permit state ownership are offered. Materials and contractor procurement are not modeled in E3."
       >
@@ -251,7 +256,7 @@ export function ConstructionScreen({
         )}
       </Section>
 
-      <Section
+      <Section folded
         title="Project queue"
         subtitle="Authorized projects start on the next processed day. Progress is gross construction payroll divided by the authorized cost; blocked projects report the concrete reason."
       >
@@ -347,13 +352,13 @@ export function ConstructionScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 13, paddingVertical: spacing.sm },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, paddingVertical: spacing.sm },
   typeList: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.xs, marginTop: spacing.sm },
   materials: { marginTop: spacing.sm },
-  inputLabel: { color: colors.muted, fontSize: 12, marginTop: spacing.sm, marginBottom: spacing.xs },
-  error: { color: colors.red, fontSize: 12, marginTop: spacing.sm },
-  note: { color: colors.faint, fontSize: 10, lineHeight: 15, marginTop: 4 },
+  inputLabel: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm, marginBottom: spacing.xs },
+  error: { color: colors.red, fontFamily: fonts.sans, fontSize: 13, marginTop: spacing.sm },
+  note: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, lineHeight: 15, marginTop: 4 },
   applyRow: { marginTop: spacing.md },
   projectRow: {
     borderTopColor: colors.border,
@@ -361,8 +366,8 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     marginTop: spacing.sm,
   },
-  projectTitle: { color: colors.text, fontSize: 12, fontWeight: "700" },
-  projectDetail: { color: colors.muted, fontSize: 10, marginTop: 2, lineHeight: 14 },
+  projectTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  projectDetail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 11, marginTop: 2, lineHeight: 14 },
   progressTrack: {
     height: 6,
     borderRadius: radii.md,
@@ -378,4 +383,4 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
-});
+}));

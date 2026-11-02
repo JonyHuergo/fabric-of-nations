@@ -10,8 +10,8 @@ import {
 } from "@century/sim-worker";
 
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Notice, Section, StatRow } from "../components/ui";
-import { colors, spacing } from "../theme";
+import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
+import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
@@ -168,6 +168,7 @@ export function PoliticsScreen({
 
   return (
     <View>
+      <Headline label="Regime" value={politics.regimeName} detail={`Governing group: ${politics.governmentGroupName}`} />
       <Section
         title="Politics"
         subtitle={`${country.name} · ${isPlayerCountry ? "Player country" : "AI-controlled"} · laws, elections, interest groups, unrest, and administration are simulated state, not a policy score.`}
@@ -198,7 +199,7 @@ export function PoliticsScreen({
         />
       </Section>
 
-      <Section
+      <Section folded
         title="Interest groups"
         subtitle="Membership is derived from professions; influence is normalised and cannot be spent. Stance is the average position on the enacted-law programme."
       >
@@ -217,7 +218,7 @@ export function PoliticsScreen({
         ))}
       </Section>
 
-      <Section
+      <Section folded
         title="State administration"
         subtitle="Quality is derived from clerk staffing, funding, literacy, regional infrastructure, law load, and recent disruption. Overload reduces tax collection and construction speed."
       >
@@ -273,7 +274,7 @@ export function PoliticsScreen({
         ))}
       </Section>
 
-      <Section
+      <Section folded
         title="Laws"
         subtitle="A proposal needs support, a legal path, and time. Enactment is not instant; effects apply from the effective day and never rewrite a closed report."
       >
@@ -345,7 +346,7 @@ export function PoliticsScreen({
         {localError === null ? null : <Text style={styles.error}>{localError}</Text>}
       </Section>
 
-      <Section
+      <Section folded
         title="Regional unrest"
         subtitle="Unrest is a regional aggregate fed by pop-level militancy, unmet needs, unemployment, exclusion, administration overload, and labor-law grievance. It updates daily after needs."
       >
@@ -368,7 +369,7 @@ export function PoliticsScreen({
           ))}
       </Section>
 
-      <Section
+      <Section folded
         title="Recent political record"
         subtitle="Bounded event log with provenance. It is presentation evidence, not a second authority."
       >
@@ -386,18 +387,18 @@ export function PoliticsScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: { color: colors.muted, fontSize: 12 },
+const styles = themedSheet(() => ({
+  empty: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13 },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xs },
   rowText: { flex: 1 },
-  label: { color: colors.text, fontSize: 13, fontWeight: "600" },
-  detail: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 2 },
-  stance: { color: colors.accent, fontSize: 12, fontVariant: ["tabular-nums"] },
-  error: { color: colors.red, fontSize: 11, lineHeight: 16, marginTop: spacing.xs },
+  label: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  detail: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, lineHeight: 16, marginTop: 2 },
+  stance: { color: colors.accent, fontFamily: fonts.sans, fontSize: 13, fontVariant: ["tabular-nums"] },
+  error: { color: colors.red, fontFamily: fonts.sans, fontSize: 13, lineHeight: 16, marginTop: spacing.xs },
   slot: { marginTop: spacing.md, gap: spacing.xs },
-  slotTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },
+  slotTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
   option: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingVertical: 2 },
-  deferred: { color: colors.faint, fontSize: 11, fontStyle: "italic" },
+  deferred: { color: colors.faint, fontFamily: fonts.sans, fontSize: 13, fontStyle: "italic" },
   preview: {
     marginTop: spacing.md,
     padding: spacing.sm,
@@ -407,6 +408,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     gap: spacing.xs,
   },
-  previewTitle: { color: colors.text, fontSize: 13, fontWeight: "700" },
-  log: { color: colors.muted, fontSize: 11, lineHeight: 16, marginTop: 2 },
-});
+  previewTitle: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  log: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, lineHeight: 16, marginTop: 2 },
+}));
