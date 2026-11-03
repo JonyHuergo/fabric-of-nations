@@ -7324,3 +7324,34 @@ accounts and per-entity rescans did the rest.
    shared since M12a, which matters once occupation writes it during a staged day), and
    world creation builds ownership before interest groups, institutions and initial
    armies read country territory.
+
+## D-135 — Proposed: P2b calibration basis (awaiting the designer)
+
+**Status:** proposed on 2026-11-03; no simulation value has changed. Details, inventory,
+baseline measurements, sources and conflicts: `docs/P2B_CALIBRATION_PLAN.md`.
+
+### Context
+
+Measured on the current 1900 world (31 days): value added is 14.2 RUSD per head
+world-wide and 14.9 in the United States, against 4,375 RUSD from MeasuringWorth nominal
+GDP ($21,197 M ÷ 76,094,000 people) × the Minneapolis Fed CPI factor 15.704; 34 of 67
+countries sit at the same 12.0 RUSD per head; 23% of wage obligations go unpaid. The
+current values cannot be rescaled; they must be rebuilt from sources (D-130).
+
+### Proposed resolutions (each needs the designer's decision)
+
+1. **A1** Values outside the United States in purchasing-power terms: MPD 2023 ratios to
+   the United States for GDP per head; local-money values at the 1900 parity scaled by
+   the country's price level.
+2. **A2** Represented sectors calibrated to their own sourced value added; GDP per head
+   reported as covered vs uncovered until P6.
+3. **A3** A per-building technique factor (initial state, documented as unmodelled land,
+   capital and technique) instead of a country scalar.
+4. **A4** Need quantities scaled to sourced food and clothing spending; the rest of the
+   budget reported as provisional saving until P6.
+5. **A5** The country treasury is general government (central plus local).
+6. **A6** The 1900 world gets its own calibrated definition files; the M5 sample keeps
+   the old scale and hashes.
+7. **A7** Occupation shares re-sourced where census tables exist; elsewhere reported.
+8. **A8** Countries without MPD 2023 values use country studies, else MPD regional
+   benchmarks, marked provisional.
