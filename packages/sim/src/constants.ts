@@ -10,7 +10,7 @@
  * Version of the simulation behavior. A save is only compatible with the same
  * version.
  *
- * M5 adds multi-region/multi-market state semantics, the country
+ * M5 adds multi-province/multi-market state semantics, the country
  * `immigrationOpen` policy field, migration, and geographic labor access. M5a
  * adds the persisted profit-allocation policy and retained-profit accounts.
  * M6 adds the country-AI enable policy, fixed-size per-country AI state, and
@@ -45,7 +45,7 @@ export const SIM_VERSION = "0.28.0";
  * construction budget memo fields (D-074). E4 adds construction material requirements,
  * per-country industrial policy, subsidy/support budget fields, and the new
  * industrial posting kinds (D-075). M8 adds country regime/laws/transitions/
- * interest-groups/institutions, regional unrest/infrastructure, world politics
+ * interest-groups/institutions, provincial unrest/infrastructure, world politics
  * event state, and administration payroll accounts (D-076). M9 adds per-country
  * technology/research and education state, world technology enablement, the
  * age-specific literacy array, and education payroll accounts (D-077). E5 adds
@@ -57,8 +57,13 @@ export const SIM_VERSION = "0.28.0";
  * claim and special-status record of every permanent geographical province.
  * Province geometry and definitions are static scenario content and are never
  * serialized (D-103).
+ * P2 (schema 28, D-118/D-120) removes the simulation-region layer: `regions`
+ * becomes `provinceEconomies` (one record per permanent province, with land and
+ * urban share), blocks, buildings, projects and armies reference provinces,
+ * countries and markets no longer store territory, and occupation lives only on
+ * province control. Older saves are reported as incompatible, never migrated.
  */
-export const WORLD_SCHEMA_VERSION = 27;
+export const WORLD_SCHEMA_VERSION = 28;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;
@@ -84,7 +89,7 @@ export const SAVE_FORMAT_VERSION = 1;
  * content version to `m3-economy-v8` (D-078). E6a adds authored market customs
  * administrations, transport routes, and per-good transport costs, so it bumps the
  * content version to `m3-economy-v11` (D-079). M11 replaces the playable world
- * content (1900 catalog, markets, regions, populations) and changes the
+ * content (1900 catalog, markets, provinces, populations) and changes the
  * scenario-level metadata contract; the existing definitions' meanings are
  * unchanged, but the world content is incompatible with v11 saves, so it bumps
  * the content version to `m3-economy-v12` (D-086/D-088).

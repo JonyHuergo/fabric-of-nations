@@ -108,7 +108,7 @@ export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
       ...scenario.population.popBlocks,
       {
         id: M9_ACADEMICS_BLOCK,
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         professionId: M8_ACADEMICS_ID,
         financialAccountId: M9_ACADEMICS_ACCOUNT,
         maleAgeGroups: m5AgeGroups(10_000),

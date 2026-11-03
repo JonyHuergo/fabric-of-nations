@@ -24,10 +24,12 @@ import type {
   BuildingDef,
   BuildingInstance,
   EconomyDefinitions,
+  EmploymentAssignment,
   GoodQuantityDef,
   ProfessionDef,
   StockLot,
 } from "./types.js";
+import { buildProvinceOwnerMap, marketProvinceIds } from "./country.js";
 
 export interface InputReservation {
   readonly buyerBuildingId: number;
@@ -138,17 +140,6 @@ function tolerance(...values: number[]): number {
   return QUANTITY_TOLERANCE * scale;
 }
 
-function assignedWorkersByProfession(world: World, buildingId: number): Map<number, number> {
-  const assigned = new Map<number, number>();
-  for (const assignment of world.employment) {
-    if (assignment.buildingInstanceId !== buildingId) continue;
-    assigned.set(
-      assignment.professionId,
-      (assigned.get(assignment.professionId) ?? 0) + assignment.workers,
-    );
-  }
-  return assigned;
-}
 
 function profileById(
   definitions: EconomyDefinitions,
@@ -170,20 +161,88 @@ function inputQuantity(
   return input?.quantityPerThroughputUnit ?? 0;
 }
 
-/** Compute a building's capacity and desired inputs from current staffing. */
+/**
+ * P1 read-only lookup tables for repeated capacity evaluation (D-116 hot path).
+ *
+ * Built once from the current world and reused for every building of one phase.
+ * The index preserves the iteration orders of the linear scans it replaces
+ * (assignments in `world.employment` order, the first owning country in
+ * `world.countries` order), so capacity results are bit-identical. It must not be
+ * reused after employment, buildings, blocks, or province ownership change.
+ */
+export interface BuildingCapacityIndex {
+  readonly buildingById: ReadonlyMap<number, BuildingInstance>;
+  readonly definitionById: ReadonlyMap<number, BuildingDef>;
+  readonly professionById: ReadonlyMap<number, ProfessionDef>;
+  readonly assignmentsByBuilding: ReadonlyMap<number, readonly EmploymentAssignment[]>;
+  readonly blockById: ReadonlyMap<number, World["popBlocks"][number]>;
+  readonly ownerByProvince: ReadonlyMap<number, World["countries"][number]>;
+}
+
+/** Build the capacity lookup tables for the current world state. */
+export function buildBuildingCapacityIndex(
+  world: World,
+  definitions: EconomyDefinitions,
+): BuildingCapacityIndex {
+  const buildingById = new Map<number, BuildingInstance>();
+  for (const building of world.buildings) {
+    if (!buildingById.has(building.id)) buildingById.set(building.id, building);
+  }
+  const assignmentsByBuilding = new Map<number, EmploymentAssignment[]>();
+  for (const assignment of world.employment) {
+    const list = assignmentsByBuilding.get(assignment.buildingInstanceId);
+    if (list === undefined) assignmentsByBuilding.set(assignment.buildingInstanceId, [assignment]);
+    else list.push(assignment);
+  }
+  const blockById = new Map<number, World["popBlocks"][number]>();
+  for (const block of world.popBlocks) {
+    if (!blockById.has(block.id)) blockById.set(block.id, block);
+  }
+  const ownerByProvince = new Map<number, World["countries"][number]>();
+  const countryById = new Map(world.countries.map((country) => [country.id, country]));
+  for (const [provinceId, countryId] of buildProvinceOwnerMap(world)) {
+    const country = countryById.get(countryId);
+    if (country !== undefined) ownerByProvince.set(provinceId, country);
+  }
+  return {
+    buildingById,
+    definitionById: definitionById(definitions),
+    professionById: profileById(definitions),
+    assignmentsByBuilding,
+    blockById,
+    ownerByProvince,
+  };
+}
+
+const NO_ASSIGNMENTS: readonly EmploymentAssignment[] = [];
+
+/**
+ * Compute a building's capacity and desired inputs from current staffing.
+ *
+ * Callers evaluating many buildings against one unchanged state pass an `index`
+ * from `buildBuildingCapacityIndex`; otherwise one is built for this call.
+ */
 export function computeBuildingCapacity(
   world: World,
   definitions: EconomyDefinitions,
   buildingId: number,
+  index: BuildingCapacityIndex = buildBuildingCapacityIndex(world, definitions),
 ): BuildingCapacityResult {
-  const building = world.buildings.find((candidate) => candidate.id === buildingId);
+  const building = index.buildingById.get(buildingId);
   if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
-  const definition = definitionById(definitions).get(building.definitionId);
+  const definition = index.definitionById.get(building.definitionId);
   if (definition === undefined) {
     throw new RangeError(`building ${String(building.id)} has no definition`);
   }
-  const professions = profileById(definitions);
-  const assigned = assignedWorkersByProfession(world, building.id);
+  const professions = index.professionById;
+  const assignments = index.assignmentsByBuilding.get(building.id) ?? NO_ASSIGNMENTS;
+  const assigned = new Map<number, number>();
+  for (const assignment of assignments) {
+    assigned.set(
+      assignment.professionId,
+      (assigned.get(assignment.professionId) ?? 0) + assignment.workers,
+    );
+  }
   let assignedWorkers = 0;
   for (const workers of assigned.values()) assignedWorkers += workers;
   const requiredWorkersByProfession = definition.jobs
@@ -240,19 +299,14 @@ export function computeBuildingCapacity(
     productivityFactor = weighted / assignedWorkers;
   }
 
-  const owner = world.countries.find((country) =>
-    country.regionIds.includes(building.regionId),
-  );
+  const owner = index.ownerByProvince.get(building.provinceId);
   // E5: qualification raises effective labour productivity; part-time training time
   // reduces it. Both are weighted over the building's actual assignments.
   let e5LaborFactor = 1;
   if (owner !== undefined && assignedWorkers > 0) {
     let weighted = 0;
-    for (const assignment of world.employment) {
-      if (assignment.buildingInstanceId !== building.id) continue;
-      const block = world.popBlocks.find(
-        (candidate) => candidate.id === assignment.popBlockId,
-      );
+    for (const assignment of assignments) {
+      const block = index.blockById.get(assignment.popBlockId);
       if (block === undefined) continue;
       weighted +=
         assignment.workers *
@@ -274,7 +328,7 @@ export function computeBuildingCapacity(
     (() => {
       return owner === undefined
         ? 1
-        : productionStrikeFactor(world, owner.id, building.regionId);
+        : productionStrikeFactor(world, owner.id, building.provinceId);
     })();
   if (!Number.isFinite(capacityTU) || capacityTU < 0) {
     throw new RangeError(`building ${String(building.id)} has invalid capacity`);
@@ -324,10 +378,10 @@ export function deriveStorageCapacityByGood(
   if (marketId !== undefined && market === undefined) {
     throw new RangeError(`unknown market ${String(marketId)} for storage capacity`);
   }
-  const regionIds = market === undefined ? undefined : new Set(market.regionIds);
+  const provinceIds = market === undefined ? undefined : new Set(marketProvinceIds(world, market.id));
   for (const building of world.buildings) {
     if (!building.operational) continue;
-    if (regionIds !== undefined && !regionIds.has(building.regionId)) continue;
+    if (provinceIds !== undefined && !provinceIds.has(building.provinceId)) continue;
     const definition = definitionsById.get(building.definitionId);
     if (definition === undefined) {
       throw new RangeError(`building ${String(building.id)} has no definition`);
@@ -431,7 +485,8 @@ export function applyOverflowLosses(
   options: ProductionPhaseOptions = {},
 ): OverflowLoss[] {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   const market =
     marketId === undefined
       ? world.markets[0]
@@ -482,7 +537,8 @@ export function runProductionPhase(
   options: ProductionPhaseOptions = {},
 ): ProductionPhaseResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }
@@ -491,7 +547,8 @@ export function runProductionPhase(
       ? world.markets[0]
       : world.markets.find((candidate) => candidate.id === options.marketId);
   if (market === undefined) throw new RangeError("M3c production requires a market");
-  const marketRegionIds = new Set(market.regionIds);
+  const marketProvinceIdSet = new Set(marketProvinceIds(world, market.id));
+  const provinceOwners = buildProvinceOwnerMap(world);
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const definitionsById = definitionById(definitions);
   const goods = definitions.goods;
@@ -535,14 +592,14 @@ export function runProductionPhase(
     if (inputQuantity(buyerDefinition, reservation.goodId) <= 0) {
       throw new RangeError(`${path}.goodId is not an input of the buyer recipe`);
     }
-    if (!market.regionIds.includes(buyer.regionId)) {
+    if (!marketProvinceIdSet.has(buyer.provinceId)) {
       throw new RangeError(`${path} buyer building is outside the market`);
     }
     const seller = buildingById.get(reservation.sellerBuildingId);
     if (seller === undefined) {
       throw new RangeError(`${path} references an unknown seller building`);
     }
-    if (!market.regionIds.includes(seller.regionId)) {
+    if (!marketProvinceIdSet.has(seller.provinceId)) {
       // E6a: an imported lot is owned by a building in another market. The opening
       // lot existence check below is the real guard; a foreign owner is legitimate
       // only when trade is enabled (D-079 §8).
@@ -585,15 +642,16 @@ export function runProductionPhase(
   const nextLots = new Map<string, number>(openingLots);
 
   const buildingIds = [...world.buildings]
-    .filter((building) => marketRegionIds.has(building.regionId))
+    .filter((building) => marketProvinceIdSet.has(building.provinceId))
     .map((building) => building.id)
     .sort((a, b) => a - b);
+  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const buildingId of buildingIds) {
     const building = buildingById.get(buildingId);
     if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
     const definition = definitionsById.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} has no definition`);
-    const capacity = computeBuildingCapacity(world, definitions, building.id);
+    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     if (!capacity.isProductionBuilding) continue;
 
     let executedTU = capacity.capacityTU;
@@ -669,9 +727,9 @@ export function runProductionPhase(
     // M9 technology: researched sector productivity increases physical output from
     // the same executed throughput (and therefore the same inputs). It does not
     // change capacity, prices, or the input recipe.
-    const owner = world.countries.find((country) =>
-      country.regionIds.includes(building.regionId),
-    );
+    const ownerId = provinceOwners.get(building.provinceId);
+    const owner =
+      ownerId === undefined ? undefined : world.countries.find((country) => country.id === ownerId);
     const technologyFactor =
       owner === undefined
         ? 1

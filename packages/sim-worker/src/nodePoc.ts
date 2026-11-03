@@ -42,7 +42,7 @@ worker.on("message", (raw: unknown) => {
   switch (event.type) {
     case "READY":
       console.log(
-        `READY day=${String(event.snapshot.dayIndex)} countries=${String(event.snapshot.countries.length)} regions=${String(event.snapshot.regions.length)}`,
+        `READY day=${String(event.snapshot.dayIndex)} countries=${String(event.snapshot.countries.length)} provinces=${String(event.snapshot.provinceTable.ids.length)}`,
       );
       send({ protocolVersion: PROTOCOL_VERSION, type: "START", commandId: commandId("start") });
       return;

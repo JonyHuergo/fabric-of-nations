@@ -39,7 +39,7 @@ import type {
   FinancialAccount,
   PopBlock,
   PopulationScenarioDef,
-  Region,
+  ProvinceEconomy,
 } from "./types.js";
 
 function assertId(value: unknown, path: string): asserts value is Id {
@@ -74,49 +74,43 @@ function assertRemainder(value: unknown, path: string): asserts value is number 
   }
 }
 
-/** Validate one region. */
-export function assertValidRegion(region: Region): void {
-  const record = requireRecord(region, "region");
-  assertId(record.id, "region.id");
-  requireString(record.key, "region.key", { minLength: 1 });
-  requireString(record.name, "region.name", { minLength: 1 });
-  const popBlockIds = requireArray(record.popBlockIds, "region.popBlockIds");
+/** Validate one province. */
+export function assertValidProvinceEconomy(province: ProvinceEconomy): void {
+  const record = requireRecord(province, "province");
+  assertId(record.id, "province.id");
+  requireString(record.key, "province.key", { minLength: 1 });
+  requireString(record.name, "province.name", { minLength: 1 });
+  const popBlockIds = requireArray(record.popBlockIds, "province.popBlockIds");
   const seen = new Set<number>();
   for (let index = 0; index < popBlockIds.length; index += 1) {
     const id = popBlockIds[index];
-    assertId(id, `region.popBlockIds[${String(index)}]`);
+    assertId(id, `province.popBlockIds[${String(index)}]`);
     if (seen.has(id)) {
-      throw new RangeError(`region.popBlockIds contains duplicate id ${String(id)}`);
+      throw new RangeError(`province.popBlockIds contains duplicate id ${String(id)}`);
     }
     seen.add(id);
   }
   if (record.marketId !== null) {
-    assertId(record.marketId, "region.marketId");
+    assertId(record.marketId, "province.marketId");
   }
-  const buildingIds = requireArray(record.buildingInstanceIds, "region.buildingInstanceIds");
+  const buildingIds = requireArray(record.buildingInstanceIds, "province.buildingInstanceIds");
   const seenBuildings = new Set<number>();
   for (let index = 0; index < buildingIds.length; index += 1) {
     const id = buildingIds[index];
-    assertId(id, `region.buildingInstanceIds[${String(index)}]`);
+    assertId(id, `province.buildingInstanceIds[${String(index)}]`);
     if (seenBuildings.has(id)) {
-      throw new RangeError(`region.buildingInstanceIds contains duplicate id ${String(id)}`);
+      throw new RangeError(`province.buildingInstanceIds contains duplicate id ${String(id)}`);
     }
     seenBuildings.add(id);
   }
-  const resourceCaps = requireArray(record.resourceCapsPerDay, "region.resourceCapsPerDay");
-  for (let index = 0; index < resourceCaps.length; index += 1) {
-    const cap = requireFiniteNumber(
-      resourceCaps[index],
-      `region.resourceCapsPerDay[${String(index)}]`,
-    );
-    if (cap < 0) {
-      throw new RangeError(`region.resourceCapsPerDay[${String(index)}] must be non-negative`);
-    }
+  for (const field of ["arableLandHa", "pastureHa"] as const) {
+    const hectares = requireFiniteNumber(record[field], `province.${field}`);
+    if (hectares < 0) throw new RangeError(`province.${field} must be non-negative`);
   }
-  for (const field of ["unrest", "infrastructure"] as const) {
-    const rate = requireFiniteNumber(record[field], `region.${field}`);
+  for (const field of ["unrest", "infrastructure", "urbanShare"] as const) {
+    const rate = requireFiniteNumber(record[field], `province.${field}`);
     if (rate < 0 || rate > 1) {
-      throw new RangeError(`region.${field} must be in 0..1`);
+      throw new RangeError(`province.${field} must be in 0..1`);
     }
   }
 }
@@ -125,7 +119,7 @@ export function assertValidRegion(region: Region): void {
 export function assertValidPopBlock(block: PopBlock): void {
   const record = requireRecord(block, "popBlock");
   assertId(record.id, "popBlock.id");
-  assertId(record.regionId, "popBlock.regionId");
+  assertId(record.provinceId, "popBlock.provinceId");
   assertId(record.professionId, "popBlock.professionId");
   assertId(record.financialAccountId, "popBlock.financialAccountId");
 
@@ -195,21 +189,21 @@ function assertUnique<T>(values: readonly T[], key: (value: T) => string | numbe
 }
 
 /**
- * Validate population/finance state and all cross-references. Empty regions,
+ * Validate population/finance state and all cross-references. Empty provinces,
  * pop blocks, and accounts are valid for M1-style empty worlds.
  */
 export function assertValidPopulationState(world: World): void {
-  const regions = requireArray(world.regions, "world.regions");
+  const provinces = requireArray(world.provinceEconomies, "world.provinceEconomies");
   const blocks = requireArray(world.popBlocks, "world.popBlocks");
-  // M2 construction still creates exactly one region, but M5 economic worlds may
-  // author several. Region/market relationships are validated by the economy
+  // M2 construction still creates exactly one province, but M5 economic worlds may
+  // author several. ProvinceEconomy/market relationships are validated by the economy
   // state pass, which knows the market collection.
-  for (let index = 0; index < regions.length; index += 1) {
-    assertValidRegion(regions[index] as Region);
+  for (let index = 0; index < provinces.length; index += 1) {
+    assertValidProvinceEconomy(provinces[index] as ProvinceEconomy);
   }
-  assertUnique(regions as Region[], (region) => region.id, "world.regions");
-  assertUnique(regions as Region[], (region) => region.key, "world.regions");
-  const regionIds = new Set<number>((regions as Region[]).map((region) => region.id));
+  assertUnique(provinces as ProvinceEconomy[], (province) => province.id, "world.provinceEconomies");
+  assertUnique(provinces as ProvinceEconomy[], (province) => province.key, "world.provinceEconomies");
+  const provinceIds = new Set<number>((provinces as ProvinceEconomy[]).map((province) => province.id));
 
   for (let index = 0; index < blocks.length; index += 1) {
     assertValidPopBlock(blocks[index] as PopBlock);
@@ -226,8 +220,8 @@ export function assertValidPopulationState(world: World): void {
   }
   const accountOwners = new Set<number>();
   for (const block of blocks as PopBlock[]) {
-    if (!regionIds.has(block.regionId)) {
-      throw new RangeError(`popBlock ${String(block.id)} references unknown region ${String(block.regionId)}`);
+    if (!provinceIds.has(block.provinceId)) {
+      throw new RangeError(`popBlock ${String(block.id)} references unknown province ${String(block.provinceId)}`);
     }
     const account = accountById.get(block.financialAccountId);
     if (account === undefined) {
@@ -258,18 +252,18 @@ export function assertValidPopulationState(world: World): void {
     }
   }
 
-  for (const region of regions as Region[]) {
+  for (const province of provinces as ProvinceEconomy[]) {
     const expected = (blocks as PopBlock[])
-      .filter((block) => block.regionId === region.id)
+      .filter((block) => block.provinceId === province.id)
       .map((block) => block.id)
       .sort((left, right) => left - right);
-    const actual = [...region.popBlockIds].sort((left, right) => left - right);
+    const actual = [...province.popBlockIds].sort((left, right) => left - right);
     if (expected.length !== actual.length || expected.some((value, index) => value !== actual[index])) {
-      throw new RangeError(`region ${String(region.id)} popBlockIds do not match its pop blocks`);
+      throw new RangeError(`province ${String(province.id)} popBlockIds do not match its pop blocks`);
     }
-    for (const id of region.popBlockIds) {
+    for (const id of province.popBlockIds) {
       if (!blockIds.has(id)) {
-        throw new RangeError(`region ${String(region.id)} references unknown popBlock ${String(id)}`);
+        throw new RangeError(`province ${String(province.id)} references unknown popBlock ${String(id)}`);
       }
     }
   }
@@ -405,11 +399,11 @@ export function worldPopulation(world: World): number {
   return total;
 }
 
-/** Sum population across all blocks in one region. */
-export function regionPopulation(world: World, regionId: Id): number {
+/** Sum population across all blocks in one province. */
+export function provincePopulation(world: World, provinceId: Id): number {
   let total = 0;
   for (const block of world.popBlocks) {
-    if (block.regionId === regionId) total += populationTotal(block);
+    if (block.provinceId === provinceId) total += populationTotal(block);
   }
   return total;
 }
@@ -451,19 +445,19 @@ export function createPopulationWorld(
   }
   assertValidPopulationDefinitions(scenario.definitions);
 
-  if (options.allowMultipleRegions !== true && scenario.regions.length !== 1) {
-    throw new RangeError("M2 population scenarios must define exactly one region");
+  if (options.allowMultipleProvinces !== true && scenario.provinceEconomies.length !== 1) {
+    throw new RangeError("M2 population scenarios must define exactly one province");
   }
-  if (scenario.regions.length === 0) {
-    throw new RangeError("scenario must define at least one region");
+  if (scenario.provinceEconomies.length === 0) {
+    throw new RangeError("scenario must define at least one province");
   }
   if (scenario.professions.length === 0) {
     throw new RangeError("M2 scenario must define at least one profession identity");
   }
   assertUnique(scenario.professions, (profession) => profession.id, "scenario.professions");
   assertUnique(scenario.professions, (profession) => profession.key, "scenario.professions");
-  assertUnique(scenario.regions, (region) => region.id, "scenario.regions");
-  assertUnique(scenario.regions, (region) => region.key, "scenario.regions");
+  assertUnique(scenario.provinceEconomies, (province) => province.id, "scenario.provinceEconomies");
+  assertUnique(scenario.provinceEconomies, (province) => province.key, "scenario.provinceEconomies");
   assertUnique(scenario.popBlocks, (block) => block.id, "scenario.popBlocks");
   assertUnique(scenario.popBlocks, (block) => block.financialAccountId, "scenario.popBlocks");
 
@@ -485,8 +479,8 @@ export function createPopulationWorld(
       );
     }
   }
-  const regionById = new Map<number, (typeof scenario.regions)[number]>();
-  for (const region of scenario.regions) regionById.set(region.id, region);
+  const provinceById = new Map<number, (typeof scenario.provinceEconomies)[number]>();
+  for (const province of scenario.provinceEconomies) provinceById.set(province.id, province);
 
   const floor = options.accountIdFloor ?? 1;
   const maxDeclared = scenario.popBlocks.reduce(
@@ -505,9 +499,9 @@ export function createPopulationWorld(
         `popBlock ${String(initial.id)} references unknown profession ${String(initial.professionId)}`,
       );
     }
-    if (!regionById.has(initial.regionId)) {
+    if (!provinceById.has(initial.provinceId)) {
       throw new RangeError(
-        `popBlock ${String(initial.id)} references unknown region ${String(initial.regionId)}`,
+        `popBlock ${String(initial.id)} references unknown province ${String(initial.provinceId)}`,
       );
     }
     if (initial.maleAgeGroups.length !== AGE_COHORT_COUNT) {
@@ -541,7 +535,7 @@ export function createPopulationWorld(
 
     const block: PopBlock = {
       id: initial.id,
-      regionId: initial.regionId,
+      provinceId: initial.provinceId,
       professionId: initial.professionId,
       maleByAge,
       femaleByAge,
@@ -608,23 +602,26 @@ export function createPopulationWorld(
     });
   }
 
-  const worldRegions: Region[] = [...scenario.regions]
+  const blockIdsByProvince = new Map<number, number[]>();
+  for (const block of blocks) {
+    const list = blockIdsByProvince.get(block.provinceId);
+    if (list === undefined) blockIdsByProvince.set(block.provinceId, [block.id]);
+    else list.push(block.id);
+  }
+  const worldProvinces: ProvinceEconomy[] = [...scenario.provinceEconomies]
     .sort((left, right) => left.id - right.id)
-    .map((region) => ({
-      id: region.id,
-      key: region.key,
-      name: region.name,
-      popBlockIds: blocks
-        .filter((block) => block.regionId === region.id)
-        .map((block) => block.id)
-        .sort((left, right) => left - right),
+    .map((province) => ({
+      id: province.id,
+      key: province.key,
+      name: province.name,
+      popBlockIds: (blockIdsByProvince.get(province.id) ?? []).sort((left, right) => left - right),
       marketId: null,
       buildingInstanceIds: [],
-      resourceCapsPerDay: [...(region.resourceCapsPerDay ?? [])],
       unrest: 0,
-      infrastructure: region.infrastructure ?? 0.5,
-      controllerCountryId: null,
-      occupiedSinceDay: null,
+      infrastructure: province.infrastructure ?? 0.5,
+      arableLandHa: province.arableLandHa ?? 0,
+      pastureHa: province.pastureHa ?? 0,
+      urbanShare: province.urbanShare ?? 0,
     }));
 
   const world: World = {
@@ -635,7 +632,7 @@ export function createPopulationWorld(
     dayIndex: startDayIndex,
     startDayIndex,
     seed,
-    regions: worldRegions,
+    provinceEconomies: worldProvinces,
     countries: [],
     currencies: [],
     currencyValuations: [],

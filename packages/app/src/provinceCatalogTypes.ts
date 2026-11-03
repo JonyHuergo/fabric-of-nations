@@ -53,7 +53,6 @@ export interface ProvinceMapProvince {
   readonly initialOwnerPolityId: number;
   readonly initialOwnerTag: string;
   readonly mapTag: string;
-  readonly simulationRegionId: number;
   readonly historicalAdminAffiliation: string;
   readonly historicalGrouping: string | null;
   readonly initialSpecialStatus: ProvinceSpecialStatus;

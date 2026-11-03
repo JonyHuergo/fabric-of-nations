@@ -1,5 +1,5 @@
 /**
- * M5 deterministic cross-region and cross-country migration.
+ * M5 deterministic cross-province and cross-country migration.
  *
  * Migration is an explicit demographic flow between two existing population
  * blocks that share a profession. It moves an integer number of people, splits
@@ -8,7 +8,7 @@
  * the source household's cash through a balanced `migration-transfer` posting.
  *
  * Design boundaries (D-052):
- * - Internal migration (any region of the same country) is always permitted.
+ * - Internal migration (any province of the same country) is always permitted.
  * - Cross-country migration requires the destination country's provisional
  *   `immigrationOpen` policy. Emigration is unrestricted in M5.
  * - No migration block is created; the destination block must already exist.
@@ -25,7 +25,7 @@ import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from
 import {
   mergeBlockLiteracyByAge,
   populationTotal,
-  regionPopulation,
+  provincePopulation,
 } from "../population/state.js";
 import { roundTo } from "../population/definitions.js";
 import { drawUint32 } from "../rng.js";
@@ -37,8 +37,8 @@ import {
   type World,
 } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
-import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
-import { buildRegionOwnerMap } from "./country.js";
+import { cloneFinanceState } from "./accounts.js";
+import { buildProvinceOwnerMap } from "./country.js";
 import {
   MIGRATION_MONTHLY_INFLOW_CAP_FRACTION,
   MIGRATION_MONTHLY_MAX_FRACTION,
@@ -63,8 +63,8 @@ export const MIGRATION_AGE_REMAINDER_PURPOSE = "migration.age-remainder";
 export interface MigrationFlow {
   readonly sourcePopBlockId: Id;
   readonly destinationPopBlockId: Id;
-  readonly sourceRegionId: Id;
-  readonly destinationRegionId: Id;
+  readonly sourceProvinceId: Id;
+  readonly destinationProvinceId: Id;
   readonly professionId: Id;
   readonly people: number;
   readonly financialTransferRUSD: number;
@@ -106,25 +106,38 @@ function isFirstDayOfMonth(dayIndex: DayIndex): boolean {
   return date.day === 1;
 }
 
-interface RegionSignal {
+interface ProvinceSignal {
   readonly vacancyRate: number;
 }
 
-function signalKey(regionId: Id, professionId: Id): string {
-  return `${String(regionId)}:${String(professionId)}`;
+function signalKey(provinceId: Id, professionId: Id): string {
+  return `${String(provinceId)}:${String(professionId)}`;
 }
 
 /**
- * Compute unfilled-slot pressure per region and profession. The vacancy rate is
- * `clamp(unfilled slots / max(1, eligible regional workforce), 0, 1)`.
+ * Unfilled-slot pressure per province and profession. The vacancy rate is
+ * `clamp(unfilled slots / max(1, eligible provincial workforce), 0, 1)`.
  */
-function computeRegionSignals(
+interface ProvinceSignalState {
+  readonly signals: Map<string, ProvinceSignal>;
+  /** Recompute the signals of the given keys after their blocks' people changed. */
+  readonly refresh: (keys: readonly string[]) => void;
+}
+
+/**
+ * Signals plus the per-key totals they derive from. A migration flow changes only the
+ * people of its source and destination blocks (employment is refreshed after the
+ * phase), so only those two keys' eligible workforce changes; `refresh` recomputes
+ * them from the same blocks in the same order, which equals a full recomputation
+ * exactly (integer worker counts) at a fraction of the cost (P2 scale, D-133).
+ */
+function provinceSignalState(
   world: World,
   definitions: EconomyDefinitions,
-): Map<string, RegionSignal> {
+): ProvinceSignalState {
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
-  const signals = new Map<string, RegionSignal>();
+  const signals = new Map<string, ProvinceSignal>();
   const eligible = new Map<string, number>();
   const slots = new Map<string, number>();
   const assigned = new Map<string, number>();
@@ -132,7 +145,7 @@ function computeRegionSignals(
   for (const block of world.popBlocks) {
     const profession = professionById.get(block.professionId);
     if (profession === undefined) continue;
-    const key = signalKey(block.regionId, block.professionId);
+    const key = signalKey(block.provinceId, block.professionId);
     eligible.set(key, (eligible.get(key) ?? 0) + eligibleWorkforceForBlock(block, profession));
   }
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
@@ -141,7 +154,7 @@ function computeRegionSignals(
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
     for (const job of definition.jobs) {
-      const key = signalKey(building.regionId, job.professionId);
+      const key = signalKey(building.provinceId, job.professionId);
       slots.set(
         key,
         (slots.get(key) ?? 0) + jobSlotsForBuilding(definition, building, job.professionId),
@@ -151,18 +164,37 @@ function computeRegionSignals(
   for (const assignment of world.employment) {
     const building = buildingById.get(assignment.buildingInstanceId);
     if (building === undefined) continue;
-    const key = signalKey(building.regionId, assignment.professionId);
+    const key = signalKey(building.provinceId, assignment.professionId);
     assigned.set(key, (assigned.get(key) ?? 0) + assignment.workers);
   }
 
-  const keys = new Set<string>([...eligible.keys(), ...slots.keys()]);
-  for (const key of keys) {
+  const blocksByKey = new Map<string, World["popBlocks"][number][]>();
+  for (const block of world.popBlocks) {
+    const key = signalKey(block.provinceId, block.professionId);
+    const list = blocksByKey.get(key);
+    if (list === undefined) blocksByKey.set(key, [block]);
+    else list.push(block);
+  }
+  const signalFor = (key: string): ProvinceSignal => {
     const eligibleWorkers = eligible.get(key) ?? 0;
     const unfilled = Math.max(0, (slots.get(key) ?? 0) - (assigned.get(key) ?? 0));
     const rate = unfilled / Math.max(1, eligibleWorkers);
-    signals.set(key, { vacancyRate: Math.min(1, Math.max(0, rate)) });
-  }
-  return signals;
+    return { vacancyRate: Math.min(1, Math.max(0, rate)) };
+  };
+  const keys = new Set<string>([...eligible.keys(), ...slots.keys()]);
+  for (const key of keys) signals.set(key, signalFor(key));
+  const refresh = (changed: readonly string[]): void => {
+    for (const key of changed) {
+      let total = 0;
+      for (const block of blocksByKey.get(key) ?? []) {
+        const profession = professionById.get(block.professionId);
+        if (profession !== undefined) total += eligibleWorkforceForBlock(block, profession);
+      }
+      eligible.set(key, total);
+      signals.set(key, signalFor(key));
+    }
+  };
+  return { signals, refresh };
 }
 
 interface Candidate {
@@ -266,9 +298,18 @@ function addCells(
   }
 }
 
+/**
+ * One block's household cash account. A single scan instead of building the full
+ * finance index for every flow (P1); the account set is validated for uniqueness
+ * by world validation, so the first match is the only match.
+ */
 function householdAccount(world: World, popBlockId: Id): FinancialAccount {
-  const index = buildFinanceIndex(world.finance);
-  const account = index.find("popBlock", popBlockId, "household-cash");
+  const account = world.finance.accounts.find(
+    (candidate) =>
+      candidate.ownerKind === "popBlock" &&
+      candidate.ownerId === popBlockId &&
+      candidate.subtype === "household-cash",
+  );
   if (account === undefined) {
     throw new RangeError(`popBlock ${String(popBlockId)} has no household cash account`);
   }
@@ -370,17 +411,17 @@ export function applyMigrationRequest(
   if (source.id === destination.id) {
     throw new RangeError("migration source and destination must be different pop blocks");
   }
-  if (source.regionId === destination.regionId) {
-    throw new RangeError("migration source and destination must be in different regions");
+  if (source.provinceId === destination.provinceId) {
+    throw new RangeError("migration source and destination must be in different provinces");
   }
   if (source.professionId !== destination.professionId) {
     throw new RangeError("migration requires the same profession at the destination");
   }
-  const sourceCountryId = regionOwnerId(world, source.regionId);
-  const destinationCountryId = regionOwnerId(world, destination.regionId);
+  const sourceCountryId = provinceOwnerId(world, source.provinceId);
+  const destinationCountryId = provinceOwnerId(world, destination.provinceId);
   if (sourceCountryId !== destinationCountryId) {
     if (destinationCountryId === null) {
-      throw new RangeError("migration cannot enter a region with no owning country");
+      throw new RangeError("migration cannot enter a province with no owning country");
     }
     const destinationCountry = world.countries.find(
       (country) => country.id === destinationCountryId,
@@ -418,11 +459,8 @@ export function applyMigrationRequest(
   return flow;
 }
 
-function regionOwnerId(world: World, regionId: Id): Id | null {
-  for (const country of world.countries) {
-    if (country.regionIds.includes(regionId)) return country.id;
-  }
-  return null;
+function provinceOwnerId(world: World, provinceId: Id): Id | null {
+  return buildProvinceOwnerMap(world).get(provinceId) ?? null;
 }
 
 /**
@@ -462,10 +500,11 @@ export function runMigrationPhase(
     return emptyResult(dayIndex);
   }
 
-  const regionOwners = buildRegionOwnerMap(world);
+  const provinceOwners = buildProvinceOwnerMap(world);
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
-  const signals = computeRegionSignals(world, definitions);
+  const signalState = provinceSignalState(world, definitions);
+  const signals = signalState.signals;
   const blocksById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const blocksByProfession = new Map<Id, World["popBlocks"]>();
   for (const block of world.popBlocks) {
@@ -478,11 +517,11 @@ export function runMigrationPhase(
   const backup = backupWorld(world);
   const flows: MigrationFlow[] = [];
   let employmentRefresh: EmploymentRefreshResult | null = null;
-  const inflowByRegion = new Map<Id, number>();
-  const standingByRegion = new Map<Id, number>();
-  for (const region of world.regions) {
-    if (populationTotalOfRegion(world, region.id) > 0) {
-      standingByRegion.set(region.id, regionPopulation(world, region.id));
+  const inflowByProvince = new Map<Id, number>();
+  const standingByProvince = new Map<Id, number>();
+  for (const province of world.provinceEconomies) {
+    if (populationTotalOfProvince(world, province.id) > 0) {
+      standingByProvince.set(province.id, provincePopulation(world, province.id));
     }
   }
   let sourceBlocksConsidered = 0;
@@ -513,22 +552,22 @@ export function runMigrationPhase(
       sourceBlocksConsidered += 1;
       const profession = professionById.get(source.professionId);
       if (profession === undefined) continue;
-      const sourceCountryId = regionOwners.get(source.regionId) ?? null;
-      const sourceSignal = signals.get(signalKey(source.regionId, source.professionId));
+      const sourceCountryId = provinceOwners.get(source.provinceId) ?? null;
+      const sourceSignal = signals.get(signalKey(source.provinceId, source.professionId));
 
       const candidates: Candidate[] = [];
       for (const destination of blocksByProfession.get(source.professionId) ?? []) {
         if (destination.id === source.id) continue;
-        if (destination.regionId === source.regionId) continue;
+        if (destination.provinceId === source.provinceId) continue;
         const destinationPopulation = populationTotal(destination);
         if (destinationPopulation <= 0) continue;
-        const destinationCountryId = regionOwners.get(destination.regionId) ?? null;
+        const destinationCountryId = provinceOwners.get(destination.provinceId) ?? null;
         if (sourceCountryId !== destinationCountryId) {
           if (destinationCountryId === null) continue;
           if (countryById.get(destinationCountryId)?.immigrationOpen !== true) continue;
         }
         const destinationSignal = signals.get(
-          signalKey(destination.regionId, source.professionId),
+          signalKey(destination.provinceId, source.professionId),
         );
         const vacancyRate = destinationSignal?.vacancyRate ?? 0;
         const sourceVacancyRate = sourceSignal?.vacancyRate ?? 0;
@@ -547,9 +586,9 @@ export function runMigrationPhase(
         );
         let people = Math.floor(sourcePopulationBefore * fraction);
         if (people < 1) continue;
-        const standing = standingByRegion.get(destination.regionId) ?? destinationPopulation;
+        const standing = standingByProvince.get(destination.provinceId) ?? destinationPopulation;
         const cap = Math.floor(standing * MIGRATION_MONTHLY_INFLOW_CAP_FRACTION);
-        const alreadyIn = inflowByRegion.get(destination.regionId) ?? 0;
+        const alreadyIn = inflowByProvince.get(destination.provinceId) ?? 0;
         const remainingCapacity = cap - alreadyIn;
         if (remainingCapacity < 1) {
           destinationsCappedByInflowLimit += 1;
@@ -580,9 +619,11 @@ export function runMigrationPhase(
       );
       const chosen = candidates[0];
       if (chosen === undefined) continue;
-      applyFlow(world, dayIndex, source, chosen.destination, chosen.people, flows, inflowByRegion);
-      signals.clear();
-      for (const [key, value] of computeRegionSignals(world, definitions)) signals.set(key, value);
+      applyFlow(world, dayIndex, source, chosen.destination, chosen.people, flows, inflowByProvince);
+      signalState.refresh([
+        signalKey(source.provinceId, source.professionId),
+        signalKey(chosen.destination.provinceId, chosen.destination.professionId),
+      ]);
       if (!blocksById.has(source.id)) throw new RangeError("migration lost its source block");
     }
     if (flows.length > 0) {
@@ -612,10 +653,10 @@ export function runMigrationPhase(
   };
 }
 
-function populationTotalOfRegion(world: World, regionId: Id): number {
+function populationTotalOfProvince(world: World, provinceId: Id): number {
   let total = 0;
   for (const block of world.popBlocks) {
-    if (block.regionId === regionId) total += populationTotal(block);
+    if (block.provinceId === provinceId) total += populationTotal(block);
   }
   return total;
 }
@@ -627,7 +668,7 @@ function applyFlow(
   destination: World["popBlocks"][number],
   people: number,
   flows: MigrationFlow[],
-  inflowByRegion: Map<Id, number>,
+  inflowByProvince: Map<Id, number>,
 ): void {
   const sourcePopulationBefore = populationTotal(source);
   const destinationPopulationBefore = populationTotal(destination);
@@ -707,15 +748,15 @@ function applyFlow(
     throw new RangeError("migration did not conserve the destination population");
   }
 
-  inflowByRegion.set(
-    destination.regionId,
-    (inflowByRegion.get(destination.regionId) ?? 0) + people,
+  inflowByProvince.set(
+    destination.provinceId,
+    (inflowByProvince.get(destination.provinceId) ?? 0) + people,
   );
   flows.push({
     sourcePopBlockId: source.id,
     destinationPopBlockId: destination.id,
-    sourceRegionId: source.regionId,
-    destinationRegionId: destination.regionId,
+    sourceProvinceId: source.provinceId,
+    destinationProvinceId: destination.provinceId,
     professionId: source.professionId,
     people,
     financialTransferRUSD: transfer,

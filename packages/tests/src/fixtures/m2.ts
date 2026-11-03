@@ -145,7 +145,7 @@ export function customScenario(
 ): PopulationScenarioDef {
   return {
     ...base,
-    regions: [{ ...base.regions[0]!, key: "test-region", name: "Test region" }],
+    provinceEconomies: [{ ...base.provinceEconomies[0]!, key: "test-province", name: "Test province" }],
     popBlocks,
   };
 }
@@ -156,7 +156,7 @@ export function oneBlockScenario(totalPerCohort: Partial<Record<number, number>>
   return customScenario([
     {
       id: 0,
-      regionId: 0,
+      provinceId: 0,
       professionId: 0,
       financialAccountId: 0,
       maleAgeGroups: split.male,

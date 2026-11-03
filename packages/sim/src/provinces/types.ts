@@ -10,11 +10,10 @@
  * - disputed claims (`claimantPolityIds`), which never imply ownership;
  * - a special administrative status (autonomy, condominium, free city, ...).
  *
- * The simulation-wide `SimulationRegion` remains a population/economy
- * accounting unit (the historical `Region`). It is not a geographical layer;
- * each province links to the simulation region whose population currently
- * contains it (`simulationRegionId`) so future milestones can move population
- * and production together with a provincial transfer.
+ * Since P2 (D-118) the province is also the unit of population, buildings,
+ * construction, unrest, land and infrastructure: its `ProvinceEconomy` record
+ * lives in `World.provinceEconomies` under the same permanent id, and a legal
+ * transfer moves that economy into the new owner's customs territory.
  *
  * Polity ids in this module refer to the 1900 catalog / future-polity registry
  * ids. For the 1900 starting world a province in a sovereign state is owned by
@@ -83,8 +82,6 @@ export interface ProvinceDefinition {
   readonly aliases: readonly string[];
   /** Polity id of the legal owner on 1 January 1900. */
   readonly initialOwnerPolityId: Id;
-  /** Simulation region whose population and economy currently contain the province. */
-  readonly simulationRegionId: Id;
   /** Historical administrative affiliation, e.g. "Austrian Crown Land". */
   readonly historicalAdminAffiliation: string;
   /** Optional informational historical grouping, e.g. "Kingdom of Hungary". */

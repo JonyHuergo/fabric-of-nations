@@ -27,6 +27,7 @@ import type {
   EconomyDefinitions,
   ProfessionDef,
 } from "./types.js";
+import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
 /** True for statuses that no longer consume the active-project cap. */
 export function constructionProjectIsTerminal(status: ConstructionProjectStatus): boolean {
@@ -113,7 +114,7 @@ export function constructionIdleWorkersByBlock(
 ): Map<Id, number> {
   const country = world.countries.find((candidate) => candidate.id === countryId);
   if (country === undefined) throw new RangeError(`unknown country ${String(countryId)}`);
-  const regionIds = new Set(country.regionIds);
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
   const assigned = new Map<Id, number>();
   for (const assignment of world.employment) {
     assigned.set(
@@ -126,7 +127,7 @@ export function constructionIdleWorkersByBlock(
   );
   const idle = new Map<Id, number>();
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
-    if (!regionIds.has(block.regionId)) continue;
+    if (!provinceIds.has(block.provinceId)) continue;
     const profession = professionById.get(block.professionId);
     if (profession === undefined) continue;
     const eligible = eligibleWorkforceForBlock(block, profession);
@@ -347,10 +348,7 @@ export function assertValidConstructionState(world: World): void {
     throw new RangeError("world.construction.history must be an array");
   }
   const countryIds = new Set(world.countries.map((country) => country.id));
-  const regionOwners = new Map<Id, Id>();
-  for (const country of world.countries) {
-    for (const regionId of country.regionIds) regionOwners.set(regionId, country.id);
-  }
+  const provinceOwners = buildProvinceOwnerMap(world);
   const buildingIds = new Set(world.buildings.map((building) => building.id));
   const projectIds = new Set<Id>();
   let active = 0;
@@ -371,14 +369,14 @@ export function assertValidConstructionState(world: World): void {
         `construction project ${String(project.id)} references unknown country ${String(project.countryId)}`,
       );
     }
-    if (!world.regions.some((region) => region.id === project.regionId)) {
+    if (!world.provinceEconomies.some((province) => province.id === project.provinceId)) {
       throw new RangeError(
-        `construction project ${String(project.id)} references unknown region ${String(project.regionId)}`,
+        `construction project ${String(project.id)} references unknown province ${String(project.provinceId)}`,
       );
     }
-    if (regionOwners.get(project.regionId) !== project.countryId) {
+    if (provinceOwners.get(project.provinceId) !== project.countryId) {
       throw new RangeError(
-        `construction project ${String(project.id)} region must be owned by its country`,
+        `construction project ${String(project.id)} province must be owned by its country`,
       );
     }
     if (constructionProjectIsTerminal(project.status)) terminated += 1;
@@ -390,9 +388,9 @@ export function assertValidConstructionState(world: World): void {
           `construction project ${String(project.id)} references unknown building ${String(project.buildingId)}`,
         );
       }
-      if (building.definitionId !== project.definitionId || building.regionId !== project.regionId) {
+      if (building.definitionId !== project.definitionId || building.provinceId !== project.provinceId) {
         throw new RangeError(
-          `construction project ${String(project.id)} building does not match its definition/region`,
+          `construction project ${String(project.id)} building does not match its definition/province`,
         );
       }
       if (building.ownerKind !== "state") {

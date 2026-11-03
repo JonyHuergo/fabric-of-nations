@@ -50,7 +50,7 @@ import {
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
-import { buildRegionOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import { buildProvinceOwnerMap, fiscalPolicyIsActive } from "./country.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import type { Country, EconomyDefinitions, FinanceState, JournalLine } from "./types.js";
 import { taxCollectionEfficiency } from "./politics.js";
@@ -275,7 +275,7 @@ function executeFiscalPhase(
   const wagesByBlock = new Map(
     settlement.households.map((household) => [household.popBlockId, household.wagesReceivedRUSD]),
   );
-  const owners = buildRegionOwnerMap(world);
+  const owners = buildProvinceOwnerMap(world);
   const countries = [...world.countries].sort((left, right) => left.id - right.id);
   const politics = options.economyDefinitions?.politics;
   const administrationProfessionKeys = new Set(
@@ -295,14 +295,14 @@ function executeFiscalPhase(
   const groupByCountry = new Map(groups.map((group) => [group.country.id, group]));
   const unowned: Id[] = [];
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
-    const countryId = owners.get(block.regionId);
+    const countryId = owners.get(block.provinceId);
     if (countryId === undefined) {
       unowned.push(block.id);
       continue;
     }
     const group = groupByCountry.get(countryId);
     if (group === undefined) {
-      throw new RangeError(`region owner ${String(countryId)} is not a registered country`);
+      throw new RangeError(`province owner ${String(countryId)} is not a registered country`);
     }
     group.blocks.push({
       popBlockId: block.id,
@@ -314,7 +314,7 @@ function executeFiscalPhase(
   const anyActive = countries.some((country) => fiscalPolicyIsActive(country.fiscal));
   if (anyActive && unowned.length > 0) {
     throw new RangeError(
-      `fiscal policy is active but pop blocks ${unowned.map((id) => String(id)).join(", ")} are in unowned regions`,
+      `fiscal policy is active but pop blocks ${unowned.map((id) => String(id)).join(", ")} are in unowned provinces`,
     );
   }
 

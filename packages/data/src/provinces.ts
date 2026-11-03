@@ -23,6 +23,7 @@ import {
   civilDateToDayIndex,
   type PolityDef,
   type ProvinceDefinition,
+  type ProvinceOwnershipInput,
   type ProvinceScenarioInput,
   type ProvinceSpecialStatus,
 } from "@century/sim";
@@ -44,9 +45,13 @@ interface RawProvince {
   readonly displayName: string;
   readonly aliases: readonly string[];
   readonly initialOwnerPolityId: number;
+  /**
+   * D-129: optional effective controller on 1 January 1900 when it differs from the
+   * legal owner (Cuba: owned by Cuba, under United States military government).
+   */
+  readonly initialControllerPolityId?: number;
   readonly initialOwnerTag: string;
   readonly mapTag: string;
-  readonly simulationRegionId: number;
   readonly historicalAdminAffiliation: string;
   readonly historicalGrouping: string | null;
   readonly initialSpecialStatus: string;
@@ -265,7 +270,6 @@ export function loadM11Provinces(): ProvinceScenarioInput {
       displayName: province.displayName,
       aliases: [...province.aliases],
       initialOwnerPolityId: province.initialOwnerPolityId,
-      simulationRegionId: province.simulationRegionId,
       historicalAdminAffiliation: province.historicalAdminAffiliation,
       historicalGrouping: province.historicalGrouping,
       initialSpecialStatus: province.initialSpecialStatus as ProvinceSpecialStatus,
@@ -291,7 +295,22 @@ export function loadM11Provinces(): ProvinceScenarioInput {
     confidence: polity.confidence,
     notes: polity.notes,
   }));
-  return { definitions, polityRegistry };
+  // D-129: provinces whose 1 January 1900 controller differs from their legal owner.
+  // The simulation requires an ownership list to describe every province once.
+  if (!bundle.provinces.some((province) => province.initialControllerPolityId !== undefined)) {
+    return { definitions, polityRegistry };
+  }
+  const ownership: ProvinceOwnershipInput[] = bundle.provinces.map((province) => {
+    const controller = province.initialControllerPolityId;
+    return controller === undefined || controller === province.initialOwnerPolityId
+      ? { provinceId: province.id, ownerPolityId: province.initialOwnerPolityId }
+      : {
+          provinceId: province.id,
+          ownerPolityId: province.initialOwnerPolityId,
+          controllerPolityId: controller,
+        };
+  });
+  return { definitions, polityRegistry, ownership };
 }
 
 /** True when all committed province bundles match the data package version. */

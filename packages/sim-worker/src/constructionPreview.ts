@@ -23,7 +23,7 @@ export interface ConstructionMaterialPreview {
 export interface ConstructionPreview {
   readonly countryId: number;
   readonly definitionId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly valid: boolean;
   readonly errors: readonly string[];
   readonly costRUSD: number;
@@ -49,7 +49,7 @@ export function previewConstruction(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
   definitionId: number,
-  regionId: number,
+  provinceId: number,
 ): ConstructionPreview {
   const projectType = snapshot.projectTypes.find(
     (candidate) => candidate.definitionId === definitionId,
@@ -64,8 +64,8 @@ export function previewConstruction(
       "Public construction requires the state-enterprise profit-distribution policy, which is disabled in this scenario.",
     );
   }
-  if (!country.regionIds.includes(regionId)) {
-    errors.push("The selected region is not owned by this country.");
+  if (!country.provinceIds.includes(provinceId)) {
+    errors.push("The selected province is not owned by this country.");
   }
   if (snapshot.playerCountryId !== country.id) {
     errors.push("Only the player-controlled country may authorize construction.");
@@ -93,7 +93,7 @@ export function previewConstruction(
   const dailyPayroll = desiredCrew * dailyWage;
   const estimatedDays =
     dailyPayroll > 0 && cost > 0 ? Math.ceil(cost / dailyPayroll) : null;
-  const market = snapshot.markets.find((entry) => entry.regionIds.includes(regionId));
+  const market = snapshot.markets.find((entry) => entry.provinceIds.includes(provinceId));
   const priceByGood = new Map(
     (market?.prices ?? []).map((price) => [price.goodId, price]),
   );
@@ -130,7 +130,7 @@ export function previewConstruction(
     );
   }
   constraints.push(
-    "The cost is the authored construction labor budget. Materials are bought from actual regional market stock at the current price and delivered before labor starts.",
+    "The cost is the authored construction labor budget. Materials are bought from actual provincial market stock at the current price and delivered before labor starts.",
     "Projects hire only idle eligible workers and pay their profession base daily wage; the existing income tax is withheld.",
     "Authorization requires treasury cash for the labor cost plus a 30-day-upkeep working-capital target; material purchases and later wages are paid as they occur and are not escrowed.",
     "Construction is pay-as-you-go; a project can wait for funds, labor, or materials and does not create a liability.",
@@ -140,7 +140,7 @@ export function previewConstruction(
   return {
     countryId: country.id,
     definitionId,
-    regionId,
+    provinceId,
     valid: errors.length === 0,
     errors,
     costRUSD: cost,

@@ -62,7 +62,8 @@ describe("render bundle identity", () => {
 
   test("preserves every province, in catalogue order, with no merging", () => {
     expect(bundle.provinceCount).toBe(provinces.length);
-    expect(provinces.length).toBe(1689);
+    // D-128: 1,689 provinces less the duplicate Greenland and the dissolved German residual.
+    expect(provinces.length).toBe(1687);
     expect([...bundle.provinceIds]).toEqual(provinces.map((province) => province.id));
     expect(new Set(bundle.provinceIds).size).toBe(provinces.length);
   });

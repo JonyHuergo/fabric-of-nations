@@ -116,7 +116,7 @@ export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
       ...scenario.population.popBlocks,
       {
         id: M8_CLERKS_BLOCK,
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         professionId: M8_CLERKS_ID,
         financialAccountId: M8_CLERKS_ACCOUNT,
         maleAgeGroups: m5AgeGroups(2_500),

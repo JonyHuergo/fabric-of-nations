@@ -2,7 +2,7 @@
   "generatedBy": "scripts/m12/build-provinces.mjs",
   "referenceDate": "1900-01-01",
   "toleranceDegrees": 0.02,
-  "provinceCount": 570,
+  "provinceCount": 569,
   "plannedProvinceCount": 570,
   "residualProvinceCount": 0,
   "politiesCovered": [
@@ -713,5 +713,6 @@
     "coverage subtraction failed for ITA; residual estimated by area (RangeError: Maximum call stack size exceeded)",
     "coverage subtraction failed for NOR; residual estimated by area (Error: Unable to find segment #2214221 [5.620003416066605, 59.94010215538807] -> [5.620003416066614, 59.94010215538807] in SweepLine tree.)"
   ],
-  "sourceCount": 17
+  "sourceCount": 17,
+  "p2Repair": "province geometry repaired by scripts/p2 (D-128); see province_repair_report.json"
 }

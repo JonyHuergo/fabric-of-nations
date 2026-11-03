@@ -134,8 +134,8 @@ export function settlePopulationNeeds(
 ): PopulationNeedsDayResult {
   const date = dayIndexToCivilDate(dayIndex);
   const days = daysInYear(date.year);
-  const region = world.regions[0];
-  if (region === undefined) throw new RangeError("M2 needs requires one region");
+  const province = world.provinceEconomies[0];
+  if (province === undefined) throw new RangeError("M2 needs requires one province");
   const blocks = [...world.popBlocks].sort((left, right) => left.id - right.id);
   const populationById = new Map<Id, number>();
   let population = 0;

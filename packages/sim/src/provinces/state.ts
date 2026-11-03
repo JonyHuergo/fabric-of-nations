@@ -129,7 +129,6 @@ export function assertValidProvinceDefinition(
   });
   requireAliasArray(definition.aliases, `${path}.aliases`);
   requireUint32(definition.initialOwnerPolityId, `${path}.initialOwnerPolityId`);
-  requireUint32(definition.simulationRegionId, `${path}.simulationRegionId`);
   requireString(
     definition.historicalAdminAffiliation,
     `${path}.historicalAdminAffiliation`,
@@ -301,14 +300,17 @@ export function assertValidPolityRegistry(
 }
 
 /**
- * Validate provincial scenario content against the authored countries, regions
+ * Validate provincial scenario content against the authored countries, provinces
  * and future-polity registry.
  */
 export function assertValidProvinceScenario(
   input: ProvinceScenarioInput,
   context: {
     readonly countryIds: ReadonlySet<Id>;
-    readonly regionIds: ReadonlySet<Id>;
+    /** Provinces with a `ProvinceEconomy` record in the scenario. */
+    readonly provinceIds: ReadonlySet<Id>;
+    /** Each simulation country's declared initial territory (D-118). */
+    readonly countryProvinceIds: ReadonlyMap<Id, readonly Id[]>;
   },
 ): void {
   assertValidProvinceDefinitions(input.definitions);
@@ -323,11 +325,35 @@ export function assertValidProvinceScenario(
       `${path}.initialOwnerPolityId`,
       knownPolityIds,
     );
-    if (!context.regionIds.has(definition.simulationRegionId)) {
+    if (!context.provinceIds.has(definition.provinceId)) {
       throw new RangeError(
-        `${path}.simulationRegionId ${String(definition.simulationRegionId)} is not a defined region`,
+        `${path}.provinceId ${String(definition.provinceId)} has no province economy record`,
       );
     }
+  }
+  // Country territory is derived from ownership; the declared initial territory must
+  // agree with the definitions (and any ownership override) province by province.
+  const overrideOwner = new Map<Id, Id>(
+    (input.ownership ?? []).map((entry) => [entry.provinceId, entry.ownerPolityId] as const),
+  );
+  const declaredOwner = new Map<Id, Id>();
+  for (const [countryId, provinceIds] of context.countryProvinceIds) {
+    for (const provinceId of provinceIds) declaredOwner.set(provinceId, countryId);
+  }
+  for (const definition of input.definitions) {
+    const owner = overrideOwner.get(definition.provinceId) ?? definition.initialOwnerPolityId;
+    const declared = declaredOwner.get(definition.provinceId);
+    if (context.countryIds.has(owner) ? declared !== owner : declared !== undefined) {
+      throw new RangeError(
+        `province ${definition.key} is owned by polity ${String(owner)} but declared as territory of ${String(declared ?? "no country")}`,
+      );
+    }
+    declaredOwner.delete(definition.provinceId);
+  }
+  for (const [provinceId, countryId] of declaredOwner) {
+    throw new RangeError(
+      `country ${String(countryId)} declares province ${String(provinceId)}, which has no definition`,
+    );
   }
   if (input.ownership !== undefined) {
     const byProvince = new Map<Id, number>();
@@ -430,6 +456,34 @@ export function createProvinceState(
     transfers: [],
     nextTransferId: 1,
   };
+}
+
+/**
+ * Build ownership-only province state for a scenario without province definitions
+ * (synthetic fixtures). Every listed province is owned and controlled by the given
+ * polity, with no claims and ordinary status.
+ */
+export function createProvinceStateFromOwners(
+  owners: readonly { readonly provinceId: Id; readonly ownerPolityId: Id }[],
+): ProvinceState {
+  const ownership: ProvinceOwnership[] = [...owners]
+    .sort((left, right) => left.provinceId - right.provinceId)
+    .map((entry) => ({
+      provinceId: entry.provinceId,
+      ownerPolityId: entry.ownerPolityId,
+      controllerPolityId: entry.ownerPolityId,
+      controlledSinceDay: null,
+      claimantPolityIds: [],
+      specialStatus: "ordinary",
+    }));
+  for (let index = 1; index < ownership.length; index += 1) {
+    if (ownership[index]!.provinceId === ownership[index - 1]!.provinceId) {
+      throw new RangeError(
+        `province ${String(ownership[index]!.provinceId)} is owned by more than one country`,
+      );
+    }
+  }
+  return { enabled: true, ownership, transfers: [], nextTransferId: 1 };
 }
 
 /** Validate authoritative province state. Never repairs values. */

@@ -11,7 +11,7 @@
       "stratum": "lower"
     }
   ],
-  "regions": [
+  "provinces": [
     {
       "id": 0,
       "key": "world-aggregate",
@@ -21,7 +21,7 @@
   "popBlocks": [
     {
       "id": 0,
-      "regionId": 0,
+      "provinceId": 0,
       "professionId": 0,
       "financialAccountId": 0,
       "literacy": 0.2,

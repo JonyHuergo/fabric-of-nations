@@ -52,6 +52,7 @@ import type {
   RusdPerCurrencyUnit,
 } from "./types.js";
 import { MONETARY_REGIMES } from "./types.js";
+import { countryProvinceIds, marketProvinceIds } from "./country.js";
 export {
   assertValidMonetaryState,
   assertValidPriceIndexState,
@@ -141,7 +142,7 @@ export interface DerivedPriceIndexes {
  * Base = 100 at the captured opening prices. A basket good with a missing or
  * non-positive base or current price is excluded from both sums; coverage is reported by
  * the caller. A country index is the population-weighted mean of the indices of the
- * markets containing its regions.
+ * markets containing its provinces.
  */
 export function derivePriceIndexes(world: World): DerivedPriceIndexes {
   const basket = world.priceIndex.basket;
@@ -163,18 +164,18 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
     marketValues.set(market.id, denominator > 0 ? (100 * numerator) / denominator : 100);
   }
 
-  const populationByRegion = new Map<Id, number>();
+  const populationByProvince = new Map<Id, number>();
   for (const block of world.popBlocks) {
-    populationByRegion.set(
-      block.regionId,
-      (populationByRegion.get(block.regionId) ?? 0) + populationTotal(block),
+    populationByProvince.set(
+      block.provinceId,
+      (populationByProvince.get(block.provinceId) ?? 0) + populationTotal(block),
     );
   }
   const marketPopulation = new Map<Id, number>();
   for (const market of world.markets) {
     let population = 0;
-    for (const regionId of market.regionIds) {
-      population += populationByRegion.get(regionId) ?? 0;
+    for (const provinceId of marketProvinceIds(world, market.id)) {
+      population += populationByProvince.get(provinceId) ?? 0;
     }
     marketPopulation.set(market.id, population);
   }
@@ -183,12 +184,12 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
   for (const country of world.countries) {
     const weights: { marketId: Id; value: number; weight: number }[] = [];
-    for (const regionId of country.regionIds) {
-      const marketId = world.regions.find((region) => region.id === regionId)?.marketId;
+    for (const provinceId of countryProvinceIds(world, country.id)) {
+      const marketId = world.provinceEconomies.find((province) => province.id === provinceId)?.marketId;
       if (marketId === null || marketId === undefined) continue;
       if (!marketById.has(marketId)) continue;
       const already = weights.find((entry) => entry.marketId === marketId);
-      const population = populationByRegion.get(regionId) ?? 0;
+      const population = populationByProvince.get(provinceId) ?? 0;
       if (already === undefined) {
         weights.push({
           marketId,

@@ -24,7 +24,7 @@ interface ParsedEnvelope {
   schemaVersion?: unknown;
   simVersion?: unknown;
   payload?: {
-    regions?: unknown;
+    provinces?: unknown;
     popBlocks?: Array<{
       maleByAge?: EncodedArrayShape;
       femaleByAge?: EncodedArrayShape;

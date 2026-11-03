@@ -39,6 +39,7 @@ import {
   planProvinceBorders,
 } from "../../app/src/components/provinceRenderPlan.js";
 import type { ProvinceMapData } from "../../app/src/provinceCatalogTypes.js";
+import { politicalGeographyWorld } from "./fixtures/provinces.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -167,7 +168,8 @@ interface ReferenceWorld {
 }
 
 function referenceWorld(seed = 12_001): ReferenceWorld {
-  const world = createEconomyWorld(M11_SCENARIO, { seed });
+  // P2: the reference sequences run on the political geography alone (D-118).
+  const world = politicalGeographyWorld(M11_SCENARIO, seed);
   return { world, scenario: M11_SCENARIO };
 }
 
@@ -186,7 +188,6 @@ function dissolveAustriaHungary(world: World): void {
     "aut-bohemia",
     "aut-moravia",
     "aut-austrian-silesia",
-    "aut-hultschin",
     "aut-svk-pressburg",
     "aut-svk-nagyszombat",
     "aut-svk-nyitra",
@@ -345,6 +346,16 @@ function settleGermany1919(world: World): void {
     "cession",
     "Schleswig plebiscite: northern Schleswig to Denmark",
     at,
+  );
+  // D-128: the Hultschin province was Prussian (Ratibor district), so it leaves with the
+  // German settlement under Versailles, not with Austria-Hungary.
+  transfer(
+    world,
+    idsFor((key) => key === "aut-hultschin"),
+    FUTURE_ID.get("CZE") as Id,
+    "cession",
+    "Treaty of Versailles: Hultschin province to Czechoslovakia",
+    day(1920, 2, 4),
   );
   transfer(
     world,
@@ -796,7 +807,16 @@ describe("M12a authoritative provincial ownership", () => {
     expect(new Set(world.provinces.ownership.map((entry) => entry.provinceId)).size).toBe(
       world.provinces.ownership.length,
     );
+    // D-129/D-132: Cuba (United States military government) and Egypt (Ottoman,
+    // under British occupation) are the 1900 province groups whose controller differs
+    // from their owner.
+    const cuban = new Set(
+      definitions
+        .filter((definition) => definition.key.startsWith("am-cub-") || definition.key.startsWith("af-egy-"))
+        .map((definition) => definition.provinceId),
+    );
     for (const entry of world.provinces.ownership) {
+      if (cuban.has(entry.provinceId)) continue;
       expect(entry.ownerPolityId).toBe(entry.controllerPolityId);
       expect(entry.controlledSinceDay).toBeNull();
       expect(entry.claimantPolityIds).toEqual([]);
@@ -1078,7 +1098,7 @@ describe("M12a historical reference snapshots", () => {
     expect(byOwner.get(1)).toBe(ownerCount("GBR"));
   });
 
-  test("map geometry no longer depends on the simulation Region layer", () => {
+  test("map geometry no longer depends on the simulation ProvinceEconomy layer", () => {
     const geometrySource = readFileSync(
       join(ROOT, "packages/app/src/components/worldMapGeometry.ts"),
       "utf8",
@@ -1091,8 +1111,8 @@ describe("M12a historical reference snapshots", () => {
       join(ROOT, "packages/app/src/components/WorldMap.tsx"),
       "utf8",
     );
-    expect(geometrySource).not.toMatch(/SimulationRegion|RegionSnapshot/iu);
-    expect(renderPlan).not.toMatch(/SimulationRegion|RegionSnapshot/iu);
+    expect(geometrySource).not.toMatch(/SimulationRegion|ProvinceEconomySnapshot/iu);
+    expect(renderPlan).not.toMatch(/SimulationRegion|ProvinceEconomySnapshot/iu);
     expect(worldMap).toContain("PROVINCE_MAP_1900");
     expect(worldMap).toContain("decodeProvinceGeometry");
     expect(worldMap).toContain("strokeOpacity");

@@ -27,7 +27,7 @@ export function fiscalCountry(overrides: Partial<CountryInitialDef> = {}): Count
     tag: "FIS",
     name: "Fiscal Test Country",
     monetary: { kind: "own", currencyId: 0 },
-    regionIds: [0],
+    provinceIds: [0],
     treasuryAccountId: FISCAL_TREASURY_ACCOUNT_ID,
     initialTreasuryCashRUSD: 0,
     fiscal: zeroFiscalPolicy(),
@@ -44,7 +44,7 @@ export interface FiscalScenarioOptions {
 }
 
 /**
- * The M3 market fixture plus one or more countries. Country 0 owns region 0 and
+ * The M3 market fixture plus one or more countries. Country 0 owns province 0 and
  * carries the requested fiscal policy. Pop blocks are the M3 fixture's four
  * blocks, so income tax and welfare have real settled wages and populations.
  */

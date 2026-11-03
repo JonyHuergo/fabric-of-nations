@@ -4,7 +4,7 @@
     "key": "british-empire",
     "customsCountryTag": "GBR",
     "name": "British Empire and Sterling Area",
-    "regionIds": [
+    "territoryIds": [
       1,
       56,
       57,
@@ -87,7 +87,7 @@
     "key": "united-states",
     "customsCountryTag": "USA",
     "name": "United States and Insular Possessions",
-    "regionIds": [
+    "territoryIds": [
       0,
       150,
       151,
@@ -148,7 +148,7 @@
     "key": "german-empire",
     "customsCountryTag": "DEU",
     "name": "German Empire and Colonial Market",
-    "regionIds": [
+    "territoryIds": [
       2,
       130,
       131,
@@ -212,7 +212,7 @@
     "key": "french-empire",
     "customsCountryTag": "FRA",
     "name": "French Empire and Colonial Union",
-    "regionIds": [
+    "territoryIds": [
       3,
       22,
       121,
@@ -279,7 +279,7 @@
     "key": "russian-empire",
     "customsCountryTag": "RUS",
     "name": "Russian Imperial Market",
-    "regionIds": [
+    "territoryIds": [
       4,
       160,
       163,
@@ -339,7 +339,7 @@
     "key": "iberian-empire",
     "customsCountryTag": "ESP",
     "name": "Iberian and Colonial Market",
-    "regionIds": [
+    "territoryIds": [
       7,
       8,
       24,
@@ -405,7 +405,7 @@
     "key": "dutch-empire",
     "customsCountryTag": "NLD",
     "name": "Dutch Empire Market",
-    "regionIds": [
+    "territoryIds": [
       9,
       145,
       146,
@@ -465,7 +465,7 @@
     "key": "belgian-congo",
     "customsCountryTag": "BEL",
     "name": "Belgian and Congo Market",
-    "regionIds": [
+    "territoryIds": [
       10,
       137
     ],
@@ -523,7 +523,7 @@
     "key": "alpine",
     "customsCountryTag": "CHE",
     "name": "Alpine Customs Union",
-    "regionIds": [
+    "territoryIds": [
       11,
       21,
       25
@@ -582,7 +582,7 @@
     "key": "northern-european",
     "customsCountryTag": "SWE",
     "name": "Northern European Market",
-    "regionIds": [
+    "territoryIds": [
       12,
       13,
       14,
@@ -645,7 +645,7 @@
     "key": "mediterranean",
     "customsCountryTag": "ITA",
     "name": "Mediterranean and Colonial Market",
-    "regionIds": [
+    "territoryIds": [
       6,
       15,
       16,
@@ -710,7 +710,7 @@
     "key": "ottoman-egyptian",
     "customsCountryTag": "OTT",
     "name": "Ottoman-Egyptian Market",
-    "regionIds": [
+    "territoryIds": [
       20,
       65,
       66,
@@ -765,7 +765,7 @@
     "key": "japanese-empire",
     "customsCountryTag": "JPN",
     "name": "Japanese Empire Market",
-    "regionIds": [
+    "territoryIds": [
       5,
       161
     ],
@@ -823,7 +823,7 @@
     "key": "east-asian",
     "customsCountryTag": "CHN",
     "name": "East Asian Treaty Port Market",
-    "regionIds": [
+    "territoryIds": [
       26,
       27,
       31,
@@ -878,7 +878,7 @@
     "key": "persian-gulf",
     "customsCountryTag": "PER",
     "name": "Persian Gulf and Himalayan Market",
-    "regionIds": [
+    "territoryIds": [
       28,
       29,
       30,
@@ -933,7 +933,7 @@
     "key": "african-independent",
     "customsCountryTag": "ETH",
     "name": "African Independent States Trade Area",
-    "regionIds": [
+    "territoryIds": [
       33,
       34,
       35,
@@ -990,7 +990,7 @@
     "key": "southern-african",
     "customsCountryTag": "ZAR",
     "name": "Southern African Market",
-    "regionIds": [
+    "territoryIds": [
       36,
       37
     ],
@@ -1043,7 +1043,7 @@
     "key": "latin-america",
     "customsCountryTag": "ARG",
     "name": "Latin American Trade Area",
-    "regionIds": [
+    "territoryIds": [
       38,
       39,
       40,
@@ -1118,7 +1118,7 @@
     "key": "austro-hungarian",
     "customsCountryTag": "AUT",
     "name": "Austro-Hungarian Customs Union",
-    "regionIds": [
+    "territoryIds": [
       60
     ],
     "priceBasis": "base-1900",
@@ -1175,7 +1175,7 @@
     "key": "pacific",
     "customsCountryTag": "TON",
     "name": "Pacific Island Trade",
-    "regionIds": [
+    "territoryIds": [
       61
     ],
     "priceBasis": "base-1900",

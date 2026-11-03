@@ -126,7 +126,7 @@ export function CountryScreen({
 
       <Section folded
         title="Market and customs"
-        subtitle="Market membership is an economic relationship, not a sovereignty claim. A dependent territory keeps its own region and market."
+        subtitle="Market membership is an economic relationship, not a sovereignty claim. A dependent territory keeps its own province and market."
       >
         {markets.length === 0 ? (
           <Text style={styles.empty}>No market is recorded for this country.</Text>
@@ -142,7 +142,7 @@ export function CountryScreen({
                       ? "Shared multi-country market"
                       : "National market"}{" "}
                   · {market.memberCountryIds.length} member countries ·{" "}
-                  {market.regionIds.length} regions
+                  {market.provinceIds.length} provinces
                 </Text>
                 <Text style={styles.marketMeta}>
                   Customs administration:{" "}

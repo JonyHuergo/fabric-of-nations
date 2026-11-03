@@ -34,7 +34,7 @@ const source = `/**
  */
 import type { EconomyScenarioDef } from "@century/sim";
 
-export const WORLD_SCENARIO = (${JSON.stringify(scenario, null, 2)}) as EconomyScenarioDef;
+export const WORLD_SCENARIO = (${JSON.stringify(scenario)}) as EconomyScenarioDef;
 `;
 
 if (checkOnly) {

@@ -34,7 +34,7 @@ export type PlayerActionRequest =
     }
   | {
       readonly kind: "start-construction";
-      readonly regionId: number;
+      readonly provinceId: number;
       readonly definitionId: number;
     }
   | { readonly kind: "cancel-construction"; readonly projectId: number }
@@ -80,11 +80,11 @@ export type PlayerActionRequest =
   | { readonly kind: "accept-peace"; readonly warId: number; readonly offerId: number }
   | {
       readonly kind: "recruit-army";
-      readonly regionId: number;
+      readonly provinceId: number;
       readonly personnel: number;
       readonly equipmentUnits?: number;
     }
-  | { readonly kind: "deploy-army"; readonly armyId: number; readonly targetRegionId: number };
+  | { readonly kind: "deploy-army"; readonly armyId: number; readonly targetProvinceId: number };
 
 export interface PlayerActionRecord {
   readonly actionId: string;
@@ -134,7 +134,7 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
     case "set-debt-policy":
       return `ceiling ${action.maxOutstandingPrincipalRUSD.toFixed(2)} RUSD, refinance on maturity ${action.refinanceOnMaturity ? "on" : "off"}`;
     case "start-construction":
-      return `start construction type ${String(action.definitionId)} in region ${String(action.regionId)}`;
+      return `start construction type ${String(action.definitionId)} in province ${String(action.provinceId)}`;
     case "cancel-construction":
       return `cancel construction project ${String(action.projectId)}`;
     case "set-construction-paused":
@@ -178,9 +178,9 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
     case "accept-peace":
       return `accept peace offer ${action.offerId} in war ${action.warId}`;
     case "recruit-army":
-      return `recruit ${action.personnel} soldiers in region ${action.regionId}`;
+      return `recruit ${action.personnel} soldiers in province ${action.provinceId}`;
     case "deploy-army":
-      return `deploy army ${action.armyId} to region ${action.targetRegionId}`;
+      return `deploy army ${action.armyId} to province ${action.targetProvinceId}`;
     case "set-monetary-policy":
       return `${action.regime} monetary policy, parity ${
         action.parityRusdPerUnit === null ? "unchanged" : action.parityRusdPerUnit.toFixed(6)

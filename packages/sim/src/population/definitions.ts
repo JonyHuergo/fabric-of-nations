@@ -247,8 +247,8 @@ export function assertValidPopulationInputs(
   if (world.scenarioId !== definitions.scenarioId) {
     throw new RangeError("population definitions scenarioId does not match world.scenarioId");
   }
-  if (world.regions.length !== 1) {
-    throw new RangeError("M2 needs fixture supports exactly one region");
+  if (world.provinceEconomies.length !== 1) {
+    throw new RangeError("M2 needs fixture supports exactly one province");
   }
 
   const neededGoods = new Set<string>();

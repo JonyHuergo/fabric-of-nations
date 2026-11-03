@@ -5,7 +5,7 @@
  * the tick driver, versioned serialization, and the test state digest. M2.1 adds
  * single-year sex-separated population blocks, exact annual ageing, age-specific
  * fertility, sex-specific mortality, needs, wealth, and militancy in a
- * single-region fixture. M3a adds validated economy definitions, buildings,
+ * single-province fixture. M3a adds validated economy definitions, buildings,
  * employment assignments, inventory lots, markets, a minimal cash ledger, and
  * schema-5 serialization. M3b adds deterministic workforce eligibility,
  * assignment, retention, and scheduling. M3c adds an explicit physical
@@ -33,3 +33,5 @@ export * from "./economy/index.js";
 export * from "./tick.js";
 export * from "./serialization.js";
 export * from "./stateHash.js";
+export * from "./integrity.js";
+export * from "./rollback.js";

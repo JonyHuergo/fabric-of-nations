@@ -69,163 +69,507 @@ export const WORLD_CATALOG = ({
   "markets": [
     {
       "id": 0,
-      "key": "british-empire",
-      "name": "British Empire and Sterling Area",
+      "key": "customs-usa",
+      "name": "United States of America and dependencies",
       "kind": "imperial",
-      "customsTag": "GBR",
-      "description": "The United Kingdom, the self-governing dominions and the crown colonies, treated as one preferential customs area."
+      "customsTag": "USA",
+      "description": "United States of America with its colonies and protectorates in one customs territory."
     },
     {
       "id": 1,
-      "key": "united-states",
-      "name": "United States and Insular Possessions",
+      "key": "customs-gbr",
+      "name": "United Kingdom of Great Britain and Ireland and dependencies",
       "kind": "imperial",
-      "customsTag": "USA",
-      "description": "The United States and its Caribbean and Pacific dependencies."
+      "customsTag": "GBR",
+      "description": "United Kingdom of Great Britain and Ireland with its colonies and protectorates in one customs territory."
     },
     {
       "id": 2,
-      "key": "german-empire",
-      "name": "German Empire and Colonial Market",
-      "kind": "imperial",
+      "key": "customs-deu",
+      "name": "German Empire customs union",
+      "kind": "shared",
       "customsTag": "DEU",
-      "description": "The German customs area and the African and Pacific colonies."
+      "description": "Customs union: Luxembourg in the German Zollverein, 1842-1918."
     },
     {
       "id": 3,
-      "key": "french-empire",
-      "name": "French Empire and Colonial Union",
-      "kind": "imperial",
+      "key": "customs-fra",
+      "name": "French Republic customs union",
+      "kind": "shared",
       "customsTag": "FRA",
-      "description": "Metropolitan France, Algeria, the African federations and Indochina."
+      "description": "Customs union: Franco-Monegasque customs union of 1865."
     },
     {
       "id": 4,
-      "key": "russian-empire",
-      "name": "Russian Imperial Market",
+      "key": "customs-rus",
+      "name": "Russian Empire and dependencies",
       "kind": "imperial",
       "customsTag": "RUS",
-      "description": "The Russian Empire and the autonomous Grand Duchy of Finland."
+      "description": "Russian Empire with its colonies and protectorates in one customs territory."
     },
     {
       "id": 5,
-      "key": "iberian-empire",
-      "name": "Iberian and Colonial Market",
-      "kind": "shared",
-      "customsTag": "ESP",
-      "description": "Spain, Portugal, Andorra and their African and Asian possessions, cleared together for this model."
+      "key": "customs-jpn",
+      "name": "Empire of Japan and dependencies",
+      "kind": "imperial",
+      "customsTag": "JPN",
+      "description": "Empire of Japan with its colonies and protectorates in one customs territory."
     },
     {
       "id": 6,
-      "key": "dutch-empire",
-      "name": "Dutch Empire Market",
-      "kind": "imperial",
-      "customsTag": "NLD",
-      "description": "The Netherlands and the East Indian, Surinamese and Caribbean possessions."
+      "key": "customs-ita",
+      "name": "Kingdom of Italy customs union",
+      "kind": "shared",
+      "customsTag": "ITA",
+      "description": "Customs union: Italo-Sammarinese convention of 1862 placing San Marino in the Italian customs area."
     },
     {
       "id": 7,
-      "key": "belgian-congo",
-      "name": "Belgian and Congo Market",
+      "key": "customs-esp",
+      "name": "Kingdom of Spain and dependencies",
       "kind": "imperial",
-      "customsTag": "BEL",
-      "description": "Belgium and the Congo Free State, linked by the personal union of the crown."
+      "customsTag": "ESP",
+      "description": "Kingdom of Spain with its colonies and protectorates in one customs territory."
     },
     {
       "id": 8,
-      "key": "alpine",
-      "name": "Alpine Customs Union",
-      "kind": "shared",
-      "customsTag": "CHE",
-      "description": "Switzerland, Luxembourg and Liechtenstein; a documented simplification of their customs arrangements."
+      "key": "customs-prt",
+      "name": "Kingdom of Portugal and dependencies",
+      "kind": "imperial",
+      "customsTag": "PRT",
+      "description": "Kingdom of Portugal with its colonies and protectorates in one customs territory."
     },
     {
       "id": 9,
-      "key": "northern-european",
-      "name": "Northern European Market",
-      "kind": "shared",
-      "customsTag": "SWE",
-      "description": "Sweden, Norway and the Danish realm, including Iceland, Greenland, the Faroes and the Danish West Indies."
+      "key": "customs-nld",
+      "name": "Kingdom of the Netherlands and dependencies",
+      "kind": "imperial",
+      "customsTag": "NLD",
+      "description": "Kingdom of the Netherlands with its colonies and protectorates in one customs territory."
     },
     {
       "id": 10,
-      "key": "mediterranean",
-      "name": "Mediterranean and Colonial Market",
-      "kind": "shared",
-      "customsTag": "ITA",
-      "description": "Italy, the Balkan states and the Italian colonies, cleared as one Mediterranean trade area."
+      "key": "customs-bel",
+      "name": "Kingdom of Belgium and dependencies",
+      "kind": "imperial",
+      "customsTag": "BEL",
+      "description": "Kingdom of Belgium with its colonies and protectorates in one customs territory."
     },
     {
       "id": 11,
-      "key": "ottoman-egyptian",
-      "name": "Ottoman-Egyptian Market",
-      "kind": "imperial",
-      "customsTag": "OTT",
-      "description": "The Ottoman Empire and the autonomous province of Egypt."
+      "key": "customs-che",
+      "name": "Swiss Confederation",
+      "kind": "national",
+      "customsTag": "CHE",
+      "description": "Swiss Confederation administers its own customs territory."
     },
     {
       "id": 12,
-      "key": "japanese-empire",
-      "name": "Japanese Empire Market",
-      "kind": "imperial",
-      "customsTag": "JPN",
-      "description": "Japan and its Formosan colony."
+      "key": "customs-swe",
+      "name": "Kingdom of Sweden",
+      "kind": "national",
+      "customsTag": "SWE",
+      "description": "Kingdom of Sweden administers its own customs territory."
     },
     {
       "id": 13,
-      "key": "east-asian",
-      "name": "East Asian Treaty Port Market",
-      "kind": "shared",
-      "customsTag": "CHN",
-      "description": "China, Korea and Siam, grouped as the East Asian trade area of the treaty ports."
+      "key": "customs-nor",
+      "name": "Kingdom of Norway",
+      "kind": "national",
+      "customsTag": "NOR",
+      "description": "Kingdom of Norway administers its own customs territory. Separate tariff from Sweden after the inter-kingdom trade law (mellomriksloven) lapsed in 1897, despite the personal union."
     },
     {
       "id": 14,
-      "key": "persian-gulf",
-      "name": "Persian Gulf and Himalayan Market",
-      "kind": "shared",
-      "customsTag": "PER",
-      "description": "Persia, Afghanistan, Oman and Nepal; a thin shared market of independent states outside the colonial empires."
+      "key": "customs-dnk",
+      "name": "Kingdom of Denmark and dependencies",
+      "kind": "imperial",
+      "customsTag": "DNK",
+      "description": "Kingdom of Denmark with its colonies and protectorates in one customs territory."
     },
     {
       "id": 15,
-      "key": "african-independent",
-      "name": "African Independent States Trade Area",
-      "kind": "shared",
-      "customsTag": "ETH",
-      "description": "Ethiopia, Liberia and Morocco, grouped as a shared clearing area."
+      "key": "customs-grc",
+      "name": "Kingdom of Greece",
+      "kind": "national",
+      "customsTag": "GRC",
+      "description": "Kingdom of Greece administers its own customs territory."
     },
     {
       "id": 16,
-      "key": "southern-african",
-      "name": "Southern African Market",
-      "kind": "shared",
-      "customsTag": "ZAR",
-      "description": "The Transvaal and the Orange Free State at the outbreak of the South African War."
+      "key": "customs-srb",
+      "name": "Kingdom of Serbia",
+      "kind": "national",
+      "customsTag": "SRB",
+      "description": "Kingdom of Serbia administers its own customs territory."
     },
     {
       "id": 17,
-      "key": "latin-america",
-      "name": "Latin American Trade Area",
-      "kind": "shared",
-      "customsTag": "ARG",
-      "description": "The independent Latin American republics, grouped as one shared trade area; national tariffs are not modelled."
+      "key": "customs-mnt",
+      "name": "Principality of Montenegro",
+      "kind": "national",
+      "customsTag": "MNT",
+      "description": "Principality of Montenegro administers its own customs territory."
     },
     {
       "id": 18,
-      "key": "austro-hungarian",
-      "name": "Austro-Hungarian Customs Union",
+      "key": "customs-rom",
+      "name": "Kingdom of Romania",
       "kind": "national",
-      "customsTag": "AUT",
-      "description": "The common Austro-Hungarian customs area linking the Austrian and Hungarian halves and jointly administered Bosnia and Herzegovina."
+      "customsTag": "ROM",
+      "description": "Kingdom of Romania administers its own customs territory."
     },
     {
       "id": 19,
-      "key": "pacific",
-      "name": "Pacific Island Trade",
+      "key": "customs-bgr",
+      "name": "Principality of Bulgaria",
+      "kind": "national",
+      "customsTag": "BGR",
+      "description": "Principality of Bulgaria administers its own customs territory. Autonomous vassal with its own customs administration; duty levels limited by the 1878 Treaty of Berlin."
+    },
+    {
+      "id": 20,
+      "key": "customs-ott",
+      "name": "Ottoman Empire and dependencies",
+      "kind": "imperial",
+      "customsTag": "OTT",
+      "description": "Ottoman Empire with its colonies and protectorates in one customs territory."
+    },
+    {
+      "id": 21,
+      "key": "customs-and",
+      "name": "Co-Principality of Andorra",
+      "kind": "national",
+      "customsTag": "AND",
+      "description": "Co-Principality of Andorra administers its own customs territory."
+    },
+    {
+      "id": 22,
+      "key": "customs-chn",
+      "name": "Qing Empire and dependencies",
+      "kind": "imperial",
+      "customsTag": "CHN",
+      "description": "Qing Empire with its colonies and protectorates in one customs territory."
+    },
+    {
+      "id": 23,
+      "key": "customs-kor",
+      "name": "Korean Empire",
+      "kind": "national",
+      "customsTag": "KOR",
+      "description": "Korean Empire administers its own customs territory."
+    },
+    {
+      "id": 24,
+      "key": "customs-per",
+      "name": "Sublime State of Persia",
+      "kind": "national",
+      "customsTag": "PER",
+      "description": "Sublime State of Persia administers its own customs territory."
+    },
+    {
+      "id": 25,
+      "key": "customs-afg",
+      "name": "Emirate of Afghanistan",
+      "kind": "national",
+      "customsTag": "AFG",
+      "description": "Emirate of Afghanistan administers its own customs territory."
+    },
+    {
+      "id": 26,
+      "key": "customs-npl",
+      "name": "Kingdom of Nepal",
+      "kind": "national",
+      "customsTag": "NPL",
+      "description": "Kingdom of Nepal administers its own customs territory."
+    },
+    {
+      "id": 27,
+      "key": "customs-tha",
+      "name": "Kingdom of Siam",
+      "kind": "national",
+      "customsTag": "THA",
+      "description": "Kingdom of Siam administers its own customs territory."
+    },
+    {
+      "id": 28,
+      "key": "customs-omn",
+      "name": "Sultanate of Muscat and Oman",
+      "kind": "national",
+      "customsTag": "OMN",
+      "description": "Sultanate of Muscat and Oman administers its own customs territory."
+    },
+    {
+      "id": 29,
+      "key": "customs-eth",
+      "name": "Ethiopian Empire",
+      "kind": "national",
+      "customsTag": "ETH",
+      "description": "Ethiopian Empire administers its own customs territory."
+    },
+    {
+      "id": 30,
+      "key": "customs-lbr",
+      "name": "Republic of Liberia",
+      "kind": "national",
+      "customsTag": "LBR",
+      "description": "Republic of Liberia administers its own customs territory."
+    },
+    {
+      "id": 31,
+      "key": "customs-mar",
+      "name": "Sultanate of Morocco",
+      "kind": "national",
+      "customsTag": "MAR",
+      "description": "Sultanate of Morocco administers its own customs territory."
+    },
+    {
+      "id": 32,
+      "key": "customs-zar",
+      "name": "South African Republic (Transvaal)",
+      "kind": "national",
+      "customsTag": "ZAR",
+      "description": "South African Republic (Transvaal) administers its own customs territory."
+    },
+    {
+      "id": 33,
+      "key": "customs-orf",
+      "name": "Orange Free State",
+      "kind": "national",
+      "customsTag": "ORF",
+      "description": "Orange Free State administers its own customs territory."
+    },
+    {
+      "id": 34,
+      "key": "customs-mex",
+      "name": "United Mexican States",
+      "kind": "national",
+      "customsTag": "MEX",
+      "description": "United Mexican States administers its own customs territory."
+    },
+    {
+      "id": 35,
+      "key": "customs-gua",
+      "name": "Republic of Guatemala",
+      "kind": "national",
+      "customsTag": "GUA",
+      "description": "Republic of Guatemala administers its own customs territory."
+    },
+    {
+      "id": 36,
+      "key": "customs-hon",
+      "name": "Republic of Honduras",
+      "kind": "national",
+      "customsTag": "HON",
+      "description": "Republic of Honduras administers its own customs territory."
+    },
+    {
+      "id": 37,
+      "key": "customs-sal",
+      "name": "Republic of El Salvador",
+      "kind": "national",
+      "customsTag": "SAL",
+      "description": "Republic of El Salvador administers its own customs territory."
+    },
+    {
+      "id": 38,
+      "key": "customs-nic",
+      "name": "Republic of Nicaragua",
+      "kind": "national",
+      "customsTag": "NIC",
+      "description": "Republic of Nicaragua administers its own customs territory."
+    },
+    {
+      "id": 39,
+      "key": "customs-cos",
+      "name": "Republic of Costa Rica",
+      "kind": "national",
+      "customsTag": "COS",
+      "description": "Republic of Costa Rica administers its own customs territory."
+    },
+    {
+      "id": 40,
+      "key": "customs-col",
+      "name": "Republic of Colombia",
+      "kind": "national",
+      "customsTag": "COL",
+      "description": "Republic of Colombia administers its own customs territory."
+    },
+    {
+      "id": 41,
+      "key": "customs-ven",
+      "name": "United States of Venezuela",
+      "kind": "national",
+      "customsTag": "VEN",
+      "description": "United States of Venezuela administers its own customs territory."
+    },
+    {
+      "id": 42,
+      "key": "customs-ecu",
+      "name": "Republic of Ecuador",
+      "kind": "national",
+      "customsTag": "ECU",
+      "description": "Republic of Ecuador administers its own customs territory."
+    },
+    {
+      "id": 43,
+      "key": "customs-pru",
+      "name": "Republic of Peru",
+      "kind": "national",
+      "customsTag": "PRU",
+      "description": "Republic of Peru administers its own customs territory."
+    },
+    {
+      "id": 44,
+      "key": "customs-bol",
+      "name": "Republic of Bolivia",
+      "kind": "national",
+      "customsTag": "BOL",
+      "description": "Republic of Bolivia administers its own customs territory."
+    },
+    {
+      "id": 45,
+      "key": "customs-chl",
+      "name": "Republic of Chile",
+      "kind": "national",
+      "customsTag": "CHL",
+      "description": "Republic of Chile administers its own customs territory."
+    },
+    {
+      "id": 46,
+      "key": "customs-arg",
+      "name": "Argentine Republic",
+      "kind": "national",
+      "customsTag": "ARG",
+      "description": "Argentine Republic administers its own customs territory."
+    },
+    {
+      "id": 47,
+      "key": "customs-ury",
+      "name": "Oriental Republic of Uruguay",
+      "kind": "national",
+      "customsTag": "URY",
+      "description": "Oriental Republic of Uruguay administers its own customs territory."
+    },
+    {
+      "id": 48,
+      "key": "customs-pry",
+      "name": "Republic of Paraguay",
+      "kind": "national",
+      "customsTag": "PRY",
+      "description": "Republic of Paraguay administers its own customs territory."
+    },
+    {
+      "id": 49,
+      "key": "customs-bra",
+      "name": "Republic of the United States of Brazil",
+      "kind": "national",
+      "customsTag": "BRA",
+      "description": "Republic of the United States of Brazil administers its own customs territory."
+    },
+    {
+      "id": 50,
+      "key": "customs-hti",
+      "name": "Republic of Haiti",
+      "kind": "national",
+      "customsTag": "HTI",
+      "description": "Republic of Haiti administers its own customs territory."
+    },
+    {
+      "id": 51,
+      "key": "customs-dom",
+      "name": "Dominican Republic",
+      "kind": "national",
+      "customsTag": "DOM",
+      "description": "Dominican Republic administers its own customs territory."
+    },
+    {
+      "id": 52,
+      "key": "customs-can",
+      "name": "Dominion of Canada",
+      "kind": "national",
+      "customsTag": "CAN",
+      "description": "Dominion of Canada administers its own customs territory. Dominion tariff (National Policy, 1879)."
+    },
+    {
+      "id": 53,
+      "key": "customs-aus",
+      "name": "Australian colonies",
+      "kind": "national",
+      "customsTag": "AUS",
+      "description": "Australian colonies administers its own customs territory. The six colonies kept separate tariffs until the Commonwealth tariff of 1901; the catalog models one Australian country, so one territory."
+    },
+    {
+      "id": 54,
+      "key": "customs-nzl",
+      "name": "Colony of New Zealand",
+      "kind": "national",
+      "customsTag": "NZL",
+      "description": "Colony of New Zealand administers its own customs territory. Own colonial tariff."
+    },
+    {
+      "id": 55,
+      "key": "customs-cub",
+      "name": "Republic of Cuba under United States occupation",
+      "kind": "national",
+      "customsTag": "CUB",
+      "description": "Republic of Cuba under United States occupation administers its own customs territory. Separate Cuban customs tariff under the 1899-1902 United States military government."
+    },
+    {
+      "id": 56,
+      "key": "customs-aut",
+      "name": "Austro-Hungarian Monarchy customs union",
+      "kind": "shared",
+      "customsTag": "AUT",
+      "description": "Customs union: Austro-Liechtenstein customs treaty of 1852, in force until 1919."
+    },
+    {
+      "id": 57,
+      "key": "customs-ton",
+      "name": "Kingdom of Tonga",
       "kind": "national",
       "customsTag": "TON",
-      "description": "The independent Kingdom of Tonga's small open economy, treated as its own market in 1900."
+      "description": "Kingdom of Tonga administers its own customs territory."
+    },
+    {
+      "id": 58,
+      "key": "customs-sok",
+      "name": "Sokoto Caliphate",
+      "kind": "national",
+      "customsTag": "SOK",
+      "description": "Sokoto Caliphate administers its own customs territory."
+    },
+    {
+      "id": 59,
+      "key": "customs-wad",
+      "name": "Sultanate of Wadai",
+      "kind": "national",
+      "customsTag": "WAD",
+      "description": "Sultanate of Wadai administers its own customs territory."
+    },
+    {
+      "id": 60,
+      "key": "customs-dar",
+      "name": "Sultanate of Darfur",
+      "kind": "national",
+      "customsTag": "DAR",
+      "description": "Sultanate of Darfur administers its own customs territory."
+    },
+    {
+      "id": 61,
+      "key": "customs-shm",
+      "name": "Emirate of Jabal Shammar (Ha'il)",
+      "kind": "national",
+      "customsTag": "SHM",
+      "description": "Emirate of Jabal Shammar (Ha'il) administers its own customs territory."
+    },
+    {
+      "id": 62,
+      "key": "customs-crt",
+      "name": "Cretan State",
+      "kind": "national",
+      "customsTag": "CRT",
+      "description": "Cretan State administers its own customs territory. Autonomous Cretan State from 1898 with its own customs revenue under the High Commissioner."
     }
   ],
   "entries": [
@@ -245,7 +589,7 @@ export const WORLD_CATALOG = ({
         "lon": -77.04
       },
       "population1900": 76094000,
-      "market": "united-states",
+      "market": "customs-usa",
       "description": "Federal republic and the largest industrial economy in the Americas.",
       "confidence": "high",
       "notes": "Includes Alaska and the annexed Hawaiian Islands.",
@@ -269,7 +613,7 @@ export const WORLD_CATALOG = ({
         "lon": -0.13
       },
       "population1900": 41155000,
-      "market": "british-empire",
+      "market": "customs-gbr",
       "description": "Parliamentary monarchy ruling the largest empire in the world.",
       "confidence": "high",
       "notes": "Ireland is part of the United Kingdom in 1900.",
@@ -297,7 +641,7 @@ export const WORLD_CATALOG = ({
         "lon": 13.4
       },
       "population1900": 56367000,
-      "market": "german-empire",
+      "market": "customs-deu",
       "description": "Federal empire under the Hohenzollern crown; Europe's fastest-growing industrial power.",
       "confidence": "high",
       "notes": "Alsace-Lorraine is administered within the Empire but not separable at this map resolution.",
@@ -321,7 +665,7 @@ export const WORLD_CATALOG = ({
         "lon": 2.35
       },
       "population1900": 38900000,
-      "market": "french-empire",
+      "market": "customs-fra",
       "description": "Third Republic with a vast colonial empire in Africa and Indochina.",
       "confidence": "medium",
       "notes": "Metropolitan France excludes Algeria, which is administered separately.",
@@ -345,7 +689,7 @@ export const WORLD_CATALOG = ({
         "lon": 30.34
       },
       "population1900": 133300000,
-      "market": "russian-empire",
+      "market": "customs-rus",
       "description": "Autocracy spanning eastern Europe and northern Asia.",
       "confidence": "medium",
       "notes": "Congress Poland is assigned to the Empire; the German and Austrian partitions of modern Poland are not separable at this resolution. Finland is a separate autonomous province.",
@@ -384,7 +728,7 @@ export const WORLD_CATALOG = ({
         "lon": 139.69
       },
       "population1900": 44103000,
-      "market": "japanese-empire",
+      "market": "customs-jpn",
       "description": "Constitutional monarchy completing its Meiji industrial transformation.",
       "confidence": "medium",
       "notes": "Taiwan (Formosa) is a separate colonial territory of the Empire.",
@@ -408,7 +752,7 @@ export const WORLD_CATALOG = ({
         "lon": 12.5
       },
       "population1900": 32475000,
-      "market": "mediterranean",
+      "market": "customs-ita",
       "description": "Parliamentary monarchy with a young African colonial empire.",
       "confidence": "high",
       "notes": "Vatican City did not exist as a sovereign state in 1900; Rome is the Italian capital.",
@@ -433,7 +777,7 @@ export const WORLD_CATALOG = ({
         "lon": -3.7
       },
       "population1900": 18600000,
-      "market": "iberian-empire",
+      "market": "customs-esp",
       "description": "Restoration monarchy recovering from the loss of Cuba and the Philippines in 1898.",
       "confidence": "medium",
       "notes": "",
@@ -457,7 +801,7 @@ export const WORLD_CATALOG = ({
         "lon": -9.14
       },
       "population1900": 5400000,
-      "market": "iberian-empire",
+      "market": "customs-prt",
       "description": "Constitutional monarchy with African and Asian colonies.",
       "confidence": "medium",
       "notes": "",
@@ -481,7 +825,7 @@ export const WORLD_CATALOG = ({
         "lon": 4.9
       },
       "population1900": 5100000,
-      "market": "dutch-empire",
+      "market": "customs-nld",
       "description": "Constitutional monarchy whose East Indies colony dominates its imperial economy.",
       "confidence": "high",
       "notes": "",
@@ -505,7 +849,7 @@ export const WORLD_CATALOG = ({
         "lon": 4.35
       },
       "population1900": 6700000,
-      "market": "belgian-congo",
+      "market": "customs-bel",
       "description": "Constitutional monarchy and early industrialiser; the Congo Free State is in personal union with its king.",
       "confidence": "high",
       "notes": "",
@@ -529,7 +873,7 @@ export const WORLD_CATALOG = ({
         "lon": 7.45
       },
       "population1900": 3300000,
-      "market": "alpine",
+      "market": "customs-che",
       "description": "Federal republic of cantons with a customs union in the Alpine region.",
       "confidence": "high",
       "notes": "",
@@ -553,7 +897,7 @@ export const WORLD_CATALOG = ({
         "lon": 18.07
       },
       "population1900": 5100000,
-      "market": "northern-european",
+      "market": "customs-swe",
       "description": "Constitutional monarchy in personal union with Norway.",
       "confidence": "high",
       "notes": "",
@@ -577,7 +921,7 @@ export const WORLD_CATALOG = ({
         "lon": 10.75
       },
       "population1900": 2200000,
-      "market": "northern-european",
+      "market": "customs-nor",
       "description": "Separate kingdom, constitution and government under the Swedish crown.",
       "confidence": "high",
       "notes": "Personal union with Sweden until 1905; selectable as its own polity.",
@@ -601,7 +945,7 @@ export const WORLD_CATALOG = ({
         "lon": 12.57
       },
       "population1900": 2400000,
-      "market": "northern-european",
+      "market": "customs-dnk",
       "description": "Constitutional monarchy with Iceland, Greenland, the Faroes and the Danish West Indies.",
       "confidence": "high",
       "notes": "",
@@ -625,7 +969,7 @@ export const WORLD_CATALOG = ({
         "lon": 23.73
       },
       "population1900": 2400000,
-      "market": "mediterranean",
+      "market": "customs-grc",
       "description": "Constitutional monarchy expanding toward its 1912 borders.",
       "confidence": "medium",
       "notes": "Crete is autonomous under Ottoman suzerainty but not separable at this map resolution.",
@@ -649,7 +993,7 @@ export const WORLD_CATALOG = ({
         "lon": 20.46
       },
       "population1900": 2500000,
-      "market": "mediterranean",
+      "market": "customs-srb",
       "description": "Independent Balkan kingdom pressing for South Slav unification.",
       "confidence": "medium",
       "notes": "",
@@ -673,7 +1017,7 @@ export const WORLD_CATALOG = ({
         "lon": 18.92
       },
       "population1900": 300000,
-      "market": "mediterranean",
+      "market": "customs-mnt",
       "description": "Small independent Balkan principality.",
       "confidence": "medium",
       "notes": "",
@@ -697,7 +1041,7 @@ export const WORLD_CATALOG = ({
         "lon": 26.1
       },
       "population1900": 6000000,
-      "market": "mediterranean",
+      "market": "customs-rom",
       "description": "Independent kingdom with a large peasant population and growing oil industry.",
       "confidence": "medium",
       "notes": "",
@@ -721,7 +1065,7 @@ export const WORLD_CATALOG = ({
         "lon": 23.32
       },
       "population1900": 3700000,
-      "market": "mediterranean",
+      "market": "customs-bgr",
       "description": "Self-governing principality tributary to the Ottoman Empire.",
       "confidence": "medium",
       "notes": "Autonomous under Ottoman suzerainty; selectable as a separate polity.",
@@ -745,7 +1089,7 @@ export const WORLD_CATALOG = ({
         "lon": 28.98
       },
       "population1900": 24000000,
-      "market": "ottoman-egyptian",
+      "market": "customs-ott",
       "description": "Multi-ethnic empire across Anatolia, the Arab provinces and the Balkans.",
       "confidence": "low",
       "notes": "Egypt is an autonomous province under British occupation. The Nejd emirate and British Aden are not separable at this resolution.",
@@ -781,7 +1125,7 @@ export const WORLD_CATALOG = ({
         "lon": 6.13
       },
       "population1900": 240000,
-      "market": "alpine",
+      "market": "customs-deu",
       "description": "Neutral grand duchy in a customs union with its neighbours.",
       "confidence": "high",
       "notes": "",
@@ -805,7 +1149,7 @@ export const WORLD_CATALOG = ({
         "lon": 7.42
       },
       "population1900": 15000,
-      "market": "french-empire",
+      "market": "customs-fra",
       "description": "Microstate on the French Riviera in customs union with France.",
       "confidence": "medium",
       "notes": "",
@@ -829,7 +1173,7 @@ export const WORLD_CATALOG = ({
         "lon": 12.45
       },
       "population1900": 11000,
-      "market": "mediterranean",
+      "market": "customs-ita",
       "description": "Ancient republic enclaved within Italy.",
       "confidence": "medium",
       "notes": "",
@@ -853,7 +1197,7 @@ export const WORLD_CATALOG = ({
         "lon": 1.58
       },
       "population1900": 5000,
-      "market": "iberian-empire",
+      "market": "customs-and",
       "description": "Pyrenean co-principality under French and Spanish episcopal suzerainty.",
       "confidence": "low",
       "notes": "Very small polity; economic values are modelled proportionally.",
@@ -877,7 +1221,7 @@ export const WORLD_CATALOG = ({
         "lon": 9.52
       },
       "population1900": 7500,
-      "market": "alpine",
+      "market": "customs-aut",
       "description": "Small Alpine principality in a customs union with Austria-Hungary.",
       "confidence": "medium",
       "notes": "",
@@ -901,7 +1245,7 @@ export const WORLD_CATALOG = ({
         "lon": 116.4
       },
       "population1900": 400000000,
-      "market": "east-asian",
+      "market": "customs-chn",
       "description": "Qing dynasty empire under foreign pressure after 1895 and the Boxer crisis.",
       "confidence": "low",
       "notes": "Tibet, Xinjiang and Mongolia are administered within the Qing realm and are not separable at this map resolution.",
@@ -926,7 +1270,7 @@ export const WORLD_CATALOG = ({
         "lon": 126.98
       },
       "population1900": 17000000,
-      "market": "east-asian",
+      "market": "customs-kor",
       "description": "Empire proclaimed in 1897, increasingly constrained by Japanese influence.",
       "confidence": "medium",
       "notes": "",
@@ -951,7 +1295,7 @@ export const WORLD_CATALOG = ({
         "lon": 51.39
       },
       "population1900": 9900000,
-      "market": "persian-gulf",
+      "market": "customs-per",
       "description": "Qajar monarchy balancing Russian and British influence.",
       "confidence": "low",
       "notes": "",
@@ -975,7 +1319,7 @@ export const WORLD_CATALOG = ({
         "lon": 69.17
       },
       "population1900": 4500000,
-      "market": "persian-gulf",
+      "market": "customs-afg",
       "description": "Buffer emirate between the Russian and British empires.",
       "confidence": "low",
       "notes": "",
@@ -999,7 +1343,7 @@ export const WORLD_CATALOG = ({
         "lon": 85.32
       },
       "population1900": 5000000,
-      "market": "persian-gulf",
+      "market": "customs-npl",
       "description": "Himalayan kingdom with a British residency but no colonial administration.",
       "confidence": "low",
       "notes": "",
@@ -1023,7 +1367,7 @@ export const WORLD_CATALOG = ({
         "lon": 100.5
       },
       "population1900": 7300000,
-      "market": "east-asian",
+      "market": "customs-tha",
       "description": "Independent Southeast Asian kingdom modernising under royal reform.",
       "confidence": "medium",
       "notes": "",
@@ -1047,7 +1391,7 @@ export const WORLD_CATALOG = ({
         "lon": 58.41
       },
       "population1900": 500000,
-      "market": "persian-gulf",
+      "market": "customs-omn",
       "description": "Independent sultanate on the Arabian Sea.",
       "confidence": "low",
       "notes": "",
@@ -1071,7 +1415,7 @@ export const WORLD_CATALOG = ({
         "lon": 38.74
       },
       "population1900": 11000000,
-      "market": "african-independent",
+      "market": "customs-eth",
       "description": "Ancient empire that preserved independence through the Scramble for Africa.",
       "confidence": "low",
       "notes": "",
@@ -1095,7 +1439,7 @@ export const WORLD_CATALOG = ({
         "lon": -10.8
       },
       "population1900": 600000,
-      "market": "african-independent",
+      "market": "customs-lbr",
       "description": "Independent West African republic founded by freed African Americans.",
       "confidence": "low",
       "notes": "",
@@ -1119,7 +1463,7 @@ export const WORLD_CATALOG = ({
         "lon": -5
       },
       "population1900": 5000000,
-      "market": "african-independent",
+      "market": "customs-mar",
       "description": "Independent North African sultanate, still outside European colonial control in 1900.",
       "confidence": "low",
       "notes": "Spanish Sahara is a separate Spanish colonial territory.",
@@ -1143,7 +1487,7 @@ export const WORLD_CATALOG = ({
         "lon": 28.19
       },
       "population1900": 1200000,
-      "market": "southern-african",
+      "market": "customs-zar",
       "description": "Boer republic at war with the British Empire in January 1900.",
       "confidence": "low",
       "notes": "Province geometry is a modern-administrative approximation of the 1900 republic.",
@@ -1170,7 +1514,7 @@ export const WORLD_CATALOG = ({
         "lon": 26.21
       },
       "population1900": 300000,
-      "market": "southern-african",
+      "market": "customs-orf",
       "description": "Boer republic allied with the Transvaal in the South African War.",
       "confidence": "low",
       "notes": "Province geometry is a modern-administrative approximation of the 1900 republic.",
@@ -1194,7 +1538,7 @@ export const WORLD_CATALOG = ({
         "lon": -99.13
       },
       "population1900": 13600000,
-      "market": "latin-america",
+      "market": "customs-mex",
       "description": "Federal republic under the Porfiriato, open to foreign capital.",
       "confidence": "medium",
       "notes": "",
@@ -1218,7 +1562,7 @@ export const WORLD_CATALOG = ({
         "lon": -90.51
       },
       "population1900": 1400000,
-      "market": "latin-america",
+      "market": "customs-gua",
       "description": "Coffee republic under long-lived Liberal caudillo rule.",
       "confidence": "low",
       "notes": "",
@@ -1242,7 +1586,7 @@ export const WORLD_CATALOG = ({
         "lon": -87.19
       },
       "population1900": 500000,
-      "market": "latin-america",
+      "market": "customs-hon",
       "description": "Banana and mining republic on the Central American isthmus.",
       "confidence": "low",
       "notes": "",
@@ -1266,7 +1610,7 @@ export const WORLD_CATALOG = ({
         "lon": -89.19
       },
       "population1900": 900000,
-      "market": "latin-america",
+      "market": "customs-sal",
       "description": "Coffee-exporting republic with a dense peasant population.",
       "confidence": "low",
       "notes": "",
@@ -1290,7 +1634,7 @@ export const WORLD_CATALOG = ({
         "lon": -86.24
       },
       "population1900": 400000,
-      "market": "latin-america",
+      "market": "customs-nic",
       "description": "Central American republic of lakes and coffee estates.",
       "confidence": "low",
       "notes": "",
@@ -1314,7 +1658,7 @@ export const WORLD_CATALOG = ({
         "lon": -84.08
       },
       "population1900": 300000,
-      "market": "latin-america",
+      "market": "customs-cos",
       "description": "Stable coffee republic with comparatively broad schooling.",
       "confidence": "low",
       "notes": "",
@@ -1338,7 +1682,7 @@ export const WORLD_CATALOG = ({
         "lon": -74.07
       },
       "population1900": 4000000,
-      "market": "latin-america",
+      "market": "customs-col",
       "description": "Republic recovering from the Thousand Days' War; Panama still a province.",
       "confidence": "medium",
       "notes": "",
@@ -1363,7 +1707,7 @@ export const WORLD_CATALOG = ({
         "lon": -66.9
       },
       "population1900": 2400000,
-      "market": "latin-america",
+      "market": "customs-ven",
       "description": "Cacao and coffee republic under the Castro restoration.",
       "confidence": "low",
       "notes": "",
@@ -1387,7 +1731,7 @@ export const WORLD_CATALOG = ({
         "lon": -78.47
       },
       "population1900": 1400000,
-      "market": "latin-america",
+      "market": "customs-ecu",
       "description": "Andean republic of cacao planters and highland peasants.",
       "confidence": "low",
       "notes": "",
@@ -1411,7 +1755,7 @@ export const WORLD_CATALOG = ({
         "lon": -77.04
       },
       "population1900": 3700000,
-      "market": "latin-america",
+      "market": "customs-pru",
       "description": "Andean republic recovering from the War of the Pacific.",
       "confidence": "low",
       "notes": "",
@@ -1435,7 +1779,7 @@ export const WORLD_CATALOG = ({
         "lon": -65.26
       },
       "population1900": 1800000,
-      "market": "latin-america",
+      "market": "customs-bol",
       "description": "Landlocked Andean republic of tin mines and haciendas.",
       "confidence": "low",
       "notes": "",
@@ -1459,7 +1803,7 @@ export const WORLD_CATALOG = ({
         "lon": -70.67
       },
       "population1900": 3000000,
-      "market": "latin-america",
+      "market": "customs-chl",
       "description": "Nitrate-exporting republic with a powerful Congress and navy.",
       "confidence": "medium",
       "notes": "",
@@ -1483,7 +1827,7 @@ export const WORLD_CATALOG = ({
         "lon": -58.38
       },
       "population1900": 4700000,
-      "market": "latin-america",
+      "market": "customs-arg",
       "description": "Export economy of beef, grain and European immigration.",
       "confidence": "medium",
       "notes": "",
@@ -1507,7 +1851,7 @@ export const WORLD_CATALOG = ({
         "lon": -56.16
       },
       "population1900": 900000,
-      "market": "latin-america",
+      "market": "customs-ury",
       "description": "Small pastoral republic with an advanced welfare state for its era.",
       "confidence": "medium",
       "notes": "",
@@ -1531,7 +1875,7 @@ export const WORLD_CATALOG = ({
         "lon": -57.58
       },
       "population1900": 600000,
-      "market": "latin-america",
+      "market": "customs-pry",
       "description": "Landlocked republic slowly recovering from the War of the Triple Alliance.",
       "confidence": "low",
       "notes": "",
@@ -1555,7 +1899,7 @@ export const WORLD_CATALOG = ({
         "lon": -43.17
       },
       "population1900": 17600000,
-      "market": "latin-america",
+      "market": "customs-bra",
       "description": "Coffee-exporting federal republic in its Old Republic.",
       "confidence": "medium",
       "notes": "",
@@ -1579,7 +1923,7 @@ export const WORLD_CATALOG = ({
         "lon": -72.34
       },
       "population1900": 1500000,
-      "market": "latin-america",
+      "market": "customs-hti",
       "description": "Caribbean republic with a rural peasant economy.",
       "confidence": "low",
       "notes": "",
@@ -1603,7 +1947,7 @@ export const WORLD_CATALOG = ({
         "lon": -69.9
       },
       "population1900": 600000,
-      "market": "latin-america",
+      "market": "customs-dom",
       "description": "Caribbean republic under recurring caudillo rule.",
       "confidence": "low",
       "notes": "",
@@ -1627,7 +1971,7 @@ export const WORLD_CATALOG = ({
         "lon": -75.7
       },
       "population1900": 5180000,
-      "market": "british-empire",
+      "market": "customs-can",
       "description": "Self-governing dominion of British North America.",
       "confidence": "medium",
       "notes": "Newfoundland is a separate dominion. Selectable as a semi-sovereign dominion, not an independent state. The map source cannot separate Newfoundland within the modern Canada polygon; it is shown as a marker within Canada.",
@@ -1651,7 +1995,7 @@ export const WORLD_CATALOG = ({
         "lon": 144.96
       },
       "population1900": 3800000,
-      "market": "british-empire",
+      "market": "customs-aus",
       "description": "Six self-governing British colonies federating on 1 January 1901.",
       "confidence": "medium",
       "notes": "In January 1900 Australia is not yet a federal state; selectable as a semi-sovereign dominion.",
@@ -1675,7 +2019,7 @@ export const WORLD_CATALOG = ({
         "lon": 174.78
       },
       "population1900": 800000,
-      "market": "british-empire",
+      "market": "customs-nzl",
       "description": "Self-governing British colony with a pioneering welfare settlement.",
       "confidence": "medium",
       "notes": "Selectable as a semi-sovereign dominion, not an independent state.",
@@ -1699,7 +2043,7 @@ export const WORLD_CATALOG = ({
         "lon": -82.37
       },
       "population1900": 1600000,
-      "market": "latin-america",
+      "market": "customs-cub",
       "description": "Cuban republic occupied by the United States after the 1898 war.",
       "confidence": "medium",
       "notes": "Not selectable: sovereignty is contested and administration is under US military occupation.",
@@ -1723,7 +2067,7 @@ export const WORLD_CATALOG = ({
         "lon": 16.37
       },
       "population1900": 51000000,
-      "market": "austro-hungarian",
+      "market": "customs-aut",
       "description": "Dual monarchy of the Austrian and Hungarian halves under a common monarch, with joint foreign, defence and finance ministries and separate parliaments and governments.",
       "confidence": "medium",
       "notes": "Cisleithania (the Austrian half) and Transleithania (the Hungarian half, including Croatia-Slavonia) each had their own government; Bosnia and Herzegovina was jointly administered. There was no single unified national flag: the common civil ensign combines the Austrian red-white-red and Hungarian red-white-green with both coats of arms. Co-capital: Budapest. The map geometry covers the core modern units (Austria, Hungary, Czechia, Slovakia, Slovenia, Croatia, Bosnia and Herzegovina); Galicia, Transylvania, Vojvodina and South Tyrol are not separable at the Natural Earth 1:50m admin-0 resolution.",
@@ -1753,7 +2097,7 @@ export const WORLD_CATALOG = ({
         "lon": -175.2
       },
       "population1900": 20000,
-      "market": "pacific",
+      "market": "customs-ton",
       "description": "Independent Polynesian kingdom under the 1875 constitution, in personal rule of King George Tupou II in 1900.",
       "confidence": "medium",
       "notes": "Tonga was an independent kingdom on 1 January 1900 and became a British protectorate later in 1900 (Treaty of Friendship, 18 May 1900). M11c reconstructs its territory from the modern Tongan archipelago; the archipelago's extent is not disputed.",
@@ -1777,7 +2121,7 @@ export const WORLD_CATALOG = ({
         "lon": 5.24
       },
       "population1900": 10000000,
-      "market": "african-independent",
+      "market": "customs-sok",
       "description": "Fulani-led Islamic caliphate in the central Sudan, the largest independent state in West Africa in 1900.",
       "confidence": "low",
       "notes": "De facto independent with limited international recognition; conquered by British forces in 1903. M11c reconstructs the caliphate's core from ten modern northern Nigerian states. Population is a rounded order-of-magnitude estimate.",
@@ -1809,8 +2153,8 @@ export const WORLD_CATALOG = ({
         "lat": 13.83,
         "lon": 20.83
       },
-      "population1900": 2000000,
-      "market": "african-independent",
+      "population1900": 1000000,
+      "market": "customs-wad",
       "description": "Sahelian sultanate east of Lake Chad, independent until the French conquest of 1909–1911.",
       "confidence": "low",
       "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate.",
@@ -1838,8 +2182,8 @@ export const WORLD_CATALOG = ({
         "lat": 13.63,
         "lon": 25.35
       },
-      "population1900": 2000000,
-      "market": "african-independent",
+      "population1900": 600000,
+      "market": "customs-dar",
       "description": "Independent sultanate in the western Sudan, conquered by Britain only in 1916.",
       "confidence": "low",
       "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate.",
@@ -1866,7 +2210,7 @@ export const WORLD_CATALOG = ({
         "lon": 41.69
       },
       "population1900": 1000000,
-      "market": "ottoman-egyptian",
+      "market": "customs-shm",
       "description": "Rashidi emirate in central Arabia, the dominant state in Najd in 1900 and a rival of the Saudis.",
       "confidence": "low",
       "notes": "De facto independent and nominally Ottoman; conquered by Ibn Saud in 1921. M11c reconstructs the emirate from Ha'il, Qassim, Riyadh, the Northern Borders and al-Jowf; Ottoman sovereignty over Najd was nominal. Population is a rounded estimate.",
@@ -1894,7 +2238,7 @@ export const WORLD_CATALOG = ({
         "lon": 24.02
       },
       "population1900": 300000,
-      "market": "ottoman-egyptian",
+      "market": "customs-crt",
       "description": "Autonomous Cretan state established in 1898 under Ottoman suzerainty and Great Power guarantee, with a Greek high commissioner.",
       "confidence": "medium",
       "notes": "Internationally recognised autonomous state, not a fully independent sovereign country (the 1913 union with Greece is after the reference date). M11c separates Crete from modern Greece using the modern Crete region. The flag combines the Greek cross with a red canton and white star.",
@@ -1918,7 +2262,7 @@ export const WORLD_CATALOG = ({
         "lon": 88.36
       },
       "population1900": 294000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Crown rule over the Indian subcontinent, including Burma.",
       "confidence": "low",
       "notes": "Burma was administered as part of British India until 1937.",
@@ -1945,7 +2289,7 @@ export const WORLD_CATALOG = ({
         "lon": 79.85
       },
       "population1900": 3900000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Crown colony of tea and rubber plantations.",
       "confidence": "low",
       "notes": "",
@@ -1970,7 +2314,7 @@ export const WORLD_CATALOG = ({
         "lon": 103.82
       },
       "population1900": 3300000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Federated and unfederated Malay states with the Straits Settlements.",
       "confidence": "low",
       "notes": "",
@@ -1996,7 +2340,7 @@ export const WORLD_CATALOG = ({
         "lon": 114.16
       },
       "population1900": 300000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "British crown colony and entrepot on the China coast.",
       "confidence": "low",
       "notes": "",
@@ -2020,7 +2364,7 @@ export const WORLD_CATALOG = ({
         "lon": 47.99
       },
       "population1900": 50000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Sheikhdom under a British protectorate from 1899.",
       "confidence": "low",
       "notes": "",
@@ -2044,7 +2388,7 @@ export const WORLD_CATALOG = ({
         "lon": 54.38
       },
       "population1900": 80000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Pearl-fishing sheikhdoms under British maritime protection.",
       "confidence": "low",
       "notes": "",
@@ -2069,7 +2413,7 @@ export const WORLD_CATALOG = ({
         "lon": 33.36
       },
       "population1900": 240000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "British-administered island leased from the Ottoman Empire.",
       "confidence": "low",
       "notes": "",
@@ -2094,7 +2438,7 @@ export const WORLD_CATALOG = ({
         "lon": 14.51
       },
       "population1900": 200000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Mediterranean naval base and crown colony.",
       "confidence": "medium",
       "notes": "",
@@ -2118,7 +2462,7 @@ export const WORLD_CATALOG = ({
         "lon": -76.79
       },
       "population1900": 2000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Sugar islands, British Guiana and British Honduras.",
       "confidence": "low",
       "notes": "Several small crown colonies are grouped for simulation granularity.",
@@ -2159,7 +2503,7 @@ export const WORLD_CATALOG = ({
         "lon": -57.85
       },
       "population1900": 15000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Falklands, St Helena, Pitcairn and the British Indian Ocean Territory.",
       "confidence": "low",
       "notes": "Grouped tiny dependencies; populations are rough.",
@@ -2187,7 +2531,7 @@ export const WORLD_CATALOG = ({
         "lon": 3.39
       },
       "population1900": 20000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Nigerian, Gold Coast, Sierra Leone and Gambian administrations.",
       "confidence": "low",
       "notes": "Several separate colonies are grouped for simulation granularity.",
@@ -2214,7 +2558,7 @@ export const WORLD_CATALOG = ({
         "lon": 36.82
       },
       "population1900": 4000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "East Africa Protectorate and Uganda Protectorate.",
       "confidence": "low",
       "notes": "",
@@ -2239,7 +2583,7 @@ export const WORLD_CATALOG = ({
         "lon": 32.56
       },
       "population1900": 2000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Condominium administered jointly with Egypt after 1899.",
       "confidence": "low",
       "notes": "",
@@ -2264,7 +2608,7 @@ export const WORLD_CATALOG = ({
         "lon": 45.01
       },
       "population1900": 200000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Coastal protectorate on the Gulf of Aden.",
       "confidence": "low",
       "notes": "",
@@ -2288,7 +2632,7 @@ export const WORLD_CATALOG = ({
         "lon": 35.33
       },
       "population1900": 3000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Rhodesias and Nyasaland under chartered and crown administration.",
       "confidence": "low",
       "notes": "",
@@ -2314,7 +2658,7 @@ export const WORLD_CATALOG = ({
         "lon": 27.24
       },
       "population1900": 1000000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Basutoland, Swaziland and Bechuanaland.",
       "confidence": "low",
       "notes": "",
@@ -2340,7 +2684,7 @@ export const WORLD_CATALOG = ({
         "lon": 178.44
       },
       "population1900": 120000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Crown colony of sugar plantations and chiefly administration.",
       "confidence": "medium",
       "notes": "",
@@ -2364,7 +2708,7 @@ export const WORLD_CATALOG = ({
         "lon": 159.95
       },
       "population1900": 300000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Solomons, Tonga, Gilberts, Cooks, Mauritius, Seychelles and the New Hebrides.",
       "confidence": "low",
       "notes": "Grouped dependencies, including the Anglo-French New Hebrides condominium.",
@@ -2396,7 +2740,7 @@ export const WORLD_CATALOG = ({
         "lon": 18.42
       },
       "population1900": 2400000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Self-governing British colony in southern Africa.",
       "confidence": "medium",
       "notes": "",
@@ -2422,7 +2766,7 @@ export const WORLD_CATALOG = ({
         "lon": 30.38
       },
       "population1900": 1100000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Self-governing British colony on the Indian Ocean coast.",
       "confidence": "medium",
       "notes": "",
@@ -2446,7 +2790,7 @@ export const WORLD_CATALOG = ({
         "lon": -52.71
       },
       "population1900": 220000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Separate self-governing dominion of the British Empire.",
       "confidence": "medium",
       "notes": "Not part of Canada in 1900. M11c separates Newfoundland and Labrador from modern Canada using the modern province boundary.",
@@ -2470,7 +2814,7 @@ export const WORLD_CATALOG = ({
         "lon": 3.06
       },
       "population1900": 4700000,
-      "market": null,
+      "market": "customs-fra",
       "description": "French colony administered as three departments.",
       "confidence": "medium",
       "notes": "",
@@ -2494,7 +2838,7 @@ export const WORLD_CATALOG = ({
         "lon": 10.18
       },
       "population1900": 1900000,
-      "market": null,
+      "market": "customs-fra",
       "description": "French protectorate with a nominal Bey.",
       "confidence": "medium",
       "notes": "",
@@ -2518,7 +2862,7 @@ export const WORLD_CATALOG = ({
         "lon": -16.49
       },
       "population1900": 10000000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Federation of French West African colonies.",
       "confidence": "low",
       "notes": "",
@@ -2549,7 +2893,7 @@ export const WORLD_CATALOG = ({
         "lon": 15.24
       },
       "population1900": 3000000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Federation of French Congo, Ubangi-Shari, Chad and Gabon.",
       "confidence": "low",
       "notes": "",
@@ -2576,7 +2920,7 @@ export const WORLD_CATALOG = ({
         "lon": 105.85
       },
       "population1900": 15000000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Union of Tonkin, Annam, Cochinchina, Laos and Cambodia.",
       "confidence": "low",
       "notes": "",
@@ -2602,7 +2946,7 @@ export const WORLD_CATALOG = ({
         "lon": 47.51
       },
       "population1900": 3500000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Island colony and the Comoros.",
       "confidence": "low",
       "notes": "",
@@ -2627,7 +2971,7 @@ export const WORLD_CATALOG = ({
         "lon": 43.15
       },
       "population1900": 50000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Red Sea port colony.",
       "confidence": "low",
       "notes": "",
@@ -2651,7 +2995,7 @@ export const WORLD_CATALOG = ({
         "lon": -61.07
       },
       "population1900": 400000,
-      "market": null,
+      "market": "customs-fra",
       "description": "French Guiana and the French Antilles.",
       "confidence": "low",
       "notes": "Martinique and Guadeloupe are not separately present in the map source.",
@@ -2678,7 +3022,7 @@ export const WORLD_CATALOG = ({
         "lon": -149.57
       },
       "population1900": 200000,
-      "market": null,
+      "market": "customs-fra",
       "description": "Tahiti, New Caledonia and Wallis and Futuna.",
       "confidence": "low",
       "notes": "",
@@ -2704,7 +3048,7 @@ export const WORLD_CATALOG = ({
         "lon": 39.21
       },
       "population1900": 7000000,
-      "market": null,
+      "market": "customs-deu",
       "description": "Tanganyika, Ruanda and Urundi.",
       "confidence": "low",
       "notes": "",
@@ -2730,7 +3074,7 @@ export const WORLD_CATALOG = ({
         "lon": 17.08
       },
       "population1900": 200000,
-      "market": null,
+      "market": "customs-deu",
       "description": "Settler colony on the Atlantic coast.",
       "confidence": "low",
       "notes": "",
@@ -2754,7 +3098,7 @@ export const WORLD_CATALOG = ({
         "lon": 11.52
       },
       "population1900": 2000000,
-      "market": null,
+      "market": "customs-deu",
       "description": "German colony in the Gulf of Guinea.",
       "confidence": "low",
       "notes": "",
@@ -2778,7 +3122,7 @@ export const WORLD_CATALOG = ({
         "lon": 1.22
       },
       "population1900": 1000000,
-      "market": null,
+      "market": "customs-deu",
       "description": "German protectorate on the Slave Coast.",
       "confidence": "low",
       "notes": "",
@@ -2802,7 +3146,7 @@ export const WORLD_CATALOG = ({
         "lon": 152.27
       },
       "population1900": 500000,
-      "market": null,
+      "market": "customs-deu",
       "description": "Northern New Guinea and the Bismarck Archipelago.",
       "confidence": "low",
       "notes": "British Papua is not separable in the map source; the whole island is shown as one territory.",
@@ -2826,7 +3170,7 @@ export const WORLD_CATALOG = ({
         "lon": -171.76
       },
       "population1900": 40000,
-      "market": null,
+      "market": "customs-deu",
       "description": "Western Samoa under German administration.",
       "confidence": "low",
       "notes": "",
@@ -2849,8 +3193,8 @@ export const WORLD_CATALOG = ({
         "lat": 5.63,
         "lon": 169.64
       },
-      "population1900": 60000,
-      "market": null,
+      "population1900": 58500,
+      "market": "customs-deu",
       "description": "Marshall, Caroline, Palau, Mariana and Nauru possessions.",
       "confidence": "low",
       "notes": "Grouped for simulation granularity.",
@@ -2878,7 +3222,7 @@ export const WORLD_CATALOG = ({
         "lon": 13.05
       },
       "population1900": 9000000,
-      "market": null,
+      "market": "customs-bel",
       "description": "Rubber and ivory concession state in personal union with King Leopold II.",
       "confidence": "low",
       "notes": "Formally not a Belgian colony until 1908; shown separately from Belgium.",
@@ -2902,7 +3246,7 @@ export const WORLD_CATALOG = ({
         "lon": 13.23
       },
       "population1900": 4000000,
-      "market": null,
+      "market": "customs-prt",
       "description": "Portuguese colony in south-west Africa.",
       "confidence": "low",
       "notes": "",
@@ -2926,7 +3270,7 @@ export const WORLD_CATALOG = ({
         "lon": 32.57
       },
       "population1900": 3000000,
-      "market": null,
+      "market": "customs-prt",
       "description": "Portuguese colony on the Indian Ocean coast.",
       "confidence": "low",
       "notes": "",
@@ -2950,7 +3294,7 @@ export const WORLD_CATALOG = ({
         "lon": -23.51
       },
       "population1900": 300000,
-      "market": null,
+      "market": "customs-prt",
       "description": "Cape Verde, Sao Tome and Portuguese Guinea.",
       "confidence": "low",
       "notes": "",
@@ -2976,7 +3320,7 @@ export const WORLD_CATALOG = ({
         "lon": 125.57
       },
       "population1900": 100000,
-      "market": null,
+      "market": "customs-prt",
       "description": "Eastern half of Timor under Portuguese rule.",
       "confidence": "low",
       "notes": "",
@@ -3000,7 +3344,7 @@ export const WORLD_CATALOG = ({
         "lon": 113.55
       },
       "population1900": 80000,
-      "market": null,
+      "market": "customs-prt",
       "description": "Portuguese trading settlement on the China coast.",
       "confidence": "medium",
       "notes": "",
@@ -3024,7 +3368,7 @@ export const WORLD_CATALOG = ({
         "lon": 38.93
       },
       "population1900": 300000,
-      "market": null,
+      "market": "customs-ita",
       "description": "Italy's first African colony.",
       "confidence": "low",
       "notes": "",
@@ -3048,7 +3392,7 @@ export const WORLD_CATALOG = ({
         "lon": 45.32
       },
       "population1900": 400000,
-      "market": null,
+      "market": "customs-ita",
       "description": "Italian protectorate on the Horn of Africa.",
       "confidence": "low",
       "notes": "",
@@ -3072,7 +3416,7 @@ export const WORLD_CATALOG = ({
         "lon": 106.85
       },
       "population1900": 42000000,
-      "market": null,
+      "market": "customs-nld",
       "description": "Netherlands Indies, the most populous colonial possession in the world.",
       "confidence": "medium",
       "notes": "",
@@ -3096,7 +3440,7 @@ export const WORLD_CATALOG = ({
         "lon": -55.2
       },
       "population1900": 80000,
-      "market": null,
+      "market": "customs-nld",
       "description": "Dutch plantation colony in South America.",
       "confidence": "low",
       "notes": "",
@@ -3120,7 +3464,7 @@ export const WORLD_CATALOG = ({
         "lon": -68.93
       },
       "population1900": 50000,
-      "market": null,
+      "market": "customs-nld",
       "description": "Curacao, Aruba, Sint Maarten and Bonaire.",
       "confidence": "low",
       "notes": "",
@@ -3146,7 +3490,7 @@ export const WORLD_CATALOG = ({
         "lon": -15.94
       },
       "population1900": 50000,
-      "market": null,
+      "market": "customs-esp",
       "description": "Spanish claims on the Atlantic Sahara.",
       "confidence": "low",
       "notes": "",
@@ -3170,7 +3514,7 @@ export const WORLD_CATALOG = ({
         "lon": 8.78
       },
       "population1900": 150000,
-      "market": null,
+      "market": "customs-esp",
       "description": "Rio Muni and Fernando Po.",
       "confidence": "low",
       "notes": "",
@@ -3194,7 +3538,7 @@ export const WORLD_CATALOG = ({
         "lon": 120.98
       },
       "population1900": 7600000,
-      "market": null,
+      "market": "customs-usa",
       "description": "American colonial administration after the 1898 Treaty of Paris.",
       "confidence": "medium",
       "notes": "Filipino resistance continued after the declaration of the First Republic.",
@@ -3218,7 +3562,7 @@ export const WORLD_CATALOG = ({
         "lon": -66.11
       },
       "population1900": 950000,
-      "market": null,
+      "market": "customs-usa",
       "description": "Caribbean island ceded by Spain in 1898.",
       "confidence": "medium",
       "notes": "",
@@ -3241,8 +3585,8 @@ export const WORLD_CATALOG = ({
         "lat": 13.47,
         "lon": 144.75
       },
-      "population1900": 12000,
-      "market": null,
+      "population1900": 9676,
+      "market": "customs-usa",
       "description": "Pacific coaling station ceded by Spain.",
       "confidence": "low",
       "notes": "",
@@ -3266,7 +3610,7 @@ export const WORLD_CATALOG = ({
         "lon": -170.7
       },
       "population1900": 6000,
-      "market": null,
+      "market": "customs-usa",
       "description": "Eastern Samoan islands under US naval administration.",
       "confidence": "low",
       "notes": "",
@@ -3290,7 +3634,7 @@ export const WORLD_CATALOG = ({
         "lon": -21.94
       },
       "population1900": 80000,
-      "market": null,
+      "market": "customs-dnk",
       "description": "Danish dependency with home rule and a fishing economy.",
       "confidence": "high",
       "notes": "",
@@ -3314,7 +3658,7 @@ export const WORLD_CATALOG = ({
         "lon": -51.72
       },
       "population1900": 12000,
-      "market": null,
+      "market": "customs-dnk",
       "description": "Danish Arctic dependency.",
       "confidence": "low",
       "notes": "",
@@ -3338,7 +3682,7 @@ export const WORLD_CATALOG = ({
         "lon": -6.77
       },
       "population1900": 15000,
-      "market": null,
+      "market": "customs-dnk",
       "description": "Danish North Atlantic dependency.",
       "confidence": "medium",
       "notes": "",
@@ -3362,7 +3706,7 @@ export const WORLD_CATALOG = ({
         "lon": -64.93
       },
       "population1900": 30000,
-      "market": null,
+      "market": "customs-dnk",
       "description": "Sugar islands sold to the United States in 1917.",
       "confidence": "low",
       "notes": "",
@@ -3386,7 +3730,7 @@ export const WORLD_CATALOG = ({
         "lon": 31.24
       },
       "population1900": 9700000,
-      "market": null,
+      "market": "customs-ott",
       "description": "Autonomous khedivate under Ottoman suzerainty and British military occupation.",
       "confidence": "medium",
       "notes": "Not selectable: sovereignty is Ottoman and administration is under British occupation.",
@@ -3410,7 +3754,7 @@ export const WORLD_CATALOG = ({
         "lon": 89.86
       },
       "population1900": 300000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Himalayan monarchy under British suzerainty in foreign affairs.",
       "confidence": "low",
       "notes": "",
@@ -3434,7 +3778,7 @@ export const WORLD_CATALOG = ({
         "lon": 24.94
       },
       "population1900": 2700000,
-      "market": null,
+      "market": "customs-rus",
       "description": "Autonomous grand duchy with its own diet and administration.",
       "confidence": "high",
       "notes": "Not selectable: part of the Russian Empire in 1900.",
@@ -3459,7 +3803,7 @@ export const WORLD_CATALOG = ({
         "lon": 121.57
       },
       "population1900": 3000000,
-      "market": null,
+      "market": "customs-jpn",
       "description": "Japanese colony ceded in 1895.",
       "confidence": "medium",
       "notes": "",
@@ -3483,7 +3827,7 @@ export const WORLD_CATALOG = ({
         "lon": 91.14
       },
       "population1900": 1200000,
-      "market": null,
+      "market": "customs-chn",
       "description": "Tibetan Buddhist polity under Qing suzerainty, administered through the Dalai Lama and Qing ambans in 1900.",
       "confidence": "low",
       "notes": "Not an independent state in 1900. M11c separates the modern Tibet Autonomous Region as a conservative core; Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated. Population is a rounded estimate.",
@@ -3507,7 +3851,7 @@ export const WORLD_CATALOG = ({
         "lon": 60.36
       },
       "population1900": 800000,
-      "market": null,
+      "market": "customs-rus",
       "description": "Central Asian khanate under Russian protectorate after 1873, retaining its own ruler and internal administration.",
       "confidence": "low",
       "notes": "Russian protectorate, not independent. M11c reconstructs the khanate's irrigated core from Xorazm, Karakalpakstan and Daşoguz. Population is a rounded estimate.",
@@ -3533,7 +3877,7 @@ export const WORLD_CATALOG = ({
         "lon": 64.42
       },
       "population1900": 2000000,
-      "market": null,
+      "market": "customs-rus",
       "description": "Central Asian emirate under Russian protectorate after 1868, retaining its own ruler and internal administration.",
       "confidence": "low",
       "notes": "Russian protectorate, not independent. M11c reconstructs the emirate from Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. Population is a rounded estimate.",
@@ -3563,7 +3907,7 @@ export const WORLD_CATALOG = ({
         "lon": 110.34
       },
       "population1900": 500000,
-      "market": null,
+      "market": "customs-gbr",
       "description": "Independent Raj of Sarawak under British protection after 1888, ruled by the Brooke dynasty.",
       "confidence": "low",
       "notes": "British protectorate, not independent. M11c separates Sarawak from British Malaya using the modern Malaysian state boundary. Population is a rounded estimate.",

@@ -4,84 +4,195 @@
     "key": "north-atlantic",
     "customsCountryTag": "USA",
     "name": "North Atlantic trade market",
-    "regionIds": [0, 1, 2, 3],
+    "provinceIds": [
+      0,
+      1,
+      2,
+      3
+    ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
     "stockLots": [
-      { "goodKey": "grain", "ownerBuildingKey": "usa-northeast-subsistence-farm", "quantity": 69209900 },
-      { "goodKey": "cotton", "ownerBuildingKey": "usa-northeast-commercial-farm", "quantity": 464000 },
-      { "goodKey": "wool", "ownerBuildingKey": "usa-northeast-ranch", "quantity": 87000 },
-      { "goodKey": "textiles", "ownerBuildingKey": "usa-northeast-textile-mill", "quantity": 715000 }
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "usa-northeast-subsistence-farm",
+        "quantity": 69209900
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "usa-northeast-commercial-farm",
+        "quantity": 464000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "usa-northeast-ranch",
+        "quantity": 87000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "usa-northeast-textile-mill",
+        "quantity": 715000
+      }
     ],
     "status": "provisional",
-    "sourceIds": ["project-authored-sample"]
+    "sourceIds": [
+      "project-authored-sample"
+    ]
   },
   {
     "id": 1,
     "key": "continental-europe",
     "customsCountryTag": "DEU",
     "name": "Continental European trade market",
-    "regionIds": [4, 5, 6, 7],
+    "provinceIds": [
+      4,
+      5,
+      6,
+      7
+    ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
     "stockLots": [
-      { "goodKey": "grain", "ownerBuildingKey": "deu-prussia-subsistence-farm", "quantity": 55808300 },
-      { "goodKey": "cotton", "ownerBuildingKey": "deu-prussia-commercial-farm", "quantity": 368000 },
-      { "goodKey": "wool", "ownerBuildingKey": "deu-prussia-ranch", "quantity": 69000 },
-      { "goodKey": "textiles", "ownerBuildingKey": "deu-prussia-textile-mill", "quantity": 572000 }
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "deu-prussia-subsistence-farm",
+        "quantity": 55808300
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "deu-prussia-commercial-farm",
+        "quantity": 368000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "deu-prussia-ranch",
+        "quantity": 69000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "deu-prussia-textile-mill",
+        "quantity": 572000
+      }
     ],
     "status": "provisional",
-    "sourceIds": ["project-authored-sample"]
+    "sourceIds": [
+      "project-authored-sample"
+    ]
   },
   {
     "id": 2,
     "key": "russian-empire",
     "customsCountryTag": "RUS",
     "name": "Russian imperial market",
-    "regionIds": [8, 9],
+    "provinceIds": [
+      8,
+      9
+    ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
     "stockLots": [
-      { "goodKey": "grain", "ownerBuildingKey": "rus-ukraine-subsistence-farm", "quantity": 79862000 },
-      { "goodKey": "cotton", "ownerBuildingKey": "rus-ukraine-commercial-farm", "quantity": 528000 },
-      { "goodKey": "wool", "ownerBuildingKey": "rus-ukraine-ranch", "quantity": 99000 },
-      { "goodKey": "textiles", "ownerBuildingKey": "rus-central-textile-mill", "quantity": 819000 }
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "rus-ukraine-subsistence-farm",
+        "quantity": 79862000
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "rus-ukraine-commercial-farm",
+        "quantity": 528000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "rus-ukraine-ranch",
+        "quantity": 99000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "rus-central-textile-mill",
+        "quantity": 819000
+      }
     ],
     "status": "provisional",
-    "sourceIds": ["project-authored-sample"]
+    "sourceIds": [
+      "project-authored-sample"
+    ]
   },
   {
     "id": 3,
     "key": "asian-trade",
     "customsCountryTag": "JPN",
     "name": "Asian trade market",
-    "regionIds": [10, 11, 12, 13],
+    "provinceIds": [
+      10,
+      11,
+      12,
+      13
+    ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
     "stockLots": [
-      { "goodKey": "grain", "ownerBuildingKey": "jpn-honshu-subsistence-farm", "quantity": 165624000 },
-      { "goodKey": "cotton", "ownerBuildingKey": "jpn-honshu-commercial-farm", "quantity": 1096000 },
-      { "goodKey": "wool", "ownerBuildingKey": "jpn-honshu-ranch", "quantity": 205500 },
-      { "goodKey": "textiles", "ownerBuildingKey": "jpn-honshu-textile-mill", "quantity": 1703000 }
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "jpn-honshu-subsistence-farm",
+        "quantity": 165624000
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "jpn-honshu-commercial-farm",
+        "quantity": 1096000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "jpn-honshu-ranch",
+        "quantity": 205500
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "jpn-honshu-textile-mill",
+        "quantity": 1703000
+      }
     ],
     "status": "provisional",
-    "sourceIds": ["project-authored-sample"]
+    "sourceIds": [
+      "project-authored-sample"
+    ]
   },
   {
     "id": 4,
     "key": "brazil",
     "customsCountryTag": "BRA",
     "name": "Brazilian market",
-    "regionIds": [14, 15],
+    "provinceIds": [
+      14,
+      15
+    ],
     "priceBasis": "base-1900",
     "initialPriceMultiplier": 0.25,
     "stockLots": [
-      { "goodKey": "grain", "ownerBuildingKey": "bra-southeast-subsistence-farm", "quantity": 10409200 },
-      { "goodKey": "cotton", "ownerBuildingKey": "bra-southeast-commercial-farm", "quantity": 80000 },
-      { "goodKey": "wool", "ownerBuildingKey": "bra-southeast-ranch", "quantity": 15000 },
-      { "goodKey": "textiles", "ownerBuildingKey": "bra-southeast-textile-mill", "quantity": 117000 }
+      {
+        "goodKey": "grain",
+        "ownerBuildingKey": "bra-southeast-subsistence-farm",
+        "quantity": 10409200
+      },
+      {
+        "goodKey": "cotton",
+        "ownerBuildingKey": "bra-southeast-commercial-farm",
+        "quantity": 80000
+      },
+      {
+        "goodKey": "wool",
+        "ownerBuildingKey": "bra-southeast-ranch",
+        "quantity": 15000
+      },
+      {
+        "goodKey": "textiles",
+        "ownerBuildingKey": "bra-southeast-textile-mill",
+        "quantity": 117000
+      }
     ],
     "status": "provisional",
-    "sourceIds": ["project-authored-sample"]
+    "sourceIds": [
+      "project-authored-sample"
+    ]
   }
 ]

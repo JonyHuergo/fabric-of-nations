@@ -7,6 +7,8 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Headline, Notice, Pill, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { provinceEconomyRows } from "@century/sim-worker";
+import { provinceDisplayName } from "../provinceNames";
 
 function countryName(snapshot: SimulationSnapshot, countryId: number | null): string {
   if (countryId === null) return "unowned";
@@ -14,10 +16,24 @@ function countryName(snapshot: SimulationSnapshot, countryId: number | null): st
   return country === undefined ? `country ${countryId}` : `${country.tag} — ${country.name}`;
 }
 
-function regionName(snapshot: SimulationSnapshot, regionId: number | null): string {
-  if (regionId === null) return "none";
-  const region = snapshot.regions.find((candidate) => candidate.id === regionId);
-  return region === undefined ? `region ${regionId}` : region.name;
+/** Most provinces offered as quick picks per list; a province is always reachable from the map. */
+const PICK_LIMIT = 12;
+
+/** The most populous provinces of a list, keeping `keep` (the current pick) in view. */
+function topByPopulation<T extends { readonly id: number; readonly population: number }>(
+  provinces: readonly T[],
+  keep: number | null,
+): readonly T[] {
+  const sorted = [...provinces].sort((left, right) => right.population - left.population || left.id - right.id);
+  const top = sorted.slice(0, PICK_LIMIT);
+  const kept = keep === null ? undefined : sorted.find((province) => province.id === keep);
+  return kept !== undefined && !top.includes(kept) ? [...top, kept] : top;
+}
+
+function provinceName(snapshot: SimulationSnapshot, provinceId: number | null): string {
+  if (provinceId === null) return "none";
+  const province = provinceEconomyRows(snapshot).find((candidate) => candidate.id === provinceId);
+  return province === undefined ? `province ${provinceId}` : provinceDisplayName(province.id);
 }
 
 export function WarScreen({
@@ -33,20 +49,26 @@ export function WarScreen({
   const [casusBelli, setCasusBelli] = useState<
     "border-dispute" | "trade-dispute" | "alliance-obligation"
   >("border-dispute");
-  const [recruitRegionId, setRecruitRegionId] = useState<number | null>(null);
+  const [recruitProvinceId, setRecruitProvinceId] = useState<number | null>(null);
   const [personnelText, setPersonnelText] = useState("1000");
   const [deployArmyId, setDeployArmyId] = useState<number | null>(null);
-  const [targetRegionId, setTargetRegionId] = useState<number | null>(null);
+  const [targetProvinceId, setTargetProvinceId] = useState<number | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalError(null);
     if (country === null) return;
     setTargetCountryId(null);
-    setRecruitRegionId(country.regionIds[0] ?? null);
+    const mostPopulous =
+      provinceEconomyRows(snapshot)
+        .filter((province) => province.countryId === country.id)
+        .sort((left, right) => right.population - left.population || left.id - right.id)[0]?.id ??
+      country.provinceIds[0] ??
+      null;
+    setRecruitProvinceId(mostPopulous);
     setDeployArmyId(country.military.armies[0]?.id ?? null);
-    setTargetRegionId(country.regionIds[0] ?? null);
-  }, [countryId, country?.regionIds, country?.military.armies.length]);
+    setTargetProvinceId(mostPopulous);
+  }, [countryId, country?.provinceIds, country?.military.armies.length]);
 
   const isPlayerCountry =
     country !== null &&
@@ -69,8 +91,8 @@ export function WarScreen({
     if (country === null) return;
     if (!requirePlayer()) return;
     const personnel = personnelOverride ?? Number(personnelText);
-    if (recruitRegionId === null) {
-      setLocalError("Choose a recruitment region.");
+    if (recruitProvinceId === null) {
+      setLocalError("Choose a recruitment province.");
       return;
     }
     if (!Number.isInteger(personnel) || personnel <= 0) {
@@ -82,7 +104,7 @@ export function WarScreen({
     applyAction({
       kind: "recruit-army",
       countryId: country.id,
-      regionId: recruitRegionId,
+      provinceId: recruitProvinceId,
       personnel,
     });
   };
@@ -116,22 +138,36 @@ export function WarScreen({
   const incomingOffers = snapshot.military.peaceOffers.filter(
     (offer) => offer.toCountryId === country.id,
   );
-  const ownRegions = snapshot.regions.filter((region) => region.sovereignCountryId === country.id);
-  const deployTargets = snapshot.regions.filter((region) => {
-    if (region.id === country.regionIds[0] && region.id === targetRegionId) return true;
-    if (region.sovereignCountryId === country.id) return true;
-    if (region.controllerCountryId === country.id) return true;
-    if (region.sovereignCountryId === null) return false;
+  // P2: a country has up to hundreds of provinces, so the quick picks are the most
+  // populous ones; every province the worker would accept is still a valid target.
+  const ownProvinces = topByPopulation(
+    provinceEconomyRows(snapshot).filter((province) => province.countryId === country.id),
+    recruitProvinceId,
+  );
+  const controlled = provinceEconomyRows(snapshot).filter(
+    (province) => province.controllerCountryId === country.id,
+  );
+  const enemyProvinces = provinceEconomyRows(snapshot).filter((province) => {
+    if (province.countryId === null || province.countryId === country.id) return false;
+    if (province.controllerCountryId === country.id) return false;
     const war = snapshot.military.wars.find(
       (candidate) =>
         candidate.endedDay === null &&
         ((candidate.attackerCountryId === country.id &&
-          candidate.defenderCountryId === region.sovereignCountryId) ||
+          candidate.defenderCountryId === province.countryId) ||
           (candidate.defenderCountryId === country.id &&
-            candidate.attackerCountryId === region.sovereignCountryId)),
+            candidate.attackerCountryId === province.countryId)),
     );
     return war !== undefined;
   });
+  const deployTargets = [
+    ...topByPopulation(
+      provinceEconomyRows(snapshot).filter((province) => province.countryId === country.id),
+      targetProvinceId,
+    ),
+    ...controlled,
+    ...topByPopulation(enemyProvinces, targetProvinceId),
+  ].filter((province, index, all) => all.findIndex((other) => other.id === province.id) === index);
   // Declarations may target any country, including summaries not focused for detail.
   const declareTargets = snapshot.countrySummaries.filter(
     (candidate) => candidate.id !== country.id,
@@ -141,18 +177,18 @@ export function WarScreen({
     !Number.isInteger(parsedPersonnel) || parsedPersonnel <= 0
       ? "Personnel must be a positive integer."
       : null;
-  const recruitRegion =
-    recruitRegionId === null
+  const recruitProvince =
+    recruitProvinceId === null
       ? null
-      : (snapshot.regions.find((region) => region.id === recruitRegionId) ?? null);
-  // The snapshot exposes region population, an upper bound on the authoritative
+      : (provinceEconomyRows(snapshot).find((province) => province.id === recruitProvinceId) ?? null);
+  // The snapshot exposes province population, an upper bound on the authoritative
   // 18-45 recruitable pool; the worker enforces the exact recruitable and cost limits.
   const personnelMin = 1000;
-  // A conservative fraction of the region population: the authoritative pool is
+  // A conservative fraction of the province population: the authoritative pool is
   // the eligible 18-45 population, so the slider must not invite impossible sizes.
   const personnelMax = Math.max(
     personnelMin,
-    Math.round((recruitRegion?.population ?? 0) * 0.25),
+    Math.round((recruitProvince?.population ?? 0) * 0.25),
   );
   const personnelSliderValue = Number.isFinite(parsedPersonnel)
     ? Math.min(personnelMax, Math.max(personnelMin, parsedPersonnel))
@@ -180,7 +216,7 @@ export function WarScreen({
       <Headline
         label="Wars under way"
         value={String(snapshot.military.wars.filter((war) => war.endedDay === null).length)}
-        detail={`${String(country.military.occupiedRegionIds.length)} regions occupied · ${String(country.military.controlledRegionIds.length)} controlled abroad`}
+        detail={`${String(country.military.occupiedProvinceIds.length)} provinces occupied · ${String(country.military.controlledProvinceIds.length)} controlled abroad`}
       />
 
       <Text style={styles.heading}>Wars</Text>
@@ -327,7 +363,7 @@ export function WarScreen({
       ) : (
         country.military.armies.map((army) => (
           <View key={army.id} style={styles.block}>
-            <StatRow label={`Army ${army.id}`} value={regionName(snapshot, army.regionId)} />
+            <StatRow label={`Army ${army.id}`} value={provinceName(snapshot, army.provinceId)} />
             <StatRow
               label="Roster"
               value={`${army.personnel} soldiers, ${army.equipmentUnits} equipment`}
@@ -343,9 +379,9 @@ export function WarScreen({
             <StatRow
               label="Movement"
               value={
-                army.destinationRegionId === null
+                army.destinationProvinceId === null
                   ? `ready from day ${army.readyDay}`
-                  : `to ${regionName(snapshot, army.destinationRegionId)} on day ${army.arrivalDay ?? "?"}`
+                  : `to ${provinceName(snapshot, army.destinationProvinceId)} on day ${army.arrivalDay ?? "?"}`
               }
             />
           </View>
@@ -362,15 +398,15 @@ export function WarScreen({
       />
 
       <Text style={styles.heading}>Recruit an army</Text>
-      <Text style={styles.label}>Region</Text>
+      <Text style={styles.label}>Province (most populous)</Text>
       <View style={styles.wrap}>
-        {ownRegions.map((region) => (
+        {ownProvinces.map((province) => (
           <Pill
-            key={region.id}
-            label={region.name}
-            active={recruitRegionId === region.id}
+            key={province.id}
+            label={provinceDisplayName(province.id)}
+            active={recruitProvinceId === province.id}
             disabled={!canAct}
-            onPress={() => setRecruitRegionId(region.id)}
+            onPress={() => setRecruitProvinceId(province.id)}
           />
         ))}
       </View>
@@ -387,12 +423,12 @@ export function WarScreen({
         pending={personnelCommit.hasPending}
         onChange={(value) => setPersonnelText(String(Math.round(value)))}
         onCommit={(value) => personnelCommit.submit(Math.round(value))}
-        hint="Whole soldiers drawn from the region's 18-45 population and paid by the treasury."
+        hint="Whole soldiers drawn from the province's 18-45 population and paid by the treasury."
       />
       {recruitError !== null ? <Text style={styles.warning}>{recruitError}</Text> : null}
       <ActionButton
         label="Recruit"
-        disabled={!canAct || recruitRegionId === null || recruitError !== null}
+        disabled={!canAct || recruitProvinceId === null || recruitError !== null}
         onPress={() => applyRecruit()}
       />
 
@@ -409,41 +445,41 @@ export function WarScreen({
           />
         ))}
       </View>
-      <Text style={styles.label}>Target region</Text>
+      <Text style={styles.label}>Target province</Text>
       <View style={styles.wrap}>
-        {deployTargets.map((region) => (
+        {deployTargets.map((province) => (
           <Pill
-            key={region.id}
-            label={`${region.name}${region.occupiedSinceDay === null ? "" : " (occupied)"}`}
-            active={targetRegionId === region.id}
+            key={province.id}
+            label={`${provinceDisplayName(province.id)}${province.controlledSinceDay === null ? "" : " (occupied)"}`}
+            active={targetProvinceId === province.id}
             disabled={!canAct}
-            onPress={() => setTargetRegionId(region.id)}
+            onPress={() => setTargetProvinceId(province.id)}
           />
         ))}
       </View>
       <ActionButton
         label="Deploy"
-        disabled={!canAct || deployArmyId === null || targetRegionId === null}
+        disabled={!canAct || deployArmyId === null || targetProvinceId === null}
         onPress={() => {
-          if (deployArmyId === null || targetRegionId === null) {
-            setLocalError("Choose an army and a target region.");
+          if (deployArmyId === null || targetProvinceId === null) {
+            setLocalError("Choose an army and a target province.");
             return;
           }
           submit({
             kind: "deploy-army",
             countryId: country.id,
             armyId: deployArmyId,
-            targetRegionId,
+            targetProvinceId,
           });
         }}
       />
 
       <Text style={styles.heading}>Territorial control</Text>
-      {country.military.occupiedRegionIds.length > 0 ? (
+      {country.military.occupiedProvinceIds.length > 0 ? (
         <StatRow
-          label="Occupied regions"
-          value={country.military.occupiedRegionIds
-            .map((regionId) => regionName(snapshot, regionId))
+          label="Occupied provinces"
+          value={country.military.occupiedProvinceIds
+            .map((provinceId) => provinceName(snapshot, provinceId))
             .join(", ")}
         />
       ) : null}
@@ -451,18 +487,18 @@ export function WarScreen({
         .filter((occupation) => occupation.sovereignCountryId === country.id)
         .map((occupation) => (
           <StatRow
-            key={occupation.regionId}
+            key={occupation.provinceId}
             label={`Occupied by ${countryName(snapshot, occupation.controllerCountryId)}`}
-            value={`${regionName(snapshot, occupation.regionId)} since day ${occupation.occupiedSinceDay ?? "?"}`}
+            value={`${provinceName(snapshot, occupation.provinceId)} since day ${occupation.occupiedSinceDay ?? "?"}`}
           />
         ))}
       <Text style={styles.help}>
         Occupation changes only military control. It never transfers sovereignty, treasury,
         buildings, people, markets, or monetary authority. A peace treaty is the only M10
-        action that changes sovereignty, and only for regions the offering side controls.
+        action that changes sovereignty, and only for provinces the offering side controls.
       </Text>
       <Text style={styles.help}>
-        Army personnel are drawn from the region's people aged 18–45 and paid from
+        Army personnel are drawn from the province's people aged 18–45 and paid from
         the treasury. Combat casualties reduce the roster and are recorded as deaths,
         wounded, or captured; no abstract war score exists.
       </Text>

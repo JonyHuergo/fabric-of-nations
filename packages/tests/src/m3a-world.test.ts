@@ -13,15 +13,15 @@ import { cloneM3Scenario, m3World } from "./fixtures/m3a.js";
 describe("M3a world state and relationships", () => {
   test("creates the small M3 economy with buildings, assignments, lots, and accounts", () => {
     const { world } = m3World();
-    const region = world.regions[0];
+    const province = world.provinceEconomies[0];
     const market = world.markets[0];
-    if (region === undefined || market === undefined) throw new Error("missing economy state");
+    if (province === undefined || market === undefined) throw new Error("missing economy state");
 
     expect(world.buildings).toHaveLength(8);
     expect(world.employment).toHaveLength(3);
     expect(world.markets).toHaveLength(1);
-    expect(region.marketId).toBe(0);
-    expect(region.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(province.marketId).toBe(0);
+    expect(province.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     expect(world.finance.accounts).toHaveLength(67);
     expect(market.priceRUSD).toHaveLength(8);
     expect(market.stockLots.length).toBeGreaterThan(0);
@@ -59,19 +59,19 @@ describe("M3a world state and relationships", () => {
     const world = createEconomyWorld(scenario, { seed: 9 });
     expect(world.buildings).toHaveLength(0);
     expect(world.markets).toHaveLength(0);
-    expect(world.regions[0]?.marketId).toBeNull();
-    expect(world.regions[0]?.buildingInstanceIds).toEqual([]);
+    expect(world.provinceEconomies[0]?.marketId).toBeNull();
+    expect(world.provinceEconomies[0]?.buildingInstanceIds).toEqual([]);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
-  test("rejects buildings without a market and a market missing its region", () => {
+  test("rejects buildings without a market and a market missing its province", () => {
     const noMarket = cloneM3Scenario();
     noMarket.markets = [];
     expect(() => createEconomyWorld(noMarket, { seed: 1 })).toThrow(/market/i);
 
-    const missingRegion = cloneM3Scenario();
-    missingRegion.markets[0]!.regionIds = [];
-    expect(() => createEconomyWorld(missingRegion, { seed: 1 })).toThrow(/region/i);
+    const missingProvince = cloneM3Scenario();
+    missingProvince.markets[0]!.provinceIds = [];
+    expect(() => createEconomyWorld(missingProvince, { seed: 1 })).toThrow(/province/i);
   });
 
   test("rejects initial inventory above storage capacity", () => {
@@ -142,7 +142,7 @@ describe("M3a world state and relationships", () => {
     expect(() => assertValidWorld(missingOwner)).toThrow(/account|owner|unknown/i);
 
     const missingBuildingReference = m3World().world;
-    missingBuildingReference.regions[0]!.buildingInstanceIds = [0, 1];
+    missingBuildingReference.provinceEconomies[0]!.buildingInstanceIds = [0, 1];
     expect(() => assertValidWorld(missingBuildingReference)).toThrow(/building/i);
   });
 

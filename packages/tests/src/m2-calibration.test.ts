@@ -104,9 +104,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // Schema 23 added the E5 labor/health fields and block qualification; E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`. The digest changes even though
     // M11 (simulation 0.27.0, data m3-economy-v12) changes the version metadata encoded in the world. The M2 population behavior is unchanged, so it is intentionally re-pinned.
-    expect(hashWorld(world)).toBe("60c0d5a0cb14679a");
+    // P2 schema 28 (D-134) encodes the province economy record instead of the region;
+    // the population trajectory is unchanged, so the digest is re-pinned.
+    expect(hashWorld(world)).toBe("43e9bc9c08b8ce3a");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("60c0d5a0cb14679a");
+    expect(hashWorld(restored)).toBe("43e9bc9c08b8ce3a");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -310,7 +312,8 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // Updated for the E5 schema-23 labor/health/qualification fields and the E6a
     // schema-24 trade/customs fields; population flows are unchanged and remain
     // validated by the ratio checks above.
-    expect(hashWorld(world)).toBe("3922b22c0285e4c6");
+    // Re-pinned for the P2 schema-28 province record (D-134); flows unchanged.
+    expect(hashWorld(world)).toBe("f3bb9fc4c630e282");
   });
 });
 

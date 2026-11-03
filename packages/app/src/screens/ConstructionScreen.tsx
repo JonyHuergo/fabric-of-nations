@@ -13,6 +13,22 @@ import {
 import { ActionButton, Headline, Pill, Section, StatRow } from "../components/ui";
 import { colors, fonts, radii, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
+import { provinceDisplayName } from "../provinceNames";
+
+/** Quick picks: a country's most populous provinces, keeping the current pick in view (P2). */
+function mostPopulousProvinces(
+  snapshot: SimulationSnapshot,
+  countryId: number,
+  keep: number | null,
+): readonly ProvinceEconomySnapshot[] {
+  const owned = provinceEconomyRows(snapshot)
+    .filter((province) => province.countryId === countryId)
+    .sort((left, right) => right.population - left.population || left.id - right.id);
+  const top = owned.slice(0, 12);
+  const kept = keep === null ? undefined : owned.find((province) => province.id === keep);
+  return kept !== undefined && !top.includes(kept) ? [...top, kept] : top;
+}
 
 export function ConstructionScreen({
   snapshot,
@@ -24,7 +40,7 @@ export function ConstructionScreen({
   const { applyAction, busy, running, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [definitionId, setDefinitionId] = useState<number | null>(null);
-  const [regionId, setRegionId] = useState<number | null>(null);
+  const [provinceId, setProvinceId] = useState<number | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,10 +51,10 @@ export function ConstructionScreen({
         ? current
         : (types[0]?.definitionId ?? null),
     );
-    setRegionId((current) =>
-      current !== null && country.regionIds.includes(current)
+    setProvinceId((current) =>
+      current !== null && country.provinceIds.includes(current)
         ? current
-        : (country.regionIds[0] ?? null),
+        : (mostPopulousProvinces(snapshot, country.id, null)[0]?.id ?? country.provinceIds[0] ?? null),
     );
   }, [countryId, snapshot.projectTypes, country]);
 
@@ -58,8 +74,8 @@ export function ConstructionScreen({
       ? null
       : (snapshot.projectTypes.find((type) => type.definitionId === definitionId) ?? null);
   const preview =
-    selectedType !== null && regionId !== null
-      ? previewConstruction(snapshot, country, selectedType.definitionId, regionId)
+    selectedType !== null && provinceId !== null
+      ? previewConstruction(snapshot, country, selectedType.definitionId, provinceId)
       : null;
   const projects = [...country.constructionProjects].sort((left, right) => {
     const active = (status: string) =>
@@ -72,15 +88,15 @@ export function ConstructionScreen({
       setLocalError("Only the player-controlled country may authorize construction.");
       return;
     }
-    if (selectedType === null || regionId === null || preview === null || !preview.valid) {
-      setLocalError(preview?.errors.join(" ") ?? "Select a valid project type and region.");
+    if (selectedType === null || provinceId === null || preview === null || !preview.valid) {
+      setLocalError(preview?.errors.join(" ") ?? "Select a valid project type and province.");
       return;
     }
     setLocalError(null);
     applyAction({
       kind: "start-construction",
       countryId: country.id,
-      regionId,
+      provinceId,
       definitionId: selectedType.definitionId,
     });
   };
@@ -165,14 +181,14 @@ export function ConstructionScreen({
             ))}
           </View>
         )}
-        <Text style={styles.inputLabel}>Target region</Text>
+        <Text style={styles.inputLabel}>Target province (most populous)</Text>
         <View style={styles.typeList}>
-          {country.regionIds.map((id) => (
+          {mostPopulousProvinces(snapshot, country.id, provinceId).map((province) => (
             <Pill
-              key={id}
-              label={`Region ${String(id)}`}
-              active={regionId === id}
-              onPress={() => setRegionId(id)}
+              key={province.id}
+              label={provinceDisplayName(province.id)}
+              active={provinceId === province.id}
+              onPress={() => setProvinceId(province.id)}
               disabled={!isPlayerCountry || busy}
             />
           ))}
@@ -208,7 +224,7 @@ export function ConstructionScreen({
                 />
                 {preview.materials.length === 0 ? null : (
                   <View style={styles.materials}>
-                    <Text style={styles.inputLabel}>Materials bought from the regional market</Text>
+                    <Text style={styles.inputLabel}>Materials bought from the provincial market</Text>
                     {preview.materials.map((material) => (
                       <Text key={material.goodId} style={styles.projectDetail}>
                         {material.goodName}: {formatQuantity(material.requiredQuantity)}{" "}
@@ -268,7 +284,7 @@ export function ConstructionScreen({
             return (
               <View key={project.id} style={styles.projectRow}>
                 <Text style={styles.projectTitle}>
-                  #{String(project.id)} {project.definitionName} · {project.regionName} ·{" "}
+                  #{String(project.id)} {project.definitionName} · {project.provinceName} ·{" "}
                   {project.status.toUpperCase()}
                 </Text>
                 <View style={styles.progressTrack}>

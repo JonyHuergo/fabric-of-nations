@@ -54,7 +54,7 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
     country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
     const home = world.popBlocks
-      .filter((block) => block.regionId === M5_REGION_A1)
+      .filter((block) => block.provinceId === M5_REGION_A1)
       .sort((left, right) => left.id - right.id)[0];
     if (home === undefined) throw new Error("missing home pop block");
     const blockId = home.id;
@@ -66,7 +66,7 @@ describe("AUDIT-014 government payroll tax and wealth treatment", () => {
         countryId: M5_COUNTRY_A,
         dayIndex: world.dayIndex,
         source: "player",
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         personnel: 500,
       },
       world.dayIndex,

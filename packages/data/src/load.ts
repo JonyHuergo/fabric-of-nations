@@ -39,7 +39,7 @@ interface RawScenario {
   description: string;
   startDayIndex?: number;
   professions: PopulationScenarioDef["professions"];
-  regions: PopulationScenarioDef["regions"];
+  provinces: PopulationScenarioDef["provinceEconomies"];
   popBlocks: PopulationScenarioDef["popBlocks"];
   needsFile: string;
   demographyFile: string;
@@ -57,7 +57,7 @@ interface RawM3Scenario {
   buildingsFile: string;
   needsFile: string;
   demographyFile: string;
-  regions: PopulationScenarioDef["regions"];
+  provinces: PopulationScenarioDef["provinceEconomies"];
   popBlocks: PopulationScenarioDef["popBlocks"];
   buildingInstances: BuildingInstanceInitialDef[];
   markets: MarketInitialDef[];
@@ -153,13 +153,13 @@ function loadScenario(scenarioFile: string): PopulationScenarioDef {
     scenarioId: raw.scenarioId,
     ...(raw.startDayIndex === undefined ? {} : { startDayIndex: raw.startDayIndex }),
     professions: raw.professions,
-    regions: raw.regions,
+    provinceEconomies: raw.provinces,
     popBlocks: raw.popBlocks,
     definitions,
   };
 }
 
-/** Load the single-region world-aggregate calibration scenario. */
+/** Load the single-province world-aggregate calibration scenario. */
 export function loadM2WorldAggregate(): PopulationScenarioDef {
   return loadScenario("m2_world_aggregate.json");
 }
@@ -220,7 +220,7 @@ export function loadM3SmallEconomy(): EconomyScenarioDef {
       name: profession.name,
       stratum: profession.stratum,
     })),
-    regions: raw.regions,
+    provinceEconomies: raw.provinces,
     popBlocks: raw.popBlocks,
     definitions,
   };

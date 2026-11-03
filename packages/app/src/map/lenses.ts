@@ -8,8 +8,9 @@
 import type { SimulationSnapshot } from "@century/sim-worker";
 
 import { MAP_MODES, type MapModeId } from "./mapModes";
+import { provinceEconomyRows } from "@century/sim-worker";
 
-export type LensData = Pick<SimulationSnapshot, "provinces" | "markets" | "regions">;
+export type LensData = Pick<SimulationSnapshot, "provinces" | "markets" | "provinceTable" | "professions">;
 
 export interface Lens {
   readonly id: MapModeId;
@@ -21,12 +22,29 @@ const LENS_RULES: Readonly<Record<MapModeId, (data: LensData | null) => boolean>
   political: () => true,
   // Who holds a province is worker state, so it needs a campaign.
   control: (data) => data !== null && data.provinces.length > 0,
-  // Market membership needs live markets with member regions.
+  // Market membership needs live markets with member provinces.
   markets: (data) =>
-    data !== null && data.markets.length > 0 && data.regions.some((region) => region.marketId !== null),
+    data !== null && data.markets.length > 0 && provinceEconomyRows(data).some((province) => province.marketId !== null),
+  // P2 province lenses read the live province economy, so they need a campaign.
+  density: (data) => populated(data),
+  urban: (data) => populated(data),
+  literacy: (data) => populated(data),
+  unrest: (data) => populated(data),
 };
 
-export const LENS_ORDER: readonly MapModeId[] = ["political", "control", "markets"];
+function populated(data: LensData | null): boolean {
+  return data !== null && provinceEconomyRows(data).some((province) => province.population > 0);
+}
+
+export const LENS_ORDER: readonly MapModeId[] = [
+  "political",
+  "control",
+  "markets",
+  "density",
+  "urban",
+  "literacy",
+  "unrest",
+];
 
 /** The lenses that have real data right now, in display order. */
 export function availableLenses(data: LensData | null): readonly Lens[] {

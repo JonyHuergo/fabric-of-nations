@@ -70,6 +70,38 @@
         "accessDate": "2026-10-29",
         "license": "CC BY-NC-SA 4.0",
         "notes": "Consulted for independence/status coding. Not redistributed with this project because of its non-commercial share-alike licence."
+      },
+      {
+        "id": "hyde-3.3",
+        "title": "HYDE 3.3 History Database of the Global Environment, 1900 AD grids (baseline)",
+        "url": "https://doi.org/10.24416/UU01-94FNH0",
+        "accessDate": "2026-11-02",
+        "license": "CC BY 3.0",
+        "notes": "Within-country province shares of population, urban population, cropland and grazing land (D-121)."
+      },
+      {
+        "id": "customs-territories-1900",
+        "title": "1900 customs territories audit (customs_territories_1900.json)",
+        "url": "packages/data/data/historical/m11/customs_territories_1900.json",
+        "accessDate": "2026-11-02",
+        "license": "Project authored",
+        "notes": "Customs unions and tariff autonomy in 1900 with sources (D-119)."
+      },
+      {
+        "id": "project-authored-p2",
+        "title": "P2 province scenario builder (scripts/p2/build-province-scenario.mjs)",
+        "url": "scripts/p2/build-province-scenario.mjs",
+        "accessDate": "2026-11-02",
+        "license": "Project authored",
+        "notes": "Provisional distribution rules of D-131; generated, not observed."
+      },
+      {
+        "id": "goa-census-1900",
+        "title": "Portuguese census of Goa, 1 December 1900 (Government of Goa, Economic Survey 2016-17, Part 1)",
+        "url": "https://www.goa.gov.in/wp-content/uploads/2020/02/Economic-Survey-2016-17-Part-1.pdf",
+        "accessDate": "2026-11-02",
+        "license": "Government publication; figure cited",
+        "notes": "475,513 inhabitants (227,393 and 248,120 by sex); used for the Portuguese India territory (D-132)."
       }
     ],
     "ageStructures": {
@@ -120,13 +152,13 @@
       }
     },
     "files": {
-      "countries": "historical/m11/countries_1900.json",
-      "regions": "historical/m11/regions_1900.json",
-      "markets": "historical/m11/markets_1900.json",
-      "tradeRoutes": "historical/m11/trade_routes_1900.json",
-      "populations": "historical/m11/pops_1900.json",
-      "buildings": "historical/m11/buildings_1900.json",
-      "employment": "historical/m11/employment_1900.json",
+      "countries": "historical/p2/countries_1900.json",
+      "provinces": "historical/p2/provinces_1900.json",
+      "markets": "historical/p2/markets_1900.json",
+      "tradeRoutes": "historical/p2/trade_routes_1900.json",
+      "populations": "historical/p2/pops_1900.json",
+      "buildings": "historical/p2/buildings_1900.json",
+      "employment": "historical/p2/employment_1900.json",
       "calibration": "historical/m11/calibration_targets_1900.json"
     },
     "definitions": {
@@ -144,7 +176,7 @@
         "status": "independent",
         "sovereignCountryId": 0,
         "capitalName": "Washington, D.C.",
-        "regionName": "United States (home territory)",
+        "homeTerritoryName": "United States (home territory)",
         "selectable": true,
         "population1900Estimate": 76094000,
         "confidence": "high",
@@ -156,7 +188,7 @@
         "status": "independent",
         "sovereignCountryId": 1,
         "capitalName": "London",
-        "regionName": "United Kingdom (home territory)",
+        "homeTerritoryName": "United Kingdom (home territory)",
         "selectable": true,
         "population1900Estimate": 41155000,
         "confidence": "high",
@@ -168,7 +200,7 @@
         "status": "independent",
         "sovereignCountryId": 2,
         "capitalName": "Berlin",
-        "regionName": "Germany (home territory)",
+        "homeTerritoryName": "Germany (home territory)",
         "selectable": true,
         "population1900Estimate": 56367000,
         "confidence": "high",
@@ -180,7 +212,7 @@
         "status": "independent",
         "sovereignCountryId": 3,
         "capitalName": "Paris",
-        "regionName": "France (home territory)",
+        "homeTerritoryName": "France (home territory)",
         "selectable": true,
         "population1900Estimate": 38900000,
         "confidence": "medium",
@@ -192,7 +224,7 @@
         "status": "independent",
         "sovereignCountryId": 4,
         "capitalName": "Saint Petersburg",
-        "regionName": "Russian Empire (home territory)",
+        "homeTerritoryName": "Russian Empire (home territory)",
         "selectable": true,
         "population1900Estimate": 133300000,
         "confidence": "medium",
@@ -204,7 +236,7 @@
         "status": "independent",
         "sovereignCountryId": 5,
         "capitalName": "Tokyo",
-        "regionName": "Japan (home territory)",
+        "homeTerritoryName": "Japan (home territory)",
         "selectable": true,
         "population1900Estimate": 44103000,
         "confidence": "medium",
@@ -216,7 +248,7 @@
         "status": "independent",
         "sovereignCountryId": 6,
         "capitalName": "Rome",
-        "regionName": "Italy (home territory)",
+        "homeTerritoryName": "Italy (home territory)",
         "selectable": true,
         "population1900Estimate": 32475000,
         "confidence": "high",
@@ -228,7 +260,7 @@
         "status": "independent",
         "sovereignCountryId": 7,
         "capitalName": "Madrid",
-        "regionName": "Spain (home territory)",
+        "homeTerritoryName": "Spain (home territory)",
         "selectable": true,
         "population1900Estimate": 18600000,
         "confidence": "medium",
@@ -240,7 +272,7 @@
         "status": "independent",
         "sovereignCountryId": 8,
         "capitalName": "Lisbon",
-        "regionName": "Portugal (home territory)",
+        "homeTerritoryName": "Portugal (home territory)",
         "selectable": true,
         "population1900Estimate": 5400000,
         "confidence": "medium",
@@ -252,7 +284,7 @@
         "status": "independent",
         "sovereignCountryId": 9,
         "capitalName": "Amsterdam",
-        "regionName": "Netherlands (home territory)",
+        "homeTerritoryName": "Netherlands (home territory)",
         "selectable": true,
         "population1900Estimate": 5100000,
         "confidence": "high",
@@ -264,7 +296,7 @@
         "status": "independent",
         "sovereignCountryId": 10,
         "capitalName": "Brussels",
-        "regionName": "Belgium (home territory)",
+        "homeTerritoryName": "Belgium (home territory)",
         "selectable": true,
         "population1900Estimate": 6700000,
         "confidence": "high",
@@ -276,7 +308,7 @@
         "status": "independent",
         "sovereignCountryId": 11,
         "capitalName": "Bern",
-        "regionName": "Switzerland (home territory)",
+        "homeTerritoryName": "Switzerland (home territory)",
         "selectable": true,
         "population1900Estimate": 3300000,
         "confidence": "high",
@@ -288,7 +320,7 @@
         "status": "independent",
         "sovereignCountryId": 12,
         "capitalName": "Stockholm",
-        "regionName": "Sweden (home territory)",
+        "homeTerritoryName": "Sweden (home territory)",
         "selectable": true,
         "population1900Estimate": 5100000,
         "confidence": "high",
@@ -300,7 +332,7 @@
         "status": "personal-union",
         "sovereignCountryId": 13,
         "capitalName": "Christiania",
-        "regionName": "Norway (home territory)",
+        "homeTerritoryName": "Norway (home territory)",
         "selectable": true,
         "population1900Estimate": 2200000,
         "confidence": "high",
@@ -312,7 +344,7 @@
         "status": "independent",
         "sovereignCountryId": 14,
         "capitalName": "Copenhagen",
-        "regionName": "Denmark (home territory)",
+        "homeTerritoryName": "Denmark (home territory)",
         "selectable": true,
         "population1900Estimate": 2400000,
         "confidence": "high",
@@ -324,7 +356,7 @@
         "status": "independent",
         "sovereignCountryId": 15,
         "capitalName": "Athens",
-        "regionName": "Greece (home territory)",
+        "homeTerritoryName": "Greece (home territory)",
         "selectable": true,
         "population1900Estimate": 2400000,
         "confidence": "medium",
@@ -336,7 +368,7 @@
         "status": "independent",
         "sovereignCountryId": 16,
         "capitalName": "Belgrade",
-        "regionName": "Serbia (home territory)",
+        "homeTerritoryName": "Serbia (home territory)",
         "selectable": true,
         "population1900Estimate": 2500000,
         "confidence": "medium",
@@ -348,7 +380,7 @@
         "status": "independent",
         "sovereignCountryId": 17,
         "capitalName": "Cetinje",
-        "regionName": "Montenegro (home territory)",
+        "homeTerritoryName": "Montenegro (home territory)",
         "selectable": true,
         "population1900Estimate": 300000,
         "confidence": "medium",
@@ -360,7 +392,7 @@
         "status": "independent",
         "sovereignCountryId": 18,
         "capitalName": "Bucharest",
-        "regionName": "Romania (home territory)",
+        "homeTerritoryName": "Romania (home territory)",
         "selectable": true,
         "population1900Estimate": 6000000,
         "confidence": "medium",
@@ -372,7 +404,7 @@
         "status": "autonomous-vassal",
         "sovereignCountryId": 19,
         "capitalName": "Sofia",
-        "regionName": "Bulgaria (home territory)",
+        "homeTerritoryName": "Bulgaria (home territory)",
         "selectable": true,
         "population1900Estimate": 3700000,
         "confidence": "medium",
@@ -384,7 +416,7 @@
         "status": "independent",
         "sovereignCountryId": 20,
         "capitalName": "Constantinople",
-        "regionName": "Ottoman Empire (home territory)",
+        "homeTerritoryName": "Ottoman Empire (home territory)",
         "selectable": true,
         "population1900Estimate": 24000000,
         "confidence": "low",
@@ -396,7 +428,7 @@
         "status": "independent",
         "sovereignCountryId": 21,
         "capitalName": "Luxembourg",
-        "regionName": "Luxembourg (home territory)",
+        "homeTerritoryName": "Luxembourg (home territory)",
         "selectable": true,
         "population1900Estimate": 240000,
         "confidence": "high",
@@ -408,7 +440,7 @@
         "status": "independent",
         "sovereignCountryId": 22,
         "capitalName": "Monaco",
-        "regionName": "Monaco (home territory)",
+        "homeTerritoryName": "Monaco (home territory)",
         "selectable": true,
         "population1900Estimate": 15000,
         "confidence": "medium",
@@ -420,7 +452,7 @@
         "status": "independent",
         "sovereignCountryId": 23,
         "capitalName": "San Marino",
-        "regionName": "San Marino (home territory)",
+        "homeTerritoryName": "San Marino (home territory)",
         "selectable": true,
         "population1900Estimate": 11000,
         "confidence": "medium",
@@ -432,7 +464,7 @@
         "status": "independent",
         "sovereignCountryId": 24,
         "capitalName": "Andorra la Vella",
-        "regionName": "Andorra (home territory)",
+        "homeTerritoryName": "Andorra (home territory)",
         "selectable": true,
         "population1900Estimate": 5000,
         "confidence": "low",
@@ -444,7 +476,7 @@
         "status": "independent",
         "sovereignCountryId": 25,
         "capitalName": "Vaduz",
-        "regionName": "Liechtenstein (home territory)",
+        "homeTerritoryName": "Liechtenstein (home territory)",
         "selectable": true,
         "population1900Estimate": 7500,
         "confidence": "medium",
@@ -456,7 +488,7 @@
         "status": "independent",
         "sovereignCountryId": 26,
         "capitalName": "Beijing",
-        "regionName": "China (home territory)",
+        "homeTerritoryName": "China (home territory)",
         "selectable": true,
         "population1900Estimate": 400000000,
         "confidence": "low",
@@ -468,7 +500,7 @@
         "status": "independent",
         "sovereignCountryId": 27,
         "capitalName": "Hanseong",
-        "regionName": "Korea (home territory)",
+        "homeTerritoryName": "Korea (home territory)",
         "selectable": true,
         "population1900Estimate": 17000000,
         "confidence": "medium",
@@ -480,7 +512,7 @@
         "status": "independent",
         "sovereignCountryId": 28,
         "capitalName": "Tehran",
-        "regionName": "Persia (home territory)",
+        "homeTerritoryName": "Persia (home territory)",
         "selectable": true,
         "population1900Estimate": 9900000,
         "confidence": "low",
@@ -492,7 +524,7 @@
         "status": "independent",
         "sovereignCountryId": 29,
         "capitalName": "Kabul",
-        "regionName": "Afghanistan (home territory)",
+        "homeTerritoryName": "Afghanistan (home territory)",
         "selectable": true,
         "population1900Estimate": 4500000,
         "confidence": "low",
@@ -504,7 +536,7 @@
         "status": "independent",
         "sovereignCountryId": 30,
         "capitalName": "Kathmandu",
-        "regionName": "Nepal (home territory)",
+        "homeTerritoryName": "Nepal (home territory)",
         "selectable": true,
         "population1900Estimate": 5000000,
         "confidence": "low",
@@ -516,7 +548,7 @@
         "status": "independent",
         "sovereignCountryId": 31,
         "capitalName": "Bangkok",
-        "regionName": "Siam (home territory)",
+        "homeTerritoryName": "Siam (home territory)",
         "selectable": true,
         "population1900Estimate": 7300000,
         "confidence": "medium",
@@ -528,7 +560,7 @@
         "status": "independent",
         "sovereignCountryId": 32,
         "capitalName": "Muscat",
-        "regionName": "Oman (home territory)",
+        "homeTerritoryName": "Oman (home territory)",
         "selectable": true,
         "population1900Estimate": 500000,
         "confidence": "low",
@@ -540,7 +572,7 @@
         "status": "independent",
         "sovereignCountryId": 33,
         "capitalName": "Addis Ababa",
-        "regionName": "Ethiopia (home territory)",
+        "homeTerritoryName": "Ethiopia (home territory)",
         "selectable": true,
         "population1900Estimate": 11000000,
         "confidence": "low",
@@ -552,7 +584,7 @@
         "status": "independent",
         "sovereignCountryId": 34,
         "capitalName": "Monrovia",
-        "regionName": "Liberia (home territory)",
+        "homeTerritoryName": "Liberia (home territory)",
         "selectable": true,
         "population1900Estimate": 600000,
         "confidence": "low",
@@ -564,7 +596,7 @@
         "status": "independent",
         "sovereignCountryId": 35,
         "capitalName": "Fez",
-        "regionName": "Morocco (home territory)",
+        "homeTerritoryName": "Morocco (home territory)",
         "selectable": true,
         "population1900Estimate": 5000000,
         "confidence": "low",
@@ -576,7 +608,7 @@
         "status": "independent",
         "sovereignCountryId": 36,
         "capitalName": "Pretoria",
-        "regionName": "Transvaal (home territory)",
+        "homeTerritoryName": "Transvaal (home territory)",
         "selectable": true,
         "population1900Estimate": 1200000,
         "confidence": "low",
@@ -588,7 +620,7 @@
         "status": "independent",
         "sovereignCountryId": 37,
         "capitalName": "Bloemfontein",
-        "regionName": "Orange Free State (home territory)",
+        "homeTerritoryName": "Orange Free State (home territory)",
         "selectable": true,
         "population1900Estimate": 300000,
         "confidence": "low",
@@ -600,7 +632,7 @@
         "status": "independent",
         "sovereignCountryId": 38,
         "capitalName": "Mexico City",
-        "regionName": "Mexico (home territory)",
+        "homeTerritoryName": "Mexico (home territory)",
         "selectable": true,
         "population1900Estimate": 13600000,
         "confidence": "medium",
@@ -612,7 +644,7 @@
         "status": "independent",
         "sovereignCountryId": 39,
         "capitalName": "Guatemala City",
-        "regionName": "Guatemala (home territory)",
+        "homeTerritoryName": "Guatemala (home territory)",
         "selectable": true,
         "population1900Estimate": 1400000,
         "confidence": "low",
@@ -624,7 +656,7 @@
         "status": "independent",
         "sovereignCountryId": 40,
         "capitalName": "Tegucigalpa",
-        "regionName": "Honduras (home territory)",
+        "homeTerritoryName": "Honduras (home territory)",
         "selectable": true,
         "population1900Estimate": 500000,
         "confidence": "low",
@@ -636,7 +668,7 @@
         "status": "independent",
         "sovereignCountryId": 41,
         "capitalName": "San Salvador",
-        "regionName": "El Salvador (home territory)",
+        "homeTerritoryName": "El Salvador (home territory)",
         "selectable": true,
         "population1900Estimate": 900000,
         "confidence": "low",
@@ -648,7 +680,7 @@
         "status": "independent",
         "sovereignCountryId": 42,
         "capitalName": "Managua",
-        "regionName": "Nicaragua (home territory)",
+        "homeTerritoryName": "Nicaragua (home territory)",
         "selectable": true,
         "population1900Estimate": 400000,
         "confidence": "low",
@@ -660,7 +692,7 @@
         "status": "independent",
         "sovereignCountryId": 43,
         "capitalName": "San Jose",
-        "regionName": "Costa Rica (home territory)",
+        "homeTerritoryName": "Costa Rica (home territory)",
         "selectable": true,
         "population1900Estimate": 300000,
         "confidence": "low",
@@ -672,7 +704,7 @@
         "status": "independent",
         "sovereignCountryId": 44,
         "capitalName": "Bogota",
-        "regionName": "Colombia (home territory)",
+        "homeTerritoryName": "Colombia (home territory)",
         "selectable": true,
         "population1900Estimate": 4000000,
         "confidence": "medium",
@@ -684,7 +716,7 @@
         "status": "independent",
         "sovereignCountryId": 45,
         "capitalName": "Caracas",
-        "regionName": "Venezuela (home territory)",
+        "homeTerritoryName": "Venezuela (home territory)",
         "selectable": true,
         "population1900Estimate": 2400000,
         "confidence": "low",
@@ -696,7 +728,7 @@
         "status": "independent",
         "sovereignCountryId": 46,
         "capitalName": "Quito",
-        "regionName": "Ecuador (home territory)",
+        "homeTerritoryName": "Ecuador (home territory)",
         "selectable": true,
         "population1900Estimate": 1400000,
         "confidence": "low",
@@ -708,7 +740,7 @@
         "status": "independent",
         "sovereignCountryId": 47,
         "capitalName": "Lima",
-        "regionName": "Peru (home territory)",
+        "homeTerritoryName": "Peru (home territory)",
         "selectable": true,
         "population1900Estimate": 3700000,
         "confidence": "low",
@@ -720,7 +752,7 @@
         "status": "independent",
         "sovereignCountryId": 48,
         "capitalName": "Sucre",
-        "regionName": "Bolivia (home territory)",
+        "homeTerritoryName": "Bolivia (home territory)",
         "selectable": true,
         "population1900Estimate": 1800000,
         "confidence": "low",
@@ -732,7 +764,7 @@
         "status": "independent",
         "sovereignCountryId": 49,
         "capitalName": "Santiago",
-        "regionName": "Chile (home territory)",
+        "homeTerritoryName": "Chile (home territory)",
         "selectable": true,
         "population1900Estimate": 3000000,
         "confidence": "medium",
@@ -744,7 +776,7 @@
         "status": "independent",
         "sovereignCountryId": 50,
         "capitalName": "Buenos Aires",
-        "regionName": "Argentina (home territory)",
+        "homeTerritoryName": "Argentina (home territory)",
         "selectable": true,
         "population1900Estimate": 4700000,
         "confidence": "medium",
@@ -756,7 +788,7 @@
         "status": "independent",
         "sovereignCountryId": 51,
         "capitalName": "Montevideo",
-        "regionName": "Uruguay (home territory)",
+        "homeTerritoryName": "Uruguay (home territory)",
         "selectable": true,
         "population1900Estimate": 900000,
         "confidence": "medium",
@@ -768,7 +800,7 @@
         "status": "independent",
         "sovereignCountryId": 52,
         "capitalName": "Asuncion",
-        "regionName": "Paraguay (home territory)",
+        "homeTerritoryName": "Paraguay (home territory)",
         "selectable": true,
         "population1900Estimate": 600000,
         "confidence": "low",
@@ -780,7 +812,7 @@
         "status": "independent",
         "sovereignCountryId": 53,
         "capitalName": "Rio de Janeiro",
-        "regionName": "Brazil (home territory)",
+        "homeTerritoryName": "Brazil (home territory)",
         "selectable": true,
         "population1900Estimate": 17600000,
         "confidence": "medium",
@@ -792,7 +824,7 @@
         "status": "independent",
         "sovereignCountryId": 54,
         "capitalName": "Port-au-Prince",
-        "regionName": "Haiti (home territory)",
+        "homeTerritoryName": "Haiti (home territory)",
         "selectable": true,
         "population1900Estimate": 1500000,
         "confidence": "low",
@@ -804,7 +836,7 @@
         "status": "independent",
         "sovereignCountryId": 55,
         "capitalName": "Santo Domingo",
-        "regionName": "Dominican Republic (home territory)",
+        "homeTerritoryName": "Dominican Republic (home territory)",
         "selectable": true,
         "population1900Estimate": 600000,
         "confidence": "low",
@@ -816,7 +848,7 @@
         "status": "dominion",
         "sovereignCountryId": 56,
         "capitalName": "Ottawa",
-        "regionName": "Canada (home territory)",
+        "homeTerritoryName": "Canada (home territory)",
         "selectable": true,
         "population1900Estimate": 5180000,
         "confidence": "medium",
@@ -828,7 +860,7 @@
         "status": "dominion",
         "sovereignCountryId": 57,
         "capitalName": "Melbourne",
-        "regionName": "Australia (home territory)",
+        "homeTerritoryName": "Australia (home territory)",
         "selectable": true,
         "population1900Estimate": 3800000,
         "confidence": "medium",
@@ -840,7 +872,7 @@
         "status": "dominion",
         "sovereignCountryId": 58,
         "capitalName": "Wellington",
-        "regionName": "New Zealand (home territory)",
+        "homeTerritoryName": "New Zealand (home territory)",
         "selectable": true,
         "population1900Estimate": 800000,
         "confidence": "medium",
@@ -852,7 +884,7 @@
         "status": "occupation",
         "sovereignCountryId": 59,
         "capitalName": "Havana",
-        "regionName": "Cuba (home territory)",
+        "homeTerritoryName": "Cuba (home territory)",
         "selectable": false,
         "population1900Estimate": 1600000,
         "confidence": "medium",
@@ -864,7 +896,7 @@
         "status": "independent",
         "sovereignCountryId": 60,
         "capitalName": "Vienna",
-        "regionName": "Austria-Hungary (home territory)",
+        "homeTerritoryName": "Austria-Hungary (home territory)",
         "selectable": true,
         "population1900Estimate": 51000000,
         "confidence": "medium",
@@ -876,7 +908,7 @@
         "status": "independent",
         "sovereignCountryId": 61,
         "capitalName": "Nuku'alofa",
-        "regionName": "Tonga (home territory)",
+        "homeTerritoryName": "Tonga (home territory)",
         "selectable": true,
         "population1900Estimate": 20000,
         "confidence": "medium",
@@ -888,7 +920,7 @@
         "status": "independent",
         "sovereignCountryId": 62,
         "capitalName": "Sokoto",
-        "regionName": "Sokoto (home territory)",
+        "homeTerritoryName": "Sokoto (home territory)",
         "selectable": true,
         "population1900Estimate": 10000000,
         "confidence": "low",
@@ -900,9 +932,9 @@
         "status": "independent",
         "sovereignCountryId": 63,
         "capitalName": "Abéché",
-        "regionName": "Wadai (home territory)",
+        "homeTerritoryName": "Wadai (home territory)",
         "selectable": true,
-        "population1900Estimate": 2000000,
+        "population1900Estimate": 1000000,
         "confidence": "low",
         "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
       },
@@ -912,9 +944,9 @@
         "status": "independent",
         "sovereignCountryId": 64,
         "capitalName": "El Fasher",
-        "regionName": "Darfur (home territory)",
+        "homeTerritoryName": "Darfur (home territory)",
         "selectable": true,
-        "population1900Estimate": 2000000,
+        "population1900Estimate": 600000,
         "confidence": "low",
         "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate."
       },
@@ -924,7 +956,7 @@
         "status": "independent",
         "sovereignCountryId": 65,
         "capitalName": "Ha'il",
-        "regionName": "Jabal Shammar (home territory)",
+        "homeTerritoryName": "Jabal Shammar (home territory)",
         "selectable": true,
         "population1900Estimate": 1000000,
         "confidence": "low",
@@ -936,7 +968,7 @@
         "status": "autonomous-vassal",
         "sovereignCountryId": 66,
         "capitalName": "Chania",
-        "regionName": "Crete (home territory)",
+        "homeTerritoryName": "Crete (home territory)",
         "selectable": true,
         "population1900Estimate": 300000,
         "confidence": "medium",
@@ -946,169 +978,734 @@
     "marketMeta": [
       {
         "marketId": 0,
-        "key": "british-empire",
-        "name": "British Empire and Sterling Area",
+        "key": "customs-usa",
+        "name": "United States of America and dependencies",
         "kind": "imperial",
-        "description": "The United Kingdom, the self-governing dominions and the crown colonies, treated as one preferential customs area.",
-        "customsCountryId": 1
+        "description": "United States of America with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 0,
+        "memberCountryIds": [
+          0
+        ]
       },
       {
         "marketId": 1,
-        "key": "united-states",
-        "name": "United States and Insular Possessions",
+        "key": "customs-gbr",
+        "name": "United Kingdom of Great Britain and Ireland and dependencies",
         "kind": "imperial",
-        "description": "The United States and its Caribbean and Pacific dependencies.",
-        "customsCountryId": 0
+        "description": "United Kingdom of Great Britain and Ireland with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 1,
+        "memberCountryIds": [
+          1
+        ]
       },
       {
         "marketId": 2,
-        "key": "german-empire",
-        "name": "German Empire and Colonial Market",
-        "kind": "imperial",
-        "description": "The German customs area and the African and Pacific colonies.",
-        "customsCountryId": 2
+        "key": "customs-deu",
+        "name": "German Empire customs union",
+        "kind": "shared",
+        "description": "Customs union: Luxembourg in the German Zollverein, 1842-1918.",
+        "customsCountryId": 2,
+        "memberCountryIds": [
+          2,
+          21
+        ]
       },
       {
         "marketId": 3,
-        "key": "french-empire",
-        "name": "French Empire and Colonial Union",
-        "kind": "imperial",
-        "description": "Metropolitan France, Algeria, the African federations and Indochina.",
-        "customsCountryId": 3
+        "key": "customs-fra",
+        "name": "French Republic customs union",
+        "kind": "shared",
+        "description": "Customs union: Franco-Monegasque customs union of 1865.",
+        "customsCountryId": 3,
+        "memberCountryIds": [
+          3,
+          22
+        ]
       },
       {
         "marketId": 4,
-        "key": "russian-empire",
-        "name": "Russian Imperial Market",
+        "key": "customs-rus",
+        "name": "Russian Empire and dependencies",
         "kind": "imperial",
-        "description": "The Russian Empire and the autonomous Grand Duchy of Finland.",
-        "customsCountryId": 4
+        "description": "Russian Empire with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 4,
+        "memberCountryIds": [
+          4
+        ]
       },
       {
         "marketId": 5,
-        "key": "iberian-empire",
-        "name": "Iberian and Colonial Market",
-        "kind": "shared",
-        "description": "Spain, Portugal, Andorra and their African and Asian possessions, cleared together for this model.",
-        "customsCountryId": 7
+        "key": "customs-jpn",
+        "name": "Empire of Japan and dependencies",
+        "kind": "imperial",
+        "description": "Empire of Japan with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 5,
+        "memberCountryIds": [
+          5
+        ]
       },
       {
         "marketId": 6,
-        "key": "dutch-empire",
-        "name": "Dutch Empire Market",
-        "kind": "imperial",
-        "description": "The Netherlands and the East Indian, Surinamese and Caribbean possessions.",
-        "customsCountryId": 9
+        "key": "customs-ita",
+        "name": "Kingdom of Italy customs union",
+        "kind": "shared",
+        "description": "Customs union: Italo-Sammarinese convention of 1862 placing San Marino in the Italian customs area.",
+        "customsCountryId": 6,
+        "memberCountryIds": [
+          6,
+          23
+        ]
       },
       {
         "marketId": 7,
-        "key": "belgian-congo",
-        "name": "Belgian and Congo Market",
+        "key": "customs-esp",
+        "name": "Kingdom of Spain and dependencies",
         "kind": "imperial",
-        "description": "Belgium and the Congo Free State, linked by the personal union of the crown.",
-        "customsCountryId": 10
+        "description": "Kingdom of Spain with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 7,
+        "memberCountryIds": [
+          7
+        ]
       },
       {
         "marketId": 8,
-        "key": "alpine",
-        "name": "Alpine Customs Union",
-        "kind": "shared",
-        "description": "Switzerland, Luxembourg and Liechtenstein; a documented simplification of their customs arrangements.",
-        "customsCountryId": 11
+        "key": "customs-prt",
+        "name": "Kingdom of Portugal and dependencies",
+        "kind": "imperial",
+        "description": "Kingdom of Portugal with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 8,
+        "memberCountryIds": [
+          8
+        ]
       },
       {
         "marketId": 9,
-        "key": "northern-european",
-        "name": "Northern European Market",
-        "kind": "shared",
-        "description": "Sweden, Norway and the Danish realm, including Iceland, Greenland, the Faroes and the Danish West Indies.",
-        "customsCountryId": 12
+        "key": "customs-nld",
+        "name": "Kingdom of the Netherlands and dependencies",
+        "kind": "imperial",
+        "description": "Kingdom of the Netherlands with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 9,
+        "memberCountryIds": [
+          9
+        ]
       },
       {
         "marketId": 10,
-        "key": "mediterranean",
-        "name": "Mediterranean and Colonial Market",
-        "kind": "shared",
-        "description": "Italy, the Balkan states and the Italian colonies, cleared as one Mediterranean trade area.",
-        "customsCountryId": 6
+        "key": "customs-bel",
+        "name": "Kingdom of Belgium and dependencies",
+        "kind": "imperial",
+        "description": "Kingdom of Belgium with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 10,
+        "memberCountryIds": [
+          10
+        ]
       },
       {
         "marketId": 11,
-        "key": "ottoman-egyptian",
-        "name": "Ottoman-Egyptian Market",
-        "kind": "imperial",
-        "description": "The Ottoman Empire and the autonomous province of Egypt.",
-        "customsCountryId": 20
+        "key": "customs-che",
+        "name": "Swiss Confederation",
+        "kind": "national",
+        "description": "Swiss Confederation administers its own customs territory.",
+        "customsCountryId": 11,
+        "memberCountryIds": [
+          11
+        ]
       },
       {
         "marketId": 12,
-        "key": "japanese-empire",
-        "name": "Japanese Empire Market",
-        "kind": "imperial",
-        "description": "Japan and its Formosan colony.",
-        "customsCountryId": 5
+        "key": "customs-swe",
+        "name": "Kingdom of Sweden",
+        "kind": "national",
+        "description": "Kingdom of Sweden administers its own customs territory.",
+        "customsCountryId": 12,
+        "memberCountryIds": [
+          12
+        ]
       },
       {
         "marketId": 13,
-        "key": "east-asian",
-        "name": "East Asian Treaty Port Market",
-        "kind": "shared",
-        "description": "China, Korea and Siam, grouped as the East Asian trade area of the treaty ports.",
-        "customsCountryId": 26
+        "key": "customs-nor",
+        "name": "Kingdom of Norway",
+        "kind": "national",
+        "description": "Kingdom of Norway administers its own customs territory. Separate tariff from Sweden after the inter-kingdom trade law (mellomriksloven) lapsed in 1897, despite the personal union.",
+        "customsCountryId": 13,
+        "memberCountryIds": [
+          13
+        ]
       },
       {
         "marketId": 14,
-        "key": "persian-gulf",
-        "name": "Persian Gulf and Himalayan Market",
-        "kind": "shared",
-        "description": "Persia, Afghanistan, Oman and Nepal; a thin shared market of independent states outside the colonial empires.",
-        "customsCountryId": 28
+        "key": "customs-dnk",
+        "name": "Kingdom of Denmark and dependencies",
+        "kind": "imperial",
+        "description": "Kingdom of Denmark with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 14,
+        "memberCountryIds": [
+          14
+        ]
       },
       {
         "marketId": 15,
-        "key": "african-independent",
-        "name": "African Independent States Trade Area",
-        "kind": "shared",
-        "description": "Ethiopia, Liberia and Morocco, grouped as a shared clearing area.",
-        "customsCountryId": 33
+        "key": "customs-grc",
+        "name": "Kingdom of Greece",
+        "kind": "national",
+        "description": "Kingdom of Greece administers its own customs territory.",
+        "customsCountryId": 15,
+        "memberCountryIds": [
+          15
+        ]
       },
       {
         "marketId": 16,
-        "key": "southern-african",
-        "name": "Southern African Market",
-        "kind": "shared",
-        "description": "The Transvaal and the Orange Free State at the outbreak of the South African War.",
-        "customsCountryId": 36
+        "key": "customs-srb",
+        "name": "Kingdom of Serbia",
+        "kind": "national",
+        "description": "Kingdom of Serbia administers its own customs territory.",
+        "customsCountryId": 16,
+        "memberCountryIds": [
+          16
+        ]
       },
       {
         "marketId": 17,
-        "key": "latin-america",
-        "name": "Latin American Trade Area",
-        "kind": "shared",
-        "description": "The independent Latin American republics, grouped as one shared trade area; national tariffs are not modelled.",
-        "customsCountryId": 50
+        "key": "customs-mnt",
+        "name": "Principality of Montenegro",
+        "kind": "national",
+        "description": "Principality of Montenegro administers its own customs territory.",
+        "customsCountryId": 17,
+        "memberCountryIds": [
+          17
+        ]
       },
       {
         "marketId": 18,
-        "key": "austro-hungarian",
-        "name": "Austro-Hungarian Customs Union",
+        "key": "customs-rom",
+        "name": "Kingdom of Romania",
         "kind": "national",
-        "description": "The common Austro-Hungarian customs area linking the Austrian and Hungarian halves and jointly administered Bosnia and Herzegovina.",
-        "customsCountryId": 60
+        "description": "Kingdom of Romania administers its own customs territory.",
+        "customsCountryId": 18,
+        "memberCountryIds": [
+          18
+        ]
       },
       {
         "marketId": 19,
-        "key": "pacific",
-        "name": "Pacific Island Trade",
+        "key": "customs-bgr",
+        "name": "Principality of Bulgaria",
         "kind": "national",
-        "description": "The independent Kingdom of Tonga's small open economy, treated as its own market in 1900.",
-        "customsCountryId": 61
+        "description": "Principality of Bulgaria administers its own customs territory. Autonomous vassal with its own customs administration; duty levels limited by the 1878 Treaty of Berlin.",
+        "customsCountryId": 19,
+        "memberCountryIds": [
+          19
+        ]
+      },
+      {
+        "marketId": 20,
+        "key": "customs-ott",
+        "name": "Ottoman Empire and dependencies",
+        "kind": "imperial",
+        "description": "Ottoman Empire with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 20,
+        "memberCountryIds": [
+          20
+        ]
+      },
+      {
+        "marketId": 21,
+        "key": "customs-and",
+        "name": "Co-Principality of Andorra",
+        "kind": "national",
+        "description": "Co-Principality of Andorra administers its own customs territory.",
+        "customsCountryId": 24,
+        "memberCountryIds": [
+          24
+        ]
+      },
+      {
+        "marketId": 22,
+        "key": "customs-chn",
+        "name": "Qing Empire and dependencies",
+        "kind": "imperial",
+        "description": "Qing Empire with its colonies and protectorates in one customs territory.",
+        "customsCountryId": 26,
+        "memberCountryIds": [
+          26
+        ]
+      },
+      {
+        "marketId": 23,
+        "key": "customs-kor",
+        "name": "Korean Empire",
+        "kind": "national",
+        "description": "Korean Empire administers its own customs territory.",
+        "customsCountryId": 27,
+        "memberCountryIds": [
+          27
+        ]
+      },
+      {
+        "marketId": 24,
+        "key": "customs-per",
+        "name": "Sublime State of Persia",
+        "kind": "national",
+        "description": "Sublime State of Persia administers its own customs territory.",
+        "customsCountryId": 28,
+        "memberCountryIds": [
+          28
+        ]
+      },
+      {
+        "marketId": 25,
+        "key": "customs-afg",
+        "name": "Emirate of Afghanistan",
+        "kind": "national",
+        "description": "Emirate of Afghanistan administers its own customs territory.",
+        "customsCountryId": 29,
+        "memberCountryIds": [
+          29
+        ]
+      },
+      {
+        "marketId": 26,
+        "key": "customs-npl",
+        "name": "Kingdom of Nepal",
+        "kind": "national",
+        "description": "Kingdom of Nepal administers its own customs territory.",
+        "customsCountryId": 30,
+        "memberCountryIds": [
+          30
+        ]
+      },
+      {
+        "marketId": 27,
+        "key": "customs-tha",
+        "name": "Kingdom of Siam",
+        "kind": "national",
+        "description": "Kingdom of Siam administers its own customs territory.",
+        "customsCountryId": 31,
+        "memberCountryIds": [
+          31
+        ]
+      },
+      {
+        "marketId": 28,
+        "key": "customs-omn",
+        "name": "Sultanate of Muscat and Oman",
+        "kind": "national",
+        "description": "Sultanate of Muscat and Oman administers its own customs territory.",
+        "customsCountryId": 32,
+        "memberCountryIds": [
+          32
+        ]
+      },
+      {
+        "marketId": 29,
+        "key": "customs-eth",
+        "name": "Ethiopian Empire",
+        "kind": "national",
+        "description": "Ethiopian Empire administers its own customs territory.",
+        "customsCountryId": 33,
+        "memberCountryIds": [
+          33
+        ]
+      },
+      {
+        "marketId": 30,
+        "key": "customs-lbr",
+        "name": "Republic of Liberia",
+        "kind": "national",
+        "description": "Republic of Liberia administers its own customs territory.",
+        "customsCountryId": 34,
+        "memberCountryIds": [
+          34
+        ]
+      },
+      {
+        "marketId": 31,
+        "key": "customs-mar",
+        "name": "Sultanate of Morocco",
+        "kind": "national",
+        "description": "Sultanate of Morocco administers its own customs territory.",
+        "customsCountryId": 35,
+        "memberCountryIds": [
+          35
+        ]
+      },
+      {
+        "marketId": 32,
+        "key": "customs-zar",
+        "name": "South African Republic (Transvaal)",
+        "kind": "national",
+        "description": "South African Republic (Transvaal) administers its own customs territory.",
+        "customsCountryId": 36,
+        "memberCountryIds": [
+          36
+        ]
+      },
+      {
+        "marketId": 33,
+        "key": "customs-orf",
+        "name": "Orange Free State",
+        "kind": "national",
+        "description": "Orange Free State administers its own customs territory.",
+        "customsCountryId": 37,
+        "memberCountryIds": [
+          37
+        ]
+      },
+      {
+        "marketId": 34,
+        "key": "customs-mex",
+        "name": "United Mexican States",
+        "kind": "national",
+        "description": "United Mexican States administers its own customs territory.",
+        "customsCountryId": 38,
+        "memberCountryIds": [
+          38
+        ]
+      },
+      {
+        "marketId": 35,
+        "key": "customs-gua",
+        "name": "Republic of Guatemala",
+        "kind": "national",
+        "description": "Republic of Guatemala administers its own customs territory.",
+        "customsCountryId": 39,
+        "memberCountryIds": [
+          39
+        ]
+      },
+      {
+        "marketId": 36,
+        "key": "customs-hon",
+        "name": "Republic of Honduras",
+        "kind": "national",
+        "description": "Republic of Honduras administers its own customs territory.",
+        "customsCountryId": 40,
+        "memberCountryIds": [
+          40
+        ]
+      },
+      {
+        "marketId": 37,
+        "key": "customs-sal",
+        "name": "Republic of El Salvador",
+        "kind": "national",
+        "description": "Republic of El Salvador administers its own customs territory.",
+        "customsCountryId": 41,
+        "memberCountryIds": [
+          41
+        ]
+      },
+      {
+        "marketId": 38,
+        "key": "customs-nic",
+        "name": "Republic of Nicaragua",
+        "kind": "national",
+        "description": "Republic of Nicaragua administers its own customs territory.",
+        "customsCountryId": 42,
+        "memberCountryIds": [
+          42
+        ]
+      },
+      {
+        "marketId": 39,
+        "key": "customs-cos",
+        "name": "Republic of Costa Rica",
+        "kind": "national",
+        "description": "Republic of Costa Rica administers its own customs territory.",
+        "customsCountryId": 43,
+        "memberCountryIds": [
+          43
+        ]
+      },
+      {
+        "marketId": 40,
+        "key": "customs-col",
+        "name": "Republic of Colombia",
+        "kind": "national",
+        "description": "Republic of Colombia administers its own customs territory.",
+        "customsCountryId": 44,
+        "memberCountryIds": [
+          44
+        ]
+      },
+      {
+        "marketId": 41,
+        "key": "customs-ven",
+        "name": "United States of Venezuela",
+        "kind": "national",
+        "description": "United States of Venezuela administers its own customs territory.",
+        "customsCountryId": 45,
+        "memberCountryIds": [
+          45
+        ]
+      },
+      {
+        "marketId": 42,
+        "key": "customs-ecu",
+        "name": "Republic of Ecuador",
+        "kind": "national",
+        "description": "Republic of Ecuador administers its own customs territory.",
+        "customsCountryId": 46,
+        "memberCountryIds": [
+          46
+        ]
+      },
+      {
+        "marketId": 43,
+        "key": "customs-pru",
+        "name": "Republic of Peru",
+        "kind": "national",
+        "description": "Republic of Peru administers its own customs territory.",
+        "customsCountryId": 47,
+        "memberCountryIds": [
+          47
+        ]
+      },
+      {
+        "marketId": 44,
+        "key": "customs-bol",
+        "name": "Republic of Bolivia",
+        "kind": "national",
+        "description": "Republic of Bolivia administers its own customs territory.",
+        "customsCountryId": 48,
+        "memberCountryIds": [
+          48
+        ]
+      },
+      {
+        "marketId": 45,
+        "key": "customs-chl",
+        "name": "Republic of Chile",
+        "kind": "national",
+        "description": "Republic of Chile administers its own customs territory.",
+        "customsCountryId": 49,
+        "memberCountryIds": [
+          49
+        ]
+      },
+      {
+        "marketId": 46,
+        "key": "customs-arg",
+        "name": "Argentine Republic",
+        "kind": "national",
+        "description": "Argentine Republic administers its own customs territory.",
+        "customsCountryId": 50,
+        "memberCountryIds": [
+          50
+        ]
+      },
+      {
+        "marketId": 47,
+        "key": "customs-ury",
+        "name": "Oriental Republic of Uruguay",
+        "kind": "national",
+        "description": "Oriental Republic of Uruguay administers its own customs territory.",
+        "customsCountryId": 51,
+        "memberCountryIds": [
+          51
+        ]
+      },
+      {
+        "marketId": 48,
+        "key": "customs-pry",
+        "name": "Republic of Paraguay",
+        "kind": "national",
+        "description": "Republic of Paraguay administers its own customs territory.",
+        "customsCountryId": 52,
+        "memberCountryIds": [
+          52
+        ]
+      },
+      {
+        "marketId": 49,
+        "key": "customs-bra",
+        "name": "Republic of the United States of Brazil",
+        "kind": "national",
+        "description": "Republic of the United States of Brazil administers its own customs territory.",
+        "customsCountryId": 53,
+        "memberCountryIds": [
+          53
+        ]
+      },
+      {
+        "marketId": 50,
+        "key": "customs-hti",
+        "name": "Republic of Haiti",
+        "kind": "national",
+        "description": "Republic of Haiti administers its own customs territory.",
+        "customsCountryId": 54,
+        "memberCountryIds": [
+          54
+        ]
+      },
+      {
+        "marketId": 51,
+        "key": "customs-dom",
+        "name": "Dominican Republic",
+        "kind": "national",
+        "description": "Dominican Republic administers its own customs territory.",
+        "customsCountryId": 55,
+        "memberCountryIds": [
+          55
+        ]
+      },
+      {
+        "marketId": 52,
+        "key": "customs-can",
+        "name": "Dominion of Canada",
+        "kind": "national",
+        "description": "Dominion of Canada administers its own customs territory. Dominion tariff (National Policy, 1879).",
+        "customsCountryId": 56,
+        "memberCountryIds": [
+          56
+        ]
+      },
+      {
+        "marketId": 53,
+        "key": "customs-aus",
+        "name": "Australian colonies",
+        "kind": "national",
+        "description": "Australian colonies administers its own customs territory. The six colonies kept separate tariffs until the Commonwealth tariff of 1901; the catalog models one Australian country, so one territory.",
+        "customsCountryId": 57,
+        "memberCountryIds": [
+          57
+        ]
+      },
+      {
+        "marketId": 54,
+        "key": "customs-nzl",
+        "name": "Colony of New Zealand",
+        "kind": "national",
+        "description": "Colony of New Zealand administers its own customs territory. Own colonial tariff.",
+        "customsCountryId": 58,
+        "memberCountryIds": [
+          58
+        ]
+      },
+      {
+        "marketId": 55,
+        "key": "customs-cub",
+        "name": "Republic of Cuba under United States occupation",
+        "kind": "national",
+        "description": "Republic of Cuba under United States occupation administers its own customs territory. Separate Cuban customs tariff under the 1899-1902 United States military government.",
+        "customsCountryId": 59,
+        "memberCountryIds": [
+          59
+        ]
+      },
+      {
+        "marketId": 56,
+        "key": "customs-aut",
+        "name": "Austro-Hungarian Monarchy customs union",
+        "kind": "shared",
+        "description": "Customs union: Austro-Liechtenstein customs treaty of 1852, in force until 1919.",
+        "customsCountryId": 60,
+        "memberCountryIds": [
+          25,
+          60
+        ]
+      },
+      {
+        "marketId": 57,
+        "key": "customs-ton",
+        "name": "Kingdom of Tonga",
+        "kind": "national",
+        "description": "Kingdom of Tonga administers its own customs territory.",
+        "customsCountryId": 61,
+        "memberCountryIds": [
+          61
+        ]
+      },
+      {
+        "marketId": 58,
+        "key": "customs-sok",
+        "name": "Sokoto Caliphate",
+        "kind": "national",
+        "description": "Sokoto Caliphate administers its own customs territory.",
+        "customsCountryId": 62,
+        "memberCountryIds": [
+          62
+        ]
+      },
+      {
+        "marketId": 59,
+        "key": "customs-wad",
+        "name": "Sultanate of Wadai",
+        "kind": "national",
+        "description": "Sultanate of Wadai administers its own customs territory.",
+        "customsCountryId": 63,
+        "memberCountryIds": [
+          63
+        ]
+      },
+      {
+        "marketId": 60,
+        "key": "customs-dar",
+        "name": "Sultanate of Darfur",
+        "kind": "national",
+        "description": "Sultanate of Darfur administers its own customs territory.",
+        "customsCountryId": 64,
+        "memberCountryIds": [
+          64
+        ]
+      },
+      {
+        "marketId": 61,
+        "key": "customs-shm",
+        "name": "Emirate of Jabal Shammar (Ha'il)",
+        "kind": "national",
+        "description": "Emirate of Jabal Shammar (Ha'il) administers its own customs territory.",
+        "customsCountryId": 65,
+        "memberCountryIds": [
+          65
+        ]
+      },
+      {
+        "marketId": 62,
+        "key": "customs-crt",
+        "name": "Cretan State",
+        "kind": "national",
+        "description": "Cretan State administers its own customs territory. Autonomous Cretan State from 1898 with its own customs revenue under the High Commissioner.",
+        "customsCountryId": 66,
+        "memberCountryIds": [
+          66
+        ]
       }
     ],
-    "regionMeta": [
+    "territoryMeta": [
       {
-        "regionId": 100,
         "polityTag": "BIN",
+        "provinceIds": [
+          100169,
+          100170,
+          100171,
+          100172,
+          100173,
+          100174,
+          100175,
+          100176,
+          100177,
+          100178,
+          100179,
+          100180,
+          100181,
+          100182,
+          100183,
+          100184,
+          100185,
+          100186,
+          100187,
+          100188,
+          100189,
+          100190,
+          100191,
+          100192,
+          100193,
+          100194,
+          100195
+        ],
         "historicalName": "British India",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1118,8 +1715,13 @@
         "notes": "Burma was administered as part of British India until 1937."
       },
       {
-        "regionId": 101,
         "polityTag": "CEY",
+        "provinceIds": [
+          100197,
+          100198,
+          100199,
+          100200
+        ],
         "historicalName": "Ceylon",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1129,8 +1731,14 @@
         "notes": ""
       },
       {
-        "regionId": 102,
         "polityTag": "MAL",
+        "provinceIds": [
+          100201,
+          100202,
+          100203,
+          100204,
+          100205
+        ],
         "historicalName": "British Malaya and Singapore",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1140,8 +1748,10 @@
         "notes": ""
       },
       {
-        "regionId": 103,
         "polityTag": "HKG",
+        "provinceIds": [
+          100207
+        ],
         "historicalName": "Hong Kong",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1151,8 +1761,10 @@
         "notes": ""
       },
       {
-        "regionId": 104,
         "polityTag": "KUW",
+        "provinceIds": [
+          100037
+        ],
         "historicalName": "Kuwait",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1162,8 +1774,11 @@
         "notes": ""
       },
       {
-        "regionId": 105,
         "polityTag": "TRU",
+        "provinceIds": [
+          100038,
+          100039
+        ],
         "historicalName": "Trucial States",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1173,8 +1788,10 @@
         "notes": ""
       },
       {
-        "regionId": 106,
         "polityTag": "CYP",
+        "provinceIds": [
+          1050
+        ],
         "historicalName": "Cyprus",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1184,8 +1801,10 @@
         "notes": ""
       },
       {
-        "regionId": 107,
         "polityTag": "MLT",
+        "provinceIds": [
+          1051
+        ],
         "historicalName": "Malta",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1195,8 +1814,42 @@
         "notes": ""
       },
       {
-        "regionId": 108,
         "polityTag": "BWI",
+        "provinceIds": [
+          300173,
+          300174,
+          300175,
+          300176,
+          300177,
+          300178,
+          300397,
+          300398,
+          300399,
+          300427,
+          300428,
+          300429,
+          300430,
+          300431,
+          300432,
+          300433,
+          300434,
+          300435,
+          300436,
+          300437,
+          300438,
+          300439,
+          300440,
+          300441,
+          300442,
+          300443,
+          300444,
+          300445,
+          300446,
+          300447,
+          300448,
+          300449,
+          300450
+        ],
         "historicalName": "British West Indies",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1206,8 +1859,15 @@
         "notes": "Several small crown colonies are grouped for simulation granularity."
       },
       {
-        "regionId": 109,
         "polityTag": "BSA",
+        "provinceIds": [
+          200017,
+          200018,
+          300465,
+          300466,
+          400115,
+          400116
+        ],
         "historicalName": "British South Atlantic and Pacific islands",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1217,8 +1877,21 @@
         "notes": "Grouped tiny dependencies; populations are rough."
       },
       {
-        "regionId": 110,
         "polityTag": "BWA",
+        "provinceIds": [
+          200168,
+          200169,
+          200170,
+          200171,
+          200172,
+          200173,
+          200174,
+          200175,
+          200176,
+          200177,
+          200178,
+          200179
+        ],
         "historicalName": "British West Africa",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1228,8 +1901,20 @@
         "notes": "Several separate colonies are grouped for simulation granularity."
       },
       {
-        "regionId": 111,
         "polityTag": "BEA",
+        "provinceIds": [
+          200158,
+          200159,
+          200160,
+          200161,
+          200162,
+          200163,
+          200164,
+          200165,
+          200166,
+          200167,
+          400139
+        ],
         "historicalName": "British East Africa",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1239,8 +1924,17 @@
         "notes": ""
       },
       {
-        "regionId": 112,
         "polityTag": "SUD",
+        "provinceIds": [
+          200059,
+          200060,
+          200061,
+          200062,
+          200063,
+          200064,
+          200065,
+          200066
+        ],
         "historicalName": "Anglo-Egyptian Sudan",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1250,8 +1944,10 @@
         "notes": ""
       },
       {
-        "regionId": 113,
         "polityTag": "BSO",
+        "provinceIds": [
+          200030
+        ],
         "historicalName": "British Somaliland",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1261,8 +1957,19 @@
         "notes": ""
       },
       {
-        "regionId": 114,
         "polityTag": "CRA",
+        "provinceIds": [
+          200133,
+          200134,
+          200135,
+          200136,
+          200137,
+          200138,
+          200139,
+          200140,
+          200141,
+          200142
+        ],
         "historicalName": "British Central Africa",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1272,8 +1979,15 @@
         "notes": ""
       },
       {
-        "regionId": 115,
         "polityTag": "HCT",
+        "provinceIds": [
+          200143,
+          200144,
+          200145,
+          200146,
+          200147,
+          200148
+        ],
         "historicalName": "High Commission Territories",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1283,8 +1997,15 @@
         "notes": ""
       },
       {
-        "regionId": 116,
         "polityTag": "FJI",
+        "provinceIds": [
+          400057,
+          400058,
+          400059,
+          400060,
+          400061,
+          400150
+        ],
         "historicalName": "Fiji",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1294,8 +2015,47 @@
         "notes": ""
       },
       {
-        "regionId": 117,
         "polityTag": "BPO",
+        "provinceIds": [
+          100239,
+          200004,
+          200005,
+          200006,
+          200007,
+          400011,
+          400036,
+          400051,
+          400052,
+          400053,
+          400054,
+          400055,
+          400056,
+          400062,
+          400063,
+          400064,
+          400065,
+          400066,
+          400067,
+          400068,
+          400069,
+          400070,
+          400071,
+          400072,
+          400073,
+          400074,
+          400075,
+          400076,
+          400093,
+          400094,
+          400095,
+          400096,
+          400104,
+          400105,
+          400106,
+          400117,
+          400145,
+          400146
+        ],
         "historicalName": "British Pacific and Indian Ocean islands",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1305,8 +2065,13 @@
         "notes": "Grouped dependencies, including the Anglo-French New Hebrides condominium."
       },
       {
-        "regionId": 118,
         "polityTag": "CAP",
+        "provinceIds": [
+          200003,
+          200149,
+          200150,
+          200151
+        ],
         "historicalName": "Cape Colony",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1316,8 +2081,10 @@
         "notes": ""
       },
       {
-        "regionId": 119,
         "polityTag": "NAT",
+        "provinceIds": [
+          200152
+        ],
         "historicalName": "Natal",
         "status": "colony",
         "sovereignCountryId": 1,
@@ -1327,8 +2094,10 @@
         "notes": ""
       },
       {
-        "regionId": 120,
         "polityTag": "NFD",
+        "provinceIds": [
+          300063
+        ],
         "historicalName": "Newfoundland",
         "status": "dominion",
         "sovereignCountryId": 1,
@@ -1338,8 +2107,17 @@
         "notes": "Not part of Canada in 1900. M11c separates Newfoundland and Labrador from modern Canada using the modern province boundary."
       },
       {
-        "regionId": 121,
         "polityTag": "ALG",
+        "provinceIds": [
+          200227,
+          200228,
+          200229,
+          200230,
+          200231,
+          200232,
+          200233,
+          400137
+        ],
         "historicalName": "Algeria",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1349,8 +2127,13 @@
         "notes": ""
       },
       {
-        "regionId": 122,
         "polityTag": "TUN",
+        "provinceIds": [
+          200234,
+          200235,
+          200236,
+          200237
+        ],
         "historicalName": "Tunisia",
         "status": "protectorate",
         "sovereignCountryId": 3,
@@ -1360,8 +2143,45 @@
         "notes": ""
       },
       {
-        "regionId": 123,
         "polityTag": "FWA",
+        "provinceIds": [
+          200180,
+          200181,
+          200182,
+          200183,
+          200184,
+          200185,
+          200186,
+          200187,
+          200188,
+          200189,
+          200190,
+          200191,
+          200192,
+          200193,
+          200194,
+          200195,
+          200196,
+          200197,
+          200198,
+          200199,
+          200200,
+          200201,
+          200202,
+          200203,
+          200204,
+          200205,
+          200206,
+          200207,
+          200208,
+          200209,
+          200210,
+          200211,
+          200212,
+          200213,
+          200214,
+          200215
+        ],
         "historicalName": "French West Africa",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1371,8 +2191,21 @@
         "notes": ""
       },
       {
-        "regionId": 124,
         "polityTag": "FEA",
+        "provinceIds": [
+          200216,
+          200217,
+          200218,
+          200219,
+          200220,
+          200221,
+          200222,
+          200223,
+          200224,
+          200225,
+          200226,
+          400129
+        ],
         "historicalName": "French Equatorial Africa",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1382,8 +2215,15 @@
         "notes": ""
       },
       {
-        "regionId": 125,
         "polityTag": "FIC",
+        "provinceIds": [
+          100209,
+          100210,
+          100211,
+          100212,
+          100213,
+          100214
+        ],
         "historicalName": "French Indochina",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1393,8 +2233,20 @@
         "notes": ""
       },
       {
-        "regionId": 126,
         "polityTag": "MAD",
+        "provinceIds": [
+          200019,
+          200020,
+          200021,
+          200022,
+          200023,
+          200024,
+          200025,
+          200026,
+          200027,
+          200028,
+          200029
+        ],
         "historicalName": "French Madagascar",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1404,8 +2256,10 @@
         "notes": ""
       },
       {
-        "regionId": 127,
         "polityTag": "FSO",
+        "provinceIds": [
+          200246
+        ],
         "historicalName": "French Somaliland",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1415,8 +2269,13 @@
         "notes": ""
       },
       {
-        "regionId": 128,
         "polityTag": "FCA",
+        "provinceIds": [
+          300451,
+          300452,
+          300453,
+          300454
+        ],
         "historicalName": "French Caribbean",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1426,8 +2285,21 @@
         "notes": "Martinique and Guadeloupe are not separately present in the map source."
       },
       {
-        "regionId": 129,
         "polityTag": "FPO",
+        "provinceIds": [
+          400077,
+          400078,
+          400079,
+          400107,
+          400108,
+          400109,
+          400110,
+          400111,
+          400112,
+          400113,
+          400114,
+          400147
+        ],
         "historicalName": "French Pacific",
         "status": "colony",
         "sovereignCountryId": 3,
@@ -1437,8 +2309,21 @@
         "notes": ""
       },
       {
-        "regionId": 130,
         "polityTag": "GEA",
+        "provinceIds": [
+          200075,
+          200076,
+          200077,
+          200078,
+          200079,
+          200080,
+          200081,
+          200082,
+          200083,
+          200084,
+          200085,
+          200086
+        ],
         "historicalName": "German East Africa",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1448,8 +2333,16 @@
         "notes": ""
       },
       {
-        "regionId": 131,
         "polityTag": "GSW",
+        "provinceIds": [
+          200095,
+          200096,
+          200097,
+          200098,
+          200099,
+          200100,
+          200101
+        ],
         "historicalName": "German South West Africa",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1459,8 +2352,13 @@
         "notes": ""
       },
       {
-        "regionId": 132,
         "polityTag": "KAM",
+        "provinceIds": [
+          200087,
+          200088,
+          200089,
+          200090
+        ],
         "historicalName": "Kamerun",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1470,8 +2368,13 @@
         "notes": ""
       },
       {
-        "regionId": 133,
         "polityTag": "TOG",
+        "provinceIds": [
+          200091,
+          200092,
+          200093,
+          200094
+        ],
         "historicalName": "Togo",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1481,8 +2384,23 @@
         "notes": ""
       },
       {
-        "regionId": 134,
         "polityTag": "GNG",
+        "provinceIds": [
+          400037,
+          400038,
+          400039,
+          400040,
+          400041,
+          400042,
+          400043,
+          400044,
+          400045,
+          400046,
+          400047,
+          400048,
+          400049,
+          400050
+        ],
         "historicalName": "German New Guinea",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1492,8 +2410,10 @@
         "notes": "British Papua is not separable in the map source; the whole island is shown as one territory."
       },
       {
-        "regionId": 135,
         "polityTag": "GSA",
+        "provinceIds": [
+          400102
+        ],
         "historicalName": "German Samoa",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1503,8 +2423,22 @@
         "notes": ""
       },
       {
-        "regionId": 136,
         "polityTag": "GPN",
+        "provinceIds": [
+          400080,
+          400081,
+          400082,
+          400083,
+          400084,
+          400085,
+          400086,
+          400087,
+          400088,
+          400089,
+          400090,
+          400091,
+          400153
+        ],
         "historicalName": "German Pacific islands",
         "status": "colony",
         "sovereignCountryId": 2,
@@ -1514,8 +2448,18 @@
         "notes": "Grouped for simulation granularity."
       },
       {
-        "regionId": 137,
         "polityTag": "CFS",
+        "provinceIds": [
+          200102,
+          200103,
+          200104,
+          200105,
+          200106,
+          200107,
+          200108,
+          200109,
+          200110
+        ],
         "historicalName": "Congo Free State",
         "status": "colony",
         "sovereignCountryId": 10,
@@ -1525,8 +2469,22 @@
         "notes": "Formally not a Belgian colony until 1908; shown separately from Belgium."
       },
       {
-        "regionId": 138,
         "polityTag": "ANG",
+        "provinceIds": [
+          200111,
+          200112,
+          200113,
+          200114,
+          200115,
+          200116,
+          200117,
+          200118,
+          200119,
+          200120,
+          200121,
+          200122,
+          200123
+        ],
         "historicalName": "Portuguese Angola",
         "status": "colony",
         "sovereignCountryId": 8,
@@ -1536,8 +2494,18 @@
         "notes": ""
       },
       {
-        "regionId": 139,
         "polityTag": "MOZ",
+        "provinceIds": [
+          200124,
+          200125,
+          200126,
+          200127,
+          200128,
+          200129,
+          200130,
+          200131,
+          200132
+        ],
         "historicalName": "Portuguese Mozambique",
         "status": "colony",
         "sovereignCountryId": 8,
@@ -1547,8 +2515,17 @@
         "notes": ""
       },
       {
-        "regionId": 140,
         "polityTag": "PAI",
+        "provinceIds": [
+          200008,
+          200009,
+          200010,
+          200011,
+          200012,
+          200013,
+          200014,
+          400141
+        ],
         "historicalName": "Portuguese Atlantic islands",
         "status": "colony",
         "sovereignCountryId": 8,
@@ -1558,8 +2535,10 @@
         "notes": ""
       },
       {
-        "regionId": 141,
         "polityTag": "PTM",
+        "provinceIds": [
+          100238
+        ],
         "historicalName": "Portuguese Timor",
         "status": "colony",
         "sovereignCountryId": 8,
@@ -1569,8 +2548,10 @@
         "notes": ""
       },
       {
-        "regionId": 142,
         "polityTag": "MAC",
+        "provinceIds": [
+          100208
+        ],
         "historicalName": "Macao",
         "status": "colony",
         "sovereignCountryId": 8,
@@ -1580,8 +2561,13 @@
         "notes": ""
       },
       {
-        "regionId": 143,
         "polityTag": "ERI",
+        "provinceIds": [
+          200034,
+          200035,
+          200036,
+          200037
+        ],
         "historicalName": "Italian Eritrea",
         "status": "colony",
         "sovereignCountryId": 6,
@@ -1591,8 +2577,13 @@
         "notes": ""
       },
       {
-        "regionId": 144,
         "polityTag": "ITS",
+        "provinceIds": [
+          200031,
+          200032,
+          200033,
+          400140
+        ],
         "historicalName": "Italian Somaliland",
         "status": "colony",
         "sovereignCountryId": 6,
@@ -1602,8 +2593,27 @@
         "notes": ""
       },
       {
-        "regionId": 145,
         "polityTag": "DEI",
+        "provinceIds": [
+          100215,
+          100216,
+          100217,
+          100218,
+          100219,
+          100220,
+          100221,
+          100222,
+          100223,
+          100224,
+          100225,
+          100226,
+          100227,
+          100228,
+          100229,
+          100230,
+          100231,
+          100232
+        ],
         "historicalName": "Dutch East Indies",
         "status": "colony",
         "sovereignCountryId": 9,
@@ -1613,8 +2623,13 @@
         "notes": ""
       },
       {
-        "regionId": 146,
         "polityTag": "SUR",
+        "provinceIds": [
+          300400,
+          300401,
+          300402,
+          300403
+        ],
         "historicalName": "Suriname",
         "status": "colony",
         "sovereignCountryId": 9,
@@ -1624,8 +2639,12 @@
         "notes": ""
       },
       {
-        "regionId": 147,
         "polityTag": "DGC",
+        "provinceIds": [
+          300459,
+          300460,
+          300461
+        ],
         "historicalName": "Dutch Caribbean",
         "status": "colony",
         "sovereignCountryId": 9,
@@ -1635,8 +2654,11 @@
         "notes": ""
       },
       {
-        "regionId": 148,
         "polityTag": "SAH",
+        "provinceIds": [
+          200001,
+          200002
+        ],
         "historicalName": "Spanish Sahara",
         "status": "colony",
         "sovereignCountryId": 7,
@@ -1646,8 +2668,11 @@
         "notes": ""
       },
       {
-        "regionId": 149,
         "polityTag": "SGG",
+        "provinceIds": [
+          200015,
+          200016
+        ],
         "historicalName": "Spanish Guinea",
         "status": "colony",
         "sovereignCountryId": 7,
@@ -1657,8 +2682,15 @@
         "notes": ""
       },
       {
-        "regionId": 150,
         "polityTag": "PHL",
+        "provinceIds": [
+          100233,
+          100234,
+          100235,
+          100236,
+          100237,
+          400144
+        ],
         "historicalName": "Philippine Islands",
         "status": "colony",
         "sovereignCountryId": 0,
@@ -1668,8 +2700,10 @@
         "notes": "Filipino resistance continued after the declaration of the First Republic."
       },
       {
-        "regionId": 151,
         "polityTag": "PRI",
+        "provinceIds": [
+          300469
+        ],
         "historicalName": "Puerto Rico",
         "status": "colony",
         "sovereignCountryId": 0,
@@ -1679,8 +2713,10 @@
         "notes": ""
       },
       {
-        "regionId": 152,
         "polityTag": "GUM",
+        "provinceIds": [
+          400092
+        ],
         "historicalName": "Guam",
         "status": "colony",
         "sovereignCountryId": 0,
@@ -1690,8 +2726,10 @@
         "notes": ""
       },
       {
-        "regionId": 153,
         "polityTag": "ASM",
+        "provinceIds": [
+          400103
+        ],
         "historicalName": "American Samoa",
         "status": "colony",
         "sovereignCountryId": 0,
@@ -1701,8 +2739,10 @@
         "notes": ""
       },
       {
-        "regionId": 154,
         "polityTag": "ISL",
+        "provinceIds": [
+          14006
+        ],
         "historicalName": "Iceland",
         "status": "dependency",
         "sovereignCountryId": 14,
@@ -1712,8 +2752,11 @@
         "notes": ""
       },
       {
-        "regionId": 155,
         "polityTag": "GRL",
+        "provinceIds": [
+          300467,
+          300468
+        ],
         "historicalName": "Greenland",
         "status": "dependency",
         "sovereignCountryId": 14,
@@ -1723,8 +2766,10 @@
         "notes": ""
       },
       {
-        "regionId": 156,
         "polityTag": "FRO",
+        "provinceIds": [
+          14007
+        ],
         "historicalName": "Faroe Islands",
         "status": "dependency",
         "sovereignCountryId": 14,
@@ -1734,8 +2779,12 @@
         "notes": ""
       },
       {
-        "regionId": 157,
         "polityTag": "DWI",
+        "provinceIds": [
+          300462,
+          300463,
+          300464
+        ],
         "historicalName": "Danish West Indies",
         "status": "colony",
         "sovereignCountryId": 14,
@@ -1745,8 +2794,20 @@
         "notes": ""
       },
       {
-        "regionId": 158,
         "polityTag": "EGY",
+        "provinceIds": [
+          200048,
+          200049,
+          200050,
+          200051,
+          200052,
+          200053,
+          200054,
+          200055,
+          200056,
+          200057,
+          200058
+        ],
         "historicalName": "Egypt",
         "status": "autonomous-province",
         "sovereignCountryId": 20,
@@ -1756,8 +2817,11 @@
         "notes": "Not selectable: sovereignty is Ottoman and administration is under British occupation."
       },
       {
-        "regionId": 159,
         "polityTag": "BHU",
+        "provinceIds": [
+          100059,
+          100060
+        ],
         "historicalName": "Bhutan",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1767,8 +2831,19 @@
         "notes": ""
       },
       {
-        "regionId": 160,
         "polityTag": "FIN",
+        "provinceIds": [
+          4001,
+          4002,
+          4003,
+          4004,
+          4005,
+          4006,
+          4007,
+          4008,
+          4009,
+          4010
+        ],
         "historicalName": "Grand Duchy of Finland",
         "status": "autonomous-province",
         "sovereignCountryId": 4,
@@ -1778,8 +2853,12 @@
         "notes": "Not selectable: part of the Russian Empire in 1900."
       },
       {
-        "regionId": 161,
         "polityTag": "TWN",
+        "provinceIds": [
+          100121,
+          100122,
+          100123
+        ],
         "historicalName": "Taiwan (Formosa)",
         "status": "colony",
         "sovereignCountryId": 5,
@@ -1789,8 +2868,11 @@
         "notes": ""
       },
       {
-        "regionId": 162,
         "polityTag": "TIB",
+        "provinceIds": [
+          100101,
+          100102
+        ],
         "historicalName": "Tibet",
         "status": "autonomous-province",
         "sovereignCountryId": 26,
@@ -1800,8 +2882,12 @@
         "notes": "Not an independent state in 1900. M11c separates the modern Tibet Autonomous Region as a conservative core; Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated. Population is a rounded estimate."
       },
       {
-        "regionId": 163,
         "polityTag": "KHI",
+        "provinceIds": [
+          100164,
+          100165,
+          100166
+        ],
         "historicalName": "Khanate of Khiva",
         "status": "protectorate",
         "sovereignCountryId": 4,
@@ -1811,8 +2897,11 @@
         "notes": "Russian protectorate, not independent. M11c reconstructs the khanate's irrigated core from Xorazm, Karakalpakstan and Daşoguz. Population is a rounded estimate."
       },
       {
-        "regionId": 164,
         "polityTag": "BUK",
+        "provinceIds": [
+          100167,
+          100168
+        ],
         "historicalName": "Emirate of Bukhara",
         "status": "protectorate",
         "sovereignCountryId": 4,
@@ -1822,8 +2911,10 @@
         "notes": "Russian protectorate, not independent. M11c reconstructs the emirate from Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. Population is a rounded estimate."
       },
       {
-        "regionId": 165,
         "polityTag": "SAR",
+        "provinceIds": [
+          100206
+        ],
         "historicalName": "Raj of Sarawak",
         "status": "protectorate",
         "sovereignCountryId": 1,
@@ -1831,6 +2922,19 @@
         "selectable": false,
         "confidence": "low",
         "notes": "British protectorate, not independent. M11c separates Sarawak from British Malaya using the modern Malaysian state boundary. Population is a rounded estimate."
+      },
+      {
+        "polityTag": "GOA",
+        "provinceIds": [
+          100196
+        ],
+        "historicalName": "Estado da India (Portuguese India)",
+        "status": "colony",
+        "sovereignCountryId": 8,
+        "capitalName": "Nova Goa (Panjim)",
+        "selectable": false,
+        "confidence": "medium",
+        "notes": "P2 (D-132): Goa only; Daman and Diu are not separate provinces on the map. Population from the census of 1 December 1900; occupation mix from Portugal's Asian territories."
       }
     ]
   }

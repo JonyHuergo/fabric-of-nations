@@ -22,7 +22,7 @@ function migrationScenario(
 ): ReturnType<typeof m5Scenario> {
   const scenario = m5Scenario(options);
   scenario.buildingInstances = scenario.buildingInstances.filter(
-    (building) => building.regionId !== M5_REGION_C1 || building.definitionId !== 0,
+    (building) => building.provinceId !== M5_REGION_C1 || building.definitionId !== 0,
   );
   scenario.population.popBlocks = scenario.population.popBlocks.map((block) =>
     block.id === 5 ? { ...block, wealthLevel: 60 } : block,
@@ -144,7 +144,7 @@ describe("M5 migration", () => {
     const result = runMigrationPhase(world, scenario.definitions, 31);
     expect(result.flows.length).toBeGreaterThan(0);
     const total = result.flows
-      .filter((flow) => flow.destinationRegionId === M5_REGION_C1)
+      .filter((flow) => flow.destinationProvinceId === M5_REGION_C1)
       .reduce((sum, flow) => sum + flow.people, 0);
     expect(total).toBeLessThanOrEqual(cap);
   });
@@ -158,7 +158,7 @@ describe("M5 migration", () => {
         ...scenario,
         population: {
           ...scenario.population,
-          regions: [...scenario.population.regions].reverse(),
+          provinceEconomies: [...scenario.population.provinceEconomies].reverse(),
           popBlocks: [...scenario.population.popBlocks].reverse(),
         },
         markets: [...scenario.markets].reverse(),
@@ -195,7 +195,7 @@ describe("M5 migration", () => {
         destinationPopBlockId: 1,
         people: 1,
       }),
-    ).toThrow(/different regions/);
+    ).toThrow(/different provinces/);
     expect(hashWorld(world)).toBe(before);
 
     expect(() =>
@@ -274,7 +274,7 @@ describe("M5 migration", () => {
       people: 10,
     });
     expect(flow.people).toBe(10);
-    expect(flow.destinationRegionId).toBe(M5_REGION_C1);
+    expect(flow.destinationProvinceId).toBe(M5_REGION_C1);
     assertValidWorld(world);
 
     const { world: closedWorld } = worldAt(31);

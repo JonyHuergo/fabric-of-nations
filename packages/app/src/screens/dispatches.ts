@@ -142,7 +142,7 @@ export function deriveDispatches(
         push(
           `built-${String(project.id)}`,
           "construction",
-          `${project.definitionName} completed in ${project.regionName}`,
+          `${project.definitionName} completed in ${project.provinceName}`,
         );
       }
       // The player's own closed months, not the country summaries: a summary's result

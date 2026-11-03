@@ -1,6 +1,6 @@
 [
   {
-    "regionId": 0,
+    "provinceId": 0,
     "professionKey": "peasants",
     "population": 15926000,
     "literacy": 0.75,
@@ -14,7 +14,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 0,
+    "provinceId": 0,
     "professionKey": "laborers",
     "population": 12573000,
     "literacy": 0.82,
@@ -28,7 +28,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 0,
+    "provinceId": 0,
     "professionKey": "clerks",
     "population": 10796200,
     "literacy": 0.95,
@@ -42,7 +42,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 0,
+    "provinceId": 0,
     "professionKey": "academics",
     "population": 938800,
     "literacy": 0.97,
@@ -56,7 +56,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 0,
+    "provinceId": 0,
     "professionKey": "capitalists",
     "population": 1676000,
     "literacy": 0.98,
@@ -70,7 +70,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 1,
+    "provinceId": 1,
     "professionKey": "peasants",
     "population": 13030000,
     "literacy": 0.75,
@@ -84,7 +84,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 1,
+    "provinceId": 1,
     "professionKey": "laborers",
     "population": 10287000,
     "literacy": 0.82,
@@ -98,7 +98,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 1,
+    "provinceId": 1,
     "professionKey": "clerks",
     "population": 8832920,
     "literacy": 0.95,
@@ -112,7 +112,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 1,
+    "provinceId": 1,
     "professionKey": "academics",
     "population": 768080,
     "literacy": 0.97,
@@ -126,7 +126,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 1,
+    "provinceId": 1,
     "professionKey": "capitalists",
     "population": 1372000,
     "literacy": 0.98,
@@ -140,7 +140,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 2,
+    "provinceId": 2,
     "professionKey": "peasants",
     "population": 4482000,
     "literacy": 0.88,
@@ -154,7 +154,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 2,
+    "provinceId": 2,
     "professionKey": "laborers",
     "population": 14940000,
     "literacy": 0.92,
@@ -168,7 +168,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 2,
+    "provinceId": 2,
     "professionKey": "clerks",
     "population": 13744800,
     "literacy": 0.97,
@@ -182,7 +182,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 2,
+    "provinceId": 2,
     "professionKey": "academics",
     "population": 1195200,
     "literacy": 0.99,
@@ -196,7 +196,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 2,
+    "provinceId": 2,
     "professionKey": "capitalists",
     "population": 2988000,
     "literacy": 0.99,
@@ -210,7 +210,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 3,
+    "provinceId": 3,
     "professionKey": "peasants",
     "population": 498000,
     "literacy": 0.88,
@@ -224,7 +224,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 3,
+    "provinceId": 3,
     "professionKey": "laborers",
     "population": 1660000,
     "literacy": 0.92,
@@ -238,7 +238,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 3,
+    "provinceId": 3,
     "professionKey": "clerks",
     "population": 1527200,
     "literacy": 0.97,
@@ -252,7 +252,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 3,
+    "provinceId": 3,
     "professionKey": "academics",
     "population": 132800,
     "literacy": 0.99,
@@ -266,7 +266,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 3,
+    "provinceId": 3,
     "professionKey": "capitalists",
     "population": 332000,
     "literacy": 0.99,
@@ -280,7 +280,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 4,
+    "provinceId": 4,
     "professionKey": "peasants",
     "population": 13440000,
     "literacy": 0.86,
@@ -294,7 +294,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 4,
+    "provinceId": 4,
     "professionKey": "laborers",
     "population": 10752000,
     "literacy": 0.89,
@@ -308,7 +308,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 4,
+    "provinceId": 4,
     "professionKey": "clerks",
     "population": 7418880,
     "literacy": 0.96,
@@ -322,7 +322,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 4,
+    "provinceId": 4,
     "professionKey": "academics",
     "population": 645120,
     "literacy": 0.98,
@@ -336,7 +336,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 4,
+    "provinceId": 4,
     "professionKey": "capitalists",
     "population": 1344000,
     "literacy": 0.98,
@@ -350,7 +350,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 5,
+    "provinceId": 5,
     "professionKey": "peasants",
     "population": 8960000,
     "literacy": 0.86,
@@ -364,7 +364,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 5,
+    "provinceId": 5,
     "professionKey": "laborers",
     "population": 7168000,
     "literacy": 0.89,
@@ -378,7 +378,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 5,
+    "provinceId": 5,
     "professionKey": "clerks",
     "population": 4945920,
     "literacy": 0.96,
@@ -392,7 +392,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 5,
+    "provinceId": 5,
     "professionKey": "academics",
     "population": 430080,
     "literacy": 0.98,
@@ -406,7 +406,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 5,
+    "provinceId": 5,
     "professionKey": "capitalists",
     "population": 896000,
     "literacy": 0.98,
@@ -420,7 +420,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 6,
+    "provinceId": 6,
     "professionKey": "peasants",
     "population": 9841700,
     "literacy": 0.76,
@@ -434,7 +434,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 6,
+    "provinceId": 6,
     "professionKey": "laborers",
     "population": 5990600,
     "literacy": 0.81,
@@ -448,7 +448,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 6,
+    "provinceId": 6,
     "professionKey": "clerks",
     "population": 4330348,
     "literacy": 0.94,
@@ -462,7 +462,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 6,
+    "provinceId": 6,
     "professionKey": "academics",
     "population": 376552,
     "literacy": 0.96,
@@ -476,7 +476,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 6,
+    "provinceId": 6,
     "professionKey": "capitalists",
     "population": 855800,
     "literacy": 0.98,
@@ -490,7 +490,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 7,
+    "provinceId": 7,
     "professionKey": "peasants",
     "population": 8052300,
     "literacy": 0.76,
@@ -504,7 +504,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 7,
+    "provinceId": 7,
     "professionKey": "laborers",
     "population": 4901400,
     "literacy": 0.81,
@@ -518,7 +518,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 7,
+    "provinceId": 7,
     "professionKey": "clerks",
     "population": 3543012,
     "literacy": 0.94,
@@ -532,7 +532,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 7,
+    "provinceId": 7,
     "professionKey": "academics",
     "population": 308088,
     "literacy": 0.96,
@@ -546,7 +546,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 7,
+    "provinceId": 7,
     "professionKey": "capitalists",
     "population": 700200,
     "literacy": 0.98,
@@ -560,7 +560,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 8,
+    "provinceId": 8,
     "professionKey": "peasants",
     "population": 47872000,
     "literacy": 0.2,
@@ -574,7 +574,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 8,
+    "provinceId": 8,
     "professionKey": "laborers",
     "population": 7180800,
     "literacy": 0.3,
@@ -588,7 +588,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 8,
+    "provinceId": 8,
     "professionKey": "clerks",
     "population": 3853696,
     "literacy": 0.7,
@@ -602,7 +602,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 8,
+    "provinceId": 8,
     "professionKey": "academics",
     "population": 335104,
     "literacy": 0.72,
@@ -616,7 +616,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 8,
+    "provinceId": 8,
     "professionKey": "capitalists",
     "population": 598400,
     "literacy": 0.9,
@@ -630,7 +630,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 9,
+    "provinceId": 9,
     "professionKey": "peasants",
     "population": 60928000,
     "literacy": 0.2,
@@ -644,7 +644,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 9,
+    "provinceId": 9,
     "professionKey": "laborers",
     "population": 9139200,
     "literacy": 0.3,
@@ -658,7 +658,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 9,
+    "provinceId": 9,
     "professionKey": "clerks",
     "population": 4904704,
     "literacy": 0.7,
@@ -672,7 +672,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 9,
+    "provinceId": 9,
     "professionKey": "academics",
     "population": 426496,
     "literacy": 0.72,
@@ -686,7 +686,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 9,
+    "provinceId": 9,
     "professionKey": "capitalists",
     "population": 761600,
     "literacy": 0.9,
@@ -700,7 +700,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 10,
+    "provinceId": 10,
     "professionKey": "peasants",
     "population": 19448000,
     "literacy": 0.52,
@@ -714,7 +714,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 10,
+    "provinceId": 10,
     "professionKey": "laborers",
     "population": 5984000,
     "literacy": 0.62,
@@ -728,7 +728,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 10,
+    "provinceId": 10,
     "professionKey": "clerks",
     "population": 3578432,
     "literacy": 0.86,
@@ -742,7 +742,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 10,
+    "provinceId": 10,
     "professionKey": "academics",
     "population": 311168,
     "literacy": 0.88,
@@ -756,7 +756,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 10,
+    "provinceId": 10,
     "professionKey": "capitalists",
     "population": 598400,
     "literacy": 0.95,
@@ -770,7 +770,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 11,
+    "provinceId": 11,
     "professionKey": "peasants",
     "population": 9152000,
     "literacy": 0.52,
@@ -784,7 +784,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 11,
+    "provinceId": 11,
     "professionKey": "laborers",
     "population": 2816000,
     "literacy": 0.62,
@@ -798,7 +798,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 11,
+    "provinceId": 11,
     "professionKey": "clerks",
     "population": 1683968,
     "literacy": 0.86,
@@ -812,7 +812,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 11,
+    "provinceId": 11,
     "professionKey": "academics",
     "population": 146432,
     "literacy": 0.88,
@@ -826,7 +826,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 11,
+    "provinceId": 11,
     "professionKey": "capitalists",
     "population": 281600,
     "literacy": 0.95,
@@ -840,7 +840,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 12,
+    "provinceId": 12,
     "professionKey": "peasants",
     "population": 94248000,
     "literacy": 0.08,
@@ -854,7 +854,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 12,
+    "provinceId": 12,
     "professionKey": "laborers",
     "population": 23562000,
     "literacy": 0.15,
@@ -868,7 +868,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 12,
+    "provinceId": 12,
     "professionKey": "clerks",
     "population": 10838520,
     "literacy": 0.5,
@@ -882,7 +882,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 12,
+    "provinceId": 12,
     "professionKey": "academics",
     "population": 942480,
     "literacy": 0.52,
@@ -896,7 +896,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 12,
+    "provinceId": 12,
     "professionKey": "capitalists",
     "population": 1309000,
     "literacy": 0.8,
@@ -910,7 +910,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 13,
+    "provinceId": 13,
     "professionKey": "peasants",
     "population": 77112000,
     "literacy": 0.08,
@@ -924,7 +924,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 13,
+    "provinceId": 13,
     "professionKey": "laborers",
     "population": 19278000,
     "literacy": 0.15,
@@ -938,7 +938,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 13,
+    "provinceId": 13,
     "professionKey": "clerks",
     "population": 8867880,
     "literacy": 0.5,
@@ -952,7 +952,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 13,
+    "provinceId": 13,
     "professionKey": "academics",
     "population": 771120,
     "literacy": 0.52,
@@ -966,7 +966,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 13,
+    "provinceId": 13,
     "professionKey": "capitalists",
     "population": 1071000,
     "literacy": 0.8,
@@ -980,7 +980,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 14,
+    "provinceId": 14,
     "professionKey": "peasants",
     "population": 7420160,
     "literacy": 0.2,
@@ -994,7 +994,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 14,
+    "provinceId": 14,
     "professionKey": "laborers",
     "population": 2872320,
     "literacy": 0.26,
@@ -1008,7 +1008,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 14,
+    "provinceId": 14,
     "professionKey": "clerks",
     "population": 1321267,
     "literacy": 0.6,
@@ -1022,7 +1022,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 14,
+    "provinceId": 14,
     "professionKey": "academics",
     "population": 114893,
     "literacy": 0.62,
@@ -1036,7 +1036,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 14,
+    "provinceId": 14,
     "professionKey": "capitalists",
     "population": 239360,
     "literacy": 0.85,
@@ -1050,7 +1050,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 15,
+    "provinceId": 15,
     "professionKey": "peasants",
     "population": 3491840,
     "literacy": 0.2,
@@ -1064,7 +1064,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 15,
+    "provinceId": 15,
     "professionKey": "laborers",
     "population": 1351680,
     "literacy": 0.26,
@@ -1078,7 +1078,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 15,
+    "provinceId": 15,
     "professionKey": "clerks",
     "population": 621773,
     "literacy": 0.6,
@@ -1092,7 +1092,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 15,
+    "provinceId": 15,
     "professionKey": "academics",
     "population": 54067,
     "literacy": 0.62,
@@ -1106,7 +1106,7 @@
     "calibrationStatus": "provisional"
   },
   {
-    "regionId": 15,
+    "provinceId": 15,
     "professionKey": "capitalists",
     "population": 112640,
     "literacy": 0.85,

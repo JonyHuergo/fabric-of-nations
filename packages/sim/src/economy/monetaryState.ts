@@ -19,6 +19,7 @@ import type {
   PriceIndexState,
   RusdPerCurrencyUnit,
 } from "./types.js";
+import { findAccountById } from "./accounts.js";
 
 /** Empty price-index state for population-only worlds. */
 export function emptyPriceIndexState(): PriceIndexState {
@@ -47,7 +48,7 @@ export function parseCurrencyRate(value: unknown, path: string): RusdPerCurrency
 
 export function accountBalanceRUSD(world: World, accountId: Id | null): number {
   if (accountId === null) return 0;
-  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = findAccountById(world.finance.accounts, accountId);
   if (account === undefined) {
     throw new RangeError(`monetary authority references unknown account ${String(accountId)}`);
   }

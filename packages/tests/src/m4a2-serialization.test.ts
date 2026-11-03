@@ -53,14 +53,14 @@ describe("M4a-2 serialization and determinism", () => {
     expect(hashWorld(clone)).toBe(hashWorld(world));
 
     clone.countries[0]!.monetary = { kind: "adopted", currencyId: 0 };
-    clone.countries[0]!.regionIds.push(1);
+    clone.provinces.ownership[0]!.ownerPolityId = 1;
     clone.currencies[0]!.issuer = { kind: "foreign", issuerKey: "changed" };
     clone.currencyValuations[0] = unavailable(0);
 
     expect(serializeWorld(world)).toBe(original);
     expect(clone.countries[0]).not.toBe(world.countries[0]);
     expect(clone.countries[0]!.monetary).not.toBe(world.countries[0]!.monetary);
-    expect(clone.countries[0]!.regionIds).not.toBe(world.countries[0]!.regionIds);
+    expect(clone.provinces.ownership[0]).not.toBe(world.provinces.ownership[0]);
     expect(clone.currencies[0]).not.toBe(world.currencies[0]);
     expect(clone.currencies[0]!.issuer).not.toBe(world.currencies[0]!.issuer);
     expect(clone.currencyValuations[0]).not.toBe(world.currencyValuations[0]);
@@ -72,7 +72,6 @@ describe("M4a-2 serialization and determinism", () => {
     reordered.countries.reverse();
     reordered.currencies.reverse();
     reordered.currencyValuations.reverse();
-    reordered.countries.forEach((country) => country.regionIds.reverse());
     expect(hashWorld(reordered)).toBe(hashWorld(world));
     expect(serializeWorld(reordered)).toBe(serializeWorld(world));
   });
@@ -170,7 +169,7 @@ function simulatedForeignScenario(): EconomyScenarioDef {
       tag: "T1",
       name: "Second Country",
       monetary: { kind: "own", currencyId: 1 },
-      regionIds: [],
+      provinceIds: [],
       treasuryAccountId: 9001,
       initialTreasuryCashRUSD: 0,
       fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },

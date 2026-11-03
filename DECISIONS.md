@@ -6659,3 +6659,668 @@ D-065 asked before the first save of a new campaign.
 - The source guards in `m7-app-lifecycle` and `m11d-provider-lifecycle` that required the
   overwrite prompt and the single-envelope ref now require the slot behaviour that replaces them;
   `save-library.test.ts` covers the library's behaviour directly.
+
+## D-115 — Prosperity Program: peacetime economy and demography overhaul (P0)
+
+**Status:** approved by the designer on 2026-11-02 (P0 design). Implementation is staged
+P1–P15; P1 is the first implementation stage.\
+**Detailed plan:** `docs/PROSPERITY_PROGRAM.md`. **GDD:** §17J (v2.19).
+
+### Context
+
+The designer judged the internal ("peace") game unsatisfying: a country that never goes to
+war or engages in diplomacy must still be fun through a realistic demographic and economic
+simulation. Inspection on 2026-11-02 confirmed the causes recorded in the plan §1:
+world-level demographic schedules, no social mobility, fixed wages, no private investment,
+an 8-good catalogue, no land or resource constraint, flat technology bonuses, multi-country
+markets with a single customs administration, 133 coarse regions under 1,689 provinces, and
+a 1900 world that takes about 660 ms per simulated day in Node.
+
+### Decision
+
+1. Adopt the Prosperity Program stages P0–P15 and their dependency order as the direction
+   for internal-economy work. Each stage is assigned and accepted separately (AGENTS.md §7).
+2. The approved foundational choices are D-116 (rollback), D-117 (population granularity),
+   D-118 (provinces replace regions), D-119 (customs territories), D-120 (save break),
+   D-121 (data sources), D-122 (RUSD and local-currency display), D-123 (companies and
+   capital markets) and D-124 (cause-driven demography).
+3. Existing accounting, determinism, fiscal, debt, law, technology, trade, monetary and
+   military foundations are retained. Where a stage changes an accepted rule, the stage's
+   decision record names the superseded decision.
+
+### Consequences
+
+- GDD v2.19 adds §17J and marks the superseded rules in §§4.2, 6.6, 7.4, 17A.10.1 and 20.1.
+- The designer owns device performance testing; stages report Node diagnostics only.
+
+## D-116 — Phase validation and checkpoint rollback replace whole-day staged cloning
+
+**Status:** approved 2026-11-02; implementation assigned to P1.\
+**Supersedes:** GDD §20.1 #14 and the whole-day staging boundary in §4.2 ("Whole-day
+atomicity"); amends D-067 (validation placement). The atomic sub-phases (M4b close, M4c
+fiscal batch, E6a/E6b phase restoration) remain.
+
+### Context
+
+`tick` deep-clones the entire world every day (`cloneWorldForTick`), the market attempt
+clones it again for the cash-capped fallback, and the day validates the whole world at both
+ends. At province scale (D-117) these copies and validations dominate cost.
+
+### Decision
+
+1. **Phase preconditions.** Every phase validates the inputs it reads before mutating.
+   Cheap global invariants (designated-cash conservation, accounting identity, population
+   totals and inventory identity) run every day. Full world validation runs at month end, on
+   load, save and action application, and always in test mode.
+2. **No partial day is ever accepted.** Any error aborts the day; the world is restored to
+   the exact state at the start of that day before control returns.
+3. **Restoration mechanism.** The runner keeps a last good checkpoint (taken at month start
+   and before each accepted action) and a journal of accepted actions since it. On failure
+   it restores the checkpoint, replays deterministically to the start of the failed day,
+   verifies the replayed hash against the hash recorded at that day's start, and reports the
+   error. A hash mismatch is itself an integrity failure, and the host refuses to continue.
+4. **Consistency.** The checkpoint covers the whole `World` (population, finance, markets,
+   trade, monetary, politics, technology, military, provinces, AI, construction,
+   diagnostics), so no subsystem can be restored separately from the others.
+
+### Consequences
+
+- Per-day copying leaves the hot path; the cost of a failure is a bounded replay (at most
+  one month).
+- Tests that asserted "world unchanged after a failed tick" assert the same property through
+  the runner; none is weakened.
+- Direct calls to individual phase functions keep their D-067 default of full validation.
+
+### P1 implementation record (2026-11-02)
+
+- `TickContext.integrity` selects `staged` (default, unchanged M3f behaviour for direct
+  API and test callers) or `phase`. `tickPhaseMode` runs the day in place: cheap
+  `assertDailyWorldInvariants` at both ends (finite balances, accounting identity, valid
+  prices and lots, finite block state) and `assertValidWorldForTick` after every civil
+  month end and at the terminal boundary.
+- `runTicksWithRollback` (`packages/sim/src/rollback.ts`) owns the guarantee. The
+  checkpoint is a validated `cloneWorld` taken at creation, at each month start (the
+  previous day ended with whole-world validation) and through
+  `checkpointRollbackRunner` after every accepted action and load. A failed day is
+  replayed from the checkpoint (replayed days use the staged market fallback) and is
+  published only if the replayed start of day matches `worldDayFingerprint` recorded
+  before the day. **Refinement of §3:** the verification uses this cheap fingerprint
+  (calendar, entity counts, allocators, population, balance, stock and price totals)
+  instead of `hashWorld`, which costs a full encode per day; tests compare full hashes.
+  A mismatch or replay error raises `IntegrityFailureError` and leaves the live world at
+  the checkpoint; any other error raises `DayRolledBackError` with the world at the start
+  of the failed day.
+- **Market fallback without a world clone** (superseded the same day by D-125's single
+  cash-capped attempt, which removed the retry, the market snapshot and
+  `MarketFundingFallbackRequired`). The cash-capped retry was needed on nearly
+  every day of the 1900 world (119 of 120 measured days). Phase mode snapshots only
+  market prices and lots before the full attempt; settlement's overdraw pre-check runs
+  before any finance write, so on a funding failure those are the only changed state.
+  A finance marker (account count, posting count, allocators, balance sum) proves it;
+  if it ever differs, `MarketFundingFallbackRequired` escalates to a full rollback and a
+  rerun of the day in `cash` mode.
+- **Phase-mode AI actions (extends D-067).** `applyCountryAction` accepts
+  `validateWorld`. In phase-mode days only, the AI phase passes false and validates the
+  candidate fiscal policy structurally instead of validating the whole world for every
+  AI action; staged days and player actions keep full candidate validation, so the
+  Batch 5 validation-count test is unchanged.
+- **Bit-identical hot-path changes.** A per-phase `BuildingCapacityIndex` replaces
+  linear scans in `computeBuildingCapacity` (same iteration orders); numeric finance
+  owner keys replace string keys (string fallback for unusual ids); per-market
+  definition re-validation is skipped in staged mode after the day's own validation;
+  migration looks up household accounts with one scan instead of rebuilding the finance
+  index per flow.
+- The worker host runs every day through the runner and checkpoints after each
+  accepted action, new game and load. Evidence: identical `hashWorld` for 120 days of
+  the 1900 world in phase mode against the pre-change staged trace, and
+  `packages/tests/src/p1-rollback.test.ts`.
+
+## D-117 — Sparse province × profession population blocks with full age pyramids
+
+**Status:** approved 2026-11-02; data/state in P2 on the P1 foundation.\
+**Supersedes:** GDD §20.1 #1 ("region × principal occupation").
+
+### Decision
+
+1. A population block is (province, profession). A block exists only where that profession
+   has people in that province. Each block keeps the single-year male/female age arrays,
+   literacy-by-age, qualification, wealth, militancy, household account and need counters.
+2. Profession-specific demography, wages, wealth and political interests are preserved.
+3. Performance is a core requirement: the population model is not simplified to meet a
+   budget. P1 provides typed-array pools, cached indexes and world-scale benchmarks; each
+   later stage reports its full-scale cost.
+
+### Consequences
+
+- Expected scale is about 8,000 blocks (1,689 provinces, about 1,400 populated, nine
+  professions, sparse) instead of 359.
+- Blocks are created when a profession first appears in a province (P7 mobility) and retired
+  when empty, through validated, conserving operations.
+
+## D-118 — Provinces replace simulation regions
+
+**Status:** approved 2026-11-02; implementation assigned to P2.\
+**Amends:** D-103 (which kept `SimulationRegion` as the population/economy unit), D-087
+(dependent territories as regions) and the D-051 ownership rules.
+
+### Decision
+
+1. `Region`/`SimulationRegion`, `World.regions`, `Country.regionIds`, `Market.regionIds`,
+   `Region.marketId`, `Region.controllerCountryId` and `ProvinceDefinition.simulationRegionId`
+   are removed.
+2. Population blocks, buildings, construction projects, unrest, infrastructure, land and
+   resources belong to a province. Country territory is derived from
+   `ProvinceOwnership.ownerPolityId`; occupation is `ProvinceOwnership.controllerPolityId`
+   only (D-081's sovereignty/control separation is preserved on the province).
+3. A dependent territory is a set of provinces of its sovereign with a colonial or
+   protectorate administrative status, not a separate entity.
+4. A provincial ownership transfer moves the province's blocks, buildings and market
+   membership in one validated, conserving operation. Transfers to a registry polity with no
+   simulation country are rejected until a country-instantiation stage exists.
+
+## D-119 — Customs territories: national markets by default
+
+**Status:** approved 2026-11-02; implementation assigned to P2.\
+**Supersedes:** the M5 rule that several countries share a market (D-051), the authored M11
+multi-country trade zones (D-091) and E6a's single customs administration for multi-polity
+zones (D-079, GDD §17F.8). Market clearing, pricing and E6a trade mechanics are retained.
+
+### Decision
+
+1. A **customs territory** is the market: one inventory/price pool with one tariff authority
+   (`administratorCountryId`).
+2. Defaults: every independent state has its own territory; colonies and protectorates
+   belong to their overlord's territory; dominions keep their own territories; autonomous
+   vassals (for example Bulgaria and Crete) have their own territory where they historically
+   set their own tariffs.
+3. Political subordination never implies economic integration by itself. Membership follows
+   the historical customs and tariff arrangement, recorded per polity with a source in an
+   audit table. The 1900 customs unions are explicit: Luxembourg in the German Zollverein,
+   Liechtenstein with Austria, Monaco with France and San Marino with Italy.
+4. Trade between territories uses E6a shipments over generated routes; tariffs are set by
+   each territory's administrator.
+
+### Consequences
+
+- About 70 markets instead of 20; every independent country can run a trade policy.
+- Independence, union and dissolution split or merge territories through province transfers.
+
+## D-120 — Breaking world-schema change for the Prosperity Program
+
+**Status:** approved 2026-11-02; applies from P2, the first stage that changes the world
+shape. Reaffirms D-013.
+
+### Decision
+
+1. Older saves are not migrated. Load Game lists them as incompatible with the reason (made
+   by an earlier version whose world format this version cannot read). The player can delete
+   them; the game never deletes or overwrites them automatically.
+2. New games initialise from the new scenario; tests cover every selectable country.
+3. Each schema bump is recorded with its stage in the GDD alignment note and change report.
+
+## D-121 — Historical data sources for provinces, land and resources
+
+**Status:** approved 2026-11-02; used from P2 (population and land) and P5 (resources).
+
+### Decision
+
+1. **HYDE 3.3** (History Database of the Global Environment, Utrecht University / PBL) 1900
+   grids for total population, urban population, cropland and grazing land distribute each
+   country's authored totals across its provinces. Country totals remain the existing
+   OWID/Maddison values; HYDE supplies the within-country distribution.
+2. **USGS** mineral-deposit data (MRDS and related resource datasets) locate deposits;
+   manually authored historical fields with citations supply the 1900 knowledge state, size
+   class and discovery dates.
+3. Provenance documentation records each dataset's version, access date, licence,
+   resolution, coverage, processing, known limitations and per-province confidence.
+4. Generated outputs are committed with a `--check` mode so builds detect stale data.
+
+## D-122 — RUSD is 1990 reference dollars; players see their own currency
+
+**Status:** approved 2026-11-02. Content rebasing assigned to P2; display assigned to P3.\
+**Conflicts identified:** D-110 §1 and `AGENTS.md` §1 ("not a fixed-rate substitute for the
+real-world US dollar"), GDD §17A.10.1 ("not a promise of constant purchasing power"), D-080
+and GDD §17G.7 ("the sample's rates are unavailable by design"), and the current
+`basePrice1900RUSD` content scale.
+
+### Decision
+
+1. **Definition.** One RUSD has the purchasing power of one real-world US dollar of 1990. It
+   is the simulation's stable internal reference and measurement unit. It is not a national
+   currency, legal tender, an issuer or an adoptable currency, and it is not the simulated
+   United States dollar, whose value against RUSD moves with the simulation.
+2. **Simulation.** Authoritative balances, prices, wages and postings stay in RUSD.
+3. **Display.** Money is shown in the player's country's currency by default, converted at
+   display time from `CurrencyValuation.rusdPerUnit`. The player may choose another
+   registered currency or RUSD (useful during hyperinflation). Changing the display currency
+   never changes simulation state. Principle: RUSD is for the simulation; local currency is
+   for the player.
+4. **Conflict resolution.** D-110 §1 and `AGENTS.md` §1 are reworded to the definition above.
+   GDD §17A.10.1 is amended: RUSD is a constant-purchasing-power reference unit. D-080's "no
+   invented historical rate" rule is kept: initial rates come from source-backed 1900
+   parities (gold and silver standards) with citations.
+5. **Rebasing.** Authored monetary content is restated in 1990 dollars with a documented
+   deflator. Because every monetary input scales by the same factor, behaviour is unchanged,
+   and this is tested (prices, wages and balances scale; quantities do not).
+
+## D-123 — Companies and capital markets: staged after the real economy
+
+**Status:** feasibility and architecture proposal delivered for designer review
+(`docs/COMPANIES_AND_CAPITAL_MARKETS_PROPOSAL.md`); implementation staged P9–P13.
+
+### Decision
+
+1. Companies are owners and decision-makers over existing buildings, with their own
+   double-entry balance sheets; production, market and settlement paths are unchanged.
+2. Stages: P9 companies and finances; P10 investment, expansion, closure and bankruptcy; P11
+   banks, credit and bonds; P12 state and mixed ownership, nationalisation and
+   privatisation; P13 exchanges, share trading and mergers.
+3. The player acts as the state; government investment in companies uses treasury cash
+   through validated actions. There is no private player fortune (GDD §2).
+4. Share prices come from fundamentals plus bounded deterministic order flow in monthly
+   batch auctions; no order book and no unkeyed randomness.
+
+Open questions are listed in the proposal §7.
+
+## D-124 — Cause-driven demography
+
+**Status:** approved 2026-11-02; implementation assigned to P4.\
+**Supersedes:** world-level WPP schedules as the *level* of fertility and mortality (inputs
+of D-026/D-027; GDD §6.6 "Source-backed and provisional inputs").
+
+### Decision
+
+1. WPP age schedules provide only the age *pattern*. The *level* of each block's fertility
+   and mortality is derived from simulated causes: female literacy, urban share, income
+   relative to subsistence, food actually consumed, housing crowding, sanitation and health
+   services, medical and contraceptive technology, laws, famine and war.
+2. Each country starts from source-backed 1900 levels.
+3. Historical series (WPP 1950–2000, pre-1950 reconstructions, Maddison/OWID totals) are
+   calibration and validation targets only. No code reads them to force a trajectory.
+4. Wars, famines, economic conditions and policies produce alternative demographic paths.
+
+## D-125 — Proposed: aggregated market settlement and a single market attempt (P1b)
+
+**Status:** approved by the designer on 2026-11-02 and implemented in P1b (see the
+implementation record at the end of this entry). It changes
+ledger granularity and therefore world hashes, so it is outside the bit-identical P1a
+changes recorded under D-116.
+
+### Evidence
+
+On the 1900 world each day settles about 20,000 market transactions and posts about
+21,000 journal entries (one per buyer × seller lot × tier × phase), plus 413 wage
+settlements. Every posting is validated line by line. At the D-117 province scale
+(about 8,000 blocks instead of 359) this grows roughly in proportion to the number of
+buyers and is the dominant cost. Separately, the full-demand market attempt overdraws a
+buyer on 119 of 120 measured days, so the cash-capped attempt runs every day and
+market clearing is paid twice.
+
+### Proposal
+
+1. **Aggregated settlement.** Within one market, good, tier and phase, buyers pay their
+   allocated value into the clearing and sellers receive revenue pro rata to their
+   allocated lots, posted as one balanced entry per (market, good, tier, phase) with one
+   line per buyer and seller account. Quantities, prices, allocations, cash per account
+   and every period total are unchanged; only the number of postings and the floating
+   summation order change.
+2. **Single attempt.** Evaluate funding per market immediately after that market clears
+   and cap the affected buyers' input demand there, instead of clearing every market,
+   failing settlement and clearing every market again. The cash-capped rule itself
+   (opening cash plus same-batch receipts) is unchanged.
+
+### Consequences
+
+- World hashes and posting-count expectations in existing tests change; accounting
+  identity, cash conservation, allocation and price tests must still pass unchanged.
+- Postings shrink from about 21,000 to a few hundred per day on the 1900 world.
+- Requires approval because M3e's per-transaction settlement (D-041) is an accepted
+  design.
+
+### P1b implementation record (2026-11-02)
+
+- **Aggregated postings** (`aggregatedMarketEntries` in `settlement.ts`): one entry per
+  (transaction kind, good). Each buyer account contributes a debit-expense/credit-cash
+  pair and each seller account a debit-cash/credit-revenue pair, amounts summed over the
+  prepared transactions in their canonical order; the pair layout makes every entry
+  balance exactly. Entity ids on these entries are null. `settlement.transactions` still
+  lists every individual transaction for reports.
+- **Single attempt, simplified from point 2.** The cash-capped attempt is identical to
+  the full attempt for every building whose full input cost fits in its opening
+  operating cash, and the full attempt failed on 399 of 400 measured days. The day
+  therefore always runs the cash-capped attempt once. The only behavioural difference
+  is on days when a building's input cost exceeded its opening cash and same-day sales
+  would have covered it (1 of 400 measured days): those purchases are now capped.
+  `fallbackUsed` now means "the cap bound for at least one building". The staged
+  restore-and-retry path, its market snapshot and `MarketFundingFallbackRequired` are
+  removed. Settlement's overdraw pre-check remains as an invariant.
+- GDD §4.2 step 7 is marked accordingly.
+
+## D-126 — Minimal employment repair after daily deaths
+
+**Status:** implemented in P1b on 2026-11-02 under the designer's instruction to continue
+the performance work; recorded for review. Refines GDD §4.2 step 5 ("mark employment
+dirty and repair immediately") and D-042's dirty-refresh use.
+
+### Evidence
+
+On the 1900 world, daily deaths left at least one block with more assigned workers than
+its eligible workforce on every measured day, so the full deterministic reassignment
+(about 40 ms, including keyed tie-break draws for every match) ran daily instead of
+monthly.
+
+### Decision
+
+1. After daily demography, if the employment state is invalid, the over-assigned blocks
+   are trimmed by exactly their excess, proportionally to their assignments' workers with
+   largest-remainder rounding (ties to the lower assignment id). Emptied assignments are
+   removed. The vacated slots are refilled by the next monthly or dirty refresh, as
+   GDD §6.7 describes for monthly labor updates.
+2. If the trimmed state still fails validation for any other reason (ineligibility, a
+   closed border, a slot overflow), the original assignments are restored and the full
+   dirty refresh runs as before.
+
+### Consequences
+
+- Employment and therefore wages and production differ slightly within a month from the
+  previous behaviour (jobs of the deceased stay vacant until the month start rather than
+  being refilled the same day); world hashes change.
+- Full reassignment now runs on the first civil day of each month, after migration, and
+  on other dirty causes (construction completion, military release, closures).
+
+## D-127 — Exact capitalization of a sole project's work in progress
+
+**Status:** implemented in P1b on 2026-11-02; recorded for review.
+
+### Evidence
+
+After D-125/D-126 changed the trajectory, two E3/E4 tests found 1.1e-13 RUSD left in
+`construction-in-progress` after a project completed. The account is debited daily
+(wages, materials) and credited on completion with the project's running totals; the two
+add the same amounts in a different order, so a floating residue can remain. The old
+trajectory happened not to leave one.
+
+### Decision
+
+On completion, when no other non-terminal project of the same country has work in
+progress, the account balance belongs to this project alone; if it agrees with the
+running totals within `MONEY_TOLERANCE_RUSD` scaling, the balance itself is capitalized,
+so the account closes at exactly zero. Otherwise the running totals are capitalized as
+before. The capitalization posting stays balanced; nothing is clamped or written off.
+
+## D-128 — Province geometry repair and 1900 border corrections (P2)
+
+**Status:** implemented on 2026-11-02 at the designer's request (straight lines on the map,
+wrong western Russian border, Galician exclave, square Hohenzollern, Silesian tip, Danish
+border). Scripts: `scripts/p2/repair-provinces.mjs`, `scripts/p2/repair-borders-1900.mjs`,
+`scripts/p2/sync-app-provinces.mjs`, shared helpers in `scripts/p2/province-geometry-lib.mjs`.
+Reports: `packages/data/data/map/province_repair_report.json` and
+`province_border_corrections_1900.json`. The M12 builders are no longer re-run: they would
+rebuild the pre-repair geometry; the P2 scripts run on top of the committed bundles.
+
+### Decision
+
+1. **Render borders follow province outlines.** The bundles' precomputed shared lines joined
+   matched vertices degrees apart and drew straight chords; `build-render-bundle.mjs` now
+   probes every province ring edge instead (border segments over 5 units fell from 1,069 to
+   ~220, the rest being real straight borders such as the 49th parallel).
+2. **Geometry repair:** the duplicate European `grl-greenland` is removed; Goa, Macao and
+   Monaco are restored from Natural Earth 1:10m (Western Macedonia stays a sliver: only that
+   strip was Greek in 1900); every overlap is resolved by subtracting the smaller province
+   from the larger, with coverage residuals always yielding (overlapping 5' cells 97,205 → 28).
+3. **Authored 1900 lines** (towns checked on each side, recorded in the script): the Russian
+   frontier with Germany and Austria-Hungary; Prussian-Austrian Silesia (Hultschin tip,
+   Pless, the Glatz county); Posen-West Prussia, Pomerania (Mecklenburg, Neumark, West
+   Prussia), Rhine Province-Westphalia, Palatinate, Baden-Wuerttemberg, Rheinhessen,
+   Mecklenburg-Strelitz; the 1864 Danish-German line (Kongeaa, Ribe bulge, Als German, Aeroe
+   Danish); outlines for Hohenzollern, Danzig, Eupen-Malmedy and Fiume.
+4. **Hultschin** was Prussian (Ratibor district) until 1920, so `aut-hultschin` is now owned by
+   the German Empire; the permanent key keeps its M12 spelling.
+5. The German coverage residual is dissolved into its neighbours and removed; touching parts
+   of each changed province are unioned; holes are written so their first vertex is not on
+   the outer ring (the renderer assigns holes by first vertex).
+
+### Consequences
+
+- 1,687 provinces (was 1,689). Tests updated with reasons: province counts, Hultschin in the
+  German 1919 settlement, render-bundle expectations.
+- Remaining known approximations: the East Prussia north/south split (the straight 1945
+  line), a few short construction edges elsewhere (Partium, Carniola, Bavaria), and the
+  generalised precision of authored lines (a few kilometres).
+- Older saves still carry 1,689 province records; the P2 schema break (D-120) will reject them.
+
+## D-129 — Sourced 1900 population corrections and Cuba's 1900 status
+
+**Status:** implemented on 2026-11-02 (`scripts/p2/apply-1900-data-corrections.mjs`, idempotent).
+
+### Decision
+
+1. Population totals: Wadai 2.0 → 1.0 million and Darfur 2.0 → 0.6 million (low confidence,
+   reasons in the catalog notes: Nachtigal, Britannica, Nuttall, a British estimate, HYDE);
+   Guam 12,000 → 9,676 (1901 naval census); German Pacific islands 60,000 → 58,500 (island
+   group estimates). Monaco stays 15,000 (no better sourced figure found). Each change is
+   applied to the catalog, the region's population blocks (integer-exact), its building
+   levels (scaled), the calibration targets (recomputed for the country and the territory's
+   sovereign), the scenario metadata and the app world catalog. The M11 world generator is
+   not re-run because the committed tables were edited after it.
+2. `province_population_1900.json` gives sourced group totals for provinces HYDE leaves
+   empty (German Pacific island groups, Guam, Monaco), split by land area in the P2 builder.
+3. **Cuba:** Spain relinquished it in 1898 and the United States governed it militarily until
+   1902 without annexing it. Its provinces are now owned by the 1900 Cuba country and
+   controlled by the United States (D-081 separation, new optional bundle field
+   `initialControllerPolityId`); 1902 independence is a liberation (control change).
+
+## D-130 — Historical money values: a separate calibration stage (P2b) with per-country wages
+
+**Status:** decided by the designer on 2026-11-02. **Amends:** D-122 §5 (rebasing) and the
+P2 scope in `docs/PROSPERITY_PROGRAM.md` §4.
+
+### Context
+
+D-122 §5 planned to restate authored monetary content in 1990 dollars with one deflator,
+so that behaviour stays unchanged. The designer instructed that the existing values must not
+be assumed to be meaningful: each must be re-derived from history, not just converted.
+Inspection on 2026-11-02 confirmed that the current values are internally consistent
+placeholders on a non-historical scale: for example, US treasury cash is 338,648 RUSD
+(federal receipts in FY1900 were roughly $567 million), grain is 0.25 RUSD/kg (about ten
+times the US farm price), wages are one world-wide figure per profession (peasant 60,
+laborer 130 per year), and US household savings are about 18 RUSD per person. Historical
+prices alone would make the production model inconsistent (for example, peasants' grain
+revenue would fall about tenfold against unchanged output and wages), so historical money
+values require recalibrating physical productivity at the same time.
+
+### Decision
+
+1. P2 completes the structural work (provinces, customs territories, generated routes,
+   schema break, province UI, typed-array pool, province-scale benchmark) with the current
+   money values unchanged.
+2. A new stage **P2b — historical money and productivity calibration** follows P2 and
+   precedes P3. Every authored monetary value (goods prices, wages, savings, treasuries,
+   budgets, construction and upkeep costs, operating cash, route capacities and the RUSD
+   coefficients in the constants module) is re-derived from a cited 1900 source, in US
+   dollars or local money at a cited parity, and then converted to 1990 dollars. Physical
+   productivity is recalibrated so that value added matches the sourced wages and GDP per
+   head. Coefficients with no historical counterpart are derived from sourced quantities or
+   stay marked provisional with their reasoning.
+3. **Deflator:** Federal Reserve Bank of Minneapolis, *Consumer Price Index, 1800–*
+   (annual averages, 1967 = 100): 1900 = 25, 1990 = 392.6, so one 1900 US dollar is
+   15.704 RUSD. Pre-1913 values are the Fed's spliced estimates (Rees cost-of-living index).
+4. P2b adds per-country 1900 wage levels by profession as authored, sourced data. They stay
+   fixed until P7's labour market makes them adjust. Country-specific productivity is
+   calibrated so that the wage gaps are sustainable.
+5. Because P2b deliberately changes values non-uniformly, D-122 §5's scale-invariance test
+   is replaced by a test that every value matches its documented source and conversion,
+   plus a before-and-after report on the 1900 world.
+
+## D-131 — P2 province world: territories, distribution rules and customs territories
+
+**Status:** implemented on 2026-11-02 under the P2 assignment (D-117 to D-121). The
+distribution rules are provisional and recorded for review.
+
+### Decision
+
+1. **Authored territory inputs.** The 133 M11 "regions" are restated as *territories*
+   (`historical/m11/territories_1900.json`, `scripts/p2/convert-territory-inputs.mjs`):
+   each catalog entry (67 states, 66 dependent territories, plus Portuguese India from
+   D-132) lists its provinces. The population, building, country and market tables keep
+   their authored totals keyed by `territoryId`; they are inputs to the scenario builder
+   and are no longer loaded at runtime. The province link is the M12 bundle link, except
+   Hultschin (German since D-128). The M12 field `simulationRegionId` is then deleted from
+   the bundles and the app province modules (`sync-app-provinces.mjs`).
+2. **Scenario builder** (`scripts/p2/build-province-scenario.mjs`, `--check`, input and
+   output checksums in `historical/p2/build_report.json`):
+   - a territory's authored total of each profession is split over its provinces by a
+     HYDE 3.3 weight: peasants by rural population, laborers by total population,
+     clerks, academics and capitalists by urban population (total when the territory
+     has no urban population); sourced group totals (D-129) and land area are the
+     fallbacks; integers by largest remainder (ties to the lower province id), so every
+     authored total is exact;
+   - a territory building's level, operating cash (whole RUSD) and opening stock are
+     split over the provinces that host its owner profession, in proportion to the
+     population of the professions it employs (total population for warehouses);
+   - each province record carries HYDE cropland and grazing land (hectares), urban share
+     and the territory's infrastructure.
+   Result: 1,687 provinces, 5,687 population blocks in 1,627 populated provinces, 3,725
+   buildings; population (1,584,134,189), building levels, operating cash and stock are
+   conserved exactly against the territory tables (checked by the builder).
+3. **Customs territories (D-119).** One market per country unless the country is a
+   member of a recorded 1900 union (Luxembourg–Germany, Liechtenstein–Austria,
+   Monaco–France, San Marino–Italy): 63 markets. Colonies and protectorates are already
+   their sovereign's provinces and so trade in its territory. `MarketMetaDef` gains
+   `memberCountryIds` (validated to equal the owners of the market's provinces); a
+   market's provinces are derived from `ProvinceEconomy.marketId`, and its administrator
+   is `customsCountryId`. Opening price multipliers are those of the country's M11 market
+   (0.25 everywhere).
+4. **Generated routes.** Territories sharing a land border, plus each coastal territory's
+   three nearest coastal territories, connected into one network: 168 routes (114 land).
+   Distance units are kilometres / 1,000 between the closest border or coastal province
+   labels (at least 0.5); capacity keeps the M11 provisional formula (P2b, D-130).
+
+### Consequences
+
+- Known approximations: the occupation mix inside a territory follows HYDE urban/rural
+  shares, not provincial occupation statistics; buildings follow employment, not
+  located plants; Réunion and Mayotte stay in the Madagascar territory's total (the M12
+  link); route distances are straight lines between label points.
+- The 1900 world has about 116,600 accounts (was 12,373) and the worker's embedded
+  scenario is 4.4 MB (compact JSON).
+
+## D-132 — Ownership reconciliation of the 1900 province layer
+
+**Status:** decided by the designer on 2026-11-02; implemented by
+`scripts/p2/apply-1900-ownership-corrections.mjs` (idempotent).
+
+### Decision
+
+1. **Egypt** is owned by the Ottoman Empire (de jure, khedivate) and controlled by the
+   United Kingdom (occupation since 1882), the D-081 owner/controller separation already
+   used for Cuba (D-129). This matches the catalog, the calibration totals and the
+   customs audit (Ottoman customs territory until Egypt is simulated).
+2. **Newfoundland** is owned by the United Kingdom, its 1900 sovereign; it had carried the
+   registry id of a later polity.
+3. **Tokelau** (a British protectorate in 1900) and the British residual of New Guinea
+   move to the British Pacific and Indian Ocean islands territory.
+4. **Goa** becomes the *Portuguese India* territory of Portugal: 475,513 inhabitants
+   (Portuguese census of 1 December 1900, as tabulated in the Government of Goa,
+   *Economic Survey 2016-17*), the occupation mix, per-capita values and per-capita
+   building levels of Portugal's Asian territories (Timor and Macao). Portugal's
+   calibration targets are recomputed (total 13,355,513). The map shows Goa as Portuguese.
+
+### Consequences
+
+- War-free control by a non-owner (Cuba, Egypt) is administrative: the M10 phase neither
+  creates nor lifts it, and it raises no occupation unrest (D-134 §4).
+
+## D-133 — Province-scale performance: sequential pairing and cached account lookups
+
+**Status:** implemented on 2026-11-02 to make the province world runnable; §1 and §2
+change trajectories and are recorded for the designer's review, §3 is bit-identical.
+
+### Evidence
+
+The first run of the province world took 85 s for its first day and 19–24 s per day after
+(Node, same machine as the P1 report). Two allocations were quadratic: market allocation
+made one reservation per (seller lot × buyer), and the employment fill spread every
+block's quota over every vacancy building of its country. Linear scans over 116,600
+accounts and per-entity rescans did the rest.
+
+### Decision
+
+1. **Market pairing.** Each lot still sells its pro-rata share of the fulfilled quantity
+   and each buyer still receives its planned quantity; the pairs are the overlaps of the
+   cumulative lot and buyer intervals (lots by seller id, buyers in demand order), so a
+   good creates at most lots + buyers reservations. Per-account payments are unchanged
+   because postings are aggregated per account (D-125); only floating summation order
+   changes. The keyed residual tie-break draws are retired.
+2. **Employment pairing.** Block quotas are apportioned as before; each building's fill
+   is apportioned once over its vacancies (keyed ties as before); the two are paired
+   first within each province, then the remainders in ascending province order. At most
+   blocks + buildings assignments; workers fill local jobs first. The fill-order draw is
+   retired.
+3. **Bit-identical indexing.** Cached account lookups by id, owner and subtype and a
+   cached finance index (keyed by the accounts array, rebuilt when accounts are
+   appended; ids, owners and subtypes never change), per-country mortality factors,
+   grouped needs bookkeeping, indexed household tier totals, and incremental migration
+   signals (a flow changes only its source and destination keys; recomputing those two
+   from the same blocks equals the full recomputation, which ran after every flow). The
+   62-day benchmark hash is identical before and after this last change.
+
+### Consequences
+
+- 1900 province world, phase mode with rollback (Node 24, Ryzen 5 2600, 57 measured
+  days): mean 1.75 s, p50 1.52 s, p95 3.86 s, p99 6.86 s per simulated day (the p99 day
+  is the month start; it was 39 s before the incremental migration signals). The
+  359-block world ran at 183 ms p50: the cost is roughly linear in entities.
+  On-device performance is the designer's to measure.
+- **Typed-array population pool (P1 item 4) not built.** Measured on the 1900 province
+  world: copying all 5,687 blocks' age arrays takes about 9 ms of a 260–390 ms
+  `cloneWorld` checkpoint, so a pooled copy saves at most about 3%; the cost is in the
+  ~116,600 account objects and the other records. Per AGENTS.md §6 (optimize from
+  profiling) the pool is deferred until a profile shows it matters.
+- The test runner gets a 4 GB heap (`packages/tests` `test` script): many test files
+  build the province world in one in-band process and exceeded Node's default 2 GB.
+
+## D-134 — Provinces replace regions in the world state (schema 28)
+
+**Status:** implemented on 2026-11-02 (D-118, D-120).
+
+### Decision
+
+1. `World.regions` becomes `World.provinceEconomies`: one `ProvinceEconomy` per permanent
+   province (same id as its `ProvinceOwnership`), with population blocks, buildings,
+   market, unrest, infrastructure, cropland and pasture (hectares) and urban share. The
+   unread `resourceCapsPerDay` is removed. Blocks, buildings, construction projects and
+   armies reference `provinceId`.
+2. `Country.regionIds` and `Market.regionIds` are removed. A country's territory is the
+   set of ownership records whose `ownerPolityId` is its id; a market's provinces are
+   those whose `marketId` is its id. Scenario inputs still declare initial territory
+   (`CountryInitialDef.provinceIds`, `MarketInitialDef.provinceIds`); with province
+   definitions the declared territory must equal the definitions' owners. Synthetic
+   fixtures without definitions get ownership records from the declared territory.
+3. **Conserving transfer** (`transferProvincesToCountry`, D-118 §4): cancels other
+   countries' projects in the provinces, changes owner and controller, moves the
+   provinces into the recipient's customs territory with the stock lots of their
+   buildings, and releases employment that the new border closes; people, accounts and
+   cash do not change. Transfers to a polity that is not a simulation country are
+   rejected. M10 peace cessions use it.
+4. **Occupation** is `ProvinceOwnership.controllerPolityId`/`controlledSinceDay` only. The
+   M10 phase creates and lifts occupations only while the controller is at war with the
+   owner; war-free control (Cuba, Egypt) is administrative and left alone.
+5. Dependent-territory metadata is `TerritoryMetaDef { polityTag, provinceIds, ... }`
+   (was `RegionMetaDef`); `CountryMetaDef.regionName` becomes `homeTerritoryName`.
+6. **Schema 28.** Saves of schema 27 and older are rejected as incompatible (D-120): the
+   save list shows them with the reason, Continue is not offered for them, and nothing is
+   deleted or overwritten. The worker protocol is version 17 and the map bridge version 2.
+7. **Snapshot.** Province economies travel as a column table (`provinceTable`, one array
+   per field) read through `provinceEconomyRows`; province names come from the app's
+   province catalog. The 1900 snapshot is about 0.6 MB (1.2 MB with one object per
+   province). Dependent territories and profession names are part of the snapshot.
+8. **Province UI and lenses (phone layout).** The province panel shows population by
+   profession, urban share, literacy, cropland and pasture, employment, buildings, unrest,
+   infrastructure and market; four lenses (population density, towns, literacy, unrest)
+   join political, control and markets, coloured from `MAP_DATA_RAMP` in the design tokens
+   and drawn the same way by the WebGL map and the SVG fallback.
+9. **Bug fixes found on the way.** `cloneWorld` now copies province ownership (it was
+   shared since M12a, which matters once occupation writes it during a staged day), and
+   world creation builds ownership before interest groups, institutions and initial
+   armies read country territory.

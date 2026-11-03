@@ -2,7 +2,7 @@
  * AUDIT-006 regression coverage.
  *
  * Recruitment and military payments must not follow pop-block array or numeric-id
- * order. The shipped eight-polity sample orders each region's blocks with the
+ * order. The shipped eight-polity sample orders each province's blocks with the
  * (small) academics block first, so a lowest-id rule concentrates recruitment,
  * signing costs, and pay there. These tests assert the documented proportional
  * rule against that real scenario, plus tie-breaks, storage-order independence,
@@ -24,6 +24,7 @@ import {
   type World,
 } from "@century/sim";
 import { loadM5EightPolities } from "@century/data";
+import { occupierOf } from "./fixtures/provinces.js";
 
 const SEED = 20_261_109;
 const RECRUITMENT_COST = 5;
@@ -59,12 +60,12 @@ function blockSnapshot(block: PopBlock): BlockSnapshot {
   };
 }
 
-function regionBlocks(world: World, regionId: Id): PopBlock[] {
-  return world.popBlocks.filter((block) => block.regionId === regionId);
+function provinceBlocks(world: World, provinceId: Id): PopBlock[] {
+  return world.popBlocks.filter((block) => block.provinceId === provinceId);
 }
 
-function snapshots(world: World, regionId: Id): Map<Id, BlockSnapshot> {
-  return new Map(regionBlocks(world, regionId).map((block) => [block.id, blockSnapshot(block)]));
+function snapshots(world: World, provinceId: Id): Map<Id, BlockSnapshot> {
+  return new Map(provinceBlocks(world, provinceId).map((block) => [block.id, blockSnapshot(block)]));
 }
 
 function accountBalance(
@@ -93,7 +94,7 @@ function professionKey(scenario: EconomyScenarioDef, block: PopBlock): string {
 function recruit(
   world: World,
   countryId: Id,
-  regionId: Id,
+  provinceId: Id,
   personnel: number,
 ): ReturnType<typeof applyMilitaryAction> {
   return applyMilitaryAction(
@@ -103,7 +104,7 @@ function recruit(
       countryId,
       dayIndex: world.dayIndex,
       source: "player",
-      regionId,
+      provinceId,
       personnel,
     },
     world.dayIndex,
@@ -119,19 +120,19 @@ function advanceMilitary(world: World, days: number): void {
 }
 
 /**
- * Replace one region's age structure with controlled pools. Eligible people are
+ * Replace one province's age structure with controlled pools. Eligible people are
  * placed in ages 20-24, which are wholly inside the 18..45 recruitment window.
  */
-function setRegionPools(
+function setProvincePools(
   scenario: EconomyScenarioDef,
-  regionId: Id,
+  provinceId: Id,
   pools: readonly BlockPool[],
 ): void {
   const blocks = scenario.population.popBlocks
-    .filter((block) => block.regionId === regionId)
+    .filter((block) => block.provinceId === provinceId)
     .sort((left, right) => left.id - right.id);
   if (blocks.length !== pools.length) {
-    throw new Error(`region ${String(regionId)} has ${String(blocks.length)} blocks`);
+    throw new Error(`province ${String(provinceId)} has ${String(blocks.length)} blocks`);
   }
   for (let index = 0; index < blocks.length; index += 1) {
     const block = blocks[index];
@@ -180,16 +181,16 @@ function totalPeople(world: World): number {
 function shippedScenario(): {
   scenario: EconomyScenarioDef;
   countryId: Id;
-  regionId: Id;
+  provinceId: Id;
   world: World;
 } {
   const scenario = loadM5EightPolities();
   const country = scenario.countries?.[0];
   if (country === undefined) throw new Error("shipped scenario has no country");
-  const regionId = country.regionIds[0];
-  if (regionId === undefined) throw new Error("shipped country has no region");
+  const provinceId = country.provinceIds[0];
+  if (provinceId === undefined) throw new Error("shipped country has no province");
   const world = createEconomyWorld(scenario, { seed: SEED });
-  return { scenario, countryId: country.id, regionId, world };
+  return { scenario, countryId: country.id, provinceId, world };
 }
 
 describe("AUDIT-006 explicit military allocation", () => {
@@ -197,13 +198,13 @@ describe("AUDIT-006 explicit military allocation", () => {
     const scenario = loadM5EightPolities();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
-    const regionId = country.regionIds[0];
-    if (regionId === undefined) throw new Error("shipped country has no region");
+    const provinceId = country.provinceIds[0];
+    if (provinceId === undefined) throw new Error("shipped country has no province");
     scenario.military = {
       armies: [
         {
           countryId: country.id,
-          regionId,
+          provinceId,
           personnel: 500,
           equipmentUnits: 10,
         },
@@ -211,12 +212,12 @@ describe("AUDIT-006 explicit military allocation", () => {
     };
     const baselineScenario = loadM5EightPolities();
     const baselineWorld = createEconomyWorld(baselineScenario, { seed: SEED });
-    const baseline = snapshots(baselineWorld, regionId);
+    const baseline = snapshots(baselineWorld, provinceId);
     const world = createEconomyWorld(scenario, { seed: SEED });
     expect(world.military.armies).toHaveLength(1);
     expect(world.military.armies[0]?.personnel).toBe(500);
     expect(militaryPeopleOutsideCivilian(world)).toBe(500);
-    const after = snapshots(world, regionId);
+    const after = snapshots(world, provinceId);
     let removed = 0;
     let changedBlocks = 0;
     for (const [blockId, prior] of baseline) {
@@ -235,21 +236,21 @@ describe("AUDIT-006 explicit military allocation", () => {
   });
 
   test("the shipped scenario recruits proportionally, not from its lowest-id academics block", () => {
-    const { scenario, countryId, regionId, world } = shippedScenario();
-    const blocks = regionBlocks(world, regionId).sort((left, right) => left.id - right.id);
+    const { scenario, countryId, provinceId, world } = shippedScenario();
+    const blocks = provinceBlocks(world, provinceId).sort((left, right) => left.id - right.id);
     const lowestId = blocks[0];
-    if (lowestId === undefined) throw new Error("region has no pop blocks");
-    // This is the exact shape the audit found: the first block in every region is
+    if (lowestId === undefined) throw new Error("province has no pop blocks");
+    // This is the exact shape the audit found: the first block in every province is
     // the small academics block, so ascending-id allocation concentrated there.
     expect(lowestId.id).toBe(0);
     expect(professionKey(scenario, lowestId)).toBe("academics");
 
-    const before = snapshots(world, regionId);
+    const before = snapshots(world, provinceId);
     const civilianBefore = world.popBlocks.reduce((total, block) => total + populationTotal(block), 0);
     const outsideBefore = militaryPeopleOutsideCivilian(world);
     const treasuryBefore = accountBalance(world, "country", countryId, "treasury-cash");
-    const result = recruit(world, countryId, regionId, 10_000);
-    const after = snapshots(world, regionId);
+    const result = recruit(world, countryId, provinceId, 10_000);
+    const after = snapshots(world, provinceId);
     const paid = militaryPayByBlock(world, world.dayIndex);
 
     let removedTotal = 0;
@@ -263,7 +264,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       removedTotal += removed;
       expect(removed).toBeGreaterThanOrEqual(0);
       expect(removed).toBeLessThanOrEqual(prior.maleEligible + prior.femaleEligible);
-      // 10,000 recruits are well below the region's male pool, so the male-first
+      // 10,000 recruits are well below the province's male pool, so the male-first
       // rule means the allocation follows each block's male eligible weight.
       const exact = (10_000 * prior.maleEligible) / expectedMaleTotal;
       expect(Math.abs(removed - exact)).toBeLessThanOrEqual(1);
@@ -317,18 +318,18 @@ describe("AUDIT-006 explicit military allocation", () => {
     const secondScenario = loadM5EightPolities();
     const secondCountry = secondScenario.countries?.[0];
     if (secondCountry === undefined) throw new Error("shipped scenario has no country");
-    const secondRegionId = secondCountry.regionIds[0];
-    if (secondRegionId === undefined) throw new Error("shipped country has no region");
+    const secondProvinceId = secondCountry.provinceIds[0];
+    if (secondProvinceId === undefined) throw new Error("shipped country has no province");
     const secondWorld = createEconomyWorld(secondScenario, { seed: SEED });
     secondWorld.popBlocks = [...secondWorld.popBlocks].reverse();
 
-    const firstBefore = snapshots(first.world, first.regionId);
-    const secondBefore = snapshots(secondWorld, secondRegionId);
-    recruit(first.world, first.countryId, first.regionId, 10_000);
-    recruit(secondWorld, secondCountry.id, secondRegionId, 10_000);
+    const firstBefore = snapshots(first.world, first.provinceId);
+    const secondBefore = snapshots(secondWorld, secondProvinceId);
+    recruit(first.world, first.countryId, first.provinceId, 10_000);
+    recruit(secondWorld, secondCountry.id, secondProvinceId, 10_000);
 
-    const firstAfter = snapshots(first.world, first.regionId);
-    const secondAfter = snapshots(secondWorld, secondRegionId);
+    const firstAfter = snapshots(first.world, first.provinceId);
+    const secondAfter = snapshots(secondWorld, secondProvinceId);
     for (const [blockId, prior] of firstBefore) {
       const nextFirst = firstAfter.get(blockId);
       const priorSecond = secondBefore.get(blockId);
@@ -363,12 +364,12 @@ describe("AUDIT-006 explicit military allocation", () => {
     const scenario = loadM5EightPolities();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
-    const regionId = country.regionIds[0];
-    if (regionId === undefined) throw new Error("shipped country has no region");
+    const provinceId = country.provinceIds[0];
+    if (provinceId === undefined) throw new Error("shipped country has no province");
     // Equal eligible pools; total population rises with the block id, so the
     // documented population tie-break selects the *higher* ids. A numeric-id rule
     // selects the lowest ids instead.
-    setRegionPools(scenario, regionId, [
+    setProvincePools(scenario, provinceId, [
       { maleEligible: 100, femaleEligible: 100, childPopulation: 100 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 200 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 300 },
@@ -377,9 +378,9 @@ describe("AUDIT-006 explicit military allocation", () => {
     ]);
     country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
-    const before = snapshots(world, regionId);
-    recruit(world, country.id, regionId, 2);
-    const after = snapshots(world, regionId);
+    const before = snapshots(world, provinceId);
+    recruit(world, country.id, provinceId, 2);
+    const after = snapshots(world, provinceId);
     const removals = new Map<Id, number>();
     for (const [blockId, prior] of before) {
       const next = after.get(blockId);
@@ -398,9 +399,9 @@ describe("AUDIT-006 explicit military allocation", () => {
     const repeatScenario = loadM5EightPolities();
     const repeatCountry = repeatScenario.countries?.[0];
     if (repeatCountry === undefined) throw new Error("shipped scenario has no country");
-    const repeatRegionId = repeatCountry.regionIds[0];
-    if (repeatRegionId === undefined) throw new Error("shipped country has no region");
-    setRegionPools(repeatScenario, repeatRegionId, [
+    const repeatProvinceId = repeatCountry.provinceIds[0];
+    if (repeatProvinceId === undefined) throw new Error("shipped country has no province");
+    setProvincePools(repeatScenario, repeatProvinceId, [
       { maleEligible: 100, femaleEligible: 100, childPopulation: 100 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 200 },
       { maleEligible: 100, femaleEligible: 100, childPopulation: 300 },
@@ -409,9 +410,9 @@ describe("AUDIT-006 explicit military allocation", () => {
     ]);
     repeatCountry.initialTreasuryCashRUSD = 1_000_000;
     const repeatWorld = createEconomyWorld(repeatScenario, { seed: SEED });
-    const repeatBefore = snapshots(repeatWorld, repeatRegionId);
-    recruit(repeatWorld, repeatCountry.id, repeatRegionId, 2);
-    const repeatAfter = snapshots(repeatWorld, repeatRegionId);
+    const repeatBefore = snapshots(repeatWorld, repeatProvinceId);
+    recruit(repeatWorld, repeatCountry.id, repeatProvinceId, 2);
+    const repeatAfter = snapshots(repeatWorld, repeatProvinceId);
     for (const [blockId, prior] of repeatBefore) {
       const next = repeatAfter.get(blockId);
       if (next === undefined) throw new Error("missing snapshot");
@@ -428,19 +429,19 @@ describe("AUDIT-006 explicit military allocation", () => {
       const scenario = loadM5EightPolities();
       const country = scenario.countries?.[0];
       if (country === undefined) throw new Error("shipped scenario has no country");
-      const regionId = country.regionIds[0];
-      if (regionId === undefined) throw new Error("shipped country has no region");
+      const provinceId = country.provinceIds[0];
+      if (provinceId === undefined) throw new Error("shipped country has no province");
       const pools: BlockPool[] = [];
       for (let index = 0; index < 5; index += 1) {
         pools.push({ maleEligible: 100, femaleEligible: 100, childPopulation: 100 });
       }
-      setRegionPools(scenario, regionId, pools);
+      setProvincePools(scenario, provinceId, pools);
       country.initialTreasuryCashRUSD = 1_000_000;
       const world = createEconomyWorld(scenario, { seed: SEED });
       if (reverse) world.popBlocks = [...world.popBlocks].reverse();
-      const before = snapshots(world, regionId);
-      recruit(world, country.id, regionId, 2);
-      const after = snapshots(world, regionId);
+      const before = snapshots(world, provinceId);
+      recruit(world, country.id, provinceId, 2);
+      const after = snapshots(world, provinceId);
       const removals = new Map<Id, number>();
       for (const [blockId, prior] of before) {
         const next = after.get(blockId);
@@ -471,9 +472,9 @@ describe("AUDIT-006 explicit military allocation", () => {
     const scenario = loadM5EightPolities();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
-    const regionId = country.regionIds[0];
-    if (regionId === undefined) throw new Error("shipped country has no region");
-    setRegionPools(scenario, regionId, [
+    const provinceId = country.provinceIds[0];
+    if (provinceId === undefined) throw new Error("shipped country has no province");
+    setProvincePools(scenario, provinceId, [
       { maleEligible: 60, femaleEligible: 40, childPopulation: 0 },
       { maleEligible: 60, femaleEligible: 40, childPopulation: 0 },
       { maleEligible: 60, femaleEligible: 40, childPopulation: 0 },
@@ -482,10 +483,10 @@ describe("AUDIT-006 explicit military allocation", () => {
     ]);
     country.initialTreasuryCashRUSD = 1_000_000;
     const world = createEconomyWorld(scenario, { seed: SEED });
-    const before = snapshots(world, regionId);
+    const before = snapshots(world, provinceId);
     // 300 male-eligible people exist; the remaining 50 must come from females.
-    recruit(world, country.id, regionId, 350);
-    const after = snapshots(world, regionId);
+    recruit(world, country.id, provinceId, 350);
+    const after = snapshots(world, provinceId);
     let removedMales = 0;
     let removedFemales = 0;
     for (const [blockId, prior] of before) {
@@ -501,26 +502,26 @@ describe("AUDIT-006 explicit military allocation", () => {
     }
     expect(removedMales).toBe(300);
     expect(removedFemales).toBe(50);
-    expect(recruitablePeople(world, regionId)).toBe(150);
+    expect(recruitablePeople(world, provinceId)).toBe(150);
     // Each block supplied 70 recruits, so its signing payment is exactly 70 * 5.
     const paid = militaryPayByBlock(world, world.dayIndex);
-    for (const block of regionBlocks(world, regionId)) {
+    for (const block of provinceBlocks(world, provinceId)) {
       expect(paid.get(block.id) ?? 0).toBeCloseTo(70 * RECRUITMENT_COST, 6);
     }
     assertValidWorld(world);
   });
 
-  test("daily pay and garrison payments are distributed across the region's households", () => {
+  test("daily pay and garrison payments are distributed across the province's households", () => {
     const scenario = loadM5EightPolities();
     const firstCountry = scenario.countries?.[0];
     const secondCountry = scenario.countries?.[1];
     if (firstCountry === undefined || secondCountry === undefined) {
       throw new Error("shipped scenario needs two countries");
     }
-    const homeRegion = firstCountry.regionIds[0];
-    const targetRegion = secondCountry.regionIds[0];
-    if (homeRegion === undefined || targetRegion === undefined) {
-      throw new Error("shipped countries need regions");
+    const homeProvince = firstCountry.provinceIds[0];
+    const targetProvince = secondCountry.provinceIds[0];
+    if (homeProvince === undefined || targetProvince === undefined) {
+      throw new Error("shipped countries need provinces");
     }
     firstCountry.initialTreasuryCashRUSD = 1_000_000_000;
     secondCountry.initialTreasuryCashRUSD = 1_000_000_000;
@@ -537,7 +538,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       },
       world.dayIndex,
     );
-    recruit(world, firstCountry.id, homeRegion, 1_000);
+    recruit(world, firstCountry.id, homeProvince, 1_000);
     advanceMilitary(world, 14);
     const army = world.military.armies.find((entry) => entry.countryId === firstCountry.id);
     if (army === undefined) throw new Error("missing army");
@@ -549,16 +550,16 @@ describe("AUDIT-006 explicit military allocation", () => {
         dayIndex: world.dayIndex,
         source: "player",
         armyId: army.id,
-        targetRegionId: targetRegion,
+        targetProvinceId: targetProvince,
       },
       world.dayIndex,
     );
     advanceMilitary(world, 12);
-    expect(world.regions.find((region) => region.id === targetRegion)?.controllerCountryId).toBe(
+    expect(occupierOf(world, targetProvince)).toBe(
       firstCountry.id,
     );
 
-    const blocks = regionBlocks(world, targetRegion);
+    const blocks = provinceBlocks(world, targetProvince);
     const before = new Map(
       blocks.map((block) => [
         block.id,
@@ -596,13 +597,13 @@ describe("AUDIT-006 explicit military allocation", () => {
     const populationScenario = loadM5EightPolities();
     const populationCountry = populationScenario.countries?.[0];
     if (populationCountry === undefined) throw new Error("shipped scenario has no country");
-    const populationRegion = populationCountry.regionIds[0];
-    if (populationRegion === undefined) throw new Error("shipped country has no region");
+    const populationProvince = populationCountry.provinceIds[0];
+    if (populationProvince === undefined) throw new Error("shipped country has no province");
     populationCountry.initialTreasuryCashRUSD = 1_000_000_000_000;
     const populationWorld = createEconomyWorld(populationScenario, { seed: SEED });
     const populationHash = hashWorld(populationWorld);
-    const available = recruitablePeople(populationWorld, populationRegion);
-    expect(() => recruit(populationWorld, populationCountry.id, populationRegion, available + 1)).toThrow(
+    const available = recruitablePeople(populationWorld, populationProvince);
+    expect(() => recruit(populationWorld, populationCountry.id, populationProvince, available + 1)).toThrow(
       /recruitable/,
     );
     expect(hashWorld(populationWorld)).toBe(populationHash);
@@ -612,20 +613,20 @@ describe("AUDIT-006 explicit military allocation", () => {
     const treasuryScenario = loadM5EightPolities();
     const treasuryCountry = treasuryScenario.countries?.[0];
     if (treasuryCountry === undefined) throw new Error("shipped scenario has no country");
-    const treasuryRegion = treasuryCountry.regionIds[0];
-    if (treasuryRegion === undefined) throw new Error("shipped country has no region");
+    const treasuryProvince = treasuryCountry.provinceIds[0];
+    if (treasuryProvince === undefined) throw new Error("shipped country has no province");
     treasuryCountry.initialTreasuryCashRUSD = 0;
     const treasuryWorld = createEconomyWorld(treasuryScenario, { seed: SEED });
     const treasuryHash = hashWorld(treasuryWorld);
-    expect(() => recruit(treasuryWorld, treasuryCountry.id, treasuryRegion, 1)).toThrow(/treasury/);
+    expect(() => recruit(treasuryWorld, treasuryCountry.id, treasuryProvince, 1)).toThrow(/treasury/);
     expect(hashWorld(treasuryWorld)).toBe(treasuryHash);
     expect(treasuryWorld.military.armies).toHaveLength(0);
     assertValidWorld(treasuryWorld);
   });
 
   test("military postings remain balanced and conserve designated cash", () => {
-    const { countryId, regionId, world } = shippedScenario();
-    recruit(world, countryId, regionId, 2_000);
+    const { countryId, provinceId, world } = shippedScenario();
+    recruit(world, countryId, provinceId, 2_000);
     runMilitaryPhase(world, world.dayIndex, { validateWorld: false });
     const accountById = new Map(
       world.finance.accounts.map((account) => [account.id, account] as const),

@@ -16,7 +16,7 @@ import {
   formatSpeed,
   type CountrySummarySnapshot,
   type ProvinceOwnershipSnapshot,
-  type RegionSnapshot,
+  type ProvinceEconomySnapshot,
   type SimulationSnapshot,
   type SpeedDaysPerSecond,
 } from "@century/sim-worker";
@@ -53,6 +53,7 @@ import { PopulationScreen } from "./PopulationScreen";
 import { TechnologyScreen } from "./TechnologyScreen";
 import { TradeScreen } from "./TradeScreen";
 import { WarScreen } from "./WarScreen";
+import { provinceEconomyRows } from "@century/sim-worker";
 
 const DOMAIN_ICON: Readonly<Record<DomainId, IconName>> = {
   realm: "realm",
@@ -185,11 +186,10 @@ export function GameShell() {
     () => WORLD_CATALOG.entries.find((entry) => entry.tag === selectedTag) ?? null,
     [selectedTag],
   );
-  const selectedRegion = useMemo(
-    () =>
-      snapshot === null || selectedEntry === null
-        ? null
-        : (snapshot.regions.find((region) => region.id === selectedEntry.id) ?? null),
+  // P2: a catalogue entry is a set of provinces: a state's home provinces or a
+  // dependent territory's provinces (D-118).
+  const selectedTerritory = useMemo(
+    () => (snapshot === null || selectedEntry === null ? null : territoryAggregate(snapshot, selectedEntry)),
     [snapshot, selectedEntry],
   );
   const selectedSummary = useMemo(() => {
@@ -229,8 +229,8 @@ export function GameShell() {
     selectedEntry === null
       ? null
       : (snapshot?.markets.find((market) =>
-          selectedRegion !== null
-            ? market.id === selectedRegion.marketId
+          selectedTerritory !== null && selectedTerritory.marketId !== null
+            ? market.id === selectedTerritory.marketId
             : market.memberCountryIds.includes(selectedEntry.id),
         ) ??
         WORLD_CATALOG.markets.find((market) => market.key === selectedEntry.market) ??
@@ -556,12 +556,15 @@ export function GameShell() {
                 ownership={
                   snapshot?.provinces.find((entry) => entry.provinceId === selectedProvinceId) ?? null
                 }
+                economy={
+                  (snapshot === null ? undefined : provinceEconomyRows(snapshot).find((entry) => entry.id === selectedProvinceId)) ?? null
+                }
               />
             )}
             <SelectedPolityPanel
               entry={selectedEntry}
               summary={selectedSummary}
-              region={selectedRegion}
+              territory={selectedTerritory}
               market={selectedMarket}
               isPlayer={selectedEntry !== null && selectedEntry.tag === playerSummary?.tag}
               onOpenOverview={() => setSheet({ kind: "screen", screen: "overview" })}
@@ -1087,12 +1090,96 @@ function Screen({
   }
 }
 
+/** Live totals of the provinces a catalogue entry stands for. */
+interface TerritoryAggregate {
+  readonly provinceCount: number;
+  readonly population: number;
+  readonly buildingCount: number;
+  readonly infrastructure: number;
+  readonly marketId: number | null;
+  readonly controllerCountryId: number | null;
+}
+
+function territoryAggregate(snapshot: SimulationSnapshot, entry: WorldCatalogEntry): TerritoryAggregate | null {
+  const provinces = provinceEconomyRows(snapshot).filter((province) =>
+    entry.kind === "state"
+      ? province.countryId === entry.id && province.territoryTag === null
+      : province.territoryTag === entry.tag,
+  );
+  if (provinces.length === 0) return null;
+  let population = 0;
+  let buildingCount = 0;
+  let infrastructureWeighted = 0;
+  for (const province of provinces) {
+    population += province.population;
+    buildingCount += province.buildingCount;
+    infrastructureWeighted += province.infrastructure * province.population;
+  }
+  return {
+    provinceCount: provinces.length,
+    population,
+    buildingCount,
+    infrastructure: population > 0 ? infrastructureWeighted / population : (provinces[0]?.infrastructure ?? 0),
+    marketId: provinces.find((province) => province.marketId !== null)?.marketId ?? null,
+    controllerCountryId: provinces.find((province) => province.controllerCountryId !== null)?.controllerCountryId ?? null,
+  };
+}
+
+const percentText = (value: number): string => `${(value * 100).toFixed(0)}%`;
+
+/** P2 live population and economy of one province (D-118). */
+function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomySnapshot }) {
+  const { snapshot } = useSimulation();
+  const professionName = new Map((snapshot?.professions ?? []).map((profession) => [String(profession.id), profession.name]));
+  const marketName = snapshot?.markets.find((market) => market.id === economy.marketId)?.name ?? null;
+  const occupations = Object.entries(economy.populationByProfession)
+    .filter(([, count]) => count > 0)
+    .sort((left, right) => right[1] - left[1])
+    .map(([id, count]) => `${professionName.get(id) ?? `profession ${id}`} ${formatPeople(count)}`)
+    .join(" · ");
+  return (
+    <>
+      <Divider />
+      <StatRow
+        label="Population"
+        value={formatPeople(economy.population)}
+        detail={occupations.length === 0 ? "No inhabitants recorded" : occupations}
+      />
+      <StatRow
+        label="Towns and literacy"
+        value={`${percentText(economy.urbanShare)} urban`}
+        detail={`Adult literacy ${percentText(economy.literacy)} · urban share from HYDE 3.3 (1900)`}
+      />
+      <StatRow
+        label="Land"
+        value={`${formatPeople(economy.arableLandHa)} ha cropland`}
+        detail={`${formatPeople(economy.pastureHa)} ha pasture and rangeland (HYDE 3.3)`}
+      />
+      <StatRow
+        label="Work"
+        value={`${formatPeople(economy.employedWorkers)} employed here`}
+        detail={`${String(economy.buildingCount)} building${economy.buildingCount === 1 ? "" : "s"}, ${String(economy.buildingLevels)} capacity level${economy.buildingLevels === 1 ? "" : "s"}`}
+      />
+      <StatRow
+        label="Unrest"
+        value={percentText(economy.unrest)}
+        detail={`Infrastructure ${percentText(economy.infrastructure)}`}
+      />
+      {marketName === null ? null : (
+        <StatRow label="Market" value={marketName} detail="The customs territory this province trades in" />
+      )}
+    </>
+  );
+}
+
 function ProvincePanel({
   province,
   ownership,
+  economy,
 }: {
   readonly province: ProvinceCatalogEntry | null;
   readonly ownership: ProvinceOwnershipSnapshot | null;
+  readonly economy: ProvinceEconomySnapshot | null;
 }) {
   if (province === null) return null;
   const tagOf = (polityId: number): string =>
@@ -1140,6 +1227,7 @@ function ProvincePanel({
           detail="Recorded claims do not imply ownership"
         />
       )}
+      {economy === null ? null : <ProvinceEconomySection economy={economy} />}
       <Text style={styles.provinceNote}>{province.notes}</Text>
     </Panel>
   );
@@ -1148,7 +1236,7 @@ function ProvincePanel({
 function SelectedPolityPanel({
   entry,
   summary,
-  region,
+  territory,
   market,
   isPlayer,
   onOpenOverview,
@@ -1156,7 +1244,7 @@ function SelectedPolityPanel({
 }: {
   readonly entry: WorldCatalogEntry | null;
   readonly summary: CountrySummarySnapshot | null;
-  readonly region: RegionSnapshot | null;
+  readonly territory: TerritoryAggregate | null;
   readonly market:
     | {
         readonly id: number;
@@ -1186,9 +1274,9 @@ function SelectedPolityPanel({
       ? null
       : (WORLD_CATALOG.entries.find((candidate) => candidate.tag === entry.sovereignTag) ?? null);
   const controllerTag =
-    snapshot === null || region === null || region.controllerCountryId === null
+    snapshot === null || territory === null || territory.controllerCountryId === null
       ? null
-      : (snapshot.countrySummaries.find((country) => country.id === region.controllerCountryId)?.tag ?? null);
+      : (snapshot.countrySummaries.find((country) => country.id === territory.controllerCountryId)?.tag ?? null);
   const playerTag =
     snapshot === null
       ? null
@@ -1223,13 +1311,14 @@ function SelectedPolityPanel({
       </View>
 
       <Divider />
-      {region === null ? null : (
+      {territory === null ? null : (
         <>
-          <Text style={type.label}>Region simulation</Text>
-          <Text style={styles.regionLine}>
-            {formatPeople(region.population)} people · {region.buildingCount} building
-            {region.buildingCount === 1 ? "" : "s"} · infrastructure{" "}
-            {(region.infrastructure * 100).toFixed(0)}%
+          <Text style={type.label}>{entry.kind === "state" ? "Home provinces" : "Territory provinces"}</Text>
+          <Text style={styles.provinceLine}>
+            {String(territory.provinceCount)} province{territory.provinceCount === 1 ? "" : "s"} ·{" "}
+            {formatPeople(territory.population)} people · {territory.buildingCount} building
+            {territory.buildingCount === 1 ? "" : "s"} · infrastructure{" "}
+            {(territory.infrastructure * 100).toFixed(0)}%
           </Text>
         </>
       )}
@@ -1238,12 +1327,12 @@ function SelectedPolityPanel({
           <Text style={[type.label, styles.spacedLabel]}>
             {entry.kind === "territory" ? "Sovereign country indicators" : "Country indicators"}
           </Text>
-          <Text style={styles.regionLine}>
+          <Text style={styles.provinceLine}>
             Population {formatPeople(countrySummary.population)} · Treasury{" "}
             {formatRusd(countrySummary.treasuryCashRUSD)} RUSD · Hardship{" "}
             {(countrySummary.hardshipPopulationShare * 100).toFixed(1)}%
           </Text>
-          <Text style={styles.regionLine}>
+          <Text style={styles.provinceLine}>
             Employed {formatPeople(countrySummary.employedWorkers)} · Literacy{" "}
             {(countrySummary.literacy * 100).toFixed(0)}% · Unrest{" "}
             {(countrySummary.militancy * 100).toFixed(0)}%
@@ -1462,7 +1551,7 @@ const styles = themedSheet(() => ({
   polityCommon: { ...type.section },
   polityMeta: { ...type.tiny, marginTop: 1 },
   occupied: { ...type.tiny, color: colors.red, marginTop: 2 },
-  regionLine: { ...type.small, marginTop: 2 },
+  provinceLine: { ...type.small, marginTop: 2 },
   spacedLabel: { marginTop: spacing.sm },
   marketName: { ...type.body, color: colors.textStrong, fontFamily: fonts.sansSemiBold, marginTop: 1 },
   marketBody: { ...type.small, marginTop: 2 },

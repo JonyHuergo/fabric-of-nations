@@ -10,16 +10,19 @@
 import {
   applyCountryAction,
   assertValidWorld,
+  checkpointRollbackRunner,
   createEconomyWorld,
+  createRollbackRunner,
   deserializeWorld,
   isCampaignComplete,
+  runTicksWithRollback,
   serializeWorld,
-  tick,
   validateCountryAction,
 } from "@century/sim";
 import type {
   CountryAction,
   EconomyScenarioDef,
+  RollbackRunner,
   TickContext,
   World,
 } from "@century/sim";
@@ -84,6 +87,12 @@ export class SimulationHost {
   private scenario: EconomyScenarioDef;
   private readonly context: TickContext;
   private world: World;
+  /**
+   * D-116 rollback state for `world`: days run in phase mode and a failed day is
+   * restored to its start. Replaced whenever `world` is replaced and checkpointed
+   * after every accepted action.
+   */
+  private runner: RollbackRunner;
   private focusCountryId: number | null = null;
   private running = false;
   private speed: SpeedDaysPerSecond = DEFAULT_SPEED_DAYS_PER_SECOND;
@@ -109,6 +118,7 @@ export class SimulationHost {
       economy: { definitions: options.scenario.definitions },
     };
     this.world = createEconomyWorld(options.scenario, { seed: options.seed });
+    this.runner = createRollbackRunner(this.world);
     this.lastClockMs = this.clock();
     this.lastSnapshotMs = this.lastClockMs;
     this.emitSnapshot("READY");
@@ -130,7 +140,7 @@ export class SimulationHost {
       focusCountryId: this.focusCountryId,
       ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
       ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
-      ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
+      ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
     }, this.scenario.population.definitions);
   }
 
@@ -303,8 +313,8 @@ export class SimulationHost {
         return true;
       }
       try {
-        const result = tick(this.world, this.context);
-        if (!result.advanced) {
+        const result = runTicksWithRollback(this.runner, 1, this.context);
+        if (result.ticksProcessed === 0) {
           this.pause();
           this.emitSnapshot("SNAPSHOT");
           return true;
@@ -354,6 +364,7 @@ export class SimulationHost {
     }
     try {
       applyCountryAction(this.world, command, this.scenario.definitions);
+      checkpointRollbackRunner(this.runner);
     } catch (error) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,
@@ -432,6 +443,7 @@ export class SimulationHost {
     this.pause();
     this.scenario = scenario;
     this.world = world;
+    this.runner = createRollbackRunner(world);
     this.focusCountryId = null;
     this.lastSnapshotMs = this.clock();
     this.emitEvent({
@@ -510,7 +522,7 @@ export class SimulationHost {
         focusCountryId: null,
         ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
         ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
-        ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
+        ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
       }, this.scenario.population.definitions),
     });
   }
@@ -545,6 +557,7 @@ export class SimulationHost {
     }
     this.pause();
     this.world = loaded;
+    this.runner = createRollbackRunner(loaded);
     this.resetPacing();
     this.lastSnapshotMs = this.lastClockMs;
     this.emitEvent({

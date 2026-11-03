@@ -77,7 +77,7 @@ export function runM7Benchmarks(): boolean {
   const initial = findSnapshot(events);
   if (initial === null) throw new Error("M7 worker produced no initial snapshot");
   const countries = initial.countries.length;
-  const regions = initial.regions.length;
+  const provinces = initial.provinceTable.ids.length;
 
   host.handleCommand({
     protocolVersion: PROTOCOL_VERSION,
@@ -132,7 +132,7 @@ export function runM7Benchmarks(): boolean {
 
   console.log("");
   console.log(
-    `M7 worker host: ${String(countries)} countries, ${String(regions)} regions, ` +
+    `M7 worker host: ${String(countries)} countries, ${String(provinces)} provinces, ` +
       `${String(MEASURED_TICKS)} measured ticks, seed ${String(SEED)}`,
   );
   console.log(
@@ -151,7 +151,7 @@ export function runM7Benchmarks(): boolean {
 
   const valid =
     countries === 8 &&
-    regions === 16 &&
+    provinces === 16 &&
     tickStats.count === MEASURED_TICKS &&
     tickStats.p95Ms > 0 &&
     snapshotBytes > 0 &&

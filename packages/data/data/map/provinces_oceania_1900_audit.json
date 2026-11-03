@@ -3,7 +3,7 @@
   "referenceDate": "1900-01-01",
   "toleranceDegrees": 0.02,
   "gapToleranceDegrees": 0.004,
-  "provinceCount": 151,
+  "provinceCount": 150,
   "plannedProvinceCount": 126,
   "gapProvinceCount": 25,
   "gapProvinces": [
@@ -5320,5 +5320,6 @@
     "ARG": 50,
     "CAN": 56,
     "PHL": 150
-  }
+  },
+  "p2Repair": "province geometry repaired by scripts/p2 (D-128); see province_repair_report.json"
 }

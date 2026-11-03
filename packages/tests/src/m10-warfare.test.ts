@@ -1,8 +1,8 @@
 /**
  * M10 — diplomacy, warfare, and territorial control (GDD §11, D-081).
  *
- * The central invariant is that military control (`Region.controllerCountryId`) is
- * not sovereignty (`Country.regionIds`): occupation and even the supported peace
+ * The central invariant is that military control (`ProvinceEconomy.controllerCountryId`) is
+ * not sovereignty (`Country.provinceIds`): occupation and even the supported peace
  * cession must not transfer treasuries, buildings, people, markets, or monetary
  * authority. The tests also cover recruitment, combat casualties and conservation,
  * war/peace validation, determinism, persistence, and the worker contract.
@@ -17,20 +17,22 @@ import {
   hashWorld,
   militaryPeopleOutsideCivilian,
   populationTotal,
-  regionControllerCountryId,
-  regionSovereignCountryId,
+  provinceControllerCountryId,
+  provinceSovereignCountryId,
   runEconomicDay,
   runMilitaryPhase,
   serializeWorld,
   validateCountryAction,
   type EconomyScenarioDef,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
   parseWorkerCommand,
   type SimulationSnapshot,
   type WorkerEvent,
+  provinceEconomyRows,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
@@ -46,6 +48,7 @@ import {
   M5_REGION_C1,
   m5Scenario,
 } from "./fixtures/m5.js";
+import { occupiedSinceOf, occupierOf } from "./fixtures/provinces.js";
 
 const SEED = 20_261_107;
 
@@ -71,7 +74,7 @@ function act(
 function recruit(
   world: World,
   countryId: number,
-  regionId: number,
+  provinceId: number,
   personnel: number,
 ): number {
   const result = act(world, {
@@ -79,7 +82,7 @@ function recruit(
     countryId,
     dayIndex: world.dayIndex,
     source: "player",
-    regionId,
+    provinceId,
     personnel,
   });
   return result.armyId ?? 0;
@@ -135,12 +138,12 @@ describe("M10 sovereignty and military control", () => {
     expect(world.military.enabled).toBe(true);
     expect(world.military.armies).toHaveLength(0);
     expect(world.military.wars).toHaveLength(0);
-    expect(world.regions.every((region) => region.controllerCountryId === null)).toBe(true);
-    // Every region has a sovereign derived from Country.regionIds, and no occupation.
-    for (const region of world.regions) {
-      expect(regionSovereignCountryId(world, region.id)).not.toBeNull();
-      expect(regionControllerCountryId(world, region.id)).toBe(
-        regionSovereignCountryId(world, region.id),
+    expect(world.provinceEconomies.every((province) => occupierOf(world, province.id) === null)).toBe(true);
+    // Every province has a sovereign derived from Country.provinceIds, and no occupation.
+    for (const province of world.provinceEconomies) {
+      expect(provinceSovereignCountryId(world, province.id)).not.toBeNull();
+      expect(provinceControllerCountryId(world, province.id)).toBe(
+        provinceSovereignCountryId(world, province.id),
       );
     }
   });
@@ -157,28 +160,27 @@ describe("M10 sovereignty and military control", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId,
-      targetRegionId: M5_REGION_C1,
+      targetProvinceId: M5_REGION_C1,
     });
     const treasuryC = accountBalance(world, "country", M5_COUNTRY_C, "treasury-cash");
-    const marketBefore = world.regions.find((region) => region.id === M5_REGION_C1)?.marketId;
+    const marketBefore = world.provinceEconomies.find((province) => province.id === M5_REGION_C1)?.marketId;
     const popBefore = peopleTotal(world);
     const buildingCountBefore = world.buildings.filter(
-      (building) => building.regionId === M5_REGION_C1,
+      (building) => building.provinceId === M5_REGION_C1,
     ).length;
     const monetaryBefore = world.monetary.currencies.filter(
       (record) => record.issuerCountryId === M5_COUNTRY_C,
     );
     advanceMilitary(world, 12);
-    const region = world.regions.find((candidate) => candidate.id === M5_REGION_C1);
-    expect(region?.controllerCountryId).toBe(M5_COUNTRY_A);
-    expect(region?.occupiedSinceDay).not.toBeNull();
+    expect(occupierOf(world, M5_REGION_C1)).toBe(M5_COUNTRY_A);
+    expect(occupiedSinceOf(world, M5_REGION_C1)).not.toBeNull();
     // Sovereignty, market, people, buildings, treasury, and monetary authority unchanged.
-    expect(regionSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
-    expect(world.countries.find((c) => c.id === M5_COUNTRY_C)?.regionIds).toContain(M5_REGION_C1);
-    expect(region?.marketId).toBe(marketBefore);
+    expect(provinceSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
+    expect(countryProvinceIds(world, M5_COUNTRY_C)).toContain(M5_REGION_C1);
+    expect(world.provinceEconomies.find((candidate) => candidate.id === M5_REGION_C1)?.marketId).toBe(marketBefore);
     expect(peopleTotal(world)).toBe(popBefore);
     expect(
-      world.buildings.filter((building) => building.regionId === M5_REGION_C1),
+      world.buildings.filter((building) => building.provinceId === M5_REGION_C1),
     ).toHaveLength(buildingCountBefore);
     expect(accountBalance(world, "country", M5_COUNTRY_C, "treasury-cash")).toBe(treasuryC);
     expect(
@@ -202,13 +204,13 @@ describe("M10 sovereignty and military control", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId,
-      targetRegionId: M5_REGION_A2,
+      targetProvinceId: M5_REGION_A2,
     });
     advanceMilitary(world, 12);
-    expect(world.regions.find((region) => region.id === M5_REGION_A2)?.controllerCountryId).toBe(
+    expect(occupierOf(world, M5_REGION_A2)).toBe(
       M5_COUNTRY_C,
     );
-    const marketBefore = world.regions.find((region) => region.id === M5_REGION_A2)?.marketId;
+    const marketBefore = world.provinceEconomies.find((province) => province.id === M5_REGION_A2)?.marketId;
     const popBefore = peopleTotal(world);
     const treasuryA = accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash");
     const buildingsBefore = world.buildings.map((building) => ({
@@ -239,19 +241,19 @@ describe("M10 sovereignty and military control", () => {
       warId: war!.id,
       offerId: offer.offerId ?? 0,
     });
-    // Sovereignty moved exactly one region; the loser keeps its other region.
-    expect(regionSovereignCountryId(world, M5_REGION_A2)).toBe(M5_COUNTRY_C);
-    expect(world.countries.find((c) => c.id === M5_COUNTRY_A)?.regionIds).not.toContain(
+    // Sovereignty moved exactly one province; the loser keeps its other province.
+    expect(provinceSovereignCountryId(world, M5_REGION_A2)).toBe(M5_COUNTRY_C);
+    expect(countryProvinceIds(world, M5_COUNTRY_A)).not.toContain(
       M5_REGION_A2,
     );
-    expect(world.countries.find((c) => c.id === M5_COUNTRY_C)?.regionIds).toContain(
+    expect(countryProvinceIds(world, M5_COUNTRY_C)).toContain(
       M5_REGION_A2,
     );
-    expect(world.countries.find((c) => c.id === M5_COUNTRY_A)?.regionIds).toContain(
+    expect(countryProvinceIds(world, M5_COUNTRY_A)).toContain(
       M5_REGION_A1,
     );
     // Market membership, people, treasury, buildings, and valuations are untouched.
-    expect(world.regions.find((region) => region.id === M5_REGION_A2)?.marketId).toBe(marketBefore);
+    expect(world.provinceEconomies.find((province) => province.id === M5_REGION_A2)?.marketId).toBe(marketBefore);
     expect(peopleTotal(world)).toBe(popBefore);
     expect(accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBe(treasuryA);
     expect(
@@ -268,7 +270,7 @@ describe("M10 sovereignty and military control", () => {
         value: valuation.status === "specified" ? valuation.rusdPerUnit : 0,
       })),
     ).toEqual(monetaryBefore);
-    expect(world.regions.find((region) => region.id === M5_REGION_A2)?.controllerCountryId).toBeNull();
+    expect(occupierOf(world, M5_REGION_A2)).toBeNull();
     assertValidWorld(world);
   });
 });
@@ -299,7 +301,7 @@ describe("M10 recruitment, movement, and combat", () => {
   test("an unaffordable recruitment is rejected without changing state", () => {
     const { world } = buildMilitary();
     // Drain the treasury through an in-world transfer chain is unnecessary: request an
-    // army larger than the treasury can fund by using the whole region's people.
+    // army larger than the treasury can fund by using the whole province's people.
     const hashBefore = hashWorld(world);
     expect(() =>
       act(world, {
@@ -307,7 +309,7 @@ describe("M10 recruitment, movement, and combat", () => {
         countryId: M5_COUNTRY_A,
         dayIndex: world.dayIndex,
         source: "player",
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         personnel: 1_000_000,
       }),
     ).toThrow(/recruitable|treasury/);
@@ -316,7 +318,7 @@ describe("M10 recruitment, movement, and combat", () => {
     assertValidWorld(world);
   });
 
-  test("armies may only deploy to their own, controlled, or at-war regions", () => {
+  test("armies may only deploy to their own, controlled, or at-war provinces", () => {
     const { world } = buildMilitary();
     recruit(world, M5_COUNTRY_A, M5_REGION_A1, 300);
     advanceMilitary(world, 14);
@@ -329,7 +331,7 @@ describe("M10 recruitment, movement, and combat", () => {
         dayIndex: world.dayIndex,
         source: "player",
         armyId,
-        targetRegionId: M5_REGION_B1,
+        targetProvinceId: M5_REGION_B1,
       }),
     ).toThrow(/not own, controlled, or at war/);
     declare(world, M5_COUNTRY_A, M5_COUNTRY_B);
@@ -339,10 +341,10 @@ describe("M10 recruitment, movement, and combat", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId,
-      targetRegionId: M5_REGION_B1,
+      targetProvinceId: M5_REGION_B1,
     });
     const army = world.military.armies.find((entry) => entry.id === armyId);
-    expect(army?.destinationRegionId).toBe(M5_REGION_B1);
+    expect(army?.destinationProvinceId).toBe(M5_REGION_B1);
     expect(army?.arrivalDay).toBeGreaterThan(world.dayIndex);
   });
 
@@ -358,7 +360,7 @@ describe("M10 recruitment, movement, and combat", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId: attacker,
-      targetRegionId: M5_REGION_B1,
+      targetProvinceId: M5_REGION_B1,
     });
     const peopleBefore = peopleTotal(world);
     const treasuryA = accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash");
@@ -405,13 +407,13 @@ describe("M10 recruitment, movement, and combat", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId,
-      targetRegionId: M5_REGION_C1,
+      targetProvinceId: M5_REGION_C1,
     });
     advanceMilitary(world, 12);
-    expect(world.regions.find((region) => region.id === M5_REGION_C1)?.controllerCountryId).toBe(
+    expect(occupierOf(world, M5_REGION_C1)).toBe(
       M5_COUNTRY_A,
     );
-    expect(regionSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
+    expect(provinceSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
     // White peace clears the occupation and leaves sovereignty untouched.
     const war = world.military.wars.find((entry) => entry.endedDay === null)!;
     const offer = act(world, {
@@ -430,8 +432,8 @@ describe("M10 recruitment, movement, and combat", () => {
       warId: war.id,
       offerId: offer.offerId ?? 0,
     });
-    expect(world.regions.find((region) => region.id === M5_REGION_C1)?.controllerCountryId).toBeNull();
-    expect(regionSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
+    expect(occupierOf(world, M5_REGION_C1)).toBeNull();
+    expect(provinceSovereignCountryId(world, M5_REGION_C1)).toBe(M5_COUNTRY_C);
     assertValidWorld(world);
   });
 });
@@ -583,7 +585,7 @@ describe("M10 determinism, persistence, and worker contract", () => {
         dayIndex: world.dayIndex,
         source: "player",
         armyId: army,
-        targetRegionId: M5_REGION_B1,
+        targetProvinceId: M5_REGION_B1,
       });
       advanceMilitary(world, 12);
     }
@@ -646,8 +648,8 @@ describe("M10 determinism, persistence, and worker contract", () => {
     expect(actionResult).not.toBeNull();
     expect(actionResult!.accepted).toBe(true);
     expect(actionResult!.snapshot.military.wars).toHaveLength(1);
-    const region = actionResult!.snapshot.regions.find(
-      (candidate) => candidate.sovereignCountryId === player.id,
+    const province = provinceEconomyRows(actionResult!.snapshot).find(
+      (candidate) => candidate.countryId === player.id,
     )!;
     host.handleCommand({
       protocolVersion: PROTOCOL_VERSION,
@@ -657,7 +659,7 @@ describe("M10 determinism, persistence, and worker contract", () => {
       action: {
         kind: "recruit-army",
         countryId: player.id,
-        regionId: region.id,
+        provinceId: province.id,
         personnel: 100,
       },
     });
@@ -688,7 +690,7 @@ describe("M10 determinism, persistence, and worker contract", () => {
     expect(() =>
       parseWorkerCommand({
         ...base,
-        action: { kind: "recruit-army", countryId: 0, regionId: 0, personnel: 0 },
+        action: { kind: "recruit-army", countryId: 0, provinceId: 0, personnel: 0 },
       }),
     ).toThrow();
   });
@@ -709,7 +711,7 @@ describe("M10 determinism, persistence, and worker contract", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId: attackerArmyId,
-      targetRegionId: M5_REGION_B1,
+      targetProvinceId: M5_REGION_B1,
     });
     // Fight until the smaller defender formation is removed from the roster.
     for (

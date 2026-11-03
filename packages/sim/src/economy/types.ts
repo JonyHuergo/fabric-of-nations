@@ -111,13 +111,13 @@ export interface BuildingDef {
    */
   constructionWorkers: number;
   /**
-   * E4 materials/commissioning inputs bought from the regional market and consumed
+   * E4 materials/commissioning inputs bought from the provincial market and consumed
    * by construction. Empty for project types with no modeled material requirement.
    */
   constructionMaterials: ConstructionMaterialDef[];
   dailyUpkeepRUSDAtLevelOne: MoneyRUSD;
   storageCapacityByGood: StorageCapacityDef[];
-  /** M3 requires this list to be empty; regional resource limits are deferred. */
+  /** M3 requires this list to be empty; provincial resource limits are deferred. */
   resourceRequirements: GoodQuantityDef[];
   requiredTechnologyId: Id | null;
   ownershipAllowed: ("private" | "state")[];
@@ -145,7 +145,7 @@ export interface EconomyDefinitions {
 export interface BuildingInstance {
   id: Id;
   definitionId: Id;
-  regionId: Id;
+  provinceId: Id;
   level: number;
   condition: Rate;
   ownerKind: "private" | "state";
@@ -175,18 +175,22 @@ export interface StockLot {
   quantity: number;
 }
 
+/**
+ * A market is a customs territory (D-119): one inventory and price pool with one
+ * tariff authority. Its provinces are derived from `ProvinceEconomy.marketId`; its
+ * member countries are the owners of those provinces.
+ */
 export interface Market {
   id: Id;
-  regionIds: Id[];
   /** RUSD per physical unit, indexed by good id. */
   priceRUSD: number[];
   /** Sole authoritative inventory representation. */
   stockLots: StockLot[];
   /**
-   * E6a customs administration of this market (its customs zone), or null in a
-   * countryless legacy world. A shipment between two markets is dutiable only when
-   * their administrations differ. The M5 sample's multi-polity markets share one
-   * administration; intra-market pooled allocation is never dutiable (D-079).
+   * Administrator of the customs territory (D-119): the country whose tariff
+   * schedule applies, or null in a countryless fixture. A shipment between two
+   * markets is dutiable only when their administrations differ; intra-market pooled
+   * allocation is never dutiable (D-079).
    */
   customsCountryId: Id | null;
 }
@@ -841,7 +845,7 @@ export interface ConstructionProjectMaterial {
 export interface ConstructionProject {
   id: Id;
   countryId: Id;
-  regionId: Id;
+  provinceId: Id;
   definitionId: Id;
   status: ConstructionProjectStatus;
   authorizedDay: Day;
@@ -1530,8 +1534,6 @@ export interface Country {
   tag: string;
   name: string;
   monetary: MonetaryArrangement;
-  /** Sole authoritative country-to-region ownership mapping. */
-  regionIds: Id[];
   /** The country's own designated `treasury-cash` account. */
   treasuryAccountId: Id;
   /** M4c provisional fiscal policy state. */
@@ -1581,7 +1583,12 @@ export interface CountryInitialDef {
   tag: string;
   name: string;
   monetary: MonetaryArrangement;
-  regionIds: Id[];
+  /**
+   * Provinces this country owns on the start day. The world records them as
+   * `ProvinceOwnership` (D-118); the country itself stores no territory. With province
+   * definitions, this must equal the provinces whose initial owner is this country.
+   */
+  provinceIds: Id[];
   treasuryAccountId: Id;
   initialTreasuryCashRUSD: MoneyRUSD;
   fiscal: FiscalPolicyInput;
@@ -1732,7 +1739,7 @@ export interface PriceIndexState {
 
 export interface BuildingInstanceInitialDef {  id: Id;
   definitionId: Id;
-  regionId: Id;
+  provinceId: Id;
   level: number;
   condition: Rate;
   ownerKind: "private" | "state";
@@ -1745,10 +1752,11 @@ export interface BuildingInstanceInitialDef {  id: Id;
 
 export interface MarketInitialDef {
   id: Id;
-  regionIds: Id[];
+  /** Provinces in this customs territory on the start day. */
+  provinceIds: Id[];
   priceRUSD: number[];
   stockLots: StockLot[];
-  /** E6a customs administration; omitted means the country owning the lowest region id. */
+  /** Customs-territory administrator; omitted means the owner of the lowest province id. */
   customsCountryId?: Id | null;
 }
 
@@ -1820,9 +1828,9 @@ export interface PeaceOffer {
 export interface Army {
   id: Id;
   countryId: Id;
-  regionId: Id;
-  /** Region the formation was raised in; retreat destination. */
-  homeRegionId: Id;
+  provinceId: Id;
+  /** Province the formation was raised in; retreat destination. */
+  homeProvinceId: Id;
   personnel: number;
   equipmentUnits: number;
   /** 0..1 organization/cohesion. */
@@ -1835,7 +1843,7 @@ export interface Army {
   captured: number;
   /** Formation delay: no movement before this day. */
   readyDay: Day;
-  destinationRegionId: Id | null;
+  destinationProvinceId: Id | null;
   arrivalDay: Day | null;
   lastBattleDay: Day | null;
 }
@@ -1850,7 +1858,7 @@ export interface MilitaryCasualtyRecord {
 
 /**
  * M10 diplomacy and war state. Empty and disabled for worlds whose scenario omits
- * the military block (D-081). Region-specific control lives on `Region`.
+ * the military block (D-081). Province control lives on `ProvinceOwnership` (D-118).
  */
 export interface MilitaryState {
   enabled: boolean;
@@ -1871,7 +1879,7 @@ export interface MilitaryState {
 /** Scenario input for one initial army. */
 export interface MilitaryArmyInput {
   countryId: Id;
-  regionId: Id;
+  provinceId: Id;
   personnel: number;
   equipmentUnits?: number;
   organization?: Rate;
@@ -1918,14 +1926,21 @@ export interface CountryMetaDef {
   /** Sovereign country id; the country itself for an independent state. */
   readonly sovereignCountryId: Id;
   readonly capitalName: string;
-  readonly regionName: string;
+  /** Player-facing name of the country's home territory (its non-dependent provinces). */
+  readonly homeTerritoryName: string;
   readonly selectable: boolean;
   readonly population1900Estimate: number | null;
   readonly confidence: "low" | "medium" | "high";
   readonly notes: string;
 }
 
-/** M11 static metadata for one market's player-facing identity. */
+/**
+ * Static identity of one customs territory (D-119), which is one market. `kind` is
+ * `national` (one country), `imperial` (a sovereign with its colonies and
+ * protectorates) or `shared` (a customs union of several states). The member
+ * countries are the owners of the market's provinces; `customsCountryId` is the
+ * administrator whose tariff schedule applies.
+ */
 export interface MarketMetaDef {
   readonly marketId: Id;
   readonly key: string;
@@ -1933,12 +1948,19 @@ export interface MarketMetaDef {
   readonly kind: "national" | "imperial" | "shared";
   readonly description: string;
   readonly customsCountryId: Id | null;
+  /** Simulation countries owning provinces in this territory, ascending. */
+  readonly memberCountryIds: readonly Id[];
 }
 
-/** M11 static metadata for a dependent territory region. */
-export interface RegionMetaDef {
-  readonly regionId: Id;
+/**
+ * Static metadata of one dependent territory (D-118 §3): a set of provinces of its
+ * sovereign with a colonial, protectorate or other dependent status. It is not a
+ * separate entity in the world; it names and describes those provinces.
+ */
+export interface TerritoryMetaDef {
   readonly polityTag: string;
+  /** Provinces of the territory, ascending; all owned by `sovereignCountryId` in 1900. */
+  readonly provinceIds: readonly Id[];
   readonly historicalName: string;
   readonly status: CountryStatus;
   readonly sovereignCountryId: Id;
@@ -1947,13 +1969,6 @@ export interface RegionMetaDef {
   readonly confidence: "low" | "medium" | "high";
   readonly notes: string;
 }
-
-/**
- * Simulation-region metadata (formerly "region meta"). This describes a
- * population/economy region and is not a geographical layer; provinces are the
- * sole geography beneath polities in M12a.
- */
-export type SimulationRegionMetaDef = RegionMetaDef;
 
 export interface EconomyScenarioDef {
   population: PopulationScenarioDef;
@@ -1970,8 +1985,8 @@ export interface EconomyScenarioDef {
    */
   countryMeta?: CountryMetaDef[];
   marketMeta?: MarketMetaDef[];
-  /** Simulation-region metadata (formerly "region meta"); not geography. */
-  regionMeta?: RegionMetaDef[];
+  /** Dependent-territory metadata (D-118 §3). */
+  territoryMeta?: TerritoryMetaDef[];
   /**
    * M12a permanent provincial geography and its initial political ownership.
    * Omitted for scenarios that predate M12a. Province geometry lives in the

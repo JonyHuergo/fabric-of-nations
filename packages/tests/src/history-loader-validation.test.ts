@@ -36,22 +36,22 @@ function errorsOf(data: HistoricalData): readonly string[] {
 
 function employment(
   buildingKey: string,
-  regionId: number,
+  provinceId: number,
   professionKey: string,
   workers: number,
 ): HistoricalEmploymentInput {
-  return { buildingKey, regionId, professionKey, workers };
+  return { buildingKey, provinceId, professionKey, workers };
 }
 
 function buildingFor(
   data: HistoricalData,
   definitionKey: string,
-  regionId = 0,
+  provinceId = 0,
 ): HistoricalData["buildings"][number] {
   const found = data.buildings.find(
-    (building) => building.definitionKey === definitionKey && building.regionId === regionId,
+    (building) => building.definitionKey === definitionKey && building.provinceId === provinceId,
   );
-  if (found === undefined) throw new Error(`missing ${definitionKey} in region ${String(regionId)}`);
+  if (found === undefined) throw new Error(`missing ${definitionKey} in province ${String(provinceId)}`);
   return found;
 }
 
@@ -88,9 +88,9 @@ describe("historical loader validation consistency", () => {
     id.countries[0]!.id = 0x1_0000_0000;
     expect(errorsOf(id).join("\n")).toMatch(/id must be an unsigned 32-bit integer/);
 
-    const caps = cloneData(loadM5HistoricalData());
-    caps.regions[0]!.resourceCapsPerDay = [-1];
-    expect(errorsOf(caps).join("\n")).toMatch(/resourceCapsPerDay\[0\] must be non-negative/);
+    const land = cloneData(loadM5HistoricalData());
+    (land.provinces[0] as { arableLandHa?: number }).arableLandHa = -1;
+    expect(errorsOf(land).join("\n")).toMatch(/arableLandHa must be non-negative/);
   });
 
   test("startDayIndex must be a processable campaign day", () => {
@@ -108,33 +108,33 @@ describe("historical loader validation consistency", () => {
 
     const wrongJob = cloneData(base);
     wrongJob.employment = [
-      employment(commercial.key, commercial.regionId, "peasants", 1),
+      employment(commercial.key, commercial.provinceId, "peasants", 1),
     ];
     expect(errorsOf(wrongJob).join("\n")).toMatch(/is not a job of building definition/);
 
     const tooMany = cloneData(base);
     tooMany.employment = [
-      employment(commercial.key, commercial.regionId, "laborers", 1_000_000),
+      employment(commercial.key, commercial.provinceId, "laborers", 1_000_000),
     ];
     expect(errorsOf(tooMany).join("\n")).toMatch(/exceeds the .* job slots/);
 
     const unqualified = cloneData(base);
     const laborer = unqualified.populations.find(
       (population) =>
-        population.regionId === commercial.regionId &&
+        population.provinceId === commercial.provinceId &&
         population.professionKey === "laborers",
     );
-    if (laborer === undefined) throw new Error("fixture has no regional laborers");
+    if (laborer === undefined) throw new Error("fixture has no provincial laborers");
     laborer.literacy = 0;
     unqualified.employment = [
-      employment(commercial.key, commercial.regionId, "laborers", 1),
+      employment(commercial.key, commercial.provinceId, "laborers", 1),
     ];
     expect(errorsOf(unqualified).join("\n")).toMatch(/only 0 are qualified and eligible/);
 
     const duplicate = cloneData(base);
     duplicate.employment = [
-      employment(farm.key, farm.regionId, "peasants", 10),
-      employment(farm.key, farm.regionId, "peasants", 20),
+      employment(farm.key, farm.provinceId, "peasants", 10),
+      employment(farm.key, farm.provinceId, "peasants", 20),
     ];
     expect(errorsOf(duplicate).join("\n")).toMatch(
       /duplicates employment .* first declared at employment\[0\]/,
@@ -185,8 +185,8 @@ describe("historical loader validation consistency", () => {
     const base = loadM5HistoricalData();
     const farm = buildingFor(base, "subsistence-farm");
     const commercial = buildingFor(base, "commercial-farm");
-    const first = employment(farm.key, farm.regionId, "peasants", 100);
-    const second = employment(commercial.key, commercial.regionId, "laborers", 100);
+    const first = employment(farm.key, farm.provinceId, "peasants", 100);
+    const second = employment(commercial.key, commercial.provinceId, "laborers", 100);
 
     const forward = cloneData(base);
     forward.employment = [first, second];

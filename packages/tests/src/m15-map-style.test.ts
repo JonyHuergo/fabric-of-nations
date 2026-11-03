@@ -25,6 +25,7 @@ import {
   type Rgb,
 } from "../../app/src/map/politicalPalette.js";
 import { bandMix, levelOfDetail } from "../../app/src/map/mapStyle.js";
+import { encodeProvinceEconomyTable } from "@century/sim-worker";
 
 const entryByTag = new Map(WORLD_CATALOG.entries.map((entry) => [entry.tag, entry] as const));
 const provinces = PROVINCE_MAP_1900.provinces;
@@ -57,7 +58,8 @@ function snapshotWith(
         specialStatus: "ordinary",
       };
     }),
-    regions: [],
+    provinceTable: encodeProvinceEconomyTable([], []),
+    professions: [],
     markets: [],
   } as unknown as SimulationSnapshot;
 }
@@ -206,8 +208,17 @@ describe("province ownership", () => {
 describe("map modes", () => {
   const context = contextFor(null);
 
-  test("the three modes are registered with the same interface", () => {
-    expect(Object.keys(MAP_MODES).sort()).toEqual(["control", "markets", "political"]);
+  test("every mode is registered with the same interface", () => {
+    // P2 adds the four province data lenses.
+    expect(Object.keys(MAP_MODES).sort()).toEqual([
+      "control",
+      "density",
+      "literacy",
+      "markets",
+      "political",
+      "unrest",
+      "urban",
+    ]);
     for (const mode of Object.values(MAP_MODES)) {
       expect(mode.legend(context).length).toBeGreaterThan(0);
       expect(mode.appearance(0, context).fill).toHaveLength(3);

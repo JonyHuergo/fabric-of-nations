@@ -722,7 +722,7 @@ export function assertTrainingPostingStructure(
  *
  * Both sides must carry the same total. This is structural validation only; the
  * month-end phase proves the amount equals `rate × positive period result` and
- * that the building belongs to the taxing country's regions.
+ * that the building belongs to the taxing country's provinces.
  */
 export function assertBusinessTaxPostingStructure(
   lines: readonly JournalLine[],
@@ -1318,7 +1318,7 @@ export function assertTradePostingStructure(
 /**
  * Enforce the required legs of the M10 military kinds (D-081).
  *
- * - `military-pay`: treasury cash moves to the soldiers' region households, so the
+ * - `military-pay`: treasury cash moves to the soldiers' province households, so the
  *   country `military-expense` and the pop block `military-income` are the P&L legs.
  * - `military-procurement`: treasury cash moves to the system supplier for equipment.
  * Both are cash-conserving.
@@ -2065,19 +2065,125 @@ export interface FinanceIndex {
   cash(): readonly FinancialAccount[];
 }
 
+const OWNER_KIND_CODES: Readonly<Record<FinancialAccountOwnerKind, number>> = {
+  popBlock: 0,
+  building: 1,
+  country: 2,
+  system: 3,
+};
+const SUBTYPE_CODES: ReadonlyMap<string, number> = new Map(
+  ACCOUNT_SUBTYPES.map((subtype, index) => [subtype, index]),
+);
+/** Owner ids below this bound get a collision-free numeric key. */
+const NUMERIC_OWNER_KEY_LIMIT = 2 ** 40;
+
+/**
+ * Owner/subtype lookup key. P1: a numeric key avoids building a string for every
+ * lookup on the settlement hot path; unusual owner ids fall back to the string form,
+ * which can never equal a number, so the two key spaces cannot collide.
+ */
 function ownerKey(
   ownerKind: FinancialAccountOwnerKind,
   ownerId: Id | null,
   subtype: AccountSubtype,
-): string {
+): number | string {
+  const subtypeCode = SUBTYPE_CODES.get(subtype);
+  const ownerCode = ownerId === null ? 0 : ownerId + 1;
+  if (
+    subtypeCode !== undefined &&
+    subtypeCode < 64 &&
+    Number.isInteger(ownerCode) &&
+    ownerCode >= 0 &&
+    ownerCode < NUMERIC_OWNER_KEY_LIMIT
+  ) {
+    return (ownerCode * 64 + subtypeCode) * 4 + OWNER_KIND_CODES[ownerKind];
+  }
   return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}:${subtype}`;
 }
 
 /** Build the transient account index for one phase. O(accounts). */
+interface AccountLookupCache {
+  readonly length: number;
+  readonly byId: Map<Id, FinancialAccount>;
+  readonly byOwner: Map<number | string, FinancialAccount>;
+  readonly bySubtype: Map<AccountSubtype, FinancialAccount[]>;
+}
+
+/**
+ * P2 derived lookup over an accounts array (D-133). Account ids, owners and
+ * subtypes never change after creation and accounts are never removed, so a map
+ * built for an array stays valid until accounts are appended; the cache is keyed by
+ * the array object and rebuilt when its length changes. It returns the live account
+ * objects, holds no authoritative state and cannot change any result: every caller
+ * gets exactly the account a linear scan would find.
+ */
+const accountLookupCache = new WeakMap<readonly FinancialAccount[], AccountLookupCache>();
+
+function accountLookup(accounts: readonly FinancialAccount[]): AccountLookupCache {
+  const cached = accountLookupCache.get(accounts);
+  if (cached !== undefined && cached.length === accounts.length) return cached;
+  const byId = new Map<Id, FinancialAccount>();
+  const byOwner = new Map<number | string, FinancialAccount>();
+  const bySubtype = new Map<AccountSubtype, FinancialAccount[]>();
+  for (const account of accounts) {
+    if (!byId.has(account.id)) byId.set(account.id, account);
+    const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
+    if (!byOwner.has(key)) byOwner.set(key, account);
+    const list = bySubtype.get(account.subtype);
+    if (list === undefined) bySubtype.set(account.subtype, [account]);
+    else list.push(account);
+  }
+  const entry = { length: accounts.length, byId, byOwner, bySubtype };
+  accountLookupCache.set(accounts, entry);
+  return entry;
+}
+
+/** The first account with this id, as `accounts.find` would return it. */
+export function findAccountById(
+  accounts: readonly FinancialAccount[],
+  accountId: Id,
+): FinancialAccount | undefined {
+  return accountLookup(accounts).byId.get(accountId);
+}
+
+/** The first account with this owner and subtype, as a linear `find` would return it. */
+export function findAccountByOwner(
+  accounts: readonly FinancialAccount[],
+  ownerKind: FinancialAccountOwnerKind,
+  ownerId: Id | null,
+  subtype: AccountSubtype,
+): FinancialAccount | undefined {
+  return accountLookup(accounts).byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+}
+
+/** All accounts of one subtype, in array order. */
+export function findAccountsBySubtype(
+  accounts: readonly FinancialAccount[],
+  subtype: AccountSubtype,
+): readonly FinancialAccount[] {
+  return accountLookup(accounts).bySubtype.get(subtype) ?? [];
+}
+
+/**
+ * Built indexes per accounts array (D-133). An index is a read-only view whose
+ * duplicate checks passed when it was built; appending accounts changes the array
+ * length and forces a rebuild with the checks. Ids, owners and subtypes are
+ * immutable, so a cached index always equals a fresh build.
+ */
+const financeIndexCache = new WeakMap<readonly FinancialAccount[], { readonly length: number; readonly index: FinanceIndex }>();
+
 export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
+  const cached = financeIndexCache.get(finance.accounts);
+  if (cached !== undefined && cached.length === finance.accounts.length) return cached.index;
+  const index = buildFinanceIndexUncached(finance);
+  financeIndexCache.set(finance.accounts, { length: finance.accounts.length, index });
+  return index;
+}
+
+function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
   const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
   const byId = new Map<Id, FinancialAccount>();
-  const byOwner = new Map<string, FinancialAccount>();
+  const byOwner = new Map<number | string, FinancialAccount>();
   const cash: FinancialAccount[] = [];
   for (const account of accounts) {
     if (byId.has(account.id)) {

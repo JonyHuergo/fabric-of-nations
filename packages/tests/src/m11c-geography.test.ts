@@ -482,7 +482,7 @@ describe("M11c global historical-border corrections", () => {
     }
     expect(contains("AUT", 18.41, 43.86)).toBe(true); // Bosnia was Austria-Hungarian
     expect(contains("OTT", 18.41, 43.86)).toBe(false);
-    expect(contains("OTT", 43.0, 40.5)).toBe(false); // Kars region
+    expect(contains("OTT", 43.0, 40.5)).toBe(false); // Kars province
     expect(contains("RUS", 43.0, 40.5)).toBe(true);
     expect(contains("GRC", 22.94, 40.64)).toBe(false);
     expect(contains("CRT", 24.02, 35.51)).toBe(true);

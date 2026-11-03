@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "dataset": "1900 customs territories (D-119)",
+    "status": "authored audit; consumed by the P2 scenario builder",
+    "referenceDate": "1900-01-01",
+    "rules": [
+      "Every state in the 1900 catalog (independent, personal union, autonomous vassal, dominion, occupied state) administers its own customs territory unless listed in `unions`.",
+      "A dependent territory (colony, protectorate, dependency, autonomous province, self-governing colony) belongs to its sovereign's customs territory unless listed in `territoryExceptions` with a modelled outcome.",
+      "Political subordination alone never merges two states' markets; only a recorded customs arrangement does."
+    ],
+    "confidence": "medium: arrangements are well documented; dates and legal details are summarised, not quoted",
+    "sources": [
+      {
+        "id": "britannica-1911",
+        "citation": "Encyclopaedia Britannica, 11th edition (1911), articles on Luxemburg, Liechtenstein, Monaco, San Marino, Norway, Crete, Bulgaria, Egypt, Finland, Newfoundland and Cape Colony."
+      },
+      {
+        "id": "clemens-williamson-2004",
+        "citation": "Clemens, M. A. and Williamson, J. G. (2004). Why did the tariff-growth correlation change after 1950? Journal of Economic Growth 9(1): 5-46 (country tariff series from 1865, including the Latin American states and the British dominions)."
+      },
+      {
+        "id": "bairoch-1989",
+        "citation": "Bairoch, P. (1989). European trade policy, 1815-1914. In The Cambridge Economic History of Europe, vol. VIII. Cambridge University Press."
+      }
+    ]
+  },
+  "unions": [
+    {
+      "administratorTag": "DEU",
+      "memberTag": "LUX",
+      "arrangement": "Luxembourg in the German Zollverein, 1842-1918",
+      "sourceIds": ["britannica-1911", "bairoch-1989"]
+    },
+    {
+      "administratorTag": "AUT",
+      "memberTag": "LIE",
+      "arrangement": "Austro-Liechtenstein customs treaty of 1852, in force until 1919",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "administratorTag": "FRA",
+      "memberTag": "MCO",
+      "arrangement": "Franco-Monegasque customs union of 1865",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "administratorTag": "ITA",
+      "memberTag": "SMR",
+      "arrangement": "Italo-Sammarinese convention of 1862 placing San Marino in the Italian customs area",
+      "sourceIds": ["britannica-1911"]
+    }
+  ],
+  "ownTerritoryNotes": [
+    {
+      "tag": "NOR",
+      "note": "Separate tariff from Sweden after the inter-kingdom trade law (mellomriksloven) lapsed in 1897, despite the personal union.",
+      "sourceIds": ["britannica-1911", "bairoch-1989"]
+    },
+    {
+      "tag": "BGR",
+      "note": "Autonomous vassal with its own customs administration; duty levels limited by the 1878 Treaty of Berlin.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "CRT",
+      "note": "Autonomous Cretan State from 1898 with its own customs revenue under the High Commissioner.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "CAN",
+      "note": "Dominion tariff (National Policy, 1879).",
+      "sourceIds": ["clemens-williamson-2004"]
+    },
+    {
+      "tag": "AUS",
+      "note": "The six colonies kept separate tariffs until the Commonwealth tariff of 1901; the catalog models one Australian country, so one territory.",
+      "sourceIds": ["clemens-williamson-2004"]
+    },
+    {
+      "tag": "NZL",
+      "note": "Own colonial tariff.",
+      "sourceIds": ["clemens-williamson-2004"]
+    },
+    {
+      "tag": "CUB",
+      "note": "Separate Cuban customs tariff under the 1899-1902 United States military government.",
+      "sourceIds": ["britannica-1911"]
+    }
+  ],
+  "territoryExceptions": [
+    {
+      "tag": "EGY",
+      "historical": "Own Egyptian customs administration under Ottoman suzerainty and British occupation.",
+      "modelled": "Ottoman customs territory until Egypt is a simulated country.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "FIN",
+      "historical": "Grand Duchy of Finland kept its own tariff and customs frontier with Russia.",
+      "modelled": "Russian customs territory until Finland is a simulated country.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "NFD",
+      "historical": "Self-governing Newfoundland set its own tariff.",
+      "modelled": "British customs territory until Newfoundland is a simulated country.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "CAP",
+      "historical": "Cape Colony set its own tariff and formed the 1889 customs union with the Orange Free State (Natal joined in 1899).",
+      "modelled": "British customs territory; the Orange Free State keeps its own territory until the Cape and Natal are simulated countries.",
+      "sourceIds": ["britannica-1911"]
+    },
+    {
+      "tag": "NAT",
+      "historical": "Natal set its own tariff and joined the Cape-Orange Free State customs union in 1899.",
+      "modelled": "British customs territory until Natal is a simulated country.",
+      "sourceIds": ["britannica-1911"]
+    }
+  ]
+}

@@ -44,6 +44,7 @@ import {
 } from "../../app/src/components/provinceRenderPlan.js";
 import { PROVINCE_MAP_1900 } from "../../app/src/provinceMapBundle.js";
 import type { ProvinceMapData } from "../../app/src/provinceCatalogTypes.js";
+import { politicalGeographyWorld } from "./fixtures/provinces.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -144,7 +145,7 @@ const OCEANIA_IDS = new Set(OCEANIA.provinces.map((province) => province.id));
 const FUTURE_ID = new Map(
   OCEANIA.futurePolities.map((polity) => [polity.tag, polity.polityId]),
 );
-const REGION_IDS = new Set(SCENARIO.population.regions.map((region) => region.id));
+const REGION_IDS = new Set(SCENARIO.population.provinceEconomies.map((province) => province.id));
 const COMBINED = [...EUROPE.provinces, ...ASIA.provinces, ...AFRICA.provinces, ...AMERICAS.provinces, ...OCEANIA.provinces];
 const COMBINED_KEYS = new Set(COMBINED.map((province) => province.key));
 
@@ -307,7 +308,8 @@ function transfer(
 }
 
 function referenceWorld(seed = 91_200): World {
-  return createEconomyWorld(SCENARIO, { seed });
+  // P2: the reference sequences run on the political geography alone (D-118).
+  return politicalGeographyWorld(SCENARIO, seed);
 }
 
 function snapshotFor(world: World) {
@@ -574,9 +576,16 @@ function landProvinceAt(x: number, y: number): string | null {
   return null;
 }
 
+/**
+ * D-128 (P2 geometry repair): the duplicate European Greenland and the dissolved German
+ * coverage residual leave 1,687 of the original 1,689 provinces.
+ */
+const PROVINCES_AFTER_P2_REPAIR = 1687;
+
 describe("M12e Oceania province inventory and geometry", () => {
   test("the committed bundle covers Oceania and the global gaps with stable unique ids", () => {
-    expect(OCEANIA.provinces.length).toBe(151);
+    // D-128: the German coverage residual was dissolved into its neighbours.
+    expect(OCEANIA.provinces.length).toBe(150);
     expect(new Set(OCEANIA.provinces.map((province) => province.id)).size).toBe(
       OCEANIA.provinces.length,
     );
@@ -624,7 +633,7 @@ describe("M12e Oceania province inventory and geometry", () => {
     }
   });
 
-  test("the required Oceanian owners, map features and region ids are represented", () => {
+  test("the required Oceanian owners, map features and province ids are represented", () => {
     const owners = new Set(OCEANIA.provinces.map((province) => province.initialOwnerTag));
     for (const tag of ["AUS", "NZL", "TON", "GBR", "DEU", "FRA", "USA", "CHL", "MEX"]) {
       expect(owners.has(tag)).toBe(true);
@@ -637,7 +646,9 @@ describe("M12e Oceania province inventory and geometry", () => {
       expect(mapTags.has(tag)).toBe(true);
     }
     for (const province of OCEANIA.provinces) {
-      expect(REGION_IDS.has(province.simulationRegionId)).toBe(true);
+      // P2 (D-118): every province is an economic unit of its own; the region link is gone.
+      expect(REGION_IDS.has(province.id)).toBe(true);
+      expect("simulationRegionId" in province).toBe(false);
     }
   });
 
@@ -892,7 +903,7 @@ describe("M12e authoritative provincial ownership", () => {
     assertValidWorld(world);
     expect(world.provinces.enabled).toBe(true);
     expect(world.provinces.ownership.length).toBe(DEFINITIONS.size);
-    expect(world.provinces.ownership.length).toBe(1689);
+    expect(world.provinces.ownership.length).toBe(PROVINCES_AFTER_P2_REPAIR);
     for (const key of [
       "oc-aus-new-south-wales",
       "oc-nzl-auckland",
@@ -1301,7 +1312,7 @@ describe("M12e rendering contracts", () => {
 describe("M12e combined five-bundle catalogue", () => {
   test("the five-bundle catalogue has unique ids, keys and one border list", () => {
     const combined = loadProvinceBundle();
-    expect(combined.provinces.length).toBe(1689);
+    expect(combined.provinces.length).toBe(PROVINCES_AFTER_P2_REPAIR);
     expect(combined.provinces.length).toBe(
       EUROPE.provinces.length +
         ASIA.provinces.length +
@@ -1402,7 +1413,7 @@ describe("M12e persistence and determinism", () => {
     const world = referenceWorld();
     australianFederation1901(world);
     const snapshot = snapshotFor(world);
-    expect(snapshot.provinces.length).toBe(1689);
+    expect(snapshot.provinces.length).toBe(PROVINCES_AFTER_P2_REPAIR);
     const byId = new Map(snapshot.provinces.map((entry) => [entry.provinceId, entry]));
     expect(byId.get(idOf("oc-aus-new-south-wales"))?.ownerPolityId).toBe(futureId("AUS"));
     expect(byId.get(idOf("oc-gng-madang"))?.ownerPolityId).toBe(2);
@@ -1469,6 +1480,6 @@ describe("M12e persistence and determinism", () => {
     const world = createEconomyWorld(scenario, { seed: 1 });
     assertValidWorld(world);
     expect(world.provinces.ownership.length).toBe(scenario.provinces?.definitions.length);
-    expect(world.provinces.ownership.length).toBe(1689);
+    expect(world.provinces.ownership.length).toBe(PROVINCES_AFTER_P2_REPAIR);
   });
 });

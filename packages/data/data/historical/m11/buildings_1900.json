@@ -1,7 +1,7 @@
 [
   {
     "key": "usa-home-subsistence-farm",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "subsistence-farm",
     "level": 249,
     "ownerProfessionKey": "peasants",
@@ -10,7 +10,7 @@
   },
   {
     "key": "usa-home-commercial-farm",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "commercial-farm",
     "level": 31,
     "ownerProfessionKey": "peasants",
@@ -19,7 +19,7 @@
   },
   {
     "key": "usa-home-warehouse",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "warehouse",
     "level": 152,
     "ownerProfessionKey": "peasants",
@@ -28,7 +28,7 @@
   },
   {
     "key": "usa-home-ranch",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "ranch",
     "level": 38,
     "ownerProfessionKey": "peasants",
@@ -37,7 +37,7 @@
   },
   {
     "key": "usa-home-fishery",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "fishery",
     "level": 38,
     "ownerProfessionKey": "peasants",
@@ -46,7 +46,7 @@
   },
   {
     "key": "usa-home-food-processing",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "food-processing",
     "level": 36,
     "ownerProfessionKey": "clerks",
@@ -55,7 +55,7 @@
   },
   {
     "key": "usa-home-workshop",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "workshop",
     "level": 53,
     "ownerProfessionKey": "capitalists",
@@ -64,7 +64,7 @@
   },
   {
     "key": "usa-home-textile-mill",
-    "regionId": 0,
+    "territoryId": 0,
     "definitionKey": "textile-mill",
     "level": 46,
     "ownerProfessionKey": "capitalists",
@@ -73,7 +73,7 @@
   },
   {
     "key": "gbr-home-subsistence-farm",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "subsistence-farm",
     "level": 135,
     "ownerProfessionKey": "peasants",
@@ -82,7 +82,7 @@
   },
   {
     "key": "gbr-home-commercial-farm",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "commercial-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -91,7 +91,7 @@
   },
   {
     "key": "gbr-home-warehouse",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "warehouse",
     "level": 82,
     "ownerProfessionKey": "peasants",
@@ -100,7 +100,7 @@
   },
   {
     "key": "gbr-home-ranch",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "ranch",
     "level": 21,
     "ownerProfessionKey": "peasants",
@@ -109,7 +109,7 @@
   },
   {
     "key": "gbr-home-fishery",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "fishery",
     "level": 21,
     "ownerProfessionKey": "peasants",
@@ -118,7 +118,7 @@
   },
   {
     "key": "gbr-home-food-processing",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "food-processing",
     "level": 20,
     "ownerProfessionKey": "clerks",
@@ -127,7 +127,7 @@
   },
   {
     "key": "gbr-home-workshop",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "workshop",
     "level": 29,
     "ownerProfessionKey": "capitalists",
@@ -136,7 +136,7 @@
   },
   {
     "key": "gbr-home-textile-mill",
-    "regionId": 1,
+    "territoryId": 1,
     "definitionKey": "textile-mill",
     "level": 25,
     "ownerProfessionKey": "capitalists",
@@ -145,7 +145,7 @@
   },
   {
     "key": "deu-home-subsistence-farm",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "subsistence-farm",
     "level": 185,
     "ownerProfessionKey": "peasants",
@@ -154,7 +154,7 @@
   },
   {
     "key": "deu-home-commercial-farm",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "commercial-farm",
     "level": 23,
     "ownerProfessionKey": "peasants",
@@ -163,7 +163,7 @@
   },
   {
     "key": "deu-home-warehouse",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "warehouse",
     "level": 113,
     "ownerProfessionKey": "peasants",
@@ -172,7 +172,7 @@
   },
   {
     "key": "deu-home-ranch",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "ranch",
     "level": 28,
     "ownerProfessionKey": "peasants",
@@ -181,7 +181,7 @@
   },
   {
     "key": "deu-home-fishery",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "fishery",
     "level": 28,
     "ownerProfessionKey": "peasants",
@@ -190,7 +190,7 @@
   },
   {
     "key": "deu-home-food-processing",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "food-processing",
     "level": 27,
     "ownerProfessionKey": "clerks",
@@ -199,7 +199,7 @@
   },
   {
     "key": "deu-home-workshop",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "workshop",
     "level": 39,
     "ownerProfessionKey": "capitalists",
@@ -208,7 +208,7 @@
   },
   {
     "key": "deu-home-textile-mill",
-    "regionId": 2,
+    "territoryId": 2,
     "definitionKey": "textile-mill",
     "level": 34,
     "ownerProfessionKey": "capitalists",
@@ -217,7 +217,7 @@
   },
   {
     "key": "fra-home-subsistence-farm",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "subsistence-farm",
     "level": 128,
     "ownerProfessionKey": "peasants",
@@ -226,7 +226,7 @@
   },
   {
     "key": "fra-home-commercial-farm",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "commercial-farm",
     "level": 16,
     "ownerProfessionKey": "peasants",
@@ -235,7 +235,7 @@
   },
   {
     "key": "fra-home-warehouse",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "warehouse",
     "level": 78,
     "ownerProfessionKey": "peasants",
@@ -244,7 +244,7 @@
   },
   {
     "key": "fra-home-ranch",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "ranch",
     "level": 19,
     "ownerProfessionKey": "peasants",
@@ -253,7 +253,7 @@
   },
   {
     "key": "fra-home-fishery",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "fishery",
     "level": 19,
     "ownerProfessionKey": "peasants",
@@ -262,7 +262,7 @@
   },
   {
     "key": "fra-home-food-processing",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "food-processing",
     "level": 19,
     "ownerProfessionKey": "clerks",
@@ -271,7 +271,7 @@
   },
   {
     "key": "fra-home-workshop",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "workshop",
     "level": 27,
     "ownerProfessionKey": "capitalists",
@@ -280,7 +280,7 @@
   },
   {
     "key": "fra-home-textile-mill",
-    "regionId": 3,
+    "territoryId": 3,
     "definitionKey": "textile-mill",
     "level": 23,
     "ownerProfessionKey": "capitalists",
@@ -289,7 +289,7 @@
   },
   {
     "key": "rus-home-subsistence-farm",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "subsistence-farm",
     "level": 437,
     "ownerProfessionKey": "peasants",
@@ -298,7 +298,7 @@
   },
   {
     "key": "rus-home-commercial-farm",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "commercial-farm",
     "level": 54,
     "ownerProfessionKey": "peasants",
@@ -307,7 +307,7 @@
   },
   {
     "key": "rus-home-warehouse",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "warehouse",
     "level": 267,
     "ownerProfessionKey": "peasants",
@@ -316,7 +316,7 @@
   },
   {
     "key": "rus-home-ranch",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "ranch",
     "level": 67,
     "ownerProfessionKey": "peasants",
@@ -325,7 +325,7 @@
   },
   {
     "key": "rus-home-fishery",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "fishery",
     "level": 67,
     "ownerProfessionKey": "peasants",
@@ -334,7 +334,7 @@
   },
   {
     "key": "rus-home-food-processing",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "food-processing",
     "level": 63,
     "ownerProfessionKey": "clerks",
@@ -343,7 +343,7 @@
   },
   {
     "key": "rus-home-workshop",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "workshop",
     "level": 93,
     "ownerProfessionKey": "capitalists",
@@ -352,7 +352,7 @@
   },
   {
     "key": "rus-home-textile-mill",
-    "regionId": 4,
+    "territoryId": 4,
     "definitionKey": "textile-mill",
     "level": 80,
     "ownerProfessionKey": "capitalists",
@@ -361,7 +361,7 @@
   },
   {
     "key": "jpn-home-subsistence-farm",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "subsistence-farm",
     "level": 145,
     "ownerProfessionKey": "peasants",
@@ -370,7 +370,7 @@
   },
   {
     "key": "jpn-home-commercial-farm",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "commercial-farm",
     "level": 18,
     "ownerProfessionKey": "peasants",
@@ -379,7 +379,7 @@
   },
   {
     "key": "jpn-home-warehouse",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "warehouse",
     "level": 88,
     "ownerProfessionKey": "peasants",
@@ -388,7 +388,7 @@
   },
   {
     "key": "jpn-home-ranch",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "ranch",
     "level": 22,
     "ownerProfessionKey": "peasants",
@@ -397,7 +397,7 @@
   },
   {
     "key": "jpn-home-fishery",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "fishery",
     "level": 22,
     "ownerProfessionKey": "peasants",
@@ -406,7 +406,7 @@
   },
   {
     "key": "jpn-home-food-processing",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "food-processing",
     "level": 21,
     "ownerProfessionKey": "clerks",
@@ -415,7 +415,7 @@
   },
   {
     "key": "jpn-home-workshop",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "workshop",
     "level": 31,
     "ownerProfessionKey": "capitalists",
@@ -424,7 +424,7 @@
   },
   {
     "key": "jpn-home-textile-mill",
-    "regionId": 5,
+    "territoryId": 5,
     "definitionKey": "textile-mill",
     "level": 27,
     "ownerProfessionKey": "capitalists",
@@ -433,7 +433,7 @@
   },
   {
     "key": "ita-home-subsistence-farm",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "subsistence-farm",
     "level": 106,
     "ownerProfessionKey": "peasants",
@@ -442,7 +442,7 @@
   },
   {
     "key": "ita-home-commercial-farm",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "commercial-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -451,7 +451,7 @@
   },
   {
     "key": "ita-home-warehouse",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "warehouse",
     "level": 65,
     "ownerProfessionKey": "peasants",
@@ -460,7 +460,7 @@
   },
   {
     "key": "ita-home-ranch",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "ranch",
     "level": 16,
     "ownerProfessionKey": "peasants",
@@ -469,7 +469,7 @@
   },
   {
     "key": "ita-home-fishery",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "fishery",
     "level": 16,
     "ownerProfessionKey": "peasants",
@@ -478,7 +478,7 @@
   },
   {
     "key": "ita-home-food-processing",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "food-processing",
     "level": 15,
     "ownerProfessionKey": "clerks",
@@ -487,7 +487,7 @@
   },
   {
     "key": "ita-home-workshop",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "workshop",
     "level": 22,
     "ownerProfessionKey": "capitalists",
@@ -496,7 +496,7 @@
   },
   {
     "key": "ita-home-textile-mill",
-    "regionId": 6,
+    "territoryId": 6,
     "definitionKey": "textile-mill",
     "level": 20,
     "ownerProfessionKey": "capitalists",
@@ -505,7 +505,7 @@
   },
   {
     "key": "esp-home-subsistence-farm",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "subsistence-farm",
     "level": 61,
     "ownerProfessionKey": "peasants",
@@ -514,7 +514,7 @@
   },
   {
     "key": "esp-home-commercial-farm",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "commercial-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -523,7 +523,7 @@
   },
   {
     "key": "esp-home-warehouse",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "warehouse",
     "level": 37,
     "ownerProfessionKey": "peasants",
@@ -532,7 +532,7 @@
   },
   {
     "key": "esp-home-ranch",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "ranch",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -541,7 +541,7 @@
   },
   {
     "key": "esp-home-fishery",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "fishery",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -550,7 +550,7 @@
   },
   {
     "key": "esp-home-food-processing",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "food-processing",
     "level": 9,
     "ownerProfessionKey": "clerks",
@@ -559,7 +559,7 @@
   },
   {
     "key": "esp-home-workshop",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "workshop",
     "level": 13,
     "ownerProfessionKey": "capitalists",
@@ -568,7 +568,7 @@
   },
   {
     "key": "esp-home-textile-mill",
-    "regionId": 7,
+    "territoryId": 7,
     "definitionKey": "textile-mill",
     "level": 11,
     "ownerProfessionKey": "capitalists",
@@ -577,7 +577,7 @@
   },
   {
     "key": "prt-home-subsistence-farm",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "subsistence-farm",
     "level": 18,
     "ownerProfessionKey": "peasants",
@@ -586,7 +586,7 @@
   },
   {
     "key": "prt-home-commercial-farm",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "commercial-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -595,7 +595,7 @@
   },
   {
     "key": "prt-home-warehouse",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "warehouse",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -604,7 +604,7 @@
   },
   {
     "key": "prt-home-ranch",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -613,7 +613,7 @@
   },
   {
     "key": "prt-home-fishery",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -622,7 +622,7 @@
   },
   {
     "key": "prt-home-food-processing",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "food-processing",
     "level": 3,
     "ownerProfessionKey": "clerks",
@@ -631,7 +631,7 @@
   },
   {
     "key": "prt-home-workshop",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "workshop",
     "level": 4,
     "ownerProfessionKey": "capitalists",
@@ -640,7 +640,7 @@
   },
   {
     "key": "prt-home-textile-mill",
-    "regionId": 8,
+    "territoryId": 8,
     "definitionKey": "textile-mill",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -649,7 +649,7 @@
   },
   {
     "key": "nld-home-subsistence-farm",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "subsistence-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -658,7 +658,7 @@
   },
   {
     "key": "nld-home-commercial-farm",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "commercial-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -667,7 +667,7 @@
   },
   {
     "key": "nld-home-warehouse",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "warehouse",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -676,7 +676,7 @@
   },
   {
     "key": "nld-home-ranch",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -685,7 +685,7 @@
   },
   {
     "key": "nld-home-fishery",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -694,7 +694,7 @@
   },
   {
     "key": "nld-home-food-processing",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -703,7 +703,7 @@
   },
   {
     "key": "nld-home-workshop",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "workshop",
     "level": 4,
     "ownerProfessionKey": "capitalists",
@@ -712,7 +712,7 @@
   },
   {
     "key": "nld-home-textile-mill",
-    "regionId": 9,
+    "territoryId": 9,
     "definitionKey": "textile-mill",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -721,7 +721,7 @@
   },
   {
     "key": "bel-home-subsistence-farm",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "subsistence-farm",
     "level": 22,
     "ownerProfessionKey": "peasants",
@@ -730,7 +730,7 @@
   },
   {
     "key": "bel-home-commercial-farm",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "commercial-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -739,7 +739,7 @@
   },
   {
     "key": "bel-home-warehouse",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "warehouse",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -748,7 +748,7 @@
   },
   {
     "key": "bel-home-ranch",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -757,7 +757,7 @@
   },
   {
     "key": "bel-home-fishery",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -766,7 +766,7 @@
   },
   {
     "key": "bel-home-food-processing",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "food-processing",
     "level": 3,
     "ownerProfessionKey": "clerks",
@@ -775,7 +775,7 @@
   },
   {
     "key": "bel-home-workshop",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "workshop",
     "level": 5,
     "ownerProfessionKey": "capitalists",
@@ -784,7 +784,7 @@
   },
   {
     "key": "bel-home-textile-mill",
-    "regionId": 10,
+    "territoryId": 10,
     "definitionKey": "textile-mill",
     "level": 4,
     "ownerProfessionKey": "capitalists",
@@ -793,7 +793,7 @@
   },
   {
     "key": "che-home-subsistence-farm",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "subsistence-farm",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -802,7 +802,7 @@
   },
   {
     "key": "che-home-commercial-farm",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -811,7 +811,7 @@
   },
   {
     "key": "che-home-warehouse",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "warehouse",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -820,7 +820,7 @@
   },
   {
     "key": "che-home-ranch",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -829,7 +829,7 @@
   },
   {
     "key": "che-home-fishery",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -838,7 +838,7 @@
   },
   {
     "key": "che-home-food-processing",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -847,7 +847,7 @@
   },
   {
     "key": "che-home-workshop",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "workshop",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -856,7 +856,7 @@
   },
   {
     "key": "che-home-textile-mill",
-    "regionId": 11,
+    "territoryId": 11,
     "definitionKey": "textile-mill",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -865,7 +865,7 @@
   },
   {
     "key": "swe-home-subsistence-farm",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "subsistence-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -874,7 +874,7 @@
   },
   {
     "key": "swe-home-commercial-farm",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "commercial-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -883,7 +883,7 @@
   },
   {
     "key": "swe-home-warehouse",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "warehouse",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -892,7 +892,7 @@
   },
   {
     "key": "swe-home-ranch",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -901,7 +901,7 @@
   },
   {
     "key": "swe-home-fishery",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -910,7 +910,7 @@
   },
   {
     "key": "swe-home-food-processing",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -919,7 +919,7 @@
   },
   {
     "key": "swe-home-workshop",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "workshop",
     "level": 4,
     "ownerProfessionKey": "capitalists",
@@ -928,7 +928,7 @@
   },
   {
     "key": "swe-home-textile-mill",
-    "regionId": 12,
+    "territoryId": 12,
     "definitionKey": "textile-mill",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -937,7 +937,7 @@
   },
   {
     "key": "nor-home-subsistence-farm",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "subsistence-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -946,7 +946,7 @@
   },
   {
     "key": "nor-home-commercial-farm",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -955,7 +955,7 @@
   },
   {
     "key": "nor-home-warehouse",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -964,7 +964,7 @@
   },
   {
     "key": "nor-home-ranch",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -973,7 +973,7 @@
   },
   {
     "key": "nor-home-fishery",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -982,7 +982,7 @@
   },
   {
     "key": "nor-home-food-processing",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -991,7 +991,7 @@
   },
   {
     "key": "nor-home-workshop",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1000,7 +1000,7 @@
   },
   {
     "key": "nor-home-textile-mill",
-    "regionId": 13,
+    "territoryId": 13,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1009,7 +1009,7 @@
   },
   {
     "key": "dnk-home-subsistence-farm",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "subsistence-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -1018,7 +1018,7 @@
   },
   {
     "key": "dnk-home-commercial-farm",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1027,7 +1027,7 @@
   },
   {
     "key": "dnk-home-warehouse",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -1036,7 +1036,7 @@
   },
   {
     "key": "dnk-home-ranch",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1045,7 +1045,7 @@
   },
   {
     "key": "dnk-home-fishery",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1054,7 +1054,7 @@
   },
   {
     "key": "dnk-home-food-processing",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -1063,7 +1063,7 @@
   },
   {
     "key": "dnk-home-workshop",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "workshop",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -1072,7 +1072,7 @@
   },
   {
     "key": "dnk-home-textile-mill",
-    "regionId": 14,
+    "territoryId": 14,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1081,7 +1081,7 @@
   },
   {
     "key": "grc-home-subsistence-farm",
-    "regionId": 15,
+    "territoryId": 15,
     "definitionKey": "subsistence-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -1090,7 +1090,7 @@
   },
   {
     "key": "grc-home-commercial-farm-peasant",
-    "regionId": 15,
+    "territoryId": 15,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1099,7 +1099,7 @@
   },
   {
     "key": "grc-home-warehouse",
-    "regionId": 15,
+    "territoryId": 15,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -1108,7 +1108,7 @@
   },
   {
     "key": "srb-home-subsistence-farm",
-    "regionId": 16,
+    "territoryId": 16,
     "definitionKey": "subsistence-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -1117,7 +1117,7 @@
   },
   {
     "key": "srb-home-commercial-farm-peasant",
-    "regionId": 16,
+    "territoryId": 16,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1126,7 +1126,7 @@
   },
   {
     "key": "srb-home-warehouse",
-    "regionId": 16,
+    "territoryId": 16,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -1135,7 +1135,7 @@
   },
   {
     "key": "mnt-home-subsistence-farm",
-    "regionId": 17,
+    "territoryId": 17,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1144,7 +1144,7 @@
   },
   {
     "key": "mnt-home-commercial-farm-peasant",
-    "regionId": 17,
+    "territoryId": 17,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1153,7 +1153,7 @@
   },
   {
     "key": "mnt-home-warehouse",
-    "regionId": 17,
+    "territoryId": 17,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1162,7 +1162,7 @@
   },
   {
     "key": "rom-home-subsistence-farm",
-    "regionId": 18,
+    "territoryId": 18,
     "definitionKey": "subsistence-farm",
     "level": 20,
     "ownerProfessionKey": "peasants",
@@ -1171,7 +1171,7 @@
   },
   {
     "key": "rom-home-commercial-farm-peasant",
-    "regionId": 18,
+    "territoryId": 18,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1180,7 +1180,7 @@
   },
   {
     "key": "rom-home-warehouse",
-    "regionId": 18,
+    "territoryId": 18,
     "definitionKey": "warehouse",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -1189,7 +1189,7 @@
   },
   {
     "key": "bgr-home-subsistence-farm",
-    "regionId": 19,
+    "territoryId": 19,
     "definitionKey": "subsistence-farm",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -1198,7 +1198,7 @@
   },
   {
     "key": "bgr-home-commercial-farm-peasant",
-    "regionId": 19,
+    "territoryId": 19,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1207,7 +1207,7 @@
   },
   {
     "key": "bgr-home-warehouse",
-    "regionId": 19,
+    "territoryId": 19,
     "definitionKey": "warehouse",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -1216,7 +1216,7 @@
   },
   {
     "key": "ott-home-subsistence-farm",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "subsistence-farm",
     "level": 79,
     "ownerProfessionKey": "peasants",
@@ -1225,7 +1225,7 @@
   },
   {
     "key": "ott-home-commercial-farm-peasant",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "commercial-farm-peasant",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -1234,7 +1234,7 @@
   },
   {
     "key": "ott-home-warehouse",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "warehouse",
     "level": 48,
     "ownerProfessionKey": "peasants",
@@ -1243,7 +1243,7 @@
   },
   {
     "key": "ott-home-ranch",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "ranch",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -1252,7 +1252,7 @@
   },
   {
     "key": "ott-home-fishery",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "fishery",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -1261,7 +1261,7 @@
   },
   {
     "key": "ott-home-food-processing",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "food-processing",
     "level": 11,
     "ownerProfessionKey": "clerks",
@@ -1270,7 +1270,7 @@
   },
   {
     "key": "ott-home-workshop-peasant",
-    "regionId": 20,
+    "territoryId": 20,
     "definitionKey": "workshop-peasant",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -1279,7 +1279,7 @@
   },
   {
     "key": "lux-home-subsistence-farm",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1288,7 +1288,7 @@
   },
   {
     "key": "lux-home-commercial-farm",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1297,7 +1297,7 @@
   },
   {
     "key": "lux-home-warehouse",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1306,7 +1306,7 @@
   },
   {
     "key": "lux-home-ranch",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1315,7 +1315,7 @@
   },
   {
     "key": "lux-home-fishery",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1324,7 +1324,7 @@
   },
   {
     "key": "lux-home-food-processing",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -1333,7 +1333,7 @@
   },
   {
     "key": "lux-home-workshop",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1342,7 +1342,7 @@
   },
   {
     "key": "lux-home-textile-mill",
-    "regionId": 21,
+    "territoryId": 21,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1351,7 +1351,7 @@
   },
   {
     "key": "mco-home-subsistence-farm",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1360,7 +1360,7 @@
   },
   {
     "key": "mco-home-commercial-farm",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1369,7 +1369,7 @@
   },
   {
     "key": "mco-home-warehouse",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1378,7 +1378,7 @@
   },
   {
     "key": "mco-home-ranch",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1387,7 +1387,7 @@
   },
   {
     "key": "mco-home-fishery",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1396,7 +1396,7 @@
   },
   {
     "key": "mco-home-food-processing",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -1405,7 +1405,7 @@
   },
   {
     "key": "mco-home-workshop",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1414,7 +1414,7 @@
   },
   {
     "key": "mco-home-textile-mill",
-    "regionId": 22,
+    "territoryId": 22,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1423,7 +1423,7 @@
   },
   {
     "key": "smr-home-subsistence-farm",
-    "regionId": 23,
+    "territoryId": 23,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1432,7 +1432,7 @@
   },
   {
     "key": "smr-home-commercial-farm-peasant",
-    "regionId": 23,
+    "territoryId": 23,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1441,7 +1441,7 @@
   },
   {
     "key": "smr-home-warehouse",
-    "regionId": 23,
+    "territoryId": 23,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1450,7 +1450,7 @@
   },
   {
     "key": "and-home-subsistence-farm",
-    "regionId": 24,
+    "territoryId": 24,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1459,7 +1459,7 @@
   },
   {
     "key": "and-home-commercial-farm-peasant",
-    "regionId": 24,
+    "territoryId": 24,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1468,7 +1468,7 @@
   },
   {
     "key": "and-home-warehouse",
-    "regionId": 24,
+    "territoryId": 24,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1477,7 +1477,7 @@
   },
   {
     "key": "lie-home-subsistence-farm",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1486,7 +1486,7 @@
   },
   {
     "key": "lie-home-commercial-farm",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1495,7 +1495,7 @@
   },
   {
     "key": "lie-home-warehouse",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1504,7 +1504,7 @@
   },
   {
     "key": "lie-home-ranch",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1513,7 +1513,7 @@
   },
   {
     "key": "lie-home-fishery",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1522,7 +1522,7 @@
   },
   {
     "key": "lie-home-food-processing",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -1531,7 +1531,7 @@
   },
   {
     "key": "lie-home-workshop",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1540,7 +1540,7 @@
   },
   {
     "key": "lie-home-textile-mill",
-    "regionId": 25,
+    "territoryId": 25,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -1549,7 +1549,7 @@
   },
   {
     "key": "chn-home-subsistence-farm",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "subsistence-farm",
     "level": 1311,
     "ownerProfessionKey": "peasants",
@@ -1558,7 +1558,7 @@
   },
   {
     "key": "chn-home-commercial-farm-peasant",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "commercial-farm-peasant",
     "level": 163,
     "ownerProfessionKey": "peasants",
@@ -1567,7 +1567,7 @@
   },
   {
     "key": "chn-home-warehouse",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "warehouse",
     "level": 800,
     "ownerProfessionKey": "peasants",
@@ -1576,7 +1576,7 @@
   },
   {
     "key": "chn-home-ranch",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "ranch",
     "level": 200,
     "ownerProfessionKey": "peasants",
@@ -1585,7 +1585,7 @@
   },
   {
     "key": "chn-home-fishery",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "fishery",
     "level": 200,
     "ownerProfessionKey": "peasants",
@@ -1594,7 +1594,7 @@
   },
   {
     "key": "chn-home-food-processing",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "food-processing",
     "level": 190,
     "ownerProfessionKey": "clerks",
@@ -1603,7 +1603,7 @@
   },
   {
     "key": "chn-home-workshop-peasant",
-    "regionId": 26,
+    "territoryId": 26,
     "definitionKey": "workshop-peasant",
     "level": 278,
     "ownerProfessionKey": "peasants",
@@ -1612,7 +1612,7 @@
   },
   {
     "key": "kor-home-subsistence-farm",
-    "regionId": 27,
+    "territoryId": 27,
     "definitionKey": "subsistence-farm",
     "level": 56,
     "ownerProfessionKey": "peasants",
@@ -1621,7 +1621,7 @@
   },
   {
     "key": "kor-home-commercial-farm-peasant",
-    "regionId": 27,
+    "territoryId": 27,
     "definitionKey": "commercial-farm-peasant",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -1630,7 +1630,7 @@
   },
   {
     "key": "kor-home-warehouse",
-    "regionId": 27,
+    "territoryId": 27,
     "definitionKey": "warehouse",
     "level": 34,
     "ownerProfessionKey": "peasants",
@@ -1639,7 +1639,7 @@
   },
   {
     "key": "per-home-subsistence-farm",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "subsistence-farm",
     "level": 32,
     "ownerProfessionKey": "peasants",
@@ -1648,7 +1648,7 @@
   },
   {
     "key": "per-home-commercial-farm-peasant",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -1657,7 +1657,7 @@
   },
   {
     "key": "per-home-warehouse",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "warehouse",
     "level": 20,
     "ownerProfessionKey": "peasants",
@@ -1666,7 +1666,7 @@
   },
   {
     "key": "per-home-ranch",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "ranch",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -1675,7 +1675,7 @@
   },
   {
     "key": "per-home-fishery",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "fishery",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -1684,7 +1684,7 @@
   },
   {
     "key": "per-home-food-processing",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "food-processing",
     "level": 5,
     "ownerProfessionKey": "clerks",
@@ -1693,7 +1693,7 @@
   },
   {
     "key": "per-home-workshop-peasant",
-    "regionId": 28,
+    "territoryId": 28,
     "definitionKey": "workshop-peasant",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -1702,7 +1702,7 @@
   },
   {
     "key": "afg-home-subsistence-farm",
-    "regionId": 29,
+    "territoryId": 29,
     "definitionKey": "subsistence-farm",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -1711,7 +1711,7 @@
   },
   {
     "key": "afg-home-commercial-farm-peasant",
-    "regionId": 29,
+    "territoryId": 29,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1720,7 +1720,7 @@
   },
   {
     "key": "afg-home-warehouse",
-    "regionId": 29,
+    "territoryId": 29,
     "definitionKey": "warehouse",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -1729,7 +1729,7 @@
   },
   {
     "key": "npl-home-subsistence-farm",
-    "regionId": 30,
+    "territoryId": 30,
     "definitionKey": "subsistence-farm",
     "level": 16,
     "ownerProfessionKey": "peasants",
@@ -1738,7 +1738,7 @@
   },
   {
     "key": "npl-home-commercial-farm-peasant",
-    "regionId": 30,
+    "territoryId": 30,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1747,7 +1747,7 @@
   },
   {
     "key": "npl-home-warehouse",
-    "regionId": 30,
+    "territoryId": 30,
     "definitionKey": "warehouse",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -1756,7 +1756,7 @@
   },
   {
     "key": "tha-home-subsistence-farm",
-    "regionId": 31,
+    "territoryId": 31,
     "definitionKey": "subsistence-farm",
     "level": 24,
     "ownerProfessionKey": "peasants",
@@ -1765,7 +1765,7 @@
   },
   {
     "key": "tha-home-commercial-farm-peasant",
-    "regionId": 31,
+    "territoryId": 31,
     "definitionKey": "commercial-farm-peasant",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -1774,7 +1774,7 @@
   },
   {
     "key": "tha-home-warehouse",
-    "regionId": 31,
+    "territoryId": 31,
     "definitionKey": "warehouse",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -1783,7 +1783,7 @@
   },
   {
     "key": "omn-home-subsistence-farm",
-    "regionId": 32,
+    "territoryId": 32,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1792,7 +1792,7 @@
   },
   {
     "key": "omn-home-commercial-farm-peasant",
-    "regionId": 32,
+    "territoryId": 32,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1801,7 +1801,7 @@
   },
   {
     "key": "omn-home-warehouse",
-    "regionId": 32,
+    "territoryId": 32,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1810,7 +1810,7 @@
   },
   {
     "key": "eth-home-subsistence-farm",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "subsistence-farm",
     "level": 36,
     "ownerProfessionKey": "peasants",
@@ -1819,7 +1819,7 @@
   },
   {
     "key": "eth-home-commercial-farm-peasant",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -1828,7 +1828,7 @@
   },
   {
     "key": "eth-home-warehouse",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "warehouse",
     "level": 22,
     "ownerProfessionKey": "peasants",
@@ -1837,7 +1837,7 @@
   },
   {
     "key": "eth-home-ranch",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "ranch",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -1846,7 +1846,7 @@
   },
   {
     "key": "eth-home-fishery",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "fishery",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -1855,7 +1855,7 @@
   },
   {
     "key": "eth-home-food-processing",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "food-processing",
     "level": 5,
     "ownerProfessionKey": "clerks",
@@ -1864,7 +1864,7 @@
   },
   {
     "key": "eth-home-workshop-peasant",
-    "regionId": 33,
+    "territoryId": 33,
     "definitionKey": "workshop-peasant",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -1873,7 +1873,7 @@
   },
   {
     "key": "lbr-home-subsistence-farm",
-    "regionId": 34,
+    "territoryId": 34,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1882,7 +1882,7 @@
   },
   {
     "key": "lbr-home-commercial-farm-peasant",
-    "regionId": 34,
+    "territoryId": 34,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1891,7 +1891,7 @@
   },
   {
     "key": "lbr-home-warehouse",
-    "regionId": 34,
+    "territoryId": 34,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1900,7 +1900,7 @@
   },
   {
     "key": "mar-home-subsistence-farm",
-    "regionId": 35,
+    "territoryId": 35,
     "definitionKey": "subsistence-farm",
     "level": 16,
     "ownerProfessionKey": "peasants",
@@ -1909,7 +1909,7 @@
   },
   {
     "key": "mar-home-commercial-farm-peasant",
-    "regionId": 35,
+    "territoryId": 35,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1918,7 +1918,7 @@
   },
   {
     "key": "mar-home-warehouse",
-    "regionId": 35,
+    "territoryId": 35,
     "definitionKey": "warehouse",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -1927,7 +1927,7 @@
   },
   {
     "key": "zar-home-subsistence-farm",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "subsistence-farm",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -1936,7 +1936,7 @@
   },
   {
     "key": "zar-home-commercial-farm-peasant",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1945,7 +1945,7 @@
   },
   {
     "key": "zar-home-warehouse",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -1954,7 +1954,7 @@
   },
   {
     "key": "zar-home-ranch",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1963,7 +1963,7 @@
   },
   {
     "key": "zar-home-fishery",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1972,7 +1972,7 @@
   },
   {
     "key": "zar-home-food-processing",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -1981,7 +1981,7 @@
   },
   {
     "key": "zar-home-workshop-peasant",
-    "regionId": 36,
+    "territoryId": 36,
     "definitionKey": "workshop-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1990,7 +1990,7 @@
   },
   {
     "key": "orf-home-subsistence-farm",
-    "regionId": 37,
+    "territoryId": 37,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -1999,7 +1999,7 @@
   },
   {
     "key": "orf-home-commercial-farm-peasant",
-    "regionId": 37,
+    "territoryId": 37,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2008,7 +2008,7 @@
   },
   {
     "key": "orf-home-warehouse",
-    "regionId": 37,
+    "territoryId": 37,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2017,7 +2017,7 @@
   },
   {
     "key": "mex-home-subsistence-farm",
-    "regionId": 38,
+    "territoryId": 38,
     "definitionKey": "subsistence-farm",
     "level": 45,
     "ownerProfessionKey": "peasants",
@@ -2026,7 +2026,7 @@
   },
   {
     "key": "mex-home-commercial-farm-peasant",
-    "regionId": 38,
+    "territoryId": 38,
     "definitionKey": "commercial-farm-peasant",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -2035,7 +2035,7 @@
   },
   {
     "key": "mex-home-warehouse",
-    "regionId": 38,
+    "territoryId": 38,
     "definitionKey": "warehouse",
     "level": 27,
     "ownerProfessionKey": "peasants",
@@ -2044,7 +2044,7 @@
   },
   {
     "key": "gua-home-subsistence-farm",
-    "regionId": 39,
+    "territoryId": 39,
     "definitionKey": "subsistence-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -2053,7 +2053,7 @@
   },
   {
     "key": "gua-home-commercial-farm-peasant",
-    "regionId": 39,
+    "territoryId": 39,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2062,7 +2062,7 @@
   },
   {
     "key": "gua-home-warehouse",
-    "regionId": 39,
+    "territoryId": 39,
     "definitionKey": "warehouse",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2071,7 +2071,7 @@
   },
   {
     "key": "hon-home-subsistence-farm",
-    "regionId": 40,
+    "territoryId": 40,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2080,7 +2080,7 @@
   },
   {
     "key": "hon-home-commercial-farm-peasant",
-    "regionId": 40,
+    "territoryId": 40,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2089,7 +2089,7 @@
   },
   {
     "key": "hon-home-warehouse",
-    "regionId": 40,
+    "territoryId": 40,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2098,7 +2098,7 @@
   },
   {
     "key": "sal-home-subsistence-farm",
-    "regionId": 41,
+    "territoryId": 41,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2107,7 +2107,7 @@
   },
   {
     "key": "sal-home-commercial-farm-peasant",
-    "regionId": 41,
+    "territoryId": 41,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2116,7 +2116,7 @@
   },
   {
     "key": "sal-home-warehouse",
-    "regionId": 41,
+    "territoryId": 41,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2125,7 +2125,7 @@
   },
   {
     "key": "nic-home-subsistence-farm",
-    "regionId": 42,
+    "territoryId": 42,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2134,7 +2134,7 @@
   },
   {
     "key": "nic-home-commercial-farm-peasant",
-    "regionId": 42,
+    "territoryId": 42,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2143,7 +2143,7 @@
   },
   {
     "key": "nic-home-warehouse",
-    "regionId": 42,
+    "territoryId": 42,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2152,7 +2152,7 @@
   },
   {
     "key": "cos-home-subsistence-farm",
-    "regionId": 43,
+    "territoryId": 43,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2161,7 +2161,7 @@
   },
   {
     "key": "cos-home-commercial-farm-peasant",
-    "regionId": 43,
+    "territoryId": 43,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2170,7 +2170,7 @@
   },
   {
     "key": "cos-home-warehouse",
-    "regionId": 43,
+    "territoryId": 43,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2179,7 +2179,7 @@
   },
   {
     "key": "col-home-subsistence-farm",
-    "regionId": 44,
+    "territoryId": 44,
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -2188,7 +2188,7 @@
   },
   {
     "key": "col-home-commercial-farm-peasant",
-    "regionId": 44,
+    "territoryId": 44,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2197,7 +2197,7 @@
   },
   {
     "key": "col-home-warehouse",
-    "regionId": 44,
+    "territoryId": 44,
     "definitionKey": "warehouse",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -2206,7 +2206,7 @@
   },
   {
     "key": "ven-home-subsistence-farm",
-    "regionId": 45,
+    "territoryId": 45,
     "definitionKey": "subsistence-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -2215,7 +2215,7 @@
   },
   {
     "key": "ven-home-commercial-farm-peasant",
-    "regionId": 45,
+    "territoryId": 45,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2224,7 +2224,7 @@
   },
   {
     "key": "ven-home-warehouse",
-    "regionId": 45,
+    "territoryId": 45,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -2233,7 +2233,7 @@
   },
   {
     "key": "ecu-home-subsistence-farm",
-    "regionId": 46,
+    "territoryId": 46,
     "definitionKey": "subsistence-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -2242,7 +2242,7 @@
   },
   {
     "key": "ecu-home-commercial-farm-peasant",
-    "regionId": 46,
+    "territoryId": 46,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2251,7 +2251,7 @@
   },
   {
     "key": "ecu-home-warehouse",
-    "regionId": 46,
+    "territoryId": 46,
     "definitionKey": "warehouse",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2260,7 +2260,7 @@
   },
   {
     "key": "pru-home-subsistence-farm",
-    "regionId": 47,
+    "territoryId": 47,
     "definitionKey": "subsistence-farm",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -2269,7 +2269,7 @@
   },
   {
     "key": "pru-home-commercial-farm-peasant",
-    "regionId": 47,
+    "territoryId": 47,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2278,7 +2278,7 @@
   },
   {
     "key": "pru-home-warehouse",
-    "regionId": 47,
+    "territoryId": 47,
     "definitionKey": "warehouse",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -2287,7 +2287,7 @@
   },
   {
     "key": "bol-home-subsistence-farm",
-    "regionId": 48,
+    "territoryId": 48,
     "definitionKey": "subsistence-farm",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -2296,7 +2296,7 @@
   },
   {
     "key": "bol-home-commercial-farm-peasant",
-    "regionId": 48,
+    "territoryId": 48,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2305,7 +2305,7 @@
   },
   {
     "key": "bol-home-warehouse",
-    "regionId": 48,
+    "territoryId": 48,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -2314,7 +2314,7 @@
   },
   {
     "key": "chl-home-subsistence-farm",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "subsistence-farm",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -2323,7 +2323,7 @@
   },
   {
     "key": "chl-home-commercial-farm",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2332,7 +2332,7 @@
   },
   {
     "key": "chl-home-warehouse",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "warehouse",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -2341,7 +2341,7 @@
   },
   {
     "key": "chl-home-ranch",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2350,7 +2350,7 @@
   },
   {
     "key": "chl-home-fishery",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2359,7 +2359,7 @@
   },
   {
     "key": "chl-home-food-processing",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -2368,7 +2368,7 @@
   },
   {
     "key": "chl-home-workshop",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "workshop",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -2377,7 +2377,7 @@
   },
   {
     "key": "chl-home-textile-mill",
-    "regionId": 49,
+    "territoryId": 49,
     "definitionKey": "textile-mill",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -2386,7 +2386,7 @@
   },
   {
     "key": "arg-home-subsistence-farm",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "subsistence-farm",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -2395,7 +2395,7 @@
   },
   {
     "key": "arg-home-commercial-farm",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "commercial-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2404,7 +2404,7 @@
   },
   {
     "key": "arg-home-warehouse",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "warehouse",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -2413,7 +2413,7 @@
   },
   {
     "key": "arg-home-ranch",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2422,7 +2422,7 @@
   },
   {
     "key": "arg-home-fishery",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2431,7 +2431,7 @@
   },
   {
     "key": "arg-home-food-processing",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -2440,7 +2440,7 @@
   },
   {
     "key": "arg-home-workshop",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "workshop",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -2449,7 +2449,7 @@
   },
   {
     "key": "arg-home-textile-mill",
-    "regionId": 50,
+    "territoryId": 50,
     "definitionKey": "textile-mill",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -2458,7 +2458,7 @@
   },
   {
     "key": "ury-home-subsistence-farm",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2467,7 +2467,7 @@
   },
   {
     "key": "ury-home-commercial-farm",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2476,7 +2476,7 @@
   },
   {
     "key": "ury-home-warehouse",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2485,7 +2485,7 @@
   },
   {
     "key": "ury-home-ranch",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2494,7 +2494,7 @@
   },
   {
     "key": "ury-home-fishery",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2503,7 +2503,7 @@
   },
   {
     "key": "ury-home-food-processing",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -2512,7 +2512,7 @@
   },
   {
     "key": "ury-home-workshop",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -2521,7 +2521,7 @@
   },
   {
     "key": "ury-home-textile-mill",
-    "regionId": 51,
+    "territoryId": 51,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -2530,7 +2530,7 @@
   },
   {
     "key": "pry-home-subsistence-farm",
-    "regionId": 52,
+    "territoryId": 52,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2539,7 +2539,7 @@
   },
   {
     "key": "pry-home-commercial-farm-peasant",
-    "regionId": 52,
+    "territoryId": 52,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2548,7 +2548,7 @@
   },
   {
     "key": "pry-home-warehouse",
-    "regionId": 52,
+    "territoryId": 52,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2557,7 +2557,7 @@
   },
   {
     "key": "bra-home-subsistence-farm",
-    "regionId": 53,
+    "territoryId": 53,
     "definitionKey": "subsistence-farm",
     "level": 58,
     "ownerProfessionKey": "peasants",
@@ -2566,7 +2566,7 @@
   },
   {
     "key": "bra-home-commercial-farm-peasant",
-    "regionId": 53,
+    "territoryId": 53,
     "definitionKey": "commercial-farm-peasant",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -2575,7 +2575,7 @@
   },
   {
     "key": "bra-home-warehouse",
-    "regionId": 53,
+    "territoryId": 53,
     "definitionKey": "warehouse",
     "level": 35,
     "ownerProfessionKey": "peasants",
@@ -2584,7 +2584,7 @@
   },
   {
     "key": "hti-home-subsistence-farm",
-    "regionId": 54,
+    "territoryId": 54,
     "definitionKey": "subsistence-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -2593,7 +2593,7 @@
   },
   {
     "key": "hti-home-commercial-farm-peasant",
-    "regionId": 54,
+    "territoryId": 54,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2602,7 +2602,7 @@
   },
   {
     "key": "hti-home-warehouse",
-    "regionId": 54,
+    "territoryId": 54,
     "definitionKey": "warehouse",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2611,7 +2611,7 @@
   },
   {
     "key": "dom-home-subsistence-farm",
-    "regionId": 55,
+    "territoryId": 55,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2620,7 +2620,7 @@
   },
   {
     "key": "dom-home-commercial-farm-peasant",
-    "regionId": 55,
+    "territoryId": 55,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2629,7 +2629,7 @@
   },
   {
     "key": "dom-home-warehouse",
-    "regionId": 55,
+    "territoryId": 55,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2638,7 +2638,7 @@
   },
   {
     "key": "can-home-subsistence-farm",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "subsistence-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -2647,7 +2647,7 @@
   },
   {
     "key": "can-home-commercial-farm",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "commercial-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2656,7 +2656,7 @@
   },
   {
     "key": "can-home-warehouse",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "warehouse",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -2665,7 +2665,7 @@
   },
   {
     "key": "can-home-ranch",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2674,7 +2674,7 @@
   },
   {
     "key": "can-home-fishery",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2683,7 +2683,7 @@
   },
   {
     "key": "can-home-food-processing",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -2692,7 +2692,7 @@
   },
   {
     "key": "can-home-workshop",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "workshop",
     "level": 4,
     "ownerProfessionKey": "capitalists",
@@ -2701,7 +2701,7 @@
   },
   {
     "key": "can-home-textile-mill",
-    "regionId": 56,
+    "territoryId": 56,
     "definitionKey": "textile-mill",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -2710,7 +2710,7 @@
   },
   {
     "key": "aus-home-subsistence-farm",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "subsistence-farm",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -2719,7 +2719,7 @@
   },
   {
     "key": "aus-home-commercial-farm",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2728,7 +2728,7 @@
   },
   {
     "key": "aus-home-warehouse",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "warehouse",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -2737,7 +2737,7 @@
   },
   {
     "key": "aus-home-ranch",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2746,7 +2746,7 @@
   },
   {
     "key": "aus-home-fishery",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2755,7 +2755,7 @@
   },
   {
     "key": "aus-home-food-processing",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -2764,7 +2764,7 @@
   },
   {
     "key": "aus-home-workshop",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "workshop",
     "level": 3,
     "ownerProfessionKey": "capitalists",
@@ -2773,7 +2773,7 @@
   },
   {
     "key": "aus-home-textile-mill",
-    "regionId": 57,
+    "territoryId": 57,
     "definitionKey": "textile-mill",
     "level": 2,
     "ownerProfessionKey": "capitalists",
@@ -2782,7 +2782,7 @@
   },
   {
     "key": "nzl-home-subsistence-farm",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2791,7 +2791,7 @@
   },
   {
     "key": "nzl-home-commercial-farm",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2800,7 +2800,7 @@
   },
   {
     "key": "nzl-home-warehouse",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -2809,7 +2809,7 @@
   },
   {
     "key": "nzl-home-ranch",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2818,7 +2818,7 @@
   },
   {
     "key": "nzl-home-fishery",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2827,7 +2827,7 @@
   },
   {
     "key": "nzl-home-food-processing",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -2836,7 +2836,7 @@
   },
   {
     "key": "nzl-home-workshop",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "workshop",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -2845,7 +2845,7 @@
   },
   {
     "key": "nzl-home-textile-mill",
-    "regionId": 58,
+    "territoryId": 58,
     "definitionKey": "textile-mill",
     "level": 1,
     "ownerProfessionKey": "capitalists",
@@ -2854,7 +2854,7 @@
   },
   {
     "key": "cub-home-subsistence-farm",
-    "regionId": 59,
+    "territoryId": 59,
     "definitionKey": "subsistence-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -2863,7 +2863,7 @@
   },
   {
     "key": "cub-home-commercial-farm-peasant",
-    "regionId": 59,
+    "territoryId": 59,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2872,7 +2872,7 @@
   },
   {
     "key": "cub-home-warehouse",
-    "regionId": 59,
+    "territoryId": 59,
     "definitionKey": "warehouse",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -2881,7 +2881,7 @@
   },
   {
     "key": "aut-home-subsistence-farm",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "subsistence-farm",
     "level": 167,
     "ownerProfessionKey": "peasants",
@@ -2890,7 +2890,7 @@
   },
   {
     "key": "aut-home-commercial-farm",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "commercial-farm",
     "level": 21,
     "ownerProfessionKey": "peasants",
@@ -2899,7 +2899,7 @@
   },
   {
     "key": "aut-home-warehouse",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "warehouse",
     "level": 102,
     "ownerProfessionKey": "peasants",
@@ -2908,7 +2908,7 @@
   },
   {
     "key": "aut-home-ranch",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "ranch",
     "level": 26,
     "ownerProfessionKey": "peasants",
@@ -2917,7 +2917,7 @@
   },
   {
     "key": "aut-home-fishery",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "fishery",
     "level": 26,
     "ownerProfessionKey": "peasants",
@@ -2926,7 +2926,7 @@
   },
   {
     "key": "aut-home-food-processing",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "food-processing",
     "level": 24,
     "ownerProfessionKey": "clerks",
@@ -2935,7 +2935,7 @@
   },
   {
     "key": "aut-home-workshop",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "workshop",
     "level": 35,
     "ownerProfessionKey": "capitalists",
@@ -2944,7 +2944,7 @@
   },
   {
     "key": "aut-home-textile-mill",
-    "regionId": 60,
+    "territoryId": 60,
     "definitionKey": "textile-mill",
     "level": 31,
     "ownerProfessionKey": "capitalists",
@@ -2953,7 +2953,7 @@
   },
   {
     "key": "ton-home-subsistence-farm",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2962,7 +2962,7 @@
   },
   {
     "key": "ton-home-commercial-farm-peasant",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2971,7 +2971,7 @@
   },
   {
     "key": "ton-home-warehouse",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2980,7 +2980,7 @@
   },
   {
     "key": "ton-home-ranch",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "ranch",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2989,7 +2989,7 @@
   },
   {
     "key": "ton-home-fishery",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "fishery",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -2998,7 +2998,7 @@
   },
   {
     "key": "ton-home-food-processing",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "food-processing",
     "level": 1,
     "ownerProfessionKey": "clerks",
@@ -3007,7 +3007,7 @@
   },
   {
     "key": "ton-home-workshop-peasant",
-    "regionId": 61,
+    "territoryId": 61,
     "definitionKey": "workshop-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3016,7 +3016,7 @@
   },
   {
     "key": "sok-home-subsistence-farm",
-    "regionId": 62,
+    "territoryId": 62,
     "definitionKey": "subsistence-farm",
     "level": 33,
     "ownerProfessionKey": "peasants",
@@ -3025,7 +3025,7 @@
   },
   {
     "key": "sok-home-commercial-farm-peasant",
-    "regionId": 62,
+    "territoryId": 62,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3034,7 +3034,7 @@
   },
   {
     "key": "sok-home-warehouse",
-    "regionId": 62,
+    "territoryId": 62,
     "definitionKey": "warehouse",
     "level": 20,
     "ownerProfessionKey": "peasants",
@@ -3043,16 +3043,16 @@
   },
   {
     "key": "wad-home-subsistence-farm",
-    "regionId": 63,
+    "territoryId": 63,
     "definitionKey": "subsistence-farm",
-    "level": 7,
+    "level": 4,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
     "key": "wad-home-commercial-farm-peasant",
-    "regionId": 63,
+    "territoryId": 63,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3061,25 +3061,25 @@
   },
   {
     "key": "wad-home-warehouse",
-    "regionId": 63,
+    "territoryId": 63,
     "definitionKey": "warehouse",
-    "level": 4,
+    "level": 2,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
     "key": "dar-home-subsistence-farm",
-    "regionId": 64,
+    "territoryId": 64,
     "definitionKey": "subsistence-farm",
-    "level": 7,
+    "level": 2,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
     "key": "dar-home-commercial-farm-peasant",
-    "regionId": 64,
+    "territoryId": 64,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3088,16 +3088,16 @@
   },
   {
     "key": "dar-home-warehouse",
-    "regionId": 64,
+    "territoryId": 64,
     "definitionKey": "warehouse",
-    "level": 4,
+    "level": 1,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
     "status": "provisional"
   },
   {
     "key": "shm-home-subsistence-farm",
-    "regionId": 65,
+    "territoryId": 65,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -3106,7 +3106,7 @@
   },
   {
     "key": "shm-home-commercial-farm-peasant",
-    "regionId": 65,
+    "territoryId": 65,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3115,7 +3115,7 @@
   },
   {
     "key": "shm-home-warehouse",
-    "regionId": 65,
+    "territoryId": 65,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3124,7 +3124,7 @@
   },
   {
     "key": "crt-home-subsistence-farm",
-    "regionId": 66,
+    "territoryId": 66,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3133,7 +3133,7 @@
   },
   {
     "key": "crt-home-commercial-farm-peasant",
-    "regionId": 66,
+    "territoryId": 66,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3142,7 +3142,7 @@
   },
   {
     "key": "crt-home-warehouse",
-    "regionId": 66,
+    "territoryId": 66,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3151,7 +3151,7 @@
   },
   {
     "key": "bin-subsistence-farm",
-    "regionId": 100,
+    "territoryId": 100,
     "definitionKey": "subsistence-farm",
     "level": 964,
     "ownerProfessionKey": "peasants",
@@ -3160,7 +3160,7 @@
   },
   {
     "key": "bin-commercial-farm-peasant",
-    "regionId": 100,
+    "territoryId": 100,
     "definitionKey": "commercial-farm-peasant",
     "level": 120,
     "ownerProfessionKey": "peasants",
@@ -3169,7 +3169,7 @@
   },
   {
     "key": "bin-warehouse",
-    "regionId": 100,
+    "territoryId": 100,
     "definitionKey": "warehouse",
     "level": 588,
     "ownerProfessionKey": "peasants",
@@ -3178,7 +3178,7 @@
   },
   {
     "key": "cey-subsistence-farm",
-    "regionId": 101,
+    "territoryId": 101,
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -3187,7 +3187,7 @@
   },
   {
     "key": "cey-commercial-farm-peasant",
-    "regionId": 101,
+    "territoryId": 101,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3196,7 +3196,7 @@
   },
   {
     "key": "cey-warehouse",
-    "regionId": 101,
+    "territoryId": 101,
     "definitionKey": "warehouse",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -3205,7 +3205,7 @@
   },
   {
     "key": "mal-subsistence-farm",
-    "regionId": 102,
+    "territoryId": 102,
     "definitionKey": "subsistence-farm",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -3214,7 +3214,7 @@
   },
   {
     "key": "mal-commercial-farm",
-    "regionId": 102,
+    "territoryId": 102,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3223,7 +3223,7 @@
   },
   {
     "key": "mal-warehouse",
-    "regionId": 102,
+    "territoryId": 102,
     "definitionKey": "warehouse",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -3232,7 +3232,7 @@
   },
   {
     "key": "hkg-subsistence-farm",
-    "regionId": 103,
+    "territoryId": 103,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3241,7 +3241,7 @@
   },
   {
     "key": "hkg-commercial-farm",
-    "regionId": 103,
+    "territoryId": 103,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3250,7 +3250,7 @@
   },
   {
     "key": "hkg-warehouse",
-    "regionId": 103,
+    "territoryId": 103,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3259,7 +3259,7 @@
   },
   {
     "key": "kuw-subsistence-farm",
-    "regionId": 104,
+    "territoryId": 104,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3268,7 +3268,7 @@
   },
   {
     "key": "kuw-commercial-farm-peasant",
-    "regionId": 104,
+    "territoryId": 104,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3277,7 +3277,7 @@
   },
   {
     "key": "kuw-warehouse",
-    "regionId": 104,
+    "territoryId": 104,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3286,7 +3286,7 @@
   },
   {
     "key": "tru-subsistence-farm",
-    "regionId": 105,
+    "territoryId": 105,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3295,7 +3295,7 @@
   },
   {
     "key": "tru-commercial-farm-peasant",
-    "regionId": 105,
+    "territoryId": 105,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3304,7 +3304,7 @@
   },
   {
     "key": "tru-warehouse",
-    "regionId": 105,
+    "territoryId": 105,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3313,7 +3313,7 @@
   },
   {
     "key": "cyp-subsistence-farm",
-    "regionId": 106,
+    "territoryId": 106,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3322,7 +3322,7 @@
   },
   {
     "key": "cyp-commercial-farm-peasant",
-    "regionId": 106,
+    "territoryId": 106,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3331,7 +3331,7 @@
   },
   {
     "key": "cyp-warehouse",
-    "regionId": 106,
+    "territoryId": 106,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3340,7 +3340,7 @@
   },
   {
     "key": "mlt-subsistence-farm",
-    "regionId": 107,
+    "territoryId": 107,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3349,7 +3349,7 @@
   },
   {
     "key": "mlt-commercial-farm",
-    "regionId": 107,
+    "territoryId": 107,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3358,7 +3358,7 @@
   },
   {
     "key": "mlt-warehouse",
-    "regionId": 107,
+    "territoryId": 107,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3367,7 +3367,7 @@
   },
   {
     "key": "bwi-subsistence-farm",
-    "regionId": 108,
+    "territoryId": 108,
     "definitionKey": "subsistence-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -3376,7 +3376,7 @@
   },
   {
     "key": "bwi-commercial-farm-peasant",
-    "regionId": 108,
+    "territoryId": 108,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3385,7 +3385,7 @@
   },
   {
     "key": "bwi-warehouse",
-    "regionId": 108,
+    "territoryId": 108,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3394,7 +3394,7 @@
   },
   {
     "key": "bsa-subsistence-farm",
-    "regionId": 109,
+    "territoryId": 109,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3403,7 +3403,7 @@
   },
   {
     "key": "bsa-commercial-farm-peasant",
-    "regionId": 109,
+    "territoryId": 109,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3412,7 +3412,7 @@
   },
   {
     "key": "bsa-warehouse",
-    "regionId": 109,
+    "territoryId": 109,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3421,7 +3421,7 @@
   },
   {
     "key": "bwa-subsistence-farm",
-    "regionId": 110,
+    "territoryId": 110,
     "definitionKey": "subsistence-farm",
     "level": 66,
     "ownerProfessionKey": "peasants",
@@ -3430,7 +3430,7 @@
   },
   {
     "key": "bwa-commercial-farm-peasant",
-    "regionId": 110,
+    "territoryId": 110,
     "definitionKey": "commercial-farm-peasant",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -3439,7 +3439,7 @@
   },
   {
     "key": "bwa-warehouse",
-    "regionId": 110,
+    "territoryId": 110,
     "definitionKey": "warehouse",
     "level": 40,
     "ownerProfessionKey": "peasants",
@@ -3448,7 +3448,7 @@
   },
   {
     "key": "bea-subsistence-farm",
-    "regionId": 111,
+    "territoryId": 111,
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -3457,7 +3457,7 @@
   },
   {
     "key": "bea-commercial-farm-peasant",
-    "regionId": 111,
+    "territoryId": 111,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3466,7 +3466,7 @@
   },
   {
     "key": "bea-warehouse",
-    "regionId": 111,
+    "territoryId": 111,
     "definitionKey": "warehouse",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -3475,7 +3475,7 @@
   },
   {
     "key": "sud-subsistence-farm",
-    "regionId": 112,
+    "territoryId": 112,
     "definitionKey": "subsistence-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -3484,7 +3484,7 @@
   },
   {
     "key": "sud-commercial-farm-peasant",
-    "regionId": 112,
+    "territoryId": 112,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3493,7 +3493,7 @@
   },
   {
     "key": "sud-warehouse",
-    "regionId": 112,
+    "territoryId": 112,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3502,7 +3502,7 @@
   },
   {
     "key": "bso-subsistence-farm",
-    "regionId": 113,
+    "territoryId": 113,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3511,7 +3511,7 @@
   },
   {
     "key": "bso-commercial-farm-peasant",
-    "regionId": 113,
+    "territoryId": 113,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3520,7 +3520,7 @@
   },
   {
     "key": "bso-warehouse",
-    "regionId": 113,
+    "territoryId": 113,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3529,7 +3529,7 @@
   },
   {
     "key": "cra-subsistence-farm",
-    "regionId": 114,
+    "territoryId": 114,
     "definitionKey": "subsistence-farm",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -3538,7 +3538,7 @@
   },
   {
     "key": "cra-commercial-farm-peasant",
-    "regionId": 114,
+    "territoryId": 114,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3547,7 +3547,7 @@
   },
   {
     "key": "cra-warehouse",
-    "regionId": 114,
+    "territoryId": 114,
     "definitionKey": "warehouse",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -3556,7 +3556,7 @@
   },
   {
     "key": "hct-subsistence-farm",
-    "regionId": 115,
+    "territoryId": 115,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -3565,7 +3565,7 @@
   },
   {
     "key": "hct-commercial-farm-peasant",
-    "regionId": 115,
+    "territoryId": 115,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3574,7 +3574,7 @@
   },
   {
     "key": "hct-warehouse",
-    "regionId": 115,
+    "territoryId": 115,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3583,7 +3583,7 @@
   },
   {
     "key": "fji-subsistence-farm",
-    "regionId": 116,
+    "territoryId": 116,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3592,7 +3592,7 @@
   },
   {
     "key": "fji-commercial-farm-peasant",
-    "regionId": 116,
+    "territoryId": 116,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3601,7 +3601,7 @@
   },
   {
     "key": "fji-warehouse",
-    "regionId": 116,
+    "territoryId": 116,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3610,7 +3610,7 @@
   },
   {
     "key": "bpo-subsistence-farm",
-    "regionId": 117,
+    "territoryId": 117,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3619,7 +3619,7 @@
   },
   {
     "key": "bpo-commercial-farm-peasant",
-    "regionId": 117,
+    "territoryId": 117,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3628,7 +3628,7 @@
   },
   {
     "key": "bpo-warehouse",
-    "regionId": 117,
+    "territoryId": 117,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3637,7 +3637,7 @@
   },
   {
     "key": "cap-subsistence-farm",
-    "regionId": 118,
+    "territoryId": 118,
     "definitionKey": "subsistence-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -3646,7 +3646,7 @@
   },
   {
     "key": "cap-commercial-farm",
-    "regionId": 118,
+    "territoryId": 118,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3655,7 +3655,7 @@
   },
   {
     "key": "cap-warehouse",
-    "regionId": 118,
+    "territoryId": 118,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -3664,7 +3664,7 @@
   },
   {
     "key": "nat-subsistence-farm",
-    "regionId": 119,
+    "territoryId": 119,
     "definitionKey": "subsistence-farm",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3673,7 +3673,7 @@
   },
   {
     "key": "nat-commercial-farm-peasant",
-    "regionId": 119,
+    "territoryId": 119,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3682,7 +3682,7 @@
   },
   {
     "key": "nat-warehouse",
-    "regionId": 119,
+    "territoryId": 119,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3691,7 +3691,7 @@
   },
   {
     "key": "nfd-subsistence-farm",
-    "regionId": 120,
+    "territoryId": 120,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3700,7 +3700,7 @@
   },
   {
     "key": "nfd-commercial-farm-peasant",
-    "regionId": 120,
+    "territoryId": 120,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3709,7 +3709,7 @@
   },
   {
     "key": "nfd-warehouse",
-    "regionId": 120,
+    "territoryId": 120,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3718,7 +3718,7 @@
   },
   {
     "key": "alg-subsistence-farm",
-    "regionId": 121,
+    "territoryId": 121,
     "definitionKey": "subsistence-farm",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -3727,7 +3727,7 @@
   },
   {
     "key": "alg-commercial-farm-peasant",
-    "regionId": 121,
+    "territoryId": 121,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -3736,7 +3736,7 @@
   },
   {
     "key": "alg-warehouse",
-    "regionId": 121,
+    "territoryId": 121,
     "definitionKey": "warehouse",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -3745,7 +3745,7 @@
   },
   {
     "key": "tun-subsistence-farm",
-    "regionId": 122,
+    "territoryId": 122,
     "definitionKey": "subsistence-farm",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -3754,7 +3754,7 @@
   },
   {
     "key": "tun-commercial-farm-peasant",
-    "regionId": 122,
+    "territoryId": 122,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3763,7 +3763,7 @@
   },
   {
     "key": "tun-warehouse",
-    "regionId": 122,
+    "territoryId": 122,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3772,7 +3772,7 @@
   },
   {
     "key": "fwa-subsistence-farm",
-    "regionId": 123,
+    "territoryId": 123,
     "definitionKey": "subsistence-farm",
     "level": 33,
     "ownerProfessionKey": "peasants",
@@ -3781,7 +3781,7 @@
   },
   {
     "key": "fwa-commercial-farm-peasant",
-    "regionId": 123,
+    "territoryId": 123,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -3790,7 +3790,7 @@
   },
   {
     "key": "fwa-warehouse",
-    "regionId": 123,
+    "territoryId": 123,
     "definitionKey": "warehouse",
     "level": 20,
     "ownerProfessionKey": "peasants",
@@ -3799,7 +3799,7 @@
   },
   {
     "key": "fea-subsistence-farm",
-    "regionId": 124,
+    "territoryId": 124,
     "definitionKey": "subsistence-farm",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -3808,7 +3808,7 @@
   },
   {
     "key": "fea-commercial-farm-peasant",
-    "regionId": 124,
+    "territoryId": 124,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3817,7 +3817,7 @@
   },
   {
     "key": "fea-warehouse",
-    "regionId": 124,
+    "territoryId": 124,
     "definitionKey": "warehouse",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -3826,7 +3826,7 @@
   },
   {
     "key": "fic-subsistence-farm",
-    "regionId": 125,
+    "territoryId": 125,
     "definitionKey": "subsistence-farm",
     "level": 49,
     "ownerProfessionKey": "peasants",
@@ -3835,7 +3835,7 @@
   },
   {
     "key": "fic-commercial-farm-peasant",
-    "regionId": 125,
+    "territoryId": 125,
     "definitionKey": "commercial-farm-peasant",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -3844,7 +3844,7 @@
   },
   {
     "key": "fic-warehouse",
-    "regionId": 125,
+    "territoryId": 125,
     "definitionKey": "warehouse",
     "level": 30,
     "ownerProfessionKey": "peasants",
@@ -3853,7 +3853,7 @@
   },
   {
     "key": "mad-subsistence-farm",
-    "regionId": 126,
+    "territoryId": 126,
     "definitionKey": "subsistence-farm",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -3862,7 +3862,7 @@
   },
   {
     "key": "mad-commercial-farm-peasant",
-    "regionId": 126,
+    "territoryId": 126,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3871,7 +3871,7 @@
   },
   {
     "key": "mad-warehouse",
-    "regionId": 126,
+    "territoryId": 126,
     "definitionKey": "warehouse",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -3880,7 +3880,7 @@
   },
   {
     "key": "fso-subsistence-farm",
-    "regionId": 127,
+    "territoryId": 127,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3889,7 +3889,7 @@
   },
   {
     "key": "fso-commercial-farm-peasant",
-    "regionId": 127,
+    "territoryId": 127,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3898,7 +3898,7 @@
   },
   {
     "key": "fso-warehouse",
-    "regionId": 127,
+    "territoryId": 127,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3907,7 +3907,7 @@
   },
   {
     "key": "fca-subsistence-farm",
-    "regionId": 128,
+    "territoryId": 128,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3916,7 +3916,7 @@
   },
   {
     "key": "fca-commercial-farm-peasant",
-    "regionId": 128,
+    "territoryId": 128,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3925,7 +3925,7 @@
   },
   {
     "key": "fca-warehouse",
-    "regionId": 128,
+    "territoryId": 128,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3934,7 +3934,7 @@
   },
   {
     "key": "fpo-subsistence-farm",
-    "regionId": 129,
+    "territoryId": 129,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3943,7 +3943,7 @@
   },
   {
     "key": "fpo-commercial-farm-peasant",
-    "regionId": 129,
+    "territoryId": 129,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3952,7 +3952,7 @@
   },
   {
     "key": "fpo-warehouse",
-    "regionId": 129,
+    "territoryId": 129,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3961,7 +3961,7 @@
   },
   {
     "key": "gea-subsistence-farm",
-    "regionId": 130,
+    "territoryId": 130,
     "definitionKey": "subsistence-farm",
     "level": 23,
     "ownerProfessionKey": "peasants",
@@ -3970,7 +3970,7 @@
   },
   {
     "key": "gea-commercial-farm-peasant",
-    "regionId": 130,
+    "territoryId": 130,
     "definitionKey": "commercial-farm-peasant",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -3979,7 +3979,7 @@
   },
   {
     "key": "gea-warehouse",
-    "regionId": 130,
+    "territoryId": 130,
     "definitionKey": "warehouse",
     "level": 14,
     "ownerProfessionKey": "peasants",
@@ -3988,7 +3988,7 @@
   },
   {
     "key": "gsw-subsistence-farm",
-    "regionId": 131,
+    "territoryId": 131,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -3997,7 +3997,7 @@
   },
   {
     "key": "gsw-commercial-farm-peasant",
-    "regionId": 131,
+    "territoryId": 131,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4006,7 +4006,7 @@
   },
   {
     "key": "gsw-warehouse",
-    "regionId": 131,
+    "territoryId": 131,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4015,7 +4015,7 @@
   },
   {
     "key": "kam-subsistence-farm",
-    "regionId": 132,
+    "territoryId": 132,
     "definitionKey": "subsistence-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -4024,7 +4024,7 @@
   },
   {
     "key": "kam-commercial-farm-peasant",
-    "regionId": 132,
+    "territoryId": 132,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4033,7 +4033,7 @@
   },
   {
     "key": "kam-warehouse",
-    "regionId": 132,
+    "territoryId": 132,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -4042,7 +4042,7 @@
   },
   {
     "key": "tog-subsistence-farm",
-    "regionId": 133,
+    "territoryId": 133,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -4051,7 +4051,7 @@
   },
   {
     "key": "tog-commercial-farm-peasant",
-    "regionId": 133,
+    "territoryId": 133,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4060,7 +4060,7 @@
   },
   {
     "key": "tog-warehouse",
-    "regionId": 133,
+    "territoryId": 133,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4069,7 +4069,7 @@
   },
   {
     "key": "gng-subsistence-farm",
-    "regionId": 134,
+    "territoryId": 134,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4078,7 +4078,7 @@
   },
   {
     "key": "gng-commercial-farm-peasant",
-    "regionId": 134,
+    "territoryId": 134,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4087,7 +4087,7 @@
   },
   {
     "key": "gng-warehouse",
-    "regionId": 134,
+    "territoryId": 134,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4096,7 +4096,7 @@
   },
   {
     "key": "gsa-subsistence-farm",
-    "regionId": 135,
+    "territoryId": 135,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4105,7 +4105,7 @@
   },
   {
     "key": "gsa-commercial-farm-peasant",
-    "regionId": 135,
+    "territoryId": 135,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4114,7 +4114,7 @@
   },
   {
     "key": "gsa-warehouse",
-    "regionId": 135,
+    "territoryId": 135,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4123,7 +4123,7 @@
   },
   {
     "key": "gpn-subsistence-farm",
-    "regionId": 136,
+    "territoryId": 136,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4132,7 +4132,7 @@
   },
   {
     "key": "gpn-commercial-farm-peasant",
-    "regionId": 136,
+    "territoryId": 136,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4141,7 +4141,7 @@
   },
   {
     "key": "gpn-warehouse",
-    "regionId": 136,
+    "territoryId": 136,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4150,7 +4150,7 @@
   },
   {
     "key": "cfs-subsistence-farm",
-    "regionId": 137,
+    "territoryId": 137,
     "definitionKey": "subsistence-farm",
     "level": 30,
     "ownerProfessionKey": "peasants",
@@ -4159,7 +4159,7 @@
   },
   {
     "key": "cfs-commercial-farm-peasant",
-    "regionId": 137,
+    "territoryId": 137,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -4168,7 +4168,7 @@
   },
   {
     "key": "cfs-warehouse",
-    "regionId": 137,
+    "territoryId": 137,
     "definitionKey": "warehouse",
     "level": 18,
     "ownerProfessionKey": "peasants",
@@ -4177,7 +4177,7 @@
   },
   {
     "key": "ang-subsistence-farm",
-    "regionId": 138,
+    "territoryId": 138,
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -4186,7 +4186,7 @@
   },
   {
     "key": "ang-commercial-farm-peasant",
-    "regionId": 138,
+    "territoryId": 138,
     "definitionKey": "commercial-farm-peasant",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4195,7 +4195,7 @@
   },
   {
     "key": "ang-warehouse",
-    "regionId": 138,
+    "territoryId": 138,
     "definitionKey": "warehouse",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -4204,7 +4204,7 @@
   },
   {
     "key": "moz-subsistence-farm",
-    "regionId": 139,
+    "territoryId": 139,
     "definitionKey": "subsistence-farm",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -4213,7 +4213,7 @@
   },
   {
     "key": "moz-commercial-farm-peasant",
-    "regionId": 139,
+    "territoryId": 139,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4222,7 +4222,7 @@
   },
   {
     "key": "moz-warehouse",
-    "regionId": 139,
+    "territoryId": 139,
     "definitionKey": "warehouse",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -4231,7 +4231,7 @@
   },
   {
     "key": "pai-subsistence-farm",
-    "regionId": 140,
+    "territoryId": 140,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4240,7 +4240,7 @@
   },
   {
     "key": "pai-commercial-farm-peasant",
-    "regionId": 140,
+    "territoryId": 140,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4249,7 +4249,7 @@
   },
   {
     "key": "pai-warehouse",
-    "regionId": 140,
+    "territoryId": 140,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4258,7 +4258,7 @@
   },
   {
     "key": "ptm-subsistence-farm",
-    "regionId": 141,
+    "territoryId": 141,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4267,7 +4267,7 @@
   },
   {
     "key": "ptm-commercial-farm-peasant",
-    "regionId": 141,
+    "territoryId": 141,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4276,7 +4276,7 @@
   },
   {
     "key": "ptm-warehouse",
-    "regionId": 141,
+    "territoryId": 141,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4285,7 +4285,7 @@
   },
   {
     "key": "mac-subsistence-farm",
-    "regionId": 142,
+    "territoryId": 142,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4294,7 +4294,7 @@
   },
   {
     "key": "mac-commercial-farm",
-    "regionId": 142,
+    "territoryId": 142,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4303,7 +4303,7 @@
   },
   {
     "key": "mac-warehouse",
-    "regionId": 142,
+    "territoryId": 142,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4312,7 +4312,7 @@
   },
   {
     "key": "eri-subsistence-farm",
-    "regionId": 143,
+    "territoryId": 143,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4321,7 +4321,7 @@
   },
   {
     "key": "eri-commercial-farm-peasant",
-    "regionId": 143,
+    "territoryId": 143,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4330,7 +4330,7 @@
   },
   {
     "key": "eri-warehouse",
-    "regionId": 143,
+    "territoryId": 143,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4339,7 +4339,7 @@
   },
   {
     "key": "its-subsistence-farm",
-    "regionId": 144,
+    "territoryId": 144,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4348,7 +4348,7 @@
   },
   {
     "key": "its-commercial-farm-peasant",
-    "regionId": 144,
+    "territoryId": 144,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4357,7 +4357,7 @@
   },
   {
     "key": "its-warehouse",
-    "regionId": 144,
+    "territoryId": 144,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4366,7 +4366,7 @@
   },
   {
     "key": "dei-subsistence-farm",
-    "regionId": 145,
+    "territoryId": 145,
     "definitionKey": "subsistence-farm",
     "level": 138,
     "ownerProfessionKey": "peasants",
@@ -4375,7 +4375,7 @@
   },
   {
     "key": "dei-commercial-farm-peasant",
-    "regionId": 145,
+    "territoryId": 145,
     "definitionKey": "commercial-farm-peasant",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -4384,7 +4384,7 @@
   },
   {
     "key": "dei-warehouse",
-    "regionId": 145,
+    "territoryId": 145,
     "definitionKey": "warehouse",
     "level": 84,
     "ownerProfessionKey": "peasants",
@@ -4393,7 +4393,7 @@
   },
   {
     "key": "sur-subsistence-farm",
-    "regionId": 146,
+    "territoryId": 146,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4402,7 +4402,7 @@
   },
   {
     "key": "sur-commercial-farm-peasant",
-    "regionId": 146,
+    "territoryId": 146,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4411,7 +4411,7 @@
   },
   {
     "key": "sur-warehouse",
-    "regionId": 146,
+    "territoryId": 146,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4420,7 +4420,7 @@
   },
   {
     "key": "dgc-subsistence-farm",
-    "regionId": 147,
+    "territoryId": 147,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4429,7 +4429,7 @@
   },
   {
     "key": "dgc-commercial-farm-peasant",
-    "regionId": 147,
+    "territoryId": 147,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4438,7 +4438,7 @@
   },
   {
     "key": "dgc-warehouse",
-    "regionId": 147,
+    "territoryId": 147,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4447,7 +4447,7 @@
   },
   {
     "key": "sah-subsistence-farm",
-    "regionId": 148,
+    "territoryId": 148,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4456,7 +4456,7 @@
   },
   {
     "key": "sah-commercial-farm-peasant",
-    "regionId": 148,
+    "territoryId": 148,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4465,7 +4465,7 @@
   },
   {
     "key": "sah-warehouse",
-    "regionId": 148,
+    "territoryId": 148,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4474,7 +4474,7 @@
   },
   {
     "key": "sgg-subsistence-farm",
-    "regionId": 149,
+    "territoryId": 149,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4483,7 +4483,7 @@
   },
   {
     "key": "sgg-commercial-farm-peasant",
-    "regionId": 149,
+    "territoryId": 149,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4492,7 +4492,7 @@
   },
   {
     "key": "sgg-warehouse",
-    "regionId": 149,
+    "territoryId": 149,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4501,7 +4501,7 @@
   },
   {
     "key": "phl-subsistence-farm",
-    "regionId": 150,
+    "territoryId": 150,
     "definitionKey": "subsistence-farm",
     "level": 25,
     "ownerProfessionKey": "peasants",
@@ -4510,7 +4510,7 @@
   },
   {
     "key": "phl-commercial-farm-peasant",
-    "regionId": 150,
+    "territoryId": 150,
     "definitionKey": "commercial-farm-peasant",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -4519,7 +4519,7 @@
   },
   {
     "key": "phl-warehouse",
-    "regionId": 150,
+    "territoryId": 150,
     "definitionKey": "warehouse",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -4528,7 +4528,7 @@
   },
   {
     "key": "pri-subsistence-farm",
-    "regionId": 151,
+    "territoryId": 151,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -4537,7 +4537,7 @@
   },
   {
     "key": "pri-commercial-farm-peasant",
-    "regionId": 151,
+    "territoryId": 151,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4546,7 +4546,7 @@
   },
   {
     "key": "pri-warehouse",
-    "regionId": 151,
+    "territoryId": 151,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4555,7 +4555,7 @@
   },
   {
     "key": "gum-subsistence-farm",
-    "regionId": 152,
+    "territoryId": 152,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4564,7 +4564,7 @@
   },
   {
     "key": "gum-commercial-farm-peasant",
-    "regionId": 152,
+    "territoryId": 152,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4573,7 +4573,7 @@
   },
   {
     "key": "gum-warehouse",
-    "regionId": 152,
+    "territoryId": 152,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4582,7 +4582,7 @@
   },
   {
     "key": "asm-subsistence-farm",
-    "regionId": 153,
+    "territoryId": 153,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4591,7 +4591,7 @@
   },
   {
     "key": "asm-commercial-farm-peasant",
-    "regionId": 153,
+    "territoryId": 153,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4600,7 +4600,7 @@
   },
   {
     "key": "asm-warehouse",
-    "regionId": 153,
+    "territoryId": 153,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4609,7 +4609,7 @@
   },
   {
     "key": "isl-subsistence-farm",
-    "regionId": 154,
+    "territoryId": 154,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4618,7 +4618,7 @@
   },
   {
     "key": "isl-commercial-farm-peasant",
-    "regionId": 154,
+    "territoryId": 154,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4627,7 +4627,7 @@
   },
   {
     "key": "isl-warehouse",
-    "regionId": 154,
+    "territoryId": 154,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4636,7 +4636,7 @@
   },
   {
     "key": "grl-subsistence-farm",
-    "regionId": 155,
+    "territoryId": 155,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4645,7 +4645,7 @@
   },
   {
     "key": "grl-commercial-farm-peasant",
-    "regionId": 155,
+    "territoryId": 155,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4654,7 +4654,7 @@
   },
   {
     "key": "grl-warehouse",
-    "regionId": 155,
+    "territoryId": 155,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4663,7 +4663,7 @@
   },
   {
     "key": "fro-subsistence-farm",
-    "regionId": 156,
+    "territoryId": 156,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4672,7 +4672,7 @@
   },
   {
     "key": "fro-commercial-farm-peasant",
-    "regionId": 156,
+    "territoryId": 156,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4681,7 +4681,7 @@
   },
   {
     "key": "fro-warehouse",
-    "regionId": 156,
+    "territoryId": 156,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4690,7 +4690,7 @@
   },
   {
     "key": "dwi-subsistence-farm",
-    "regionId": 157,
+    "territoryId": 157,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4699,7 +4699,7 @@
   },
   {
     "key": "dwi-commercial-farm-peasant",
-    "regionId": 157,
+    "territoryId": 157,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4708,7 +4708,7 @@
   },
   {
     "key": "dwi-warehouse",
-    "regionId": 157,
+    "territoryId": 157,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4717,7 +4717,7 @@
   },
   {
     "key": "egy-subsistence-farm",
-    "regionId": 158,
+    "territoryId": 158,
     "definitionKey": "subsistence-farm",
     "level": 32,
     "ownerProfessionKey": "peasants",
@@ -4726,7 +4726,7 @@
   },
   {
     "key": "egy-commercial-farm-peasant",
-    "regionId": 158,
+    "territoryId": 158,
     "definitionKey": "commercial-farm-peasant",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -4735,7 +4735,7 @@
   },
   {
     "key": "egy-warehouse",
-    "regionId": 158,
+    "territoryId": 158,
     "definitionKey": "warehouse",
     "level": 19,
     "ownerProfessionKey": "peasants",
@@ -4744,7 +4744,7 @@
   },
   {
     "key": "bhu-subsistence-farm",
-    "regionId": 159,
+    "territoryId": 159,
     "definitionKey": "subsistence-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4753,7 +4753,7 @@
   },
   {
     "key": "bhu-commercial-farm-peasant",
-    "regionId": 159,
+    "territoryId": 159,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4762,7 +4762,7 @@
   },
   {
     "key": "bhu-warehouse",
-    "regionId": 159,
+    "territoryId": 159,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4771,7 +4771,7 @@
   },
   {
     "key": "fin-subsistence-farm",
-    "regionId": 160,
+    "territoryId": 160,
     "definitionKey": "subsistence-farm",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -4780,7 +4780,7 @@
   },
   {
     "key": "fin-commercial-farm",
-    "regionId": 160,
+    "territoryId": 160,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4789,7 +4789,7 @@
   },
   {
     "key": "fin-warehouse",
-    "regionId": 160,
+    "territoryId": 160,
     "definitionKey": "warehouse",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -4798,7 +4798,7 @@
   },
   {
     "key": "twn-subsistence-farm",
-    "regionId": 161,
+    "territoryId": 161,
     "definitionKey": "subsistence-farm",
     "level": 10,
     "ownerProfessionKey": "peasants",
@@ -4807,7 +4807,7 @@
   },
   {
     "key": "twn-commercial-farm-peasant",
-    "regionId": 161,
+    "territoryId": 161,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4816,7 +4816,7 @@
   },
   {
     "key": "twn-warehouse",
-    "regionId": 161,
+    "territoryId": 161,
     "definitionKey": "warehouse",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -4825,7 +4825,7 @@
   },
   {
     "key": "tib-subsistence-farm",
-    "regionId": 162,
+    "territoryId": 162,
     "definitionKey": "subsistence-farm",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -4834,7 +4834,7 @@
   },
   {
     "key": "tib-commercial-farm-peasant",
-    "regionId": 162,
+    "territoryId": 162,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4843,7 +4843,7 @@
   },
   {
     "key": "tib-warehouse",
-    "regionId": 162,
+    "territoryId": 162,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4852,7 +4852,7 @@
   },
   {
     "key": "khi-subsistence-farm",
-    "regionId": 163,
+    "territoryId": 163,
     "definitionKey": "subsistence-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -4861,7 +4861,7 @@
   },
   {
     "key": "khi-commercial-farm-peasant",
-    "regionId": 163,
+    "territoryId": 163,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4870,7 +4870,7 @@
   },
   {
     "key": "khi-warehouse",
-    "regionId": 163,
+    "territoryId": 163,
     "definitionKey": "warehouse",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4879,7 +4879,7 @@
   },
   {
     "key": "buk-subsistence-farm",
-    "regionId": 164,
+    "territoryId": 164,
     "definitionKey": "subsistence-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -4888,7 +4888,7 @@
   },
   {
     "key": "buk-commercial-farm-peasant",
-    "regionId": 164,
+    "territoryId": 164,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4897,7 +4897,7 @@
   },
   {
     "key": "buk-warehouse",
-    "regionId": 164,
+    "territoryId": 164,
     "definitionKey": "warehouse",
     "level": 4,
     "ownerProfessionKey": "peasants",
@@ -4906,7 +4906,7 @@
   },
   {
     "key": "sar-subsistence-farm",
-    "regionId": 165,
+    "territoryId": 165,
     "definitionKey": "subsistence-farm",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -4915,7 +4915,7 @@
   },
   {
     "key": "sar-commercial-farm-peasant",
-    "regionId": 165,
+    "territoryId": 165,
     "definitionKey": "commercial-farm-peasant",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -4924,11 +4924,47 @@
   },
   {
     "key": "sar-warehouse",
-    "regionId": 165,
+    "territoryId": 165,
     "definitionKey": "warehouse",
     "level": 1,
     "ownerProfessionKey": "peasants",
     "operatingCashRUSD": 50000,
+    "status": "provisional"
+  },
+  {
+    "key": "goa-commercial-farm",
+    "territoryId": 166,
+    "definitionKey": "commercial-farm",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashRUSD": 150000,
+    "status": "provisional"
+  },
+  {
+    "key": "goa-commercial-farm-peasant",
+    "territoryId": 166,
+    "definitionKey": "commercial-farm-peasant",
+    "level": 3,
+    "ownerProfessionKey": "peasants",
+    "operatingCashRUSD": 150000,
+    "status": "provisional"
+  },
+  {
+    "key": "goa-subsistence-farm",
+    "territoryId": 166,
+    "definitionKey": "subsistence-farm",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashRUSD": 250000,
+    "status": "provisional"
+  },
+  {
+    "key": "goa-warehouse",
+    "territoryId": 166,
+    "definitionKey": "warehouse",
+    "level": 5,
+    "ownerProfessionKey": "peasants",
+    "operatingCashRUSD": 250000,
     "status": "provisional"
   }
 ]

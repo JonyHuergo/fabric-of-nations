@@ -18,6 +18,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 import { SimulationHost } from "@century/sim-worker/host";
 import { PROTOCOL_VERSION, type WorkerEvent } from "@century/sim-worker";
@@ -88,7 +89,7 @@ describe("M8 political institutions", () => {
       "rural",
     ]);
     const ownedPopulation = world.popBlocks
-      .filter((block) => country.regionIds.includes(block.regionId))
+      .filter((block) => countryProvinceIds(world, country.id).includes(block.provinceId))
       .reduce(
         (total, block) =>
           total +
@@ -302,14 +303,14 @@ describe("M8 political institutions", () => {
     expect(world.dayIndex).toBe(31);
     const country = world.countries.find((entry) => entry.id === M8_COUNTRY_B)!;
     for (const block of world.popBlocks) {
-      if (country.regionIds.includes(block.regionId)) {
+      if (countryProvinceIds(world, country.id).includes(block.provinceId)) {
         block.militancy = 0.95;
         block.unmetSubsistenceDays = 30;
       }
     }
-    for (const regionId of country.regionIds) {
-      const region = world.regions.find((entry) => entry.id === regionId)!;
-      region.unrest = 0.95;
+    for (const provinceId of countryProvinceIds(world, country.id)) {
+      const province = world.provinceEconomies.find((entry) => entry.id === provinceId)!;
+      province.unrest = 0.95;
     }
     country.regime = {
       ...country.regime,
@@ -328,19 +329,19 @@ describe("M8 political institutions", () => {
     assertValidWorld(world);
   });
 
-  test("regional unrest responds to real needs and militancy", () => {
+  test("provincial unrest responds to real needs and militancy", () => {
     const scenario = m8Scenario();
     const world = worldFor(scenario);
     const country = world.countries.find((entry) => entry.id === M8_COUNTRY_A)!;
     for (const block of world.popBlocks) {
-      if (country.regionIds.includes(block.regionId)) {
+      if (countryProvinceIds(world, country.id).includes(block.provinceId)) {
         block.militancy = 0.8;
         block.unmetSubsistenceDays = 14;
       }
     }
-    const before = world.regions[0]!.unrest;
+    const before = world.provinceEconomies[0]!.unrest;
     run(world, scenario, 10);
-    expect(world.regions[0]!.unrest).toBeGreaterThan(before);
+    expect(world.provinceEconomies[0]!.unrest).toBeGreaterThan(before);
   });
 
   test("scripted events apply once with provenance and survive save/load", () => {
@@ -365,10 +366,10 @@ describe("M8 political institutions", () => {
     expect(world.politics.eventLog.some((log) => log.provenance === eventDef.provenance)).toBe(
       true,
     );
-    const unrestAfterFirst = world.regions[0]!.unrest;
+    const unrestAfterFirst = world.provinceEconomies[0]!.unrest;
     run(world, scenario, 1);
     expect(entry.status).toBe("applied");
-    expect(world.regions[0]!.unrest).not.toBeCloseTo(unrestAfterFirst + 0.15, 9);
+    expect(world.provinceEconomies[0]!.unrest).not.toBeCloseTo(unrestAfterFirst + 0.15, 9);
 
     const roundTripped = deserializeWorld(serializeWorld(world));
     expect(hashWorld(roundTripped)).toBe(hashWorld(world));

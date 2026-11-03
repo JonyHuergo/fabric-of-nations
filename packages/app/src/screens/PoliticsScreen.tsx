@@ -13,6 +13,8 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { provinceEconomyRows } from "@century/sim-worker";
+import { provinceDisplayName } from "../provinceNames";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
 const MAX_ANNUAL_FUNDING_RUSD = 1e15;
@@ -220,7 +222,7 @@ export function PoliticsScreen({
 
       <Section folded
         title="State administration"
-        subtitle="Quality is derived from clerk staffing, funding, literacy, regional infrastructure, law load, and recent disruption. Overload reduces tax collection and construction speed."
+        subtitle="Quality is derived from clerk staffing, funding, literacy, provincial infrastructure, law load, and recent disruption. Overload reduces tax collection and construction speed."
       >
         <StatRow
           label="Quality / overload"
@@ -347,8 +349,8 @@ export function PoliticsScreen({
       </Section>
 
       <Section folded
-        title="Regional unrest"
-        subtitle="Unrest is a regional aggregate fed by pop-level militancy, unmet needs, unemployment, exclusion, administration overload, and labor-law grievance. It updates daily after needs."
+        title="Provincial unrest"
+        subtitle="Unrest is a provincial aggregate fed by pop-level militancy, unmet needs, unemployment, exclusion, administration overload, and labor-law grievance. It updates daily after needs."
       >
         {politics.interestGroups.length === 0 ? null : (
           <Text style={styles.detail}>
@@ -357,14 +359,14 @@ export function PoliticsScreen({
             {String(politics.crisis.pressureDays)} days at or above threshold.
           </Text>
         )}
-        {snapshot.regions
-          .filter((region) => country.regionIds.includes(region.id))
-          .map((region) => (
+        {provinceEconomyRows(snapshot)
+          .filter((province) => country.provinceIds.includes(province.id))
+          .map((province) => (
             <StatRow
-              key={region.id}
-              label={region.name}
-              value={`${(region.unrest * 100).toFixed(1)}% unrest`}
-              detail={`Infrastructure ${(region.infrastructure * 100).toFixed(1)}% · population ${region.population.toLocaleString()}`}
+              key={province.id}
+              label={provinceDisplayName(province.id)}
+              value={`${(province.unrest * 100).toFixed(1)}% unrest`}
+              detail={`Infrastructure ${(province.infrastructure * 100).toFixed(1)}% · population ${province.population.toLocaleString()}`}
             />
           ))}
       </Section>

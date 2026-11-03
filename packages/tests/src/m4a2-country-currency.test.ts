@@ -7,7 +7,7 @@ import {
   crossRate,
   crossRateFor,
   currencyFromRusd,
-  regionOwner,
+  provinceOwner,
   requireCurrencyRate,
   ratesApproximatelyEqual,
   rusdFromCurrency,
@@ -216,14 +216,14 @@ describe("M4a-2 country and currency identity", () => {
     expect(() => crossRateFor(world.currencyValuations, 0, 0)).toThrow(/unavailable/i);
   });
 
-  test("rejects unknown and duplicated region claims", () => {
+  test("rejects unknown and duplicated province claims", () => {
     const unknown = ownCurrencyScenario();
-    unknown.countries![0]!.regionIds = [99];
-    expect(() => build(unknown)).toThrow(/unknown region/i);
+    unknown.countries![0]!.provinceIds = [99];
+    expect(() => build(unknown)).toThrow(/unknown province/i);
 
     const duplicateWithinCountry = ownCurrencyScenario();
-    duplicateWithinCountry.countries![0]!.regionIds = [0, 0];
-    expect(() => build(duplicateWithinCountry)).toThrow(/lists region.*twice/i);
+    duplicateWithinCountry.countries![0]!.provinceIds = [0, 0];
+    expect(() => build(duplicateWithinCountry)).toThrow(/lists province.*twice/i);
 
     const duplicateClaim = ownCurrencyScenario();
     duplicateClaim.countries = [
@@ -235,30 +235,30 @@ describe("M4a-2 country and currency identity", () => {
     expect(() => build(duplicateClaim)).toThrow(/claimed by both/i);
   });
 
-  test("regionOwner returns the owner, null for unassigned, and throws for unknown", () => {
+  test("provinceOwner returns the owner, null for unassigned, and throws for unknown", () => {
     const assigned = build(ownCurrencyScenario());
-    expect(regionOwner(assigned, 0)).toBe(0);
+    expect(provinceOwner(assigned, 0)).toBe(0);
 
     const unassignedScenario = ownCurrencyScenario();
-    unassignedScenario.countries![0]!.regionIds = [];
+    unassignedScenario.countries![0]!.provinceIds = [];
     const unassigned = build(unassignedScenario);
-    expect(regionOwner(unassigned, 0)).toBeNull();
+    expect(provinceOwner(unassigned, 0)).toBeNull();
 
-    expect(() => regionOwner(assigned, 99)).toThrow(/unknown region/i);
+    expect(() => provinceOwner(assigned, 99)).toThrow(/unknown province/i);
   });
 
-  test("a world with no countries leaves regions unassigned", () => {
+  test("a world with no countries leaves provinces unassigned", () => {
     const world = build(baseScenario());
     expect(world.countries).toEqual([]);
-    expect(regionOwner(world, 0)).toBeNull();
+    expect(provinceOwner(world, 0)).toBeNull();
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
-  test("a world with countries may leave regions unassigned", () => {
+  test("a world with countries may leave provinces unassigned", () => {
     const scenario = ownCurrencyScenario();
-    scenario.countries![0]!.regionIds = [];
+    scenario.countries![0]!.provinceIds = [];
     const world = build(scenario);
-    expect(world.regions).toHaveLength(1);
+    expect(world.provinceEconomies).toHaveLength(1);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 });

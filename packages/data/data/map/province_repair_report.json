@@ -1,0 +1,3120 @@
+{
+ "removed": [
+  {
+   "key": "grl-greenland",
+   "id": 14008
+  }
+ ],
+ "restored": [
+  {
+   "key": "as-bin-goa",
+   "areaBefore": 0.003,
+   "areaAfter": 0.288,
+   "sourceUnits": 1
+  },
+  {
+   "key": "as-mac-macao",
+   "areaBefore": 0.002,
+   "areaAfter": 0.003,
+   "sourceUnits": 1
+  },
+  {
+   "key": "mco-monaco",
+   "areaBefore": 0.001,
+   "areaAfter": 0.002,
+   "sourceUnits": 1
+  }
+ ],
+ "subtracted": [
+  {
+   "larger": "as-ott-ankara",
+   "smaller": "as-ott-kastamonu",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-erzurum",
+   "smaller": "as-ott-trabzon",
+   "removedSqDeg": 0.004,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-aleppo",
+   "smaller": "as-ott-urfa",
+   "removedSqDeg": 0.0046,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-baghdad",
+   "smaller": "as-ott-aleppo",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-damascus",
+   "smaller": "as-ott-lebanon",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-jerusalem",
+   "smaller": "as-ott-lebanon",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-baghdad",
+   "smaller": "as-ott-syrian-coast",
+   "removedSqDeg": 0.0059,
+   "method": "difference"
+  },
+  {
+   "larger": "as-ott-transjordan",
+   "smaller": "as-ott-jerusalem",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-ott-residual",
+   "smaller": "as-ott-al-hasa",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "bel-hainaut",
+   "smaller": "bel-namur",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "as-shm-northern-arabia",
+   "smaller": "as-shm-ha-il",
+   "removedSqDeg": 0.0037,
+   "method": "difference"
+  },
+  {
+   "larger": "as-per-isfahan",
+   "smaller": "as-per-kermanshah",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "as-per-isfahan",
+   "smaller": "as-per-tehran",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "as-per-tehran",
+   "smaller": "as-per-kermanshah",
+   "removedSqDeg": 0.0058,
+   "method": "difference"
+  },
+  {
+   "larger": "as-afg-kandahar",
+   "smaller": "as-afg-kabul",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "as-afg-herat",
+   "smaller": "as-afg-afghan-turkestan",
+   "removedSqDeg": 0.0052,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-bengal",
+   "smaller": "as-bhu-western-bhutan",
+   "removedSqDeg": 0.0005,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-bengal",
+   "smaller": "as-bhu-eastern-bhutan",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tha-nakhon-ratchasima",
+   "smaller": "as-tha-bangkok",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tha-phitsanulok",
+   "smaller": "as-tha-nakhon-sawan",
+   "removedSqDeg": 0.0062,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tha-nakhon-ratchasima",
+   "smaller": "as-tha-nakhon-sawan",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tha-nakhon-ratchasima",
+   "smaller": "as-tha-inner-cambodia",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tha-nakhon-ratchasima",
+   "smaller": "as-tha-xaignabouri",
+   "removedSqDeg": 0.0028,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-zhili",
+   "smaller": "as-chn-shandong",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-rehe",
+   "smaller": "as-chn-zhili",
+   "removedSqDeg": 0.0081,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-shaanxi",
+   "smaller": "as-chn-shanxi",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-inner-mongolia",
+   "smaller": "as-chn-shanxi",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-gansu",
+   "smaller": "as-chn-shaanxi",
+   "removedSqDeg": 0.006,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-sichuan",
+   "smaller": "as-chn-shaanxi",
+   "removedSqDeg": 0.008,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-qinghai",
+   "smaller": "as-chn-gansu",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-xinjiang",
+   "smaller": "as-chn-gansu",
+   "removedSqDeg": 0.0064,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-qinghai",
+   "smaller": "as-chn-sichuan",
+   "removedSqDeg": 0.0074,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-xinjiang",
+   "smaller": "as-chn-qinghai",
+   "removedSqDeg": 0.0103,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-qinghai",
+   "smaller": "as-tib-kham",
+   "removedSqDeg": 0.0096,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-chn-residual",
+   "smaller": "as-chn-jiangsu",
+   "removedSqDeg": 0.0128,
+   "method": "difference"
+  },
+  {
+   "larger": "bel-antwerp",
+   "smaller": "bel-flemish-brabant",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-hubei",
+   "smaller": "as-chn-anhui",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-jiangxi",
+   "smaller": "as-chn-fujian",
+   "removedSqDeg": 0.0082,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-guangdong",
+   "smaller": "as-chn-jiangxi",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-chn-residual",
+   "smaller": "as-chn-fujian",
+   "removedSqDeg": 0.0046,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-hunan",
+   "smaller": "as-chn-guangdong",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-hunan",
+   "smaller": "as-chn-guizhou",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-guangxi",
+   "smaller": "as-chn-guangdong",
+   "removedSqDeg": 0.0066,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-chn-residual",
+   "smaller": "as-chn-guangdong",
+   "removedSqDeg": 18.2019,
+   "method": "per-polygon"
+  },
+  {
+   "larger": "as-chn-yunnan",
+   "smaller": "as-chn-guangxi",
+   "removedSqDeg": 0.0064,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-xinjiang",
+   "smaller": "as-chn-eastern-and-gobi-mongolia",
+   "removedSqDeg": 0.005,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-xinjiang",
+   "smaller": "as-tib-u-tsang",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-rehe",
+   "smaller": "as-chn-fengtian",
+   "removedSqDeg": 0.0001,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-inner-mongolia",
+   "smaller": "as-chn-jilin",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-heilongjiang",
+   "smaller": "as-chn-xing-an",
+   "removedSqDeg": 0.0103,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-inner-mongolia",
+   "smaller": "as-chn-rehe",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-eastern-and-gobi-mongolia",
+   "smaller": "as-chn-inner-mongolia",
+   "removedSqDeg": 0.0139,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-eastern-and-gobi-mongolia",
+   "smaller": "as-chn-khalkha-mongolia",
+   "removedSqDeg": 0.0113,
+   "method": "difference"
+  },
+  {
+   "larger": "as-chn-eastern-and-gobi-mongolia",
+   "smaller": "as-chn-western-mongolia",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "bel-flemish-brabant",
+   "smaller": "bel-brussels",
+   "removedSqDeg": 0.0209,
+   "method": "difference"
+  },
+  {
+   "larger": "as-tib-u-tsang",
+   "smaller": "as-tib-kham",
+   "removedSqDeg": 0.0361,
+   "method": "difference"
+  },
+  {
+   "larger": "as-kor-chungcheong",
+   "smaller": "as-kor-gyeonggi",
+   "removedSqDeg": 0.0425,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-erivan",
+   "smaller": "as-rus-nakhchivan",
+   "removedSqDeg": 0.0008,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uralsk",
+   "smaller": "as-rus-transcaspia",
+   "removedSqDeg": 0.0142,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-semipalatinsk",
+   "smaller": "as-rus-omsk",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-tomsk",
+   "smaller": "as-rus-semipalatinsk",
+   "removedSqDeg": 0.0123,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-semipalatinsk",
+   "smaller": "as-rus-altai",
+   "removedSqDeg": 0.0116,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-semirechye",
+   "smaller": "as-rus-kyrgyz-steppe",
+   "removedSqDeg": 0.0051,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-kazakh-syr-darya",
+   "smaller": "as-rus-uzbek-syr-darya",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uzbek-syr-darya",
+   "smaller": "as-rus-samarkand",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uzbek-syr-darya",
+   "smaller": "as-rus-khojand",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-osh",
+   "smaller": "as-rus-fergana",
+   "removedSqDeg": 0.0465,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-khojand",
+   "smaller": "as-rus-fergana",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-osh",
+   "smaller": "as-rus-khojand",
+   "removedSqDeg": 0.0162,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-kyrgyz-steppe",
+   "smaller": "as-rus-osh",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "as-buk-bukhara",
+   "smaller": "as-rus-samarkand",
+   "removedSqDeg": 0.0028,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yeniseysk",
+   "smaller": "as-rus-tobolsk",
+   "removedSqDeg": 0.0096,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-rus-tobolsk",
+   "removedSqDeg": 0.0196,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-tomsk",
+   "smaller": "as-rus-altai",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yeniseysk",
+   "smaller": "as-rus-tomsk",
+   "removedSqDeg": 0.0151,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yeniseysk",
+   "smaller": "as-rus-altai",
+   "removedSqDeg": 0.0076,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yeniseysk",
+   "smaller": "as-rus-irkutsk",
+   "removedSqDeg": 0.0151,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yakutsk",
+   "smaller": "as-rus-yeniseysk",
+   "removedSqDeg": 0.0258,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yeniseysk",
+   "smaller": "as-rus-uriankhai",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-rus-yeniseysk",
+   "removedSqDeg": 0.0069,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-irkutsk",
+   "smaller": "as-rus-transbaikal",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yakutsk",
+   "smaller": "as-rus-irkutsk",
+   "removedSqDeg": 0.0089,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-irkutsk",
+   "smaller": "as-rus-uriankhai",
+   "removedSqDeg": 0.0082,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yakutsk",
+   "smaller": "as-rus-transbaikal",
+   "removedSqDeg": 0.0133,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-transbaikal",
+   "smaller": "as-rus-khabarovsk",
+   "removedSqDeg": 0.0077,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-kamchatka",
+   "smaller": "as-rus-transbaikal",
+   "removedSqDeg": 0.0147,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-yakutsk",
+   "smaller": "as-rus-kamchatka",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-rus-yakutsk",
+   "removedSqDeg": 0.0664,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-khabarovsk",
+   "smaller": "as-rus-amur",
+   "removedSqDeg": 0.0177,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-rus-primorye",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-rus-kamchatka",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "as-khi-karakalpak",
+   "smaller": "as-khi-khiva",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "as-khi-karakalpak",
+   "smaller": "as-khi-tashauz",
+   "removedSqDeg": 0.0056,
+   "method": "difference"
+  },
+  {
+   "larger": "as-buk-bukhara",
+   "smaller": "as-khi-karakalpak",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "as-khi-karakalpak",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-eastern-bengal",
+   "smaller": "as-bin-bengal",
+   "removedSqDeg": 0.0055,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-bihar",
+   "smaller": "as-bin-bengal",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-burma",
+   "smaller": "as-bin-assam",
+   "removedSqDeg": 0.0095,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-united-provinces",
+   "smaller": "as-bin-bihar",
+   "removedSqDeg": 0.0092,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-central-provinces",
+   "smaller": "as-bin-orissa",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-madras",
+   "smaller": "as-bin-orissa",
+   "removedSqDeg": 0.0036,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-orissa",
+   "smaller": "as-bin-hyderabad",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-united-provinces",
+   "smaller": "as-bin-punjab",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-central-provinces",
+   "smaller": "as-bin-united-provinces",
+   "removedSqDeg": 0.0082,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-rajputana",
+   "smaller": "as-bin-punjab",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-west-punjab",
+   "smaller": "as-bin-north-west-frontier",
+   "removedSqDeg": 0.0036,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-baluchistan",
+   "smaller": "as-bin-west-punjab",
+   "removedSqDeg": 0.0077,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-west-punjab",
+   "smaller": "as-bin-kashmir",
+   "removedSqDeg": 0.0035,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-west-punjab",
+   "smaller": "as-bin-azad-kashmir",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-baluchistan",
+   "smaller": "as-bin-sind",
+   "removedSqDeg": 0.0051,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-bombay",
+   "smaller": "as-bin-sind",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-north-west-frontier",
+   "smaller": "as-bin-azad-kashmir",
+   "removedSqDeg": 0.0046,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-kashmir",
+   "smaller": "as-bin-azad-kashmir",
+   "removedSqDeg": 0.0061,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-central-provinces",
+   "smaller": "as-bin-hyderabad",
+   "removedSqDeg": 0.0069,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-bombay",
+   "smaller": "as-bin-goa",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-madras",
+   "smaller": "as-bin-hyderabad",
+   "removedSqDeg": 0.0011,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-madras",
+   "smaller": "as-bin-mysore",
+   "removedSqDeg": 0.0081,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-madras",
+   "smaller": "as-bin-travancore-and-cochin",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-mysore",
+   "smaller": "as-bin-travancore-and-cochin",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-mysore",
+   "smaller": "as-bin-goa",
+   "removedSqDeg": 0.004,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-burma",
+   "smaller": "as-bin-shan-states",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "as-bin-burma",
+   "smaller": "as-bin-frontier-divisions",
+   "removedSqDeg": 0.0075,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-pai-residual",
+   "smaller": "as-bin-goa",
+   "removedSqDeg": 0.2594,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-lancashire-and-cheshire",
+   "smaller": "gbr-northumberland-and-durham",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-yorkshire",
+   "smaller": "gbr-northumberland-and-durham",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "as-mal-johor",
+   "smaller": "as-mal-straits-settlements",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "as-sar-sarawak",
+   "smaller": "as-mal-british-north-borneo",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "as-sar-sarawak",
+   "smaller": "as-mal-brunei",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "as-dei-east-java",
+   "smaller": "as-dei-central-java",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "as-dei-north-sumatra",
+   "smaller": "as-dei-aceh",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "as-dei-south-sulawesi",
+   "smaller": "as-dei-central-sulawesi",
+   "removedSqDeg": 0.0062,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-phl-residual",
+   "smaller": "as-phl-northern-luzon",
+   "removedSqDeg": 0.0036,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-lancashire-and-cheshire",
+   "smaller": "gbr-north-wales",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-derbyshire-and-nottinghamshire",
+   "smaller": "gbr-staffordshire-and-warwickshire",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-wessex",
+   "smaller": "gbr-devon-and-cornwall",
+   "removedSqDeg": 0.0028,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-ie-cork",
+   "smaller": "gbr-ie-limerick",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-ie-kildare",
+   "smaller": "gbr-ie-carlow",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-ie-galway",
+   "smaller": "gbr-ie-roscommon",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "gbr-ie-offaly",
+   "smaller": "gbr-ie-laois",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "che-valais",
+   "smaller": "che-uri",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "che-sankt-gallen",
+   "smaller": "che-appenzell-ausserrhoden",
+   "removedSqDeg": 0.0288,
+   "method": "difference"
+  },
+  {
+   "larger": "che-sankt-gallen",
+   "smaller": "che-appenzell-innerrhoden",
+   "removedSqDeg": 0.018,
+   "method": "difference"
+  },
+  {
+   "larger": "che-vaud",
+   "smaller": "che-neuchatel",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "che-vaud",
+   "smaller": "che-fribourg",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "che-schwyz",
+   "smaller": "che-glarus",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-vasterbotten",
+   "smaller": "swe-vasternorrland",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-jamtland",
+   "smaller": "swe-dalarna",
+   "removedSqDeg": 0.0073,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-jamtland",
+   "smaller": "swe-vasternorrland",
+   "removedSqDeg": 0.0096,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-dalarna",
+   "smaller": "swe-varmland",
+   "removedSqDeg": 0.0054,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-dalarna",
+   "smaller": "swe-gavleborg",
+   "removedSqDeg": 0.0053,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-varmland",
+   "smaller": "swe-orebro",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-vastra-gotaland",
+   "smaller": "swe-halland",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-vastmanland",
+   "smaller": "swe-uppsala",
+   "removedSqDeg": 0.0008,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-sodermanland",
+   "smaller": "swe-stockholm",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-skane",
+   "smaller": "swe-kronoberg",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "swe-orebro",
+   "smaller": "swe-vastmanland",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "nor-s-r-tr-ndelag",
+   "smaller": "nor-m-re-og-romsdal",
+   "removedSqDeg": 0.0036,
+   "method": "difference"
+  },
+  {
+   "larger": "nor-aust-agder",
+   "smaller": "nor-rogaland",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "grc-central-greece",
+   "smaller": "grc-attica",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-ott-residual",
+   "smaller": "grc-epirus",
+   "removedSqDeg": 0,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-ott-residual",
+   "smaller": "grc-macedonia",
+   "removedSqDeg": 0,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-grc-residual",
+   "smaller": "grc-macedonia",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "rom-muntenia",
+   "smaller": "rom-dobruja",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "bgr-ruse",
+   "smaller": "bgr-varna",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "af-mad-mahajanga",
+   "smaller": "af-mad-antananarivo",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "af-mad-toliara",
+   "smaller": "af-mad-antananarivo",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "af-mad-mahajanga",
+   "smaller": "af-mad-antsiranana",
+   "removedSqDeg": 0.0028,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eri-barka-and-gash",
+   "smaller": "af-eri-hamasien",
+   "removedSqDeg": 0.0008,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-amhara-and-begemder",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-shewa-and-addis-ababa",
+   "removedSqDeg": 0.0447,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-sidamo-and-the-southern-provinces",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-hararghe",
+   "removedSqDeg": 0.0285,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-ogaden",
+   "removedSqDeg": 0.0053,
+   "method": "difference"
+  },
+  {
+   "larger": "af-eth-oromia",
+   "smaller": "af-eth-benishangul",
+   "removedSqDeg": 0.0496,
+   "method": "difference"
+  },
+  {
+   "larger": "af-egy-aswan-and-the-red-sea",
+   "smaller": "af-egy-sohag-and-qena",
+   "removedSqDeg": 0.0045,
+   "method": "difference"
+  },
+  {
+   "larger": "af-egy-the-western-desert",
+   "smaller": "af-egy-aswan-and-the-red-sea",
+   "removedSqDeg": 0.0094,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-northern-province",
+   "smaller": "af-sud-khartoum",
+   "removedSqDeg": 0.0083,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-kassala-and-the-red-sea",
+   "smaller": "af-sud-blue-nile-and-sennar",
+   "removedSqDeg": 0.0087,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-kordofan",
+   "smaller": "af-sud-blue-nile-and-sennar",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-northern-province",
+   "smaller": "af-sud-kassala-and-the-red-sea",
+   "removedSqDeg": 0.0051,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-kordofan",
+   "smaller": "af-sud-upper-nile",
+   "removedSqDeg": 0.0059,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sud-upper-nile",
+   "smaller": "af-sud-bahr-el-ghazal",
+   "removedSqDeg": 0.0031,
+   "method": "difference"
+  },
+  {
+   "larger": "af-dar-north-darfur",
+   "smaller": "af-dar-south-and-west-darfur",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "af-wad-borkou-ennedi-and-tibesti",
+   "smaller": "af-wad-wadai-and-ouaddai",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sok-sokoto-and-gwandu",
+   "smaller": "af-sok-zaria",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "af-sok-bauchi-and-adamawa",
+   "smaller": "af-sok-kano",
+   "removedSqDeg": 0.0031,
+   "method": "difference"
+  },
+  {
+   "larger": "af-gea-arusha-and-the-maasai-steppe",
+   "smaller": "af-gea-tanga-and-the-usambara",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "af-gea-iringa-mbeya-and-rukwa",
+   "smaller": "af-gea-lindi-mtwara-and-ruvuma",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "af-kam-central-kamerun",
+   "smaller": "af-kam-southern-cameroons",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "af-kam-southern-kamerun",
+   "smaller": "af-kam-central-kamerun",
+   "removedSqDeg": 0.0055,
+   "method": "difference"
+  },
+  {
+   "larger": "af-tog-french-togoland-maritime-and-plateaux",
+   "smaller": "af-tog-british-togoland",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "af-gsw-hereroland",
+   "smaller": "af-gsw-erongo-and-the-central-coast",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cap-northern-cape-and-griqualand-west",
+   "smaller": "af-gsw-namaland",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "af-gsw-kaokoland",
+   "smaller": "af-gsw-ovamboland",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "af-hct-bechuanaland-ngamiland-and-chobe",
+   "smaller": "af-gsw-kavango-and-caprivi",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cfs-equateur",
+   "smaller": "af-cfs-kwango-and-bandundu",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cfs-kasai",
+   "smaller": "af-cfs-kwango-and-bandundu",
+   "removedSqDeg": 0.0083,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cfs-katanga",
+   "smaller": "af-cfs-kasai",
+   "removedSqDeg": 0.007,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cfs-maniema",
+   "smaller": "af-cfs-north-kivu",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ang-malanje",
+   "smaller": "af-ang-cuanza",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ang-uige-and-zaire",
+   "smaller": "af-ang-cuanza",
+   "removedSqDeg": 0.0038,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ang-lunda",
+   "smaller": "af-ang-malanje",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ang-lunda",
+   "smaller": "af-ang-huambo-and-bie",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "af-moz-zambezia",
+   "smaller": "af-moz-nampula",
+   "removedSqDeg": 0.0074,
+   "method": "difference"
+  },
+  {
+   "larger": "af-moz-manica-and-sofala",
+   "smaller": "af-moz-zambezia",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "af-moz-gaza",
+   "smaller": "af-moz-inhambane",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cra-northern-rhodesia-north-eastern",
+   "smaller": "af-cra-northern-rhodesia-central",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cra-northern-rhodesia-north-eastern",
+   "smaller": "af-cra-northern-rhodesia-southern",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cra-northern-rhodesia-central",
+   "smaller": "af-cra-northern-rhodesia-southern",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cra-northern-rhodesia-central",
+   "smaller": "af-cra-southern-rhodesia-mashonaland",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "af-hct-basutoland-the-lowlands",
+   "smaller": "af-hct-basutoland-the-highlands",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "af-cap-northern-cape-and-griqualand-west",
+   "smaller": "af-cap-cape-peninsula-and-the-western-districts",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "af-bwa-southern-nigeria-the-west",
+   "smaller": "af-bwa-lagos-colony",
+   "removedSqDeg": 0.0056,
+   "method": "difference"
+  },
+  {
+   "larger": "af-bwa-southern-nigeria-the-middle-belt",
+   "smaller": "af-bwa-northern-nigeria-the-niger-province",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-senegal-the-interior",
+   "smaller": "af-fwa-senegal-the-communes-and-the-coast",
+   "removedSqDeg": 0.0062,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-french-sudan-kayes-bamako-and-koulikoro",
+   "smaller": "af-fwa-senegal-the-interior",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-senegal-the-interior",
+   "smaller": "af-fwa-guinea-fouta-djallon",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-mauritania-adrar-and-the-hodh",
+   "smaller": "af-alg-bechar-and-the-west-sahara",
+   "removedSqDeg": 0.0122,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-french-sudan-kayes-bamako-and-koulikoro",
+   "smaller": "af-fwa-guinea-the-upper-niger",
+   "removedSqDeg": 0.0075,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-french-sudan-sikasso",
+   "smaller": "af-fwa-guinea-the-upper-niger",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-ivory-coast-the-north",
+   "smaller": "af-fwa-french-sudan-sikasso",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-guinea-boke",
+   "smaller": "af-fwa-guinea-conakry-and-the-coast",
+   "removedSqDeg": 0.0058,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-guinea-faranah",
+   "smaller": "af-fwa-guinea-the-middle-niger",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-guinea-the-upper-niger",
+   "smaller": "af-fwa-guinea-faranah",
+   "removedSqDeg": 0.0055,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-guinea-the-upper-niger",
+   "smaller": "af-fwa-guinea-the-forest-region",
+   "removedSqDeg": 0.0039,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-ivory-coast-the-north",
+   "smaller": "af-fwa-ivory-coast-the-south",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-upper-volta-dedougou",
+   "smaller": "af-fwa-upper-volta-bobo-dioulasso",
+   "removedSqDeg": 0.0058,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-niger-the-niger-valley",
+   "smaller": "af-fwa-dahomey-the-north",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-niger-the-sahara",
+   "smaller": "af-fwa-niger-the-sahel",
+   "removedSqDeg": 0.0097,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fwa-niger-the-sahara",
+   "smaller": "af-fea-chad-the-chari-and-the-lake",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fea-gabon-the-interior",
+   "smaller": "af-fea-gabon-the-estuary-and-the-coast",
+   "removedSqDeg": 0.0051,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fea-ubangi-shari-the-centre",
+   "smaller": "af-fea-chad-the-south",
+   "removedSqDeg": 0.0035,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fea-ubangi-shari-the-east",
+   "smaller": "af-fea-chad-the-east",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-fea-residual",
+   "smaller": "af-fea-ubangi-shari-the-east",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "af-fea-chad-the-chari-and-the-lake",
+   "smaller": "af-fea-chad-the-south",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  },
+  {
+   "larger": "af-alg-constantine-and-the-east",
+   "smaller": "af-alg-algiers-and-the-mitidja",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "af-alg-laghouat-and-the-southern-territories",
+   "smaller": "af-alg-algiers-and-the-mitidja",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "af-alg-laghouat-and-the-southern-territories",
+   "smaller": "af-alg-constantine-and-the-east",
+   "removedSqDeg": 0.0119,
+   "method": "difference"
+  },
+  {
+   "larger": "af-alg-ouargla-and-the-east-sahara",
+   "smaller": "af-alg-bechar-and-the-west-sahara",
+   "removedSqDeg": 0.0122,
+   "method": "difference"
+  },
+  {
+   "larger": "af-tun-bizerte-and-the-north-west",
+   "smaller": "af-tun-kairouan-and-the-centre",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "af-mar-souss-the-anti-atlas-and-tarfaya",
+   "smaller": "af-mar-fez-and-meknes",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-mar-residual",
+   "smaller": "af-mar-eastern-morocco",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "af-lbr-grand-bassa",
+   "smaller": "af-lbr-montserrado",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "af-lbr-nimba-and-bong",
+   "smaller": "af-lbr-grand-bassa",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ott-misrata-and-the-gulf-coast",
+   "smaller": "af-ott-sabha-wadi-al-hayaa-and-ash-shati",
+   "removedSqDeg": 0.0038,
+   "method": "difference"
+  },
+  {
+   "larger": "af-ott-derna-butnan-and-ajdabiya",
+   "smaller": "af-ott-benghazi-and-the-jabal-al-akhdar",
+   "removedSqDeg": 0.0073,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-saxony",
+   "smaller": "deu-thuringia",
+   "removedSqDeg": 0.0035,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-hanover",
+   "smaller": "deu-hesse",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-hesse",
+   "smaller": "deu-westphalia",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-hanover",
+   "smaller": "deu-bremen",
+   "removedSqDeg": 0.0405,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-posen",
+   "smaller": "deu-brandenburg-lebus",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-schleswig-holstein",
+   "smaller": "deu-mecklenburg",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-baden",
+   "smaller": "deu-alsace",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-east-prussia-south",
+   "smaller": "deu-east-prussia-north",
+   "removedSqDeg": 0.0103,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-east-prussia-north",
+   "smaller": "deu-memel",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-palatinate",
+   "smaller": "deu-alsace",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-rhine-province",
+   "smaller": "deu-westphalia",
+   "removedSqDeg": 0.0732,
+   "method": "difference"
+  },
+  {
+   "larger": "deu-rhine-province",
+   "smaller": "deu-palatinate",
+   "removedSqDeg": 0.1741,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-florida",
+   "smaller": "am-usa-alabama",
+   "removedSqDeg": 0,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-texas",
+   "smaller": "am-usa-arkansas",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-california",
+   "smaller": "am-usa-arizona-territory",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-nevada",
+   "smaller": "am-usa-arizona-territory",
+   "removedSqDeg": 0.0038,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-colorado",
+   "smaller": "am-usa-kansas",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-pennsylvania",
+   "smaller": "am-usa-delaware",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-wisconsin",
+   "smaller": "am-usa-iowa",
+   "removedSqDeg": 0.0038,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-oregon",
+   "smaller": "am-usa-idaho",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-ohio",
+   "smaller": "am-usa-kentucky",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-mississippi",
+   "smaller": "am-usa-louisiana",
+   "removedSqDeg": 0.0046,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-minnesota",
+   "smaller": "am-usa-wisconsin",
+   "removedSqDeg": 0.0063,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-missouri",
+   "smaller": "am-usa-tennessee",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-montana",
+   "smaller": "am-usa-north-dakota",
+   "removedSqDeg": 0.0059,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-montana",
+   "smaller": "am-usa-south-dakota",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-north-carolina",
+   "smaller": "am-usa-tennessee",
+   "removedSqDeg": 0.0005,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-south-dakota",
+   "smaller": "am-usa-nebraska",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-vermont",
+   "smaller": "am-usa-new-hampshire",
+   "removedSqDeg": 0.0051,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-pennsylvania",
+   "smaller": "am-usa-new-jersey",
+   "removedSqDeg": 0.0055,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-oregon",
+   "smaller": "am-usa-washington",
+   "removedSqDeg": 0.0123,
+   "method": "difference"
+  },
+  {
+   "larger": "am-usa-virginia",
+   "smaller": "am-usa-west-virginia",
+   "removedSqDeg": 0.0153,
+   "method": "difference"
+  },
+  {
+   "larger": "am-can-quebec",
+   "smaller": "am-can-ontario",
+   "removedSqDeg": 0.0083,
+   "method": "difference"
+  },
+  {
+   "larger": "am-can-ontario",
+   "smaller": "am-can-manitoba",
+   "removedSqDeg": 0.0267,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-can-residual",
+   "smaller": "am-can-quebec",
+   "removedSqDeg": 0.004,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-can-residual",
+   "smaller": "am-can-british-columbia",
+   "removedSqDeg": 0.1008,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-can-residual",
+   "smaller": "am-can-northwest-territories",
+   "removedSqDeg": 0.0452,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-campeche",
+   "smaller": "am-mex-tabasco",
+   "removedSqDeg": 0.0045,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-chihuahua",
+   "smaller": "am-mex-durango",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-colima",
+   "smaller": "oc-mex-revillagigedo-islands",
+   "removedSqDeg": 0.011,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-durango",
+   "smaller": "am-mex-sinaloa",
+   "removedSqDeg": 0.0063,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-michoacan",
+   "smaller": "am-mex-guanajuato",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-guanajuato",
+   "smaller": "am-mex-queretaro",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-oaxaca",
+   "smaller": "am-mex-veracruz",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "am-mex-tamaulipas",
+   "smaller": "am-mex-san-luis-potosi",
+   "removedSqDeg": 0.005,
+   "method": "difference"
+  },
+  {
+   "larger": "am-gua-quiche",
+   "smaller": "am-gua-chimaltenango",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "am-gua-san-marcos",
+   "smaller": "am-gua-quezaltenango",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "am-hon-olancho",
+   "smaller": "am-hon-yoro",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  },
+  {
+   "larger": "am-sal-usulutan",
+   "smaller": "am-sal-san-vicente",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "am-nic-boaco",
+   "smaller": "am-nic-managua",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "am-cos-guanacaste",
+   "smaller": "am-cos-alajuela",
+   "removedSqDeg": 0.0005,
+   "method": "difference"
+  },
+  {
+   "larger": "am-cos-san-jose",
+   "smaller": "am-cos-heredia",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bwi-blz-cayo",
+   "smaller": "am-bwi-blz-belize",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pan-panama",
+   "smaller": "am-pan-colon",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-amazonas",
+   "smaller": "am-col-caqueta",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-antioquia",
+   "smaller": "am-col-choco",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-casanare",
+   "smaller": "am-col-arauca",
+   "removedSqDeg": 0.006,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-bolivar",
+   "smaller": "am-col-cesar",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-bogota",
+   "smaller": "am-col-caldas",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-caldas",
+   "smaller": "am-col-risaralda",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-caqueta",
+   "smaller": "am-col-guaviare",
+   "removedSqDeg": 0.0031,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-meta",
+   "smaller": "am-col-casanare",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-guainia",
+   "smaller": "am-col-guaviare",
+   "removedSqDeg": 0.0032,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-meta",
+   "smaller": "am-col-guaviare",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-meta",
+   "smaller": "am-col-huila",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-tolima",
+   "smaller": "am-col-huila",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-narino",
+   "smaller": "am-col-putumayo",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "am-col-tolima",
+   "smaller": "am-col-valle-del-cauca",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-vargas",
+   "smaller": "am-ven-distrito-capital",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-guarico",
+   "smaller": "am-ven-anzoategui",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-apure",
+   "smaller": "am-ven-barinas",
+   "removedSqDeg": 0.0049,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-barinas",
+   "smaller": "am-ven-portuguesa",
+   "removedSqDeg": 0.0035,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-barinas",
+   "smaller": "am-ven-tachira",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-bolivar",
+   "smaller": "am-ven-delta-amacuro",
+   "removedSqDeg": 0.0037,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ven-guarico",
+   "smaller": "am-ven-miranda",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-los-rios",
+   "smaller": "am-ecu-bolivar",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-orellana",
+   "smaller": "am-ecu-sucumbios",
+   "removedSqDeg": 0.0021,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-esmeraldas",
+   "smaller": "am-ecu-imbabura",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-esmeraldas",
+   "smaller": "am-ecu-pichincha",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-manabi",
+   "smaller": "am-ecu-guayas",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-pichincha",
+   "smaller": "am-ecu-imbabura",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-pichincha",
+   "smaller": "am-ecu-cotopaxi",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ecu-pastaza",
+   "smaller": "am-ecu-morona-santiago",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-loreto",
+   "smaller": "am-pru-amazonas",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-san-martin",
+   "smaller": "am-pru-amazonas",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-arequipa",
+   "smaller": "am-pru-ayacucho",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-cusco",
+   "smaller": "am-pru-arequipa",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-ayacucho",
+   "smaller": "am-pru-huancavelica",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-cajamarca",
+   "smaller": "am-pru-lambayeque",
+   "removedSqDeg": 0.0031,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-cusco",
+   "smaller": "am-pru-junin",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-madre-de-dios",
+   "smaller": "am-pru-cusco",
+   "removedSqDeg": 0.0081,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-san-martin",
+   "smaller": "am-pru-la-libertad",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pru-ucayali",
+   "smaller": "am-pru-pasco",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bol-potosi",
+   "smaller": "am-bol-chuquisaca",
+   "removedSqDeg": 0.0094,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bol-santa-cruz",
+   "smaller": "am-bol-chuquisaca",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bol-la-paz",
+   "smaller": "am-bol-pando",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bol-potosi",
+   "smaller": "am-bol-tarija",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "am-chl-los-lagos",
+   "smaller": "am-chl-los-rios",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "am-chl-valparaiso",
+   "smaller": "am-chl-region-metropolitana-de-santiago",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "am-chl-valparaiso",
+   "smaller": "oc-chl-easter-island",
+   "removedSqDeg": 0.0101,
+   "method": "difference"
+  },
+  {
+   "larger": "am-chl-valparaiso",
+   "smaller": "oc-chl-juan-fernandez-islands",
+   "removedSqDeg": 0.008,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-salta",
+   "smaller": "am-arg-jujuy",
+   "removedSqDeg": 0.0102,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-buenos-aires",
+   "smaller": "am-arg-cordoba",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-san-juan",
+   "smaller": "am-arg-san-luis",
+   "removedSqDeg": 0.008,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-cordoba",
+   "smaller": "am-arg-san-luis",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-santa-fe",
+   "smaller": "am-arg-entre-rios",
+   "removedSqDeg": 0.0081,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-la-rioja",
+   "smaller": "am-arg-san-juan",
+   "removedSqDeg": 0.0068,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-cordoba",
+   "smaller": "am-arg-la-rioja",
+   "removedSqDeg": 0.0049,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-chaco",
+   "smaller": "am-arg-corrientes",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-arg-residual",
+   "smaller": "am-arg-san-juan",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "am-arg-catamarca",
+   "smaller": "am-arg-tucuman",
+   "removedSqDeg": 0.0049,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-arg-residual",
+   "smaller": "am-arg-catamarca",
+   "removedSqDeg": 0.0011,
+   "method": "per-polygon"
+  },
+  {
+   "larger": "am-arg-cordoba",
+   "smaller": "am-arg-santa-fe",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "am-ury-rocha",
+   "smaller": "am-ury-treinta-y-tres",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pry-paraguari",
+   "smaller": "am-pry-central",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pry-presidente-hayes",
+   "smaller": "am-pry-san-pedro",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "am-pry-paraguari",
+   "smaller": "am-pry-guaira",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-amazonas",
+   "smaller": "am-bra-para",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-para",
+   "smaller": "am-bra-goias",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-paraiba",
+   "smaller": "am-bra-rio-grande-do-norte",
+   "removedSqDeg": 0.0037,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-alagoas",
+   "smaller": "am-bra-sergipe",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-bahia",
+   "smaller": "am-bra-espirito-santo",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-minas-gerais",
+   "smaller": "am-bra-bahia",
+   "removedSqDeg": 0.0118,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-goias",
+   "smaller": "am-bra-bahia",
+   "removedSqDeg": 0.0072,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-minas-gerais",
+   "smaller": "am-bra-rio-de-janeiro",
+   "removedSqDeg": 0.0063,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-minas-gerais",
+   "smaller": "am-bra-sao-paulo",
+   "removedSqDeg": 0.0108,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-mato-grosso",
+   "smaller": "am-bra-goias",
+   "removedSqDeg": 0.005,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bra-mato-grosso",
+   "smaller": "am-bra-parana",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "am-bwi-guy-demerara",
+   "smaller": "am-bwi-guy-essequibo",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-marne",
+   "smaller": "fra-aisne",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "am-hti-sud",
+   "smaller": "am-hti-grand-anse",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "am-grl-north-greenland",
+   "smaller": "am-grl-south-greenland",
+   "removedSqDeg": 0.0052,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-meuse",
+   "smaller": "fra-meurthe-et-moselle",
+   "removedSqDeg": 0.0035,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-alpes-maritimes",
+   "smaller": "mco-monaco",
+   "removedSqDeg": 0.0001,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-pyrenees-atlantiques",
+   "smaller": "fra-hautes-pyrenees",
+   "removedSqDeg": 0.0061,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-haute-garonne",
+   "smaller": "fra-tarn",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-haute-saone",
+   "smaller": "fra-territoire-de-belfort",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-haute-saone",
+   "smaller": "fra-doubs",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-herault",
+   "smaller": "fra-gard",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-gard",
+   "smaller": "fra-vaucluse",
+   "removedSqDeg": 0.0008,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-landes",
+   "smaller": "fra-gers",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-charente-maritime",
+   "smaller": "fra-charente",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-finistere",
+   "smaller": "fra-morbihan",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-cotes-d-armor",
+   "smaller": "fra-finistere",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-cotes-d-armor",
+   "smaller": "fra-ille-et-vilaine",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-pas-de-calais",
+   "smaller": "fra-somme",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-indre",
+   "smaller": "fra-haute-vienne",
+   "removedSqDeg": 0.0011,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-lot",
+   "smaller": "fra-tarn-et-garonne",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-lot-et-garonne",
+   "smaller": "fra-tarn-et-garonne",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-aveyron",
+   "smaller": "fra-tarn",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-drome",
+   "smaller": "fra-vaucluse",
+   "removedSqDeg": 0.0108,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-cher",
+   "smaller": "fra-loir-et-cher",
+   "removedSqDeg": 0.0036,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-loir-et-cher",
+   "smaller": "fra-eure-et-loir",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-orne",
+   "smaller": "fra-sarthe",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-ardeche",
+   "smaller": "fra-haute-loire",
+   "removedSqDeg": 0.0011,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-ardeche",
+   "smaller": "fra-lozere",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-maine-et-loire",
+   "smaller": "fra-vienne",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-cote-d-or",
+   "smaller": "fra-aube",
+   "removedSqDeg": 0.0027,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-orne",
+   "smaller": "fra-eure-et-loir",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-saone-et-loire",
+   "smaller": "fra-nievre",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-seien-et-marne",
+   "smaller": "fra-essonne",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "fra-essonne",
+   "smaller": "fra-val-de-marne",
+   "removedSqDeg": 0.0011,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-aus-residual",
+   "smaller": "oc-aus-tasmania",
+   "removedSqDeg": 0,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-nzl-southland",
+   "smaller": "oc-nzl-west-coast",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-gng-residual",
+   "smaller": "oc-bpo-papua-central",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-bpo-residual",
+   "smaller": "oc-bpo-solomon-central",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-aut-krk-island",
+   "smaller": "oc-aut-cres-and-losinj",
+   "removedSqDeg": 0.0197,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-fin-kymi",
+   "smaller": "rus-fin-uusimaa",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-fin-hame",
+   "smaller": "rus-fin-vaasa",
+   "removedSqDeg": 0.0057,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-saint-petersburg",
+   "smaller": "rus-fin-kymi",
+   "removedSqDeg": 0.0028,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-fin-kuopio",
+   "smaller": "rus-fin-mikkeli",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-fin-lapland",
+   "smaller": "rus-fin-oulu",
+   "removedSqDeg": 0.0058,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-pskov",
+   "smaller": "rus-est-tartu",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-lva-riga",
+   "smaller": "rus-lva-zemgale",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-lva-riga",
+   "smaller": "rus-ltu-panevezys",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ltu-kaunas",
+   "smaller": "rus-ltu-panevezys",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ltu-kaunas",
+   "smaller": "rus-ltu-marijampole",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-pol-warsaw",
+   "smaller": "rus-pol-siedlce",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-pol-odz",
+   "smaller": "rus-pol-kalisz",
+   "removedSqDeg": 0.0022,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-blr-brest",
+   "smaller": "rus-blr-grodno",
+   "removedSqDeg": 0.0097,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-bryansk",
+   "smaller": "rus-blr-mogilev",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-kiev",
+   "smaller": "rus-blr-gomel",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-yekaterinoslav",
+   "smaller": "rus-ukr-kherson",
+   "removedSqDeg": 0.0059,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-kharkov",
+   "smaller": "rus-bryansk",
+   "removedSqDeg": 0.0066,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-kharkov",
+   "smaller": "rus-kursk",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-kharkov",
+   "smaller": "rus-belgorod",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-poltava",
+   "smaller": "rus-ukr-chernigov",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ukr-odessa",
+   "smaller": "rus-mda-kishinev",
+   "removedSqDeg": 0.0064,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-mda-kishinev",
+   "smaller": "rus-mda-bender",
+   "removedSqDeg": 0.004,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-mda-kishinev",
+   "smaller": "rus-mda-izmail",
+   "removedSqDeg": 0.0274,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-tver",
+   "smaller": "rus-moscow",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-saint-petersburg",
+   "smaller": "rus-pskov",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-tver",
+   "smaller": "rus-smolensk",
+   "removedSqDeg": 0.0013,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-smolensk",
+   "smaller": "rus-bryansk",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-kostroma",
+   "smaller": "rus-yaroslavl",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-vyatka",
+   "smaller": "rus-kostroma",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ryazan",
+   "smaller": "rus-mordovia",
+   "removedSqDeg": 0.007,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-tula",
+   "smaller": "rus-orel",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-kursk",
+   "smaller": "rus-belgorod",
+   "removedSqDeg": 0.0004,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-voronezh",
+   "smaller": "rus-tambov",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uralsk",
+   "smaller": "rus-tsaritsyn",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "rus-tsaritsyn",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-tsaritsyn",
+   "smaller": "rus-saratov",
+   "removedSqDeg": 0.0061,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-turgai",
+   "smaller": "rus-kurgan",
+   "removedSqDeg": 0.0014,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-yekaterinburg",
+   "smaller": "rus-kurgan",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-saratov",
+   "smaller": "rus-penza",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uralsk",
+   "smaller": "rus-saratov",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-saratov",
+   "smaller": "rus-simbirsk",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-kazan",
+   "smaller": "rus-samara",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-orenburg",
+   "smaller": "rus-samara",
+   "removedSqDeg": 0.0015,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "rus-kazan",
+   "removedSqDeg": 0.0003,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "rus-chuvash",
+   "removedSqDeg": 0.0001,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-vyatka",
+   "smaller": "rus-mari-el",
+   "removedSqDeg": 0.0029,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-vyatka",
+   "smaller": "rus-udmurt",
+   "removedSqDeg": 0.0018,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-yekaterinburg",
+   "smaller": "rus-perm",
+   "removedSqDeg": 0.0033,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-arkhangelsk",
+   "smaller": "rus-vologda",
+   "removedSqDeg": 0.0055,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "rus-arkhangelsk",
+   "removedSqDeg": 0.0674,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-arkhangelsk",
+   "smaller": "rus-olonets",
+   "removedSqDeg": 0.0026,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-arkhangelsk",
+   "smaller": "rus-ust-sysolsk",
+   "removedSqDeg": 0.0059,
+   "method": "difference"
+  },
+  {
+   "larger": "oc-gap-rus-residual",
+   "smaller": "rus-olonets",
+   "removedSqDeg": 0.0007,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-uralsk",
+   "smaller": "rus-orenburg",
+   "removedSqDeg": 0.0048,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-yekaterinburg",
+   "smaller": "rus-ufa",
+   "removedSqDeg": 0.0011,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-ufa",
+   "smaller": "rus-chelyabinsk",
+   "removedSqDeg": 0.0052,
+   "method": "difference"
+  },
+  {
+   "larger": "as-rus-turgai",
+   "smaller": "rus-chelyabinsk",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-don",
+   "smaller": "rus-kalmykia",
+   "removedSqDeg": 0.0034,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-kuban",
+   "smaller": "rus-stavropol",
+   "removedSqDeg": 0.0048,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-dagestan",
+   "smaller": "as-rus-baku",
+   "removedSqDeg": 0.0006,
+   "method": "difference"
+  },
+  {
+   "larger": "rus-dagestan",
+   "smaller": "as-rus-elisavetpol",
+   "removedSqDeg": 0.0038,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-bohemia",
+   "smaller": "aut-lower-austria",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-lower-austria",
+   "smaller": "aut-svk-pressburg",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-carinthia",
+   "smaller": "aut-lower-styria",
+   "removedSqDeg": 0.0131,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-western-galicia",
+   "smaller": "aut-svk-eperjes",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-eastern-galicia",
+   "smaller": "aut-tarnopol",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-eastern-galicia",
+   "smaller": "aut-partium",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "ita-piedmont",
+   "smaller": "ita-aosta",
+   "removedSqDeg": 0.0021,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-carniola",
+   "smaller": "aut-istria",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-croatia-proper",
+   "smaller": "aut-lower-styria",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-herzegovina",
+   "smaller": "aut-bosnia",
+   "removedSqDeg": 0.0047,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-croatia-proper",
+   "smaller": "aut-bosnia",
+   "removedSqDeg": 0.0021,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-hun-transdanubia",
+   "smaller": "aut-slavonia",
+   "removedSqDeg": 0.0023,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-hun-transdanubia",
+   "smaller": "aut-burgenland",
+   "removedSqDeg": 0.0008,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-hun-great-hungarian-plain",
+   "smaller": "aut-hun-northern-hungary",
+   "removedSqDeg": 0.0295,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-transylvania",
+   "smaller": "aut-hun-great-hungarian-plain",
+   "removedSqDeg": 0.003,
+   "method": "difference"
+  },
+  {
+   "larger": "ita-emilia-romagna",
+   "smaller": "ita-liguria",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-svk-eperjes",
+   "smaller": "aut-svk-turoc",
+   "removedSqDeg": 0.0002,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-transylvania",
+   "smaller": "aut-partium",
+   "removedSqDeg": 0.0045,
+   "method": "difference"
+  },
+  {
+   "larger": "aut-transylvania",
+   "smaller": "aut-banat",
+   "removedSqDeg": 0.0041,
+   "method": "difference"
+  },
+  {
+   "larger": "ita-emilia-romagna",
+   "smaller": "ita-tuscany",
+   "removedSqDeg": 0.0039,
+   "method": "difference"
+  },
+  {
+   "larger": "ita-emilia-romagna",
+   "smaller": "ita-marche",
+   "removedSqDeg": 0.002,
+   "method": "difference"
+  },
+  {
+   "larger": "ita-abruzzo",
+   "smaller": "ita-molise",
+   "removedSqDeg": 0.0017,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-navarra",
+   "smaller": "esp-gipuzkoa",
+   "removedSqDeg": 0.0016,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-zaragoza",
+   "smaller": "esp-navarra",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-badajoz",
+   "smaller": "esp-caceres",
+   "removedSqDeg": 0.0025,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-sevilla",
+   "smaller": "esp-cadiz",
+   "removedSqDeg": 0.0009,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-salamanca",
+   "smaller": "esp-avila",
+   "removedSqDeg": 0.0024,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-leon",
+   "smaller": "esp-zamora",
+   "removedSqDeg": 0.0044,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-albacete",
+   "smaller": "esp-murcia",
+   "removedSqDeg": 0.0043,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-granada",
+   "smaller": "esp-almeria",
+   "removedSqDeg": 0.0021,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-palencia",
+   "smaller": "esp-cantabria",
+   "removedSqDeg": 0.0042,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-burgos",
+   "smaller": "esp-alava",
+   "removedSqDeg": 0.0288,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-ciudad-real",
+   "smaller": "esp-toledo",
+   "removedSqDeg": 0.005,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-burgos",
+   "smaller": "esp-soria",
+   "removedSqDeg": 0.0031,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-guadalajara",
+   "smaller": "esp-soria",
+   "removedSqDeg": 0.001,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-burgos",
+   "smaller": "esp-palencia",
+   "removedSqDeg": 0.005,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-burgos",
+   "smaller": "esp-valladolid",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  },
+  {
+   "larger": "esp-ciudad-real",
+   "smaller": "esp-cordoba",
+   "removedSqDeg": 0.0005,
+   "method": "difference"
+  },
+  {
+   "larger": "prt-evora",
+   "smaller": "prt-portalegre",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "prt-castelo-branco",
+   "smaller": "prt-coimbra",
+   "removedSqDeg": 0.0019,
+   "method": "difference"
+  },
+  {
+   "larger": "nld-noord-holland",
+   "smaller": "nld-utrecht",
+   "removedSqDeg": 0.0012,
+   "method": "difference"
+  }
+ ]
+}

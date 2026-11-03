@@ -25,7 +25,7 @@ import { tick } from "@century/sim";
 describe("M2.1 population state and validation", () => {
   test("creates the aggregate world with single-year sex state and a household account", () => {
     const { world } = aggregateWorld();
-    expect(world.regions).toHaveLength(1);
+    expect(world.provinceEconomies).toHaveLength(1);
     expect(world.popBlocks).toHaveLength(1);
     expect(world.finance.accounts).toHaveLength(4);
     const block = world.popBlocks[0]!;
@@ -55,12 +55,12 @@ describe("M2.1 population state and validation", () => {
     expect(combined.reduce((total, value) => total + value, 0)).toBe(populationTotal(block));
   });
 
-  test("creates the multi-block fixture with one shared region", () => {
+  test("creates the multi-block fixture with one shared province", () => {
     const scenario = multiBlockScenario();
     const world = createPopulationWorld(scenario);
-    expect(world.regions).toHaveLength(1);
+    expect(world.provinceEconomies).toHaveLength(1);
     expect(world.popBlocks).toHaveLength(3);
-    expect(world.regions[0]?.popBlockIds).toEqual([0, 1, 2]);
+    expect(world.provinceEconomies[0]?.popBlockIds).toEqual([0, 1, 2]);
     expect(world.finance.accounts).toHaveLength(12);
     expect(worldPopulation(world)).toBe(1_000_000);
     expect(() => assertValidWorld(world)).not.toThrow();

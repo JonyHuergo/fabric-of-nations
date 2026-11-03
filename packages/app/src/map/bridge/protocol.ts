@@ -14,15 +14,37 @@ import { ERA_ORDER, type EraId } from "../../design/tokens";
 import type { ReservedBox } from "../labels";
 import type { MapModeId } from "../mapModes";
 
-export const MAP_PROTOCOL_VERSION = 1;
+/** 2: P2 province lens values in every state change. */
+export const MAP_PROTOCOL_VERSION = 2;
 
-export const MAP_LENS_IDS: readonly MapModeId[] = ["political", "control", "markets"];
+export const MAP_LENS_IDS: readonly MapModeId[] = [
+  "political",
+  "control",
+  "markets",
+  "density",
+  "urban",
+  "literacy",
+  "unrest",
+];
 
 /** Fastest backdrop rotation the runtime accepts, in degrees of longitude per second. */
 export const MAX_DRIFT_DEGREES_PER_SECOND = 30;
 
-/** [province index, owner tag, controller tag, unit tag, market id] */
-export type ProvinceStateChange = readonly [number, string, string, string, number | null];
+/**
+ * [province index, owner tag, controller tag, unit tag, market id, density per km²,
+ * urban share, literacy, unrest]; the four lens values are null without data.
+ */
+export type ProvinceStateChange = readonly [
+  number,
+  string,
+  string,
+  string,
+  number | null,
+  number | null,
+  number | null,
+  number | null,
+  number | null,
+];
 
 export type MapCommand =
   | { readonly type: "set-theme"; readonly eraId: EraId; readonly immediate: boolean }
@@ -96,12 +118,13 @@ function isReservedBox(value: unknown): value is ReservedBox {
 function isStateChange(value: unknown): value is ProvinceStateChange {
   return (
     Array.isArray(value) &&
-    value.length === 5 &&
+    value.length === 9 &&
     isIndex(value[0]) &&
     typeof value[1] === "string" &&
     typeof value[2] === "string" &&
     typeof value[3] === "string" &&
-    (value[4] === null || isIndex(value[4]))
+    (value[4] === null || isIndex(value[4])) &&
+    [value[5], value[6], value[7], value[8]].every((entry) => entry === null || isFiniteNumber(entry))
   );
 }
 

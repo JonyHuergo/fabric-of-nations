@@ -12,7 +12,6 @@
 import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import type { NeedTierDef } from "../population/types.js";
-import { drawUint32 } from "../rng.js";
 import type { DayIndex } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
@@ -32,12 +31,17 @@ import {
   type ProductionPhaseResult,
 } from "./production.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
+import { marketProvinceIds } from "./country.js";
 
 export const M3_MARKET_TIERS = [1, 2, 3, 5, 6] as const;
 export type MarketTier = (typeof M3_MARKET_TIERS)[number];
 export type HouseholdTier = 1 | 3 | 6;
 export type ProductionInputTier = 2 | 5;
 
+/**
+ * Purpose ids of the retired keyed residual tie-break (D-133: sequential pairing
+ * needs no draw). Kept so older documentation and audits resolve the names.
+ */
 export const M3_MARKET_HOUSEHOLD_RESIDUAL_PURPOSE = "market.household-residual";
 export const M3_MARKET_BUILDING_RESIDUAL_PURPOSE = "market.building-residual";
 
@@ -246,7 +250,8 @@ function validateMarketDayInput(
   readonly blockIds: Set<number>;
 } {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }
@@ -264,7 +269,7 @@ function validateMarketDayInput(
   if (market.priceRUSD.length !== definitions.goods.length) {
     throw new RangeError("market price array does not match the goods definitions");
   }
-  const marketRegionIds = new Set(market.regionIds);
+  const marketProvinceIdSet = new Set(marketProvinceIds(world, market.id));
   const goodIds = new Set(definitions.goods.map((good) => good.id));
   const blockIds = new Set(world.popBlocks.map((block) => block.id));
   const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
@@ -279,7 +284,7 @@ function validateMarketDayInput(
       throw new RangeError(`${path}.popBlockId references an unknown pop block`);
     }
     const block = blockById.get(demand.popBlockId);
-    if (block !== undefined && !marketRegionIds.has(block.regionId)) {
+    if (block !== undefined && !marketProvinceIdSet.has(block.provinceId)) {
       throw new RangeError(`${path}.popBlockId is outside market ${String(market.id)}`);
     }
     if (!isHouseholdTier(demand.tier)) {
@@ -305,7 +310,7 @@ function validateMarketDayInput(
     if (building === undefined) {
       throw new RangeError(`${path}.buyerBuildingId references an unknown building`);
     }
-    if (!marketRegionIds.has(building.regionId)) {
+    if (!marketProvinceIdSet.has(building.provinceId)) {
       throw new RangeError(`${path}.buyerBuildingId is outside market ${String(market.id)}`);
     }
     if (!building.operational) {
@@ -341,68 +346,52 @@ function validateMarketDayInput(
   return { marketId: market.id, criticalGoods, buildingById, blockIds };
 }
 
-function householdTierMet(
-  demands: readonly DemandState[],
-  popBlockId: number,
-  tier: HouseholdTier,
-): boolean {
-  let desired = 0;
-  let fulfilled = 0;
+interface HouseholdTierTotals {
+  desired1: number;
+  fulfilled1: number;
+  desired3: number;
+  fulfilled3: number;
+}
+
+/**
+ * Desired and fulfilled household quantities of tiers 1 and 3 per pop block, summed
+ * in demand order. Computed once per eligibility pass instead of rescanning every
+ * demand for every demand (P2 scale).
+ */
+function householdTierTotals(demands: readonly DemandState[]): Map<number, HouseholdTierTotals> {
+  const totals = new Map<number, HouseholdTierTotals>();
   for (const demand of demands) {
-    if (demand.kind !== "household" || demand.buyerId !== popBlockId || demand.tier !== tier) {
-      continue;
+    if (demand.kind !== "household" || (demand.tier !== 1 && demand.tier !== 3)) continue;
+    let entry = totals.get(demand.buyerId);
+    if (entry === undefined) {
+      entry = { desired1: 0, fulfilled1: 0, desired3: 0, fulfilled3: 0 };
+      totals.set(demand.buyerId, entry);
     }
-    desired += demand.desired;
-    fulfilled += demand.fulfilled;
+    if (demand.tier === 1) {
+      entry.desired1 += demand.desired;
+      entry.fulfilled1 += demand.fulfilled;
+    } else {
+      entry.desired3 += demand.desired;
+      entry.fulfilled3 += demand.fulfilled;
+    }
   }
+  return totals;
+}
+
+function tierMet(desired: number, fulfilled: number): boolean {
   return desired <= tolerance(desired) || fulfilled >= desired - tolerance(desired, fulfilled);
 }
 
 function householdTierEligible(
-  demands: readonly DemandState[],
+  totals: ReadonlyMap<number, HouseholdTierTotals>,
   demand: DemandState,
 ): boolean {
   if (demand.kind !== "household") return true;
-  const popBlockId = demand.buyerId;
   if (demand.tier === 1) return true;
-  if (!householdTierMet(demands, popBlockId, 1)) return false;
+  const entry = totals.get(demand.buyerId);
+  if (entry !== undefined && !tierMet(entry.desired1, entry.fulfilled1)) return false;
   if (demand.tier === 3) return true;
-  return householdTierMet(demands, popBlockId, 3);
-}
-
-function residualOrder(
-  world: World,
-  dayIndex: DayIndex,
-  demands: readonly DemandAllocation[],
-): number[] {
-  const indexes = demands.map((_demand, index) => index);
-  indexes.sort((left, right) => {
-    const leftDemand = demands[left]?.demand;
-    const rightDemand = demands[right]?.demand;
-    if (leftDemand === undefined || rightDemand === undefined) return left - right;
-    const leftKey = drawUint32({
-      seed: world.seed,
-      day: dayIndex,
-      entityId: leftDemand.buyerId,
-      purpose:
-        leftDemand.kind === "household"
-          ? M3_MARKET_HOUSEHOLD_RESIDUAL_PURPOSE
-          : M3_MARKET_BUILDING_RESIDUAL_PURPOSE,
-      drawIndex: 0,
-    });
-    const rightKey = drawUint32({
-      seed: world.seed,
-      day: dayIndex,
-      entityId: rightDemand.buyerId,
-      purpose:
-        rightDemand.kind === "household"
-          ? M3_MARKET_HOUSEHOLD_RESIDUAL_PURPOSE
-          : M3_MARKET_BUILDING_RESIDUAL_PURPOSE,
-      drawIndex: 0,
-    });
-    return leftKey - rightKey || leftDemand.buyerId - rightDemand.buyerId;
-  });
-  return indexes;
+  return entry === undefined || tierMet(entry.desired3, entry.fulfilled3);
 }
 
 /**
@@ -411,15 +400,22 @@ function residualOrder(
  * reservations/remaining lots.
  */
 function allocateTierGood(
-  world: World,
-  dayIndex: DayIndex,
   demands: readonly DemandAllocation[],
   goodId: number,
   remainingByLot: Map<string, number>,
   reservations: MarketReservation[],
   phase: "A" | "B",
 ): { readonly totalFunded: number; readonly fulfilled: number } {
-  const relevant = demands.filter((demand) => demand.demand.goodId === goodId && demand.funded > 0);
+  // Canonical buyer order (households before buildings, then id and tier), so the
+  // sequential pairing below never depends on the order demands arrive in (D-133).
+  const relevant = demands
+    .filter((demand) => demand.demand.goodId === goodId && demand.funded > 0)
+    .sort(
+      (left, right) =>
+        Number(left.demand.kind === "building") - Number(right.demand.kind === "building") ||
+        left.demand.buyerId - right.demand.buyerId ||
+        left.demand.tier - right.demand.tier,
+    );
   let totalFunded = 0;
   for (const demand of relevant) totalFunded += demand.funded;
   if (totalFunded <= tolerance(totalFunded)) {
@@ -447,60 +443,77 @@ function allocateTierGood(
     throw new RangeError(`market allocation planned quantity does not reconcile for good ${String(goodId)}`);
   }
 
-  const order = residualOrder(world, dayIndex, relevant);
-  let actualFulfilled = 0;
+  // D-133 sequential pairing. Every lot sells its pro-rata share of the fulfilled
+  // quantity and every buyer receives its planned quantity, exactly as before; the
+  // pairs are formed by walking lots (ascending seller id) and buyers (demand
+  // order) together, so a day creates at most lots + buyers reservations instead of
+  // lots x buyers. Per-account payments and per-lot sales are unchanged because the
+  // aggregated postings (D-125) sum per account.
+  // Pairs are the overlaps of the cumulative lot intervals and the cumulative buyer
+  // intervals on [0, fulfilledTotal], so each lot and each buyer total telescopes
+  // to its share without any tolerance-based skipping.
+  const lotEnd: number[] = [];
+  let cumulative = 0;
   for (const lot of lots) {
-    const lotReserved = (lot.quantity / available) * fulfilledTotal;
-    const allocations = planned.map((quantity) => (lotReserved * quantity) / plannedTotal);
-    let allocated = 0;
-    for (const quantity of allocations) allocated += quantity;
-    let residual = lotReserved - allocated;
-    if (Math.abs(residual) > tolerance(lotReserved, allocated)) {
-      throw new RangeError(`market lot allocation does not reconcile for seller lot ${lot.key}`);
-    }
-    for (let attempt = 0; attempt < order.length && Math.abs(residual) > tolerance(residual); attempt += 1) {
-      const index = order[attempt];
-      if (index === undefined) break;
-      const current = allocations[index] ?? 0;
-      if (residual > 0) {
-        allocations[index] = current + residual;
-        residual = 0;
-      } else if (current >= -residual) {
-        allocations[index] = current + residual;
-        residual = 0;
+    cumulative += (lot.quantity / available) * fulfilledTotal;
+    lotEnd.push(cumulative);
+  }
+  lotEnd[lotEnd.length - 1] = fulfilledTotal;
+  const buyerEnd: number[] = [];
+  cumulative = 0;
+  for (const quantity of planned) {
+    cumulative += quantity;
+    buyerEnd.push(cumulative);
+  }
+  if (buyerEnd.length > 0) buyerEnd[buyerEnd.length - 1] = fulfilledTotal;
+  const reservedByLot = new Array<number>(lots.length).fill(0);
+  let buyerIndex = 0;
+  let actualFulfilled = 0;
+  let lotStart = 0;
+  for (let lotIndex = 0; lotIndex < lots.length; lotIndex += 1) {
+    const lot = lots[lotIndex];
+    if (lot === undefined) continue;
+    const lotStop = lotEnd[lotIndex] ?? lotStart;
+    while (buyerIndex < relevant.length) {
+      const buyerStart = buyerIndex === 0 ? 0 : (buyerEnd[buyerIndex - 1] ?? 0);
+      const buyerStop = buyerEnd[buyerIndex] ?? buyerStart;
+      const quantity = Math.min(lotStop, buyerStop) - Math.max(lotStart, buyerStart);
+      if (quantity > 0) {
+        const demand = relevant[buyerIndex];
+        if (demand === undefined) throw new RangeError("missing allocation demand");
+        demand.demand.fulfilled += quantity;
+        if (phase === "A") demand.demand.passAFulfilled += quantity;
+        else demand.demand.passBFulfilled += quantity;
+        reservations.push({
+          buyerKind: demand.demand.kind,
+          buyerId: demand.demand.buyerId,
+          tier: demand.demand.tier,
+          goodId,
+          sellerBuildingId: lot.sellerBuildingId,
+          quantity,
+          phase,
+        });
+        reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
       }
+      if (buyerStop <= lotStop) buyerIndex += 1;
+      else break;
     }
-    if (Math.abs(residual) > tolerance(residual)) {
-      throw new RangeError(`market residual allocation failed for seller lot ${lot.key}`);
-    }
-
-    let reservedFromLot = 0;
-    for (let index = 0; index < relevant.length; index += 1) {
-      const quantity = allocations[index] ?? 0;
-      if (!(quantity > 0)) continue;
-      const demand = relevant[index];
-      if (demand === undefined) throw new RangeError("missing allocation demand");
-      demand.demand.fulfilled += quantity;
-      if (phase === "A") demand.demand.passAFulfilled += quantity;
-      else demand.demand.passBFulfilled += quantity;
-      reservations.push({
-        buyerKind: demand.demand.kind,
-        buyerId: demand.demand.buyerId,
-        tier: demand.demand.tier,
-        goodId,
-        sellerBuildingId: lot.sellerBuildingId,
-        quantity,
-        phase,
-      });
-      reservedFromLot += quantity;
-    }
+    lotStart = lotStop;
+  }
+  for (let lotIndex = 0; lotIndex < lots.length; lotIndex += 1) {
+    const lot = lots[lotIndex];
+    if (lot === undefined) continue;
+    const reservedFromLot = reservedByLot[lotIndex] ?? 0;
     actualFulfilled += reservedFromLot;
     const remaining = lot.quantity - reservedFromLot;
     if (remaining < -tolerance(lot.quantity, reservedFromLot)) {
       throw new RangeError(`market reservation exceeds seller lot ${lot.key}`);
     }
-    if (remaining <= 0) remainingByLot.delete(lot.key);
+    if (remaining <= tolerance(lot.quantity, reservedFromLot)) remainingByLot.delete(lot.key);
     else remainingByLot.set(lot.key, remaining);
+  }
+  if (Math.abs(actualFulfilled - fulfilledTotal) > tolerance(actualFulfilled, fulfilledTotal)) {
+    throw new RangeError(`market allocation does not reconcile for good ${String(goodId)}`);
   }
 
   return { totalFunded, fulfilled: actualFulfilled };
@@ -625,8 +638,9 @@ export function runMarketDay(
   try {
     for (const tier of M3_MARKET_TIERS) {
       const tierDemands = demands.filter((demand) => demand.tier === tier);
+      const tierTotals = householdTierTotals(demands);
       for (const demand of tierDemands) {
-        demand.eligible = householdTierEligible(demands, demand);
+        demand.eligible = householdTierEligible(tierTotals, demand);
         if (demand.eligible) {
           priceFundedByGood[demand.goodId] =
             (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
@@ -638,8 +652,6 @@ export function runMarketDay(
           (demand) => demand.goodId === goodId && demand.eligible && demand.funded > 0,
         );
         const allocation = allocateTierGood(
-          world,
-          input.dayIndex,
           goodDemands.map((demand) => ({ demand, funded: demand.funded })),
           goodId,
           remainingByLot,
@@ -720,10 +732,11 @@ export function runMarketDay(
       // tier from same-day production, so recompute eligibility after each
       // completed tier and include newly unlocked funded demand in the price
       // signal (it was excluded from the Pass-A signal).
+      const tierTotals = householdTierTotals(demands);
       for (const demand of demands) {
         if (demand.kind !== "household" || demand.tier !== tier) continue;
         const wasEligible = demand.eligible;
-        demand.eligible = householdTierEligible(demands, demand);
+        demand.eligible = householdTierEligible(tierTotals, demand);
         if (!wasEligible && demand.eligible) {
           priceFundedByGood[demand.goodId] =
             (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
@@ -747,8 +760,6 @@ export function runMarketDay(
         }
         const goodDemands = tierDemands.filter((demand) => demand.goodId === goodId);
         const allocation = allocateTierGood(
-          world,
-          input.dayIndex,
           goodDemands.map((demand) => ({
             demand,
             funded: demand.funded - demand.passAFulfilled,

@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "purpose": "Sourced 1900 population totals for provinces that HYDE 3.3 leaves empty. Each group total is split over its provinces by land area in the P2 scenario builder.",
+    "decision": "D-129",
+    "sourceIds": [
+      "p2-population-review-1900"
+    ]
+  },
+  "groups": [
+    {
+      "label": "Caroline Islands",
+      "population": 36000,
+      "provinceKeys": [
+        "oc-gpn-caroline-kosrae",
+        "oc-gpn-caroline-pohnpei",
+        "oc-gpn-caroline-chuuk",
+        "oc-gpn-caroline-yap"
+      ]
+    },
+    {
+      "label": "Marshall Islands",
+      "population": 15000,
+      "provinceKeys": [
+        "oc-gpn-marshall-ratak-chain",
+        "oc-gpn-marshall-ralik-chain"
+      ]
+    },
+    {
+      "label": "Palau",
+      "population": 4000,
+      "provinceKeys": [
+        "oc-gpn-palau"
+      ]
+    },
+    {
+      "label": "German Northern Marianas",
+      "population": 2000,
+      "provinceKeys": [
+        "oc-gpn-northern-marianas-northern-islands",
+        "oc-gpn-northern-marianas-saipan",
+        "oc-gpn-northern-marianas-tinian",
+        "oc-gpn-northern-marianas-rota"
+      ]
+    },
+    {
+      "label": "Nauru",
+      "population": 1500,
+      "provinceKeys": [
+        "oc-gpn-nauru"
+      ]
+    },
+    {
+      "label": "Guam",
+      "population": 9676,
+      "provinceKeys": [
+        "oc-gum-guam"
+      ]
+    },
+    {
+      "label": "Monaco",
+      "population": 15000,
+      "provinceKeys": [
+        "mco-monaco"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,7 @@ import {
   runEconomicDay,
   type EconomyDayResult,
 } from "./economy/day.js";
+import { assertDailyWorldInvariants } from "./integrity.js";
 import type {
   PopulationDefinitions,
   PopulationInputs,
@@ -150,6 +151,9 @@ function runPopulationDay(
  * a population context is supplied. No hidden state or wall-clock dependency.
  */
 export function tick(world: World, context?: TickContext): TickResult {
+  if (context?.integrity === "phase" && isEconomicWorld(world)) {
+    return tickPhaseMode(world, context);
+  }
   assertValidWorldForTick(world);
 
   if (world.dayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX) {
@@ -203,6 +207,62 @@ export function tick(world: World, context?: TickContext): TickResult {
     campaignComplete: isTerminalDayIndex(world.dayIndex),
   };
   return populationResult === undefined ? base : { ...base, population: populationResult };
+}
+
+function isEconomicWorld(world: World): boolean {
+  return world.buildings.length > 0 || world.markets.length > 0;
+}
+
+/**
+ * D-116 phase-mode economic day, run in place.
+ *
+ * The day starts with the cheap daily invariants (the world was fully validated
+ * when its rollback checkpoint was taken or at the previous month end), runs every
+ * phase with its own precondition checks, and ends with the cheap invariants or,
+ * at a civil month end and at the terminal boundary, whole-world validation. On
+ * any error the world is left partly advanced: callers other than
+ * `runTicksWithRollback` must use the default staged mode.
+ */
+export function tickPhaseMode(world: World, context: TickContext): TickResult {
+  assertDailyWorldInvariants(world);
+  if (world.dayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX) {
+    return {
+      advanced: false,
+      dayProcessed: null,
+      dayIndex: world.dayIndex,
+      campaignComplete: true,
+    };
+  }
+  const economy = context.economy;
+  const population = context.population;
+  if (economy === undefined) {
+    throw new RangeError("an economy context is required for an economic world");
+  }
+  if (population === undefined) {
+    throw new RangeError("a population context is required for an economic world");
+  }
+  const processedDay = world.dayIndex;
+  const day = runEconomicDay(
+    world,
+    population.definitions,
+    economy.definitions,
+    processedDay,
+    { validateWorld: false, integrity: "phase" },
+  );
+  world.dayIndex = processedDay + 1;
+  if (lastDayOfMonth(processedDay) || isTerminalDayIndex(world.dayIndex)) {
+    assertValidWorldForTick(world);
+  } else {
+    assertDailyWorldInvariants(world);
+  }
+  return {
+    advanced: true,
+    dayProcessed: processedDay,
+    dayIndex: world.dayIndex,
+    campaignComplete: isTerminalDayIndex(world.dayIndex),
+    population: day.population,
+    economy: day.economy,
+  };
 }
 
 function runUntil(

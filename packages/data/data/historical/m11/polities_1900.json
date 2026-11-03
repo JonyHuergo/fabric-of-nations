@@ -2303,7 +2303,7 @@
         "lat": 13.83,
         "lon": 20.83
       },
-      "population1900": 2000000,
+      "population1900": 1000000,
       "tier": "agrarian",
       "literacy": 0.03,
       "peasantShare": 0.85,
@@ -2318,11 +2318,12 @@
       ],
       "description": "Sahelian sultanate east of Lake Chad, independent until the French conquest of 1909–1911.",
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate.",
+      "notes": "De facto independent with limited international recognition. M11c reconstructs the sultanate's core from modern Chadian regions; the northern Tibesti and southern tributary zones are excluded. M11c.1 uses the user-selected representative flag (white field with black border), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate. P2 review (D-129): Nachtigal's 2.6 million (1870s) covered Wadai with Bagirmi; Britannica records a fall from over 2 million in the 1870s to about 300,000 by 1917, and HYDE 3.3 gives 0.34 million for the modern Ouaddai grid. 1.0 million is a low-confidence midpoint for 1900.",
       "sources": [
         "owid-population",
         "maddison-2023",
-        "project-authored-1900"
+        "project-authored-1900",
+        "p2-population-review-1900"
       ],
       "continent": "Africa"
     },
@@ -2340,7 +2341,7 @@
         "lat": 13.63,
         "lon": 25.35
       },
-      "population1900": 2000000,
+      "population1900": 600000,
       "tier": "agrarian",
       "literacy": 0.05,
       "peasantShare": 0.8,
@@ -2353,11 +2354,12 @@
       ],
       "description": "Independent sultanate in the western Sudan, conquered by Britain only in 1916.",
       "confidence": "low",
-      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate.",
+      "notes": "De facto independent with limited international recognition; the Anglo-Egyptian condominium did not control Darfur in 1900. M11c reconstructs the sultanate from the modern Darfur states as a conservative core. M11c.1 uses the user-selected representative flag (green-red-black triband with white crescent), classified as representative rather than an exact attested historical national flag. Population is a rounded estimate. P2 review (D-129): the Nuttall Encyclopaedia (1907) gives about 500,000 c. 1900, a British government document of the period 'probably under 1,000,000', and HYDE 3.3 0.64 million; 600,000 is a low-confidence estimate between them.",
       "sources": [
         "owid-population",
         "maddison-2023",
-        "project-authored-1900"
+        "project-authored-1900",
+        "p2-population-review-1900"
       ],
       "continent": "Africa"
     },
@@ -3665,7 +3667,7 @@
         "lat": 5.63,
         "lon": 169.64
       },
-      "population1900": 60000,
+      "population1900": 58500,
       "tier": "agrarian",
       "literacy": 0.1,
       "peasantShare": 0.8,
@@ -3679,11 +3681,12 @@
       ],
       "description": "Marshall, Caroline, Palau, Mariana and Nauru possessions.",
       "confidence": "low",
-      "notes": "Grouped for simulation granularity.",
+      "notes": "Grouped for simulation granularity. P2 review (D-129): c. 1900 estimates of the Carolines 36,000, Marshall Islands 15,000, Palau 4,000, German Northern Marianas 2,000 and Nauru 1,500; no German colonial census for 1900 was found.",
       "sources": [
         "owid-population",
         "maddison-2023",
-        "project-authored-1900"
+        "project-authored-1900",
+        "p2-population-review-1900"
       ],
       "continent": "Oceania"
     },
@@ -4185,7 +4188,7 @@
         "lat": 13.47,
         "lon": 144.75
       },
-      "population1900": 12000,
+      "population1900": 9676,
       "tier": "agrarian",
       "literacy": 0.4,
       "peasantShare": 0.55,
@@ -4194,12 +4197,13 @@
         "GUM"
       ],
       "description": "Pacific coaling station ceded by Spain.",
-      "confidence": "low",
-      "notes": "",
+      "confidence": "high",
+      "notes": "P2 review (D-129): United States naval government census of 1901, 9,676 (a later Navy report gives 9,630).",
       "sources": [
         "owid-population",
         "maddison-2023",
-        "project-authored-1900"
+        "project-authored-1900",
+        "p2-population-review-1900"
       ],
       "continent": "Oceania"
     },

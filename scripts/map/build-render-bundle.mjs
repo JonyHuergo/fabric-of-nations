@@ -537,7 +537,13 @@ function loadProvinces() {
     hash.push(sha256(bytes));
     const data = JSON.parse(bytes.toString("utf8"));
     provinces.push(...data.provinces);
-    borders.push(...data.borders);
+  }
+  // P2 border repair: the bundles' precomputed shared lines join matched vertices
+  // that can lie degrees apart along the real seam, which drew straight chords across
+  // provinces. Every province ring is therefore probed edge by edge instead (the
+  // unmatched-edge path below), so a seam always follows a province outline.
+  for (const province of provinces) {
+    borders.push({ a: province.id, b: -1, lines: province.rings, closed: true });
   }
   return { provinces, borders, sourceHash: sha256(hash.join("")) };
 }
@@ -895,6 +901,7 @@ async function build() {
     if (a === undefined) throw new Error(`border references unknown province ${String(border.a)}`);
     for (const line of border.lines) {
       const points = decodeRing(line);
+      if (border.closed === true && points.length > 2) points.push(points[0]);
       if (border.b >= 0) {
         const b = indexById.get(border.b);
         if (b === undefined) throw new Error(`border references unknown province ${String(border.b)}`);
