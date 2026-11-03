@@ -38,7 +38,7 @@ import {
   type WorkerCommand,
   type WorkerEvent,
 } from "./protocol.js";
-import { buildSimulationSnapshot } from "./snapshot.js";
+import { buildSimulationSnapshot, createSnapshotCache, type SnapshotCache } from "./snapshot.js";
 
 const PUMP_INTERVAL_MS = 100;
 const SNAPSHOT_INTERVAL_MS = 100;
@@ -105,6 +105,8 @@ export class SimulationHost {
   private rateWindowTicks = 0;
   private timer: ReturnType<typeof setInterval> | null = null;
   private closed = false;
+  /** Presentation cache for snapshot builds (D-137); never simulation state. */
+  private readonly snapshotCache: SnapshotCache = createSnapshotCache();
 
   public constructor(options: SimulationHostOptions) {
     this.emitEvent = options.emit;
@@ -141,7 +143,7 @@ export class SimulationHost {
       ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
       ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
       ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
-    }, this.scenario.population.definitions);
+    }, this.scenario.population.definitions, this.snapshotCache);
   }
 
   /** Discard pending wall-time debt and reset the achieved-rate window. */
@@ -523,7 +525,7 @@ export class SimulationHost {
         ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
         ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
         ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
-      }, this.scenario.population.definitions),
+      }, this.scenario.population.definitions, this.snapshotCache),
     });
   }
 

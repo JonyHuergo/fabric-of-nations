@@ -116,6 +116,53 @@ import {
   type SnapshotArmy,
 } from "./protocol.js";
 
+/**
+ * Host-owned presentation cache for snapshot builds (D-137). It holds only values
+ * derived from data that cannot change while the entry is used: closed period
+ * summaries (immutable once closed; compaction replaces the object), the account
+ * registry (ids, owners and subtypes never change; the registry only grows), and the
+ * static definitions. A snapshot built with a cache equals one built without it.
+ * It is never part of the world, a save or a hash.
+ */
+export interface SnapshotCache {
+  readonly periodTotals: WeakMap<FinancePeriodSummary, ReturnType<typeof governmentPeriodTotals>>;
+  readonly financeHistory: Map<
+    number,
+    {
+      readonly summaries: readonly FinancePeriodSummary[];
+      readonly accountCount: number;
+      readonly blockKey: string;
+      readonly history: readonly SnapshotFinancePeriod[];
+    }
+  >;
+  staticFor: {
+    readonly definitions: EconomyDefinitions;
+    readonly populationDefinitions: PopulationDefinitions | undefined;
+    readonly territoryMeta: readonly TerritoryMetaDef[];
+    readonly sections: StaticSnapshotSections;
+  } | null;
+}
+
+interface StaticSnapshotSections {
+  readonly goods: SimulationSnapshot["goods"];
+  readonly professions: SimulationSnapshot["professions"];
+  readonly needTiers: SimulationSnapshot["needTiers"];
+  readonly projectTypes: SimulationSnapshot["projectTypes"];
+  readonly technologyEraNames: SimulationSnapshot["technologyEraNames"];
+  readonly technologyCatalog: SimulationSnapshot["technologyCatalog"];
+  readonly territories: SimulationSnapshot["territories"];
+}
+
+export function createSnapshotCache(): SnapshotCache {
+  return { periodTotals: new WeakMap(), financeHistory: new Map(), staticFor: null };
+}
+
+/** Per-build values shared by several sections (computed once per snapshot). */
+interface SnapshotBuild {
+  readonly cache: SnapshotCache;
+  readonly priceIndexes: ReturnType<typeof derivePriceIndexes>;
+}
+
 export interface SnapshotRuntimeState {
   readonly sequence: number;
   readonly running: boolean;
@@ -237,10 +284,14 @@ function fiscalTotals(
   summary: FinancePeriodSummary,
   countryId: number,
   world: World,
+  cache?: SnapshotCache,
 ): { totals: SnapshotFiscalTotals; businessTaxRevenueRUSD: number } | null {
-  const totals = governmentPeriodTotals(world.finance, summary).find(
-    (entry) => entry.countryId === countryId,
-  );
+  let periodTotals = cache?.periodTotals.get(summary);
+  if (periodTotals === undefined) {
+    periodTotals = governmentPeriodTotals(world.finance, summary);
+    cache?.periodTotals.set(summary, periodTotals);
+  }
+  const totals = periodTotals.find((entry) => entry.countryId === countryId);
   if (totals === undefined) return null;
   return {
     totals: {
@@ -554,8 +605,40 @@ function financeHistory(
   country: World["countries"][number],
   index: ReturnType<typeof buildFinanceIndex>,
   blockIds: ReadonlySet<number>,
+  cache?: SnapshotCache,
 ): readonly SnapshotFinancePeriod[] {
   const summaries = world.finance.periodSummaries.slice(-MAX_SNAPSHOT_LEDGER_MONTHS);
+  // The history reads closed summaries, the account registry and the country's
+  // blocks only; reuse it while all three are unchanged (D-137).
+  const blockKey = [...blockIds].join(",");
+  const cached = cache?.financeHistory.get(country.id);
+  if (
+    cached !== undefined &&
+    cached.accountCount === index.accounts.length &&
+    cached.blockKey === blockKey &&
+    cached.summaries.length === summaries.length &&
+    cached.summaries.every((summary, position) => summary === summaries[position])
+  ) {
+    return cached.history;
+  }
+  const history = buildFinanceHistory(world, country, index, blockIds, summaries, cache);
+  cache?.financeHistory.set(country.id, {
+    summaries,
+    accountCount: index.accounts.length,
+    blockKey,
+    history,
+  });
+  return history;
+}
+
+function buildFinanceHistory(
+  world: World,
+  country: World["countries"][number],
+  index: ReturnType<typeof buildFinanceIndex>,
+  blockIds: ReadonlySet<number>,
+  summaries: readonly FinancePeriodSummary[],
+  cache: SnapshotCache | undefined,
+): readonly SnapshotFinancePeriod[] {
   const treasuryId = index.find("country", country.id, "treasury-cash")?.id;
   const debtAccountIds = new Set(
     index.accounts
@@ -580,7 +663,7 @@ function financeHistory(
   );
   const history: SnapshotFinancePeriod[] = [];
   for (const summary of summaries) {
-    const periodFiscal = fiscalTotals(summary, country.id, world);
+    const periodFiscal = fiscalTotals(summary, country.id, world, cache);
     if (periodFiscal === null) continue;
     const budget = summary.countryBudgetTotals[country.id];
     // A summary is compacted exactly when it retains no account trial balance;
@@ -1073,6 +1156,7 @@ function countrySnapshot(
   capacity: ReadonlyMap<number, number> | undefined,
   definitions: EconomyDefinitions,
   meta: CountryMetaDef | undefined,
+  build?: SnapshotBuild,
 ): CountrySnapshot {
   const provinceIds = new Set(countryProvinceIds(world, country.id));
   const blockIds = new Set<number>();
@@ -1304,7 +1388,7 @@ function countrySnapshot(
     education: educationSnapshot(world, country, definitions),
     labor: laborSnapshot(world, country, definitions),
     trade: tradePolicySnapshot(world, country),
-    priceIndex: countryPriceIndexSnapshot(world, country),
+    priceIndex: countryPriceIndexSnapshot(world, country, build?.priceIndexes),
     monetary: monetarySnapshot(world, country),
     military: countryMilitarySnapshot(world, country),
   };
@@ -1440,8 +1524,8 @@ function marketPopulations(world: World): Map<number, number> {
 function priceIndexSnapshot(
   world: World,
   definitions: EconomyDefinitions,
+  values: ReturnType<typeof derivePriceIndexes> = derivePriceIndexes(world),
 ): SnapshotPriceIndex {
-  const values = derivePriceIndexes(world);
   const goodById = new Map(definitions.goods.map((good) => [good.id, good]));
   const populations = marketPopulations(world);
   let coverageWeighted = 0;
@@ -1488,8 +1572,8 @@ function roundOptional(value: number | null): number | null {
 function countryPriceIndexSnapshot(
   world: World,
   country: World["countries"][number],
+  values: ReturnType<typeof derivePriceIndexes> = derivePriceIndexes(world),
 ): SnapshotCountryPriceIndex {
-  const values = derivePriceIndexes(world);
   const coverageWeighted = countryProvinceIds(world, country.id).reduce((total, provinceId) => {
     const marketId = world.provinceEconomies.find((province) => province.id === provinceId)?.marketId;
     return total + (marketId === null || marketId === undefined ? 0 : priceIndexCoverage(world, marketId));
@@ -1896,13 +1980,23 @@ function countrySummarySnapshots(
   for (const country of world.countries) {
     provinceIdsByCountry.set(country.id, new Set(countryProvinceIds(world, country.id)));
   }
+  // D-137: the countries owning each province once, so blocks and assignments are
+  // attributed in one pass (was a test of every country for each). Each country's
+  // blocks and employment keep `world.popBlocks` / `world.employment` order.
+  const ownersByProvince = new Map<number, number[]>();
+  for (const country of world.countries) {
+    for (const provinceId of provinceIdsByCountry.get(country.id) ?? []) {
+      const owners = ownersByProvince.get(provinceId);
+      if (owners === undefined) ownersByProvince.set(provinceId, [country.id]);
+      else if (!owners.includes(country.id)) owners.push(country.id);
+    }
+  }
   const blocksByCountry = new Map<number, World["popBlocks"][number][]>();
   for (const block of world.popBlocks) {
-    for (const country of world.countries) {
-      if (provinceIdsByCountry.get(country.id)?.has(block.provinceId) !== true) continue;
-      const list = blocksByCountry.get(country.id) ?? [];
+    for (const countryId of ownersByProvince.get(block.provinceId) ?? []) {
+      const list = blocksByCountry.get(countryId) ?? [];
       list.push(block);
-      blocksByCountry.set(country.id, list);
+      blocksByCountry.set(countryId, list);
     }
   }
   const employedByCountry = new Map<number, number>();
@@ -1910,9 +2004,8 @@ function countrySummarySnapshots(
   for (const assignment of world.employment) {
     const building = buildingById.get(assignment.buildingInstanceId);
     if (building === undefined) continue;
-    for (const country of world.countries) {
-      if (provinceIdsByCountry.get(country.id)?.has(building.provinceId) !== true) continue;
-      employedByCountry.set(country.id, (employedByCountry.get(country.id) ?? 0) + assignment.workers);
+    for (const countryId of ownersByProvince.get(building.provinceId) ?? []) {
+      employedByCountry.set(countryId, (employedByCountry.get(countryId) ?? 0) + assignment.workers);
     }
   }
   const lastPeriod =
@@ -2149,7 +2242,35 @@ export function buildSimulationSnapshot(
   definitions: EconomyDefinitions,
   runtime: SnapshotRuntimeState,
   populationDefinitions?: PopulationDefinitions,
+  /** Host presentation cache (D-137); a fresh one when omitted. */
+  cache: SnapshotCache = createSnapshotCache(),
 ): SimulationSnapshot {
+  const build: SnapshotBuild = { cache, priceIndexes: derivePriceIndexes(world) };
+  const territoryMeta = runtime.territoryMeta ?? [];
+  if (
+    cache.staticFor === null ||
+    cache.staticFor.definitions !== definitions ||
+    cache.staticFor.populationDefinitions !== populationDefinitions ||
+    cache.staticFor.territoryMeta !== territoryMeta
+  ) {
+    cache.staticFor = {
+      definitions,
+      populationDefinitions,
+      territoryMeta,
+      sections: {
+        goods: goodsSnapshots(definitions),
+        professions: [...definitions.professions]
+          .sort((left, right) => left.id - right.id)
+          .map((profession) => ({ id: profession.id, key: profession.key, name: profession.name })),
+        needTiers: needTierSnapshots(populationDefinitions, definitions),
+        projectTypes: projectTypeSnapshots(definitions),
+        technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
+        technologyCatalog: technologyCatalogSnapshot(definitions),
+        territories: territorySnapshots(territoryMeta),
+      },
+    };
+  }
+  const staticSections = cache.staticFor.sections;
   const civil = dayIndexToCivilDate(world.dayIndex);
   const index = buildFinanceIndex(world.finance);
   const capacities = productionCapacities(world, definitions);
@@ -2190,10 +2311,11 @@ export function buildSimulationSnapshot(
         world,
         country,
         index,
-        financeHistory(world, country, index, blockIds),
+        financeHistory(world, country, index, blockIds, cache),
         capacities.byCountry.get(country.id),
         definitions,
         countryMetaById.get(country.id),
+        build,
       );
     });
   const countrySummaries = countrySummarySnapshots(
@@ -2235,19 +2357,17 @@ export function buildSimulationSnapshot(
       provinceEconomySnapshots(world, runtime.territoryMeta ?? []),
       [...definitions.professions].sort((left, right) => left.id - right.id),
     ),
-    territories: territorySnapshots(runtime.territoryMeta ?? []),
+    territories: staticSections.territories,
     provinces: provinceSnapshots(world),
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
-    goods: goodsSnapshots(definitions),
-    professions: [...definitions.professions]
-      .sort((left, right) => left.id - right.id)
-      .map((profession) => ({ id: profession.id, key: profession.key, name: profession.name })),
-    needTiers: needTierSnapshots(populationDefinitions, definitions),
-    projectTypes: projectTypeSnapshots(definitions),
-    technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
-    technologyCatalog: technologyCatalogSnapshot(definitions),
+    goods: staticSections.goods,
+    professions: staticSections.professions,
+    needTiers: staticSections.needTiers,
+    projectTypes: staticSections.projectTypes,
+    technologyEraNames: staticSections.technologyEraNames,
+    technologyCatalog: staticSections.technologyCatalog,
     trade: tradeNetworkSnapshot(world, definitions),
-    priceIndex: priceIndexSnapshot(world, definitions),
+    priceIndex: priceIndexSnapshot(world, definitions, build.priceIndexes),
     currencies: currenciesSnapshot(world),
     military: militarySnapshot(world),
     diagnostics,

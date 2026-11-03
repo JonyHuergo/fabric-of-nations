@@ -52,7 +52,6 @@ import type {
   RusdPerCurrencyUnit,
 } from "./types.js";
 import { MONETARY_REGIMES } from "./types.js";
-import { countryProvinceIds, marketProvinceIds } from "./country.js";
 export {
   assertValidMonetaryState,
   assertValidPriceIndexState,
@@ -171,10 +170,31 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
       (populationByProvince.get(block.provinceId) ?? 0) + populationTotal(block),
     );
   }
+  // D-137: provinces by id, each market's provinces (ascending, `marketProvinceIds`)
+  // and each country's (`countryProvinceIds` order) once, instead of a scan per
+  // market and country and a `find` per province.
+  const provinceById = new Map<Id, World["provinceEconomies"][number]>();
+  const provinceIdsByMarket = new Map<Id, Id[]>();
+  for (const province of world.provinceEconomies) {
+    if (!provinceById.has(province.id)) provinceById.set(province.id, province);
+    if (province.marketId === null) continue;
+    const list = provinceIdsByMarket.get(province.marketId);
+    if (list === undefined) provinceIdsByMarket.set(province.marketId, [province.id]);
+    else list.push(province.id);
+  }
+  for (const list of provinceIdsByMarket.values()) list.sort((left, right) => left - right);
+  const provinceIdsByCountry = new Map<Id, Id[]>();
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      const list = provinceIdsByCountry.get(record.ownerPolityId);
+      if (list === undefined) provinceIdsByCountry.set(record.ownerPolityId, [record.provinceId]);
+      else list.push(record.provinceId);
+    }
+  }
   const marketPopulation = new Map<Id, number>();
   for (const market of world.markets) {
     let population = 0;
-    for (const provinceId of marketProvinceIds(world, market.id)) {
+    for (const provinceId of provinceIdsByMarket.get(market.id) ?? []) {
       population += populationByProvince.get(provinceId) ?? 0;
     }
     marketPopulation.set(market.id, population);
@@ -184,8 +204,8 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
   for (const country of world.countries) {
     const weights: { marketId: Id; value: number; weight: number }[] = [];
-    for (const provinceId of countryProvinceIds(world, country.id)) {
-      const marketId = world.provinceEconomies.find((province) => province.id === provinceId)?.marketId;
+    for (const provinceId of provinceIdsByCountry.get(country.id) ?? []) {
+      const marketId = provinceById.get(provinceId)?.marketId;
       if (marketId === null || marketId === undefined) continue;
       if (!marketById.has(marketId)) continue;
       const already = weights.find((entry) => entry.marketId === marketId);
