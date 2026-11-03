@@ -1,0 +1,85 @@
+{
+  "startedAt": "2026-11-03T22:00:51.261Z",
+  "viewport": "844,390",
+  "checks": [
+    {
+      "name": "phone landscape viewport",
+      "passed": true,
+      "detail": "{\"width\":844,\"height\":390}"
+    },
+    {
+      "name": "United States row selectable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "campaign initializes at the phone layout",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "campaign sheet opens",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "manual save succeeds",
+      "passed": true,
+      "detail": "1054 ms incl. UI"
+    },
+    {
+      "name": "manual load succeeds",
+      "passed": true,
+      "detail": "1420 ms incl. UI"
+    },
+    {
+      "name": "speed control present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "fastest speed selectable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "speed set to 30x",
+      "passed": true,
+      "detail": "Speed 30 times, change speed"
+    },
+    {
+      "name": "simulation advanced while playing",
+      "passed": true,
+      "detail": "wall 8136 ms"
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "0"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/perf/stage-844x390-menu.png",
+    "docs/images/perf/stage-844x390-campaign.png",
+    "docs/images/perf/stage-844x390-loaded.png",
+    "docs/images/perf/stage-844x390-playing.png"
+  ],
+  "consoleErrors": [],
+  "exceptions": [],
+  "failedLoads": [],
+  "saveUiMs": 1054,
+  "loadUiMs": 1420,
+  "finishedAt": "2026-11-03T22:01:17.802Z",
+  "passed": true
+}

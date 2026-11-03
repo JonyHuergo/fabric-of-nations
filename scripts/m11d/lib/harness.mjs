@@ -390,13 +390,39 @@ export function createSession(cdp) {
   };
 }
 
-export async function boot({ port = 8877, cdpPort = 9462, profile, fresh = false } = {}) {
+export async function boot({
+  port = 8877,
+  cdpPort = 9462,
+  profile,
+  fresh = false,
+  windowSize = undefined,
+} = {}) {
   if (!existsSync(join(WEB_ROOT, "index.html"))) {
     throw new Error("missing packages/app/dist-web; run pnpm -F @century/app export:web first");
   }
   const server = await startServer(port);
-  const cdp = await connectChrome({ port: cdpPort, profile, fresh });
+  const cdp = await connectChrome({
+    port: cdpPort,
+    profile,
+    fresh,
+    ...(windowSize === undefined ? {} : { windowSize }),
+  });
   const session = createSession(cdp);
+  if (windowSize !== undefined) {
+    // Pin the CSS viewport to the requested phone/tablet size; --window-size alone
+    // includes browser chrome and is not the layout viewport in headless mode.
+    const [width, height] = String(windowSize)
+      .split(",")
+      .map((value) => Number(value));
+    if (Number.isFinite(width) && Number.isFinite(height)) {
+      await cdp.send("Emulation.setDeviceMetricsOverride", {
+        width,
+        height,
+        deviceScaleFactor: 1,
+        mobile: true,
+      });
+    }
+  }
   await session.send("Page.enable");
   await session.send("Runtime.enable");
   await session.send("Log.enable");

@@ -7447,3 +7447,116 @@ the three fixes below found during P2b and implemented for review. **Amends:** D
 
 - Trajectories change in every economic fixture (1); (2)-(4) only remove failures. Known
   answers are re-pinned with this decision as the reason.
+
+## D-137 — Performance stage: measurement hooks, in-place phases, result detail, snapshot cache and save format 2
+
+**Status:** implemented on `perf/10x` for review; the 10x acceptance target is not reached
+(details in `PERF_COMPLETION_REPORT.md`). **Amends:** D-040 (save checksum), D-047
+(period-close staging), D-116 (rollback), D-120 (save compatibility), D-123
+(protocol/snapshot), D-133 (derived caches). **Acceptance basis:** the performance-stage
+brief: host-path day mean and p50 at most 1/10 of the recorded baseline over 92+ days,
+month start at most 3x the ordinary p50, save and load at most 1/10, new game at least 5x
+faster, determinism, and identical outcomes where possible. The baseline is
+`docs/perf/baseline.{json,txt}` (host day mean 2,356 / p50 2,190 ms, save 5,364 ms, load
+5,107 ms, new game 990 ms, month starts 3.1-3.4x ordinary p50).
+
+### Decision
+
+1. **Phase observer (measurement only).** `TickContext.phaseObserver` is an optional
+   callback the simulation invokes with a phase name at phase boundaries. The simulation
+   never reads a clock and never reads anything back from the callback, so no outcome can
+   depend on whether an observer is present. The benchmark (`perfBench`) and the
+   profiler (`perfProfileDays`) use it to attribute wall time per phase. A test asserts
+   the world hash is identical with and without an observer.
+2. **`financeInPlace`.** Phase functions accept `financeInPlace` (default false). Direct
+   callers keep the staged copy (`phaseFinance` clones the finance state, validates before
+   publishing, and a failure leaves the world untouched). Inside the integrated day every
+   phase writes finance in place: the day already owns atomicity through its own staging
+   (staged tick) or the rollback runner (phase mode), and the cached finance index stays
+   valid because the accounts array does not change. Every in-place phase records the
+   opening designated-cash total before posting and checks conservation itself.
+3. **In-day month-end validation consolidation.** On a civil month end the period close
+   and the profit-distribution phase no longer repeat whole-finance and whole-summary
+   validation that the same day's month-end whole-world validation performs before the
+   day is published (`closeFinancePeriod`/`runProfitDistributionPhase` with
+   `financeInPlace`). Direct callers and tests that invoke a phase on its own keep every
+   check. The published world is still validated exactly once, after the close and the
+   profit allocation, with `allowUnadvancedClose` false.
+4. **Result detail level.** `TickContext.detail` is `"full"` (default) or `"summary"`.
+   `summary` is for callers that never read the per-day result diagnostics:
+   - market-day result lists stay in production order instead of being sorted, and the
+     settlement's per-transaction copy is omitted;
+   - the per-good needs detail is omitted;
+   - the world outcome, postings, balances and totals are identical.
+   The worker host uses `summary`; tests and benchmarks use `full` unless they explicitly
+   measure the host path. A 33-day trace is identical at both levels, and the 92-day bench
+   reports identical canonical hashes from the host (`summary`) and phase (`full`) runs.
+5. **RNG purpose memoisation.** The keyed RNG caches the validated purpose prefix (the
+   purpose validation and its two FNV lanes) in a bounded map of 1,024 entries. It is a
+   derived value only: every draw returns exactly the same value with or without the cache,
+   no authoritative state is stored, and arbitrary purpose strings cannot grow it without
+   limit. Known-answer RNG tests are unchanged.
+6. **Snapshot presentation cache.** The host owns a `SnapshotCache` that is never part of
+   the world, a save or a hash. It holds the static snapshot sections per definitions
+   object, per-summary government totals (closed summaries are immutable; compaction
+   replaces the object), and the player's finance history until a summary, the account
+   registry or the country's blocks change. Price indexes are derived once per snapshot.
+   A cached snapshot is JSON-identical to an uncached one (test), and country summaries
+   attribute blocks and assignments through the province-owner map instead of a per-block
+   scan.
+7. **Save format 2 and the stored form.** `SAVE_FORMAT_VERSION` is 2. Accounts, pop
+   blocks, buildings, employment, provinces and period account totals are written as
+   column tables; the payload is canonicalised once and the checksum is computed over that
+   text (and verified over the text when the layout is ours, so a save does not need a
+   second canonicalisation on load). Format-1 saves are listed as incompatible with the
+   reason shown to the player; they are never deleted or overwritten (D-120). The stored
+   form is `fon-save-deflate2:` + the envelope metadata as one JSON line + the canonical
+   save deflated at level 1 (fflate, pure JavaScript on web/iOS/Android) + base64. The
+   worker produces the stored form in `SAVE_RESULT` (compression runs off the app thread)
+   and accepts it on `LOAD`/`PREVIEW_SAVE`; `compressSaveForStorage` is idempotent. Legacy
+   `century-save-gzip1:` saves are still decoded for listing and incompatibility
+   explanation, but are not loadable worlds.
+8. **Worker protocol 18.** The version reflects the stored save form on `SAVE_RESULT` and
+   `LOAD` (17 was the P2 province snapshot vocabulary). A client and worker must agree on
+   the protocol version; older commands are rejected with `unsupported_protocol`.
+9. **Dropped SUSD normalizer.** Save format 2 rejects every format-1 save (including
+   pre-M14 saves whose persisted finance keys still said `SUSD`) before decoding, so the
+   format-1 legacy-key normalizer was removed. The historical SUSD spelling survives only
+   in the state-hash view and the opening-balance checksum, where it is required to keep
+   historical hashes stable (M14 keeps the former spelling in hashes by design).
+10. **m14 monetary-terminology audit rule.** The audit now requires the format-1
+    incompatibility message in `serialization.ts` instead of the removed normalizer, and
+    still requires the canonical `balanceRUSD` save field. The RUSD rename rule itself is
+    unchanged: current player-facing and current documentation text must not say SUSD;
+    historical records and legacy aliases may.
+
+### Additional bit-identical savings recorded under this decision
+
+- `postJournalBatch` validates and applies every entry before materialising any posting,
+  and copies lines only for the tail that survives the 256-entry audit buffer (a
+  settlement day creates several thousand wage/upkeep entries). The batch path adds line
+  deltas directly into the batch aggregate instead of a per-entry map. A rejected batch
+  leaves balances, postings and `nextPostingId` unchanged.
+- Settlement reads opening producer/household cash from one dense account-id table (map
+  fallback for sparse ids) and relies on the aggregated posting batch, which applies the
+  same net market deltas, for the affordability invariant instead of a second
+  hundred-thousand-account pass.
+- `inIdOrder` uses the fact that `popBlocks`/`buildings`/`countries` are kept in ascending
+  id order (construction appends only higher ids): a phase that wants an explicit order
+  checks it in O(n) and only copies and sorts when a caller supplied an unsorted fixture.
+- Household and production demand lists are emitted in canonical order by construction,
+  so the two per-day 30k-record sorts and the per-building recipe copy/sort are gone.
+
+### Consequences
+
+- World outcomes, hashes and the 64-day reference trace are unchanged by every item above
+  (checked with `docs/perf/check-trace.sh`); save text changes because format 2 is a new
+  layout and a format break (D-120).
+- The acceptance benchmark improves from host day p50 2,190 to about 550 ms, save and load
+  to about 1.0-1.3 s, and new game to about 0.64 s. The remaining distance to 10x is
+  measured and explained in `PERF_COMPLETION_REPORT.md`: most of it is fixed per-day work
+  in settlement, market clearing, demography and needs, plus JavaScript deflate time on a
+  15M-character canonical save, not a duplicate-validation or allocation bug that one more
+  pass would remove.
+- The worker bundle is 4,833 KiB (the generated 1900 scenario module dominates); this is
+  recorded, not changed, in this stage.

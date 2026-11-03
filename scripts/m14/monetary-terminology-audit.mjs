@@ -229,7 +229,8 @@ requireIncludes("legacy opening checksum", accounts, "balanceSUSD: entry.balance
 requireIncludes("save format unchanged", serialization, 'format: "century-save"');
 requireIncludes("save format version unchanged", serialization, "formatVersion: SAVE_FORMAT_VERSION");
 const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"), "utf8");
-requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 17");
+// 18: D-137 stored save form on SAVE_RESULT/LOAD (the m14 test pins the value).
+requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 18");
 if (!existsSync(join(ROOT, "docs/M14_RUSD_RENAMING_REPORT.md"))) {
   errors.push("the M14 renaming report is missing");
 }
