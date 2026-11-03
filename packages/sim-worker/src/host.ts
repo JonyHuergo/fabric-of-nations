@@ -140,7 +140,7 @@ export class SimulationHost {
       focusCountryId: this.focusCountryId,
       ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
       ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
-      ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
+      ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
     }, this.scenario.population.definitions);
   }
 
@@ -522,7 +522,7 @@ export class SimulationHost {
         focusCountryId: null,
         ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
         ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
-        ...(this.scenario.regionMeta === undefined ? {} : { regionMeta: this.scenario.regionMeta }),
+        ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
       }, this.scenario.population.definitions),
     });
   }

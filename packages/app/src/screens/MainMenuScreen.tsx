@@ -15,7 +15,7 @@ import { WORLD_CATALOG } from "../generated/worldCatalog";
 import { useMapView } from "../map/host/MapStage";
 import { TOUCH_TARGET, colors, fonts, spacing, themedSheet, type } from "../theme";
 import type { SaveSlot } from "../storage/saveStorage";
-import { longDate, saveEra, saveNation } from "./saveDisplay";
+import { longDate, saveEra, saveNation, saveProblem } from "./saveDisplay";
 
 /**
  * How fast the world turns behind the title and load screens, in degrees of
@@ -67,6 +67,8 @@ export function MainMenuScreen({
   const savedDate =
     latestSave === null ? null : latestSave.metadata === null ? "Unreadable save" : longDate(latestSave.metadata.dateLabel);
   const era = latestSave === null ? ERA_THEMES.imperial : saveEra(latestSave);
+  // D-120: an incompatible save is listed under Load game with its reason, never continued.
+  const canContinue = latestSave !== null && saveProblem(latestSave) === null;
   const playable = WORLD_CATALOG.entries.filter((entry) => entry.selectable).length;
   const territories = WORLD_CATALOG.entries.filter((entry) => entry.kind === "territory").length;
 
@@ -122,6 +124,7 @@ export function MainMenuScreen({
         <View style={[styles.entries, compact ? null : styles.entriesRoomy]}>
           {latestSave === null ? null : (
             <>
+              {canContinue ? (
               <Animated.View style={rise(1, 12)}>
                 <MenuEntry
                   label={loading ? "Loading…" : "Continue"}
@@ -141,13 +144,14 @@ export function MainMenuScreen({
                   }
                 />
               </Animated.View>
+              ) : null}
               <Animated.View style={rise(2, 12)}>
                 <MenuEntry label="Load game" disabled={loading} onPress={onLoadGame} />
               </Animated.View>
             </>
           )}
           <Animated.View style={rise(entryCount - 1, 12)}>
-            <MenuEntry label="New campaign" primary={latestSave === null} disabled={loading} onPress={onNewGame} />
+            <MenuEntry label="New campaign" primary={!canContinue} disabled={loading} onPress={onNewGame} />
           </Animated.View>
           <Animated.View style={rise(entryCount, 12)}>
             <MenuEntry label="The world of 1900" onPress={() => setCodex(true)} />
@@ -166,13 +170,13 @@ export function MainMenuScreen({
         ]}
       >
         <Text style={styles.captionKicker}>
-          {latestSave === null ? "The world" : "The world as saved"}
+          {!canContinue ? "The world" : "The world as saved"}
           {era === null ? "" : ` · ${era.label} era`}
         </Text>
-        <Text style={styles.captionDate}>{savedDate ?? "1 January 1900"}</Text>
+        <Text style={styles.captionDate}>{canContinue ? (savedDate ?? "1 January 1900") : "1 January 1900"}</Text>
         <Ornament align="center" width={120} style={styles.captionRule} />
         <Text style={styles.captionMeta} numberOfLines={2}>
-          {latestSave === null
+          {!canContinue
             ? `${String(playable)} nations to lead · ${String(territories)} territories · ${String(WORLD_CATALOG.markets.length)} markets`
             : savedWorld === undefined
               ? "Reading the saved world…"
@@ -210,7 +214,7 @@ export function MainMenuScreen({
         <Divider />
         <Text style={styles.codexHeading}>Nations and their dependencies</Text>
         <Text style={styles.codexBody}>
-          Every selectable country has its own regions, population, buildings, treasury,
+          Every selectable country has its own provinces, population, buildings, treasury,
           government, laws, technology and market membership. Colonies and protectorates are
           shown as dependent territories of their sovereign power, not as independent states.
           Population, occupation structure and economic starting values are documented

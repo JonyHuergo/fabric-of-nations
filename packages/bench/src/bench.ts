@@ -558,7 +558,7 @@ function scaledProductionScenario(groups: number): EconomyScenarioDef {
   scenario.markets = [
     {
       id: 0,
-      regionIds: [0],
+      provinceIds: [0],
       priceRUSD: [...base.markets[0]!.priceRUSD],
       stockLots,
     },
@@ -1395,7 +1395,7 @@ function fiscalBenchmarkScenario(groups: number): EconomyScenarioDef {
     tag: "BNC",
     name: "Benchmark Fiscal Country",
     monetary: { kind: "own", currencyId: 0 },
-    regionIds: [0],
+    provinceIds: [0],
     treasuryAccountId: M4C_TREASURY_ACCOUNT_ID,
     initialTreasuryCashRUSD: 5_000_000,
     fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 1_000_000 },
@@ -1599,7 +1599,7 @@ function stressScenario(blockCount: number): PopulationScenarioDef {
     ...base,
     scenarioId: `m2-stress-${String(blockCount)}`,
     popBlocks,
-    regions: [{ ...base.regions[0]! }],
+    provinceEconomies: [{ ...base.provinceEconomies[0]! }],
     definitions,
   };
 }

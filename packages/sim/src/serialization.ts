@@ -120,7 +120,7 @@ import {
 import { assertValidFiscalPolicy, assertValidIndustrialPolicy } from "./economy/country.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
-import type { PopBlock, Region } from "./population/types.js";
+import type { PopBlock, ProvinceEconomy } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
 import {
   requireArray,
@@ -198,19 +198,19 @@ export type SerializedDiagnostics = {
   readonly recentWarnings: readonly string[];
 };
 
-/** Encoded region. */
-export type SerializedRegion = {
+/** Encoded province economy (schema 28). */
+export type SerializedProvinceEconomy = {
   readonly id: number;
   readonly key: string;
   readonly name: string;
   readonly popBlockIds: readonly number[];
   readonly marketId: number | null;
   readonly buildingInstanceIds: readonly number[];
-  readonly resourceCapsPerDay: readonly number[];
-  /** M10 temporary military controller; null means the sovereign controls the region. */
-  readonly controllerCountryId: number | null;
-  /** M10 occupation start day; null when not occupied. */
-  readonly occupiedSinceDay: number | null;
+  readonly unrest: number;
+  readonly infrastructure: number;
+  readonly arableLandHa: number;
+  readonly pastureHa: number;
+  readonly urbanShare: number;
 };
 
 /** Encoded financial account. */
@@ -319,7 +319,7 @@ export type SerializedConstructionMaterial = {
 export type SerializedConstructionProject = {
   readonly id: number;
   readonly countryId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly definitionId: number;
   readonly status: ConstructionProject["status"];
   readonly authorizedDay: number;
@@ -510,7 +510,7 @@ export type SerializedDebtContract = {
   readonly arrearsSinceDay: number | null;
 };
 
-/** Encoded country identity, region ownership, treasury, and fiscal policy. */
+/** Encoded country identity, province ownership, treasury, and fiscal policy. */
 /** Encoded M8 regime, laws, groups, institutions, and world politics state. */
 export type SerializedElectionResult = {
   readonly day: number;
@@ -758,8 +758,8 @@ export type SerializedMonetaryCurrencyState = {
 export type SerializedArmy = {
   readonly id: number;
   readonly countryId: number;
-  readonly regionId: number;
-  readonly homeRegionId: number;
+  readonly provinceId: number;
+  readonly homeProvinceId: number;
   readonly personnel: number;
   readonly equipmentUnits: number;
   readonly organization: number;
@@ -769,7 +769,7 @@ export type SerializedArmy = {
   readonly deaths: number;
   readonly captured: number;
   readonly readyDay: number;
-  readonly destinationRegionId: number | null;
+  readonly destinationProvinceId: number | null;
   readonly arrivalDay: number | null;
   readonly lastBattleDay: number | null;
 };
@@ -832,7 +832,6 @@ export type SerializedCountry = {  readonly id: number;
   readonly tag: string;
   readonly name: string;
   readonly monetary: SerializedMonetaryArrangement;
-  readonly regionIds: readonly number[];
   readonly treasuryAccountId: number;
   readonly fiscal: SerializedFiscalPolicy;
   readonly industrial: SerializedIndustrialPolicy;
@@ -873,7 +872,7 @@ export type SerializedStockLot = {
 export type SerializedBuilding = {
   readonly id: number;
   readonly definitionId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly level: number;
   readonly condition: number;
   readonly ownerKind: "private" | "state";
@@ -895,7 +894,6 @@ export type SerializedEmploymentAssignment = {
 /** Encoded market. */
 export type SerializedMarket = {
   readonly id: number;
-  readonly regionIds: readonly number[];
   readonly priceRUSD: readonly number[];
   readonly stockLots: readonly SerializedStockLot[];
   readonly customsCountryId: number | null;
@@ -904,7 +902,7 @@ export type SerializedMarket = {
 /** Encoded population block with explicit typed-array tags. */
 export type SerializedPopBlock = {
   readonly id: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly professionId: number;
   readonly maleByAge: EncodedTypedArray;
   readonly femaleByAge: EncodedTypedArray;
@@ -960,7 +958,7 @@ export type SerializedWorld = {
   readonly dayIndex: number;
   readonly startDayIndex: number;
   readonly seed: number;
-  readonly regions: readonly SerializedRegion[];
+  readonly provinceEconomies: readonly SerializedProvinceEconomy[];
   readonly countries: readonly SerializedCountry[];
   readonly currencies: readonly SerializedCurrency[];
   readonly currencyValuations: readonly SerializedCurrencyValuation[];
@@ -1282,18 +1280,18 @@ export function encodeWorld(world: World): SerializedWorld {
     dayIndex: world.dayIndex,
     startDayIndex: world.startDayIndex,
     seed: world.seed,
-    regions: world.regions.map((region) => ({
-      id: region.id,
-      key: region.key,
-      name: region.name,
-      popBlockIds: [...region.popBlockIds],
-      marketId: region.marketId,
-      buildingInstanceIds: [...region.buildingInstanceIds].sort((left, right) => left - right),
-      resourceCapsPerDay: [...region.resourceCapsPerDay],
-      unrest: region.unrest,
-      infrastructure: region.infrastructure,
-      controllerCountryId: region.controllerCountryId,
-      occupiedSinceDay: region.occupiedSinceDay,
+    provinceEconomies: world.provinceEconomies.map((province) => ({
+      id: province.id,
+      key: province.key,
+      name: province.name,
+      popBlockIds: [...province.popBlockIds],
+      marketId: province.marketId,
+      buildingInstanceIds: [...province.buildingInstanceIds].sort((left, right) => left - right),
+      unrest: province.unrest,
+      infrastructure: province.infrastructure,
+      arableLandHa: province.arableLandHa,
+      pastureHa: province.pastureHa,
+      urbanShare: province.urbanShare,
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1302,7 +1300,6 @@ export function encodeWorld(world: World): SerializedWorld {
         tag: country.tag,
         name: country.name,
         monetary: { ...country.monetary },
-        regionIds: [...country.regionIds].sort((left, right) => left - right),
         treasuryAccountId: country.treasuryAccountId,
         fiscal: {
           incomeTaxRate: country.fiscal.incomeTaxRate,
@@ -1438,7 +1435,7 @@ export function encodeWorld(world: World): SerializedWorld {
       ),
     popBlocks: world.popBlocks.map((block) => ({
       id: block.id,
-      regionId: block.regionId,
+      provinceId: block.provinceId,
       professionId: block.professionId,
       maleByAge: encodeTypedArray(block.maleByAge),
       femaleByAge: encodeTypedArray(block.femaleByAge),
@@ -1460,7 +1457,7 @@ export function encodeWorld(world: World): SerializedWorld {
       .map((building) => ({
         id: building.id,
         definitionId: building.definitionId,
-        regionId: building.regionId,
+        provinceId: building.provinceId,
         level: building.level,
         condition: building.condition,
         ownerKind: building.ownerKind,
@@ -1483,7 +1480,6 @@ export function encodeWorld(world: World): SerializedWorld {
       .sort((left, right) => left.id - right.id)
       .map((market) => ({
         id: market.id,
-        regionIds: [...market.regionIds],
         priceRUSD: [...market.priceRUSD],
         stockLots: canonicalizeStockLots(market.stockLots).map((lot) => ({
           goodId: lot.goodId,
@@ -1642,7 +1638,7 @@ export function encodeWorld(world: World): SerializedWorld {
         .map((project) => ({
           id: project.id,
           countryId: project.countryId,
-          regionId: project.regionId,
+          provinceId: project.provinceId,
           definitionId: project.definitionId,
           status: project.status,
           authorizedDay: project.authorizedDay,
@@ -1841,7 +1837,7 @@ export function encodeWorld(world: World): SerializedWorld {
   };
 }
 
-function decodeRegion(value: unknown, path: string): Region {
+function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
   const record = requireRecord(value, path);
   const popBlockIds = requireArray(record.popBlockIds, `${path}.popBlockIds`);
   const ids: number[] = [];
@@ -1855,13 +1851,6 @@ function decodeRegion(value: unknown, path: string): Region {
       requireUint32(buildingIds[index], `${path}.buildingInstanceIds[${String(index)}]`),
     );
   }
-  const resourceCaps = requireArray(record.resourceCapsPerDay, `${path}.resourceCapsPerDay`);
-  const caps: number[] = [];
-  for (let index = 0; index < resourceCaps.length; index += 1) {
-    caps.push(
-      requireFiniteNumber(resourceCaps[index], `${path}.resourceCapsPerDay[${String(index)}]`),
-    );
-  }
   const marketId =
     record.marketId === null ? null : requireUint32(record.marketId, `${path}.marketId`);
   return {
@@ -1871,17 +1860,11 @@ function decodeRegion(value: unknown, path: string): Region {
     popBlockIds: ids,
     marketId,
     buildingInstanceIds: buildings,
-    resourceCapsPerDay: caps,
     unrest: requireFiniteNumber(record.unrest, `${path}.unrest`),
     infrastructure: requireFiniteNumber(record.infrastructure, `${path}.infrastructure`),
-    controllerCountryId:
-      record.controllerCountryId === null || record.controllerCountryId === undefined
-        ? null
-        : requireUint32(record.controllerCountryId, `${path}.controllerCountryId`),
-    occupiedSinceDay:
-      record.occupiedSinceDay === null || record.occupiedSinceDay === undefined
-        ? null
-        : requireInteger(record.occupiedSinceDay, `${path}.occupiedSinceDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
+    arableLandHa: requireFiniteNumber(record.arableLandHa, `${path}.arableLandHa`),
+    pastureHa: requireFiniteNumber(record.pastureHa, `${path}.pastureHa`),
+    urbanShare: requireFiniteNumber(record.urbanShare, `${path}.urbanShare`),
   };
 }
 
@@ -3002,8 +2985,8 @@ function decodeArmy(value: unknown, path: string): Army {
   return {
     id: requireUint32(record.id, `${path}.id`),
     countryId: requireUint32(record.countryId, `${path}.countryId`),
-    regionId: requireUint32(record.regionId, `${path}.regionId`),
-    homeRegionId: requireUint32(record.homeRegionId, `${path}.homeRegionId`),
+    provinceId: requireUint32(record.provinceId, `${path}.provinceId`),
+    homeProvinceId: requireUint32(record.homeProvinceId, `${path}.homeProvinceId`),
     personnel: integerField("personnel"),
     equipmentUnits: integerField("equipmentUnits"),
     organization: requireFiniteNumber(record.organization, `${path}.organization`),
@@ -3013,10 +2996,10 @@ function decodeArmy(value: unknown, path: string): Army {
     deaths: integerField("deaths"),
     captured: integerField("captured"),
     readyDay: requireInteger(record.readyDay, `${path}.readyDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
-    destinationRegionId:
-      record.destinationRegionId === null || record.destinationRegionId === undefined
+    destinationProvinceId:
+      record.destinationProvinceId === null || record.destinationProvinceId === undefined
         ? null
-        : requireUint32(record.destinationRegionId, `${path}.destinationRegionId`),
+        : requireUint32(record.destinationProvinceId, `${path}.destinationProvinceId`),
     arrivalDay: optionalDay("arrivalDay"),
     lastBattleDay: optionalDay("lastBattleDay"),
   };
@@ -3133,7 +3116,6 @@ function decodeMilitaryState(value: unknown, path: string): MilitaryState {
 
 function decodeCountry(value: unknown, path: string): Country {
   const record = requireRecord(value, path);
-  const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
   if (typeof record.immigrationOpen !== "boolean") {
     throw new SaveFormatError(`${path}.immigrationOpen must be a boolean`);
   }
@@ -3142,9 +3124,6 @@ function decodeCountry(value: unknown, path: string): Country {
     tag: requireString(record.tag, `${path}.tag`, { minLength: 1 }),
     name: requireString(record.name, `${path}.name`, { minLength: 1 }),
     monetary: decodeMonetaryArrangement(record.monetary, `${path}.monetary`),
-    regionIds: rawRegionIds.map((regionId, index) =>
-      requireUint32(regionId, `${path}.regionIds[${String(index)}]`),
-    ),
     treasuryAccountId: requireUint32(record.treasuryAccountId, `${path}.treasuryAccountId`),
     fiscal: decodeFiscalPolicy(record.fiscal, `${path}.fiscal`),
     industrial: decodeIndustrialPolicy(record.industrial, `${path}.industrial`),
@@ -3614,9 +3593,6 @@ function decodeStockLot(value: unknown, path: string): StockLot {
 
 function decodeMarket(value: unknown, path: string): Market {
   const record = requireRecord(value, path);
-  const regionIds = requireArray(record.regionIds, `${path}.regionIds`).map((regionId, index) =>
-    requireUint32(regionId, `${path}.regionIds[${String(index)}]`),
-  );
   const prices = requireArray(record.priceRUSD, `${path}.priceRUSD`).map((price, index) =>
     requireFiniteNumber(price, `${path}.priceRUSD[${String(index)}]`),
   );
@@ -3625,7 +3601,6 @@ function decodeMarket(value: unknown, path: string): Market {
   );
   return {
     id: requireUint32(record.id, `${path}.id`),
-    regionIds,
     priceRUSD: prices,
     stockLots: canonicalizeStockLots(lots),
     customsCountryId:
@@ -3646,7 +3621,7 @@ function decodeBuilding(value: unknown, path: string): BuildingInstance {
   return {
     id: requireUint32(record.id, `${path}.id`),
     definitionId: requireUint32(record.definitionId, `${path}.definitionId`),
-    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    provinceId: requireUint32(record.provinceId, `${path}.provinceId`),
     level: requireInteger(record.level, `${path}.level`, 1, Number.MAX_SAFE_INTEGER),
     condition: requireFiniteNumber(record.condition, `${path}.condition`),
     ownerKind: record.ownerKind,
@@ -3702,7 +3677,7 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
   );
   return {
     id: requireUint32(record.id, `${path}.id`),
-    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    provinceId: requireUint32(record.provinceId, `${path}.provinceId`),
     professionId: requireUint32(record.professionId, `${path}.professionId`),
     maleByAge,
     femaleByAge,
@@ -3776,7 +3751,7 @@ function decodeConstructionProject(
   return {
     id: requireUint32(record.id, `${path}.id`),
     countryId: requireUint32(record.countryId, `${path}.countryId`),
-    regionId: requireUint32(record.regionId, `${path}.regionId`),
+    provinceId: requireUint32(record.provinceId, `${path}.provinceId`),
     definitionId: requireUint32(record.definitionId, `${path}.definitionId`),
     status,
     authorizedDay: requireInteger(record.authorizedDay, `${path}.authorizedDay`, 0, CAMPAIGN_TERMINAL_DAY_INDEX),
@@ -4099,9 +4074,9 @@ function decodeWorldPayload(value: unknown): World {
     );
   }
 
-  const rawRegions = requireArray(payload.regions, "save payload.regions");
-  const regions = rawRegions.map((region, index) =>
-    decodeRegion(region, `save payload.regions[${String(index)}]`),
+  const rawProvinces = requireArray(payload.provinceEconomies, "save payload.provinceEconomies");
+  const provinceEconomies = rawProvinces.map((province, index) =>
+    decodeProvinceEconomy(province, `save payload.provinceEconomies[${String(index)}]`),
   );
   const rawCountries = requireArray(payload.countries, "save payload.countries");
   const countries = rawCountries.map((country, index) =>
@@ -4182,7 +4157,7 @@ function decodeWorldPayload(value: unknown): World {
     dayIndex,
     startDayIndex,
     seed,
-    regions,
+    provinceEconomies,
     countries,
     currencies,
     currencyValuations,

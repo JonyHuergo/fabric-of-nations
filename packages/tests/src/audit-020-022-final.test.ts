@@ -89,7 +89,7 @@ describe("AUDIT-020 military action day and accounting-period validation", () =>
 describe("AUDIT-022 recruitment and civilian employment", () => {
   test("recruitment keeps assignments within the remaining working-age population and marks employment dirty", () => {
     const scenario = militaryScenario();
-    const a1Blocks = scenario.population.popBlocks.filter((block) => block.regionId === 0);
+    const a1Blocks = scenario.population.popBlocks.filter((block) => block.provinceId === 0);
     for (const block of a1Blocks) {
       block.maleAgeGroups = workingAgeOnlyGroups(1_000);
       block.femaleAgeGroups = workingAgeOnlyGroups(1_000);
@@ -97,8 +97,8 @@ describe("AUDIT-022 recruitment and civilian employment", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
     assertValidWorld(world);
-    const block = world.popBlocks.find((entry) => entry.regionId === 0);
-    if (block === undefined) throw new Error("missing region block");
+    const block = world.popBlocks.find((entry) => entry.provinceId === 0);
+    if (block === undefined) throw new Error("missing province block");
     const beforeAssigned = assignedWorkers(world, block.id);
     expect(beforeAssigned).toBeGreaterThan(0);
 
@@ -109,7 +109,7 @@ describe("AUDIT-022 recruitment and civilian employment", () => {
         countryId: 0,
         dayIndex: world.dayIndex,
         source: "player",
-        regionId: 0,
+        provinceId: 0,
         personnel: 3_500,
       },
       world.dayIndex,
@@ -126,7 +126,7 @@ describe("AUDIT-022 recruitment and civilian employment", () => {
 
   test("a failed recruitment restores employment and its dirty marker atomically", () => {
     const scenario = militaryScenario();
-    const a1Blocks = scenario.population.popBlocks.filter((block) => block.regionId === 0);
+    const a1Blocks = scenario.population.popBlocks.filter((block) => block.provinceId === 0);
     for (const block of a1Blocks) {
       block.maleAgeGroups = workingAgeOnlyGroups(1_000);
       block.femaleAgeGroups = workingAgeOnlyGroups(1_000);
@@ -147,7 +147,7 @@ describe("AUDIT-022 recruitment and civilian employment", () => {
           countryId: 0,
           dayIndex: world.dayIndex,
           source: "player",
-          regionId: 0,
+          provinceId: 0,
           personnel: 100,
         },
         world.dayIndex,

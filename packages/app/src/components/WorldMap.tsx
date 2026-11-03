@@ -30,7 +30,7 @@ import type { SimulationSnapshot } from "@century/sim-worker";
 import { ERA_THEMES, FONTS, MAP_LABELS, desaturate, labelBudget, type EraId } from "../design/tokens";
 import { AtlasMap, type AtlasMapHandle, type MapPress } from "../map/host/AtlasMap";
 import type { ReservedBox } from "../map/labels";
-import { marketColor } from "../map/mapModes";
+import { dataLensFill, marketColor, type MapModeId } from "../map/mapModes";
 import { politicalColor, rgbToCss, stateColor, type Rgb } from "../map/politicalPalette";
 import { statusLabel } from "../map/statusLabel";
 import { TOUCH_TARGET, colors, nationColor, radii, spacing, themedSheet, type } from "../theme";
@@ -68,11 +68,13 @@ import type {
   WorldMapPolity,
 } from "../worldCatalogTypes";
 import { Badge } from "./ui";
+import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
 
 const MIN_SCALE = MAP_MIN_SCALE;
 const MAX_SCALE = MAP_MAX_SCALE;
 
-export type MapLayer = "political" | "control" | "markets";
+/** Every map mode; the province data lenses draw through `dataLensFill` (P2). */
+export type MapLayer = MapModeId;
 
 interface DecodedPolity extends WorldMapPolity {
   readonly entry: WorldCatalogEntry;
@@ -237,11 +239,31 @@ function SvgWorldMap({
     () => new Map(catalog.markets.map((market) => [market.key, market] as const)),
     [catalog],
   );
-  const regionByPolityId = useMemo(() => {
-    const mapById = new Map<number, SimulationSnapshot["regions"][number]>();
-    if (snapshot !== null) for (const region of snapshot.regions) mapById.set(region.id, region);
+  /** P2: live province economy by permanent province id (D-118). */
+  const economyByProvinceId = useMemo(() => {
+    const mapById = new Map<number, ProvinceEconomySnapshot>();
+    if (snapshot !== null) for (const province of provinceEconomyRows(snapshot)) mapById.set(province.id, province);
     return mapById;
   }, [snapshot]);
+  /**
+   * Market and foreign controller of a catalogue entry, read from its provinces: a
+   * state's own (non-territory) provinces, or a dependent territory's provinces.
+   */
+  const entryLiveState = useMemo(() => {
+    const byEntryId = new Map<number, { marketId: number | null; controllerCountryId: number | null }>();
+    if (snapshot === null) return byEntryId;
+    const idByTag = new Map(catalog.entries.map((entry) => [entry.tag, entry.id] as const));
+    for (const province of provinceEconomyRows(snapshot)) {
+      const entryId = province.territoryTag !== null ? idByTag.get(province.territoryTag) : province.countryId;
+      if (entryId === undefined || entryId === null) continue;
+      const current = byEntryId.get(entryId) ?? { marketId: null, controllerCountryId: null };
+      byEntryId.set(entryId, {
+        marketId: current.marketId ?? province.marketId,
+        controllerCountryId: current.controllerCountryId ?? province.controllerCountryId,
+      });
+    }
+    return byEntryId;
+  }, [snapshot, catalog]);
   const countryTagById = useMemo(() => {
     const byId = new Map<number, string>();
     if (snapshot !== null) {
@@ -645,16 +667,17 @@ function SvgWorldMap({
   const provinceFillFor = useCallback(
     (province: DecodedProvince): string => {
       const ownerTag = ownerTagByProvinceId.get(province.id) ?? province.initialOwnerTag;
+      const lensFill = dataLensFill(layer, province, economyByProvinceId.get(province.id));
+      if (lensFill !== null) return land(lensFill);
       if (layer === "markets") {
-        const region = regionByPolityId.get(province.simulationRegionId);
-        const marketId = region?.marketId ?? null;
+        const marketId = economyByProvinceId.get(province.id)?.marketId ?? null;
         if (marketId !== null) return land(marketColor(marketId));
       }
       return land(politicalColor(ownerTag === province.initialOwnerTag ? province.mapTag : ownerTag, entryByTag));
     },
     // `land` closes over the era's saturation only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [entryByTag, layer, ownerTagByProvinceId, regionByPolityId, landSaturation],
+    [entryByTag, layer, ownerTagByProvinceId, economyByProvinceId, landSaturation],
   );
 
   const handlePointerMove = useCallback(
@@ -682,8 +705,8 @@ function SvgWorldMap({
   );
 
   const marketIdFor = (polity: DecodedPolity): number | null => {
-    const region = regionByPolityId.get(polity.entry.id);
-    if (region !== undefined && region.marketId !== null) return region.marketId;
+    const live = entryLiveState.get(polity.entry.id);
+    if (live !== undefined && live.marketId !== null) return live.marketId;
     const key = polity.entry.market ?? marketByKey.get(polity.entry.market ?? "")?.key ?? null;
     return catalog.markets.find((market) => market.key === key)?.id ?? null;
   };
@@ -691,8 +714,7 @@ function SvgWorldMap({
   const fillFor = (polity: DecodedPolity): string => {
     const entry = polity.entry;
     if (layer === "markets") {
-      const region = regionByPolityId.get(entry.id);
-      const marketId = region?.marketId;
+      const marketId = entryLiveState.get(entry.id)?.marketId;
       if (marketId !== undefined && marketId !== null) return land(marketColor(marketId));
       const marketKey = entry.market ?? marketByKey.get(entry.market ?? "")?.key;
       const fallback = catalog.markets.find((market) => market.key === marketKey);
@@ -703,9 +725,9 @@ function SvgWorldMap({
 
   const occupationFor = (polity: DecodedPolity) => {
     if (layer !== "control" && layer !== "political") return null;
-    const region = regionByPolityId.get(polity.entry.id);
-    if (region === undefined || region.controllerCountryId === null) return null;
-    const controllerTag = countryTagById.get(region.controllerCountryId) ?? null;
+    const live = entryLiveState.get(polity.entry.id);
+    if (live === undefined || live.controllerCountryId === null) return null;
+    const controllerTag = countryTagById.get(live.controllerCountryId) ?? null;
     return controllerTag;
   };
 
@@ -991,7 +1013,7 @@ function SvgWorldMap({
                     const dimmed =
                       layer === "markets" &&
                       highlightMarketId !== null &&
-                      (regionByPolityId.get(province.simulationRegionId)?.marketId ?? null) !==
+                      (economyByProvinceId.get(province.id)?.marketId ?? null) !==
                         highlightMarketId;
                     return (
                       <Path

@@ -54,7 +54,7 @@ function fixture(): Fixture {
       tag: "TST",
       name: "Test Country",
       monetary: { kind: "own", currencyId: 0 },
-      regionIds: [REGION],
+      provinceIds: [REGION],
       treasuryAccountId: 1000,
       initialTreasuryCashRUSD: 100_000,
       fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
@@ -121,7 +121,7 @@ function startFarm(f: Fixture): number {
     countryId: COUNTRY,
     dayIndex: f.world.dayIndex,
     source: "player",
-    regionId: REGION,
+    provinceId: REGION,
     definitionId: FARM,
   };
   const validation = validateCountryAction(f.world, action, f.scenario.definitions);

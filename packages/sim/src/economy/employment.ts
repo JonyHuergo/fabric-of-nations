@@ -15,7 +15,7 @@ import { workingAgePopulation } from "../population/state.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
-import { buildRegionOwnerMap } from "./country.js";
+import { buildProvinceOwnerMap } from "./country.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import type {
   BuildingDef,
@@ -28,6 +28,7 @@ import type {
 /** Purpose identifiers for the keyed tie-break draws. */
 export const EMPLOYMENT_RETENTION_PURPOSE = "employment.retain";
 export const EMPLOYMENT_BLOCK_REMAINDER_PURPOSE = "employment.block-remainder";
+/** Retired by D-133 (pairing needs no fill-order draw); kept so audits resolve the name. */
 export const EMPLOYMENT_FILL_ORDER_PURPOSE = "employment.fill-order";
 export const EMPLOYMENT_BUILDING_REMAINDER_PURPOSE = "employment.building-remainder";
 
@@ -96,9 +97,9 @@ export function eligibleWorkforceForBlock(
 /**
  * M5 labor-access rule.
  *
- * A resident may take a job in any region of their own country (internal labor
+ * A resident may take a job in any province of their own country (internal labor
  * mobility). A cross-country assignment additionally requires the destination
- * country's provisional open-border policy. Countryless regions form a single
+ * country's provisional open-border policy. Countryless provinces form a single
  * unrestricted area so pre-M5 fixtures keep their behavior.
  *
  * The GDD describes travel/migration limits without fixing them; this is the
@@ -106,24 +107,24 @@ export function eligibleWorkforceForBlock(
  * (D-052).
  */
 export function laborAccessAllowed(
-  regionOwners: ReadonlyMap<Id, Id>,
+  provinceOwners: ReadonlyMap<Id, Id>,
   countries: ReadonlyMap<Id, World["countries"][number]>,
-  sourceRegionId: Id,
-  destinationRegionId: Id,
+  sourceProvinceId: Id,
+  destinationProvinceId: Id,
 ): boolean {
-  const sourceCountry = regionOwners.get(sourceRegionId) ?? null;
-  const destinationCountry = regionOwners.get(destinationRegionId) ?? null;
+  const sourceCountry = provinceOwners.get(sourceProvinceId) ?? null;
+  const destinationCountry = provinceOwners.get(destinationProvinceId) ?? null;
   if (sourceCountry === destinationCountry) return true;
   if (destinationCountry === null) return false;
   return countries.get(destinationCountry)?.immigrationOpen === true;
 }
 
 function countryMaps(world: World): {
-  readonly regionOwners: ReadonlyMap<Id, Id>;
+  readonly provinceOwners: ReadonlyMap<Id, Id>;
   readonly countries: ReadonlyMap<Id, World["countries"][number]>;
 } {
   return {
-    regionOwners: buildRegionOwnerMap(world),
+    provinceOwners: buildProvinceOwnerMap(world),
     countries: new Map(world.countries.map((country) => [country.id, country])),
   };
 }
@@ -233,7 +234,7 @@ function validateAssignments(
   const buildingById = new Map(world.buildings.map((b) => [b.id, b]));
   const definitionById = new Map(definitions.buildings.map((b) => [b.id, b]));
   const blockById = new Map(world.popBlocks.map((b) => [b.id, b]));
-  const { regionOwners, countries } = countryMaps(world);
+  const { provinceOwners, countries } = countryMaps(world);
   const assignedByBlock = new Map<Id, number>();
   const assignedBySlot = new Map<string, number>();
   const keys = new Set<string>();
@@ -259,10 +260,10 @@ function validateAssignments(
       throw new RangeError(`employment assignment ${key} references a non-operational building`);
     }
     if (
-      !laborAccessAllowed(regionOwners, countries, block.regionId, building.regionId)
+      !laborAccessAllowed(provinceOwners, countries, block.provinceId, building.provinceId)
     ) {
       throw new RangeError(
-        `employment assignment ${key} crosses a closed border between regions ${String(block.regionId)} and ${String(building.regionId)}`,
+        `employment assignment ${key} crosses a closed border between provinces ${String(block.provinceId)} and ${String(building.provinceId)}`,
       );
     }
     const eligible = eligibleWorkforceForBlock(block, profession);
@@ -345,7 +346,7 @@ export function refreshEmployment(
   );
   const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
-  const { regionOwners, countries } = countryMaps(world);
+  const { provinceOwners, countries } = countryMaps(world);
   for (const building of world.buildings) {
     if (!buildingDefinitionById.has(building.definitionId)) {
       throw new RangeError(
@@ -391,7 +392,7 @@ export function refreshEmployment(
       definition === undefined ||
       !building.operational ||
       assignment.professionId !== block.professionId ||
-      !laborAccessAllowed(regionOwners, countries, block.regionId, building.regionId) ||
+      !laborAccessAllowed(provinceOwners, countries, block.provinceId, building.provinceId) ||
       eligibleWorkforceForBlock(block, profession) <= 0 ||
       jobSlotsForBuilding(definition, building, assignment.professionId) <= 0
     ) {
@@ -489,40 +490,72 @@ export function refreshEmployment(
         keyedTie(world, dayIndex, block.id, EMPLOYMENT_BLOCK_REMAINDER_PURPOSE),
       ),
     );
-    const fillOrder = eligibleBlocks
-      .map((block, index) => ({
-        block,
-        quota: blockQuotas[index] ?? 0,
-        order: keyedTie(world, dayIndex, block.id, EMPLOYMENT_FILL_ORDER_PURPOSE),
-      }))
-      .filter((candidate) => candidate.quota > 0)
-      .sort((left, right) => left.order - right.order || left.block.id - right.block.id);
-
-    for (const candidate of fillOrder) {
-      const remainingVacancies = vacancyBuildings.map((building) => {
-        const definition = buildingDefinitionById.get(building.definitionId);
-        if (definition === undefined) throw new RangeError("vacancy building has no definition");
-        return (
-          jobSlotsForBuilding(definition, building, profession.id) -
-          (usedSlots.get(`${String(building.id)}:${String(profession.id)}`) ?? 0)
-        );
-      });
-      const remainingTotal = remainingVacancies.reduce((total, value) => total + value, 0);
-      if (candidate.quota > remainingTotal) {
-        throw new RangeError("employment fill quota exceeds remaining building vacancies");
+    // D-133: each building's fill is apportioned once over its vacancies, then block
+    // quotas and building fills are paired, first within each province and then the
+    // remainders in ascending province order. Block and building totals are those of
+    // the apportionments; the pairing creates at most blocks + buildings assignments.
+    const buildingQuotas = apportionLargestRemainder(
+      assignable,
+      buildingWeights,
+      vacancyBuildings.map((building) =>
+        keyedTie(world, dayIndex, building.id, EMPLOYMENT_BUILDING_REMAINDER_PURPOSE),
+      ),
+    );
+    const blockLeft = eligibleBlocks
+      .map((block, index) => ({ block, left: blockQuotas[index] ?? 0 }))
+      .filter((entry) => entry.left > 0)
+      .sort((left, right) => left.block.provinceId - right.block.provinceId || left.block.id - right.block.id);
+    const buildingLeft = vacancyBuildings
+      .map((building, index) => ({ building, left: buildingQuotas[index] ?? 0 }))
+      .filter((entry) => entry.left > 0)
+      .sort((left, right) => left.building.provinceId - right.building.provinceId || left.building.id - right.building.id);
+    const pairs: { block: World["popBlocks"][number]; building: BuildingInstance; workers: number }[] = [];
+    const pairSequential = (
+      blocks: readonly { block: World["popBlocks"][number]; left: number }[],
+      buildings: readonly { building: BuildingInstance; left: number }[],
+    ): void => {
+      let buildingIndex = 0;
+      for (const blockEntry of blocks) {
+        while (blockEntry.left > 0 && buildingIndex < buildings.length) {
+          const buildingEntry = buildings[buildingIndex];
+          if (buildingEntry === undefined) break;
+          if (buildingEntry.left <= 0) {
+            buildingIndex += 1;
+            continue;
+          }
+          const workers = Math.min(blockEntry.left, buildingEntry.left);
+          pairs.push({ block: blockEntry.block, building: buildingEntry.building, workers });
+          blockEntry.left -= workers;
+          buildingEntry.left -= workers;
+        }
       }
-      const buildingAllocations = apportionLargestRemainder(
-        candidate.quota,
-        remainingVacancies,
-        vacancyBuildings.map((building) =>
-          keyedTie(world, dayIndex, building.id, EMPLOYMENT_BUILDING_REMAINDER_PURPOSE),
-        ),
-      );
-      for (let index = 0; index < vacancyBuildings.length; index += 1) {
-        const allocation = buildingAllocations[index] ?? 0;
-        if (allocation === 0) continue;
-        const building = vacancyBuildings[index];
-        if (building === undefined) throw new RangeError("missing vacancy building");
+    };
+    const buildingsByProvince = new Map<Id, { building: BuildingInstance; left: number }[]>();
+    for (const entry of buildingLeft) {
+      const list = buildingsByProvince.get(entry.building.provinceId);
+      if (list === undefined) buildingsByProvince.set(entry.building.provinceId, [entry]);
+      else list.push(entry);
+    }
+    let provinceStart = 0;
+    while (provinceStart < blockLeft.length) {
+      const provinceId = blockLeft[provinceStart]!.block.provinceId;
+      let provinceEnd = provinceStart;
+      while (provinceEnd < blockLeft.length && blockLeft[provinceEnd]!.block.provinceId === provinceId) {
+        provinceEnd += 1;
+      }
+      pairSequential(blockLeft.slice(provinceStart, provinceEnd), buildingsByProvince.get(provinceId) ?? []);
+      provinceStart = provinceEnd;
+    }
+    pairSequential(blockLeft, buildingLeft);
+    if (blockLeft.some((entry) => entry.left !== 0) || buildingLeft.some((entry) => entry.left !== 0)) {
+      throw new RangeError("employment pairing did not reconcile block quotas with building fills");
+    }
+
+    for (const pair of pairs) {
+      const candidate = { block: pair.block };
+      const building = pair.building;
+      const allocation = pair.workers;
+      {
         const key = assignmentKey(candidate.block.id, building.id, profession.id);
         const existing = retainedByKey.get(key);
         if (existing !== undefined) {
@@ -557,7 +590,7 @@ export function refreshEmployment(
   ): Map<number | null, BuildingInstance[]> {
     const groups = new Map<number | null, BuildingInstance[]>();
     for (const building of buildings) {
-      const countryId = regionOwners.get(building.regionId) ?? null;
+      const countryId = provinceOwners.get(building.provinceId) ?? null;
       const list = groups.get(countryId);
       if (list === undefined) groups.set(countryId, [building]);
       else list.push(building);
@@ -582,7 +615,7 @@ export function refreshEmployment(
       const eligibleBlocks = world.popBlocks
         .filter(
           (block) =>
-            (regionOwners.get(block.regionId) ?? null) === countryId &&
+            (provinceOwners.get(block.provinceId) ?? null) === countryId &&
             eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0) > 0,
         )
         .sort((left, right) => left.id - right.id);
@@ -600,13 +633,13 @@ export function refreshEmployment(
   for (const profession of professions) {
     for (const countryId of openCountryIds) {
       const groupBuildings = vacancyBuildingsFor(profession).filter(
-        (building) => (regionOwners.get(building.regionId) ?? null) === countryId,
+        (building) => (provinceOwners.get(building.provinceId) ?? null) === countryId,
       );
       if (groupBuildings.length === 0) continue;
       const eligibleBlocks = world.popBlocks
         .filter(
           (block) =>
-            (regionOwners.get(block.regionId) ?? null) !== countryId &&
+            (provinceOwners.get(block.provinceId) ?? null) !== countryId &&
             eligibleWorkforceForBlock(block, profession) - (usedByBlock.get(block.id) ?? 0) > 0,
         )
         .sort((left, right) => left.id - right.id);
@@ -622,14 +655,19 @@ export function refreshEmployment(
 
   let assignedWorkers = 0;
   for (const assignment of assignments) assignedWorkers += assignment.workers;
+  const assignedByBlock = new Map<Id, number>();
+  const assignedBySlot = new Map<string, number>();
+  for (const assignment of assignments) {
+    assignedByBlock.set(assignment.popBlockId, (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers);
+    const slotKey = `${String(assignment.buildingInstanceId)}:${String(assignment.professionId)}`;
+    assignedBySlot.set(slotKey, (assignedBySlot.get(slotKey) ?? 0) + assignment.workers);
+  }
   let unemployedEligible = 0;
   for (const block of world.popBlocks) {
     const profession = professionById.get(block.professionId);
     if (profession === undefined) continue;
     const eligible = eligibleWorkforceForBlock(block, profession);
-    const assigned = assignments
-      .filter((assignment) => assignment.popBlockId === block.id)
-      .reduce((total, assignment) => total + assignment.workers, 0);
+    const assigned = assignedByBlock.get(block.id) ?? 0;
     unemployedEligible += Math.max(0, eligible - assigned);
   }
   let unfilledSlots = 0;
@@ -640,13 +678,7 @@ export function refreshEmployment(
     }
     for (const job of definition.jobs) {
       const slots = jobSlotsForBuilding(definition, building, job.professionId);
-      const assigned = assignments
-        .filter(
-          (assignment) =>
-            assignment.buildingInstanceId === building.id &&
-            assignment.professionId === job.professionId,
-        )
-        .reduce((total, assignment) => total + assignment.workers, 0);
+      const assigned = assignedBySlot.get(`${String(building.id)}:${String(job.professionId)}`) ?? 0;
       unfilledSlots += Math.max(0, slots - assigned);
     }
   }

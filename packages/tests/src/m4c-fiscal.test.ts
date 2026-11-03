@@ -29,6 +29,7 @@ import {
   type MarketSettlementResult,
   type TickResult,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   __runFiscalPhaseWithHooks,
@@ -131,7 +132,7 @@ function withPopulatedUnemployedBlock(
         ...scenario.population.popBlocks,
         {
           id,
-          regionId: 0,
+          provinceId: 0,
           professionId: 3,
           financialAccountId,
           maleAgeGroups: Array.from({ length: 17 }, () => 100),
@@ -208,22 +209,22 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     );
   });
 
-  test("zero-fiscal countries keep unowned regions valid, active fiscal requires ownership", () => {
+  test("zero-fiscal countries keep unowned provinces valid, active fiscal requires ownership", () => {
     const zero = buildWorld(
       fiscalScenario({
-        countries: [fiscalCountry({ regionIds: [], fiscal: zeroFiscalPolicy() })],
+        countries: [fiscalCountry({ provinceIds: [], fiscal: zeroFiscalPolicy() })],
       }),
     );
-    expect(zero.countries[0]?.regionIds).toEqual([]);
+    expect(countryProvinceIds(zero, zero.countries[0]!.id)).toEqual([]);
 
     const unowned = fiscalScenario({
-      countries: [fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 0 } })],
+      countries: [fiscalCountry({ provinceIds: [], fiscal: { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 0 } })],
     });
     expect(() => buildWorld(unowned)).toThrow(/owned by exactly one country/i);
 
     const unownedBudget = fiscalScenario({
       countries: [
-        fiscalCountry({ regionIds: [], fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 10 } }),
+        fiscalCountry({ provinceIds: [], fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 10 } }),
       ],
     });
     expect(() => buildWorld(unownedBudget)).toThrow(/owned by exactly one country/i);
@@ -255,7 +256,7 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     const duplicateTreasury = fiscalScenario({
       countries: [
         fiscalCountry({ id: 0 }),
-        fiscalCountry({ id: 1, tag: "T1", regionIds: [], treasuryAccountId: FISCAL_TREASURY_ACCOUNT_ID }),
+        fiscalCountry({ id: 1, tag: "T1", provinceIds: [], treasuryAccountId: FISCAL_TREASURY_ACCOUNT_ID }),
       ],
     });
     expect(() => buildWorld(duplicateTreasury)).toThrow(/duplicate .*treasury account id/i);
@@ -329,9 +330,9 @@ describe("M4c fiscal accounts, construction, and validation", () => {
 
     const clone = cloneWorld(world);
     clone.countries[0]!.fiscal.incomeTaxRate = 0;
-    clone.countries[0]!.regionIds.push(7);
+    clone.provinces.ownership[0]!.ownerPolityId = 7;
     expect(world.countries[0]?.fiscal.incomeTaxRate).toBe(0.15);
-    expect(world.countries[0]?.regionIds).toEqual([0]);
+    expect(countryProvinceIds(world, world.countries[0]!.id)).toEqual([0]);
   });
 
   test("rejects schema-8 and simulation-0.8.0 saves with actionable errors", () => {
@@ -701,7 +702,7 @@ describe("M4c budgeted welfare transfers", () => {
         fiscalCountry({
           id: 1,
           tag: "T1",
-          regionIds: [],
+          provinceIds: [],
           treasuryAccountId: 1001,
           initialTreasuryCashRUSD: 100,
           monetary: { kind: "adopted", currencyId: 0 },
@@ -722,7 +723,7 @@ describe("M4c budgeted welfare transfers", () => {
     const base = fiscalScenario({ rate: 0, budget: 36_500, treasuryCash: 1_000 });
     const zeroBlock = {
       id: 4,
-      regionId: 0,
+      provinceId: 0,
       professionId: 0,
       financialAccountId: 500,
       maleAgeGroups: Array.from({ length: 17 }, () => 0),
@@ -759,7 +760,7 @@ describe("M4c budgeted welfare transfers", () => {
         fiscalCountry({
           id: 1,
           tag: "T1",
-          regionIds: [],
+          provinceIds: [],
           treasuryAccountId: 1001,
           monetary: { kind: "adopted", currencyId: 0 },
           fiscal: { incomeTaxRate: 0.2, welfareBudgetRUSDPerYear: 7_300 },

@@ -37,9 +37,23 @@ export function diffProvinceStates(
       before?.ownerTag !== state.ownerTag ||
       before.controllerTag !== state.controllerTag ||
       before.unitTag !== state.unitTag ||
-      before.marketId !== state.marketId
+      before.marketId !== state.marketId ||
+      before.densityPerKm2 !== state.densityPerKm2 ||
+      before.urbanShare !== state.urbanShare ||
+      before.literacy !== state.literacy ||
+      before.unrest !== state.unrest
     ) {
-      changes.push([index, state.ownerTag, state.controllerTag, state.unitTag, state.marketId]);
+      changes.push([
+        index,
+        state.ownerTag,
+        state.controllerTag,
+        state.unitTag,
+        state.marketId,
+        state.densityPerKm2,
+        state.urbanShare,
+        state.literacy,
+        state.unrest,
+      ]);
     }
   });
   return changes;

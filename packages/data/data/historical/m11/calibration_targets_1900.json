@@ -278,11 +278,12 @@
     "year": 1900,
     "units": "people",
     "definition": "Authored 1900 population aggregate for this polity and its dependent territories.",
-    "target": 12880000,
+    "target": 13355513,
     "toleranceRelative": 0.000001,
     "sourceIds": [
       "owid-population",
-      "maddison-2023"
+      "maddison-2023",
+      "goa-census-1900"
     ],
     "confidence": "medium",
     "status": "provisional",
@@ -295,11 +296,12 @@
     "year": 1900,
     "units": "share of population",
     "definition": "Share of the country's modelled population in the peasant profession.",
-    "target": 0.6181366459627329,
+    "target": 0.6237414466969557,
     "toleranceAbsolute": 0.000001,
     "sourceIds": [
       "owid-employment-by-sector",
-      "project-authored-1900"
+      "project-authored-1900",
+      "goa-census-1900"
     ],
     "confidence": "low",
     "status": "provisional",

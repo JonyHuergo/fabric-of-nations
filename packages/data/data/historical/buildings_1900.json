@@ -1,7 +1,7 @@
 [
   {
     "key": "usa-northeast-subsistence-farm",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "subsistence-farm",
     "level": 137,
     "ownerProfessionKey": "peasants",
@@ -10,7 +10,7 @@
   },
   {
     "key": "usa-northeast-commercial-farm",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "commercial-farm",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -19,7 +19,7 @@
   },
   {
     "key": "usa-northeast-warehouse",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -28,7 +28,7 @@
   },
   {
     "key": "usa-northeast-food-processing",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "food-processing",
     "level": 20,
     "ownerProfessionKey": "clerks",
@@ -37,7 +37,7 @@
   },
   {
     "key": "usa-northeast-textile-mill",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "textile-mill",
     "level": 31,
     "ownerProfessionKey": "clerks",
@@ -46,7 +46,7 @@
   },
   {
     "key": "usa-northeast-workshop",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "workshop",
     "level": 29,
     "ownerProfessionKey": "clerks",
@@ -55,7 +55,7 @@
   },
   {
     "key": "usa-northeast-ranch",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "ranch",
     "level": 21,
     "ownerProfessionKey": "peasants",
@@ -64,7 +64,7 @@
   },
   {
     "key": "usa-northeast-fishery",
-    "regionId": 0,
+    "provinceId": 0,
     "definitionKey": "fishery",
     "level": 21,
     "ownerProfessionKey": "peasants",
@@ -73,7 +73,7 @@
   },
   {
     "key": "usa-south-subsistence-farm",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "subsistence-farm",
     "level": 112,
     "ownerProfessionKey": "peasants",
@@ -82,7 +82,7 @@
   },
   {
     "key": "usa-south-commercial-farm",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "commercial-farm",
     "level": 14,
     "ownerProfessionKey": "peasants",
@@ -91,7 +91,7 @@
   },
   {
     "key": "usa-south-warehouse",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -100,7 +100,7 @@
   },
   {
     "key": "usa-south-food-processing",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "food-processing",
     "level": 17,
     "ownerProfessionKey": "clerks",
@@ -109,7 +109,7 @@
   },
   {
     "key": "usa-south-ranch",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "ranch",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -118,7 +118,7 @@
   },
   {
     "key": "usa-south-fishery",
-    "regionId": 1,
+    "provinceId": 1,
     "definitionKey": "fishery",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -127,7 +127,7 @@
   },
   {
     "key": "gbr-britain-subsistence-farm",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "subsistence-farm",
     "level": 122,
     "ownerProfessionKey": "peasants",
@@ -136,7 +136,7 @@
   },
   {
     "key": "gbr-britain-commercial-farm",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "commercial-farm",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -145,7 +145,7 @@
   },
   {
     "key": "gbr-britain-warehouse",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -154,7 +154,7 @@
   },
   {
     "key": "gbr-britain-food-processing",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "food-processing",
     "level": 18,
     "ownerProfessionKey": "clerks",
@@ -163,7 +163,7 @@
   },
   {
     "key": "gbr-britain-textile-mill",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "textile-mill",
     "level": 27,
     "ownerProfessionKey": "clerks",
@@ -172,7 +172,7 @@
   },
   {
     "key": "gbr-britain-workshop",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "workshop",
     "level": 26,
     "ownerProfessionKey": "clerks",
@@ -181,7 +181,7 @@
   },
   {
     "key": "gbr-britain-ranch",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "ranch",
     "level": 19,
     "ownerProfessionKey": "peasants",
@@ -190,7 +190,7 @@
   },
   {
     "key": "gbr-britain-fishery",
-    "regionId": 2,
+    "provinceId": 2,
     "definitionKey": "fishery",
     "level": 19,
     "ownerProfessionKey": "peasants",
@@ -199,7 +199,7 @@
   },
   {
     "key": "gbr-ireland-subsistence-farm",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "subsistence-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -208,7 +208,7 @@
   },
   {
     "key": "gbr-ireland-commercial-farm",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "commercial-farm",
     "level": 1,
     "ownerProfessionKey": "peasants",
@@ -217,7 +217,7 @@
   },
   {
     "key": "gbr-ireland-warehouse",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -226,7 +226,7 @@
   },
   {
     "key": "gbr-ireland-food-processing",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "food-processing",
     "level": 2,
     "ownerProfessionKey": "clerks",
@@ -235,7 +235,7 @@
   },
   {
     "key": "gbr-ireland-ranch",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "ranch",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -244,7 +244,7 @@
   },
   {
     "key": "gbr-ireland-fishery",
-    "regionId": 3,
+    "provinceId": 3,
     "definitionKey": "fishery",
     "level": 2,
     "ownerProfessionKey": "peasants",
@@ -253,7 +253,7 @@
   },
   {
     "key": "deu-prussia-subsistence-farm",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "subsistence-farm",
     "level": 110,
     "ownerProfessionKey": "peasants",
@@ -262,7 +262,7 @@
   },
   {
     "key": "deu-prussia-commercial-farm",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "commercial-farm",
     "level": 13,
     "ownerProfessionKey": "peasants",
@@ -271,7 +271,7 @@
   },
   {
     "key": "deu-prussia-warehouse",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -280,7 +280,7 @@
   },
   {
     "key": "deu-prussia-food-processing",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "food-processing",
     "level": 16,
     "ownerProfessionKey": "clerks",
@@ -289,7 +289,7 @@
   },
   {
     "key": "deu-prussia-textile-mill",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "textile-mill",
     "level": 28,
     "ownerProfessionKey": "clerks",
@@ -298,7 +298,7 @@
   },
   {
     "key": "deu-prussia-workshop",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "workshop",
     "level": 19,
     "ownerProfessionKey": "clerks",
@@ -307,7 +307,7 @@
   },
   {
     "key": "deu-prussia-ranch",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "ranch",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -316,7 +316,7 @@
   },
   {
     "key": "deu-prussia-fishery",
-    "regionId": 4,
+    "provinceId": 4,
     "definitionKey": "fishery",
     "level": 17,
     "ownerProfessionKey": "peasants",
@@ -325,7 +325,7 @@
   },
   {
     "key": "deu-south-subsistence-farm",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "subsistence-farm",
     "level": 74,
     "ownerProfessionKey": "peasants",
@@ -334,7 +334,7 @@
   },
   {
     "key": "deu-south-commercial-farm",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "commercial-farm",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -343,7 +343,7 @@
   },
   {
     "key": "deu-south-warehouse",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -352,7 +352,7 @@
   },
   {
     "key": "deu-south-food-processing",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "food-processing",
     "level": 11,
     "ownerProfessionKey": "clerks",
@@ -361,7 +361,7 @@
   },
   {
     "key": "deu-south-workshop",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "workshop",
     "level": 13,
     "ownerProfessionKey": "clerks",
@@ -370,7 +370,7 @@
   },
   {
     "key": "deu-south-ranch",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "ranch",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -379,7 +379,7 @@
   },
   {
     "key": "deu-south-fishery",
-    "regionId": 5,
+    "provinceId": 5,
     "definitionKey": "fishery",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -388,7 +388,7 @@
   },
   {
     "key": "fra-north-subsistence-farm",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "subsistence-farm",
     "level": 70,
     "ownerProfessionKey": "peasants",
@@ -397,7 +397,7 @@
   },
   {
     "key": "fra-north-commercial-farm",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "commercial-farm",
     "level": 8,
     "ownerProfessionKey": "peasants",
@@ -406,7 +406,7 @@
   },
   {
     "key": "fra-north-warehouse",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -415,7 +415,7 @@
   },
   {
     "key": "fra-north-food-processing",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "food-processing",
     "level": 10,
     "ownerProfessionKey": "clerks",
@@ -424,7 +424,7 @@
   },
   {
     "key": "fra-north-textile-mill",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "textile-mill",
     "level": 18,
     "ownerProfessionKey": "clerks",
@@ -433,7 +433,7 @@
   },
   {
     "key": "fra-north-workshop",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "workshop",
     "level": 12,
     "ownerProfessionKey": "clerks",
@@ -442,7 +442,7 @@
   },
   {
     "key": "fra-north-ranch",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "ranch",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -451,7 +451,7 @@
   },
   {
     "key": "fra-north-fishery",
-    "regionId": 6,
+    "provinceId": 6,
     "definitionKey": "fishery",
     "level": 11,
     "ownerProfessionKey": "peasants",
@@ -460,7 +460,7 @@
   },
   {
     "key": "fra-south-subsistence-farm",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "subsistence-farm",
     "level": 57,
     "ownerProfessionKey": "peasants",
@@ -469,7 +469,7 @@
   },
   {
     "key": "fra-south-commercial-farm",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "commercial-farm",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -478,7 +478,7 @@
   },
   {
     "key": "fra-south-warehouse",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -487,7 +487,7 @@
   },
   {
     "key": "fra-south-food-processing",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "food-processing",
     "level": 9,
     "ownerProfessionKey": "clerks",
@@ -496,7 +496,7 @@
   },
   {
     "key": "fra-south-ranch",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "ranch",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -505,7 +505,7 @@
   },
   {
     "key": "fra-south-fishery",
-    "regionId": 7,
+    "provinceId": 7,
     "definitionKey": "fishery",
     "level": 9,
     "ownerProfessionKey": "peasants",
@@ -514,7 +514,7 @@
   },
   {
     "key": "rus-ukraine-subsistence-farm",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "subsistence-farm",
     "level": 196,
     "ownerProfessionKey": "peasants",
@@ -523,7 +523,7 @@
   },
   {
     "key": "rus-ukraine-commercial-farm",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "commercial-farm-peasant",
     "level": 23,
     "ownerProfessionKey": "peasants",
@@ -532,7 +532,7 @@
   },
   {
     "key": "rus-ukraine-warehouse",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -541,7 +541,7 @@
   },
   {
     "key": "rus-ukraine-food-processing",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "food-processing",
     "level": 29,
     "ownerProfessionKey": "clerks",
@@ -550,7 +550,7 @@
   },
   {
     "key": "rus-ukraine-ranch",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "ranch",
     "level": 30,
     "ownerProfessionKey": "peasants",
@@ -559,7 +559,7 @@
   },
   {
     "key": "rus-ukraine-fishery",
-    "regionId": 8,
+    "provinceId": 8,
     "definitionKey": "fishery",
     "level": 30,
     "ownerProfessionKey": "peasants",
@@ -568,7 +568,7 @@
   },
   {
     "key": "rus-central-subsistence-farm",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "subsistence-farm",
     "level": 249,
     "ownerProfessionKey": "peasants",
@@ -577,7 +577,7 @@
   },
   {
     "key": "rus-central-commercial-farm",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "commercial-farm-peasant",
     "level": 30,
     "ownerProfessionKey": "peasants",
@@ -586,7 +586,7 @@
   },
   {
     "key": "rus-central-warehouse",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -595,7 +595,7 @@
   },
   {
     "key": "rus-central-food-processing",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "food-processing",
     "level": 36,
     "ownerProfessionKey": "clerks",
@@ -604,7 +604,7 @@
   },
   {
     "key": "rus-central-textile-mill",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "textile-mill",
     "level": 66,
     "ownerProfessionKey": "clerks",
@@ -613,7 +613,7 @@
   },
   {
     "key": "rus-central-workshop",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "workshop-peasant",
     "level": 63,
     "ownerProfessionKey": "clerks",
@@ -622,7 +622,7 @@
   },
   {
     "key": "rus-central-ranch",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "ranch",
     "level": 38,
     "ownerProfessionKey": "peasants",
@@ -631,7 +631,7 @@
   },
   {
     "key": "rus-central-fishery",
-    "regionId": 9,
+    "provinceId": 9,
     "definitionKey": "fishery",
     "level": 38,
     "ownerProfessionKey": "peasants",
@@ -640,7 +640,7 @@
   },
   {
     "key": "jpn-honshu-subsistence-farm",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "subsistence-farm",
     "level": 98,
     "ownerProfessionKey": "peasants",
@@ -649,7 +649,7 @@
   },
   {
     "key": "jpn-honshu-commercial-farm",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "commercial-farm-peasant",
     "level": 12,
     "ownerProfessionKey": "peasants",
@@ -658,7 +658,7 @@
   },
   {
     "key": "jpn-honshu-warehouse",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -667,7 +667,7 @@
   },
   {
     "key": "jpn-honshu-food-processing",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "food-processing",
     "level": 14,
     "ownerProfessionKey": "clerks",
@@ -676,7 +676,7 @@
   },
   {
     "key": "jpn-honshu-textile-mill",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "textile-mill",
     "level": 25,
     "ownerProfessionKey": "clerks",
@@ -685,7 +685,7 @@
   },
   {
     "key": "jpn-honshu-workshop",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "workshop-peasant",
     "level": 24,
     "ownerProfessionKey": "capitalists",
@@ -694,7 +694,7 @@
   },
   {
     "key": "jpn-honshu-ranch",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "ranch",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -703,7 +703,7 @@
   },
   {
     "key": "jpn-honshu-fishery",
-    "regionId": 10,
+    "provinceId": 10,
     "definitionKey": "fishery",
     "level": 15,
     "ownerProfessionKey": "peasants",
@@ -712,7 +712,7 @@
   },
   {
     "key": "jpn-kyushu-subsistence-farm",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "subsistence-farm",
     "level": 46,
     "ownerProfessionKey": "peasants",
@@ -721,7 +721,7 @@
   },
   {
     "key": "jpn-kyushu-commercial-farm",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "commercial-farm-peasant",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -730,7 +730,7 @@
   },
   {
     "key": "jpn-kyushu-warehouse",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -739,7 +739,7 @@
   },
   {
     "key": "jpn-kyushu-food-processing",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "food-processing",
     "level": 7,
     "ownerProfessionKey": "clerks",
@@ -748,7 +748,7 @@
   },
   {
     "key": "jpn-kyushu-ranch",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "ranch",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -757,7 +757,7 @@
   },
   {
     "key": "jpn-kyushu-fishery",
-    "regionId": 11,
+    "provinceId": 11,
     "definitionKey": "fishery",
     "level": 7,
     "ownerProfessionKey": "peasants",
@@ -766,7 +766,7 @@
   },
   {
     "key": "ind-bengal-subsistence-farm",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "subsistence-farm",
     "level": 427,
     "ownerProfessionKey": "peasants",
@@ -775,7 +775,7 @@
   },
   {
     "key": "ind-bengal-commercial-farm",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "commercial-farm-peasant",
     "level": 51,
     "ownerProfessionKey": "peasants",
@@ -784,7 +784,7 @@
   },
   {
     "key": "ind-bengal-warehouse",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -793,7 +793,7 @@
   },
   {
     "key": "ind-bengal-food-processing",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "food-processing",
     "level": 63,
     "ownerProfessionKey": "clerks",
@@ -802,7 +802,7 @@
   },
   {
     "key": "ind-bengal-textile-mill",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "textile-mill",
     "level": 112,
     "ownerProfessionKey": "clerks",
@@ -811,7 +811,7 @@
   },
   {
     "key": "ind-bengal-workshop",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "workshop-peasant",
     "level": 107,
     "ownerProfessionKey": "capitalists",
@@ -820,7 +820,7 @@
   },
   {
     "key": "ind-bengal-ranch",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "ranch",
     "level": 65,
     "ownerProfessionKey": "peasants",
@@ -829,7 +829,7 @@
   },
   {
     "key": "ind-bengal-fishery",
-    "regionId": 12,
+    "provinceId": 12,
     "definitionKey": "fishery",
     "level": 65,
     "ownerProfessionKey": "peasants",
@@ -838,7 +838,7 @@
   },
   {
     "key": "ind-madras-subsistence-farm",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "subsistence-farm",
     "level": 350,
     "ownerProfessionKey": "peasants",
@@ -847,7 +847,7 @@
   },
   {
     "key": "ind-madras-commercial-farm",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "commercial-farm-peasant",
     "level": 42,
     "ownerProfessionKey": "peasants",
@@ -856,7 +856,7 @@
   },
   {
     "key": "ind-madras-warehouse",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -865,7 +865,7 @@
   },
   {
     "key": "ind-madras-food-processing",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "food-processing",
     "level": 51,
     "ownerProfessionKey": "clerks",
@@ -874,7 +874,7 @@
   },
   {
     "key": "ind-madras-ranch",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "ranch",
     "level": 54,
     "ownerProfessionKey": "peasants",
@@ -883,7 +883,7 @@
   },
   {
     "key": "ind-madras-fishery",
-    "regionId": 13,
+    "provinceId": 13,
     "definitionKey": "fishery",
     "level": 54,
     "ownerProfessionKey": "peasants",
@@ -892,7 +892,7 @@
   },
   {
     "key": "bra-southeast-subsistence-farm",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "subsistence-farm",
     "level": 39,
     "ownerProfessionKey": "peasants",
@@ -901,7 +901,7 @@
   },
   {
     "key": "bra-southeast-commercial-farm",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "commercial-farm",
     "level": 5,
     "ownerProfessionKey": "peasants",
@@ -910,7 +910,7 @@
   },
   {
     "key": "bra-southeast-warehouse",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -919,7 +919,7 @@
   },
   {
     "key": "bra-southeast-food-processing",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "food-processing",
     "level": 6,
     "ownerProfessionKey": "clerks",
@@ -928,7 +928,7 @@
   },
   {
     "key": "bra-southeast-textile-mill",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "textile-mill",
     "level": 10,
     "ownerProfessionKey": "clerks",
@@ -937,7 +937,7 @@
   },
   {
     "key": "bra-southeast-workshop",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "workshop",
     "level": 9,
     "ownerProfessionKey": "capitalists",
@@ -946,7 +946,7 @@
   },
   {
     "key": "bra-southeast-ranch",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "ranch",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -955,7 +955,7 @@
   },
   {
     "key": "bra-southeast-fishery",
-    "regionId": 14,
+    "provinceId": 14,
     "definitionKey": "fishery",
     "level": 6,
     "ownerProfessionKey": "peasants",
@@ -964,7 +964,7 @@
   },
   {
     "key": "bra-northeast-subsistence-farm",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "subsistence-farm",
     "level": 18,
     "ownerProfessionKey": "peasants",
@@ -973,7 +973,7 @@
   },
   {
     "key": "bra-northeast-commercial-farm",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "commercial-farm",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -982,7 +982,7 @@
   },
   {
     "key": "bra-northeast-warehouse",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "warehouse",
     "level": 100,
     "ownerProfessionKey": "peasants",
@@ -991,7 +991,7 @@
   },
   {
     "key": "bra-northeast-food-processing",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "food-processing",
     "level": 3,
     "ownerProfessionKey": "clerks",
@@ -1000,7 +1000,7 @@
   },
   {
     "key": "bra-northeast-ranch",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "ranch",
     "level": 3,
     "ownerProfessionKey": "peasants",
@@ -1009,7 +1009,7 @@
   },
   {
     "key": "bra-northeast-fishery",
-    "regionId": 15,
+    "provinceId": 15,
     "definitionKey": "fishery",
     "level": 3,
     "ownerProfessionKey": "peasants",

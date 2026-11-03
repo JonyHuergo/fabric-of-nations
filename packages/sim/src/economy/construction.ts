@@ -21,7 +21,7 @@
  * 5. cancelled projects write their spent work-in-progress off to country equity.
  *
  * The phase operates on a shallow staged world (finance, projects, buildings, and
- * regions are copies) and publishes only after complete validation. All postings
+ * provinces are copies) and publishes only after complete validation. All postings
  * are balanced and cash-neutral; no construction flow creates cash or expense.
  */
 
@@ -79,6 +79,7 @@ import type {
   FinancialAccount,
   Market,
 } from "./types.js";
+import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
@@ -159,24 +160,21 @@ function allocateAccount(
   return account;
 }
 
-function regionOwner(world: World, regionId: Id): Id | null {
-  for (const country of world.countries) {
-    if (country.regionIds.includes(regionId)) return country.id;
-  }
-  return null;
+function provinceOwner(world: World, provinceId: Id): Id | null {
+  return buildProvinceOwnerMap(world).get(provinceId) ?? null;
 }
 
 function projectMarket(world: World, project: ConstructionProject): Market {
-  const region = world.regions.find((candidate) => candidate.id === project.regionId);
-  if (region === undefined) {
-    throw new RangeError(`construction project region ${String(project.regionId)} is missing`);
+  const province = world.provinceEconomies.find((candidate) => candidate.id === project.provinceId);
+  if (province === undefined) {
+    throw new RangeError(`construction project province ${String(project.provinceId)} is missing`);
   }
-  if (region.marketId === null) {
-    throw new RangeError(`construction project region ${String(region.id)} has no market`);
+  if (province.marketId === null) {
+    throw new RangeError(`construction project province ${String(province.id)} has no market`);
   }
-  const market = world.markets.find((candidate) => candidate.id === region.marketId);
+  const market = world.markets.find((candidate) => candidate.id === province.marketId);
   if (market === undefined) {
-    throw new RangeError(`construction project market ${String(region.marketId)} is missing`);
+    throw new RangeError(`construction project market ${String(province.marketId)} is missing`);
   }
   return market;
 }
@@ -290,17 +288,17 @@ function procureProjectMaterials(
 function createCompletedBuilding(
   world: World,
   definitionId: Id,
-  regionId: Id,
+  provinceId: Id,
   countryId: Id,
   dayIndex: Day,
 ): { building: BuildingInstance; operatingCashAccountId: Id; equityAccountId: Id } {
   const finance = world.finance;
   const country = world.countries.find((candidate) => candidate.id === countryId);
   if (country === undefined) throw new RangeError(`unknown country ${String(countryId)}`);
-  const region = world.regions.find((candidate) => candidate.id === regionId);
-  if (region === undefined) throw new RangeError(`unknown region ${String(regionId)}`);
-  if (regionOwner(world, regionId) !== countryId) {
-    throw new RangeError(`region ${String(regionId)} is not owned by country ${String(countryId)}`);
+  const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+  if (province === undefined) throw new RangeError(`unknown province ${String(provinceId)}`);
+  if (provinceOwner(world, provinceId) !== countryId) {
+    throw new RangeError(`province ${String(provinceId)} is not owned by country ${String(countryId)}`);
   }
   const buildingId = world.construction.nextBuildingId;
   if (!Number.isSafeInteger(buildingId) || buildingId < 1) {
@@ -328,7 +326,7 @@ function createCompletedBuilding(
   const building: BuildingInstance = {
     id: buildingId,
     definitionId,
-    regionId,
+    provinceId,
     level: 1,
     condition: 1,
     ownerKind: "state",
@@ -339,8 +337,8 @@ function createCompletedBuilding(
   };
   world.buildings.push(building);
   world.buildings.sort((left, right) => left.id - right.id);
-  region.buildingInstanceIds.push(buildingId);
-  region.buildingInstanceIds.sort((left, right) => left - right);
+  province.buildingInstanceIds.push(buildingId);
+  province.buildingInstanceIds.sort((left, right) => left - right);
   world.construction.nextBuildingId = buildingId + 1;
   world.employmentDirty = true;
   finance.accounts.sort((left, right) => left.id - right.id);
@@ -446,15 +444,14 @@ export function runConstructionPhase(
   const stagedFinance = cloneFinanceState(world.finance);
   const stagedConstruction = cloneConstructionState(world.construction);
   const stagedBuildings = world.buildings.map((building) => ({ ...building }));
-  const stagedRegions = world.regions.map((region) => ({
-    ...region,
-    buildingInstanceIds: [...region.buildingInstanceIds],
+  const stagedProvinces = world.provinceEconomies.map((province) => ({
+    ...province,
+    buildingInstanceIds: [...province.buildingInstanceIds],
   }));
   // Material procurement is a physical market-stock mutation. Stage the markets
   // too, so a failed construction phase cannot consume another project's goods.
   const stagedMarkets = world.markets.map((market) => ({
     ...market,
-    regionIds: [...market.regionIds],
     priceRUSD: [...market.priceRUSD],
     stockLots: market.stockLots.map((lot) => ({ ...lot })),
   }));
@@ -463,7 +460,7 @@ export function runConstructionPhase(
     finance: stagedFinance,
     construction: stagedConstruction,
     buildings: stagedBuildings,
-    regions: stagedRegions,
+    provinceEconomies: stagedProvinces,
     markets: stagedMarkets,
   };
   const index = buildFinanceIndex(stagedFinance);
@@ -502,9 +499,9 @@ export function runConstructionPhase(
         `construction project ${String(project.id)} references unknown country`,
       );
     }
-    if (regionOwner(staged, project.regionId) !== country.id) {
+    if (provinceOwner(staged, project.provinceId) !== country.id) {
       throw new RangeError(
-        `construction project ${String(project.id)} region is not owned by its country`,
+        `construction project ${String(project.id)} province is not owned by its country`,
       );
     }
     const treasury = index.get("country", country.id, "treasury-cash");
@@ -566,8 +563,9 @@ export function runConstructionPhase(
     const professionById = new Map(
       definitions.professions.map((profession) => [profession.id, profession]),
     );
+    const ownedProvinces = new Set(countryProvinceIds(staged, country.id));
     const blocks = [...staged.popBlocks]
-      .filter((block) => country.regionIds.includes(block.regionId))
+      .filter((block) => ownedProvinces.has(block.provinceId))
       .sort((left, right) => left.id - right.id);
     const groupGross = new Map<Id, number>();
     const groupWorkers = new Map<Id, number>();
@@ -740,7 +738,7 @@ export function runConstructionPhase(
     const created = createCompletedBuilding(
       staged,
       project.definitionId,
-      project.regionId,
+      project.provinceId,
       project.countryId,
       dayIndex,
     );
@@ -860,7 +858,7 @@ export function runConstructionPhase(
   world.finance = staged.finance;
   world.construction = staged.construction;
   world.buildings = staged.buildings;
-  world.regions = staged.regions;
+  world.provinceEconomies = staged.provinceEconomies;
   world.markets = staged.markets;
   world.employmentDirty = staged.employmentDirty;
   const postingIds = [...wagePostings, ...completionPostings].map((posting) => posting.id);
@@ -881,7 +879,7 @@ export function runConstructionPhase(
 /** Input for starting a public-construction project. */
 export interface ConstructionStartInput {
   readonly countryId: Id;
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly definitionId: Id;
 }
 
@@ -932,13 +930,13 @@ export function validateConstructionStart(
       `definition ${String(definition.id)} requires un-researched technology ${String(definition.requiredTechnologyId)}`,
     );
   }
-  const region = world.regions.find((entry) => entry.id === input.regionId);
-  if (region === undefined) throw new RangeError(`unknown region ${String(input.regionId)}`);
-  if (regionOwner(world, region.id) !== country.id) {
-    throw new RangeError(`region ${String(region.id)} is not owned by country ${String(country.id)}`);
+  const province = world.provinceEconomies.find((entry) => entry.id === input.provinceId);
+  if (province === undefined) throw new RangeError(`unknown province ${String(input.provinceId)}`);
+  if (provinceOwner(world, province.id) !== country.id) {
+    throw new RangeError(`province ${String(province.id)} is not owned by country ${String(country.id)}`);
   }
-  if (world.markets.length > 0 && region.marketId === null) {
-    throw new RangeError(`region ${String(region.id)} has no market`);
+  if (world.markets.length > 0 && province.marketId === null) {
+    throw new RangeError(`province ${String(province.id)} has no market`);
   }
   if (!world.profitDistribution.enabled) {
     throw new RangeError(
@@ -979,7 +977,7 @@ export function startConstruction(
   const project: ConstructionProject = {
     id: world.construction.nextProjectId,
     countryId: input.countryId,
-    regionId: input.regionId,
+    provinceId: input.provinceId,
     definitionId: input.definitionId,
     status: "authorized",
     authorizedDay: world.dayIndex,

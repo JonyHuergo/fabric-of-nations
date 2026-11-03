@@ -7,8 +7,9 @@
  *   foreign issuer).
  * - A country may issue a currency and adopt a different one for domestic use.
  *
- * `Country.regionIds` is the sole authoritative country-to-region ownership
- * relation. Unassigned regions are permitted; lookups return an explicit null.
+ * Country territory is derived from `World.provinces.ownership` (D-118): a country
+ * owns the provinces whose `ownerPolityId` is its id. Unowned provinces are
+ * permitted in fixtures; lookups return an explicit null.
  *
  * M4c adds `treasuryAccountId` and the provisional `fiscal` policy to each
  * country. Issuance and domestic use remain independent, and no monetary
@@ -68,7 +69,8 @@ export interface CountryIdentityInput {
   readonly tag: string;
   readonly name: string;
   readonly monetary: MonetaryArrangement;
-  readonly regionIds: readonly Id[];
+  /** Scenario input only: initial territory. Runtime countries store none (D-118). */
+  readonly provinceIds?: readonly Id[];
   readonly treasuryAccountId: Id;
   /**
    * Runtime worlds carry the complete E2 policy; scenario input may omit the E2
@@ -82,7 +84,7 @@ export interface CountryCurrencyValidationInput {
   readonly countries: readonly CountryIdentityInput[];
   readonly currencies: readonly Currency[];
   readonly currencyValuations: readonly CurrencyValuation[];
-  readonly regionIds: ReadonlySet<Id>;
+  readonly provinceIds: ReadonlySet<Id>;
   /** When provided, specified valuations must be set on this day. */
   readonly expectedStartDay?: Day;
   /**
@@ -99,29 +101,78 @@ export function currencyIdOf(country: Country): Id {
 }
 
 /**
- * Owner of a region: country id when assigned, `null` for a known unassigned
- * region, and a thrown error for an unknown region id. Never guesses.
+ * Owner country of a province: the simulation country whose id is the province's
+ * `ownerPolityId`, `null` for a province with no ownership record or one owned by a
+ * registry polity that is not a simulation country, and a thrown error for an
+ * unknown province id. Never guesses.
  */
-export function regionOwner(world: World, regionId: Id): Id | null {
-  if (!world.regions.some((region) => region.id === regionId)) {
-    throw new RangeError(`unknown region ${String(regionId)}`);
+export function provinceOwner(world: World, provinceId: Id): Id | null {
+  if (!world.provinceEconomies.some((province) => province.id === provinceId)) {
+    throw new RangeError(`unknown province ${String(provinceId)}`);
   }
-  for (const country of world.countries) {
-    if (country.regionIds.includes(regionId)) return country.id;
-  }
-  return null;
+  return buildProvinceOwnerMap(world).get(provinceId) ?? null;
 }
 
 /**
- * Transient region-to-country ownership lookup. Country validation has already
- * rejected duplicate region claims, so a conflict cannot be hidden here.
+ * Transient province-to-owner-country lookup derived from province ownership
+ * (D-118). Only owners that are simulation countries appear. O(provinces).
  */
-export function buildRegionOwnerMap(world: World): ReadonlyMap<Id, Id> {
+export function buildProvinceOwnerMap(world: World): ReadonlyMap<Id, Id> {
   const owners = new Map<Id, Id>();
-  for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    for (const regionId of country.regionIds) owners.set(regionId, country.id);
+  if (!world.provinces.enabled) return owners;
+  const countryIds = new Set<Id>();
+  for (const country of world.countries) countryIds.add(country.id);
+  for (const record of world.provinces.ownership) {
+    if (countryIds.has(record.ownerPolityId)) owners.set(record.provinceId, record.ownerPolityId);
   }
   return owners;
+}
+
+/**
+ * Province ids owned by each simulation country, ascending, derived from province
+ * ownership. Every country has an entry, possibly empty.
+ */
+export function buildCountryProvinceMap(world: World): ReadonlyMap<Id, readonly Id[]> {
+  const byCountry = new Map<Id, Id[]>();
+  for (const country of world.countries) byCountry.set(country.id, []);
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      byCountry.get(record.ownerPolityId)?.push(record.provinceId);
+    }
+  }
+  return byCountry;
+}
+
+/** Province ids owned by one country, ascending (ownership is stored ascending). */
+export function countryProvinceIds(world: World, countryId: Id): Id[] {
+  const result: Id[] = [];
+  if (!world.provinces.enabled) return result;
+  for (const record of world.provinces.ownership) {
+    if (record.ownerPolityId === countryId) result.push(record.provinceId);
+  }
+  return result;
+}
+
+/** Province ids of one market (customs territory), ascending, derived from `marketId`. */
+export function marketProvinceIds(world: World, marketId: Id): Id[] {
+  const result: Id[] = [];
+  for (const province of world.provinceEconomies) {
+    if (province.marketId === marketId) result.push(province.id);
+  }
+  return result.sort((left, right) => left - right);
+}
+
+/**
+ * The country exercising effective control of a province: its `controllerPolityId`
+ * when that is a simulation country, else null (D-081 separation on the province).
+ */
+export function provinceControllerCountry(world: World, provinceId: Id): Id | null {
+  if (!world.provinces.enabled) return null;
+  const record = world.provinces.ownership.find((entry) => entry.provinceId === provinceId);
+  if (record === undefined) return null;
+  return world.countries.some((country) => country.id === record.controllerPolityId)
+    ? record.controllerPolityId
+    : null;
 }
 
 /** True when a country has any active fiscal policy. */
@@ -295,7 +346,6 @@ export function copyCountry(country: Country): Country {
   return {
     ...country,
     monetary: { ...country.monetary },
-    regionIds: [...country.regionIds],
     fiscal: { ...country.fiscal },
     industrial: {
       sectorSubsidyRates: [...country.industrial.sectorSubsidyRates],
@@ -438,36 +488,37 @@ export function assertValidCountryCurrencyState(input: CountryCurrencyValidation
       input.allowLegacyFiscalDefaults === true
         ? createFiscalPolicy(record.fiscal as FiscalPolicyInput, `${path}.fiscal`)
         : assertValidFiscalPolicy(record.fiscal, `${path}.fiscal`);
-    const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
-    const regionIds: Id[] = [];
-    const seenRegions = new Set<Id>();
-    for (let regionIndex = 0; regionIndex < rawRegionIds.length; regionIndex += 1) {
-      const regionId = requireUint32(
-        rawRegionIds[regionIndex],
-        `${path}.regionIds[${String(regionIndex)}]`,
+    const rawProvinceIds =
+      record.provinceIds === undefined ? [] : requireArray(record.provinceIds, `${path}.provinceIds`);
+    const provinceIds: Id[] = [];
+    const seenProvinces = new Set<Id>();
+    for (let provinceIndex = 0; provinceIndex < rawProvinceIds.length; provinceIndex += 1) {
+      const provinceId = requireUint32(
+        rawProvinceIds[provinceIndex],
+        `${path}.provinceIds[${String(provinceIndex)}]`,
       );
-      if (!input.regionIds.has(regionId)) {
-        throw new RangeError(`${path}.regionIds references unknown region ${String(regionId)}`);
+      if (!input.provinceIds.has(provinceId)) {
+        throw new RangeError(`${path}.provinceIds references unknown province ${String(provinceId)}`);
       }
-      if (seenRegions.has(regionId)) {
-        throw new RangeError(`${path}.regionIds lists region ${String(regionId)} twice`);
+      if (seenProvinces.has(provinceId)) {
+        throw new RangeError(`${path}.provinceIds lists province ${String(provinceId)} twice`);
       }
-      seenRegions.add(regionId);
-      regionIds.push(regionId);
+      seenProvinces.add(provinceId);
+      provinceIds.push(provinceId);
     }
-    countries.set(id, { id, tag, name, monetary, regionIds, treasuryAccountId, fiscal });
+    countries.set(id, { id, tag, name, monetary, provinceIds, treasuryAccountId, fiscal });
   }
 
-  const regionClaims = new Map<Id, Id>();
+  const provinceClaims = new Map<Id, Id>();
   for (const country of countries.values()) {
-    for (const regionId of country.regionIds) {
-      const existing = regionClaims.get(regionId);
+    for (const provinceId of country.provinceIds ?? []) {
+      const existing = provinceClaims.get(provinceId);
       if (existing !== undefined) {
         throw new RangeError(
-          `region ${String(regionId)} is claimed by both country ${String(existing)} and country ${String(country.id)}`,
+          `province ${String(provinceId)} is claimed by both country ${String(existing)} and country ${String(country.id)}`,
         );
       }
-      regionClaims.set(regionId, country.id);
+      provinceClaims.set(provinceId, country.id);
     }
   }
 

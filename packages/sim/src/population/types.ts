@@ -18,46 +18,43 @@ export type {
   JournalPosting,
 } from "../economy/types.js";
 
-export interface Region {
+/**
+ * P2 population, economic and social state of one permanent province (D-118).
+ *
+ * `id` is the permanent province id shared with `ProvinceOwnership` and the map
+ * bundle. Political facts (legal owner, effective controller, claims, special
+ * status) live only on `World.provinces.ownership`; this record holds what lives
+ * in the province: its population blocks, buildings, unrest, infrastructure, land
+ * and urban share. Country territory is derived from ownership, never stored here.
+ */
+export interface ProvinceEconomy {
   id: Id;
   key: string;
   name: string;
   popBlockIds: Id[];
-  /** Null only for population-only M2 worlds with no market. */
+  /**
+   * The province's market: the customs territory of its owner (D-119). Null only for
+   * population-only worlds with no market. Validated against the owner's territory
+   * and rewritten only by a validated provincial transfer.
+   */
   marketId: Id | null;
   buildingInstanceIds: Id[];
-  /** Reserved for future regional resource limits; M3 does not read or apply it. */
-  resourceCapsPerDay: number[];
-  /** M8 regional unrest, 0..1; updated daily by the politics phase. */
+  /** M8 provincial unrest, 0..1; updated daily by the politics phase. */
   unrest: Rate;
-  /** M8 provisional regional infrastructure quality, 0..1. */
+  /** M8 provisional provincial infrastructure quality, 0..1. */
   infrastructure: Rate;
-  /**
-   * M10 temporary military controller. Null means the sovereign controls the region.
-   * This never changes `Country.regionIds`, which is the sovereignty record (D-081).
-   */
-  controllerCountryId: Id | null;
-  /** Day the current occupation began; null when not occupied. */
-  occupiedSinceDay: Day | null;
+  /** P2 cropland on 1 January 1900 (HYDE 3.3), hectares; static until P5. */
+  arableLandHa: number;
+  /** P2 pasture and rangeland on 1 January 1900 (HYDE 3.3), hectares; static until P5. */
+  pastureHa: number;
+  /** P2 urban share of the 1900 population (HYDE 3.3), 0..1; static until P4/P7. */
+  urbanShare: Rate;
 }
-
-/**
- * Explicit alias for the historical `Region` concept.
- *
- * A SimulationRegion is a population/economy accounting unit. It is NOT a
- * geographical subdivision: since M12a the sole geographical layer beneath a
- * polity is the permanent `Province`. The runtime field keeps the name
- * `regions` for save compatibility, but new code should use this alias.
- */
-export type SimulationRegion = Region;
-
-/** Explicit alias for the simulation-region scenario input (not geography). */
-export type SimulationRegionInitialDef = RegionInitialDef;
 
 /** Authoritative population block state. */
 export interface PopBlock {
   id: Id;
-  regionId: Id;
+  provinceId: Id;
   professionId: Id;
 
   /** Male persons by single year of age: 0..79, then open-ended 80+. */
@@ -151,7 +148,7 @@ export interface PopulationDefinitions {
 
 export interface PopBlockInitialDef {
   id: Id;
-  regionId: Id;
+  provinceId: Id;
   professionId: Id;
   financialAccountId: Id;
   /** Male population in 17 five-year bands; expanded to single years at creation. */
@@ -164,14 +161,19 @@ export interface PopBlockInitialDef {
   militancy: Rate;
 }
 
-export interface RegionInitialDef {
+export interface ProvinceEconomyInitialDef {
+  /** Permanent province id. */
   id: Id;
   key: string;
   name: string;
-  /** Optional future regional resource caps. M3 does not read them. */
-  resourceCapsPerDay?: readonly number[];
   /** M8 provisional infrastructure quality, 0..1; defaults to 0.5. */
   infrastructure?: Rate;
+  /** Cropland in hectares; defaults to 0. */
+  arableLandHa?: number;
+  /** Pasture and rangeland in hectares; defaults to 0. */
+  pastureHa?: number;
+  /** Urban share of the population, 0..1; defaults to 0. */
+  urbanShare?: Rate;
 }
 
 export interface PopulationScenarioDef {
@@ -180,7 +182,7 @@ export interface PopulationScenarioDef {
   /** Optional non-1900 validation start; defaults to day 0. */
   startDayIndex?: Day;
   professions: readonly ProfessionIdentityDef[];
-  regions: readonly RegionInitialDef[];
+  provinceEconomies: readonly ProvinceEconomyInitialDef[];
   popBlocks: readonly PopBlockInitialDef[];
   definitions: PopulationDefinitions;
 }

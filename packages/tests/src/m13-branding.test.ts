@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { deserializeWorld, hashWorld } from "@century/sim";
+import { deserializeWorld } from "@century/sim";
 import { decompressSaveFromStorage, readSaveMetadata } from "@century/sim-worker/persistence";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -61,7 +61,7 @@ describe("M13 player-facing identity", () => {
 });
 
 describe("M13 save compatibility", () => {
-  test("a compressed Century-era save still loads under the unchanged schema", () => {
+  test("a compressed Century-era save is read, then rejected as incompatible (D-120)", () => {
     const fixture = JSON.parse(
       readFileSync(join(HERE, "fixtures/century-era-save.json"), "utf8"),
     ) as {
@@ -82,9 +82,8 @@ describe("M13 save compatibility", () => {
     expect(metadata.formatVersion).toBe(1);
     expect(metadata.scenarioId).toBe("m11-world-1900");
 
-    const world = deserializeWorld(canonical);
-    expect(world.schemaVersion).toBe(27);
-    expect(world.dayIndex).toBe(0);
-    expect(hashWorld(world)).toBe(fixture.worldHash);
+    // P2 (schema 28, D-134): the envelope and metadata stay readable, so the game can
+    // list the save with its reason, but the world is never migrated.
+    expect(() => deserializeWorld(canonical)).toThrow(/schema 27 is incompatible with this build \(28\)/u);
   }, 60_000);
 });

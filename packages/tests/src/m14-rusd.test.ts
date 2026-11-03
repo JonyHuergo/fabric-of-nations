@@ -102,15 +102,16 @@ describe("M14 monetary equivalence and determinism", () => {
   // to the pre-M14 save before re-pinning. The test comparing this world with the pre-M14
   // save was retired with the designer's approval: the save predates D-128/D-129, and the
   // P2 schema break (D-120) makes it incompatible.
+  // Re-pinned for P2: the 1900 world is the province world (D-131, D-132, schema 28).
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("6779e9a79c440401");
+    expect(hashWorld(world)).toBe("d722fa8d0b3525eb");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
     const save = serializeWorld(world);
     const envelope = JSON.parse(save) as { format: string; schemaVersion: number; payload: unknown };
     expect(envelope.format).toBe("century-save");
-    expect(envelope.schemaVersion).toBe(27);
+    expect(envelope.schemaVersion).toBe(28);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);
@@ -119,7 +120,7 @@ describe("M14 monetary equivalence and determinism", () => {
     expect(serializeWorld(restored)).toBe(save);
   }, 60_000);
 
-  test("a pre-M14 SUSD save loads with unchanged metadata", () => {
+  test("a pre-M14 SUSD save keeps readable metadata and is rejected as incompatible (D-120)", () => {
     const fixture = JSON.parse(
       readFileSync(join(HERE, "fixtures/century-era-save.json"), "utf8"),
     ) as { stored: string; worldHash: string; schemaVersion: number };
@@ -128,8 +129,7 @@ describe("M14 monetary equivalence and determinism", () => {
     expect(metadata.schemaVersion).toBe(27);
     expect(metadata.formatVersion).toBe(1);
     expect(metadata.scenarioId).toBe("m11-world-1900");
-    const restored = deserializeWorld(canonical);
-    expect(hashWorld(restored)).toBe(fixture.worldHash);
+    expect(() => deserializeWorld(canonical)).toThrow(/incompatible/u);
   }, 60_000);
 });
 
@@ -144,7 +144,8 @@ describe("M14 current documentation and protocol", () => {
   });
 
   test("the worker protocol version reflects the snapshot vocabulary change", () => {
-    expect(PROTOCOL_VERSION).toBe(16);
+    // 17: P2 province economy table, territories and professions (D-134).
+    expect(PROTOCOL_VERSION).toBe(17);
   });
 
   test("the monetary terminology audit passes", () => {

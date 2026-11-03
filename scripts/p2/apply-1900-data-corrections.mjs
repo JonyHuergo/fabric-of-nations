@@ -15,7 +15,7 @@
  * Usage: node scripts/p2/apply-1900-data-corrections.mjs
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -23,6 +23,13 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const M11 = join(ROOT, "packages/data/data/historical/m11");
 const MAP = join(ROOT, "packages/data/data/map");
 const SCENARIO = join(ROOT, "packages/data/data/scenarios/m11_world_1900.json");
+
+// P2 (D-131): the region tables this script corrected were converted to territory
+// tables by convert-territory-inputs.mjs, which carry the corrections already.
+if (!existsSync(join(M11, "regions_1900.json"))) {
+  console.log("D-129 corrections are already part of the territory tables; nothing to do.");
+  process.exit(0);
+}
 const CATALOG_TS = join(ROOT, "packages/app/src/generated/worldCatalog.ts");
 
 const SOURCE_ID = "p2-population-review-1900";

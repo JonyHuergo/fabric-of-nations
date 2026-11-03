@@ -20,6 +20,7 @@ import { assertValidWorld, type World } from "../world.js";
 import {
   assertValidProvinceScenario,
   createProvinceState,
+  createProvinceStateFromOwners,
   emptyProvinceState,
 } from "../provinces/state.js";
 import {
@@ -167,28 +168,28 @@ function assertCountryInitialDefs(
 }
 
 /**
- * M4c: a country with an active fiscal policy must own every region that
+ * M4c: a country with an active fiscal policy must own every province that
  * contains population blocks or buildings, otherwise tax and welfare would
  * silently skip real economic entities. Zero-fiscal worlds keep the M4a-2
- * rule that unowned regions are permitted.
+ * rule that unowned provinces are permitted.
  */
-function assertFiscalRegionOwnership(scenario: EconomyScenarioDef): void {
+function assertFiscalProvinceOwnership(scenario: EconomyScenarioDef): void {
   const countries = scenario.countries ?? [];
   if (!countries.some((country) => fiscalPolicyIsActive(country.fiscal))) return;
   const claimed = new Map<number, number>();
   for (const country of countries) {
-    for (const regionId of country.regionIds) {
-      claimed.set(regionId, (claimed.get(regionId) ?? 0) + 1);
+    for (const provinceId of country.provinceIds) {
+      claimed.set(provinceId, (claimed.get(provinceId) ?? 0) + 1);
     }
   }
-  const economicRegions = new Set<number>();
-  for (const block of scenario.population.popBlocks) economicRegions.add(block.regionId);
-  for (const building of scenario.buildingInstances) economicRegions.add(building.regionId);
-  for (const regionId of economicRegions) {
-    const claims = claimed.get(regionId) ?? 0;
+  const economicProvinces = new Set<number>();
+  for (const block of scenario.population.popBlocks) economicProvinces.add(block.provinceId);
+  for (const building of scenario.buildingInstances) economicProvinces.add(building.provinceId);
+  for (const provinceId of economicProvinces) {
+    const claims = claimed.get(provinceId) ?? 0;
     if (claims !== 1) {
       throw new RangeError(
-        `region ${String(regionId)} must be owned by exactly one country when a fiscal policy is active; found ${String(claims)}`,
+        `province ${String(provinceId)} must be owned by exactly one country when a fiscal policy is active; found ${String(claims)}`,
       );
     }
   }
@@ -228,7 +229,7 @@ function assertProfessionIdentities(scenario: EconomyScenarioDef): void {
 
 function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: ReadonlySet<number>): void {
   const definitions = buildingDefinitions(scenario);
-  const regions = new Set(scenario.population.regions.map((region) => region.id));
+  const provinces = new Set(scenario.population.provinceEconomies.map((province) => province.id));
   const policy = scenario.profitDistribution ?? {
     enabled: false,
     privatePayoutRate: 0.5,
@@ -250,8 +251,8 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
     if (definition === undefined) {
       throw new RangeError(`${path} references unknown building definition ${String(instance.definitionId)}`);
     }
-    if (!regions.has(instance.regionId)) {
-      throw new RangeError(`${path} references unknown region ${String(instance.regionId)}`);
+    if (!provinces.has(instance.provinceId)) {
+      throw new RangeError(`${path} references unknown province ${String(instance.provinceId)}`);
     }
     requireInteger(instance.level, `${path}.level`, 1, Number.MAX_SAFE_INTEGER);
     const condition = requireFiniteNumber(instance.condition, `${path}.condition`);
@@ -293,13 +294,13 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
 }
 
 function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<number>): Map<number, number> {
-  const regionIds = new Set(scenario.population.regions.map((region) => region.id));
+  const provinceIds = new Set(scenario.population.provinceEconomies.map((province) => province.id));
   const goods = scenario.definitions.goods;
   const goodById = new Map(goods.map((good) => [good.id, good]));
   const definitions = buildingDefinitions(scenario);
   const instanceById = new Map(scenario.buildingInstances.map((building) => [building.id, building]));
   const marketIds = new Set<number>();
-  const regionToMarket = new Map<number, number>();
+  const provinceToMarket = new Map<number, number>();
 
   for (const market of scenario.markets) {
     requireInteger(market.id, `markets[${String(market.id)}].id`, 0, 0xffff_ffff);
@@ -321,25 +322,25 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
         throw new RangeError(`market ${String(market.id)} priceRUSD[${String(index)}] must be positive`);
       }
     }
-    const seenRegions = new Set<number>();
-    if (market.regionIds.length === 0) {
-      throw new RangeError(`market ${String(market.id)} must list at least one region`);
+    const seenProvinces = new Set<number>();
+    if (market.provinceIds.length === 0) {
+      throw new RangeError(`market ${String(market.id)} must list at least one province`);
     }
-    for (const regionId of market.regionIds) {
-      if (!regionIds.has(regionId)) {
-        throw new RangeError(`market ${String(market.id)} references unknown region ${String(regionId)}`);
+    for (const provinceId of market.provinceIds) {
+      if (!provinceIds.has(provinceId)) {
+        throw new RangeError(`market ${String(market.id)} references unknown province ${String(provinceId)}`);
       }
-      if (seenRegions.has(regionId)) {
-        throw new RangeError(`market ${String(market.id)} lists region ${String(regionId)} twice`);
+      if (seenProvinces.has(provinceId)) {
+        throw new RangeError(`market ${String(market.id)} lists province ${String(provinceId)} twice`);
       }
-      seenRegions.add(regionId);
-      const existingMarket = regionToMarket.get(regionId);
+      seenProvinces.add(provinceId);
+      const existingMarket = provinceToMarket.get(provinceId);
       if (existingMarket !== undefined) {
         throw new RangeError(
-          `region ${String(regionId)} belongs to both market ${String(existingMarket)} and market ${String(market.id)}`,
+          `province ${String(provinceId)} belongs to both market ${String(existingMarket)} and market ${String(market.id)}`,
         );
       }
-      regionToMarket.set(regionId, market.id);
+      provinceToMarket.set(provinceId, market.id);
     }
 
     // Storage and initial lots are market-scoped: a warehouse in another market
@@ -347,7 +348,7 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
     const capacityByGood = new Map<number, number>();
     for (const instance of scenario.buildingInstances) {
       if (!instance.operational) continue;
-      if (!seenRegions.has(instance.regionId)) continue;
+      if (!seenProvinces.has(instance.provinceId)) continue;
       const definition = definitions.get(instance.definitionId);
       if (definition === undefined) continue;
       for (const capacity of definition.storageCapacityByGood) {
@@ -370,7 +371,7 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
         );
       }
       const owner = instanceById.get(lot.ownerBuildingId);
-      if (owner === undefined || !seenRegions.has(owner.regionId)) {
+      if (owner === undefined || !seenProvinces.has(owner.provinceId)) {
         throw new RangeError(
           `market ${String(market.id)} lot owner building ${String(lot.ownerBuildingId)} is outside the market`,
         );
@@ -400,37 +401,37 @@ function assertMarkets(scenario: EconomyScenarioDef, buildingIds: ReadonlySet<nu
   }
 
   if (scenario.markets.length > 0) {
-    for (const region of scenario.population.regions) {
-      if (!regionToMarket.has(region.id)) {
-        throw new RangeError(`region ${String(region.id)} is not assigned to a market`);
+    for (const province of scenario.population.provinceEconomies) {
+      if (!provinceToMarket.has(province.id)) {
+        throw new RangeError(`province ${String(province.id)} is not assigned to a market`);
       }
     }
-    assertCountryMarketCoherence(scenario, regionToMarket);
+    assertCountryMarketCoherence(scenario, provinceToMarket);
   }
-  return regionToMarket;
+  return provinceToMarket;
 }
 
-function countryByRegionId(scenario: EconomyScenarioDef): Map<number, number> {
+function countryByProvinceId(scenario: EconomyScenarioDef): Map<number, number> {
   const owners = new Map<number, number>();
   for (const country of scenario.countries ?? []) {
-    for (const regionId of country.regionIds) owners.set(regionId, country.id);
+    for (const provinceId of country.provinceIds) owners.set(provinceId, country.id);
   }
   return owners;
 }
 
 /**
- * M5 restriction: a country's regions all belong to one market. The GDD's first
+ * M5 restriction: a country's provinces all belong to one market. The GDD's first
  * multi-market model permits one market per country; mixed membership would need
  * an explicit customs-zone rule that is not part of M5.
  */
 function assertCountryMarketCoherence(
   scenario: EconomyScenarioDef,
-  regionToMarket: ReadonlyMap<number, number>,
+  provinceToMarket: ReadonlyMap<number, number>,
 ): void {
   for (const country of scenario.countries ?? []) {
     let marketId: number | undefined;
-    for (const regionId of country.regionIds) {
-      const candidate = regionToMarket.get(regionId);
+    for (const provinceId of country.provinceIds) {
+      const candidate = provinceToMarket.get(provinceId);
       if (candidate === undefined) continue;
       if (marketId === undefined) marketId = candidate;
       else if (marketId !== candidate) {
@@ -446,12 +447,12 @@ function assertBuildingOwnershipGeography(scenario: EconomyScenarioDef): void {
   const blockByAccount = new Map(
     scenario.population.popBlocks.map((block) => [block.financialAccountId, block]),
   );
-  const owners = countryByRegionId(scenario);
+  const owners = countryByProvinceId(scenario);
   const treasuryOwner = new Map(
     (scenario.countries ?? []).map((country) => [country.treasuryAccountId, country.id]),
   );
   for (const building of scenario.buildingInstances) {
-    const buildingCountry = owners.get(building.regionId) ?? null;
+    const buildingCountry = owners.get(building.provinceId) ?? null;
     if (building.ownerKind === "state") {
       const ownerCountry = treasuryOwner.get(building.ownerAccountId);
       if (ownerCountry === undefined) {
@@ -472,7 +473,7 @@ function assertBuildingOwnershipGeography(scenario: EconomyScenarioDef): void {
         `building ${String(building.id)} ownerAccountId must be a pop-block household cash account`,
       );
     }
-    const ownerCountry = owners.get(owner.regionId) ?? null;
+    const ownerCountry = owners.get(owner.provinceId) ?? null;
     if (buildingCountry !== ownerCountry) {
       throw new RangeError(
         `building ${String(building.id)} and its owner popBlock ${String(owner.id)} must belong to the same country`,
@@ -490,7 +491,7 @@ function assertInitialEmployment(
   const instances = new Map(
     scenario.buildingInstances.map((building) => [building.id, building]),
   );
-  const owners = countryByRegionId(scenario);
+  const owners = countryByProvinceId(scenario);
   const countries = new Map((scenario.countries ?? []).map((country) => [country.id, country]));
   const assignmentIds = new Set<number>();
   const assignmentKeys = new Set<string>();
@@ -512,12 +513,12 @@ function assertInitialEmployment(
     if (instance === undefined) {
       throw new RangeError(`${path} references unknown building instance`);
     }
-    const sourceCountry = owners.get(block.regionId) ?? null;
-    const destinationCountry = owners.get(instance.regionId) ?? null;
+    const sourceCountry = owners.get(block.provinceId) ?? null;
+    const destinationCountry = owners.get(instance.provinceId) ?? null;
     if (sourceCountry !== destinationCountry) {
       if (destinationCountry === null) {
         throw new RangeError(
-          `${path} cannot assign a resident of country ${String(sourceCountry)} to an unowned region`,
+          `${path} cannot assign a resident of country ${String(sourceCountry)} to an unowned province`,
         );
       }
       if (countries.get(destinationCountry)?.immigrationOpen !== true) {
@@ -611,27 +612,27 @@ function assertInitialEmployment(
 /**
  * Resolve each market's E6a customs administration.
  *
- * An authored `customsCountryId` must be a country that owns at least one region of
- * the market. When omitted, the country owning the market's lowest region id is the
+ * An authored `customsCountryId` must be a country that owns at least one province of
+ * the market. When omitted, the country owning the market's lowest province id is the
  * administration; a countryless market has no customs administration. The same rule
  * is used for validation and construction so the two cannot disagree.
  */
 function resolveMarketCustomsCountries(
   scenario: EconomyScenarioDef,
 ): Map<number, Id | null> {
-  const countryByRegion = countryByRegionId(scenario);
+  const countryByProvince = countryByProvinceId(scenario);
   const result = new Map<number, Id | null>();
   for (const market of scenario.markets) {
     const owners = new Set<number>();
-    for (const regionId of market.regionIds) {
-      const countryId = countryByRegion.get(regionId);
+    for (const provinceId of market.provinceIds) {
+      const countryId = countryByProvince.get(provinceId);
       if (countryId !== undefined) owners.add(countryId);
     }
     const declared = market.customsCountryId;
     if (declared !== undefined && declared !== null) {
       if (!owners.has(declared)) {
         throw new RangeError(
-          `market ${String(market.id)} customsCountryId ${String(declared)} must own at least one of its regions`,
+          `market ${String(market.id)} customsCountryId ${String(declared)} must own at least one of its provinces`,
         );
       }
       result.set(market.id, declared);
@@ -641,14 +642,14 @@ function resolveMarketCustomsCountries(
       result.set(market.id, null);
       continue;
     }
-    let lowestRegion: number | undefined;
-    for (const regionId of market.regionIds) {
-      if (countryByRegion.get(regionId) === undefined) continue;
-      if (lowestRegion === undefined || regionId < lowestRegion) lowestRegion = regionId;
+    let lowestProvince: number | undefined;
+    for (const provinceId of market.provinceIds) {
+      if (countryByProvince.get(provinceId) === undefined) continue;
+      if (lowestProvince === undefined || provinceId < lowestProvince) lowestProvince = provinceId;
     }
     result.set(
       market.id,
-      lowestRegion === undefined ? null : (countryByRegion.get(lowestRegion) ?? null),
+      lowestProvince === undefined ? null : (countryByProvince.get(lowestProvince) ?? null),
     );
   }
   return result;
@@ -854,14 +855,17 @@ export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
     countries: scenario.countries ?? [],
     currencies: scenario.currencies ?? [],
     currencyValuations: scenario.currencyValuations ?? [],
-    regionIds: new Set(scenario.population.regions.map((region) => region.id)),
+    provinceIds: new Set(scenario.population.provinceEconomies.map((province) => province.id)),
     allowLegacyFiscalDefaults: true,
   });
-  assertFiscalRegionOwnership(scenario);
+  assertFiscalProvinceOwnership(scenario);
   if (scenario.provinces !== undefined) {
     assertValidProvinceScenario(scenario.provinces, {
       countryIds: new Set((scenario.countries ?? []).map((country) => country.id)),
-      regionIds: new Set(scenario.population.regions.map((region) => region.id)),
+      provinceIds: new Set(scenario.population.provinceEconomies.map((province) => province.id)),
+      countryProvinceIds: new Map(
+        (scenario.countries ?? []).map((country) => [country.id, country.provinceIds] as const),
+      ),
     });
   }
 }
@@ -884,7 +888,7 @@ export function createEconomyWorld(
     deferOpeningBalances: true,
     accountIdFloor,
     fiscalAccounts: (scenario.countries ?? []).length > 0,
-    allowMultipleRegions: true,
+    allowMultipleProvinces: true,
   });
   const profitDistribution = createProfitDistributionPolicy(scenario.profitDistribution);
   world.profitDistribution = profitDistribution;
@@ -932,7 +936,6 @@ export function createEconomyWorld(
         tag: initial.tag,
         name: initial.name,
         monetary: { ...initial.monetary },
-        regionIds: [...initial.regionIds].sort((left, right) => left - right),
         treasuryAccountId: initial.treasuryAccountId,
         fiscal: createFiscalPolicy(initial.fiscal, `countries[${String(initial.id)}].fiscal`),
         industrial: createIndustrialPolicy(
@@ -967,6 +970,24 @@ export function createEconomyWorld(
       };
     })
     .sort((left, right) => left.id - right.id);
+  // P2 provincial ownership (D-118). With M12a province definitions every province
+  // starts with its authored 1900 owner and effective controller; scenarios without
+  // definitions derive ownership from the countries' initial territory. Countryless
+  // fixtures keep the layer disabled. Created right after the countries:
+  // interest groups, institutions and initial armies all read country territory.
+  const initialOwners: { provinceId: Id; ownerPolityId: Id }[] = [];
+  for (const country of scenario.countries ?? []) {
+    for (const provinceId of country.provinceIds) {
+      initialOwners.push({ provinceId, ownerPolityId: country.id });
+    }
+  }
+  world.provinces =
+    scenario.provinces !== undefined
+      ? createProvinceState(scenario.provinces, world.startDayIndex)
+      : initialOwners.length > 0
+        ? createProvinceStateFromOwners(initialOwners)
+        : emptyProvinceState();
+
   world.politics = createWorldPoliticsState(
     world.startDayIndex,
     scenario.definitions.politics,
@@ -1322,7 +1343,7 @@ export function createEconomyWorld(
     world.buildings.push({
       id: instance.id,
       definitionId: instance.definitionId,
-      regionId: instance.regionId,
+      provinceId: instance.provinceId,
       level: instance.level,
       condition: instance.condition,
       ownerKind: instance.ownerKind,
@@ -1340,7 +1361,6 @@ export function createEconomyWorld(
   for (const market of scenario.markets) {
     const built: Market = {
       id: market.id,
-      regionIds: [...market.regionIds].sort((left, right) => left - right),
       priceRUSD: [...market.priceRUSD],
       stockLots: canonicalizeStockLots(market.stockLots),
       customsCountryId: customsCountryByMarket.get(market.id) ?? null,
@@ -1355,21 +1375,31 @@ export function createEconomyWorld(
     scenario.population.definitions,
     world.markets,
   );
-  const marketByRegion = new Map<number, number>();
-  for (const market of world.markets) {
-    for (const regionId of market.regionIds) marketByRegion.set(regionId, market.id);
+  const marketByProvince = new Map<number, number>();
+  for (const market of scenario.markets) {
+    for (const provinceId of market.provinceIds) marketByProvince.set(provinceId, market.id);
+  }
+  const buildingIdsByProvince = new Map<number, number[]>();
+  for (const building of world.buildings) {
+    const list = buildingIdsByProvince.get(building.provinceId);
+    if (list === undefined) buildingIdsByProvince.set(building.provinceId, [building.id]);
+    else list.push(building.id);
+  }
+  const blockIdsByProvince = new Map<number, number[]>();
+  for (const block of world.popBlocks) {
+    const list = blockIdsByProvince.get(block.provinceId);
+    if (list === undefined) blockIdsByProvince.set(block.provinceId, [block.id]);
+    else list.push(block.id);
   }
 
-  for (const region of world.regions) {
-    region.marketId = marketByRegion.get(region.id) ?? null;
-    region.buildingInstanceIds = world.buildings
-      .filter((building) => building.regionId === region.id)
-      .map((building) => building.id)
-      .sort((left, right) => left - right);
-    region.popBlockIds = world.popBlocks
-      .filter((block) => block.regionId === region.id)
-      .map((block) => block.id)
-      .sort((left, right) => left - right);
+  for (const province of world.provinceEconomies) {
+    province.marketId = marketByProvince.get(province.id) ?? null;
+    province.buildingInstanceIds = (buildingIdsByProvince.get(province.id) ?? []).sort(
+      (left, right) => left - right,
+    );
+    province.popBlockIds = (blockIdsByProvince.get(province.id) ?? []).sort(
+      (left, right) => left - right,
+    );
   }
 
   for (const assignment of scenario.employment) {
@@ -1388,12 +1418,6 @@ export function createEconomyWorld(
   world.construction.nextBuildingId =
     world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;
 
-  // M12a provincial geography. Disabled for legacy scenarios; when present every
-  // province starts with its authored 1900 owner and effective controller.
-  world.provinces =
-    scenario.provinces === undefined
-      ? emptyProvinceState()
-      : createProvinceState(scenario.provinces, world.startDayIndex);
 
   assertValidWorld(world);
   return world;

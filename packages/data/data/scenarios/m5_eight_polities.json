@@ -105,7 +105,7 @@
     },
     "files": {
       "countries": "historical/countries_1900.json",
-      "regions": "historical/regions_1900.json",
+      "provinces": "historical/provinces_1900.json",
       "markets": "historical/markets_1900.json",
       "tradeRoutes": "historical/trade_routes_1900.json",
       "populations": "historical/pops_1900.json",

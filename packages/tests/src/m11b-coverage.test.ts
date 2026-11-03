@@ -269,12 +269,12 @@ describe("M11b catalog coverage — dependencies, flags and saves", () => {
       const custom = { ...scenario, playerCountryId };
       const world = createEconomyWorld(custom, { seed: 11 });
       expect(world.countries).toHaveLength(67);
-      expect(world.regions).toHaveLength(133);
+      expect(world.provinceEconomies).toHaveLength(1687); // P2: one record per province (D-118)
       expect(world.playerCountryId).toBe(playerCountryId);
       const restored = deserializeWorld(serializeWorld(world));
       expect(restored.playerCountryId).toBe(playerCountryId);
       expect(restored.countries).toHaveLength(67);
-      expect(restored.regions).toHaveLength(133);
+      expect(restored.provinceEconomies).toHaveLength(1687);
     }
   });
 });

@@ -247,6 +247,19 @@ const SEMANTIC = {
   purple: "#b7a4d6",
 } as const;
 
+/**
+ * Sequential ramp for province data lenses (P2), low to high. Matte, in the band of
+ * the political palette, and ordered in lightness so it reads without hue alone.
+ * The same in every era: a lens value must not change meaning with the theme.
+ */
+export const MAP_DATA_RAMP: readonly string[] = [
+  "#2f4a57",
+  "#3f6b6a",
+  "#6d8f62",
+  "#b3a35a",
+  "#d9b46a",
+] as const;
+
 interface EraValues {
   readonly sea: Rgb;
   readonly accent: Rgb;

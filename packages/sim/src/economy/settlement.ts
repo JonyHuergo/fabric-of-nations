@@ -61,6 +61,7 @@ import type {
   JournalPosting,
   ProfessionDef,
 } from "./types.js";
+import { buildProvinceOwnerMap } from "./country.js";
 
 export const M3E_WAGE_RESIDUAL_PURPOSE = "settlement.wage-residual";
 
@@ -456,7 +457,7 @@ function allocateMoney(
 interface WageLookup {
   readonly assignmentsByBuilding: ReadonlyMap<Id, readonly EmploymentAssignment[]>;
   readonly blockById: ReadonlyMap<Id, World["popBlocks"][number]>;
-  readonly ownerByRegion: ReadonlyMap<Id, World["countries"][number]>;
+  readonly ownerByProvince: ReadonlyMap<Id, World["countries"][number]>;
 }
 
 function buildWageLookup(world: World): WageLookup {
@@ -470,13 +471,13 @@ function buildWageLookup(world: World): WageLookup {
   for (const block of world.popBlocks) {
     if (!blockById.has(block.id)) blockById.set(block.id, block);
   }
-  const ownerByRegion = new Map<Id, World["countries"][number]>();
-  for (const country of world.countries) {
-    for (const regionId of country.regionIds) {
-      if (!ownerByRegion.has(regionId)) ownerByRegion.set(regionId, country);
-    }
+  const ownerByProvince = new Map<Id, World["countries"][number]>();
+  const countryById = new Map(world.countries.map((country) => [country.id, country]));
+  for (const [provinceId, countryId] of buildProvinceOwnerMap(world)) {
+    const country = countryById.get(countryId);
+    if (country !== undefined) ownerByProvince.set(provinceId, country);
   }
-  return { assignmentsByBuilding, blockById, ownerByRegion };
+  return { assignmentsByBuilding, blockById, ownerByProvince };
 }
 
 function buildWageGroups(
@@ -694,7 +695,7 @@ function settleMarketDaysInternal(
         index,
         yearDays,
         (() => {
-          const owner = wageLookup.ownerByRegion.get(building.regionId);
+          const owner = wageLookup.ownerByProvince.get(building.provinceId);
           return owner === undefined
             ? { minimumWageRUSDPerYear: 0, hoursFactor: 1 }
             : {

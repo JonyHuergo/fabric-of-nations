@@ -45,6 +45,7 @@ import {
 } from "../../app/src/components/provinceRenderPlan.js";
 import { PROVINCE_MAP_1900 } from "../../app/src/provinceMapBundle.js";
 import type { ProvinceMapData } from "../../app/src/provinceCatalogTypes.js";
+import { politicalGeographyWorld } from "./fixtures/provinces.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -90,7 +91,7 @@ const AFRICA_IDS = new Set(AFRICA.provinces.map((province) => province.id));
 const FUTURE_ID = new Map(
   AFRICA.futurePolities.map((polity) => [polity.tag, polity.polityId]),
 );
-const REGION_IDS = new Set(SCENARIO.population.regions.map((region) => region.id));
+const REGION_IDS = new Set(SCENARIO.population.provinceEconomies.map((province) => province.id));
 const TERMINAL_DAY = civilDateToDayIndex(2000, 1, 1);
 
 /** Province key prefix -> the modern successor state the province becomes. */
@@ -277,7 +278,8 @@ function transfer(
 }
 
 function referenceWorld(seed = 78_000): World {
-  return createEconomyWorld(SCENARIO, { seed });
+  // P2: the reference sequences run on the political geography alone (D-118).
+  return politicalGeographyWorld(SCENARIO, seed);
 }
 
 /** 1903: the British conquest of the Sokoto Caliphate. */
@@ -670,7 +672,9 @@ describe("M12c Africa province inventory and geometry", () => {
       expect(mapTags.has(tag)).toBe(true);
     }
     for (const province of AFRICA.provinces) {
-      expect(REGION_IDS.has(province.simulationRegionId)).toBe(true);
+      // P2 (D-118): every province is an economic unit of its own; the region link is gone.
+      expect(REGION_IDS.has(province.id)).toBe(true);
+      expect("simulationRegionId" in province).toBe(false);
     }
   });
 
@@ -1054,12 +1058,14 @@ describe("M12c authoritative provincial ownership", () => {
     for (const province of AFRICA.provinces) {
       const entry = ownershipOf(world, province.key);
       expect(entry?.ownerPolityId).toBe(province.initialOwnerPolityId);
-      expect(entry?.controllerPolityId).toBe(province.initialOwnerPolityId);
+      // D-132: Egypt is Ottoman-owned and British-controlled in 1900.
+      expect(entry?.controllerPolityId).toBe(province.key.startsWith("af-egy-") ? 1 : province.initialOwnerPolityId);
       expect(entry?.claimantPolityIds).toEqual([]);
     }
-    // Sudan is a condominium; the other special statuses start ordinary.
+    // Sudan is a condominium; Egypt is under occupation; the others start ordinary.
     expect(ownershipOf(world, "af-sud-khartoum")?.specialStatus).toBe("condominium");
-    expect(ownershipOf(world, "af-egy-cairo")?.specialStatus).toBe("ordinary");
+    expect(ownershipOf(world, "af-egy-cairo")?.ownerPolityId).toBe(20);
+    expect(ownershipOf(world, "af-egy-cairo")?.specialStatus).toBe("occupied");
   });
 
   test("ownership transfers preserve province ids and geometry references", () => {
@@ -1098,15 +1104,17 @@ describe("M12c authoritative provincial ownership", () => {
     expect(controllerOf(world, "af-ott-tripoli-and-the-jefara")).toBe(20);
   });
 
-  test("the Ottoman claim to Egypt never implies ownership", () => {
+  test("British control of and a British claim to Egypt never imply ownership", () => {
+    // D-132: the Ottoman Empire owns Egypt in 1900; the United Kingdom controls it.
     const world = referenceWorld();
     const cairo = idOf("af-egy-cairo");
-    addProvinceClaim(world, cairo, 20 as Id);
-    expect(ownershipOf(world, "af-egy-cairo")?.ownerPolityId).toBe(1);
-    expect(ownershipOf(world, "af-egy-cairo")?.claimantPolityIds).toEqual([20]);
+    addProvinceClaim(world, cairo, 1 as Id);
+    expect(ownershipOf(world, "af-egy-cairo")?.ownerPolityId).toBe(20);
+    expect(ownershipOf(world, "af-egy-cairo")?.controllerPolityId).toBe(1);
+    expect(ownershipOf(world, "af-egy-cairo")?.claimantPolityIds).toEqual([1]);
     transfer(world, idsOf("af-egy-cairo"), futureId("EGY"), "independence", "Egyptian independence", day(1922, 2, 28));
     expect(ownershipOf(world, "af-egy-cairo")?.ownerPolityId).toBe(futureId("EGY"));
-    expect(ownershipOf(world, "af-egy-cairo")?.claimantPolityIds).toEqual([20]);
+    expect(ownershipOf(world, "af-egy-cairo")?.claimantPolityIds).toEqual([1]);
   });
 
   test("mandate and condominium statuses are explicit and survive a transfer", () => {
@@ -1162,7 +1170,7 @@ describe("M12c historical reference snapshots", () => {
     expect(ownerOf(world, "af-ott-tripoli-and-the-jefara")).toBe(6);
     expect(ownerOf(world, "af-ott-benghazi-and-the-jabal-al-akhdar")).toBe(6);
     expect(ownerOf(world, "af-ott-sabha-wadi-al-hayaa-and-ash-shati")).toBe(6);
-    // The three historic regions are separate provinces, so the 1951 federation
+    // The three historic provinces are separate provinces, so the 1951 federation
     // is representable.
     transfer(world, idsFor("af-ott-"), futureId("LBY"), "independence", "Independent Libya", day(1951, 12, 24));
     expect(ownerOf(world, "af-ott-murzuq-and-ghat")).toBe(futureId("LBY"));
@@ -1406,7 +1414,7 @@ describe("M12c persistence and determinism", () => {
     const world = referenceWorld(9_101);
     mandatePartition1919(world);
     moroccanProtectorates1912(world);
-    addProvinceClaim(world, idOf("af-egy-cairo"), 20 as Id);
+    addProvinceClaim(world, idOf("af-egy-cairo"), 1 as Id);
     setProvinceSpecialStatus(world, idOf("af-gea-rwanda"), "mandate");
     const serialized = serializeWorld(world);
     const restored = deserializeWorld(serialized);
@@ -1416,7 +1424,7 @@ describe("M12c persistence and determinism", () => {
     expect(ownerOf(restored, "af-gea-rwanda")).toBe(10);
     expect(ownerOf(restored, "af-mar-marrakech-and-the-south")).toBe(35);
     expect(controllerOf(restored, "af-mar-marrakech-and-the-south")).toBe(3);
-    expect(ownershipOf(restored, "af-egy-cairo")?.claimantPolityIds).toEqual([20]);
+    expect(ownershipOf(restored, "af-egy-cairo")?.claimantPolityIds).toEqual([1]);
   });
 
   test("an M12a-era save with only European ownership records still loads", () => {

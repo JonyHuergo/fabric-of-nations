@@ -25,6 +25,7 @@ import {
   type SetFiscalPolicyAction,
   type TickContext,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 import { M5_COUNTRY_A, M5_COUNTRY_B, m5Scenario } from "./fixtures/m5.js";
 
@@ -77,12 +78,12 @@ function observation(overrides: Partial<CountryAIObservation> = {}): CountryAIOb
     dayIndex: 7,
     fiscal: fiscalPolicy(),
     treasuryCashRUSD: 1_000_000,
-    regionIds: [0],
+    provinceIds: [0],
     population: 1_000,
     blocks: [
       {
         popBlockId: 0,
-        regionId: 0,
+        provinceId: 0,
         population: 1_000,
         literacy: 0.2,
         wealthLevel: 30,
@@ -211,7 +212,7 @@ describe("M6 country AI and action validation", () => {
         blocks: [
           {
             popBlockId: 0,
-            regionId: 0,
+            provinceId: 0,
             population: 1_000,
             literacy: 0.2,
             wealthLevel: 40,
@@ -250,10 +251,10 @@ describe("M6 country AI and action validation", () => {
     const otherCountry = second.countries.find((country) => country.id === M5_COUNTRY_B);
     if (otherCountry === undefined) throw new Error("missing country B");
     otherCountry.fiscal = fiscalPolicy({ incomeTaxRate: 0.9, welfareBudgetRUSDPerYear: 999_999 });
-    const countryARegions = new Set(
-      second.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds ?? [],
+    const countryAProvinces = new Set(
+      countryProvinceIds(second, M5_COUNTRY_A) ?? [],
     );
-    const otherBlock = second.popBlocks.find((block) => !countryARegions.has(block.regionId));
+    const otherBlock = second.popBlocks.find((block) => !countryAProvinces.has(block.provinceId));
     if (otherBlock === undefined) throw new Error("missing non-A block");
     otherBlock.militancy = 0.99;
     second.seed = 7;

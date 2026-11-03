@@ -12,6 +12,8 @@ import {
   deserializeWorld,
   tick,
   type TickContext,
+  countryProvinceIds,
+  marketProvinceIds,
 } from "@century/sim";
 import {
   M5_COUNTRY_A,
@@ -31,20 +33,20 @@ function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
   };
 }
 
-describe("M5 multi-region and multi-country world", () => {
-  test("constructs three countries, four regions, two markets, and seven blocks", () => {
+describe("M5 multi-province and multi-country world", () => {
+  test("constructs three countries, four provinces, two markets, and seven blocks", () => {
     const { scenario, world } = m5World();
     expect(world.countries).toHaveLength(3);
     expect(world.currencies).toHaveLength(3);
-    expect(world.regions).toHaveLength(4);
+    expect(world.provinceEconomies).toHaveLength(4);
     expect(world.markets).toHaveLength(2);
     expect(world.popBlocks).toHaveLength(7);
     assertValidWorld(world);
     assertValidEconomyScenario(scenario);
 
-    expect(world.regions.map((region) => region.marketId)).toEqual([0, 0, 1, 0]);
-    expect(world.markets.find((market) => market.id === 0)?.regionIds).toEqual([0, 1, 3]);
-    expect(world.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds).toEqual([
+    expect(world.provinceEconomies.map((province) => province.marketId)).toEqual([0, 0, 1, 0]);
+    expect(marketProvinceIds(world, 0)).toEqual([0, 1, 3]);
+    expect(countryProvinceIds(world, M5_COUNTRY_A)).toEqual([
       0, 1,
     ]);
     expect(world.countries.find((country) => country.id === M5_COUNTRY_C)?.immigrationOpen).toBe(
@@ -55,40 +57,40 @@ describe("M5 multi-region and multi-country world", () => {
     );
   });
 
-  test("assigns cross-region labor within a country and cross-border labor only into an open country", () => {
+  test("assigns cross-province labor within a country and cross-border labor only into an open country", () => {
     const { world } = m5World();
     runTicks(world, 1, context(m5Scenario()));
     expect(world.employment.length).toBeGreaterThan(0);
     assertValidWorld(world);
-    const regionByBuilding = new Map(world.buildings.map((building) => [building.id, building.regionId]));
-    const countryOfRegion = new Map<number, number>();
+    const provinceByBuilding = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
+    const countryOfProvince = new Map<number, number>();
     for (const country of world.countries) {
-      for (const regionId of country.regionIds) countryOfRegion.set(regionId, country.id);
+      for (const provinceId of countryProvinceIds(world, country.id)) countryOfProvince.set(provinceId, country.id);
     }
-    let crossRegionSameCountry = 0;
+    let crossProvinceSameCountry = 0;
     for (const assignment of world.employment) {
       const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
       expect(block).toBeDefined();
       if (block === undefined) continue;
-      const buildingRegion = regionByBuilding.get(assignment.buildingInstanceId);
-      if (buildingRegion === undefined) continue;
-      if (buildingRegion !== block.regionId) {
-        const sourceCountry = countryOfRegion.get(block.regionId);
-        const destinationCountry = countryOfRegion.get(buildingRegion);
-        if (sourceCountry === destinationCountry) crossRegionSameCountry += 1;
+      const buildingProvince = provinceByBuilding.get(assignment.buildingInstanceId);
+      if (buildingProvince === undefined) continue;
+      if (buildingProvince !== block.provinceId) {
+        const sourceCountry = countryOfProvince.get(block.provinceId);
+        const destinationCountry = countryOfProvince.get(buildingProvince);
+        if (sourceCountry === destinationCountry) crossProvinceSameCountry += 1;
         else {
           expect(destinationCountry).toBe(M5_COUNTRY_C);
           expect(world.countries.find((country) => country.id === destinationCountry)?.immigrationOpen).toBe(true);
         }
       }
     }
-    expect(crossRegionSameCountry).toBeGreaterThan(0);
+    expect(crossProvinceSameCountry).toBeGreaterThan(0);
   });
 
   test("keeps a closed border closed even when vacancies exist", () => {
     const scenario = m5Scenario();
     const farm = scenario.buildingInstances.find(
-      (building) => building.id === 5 && building.regionId === M5_REGION_B1,
+      (building) => building.id === 5 && building.provinceId === M5_REGION_B1,
     );
     expect(farm?.definitionId).toBe(M5_FARM);
     // Enlarge B's farm far beyond its domestic workforce.
@@ -97,9 +99,9 @@ describe("M5 multi-region and multi-country world", () => {
     );
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     runTicks(world, 1, context(scenario));
-    const bBlocks = world.popBlocks.filter((block) => block.regionId === M5_REGION_B1);
+    const bBlocks = world.popBlocks.filter((block) => block.provinceId === M5_REGION_B1);
     const bBuildingIds = new Set(
-      world.buildings.filter((building) => building.regionId === M5_REGION_B1).map((building) => building.id),
+      world.buildings.filter((building) => building.provinceId === M5_REGION_B1).map((building) => building.id),
     );
     for (const assignment of world.employment) {
       if (!bBuildingIds.has(assignment.buildingInstanceId)) continue;
@@ -108,26 +110,26 @@ describe("M5 multi-region and multi-country world", () => {
   });
 
   test("rejects invalid market and country membership", () => {
-    const duplicateRegion = m5Scenario();
-    duplicateRegion.markets = duplicateRegion.markets.map((market) =>
-      market.id === 1 ? { ...market, regionIds: [M5_REGION_B1, 0] } : market,
+    const duplicateProvince = m5Scenario();
+    duplicateProvince.markets = duplicateProvince.markets.map((market) =>
+      market.id === 1 ? { ...market, provinceIds: [M5_REGION_B1, 0] } : market,
     );
-    expect(() => createEconomyWorld(duplicateRegion)).toThrow(/belongs to both market/);
+    expect(() => createEconomyWorld(duplicateProvince)).toThrow(/belongs to both market/);
 
     const splitCountry = m5Scenario();
     splitCountry.countries = (splitCountry.countries ?? []).map((country) =>
-      country.id === M5_COUNTRY_A ? { ...country, regionIds: [0] } : country,
+      country.id === M5_COUNTRY_A ? { ...country, provinceIds: [0] } : country,
     );
-    // Region 1 becomes unowned; zero-fiscal countries allow unowned regions only
+    // ProvinceEconomy 1 becomes unowned; zero-fiscal countries allow unowned provinces only
     // when no fiscal policy is active. A is active, so ownership must cover it.
-    expect(() => createEconomyWorld(splitCountry)).toThrow(/region 1 must be owned/);
+    expect(() => createEconomyWorld(splitCountry)).toThrow(/province 1 must be owned/);
 
     const unknownMarket = m5Scenario();
-    unknownMarket.population.regions = unknownMarket.population.regions.map((region) =>
-      region.id === M5_REGION_A2 ? { ...region, key: "a2", name: "A2" } : region,
+    unknownMarket.population.provinceEconomies = unknownMarket.population.provinceEconomies.map((province) =>
+      province.id === M5_REGION_A2 ? { ...province, key: "a2", name: "A2" } : province,
     );
     unknownMarket.markets = unknownMarket.markets.map((market) =>
-      market.id === 0 ? { ...market, regionIds: [0, 3] } : market,
+      market.id === 0 ? { ...market, provinceIds: [0, 3] } : market,
     );
     expect(() => createEconomyWorld(unknownMarket)).toThrow(/not assigned to a market/);
   });
@@ -195,18 +197,18 @@ describe("M5 multi-region and multi-country world", () => {
     expect(world.dayIndex).toBe(32);
   });
 
-  test("keeps a countryless multi-region world valid and tickable", () => {
+  test("keeps a countryless multi-province world valid and tickable", () => {
     const scenario = m5Scenario();
     scenario.countries = [];
     scenario.currencies = [];
     scenario.currencyValuations = [];
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     expect(world.countries).toHaveLength(0);
-    expect(world.regions).toHaveLength(4);
+    expect(world.provinceEconomies).toHaveLength(4);
     expect(world.markets).toHaveLength(2);
     runTicks(world, 3, context(scenario));
     assertValidWorld(world);
-    // Countryless labor access is unrestricted only among countryless regions.
+    // Countryless labor access is unrestricted only among countryless provinces.
     for (const assignment of world.employment) {
       expect(assignment.workers).toBeGreaterThan(0);
     }

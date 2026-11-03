@@ -10,6 +10,7 @@ import {
 
 import { Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
+import { provinceEconomyRows } from "@century/sim-worker";
 
 export function PopulationScreen({
   snapshot,
@@ -67,8 +68,8 @@ export function PopulationScreen({
             label="Blocks with unmet subsistence"
             value={`${String(country.blocksWithUnmetSubsistence)} block(s)`}
             detail={`Country has ${String(
-              snapshot.regions.filter((region) => region.countryId === country.id).length,
-            )} regions. Any unmet subsistence day in the block's current counter.`}
+              provinceEconomyRows(snapshot).filter((province) => province.countryId === country.id).length,
+            )} provinces. Any unmet subsistence day in the block's current counter.`}
           />
           <StatRow
             label="Blocks with unmet basic needs"

@@ -44,6 +44,7 @@ import {
 } from "../../app/src/components/provinceRenderPlan.js";
 import { PROVINCE_MAP_1900 } from "../../app/src/provinceMapBundle.js";
 import type { ProvinceMapData } from "../../app/src/provinceCatalogTypes.js";
+import { politicalGeographyWorld } from "./fixtures/provinces.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -90,7 +91,7 @@ const AMERICAS_IDS = new Set(AMERICAS.provinces.map((province) => province.id));
 const FUTURE_ID = new Map(
   AMERICAS.futurePolities.map((polity) => [polity.tag, polity.polityId]),
 );
-const REGION_IDS = new Set(SCENARIO.population.regions.map((region) => region.id));
+const REGION_IDS = new Set(SCENARIO.population.provinceEconomies.map((province) => province.id));
 
 /** Province key prefix -> the modern successor state the province becomes. */
 const SUCCESSOR_RULES: readonly (readonly [string, string])[] = [
@@ -233,7 +234,8 @@ function transfer(
 }
 
 function referenceWorld(seed = 91_000): World {
-  return createEconomyWorld(SCENARIO, { seed });
+  // P2: the reference sequences run on the political geography alone (D-118).
+  return politicalGeographyWorld(SCENARIO, seed);
 }
 
 /** 1915-1934: the United States occupies Haiti without changing ownership. */
@@ -457,10 +459,12 @@ describe("M12d Americas province inventory and geometry", () => {
     for (const tag of [
       "USA", "GBR", "FRA", "NLD", "DNK", "MEX", "GUA", "HON", "SAL", "NIC",
       "COS", "COL", "VEN", "ECU", "PRU", "BOL", "CHL", "ARG", "URY", "PRY",
-      "BRA", "HTI", "DOM", "CAN", "NFD",
+      "BRA", "HTI", "DOM", "CAN",
     ]) {
       expect(owners.has(tag)).toBe(true);
     }
+    // D-132: Newfoundland is a British colony in 1900, not a separate owner.
+    expect(owners.has("NFD")).toBe(false);
     const mapTags = new Set(AMERICAS.provinces.map((province) => province.mapTag));
     for (const tag of [
       "USA", "CAN", "NFD", "MEX", "GUA", "HON", "SAL", "NIC", "COS", "COL",
@@ -471,7 +475,9 @@ describe("M12d Americas province inventory and geometry", () => {
       expect(mapTags.has(tag)).toBe(true);
     }
     for (const province of AMERICAS.provinces) {
-      expect(REGION_IDS.has(province.simulationRegionId)).toBe(true);
+      // P2 (D-118): every province is an economic unit of its own; the region link is gone.
+      expect(REGION_IDS.has(province.id)).toBe(true);
+      expect("simulationRegionId" in province).toBe(false);
     }
   });
 
@@ -923,15 +929,15 @@ describe("M12d authoritative provincial ownership", () => {
     assertValidWorld(world);
   });
 
-  test("the 1900 baseline keeps every future polity out except the 1900 Newfoundland registry", () => {
+  test("the 1900 baseline keeps every future polity out", () => {
     const world = referenceWorld();
     const futureIds = new Set(AMERICAS.futurePolities.map((polity) => polity.polityId));
-    futureIds.delete(futureId("NFD"));
     for (const entry of world.provinces.ownership) {
       if (!AMERICAS_IDS.has(entry.provinceId)) continue;
       expect(futureIds.has(entry.ownerPolityId)).toBe(false);
     }
-    expect(ownerOf(world, "am-nfd-newfoundland-and-labrador")).toBe(futureId("NFD"));
+    // D-132: Newfoundland is owned by the United Kingdom, its 1900 sovereign.
+    expect(ownerOf(world, "am-nfd-newfoundland-and-labrador")).toBe(1);
   });
 
   test("1902-1917 transitions are ordinary ownership changes", () => {
@@ -1030,7 +1036,7 @@ describe("M12d historical reference snapshots", () => {
     expect(ownerOf(world, "am-cub-oriente")).toBe(59);
     expect(controllerOf(world, "am-cub-oriente")).toBe(0);
     expect(ownerOf(world, "am-can-ontario")).toBe(56);
-    expect(ownerOf(world, "am-nfd-newfoundland-and-labrador")).toBe(futureId("NFD"));
+    expect(ownerOf(world, "am-nfd-newfoundland-and-labrador")).toBe(1); // D-132
     expect(ownerOf(world, "am-bwi-guy-essequibo")).toBe(1);
     expect(ownerOf(world, "am-sur-paramaribo-and-the-coast")).toBe(9);
     expect(ownerOf(world, "am-dwi-saint-thomas")).toBe(14);

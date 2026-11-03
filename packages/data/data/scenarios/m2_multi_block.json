@@ -23,7 +23,7 @@
       "stratum": "middle"
     }
   ],
-  "regions": [
+  "provinces": [
     {
       "id": 0,
       "key": "test-region",
@@ -33,7 +33,7 @@
   "popBlocks": [
     {
       "id": 0,
-      "regionId": 0,
+      "provinceId": 0,
       "professionId": 0,
       "financialAccountId": 0,
       "literacy": 0.35,
@@ -81,7 +81,7 @@
     },
     {
       "id": 1,
-      "regionId": 0,
+      "provinceId": 0,
       "professionId": 1,
       "financialAccountId": 1,
       "literacy": 0.5,
@@ -129,7 +129,7 @@
     },
     {
       "id": 2,
-      "regionId": 0,
+      "provinceId": 0,
       "professionId": 2,
       "financialAccountId": 2,
       "literacy": 0.85,

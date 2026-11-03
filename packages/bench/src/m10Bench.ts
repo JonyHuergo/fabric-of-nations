@@ -39,15 +39,15 @@ function scenarioWithArmies(): {
   const first = scenario.countries?.[0];
   const second = scenario.countries?.[1];
   if (first === undefined || second === undefined) throw new Error("M10 bench needs two countries");
-  const firstRegion = first.regionIds[0];
-  const secondRegion = second.regionIds[0];
-  if (firstRegion === undefined || secondRegion === undefined) {
-    throw new Error("M10 bench needs two regions");
+  const firstProvince = first.provinceIds[0];
+  const secondProvince = second.provinceIds[0];
+  if (firstProvince === undefined || secondProvince === undefined) {
+    throw new Error("M10 bench needs two provinces");
   }
   scenario.military = {
     armies: [
-      { countryId: first.id, regionId: firstRegion, personnel: 2_000, equipmentUnits: 40 },
-      { countryId: second.id, regionId: secondRegion, personnel: 2_000, equipmentUnits: 40 },
+      { countryId: first.id, provinceId: firstProvince, personnel: 2_000, equipmentUnits: 40 },
+      { countryId: second.id, provinceId: secondProvince, personnel: 2_000, equipmentUnits: 40 },
     ],
   };
   return {

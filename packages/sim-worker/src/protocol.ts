@@ -6,7 +6,7 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 16 as const;
+export const PROTOCOL_VERSION = 17 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -80,7 +80,7 @@ export interface SetDebtPolicyActionDto {
 export interface StartConstructionActionDto {
   readonly kind: "start-construction";
   readonly countryId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly definitionId: number;
 }
 
@@ -219,7 +219,7 @@ export interface AcceptPeaceActionDto {
 export interface RecruitArmyActionDto {
   readonly kind: "recruit-army";
   readonly countryId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly personnel: number;
   readonly equipmentUnits?: number;
 }
@@ -229,7 +229,7 @@ export interface DeployArmyActionDto {
   readonly kind: "deploy-army";
   readonly countryId: number;
   readonly armyId: number;
-  readonly targetRegionId: number;
+  readonly targetProvinceId: number;
 }
 
 /** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
@@ -451,8 +451,8 @@ export interface SnapshotProjectMaterial {
 export interface SnapshotConstructionProject {
   readonly id: number;
   readonly countryId: number;
-  readonly regionId: number;
-  readonly regionName: string;
+  readonly provinceId: number;
+  readonly provinceName: string;
   readonly definitionId: number;
   readonly definitionKey: string;
   readonly definitionName: string;
@@ -520,8 +520,8 @@ export interface SnapshotPublicEnterprise {
   readonly definitionId: number;
   readonly definitionKey: string;
   readonly definitionName: string;
-  readonly regionId: number;
-  readonly regionName: string;
+  readonly provinceId: number;
+  readonly provinceName: string;
   readonly sector: string;
   readonly level: number;
   readonly condition: number;
@@ -998,9 +998,110 @@ export interface CountryMetaSnapshot {
   readonly notes: string;
 }
 
-/** M11 static metadata attached to a dependent-territory region. */
-export interface RegionMetaSnapshot {
+/** M11 static metadata attached to a dependent-territory province. */
+/**
+ * P2 province economies as columns: entry i of every column belongs to province
+ * `ids[i]` (ascending). A snapshot of 1,687 provinces would otherwise repeat every
+ * field name per province; the columns keep the per-tick message small. Read rows
+ * with `provinceEconomyRows`. Province names are static app content.
+ */
+export interface ProvinceEconomyTable {
+  readonly ids: readonly number[];
+  readonly countryId: readonly (number | null)[];
+  readonly marketId: readonly (number | null)[];
+  readonly population: readonly number[];
+  /** One row per province, aligned with the snapshot's `professions` order. */
+  readonly populationByProfession: readonly (readonly number[])[];
+  readonly buildingCount: readonly number[];
+  readonly buildingLevels: readonly number[];
+  readonly employedWorkers: readonly number[];
+  readonly unrest: readonly number[];
+  readonly infrastructure: readonly number[];
+  readonly urbanShare: readonly number[];
+  readonly arableLandHa: readonly number[];
+  readonly pastureHa: readonly number[];
+  readonly literacy: readonly number[];
+  readonly controllerCountryId: readonly (number | null)[];
+  readonly controlledSinceDay: readonly (number | null)[];
+  readonly territoryTag: readonly (string | null)[];
+}
+
+/** Encode province rows as a column table (rows ascending by id). */
+export function encodeProvinceEconomyTable(
+  rows: readonly ProvinceEconomySnapshot[],
+  professions: readonly { readonly id: number }[],
+): ProvinceEconomyTable {
+  return {
+    ids: rows.map((row) => row.id),
+    countryId: rows.map((row) => row.countryId),
+    marketId: rows.map((row) => row.marketId),
+    population: rows.map((row) => row.population),
+    populationByProfession: rows.map((row) =>
+      professions.map((profession) => row.populationByProfession[String(profession.id)] ?? 0),
+    ),
+    buildingCount: rows.map((row) => row.buildingCount),
+    buildingLevels: rows.map((row) => row.buildingLevels),
+    employedWorkers: rows.map((row) => row.employedWorkers),
+    unrest: rows.map((row) => row.unrest),
+    infrastructure: rows.map((row) => row.infrastructure),
+    urbanShare: rows.map((row) => row.urbanShare),
+    arableLandHa: rows.map((row) => row.arableLandHa),
+    pastureHa: rows.map((row) => row.pastureHa),
+    literacy: rows.map((row) => row.literacy),
+    controllerCountryId: rows.map((row) => row.controllerCountryId),
+    controlledSinceDay: rows.map((row) => row.controlledSinceDay),
+    territoryTag: rows.map((row) => row.territoryTag),
+  };
+}
+
+const provinceRowsCache = new WeakMap<ProvinceEconomyTable, readonly ProvinceEconomySnapshot[]>();
+
+/**
+ * Province economy rows of a snapshot, decoded once per table (presentation-side
+ * cache keyed by the immutable snapshot table; it holds no simulation state).
+ */
+export function provinceEconomyRows(
+  snapshot: Pick<SimulationSnapshot, "provinceTable" | "professions">,
+): readonly ProvinceEconomySnapshot[] {
+  const table = snapshot.provinceTable;
+  const cached = provinceRowsCache.get(table);
+  if (cached !== undefined) return cached;
+  const rows = table.ids.map((id, index): ProvinceEconomySnapshot => {
+    const counts = table.populationByProfession[index] ?? [];
+    const byProfession: Record<string, number> = {};
+    snapshot.professions.forEach((profession, column) => {
+      const count = counts[column] ?? 0;
+      if (count > 0) byProfession[String(profession.id)] = count;
+    });
+    return Object.freeze({
+      id,
+      countryId: table.countryId[index] ?? null,
+      marketId: table.marketId[index] ?? null,
+      population: table.population[index] ?? 0,
+      populationByProfession: Object.freeze(byProfession),
+      buildingCount: table.buildingCount[index] ?? 0,
+      buildingLevels: table.buildingLevels[index] ?? 0,
+      employedWorkers: table.employedWorkers[index] ?? 0,
+      unrest: table.unrest[index] ?? 0,
+      infrastructure: table.infrastructure[index] ?? 0,
+      urbanShare: table.urbanShare[index] ?? 0,
+      arableLandHa: table.arableLandHa[index] ?? 0,
+      pastureHa: table.pastureHa[index] ?? 0,
+      literacy: table.literacy[index] ?? 0,
+      controllerCountryId: table.controllerCountryId[index] ?? null,
+      controlledSinceDay: table.controlledSinceDay[index] ?? null,
+      territoryTag: table.territoryTag[index] ?? null,
+    });
+  });
+  provinceRowsCache.set(table, rows);
+  return rows;
+}
+
+/** P2 dependent territory: a named set of provinces of its sovereign (D-118 §3). */
+export interface TerritorySnapshot {
   readonly polityTag: string;
+  /** Provinces of the territory, ascending. */
+  readonly provinceIds: readonly number[];
   readonly historicalName: string;
   readonly status: CountryStatusDto;
   readonly sovereignCountryId: number;
@@ -1025,7 +1126,7 @@ export interface CountrySummarySnapshot {
   readonly selectable: boolean;
   readonly isPlayer: boolean;
   readonly isFocused: boolean;
-  readonly regionIds: readonly number[];
+  readonly provinceIds: readonly number[];
   readonly marketIds: readonly number[];
   readonly population: number;
   readonly workingAgePopulation: number;
@@ -1045,7 +1146,7 @@ export interface CountrySnapshot {
   readonly name: string;
   /** M11 static polity metadata; null for legacy scenarios without a catalog. */
   readonly meta: CountryMetaSnapshot | null;
-  readonly regionIds: readonly number[];
+  readonly provinceIds: readonly number[];
   readonly fiscal: SnapshotFiscalPolicy;
   readonly treasuryCashRUSD: number;
   readonly debtEnabled: boolean;
@@ -1130,15 +1231,15 @@ export interface CountrySnapshot {
     readonly wounded: number;
     readonly captured: number;
     readonly relations: readonly SnapshotDiplomaticRelation[];
-    readonly occupiedRegionIds: readonly number[];
-    readonly controlledRegionIds: readonly number[];
+    readonly occupiedProvinceIds: readonly number[];
+    readonly controlledProvinceIds: readonly number[];
   };
 }
 
 export interface SnapshotArmy {
   readonly id: number;
   readonly countryId: number;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly personnel: number;
   readonly equipmentUnits: number;
   readonly organization: number;
@@ -1147,7 +1248,7 @@ export interface SnapshotArmy {
   readonly deaths: number;
   readonly captured: number;
   readonly readyDay: number;
-  readonly destinationRegionId: number | null;
+  readonly destinationProvinceId: number | null;
   readonly arrivalDay: number | null;
 }
 
@@ -1181,30 +1282,45 @@ export interface SnapshotDiplomaticRelation {
 }
 
 export interface SnapshotOccupation {
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly sovereignCountryId: number | null;
   readonly controllerCountryId: number | null;
   readonly occupiedSinceDay: number | null;
 }
 
-export interface RegionSnapshot {
+/**
+ * P2 population, economic and social state of one province (D-118). The legal owner
+ * is `countryId`; `controllerCountryId` is set only while another country controls
+ * the province (an occupation or an administration such as Cuba in 1900).
+ */
+export interface ProvinceEconomySnapshot {
   readonly id: number;
-  readonly key: string;
-  readonly name: string;
+  /** Owner country (simulation country), or null. */
   readonly countryId: number | null;
+  /** Customs territory (market) of the province. */
   readonly marketId: number | null;
   readonly population: number;
+  /** Population of each profession, by profession id (absent when zero). */
+  readonly populationByProfession: Readonly<Record<string, number>>;
   readonly buildingCount: number;
-  /** M8 regional militancy aggregate and provisional infrastructure quality. */
+  /** Total building levels (capacity) in the province. */
+  readonly buildingLevels: number;
+  /** Workers employed in the province's buildings. */
+  readonly employedWorkers: number;
+  /** M8 provincial militancy aggregate and provisional infrastructure quality. */
   readonly unrest: number;
   readonly infrastructure: number;
-  /** M10 sovereign owner; equal to countryId and never changes on occupation. */
-  readonly sovereignCountryId: number | null;
-  /** M10 temporary military controller; null means the sovereign controls it. */
+  /** HYDE 3.3 urban share of the 1900 population, 0..1. */
+  readonly urbanShare: number;
+  readonly arableLandHa: number;
+  readonly pastureHa: number;
+  /** Population-weighted literacy of ages 15+. */
+  readonly literacy: number;
+  /** Controller when it differs from the owner; null when the owner controls it. */
   readonly controllerCountryId: number | null;
-  readonly occupiedSinceDay: number | null;
-  /** M11 dependent-territory metadata; null for a sovereign home region. */
-  readonly meta: RegionMetaSnapshot | null;
+  readonly controlledSinceDay: number | null;
+  /** Dependent territory the province belongs to; null for a home province. */
+  readonly territoryTag: string | null;
 }
 
 /**
@@ -1222,8 +1338,12 @@ export interface ProvinceOwnershipSnapshot {
   readonly specialStatus: string;
 }
 
-/** Explicit alias: a simulation region is not a geographical province. */
-export type SimulationRegionSnapshot = RegionSnapshot;
+
+export interface ProfessionSnapshot {
+  readonly id: number;
+  readonly key: string;
+  readonly name: string;
+}
 
 export interface GoodSnapshot {
   readonly id: number;
@@ -1251,13 +1371,13 @@ export interface MarketSnapshot {
   readonly name: string;
   readonly description: string;
   readonly kind: "national" | "imperial" | "shared" | "unspecified";
-  readonly regionIds: readonly number[];
-  /** Countries with at least one region in this market, ascending. */
+  readonly provinceIds: readonly number[];
+  /** Countries with at least one province in this market, ascending. */
   readonly memberCountryIds: readonly number[];
   readonly prices: readonly MarketPriceSnapshot[];
   /** E6a customs administration of this market, or null. */
   readonly customsCountryId: number | null;
-  /** Derived mean infrastructure quality of the market's regions, 0..1. */
+  /** Derived mean infrastructure quality of the market's provinces, 0..1. */
   readonly infrastructure: number;
 }
 
@@ -1297,11 +1417,16 @@ export interface SimulationSnapshot {
   readonly countries: readonly CountrySnapshot[];
   /** Compact record for every country in the world. */
   readonly countrySummaries: readonly CountrySummarySnapshot[];
-  readonly regions: readonly RegionSnapshot[];
+  /** P2 per-province population and economy as columns (D-118); see `provinceEconomyRows`. */
+  readonly provinceTable: ProvinceEconomyTable;
+  /** P2 dependent territories (static), ascending by polity tag. */
+  readonly territories: readonly TerritorySnapshot[];
   /** M12a permanent provincial ownership and effective control, ascending by id. */
   readonly provinces: readonly ProvinceOwnershipSnapshot[];
   readonly markets: readonly MarketSnapshot[];
   readonly goods: readonly GoodSnapshot[];
+  /** P2 profession names, for per-province population (static). */
+  readonly professions: readonly ProfessionSnapshot[];
   /** Static authored need tiers, used for evidence-based diagnosis. */
   readonly needTiers: readonly SnapshotNeedTier[];
   /** Validated buildable public-construction project types. */
@@ -1588,9 +1713,9 @@ function parseAction(value: unknown): CountryActionDto {
     return {
       kind: "start-construction",
       countryId,
-      regionId: requireInteger(
-        record.regionId,
-        "command.action.regionId",
+      provinceId: requireInteger(
+        record.provinceId,
+        "command.action.provinceId",
         0,
         0xffff_ffff,
       ),
@@ -1904,7 +2029,7 @@ function parseAction(value: unknown): CountryActionDto {
     };
   }
   if (kind === "recruit-army") {
-    const regionId = requireUint32(record.regionId, "command.action.regionId");
+    const provinceId = requireUint32(record.provinceId, "command.action.provinceId");
     const personnel = requireInteger(
       record.personnel,
       "command.action.personnel",
@@ -1921,16 +2046,16 @@ function parseAction(value: unknown): CountryActionDto {
       );
     }
     if (equipmentUnits === undefined) {
-      return { kind, countryId, regionId, personnel };
+      return { kind, countryId, provinceId, personnel };
     }
-    return { kind, countryId, regionId, personnel, equipmentUnits };
+    return { kind, countryId, provinceId, personnel, equipmentUnits };
   }
   if (kind === "deploy-army") {
     return {
       kind,
       countryId,
       armyId: requireUint32(record.armyId, "command.action.armyId"),
-      targetRegionId: requireUint32(record.targetRegionId, "command.action.targetRegionId"),
+      targetProvinceId: requireUint32(record.targetProvinceId, "command.action.targetProvinceId"),
     };
   }
   throw new ProtocolError("invalid_action", "command.action.kind is not supported");
@@ -2051,6 +2176,10 @@ function isIntegerIn(value: unknown, min: number, max: number): value is number 
 
 function isNullableId(value: unknown): value is number | null {
   return value === null || isIntegerIn(value, 0, 0xffff_ffff);
+}
+
+function isFiniteNumberArray(value: unknown): value is readonly number[] {
+  return Array.isArray(value) && value.every(isFiniteNumber);
 }
 
 function isNumberArray(value: unknown): value is readonly number[] {
@@ -2329,8 +2458,8 @@ function isConstructionProject(value: unknown): value is SnapshotConstructionPro
   return (
     isIntegerIn(value.id, 1, 0xffff_ffff) &&
     isIntegerIn(value.countryId, 0, 0xffff_ffff) &&
-    isIntegerIn(value.regionId, 0, 0xffff_ffff) &&
-    isString(value.regionName, 256) &&
+    isIntegerIn(value.provinceId, 0, 0xffff_ffff) &&
+    isString(value.provinceName, 256) &&
     isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
     isString(value.definitionKey, 128) &&
     isString(value.definitionName, 256) &&
@@ -2396,8 +2525,8 @@ function isPublicEnterprise(value: unknown): value is SnapshotPublicEnterprise {
     isIntegerIn(value.definitionId, 0, 0xffff_ffff) &&
     isString(value.definitionKey, 128) &&
     isString(value.definitionName, 256) &&
-    isIntegerIn(value.regionId, 0, 0xffff_ffff) &&
-    isString(value.regionName, 256) &&
+    isIntegerIn(value.provinceId, 0, 0xffff_ffff) &&
+    isString(value.provinceName, 256) &&
     isString(value.sector, 64) &&
     isFiniteNumber(value.level) &&
     isFiniteNumber(value.condition) &&
@@ -2535,7 +2664,7 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
   if (!isString(value.tag, 32) || !isString(value.name, 256)) return false;
-  if (!isNumberArray(value.regionIds)) return false;
+  if (!isNumberArray(value.provinceIds)) return false;
   if (!isRecord(value.fiscal)) return false;
   for (const field of [
     "incomeTaxRate",
@@ -2597,16 +2726,43 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   );
 }
 
-function isRegionSnapshot(value: unknown): value is RegionSnapshot {
+function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
+  if (!isRecord(value) || !isNumberArray(value.ids)) return false;
+  const length = value.ids.length;
+  const numberColumns = [
+    "population",
+    "buildingCount",
+    "buildingLevels",
+    "employedWorkers",
+    "unrest",
+    "infrastructure",
+    "urbanShare",
+    "arableLandHa",
+    "pastureHa",
+    "literacy",
+  ] as const;
+  for (const column of numberColumns) {
+    const entries = value[column];
+    if (!isFiniteNumberArray(entries) || entries.length !== length) return false;
+  }
+  for (const column of ["countryId", "marketId", "controllerCountryId", "controlledSinceDay"] as const) {
+    const entries = value[column];
+    if (!Array.isArray(entries) || entries.length !== length || !entries.every(isNullableId)) return false;
+  }
+  const tags = value.territoryTag;
+  if (!Array.isArray(tags) || tags.length !== length) return false;
+  if (!tags.every((tag) => tag === null || isString(tag, 16))) return false;
+  const counts = value.populationByProfession;
+  return Array.isArray(counts) && counts.length === length && counts.every(isFiniteNumberArray);
+}
+
+function isTerritorySnapshot(value: unknown): value is TerritorySnapshot {
   if (!isRecord(value)) return false;
   return (
-    isIntegerIn(value.id, 0, 0xffff_ffff) &&
-    isString(value.key, 128) &&
-    isString(value.name, 256) &&
-    isNullableId(value.countryId) &&
-    isNullableId(value.marketId) &&
-    isFiniteNumber(value.population) &&
-    isIntegerIn(value.buildingCount, 0, 1_000_000)
+    isString(value.polityTag, 16) &&
+    isNumberArray(value.provinceIds) &&
+    isString(value.historicalName, 256) &&
+    isIntegerIn(value.sovereignCountryId, 0, 0xffff_ffff)
   );
 }
 
@@ -2638,7 +2794,7 @@ function isMarketSnapshot(value: unknown): value is MarketSnapshot {
   if (!isRecord(value)) return false;
   if (!isIntegerIn(value.id, 0, 0xffff_ffff)) return false;
   if (!isString(value.label, 256)) return false;
-  if (!isNumberArray(value.regionIds)) return false;
+  if (!isNumberArray(value.provinceIds)) return false;
   if (!Array.isArray(value.prices)) return false;
   return value.prices.every((price) => {
     if (!isRecord(price)) return false;
@@ -2679,7 +2835,7 @@ function isCountrySummary(value: unknown): value is CountrySummarySnapshot {
   ) {
     return false;
   }
-  if (!isNumberArray(value.regionIds) || !isNumberArray(value.marketIds)) return false;
+  if (!isNumberArray(value.provinceIds) || !isNumberArray(value.marketIds)) return false;
   for (const key of [
     "population",
     "workingAgePopulation",
@@ -2756,7 +2912,9 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   ) {
     return false;
   }
-  if (!Array.isArray(value.regions) || !value.regions.every(isRegionSnapshot)) return false;
+  if (!isProvinceEconomyTable(value.provinceTable)) return false;
+  if (!Array.isArray(value.territories) || !value.territories.every(isTerritorySnapshot)) return false;
+  if (!Array.isArray(value.professions)) return false;
   if (
     !Array.isArray(value.provinces) ||
     !value.provinces.every(isProvinceOwnershipSnapshot)

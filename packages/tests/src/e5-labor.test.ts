@@ -20,6 +20,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 
 import { e5Scenario } from "./fixtures/e5.js";
@@ -131,7 +132,7 @@ describe("E5 training and qualification", () => {
     const indexBefore = buildFinanceIndex(world.finance);
     const treasuryBefore = indexBefore.get("country", country.id, "treasury-cash").balanceRUSD;
     const householdBefore = world.popBlocks
-      .filter((block) => country.regionIds.includes(block.regionId))
+      .filter((block) => countryProvinceIds(world, country.id).includes(block.provinceId))
       .reduce(
         (total, block) =>
           total + indexBefore.get("popBlock", block.id, "household-cash").balanceRUSD,
@@ -142,7 +143,7 @@ describe("E5 training and qualification", () => {
     const indexAfter = buildFinanceIndex(world.finance);
     const treasuryAfter = indexAfter.get("country", country.id, "treasury-cash").balanceRUSD;
     const householdAfter = world.popBlocks
-      .filter((block) => country.regionIds.includes(block.regionId))
+      .filter((block) => countryProvinceIds(world, country.id).includes(block.provinceId))
       .reduce(
         (total, block) =>
           total + indexAfter.get("popBlock", block.id, "household-cash").balanceRUSD,
@@ -156,7 +157,7 @@ describe("E5 training and qualification", () => {
       runTrainingPhase(world, scenario.definitions, day);
     }
     const qualified = world.popBlocks.filter(
-      (block) => country.regionIds.includes(block.regionId) && block.qualification > 0,
+      (block) => countryProvinceIds(world, country.id).includes(block.provinceId) && block.qualification > 0,
     );
     expect(qualified.length).toBeGreaterThan(0);
     expect(Math.max(...qualified.map((block) => block.qualification))).toBeGreaterThan(0);

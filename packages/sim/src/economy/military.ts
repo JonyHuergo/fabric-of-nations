@@ -1,10 +1,11 @@
 /**
  * M10 diplomacy, warfare, and territorial control (D-081).
  *
- * Sovereignty is `Country.regionIds`; temporary military control is
- * `Region.controllerCountryId`. Occupation never changes sovereignty, market
- * membership, buildings, people, accounts, treasuries, or monetary authorities.
- * Only a validated peace-treaty cession changes sovereignty.
+ * Sovereignty is `ProvinceOwnership.ownerPolityId`; temporary military control is
+ * `ProvinceOwnership.controllerPolityId` (D-118). Occupation never changes
+ * sovereignty, market membership, buildings, people, accounts, treasuries, or
+ * monetary authorities. Only a validated peace-treaty cession changes sovereignty;
+ * it moves the ceded provinces into the recipient's customs territory (D-119).
  *
  * This module owns the military state, the five player/AI actions, and the daily
  * military phase. All randomness is keyed by the world seed and day; iteration is
@@ -19,9 +20,13 @@ import {
   countryById,
   emptyMilitaryState,
   isWarPair,
-  regionById,
-  regionSovereignCountryId,
+  provinceById,
+  provinceControllerCountryId,
+  provinceSovereignCountryId,
 } from "./militaryState.js";
+import { countryProvinceIds } from "./country.js";
+import { transferProvincesToCountry } from "./provinceTransfer.js";
+import { setProvinceControl } from "../provinces/state.js";
 import type { Day, Id } from "../types.js";
 import type { PopBlock } from "../population/types.js";
 import {
@@ -121,7 +126,7 @@ export interface MilitaryActionResult {
   readonly warId: Id | null;
   readonly offerId: Id | null;
   readonly armyId: Id | null;
-  readonly regionId: Id | null;
+  readonly provinceId: Id | null;
   readonly personnel: number;
   readonly equipmentUnits: number;
   readonly spentRUSD: number;
@@ -147,7 +152,7 @@ export interface AcceptPeaceInput {
 
 export interface RecruitArmyInput {
   readonly countryId: Id;
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly personnel: number;
   readonly equipmentUnits?: number;
 }
@@ -155,7 +160,7 @@ export interface RecruitArmyInput {
 export interface DeployArmyInput {
   readonly countryId: Id;
   readonly armyId: Id;
-  readonly targetRegionId: Id;
+  readonly targetProvinceId: Id;
 }
 
 export type MilitaryActionInput = (
@@ -176,7 +181,7 @@ export interface MilitaryValidation {
 }
 
 export interface MilitaryBattleResult {
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly attackerCountryId: Id;
   readonly defenderCountryId: Id;
   readonly attackerLosses: number;
@@ -188,8 +193,8 @@ export interface MilitaryBattleResult {
 export interface MilitaryPhaseResult {
   readonly dayIndex: Day;
   readonly battles: readonly MilitaryBattleResult[];
-  readonly occupiedRegionIds: readonly Id[];
-  readonly liberatedRegionIds: readonly Id[];
+  readonly occupiedProvinceIds: readonly Id[];
+  readonly liberatedProvinceIds: readonly Id[];
   readonly movedArmyIds: readonly Id[];
   readonly recoveredWounded: number;
   readonly paidRUSD: number;
@@ -202,8 +207,8 @@ function emptyPhaseResult(dayIndex: Day): MilitaryPhaseResult {
   return {
     dayIndex,
     battles: [],
-    occupiedRegionIds: [],
-    liberatedRegionIds: [],
+    occupiedProvinceIds: [],
+    liberatedProvinceIds: [],
     movedArmyIds: [],
     recoveredWounded: 0,
     paidRUSD: 0,
@@ -236,8 +241,8 @@ export function armiesOfCountry(world: World, countryId: Id): Army[] {
   return world.military.armies.filter((army) => army.countryId === countryId);
 }
 
-export function armiesInRegion(world: World, regionId: Id): Army[] {
-  return world.military.armies.filter((army) => army.regionId === regionId);
+export function armiesInProvince(world: World, provinceId: Id): Army[] {
+  return world.military.armies.filter((army) => army.provinceId === provinceId);
 }
 
 /** Active war opponents of a country, ascending. */
@@ -272,7 +277,7 @@ export function militaryPeopleOutsideCivilian(world: World): number {
 
 /**
  * Build the M10 state from scenario input. Initial armies are part of the opening
- * state: their people are removed from the region's pop blocks and their equipment
+ * state: their people are removed from the province's pop blocks and their equipment
  * is opening stock (no opening money postings). Omitted input leaves the system
  * disabled.
  */
@@ -327,19 +332,19 @@ function createInitialArmy(
 ): Army {
   const country = countryById(world, input.countryId);
   if (country === undefined) throw new RangeError("military army references an unknown country");
-  const region = regionById(world, input.regionId);
-  if (region === undefined) throw new RangeError("military army references an unknown region");
-  if (regionSovereignCountryId(world, input.regionId) !== country.id) {
-    throw new RangeError("military army must start in a region its country owns");
+  const province = provinceById(world, input.provinceId);
+  if (province === undefined) throw new RangeError("military army references an unknown province");
+  if (provinceSovereignCountryId(world, input.provinceId) !== country.id) {
+    throw new RangeError("military army must start in a province its country owns");
   }
   if (!Number.isInteger(input.personnel) || input.personnel <= 0) {
     throw new RangeError("military army personnel must be a positive integer");
   }
-  const available = recruitablePeople(world, input.regionId);
+  const available = recruitablePeople(world, input.provinceId);
   if (input.personnel > available) {
-    throw new RangeError("military army personnel exceeds the region's recruitable people");
+    throw new RangeError("military army personnel exceeds the province's recruitable people");
   }
-  removePeople(world, input.regionId, input.personnel, dayIndex);
+  removePeople(world, input.provinceId, input.personnel, dayIndex);
   const equipmentUnits =
     input.equipmentUnits ??
     Math.ceil(input.personnel / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
@@ -354,8 +359,8 @@ function createInitialArmy(
   return {
     id,
     countryId: country.id,
-    regionId: region.id,
-    homeRegionId: region.id,
+    provinceId: province.id,
+    homeProvinceId: province.id,
     personnel: input.personnel,
     equipmentUnits,
     organization,
@@ -365,7 +370,7 @@ function createInitialArmy(
     deaths: 0,
     captured: 0,
     readyDay: dayIndex,
-    destinationRegionId: null,
+    destinationProvinceId: null,
     arrivalDay: null,
     lastBattleDay: null,
   };
@@ -402,11 +407,11 @@ function blockPopulation(block: PopBlock): number {
   return total;
 }
 
-/** People aged 18..45 in the region, the recruitment pool. */
-export function recruitablePeople(world: World, regionId: Id): number {
+/** People aged 18..45 in the province, the recruitment pool. */
+export function recruitablePeople(world: World, provinceId: Id): number {
   let total = 0;
   for (const block of world.popBlocks) {
-    if (block.regionId !== regionId) continue;
+    if (block.provinceId !== provinceId) continue;
     total += eligibleAgeCount(block.maleByAge) + eligibleAgeCount(block.femaleByAge);
   }
   return total;
@@ -425,7 +430,7 @@ export function recruitablePeople(world: World, regionId: Id): number {
  *
  * With `capacityCapped`, each recipient receives at most its weight (used for
  * removing people). Without it, weights are shares only and the total may exceed
- * their sum (used for returning people to a region). Exact BigInt remainders
+ * their sum (used for returning people to a province). Exact BigInt remainders
  * avoid floating-point drift in the largest-remainder comparison.
  */
 function apportionLargestRemainder(
@@ -530,20 +535,20 @@ function bestRecipient<T extends PayRecipient>(recipients: readonly T[]): T {
 }
 
 /**
- * Remove `count` people from a region's blocks, preserving the documented
+ * Remove `count` people from a province's blocks, preserving the documented
  * "males 18..45 first, then females 18..45" eligibility rule. Within each sex,
  * recruitment is apportioned across blocks in proportion to that block's
  * available eligible people, so no block can supply more than it has.
  */
 function removePeople(
   world: World,
-  regionId: Id,
+  provinceId: Id,
   count: number,
   dayIndex: Day,
 ): RecruitmentRemoval[] {
-  const blocks = world.popBlocks.filter((block) => block.regionId === regionId);
+  const blocks = world.popBlocks.filter((block) => block.provinceId === provinceId);
   if (blocks.length === 0) {
-    throw new RangeError(`region ${String(regionId)} has no pop block`);
+    throw new RangeError(`province ${String(provinceId)} has no pop block`);
   }
   const totalPopulations = blocks.map(blockPopulation);
   const maleWeights = blocks.map((block) => eligibleAgeCount(block.maleByAge));
@@ -551,7 +556,7 @@ function removePeople(
   const malePool = maleWeights.reduce((total, value) => total + value, 0);
   const femalePool = femaleWeights.reduce((total, value) => total + value, 0);
   if (count > malePool + femalePool) {
-    throw new RangeError(`region ${String(regionId)} lacks ${String(count)} recruitable people`);
+    throw new RangeError(`province ${String(provinceId)} lacks ${String(count)} recruitable people`);
   }
   const maleTake = Math.min(count, malePool);
   const femaleTake = count - maleTake;
@@ -797,17 +802,17 @@ function postMilitaryProcurement(
 /**
  * Population-weighted recipients for daily pay or a garrison payment.
  *
- * Weights are the region's recruitment-eligible people when any exist, otherwise
+ * Weights are the province's recruitment-eligible people when any exist, otherwise
  * its total civilian population. No formation-source record is persisted, so a
  * coherent household-population rule is used instead of tracking every soldier's
  * original block.
  */
 function payRecipients(
   world: World,
-  regionId: Id,
+  provinceId: Id,
   dayIndex: Day,
 ): PayRecipient[] {
-  const blocks = world.popBlocks.filter((block) => block.regionId === regionId);
+  const blocks = world.popBlocks.filter((block) => block.provinceId === provinceId);
   if (blocks.length === 0) return [];
   const totalPopulations = blocks.map(blockPopulation);
   const eligible = blocks.map(
@@ -911,8 +916,8 @@ function militaryActionDayError(world: World, dayIndex: Day): string | null {
  * Validate a `cede-occupied` term against the current world.
  *
  * The ceding country is the opponent of the offerer. Cession transfers every
- * region of that opponent that the offerer currently controls, so the opponent
- * must retain at least one sovereign region after all transfers.
+ * province of that opponent that the offerer currently controls, so the opponent
+ * must retain at least one sovereign province after all transfers.
  */
 function cessionError(
   world: World,
@@ -926,12 +931,12 @@ function cessionError(
   if (cedingCountry.id === offererCountryId) {
     return "cession requires two distinct belligerents";
   }
-  const transferred = controlledRegionsOf(world, offererCountryId, cedingCountryId);
+  const transferred = controlledProvincesOf(world, offererCountryId, cedingCountryId);
   if (transferred.length === 0) {
-    return "cession requires control of at least one enemy region";
+    return "cession requires control of at least one enemy province";
   }
-  if (cedingCountry.regionIds.length - transferred.length < 1) {
-    return `cession would remove the last region of country ${String(cedingCountry.id)}`;
+  if (countryProvinceIds(world, cedingCountry.id).length - transferred.length < 1) {
+    return `cession would remove the last province of country ${String(cedingCountry.id)}`;
   }
   return null;
 }
@@ -1037,19 +1042,19 @@ export function validateRecruitArmy(world: World, input: RecruitArmyInput): Mili
   if (country === undefined) {
     fail(errors, `unknown country ${String(input.countryId)}`);
   }
-  const region = regionById(world, input.regionId);
-  if (region === undefined) {
-    fail(errors, `unknown region ${String(input.regionId)}`);
+  const province = provinceById(world, input.provinceId);
+  if (province === undefined) {
+    fail(errors, `unknown province ${String(input.provinceId)}`);
   }
-  if (country !== undefined && region !== undefined) {
-    const owner = regionSovereignCountryId(world, input.regionId);
+  if (country !== undefined && province !== undefined) {
+    const owner = provinceSovereignCountryId(world, input.provinceId);
     if (owner !== country.id) {
-      fail(errors, "armies may only be recruited in a region the country owns");
+      fail(errors, "armies may only be recruited in a province the country owns");
     }
     if (!Number.isInteger(input.personnel) || input.personnel <= 0) {
       fail(errors, "personnel must be a positive integer");
-    } else if (input.personnel > recruitablePeople(world, input.regionId)) {
-      fail(errors, "personnel exceeds the region's recruitable people");
+    } else if (input.personnel > recruitablePeople(world, input.provinceId)) {
+      fail(errors, "personnel exceeds the province's recruitable people");
     }
     const equipment =
       input.equipmentUnits ?? Math.ceil(Math.max(0, input.personnel) / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
@@ -1080,20 +1085,20 @@ export function validateDeployArmy(world: World, input: DeployArmyInput): Milita
   } else {
     if (army.countryId !== input.countryId) fail(errors, "the army belongs to another country");
     if (world.dayIndex < army.readyDay) fail(errors, "the formation is not ready");
-    if (army.destinationRegionId !== null) fail(errors, "the army is already moving");
-    const target = regionById(world, input.targetRegionId);
+    if (army.destinationProvinceId !== null) fail(errors, "the army is already moving");
+    const target = provinceById(world, input.targetProvinceId);
     if (target === undefined) {
-      fail(errors, "unknown target region");
-    } else if (input.targetRegionId === army.regionId) {
-      fail(errors, "the army is already in that region");
+      fail(errors, "unknown target province");
+    } else if (input.targetProvinceId === army.provinceId) {
+      fail(errors, "the army is already in that province");
     } else {
-      const sovereign = regionSovereignCountryId(world, input.targetRegionId);
+      const sovereign = provinceSovereignCountryId(world, input.targetProvinceId);
       const allowed =
         sovereign === army.countryId ||
-        target.controllerCountryId === army.countryId ||
+        provinceControllerCountryId(world, target.id) === army.countryId ||
         (sovereign !== null && areAtWar(world, army.countryId, sovereign));
       if (!allowed) {
-        fail(errors, "the target region is not own, controlled, or at war");
+        fail(errors, "the target province is not own, controlled, or at war");
       }
     }
   }
@@ -1157,7 +1162,7 @@ function removeDestroyedArmies(world: World, dayIndex: Day): void {
   for (const army of world.military.armies) {
     if (army.personnel > 0) continue;
     if (army.wounded > 0) {
-      returnPeople(world, army.homeRegionId, army.wounded, dayIndex);
+      returnPeople(world, army.homeProvinceId, army.wounded, dayIndex);
       recordCasualty(world.military, army.countryId).woundedReturned += army.wounded;
     }
   }
@@ -1165,19 +1170,19 @@ function removeDestroyedArmies(world: World, dayIndex: Day): void {
 }
 
 /**
- * Return wounded or demobilised people to a region's population.
+ * Return wounded or demobilised people to a province's population.
  *
  * No source block is persisted for a formation, so returns follow the same
- * documented population rule as recruitment: proportional to the region's
+ * documented population rule as recruitment: proportional to the province's
  * current eligible people, falling back to total population and finally to an
- * even split when a region is fully depopulated. People return into male
+ * even split when a province is fully depopulated. People return into male
  * 18..45 cells, matching the existing M10 convention.
  */
-function returnPeople(world: World, regionId: Id, count: number, dayIndex: Day): void {
+function returnPeople(world: World, provinceId: Id, count: number, dayIndex: Day): void {
   if (!(count > 0)) return;
-  const blocks = world.popBlocks.filter((candidate) => candidate.regionId === regionId);
+  const blocks = world.popBlocks.filter((candidate) => candidate.provinceId === provinceId);
   if (blocks.length === 0) {
-    throw new RangeError(`region ${String(regionId)} has no pop block for returning people`);
+    throw new RangeError(`province ${String(provinceId)} has no pop block for returning people`);
   }
   const totalPopulations = blocks.map(blockPopulation);
   const eligible = blocks.map(
@@ -1214,55 +1219,59 @@ function returnPeople(world: World, regionId: Id, count: number, dayIndex: Day):
   }
 }
 
-/** Regions the country militarily controls that belong to `targetCountryId`. */
-export function controlledRegionsOf(
+/** Provinces the country militarily controls that belong to `targetCountryId`. */
+export function controlledProvincesOf(
   world: World,
   countryId: Id,
   targetCountryId: Id,
 ): Id[] {
-  const regions: Id[] = [];
-  for (const region of world.regions) {
-    if (region.controllerCountryId !== countryId) continue;
-    if (regionSovereignCountryId(world, region.id) === targetCountryId) {
-      regions.push(region.id);
-    }
+  const provinces: Id[] = [];
+  if (!world.provinces.enabled) return provinces;
+  for (const record of world.provinces.ownership) {
+    if (record.controllerPolityId !== countryId || record.ownerPolityId === countryId) continue;
+    if (record.ownerPolityId === targetCountryId) provinces.push(record.provinceId);
   }
-  return regions.sort((left, right) => left - right);
+  return provinces.sort((left, right) => left - right);
 }
 
 /**
- * Transfer sovereignty of one region. This is the only M10 operation that changes
- * `Country.regionIds`. Market membership, buildings, pop blocks, accounts, cash, and
- * monetary authority are untouched.
+ * Cede provinces to a country by treaty. This is the only M10 operation that
+ * changes legal ownership. Through `transferProvincesToCountry` (D-118 §4) the
+ * provinces join the recipient's customs territory with their blocks, buildings
+ * and stock; people, accounts and cash are conserved and monetary authority is
+ * untouched. A country can never cede its last province.
  */
-export function transferRegionSovereignty(
+export function transferProvinceSovereignty(
   world: World,
-  regionId: Id,
+  provinceIds: readonly Id[],
   toCountryId: Id,
+  dayIndex: Day,
 ): void {
-  const region = regionById(world, regionId);
-  if (region === undefined) throw new RangeError(`unknown region ${String(regionId)}`);
-  const toCountry = countryById(world, toCountryId);
-  if (toCountry === undefined) throw new RangeError(`unknown country ${String(toCountryId)}`);
-  const fromCountryId = regionSovereignCountryId(world, regionId);
-  if (fromCountryId === toCountryId) return;
-  if (fromCountryId !== null) {
-    const fromCountry = countryById(world, fromCountryId);
-    if (fromCountry === undefined) {
-      throw new RangeError(`region ${String(regionId)} has an unknown sovereign`);
-    }
-    if (fromCountry.regionIds.length <= 1) {
-      throw new RangeError(
-        `country ${String(fromCountryId)} cannot cede its last region`,
-      );
-    }
-    fromCountry.regionIds = fromCountry.regionIds.filter((id) => id !== regionId);
+  if (countryById(world, toCountryId) === undefined) {
+    throw new RangeError(`unknown country ${String(toCountryId)}`);
   }
-  if (!toCountry.regionIds.includes(regionId)) {
-    toCountry.regionIds = [...toCountry.regionIds, regionId].sort((left, right) => left - right);
+  const moving = [...new Set(provinceIds)]
+    .filter((provinceId) => provinceSovereignCountryId(world, provinceId) !== toCountryId)
+    .sort((left, right) => left - right);
+  if (moving.length === 0) return;
+  const losses = new Map<Id, number>();
+  for (const provinceId of moving) {
+    const fromCountryId = provinceSovereignCountryId(world, provinceId);
+    if (fromCountryId === null) continue;
+    losses.set(fromCountryId, (losses.get(fromCountryId) ?? 0) + 1);
   }
-  region.controllerCountryId = null;
-  region.occupiedSinceDay = null;
+  for (const [fromCountryId, lost] of losses) {
+    if (countryProvinceIds(world, fromCountryId).length - lost < 1) {
+      throw new RangeError(`country ${String(fromCountryId)} cannot cede its last province`);
+    }
+  }
+  transferProvincesToCountry(world, {
+    provinceIds: moving,
+    toCountryId,
+    kind: "cession",
+    day: dayIndex,
+    note: "Ceded by peace treaty",
+  });
 }
 
 function applyPeace(
@@ -1274,12 +1283,12 @@ function applyPeace(
 ): void {
   const winnerSide = war.attackerCountryId;
   const loserSide = war.defenderCountryId;
-  let cessionRegions: Id[] = [];
+  let cessionProvinces: Id[] = [];
   if (terms === "cede-occupied") {
     const other = fromCountryId === winnerSide ? loserSide : winnerSide;
     const cession = cessionError(world, fromCountryId, other);
     if (cession !== null) throw new RangeError(cession);
-    cessionRegions = controlledRegionsOf(world, fromCountryId, other);
+    cessionProvinces = controlledProvincesOf(world, fromCountryId, other);
   }
   war.endedDay = dayIndex;
   // `truceUntilDay` is the last prohibited day. A peace on day P is followed by
@@ -1289,32 +1298,43 @@ function applyPeace(
   const relation = relationForUpdate(world.military, winnerSide, loserSide);
   relation.truceUntilDay = dayIndex + M10_TRUCE_DAYS;
   relation.score = Math.min(relation.score, M10_PEACE_RELATION_SCORE);
-  for (const regionId of cessionRegions) {
-    transferRegionSovereignty(world, regionId, fromCountryId);
-  }
-  // Every remaining occupation between the two belligerents is cleared on peace.
-  for (const region of [...world.regions].sort((left, right) => left.id - right.id)) {
-    const sovereign = regionSovereignCountryId(world, region.id);
-    const controller = region.controllerCountryId;
-    if (controller === null) continue;
-    const pair =
-      (controller === winnerSide && sovereign === loserSide) ||
-      (controller === loserSide && sovereign === winnerSide);
-    if (pair) {
-      region.controllerCountryId = null;
-      region.occupiedSinceDay = null;
-    }
-  }
+  // The ended war's offers go first: the cession validates the whole world.
   world.military.peaceOffers = world.military.peaceOffers.filter(
     (offer) => offer.warId !== war.id,
   );
+  if (cessionProvinces.length > 0) {
+    transferProvinceSovereignty(world, cessionProvinces, fromCountryId, dayIndex);
+  }
+  // Every remaining occupation between the two belligerents is cleared on peace.
+  const liberated: Id[] = [];
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      const controller = record.controllerPolityId;
+      const sovereign = record.ownerPolityId;
+      const pair =
+        (controller === winnerSide && sovereign === loserSide) ||
+        (controller === loserSide && sovereign === winnerSide);
+      if (pair) liberated.push(record.provinceId);
+    }
+  }
+  if (liberated.length > 0) {
+    setProvinceControl(world, {
+      provinceIds: liberated,
+      controllerPolityId: null,
+      kind: "liberation",
+      day: dayIndex,
+      note: "Occupation ended by peace",
+    });
+  }
 }
 
 /** Deep enough copy to restore a failed action atomically. */
 function snapshotForAction(world: World): {
   military: MilitaryState;
-  controllers: Map<Id, { controllerCountryId: Id | null; occupiedSinceDay: Day | null }>;
-  regionIdsByCountry: Map<Id, Id[]>;
+  provinces: World["provinces"];
+  provinceEconomies: World["provinceEconomies"];
+  markets: World["markets"];
+  construction: World["construction"];
   finance: World["finance"];
   popBlocks: PopBlock[];
   employment: World["employment"];
@@ -1329,18 +1349,27 @@ function snapshotForAction(world: World): {
       peaceOffers: world.military.peaceOffers.map((offer) => ({ ...offer })),
       casualties: world.military.casualties.map((record) => ({ ...record })),
     },
-    controllers: new Map(
-      world.regions.map((region) => [
-        region.id,
-        {
-          controllerCountryId: region.controllerCountryId,
-          occupiedSinceDay: region.occupiedSinceDay,
-        },
-      ]),
-    ),
-    regionIdsByCountry: new Map(
-      world.countries.map((country) => [country.id, [...country.regionIds]]),
-    ),
+    // A peace cession moves provinces between customs territories (D-118), so the
+    // province, market and construction state are part of the atomic snapshot.
+    provinces: {
+      ...world.provinces,
+      ownership: world.provinces.ownership.map((entry) => ({
+        ...entry,
+        claimantPolityIds: [...entry.claimantPolityIds],
+      })),
+      transfers: [...world.provinces.transfers],
+    },
+    provinceEconomies: world.provinceEconomies.map((province) => ({
+      ...province,
+      popBlockIds: [...province.popBlockIds],
+      buildingInstanceIds: [...province.buildingInstanceIds],
+    })),
+    markets: world.markets.map((market) => ({
+      ...market,
+      priceRUSD: [...market.priceRUSD],
+      stockLots: market.stockLots.map((lot) => ({ ...lot })),
+    })),
+    construction: world.construction,
     finance: cloneFinanceState(world.finance),
     popBlocks: world.popBlocks.map((block) => ({
       ...block,
@@ -1357,16 +1386,10 @@ function restoreActionSnapshot(
   snapshot: ReturnType<typeof snapshotForAction>,
 ): void {
   world.military = snapshot.military;
-  for (const region of world.regions) {
-    const saved = snapshot.controllers.get(region.id);
-    if (saved === undefined) continue;
-    region.controllerCountryId = saved.controllerCountryId;
-    region.occupiedSinceDay = saved.occupiedSinceDay;
-  }
-  for (const country of world.countries) {
-    const saved = snapshot.regionIdsByCountry.get(country.id);
-    if (saved !== undefined) country.regionIds = saved;
-  }
+  world.provinces = snapshot.provinces;
+  world.provinceEconomies = snapshot.provinceEconomies;
+  world.markets = snapshot.markets;
+  world.construction = snapshot.construction;
   world.finance = snapshot.finance;
   world.popBlocks = snapshot.popBlocks;
   world.employment = snapshot.employment;
@@ -1432,7 +1455,7 @@ function executeMilitaryAction(
         warId,
         offerId: null,
         armyId: null,
-        regionId: null,
+        provinceId: null,
         personnel: 0,
         equipmentUnits: 0,
         spentRUSD: 0,
@@ -1462,7 +1485,7 @@ function executeMilitaryAction(
         warId: war.id,
         offerId,
         armyId: null,
-        regionId: null,
+        provinceId: null,
         personnel: 0,
         equipmentUnits: 0,
         spentRUSD: 0,
@@ -1482,7 +1505,7 @@ function executeMilitaryAction(
         warId: war.id,
         offerId: offer.id,
         armyId: null,
-        regionId: null,
+        provinceId: null,
         personnel: 0,
         equipmentUnits: 0,
         spentRUSD: 0,
@@ -1494,9 +1517,9 @@ function executeMilitaryAction(
         Math.ceil(action.personnel / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
       const recruitmentCost = action.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD;
       const equipmentCost = equipmentUnits * M10_EQUIPMENT_PRICE_RUSD;
-      const region = regionById(world, action.regionId);
-      if (region === undefined) throw new RangeError("missing recruitment region");
-      const removals = removePeople(world, region.id, action.personnel, dayIndex);
+      const province = provinceById(world, action.provinceId);
+      if (province === undefined) throw new RangeError("missing recruitment province");
+      const removals = removePeople(world, province.id, action.personnel, dayIndex);
       reconcileRecruitmentEmployment(world, removals);
       // Signing costs follow the actual supplier blocks: each block is paid for
       // exactly the recruits it supplied. This is a real treasury-to-household
@@ -1517,8 +1540,8 @@ function executeMilitaryAction(
       world.military.armies.push({
         id: armyId,
         countryId: action.countryId,
-        regionId: region.id,
-        homeRegionId: region.id,
+        provinceId: province.id,
+        homeProvinceId: province.id,
         personnel: action.personnel,
         equipmentUnits,
         organization: 0.5,
@@ -1528,7 +1551,7 @@ function executeMilitaryAction(
         deaths: 0,
         captured: 0,
         readyDay: dayIndex + M10_ARMY_FORMATION_DAYS,
-        destinationRegionId: null,
+        destinationProvinceId: null,
         arrivalDay: null,
         lastBattleDay: null,
       });
@@ -1540,7 +1563,7 @@ function executeMilitaryAction(
         warId: null,
         offerId: null,
         armyId,
-        regionId: region.id,
+        provinceId: province.id,
         personnel: action.personnel,
         equipmentUnits,
         spentRUSD: recruitmentCost + equipmentCost,
@@ -1549,7 +1572,7 @@ function executeMilitaryAction(
     case "deploy-army": {
       const army = world.military.armies.find((entry) => entry.id === action.armyId);
       if (army === undefined) throw new RangeError("missing army");
-      army.destinationRegionId = action.targetRegionId;
+      army.destinationProvinceId = action.targetProvinceId;
       army.arrivalDay = dayIndex + M10_DEPLOYMENT_DAYS;
       return {
         kind: action.kind,
@@ -1558,7 +1581,7 @@ function executeMilitaryAction(
         warId: null,
         offerId: null,
         armyId: army.id,
-        regionId: action.targetRegionId,
+        provinceId: action.targetProvinceId,
         personnel: army.personnel,
         equipmentUnits: army.equipmentUnits,
         spentRUSD: 0,
@@ -1588,7 +1611,7 @@ function casualtyJitter(
   world: World,
   warId: Id,
   dayIndex: Day,
-  regionId: Id,
+  provinceId: Id,
   side: number,
 ): number {
   const draw = drawUint32({
@@ -1596,7 +1619,7 @@ function casualtyJitter(
     day: dayIndex,
     entityId: warId,
     purpose: "m10-combat",
-    drawIndex: regionId * 2 + side,
+    drawIndex: provinceId * 2 + side,
   });
   return draw / 0xffff_ffff;
 }
@@ -1698,7 +1721,7 @@ function resolveBattle(
   state: MilitaryState,
   war: WarState,
   dayIndex: Day,
-  regionId: Id,
+  provinceId: Id,
   attacker: Army,
   defender: Army,
 ): BattleApplication {
@@ -1709,13 +1732,13 @@ function resolveBattle(
     M10_MAX_CASUALTY_FRACTION,
     (M10_BASE_CASUALTY_FRACTION +
       M10_CASUALTY_STRENGTH_SCALE * (defenderStrength / total)) *
-      (0.8 + 0.4 * casualtyJitter(world, war.id, dayIndex, regionId, 0)),
+      (0.8 + 0.4 * casualtyJitter(world, war.id, dayIndex, provinceId, 0)),
   );
   const defenderLossRate = Math.min(
     M10_MAX_CASUALTY_FRACTION,
     (M10_BASE_CASUALTY_FRACTION +
       M10_CASUALTY_STRENGTH_SCALE * (attackerStrength / total)) *
-      (0.8 + 0.4 * casualtyJitter(world, war.id, dayIndex, regionId, 1)),
+      (0.8 + 0.4 * casualtyJitter(world, war.id, dayIndex, provinceId, 1)),
   );
   const attackerLosses = Math.min(
     attacker.personnel,
@@ -1731,7 +1754,7 @@ function resolveBattle(
   defender.lastBattleDay = dayIndex;
   return {
     result: {
-      regionId,
+      provinceId,
       attackerCountryId: attacker.countryId,
       defenderCountryId: defender.countryId,
       attackerLosses,
@@ -1751,8 +1774,8 @@ function payUpkeep(
   const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_RUSD;
   const required = payRequired + equipmentRequired;
   if (!(required > 0)) return { paid: 0, shortfall: 0 };
-  const recipients = payRecipients(world, army.regionId, dayIndex);
-  // Soldiers' pay needs a household recipient. If the region has none, only the
+  const recipients = payRecipients(world, army.provinceId, dayIndex);
+  // Soldiers' pay needs a household recipient. If the province has none, only the
   // equipment supplier can be paid; the unpaid pay remains an honest shortfall.
   const payable = recipients.length > 0 ? required : equipmentRequired;
   const available = treasuryCash(world, army.countryId);
@@ -1799,8 +1822,8 @@ function shouldAiAccept(
   if (recipient.id === world.playerCountryId) return false;
   if (offer.terms !== "white-peace") return false;
   if (dayIndex - war.startedDay >= M10_AI_PEACE_MIN_WAR_DAYS) return true;
-  const controlledAgainst = controlledRegionsOf(world, recipient.id, offer.fromCountryId).length;
-  const enemyControlled = controlledRegionsOf(world, offer.fromCountryId, recipient.id).length;
+  const controlledAgainst = controlledProvincesOf(world, recipient.id, offer.fromCountryId).length;
+  const enemyControlled = controlledProvincesOf(world, offer.fromCountryId, recipient.id).length;
   return enemyControlled > controlledAgainst;
 }
 
@@ -1820,8 +1843,8 @@ export function runMilitaryPhase(
   const result = {
     dayIndex,
     battles: [] as MilitaryBattleResult[],
-    occupiedRegionIds: [] as Id[],
-    liberatedRegionIds: [] as Id[],
+    occupiedProvinceIds: [] as Id[],
+    liberatedProvinceIds: [] as Id[],
     movedArmyIds: [] as Id[],
     recoveredWounded: 0,
     paidRUSD: 0,
@@ -1831,18 +1854,18 @@ export function runMilitaryPhase(
 
   // 1. Movement arrivals.
   for (const army of [...world.military.armies].sort((left, right) => left.id - right.id)) {
-    if (army.destinationRegionId === null || army.arrivalDay === null) continue;
+    if (army.destinationProvinceId === null || army.arrivalDay === null) continue;
     if (army.arrivalDay > dayIndex) continue;
-    army.regionId = army.destinationRegionId;
-    army.destinationRegionId = null;
+    army.provinceId = army.destinationProvinceId;
+    army.destinationProvinceId = null;
     army.arrivalDay = null;
     result.movedArmyIds.push(army.id);
   }
 
-  // 2. Battles: one battle per region per day between the first hostile pair.
-  const regionIds = world.regions.map((region) => region.id).sort((left, right) => left - right);
-  for (const regionId of regionIds) {
-    const armies = armiesInRegion(world, regionId).sort((left, right) => left.id - right.id);
+  // 2. Battles: one battle per province per day between the first hostile pair.
+  const provinceIds = world.provinceEconomies.map((province) => province.id).sort((left, right) => left - right);
+  for (const provinceId of provinceIds) {
+    const armies = armiesInProvince(world, provinceId).sort((left, right) => left.id - right.id);
     if (armies.length < 2) continue;
     let attacker: Army | undefined;
     let defender: Army | undefined;
@@ -1853,7 +1876,7 @@ export function runMilitaryPhase(
         if (first === undefined || second === undefined) continue;
         const war = activeWarBetween(world, first.countryId, second.countryId);
         if (war === null) continue;
-        const sovereign = regionSovereignCountryId(world, regionId);
+        const sovereign = provinceSovereignCountryId(world, provinceId);
         if (sovereign !== null && first.countryId === sovereign) {
           defender = first;
           attacker = second;
@@ -1864,7 +1887,7 @@ export function runMilitaryPhase(
           attacker = first;
           defender = second;
         }
-        const battle = resolveBattle(world, world.military, war, dayIndex, regionId, attacker, defender);
+        const battle = resolveBattle(world, world.military, war, dayIndex, provinceId, attacker, defender);
         result.battles.push(battle.result);
         break;
       }
@@ -1873,51 +1896,76 @@ export function runMilitaryPhase(
   removeDestroyedArmies(world, dayIndex);
 
   // 3. Occupation and liberation.
-  for (const region of [...world.regions].sort((left, right) => left.id - right.id)) {
-    const sovereign = regionSovereignCountryId(world, region.id);
-    if (sovereign === null) continue;
-    const armies = armiesInRegion(world, region.id);
-    if (region.controllerCountryId !== null) {
-      const controller = region.controllerCountryId;
-      const controllerArmy = armies.find((army) => army.countryId === controller);
-      if (controllerArmy === undefined) {
-        region.controllerCountryId = null;
-        region.occupiedSinceDay = null;
-        result.liberatedRegionIds.push(region.id);
-        continue;
-      }
-      if (!areAtWar(world, controller, sovereign)) {
-        region.controllerCountryId = null;
-        region.occupiedSinceDay = null;
-        result.liberatedRegionIds.push(region.id);
+  // Occupation is province control (D-118). Only war occupations are created and
+  // lifted here; war-free administrative control (D-129) is left untouched. Only
+  // provinces that host an army or are already occupied can change, so the scan
+  // is over armies and occupied provinces, not every province.
+  const countryIds = new Set(world.countries.map((country) => country.id));
+  const candidateProvinceIds = new Set<Id>();
+  for (const army of world.military.armies) candidateProvinceIds.add(army.provinceId);
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      if (record.controllerPolityId !== record.ownerPolityId) candidateProvinceIds.add(record.provinceId);
+    }
+  }
+  const occupiedNow = new Map<Id, Id>();
+  for (const provinceId of [...candidateProvinceIds].sort((left, right) => left - right)) {
+    const record = world.provinces.enabled
+      ? world.provinces.ownership.find((entry) => entry.provinceId === provinceId)
+      : undefined;
+    if (record === undefined || !countryIds.has(record.ownerPolityId)) continue;
+    const sovereign = record.ownerPolityId;
+    const armies = armiesInProvince(world, provinceId);
+    if (record.controllerPolityId !== sovereign) {
+      const controller = record.controllerPolityId;
+      // War-free control is administrative (peace already lifted every war
+      // occupation between former belligerents), so it is not touched here.
+      if (!countryIds.has(controller) || !areAtWar(world, controller, sovereign)) continue;
+      if (armies.some((army) => army.countryId === controller)) {
+        occupiedNow.set(provinceId, controller);
+      } else {
+        setProvinceControl(world, {
+          provinceIds: [provinceId],
+          controllerPolityId: null,
+          kind: "liberation",
+          day: dayIndex,
+          note: "Occupier withdrew",
+        });
+        result.liberatedProvinceIds.push(provinceId);
       }
       continue;
     }
-    const sovereignArmy = armies.find((army) => army.countryId === sovereign);
-    if (sovereignArmy !== undefined) continue;
+    if (armies.some((army) => army.countryId === sovereign)) continue;
     const occupier = armies
       .filter((army) => areAtWar(world, army.countryId, sovereign))
       .sort((left, right) => left.id - right.id)[0];
     if (occupier !== undefined) {
-      region.controllerCountryId = occupier.countryId;
-      region.occupiedSinceDay = dayIndex;
-      result.occupiedRegionIds.push(region.id);
+      setProvinceControl(world, {
+        provinceIds: [provinceId],
+        controllerPolityId: occupier.countryId,
+        kind: "occupation",
+        day: dayIndex,
+        note: "Military occupation",
+      });
+      occupiedNow.set(provinceId, occupier.countryId);
+      result.occupiedProvinceIds.push(provinceId);
     }
   }
 
   // 4. Occupation effects: unrest and garrison procurement paid by the controller.
-  for (const region of [...world.regions].sort((left, right) => left.id - right.id)) {
-    const controller = region.controllerCountryId;
-    if (controller === null) continue;
-    region.unrest = Math.min(1, region.unrest + M10_OCCUPATION_UNREST_PER_DAY);
-    const occupier = armiesInRegion(world, region.id)
+  const provinceEconomyById = new Map(world.provinceEconomies.map((province) => [province.id, province]));
+  for (const [provinceId, controller] of [...occupiedNow].sort((left, right) => left[0] - right[0])) {
+    const province = provinceEconomyById.get(provinceId);
+    if (province === undefined) continue;
+    province.unrest = Math.min(1, province.unrest + M10_OCCUPATION_UNREST_PER_DAY);
+    const occupier = armiesInProvince(world, province.id)
       .filter((army) => army.countryId === controller)
       .sort((left, right) => left.id - right.id)[0];
     if (occupier === undefined) continue;
     const requested = occupier.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD;
-    const recipients = payRecipients(world, region.id, dayIndex);
+    const recipients = payRecipients(world, province.id, dayIndex);
     if (recipients.length === 0) {
-      // No occupied-region household can receive the payment, so no treasury
+      // No occupied-province household can receive the payment, so no treasury
       // cash moves and the full amount is an honest shortfall.
       result.shortfallRUSD += requested;
       continue;
@@ -1976,7 +2024,7 @@ export {
   assertValidMilitaryState,
   countryById,
   emptyMilitaryState,
-  regionById,
-  regionControllerCountryId,
-  regionSovereignCountryId,
+  provinceById,
+  provinceControllerCountryId,
+  provinceSovereignCountryId,
 } from "./militaryState.js";

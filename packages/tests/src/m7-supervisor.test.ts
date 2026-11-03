@@ -5,6 +5,7 @@ import {
   type SimulationSnapshot,
   type WorkerCommand,
   type WorkerEvent,
+  encodeProvinceEconomyTable,
 } from "@century/sim-worker";
 
 class ManualScheduler {
@@ -75,7 +76,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         tag: "USA",
         name: "United States",
         meta: null,
-        regionIds: [0],
+        provinceIds: [0],
         fiscal: {
           incomeTaxRate: 0.1,
           incomeTaxAllowanceRUSDPerYear: 0,
@@ -273,8 +274,8 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
           wounded: 0,
           captured: 0,
           relations: [],
-          occupiedRegionIds: [],
-          controlledRegionIds: [],
+          occupiedProvinceIds: [],
+          controlledProvinceIds: [],
         },
         monetary: {
           hasAuthority: false,
@@ -294,9 +295,14 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         },
       },
     ],
-    regions: [
-      { id: 0, key: "r0", name: "Region", countryId: 0, marketId: 0, population: 100, buildingCount: 1, unrest: 0, infrastructure: 0.5, sovereignCountryId: 0, controllerCountryId: null, occupiedSinceDay: null, meta: null },
-    ],
+    provinceTable: encodeProvinceEconomyTable(
+      [
+        { id: 0, countryId: 0, marketId: 0, population: 100, populationByProfession: {}, buildingCount: 1, buildingLevels: 1, employedWorkers: 0, unrest: 0, infrastructure: 0.5, urbanShare: 0, arableLandHa: 0, pastureHa: 0, literacy: 0, controllerCountryId: null, controlledSinceDay: null, territoryTag: null },
+      ],
+      [],
+    ),
+    territories: [],
+    professions: [],
     provinces: [],
     countrySummaries: [
       {
@@ -310,7 +316,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         selectable: true,
         isPlayer: false,
         isFocused: false,
-        regionIds: [0],
+        provinceIds: [0],
         marketIds: [0],
         population: 100,
         workingAgePopulation: 60,
@@ -332,7 +338,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         description: "A test market.",
         kind: "national",
         memberCountryIds: [0],
-        regionIds: [0],
+        provinceIds: [0],
         prices: [
           {
             goodId: 0,
@@ -544,13 +550,13 @@ describe("snapshot protocol validation", () => {
         (snapshot.date as { label: string }).label = "";
       },
       (snapshot) => {
-        (snapshot.countries[0] as { regionIds: unknown }).regionIds = "not-an-array";
+        (snapshot.countries[0] as { provinceIds: unknown }).provinceIds = "not-an-array";
       },
       (snapshot) => {
-        (snapshot.regions[0] as { key: unknown }).key = 7;
+        (snapshot.provinceTable as unknown as { territoryTag: unknown[] }).territoryTag[0] = 7;
       },
       (snapshot) => {
-        (snapshot.regions[0] as { countryId: unknown }).countryId = -1;
+        (snapshot.provinceTable as unknown as { countryId: unknown[] }).countryId[0] = -1;
       },
       (snapshot) => {
         (snapshot.markets[0] as { prices: unknown }).prices = [{}];

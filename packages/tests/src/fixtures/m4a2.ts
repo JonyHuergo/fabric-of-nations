@@ -29,14 +29,14 @@ export function zeroFiscal(): FiscalPolicy {
 export function country(
   id: number,
   monetary: MonetaryArrangement,
-  regionIds: number[] = [],
+  provinceIds: number[] = [],
 ): CountryInitialDef {
   return {
     id,
     tag: `T${String(id)}`,
     name: `Test Country ${String(id)}`,
     monetary,
-    regionIds,
+    provinceIds,
     treasuryAccountId: 9000 + id,
     initialTreasuryCashRUSD: 0,
     fiscal: zeroFiscal(),

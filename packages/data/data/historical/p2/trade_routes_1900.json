@@ -1,0 +1,1850 @@
+[
+  {
+    "marketAKey": "customs-afg",
+    "marketBKey": "customs-omn",
+    "kind": "sea",
+    "distanceUnits": 0.9,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-arg",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-arg",
+    "marketBKey": "customs-pry",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-arg",
+    "marketBKey": "customs-ury",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-aus",
+    "marketBKey": "customs-nzl",
+    "kind": "sea",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bgr",
+    "marketBKey": "customs-crt",
+    "kind": "sea",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bgr",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bol",
+    "marketBKey": "customs-arg",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bol",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bol",
+    "marketBKey": "customs-chl",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-bol",
+    "marketBKey": "customs-pry",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-che",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 43577,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-chl",
+    "marketBKey": "customs-arg",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-chn",
+    "marketBKey": "customs-afg",
+    "kind": "land",
+    "distanceUnits": 3.8,
+    "baseCapacityRUSDPerDay": 131425,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-chn",
+    "marketBKey": "customs-kor",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 134550,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-chn",
+    "marketBKey": "customs-npl",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 131550,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-col",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.8,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-col",
+    "marketBKey": "customs-ecu",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-col",
+    "marketBKey": "customs-pru",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-col",
+    "marketBKey": "customs-ven",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-cos",
+    "marketBKey": "customs-col",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 59603,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-bel",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 50776,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-dnk",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 47486,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-esp",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51551,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-fra",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 66268,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-nld",
+    "kind": "land",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 58659,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-nzl",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 47051,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-prt",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 50190,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-rus",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 81551,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-sok",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49351,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-deu",
+    "marketBKey": "customs-ton",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 46856,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ecu",
+    "marketBKey": "customs-pru",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-esp",
+    "marketBKey": "customs-and",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-esp",
+    "marketBKey": "customs-mar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-esp",
+    "marketBKey": "customs-prt",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-and",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49418,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-bel",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 53341,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.6,
+    "baseCapacityRUSDPerDay": 53816,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-can",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 50711,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-che",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 50241,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-chn",
+    "kind": "land",
+    "distanceUnits": 2.4,
+    "baseCapacityRUSDPerDay": 149716,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-dar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49566,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-esp",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 54116,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-eth",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 52166,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-ita",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 57713,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-lbr",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49566,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-mar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 50666,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-nld",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 61224,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-nzl",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49616,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.6,
+    "baseCapacityRUSDPerDay": 57841,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-prt",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 52755,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-sok",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51916,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-tha",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51241,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-ton",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49421,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-fra",
+    "marketBKey": "customs-wad",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 49666,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-afg",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 126220,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-bel",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 129020,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 1,
+    "baseCapacityRUSDPerDay": 129495,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-can",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 126390,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-chn",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 225395,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-cub",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125495,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-dar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125245,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-deu",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 141946,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-dnk",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125729,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-dom",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125245,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-eth",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 127845,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-fra",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 144511,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-gua",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125445,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-hti",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125470,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-ita",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 133392,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-lbr",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125245,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-mex",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 128495,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-nld",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 136903,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-npl",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 126345,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-nzl",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125295,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-omn",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125220,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-orf",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125170,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 133520,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-per",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 127570,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-prt",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 128434,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-shm",
+    "kind": "sea",
+    "distanceUnits": 0.6,
+    "baseCapacityRUSDPerDay": 125345,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-sok",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 127595,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-tha",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 126920,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-ton",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125100,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-ven",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125695,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gbr",
+    "marketBKey": "customs-zar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 125395,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-grc",
+    "marketBKey": "customs-bgr",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-grc",
+    "marketBKey": "customs-crt",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-grc",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gua",
+    "marketBKey": "customs-hon",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-gua",
+    "marketBKey": "customs-sal",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-hon",
+    "marketBKey": "customs-cos",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-hon",
+    "marketBKey": "customs-nic",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-hon",
+    "marketBKey": "customs-sal",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-hti",
+    "marketBKey": "customs-cub",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-hti",
+    "marketBKey": "customs-dom",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ita",
+    "marketBKey": "customs-and",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ita",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51048,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ita",
+    "marketBKey": "customs-che",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ita",
+    "marketBKey": "customs-eth",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 41047,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-jpn",
+    "marketBKey": "customs-chn",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 142076,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-jpn",
+    "marketBKey": "customs-kor",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 46026,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-mex",
+    "marketBKey": "customs-gua",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-mex",
+    "marketBKey": "customs-hon",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-mnt",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 42827,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-mnt",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nic",
+    "marketBKey": "customs-cos",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nld",
+    "marketBKey": "customs-aus",
+    "kind": "sea",
+    "distanceUnits": 1.1,
+    "baseCapacityRUSDPerDay": 42758,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nld",
+    "marketBKey": "customs-bel",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 45733,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nld",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.8,
+    "baseCapacityRUSDPerDay": 46208,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nld",
+    "marketBKey": "customs-tha",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 43633,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nld",
+    "marketBKey": "customs-ven",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 42408,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-nor",
+    "marketBKey": "customs-dnk",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51177,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-crt",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-omn",
+    "kind": "land",
+    "distanceUnits": 4.1,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-per",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40900,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-shm",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ott",
+    "marketBKey": "customs-wad",
+    "kind": "sea",
+    "distanceUnits": 0.9,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-per",
+    "marketBKey": "customs-afg",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-per",
+    "marketBKey": "customs-omn",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-per",
+    "marketBKey": "customs-shm",
+    "kind": "sea",
+    "distanceUnits": 0.9,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-aus",
+    "kind": "sea",
+    "distanceUnits": 1,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-bel",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-chn",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 133639,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-lbr",
+    "kind": "sea",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-mar",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-orf",
+    "kind": "sea",
+    "distanceUnits": 0.6,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-prt",
+    "marketBKey": "customs-zar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-pru",
+    "marketBKey": "customs-bol",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-pru",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 1,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-pru",
+    "marketBKey": "customs-chl",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-pry",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rom",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 44252,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rom",
+    "marketBKey": "customs-bgr",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-afg",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 65825,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 77452,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-chn",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 165000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-jpn",
+    "kind": "sea",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 76476,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-kor",
+    "kind": "sea",
+    "distanceUnits": 0.7,
+    "baseCapacityRUSDPerDay": 68950,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-nor",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 65250,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-npl",
+    "kind": "sea",
+    "distanceUnits": 1.3,
+    "baseCapacityRUSDPerDay": 65950,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 73125,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-per",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 67175,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-rom",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 66200,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-rus",
+    "marketBKey": "customs-swe",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 65975,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-sal",
+    "marketBKey": "customs-nic",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-srb",
+    "marketBKey": "customs-aut",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 43377,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-srb",
+    "marketBKey": "customs-bgr",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-srb",
+    "marketBKey": "customs-mnt",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-srb",
+    "marketBKey": "customs-ott",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-srb",
+    "marketBKey": "customs-rom",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-swe",
+    "marketBKey": "customs-dnk",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-swe",
+    "marketBKey": "customs-nor",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ury",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ury",
+    "marketBKey": "customs-pry",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-can",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 52460,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-cub",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51565,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-deu",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 68016,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-dnk",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51799,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-dom",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51315,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-hti",
+    "kind": "sea",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 51540,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-usa",
+    "marketBKey": "customs-mex",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 54565,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ven",
+    "marketBKey": "customs-bra",
+    "kind": "land",
+    "distanceUnits": 0.8,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-ven",
+    "marketBKey": "customs-ecu",
+    "kind": "sea",
+    "distanceUnits": 1,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-wad",
+    "marketBKey": "customs-dar",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  },
+  {
+    "marketAKey": "customs-zar",
+    "marketBKey": "customs-orf",
+    "kind": "land",
+    "distanceUnits": 0.5,
+    "baseCapacityRUSDPerDay": 40000,
+    "status": "provisional",
+    "sourceIds": [
+      "project-authored-p2"
+    ]
+  }
+]

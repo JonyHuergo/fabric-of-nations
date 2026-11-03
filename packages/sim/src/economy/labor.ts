@@ -68,6 +68,7 @@ import type {
   LaborPolicyState,
   LawDef,
 } from "./types.js";
+import { countryProvinceIds } from "./country.js";
 
 function clamp(value: number, minimum: number, maximum: number): number {
   if (value < minimum) return minimum;
@@ -85,8 +86,8 @@ function isFirstDayOfMonth(day: Day): boolean {
 }
 
 function countryBlocks(world: World, country: Country): World["popBlocks"] {
-  const regions = new Set(country.regionIds);
-  return world.popBlocks.filter((block) => regions.has(block.regionId));
+  const provinces = new Set(countryProvinceIds(world, country.id));
+  return world.popBlocks.filter((block) => provinces.has(block.provinceId));
 }
 
 function lawInSlot(

@@ -58,9 +58,9 @@ import {
   type PopulationDefinitions,
   type PopulationScenarioDef,
   type ProfessionDef,
-  type RegionInitialDef,
-  type RegionMetaDef,
+  type ProvinceEconomyInitialDef,
   type SystemAccountInitialDef,
+  type TerritoryMetaDef,
   type TechnologyDefinitions,
   type TradeRouteInitialDef,
 } from "@century/sim";
@@ -102,7 +102,7 @@ export interface HistoricalAgeStructure {
 
 export interface HistoricalScenarioFiles {
   readonly countries: string;
-  readonly regions: string;
+  readonly provinces: string;
   readonly markets: string;
   readonly tradeRoutes: string;
   readonly populations: string;
@@ -147,7 +147,8 @@ export interface HistoricalScenarioMeta {
   /** M11 static polity metadata; optional for the pre-M11 sample. */
   readonly countryMeta?: readonly CountryMetaDef[];
   readonly marketMeta?: readonly MarketMetaDef[];
-  readonly regionMeta?: readonly RegionMetaDef[];
+  /** P2 dependent-territory metadata (D-118 §3). */
+  readonly territoryMeta?: readonly TerritoryMetaDef[];
 }
 
 export interface HistoricalCurrencyInput {
@@ -166,7 +167,7 @@ export interface HistoricalCountryInput {
   readonly id: number;
   readonly tag: string;
   readonly name: string;
-  readonly regionIds: readonly number[];
+  readonly provinceIds: readonly number[];
   readonly currency: HistoricalCurrencyInput;
   readonly fiscal: {
     readonly incomeTaxRate: number;
@@ -196,13 +197,18 @@ export interface HistoricalCountryInput {
   readonly occupationSourceIds: readonly string[];
 }
 
-export interface HistoricalRegionInput {
+export interface HistoricalProvinceInput {
   readonly id: number;
   readonly key: string;
   readonly name: string;
-  readonly resourceCapsPerDay?: readonly number[];
-  /** M8 provisional regional infrastructure quality, 0..1. */
+  /** M8 provisional provincial infrastructure quality, 0..1. */
   readonly infrastructure?: number;
+  /** P2 HYDE 3.3 cropland, hectares. */
+  readonly arableLandHa?: number;
+  /** P2 HYDE 3.3 pasture and rangeland, hectares. */
+  readonly pastureHa?: number;
+  /** P2 HYDE 3.3 urban share of the 1900 population, 0..1. */
+  readonly urbanShare?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -217,8 +223,8 @@ export interface HistoricalMarketInput {
   readonly id: number;
   readonly key: string;
   readonly name: string;
-  readonly regionIds: readonly number[];
-  /** E6a customs administration tag; defaults to the lowest-region owner. */
+  readonly provinceIds: readonly number[];
+  /** E6a customs administration tag; defaults to the lowest-province owner. */
   readonly customsCountryTag?: string;
   readonly priceBasis: "base-1900";
   /** Provisional multiplier applied to base-1900 prices for the opening price. */
@@ -245,7 +251,7 @@ export interface HistoricalTradeRouteInput {
 }
 
 export interface HistoricalPopulationInput {
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly professionKey: string;
   readonly population: number;
   readonly literacy: number;
@@ -258,7 +264,7 @@ export interface HistoricalPopulationInput {
 
 export interface HistoricalBuildingInput {
   readonly key: string;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly definitionKey: string;
   readonly level: number;
   readonly ownerProfessionKey: string;
@@ -268,7 +274,7 @@ export interface HistoricalBuildingInput {
 
 export interface HistoricalEmploymentInput {
   readonly buildingKey: string;
-  readonly regionId: number;
+  readonly provinceId: number;
   readonly professionKey: string;
   readonly workers: number;
 }
@@ -294,7 +300,7 @@ export interface HistoricalCalibrationTarget {
 export interface HistoricalData {
   readonly meta: HistoricalScenarioMeta;
   readonly countries: readonly HistoricalCountryInput[];
-  readonly regions: readonly HistoricalRegionInput[];
+  readonly provinces: readonly HistoricalProvinceInput[];
   readonly markets: readonly HistoricalMarketInput[];
   readonly tradeRoutes: readonly HistoricalTradeRouteInput[];
   readonly populations: readonly HistoricalPopulationInput[];
@@ -536,7 +542,7 @@ function readCountryMeta(value: unknown, errors: string[]): CountryMetaDef[] {
       status: status as CountryStatus,
       sovereignCountryId: numberField(record, "sovereignCountryId", path, errors),
       capitalName: stringField(record, "capitalName", path, errors),
-      regionName: stringField(record, "regionName", path, errors),
+      homeTerritoryName: stringField(record, "homeTerritoryName", path, errors),
       selectable: booleanField(record, "selectable", path, errors),
       population1900Estimate: numberField(record, "population1900Estimate", path, errors),
       confidence: readConfidence(record, path, errors),
@@ -567,25 +573,26 @@ function readMarketMeta(value: unknown, errors: string[]): MarketMetaDef[] {
         | "shared",
       description: stringField(record, "description", path, errors),
       customsCountryId: numberField(record, "customsCountryId", path, errors),
+      memberCountryIds: integerArrayField(record, "memberCountryIds", path, errors),
     };
   });
 }
 
-function readRegionMeta(value: unknown, errors: string[]): RegionMetaDef[] {
+function readTerritoryMeta(value: unknown, errors: string[]): TerritoryMetaDef[] {
   if (!Array.isArray(value)) {
-    errors.push("meta.regionMeta must be an array");
+    errors.push("meta.territoryMeta must be an array");
     return [];
   }
   return value.map((raw, index) => {
-    const path = `meta.regionMeta[${String(index)}]`;
+    const path = `meta.territoryMeta[${String(index)}]`;
     const record = assertRecord(raw, path, errors);
     const status = stringField(record, "status", path, errors);
     if (!COUNTRY_STATUS_SET.has(status)) {
       errors.push(`${path}.status ${JSON.stringify(status)} is not a supported country status`);
     }
     return {
-      regionId: numberField(record, "regionId", path, errors),
       polityTag: stringField(record, "polityTag", path, errors),
+      provinceIds: integerArrayField(record, "provinceIds", path, errors),
       historicalName: stringField(record, "historicalName", path, errors),
       status: status as CountryStatus,
       sovereignCountryId: numberField(record, "sovereignCountryId", path, errors),
@@ -647,7 +654,7 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
     ageStructures: readAgeStructures(record.ageStructures, errors),
     files: {
       countries: stringField(files, "countries", "meta.files", errors),
-      regions: stringField(files, "regions", "meta.files", errors),
+      provinces: stringField(files, "provinces", "meta.files", errors),
       markets: stringField(files, "markets", "meta.files", errors),
       tradeRoutes: stringField(files, "tradeRoutes", "meta.files", errors),
       populations: stringField(files, "populations", "meta.files", errors),
@@ -671,9 +678,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
     ...(record.marketMeta === undefined
       ? {}
       : { marketMeta: readMarketMeta(record.marketMeta, errors) }),
-    ...(record.regionMeta === undefined
+    ...(record.territoryMeta === undefined
       ? {}
-      : { regionMeta: readRegionMeta(record.regionMeta, errors) }),
+      : { territoryMeta: readTerritoryMeta(record.territoryMeta, errors) }),
   };
 }
 
@@ -688,7 +695,7 @@ export function loadHistoricalData(
   if (errors.length > 0) throw new HistoricalDataError(errors.sort());
 
   const countries = readJson<unknown>(meta.files.countries);
-  const regions = readJson<unknown>(meta.files.regions);
+  const provinces = readJson<unknown>(meta.files.provinces);
   const markets = readJson<unknown>(meta.files.markets);
   const tradeRoutes = readJson<unknown>(meta.files.tradeRoutes);
   const populations = readJson<unknown>(meta.files.populations);
@@ -697,7 +704,7 @@ export function loadHistoricalData(
   const calibration = readJson<unknown>(meta.files.calibration);
   for (const [label, value] of [
     ["countries", countries],
-    ["regions", regions],
+    ["provinces", provinces],
     ["markets", markets],
     ["tradeRoutes", tradeRoutes],
     ["populations", populations],
@@ -713,7 +720,7 @@ export function loadHistoricalData(
   const data = parseHistoricalTables({
     meta,
     countries,
-    regions,
+    provinces,
     markets,
     tradeRoutes,
     populations,
@@ -733,7 +740,7 @@ export function loadM5HistoricalData(): HistoricalData {
 interface RawTables {
   readonly meta: HistoricalScenarioMeta;
   readonly countries: unknown;
-  readonly regions: unknown;
+  readonly provinces: unknown;
   readonly markets: unknown;
   readonly tradeRoutes: unknown;
   readonly populations: unknown;
@@ -746,7 +753,7 @@ function parseHistoricalTables(tables: RawTables): HistoricalData {
   const errors: string[] = [];
   const meta = tables.meta;
   const countries = parseCountries(tables.countries, errors);
-  const regions = parseRegions(tables.regions, errors);
+  const provinces = parseProvinces(tables.provinces, errors);
   const markets = parseMarkets(tables.markets, errors);
   const tradeRoutes = parseTradeRoutes(tables.tradeRoutes, errors);
   const populations = parsePopulations(tables.populations, errors);
@@ -757,7 +764,7 @@ function parseHistoricalTables(tables: RawTables): HistoricalData {
   return {
     meta,
     countries,
-    regions,
+    provinces,
     markets,
     tradeRoutes,
     populations,
@@ -925,7 +932,7 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       id: numberField(record, "id", path, errors),
       tag: stringField(record, "tag", path, errors, { maxLength: MAX_COUNTRY_TAG_LENGTH }),
       name: stringField(record, "name", path, errors, { maxLength: MAX_COUNTRY_NAME_LENGTH }),
-      regionIds: numberArrayField(record, "regionIds", path, errors),
+      provinceIds: numberArrayField(record, "provinceIds", path, errors),
       currency: {
         key: stringField(currencyRecord, "key", `${path}.currency`, errors, {
           maxLength: MAX_CURRENCY_KEY_LENGTH,
@@ -972,19 +979,26 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
   });
 }
 
-function parseRegions(value: unknown, errors: string[]): HistoricalRegionInput[] {
+function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInput[] {
   const values = value as readonly unknown[];
   return values.map((raw, index) => {
-    const path = `regions[${String(index)}]`;
+    const path = `provinces[${String(index)}]`;
     const record = assertRecord(raw, path, errors);
     const status = stringField(record, "calibrationStatus", path, errors);
     if (status !== "source-backed" && status !== "provisional") {
       errors.push(`${path}.calibrationStatus must be "source-backed" or "provisional"`);
     }
-    const caps =
-      record.resourceCapsPerDay === undefined
-        ? undefined
-        : numberArrayField(record, "resourceCapsPerDay", path, errors);
+    const optional = (key: "arableLandHa" | "pastureHa" | "urbanShare"): number | undefined =>
+      record[key] === undefined ? undefined : numberField(record, key, path, errors);
+    const arableLandHa = optional("arableLandHa");
+    const pastureHa = optional("pastureHa");
+    const urbanShare = optional("urbanShare");
+    for (const [key, field] of [["arableLandHa", arableLandHa], ["pastureHa", pastureHa]] as const) {
+      if (field !== undefined && !(field >= 0)) errors.push(`${path}.${key} must be non-negative`);
+    }
+    if (urbanShare !== undefined && !(urbanShare >= 0 && urbanShare <= 1)) {
+      errors.push(`${path}.urbanShare must be in 0..1`);
+    }
     const infrastructure =
       record.infrastructure === undefined
         ? undefined
@@ -993,8 +1007,10 @@ function parseRegions(value: unknown, errors: string[]): HistoricalRegionInput[]
       id: numberField(record, "id", path, errors),
       key: stringField(record, "key", path, errors),
       name: stringField(record, "name", path, errors),
-      ...(caps === undefined ? {} : { resourceCapsPerDay: caps }),
       ...(infrastructure === undefined ? {} : { infrastructure }),
+      ...(arableLandHa === undefined ? {} : { arableLandHa }),
+      ...(pastureHa === undefined ? {} : { pastureHa }),
+      ...(urbanShare === undefined ? {} : { urbanShare }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -1041,7 +1057,7 @@ function parseMarkets(value: unknown, errors: string[]): HistoricalMarketInput[]
       id: numberField(record, "id", path, errors),
       key: stringField(record, "key", path, errors),
       name: stringField(record, "name", path, errors),
-      regionIds: numberArrayField(record, "regionIds", path, errors),
+      provinceIds: numberArrayField(record, "provinceIds", path, errors),
       ...(customsCountryTag === undefined ? {} : { customsCountryTag }),
       priceBasis: "base-1900",
       initialPriceMultiplier,
@@ -1082,7 +1098,7 @@ function parsePopulations(value: unknown, errors: string[]): HistoricalPopulatio
       errors.push(`${path}.calibrationStatus must be "source-backed" or "provisional"`);
     }
     return {
-      regionId: numberField(record, "regionId", path, errors),
+      provinceId: numberField(record, "provinceId", path, errors),
       professionKey: stringField(record, "professionKey", path, errors),
       population: numberField(record, "population", path, errors),
       literacy: numberField(record, "literacy", path, errors),
@@ -1106,7 +1122,7 @@ function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInp
     }
     return {
       key: stringField(record, "key", path, errors),
-      regionId: numberField(record, "regionId", path, errors),
+      provinceId: numberField(record, "provinceId", path, errors),
       definitionKey: stringField(record, "definitionKey", path, errors),
       level: numberField(record, "level", path, errors),
       ownerProfessionKey: stringField(record, "ownerProfessionKey", path, errors),
@@ -1123,7 +1139,7 @@ function parseEmployment(value: unknown, errors: string[]): HistoricalEmployment
     const record = assertRecord(raw, path, errors);
     return {
       buildingKey: stringField(record, "buildingKey", path, errors),
-      regionId: numberField(record, "regionId", path, errors),
+      provinceId: numberField(record, "provinceId", path, errors),
       professionKey: stringField(record, "professionKey", path, errors),
       workers: numberField(record, "workers", path, errors),
     };
@@ -1278,10 +1294,10 @@ export function validateM5HistoricalData(
     }
   }
 
-  const regionById = new Map<number, HistoricalRegionInput>();
-  const regionKeys = new Set<string>();
-  const regionOwner = new Map<number, number>();
-  const countryRegionIds = new Map<number, number[]>();
+  const provinceById = new Map<number, HistoricalProvinceInput>();
+  const provinceKeys = new Set<string>();
+  const provinceOwner = new Map<number, number>();
+  const countryProvinceIds = new Map<number, number[]>();
   const countryById = new Map<number, HistoricalCountryInput>();
   const countryTags = new Set<string>();
   const currencyKeys = new Set<string>();
@@ -1300,19 +1316,19 @@ export function validateM5HistoricalData(
     }
     if (countryTags.has(country.tag)) errors.push(`${path}.tag ${JSON.stringify(country.tag)} is duplicated`);
     countryTags.add(country.tag);
-    if (country.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
-    const seenRegions = new Set<number>();
-    for (const regionId of country.regionIds) {
-      if (!isValidId(regionId)) errors.push(`${path}.regionIds contains an invalid region id ${String(regionId)}`);
-      if (seenRegions.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
-      seenRegions.add(regionId);
-      const existing = regionOwner.get(regionId);
+    if (country.provinceIds.length === 0) errors.push(`${path}.provinceIds must not be empty`);
+    const seenProvinces = new Set<number>();
+    for (const provinceId of country.provinceIds) {
+      if (!isValidId(provinceId)) errors.push(`${path}.provinceIds contains an invalid province id ${String(provinceId)}`);
+      if (seenProvinces.has(provinceId)) errors.push(`${path}.provinceIds duplicates province ${String(provinceId)}`);
+      seenProvinces.add(provinceId);
+      const existing = provinceOwner.get(provinceId);
       if (existing !== undefined) {
-        errors.push(`region ${String(regionId)} is claimed by countries ${String(existing)} and ${String(country.id)}`);
+        errors.push(`province ${String(provinceId)} is claimed by countries ${String(existing)} and ${String(country.id)}`);
       }
-      regionOwner.set(regionId, country.id);
+      provinceOwner.set(provinceId, country.id);
     }
-    countryRegionIds.set(country.id, [...country.regionIds].sort((left, right) => left - right));
+    countryProvinceIds.set(country.id, [...country.provinceIds].sort((left, right) => left - right));
     requireSources(country.sourceIds, `${path}.sourceIds`);
     requireSources(country.occupationSourceIds, `${path}.occupationSourceIds`);
     if (!/^[a-z][a-z0-9-]*$/.test(country.currency.key)) {
@@ -1416,47 +1432,46 @@ export function validateM5HistoricalData(
     }
   }
 
-  const regionCountry = new Map<number, number>();
-  for (let index = 0; index < data.regions.length; index += 1) {
-    const region = data.regions[index];
-    if (region === undefined) continue;
-    const path = `regions[${String(index)}]`;
-    if (!isValidId(region.id)) {
+  const provinceCountry = new Map<number, number>();
+  for (let index = 0; index < data.provinces.length; index += 1) {
+    const province = data.provinces[index];
+    if (province === undefined) continue;
+    const path = `provinces[${String(index)}]`;
+    if (!isValidId(province.id)) {
       errors.push(`${path}.id must be an unsigned 32-bit integer`);
     }
-    if (regionById.has(region.id)) errors.push(`${path}.id ${String(region.id)} is duplicated`);
-    regionById.set(region.id, region);
-    if (regionKeys.has(region.key)) errors.push(`${path}.key ${JSON.stringify(region.key)} is duplicated`);
-    regionKeys.add(region.key);
-    if (region.resourceCapsPerDay !== undefined) {
-      for (let capIndex = 0; capIndex < region.resourceCapsPerDay.length; capIndex += 1) {
-        const cap = region.resourceCapsPerDay[capIndex];
-        if (cap !== undefined && cap < 0) {
-          errors.push(
-            `regions[${String(index)}].resourceCapsPerDay[${String(capIndex)}] must be non-negative`,
-          );
-        }
+    if (provinceById.has(province.id)) errors.push(`${path}.id ${String(province.id)} is duplicated`);
+    provinceById.set(province.id, province);
+    if (provinceKeys.has(province.key)) errors.push(`${path}.key ${JSON.stringify(province.key)} is duplicated`);
+    provinceKeys.add(province.key);
+    for (const field of ["arableLandHa", "pastureHa"] as const) {
+      const value = province[field];
+      if (value !== undefined && !(Number.isFinite(value) && value >= 0)) {
+        errors.push(`${path}.${field} must be non-negative`);
       }
     }
-    requireSources(region.sourceIds, `${path}.sourceIds`);
-    const owner = regionOwner.get(region.id);
+    if (province.urbanShare !== undefined && !(province.urbanShare >= 0 && province.urbanShare <= 1)) {
+      errors.push(`${path}.urbanShare must be in 0..1`);
+    }
+    requireSources(province.sourceIds, `${path}.sourceIds`);
+    const owner = provinceOwner.get(province.id);
     if (owner === undefined) {
-      errors.push(`region ${String(region.id)} has no owning country`);
+      errors.push(`province ${String(province.id)} has no owning country`);
     } else {
-      regionCountry.set(region.id, owner);
+      provinceCountry.set(province.id, owner);
     }
   }
-  for (const regionId of regionOwner.keys()) {
-    if (!regionById.has(regionId)) {
-      errors.push(`country ownership references unknown region ${String(regionId)}`);
+  for (const provinceId of provinceOwner.keys()) {
+    if (!provinceById.has(provinceId)) {
+      errors.push(`country ownership references unknown province ${String(provinceId)}`);
     }
   }
 
   const marketById = new Map<number, HistoricalMarketInput>();
-  const mapRegionMarket = new Map<number, number>();
+  const mapProvinceMarket = new Map<number, number>();
   const marketKeys = new Set<string>();
-  const buildingRegionByKey = new Map(
-    data.buildings.map((building) => [building.key, building.regionId] as const),
+  const buildingProvinceByKey = new Map(
+    data.buildings.map((building) => [building.key, building.provinceId] as const),
   );
   for (let index = 0; index < data.markets.length; index += 1) {
     const market = data.markets[index];
@@ -1467,25 +1482,25 @@ export function validateM5HistoricalData(
     marketById.set(market.id, market);
     if (marketKeys.has(market.key)) errors.push(`${path}.key ${JSON.stringify(market.key)} is duplicated`);
     marketKeys.add(market.key);
-    if (market.regionIds.length === 0) errors.push(`${path}.regionIds must not be empty`);
+    if (market.provinceIds.length === 0) errors.push(`${path}.provinceIds must not be empty`);
     if (!(market.initialPriceMultiplier >= 0.25 && market.initialPriceMultiplier <= 4)) {
       errors.push(`${path}.initialPriceMultiplier must be in 0.25..4`);
     }
     const seen = new Set<number>();
-    for (const regionId of market.regionIds) {
-      if (!regionById.has(regionId)) {
-        errors.push(`${path}.regionIds references unknown region ${String(regionId)}`);
+    for (const provinceId of market.provinceIds) {
+      if (!provinceById.has(provinceId)) {
+        errors.push(`${path}.provinceIds references unknown province ${String(provinceId)}`);
       }
-      if (!isValidId(regionId)) {
-        errors.push(`${path}.regionIds contains an invalid region id ${String(regionId)}`);
+      if (!isValidId(provinceId)) {
+        errors.push(`${path}.provinceIds contains an invalid province id ${String(provinceId)}`);
       }
-      if (seen.has(regionId)) errors.push(`${path}.regionIds duplicates region ${String(regionId)}`);
-      seen.add(regionId);
-      const existing = mapRegionMarket.get(regionId);
+      if (seen.has(provinceId)) errors.push(`${path}.provinceIds duplicates province ${String(provinceId)}`);
+      seen.add(provinceId);
+      const existing = mapProvinceMarket.get(provinceId);
       if (existing !== undefined) {
-        errors.push(`region ${String(regionId)} belongs to markets ${String(existing)} and ${String(market.id)}`);
+        errors.push(`province ${String(provinceId)} belongs to markets ${String(existing)} and ${String(market.id)}`);
       }
-      mapRegionMarket.set(regionId, market.id);
+      mapProvinceMarket.set(provinceId, market.id);
     }
     const lotKeys = new Set<string>();
     for (let lotIndex = 0; lotIndex < market.stockLots.length; lotIndex += 1) {
@@ -1495,12 +1510,12 @@ export function validateM5HistoricalData(
       if (keys !== null && !keys.goods.has(lot.goodKey)) {
         errors.push(`${lotPath}.goodKey references unknown good ${JSON.stringify(lot.goodKey)}`);
       }
-      const ownerRegionId = buildingRegionByKey.get(lot.ownerBuildingKey);
-      if (ownerRegionId === undefined) {
+      const ownerProvinceId = buildingProvinceByKey.get(lot.ownerBuildingKey);
+      if (ownerProvinceId === undefined) {
         errors.push(
           `${lotPath}.ownerBuildingKey references unknown building ${JSON.stringify(lot.ownerBuildingKey)}`,
         );
-      } else if (!seen.has(ownerRegionId)) {
+      } else if (!seen.has(ownerProvinceId)) {
         errors.push(`${lotPath}.ownerBuildingKey is outside the market`);
       }
       if (!(lot.quantity > 0) || !Number.isFinite(lot.quantity)) {
@@ -1512,25 +1527,25 @@ export function validateM5HistoricalData(
     }
     requireSources(market.sourceIds, `${path}.sourceIds`);
   }
-  for (const region of data.regions) {
-    if (!mapRegionMarket.has(region.id)) {
-      errors.push(`region ${String(region.id)} is not assigned to a market`);
+  for (const province of data.provinces) {
+    if (!mapProvinceMarket.has(province.id)) {
+      errors.push(`province ${String(province.id)} is not assigned to a market`);
     }
   }
   for (const country of data.countries) {
     let countryMarket: number | undefined;
-    for (const regionId of country.regionIds) {
-      const marketId = mapRegionMarket.get(regionId);
+    for (const provinceId of country.provinceIds) {
+      const marketId = mapProvinceMarket.get(provinceId);
       if (marketId === undefined) continue;
       if (countryMarket === undefined) countryMarket = marketId;
       else if (countryMarket !== marketId) {
         errors.push(
-          `country ${JSON.stringify(country.tag)} spans markets ${String(countryMarket)} and ${String(marketId)}; M5 permits one market per country`,
+          `country ${JSON.stringify(country.tag)} spans markets ${String(countryMarket)} and ${String(marketId)}; a country belongs to one customs territory (D-119)`,
         );
       }
     }
     if (countryMarket === undefined) {
-      errors.push(`country ${JSON.stringify(country.tag)} has no region in a market`);
+      errors.push(`country ${JSON.stringify(country.tag)} has no province in a market`);
     }
   }
 
@@ -1547,9 +1562,9 @@ export function validateM5HistoricalData(
       errors.push(`${path}.customsCountryTag references unknown country ${JSON.stringify(tag)}`);
       continue;
     }
-    if (!country.regionIds.some((regionId) => market.regionIds.includes(regionId))) {
+    if (!country.provinceIds.some((provinceId) => market.provinceIds.includes(provinceId))) {
       errors.push(
-        `${path}.customsCountryTag ${JSON.stringify(tag)} owns no region of the market`,
+        `${path}.customsCountryTag ${JSON.stringify(tag)} owns no province of the market`,
       );
     }
   }
@@ -1583,20 +1598,20 @@ export function validateM5HistoricalData(
   }
 
   const populationKeys = new Set<string>();
-  const populationByRegion = new Map<number, HistoricalPopulationInput[]>();
+  const populationByProvince = new Map<number, HistoricalPopulationInput[]>();
   const countryPopulation = new Map<number, number>();
   const countryPeasants = new Map<number, number>();
   for (let index = 0; index < data.populations.length; index += 1) {
     const population = data.populations[index];
     if (population === undefined) continue;
     const path = `populations[${String(index)}]`;
-    const region = regionById.get(population.regionId);
-    if (region === undefined) {
-      errors.push(`${path}.regionId references unknown region ${String(population.regionId)}`);
+    const province = provinceById.get(population.provinceId);
+    if (province === undefined) {
+      errors.push(`${path}.provinceId references unknown province ${String(population.provinceId)}`);
       continue;
     }
-    const key = `${String(population.regionId)}:${population.professionKey}`;
-    if (populationKeys.has(key)) errors.push(`${path} duplicates region/profession ${key}`);
+    const key = `${String(population.provinceId)}:${population.professionKey}`;
+    if (populationKeys.has(key)) errors.push(`${path} duplicates province/profession ${key}`);
     populationKeys.add(key);
     if (keys !== null && !keys.professions.has(population.professionKey)) {
       errors.push(`${path}.professionKey references unknown profession ${JSON.stringify(population.professionKey)}`);
@@ -1620,10 +1635,10 @@ export function validateM5HistoricalData(
       errors.push(`${path}.militancy must be in 0..1`);
     }
     requireSources(population.sourceIds, `${path}.sourceIds`);
-    const list = populationByRegion.get(population.regionId) ?? [];
+    const list = populationByProvince.get(population.provinceId) ?? [];
     list.push(population);
-    populationByRegion.set(population.regionId, list);
-    const countryId = regionCountry.get(population.regionId);
+    populationByProvince.set(population.provinceId, list);
+    const countryId = provinceCountry.get(population.provinceId);
     if (countryId !== undefined) {
       countryPopulation.set(countryId, (countryPopulation.get(countryId) ?? 0) + population.population);
       if (population.professionKey === "peasants") {
@@ -1631,22 +1646,23 @@ export function validateM5HistoricalData(
       }
     }
   }
-  for (const region of data.regions) {
-    if ((populationByRegion.get(region.id) ?? []).length === 0) {
-      errors.push(`region ${String(region.id)} has no population block`);
+  // P2: a province may be empty (an uninhabited island); a country may not.
+  for (const country of data.countries) {
+    if (!((countryPopulation.get(country.id) ?? 0) > 0)) {
+      errors.push(`country ${JSON.stringify(country.tag)} has no population block`);
     }
   }
 
   const buildingKeys = new Set<string>();
-  const buildingsByRegion = new Map<number, HistoricalBuildingInput[]>();
+  const buildingsByProvince = new Map<number, HistoricalBuildingInput[]>();
   for (let index = 0; index < data.buildings.length; index += 1) {
     const building = data.buildings[index];
     if (building === undefined) continue;
     const path = `buildings[${String(index)}]`;
     if (buildingKeys.has(building.key)) errors.push(`${path}.key ${JSON.stringify(building.key)} is duplicated`);
     buildingKeys.add(building.key);
-    if (!regionById.has(building.regionId)) {
-      errors.push(`${path}.regionId references unknown region ${String(building.regionId)}`);
+    if (!provinceById.has(building.provinceId)) {
+      errors.push(`${path}.provinceId references unknown province ${String(building.provinceId)}`);
     }
     if (keys !== null && !keys.buildings.has(building.definitionKey)) {
       errors.push(`${path}.definitionKey references unknown building definition ${JSON.stringify(building.definitionKey)}`);
@@ -1671,21 +1687,21 @@ export function validateM5HistoricalData(
     if (!(building.operatingCashRUSD >= 0)) {
       errors.push(`${path}.operatingCashRUSD must be non-negative`);
     }
-    const ownerBlock = (populationByRegion.get(building.regionId) ?? []).find(
+    const ownerBlock = (populationByProvince.get(building.provinceId) ?? []).find(
       (population) => population.professionKey === building.ownerProfessionKey,
     );
     if (ownerBlock === undefined) {
       errors.push(
-        `${path}.ownerProfessionKey ${JSON.stringify(building.ownerProfessionKey)} has no population block in region ${String(building.regionId)}`,
+        `${path}.ownerProfessionKey ${JSON.stringify(building.ownerProfessionKey)} has no population block in province ${String(building.provinceId)}`,
       );
     }
-    const list = buildingsByRegion.get(building.regionId) ?? [];
+    const list = buildingsByProvince.get(building.provinceId) ?? [];
     list.push(building);
-    buildingsByRegion.set(building.regionId, list);
+    buildingsByProvince.set(building.provinceId, list);
   }
-  for (const region of data.regions) {
-    if ((buildingsByRegion.get(region.id) ?? []).length === 0) {
-      errors.push(`region ${String(region.id)} has no building`);
+  for (const country of data.countries) {
+    if (!country.provinceIds.some((provinceId) => (buildingsByProvince.get(provinceId) ?? []).length > 0)) {
+      errors.push(`country ${JSON.stringify(country.tag)} has no building`);
     }
   }
 
@@ -1699,7 +1715,7 @@ export function validateM5HistoricalData(
     profession: ProfessionDef,
     path: string,
   ): number => {
-    const cacheKey = `${String(population.regionId)}:${population.professionKey}`;
+    const cacheKey = `${String(population.provinceId)}:${population.professionKey}`;
     const cached = eligibleCache.get(cacheKey);
     if (cached !== undefined) return cached;
     if (profile === undefined) return 0;
@@ -1720,14 +1736,14 @@ export function validateM5HistoricalData(
     const entry = data.employment[index];
     if (entry === undefined) continue;
     const path = `employment[${String(index)}]`;
-    if (!isValidId(entry.regionId)) {
-      errors.push(`${path}.regionId must be an unsigned 32-bit integer`);
+    if (!isValidId(entry.provinceId)) {
+      errors.push(`${path}.provinceId must be an unsigned 32-bit integer`);
     }
     const building = buildingByKey.get(entry.buildingKey);
     if (building === undefined) {
       errors.push(`${path}.buildingKey references unknown building ${JSON.stringify(entry.buildingKey)}`);
-    } else if (building.regionId !== entry.regionId) {
-      errors.push(`${path}.regionId does not match the building's region`);
+    } else if (building.provinceId !== entry.provinceId) {
+      errors.push(`${path}.provinceId does not match the building's province`);
     }
     const profession =
       keys === null ? undefined : keys.professionByKey.get(entry.professionKey);
@@ -1759,7 +1775,7 @@ export function validateM5HistoricalData(
       }
     }
     if (!isPositiveInteger(entry.workers)) errors.push(`${path}.workers must be a positive integer`);
-    const key = `${String(entry.regionId)}:${entry.professionKey}:${entry.buildingKey}`;
+    const key = `${String(entry.provinceId)}:${entry.professionKey}:${entry.buildingKey}`;
     const firstIndex = employmentFirstIndex.get(key);
     if (firstIndex !== undefined) {
       errors.push(
@@ -1768,15 +1784,15 @@ export function validateM5HistoricalData(
     } else {
       employmentFirstIndex.set(key, index);
     }
-    const block = (populationByRegion.get(entry.regionId) ?? []).find(
+    const block = (populationByProvince.get(entry.provinceId) ?? []).find(
       (population) => population.professionKey === entry.professionKey,
     );
     if (block === undefined) {
       errors.push(
-        `${path} references unknown region/profession ${String(entry.regionId)}:${entry.professionKey}`,
+        `${path} references unknown province/profession ${String(entry.provinceId)}:${entry.professionKey}`,
       );
     } else if (keys !== null && profession !== undefined) {
-      const blockKey = `${String(entry.regionId)}:${entry.professionKey}`;
+      const blockKey = `${String(entry.provinceId)}:${entry.professionKey}`;
       if (entry.workers > 0) {
         assignedWorkersByBlock.set(
           blockKey,
@@ -1937,6 +1953,17 @@ export function validateM5HistoricalData(
         errors.push(`${path}.marketId ${String(meta.marketId)} is described twice`);
       }
       described.add(meta.marketId);
+      if (market !== undefined) {
+        const owners = new Set(market.provinceIds);
+        const expected = data.countries
+          .filter((country) => country.provinceIds.some((provinceId) => owners.has(provinceId)))
+          .map((country) => country.id)
+          .sort((left, right) => left - right);
+        const declared = [...meta.memberCountryIds].sort((left, right) => left - right);
+        if (expected.length !== declared.length || expected.some((id, i) => id !== declared[i])) {
+          errors.push(`${path}.memberCountryIds must list exactly the owners of the territory provinces (D-119)`);
+        }
+      }
       if (meta.name.length < 3) {
         errors.push(`${path}.name must be a meaningful player-facing market name`);
       }
@@ -1947,24 +1974,32 @@ export function validateM5HistoricalData(
       }
     }
   }
-  if (data.meta.regionMeta !== undefined) {
+  if (data.meta.territoryMeta !== undefined) {
     const described = new Set<number>();
-    for (let index = 0; index < data.meta.regionMeta.length; index += 1) {
-      const meta = data.meta.regionMeta[index];
+    const tags = new Set<string>();
+    for (let index = 0; index < data.meta.territoryMeta.length; index += 1) {
+      const meta = data.meta.territoryMeta[index];
       if (meta === undefined) continue;
-      const path = `meta.regionMeta[${String(index)}]`;
-      if (!regionById.has(meta.regionId)) {
-        errors.push(`${path}.regionId references unknown region ${String(meta.regionId)}`);
-      }
-      if (described.has(meta.regionId)) {
-        errors.push(`${path}.regionId ${String(meta.regionId)} is described twice`);
-      }
-      described.add(meta.regionId);
+      const path = `meta.territoryMeta[${String(index)}]`;
+      if (tags.has(meta.polityTag)) errors.push(`${path}.polityTag ${meta.polityTag} is described twice`);
+      tags.add(meta.polityTag);
+      if (meta.provinceIds.length === 0) errors.push(`${path}.provinceIds must not be empty`);
       const sovereign = countryById.get(meta.sovereignCountryId);
       if (sovereign === undefined) {
         errors.push(`${path}.sovereignCountryId references unknown country`);
-      } else if (!sovereign.regionIds.includes(meta.regionId)) {
-        errors.push(`${path}.regionId is not owned by its declared sovereign country`);
+      }
+      const owned = new Set(sovereign?.provinceIds ?? []);
+      for (const provinceId of meta.provinceIds) {
+        if (!provinceById.has(provinceId)) {
+          errors.push(`${path}.provinceIds references unknown province ${String(provinceId)}`);
+        }
+        if (described.has(provinceId)) {
+          errors.push(`${path}.provinceIds lists province ${String(provinceId)}, already in another territory`);
+        }
+        described.add(provinceId);
+        if (sovereign !== undefined && !owned.has(provinceId)) {
+          errors.push(`${path}.provinceIds ${String(provinceId)} is not owned by its declared sovereign country`);
+        }
       }
       if (meta.selectable) {
         errors.push(`${path} describes a dependent territory but is marked selectable`);
@@ -2082,7 +2117,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
   assertValidPopulationDefinitions(populationDefinitions);
 
   const sortedPopulations = [...data.populations].sort((left, right) => {
-    if (left.regionId !== right.regionId) return left.regionId - right.regionId;
+    if (left.provinceId !== right.provinceId) return left.provinceId - right.provinceId;
     return left.professionKey < right.professionKey
       ? -1
       : left.professionKey > right.professionKey
@@ -2095,11 +2130,11 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     const profession = professionByKey.get(population.professionKey);
     if (profession === undefined) {
       throw new HistoricalDataError([
-        `population ${String(population.regionId)}:${population.professionKey} references an unknown profession`,
+        `population ${String(population.provinceId)}:${population.professionKey} references an unknown profession`,
       ]);
     }
     const householdAccountId = HISTORICAL_HOUSEHOLD_ACCOUNT_BASE + index;
-    const key = `${String(population.regionId)}:${population.professionKey}`;
+    const key = `${String(population.provinceId)}:${population.professionKey}`;
     blockIdByKey.set(key, index);
     accountIdByKey.set(key, householdAccountId);
     const ages = expandHistoricalPopulation(
@@ -2109,7 +2144,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     );
     return {
       id: index,
-      regionId: population.regionId,
+      provinceId: population.provinceId,
       professionId: profession.id,
       financialAccountId: householdAccountId,
       maleAgeGroups: ages.maleAgeGroups,
@@ -2121,23 +2156,23 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     };
   });
 
-  const regions: RegionInitialDef[] = [...data.regions]
+  const provinceEconomies: ProvinceEconomyInitialDef[] = [...data.provinces]
     .sort((left, right) => left.id - right.id)
-    .map((region) => ({
-      id: region.id,
-      key: region.key,
-      name: region.name,
-      ...(region.resourceCapsPerDay === undefined
+    .map((province) => ({
+      id: province.id,
+      key: province.key,
+      name: province.name,
+      ...(province.infrastructure === undefined
         ? {}
-        : { resourceCapsPerDay: region.resourceCapsPerDay }),
-      ...(region.infrastructure === undefined
-        ? {}
-        : { infrastructure: region.infrastructure }),
+        : { infrastructure: province.infrastructure }),
+      ...(province.arableLandHa === undefined ? {} : { arableLandHa: province.arableLandHa }),
+      ...(province.pastureHa === undefined ? {} : { pastureHa: province.pastureHa }),
+      ...(province.urbanShare === undefined ? {} : { urbanShare: province.urbanShare }),
     }));
 
   const sortedMarkets = [...data.markets].sort((left, right) => left.id - right.id);
   const sortedBuildings = [...data.buildings].sort((left, right) => {
-    if (left.regionId !== right.regionId) return left.regionId - right.regionId;
+    if (left.provinceId !== right.provinceId) return left.provinceId - right.provinceId;
     if (left.definitionKey !== right.definitionKey) {
       return left.definitionKey < right.definitionKey ? -1 : 1;
     }
@@ -2153,7 +2188,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
           `building ${building.key} references unknown definition ${building.definitionKey}`,
         ]);
       }
-      const ownerKey = `${String(building.regionId)}:${building.ownerProfessionKey}`;
+      const ownerKey = `${String(building.provinceId)}:${building.ownerProfessionKey}`;
       const ownerAccountId = accountIdByKey.get(ownerKey);
       if (ownerAccountId === undefined) {
         throw new HistoricalDataError([
@@ -2164,7 +2199,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       return {
         id: index,
         definitionId: definition.id,
-        regionId: building.regionId,
+        provinceId: building.provinceId,
         level: building.level,
         condition: 1,
         ownerKind: "private",
@@ -2185,7 +2220,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
   const employment: EmploymentAssignmentInitialDef[] = data.employment
     .map((entry) => {
       const buildingId = buildingIdByKey.get(entry.buildingKey);
-      const popBlockId = blockIdByKey.get(`${String(entry.regionId)}:${entry.professionKey}`);
+      const popBlockId = blockIdByKey.get(`${String(entry.provinceId)}:${entry.professionKey}`);
       const profession = professionByKey.get(entry.professionKey);
       if (buildingId === undefined || popBlockId === undefined || profession === undefined) {
         throw new HistoricalDataError([
@@ -2221,7 +2256,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     }
     return {
       id: market.id,
-      regionIds: [...market.regionIds].sort((left, right) => left - right),
+      provinceIds: [...market.provinceIds].sort((left, right) => left - right),
       priceRUSD: goods.map((good) => good.basePrice1900RUSD * market.initialPriceMultiplier),
       stockLots: market.stockLots.map((lot) => {
         const good = goodByKey.get(lot.goodKey);
@@ -2291,7 +2326,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       tag: country.tag,
       name: country.name,
       monetary: { kind: "own", currencyId: country.id },
-      regionIds: [...country.regionIds].sort((left, right) => left - right),
+      provinceIds: [...country.provinceIds].sort((left, right) => left - right),
       treasuryAccountId: HISTORICAL_TREASURY_ACCOUNT_BASE + country.id,
       initialTreasuryCashRUSD: country.initialTreasuryCashRUSD,
       fiscal: { ...country.fiscal },
@@ -2319,7 +2354,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       name: profession.name,
       stratum: profession.stratum,
     })),
-    regions,
+    provinceEconomies,
     popBlocks,
     definitions: populationDefinitions,
   };
@@ -2360,7 +2395,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     military: {},
     ...(data.meta.countryMeta === undefined ? {} : { countryMeta: [...data.meta.countryMeta] }),
     ...(data.meta.marketMeta === undefined ? {} : { marketMeta: [...data.meta.marketMeta] }),
-    ...(data.meta.regionMeta === undefined ? {} : { regionMeta: [...data.meta.regionMeta] }),
+    ...(data.meta.territoryMeta === undefined ? {} : { territoryMeta: [...data.meta.territoryMeta] }),
   };
 }
 

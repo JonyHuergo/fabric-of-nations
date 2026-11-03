@@ -1,7 +1,7 @@
 /**
- * M5 multi-region/multi-country fixture.
+ * M5 multi-province/multi-country fixture.
  *
- * Three countries, four regions, two markets, seven population blocks, and a
+ * Three countries, four provinces, two markets, seven population blocks, and a
  * small set of producing buildings. Country A and country C share market 0
  * (cross-country pooled market); country B is isolated in market 1. Country C is
  * the only open-border country, so cross-country migration and employment from A
@@ -275,7 +275,7 @@ export function m5AgeGroups(population: number): number[] {
 
 interface BlockSpec {
   readonly id: Id;
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly professionId: Id;
   readonly population: number;
   readonly literacy: number;
@@ -286,8 +286,8 @@ interface BlockSpec {
 export interface M5FixtureOptions {
   /**
    * Optional authored building instance list. Defaults build one farm in each
-   * region, a food plant in A1, a workshop in C1, and a warehouse in every
-   * region.
+   * province, a food plant in A1, a workshop in C1, and a warehouse in every
+   * province.
    */
   readonly buildings?: EconomyScenarioDef["buildingInstances"];
   /** Country ids whose `immigrationOpen` is true. Defaults to country C only. */
@@ -299,13 +299,13 @@ export interface M5FixtureOptions {
 
 function defaultBlocks(): BlockSpec[] {
   return [
-    { id: 0, regionId: M5_REGION_A1, professionId: M5_PEASANTS, population: 10_000, literacy: 0.2, wealthLevel: 30, accountId: 100 },
-    { id: 1, regionId: M5_REGION_A1, professionId: M5_LABORERS, population: 5_000, literacy: 0.3, wealthLevel: 35, accountId: 101 },
-    { id: 2, regionId: M5_REGION_A2, professionId: M5_PEASANTS, population: 8_000, literacy: 0.2, wealthLevel: 25, accountId: 102 },
-    { id: 3, regionId: M5_REGION_A2, professionId: M5_LABORERS, population: 2_000, literacy: 0.3, wealthLevel: 32, accountId: 103 },
-    { id: 4, regionId: M5_REGION_B1, professionId: M5_PEASANTS, population: 6_000, literacy: 0.15, wealthLevel: 20, accountId: 104 },
-    { id: 5, regionId: M5_REGION_C1, professionId: M5_PEASANTS, population: 6_000, literacy: 0.25, wealthLevel: 28, accountId: 105 },
-    { id: 6, regionId: M5_REGION_C1, professionId: M5_LABORERS, population: 2_000, literacy: 0.35, wealthLevel: 33, accountId: 106 },
+    { id: 0, provinceId: M5_REGION_A1, professionId: M5_PEASANTS, population: 10_000, literacy: 0.2, wealthLevel: 30, accountId: 100 },
+    { id: 1, provinceId: M5_REGION_A1, professionId: M5_LABORERS, population: 5_000, literacy: 0.3, wealthLevel: 35, accountId: 101 },
+    { id: 2, provinceId: M5_REGION_A2, professionId: M5_PEASANTS, population: 8_000, literacy: 0.2, wealthLevel: 25, accountId: 102 },
+    { id: 3, provinceId: M5_REGION_A2, professionId: M5_LABORERS, population: 2_000, literacy: 0.3, wealthLevel: 32, accountId: 103 },
+    { id: 4, provinceId: M5_REGION_B1, professionId: M5_PEASANTS, population: 6_000, literacy: 0.15, wealthLevel: 20, accountId: 104 },
+    { id: 5, provinceId: M5_REGION_C1, professionId: M5_PEASANTS, population: 6_000, literacy: 0.25, wealthLevel: 28, accountId: 105 },
+    { id: 6, provinceId: M5_REGION_C1, professionId: M5_LABORERS, population: 2_000, literacy: 0.35, wealthLevel: 33, accountId: 106 },
   ];
 }
 
@@ -314,14 +314,14 @@ function defaultBuildings(): EconomyScenarioDef["buildingInstances"] {
   let nextId = 0;
   const add = (
     definitionId: number,
-    regionId: Id,
+    provinceId: Id,
     ownerAccountId: Id,
     operatingCashAccountId: Id,
   ): void => {
     instances.push({
       id: nextId,
       definitionId,
-      regionId,
+      provinceId,
       level: 1,
       condition: 1,
       ownerKind: "private",
@@ -361,15 +361,15 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
         name: profession.name,
         stratum: profession.stratum,
       })),
-      regions: [
-        { id: M5_REGION_A1, key: "a1", name: "Country A Region 1" },
-        { id: M5_REGION_A2, key: "a2", name: "Country A Region 2" },
-        { id: M5_REGION_B1, key: "b1", name: "Country B Region 1" },
-        { id: M5_REGION_C1, key: "c1", name: "Country C Region 1" },
+      provinceEconomies: [
+        { id: M5_REGION_A1, key: "a1", name: "Country A ProvinceEconomy 1" },
+        { id: M5_REGION_A2, key: "a2", name: "Country A ProvinceEconomy 2" },
+        { id: M5_REGION_B1, key: "b1", name: "Country B ProvinceEconomy 1" },
+        { id: M5_REGION_C1, key: "c1", name: "Country C ProvinceEconomy 1" },
       ],
       popBlocks: blocks.map((block) => ({
         id: block.id,
-        regionId: block.regionId,
+        provinceId: block.provinceId,
         professionId: block.professionId,
         financialAccountId: block.accountId,
         maleAgeGroups: m5AgeGroups(Math.floor(block.population / 2)),
@@ -386,13 +386,13 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
     markets: [
       {
         id: 0,
-        regionIds: [M5_REGION_A1, M5_REGION_A2, M5_REGION_C1],
+        provinceIds: [M5_REGION_A1, M5_REGION_A2, M5_REGION_C1],
         priceRUSD: definitions.goods.map((good) => good.basePrice1900RUSD),
         stockLots: [],
       },
       {
         id: 1,
-        regionIds: [M5_REGION_B1],
+        provinceIds: [M5_REGION_B1],
         priceRUSD: definitions.goods.map((good) => good.basePrice1900RUSD),
         stockLots: [],
       },
@@ -405,7 +405,7 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
         tag: "AAA",
         name: "Country A",
         monetary: { kind: "own", currencyId: 0 },
-        regionIds: [M5_REGION_A1, M5_REGION_A2],
+        provinceIds: [M5_REGION_A1, M5_REGION_A2],
         treasuryAccountId: 9000,
         initialTreasuryCashRUSD: 10_000,
         fiscal: fiscal[M5_COUNTRY_A] ?? { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 0 },
@@ -416,7 +416,7 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
         tag: "BBB",
         name: "Country B",
         monetary: { kind: "own", currencyId: 1 },
-        regionIds: [M5_REGION_B1],
+        provinceIds: [M5_REGION_B1],
         treasuryAccountId: 9001,
         initialTreasuryCashRUSD: 10_000,
         fiscal: fiscal[M5_COUNTRY_B] ?? { incomeTaxRate: 0.1, welfareBudgetRUSDPerYear: 0 },
@@ -427,7 +427,7 @@ export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
         tag: "CCC",
         name: "Country C",
         monetary: { kind: "own", currencyId: 2 },
-        regionIds: [M5_REGION_C1],
+        provinceIds: [M5_REGION_C1],
         treasuryAccountId: 9002,
         initialTreasuryCashRUSD: 10_000,
         fiscal: fiscal[M5_COUNTRY_C] ?? { incomeTaxRate: 0.05, welfareBudgetRUSDPerYear: 0 },

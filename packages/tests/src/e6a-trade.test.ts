@@ -382,16 +382,16 @@ describe("E6a dispatch, customs, and delivery", () => {
     // A third market with no population lets two routes offer the same origin lot.
     scenario.population = {
       ...scenario.population,
-      regions: [
-        ...scenario.population.regions,
-        { id: 4, key: "d1", name: "Third market region" },
+      provinceEconomies: [
+        ...scenario.population.provinceEconomies,
+        { id: 4, key: "d1", name: "Third market province" },
       ],
     };
     scenario.markets = [
       ...scenario.markets,
       {
         id: 2,
-        regionIds: [4],
+        provinceIds: [4],
         priceRUSD: scenario.markets[0]!.priceRUSD.map((price, goodId) =>
           goodId === M5_CLOTHING ? 1.5 : price,
         ),

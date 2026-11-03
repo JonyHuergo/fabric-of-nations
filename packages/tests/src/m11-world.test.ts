@@ -17,12 +17,15 @@ import {
   validateCountryAction,
   type CountryAction,
   type EconomyScenarioDef,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
   parseWorkerCommand,
   parseWorkerEvent,
   type WorkerEvent,
+  provinceEconomyRows,
+  type SimulationSnapshot,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 
@@ -170,18 +173,21 @@ describe("M11 world initialization", () => {
 
   test("every selectable country exists as a playable simulation entity", () => {
     expect(scenario.countries?.length).toBe(67);
-    expect(scenario.population.regions.length).toBe(133);
-    expect(scenario.markets.length).toBe(20);
+    // P2 (D-118, D-119, D-132): one economic record per province, one market per
+    // customs territory (67 states, four recorded unions), and the 66 M11 dependent
+    // territories plus Portuguese India.
+    expect(scenario.population.provinceEconomies.length).toBe(1687);
+    expect(scenario.markets.length).toBe(63);
     expect(scenario.countryMeta?.length).toBe(67);
-    expect(scenario.marketMeta?.length).toBe(20);
-    expect(scenario.regionMeta?.length).toBe(66);
+    expect(scenario.marketMeta?.length).toBe(63);
+    expect(scenario.territoryMeta?.length).toBe(67);
     const byTag = tagsOfScenario(scenario);
     expect(byTag.size).toBe(67);
     for (const meta of scenario.countryMeta ?? []) {
       if (!meta.selectable) continue;
       const country = scenario.countries?.find((candidate) => candidate.id === meta.countryId);
       expect(country).toBeDefined();
-      expect(country?.regionIds.length).toBeGreaterThan(0);
+      expect(country?.provinceIds.length).toBeGreaterThan(0);
     }
     for (const market of scenario.marketMeta ?? []) {
       expect(market.name.length).toBeGreaterThan(3);
@@ -206,14 +212,17 @@ describe("M11 world initialization", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     assertValidWorld(world);
     for (const country of world.countries) {
-      expect(country.regionIds.length).toBeGreaterThan(0);
-      expect(world.popBlocks.some((block) => country.regionIds.includes(block.regionId))).toBe(true);
-      expect(world.buildings.some((building) => country.regionIds.includes(building.regionId))).toBe(true);
+      expect(countryProvinceIds(world, country.id).length).toBeGreaterThan(0);
+      expect(world.popBlocks.some((block) => countryProvinceIds(world, country.id).includes(block.provinceId))).toBe(true);
+      expect(world.buildings.some((building) => countryProvinceIds(world, country.id).includes(building.provinceId))).toBe(true);
     }
-    for (const region of world.regions) {
-      expect(world.popBlocks.some((block) => block.regionId === region.id)).toBe(true);
-      expect(world.buildings.some((building) => building.regionId === region.id)).toBe(true);
-    }
+    // P2 (D-131): a province may be uninhabited (small islands); every block and
+    // building stands in a province and every populated province has a block.
+    const provinceIds = new Set(world.provinceEconomies.map((province) => province.id));
+    for (const block of world.popBlocks) expect(provinceIds.has(block.provinceId)).toBe(true);
+    for (const building of world.buildings) expect(provinceIds.has(building.provinceId)).toBe(true);
+    const populated = world.provinceEconomies.filter((province) => province.popBlockIds.length > 0).length;
+    expect(populated).toBeGreaterThan(1_600);
   });
 
   test("AI control excludes the player country and covers the rest", () => {
@@ -346,11 +355,12 @@ describe("M11 country selection and persistence", () => {
           name: string;
           description: string;
           memberCountryIds: number[];
-          regionIds: number[];
+          provinceIds: number[];
           customsCountryId: number | null;
         }[];
-        countrySummaries: { id: number; regionIds: number[]; marketIds: number[] }[];
-        regions: { id: number; countryId: number | null; marketId: number | null }[];
+        countrySummaries: { id: number; provinceIds: number[]; marketIds: number[] }[];
+        provinceTable: SimulationSnapshot["provinceTable"];
+        professions: SimulationSnapshot["professions"];
       };
     }).snapshot;
     expect(JSON.stringify(snapshot).length).toBeLessThan(700_000);
@@ -358,25 +368,25 @@ describe("M11 country selection and persistence", () => {
       expect(market.label).not.toMatch(/^Market \d+$/);
       expect(market.name).toBe(market.label);
       expect(market.description.length).toBeGreaterThan(10);
-      // Every member country owns at least one region of the market.
+      // Every member country owns at least one province of the market.
       for (const countryId of market.memberCountryIds) {
         const country = snapshot.countrySummaries.find((entry) => entry.id === countryId);
         expect(country).toBeDefined();
-        expect(country?.regionIds.some((regionId) => market.regionIds.includes(regionId))).toBe(true);
+        expect(country?.provinceIds.some((provinceId) => market.provinceIds.includes(provinceId))).toBe(true);
       }
       if (market.customsCountryId !== null) {
         const customs = snapshot.countrySummaries.find(
           (entry) => entry.id === market.customsCountryId,
         );
-        expect(customs?.regionIds.some((regionId) => market.regionIds.includes(regionId))).toBe(true);
+        expect(customs?.provinceIds.some((provinceId) => market.provinceIds.includes(provinceId))).toBe(true);
       }
     }
-    // Every region is in exactly one market, and that market lists its country.
-    for (const region of snapshot.regions) {
-      expect(region.marketId).not.toBeNull();
-      const market = snapshot.markets.find((entry) => entry.id === region.marketId);
+    // Every province is in exactly one market, and that market lists its country.
+    for (const province of provinceEconomyRows(snapshot)) {
+      expect(province.marketId).not.toBeNull();
+      const market = snapshot.markets.find((entry) => entry.id === province.marketId);
       expect(market).toBeDefined();
-      if (region.countryId !== null) expect(market?.memberCountryIds).toContain(region.countryId);
+      if (province.countryId !== null) expect(market?.memberCountryIds).toContain(province.countryId);
     }
   });
 });

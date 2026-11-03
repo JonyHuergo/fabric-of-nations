@@ -44,6 +44,7 @@ import {
 } from "../../app/src/components/provinceRenderPlan.js";
 import { PROVINCE_MAP_1900 } from "../../app/src/provinceMapBundle.js";
 import type { ProvinceMapData } from "../../app/src/provinceCatalogTypes.js";
+import { politicalGeographyWorld } from "./fixtures/provinces.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -144,7 +145,7 @@ const OCEANIA_IDS = new Set(OCEANIA.provinces.map((province) => province.id));
 const FUTURE_ID = new Map(
   OCEANIA.futurePolities.map((polity) => [polity.tag, polity.polityId]),
 );
-const REGION_IDS = new Set(SCENARIO.population.regions.map((region) => region.id));
+const REGION_IDS = new Set(SCENARIO.population.provinceEconomies.map((province) => province.id));
 const COMBINED = [...EUROPE.provinces, ...ASIA.provinces, ...AFRICA.provinces, ...AMERICAS.provinces, ...OCEANIA.provinces];
 const COMBINED_KEYS = new Set(COMBINED.map((province) => province.key));
 
@@ -307,7 +308,8 @@ function transfer(
 }
 
 function referenceWorld(seed = 91_200): World {
-  return createEconomyWorld(SCENARIO, { seed });
+  // P2: the reference sequences run on the political geography alone (D-118).
+  return politicalGeographyWorld(SCENARIO, seed);
 }
 
 function snapshotFor(world: World) {
@@ -631,7 +633,7 @@ describe("M12e Oceania province inventory and geometry", () => {
     }
   });
 
-  test("the required Oceanian owners, map features and region ids are represented", () => {
+  test("the required Oceanian owners, map features and province ids are represented", () => {
     const owners = new Set(OCEANIA.provinces.map((province) => province.initialOwnerTag));
     for (const tag of ["AUS", "NZL", "TON", "GBR", "DEU", "FRA", "USA", "CHL", "MEX"]) {
       expect(owners.has(tag)).toBe(true);
@@ -644,7 +646,9 @@ describe("M12e Oceania province inventory and geometry", () => {
       expect(mapTags.has(tag)).toBe(true);
     }
     for (const province of OCEANIA.provinces) {
-      expect(REGION_IDS.has(province.simulationRegionId)).toBe(true);
+      // P2 (D-118): every province is an economic unit of its own; the region link is gone.
+      expect(REGION_IDS.has(province.id)).toBe(true);
+      expect("simulationRegionId" in province).toBe(false);
     }
   });
 

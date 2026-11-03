@@ -261,7 +261,7 @@ export function IndustryScreen({
               <View key={enterprise.buildingId} style={styles.enterprise}>
                 <Text style={styles.enterpriseTitle}>
                   #{String(enterprise.buildingId)} {enterprise.definitionName} ·{" "}
-                  {enterprise.regionName}
+                  {enterprise.provinceName}
                 </Text>
                 <Text style={styles.detail}>
                   {enterprise.sector} · level {String(enterprise.level)} · condition{" "}

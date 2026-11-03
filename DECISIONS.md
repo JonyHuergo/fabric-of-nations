@@ -7151,3 +7151,176 @@ values require recalibrating physical productivity at the same time.
 5. Because P2b deliberately changes values non-uniformly, D-122 §5's scale-invariance test
    is replaced by a test that every value matches its documented source and conversion,
    plus a before-and-after report on the 1900 world.
+
+## D-131 — P2 province world: territories, distribution rules and customs territories
+
+**Status:** implemented on 2026-11-02 under the P2 assignment (D-117 to D-121). The
+distribution rules are provisional and recorded for review.
+
+### Decision
+
+1. **Authored territory inputs.** The 133 M11 "regions" are restated as *territories*
+   (`historical/m11/territories_1900.json`, `scripts/p2/convert-territory-inputs.mjs`):
+   each catalog entry (67 states, 66 dependent territories, plus Portuguese India from
+   D-132) lists its provinces. The population, building, country and market tables keep
+   their authored totals keyed by `territoryId`; they are inputs to the scenario builder
+   and are no longer loaded at runtime. The province link is the M12 bundle link, except
+   Hultschin (German since D-128). The M12 field `simulationRegionId` is then deleted from
+   the bundles and the app province modules (`sync-app-provinces.mjs`).
+2. **Scenario builder** (`scripts/p2/build-province-scenario.mjs`, `--check`, input and
+   output checksums in `historical/p2/build_report.json`):
+   - a territory's authored total of each profession is split over its provinces by a
+     HYDE 3.3 weight: peasants by rural population, laborers by total population,
+     clerks, academics and capitalists by urban population (total when the territory
+     has no urban population); sourced group totals (D-129) and land area are the
+     fallbacks; integers by largest remainder (ties to the lower province id), so every
+     authored total is exact;
+   - a territory building's level, operating cash (whole RUSD) and opening stock are
+     split over the provinces that host its owner profession, in proportion to the
+     population of the professions it employs (total population for warehouses);
+   - each province record carries HYDE cropland and grazing land (hectares), urban share
+     and the territory's infrastructure.
+   Result: 1,687 provinces, 5,687 population blocks in 1,627 populated provinces, 3,725
+   buildings; population (1,584,134,189), building levels, operating cash and stock are
+   conserved exactly against the territory tables (checked by the builder).
+3. **Customs territories (D-119).** One market per country unless the country is a
+   member of a recorded 1900 union (Luxembourg–Germany, Liechtenstein–Austria,
+   Monaco–France, San Marino–Italy): 63 markets. Colonies and protectorates are already
+   their sovereign's provinces and so trade in its territory. `MarketMetaDef` gains
+   `memberCountryIds` (validated to equal the owners of the market's provinces); a
+   market's provinces are derived from `ProvinceEconomy.marketId`, and its administrator
+   is `customsCountryId`. Opening price multipliers are those of the country's M11 market
+   (0.25 everywhere).
+4. **Generated routes.** Territories sharing a land border, plus each coastal territory's
+   three nearest coastal territories, connected into one network: 168 routes (114 land).
+   Distance units are kilometres / 1,000 between the closest border or coastal province
+   labels (at least 0.5); capacity keeps the M11 provisional formula (P2b, D-130).
+
+### Consequences
+
+- Known approximations: the occupation mix inside a territory follows HYDE urban/rural
+  shares, not provincial occupation statistics; buildings follow employment, not
+  located plants; Réunion and Mayotte stay in the Madagascar territory's total (the M12
+  link); route distances are straight lines between label points.
+- The 1900 world has about 116,600 accounts (was 12,373) and the worker's embedded
+  scenario is 4.4 MB (compact JSON).
+
+## D-132 — Ownership reconciliation of the 1900 province layer
+
+**Status:** decided by the designer on 2026-11-02; implemented by
+`scripts/p2/apply-1900-ownership-corrections.mjs` (idempotent).
+
+### Decision
+
+1. **Egypt** is owned by the Ottoman Empire (de jure, khedivate) and controlled by the
+   United Kingdom (occupation since 1882), the D-081 owner/controller separation already
+   used for Cuba (D-129). This matches the catalog, the calibration totals and the
+   customs audit (Ottoman customs territory until Egypt is simulated).
+2. **Newfoundland** is owned by the United Kingdom, its 1900 sovereign; it had carried the
+   registry id of a later polity.
+3. **Tokelau** (a British protectorate in 1900) and the British residual of New Guinea
+   move to the British Pacific and Indian Ocean islands territory.
+4. **Goa** becomes the *Portuguese India* territory of Portugal: 475,513 inhabitants
+   (Portuguese census of 1 December 1900, as tabulated in the Government of Goa,
+   *Economic Survey 2016-17*), the occupation mix, per-capita values and per-capita
+   building levels of Portugal's Asian territories (Timor and Macao). Portugal's
+   calibration targets are recomputed (total 13,355,513). The map shows Goa as Portuguese.
+
+### Consequences
+
+- War-free control by a non-owner (Cuba, Egypt) is administrative: the M10 phase neither
+  creates nor lifts it, and it raises no occupation unrest (D-134 §4).
+
+## D-133 — Province-scale performance: sequential pairing and cached account lookups
+
+**Status:** implemented on 2026-11-02 to make the province world runnable; §1 and §2
+change trajectories and are recorded for the designer's review, §3 is bit-identical.
+
+### Evidence
+
+The first run of the province world took 85 s for its first day and 19–24 s per day after
+(Node, same machine as the P1 report). Two allocations were quadratic: market allocation
+made one reservation per (seller lot × buyer), and the employment fill spread every
+block's quota over every vacancy building of its country. Linear scans over 116,600
+accounts and per-entity rescans did the rest.
+
+### Decision
+
+1. **Market pairing.** Each lot still sells its pro-rata share of the fulfilled quantity
+   and each buyer still receives its planned quantity; the pairs are the overlaps of the
+   cumulative lot and buyer intervals (lots by seller id, buyers in demand order), so a
+   good creates at most lots + buyers reservations. Per-account payments are unchanged
+   because postings are aggregated per account (D-125); only floating summation order
+   changes. The keyed residual tie-break draws are retired.
+2. **Employment pairing.** Block quotas are apportioned as before; each building's fill
+   is apportioned once over its vacancies (keyed ties as before); the two are paired
+   first within each province, then the remainders in ascending province order. At most
+   blocks + buildings assignments; workers fill local jobs first. The fill-order draw is
+   retired.
+3. **Bit-identical indexing.** Cached account lookups by id, owner and subtype and a
+   cached finance index (keyed by the accounts array, rebuilt when accounts are
+   appended; ids, owners and subtypes never change), per-country mortality factors,
+   grouped needs bookkeeping, indexed household tier totals, and incremental migration
+   signals (a flow changes only its source and destination keys; recomputing those two
+   from the same blocks equals the full recomputation, which ran after every flow). The
+   62-day benchmark hash is identical before and after this last change.
+
+### Consequences
+
+- 1900 province world, phase mode with rollback (Node 24, Ryzen 5 2600, 57 measured
+  days): mean 1.75 s, p50 1.52 s, p95 3.86 s, p99 6.86 s per simulated day (the p99 day
+  is the month start; it was 39 s before the incremental migration signals). The
+  359-block world ran at 183 ms p50: the cost is roughly linear in entities.
+  On-device performance is the designer's to measure.
+- **Typed-array population pool (P1 item 4) not built.** Measured on the 1900 province
+  world: copying all 5,687 blocks' age arrays takes about 9 ms of a 260–390 ms
+  `cloneWorld` checkpoint, so a pooled copy saves at most about 3%; the cost is in the
+  ~116,600 account objects and the other records. Per AGENTS.md §6 (optimize from
+  profiling) the pool is deferred until a profile shows it matters.
+- The test runner gets a 4 GB heap (`packages/tests` `test` script): many test files
+  build the province world in one in-band process and exceeded Node's default 2 GB.
+
+## D-134 — Provinces replace regions in the world state (schema 28)
+
+**Status:** implemented on 2026-11-02 (D-118, D-120).
+
+### Decision
+
+1. `World.regions` becomes `World.provinceEconomies`: one `ProvinceEconomy` per permanent
+   province (same id as its `ProvinceOwnership`), with population blocks, buildings,
+   market, unrest, infrastructure, cropland and pasture (hectares) and urban share. The
+   unread `resourceCapsPerDay` is removed. Blocks, buildings, construction projects and
+   armies reference `provinceId`.
+2. `Country.regionIds` and `Market.regionIds` are removed. A country's territory is the
+   set of ownership records whose `ownerPolityId` is its id; a market's provinces are
+   those whose `marketId` is its id. Scenario inputs still declare initial territory
+   (`CountryInitialDef.provinceIds`, `MarketInitialDef.provinceIds`); with province
+   definitions the declared territory must equal the definitions' owners. Synthetic
+   fixtures without definitions get ownership records from the declared territory.
+3. **Conserving transfer** (`transferProvincesToCountry`, D-118 §4): cancels other
+   countries' projects in the provinces, changes owner and controller, moves the
+   provinces into the recipient's customs territory with the stock lots of their
+   buildings, and releases employment that the new border closes; people, accounts and
+   cash do not change. Transfers to a polity that is not a simulation country are
+   rejected. M10 peace cessions use it.
+4. **Occupation** is `ProvinceOwnership.controllerPolityId`/`controlledSinceDay` only. The
+   M10 phase creates and lifts occupations only while the controller is at war with the
+   owner; war-free control (Cuba, Egypt) is administrative and left alone.
+5. Dependent-territory metadata is `TerritoryMetaDef { polityTag, provinceIds, ... }`
+   (was `RegionMetaDef`); `CountryMetaDef.regionName` becomes `homeTerritoryName`.
+6. **Schema 28.** Saves of schema 27 and older are rejected as incompatible (D-120): the
+   save list shows them with the reason, Continue is not offered for them, and nothing is
+   deleted or overwritten. The worker protocol is version 17 and the map bridge version 2.
+7. **Snapshot.** Province economies travel as a column table (`provinceTable`, one array
+   per field) read through `provinceEconomyRows`; province names come from the app's
+   province catalog. The 1900 snapshot is about 0.6 MB (1.2 MB with one object per
+   province). Dependent territories and profession names are part of the snapshot.
+8. **Province UI and lenses (phone layout).** The province panel shows population by
+   profession, urban share, literacy, cropland and pasture, employment, buildings, unrest,
+   infrastructure and market; four lenses (population density, towns, literacy, unrest)
+   join political, control and markets, coloured from `MAP_DATA_RAMP` in the design tokens
+   and drawn the same way by the WebGL map and the SVG fallback.
+9. **Bug fixes found on the way.** `cloneWorld` now copies province ownership (it was
+   shared since M12a, which matters once occupation writes it during a staged day), and
+   world creation builds ownership before interest groups, institutions and initial
+   armies read country territory.

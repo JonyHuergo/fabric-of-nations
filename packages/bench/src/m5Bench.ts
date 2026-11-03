@@ -90,7 +90,7 @@ function contextFor(scenario: EconomyScenarioDef): TickContext {
 
 function structuralCounts(world: World): {
   readonly countries: number;
-  readonly regions: number;
+  readonly provinceEconomies: number;
   readonly markets: number;
   readonly blocks: number;
   readonly buildings: number;
@@ -99,7 +99,7 @@ function structuralCounts(world: World): {
 } {
   return {
     countries: world.countries.length,
-    regions: world.regions.length,
+    provinceEconomies: world.provinceEconomies.length,
     markets: world.markets.length,
     blocks: world.popBlocks.length,
     buildings: world.buildings.length,
@@ -108,7 +108,7 @@ function structuralCounts(world: World): {
   };
 }
 
-/** Duplicate blocks and buildings to produce a larger multi-region campaign. */
+/** Duplicate blocks and buildings to produce a larger multi-province campaign. */
 function stressScenario(base: EconomyScenarioDef): EconomyScenarioDef {
   const extraBlocks = base.population.popBlocks.map((block, index) => ({
     ...block,
@@ -282,7 +282,7 @@ export function runM5Benchmarks(): boolean {
 
   console.log("");
   console.log(
-    `M5 eight-polity campaign: ${String(counts.countries)} countries, ${String(counts.regions)} regions, ` +
+    `M5 eight-polity campaign: ${String(counts.countries)} countries, ${String(counts.provinceEconomies)} provinces, ` +
       `${String(counts.markets)} markets, ${String(counts.blocks)} blocks, ` +
       `${String(counts.buildings)} buildings, ${String(counts.employment)} assignments, ` +
       `population ${String(counts.population)}`,
@@ -328,7 +328,7 @@ export function runM5Benchmarks(): boolean {
       `${m5bInterestAccrued.toFixed(2)} RUSD interest accrued in the sample`,
   );
   console.log(
-    `M5 stress: ${String(stressCounts.countries)} countries, ${String(stressCounts.regions)} regions, ` +
+    `M5 stress: ${String(stressCounts.countries)} countries, ${String(stressCounts.provinceEconomies)} provinces, ` +
       `${String(stressCounts.markets)} markets, ${String(stressCounts.blocks)} blocks, ` +
       `${String(stressCounts.buildings)} buildings, ${String(stressCounts.employment)} assignments; ` +
       `${String(M5_STRESS_TICKS)} ticks; hash ${stressHash}`,
@@ -344,7 +344,7 @@ export function runM5Benchmarks(): boolean {
     m5bContracts > 0 &&
     m5bInterestAccrued > 0 &&
     counts.countries === 8 &&
-    counts.regions >= 16 &&
+    counts.provinceEconomies >= 16 &&
     counts.markets >= 5 &&
     counts.blocks >= 64 &&
     stressCounts.blocks >= counts.blocks * 2;

@@ -1,7 +1,7 @@
 /**
  * Authoritative world state.
  *
- * M1 fields remain. M2/M2.1 add a single-region population collection and
+ * M1 fields remain. M2/M2.1 add a single-province population collection and
  * household accounts. M3a adds buildings, employment assignments, markets with
  * authoritative stock lots, and a minimal cash ledger. M3b adds the persisted
  * employment-dirty scheduling marker. M4a-1 adds category-aware accounts.
@@ -51,7 +51,7 @@ import {
   assertValidPriceIndexState,
 } from "./economy/monetaryState.js";
 import { assertValidMilitaryState } from "./economy/militaryState.js";
-import type { PopBlock, Region } from "./population/types.js";
+import type { PopBlock, ProvinceEconomy } from "./population/types.js";
 import type { ProvinceState } from "./provinces/types.js";
 import { assertValidProvinceState, emptyProvinceState } from "./provinces/state.js";
 import { emptyMilitaryState } from "./economy/militaryState.js";
@@ -89,8 +89,8 @@ export interface World {
   startDayIndex: Day;
   /** Unsigned 32-bit deterministic world seed. */
   seed: Seed;
-  /** M2 supports at most one region; the collection is future-compatible. */
-  regions: Region[];
+  /** M2 supports at most one province; the collection is future-compatible. */
+  provinceEconomies: ProvinceEconomy[];
   /** M4a-2 country identity. Empty for earlier population/economy fixtures. */
   countries: Country[];
   /** M4a-2 currency identity and issuer. */
@@ -171,10 +171,10 @@ export interface CreateWorldOptions {
   readonly fiscalAccounts?: boolean;
   /**
    * Internal construction control. The public M2 path still creates exactly one
-   * region; integrated economy construction passes true so a scenario may author
-   * several regions.
+   * province; integrated economy construction passes true so a scenario may author
+   * several provinces.
    */
-  readonly allowMultipleRegions?: boolean;
+  readonly allowMultipleProvinces?: boolean;
 }
 
 /** Create an empty M2-schema world at 1900-01-01. */
@@ -198,7 +198,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     dayIndex: startDayIndex,
     startDayIndex,
     seed,
-    regions: [],
+    provinceEconomies: [],
     countries: [],
     currencies: [],
     currencyValuations: [],

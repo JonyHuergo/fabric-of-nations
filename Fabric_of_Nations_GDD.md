@@ -6627,7 +6627,9 @@ land-layer rendering bug and raises the maximum zoom.
 
 ## 17J. Prosperity Program — peacetime economy and demography (P0–P15)
 
-**Status:** P0 (design) approved 2026-11-02. P1 is implemented with a documented
+**Status:** P0 (design) approved 2026-11-02. P2 (provinces, customs territories, schema
+28) is implemented for review, with the money calibration moved to P2b (D-130 to D-134).
+P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair
 (D-126) and exact work-in-progress capitalization (D-127) make the 1900 world day about

@@ -42,6 +42,7 @@ import type { MarketDayResult } from "./market.js";
 import { assertValidFinanceState } from "./validation.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { BUILDING_SECTORS } from "./types.js";
+import { buildProvinceOwnerMap } from "./country.js";
 
 function toleranceMoney(...values: number[]): number {
   let scale = 1;
@@ -125,10 +126,7 @@ export function runIndustrialSubsidyPhase(
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
-  const regionOwner = new Map<Id, Id>();
-  for (const country of world.countries) {
-    for (const regionId of country.regionIds) regionOwner.set(regionId, country.id);
-  }
+  const provinceOwner = buildProvinceOwnerMap(world);
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
 
@@ -147,7 +145,7 @@ export function runIndustrialSubsidyPhase(
       if (building === undefined) continue;
       const definition = definitionById.get(building.definitionId);
       if (definition === undefined) continue;
-      const countryId = regionOwner.get(building.regionId);
+      const countryId = provinceOwner.get(building.provinceId);
       if (countryId === undefined) continue;
       const country = countryById.get(countryId);
       if (country === undefined) continue;

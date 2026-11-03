@@ -42,6 +42,7 @@ import {
   type DispatchSource,
 } from "../../app/src/screens/dispatches.js";
 import { DOMAINS, domainOf, type ScreenId } from "../../app/src/screens/navigation.js";
+import { encodeProvinceEconomyTable } from "@century/sim-worker";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const APP = join(ROOT, "packages/app");
@@ -129,11 +130,14 @@ describe("navigation", () => {
 });
 
 describe("lenses", () => {
-  const empty: LensData = { provinces: [], markets: [], regions: [] };
+  const table = (rows: readonly object[]) =>
+    encodeProvinceEconomyTable(rows as unknown as Parameters<typeof encodeProvinceEconomyTable>[0], []);
+  const empty: LensData = { provinces: [], markets: [], provinceTable: table([]), professions: [] };
   const live = {
     provinces: [{ provinceId: 1 }],
     markets: [{ id: 0 }],
-    regions: [{ id: 1, marketId: 0 }],
+    provinceTable: table([{ id: 1, marketId: 0 }]),
+    professions: [],
   } as unknown as LensData;
 
   test("every lens is a registered map mode", () => {
@@ -149,15 +153,35 @@ describe("lenses", () => {
     expect(availableLenses(empty).map((lens) => lens.id)).toEqual(["political"]);
     expect(availableLenses({ ...live, markets: [] }).map((lens) => lens.id)).toEqual(["political", "control"]);
     expect(
-      availableLenses({ ...live, regions: [{ id: 1, marketId: null }] as unknown as LensData["regions"] }).map(
+      availableLenses({ ...live, provinceTable: table([{ id: 1, marketId: null }]) }).map(
         (lens) => lens.id,
       ),
     ).toEqual(["political", "control"]);
     expect(availableLenses(live).map((lens) => lens.label)).toEqual(["Political", "Control", "Markets"]);
+    // P2 province lenses need a populated province in the live snapshot.
+    const populated = {
+      ...live,
+      provinceTable: table([{ id: 1, marketId: 0, population: 10 }]),
+    } as unknown as LensData;
+    expect(availableLenses(populated).map((lens) => lens.id)).toEqual([
+      "political",
+      "control",
+      "markets",
+      "density",
+      "urban",
+      "literacy",
+      "unrest",
+    ]);
   });
 
   test("no lens is offered that the snapshot cannot back", () => {
-    expect(read("src/map/lenses.ts")).not.toMatch(/population|unrest|infrastructure|literacy/iu);
+    // P2: the province lenses draw values the worker snapshot carries per province.
+    const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"), "utf8");
+    for (const field of ["population", "urbanShare", "literacy", "unrest"]) {
+      expect(protocol).toMatch(new RegExp(`readonly ${field}: number;`, "u"));
+    }
+    // Nothing the simulation does not model yet may appear as a lens.
+    expect(read("src/map/lenses.ts")).not.toMatch(/gdp|wealth|deposit|harvest|infrastructure/iu);
   });
 });
 
@@ -181,7 +205,7 @@ describe("dispatches", () => {
         {
           id: 1,
           technology: { statuses: [{ technologyId: 7, status: "active" }] },
-          constructionProjects: [{ id: 3, status: "active", definitionName: "Railway", regionName: "Brittany" }],
+          constructionProjects: [{ id: 3, status: "active", definitionName: "Railway", provinceName: "Brittany" }],
           financeHistory: [],
         },
       ],
@@ -239,7 +263,7 @@ describe("dispatches", () => {
       {
         id: 1,
         technology: { statuses: [{ technologyId: 7, status: "researched" }] },
-        constructionProjects: [{ id: 3, status: "completed", definitionName: "Railway", regionName: "Brittany" }],
+        constructionProjects: [{ id: 3, status: "completed", definitionName: "Railway", provinceName: "Brittany" }],
         financeHistory: [{ periodEndDay: 30, netFiscalResultRUSD: -2_500_000 }],
       },
     ] as unknown as DispatchSource["countries"];
@@ -377,7 +401,13 @@ describe("the bridge", () => {
     { type: "set-theme", eraId: "cold-war", immediate: false },
     { type: "set-lens", lens: "markets", highlightMarketId: 3 },
     { type: "set-lens", lens: "political", highlightMarketId: null },
-    { type: "set-states", changes: [[4, "FRA", "DEU", "FRA", 2], [5, "DEU", "DEU", "DEU", null]] },
+    {
+      type: "set-states",
+      changes: [
+        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02],
+        [5, "DEU", "DEU", "DEU", null, null, null, null, null],
+      ],
+    },
     { type: "set-selection", selectedTag: "GBR", playerTag: null, selectedProvinceIndex: 12 },
     { type: "set-insets", left: 60, right: 300, reserved: [{ left: 1, top: 2, width: 3, height: 4 }] },
     { type: "focus-unit", tag: "JPN", immediate: true },
@@ -461,9 +491,20 @@ describe("the bridge", () => {
     const first = next[0];
     if (first === undefined) throw new Error("no provinces");
     next[0] = { ...first, ownerTag: "ZZZ", unitTag: "ZZZ" };
-    expect(diffProvinceStates(base, next)).toEqual([[0, "ZZZ", first.controllerTag, "ZZZ", first.marketId]]);
+    const change = [
+      0,
+      "ZZZ",
+      first.controllerTag,
+      "ZZZ",
+      first.marketId,
+      first.densityPerKm2,
+      first.urbanShare,
+      first.literacy,
+      first.unrest,
+    ];
+    expect(diffProvinceStates(base, next)).toEqual([change]);
     expect(planMapCommands(inputs(), inputs({ states: next }), base)).toEqual([
-      { type: "set-states", changes: [[0, "ZZZ", first.controllerTag, "ZZZ", first.marketId]] },
+      { type: "set-states", changes: [change] },
     ]);
   });
 
@@ -574,7 +615,7 @@ describe("province data without geometry", () => {
   });
 
   test("ownership resolves identically from either source", () => {
-    const snapshot = { provinces: [], regions: [] } as unknown as SimulationSnapshot;
+    const snapshot = { provinces: [], provinceTable: encodeProvinceEconomyTable([], []), professions: [] } as unknown as SimulationSnapshot;
     expect(buildProvinceStates(PROVINCE_CATALOG, WORLD_CATALOG, snapshot)).toEqual(
       buildProvinceStates(PROVINCE_MAP_1900, WORLD_CATALOG, snapshot),
     );

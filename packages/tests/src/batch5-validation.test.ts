@@ -61,7 +61,10 @@ const SEED = 20_261_023;
 // P1b re-pins it because D-125 (one cash-capped market attempt, aggregated market
 // postings) and D-126 (minimal employment repair) intentionally change the trajectory;
 // the P1a optimizations before them reproduced "22eefa09ff274493" exactly.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "b400f2babc5af078";
+// P2 re-pins it: schema 28 (D-134) encodes province economies and ownership instead
+// of regions, and D-133 pairs market reservations and employment sequentially, which
+// changes floating summation order and job pairings by design.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "c353751e30c61230";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

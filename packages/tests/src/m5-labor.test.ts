@@ -10,6 +10,7 @@ import {
   tick,
   workingAgePopulation,
   type TickContext,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   M5_COUNTRY_A,
@@ -38,7 +39,7 @@ function withBuildingLevel(
 }
 
 describe("M5 labor mobility", () => {
-  test("fills cross-region jobs within a country and cross-border jobs only through an open border", () => {
+  test("fills cross-province jobs within a country and cross-border jobs only through an open border", () => {
     const scenario = m5Scenario();
     withBuildingLevel(scenario, 8, 20);
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
@@ -50,14 +51,14 @@ describe("M5 labor mobility", () => {
     );
     const foreign = workshopAssignments.filter((assignment) => {
       const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
-      return block !== undefined && block.regionId !== M5_REGION_C1;
+      return block !== undefined && block.provinceId !== M5_REGION_C1;
     });
     expect(foreign.length).toBeGreaterThan(0);
     for (const assignment of foreign) {
       const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
       expect(block).toBeDefined();
       if (block === undefined) continue;
-      const owner = world.countries.find((country) => country.regionIds.includes(block.regionId));
+      const owner = world.countries.find((country) => countryProvinceIds(world, country.id).includes(block.provinceId));
       expect([M5_COUNTRY_A, M5_COUNTRY_C]).toContain(owner?.id);
     }
     // B is closed: no B residents may work in C and no A residents may work in B.
@@ -65,11 +66,11 @@ describe("M5 labor mobility", () => {
       const building = world.buildings.find(
         (candidate) => candidate.id === assignment.buildingInstanceId,
       );
-      return building?.regionId === M5_REGION_B1;
+      return building?.provinceId === M5_REGION_B1;
     });
     for (const assignment of bAssignments) {
       const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
-      expect(block?.regionId).toBe(M5_REGION_B1);
+      expect(block?.provinceId).toBe(M5_REGION_B1);
     }
     assertValidWorld(world);
   });
@@ -194,13 +195,13 @@ describe("M5 labor mobility", () => {
     withBuildingLevel(scenario, 8, 20);
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     runTicks(world, 1, context(scenario));
-    const regionOwners = new Map<number, number>();
+    const provinceOwners = new Map<number, number>();
     for (const country of world.countries) {
-      for (const regionId of country.regionIds) regionOwners.set(regionId, country.id);
+      for (const provinceId of countryProvinceIds(world, country.id)) provinceOwners.set(provinceId, country.id);
     }
     const accountById = new Map(world.finance.accounts.map((account) => [account.id, account]));
     for (const block of world.popBlocks) {
-      const residence = regionOwners.get(block.regionId);
+      const residence = provinceOwners.get(block.provinceId);
       if (residence === undefined) continue;
       const taxExpense = world.finance.accounts.find(
         (account) =>
@@ -230,7 +231,7 @@ describe("M5 labor mobility", () => {
       );
       expect(taxRevenue).toBeDefined();
       const residentTax = world.popBlocks
-        .filter((block) => regionOwners.get(block.regionId) === country.id)
+        .filter((block) => provinceOwners.get(block.provinceId) === country.id)
         .reduce((total, block) => {
           const expense = world.finance.accounts.find(
             (account) =>

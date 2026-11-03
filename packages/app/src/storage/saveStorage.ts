@@ -13,7 +13,7 @@ import {
  * can reject an incompatible startup save before offering Continue; the worker
  * remains the authoritative validator when the save is loaded.
  */
-export const SUPPORTED_SAVE_SCHEMA_VERSION = 27;
+export const SUPPORTED_SAVE_SCHEMA_VERSION = 28;
 
 /** One slot per campaign, each a replace-safe SaveStore; see D-114. */
 const library = new SaveLibrary(AsyncStorage, {

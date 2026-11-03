@@ -43,6 +43,7 @@ import {
   isDebtPostingKind,
   isProfitAllocationKind,
   transactionKindChangesCash,
+  buildFinanceIndex,
 } from "./accounts.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
@@ -83,17 +84,10 @@ function toleranceMoney(...values: number[]): number {
   return MONEY_TOLERANCE_RUSD * scale;
 }
 
-function accountMap(finance: FinanceState): Map<number, FinancialAccount> {
-  const accounts = requireArray(finance.accounts, "finance.accounts");
-  const map = new Map<number, FinancialAccount>();
-  for (const value of accounts) {
-    const account = value as FinancialAccount;
-    if (map.has(account.id)) {
-      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
-    }
-    map.set(account.id, account);
-  }
-  return map;
+/** Accounts by id with the duplicate-id check, from the cached finance index (D-133). */
+function accountMap(finance: FinanceState): ReadonlyMap<number, FinancialAccount> {
+  requireArray(finance.accounts, "finance.accounts");
+  return buildFinanceIndex(finance).byId;
 }
 
 function assertTransactionKind(value: unknown): asserts value is TransactionKind {
@@ -120,7 +114,7 @@ function assertPublicTransactionKind(value: unknown): asserts value is PublicTra
 
 function validatePostingLines(
   lines: readonly JournalLine[],
-  accounts: Map<number, FinancialAccount>,
+  accounts: ReadonlyMap<number, FinancialAccount>,
   transactionKind: TransactionKind,
 ): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
@@ -225,7 +219,7 @@ function validatePostingLines(
 }
 
 function assertBalanceConstraints(
-  accounts: Map<number, FinancialAccount>,
+  accounts: ReadonlyMap<number, FinancialAccount>,
   deltas: Map<number, number>,
 ): void {
   for (const [accountId, delta] of deltas) {

@@ -6,6 +6,7 @@ import {
   governmentPeriodTotals,
   runTicks,
   type TickContext,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   M5_COUNTRY_A,
@@ -29,9 +30,9 @@ describe("M5 multi-country finance and fiscal integrity", () => {
     });
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     runTicks(world, 10, context(scenario));
-    const regionOwners = new Map<number, number>();
+    const provinceOwners = new Map<number, number>();
     for (const country of world.countries) {
-      for (const regionId of country.regionIds) regionOwners.set(regionId, country.id);
+      for (const provinceId of countryProvinceIds(world, country.id)) provinceOwners.set(provinceId, country.id);
     }
     for (const country of world.countries) {
       const treasury = world.finance.accounts.find(
@@ -50,7 +51,7 @@ describe("M5 multi-country finance and fiscal integrity", () => {
       expect(taxRevenue).toBeDefined();
       if (treasury === undefined || taxRevenue === undefined) continue;
       const residentTax = world.popBlocks
-        .filter((block) => regionOwners.get(block.regionId) === country.id)
+        .filter((block) => provinceOwners.get(block.provinceId) === country.id)
         .reduce((total, block) => {
           const expense = world.finance.accounts.find(
             (account) =>
@@ -124,7 +125,7 @@ describe("M5 multi-country finance and fiscal integrity", () => {
           account.subtype === "treasury-cash",
       )?.balanceRUSD ?? 0;
     expect(treasury(M5_COUNTRY_A)).not.toBe(treasury(M5_COUNTRY_C));
-    expect(world.regions.find((region) => region.id === M5_REGION_A1)?.marketId).toBe(0);
+    expect(world.provinceEconomies.find((province) => province.id === M5_REGION_A1)?.marketId).toBe(0);
     // A market transfer is a goods purchase, not a fiscal flow.
     const summaryless = world.finance.periodSummaries.length;
     expect(summaryless).toBe(0);

@@ -72,15 +72,15 @@ function computeMarketCapacities(
 ): MarketCapacity[] {
   const definitionsById = byId(scenario.definitions.buildings);
   return scenario.markets.map((market) => {
-    const regionIds = new Set(market.regionIds);
+    const provinceIds = new Set(market.provinceIds);
     const capacity = new Map<number, number>();
     const inputDemand = new Map<number, number>();
     let population = 0;
     for (const block of world.popBlocks) {
-      if (regionIds.has(block.regionId)) population += populationTotal(block);
+      if (provinceIds.has(block.provinceId)) population += populationTotal(block);
     }
     for (const building of scenario.buildingInstances) {
-      if (!regionIds.has(building.regionId)) continue;
+      if (!provinceIds.has(building.provinceId)) continue;
       const definition = definitionsById.get(building.definitionId);
       if (definition === undefined) throw new Error("missing building definition");
       const throughput = definition.referenceThroughputPerDayAtLevelOne * building.level;

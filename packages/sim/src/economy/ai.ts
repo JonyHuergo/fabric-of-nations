@@ -58,7 +58,10 @@ import {
   MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
   MAX_TRADE_QUOTA_QUANTITY,
 } from "./constants.js";
-import { assertValidFiscalPolicy } from "./country.js";
+import {
+  assertValidFiscalPolicy,
+  countryProvinceIds,
+} from "./country.js";
 import { createTradePolicyState } from "./trade.js";
 import { applyMonetaryPolicy, validateMonetaryPolicy } from "./monetary.js";
 import { applyMilitaryAction, validateMilitaryAction } from "./military.js";
@@ -184,13 +187,13 @@ export interface SetDebtPolicyAction {
   readonly maxOutstandingPrincipalRUSD: MoneyRUSD;
 }
 
-/** Start one E3 public-construction project in a country-owned region. */
+/** Start one E3 public-construction project in a country-owned province. */
 export interface StartConstructionAction {
   readonly kind: "start-construction";
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly definitionId: Id;
 }
 
@@ -362,25 +365,25 @@ export interface AcceptPeaceAction {
   readonly offerId: Id;
 }
 
-/** M10: recruit an army from a region's people and treasury. */
+/** M10: recruit an army from a province's people and treasury. */
 export interface RecruitArmyAction {
   readonly kind: "recruit-army";
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly personnel: number;
   readonly equipmentUnits?: number;
 }
 
-/** M10: deploy a ready army to a legal target region. */
+/** M10: deploy a ready army to a legal target province. */
 export interface DeployArmyAction {
   readonly kind: "deploy-army";
   readonly countryId: Id;
   readonly dayIndex: Day;
   readonly source: "player" | "ai";
   readonly armyId: Id;
-  readonly targetRegionId: Id;
+  readonly targetProvinceId: Id;
 }
 
 /** E6b: set the monetary regime/parity and perform a reserve or currency operation. */
@@ -506,7 +509,7 @@ export interface CountryActionApplication {
     readonly warId: Id | null;
     readonly offerId: Id | null;
     readonly armyId: Id | null;
-    readonly regionId: Id | null;
+    readonly provinceId: Id | null;
     readonly personnel: number;
     readonly equipmentUnits: number;
     readonly spentRUSD: MoneyRUSD;
@@ -527,7 +530,7 @@ export interface CountryActionApplication {
 /** One observed population block. Own-country blocks only. */
 export interface CountryAIObservedBlock {
   readonly popBlockId: Id;
-  readonly regionId: Id;
+  readonly provinceId: Id;
   readonly population: number;
   readonly literacy: Rate;
   readonly wealthLevel: number;
@@ -562,7 +565,7 @@ export interface CountryAIObservation {
   readonly dayIndex: Day;
   readonly fiscal: FiscalPolicy;
   readonly treasuryCashRUSD: number;
-  readonly regionIds: readonly Id[];
+  readonly provinceIds: readonly Id[];
   readonly population: number;
   readonly blocks: readonly CountryAIObservedBlock[];
   readonly lastClosedPeriod: CountryAIObservedPeriod | null;
@@ -641,16 +644,16 @@ export function buildCountryAIObservation(
 ): CountryAIObservation {
   const country = world.countries.find((candidate) => candidate.id === countryId);
   if (country === undefined) throw new RangeError(`unknown country ${String(countryId)}`);
-  const regionIds = new Set(country.regionIds);
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
   const blocks: CountryAIObservedBlock[] = [];
   let population = 0;
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
-    if (!regionIds.has(block.regionId)) continue;
+    if (!provinceIds.has(block.provinceId)) continue;
     const blockPopulation = populationTotal(block);
     population += blockPopulation;
     blocks.push({
       popBlockId: block.id,
-      regionId: block.regionId,
+      provinceId: block.provinceId,
       population: blockPopulation,
       literacy: block.literacy,
       wealthLevel: block.wealthLevel,
@@ -684,7 +687,7 @@ export function buildCountryAIObservation(
     dayIndex,
     fiscal: { ...country.fiscal },
     treasuryCashRUSD: treasuryAccountOf(world, countryId).balanceRUSD,
-    regionIds: [...country.regionIds],
+    provinceIds: countryProvinceIds(world, country.id),
     population,
     blocks,
     lastClosedPeriod,
@@ -1005,7 +1008,7 @@ export function validateCountryAction(
         try {
           validateConstructionStart(world, definitions, {
             countryId: country.id,
-            regionId: action.regionId,
+            provinceId: action.provinceId,
             definitionId: action.definitionId,
           });
         } catch (error) {
@@ -1421,7 +1424,7 @@ export function applyCountryAction(
     }
     const project = startConstruction(world, definitions, {
       countryId: country.id,
-      regionId: action.regionId,
+      provinceId: action.provinceId,
       definitionId: action.definitionId,
     });
     return {
@@ -1877,7 +1880,7 @@ export function applyCountryAction(
         warId: result.warId,
         offerId: result.offerId,
         armyId: result.armyId,
-        regionId: result.regionId,
+        provinceId: result.provinceId,
         personnel: result.personnel,
         equipmentUnits: result.equipmentUnits,
         spentRUSD: result.spentRUSD,

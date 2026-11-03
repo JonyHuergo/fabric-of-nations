@@ -43,7 +43,7 @@ import {
   marketInfrastructureQuality,
   activeWarBetween,
   armiesOfCountry,
-  regionSovereignCountryId,
+  provinceSovereignCountryId,
   relationBetween,
   routeCapacityRUSDPerDay,
   transitDays,
@@ -58,6 +58,9 @@ import {
   IMPLEMENTED_LAW_SLOTS,
   INTEREST_GROUP_KEYS,
   LAW_SLOTS,
+  buildProvinceOwnerMap,
+  countryProvinceIds,
+  marketProvinceIds,
 } from "@century/sim";
 import type {
   CountryMetaDef,
@@ -65,7 +68,7 @@ import type {
   FinancePeriodSummary,
   MarketMetaDef,
   PopulationDefinitions,
-  RegionMetaDef,
+  TerritoryMetaDef,
   World,
 } from "@century/sim";
 
@@ -75,12 +78,14 @@ import {
   MAX_SNAPSHOT_TRADE_BLOCKED,
   MAX_SNAPSHOT_TRADE_SHIPMENTS,
   PROTOCOL_VERSION,
+  encodeProvinceEconomyTable,
   type CountrySnapshot,
   type CountrySummarySnapshot,
   type GoodSnapshot,
   type MarketSnapshot,
   type ProvinceOwnershipSnapshot,
-  type RegionSnapshot,
+  type ProvinceEconomySnapshot,
+  type TerritorySnapshot,
   type SimulationSnapshot,
   type SnapshotAnnualReport,
   type SnapshotBudgetMonthToDate,
@@ -122,7 +127,7 @@ export interface SnapshotRuntimeState {
   /** M11 static polity/market metadata from the scenario. */
   readonly countryMeta?: readonly CountryMetaDef[];
   readonly marketMeta?: readonly MarketMetaDef[];
-  readonly regionMeta?: readonly RegionMetaDef[];
+  readonly territoryMeta?: readonly TerritoryMetaDef[];
 }
 
 function roundDisplay(value: number, decimals = 4): number {
@@ -152,13 +157,13 @@ function productionCapacities(
   world: World,
   definitions: EconomyDefinitions,
 ): CapacityMaps {
-  const ownerByRegion = new Map<number, number>();
+  const ownerByProvince = new Map<number, number>();
   for (const country of world.countries) {
-    for (const regionId of country.regionIds) ownerByRegion.set(regionId, country.id);
+    for (const provinceId of countryProvinceIds(world, country.id)) ownerByProvince.set(provinceId, country.id);
   }
-  const marketByRegion = new Map<number, number>();
-  for (const region of world.regions) {
-    if (region.marketId !== null) marketByRegion.set(region.id, region.marketId);
+  const marketByProvince = new Map<number, number>();
+  for (const province of world.provinceEconomies) {
+    if (province.marketId !== null) marketByProvince.set(province.id, province.marketId);
   }
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
@@ -171,8 +176,8 @@ function productionCapacities(
     if (definition === undefined || definition.outputs.length === 0) continue;
     const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     if (!(capacity.capacityTU > 0)) continue;
-    const countryId = ownerByRegion.get(building.regionId);
-    const marketId = marketByRegion.get(building.regionId);
+    const countryId = ownerByProvince.get(building.provinceId);
+    const marketId = marketByProvince.get(building.provinceId);
     for (const output of definition.outputs) {
       const quantity = output.quantityPerThroughputUnit * capacity.capacityTU;
       if (!(quantity > 0)) continue;
@@ -362,26 +367,26 @@ function constructionProjectSnapshots(
   definitions: EconomyDefinitions,
   countryId: number,
 ): readonly SnapshotConstructionProject[] {
-  const regionById = new Map(world.regions.map((region) => [region.id, region]));
+  const provinceById = new Map(world.provinceEconomies.map((province) => [province.id, province]));
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
   const goods = new Map(definitions.goods.map((good) => [good.id, good]));
-  const marketByRegion = new Map<number, (typeof world.markets)[number]>();
+  const marketByProvince = new Map<number, (typeof world.markets)[number]>();
   for (const market of world.markets) {
-    for (const regionId of market.regionIds) marketByRegion.set(regionId, market);
+    for (const provinceId of marketProvinceIds(world, market.id)) marketByProvince.set(provinceId, market);
   }
   return [...world.construction.projects]
     .filter((project) => project.countryId === countryId)
     .sort((left, right) => left.id - right.id)
     .map((project) => {
       const definition = definitionById.get(project.definitionId);
-      const market = marketByRegion.get(project.regionId);
+      const market = marketByProvince.get(project.provinceId);
       return {
         id: project.id,
         countryId: project.countryId,
-        regionId: project.regionId,
-        regionName: regionById.get(project.regionId)?.name ?? `Region ${String(project.regionId)}`,
+        provinceId: project.provinceId,
+        provinceName: provinceById.get(project.provinceId)?.name ?? `Province ${String(project.provinceId)}`,
         definitionId: project.definitionId,
         definitionKey: definition?.key ?? `definition-${String(project.definitionId)}`,
         definitionName: definition?.name ?? `Definition ${String(project.definitionId)}`,
@@ -479,8 +484,8 @@ function holderLabel(
   }
   const block = world.popBlocks.find((candidate) => candidate.id === id);
   if (block === undefined) return `Pop block ${String(id)}`;
-  const region = world.regions.find((candidate) => candidate.id === block.regionId);
-  return `Pop block ${String(id)}${region === undefined ? "" : ` (${region.name})`}`;
+  const province = world.provinceEconomies.find((candidate) => candidate.id === block.provinceId);
+  return `Pop block ${String(id)}${province === undefined ? "" : ` (${province.name})`}`;
 }
 
 /** Debt policy plus derived creditor-cash and headroom constraints. */
@@ -658,20 +663,20 @@ function countrySectorValueEstimates(
   country: World["countries"][number],
 ): Map<string, number> {
   const values = new Map<string, number>();
-  const regionIds = new Set(country.regionIds);
-  const marketByRegion = new Map<number, (typeof world.markets)[number]>();
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
+  const marketByProvince = new Map<number, (typeof world.markets)[number]>();
   for (const market of world.markets) {
-    for (const regionId of market.regionIds) marketByRegion.set(regionId, market);
+    for (const provinceId of marketProvinceIds(world, market.id)) marketByProvince.set(provinceId, market);
   }
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
   const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const building of world.buildings) {
-    if (!regionIds.has(building.regionId)) continue;
+    if (!provinceIds.has(building.provinceId)) continue;
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
-    const market = marketByRegion.get(building.regionId);
+    const market = marketByProvince.get(building.provinceId);
     if (market === undefined) continue;
     const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
     let value = 0;
@@ -836,11 +841,11 @@ function laborSnapshot(
 ): SnapshotLabor {
   const training = deriveTraining(world, country, definitions);
   const health = deriveHealth(world, country, definitions);
-  const regionIds = new Set(country.regionIds);
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
   let workingAgeTotal = 0;
   let qualificationWeighted = 0;
   for (const block of world.popBlocks) {
-    if (!regionIds.has(block.regionId)) continue;
+    if (!provinceIds.has(block.provinceId)) continue;
     const workingAge = workingAgePopulation(block);
     workingAgeTotal += workingAge;
     qualificationWeighted += block.qualification * workingAge;
@@ -1066,7 +1071,7 @@ function countrySnapshot(
   definitions: EconomyDefinitions,
   meta: CountryMetaDef | undefined,
 ): CountrySnapshot {
-  const regionIds = new Set(country.regionIds);
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
   const blockIds = new Set<number>();
   let population = 0;
   let workingAge = 0;
@@ -1078,7 +1083,7 @@ function countrySnapshot(
   let unmetBasicBlocks = 0;
   let buildingCount = 0;
   for (const block of world.popBlocks) {
-    if (!regionIds.has(block.regionId)) continue;
+    if (!provinceIds.has(block.provinceId)) continue;
     blockIds.add(block.id);
     const blockPopulation = populationTotal(block);
     population += blockPopulation;
@@ -1093,7 +1098,7 @@ function countrySnapshot(
     weightedMilitancy += block.militancy * blockPopulation;
   }
   for (const building of world.buildings) {
-    if (regionIds.has(building.regionId)) buildingCount += 1;
+    if (provinceIds.has(building.provinceId)) buildingCount += 1;
   }
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const professionById = new Map(
@@ -1105,7 +1110,7 @@ function countrySnapshot(
   const wageBaseByBlock = new Map<number, number>();
   for (const assignment of world.employment) {
     const building = buildingById.get(assignment.buildingInstanceId);
-    if (building === undefined || !regionIds.has(building.regionId)) continue;
+    if (building === undefined || !provinceIds.has(building.provinceId)) continue;
     employedWorkers += assignment.workers;
     const profession = professionById.get(assignment.professionId);
     if (profession !== undefined) {
@@ -1133,7 +1138,7 @@ function countrySnapshot(
   // recognized-revenue-minus-eligible-costs measure the month-end phase assesses.
   let businessTaxBaseMonthToDate = 0;
   for (const building of world.buildings) {
-    if (!regionIds.has(building.regionId)) continue;
+    if (!provinceIds.has(building.provinceId)) continue;
     const revenue = index.find("building", building.id, "sales-revenue")?.balanceRUSD ?? 0;
     const subsidy = index.find("building", building.id, "subsidy-revenue")?.balanceRUSD ?? 0;
     const input = index.find("building", building.id, "input-expense")?.balanceRUSD ?? 0;
@@ -1191,14 +1196,14 @@ function countrySnapshot(
     ),
     shortfallMonthToDateRUSD: roundDisplay(memo.subsidyShortfallRUSD, 6),
   };
-  const regionById = new Map(world.regions.map((region) => [region.id, region]));
+  const provinceById = new Map(world.provinceEconomies.map((province) => [province.id, province]));
   const definitionById = new Map(
     definitions.buildings.map((definition) => [definition.id, definition]),
   );
   const publicEnterprises: SnapshotPublicEnterprise[] = world.buildings
     .filter(
       (building) =>
-        regionIds.has(building.regionId) &&
+        provinceIds.has(building.provinceId) &&
         building.ownerKind === "state" &&
         building.ownerAccountId === country.treasuryAccountId,
     )
@@ -1210,8 +1215,8 @@ function countrySnapshot(
         definitionId: building.definitionId,
         definitionKey: definition?.key ?? `definition-${String(building.definitionId)}`,
         definitionName: definition?.name ?? `Definition ${String(building.definitionId)}`,
-        regionId: building.regionId,
-        regionName: regionById.get(building.regionId)?.name ?? `Region ${String(building.regionId)}`,
+        provinceId: building.provinceId,
+        provinceName: provinceById.get(building.provinceId)?.name ?? `Province ${String(building.provinceId)}`,
         sector: definition?.sector ?? "storage",
         level: building.level,
         condition: building.condition,
@@ -1239,7 +1244,7 @@ function countrySnapshot(
             confidence: meta.confidence,
             notes: meta.notes,
           },
-    regionIds: [...country.regionIds].sort((left, right) => left - right),
+    provinceIds: [...countryProvinceIds(world, country.id)].sort((left, right) => left - right),
     fiscal: {
       incomeTaxRate: country.fiscal.incomeTaxRate,
       incomeTaxAllowanceRUSDPerYear: country.fiscal.incomeTaxAllowanceRUSDPerYear,
@@ -1416,14 +1421,14 @@ function tradeNetworkSnapshot(
 }
 
 function marketPopulations(world: World): Map<number, number> {
-  const byRegion = new Map<number, number>();
+  const byProvince = new Map<number, number>();
   for (const block of world.popBlocks) {
-    byRegion.set(block.regionId, (byRegion.get(block.regionId) ?? 0) + populationTotal(block));
+    byProvince.set(block.provinceId, (byProvince.get(block.provinceId) ?? 0) + populationTotal(block));
   }
   const byMarket = new Map<number, number>();
   for (const market of world.markets) {
     let population = 0;
-    for (const regionId of market.regionIds) population += byRegion.get(regionId) ?? 0;
+    for (const provinceId of marketProvinceIds(world, market.id)) population += byProvince.get(provinceId) ?? 0;
     byMarket.set(market.id, population);
   }
   return byMarket;
@@ -1482,15 +1487,15 @@ function countryPriceIndexSnapshot(
   country: World["countries"][number],
 ): SnapshotCountryPriceIndex {
   const values = derivePriceIndexes(world);
-  const coverageWeighted = country.regionIds.reduce((total, regionId) => {
-    const marketId = world.regions.find((region) => region.id === regionId)?.marketId;
+  const coverageWeighted = countryProvinceIds(world, country.id).reduce((total, provinceId) => {
+    const marketId = world.provinceEconomies.find((province) => province.id === provinceId)?.marketId;
     return total + (marketId === null || marketId === undefined ? 0 : priceIndexCoverage(world, marketId));
   }, 0);
-  const regionCount = Math.max(1, country.regionIds.length);
+  const provinceCount = Math.max(1, countryProvinceIds(world, country.id).length);
   return {
     baseDayIndex: world.startDayIndex,
     value: roundDisplay(values.countries.get(country.id) ?? 100, 4),
-    coverage: roundDisplay(coverageWeighted / regionCount, 4),
+    coverage: roundDisplay(coverageWeighted / provinceCount, 4),
     monthOnMonthInflation: roundOptional(priceIndexInflation(world, country.id, 1)),
     yearOnYearInflation: roundOptional(priceIndexInflation(world, country.id, 12)),
   };
@@ -1586,7 +1591,7 @@ function armySnapshot(army: World["military"]["armies"][number]): SnapshotArmy {
   return {
     id: army.id,
     countryId: army.countryId,
-    regionId: army.regionId,
+    provinceId: army.provinceId,
     personnel: army.personnel,
     equipmentUnits: army.equipmentUnits,
     organization: roundDisplay(army.organization, 4),
@@ -1595,7 +1600,7 @@ function armySnapshot(army: World["military"]["armies"][number]): SnapshotArmy {
     deaths: army.deaths,
     captured: army.captured,
     readyDay: army.readyDay,
-    destinationRegionId: army.destinationRegionId,
+    destinationProvinceId: army.destinationProvinceId,
     arrivalDay: army.arrivalDay,
   };
 }
@@ -1637,9 +1642,9 @@ function countryMilitarySnapshot(
         warId: war?.id ?? null,
       };
     });
-  const occupiedRegionIds = world.regions
-    .filter((region) => region.controllerCountryId === country.id)
-    .map((region) => region.id)
+  const occupiedProvinceIds = world.provinces.ownership
+    .filter((entry) => entry.controllerPolityId === country.id && entry.ownerPolityId !== country.id)
+    .map((entry) => entry.provinceId)
     .sort((left, right) => left - right);
   return {
     armies,
@@ -1647,8 +1652,8 @@ function countryMilitarySnapshot(
     wounded,
     captured,
     relations,
-    occupiedRegionIds,
-    controlledRegionIds: [...occupiedRegionIds],
+    occupiedProvinceIds,
+    controlledProvinceIds: [...occupiedProvinceIds],
   };
 }
 
@@ -1681,61 +1686,100 @@ function militarySnapshot(world: World): SimulationSnapshot["military"] {
     armies: [...world.military.armies]
       .sort((left, right) => left.id - right.id)
       .map(armySnapshot),
-    occupations: world.regions
-      .filter((region) => region.controllerCountryId !== null)
-      .sort((left, right) => left.id - right.id)
-      .map((region) => ({
-        regionId: region.id,
-        sovereignCountryId: regionSovereignCountryId(world, region.id),
-        controllerCountryId: region.controllerCountryId,
-        occupiedSinceDay: region.occupiedSinceDay,
+    occupations: world.provinces.ownership
+      .filter((entry) => entry.controllerPolityId !== entry.ownerPolityId)
+      .sort((left, right) => left.provinceId - right.provinceId)
+      .map((entry) => ({
+        provinceId: entry.provinceId,
+        sovereignCountryId: provinceSovereignCountryId(world, entry.provinceId),
+        controllerCountryId: entry.controllerPolityId,
+        occupiedSinceDay: entry.controlledSinceDay,
       })),
   };
 }
 
-function regionSnapshots(
+/** P2 per-province population and economy (D-118), one pass over blocks and buildings. */
+function provinceEconomySnapshots(
   world: World,
-  regionMeta: ReadonlyMap<number, RegionMetaDef>,
-): readonly RegionSnapshot[] {
-  const ownerByRegion = new Map<number, number>();
-  for (const country of world.countries) {
-    for (const regionId of country.regionIds) ownerByRegion.set(regionId, country.id);
+  territoryMeta: readonly TerritoryMetaDef[],
+): readonly ProvinceEconomySnapshot[] {
+  const ownerByProvince = buildProvinceOwnerMap(world);
+  const ownershipById = new Map(world.provinces.ownership.map((entry) => [entry.provinceId, entry]));
+  const territoryByProvince = new Map<number, string>();
+  for (const meta of territoryMeta) {
+    for (const provinceId of meta.provinceIds) territoryByProvince.set(provinceId, meta.polityTag);
   }
-  const blockPopulation = new Map<number, number>();
+  const population = new Map<number, number>();
+  const byProfession = new Map<number, Record<string, number>>();
+  const literacyWeighted = new Map<number, number>();
+  const adults = new Map<number, number>();
   for (const block of world.popBlocks) {
-    blockPopulation.set(block.regionId, (blockPopulation.get(block.regionId) ?? 0) + populationTotal(block));
+    const count = populationTotal(block);
+    population.set(block.provinceId, (population.get(block.provinceId) ?? 0) + count);
+    const record = byProfession.get(block.provinceId) ?? {};
+    if (count > 0) record[String(block.professionId)] = (record[String(block.professionId)] ?? 0) + count;
+    byProfession.set(block.provinceId, record);
+    let adult = 0;
+    for (let age = 15; age < block.maleByAge.length; age += 1) {
+      adult += (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
+    }
+    adults.set(block.provinceId, (adults.get(block.provinceId) ?? 0) + adult);
+    literacyWeighted.set(block.provinceId, (literacyWeighted.get(block.provinceId) ?? 0) + block.literacy * adult);
   }
-  return [...world.regions]
+  const levels = new Map<number, number>();
+  const buildingProvince = new Map<number, number>();
+  for (const building of world.buildings) {
+    buildingProvince.set(building.id, building.provinceId);
+    levels.set(building.provinceId, (levels.get(building.provinceId) ?? 0) + building.level);
+  }
+  const employed = new Map<number, number>();
+  for (const assignment of world.employment) {
+    const provinceId = buildingProvince.get(assignment.buildingInstanceId);
+    if (provinceId === undefined) continue;
+    employed.set(provinceId, (employed.get(provinceId) ?? 0) + assignment.workers);
+  }
+  return [...world.provinceEconomies]
     .sort((left, right) => left.id - right.id)
-    .map((region) => {
-      const meta = regionMeta.get(region.id);
+    .map((province) => {
+      const ownership = ownershipById.get(province.id);
+      const controlled =
+        ownership !== undefined && ownership.controllerPolityId !== ownership.ownerPolityId;
+      const adultCount = adults.get(province.id) ?? 0;
       return {
-        id: region.id,
-        key: region.key,
-        name: region.name,
-        countryId: ownerByRegion.get(region.id) ?? null,
-        marketId: region.marketId,
-        population: blockPopulation.get(region.id) ?? 0,
-        buildingCount: region.buildingInstanceIds.length,
-        unrest: region.unrest,
-        infrastructure: region.infrastructure,
-        sovereignCountryId: ownerByRegion.get(region.id) ?? null,
-        controllerCountryId: region.controllerCountryId,
-        occupiedSinceDay: region.occupiedSinceDay,
-        meta:
-          meta === undefined
-            ? null
-            : {
-                polityTag: meta.polityTag,
-                historicalName: meta.historicalName,
-                status: meta.status,
-                sovereignCountryId: meta.sovereignCountryId,
-                capitalName: meta.capitalName,
-                confidence: meta.confidence,
-                notes: meta.notes,
-              },
+        id: province.id,
+        countryId: ownerByProvince.get(province.id) ?? null,
+        marketId: province.marketId,
+        population: population.get(province.id) ?? 0,
+        populationByProfession: byProfession.get(province.id) ?? {},
+        buildingCount: province.buildingInstanceIds.length,
+        buildingLevels: levels.get(province.id) ?? 0,
+        employedWorkers: employed.get(province.id) ?? 0,
+        unrest: roundDisplay(province.unrest, 4),
+        infrastructure: roundDisplay(province.infrastructure, 4),
+        urbanShare: province.urbanShare,
+        arableLandHa: province.arableLandHa,
+        pastureHa: province.pastureHa,
+        literacy: adultCount > 0 ? roundDisplay((literacyWeighted.get(province.id) ?? 0) / adultCount, 4) : 0,
+        controllerCountryId: controlled ? ownership.controllerPolityId : null,
+        controlledSinceDay: controlled ? ownership.controlledSinceDay : null,
+        territoryTag: territoryByProvince.get(province.id) ?? null,
       };
     });
+}
+
+function territorySnapshots(territoryMeta: readonly TerritoryMetaDef[]): readonly TerritorySnapshot[] {
+  return [...territoryMeta]
+    .sort((left, right) => (left.polityTag < right.polityTag ? -1 : left.polityTag > right.polityTag ? 1 : 0))
+    .map((meta) => ({
+      polityTag: meta.polityTag,
+      provinceIds: [...meta.provinceIds],
+      historicalName: meta.historicalName,
+      status: meta.status,
+      sovereignCountryId: meta.sovereignCountryId,
+      capitalName: meta.capitalName,
+      confidence: meta.confidence,
+      notes: meta.notes,
+    }));
 }
 
 /**
@@ -1775,9 +1819,9 @@ function marketSnapshots(
   marketMeta: ReadonlyMap<number, MarketMetaDef>,
 ): readonly MarketSnapshot[] {
   const goods = [...definitions.goods].sort((left, right) => left.id - right.id);
-  const countryByRegion = new Map<number, number>();
+  const countryByProvince = new Map<number, number>();
   for (const country of world.countries) {
-    for (const regionId of country.regionIds) countryByRegion.set(regionId, country.id);
+    for (const provinceId of countryProvinceIds(world, country.id)) countryByProvince.set(provinceId, country.id);
   }
   const countryName = new Map(world.countries.map((country) => [country.id, country.name]));
   return [...world.markets]
@@ -1789,8 +1833,8 @@ function marketSnapshots(
       }
       const capacity = capacityByMarket.get(market.id);
       const memberCountryIds = new Set<number>();
-      for (const regionId of market.regionIds) {
-        const countryId = countryByRegion.get(regionId);
+      for (const provinceId of marketProvinceIds(world, market.id)) {
+        const countryId = countryByProvince.get(provinceId);
         if (countryId !== undefined) memberCountryIds.add(countryId);
       }
       const members = [...memberCountryIds].sort((left, right) => left - right);
@@ -1815,7 +1859,7 @@ function marketSnapshots(
           meta?.description ??
           `Trade area covering ${String(members.length)} ${members.length === 1 ? "country" : "countries"}.`,
         kind: meta?.kind ?? "unspecified",
-        regionIds: [...market.regionIds].sort((left, right) => left - right),
+        provinceIds: [...marketProvinceIds(world, market.id)].sort((left, right) => left - right),
         memberCountryIds: members,
         prices: goods.map((good) => ({
           goodId: good.id,
@@ -1844,15 +1888,15 @@ function countrySummarySnapshots(
   playerCountryId: number | null,
   focusCountryId: number | null,
 ): readonly CountrySummarySnapshot[] {
-  const regionIdsByCountry = new Map<number, Set<number>>();
-  const marketIdsByRegion = new Map(world.regions.map((region) => [region.id, region.marketId]));
+  const provinceIdsByCountry = new Map<number, Set<number>>();
+  const marketIdsByProvince = new Map(world.provinceEconomies.map((province) => [province.id, province.marketId]));
   for (const country of world.countries) {
-    regionIdsByCountry.set(country.id, new Set(country.regionIds));
+    provinceIdsByCountry.set(country.id, new Set(countryProvinceIds(world, country.id)));
   }
   const blocksByCountry = new Map<number, World["popBlocks"][number][]>();
   for (const block of world.popBlocks) {
     for (const country of world.countries) {
-      if (!country.regionIds.includes(block.regionId)) continue;
+      if (provinceIdsByCountry.get(country.id)?.has(block.provinceId) !== true) continue;
       const list = blocksByCountry.get(country.id) ?? [];
       list.push(block);
       blocksByCountry.set(country.id, list);
@@ -1864,7 +1908,7 @@ function countrySummarySnapshots(
     const building = buildingById.get(assignment.buildingInstanceId);
     if (building === undefined) continue;
     for (const country of world.countries) {
-      if (!country.regionIds.includes(building.regionId)) continue;
+      if (provinceIdsByCountry.get(country.id)?.has(building.provinceId) !== true) continue;
       employedByCountry.set(country.id, (employedByCountry.get(country.id) ?? 0) + assignment.workers);
     }
   }
@@ -1894,13 +1938,13 @@ function countrySummarySnapshots(
         weightedWealth += block.wealthLevel * blockPopulation;
         weightedMilitancy += block.militancy * blockPopulation;
       }
-      const regionIds = [...(regionIdsByCountry.get(country.id) ?? new Set<number>())].sort(
+      const provinceIds = [...(provinceIdsByCountry.get(country.id) ?? new Set<number>())].sort(
         (left, right) => left - right,
       );
       const marketIds = [
         ...new Set(
-          regionIds
-            .map((regionId) => marketIdsByRegion.get(regionId))
+          provinceIds
+            .map((provinceId) => marketIdsByProvince.get(provinceId))
             .filter((marketId): marketId is number => marketId !== undefined && marketId !== null),
         ),
       ].sort((left, right) => left - right);
@@ -1923,7 +1967,7 @@ function countrySummarySnapshots(
         selectable: meta?.selectable ?? true,
         isPlayer: country.id === playerCountryId,
         isFocused: country.id === focusCountryId,
-        regionIds,
+        provinceIds,
         marketIds,
         population,
         workingAgePopulation: workingAge,
@@ -1946,7 +1990,7 @@ function countrySummarySnapshots(
 function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   for (const country of snapshot.countries) {
     Object.freeze(country.fiscal);
-    Object.freeze(country.regionIds);
+    Object.freeze(country.provinceIds);
     Object.freeze(country.latestFiscal);
     Object.freeze(country.debtPolicy);
     for (const contract of country.debtContracts) Object.freeze(contract);
@@ -2005,14 +2049,15 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(country.monetary);
     Object.freeze(country);
   }
-  for (const region of snapshot.regions) Object.freeze(region);
   for (const market of snapshot.markets) {
     for (const price of market.prices) Object.freeze(price);
     Object.freeze(market.prices);
-    Object.freeze(market.regionIds);
+    Object.freeze(market.provinceIds);
     Object.freeze(market);
   }
   for (const good of snapshot.goods) Object.freeze(good);
+  for (const profession of snapshot.professions) Object.freeze(profession);
+  Object.freeze(snapshot.professions);
   for (const tier of snapshot.needTiers) {
     for (const good of tier.goods) Object.freeze(good);
     Object.freeze(tier.goods);
@@ -2067,20 +2112,28 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   Object.freeze(snapshot.diagnostics);
   Object.freeze(snapshot.date);
   for (const summary of snapshot.countrySummaries) {
-    Object.freeze(summary.regionIds);
+    Object.freeze(summary.provinceIds);
     Object.freeze(summary.marketIds);
     Object.freeze(summary);
   }
   Object.freeze(snapshot.countrySummaries);
-  for (const region of snapshot.regions) {
-    if (region.meta !== null) Object.freeze(region.meta);
+  for (const column of Object.values(snapshot.provinceTable)) {
+    if (Array.isArray(column)) {
+      for (const entry of column) if (Array.isArray(entry)) Object.freeze(entry);
+      Object.freeze(column);
+    }
   }
+  Object.freeze(snapshot.provinceTable);
+  for (const territory of snapshot.territories) {
+    Object.freeze(territory.provinceIds);
+    Object.freeze(territory);
+  }
+  Object.freeze(snapshot.territories);
   for (const market of snapshot.markets) {
-    Object.freeze(market.regionIds);
+    Object.freeze(market.provinceIds);
     Object.freeze(market.memberCountryIds);
   }
   Object.freeze(snapshot.countries);
-  Object.freeze(snapshot.regions);
   Object.freeze(snapshot.provinces);
   Object.freeze(snapshot.markets);
   Object.freeze(snapshot.goods);
@@ -2103,9 +2156,6 @@ export function buildSimulationSnapshot(
   const marketMetaById = new Map(
     (runtime.marketMeta ?? []).map((meta) => [meta.marketId, meta] as const),
   );
-  const regionMetaById = new Map(
-    (runtime.regionMeta ?? []).map((meta) => [meta.regionId, meta] as const),
-  );
   const playerCountryId = world.playerCountryId;
   let focusCountryId = runtime.focusCountryId ?? null;
   if (
@@ -2127,9 +2177,10 @@ export function buildSimulationSnapshot(
     .filter((country) => !boundedDetail || detailCountryIds.has(country.id))
     .sort((left, right) => left.id - right.id)
     .map((country) => {
+      const ownedProvinces = new Set(countryProvinceIds(world, country.id));
       const blockIds = new Set(
         world.popBlocks
-          .filter((block) => country.regionIds.includes(block.regionId))
+          .filter((block) => ownedProvinces.has(block.provinceId))
           .map((block) => block.id),
       );
       return countrySnapshot(
@@ -2177,10 +2228,17 @@ export function buildSimulationSnapshot(
     constructionEnabled: world.profitDistribution.enabled,
     countries,
     countrySummaries,
-    regions: regionSnapshots(world, regionMetaById),
+    provinceTable: encodeProvinceEconomyTable(
+      provinceEconomySnapshots(world, runtime.territoryMeta ?? []),
+      [...definitions.professions].sort((left, right) => left.id - right.id),
+    ),
+    territories: territorySnapshots(runtime.territoryMeta ?? []),
     provinces: provinceSnapshots(world),
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
     goods: goodsSnapshots(definitions),
+    professions: [...definitions.professions]
+      .sort((left, right) => left.id - right.id)
+      .map((profession) => ({ id: profession.id, key: profession.key, name: profession.name })),
     needTiers: needTierSnapshots(populationDefinitions, definitions),
     projectTypes: projectTypeSnapshots(definitions),
     technologyEraNames: [...(definitions.technology?.eraNames ?? [])],

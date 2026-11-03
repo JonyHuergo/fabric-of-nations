@@ -39,23 +39,52 @@ export function countryById(world: World, countryId: Id) {
   return world.countries.find((country) => country.id === countryId);
 }
 
-export function regionById(world: World, regionId: Id) {
-  return world.regions.find((region) => region.id === regionId);
+export function provinceById(world: World, provinceId: Id) {
+  return world.provinceEconomies.find((province) => province.id === provinceId);
 }
 
-/** The sovereign country that owns the region, or null for an unowned region. */
-export function regionSovereignCountryId(world: World, regionId: Id): Id | null {
-  for (const country of world.countries) {
-    if (country.regionIds.includes(regionId)) return country.id;
+function ownershipRecord(world: World, provinceId: Id) {
+  if (!world.provinces.enabled) return undefined;
+  return world.provinces.ownership.find((entry) => entry.provinceId === provinceId);
+}
+
+function isCountry(world: World, polityId: Id): boolean {
+  return world.countries.some((country) => country.id === polityId);
+}
+
+/**
+ * The sovereign country that legally owns the province (`ownerPolityId`), or null
+ * for an unowned province or one owned by a non-simulation polity (D-118).
+ */
+export function provinceSovereignCountryId(world: World, provinceId: Id): Id | null {
+  const record = ownershipRecord(world, provinceId);
+  return record !== undefined && isCountry(world, record.ownerPolityId) ? record.ownerPolityId : null;
+}
+
+/**
+ * The country exercising effective control (`controllerPolityId`): the occupier
+ * or administrator when it differs from the owner, else the sovereign.
+ */
+export function provinceControllerCountryId(world: World, provinceId: Id): Id | null {
+  const record = ownershipRecord(world, provinceId);
+  return record !== undefined && isCountry(world, record.controllerPolityId)
+    ? record.controllerPolityId
+    : null;
+}
+
+/**
+ * True when a province is under M10 military occupation: a country controls it
+ * while at war with its sovereign. Control by a non-owner without a war is an
+ * administrative arrangement (for example the United States in Cuba in 1900,
+ * D-129) that the military phase neither creates nor lifts.
+ */
+export function isMilitaryOccupation(world: World, provinceId: Id): boolean {
+  const record = ownershipRecord(world, provinceId);
+  if (record === undefined || record.controllerPolityId === record.ownerPolityId) return false;
+  if (!isCountry(world, record.controllerPolityId) || !isCountry(world, record.ownerPolityId)) {
+    return false;
   }
-  return null;
-}
-
-/** The country exercising military control: the occupier, else the sovereign. */
-export function regionControllerCountryId(world: World, regionId: Id): Id | null {
-  const region = regionById(world, regionId);
-  if (region === undefined) return null;
-  return region.controllerCountryId ?? regionSovereignCountryId(world, regionId);
+  return activeWarBetween(world, record.controllerPolityId, record.ownerPolityId) !== null;
 }
 
 export function activeWarBetween(
@@ -158,7 +187,7 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
     throw new RangeError(`${path}.peaceOffers exceeds ${String(MAX_PEACE_OFFERS)}`);
   }
   const countryIds = new Set<Id>(world.countries.map((country) => country.id));
-  const regionIds = new Set<Id>(world.regions.map((region) => region.id));
+  const provinceIds = new Set<Id>(world.provinceEconomies.map((province) => province.id));
   assertValidDayIndex(world.dayIndex);
   if (
     state.lastPhaseDay !== null &&
@@ -199,8 +228,8 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
     if (!countryIds.has(army.countryId)) {
       throw new RangeError(`${path}.armies references an unknown country`);
     }
-    if (!regionIds.has(army.regionId) || !regionIds.has(army.homeRegionId)) {
-      throw new RangeError(`${path}.armies references an unknown region`);
+    if (!provinceIds.has(army.provinceId) || !provinceIds.has(army.homeProvinceId)) {
+      throw new RangeError(`${path}.armies references an unknown province`);
     }
     for (const value of [army.personnel, army.wounded, army.deaths, army.captured]) {
       requireInteger(value, `${path}.armies count`, 0, 0xffff_ffff);
@@ -213,11 +242,11 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
       throw new RangeError(`${path}.armies.supply must be in 0..1`);
     }
     requireInteger(army.readyDay, `${path}.armies.readyDay`, 0, world.dayIndex + 1_000_000);
-    if ((army.destinationRegionId === null) !== (army.arrivalDay === null)) {
+    if ((army.destinationProvinceId === null) !== (army.arrivalDay === null)) {
       throw new RangeError(`${path}.armies movement fields must agree`);
     }
-    if (army.destinationRegionId !== null && !regionIds.has(army.destinationRegionId)) {
-      throw new RangeError(`${path}.armies destination is not a region`);
+    if (army.destinationProvinceId !== null && !provinceIds.has(army.destinationProvinceId)) {
+      throw new RangeError(`${path}.armies destination is not a province`);
     }
     if (army.arrivalDay !== null) {
       requireInteger(army.arrivalDay, `${path}.armies.arrivalDay`, 0, world.dayIndex + 1_000_000);
@@ -342,35 +371,8 @@ export function assertValidMilitaryState(world: World, path = "world.military"):
       requireInteger(value, `${path}.casualties count`, 0, 0xffff_ffff);
     }
   }
-  for (const region of world.regions) {
-    if (region.controllerCountryId === null) {
-      if (region.occupiedSinceDay !== null) {
-        throw new RangeError(`region ${String(region.id)} has no controller but an occupation day`);
-      }
-      continue;
-    }
-    if (!countryIds.has(region.controllerCountryId)) {
-      throw new RangeError(`region ${String(region.id)} has an unknown controller`);
-    }
-    const sovereign = regionSovereignCountryId(world, region.id);
-    if (sovereign === null) {
-      throw new RangeError(`region ${String(region.id)} is occupied but unowned`);
-    }
-    if (region.controllerCountryId === sovereign) {
-      throw new RangeError(`region ${String(region.id)} controller is its sovereign`);
-    }
-    if (region.occupiedSinceDay === null) {
-      throw new RangeError(`region ${String(region.id)} is occupied without a start day`);
-    }
-    requireInteger(
-      region.occupiedSinceDay,
-      `region ${String(region.id)}.occupiedSinceDay`,
-      0,
-      world.dayIndex,
-    );
-    const war = activeWarBetween(world, region.controllerCountryId, sovereign);
-    if (war === null) {
-      throw new RangeError(`region ${String(region.id)} is occupied without an active war`);
-    }
-  }
+  // Occupation lives on province control (D-118); its structure (controller,
+  // control date, status) is validated with the province state. Control by a
+  // non-owner may also be administrative and war-free (D-129), so no war is
+  // required here; the military phase only creates and lifts war occupations.
 }

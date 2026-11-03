@@ -1,7 +1,7 @@
 /**
  * AUDIT-010 through AUDIT-015 regression coverage.
  *
- * Covers last-region cession validation (including stale offers), zero-recipient
+ * Covers last-province cession validation (including stale offers), zero-recipient
  * military payments, truce boundaries, casualty-share apportionment, and crafted
  * military-state saves.
  */
@@ -30,6 +30,7 @@ import {
   type Id,
   type MilitaryActionInput,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 
 import {
@@ -42,6 +43,7 @@ import {
   M5_REGION_C1,
   m5Scenario,
 } from "./fixtures/m5.js";
+import { occupierOf, setOccupier } from "./fixtures/provinces.js";
 
 const SEED = 20_261_110;
 
@@ -96,13 +98,13 @@ function declare(world: World, countryId: Id, targetCountryId: Id): Id {
   return result.warId ?? 0;
 }
 
-function recruit(world: World, countryId: Id, regionId: Id, personnel: number): Id {
+function recruit(world: World, countryId: Id, provinceId: Id, personnel: number): Id {
   const result = act(world, {
     kind: "recruit-army",
     countryId,
     dayIndex: world.dayIndex,
     source: "player",
-    regionId,
+    provinceId,
     personnel,
   });
   return result.armyId ?? 0;
@@ -119,16 +121,16 @@ function advanceMilitary(world: World, days: number): void {
 function occupy(
   world: World,
   countryId: Id,
-  homeRegionId: Id,
-  targetRegionId: Id,
+  homeProvinceId: Id,
+  targetProvinceId: Id,
   personnel = 500,
 ): void {
   const targetCountry = world.countries.find((country) =>
-    country.regionIds.includes(targetRegionId),
+    countryProvinceIds(world, country.id).includes(targetProvinceId),
   );
-  if (targetCountry === undefined) throw new Error("target region has no sovereign");
+  if (targetCountry === undefined) throw new Error("target province has no sovereign");
   declare(world, countryId, targetCountry.id);
-  recruit(world, countryId, homeRegionId, personnel);
+  recruit(world, countryId, homeProvinceId, personnel);
   advanceMilitary(world, 14);
   const army = world.military.armies.find((entry) => entry.countryId === countryId);
   if (army === undefined) throw new Error("missing army");
@@ -138,10 +140,10 @@ function occupy(
     dayIndex: world.dayIndex,
     source: "player",
     armyId: army.id,
-    targetRegionId,
+    targetProvinceId,
   });
   advanceMilitary(world, 12);
-  expect(world.regions.find((region) => region.id === targetRegionId)?.controllerCountryId).toBe(
+  expect(occupierOf(world, targetProvinceId)).toBe(
     countryId,
   );
 }
@@ -162,9 +164,9 @@ function accountBalance(
   return account.balanceRUSD;
 }
 
-function zeroRegionPopulation(world: World, regionId: Id): void {
+function zeroProvincePopulation(world: World, provinceId: Id): void {
   for (const block of world.popBlocks) {
-    if (block.regionId !== regionId) continue;
+    if (block.provinceId !== provinceId) continue;
     block.maleByAge.fill(0);
     block.femaleByAge.fill(0);
   }
@@ -177,8 +179,8 @@ function craftSave(world: World, mutate: (payload: LooseSave["payload"]) => void
   return JSON.stringify(parsed);
 }
 
-describe("AUDIT-010 last-region cession validation", () => {
-  test("a cession that would remove the opponent's last region is rejected before mutation", () => {
+describe("AUDIT-010 last-province cession validation", () => {
+  test("a cession that would remove the opponent's last province is rejected before mutation", () => {
     const world = buildWorld();
     declare(world, M5_COUNTRY_A, M5_COUNTRY_B);
     recruit(world, M5_COUNTRY_A, M5_REGION_A1, 500);
@@ -191,10 +193,10 @@ describe("AUDIT-010 last-region cession validation", () => {
       dayIndex: world.dayIndex,
       source: "player",
       armyId: army.id,
-      targetRegionId: M5_REGION_B1,
+      targetProvinceId: M5_REGION_B1,
     });
     advanceMilitary(world, 12);
-    expect(world.regions.find((region) => region.id === M5_REGION_B1)?.controllerCountryId).toBe(
+    expect(occupierOf(world, M5_REGION_B1)).toBe(
       M5_COUNTRY_A,
     );
 
@@ -209,7 +211,7 @@ describe("AUDIT-010 last-region cession validation", () => {
       terms: "cede-occupied",
     });
     expect(validation.valid).toBe(false);
-    expect(validation.errors.join(" ")).toMatch(/last region/);
+    expect(validation.errors.join(" ")).toMatch(/last province/);
     const hash = hashWorld(world);
     expect(() =>
       act(world, {
@@ -218,13 +220,13 @@ describe("AUDIT-010 last-region cession validation", () => {
         warId: war.id,
         terms: "cede-occupied",
       }),
-    ).toThrow(/last region/);
+    ).toThrow(/last province/);
     expect(hashWorld(world)).toBe(hash);
     expect(world.military.peaceOffers).toHaveLength(0);
     assertValidWorld(world);
   });
 
-  test("a stale cession is revalidated at acceptance and cannot remove the last region", () => {
+  test("a stale cession is revalidated at acceptance and cannot remove the last province", () => {
     const world = buildWorld();
     // C occupies A2, so a cession offer is initially valid (A keeps A1).
     occupy(world, M5_COUNTRY_C, M5_REGION_C1, M5_REGION_A2);
@@ -238,12 +240,9 @@ describe("AUDIT-010 last-region cession validation", () => {
     });
     if (offer.offerId === null) throw new Error("missing offer");
 
-    // The world changes before acceptance: C now controls A's other region too,
-    // so accepting would remove A's last sovereign region.
-    const a1 = world.regions.find((region) => region.id === M5_REGION_A1);
-    if (a1 === undefined) throw new Error("missing A1");
-    a1.controllerCountryId = M5_COUNTRY_C;
-    a1.occupiedSinceDay = world.dayIndex;
+    // The world changes before acceptance: C now controls A's other province too,
+    // so accepting would remove A's last sovereign province.
+    setOccupier(world, M5_REGION_A1, M5_COUNTRY_C, world.dayIndex);
     assertValidWorld(world);
 
     const validation = validateMilitaryAction(world, {
@@ -255,7 +254,7 @@ describe("AUDIT-010 last-region cession validation", () => {
       offerId: offer.offerId,
     });
     expect(validation.valid).toBe(false);
-    expect(validation.errors.join(" ")).toMatch(/last region/);
+    expect(validation.errors.join(" ")).toMatch(/last province/);
     const hash = hashWorld(world);
     expect(() =>
       act(world, {
@@ -264,15 +263,15 @@ describe("AUDIT-010 last-region cession validation", () => {
         warId: war.id,
         offerId: offer.offerId ?? 0,
       }),
-    ).toThrow(/last region/);
+    ).toThrow(/last province/);
     expect(hashWorld(world)).toBe(hash);
     expect(world.military.wars.find((entry) => entry.id === war.id)?.endedDay).toBeNull();
     expect(
-      world.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds,
+      countryProvinceIds(world, M5_COUNTRY_A),
     ).toEqual(expect.arrayContaining([M5_REGION_A1, M5_REGION_A2]));
   });
 
-  test("a valid multi-region cession retains the loser's remaining region and unrelated state", () => {
+  test("a valid multi-province cession retains the loser's remaining province and unrelated state", () => {
     const world = buildWorld();
     occupy(world, M5_COUNTRY_C, M5_REGION_C1, M5_REGION_A2);
     const war = world.military.wars.find((entry) => entry.endedDay === null);
@@ -280,9 +279,9 @@ describe("AUDIT-010 last-region cession validation", () => {
     const treasuryA = accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash");
     const buildings = world.buildings.map((building) => ({
       id: building.id,
-      regionId: building.regionId,
+      provinceId: building.provinceId,
     }));
-    const marketA2 = world.regions.find((region) => region.id === M5_REGION_A2)?.marketId;
+    const marketA2 = world.provinceEconomies.find((province) => province.id === M5_REGION_A2)?.marketId;
     const offer = act(world, {
       kind: "offer-peace",
       countryId: M5_COUNTRY_C,
@@ -296,17 +295,17 @@ describe("AUDIT-010 last-region cession validation", () => {
       warId: war.id,
       offerId: offer.offerId,
     });
-    expect(world.countries.find((country) => country.id === M5_COUNTRY_A)?.regionIds).toEqual([
+    expect(countryProvinceIds(world, M5_COUNTRY_A)).toEqual([
       M5_REGION_A1,
     ]);
-    expect(world.countries.find((country) => country.id === M5_COUNTRY_C)?.regionIds).toContain(
+    expect(countryProvinceIds(world, M5_COUNTRY_C)).toContain(
       M5_REGION_A2,
     );
     expect(accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBe(treasuryA);
     expect(
-      world.buildings.map((building) => ({ id: building.id, regionId: building.regionId })),
+      world.buildings.map((building) => ({ id: building.id, provinceId: building.provinceId })),
     ).toEqual(buildings);
-    expect(world.regions.find((region) => region.id === M5_REGION_A2)?.marketId).toBe(marketA2);
+    expect(world.provinceEconomies.find((province) => province.id === M5_REGION_A2)?.marketId).toBe(marketA2);
     assertValidWorld(world);
   });
 });
@@ -315,7 +314,7 @@ describe("AUDIT-011 zero-recipient military payments", () => {
   test("unpaid upkeep and garrison never count as paid or enable supply recovery", () => {
     const world = buildWorld();
     occupy(world, M5_COUNTRY_A, M5_REGION_A1, M5_REGION_C1, 500);
-    zeroRegionPopulation(world, M5_REGION_C1);
+    zeroProvincePopulation(world, M5_REGION_C1);
     assertValidWorld(world);
     const army = world.military.armies.find((entry) => entry.countryId === M5_COUNTRY_A);
     if (army === undefined) throw new Error("missing army");
@@ -326,7 +325,7 @@ describe("AUDIT-011 zero-recipient military payments", () => {
     const postingsBefore = world.finance.postings.length;
     const incomeBefore = new Map(
       world.popBlocks
-        .filter((block) => block.regionId === M5_REGION_C1)
+        .filter((block) => block.provinceId === M5_REGION_C1)
         .map((block) => [
           block.id,
           accountBalance(world, "popBlock", block.id, "military-income"),
@@ -350,7 +349,7 @@ describe("AUDIT-011 zero-recipient military payments", () => {
     );
     expect(army.supply).toBeLessThan(supplyBefore);
     expect(army.organization).toBeLessThan(organizationBefore);
-    for (const block of world.popBlocks.filter((entry) => entry.regionId === M5_REGION_C1)) {
+    for (const block of world.popBlocks.filter((entry) => entry.provinceId === M5_REGION_C1)) {
       expect(accountBalance(world, "popBlock", block.id, "military-income")).toBeCloseTo(
         incomeBefore.get(block.id) ?? 0,
         6,

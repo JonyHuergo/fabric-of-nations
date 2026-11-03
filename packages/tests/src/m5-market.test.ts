@@ -13,6 +13,7 @@ import {
   tick,
   type MarketDayResult,
   type TickContext,
+  countryProvinceIds,
 } from "@century/sim";
 import {
   M5_REGION_A1,
@@ -81,25 +82,25 @@ describe("M5 multi-market clearing and conservation", () => {
     const result = tick(world, context(scenario));
     const transactions = result.economy?.settlement.transactions ?? [];
     expect(transactions.length).toBeGreaterThan(0);
-    const regionByBuilding = new Map(world.buildings.map((building) => [building.id, building.regionId]));
-    const regionByBlock = new Map(world.popBlocks.map((block) => [block.id, block.regionId]));
-    const countryByRegion = new Map<number, number>();
+    const provinceByBuilding = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
+    const provinceByBlock = new Map(world.popBlocks.map((block) => [block.id, block.provinceId]));
+    const countryByProvince = new Map<number, number>();
     for (const country of world.countries) {
-      for (const regionId of country.regionIds) countryByRegion.set(regionId, country.id);
+      for (const provinceId of countryProvinceIds(world, country.id)) countryByProvince.set(provinceId, country.id);
     }
     let crossMarket = 0;
     let crossCountry = 0;
     for (const transaction of transactions) {
-      const sellerRegion = regionByBuilding.get(transaction.sellerBuildingId);
-      const buyerRegion =
+      const sellerProvince = provinceByBuilding.get(transaction.sellerBuildingId);
+      const buyerProvince =
         transaction.buyerPopBlockId === null
-          ? regionByBuilding.get(transaction.buyerBuildingId ?? -1)
-          : regionByBlock.get(transaction.buyerPopBlockId);
-      if (sellerRegion === undefined || buyerRegion === undefined) continue;
-      const sellerMarket = world.regions.find((region) => region.id === sellerRegion)?.marketId;
-      const buyerMarket = world.regions.find((region) => region.id === buyerRegion)?.marketId;
+          ? provinceByBuilding.get(transaction.buyerBuildingId ?? -1)
+          : provinceByBlock.get(transaction.buyerPopBlockId);
+      if (sellerProvince === undefined || buyerProvince === undefined) continue;
+      const sellerMarket = world.provinceEconomies.find((province) => province.id === sellerProvince)?.marketId;
+      const buyerMarket = world.provinceEconomies.find((province) => province.id === buyerProvince)?.marketId;
       if (sellerMarket !== buyerMarket) crossMarket += 1;
-      if (countryByRegion.get(sellerRegion) !== countryByRegion.get(buyerRegion)) crossCountry += 1;
+      if (countryByProvince.get(sellerProvince) !== countryByProvince.get(buyerProvince)) crossCountry += 1;
     }
     expect(crossMarket).toBe(0);
     expect(crossCountry).toBeGreaterThan(0);
@@ -117,14 +118,14 @@ describe("M5 multi-market clearing and conservation", () => {
     expect(market0.priceRUSD).not.toEqual(market1.priceRUSD);
   });
 
-  test("does not duplicate goods when regions share a market", () => {
+  test("does not duplicate goods when provinces share a market", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     const after = cloneWorld(world);
     const beforeHash = hashWorld(world);
     runTicks(world, 3, context(scenario));
     expect(hashWorld(after)).toBe(beforeHash);
-    // Market 0 covers three regions but has one inventory pool. The total stock
+    // Market 0 covers three provinces but has one inventory pool. The total stock
     // must equal the sum of that market's lots, not three separate copies.
     const market0 = world.markets.find((market) => market.id === 0);
     expect(market0).toBeDefined();
@@ -132,11 +133,11 @@ describe("M5 multi-market clearing and conservation", () => {
     const lotTotal = market0.stockLots.reduce((total, lot) => total + lot.quantity, 0);
     expect(Number.isFinite(lotTotal)).toBe(true);
     expect(market0.stockLots.every((lot) => lot.quantity > 0)).toBe(true);
-    // Only the three regions in market 0 own those lots.
-    const buildingRegion = new Map(world.buildings.map((building) => [building.id, building.regionId]));
+    // Only the three provinces in market 0 own those lots.
+    const buildingProvince = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
     for (const lot of market0.stockLots) {
-      const regionId = buildingRegion.get(lot.ownerBuildingId);
-      expect([M5_REGION_A1, M5_REGION_A2, M5_REGION_C1]).toContain(regionId);
+      const provinceId = buildingProvince.get(lot.ownerBuildingId);
+      expect([M5_REGION_A1, M5_REGION_A2, M5_REGION_C1]).toContain(provinceId);
     }
     expect(after.markets).toHaveLength(2);
     assertValidWorld(world);
@@ -148,12 +149,12 @@ describe("M5 multi-market clearing and conservation", () => {
       ...scenario,
       population: {
         ...scenario.population,
-        regions: [...scenario.population.regions].reverse(),
+        provinceEconomies: [...scenario.population.provinceEconomies].reverse(),
         popBlocks: [...scenario.population.popBlocks].reverse(),
       },
       markets: scenario.markets.map((market) => ({
         ...market,
-        regionIds: [...market.regionIds].reverse(),
+        provinceIds: [...market.provinceIds].reverse(),
       })).reverse(),
       buildingInstances: [...scenario.buildingInstances].reverse(),
       countries: [...(scenario.countries ?? [])].reverse(),
@@ -181,41 +182,41 @@ describe("M5 multi-market clearing and conservation", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     const before = hashWorld(world);
     const broken = cloneWorld(world);
-    // A market listing an unknown region is rejected before any phase runs.
-    if (broken.markets[1] !== undefined) broken.markets[1].regionIds = [999];
+    // A province referencing an unknown market is rejected before any phase runs.
+    if (broken.provinceEconomies[0] !== undefined) broken.provinceEconomies[0].marketId = 999;
     expect(() => tick(broken, context(scenario))).toThrow();
     expect(hashWorld(world)).toBe(before);
     // The original still advances correctly.
     expect(tick(world, context(scenario)).advanced).toBe(true);
   });
 
-  test("cross-region purchases settle through the shared market", () => {
+  test("cross-province purchases settle through the shared market", () => {
     const scenario = m5Scenario();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     const first = tick(world, context(scenario));
     runTicks(world, 5, context(scenario));
     const transactions = first.economy?.settlement.transactions ?? [];
     assertValidWorld(world);
-    expect(world.regions.find((region) => region.id === M5_REGION_B1)?.marketId).toBe(1);
-    const buildingRegion = new Map(
-      world.buildings.map((building) => [building.id, building.regionId]),
+    expect(world.provinceEconomies.find((province) => province.id === M5_REGION_B1)?.marketId).toBe(1);
+    const buildingProvince = new Map(
+      world.buildings.map((building) => [building.id, building.provinceId]),
     );
-    const blockRegion = new Map(world.popBlocks.map((block) => [block.id, block.regionId]));
-    const crossRegion = transactions.some((transaction) => {
-      const sellerRegion = buildingRegion.get(transaction.sellerBuildingId);
-      const buyerRegion =
+    const blockProvince = new Map(world.popBlocks.map((block) => [block.id, block.provinceId]));
+    const crossProvince = transactions.some((transaction) => {
+      const sellerProvince = buildingProvince.get(transaction.sellerBuildingId);
+      const buyerProvince =
         transaction.buyerPopBlockId !== null
-          ? blockRegion.get(transaction.buyerPopBlockId)
+          ? blockProvince.get(transaction.buyerPopBlockId)
           : transaction.buyerBuildingId !== null
-            ? buildingRegion.get(transaction.buyerBuildingId)
+            ? buildingProvince.get(transaction.buyerBuildingId)
             : undefined;
       return (
-        sellerRegion !== undefined &&
-        buyerRegion !== undefined &&
-        sellerRegion !== buyerRegion
+        sellerProvince !== undefined &&
+        buyerProvince !== undefined &&
+        sellerProvince !== buyerProvince
       );
     });
-    expect(crossRegion).toBe(true);
+    expect(crossProvince).toBe(true);
     expect(world.markets[0]?.stockLots.length ?? 0).toBeGreaterThan(0);
     assertAccountingIdentity(world.finance);
   });

@@ -56,7 +56,7 @@ function scenarioWithGroups(
       [
         {
           id: 0,
-          regionId: 0,
+          provinceId: 0,
           professionId: 0,
           financialAccountId: 0,
           maleAgeGroups: maleGroups,

@@ -25,9 +25,9 @@ describe("M5 historical data pipeline", () => {
     const validation = validateM5HistoricalData(data);
     expect(validation.errors).toEqual([]);
     expect(data.countries).toHaveLength(8);
-    expect(data.regions).toHaveLength(16);
+    expect(data.provinces).toHaveLength(16);
     expect(data.markets).toHaveLength(5);
-    // M9 adds one academics block per region (population moved from the clerks
+    // M9 adds one academics block per province (population moved from the clerks
     // block, so country totals are unchanged): 64 + 16 = 80.
     expect(data.populations).toHaveLength(80);
     expect(data.buildings).toHaveLength(113);
@@ -40,7 +40,7 @@ describe("M5 historical data pipeline", () => {
     const scenario = loadM5EightPolities();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     expect(world.countries).toHaveLength(8);
-    expect(world.regions).toHaveLength(16);
+    expect(world.provinceEconomies).toHaveLength(16);
     expect(world.markets).toHaveLength(5);
     expect(world.popBlocks).toHaveLength(80);
     expect(world.buildings).toHaveLength(113);
@@ -67,8 +67,8 @@ describe("M5 historical data pipeline", () => {
   test("population targets and provisional occupation targets are satisfied by authored data", () => {
     const data = loadM5HistoricalData();
     for (const country of data.countries) {
-      const regionIds = new Set(country.regionIds);
-      const blocks = data.populations.filter((block) => regionIds.has(block.regionId));
+      const provinceIds = new Set(country.provinceIds);
+      const blocks = data.populations.filter((block) => provinceIds.has(block.provinceId));
       const total = blocks.reduce((sum, block) => sum + block.population, 0);
       const peasants = blocks
         .filter((block) => block.professionKey === "peasants")
@@ -102,7 +102,7 @@ describe("M5 historical data pipeline", () => {
     const reversedData: HistoricalData = {
       ...reversed,
       countries: [...reversed.countries].reverse(),
-      regions: [...reversed.regions].reverse(),
+      provinces: [...reversed.provinces].reverse(),
       markets: [...reversed.markets].reverse(),
       populations: [...reversed.populations].reverse(),
       buildings: [...reversed.buildings].reverse(),
@@ -135,17 +135,17 @@ describe("M5 historical data pipeline", () => {
   test("validator reports deterministic, actionable structural errors", () => {
     const data = loadM5HistoricalData();
     const broken = cloneData(data) as unknown as {
-      countries: { id: number; regionIds: number[] }[];
-      regions: { id: number }[];
-      markets: { regionIds: number[] }[];
-      populations: { regionId: number; professionKey: string }[];
+      countries: { id: number; provinceIds: number[] }[];
+      provinces: { id: number }[];
+      markets: { provinceIds: number[] }[];
+      populations: { provinceId: number; professionKey: string }[];
       calibration: { id: string }[];
     };
     broken.countries[0] = { ...broken.countries[0]!, id: broken.countries[1]!.id };
-    broken.regions[0] = { ...broken.regions[0]!, id: broken.regions[1]!.id };
+    broken.provinces[0] = { ...broken.provinces[0]!, id: broken.provinces[1]!.id };
     broken.populations[0] = {
       ...broken.populations[0]!,
-      regionId: 2,
+      provinceId: 2,
       professionKey: "unknown-profession",
     };
     broken.calibration[0] = { ...broken.calibration[0]!, id: broken.calibration[1]!.id };
@@ -187,7 +187,7 @@ describe("M5 historical data pipeline", () => {
   test("rejects an authored population outside the source-backed target", () => {
     const data = loadM5HistoricalData();
     const broken = cloneData(data) as unknown as {
-      populations: { regionId: number; population: number }[];
+      populations: { provinceId: number; population: number }[];
     };
     // First population belongs to the United States; halving it breaks the target.
     broken.populations[0]!.population = Math.floor(broken.populations[0]!.population / 2);

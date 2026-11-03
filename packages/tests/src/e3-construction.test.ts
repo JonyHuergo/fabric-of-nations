@@ -61,7 +61,7 @@ function fixture(): Fixture {
       tag: "TST",
       name: "Test Country",
       monetary: { kind: "own", currencyId: 0 },
-      regionIds: [REGION],
+      provinceIds: [REGION],
       treasuryAccountId: 1000,
       initialTreasuryCashRUSD: 100_000,
       fiscal: { incomeTaxRate: 0, welfareBudgetRUSDPerYear: 0 },
@@ -106,7 +106,7 @@ function startAction(world: World, definitionId = FARM): StartAction {
     countryId: COUNTRY,
     dayIndex: world.dayIndex,
     source: "player",
-    regionId: REGION,
+    provinceId: REGION,
     definitionId,
   };
 }
@@ -189,12 +189,12 @@ describe("E3 construction selection and authorization", () => {
     expect(f.world.buildings).toHaveLength(8);
   });
 
-  test("rejects unsupported types, regions, funds, AI source, and the active cap", () => {
+  test("rejects unsupported types, provinces, funds, AI source, and the active cap", () => {
     const f = fixture();
     const before = hashWorld(f.world);
     const invalid: CountryAction[] = [
       startAction(f.world, WAREHOUSE), // no productive output
-      { ...startAction(f.world), regionId: 99 },
+      { ...startAction(f.world), provinceId: 99 },
       { ...startAction(f.world), source: "ai" },
       { ...startAction(f.world), countryId: 99 },
       { ...startAction(f.world), definitionId: 999 },
@@ -310,13 +310,13 @@ describe("E3 construction progress and completion", () => {
     const building = f.world.buildings.find((entry) => entry.id === completed.buildingId)!;
     expect(building.ownerKind).toBe("state");
     expect(building.ownerAccountId).toBe(f.world.countries[COUNTRY]!.treasuryAccountId);
-    expect(building.regionId).toBe(REGION);
+    expect(building.provinceId).toBe(REGION);
     expect(building.definitionId).toBe(FARM);
     expect(building.level).toBe(1);
     expect(building.condition).toBe(1);
     expect(building.operational).toBe(true);
     expect(
-      f.world.regions.find((region) => region.id === REGION)!.buildingInstanceIds,
+      f.world.provinceEconomies.find((province) => province.id === REGION)!.buildingInstanceIds,
     ).toContain(building.id);
     expect(accountBalance(f.world, "country", COUNTRY, "construction-in-progress")).toBe(0);
     expect(accountBalance(f.world, "country", COUNTRY, "public-capital")).toBeCloseTo(
@@ -631,7 +631,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
       projects.push({
         id,
         countryId: COUNTRY,
-        regionId: REGION,
+        provinceId: REGION,
         definitionId: FARM,
         status: "cancelled",
         authorizedDay: 0,

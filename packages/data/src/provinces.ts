@@ -52,7 +52,6 @@ interface RawProvince {
   readonly initialControllerPolityId?: number;
   readonly initialOwnerTag: string;
   readonly mapTag: string;
-  readonly simulationRegionId: number;
   readonly historicalAdminAffiliation: string;
   readonly historicalGrouping: string | null;
   readonly initialSpecialStatus: string;
@@ -271,7 +270,6 @@ export function loadM11Provinces(): ProvinceScenarioInput {
       displayName: province.displayName,
       aliases: [...province.aliases],
       initialOwnerPolityId: province.initialOwnerPolityId,
-      simulationRegionId: province.simulationRegionId,
       historicalAdminAffiliation: province.historicalAdminAffiliation,
       historicalGrouping: province.historicalGrouping,
       initialSpecialStatus: province.initialSpecialStatus as ProvinceSpecialStatus,

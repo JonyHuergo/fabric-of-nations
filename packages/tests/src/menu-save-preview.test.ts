@@ -80,9 +80,7 @@ describe("saved-world preview for the title screen", () => {
     const loaded = last(events, "LOAD_RESULT");
     expect(loaded.accepted).toBe(true);
     expect(preview.snapshot?.provinces).toEqual(loaded.snapshot.provinces);
-    expect(preview.snapshot?.regions.map((region) => region.marketId)).toEqual(
-      loaded.snapshot.regions.map((region) => region.marketId),
-    );
+    expect(preview.snapshot?.provinceTable.marketId).toEqual(loaded.snapshot.provinceTable.marketId);
     expect(preview.snapshot?.playerCountryId).toBe(loaded.snapshot.playerCountryId);
   });
 

@@ -132,7 +132,6 @@ function runtimeCatalog({ provinces, futurePolities }, worldCatalog) {
       mapTag: province.mapTag,
       initialOwnerTag: province.initialOwnerTag,
       initialOwnerPolityId: province.initialOwnerPolityId,
-      simulationRegionId: province.simulationRegionId,
       residual: province.residual,
       area: province.area,
       bbox: province.bbox,

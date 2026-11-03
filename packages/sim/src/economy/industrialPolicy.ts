@@ -26,7 +26,10 @@ import { accumulateBudgetMemo } from "./budget.js";
 import {
   MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD,
 } from "./constants.js";
-import { assertValidIndustrialPolicy } from "./country.js";
+import {
+  assertValidIndustrialPolicy,
+  buildProvinceOwnerMap,
+} from "./country.js";
 import { assertValidFinanceState } from "./validation.js";
 import type { BuildingInstance, Country, IndustrialPolicy } from "./types.js";
 
@@ -94,8 +97,8 @@ export function validatePublicEnterpriseSupport(
   if (building.ownerKind !== "state") {
     throw new RangeError("public-enterprise support requires a state-owned building");
   }
-  if (!country.regionIds.includes(building.regionId)) {
-    throw new RangeError("the state-owned building must be in the country's regions");
+  if (buildProvinceOwnerMap(world).get(building.provinceId) !== country.id) {
+    throw new RangeError("the state-owned building must be in the country's provinces");
   }
   if (building.ownerAccountId !== country.treasuryAccountId) {
     throw new RangeError("the state-owned building must be owned by this country treasury");

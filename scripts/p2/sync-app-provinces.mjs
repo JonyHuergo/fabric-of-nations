@@ -5,6 +5,10 @@
  * province counts in the bundle audits. The M12 builders are not re-run, because they
  * would rebuild the pre-repair geometry from the Natural Earth sources.
  *
+ * P2 (D-118): the M12 field `simulationRegionId` is deleted from every province here,
+ * because provinces are the economic unit and the region layer no longer exists; the
+ * repair scripts start from the M12 bundles, which still carry it.
+ *
  * Usage: node scripts/p2/sync-app-provinces.mjs [--check]
  */
 
@@ -26,8 +30,14 @@ const checkOnly = process.argv.includes("--check");
 const stale = [];
 
 for (const [bundleName, moduleName] of PAIRS) {
-  const json = readFileSync(join(MAP_DIR, `${bundleName}.json`), "utf8").trim();
+  const bundlePath = join(MAP_DIR, `${bundleName}.json`);
+  const json = readFileSync(bundlePath, "utf8").trim();
   const bundle = JSON.parse(json);
+  if (bundle.provinces.some((province) => "simulationRegionId" in province)) {
+    for (const province of bundle.provinces) delete province.simulationRegionId;
+    stale.push(bundlePath);
+    if (!checkOnly) writeFileSync(bundlePath, JSON.stringify(bundle), "utf8");
+  }
   const modulePath = join(APP_DIR, `${moduleName}.ts`);
   const source = readFileSync(modulePath, "utf8");
   const match = /export const ([A-Z0-9_]+) = \(/.exec(source);

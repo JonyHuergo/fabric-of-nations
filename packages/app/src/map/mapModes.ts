@@ -15,6 +15,7 @@ import type { SimulationSnapshot } from "@century/sim-worker";
 
 import type { ProvinceMapProvince } from "../provinceCatalogTypes";
 import type { WorldCatalogEntry, WorldCatalogMarket } from "../worldCatalogTypes";
+import { MAP_DATA_RAMP } from "../design/tokens";
 import {
   hexToRgb,
   mixRgb,
@@ -23,8 +24,16 @@ import {
   UNCLAIMED_LAND,
   type Rgb,
 } from "./politicalPalette";
+import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
 
-export type MapModeId = "political" | "control" | "markets";
+export type MapModeId =
+  | "political"
+  | "control"
+  | "markets"
+  | "density"
+  | "urban"
+  | "literacy"
+  | "unrest";
 
 export interface ProvinceAppearance {
   readonly fill: Rgb;
@@ -48,6 +57,11 @@ export interface ProvinceState {
   /** Political unit: the 1900 polity until the province changes hands. */
   readonly unitTag: string;
   readonly marketId: number | null;
+  /** P2 live province values; null before a campaign exists or for an empty province. */
+  readonly densityPerKm2: number | null;
+  readonly urbanShare: number | null;
+  readonly literacy: number | null;
+  readonly unrest: number | null;
 }
 
 /** The fields of a province the map reads; geometry is not among them. */
@@ -59,7 +73,6 @@ export type MapProvince = Pick<
   | "mapTag"
   | "initialOwnerTag"
   | "initialOwnerPolityId"
-  | "simulationRegionId"
   | "residual"
   | "area"
   | "bbox"
@@ -198,18 +211,75 @@ const marketsMode: MapMode = {
   },
 };
 
+const RAMP: readonly Rgb[] = MAP_DATA_RAMP.map(hexToRgb);
+
+/**
+ * A sequential lens over one live province value. `thresholds` are the lower
+ * bounds of ramp steps 1..4 (step 0 is below the first); a province with no value
+ * takes NO_DATA_FILL rather than a fabricated colour.
+ */
+function sequentialMode(
+  id: MapModeId,
+  label: string,
+  value: (state: ProvinceState) => number | null,
+  thresholds: readonly [number, number, number, number],
+  format: (value: number) => string,
+): MapMode {
+  const step = (amount: number): number => {
+    let index = 0;
+    while (index < thresholds.length && amount >= (thresholds[index] ?? Infinity)) index += 1;
+    return index;
+  };
+  return {
+    id,
+    label,
+    appearance: (index, context) => {
+      const state = context.states[index];
+      const amount = state === undefined ? null : value(state);
+      if (amount === null) return { fill: NO_DATA_FILL, stripe: null, dimmed: false };
+      return { fill: RAMP[step(amount)] ?? NO_DATA_FILL, stripe: null, dimmed: false };
+    },
+    legend: () => [
+      { label: `Below ${format(thresholds[0])}`, color: RAMP[0] ?? NO_DATA_FILL },
+      ...thresholds.map((threshold, index) => ({
+        label: index === thresholds.length - 1 ? `${format(threshold)} and above` : `${format(threshold)} to ${format(thresholds[index + 1] ?? threshold)}`,
+        color: RAMP[index + 1] ?? NO_DATA_FILL,
+      })),
+      { label: "No data", color: NO_DATA_FILL },
+    ],
+  };
+}
+
+const percent = (value: number): string => `${String(Math.round(value * 100))}%`;
+
 export const MAP_MODES: Readonly<Record<MapModeId, MapMode>> = {
   political: politicalMode,
   control: controlMode,
   markets: marketsMode,
+  density: sequentialMode(
+    "density",
+    "Population",
+    (state) => state.densityPerKm2,
+    [5, 20, 60, 150],
+    (value) => `${String(value)}/km²`,
+  ),
+  urban: sequentialMode("urban", "Towns", (state) => state.urbanShare, [0.05, 0.12, 0.25, 0.45], percent),
+  literacy: sequentialMode("literacy", "Literacy", (state) => state.literacy, [0.1, 0.3, 0.55, 0.8], percent),
+  unrest: sequentialMode("unrest", "Unrest", (state) => state.unrest, [0.05, 0.15, 0.3, 0.5], percent),
 };
+
+/** Approximate land area of a province from its bundle area (square degrees) at its label latitude. */
+function approximateAreaKm2(province: Pick<ProvinceMapProvince, "area" | "label">): number {
+  const latitude = province.label[1] ?? 0;
+  return province.area * 111.32 * 111.32 * Math.max(0.05, Math.cos((latitude * Math.PI) / 180));
+}
 
 /** Resolve authoritative ownership for every province, in bundle order. */
 export function buildProvinceStates(
   provinceMap: {
     readonly provinces: readonly Pick<
       ProvinceMapProvince,
-      "id" | "initialOwnerPolityId" | "initialOwnerTag" | "mapTag" | "simulationRegionId"
+      "id" | "initialOwnerPolityId" | "initialOwnerTag" | "mapTag" | "area" | "label"
     >[];
     readonly futurePolities: readonly { readonly polityId: number; readonly tag: string }[];
   },
@@ -217,7 +287,7 @@ export function buildProvinceStates(
     readonly entries: readonly Pick<WorldCatalogEntry, "id" | "tag" | "market">[];
     readonly markets: readonly Pick<WorldCatalogMarket, "id" | "key">[];
   },
-  snapshot: Pick<SimulationSnapshot, "provinces" | "regions"> | null,
+  snapshot: Pick<SimulationSnapshot, "provinces" | "provinceTable" | "professions"> | null,
 ): readonly ProvinceState[] {
   const tagByPolityId = new Map<number, string>();
   for (const entry of catalog.entries) tagByPolityId.set(entry.id, entry.tag);
@@ -225,8 +295,8 @@ export function buildProvinceStates(
   const ownership = new Map(
     (snapshot?.provinces ?? []).map((entry) => [entry.provinceId, entry] as const),
   );
-  const marketByRegionId = new Map(
-    (snapshot?.regions ?? []).map((region) => [region.id, region.marketId] as const),
+  const economyById = new Map(
+    ((snapshot === null ? [] : provinceEconomyRows(snapshot))).map((province) => [province.id, province] as const),
   );
   const marketIdByKey = new Map(catalog.markets.map((market) => [market.key, market.id] as const));
   const marketKeyByTag = new Map(catalog.entries.map((entry) => [entry.tag, entry.market] as const));
@@ -236,13 +306,19 @@ export function buildProvinceStates(
     const controllerId = entry?.controllerPolityId ?? ownerId;
     const ownerTag = tagByPolityId.get(ownerId) ?? province.initialOwnerTag;
     const key = marketKeyByTag.get(province.mapTag) ?? null;
+    const economy = economyById.get(province.id);
+    const populated = economy !== undefined && economy.population > 0;
     return {
       ownerTag,
       controllerTag: tagByPolityId.get(controllerId) ?? ownerTag,
       unitTag: ownerId === province.initialOwnerPolityId ? province.mapTag : ownerTag,
       marketId:
-        marketByRegionId.get(province.simulationRegionId) ??
-        (key === null ? null : (marketIdByKey.get(key) ?? null)),
+        economy?.marketId ?? (key === null ? null : (marketIdByKey.get(key) ?? null)),
+      // Rounded so that the bridge resends a province only when its lens step can change.
+      densityPerKm2: populated ? Math.round((economy.population / approximateAreaKm2(province)) * 10) / 10 : null,
+      urbanShare: populated ? Math.round(economy.urbanShare * 100) / 100 : null,
+      literacy: populated ? Math.round(economy.literacy * 100) / 100 : null,
+      unrest: populated ? Math.round(economy.unrest * 100) / 100 : null,
     };
   });
 }
@@ -322,4 +398,35 @@ export function selectionFlags(state: ProvinceState, selectedTag: string | null,
     flags |= STYLE_FLAG_PLAYER;
   }
   return flags;
+}
+
+/**
+ * Fill of a province under a data lens, for renderers that draw provinces one by
+ * one (the SVG fallback); null for a lens that is not a province data lens.
+ */
+export function dataLensFill(
+  lens: MapModeId,
+  province: Pick<ProvinceMapProvince, "area" | "label">,
+  economy: ProvinceEconomySnapshot | undefined,
+): Rgb | null {
+  if (lens !== "density" && lens !== "urban" && lens !== "literacy" && lens !== "unrest") return null;
+  const populated = economy !== undefined && economy.population > 0;
+  const state: ProvinceState = {
+    ownerTag: "",
+    controllerTag: "",
+    unitTag: "",
+    marketId: economy?.marketId ?? null,
+    densityPerKm2: populated ? economy.population / approximateAreaKm2(province) : null,
+    urbanShare: populated ? economy.urbanShare : null,
+    literacy: populated ? economy.literacy : null,
+    unrest: populated ? economy.unrest : null,
+  };
+  const context: MapDataContext = {
+    provinces: [],
+    states: [state],
+    entryByTag: new Map(),
+    marketNames: new Map(),
+    highlightMarketId: null,
+  };
+  return MAP_MODES[lens].appearance(0, context).fill;
 }

@@ -18,6 +18,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 import { loadM5EightPolities } from "@century/data";
 import { PROTOCOL_VERSION } from "@century/sim-worker";
@@ -201,7 +202,7 @@ describe("M7a annual accounting", () => {
   test("a controlled correction posts once, is audited, and never rewrites monthly history", () => {
     const { scenario, world } = worldAt(civilDateToDayIndex(1900, 12, 1));
     const country = world.countries[0]!;
-    const block = world.popBlocks.find((entry) => entry.regionId === country.regionIds[0])!;
+    const block = world.popBlocks.find((entry) => entry.provinceId === countryProvinceIds(world, country.id)[0])!;
     const cash = world.finance.accounts.find(
       (account) => account.ownerKind === "popBlock" && account.ownerId === block.id && account.subtype === "household-cash",
     )!;

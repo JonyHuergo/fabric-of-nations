@@ -401,7 +401,7 @@ describe("M9 technology effects", () => {
     expect(() =>
       validateConstructionStart(locked.world, locked.scenario.definitions, {
         countryId: M5_COUNTRY_A,
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         definitionId: M9_TECH_GATED_BUILDING,
       }),
     ).toThrow(/un-researched/);
@@ -410,7 +410,7 @@ describe("M9 technology effects", () => {
     expect(() =>
       validateConstructionStart(unlocked.world, unlocked.scenario.definitions, {
         countryId: M5_COUNTRY_A,
-        regionId: M5_REGION_A1,
+        provinceId: M5_REGION_A1,
         definitionId: M9_TECH_GATED_BUILDING,
       }),
     ).not.toThrow();

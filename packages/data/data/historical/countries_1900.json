@@ -3,7 +3,7 @@
     "id": 0,
     "tag": "USA",
     "name": "United States",
-    "regionIds": [
+    "provinceIds": [
       0,
       1
     ],
@@ -65,7 +65,7 @@
     "id": 1,
     "tag": "GBR",
     "name": "United Kingdom",
-    "regionIds": [
+    "provinceIds": [
       2,
       3
     ],
@@ -117,7 +117,7 @@
     "id": 2,
     "tag": "DEU",
     "name": "German Empire",
-    "regionIds": [
+    "provinceIds": [
       4,
       5
     ],
@@ -169,7 +169,7 @@
     "id": 3,
     "tag": "FRA",
     "name": "France",
-    "regionIds": [
+    "provinceIds": [
       6,
       7
     ],
@@ -221,7 +221,7 @@
     "id": 4,
     "tag": "RUS",
     "name": "Russian Empire",
-    "regionIds": [
+    "provinceIds": [
       8,
       9
     ],
@@ -271,7 +271,7 @@
     "id": 5,
     "tag": "JPN",
     "name": "Empire of Japan",
-    "regionIds": [
+    "provinceIds": [
       10,
       11
     ],
@@ -321,7 +321,7 @@
     "id": 6,
     "tag": "IND",
     "name": "British India",
-    "regionIds": [
+    "provinceIds": [
       12,
       13
     ],
@@ -369,7 +369,7 @@
     "id": 7,
     "tag": "BRA",
     "name": "Brazil",
-    "regionIds": [
+    "provinceIds": [
       14,
       15
     ],

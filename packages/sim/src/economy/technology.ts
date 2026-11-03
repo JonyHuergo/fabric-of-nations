@@ -63,6 +63,7 @@ import {
   type TechnologyDefinitions,
   type TechnologyEra,
 } from "./types.js";
+import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
 const MAX_TECHNOLOGY_DESCRIPTION_LENGTH = 500;
 const MAX_TECHNOLOGY_KEY_LENGTH = 64;
@@ -634,14 +635,15 @@ export function technologyEducationBonus(
   return clamp(bonus, 0, MAX_TECHNOLOGY_EDUCATION_BONUS);
 }
 
-/** Country that owns a region, or null. */
-export function countryForRegion(world: World, regionId: Id): Country | null {
-  return world.countries.find((country) => country.regionIds.includes(regionId)) ?? null;
+/** Country that owns a province, or null. */
+export function countryForProvince(world: World, provinceId: Id): Country | null {
+  const ownerId = buildProvinceOwnerMap(world).get(provinceId);
+  return ownerId === undefined ? null : (world.countries.find((country) => country.id === ownerId) ?? null);
 }
 
 function countryBlocks(world: World, country: Country): World["popBlocks"] {
-  const regions = new Set(country.regionIds);
-  return world.popBlocks.filter((block) => regions.has(block.regionId));
+  const provinces = new Set(countryProvinceIds(world, country.id));
+  return world.popBlocks.filter((block) => provinces.has(block.provinceId));
 }
 
 function professionKeyById(definitions: EconomyDefinitions): Map<Id, string> {

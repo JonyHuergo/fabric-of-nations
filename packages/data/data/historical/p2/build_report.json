@@ -1,0 +1,46 @@
+{
+  "generator": "scripts/p2/build-province-scenario.mjs",
+  "decision": "D-131",
+  "inputs": {
+    "territories": "c2058b13e6cbd3241d7c3b3fa8f76230405b386feca7e34dcfd18fc0f7d7d82a",
+    "pops": "4916943c62935ebadb508bc67601026e0a6753a5c1309296b5e7d982d7a1f70e",
+    "buildings": "1e6de17b33aefc3b0e95f1984f09d0281971896a3b3cee2f851b98b79976cafc",
+    "countries": "8dd75f86d39c9d0c0eea20051a6093b30202571229cdff2b2daba6de65b184ad",
+    "markets": "694e164482a4330026da62346c946467eadd4eb2f1042da5bfd48fa055b18b06",
+    "customs": "60053ff3abeba41f6aa64f04ff4b1534b316efad077e3ad86dfb1620af8f24dd",
+    "geography": "a1479e70fa3741c486d60202becf170aeb1c26e297cc1713deeb706c79aaa22a",
+    "sourcedPopulation": "a2824b8ce44e00db725ca23dd0ff07561354e1f60bb857fbec3229ffe2380b20",
+    "professions": "da52e8a5b74b1b0e08547f0359e609d00ffb0a53ea5c265d7db8b31c7510a71f",
+    "buildingDefinitions": "30b978c0628c2be08a06ff2f898e684f7faa1156753dd214ee1ef2bad5f06fde",
+    "provinces_1900": "946169009f95cb32523dd02cd497faadb6fcd9439c04fd18491722be66006f0a",
+    "provinces_africa_1900": "c6ae454f73b301f44973ffcb926a15d317243f722c47d798b8bfc43a6e2565ee",
+    "provinces_americas_1900": "ad38f5c34df476f59280e9cbdc7a29d8047268741142f1f6c37c4fc9244801f7",
+    "provinces_asia_1900": "e62050c3cc60acd6a3b29d61f56eef96ad9236daccf4979529e74e0c2845bea2",
+    "provinces_oceania_1900": "6e6d7628c1213e7eeb573be77bfd6f7ae613fd8dc2c0287534f67ce63ef04354"
+  },
+  "outputs": {
+    "provinces_1900.json": "d1d804aea8bc320d4e579cb379631ad3493d31817f7946537b7a2597938f9e4e",
+    "pops_1900.json": "da3b1f18dd0bbb46d9a4760fda31b68ce4102b489984c91b1cba5d48bde55fc4",
+    "buildings_1900.json": "3484835ba701364f8bf1ceb64fbd0257f14b0fb8954bfdd4d068ddf6775a5a8f",
+    "countries_1900.json": "8f2bbdb5198548e98594e8776244b29a3e8ba820f6ccd2886912a21542a37321",
+    "markets_1900.json": "1e6678cbc151f770834c70e06d1023f0cbab34c39bd309a56d81eefb6b1f64ae",
+    "trade_routes_1900.json": "fb85918752232256560502ab0012c9512bdf392be92c944affec0619bc9b4dcc",
+    "employment_1900.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "counts": {
+    "provinces": 1687,
+    "populationBlocks": 5687,
+    "buildings": 3725,
+    "customsTerritories": 63,
+    "tradeRoutes": 168,
+    "landRoutes": 114,
+    "provincesWithPopulation": 1627
+  },
+  "conservation": {
+    "population": 1584134189,
+    "buildingLevels": 11630,
+    "operatingCashRUSD": 55950000,
+    "stockQuantityIn": 384571304,
+    "stockQuantityOut": 384571304
+  }
+}

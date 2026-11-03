@@ -55,7 +55,9 @@ describe("M3a schema-25 serialization", () => {
     // M3 fixture has technology disabled, so no behaviour changes. E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`, so the structural digest is
     // intentionally re-pinned; the fixture still has trade disabled. M11 (simulation 0.27.0, data m3-economy-v12) changes the encoded version metadata, so the digest is re-pinned again without changing the fixture's behaviour.
-    expect(hashWorld(cloneWorld())).toBe("cbdb84df3c7ff849");
+    // P2 schema 28 (D-134): province economy record, land fields and the removed
+    // market region list change the encoding, not the fixture's behaviour.
+    expect(hashWorld(cloneWorld())).toBe("7d2bb34588596f03");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

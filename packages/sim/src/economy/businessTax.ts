@@ -51,7 +51,7 @@ import {
   type FinanceIndex,
 } from "./accounts.js";
 import { accumulateBudgetMemo, readBudgetMemo } from "./budget.js";
-import { buildRegionOwnerMap } from "./country.js";
+import { buildProvinceOwnerMap } from "./country.js";
 import { assertValidFinanceState } from "./validation.js";
 import type { FinanceState } from "./types.js";
 
@@ -148,7 +148,7 @@ export function runBusinessTaxPhase(
 
   const staged: FinanceState = cloneFinanceState(world.finance);
   const index = buildFinanceIndex(staged);
-  const owners = buildRegionOwnerMap(world);
+  const owners = buildProvinceOwnerMap(world);
   const openingCash = designatedCashTotal(world.finance);
   const entries: JournalEntryInput[] = [];
   const buildingResults: BusinessTaxBuildingResult[] = [];
@@ -165,7 +165,7 @@ export function runBusinessTaxPhase(
       );
     }
     for (const building of buildings) {
-      const ownerCountryId = owners.get(building.regionId);
+      const ownerCountryId = owners.get(building.provinceId);
       if (ownerCountryId !== country.id) continue;
       const netResult = periodNetResult(index, building.id);
       const taxable = Math.max(0, netResult);

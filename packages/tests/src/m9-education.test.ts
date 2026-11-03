@@ -16,6 +16,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  countryProvinceIds,
 } from "@century/sim";
 
 import {
@@ -206,7 +207,7 @@ describe("M9 age-specific literacy", () => {
     const countryB = staffless.world.countries.find((entry) => entry.id === 1);
     if (countryB === undefined) throw new Error("fixture is missing country B");
     const blocksBefore = staffless.world.popBlocks
-      .filter((block) => countryB.regionIds.includes(block.regionId))
+      .filter((block) => countryProvinceIds(staffless.world, countryB.id).includes(block.provinceId))
       .map((block) => block.literacyByAge.slice());
     runEconomicDay(
       staffless.world,
@@ -215,7 +216,7 @@ describe("M9 age-specific literacy", () => {
       staffless.world.dayIndex,
     );
     const blocksAfter = staffless.world.popBlocks.filter((block) =>
-      countryB.regionIds.includes(block.regionId),
+      countryProvinceIds(staffless.world, countryB.id).includes(block.provinceId),
     );
     for (let index = 0; index < blocksAfter.length; index += 1) {
       expect(blocksAfter[index]?.literacyByAge).toEqual(blocksBefore[index]);
@@ -252,9 +253,9 @@ describe("M9 age-specific literacy", () => {
     const { world } = fixture();
     const destination = academicsBlock(world);
     const source = world.popBlocks.find(
-      (block) => block.id !== destination.id && block.regionId !== destination.regionId,
+      (block) => block.id !== destination.id && block.provinceId !== destination.provinceId,
     );
-    if (source === undefined) throw new Error("fixture has no second-region block");
+    if (source === undefined) throw new Error("fixture has no second-province block");
     destination.literacyByAge[5] = 0.9;
     source.literacyByAge[5] = 1;
     const destinationMaleBefore = [...destination.maleByAge];

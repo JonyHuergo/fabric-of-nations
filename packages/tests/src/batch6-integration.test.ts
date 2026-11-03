@@ -1,7 +1,7 @@
 /**
  * Batch 6 integrated economic correctness evidence.
  *
- * The run uses the shipped eight-polity sample (8 countries, 16 regions, 5
+ * The run uses the shipped eight-polity sample (8 countries, 16 provinces, 5
  * markets, 113 buildings) and exercises the real `tick` pipeline across two
  * month-end closes and two migration dates. It deliberately starts at day 28 so
  * the bounded run covers the January close (day 30), the February migration

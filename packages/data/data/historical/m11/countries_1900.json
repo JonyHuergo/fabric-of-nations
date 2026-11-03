@@ -3,7 +3,7 @@
     "id": 0,
     "tag": "USA",
     "name": "United States of America",
-    "regionIds": [
+    "territoryIds": [
       0,
       150,
       151,
@@ -72,7 +72,7 @@
     "id": 1,
     "tag": "GBR",
     "name": "United Kingdom of Great Britain and Ireland",
-    "regionIds": [
+    "territoryIds": [
       1,
       100,
       101,
@@ -160,7 +160,7 @@
     "id": 2,
     "tag": "DEU",
     "name": "German Empire",
-    "regionIds": [
+    "territoryIds": [
       2,
       130,
       131,
@@ -232,7 +232,7 @@
     "id": 3,
     "tag": "FRA",
     "name": "French Republic",
-    "regionIds": [
+    "territoryIds": [
       3,
       121,
       122,
@@ -306,7 +306,7 @@
     "id": 4,
     "tag": "RUS",
     "name": "Russian Empire",
-    "regionIds": [
+    "territoryIds": [
       4,
       160,
       163,
@@ -371,7 +371,7 @@
     "id": 5,
     "tag": "JPN",
     "name": "Empire of Japan",
-    "regionIds": [
+    "territoryIds": [
       5,
       161
     ],
@@ -434,7 +434,7 @@
     "id": 6,
     "tag": "ITA",
     "name": "Kingdom of Italy",
-    "regionIds": [
+    "territoryIds": [
       6,
       143,
       144
@@ -498,7 +498,7 @@
     "id": 7,
     "tag": "ESP",
     "name": "Kingdom of Spain",
-    "regionIds": [
+    "territoryIds": [
       7,
       148,
       149
@@ -562,13 +562,14 @@
     "id": 8,
     "tag": "PRT",
     "name": "Kingdom of Portugal",
-    "regionIds": [
+    "territoryIds": [
       8,
       138,
       139,
       140,
       141,
-      142
+      142,
+      166
     ],
     "currency": {
       "key": "pte",
@@ -629,7 +630,7 @@
     "id": 9,
     "tag": "NLD",
     "name": "Kingdom of the Netherlands",
-    "regionIds": [
+    "territoryIds": [
       9,
       145,
       146,
@@ -697,7 +698,7 @@
     "id": 10,
     "tag": "BEL",
     "name": "Kingdom of Belgium",
-    "regionIds": [
+    "territoryIds": [
       10,
       137
     ],
@@ -763,7 +764,7 @@
     "id": 11,
     "tag": "CHE",
     "name": "Swiss Confederation",
-    "regionIds": [
+    "territoryIds": [
       11
     ],
     "currency": {
@@ -828,7 +829,7 @@
     "id": 12,
     "tag": "SWE",
     "name": "Kingdom of Sweden",
-    "regionIds": [
+    "territoryIds": [
       12
     ],
     "currency": {
@@ -890,7 +891,7 @@
     "id": 13,
     "tag": "NOR",
     "name": "Kingdom of Norway",
-    "regionIds": [
+    "territoryIds": [
       13
     ],
     "currency": {
@@ -952,7 +953,7 @@
     "id": 14,
     "tag": "DNK",
     "name": "Kingdom of Denmark",
-    "regionIds": [
+    "territoryIds": [
       14,
       154,
       155,
@@ -1018,7 +1019,7 @@
     "id": 15,
     "tag": "GRC",
     "name": "Kingdom of Greece",
-    "regionIds": [
+    "territoryIds": [
       15
     ],
     "currency": {
@@ -1077,7 +1078,7 @@
     "id": 16,
     "tag": "SRB",
     "name": "Kingdom of Serbia",
-    "regionIds": [
+    "territoryIds": [
       16
     ],
     "currency": {
@@ -1136,7 +1137,7 @@
     "id": 17,
     "tag": "MNT",
     "name": "Principality of Montenegro",
-    "regionIds": [
+    "territoryIds": [
       17
     ],
     "currency": {
@@ -1195,7 +1196,7 @@
     "id": 18,
     "tag": "ROM",
     "name": "Kingdom of Romania",
-    "regionIds": [
+    "territoryIds": [
       18
     ],
     "currency": {
@@ -1254,7 +1255,7 @@
     "id": 19,
     "tag": "BGR",
     "name": "Principality of Bulgaria",
-    "regionIds": [
+    "territoryIds": [
       19
     ],
     "currency": {
@@ -1313,7 +1314,7 @@
     "id": 20,
     "tag": "OTT",
     "name": "Ottoman Empire",
-    "regionIds": [
+    "territoryIds": [
       20,
       158
     ],
@@ -1373,7 +1374,7 @@
     "id": 21,
     "tag": "LUX",
     "name": "Grand Duchy of Luxembourg",
-    "regionIds": [
+    "territoryIds": [
       21
     ],
     "currency": {
@@ -1435,7 +1436,7 @@
     "id": 22,
     "tag": "MCO",
     "name": "Principality of Monaco",
-    "regionIds": [
+    "territoryIds": [
       22
     ],
     "currency": {
@@ -1497,7 +1498,7 @@
     "id": 23,
     "tag": "SMR",
     "name": "Most Serene Republic of San Marino",
-    "regionIds": [
+    "territoryIds": [
       23
     ],
     "currency": {
@@ -1556,7 +1557,7 @@
     "id": 24,
     "tag": "AND",
     "name": "Co-Principality of Andorra",
-    "regionIds": [
+    "territoryIds": [
       24
     ],
     "currency": {
@@ -1615,7 +1616,7 @@
     "id": 25,
     "tag": "LIE",
     "name": "Principality of Liechtenstein",
-    "regionIds": [
+    "territoryIds": [
       25
     ],
     "currency": {
@@ -1677,7 +1678,7 @@
     "id": 26,
     "tag": "CHN",
     "name": "Qing Empire",
-    "regionIds": [
+    "territoryIds": [
       26,
       162
     ],
@@ -1737,7 +1738,7 @@
     "id": 27,
     "tag": "KOR",
     "name": "Korean Empire",
-    "regionIds": [
+    "territoryIds": [
       27
     ],
     "currency": {
@@ -1796,7 +1797,7 @@
     "id": 28,
     "tag": "PER",
     "name": "Sublime State of Persia",
-    "regionIds": [
+    "territoryIds": [
       28
     ],
     "currency": {
@@ -1855,7 +1856,7 @@
     "id": 29,
     "tag": "AFG",
     "name": "Emirate of Afghanistan",
-    "regionIds": [
+    "territoryIds": [
       29
     ],
     "currency": {
@@ -1914,7 +1915,7 @@
     "id": 30,
     "tag": "NPL",
     "name": "Kingdom of Nepal",
-    "regionIds": [
+    "territoryIds": [
       30
     ],
     "currency": {
@@ -1973,7 +1974,7 @@
     "id": 31,
     "tag": "THA",
     "name": "Kingdom of Siam",
-    "regionIds": [
+    "territoryIds": [
       31
     ],
     "currency": {
@@ -2032,7 +2033,7 @@
     "id": 32,
     "tag": "OMN",
     "name": "Sultanate of Muscat and Oman",
-    "regionIds": [
+    "territoryIds": [
       32
     ],
     "currency": {
@@ -2091,7 +2092,7 @@
     "id": 33,
     "tag": "ETH",
     "name": "Ethiopian Empire",
-    "regionIds": [
+    "territoryIds": [
       33
     ],
     "currency": {
@@ -2150,7 +2151,7 @@
     "id": 34,
     "tag": "LBR",
     "name": "Republic of Liberia",
-    "regionIds": [
+    "territoryIds": [
       34
     ],
     "currency": {
@@ -2209,7 +2210,7 @@
     "id": 35,
     "tag": "MAR",
     "name": "Sultanate of Morocco",
-    "regionIds": [
+    "territoryIds": [
       35
     ],
     "currency": {
@@ -2268,7 +2269,7 @@
     "id": 36,
     "tag": "ZAR",
     "name": "South African Republic (Transvaal)",
-    "regionIds": [
+    "territoryIds": [
       36
     ],
     "currency": {
@@ -2327,7 +2328,7 @@
     "id": 37,
     "tag": "ORF",
     "name": "Orange Free State",
-    "regionIds": [
+    "territoryIds": [
       37
     ],
     "currency": {
@@ -2386,7 +2387,7 @@
     "id": 38,
     "tag": "MEX",
     "name": "United Mexican States",
-    "regionIds": [
+    "territoryIds": [
       38
     ],
     "currency": {
@@ -2445,7 +2446,7 @@
     "id": 39,
     "tag": "GUA",
     "name": "Republic of Guatemala",
-    "regionIds": [
+    "territoryIds": [
       39
     ],
     "currency": {
@@ -2504,7 +2505,7 @@
     "id": 40,
     "tag": "HON",
     "name": "Republic of Honduras",
-    "regionIds": [
+    "territoryIds": [
       40
     ],
     "currency": {
@@ -2563,7 +2564,7 @@
     "id": 41,
     "tag": "SAL",
     "name": "Republic of El Salvador",
-    "regionIds": [
+    "territoryIds": [
       41
     ],
     "currency": {
@@ -2622,7 +2623,7 @@
     "id": 42,
     "tag": "NIC",
     "name": "Republic of Nicaragua",
-    "regionIds": [
+    "territoryIds": [
       42
     ],
     "currency": {
@@ -2681,7 +2682,7 @@
     "id": 43,
     "tag": "COS",
     "name": "Republic of Costa Rica",
-    "regionIds": [
+    "territoryIds": [
       43
     ],
     "currency": {
@@ -2740,7 +2741,7 @@
     "id": 44,
     "tag": "COL",
     "name": "Republic of Colombia",
-    "regionIds": [
+    "territoryIds": [
       44
     ],
     "currency": {
@@ -2799,7 +2800,7 @@
     "id": 45,
     "tag": "VEN",
     "name": "United States of Venezuela",
-    "regionIds": [
+    "territoryIds": [
       45
     ],
     "currency": {
@@ -2858,7 +2859,7 @@
     "id": 46,
     "tag": "ECU",
     "name": "Republic of Ecuador",
-    "regionIds": [
+    "territoryIds": [
       46
     ],
     "currency": {
@@ -2917,7 +2918,7 @@
     "id": 47,
     "tag": "PRU",
     "name": "Republic of Peru",
-    "regionIds": [
+    "territoryIds": [
       47
     ],
     "currency": {
@@ -2976,7 +2977,7 @@
     "id": 48,
     "tag": "BOL",
     "name": "Republic of Bolivia",
-    "regionIds": [
+    "territoryIds": [
       48
     ],
     "currency": {
@@ -3035,7 +3036,7 @@
     "id": 49,
     "tag": "CHL",
     "name": "Republic of Chile",
-    "regionIds": [
+    "territoryIds": [
       49
     ],
     "currency": {
@@ -3097,7 +3098,7 @@
     "id": 50,
     "tag": "ARG",
     "name": "Argentine Republic",
-    "regionIds": [
+    "territoryIds": [
       50
     ],
     "currency": {
@@ -3159,7 +3160,7 @@
     "id": 51,
     "tag": "URY",
     "name": "Oriental Republic of Uruguay",
-    "regionIds": [
+    "territoryIds": [
       51
     ],
     "currency": {
@@ -3221,7 +3222,7 @@
     "id": 52,
     "tag": "PRY",
     "name": "Republic of Paraguay",
-    "regionIds": [
+    "territoryIds": [
       52
     ],
     "currency": {
@@ -3280,7 +3281,7 @@
     "id": 53,
     "tag": "BRA",
     "name": "Republic of the United States of Brazil",
-    "regionIds": [
+    "territoryIds": [
       53
     ],
     "currency": {
@@ -3339,7 +3340,7 @@
     "id": 54,
     "tag": "HTI",
     "name": "Republic of Haiti",
-    "regionIds": [
+    "territoryIds": [
       54
     ],
     "currency": {
@@ -3398,7 +3399,7 @@
     "id": 55,
     "tag": "DOM",
     "name": "Dominican Republic",
-    "regionIds": [
+    "territoryIds": [
       55
     ],
     "currency": {
@@ -3457,7 +3458,7 @@
     "id": 56,
     "tag": "CAN",
     "name": "Dominion of Canada",
-    "regionIds": [
+    "territoryIds": [
       56
     ],
     "currency": {
@@ -3519,7 +3520,7 @@
     "id": 57,
     "tag": "AUS",
     "name": "Australian colonies",
-    "regionIds": [
+    "territoryIds": [
       57
     ],
     "currency": {
@@ -3581,7 +3582,7 @@
     "id": 58,
     "tag": "NZL",
     "name": "Colony of New Zealand",
-    "regionIds": [
+    "territoryIds": [
       58
     ],
     "currency": {
@@ -3643,7 +3644,7 @@
     "id": 59,
     "tag": "CUB",
     "name": "Republic of Cuba under United States occupation",
-    "regionIds": [
+    "territoryIds": [
       59
     ],
     "currency": {
@@ -3702,7 +3703,7 @@
     "id": 60,
     "tag": "AUT",
     "name": "Austro-Hungarian Monarchy",
-    "regionIds": [
+    "territoryIds": [
       60
     ],
     "currency": {
@@ -3764,7 +3765,7 @@
     "id": 61,
     "tag": "TON",
     "name": "Kingdom of Tonga",
-    "regionIds": [
+    "territoryIds": [
       61
     ],
     "currency": {
@@ -3823,7 +3824,7 @@
     "id": 62,
     "tag": "SOK",
     "name": "Sokoto Caliphate",
-    "regionIds": [
+    "territoryIds": [
       62
     ],
     "currency": {
@@ -3882,7 +3883,7 @@
     "id": 63,
     "tag": "WAD",
     "name": "Sultanate of Wadai",
-    "regionIds": [
+    "territoryIds": [
       63
     ],
     "currency": {
@@ -3941,7 +3942,7 @@
     "id": 64,
     "tag": "DAR",
     "name": "Sultanate of Darfur",
-    "regionIds": [
+    "territoryIds": [
       64
     ],
     "currency": {
@@ -4000,7 +4001,7 @@
     "id": 65,
     "tag": "SHM",
     "name": "Emirate of Jabal Shammar (Ha'il)",
-    "regionIds": [
+    "territoryIds": [
       65
     ],
     "currency": {
@@ -4059,7 +4060,7 @@
     "id": 66,
     "tag": "CRT",
     "name": "Cretan State",
-    "regionIds": [
+    "territoryIds": [
       66
     ],
     "currency": {

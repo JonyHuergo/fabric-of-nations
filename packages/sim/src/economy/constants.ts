@@ -79,7 +79,7 @@ export const M3_PRICE_MAX_RATIO = 4;
  *
  * Monthly pressure for one source->destination pair is
  * `vacancyWeight * vacancyRate + wealthWeight * wealthGap`, where vacancyRate is
- * unfilled job slots divided by eligible regional workforce (0..1) and
+ * unfilled job slots divided by eligible provincial workforce (0..1) and
  * wealthGap is (destination wealth - source wealth) / 100. The weights sum to 1.
  * The monthly migrant fraction of the source population is
  * `clamp(pressure * ratePerPressure, 0, maxFraction)`.
@@ -94,7 +94,7 @@ export const MIGRATION_RATE_PER_PRESSURE = 0.01;
 export const MIGRATION_MONTHLY_MAX_FRACTION = 0.01;
 
 /**
- * Provisional absorption/friction cap: a destination region may receive at most
+ * Provisional absorption/friction cap: a destination province may receive at most
  * this fraction of its own starting-of-month population in one month. This
  * stands in for the transport/housing constraints the GDD describes until those
  * systems exist. PROVISIONAL.
@@ -189,7 +189,7 @@ export const MAX_WARS = 100;
 export const MAX_MILITARY_RELATIONS = 256;
 /** Maximum pending peace offers across all wars. */
 export const MAX_PEACE_OFFERS = 100;
-/** Recruitment signing cost per soldier, paid to the soldiers' region households. */
+/** Recruitment signing cost per soldier, paid to the soldiers' province households. */
 export const M10_RECRUITMENT_COST_PER_SOLDIER_RUSD = 5;
 /** Imported equipment price per equipment unit, paid to the system supplier. */
 export const M10_EQUIPMENT_PRICE_RUSD = 20;
@@ -201,13 +201,13 @@ export const M10_SOLDIER_DAILY_PAY_RUSD = 0.05;
 export const M10_EQUIPMENT_DAILY_UPKEEP_RUSD = 0.02;
 /** Formation delay after recruitment before deployment is allowed. */
 export const M10_ARMY_FORMATION_DAYS = 14;
-/** Strategic deployment delay to any legal target region. */
+/** Strategic deployment delay to any legal target province. */
 export const M10_DEPLOYMENT_DAYS = 10;
 /** Days before wounded soldiers return to the roster. */
 export const M10_WOUND_RECOVERY_DAYS = 30;
-/** Daily garrison procurement per occupying soldier, paid in the occupied region. */
+/** Daily garrison procurement per occupying soldier, paid in the occupied province. */
 export const M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD = 0.02;
-/** Daily unrest increment in an occupied region. */
+/** Daily unrest increment in an occupied province. */
 export const M10_OCCUPATION_UNREST_PER_DAY = 0.002;
 /** Minimum organization when unpaid supply erodes cohesion. */
 export const M10_MIN_ORGANIZATION = 0.2;

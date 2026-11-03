@@ -9,6 +9,7 @@ import {
   type SimulationSnapshot,
   type WorkerCommand,
   type WorkerEvent,
+  provinceEconomyRows,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 import {
@@ -83,7 +84,7 @@ describe("M7 simulation worker host", () => {
     expect(snapshot.dayIndex).toBe(0);
     expect(snapshot.date.label).toBe("1900-01-01");
     expect(snapshot.countries).toHaveLength(8);
-    expect(snapshot.regions).toHaveLength(16);
+    expect(provinceEconomyRows(snapshot)).toHaveLength(16);
     expect(snapshot.markets).toHaveLength(5);
     expect(snapshot.goods).toHaveLength(8);
     expect(Object.isFrozen(snapshot)).toBe(true);
@@ -213,7 +214,7 @@ describe("M7 simulation worker host", () => {
     const country = before.countries.find((entry) => entry.id === before.playerCountryId)!;
     const projectType = before.projectTypes.find((entry) => entry.outputs.length > 0)!;
     expect(projectType).toBeDefined();
-    const regionId = country.regionIds[0]!;
+    const provinceId = country.provinceIds[0]!;
     host.handleCommand({
       protocolVersion: PROTOCOL_VERSION,
       type: "APPLY_ACTION",
@@ -222,7 +223,7 @@ describe("M7 simulation worker host", () => {
       action: {
         kind: "start-construction",
         countryId: country.id,
-        regionId,
+        provinceId,
         definitionId: projectType.definitionId,
       },
     });
@@ -277,7 +278,7 @@ describe("M7 simulation worker host", () => {
     expect(cancelled.constructionInProgressRUSD).toBeCloseTo(0, 6);
   });
 
-  test("rejects a construction action with invalid region/definition ids", () => {
+  test("rejects a construction action with invalid province/definition ids", () => {
     const { host, events } = createHarness();
     const before = lastSnapshot(events);
     const country = before.countries.find((entry) => entry.id === before.playerCountryId)!;
@@ -291,7 +292,7 @@ describe("M7 simulation worker host", () => {
       action: {
         kind: "start-construction",
         countryId: country.id,
-        regionId: 99_999,
+        provinceId: 99_999,
         definitionId: 99_999,
       },
     });
@@ -417,7 +418,7 @@ describe("M7 simulation worker host", () => {
     expect(formatRUSD(1_500_000)).toBe("1.50M RUSD");
     expect(formatRate(0.125)).toBe("12.5%");
     expect(fiscalResultLabel(-1)).toBe("Deficit");
-    expect(marketForCountry(snapshot, country)?.regionIds.length).toBeGreaterThan(0);
+    expect(marketForCountry(snapshot, country)?.provinceIds.length).toBeGreaterThan(0);
   });
 
   test("bounds a long elapsed-time stall instead of replaying the backlog", () => {

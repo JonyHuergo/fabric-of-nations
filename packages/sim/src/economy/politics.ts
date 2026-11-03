@@ -1,10 +1,10 @@
 /**
  * M8 political institutions: laws, regimes, elections, interest groups,
- * regional unrest, crisis/revolution, scripted events, and the state
+ * provincial unrest, crisis/revolution, scripted events, and the state
  * administration (GDD §9, D-076).
  *
  * The module is deterministic and uses no random draw. Countries, groups, laws,
- * regions, and events are always processed in ascending stable id/key order.
+ * provinces, and events are always processed in ascending stable id/key order.
  * Influence and support are derived indicators, never spendable resources.
  */
 
@@ -110,6 +110,7 @@ import {
   REGIME_KINDS,
   SUFFRAGE_KINDS,
 } from "./types.js";
+import { countryProvinceIds } from "./country.js";
 
 const DEFAULT_INFRASTRUCTURE = 0.5;
 const DEFAULT_ADULT_AGE = SUFFRAGE_MIN_AGE;
@@ -897,9 +898,9 @@ function professionKeyById(definitions: EconomyDefinitions): Map<Id, string> {
 }
 
 function countryBlocks(world: World, country: Country): typeof world.popBlocks {
-  const regionIds = new Set(country.regionIds);
+  const provinceIds = new Set(countryProvinceIds(world, country.id));
   return [...world.popBlocks]
-    .filter((block) => regionIds.has(block.regionId))
+    .filter((block) => provinceIds.has(block.provinceId))
     .sort((left, right) => left.id - right.id);
 }
 
@@ -1095,7 +1096,7 @@ export function refreshInstitution(
   let population = 0;
   let literacyWeighted = 0;
   let infrastructureWeighted = 0;
-  let regionCount = 0;
+  let provinceCount = 0;
   for (const block of countryBlocks(world, country)) {
     const count = populationTotal(block);
     population += count;
@@ -1110,14 +1111,14 @@ export function refreshInstitution(
     }
     literacyWeighted += block.literacy * count;
   }
-  for (const regionId of country.regionIds) {
-    const region = world.regions.find((candidate) => candidate.id === regionId);
-    if (region === undefined) continue;
-    infrastructureWeighted += region.infrastructure;
-    regionCount += 1;
+  for (const provinceId of countryProvinceIds(world, country.id)) {
+    const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+    if (province === undefined) continue;
+    infrastructureWeighted += province.infrastructure;
+    provinceCount += 1;
   }
   const literacy = population > 0 ? literacyWeighted / population : 0;
-  const infrastructure = regionCount > 0 ? infrastructureWeighted / regionCount : DEFAULT_INFRASTRUCTURE;
+  const infrastructure = provinceCount > 0 ? infrastructureWeighted / provinceCount : DEFAULT_INFRASTRUCTURE;
   const clerkShare = population > 0 ? staff / population : 0;
   const staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
   const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD;
@@ -1211,19 +1212,19 @@ export function constructionProgressFactor(country: Country): Rate {
   );
 }
 
-/** Regional production factor during the strike/crisis/revolution stages. */
+/** Provincial production factor during the strike/crisis/revolution stages. */
 export function productionStrikeFactor(
   world: World,
   countryId: Id,
-  regionId: Id,
+  provinceId: Id,
 ): Rate {
   if (!world.politics.enabled) return 1;
   const country = world.countries.find((candidate) => candidate.id === countryId);
   if (country === undefined) return 1;
   const stage = country.regime.crisis.stage;
   if (stage !== "strike" && stage !== "crisis" && stage !== "revolution") return 1;
-  const region = world.regions.find((candidate) => candidate.id === regionId);
-  if (region === undefined || region.unrest < STRIKE_UNREST_THRESHOLD) return 1;
+  const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+  if (province === undefined || province.unrest < STRIKE_UNREST_THRESHOLD) return 1;
   return STRIKE_OUTPUT_FACTOR;
 }
 
@@ -1382,10 +1383,10 @@ export function runPoliticsDayStart(
           block.militancy = roundTo(clamp(block.militancy + effect.amount, 0, 1), POLITICS_RATE_DECIMALS);
         }
       } else if (effect.kind === "unrest-pressure") {
-        for (const regionId of country.regionIds) {
-          const region = world.regions.find((candidate) => candidate.id === regionId);
-          if (region === undefined) continue;
-          region.unrest = roundTo(clamp(region.unrest + effect.amount, 0, 1), POLITICS_RATE_DECIMALS);
+        for (const provinceId of countryProvinceIds(world, country.id)) {
+          const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+          if (province === undefined) continue;
+          province.unrest = roundTo(clamp(province.unrest + effect.amount, 0, 1), POLITICS_RATE_DECIMALS);
         }
       } else {
         country.institutions = {
@@ -1630,15 +1631,15 @@ export function crisisPressure(
   const unmet = population > 0 ? unmetPopulation / population : 0;
   let weightedUnrest = 0;
   let unrestWeight = 0;
-  for (const regionId of country.regionIds) {
-    const region = world.regions.find((candidate) => candidate.id === regionId);
-    if (region === undefined) continue;
-    let regionPopulation = 0;
+  for (const provinceId of countryProvinceIds(world, country.id)) {
+    const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+    if (province === undefined) continue;
+    let provincePopulation = 0;
     for (const block of blocks) {
-      if (block.regionId === regionId) regionPopulation += populationTotal(block);
+      if (block.provinceId === provinceId) provincePopulation += populationTotal(block);
     }
-    weightedUnrest += region.unrest * regionPopulation;
-    unrestWeight += regionPopulation;
+    weightedUnrest += province.unrest * provincePopulation;
+    unrestWeight += provincePopulation;
   }
   const unrest = unrestWeight > 0 ? weightedUnrest / unrestWeight : 0;
   const franchise = countryFranchise(world, country, definitions);
@@ -1707,7 +1708,7 @@ function runRevolution(
 }
 
 /**
- * Update regional unrest after the day's needs/militancy and before the close.
+ * Update provincial unrest after the day's needs/militancy and before the close.
  * One-day lag: the tax/construction effects of today's unrest are read on the
  * next civil day.
  */
@@ -1732,18 +1733,18 @@ export function runUnrestPhase(
     const blocks = countryBlocks(world, country);
     const labor = lawDefinition(politics, country.laws.labor);
     const grievance = labor?.laborGrievance ?? 0;
-    for (const regionId of country.regionIds) {
-      const region = world.regions.find((candidate) => candidate.id === regionId);
-      if (region === undefined) continue;
-      let regionPopulation = 0;
+    for (const provinceId of countryProvinceIds(world, country.id)) {
+      const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+      if (province === undefined) continue;
+      let provincePopulation = 0;
       let weightedMilitancy = 0;
       let unmetPopulation = 0;
       let workingAge = 0;
       let employed = 0;
       for (const block of blocks) {
-        if (block.regionId !== regionId) continue;
+        if (block.provinceId !== provinceId) continue;
         const count = populationTotal(block);
-        regionPopulation += count;
+        provincePopulation += count;
         weightedMilitancy += block.militancy * count;
         if (block.unmetSubsistenceDays >= 7) unmetPopulation += count;
         let blockWorkingAge = 0;
@@ -1753,15 +1754,15 @@ export function runUnrestPhase(
         workingAge += blockWorkingAge;
         employed += employedByBlock.get(block.id) ?? 0;
       }
-      if (!(regionPopulation > 0)) {
-        region.unrest = roundTo(
-          region.unrest + (0 - region.unrest) * UNREST_DAILY_SMOOTHING,
+      if (!(provincePopulation > 0)) {
+        province.unrest = roundTo(
+          province.unrest + (0 - province.unrest) * UNREST_DAILY_SMOOTHING,
           POLITICS_RATE_DECIMALS,
         );
         continue;
       }
-      const militancy = weightedMilitancy / regionPopulation;
-      const unmet = unmetPopulation / regionPopulation;
+      const militancy = weightedMilitancy / provincePopulation;
+      const unmet = unmetPopulation / provincePopulation;
       const unemployment = workingAge > 0 ? clamp(1 - employed / workingAge, 0, 1) : 0;
       const overload = Math.min(country.institutions.overload, 1);
       const target = clamp(
@@ -1775,11 +1776,11 @@ export function runUnrestPhase(
         1,
       );
       const next = clamp(
-        region.unrest + (target - region.unrest) * UNREST_DAILY_SMOOTHING,
+        province.unrest + (target - province.unrest) * UNREST_DAILY_SMOOTHING,
         0,
         1,
       );
-      region.unrest = roundTo(next, POLITICS_RATE_DECIMALS);
+      province.unrest = roundTo(next, POLITICS_RATE_DECIMALS);
     }
   }
 }

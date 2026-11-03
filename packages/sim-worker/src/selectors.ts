@@ -6,11 +6,12 @@
  */
 
 import { RUSD_UNIT_ABBREVIATION } from "@century/sim";
+import { provinceEconomyRows } from "./protocol.js";
 import type {
   CountrySnapshot,
   GoodSnapshot,
   MarketSnapshot,
-  RegionSnapshot,
+  ProvinceEconomySnapshot,
   SimulationSnapshot,
 } from "./protocol.js";
 
@@ -35,12 +36,12 @@ export function countryById(
   return snapshot.countries.find((country) => country.id === countryId) ?? null;
 }
 
-export function regionById(
+export function provinceById(
   snapshot: SimulationSnapshot,
-  regionId: number | null,
-): RegionSnapshot | null {
-  if (regionId === null) return null;
-  return snapshot.regions.find((region) => region.id === regionId) ?? null;
+  provinceId: number | null,
+): ProvinceEconomySnapshot | null {
+  if (provinceId === null) return null;
+  return provinceEconomyRows(snapshot).find((province) => province.id === provinceId) ?? null;
 }
 
 export function marketById(
@@ -115,30 +116,30 @@ export function latestFinancePeriod(country: CountrySnapshot) {
     : (country.financeHistory[country.financeHistory.length - 1] ?? null);
 }
 
-/** Selected market for a country: the market of its first owned region. */
+/** Selected market for a country: the market of its first owned province. */
 export function marketForCountry(
   snapshot: SimulationSnapshot,
-  country: { readonly regionIds: readonly number[] } | null,
+  country: { readonly provinceIds: readonly number[] } | null,
 ): MarketSnapshot | null {
   if (country === null) return null;
-  for (const regionId of country.regionIds) {
-    const region = regionById(snapshot, regionId);
-    if (region !== null && region.marketId !== null) {
-      return marketById(snapshot, region.marketId);
+  for (const provinceId of country.provinceIds) {
+    const province = provinceById(snapshot, provinceId);
+    if (province !== null && province.marketId !== null) {
+      return marketById(snapshot, province.marketId);
     }
   }
   return null;
 }
 
-/** Every market containing at least one region owned by the country. */
+/** Every market containing at least one province owned by the country. */
 export function marketsForCountry(
   snapshot: SimulationSnapshot,
-  country: { readonly regionIds: readonly number[] } | null,
+  country: { readonly provinceIds: readonly number[] } | null,
 ): readonly MarketSnapshot[] {
   if (country === null) return [];
-  const countryRegions = new Set(country.regionIds);
+  const countryProvinces = new Set(country.provinceIds);
   return snapshot.markets
-    .filter((market) => market.regionIds.some((regionId) => countryRegions.has(regionId)))
+    .filter((market) => market.provinceIds.some((provinceId) => countryProvinces.has(provinceId)))
     .sort((left, right) => left.id - right.id);
 }
 

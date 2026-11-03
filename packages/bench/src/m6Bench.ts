@@ -75,7 +75,7 @@ function contextFor(scenario: EconomyScenarioDef): TickContext {
 
 function structuralCounts(world: World): {
   readonly countries: number;
-  readonly regions: number;
+  readonly provinceEconomies: number;
   readonly markets: number;
   readonly blocks: number;
   readonly buildings: number;
@@ -84,7 +84,7 @@ function structuralCounts(world: World): {
 } {
   return {
     countries: world.countries.length,
-    regions: world.regions.length,
+    provinceEconomies: world.provinceEconomies.length,
     markets: world.markets.length,
     blocks: world.popBlocks.length,
     buildings: world.buildings.length,
@@ -220,7 +220,7 @@ export function runM6BoundedBenchmarks(): boolean {
 
   console.log("");
   console.log(
-    `M6 country-AI sample: ${String(counts.countries)} countries, ${String(counts.regions)} regions, ` +
+    `M6 country-AI sample: ${String(counts.countries)} countries, ${String(counts.provinceEconomies)} provinces, ` +
       `${String(counts.markets)} markets, ${String(counts.blocks)} blocks, ` +
       `${String(counts.buildings)} buildings, ${String(counts.population)} people`,
   );
@@ -357,7 +357,7 @@ export function runM6FullCampaignBenchmark(): boolean {
   console.log("");
   console.log(
     `M6 full campaign: ${String(CAMPAIGN_TICKS)} ticks, seed ${String(M6_SEED)}, ` +
-      `${String(counts.countries)} countries, ${String(counts.regions)} regions, ` +
+      `${String(counts.countries)} countries, ${String(counts.provinceEconomies)} provinces, ` +
       `${String(counts.markets)} markets, ${String(counts.blocks)} blocks, ` +
       `${String(counts.buildings)} buildings, final population ${String(counts.population)}`,
   );

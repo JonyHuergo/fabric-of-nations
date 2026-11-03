@@ -45,7 +45,13 @@ import {
   transactionKindChangesCash,
   type OwnerEquityTally,
 } from "./accounts.js";
-import { assertValidCountryCurrencyState, buildRegionOwnerMap, assertValidIndustrialPolicy, fiscalPolicyIsActive } from "./country.js";
+import {
+  assertValidCountryCurrencyState,
+  buildProvinceOwnerMap,
+  assertValidIndustrialPolicy,
+  fiscalPolicyIsActive,
+  buildCountryProvinceMap,
+} from "./country.js";
 import {
   assertValidCountryLaws,
   assertValidInstitutionState,
@@ -1203,7 +1209,7 @@ function assertValidBuilding(building: BuildingInstance): void {
   const record = requireRecord(building, "world.buildings[]");
   requireInteger(record.id, "world.buildings[].id", 0, 0xffff_ffff);
   requireInteger(record.definitionId, "world.buildings[].definitionId", 0, 0xffff_ffff);
-  requireInteger(record.regionId, "world.buildings[].regionId", 0, 0xffff_ffff);
+  requireInteger(record.provinceId, "world.buildings[].provinceId", 0, 0xffff_ffff);
   requireInteger(record.level, "world.buildings[].level", 1, Number.MAX_SAFE_INTEGER);
   const condition = requireFiniteNumber(record.condition, "world.buildings[].condition");
   if (condition < 0 || condition > 1) {
@@ -1266,31 +1272,10 @@ function assertValidLot(
 function assertValidMarket(
   market: Market,
   path: string,
-  regionIds: ReadonlySet<number>,
   buildingIds: ReadonlySet<number>,
 ): void {
   const record = requireRecord(market, path);
   requireInteger(record.id, `${path}.id`, 0, 0xffff_ffff);
-  const rawRegionIds = requireArray(record.regionIds, `${path}.regionIds`);
-  if (rawRegionIds.length === 0) {
-    throw new RangeError(`${path}.regionIds must contain at least one region`);
-  }
-  const seenRegions = new Set<number>();
-  for (let index = 0; index < rawRegionIds.length; index += 1) {
-    const regionId = requireInteger(
-      rawRegionIds[index],
-      `${path}.regionIds[${String(index)}]`,
-      0,
-      0xffff_ffff,
-    );
-    if (!regionIds.has(regionId)) {
-      throw new RangeError(`${path}.regionIds references unknown region ${String(regionId)}`);
-    }
-    if (seenRegions.has(regionId)) {
-      throw new RangeError(`${path}.regionIds contains duplicate region ${String(regionId)}`);
-    }
-    seenRegions.add(regionId);
-  }
 
   const rawPrices = requireArray(record.priceRUSD, `${path}.priceRUSD`);
   if (rawPrices.length === 0) throw new RangeError(`${path}.priceRUSD must not be empty`);
@@ -1394,23 +1379,20 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
 }
 
 /**
- * M4c: when any fiscal policy is active, every region that contains pop blocks
+ * M4c: when any fiscal policy is active, every province that contains pop blocks
  * or buildings must be claimed by exactly one country. Country validation has
  * already rejected duplicate claims, so this only needs to reject gaps.
  */
-function assertFiscalRegionOwnership(world: World): void {
+function assertFiscalProvinceOwnership(world: World): void {
   if (!world.countries.some((country) => fiscalPolicyIsActive(country.fiscal))) return;
-  const claimed = new Set<number>();
-  for (const country of world.countries) {
-    for (const regionId of country.regionIds) claimed.add(regionId);
-  }
-  const economicRegions = new Set<number>();
-  for (const block of world.popBlocks) economicRegions.add(block.regionId);
-  for (const building of world.buildings) economicRegions.add(building.regionId);
-  for (const regionId of economicRegions) {
-    if (!claimed.has(regionId)) {
+  const claimed = buildProvinceOwnerMap(world);
+  const economicProvinces = new Set<number>();
+  for (const block of world.popBlocks) economicProvinces.add(block.provinceId);
+  for (const building of world.buildings) economicProvinces.add(building.provinceId);
+  for (const provinceId of economicProvinces) {
+    if (!claimed.has(provinceId)) {
       throw new RangeError(
-        `region ${String(regionId)} must be owned by a country when a fiscal policy is active`,
+        `province ${String(provinceId)} must be owned by a country when a fiscal policy is active`,
       );
     }
   }
@@ -1550,13 +1532,13 @@ export function assertValidEconomyState(
   }
 
   const rawMarkets = requireArray(world.markets, "world.markets");
-  const regionIds = new Set<number>(world.regions.map((region) => region.id));
+  const provinceIds = new Set<number>(world.provinceEconomies.map((province) => province.id));
   const marketIds = new Set<number>();
   const marketById = new Map<number, Market>();
   const buildingIds = new Set<number>(buildingById.keys());
   for (const value of rawMarkets) {
     const market = value as Market;
-    assertValidMarket(market, "world.markets[]", regionIds, buildingIds);
+    assertValidMarket(market, "world.markets[]", buildingIds);
     if (marketIds.has(market.id)) {
       throw new RangeError(`duplicate market id ${String(market.id)}`);
     }
@@ -1564,16 +1546,21 @@ export function assertValidEconomyState(
     marketById.set(market.id, market);
   }
 
-  const regionMarket = new Map<number, number>();
+  // D-119: a market's provinces are derived from `ProvinceEconomy.marketId`.
+  const provinceMarket = new Map<number, number>();
+  const provincesByMarket = new Map<number, number[]>();
+  for (const province of world.provinceEconomies) {
+    if (province.marketId === null) continue;
+    provinceMarket.set(province.id, province.marketId);
+    const list = provincesByMarket.get(province.marketId);
+    if (list === undefined) provincesByMarket.set(province.marketId, [province.id]);
+    else list.push(province.id);
+  }
   for (const market of marketById.values()) {
-    for (const regionId of market.regionIds) {
-      const existing = regionMarket.get(regionId);
-      if (existing !== undefined) {
-        throw new RangeError(
-          `region ${String(regionId)} belongs to both market ${String(existing)} and market ${String(market.id)}`,
-        );
-      }
-      regionMarket.set(regionId, market.id);
+    if ((provincesByMarket.get(market.id) ?? []).length === 0) {
+      throw new RangeError(`market ${String(market.id)} must contain at least one province`);
+    }
+    {
       for (const lot of market.stockLots) {
         const owner = buildingById.get(lot.ownerBuildingId);
         if (owner === undefined) {
@@ -1581,7 +1568,7 @@ export function assertValidEconomyState(
             `market ${String(market.id)} lot references unknown owner building ${String(lot.ownerBuildingId)}`,
           );
         }
-        if (!market.regionIds.includes(owner.regionId)) {
+        if (provinceMarket.get(owner.provinceId) !== market.id) {
           // E6a: a lot owned by a building outside the market is an imported good
           // delivered by the trade arrivals phase. Only trade-enabled worlds may hold
           // them, and the owner must still be a real operational building (D-079 §8).
@@ -1601,16 +1588,16 @@ export function assertValidEconomyState(
   }
 
   // E6a customs administration: null only in a world with no countries, otherwise a
-  // country that owns at least one of the market's regions.
-  const regionOwnerById = buildRegionOwnerMap(world);
+  // country that owns at least one of the market's provinces.
+  const provinceOwnerById = buildProvinceOwnerMap(world);
   const countryIdSet = new Set(world.countries.map((country) => country.id));
   for (const market of marketById.values()) {
     const declared = market.customsCountryId;
     if (declared === null) {
-      for (const regionId of market.regionIds) {
-        if (regionOwnerById.get(regionId) !== undefined) {
+      for (const provinceId of provincesByMarket.get(market.id) ?? []) {
+        if (provinceOwnerById.get(provinceId) !== undefined) {
           throw new RangeError(
-            `market ${String(market.id)} has owned regions and therefore requires a customsCountryId`,
+            `market ${String(market.id)} has owned provinces and therefore requires a customsCountryId`,
           );
         }
       }
@@ -1621,64 +1608,78 @@ export function assertValidEconomyState(
         `market ${String(market.id)} customsCountryId ${String(declared)} is not a registered country`,
       );
     }
-    let ownsRegion = false;
-    for (const regionId of market.regionIds) {
-      if (regionOwnerById.get(regionId) === declared) {
-        ownsRegion = true;
+    let ownsProvince = false;
+    for (const provinceId of provincesByMarket.get(market.id) ?? []) {
+      if (provinceOwnerById.get(provinceId) === declared) {
+        ownsProvince = true;
         break;
       }
     }
-    if (!ownsRegion) {
+    if (!ownsProvince) {
       throw new RangeError(
-        `market ${String(market.id)} customsCountryId ${String(declared)} owns no region of the market`,
+        `market ${String(market.id)} customsCountryId ${String(declared)} owns no province of the market`,
       );
     }
   }
 
-  for (const region of world.regions) {
-    if (world.markets.length === 0) {
-      if (region.marketId !== null) {
-        throw new RangeError(`region ${String(region.id)} references a market but none exists`);
-      }
-      if (region.buildingInstanceIds.length > 0) {
-        throw new RangeError(`region ${String(region.id)} has buildings but no market`);
-      }
-    } else {
-      if (region.marketId === null) {
-        throw new RangeError(`region ${String(region.id)} has no market`);
-      }
-      const market = marketById.get(region.marketId);
-      if (market === undefined) {
+  const buildingIdsByProvince = new Map<number, number[]>();
+  for (const value of rawBuildings) {
+    const building = value as BuildingInstance;
+    const list = buildingIdsByProvince.get(building.provinceId);
+    if (list === undefined) buildingIdsByProvince.set(building.provinceId, [building.id]);
+    else list.push(building.id);
+  }
+  // D-118: every province with political state must have its economic record.
+  if (world.provinces.enabled) {
+    const economicProvinceIds = new Set(world.provinceEconomies.map((province) => province.id));
+    for (const record of world.provinces.ownership) {
+      if (!economicProvinceIds.has(record.provinceId)) {
         throw new RangeError(
-          `region ${String(region.id)} references unknown market ${String(region.marketId)}`,
+          `province ${String(record.provinceId)} has ownership but no province economy record`,
         );
       }
-      if (!market.regionIds.includes(region.id)) {
-        throw new RangeError(`market ${String(market.id)} does not list region ${String(region.id)}`);
+    }
+  }
+  for (const province of world.provinceEconomies) {
+    if (world.markets.length === 0) {
+      if (province.marketId !== null) {
+        throw new RangeError(`province ${String(province.id)} references a market but none exists`);
+      }
+      if (province.buildingInstanceIds.length > 0) {
+        throw new RangeError(`province ${String(province.id)} has buildings but no market`);
+      }
+    } else {
+      if (province.marketId === null) {
+        throw new RangeError(`province ${String(province.id)} has no market`);
+      }
+      const market = marketById.get(province.marketId);
+      if (market === undefined) {
+        throw new RangeError(
+          `province ${String(province.id)} references unknown market ${String(province.marketId)}`,
+        );
       }
     }
-    const expectedBuildings = [...rawBuildings]
-      .map((value) => value as BuildingInstance)
-      .filter((building) => building.regionId === region.id)
-      .map((building) => building.id)
-      .sort((left, right) => left - right);
-    const actualBuildings = [...region.buildingInstanceIds].sort((left, right) => left - right);
+    const expectedBuildings = (buildingIdsByProvince.get(province.id) ?? []).sort(
+      (left, right) => left - right,
+    );
+    const actualBuildings = [...province.buildingInstanceIds].sort((left, right) => left - right);
     if (
       expectedBuildings.length !== actualBuildings.length ||
       expectedBuildings.some((id, index) => id !== actualBuildings[index])
     ) {
-      throw new RangeError(`region ${String(region.id)} buildingInstanceIds do not match its buildings`);
+      throw new RangeError(`province ${String(province.id)} buildingInstanceIds do not match its buildings`);
     }
-    for (const buildingId of region.buildingInstanceIds) {
+    for (const buildingId of province.buildingInstanceIds) {
       if (!buildingIds.has(buildingId)) {
         throw new RangeError(
-          `region ${String(region.id)} references unknown building ${String(buildingId)}`,
+          `province ${String(province.id)} references unknown building ${String(buildingId)}`,
         );
       }
     }
   }
 
-  const regionOwners = buildRegionOwnerMap(world);
+  const provinceOwners = buildProvinceOwnerMap(world);
+  const countryProvinces = buildCountryProvinceMap(world);
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
   for (const country of world.countries) {
     if (typeof country.immigrationOpen !== "boolean") {
@@ -1742,17 +1743,17 @@ export function assertValidEconomyState(
       }
     }
     let countryMarket: number | undefined;
-    for (const regionId of country.regionIds) {
-      const marketId = regionMarket.get(regionId);
+    for (const provinceId of countryProvinces.get(country.id) ?? []) {
+      const marketId = provinceMarket.get(provinceId);
       if (marketId === undefined) {
         throw new RangeError(
-          `country ${String(country.id)} owns region ${String(regionId)} which has no market`,
+          `country ${String(country.id)} owns province ${String(provinceId)} which has no market`,
         );
       }
       if (countryMarket === undefined) countryMarket = marketId;
       else if (countryMarket !== marketId) {
         throw new RangeError(
-          `country ${String(country.id)} spans markets ${String(countryMarket)} and ${String(marketId)}; M5 permits one market per country`,
+          `country ${String(country.id)} spans markets ${String(countryMarket)} and ${String(marketId)}; a country belongs to one customs territory (D-119)`,
         );
       }
     }
@@ -1799,14 +1800,14 @@ export function assertValidEconomyState(
   }
 
   for (const building of buildingById.values()) {
-    if (!regionIds.has(building.regionId)) {
+    if (!provinceIds.has(building.provinceId)) {
       throw new RangeError(
-        `building ${String(building.id)} references unknown region ${String(building.regionId)}`,
+        `building ${String(building.id)} references unknown province ${String(building.provinceId)}`,
       );
     }
-    if (world.markets.length > 0 && !regionMarket.has(building.regionId)) {
+    if (world.markets.length > 0 && !provinceMarket.has(building.provinceId)) {
       throw new RangeError(
-        `building ${String(building.id)} is in a region with no market`,
+        `building ${String(building.id)} is in a province with no market`,
       );
     }
     const ownerAccount = accounts.byId.get(building.ownerAccountId);
@@ -1828,10 +1829,10 @@ export function assertValidEconomyState(
           `building ${String(building.id)} state owner account must be a country treasury-cash account`,
         );
       }
-      const buildingCountry = regionOwners.get(building.regionId) ?? null;
+      const buildingCountry = provinceOwners.get(building.provinceId) ?? null;
       if (buildingCountry !== ownerAccount.ownerId) {
         throw new RangeError(
-          `building ${String(building.id)} must be owned by the country that owns its region`,
+          `building ${String(building.id)} must be owned by the country that owns its province`,
         );
       }
       const operatingAccount = accounts.byId.get(building.operatingCashAccountId);
@@ -1857,8 +1858,8 @@ export function assertValidEconomyState(
         `building ${String(building.id)} owner account must belong to a pop block`,
       );
     }
-    const buildingCountry = regionOwners.get(building.regionId) ?? null;
-    const ownerCountry = regionOwners.get(ownerBlock.regionId) ?? null;
+    const buildingCountry = provinceOwners.get(building.provinceId) ?? null;
+    const ownerCountry = provinceOwners.get(ownerBlock.provinceId) ?? null;
     if (buildingCountry !== ownerCountry) {
       throw new RangeError(
         `building ${String(building.id)} and its owner popBlock ${String(ownerBlock.id)} must belong to the same country`,
@@ -1879,12 +1880,12 @@ export function assertValidEconomyState(
     const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
     const building = buildingById.get(assignment.buildingInstanceId);
     if (block === undefined || building === undefined) continue;
-    const sourceCountry = regionOwners.get(block.regionId) ?? null;
-    const destinationCountry = regionOwners.get(building.regionId) ?? null;
+    const sourceCountry = provinceOwners.get(block.provinceId) ?? null;
+    const destinationCountry = provinceOwners.get(building.provinceId) ?? null;
     if (sourceCountry === destinationCountry) continue;
     if (destinationCountry === null) {
       throw new RangeError(
-        `employment assignment cannot move country ${String(sourceCountry)} residents into an unowned region`,
+        `employment assignment cannot move country ${String(sourceCountry)} residents into an unowned province`,
       );
     }
     if (countryById.get(destinationCountry)?.immigrationOpen !== true) {
@@ -1905,10 +1906,10 @@ export function assertValidEconomyState(
     countries: world.countries,
     currencies: world.currencies,
     currencyValuations: world.currencyValuations,
-    regionIds,
+    provinceIds,
     expectedStartDay: world.startDayIndex,
   });
-  assertFiscalRegionOwnership(world);
+  assertFiscalProvinceOwnership(world);
 }
 
 /** Export for tests and scenario validation. */

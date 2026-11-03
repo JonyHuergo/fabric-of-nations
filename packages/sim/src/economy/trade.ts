@@ -29,7 +29,10 @@ import {
   TRADE_MIN_MARGIN_RATE,
 } from "./constants.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import { buildRegionOwnerMap } from "./country.js";
+import {
+  buildProvinceOwnerMap,
+  marketProvinceIds,
+} from "./country.js";
 import { isConvertibilitySuspended } from "./monetary.js";
 import {
   type AccountSubtype,
@@ -43,6 +46,7 @@ import {
   type TradeShipment,
   type TradeState,
 } from "./types.js";
+import { findAccountByOwner, findAccountsBySubtype } from "./accounts.js";
 
 export {
   assertValidTradePolicyState,
@@ -58,16 +62,16 @@ export function isFirstCivilDayOfMonth(dayIndex: DayIndex): boolean {
 }
 
 
-/** Derived infrastructure quality of a market: mean of its regions, or 0. */
+/** Derived infrastructure quality of a market: mean of its provinces, or 0. */
 export function marketInfrastructureQuality(world: World, market: Market): number {
-  if (market.regionIds.length === 0) return 0;
-  const byId = new Map(world.regions.map((region) => [region.id, region]));
   let total = 0;
-  for (const regionId of market.regionIds) {
-    const region = byId.get(regionId);
-    total += region === undefined ? 0 : region.infrastructure;
+  let count = 0;
+  for (const province of world.provinceEconomies) {
+    if (province.marketId !== market.id) continue;
+    total += province.infrastructure;
+    count += 1;
   }
-  return total / market.regionIds.length;
+  return count === 0 ? 0 : total / count;
 }
 
 /**
@@ -213,12 +217,7 @@ function accountByOwner(
   ownerId: Id | null,
   subtype: AccountSubtype,
 ): FinancialAccount {
-  const account = world.finance.accounts.find(
-    (candidate) =>
-      candidate.ownerKind === ownerKind &&
-      candidate.ownerId === ownerId &&
-      candidate.subtype === subtype,
-  );
+  const account = findAccountByOwner(world.finance.accounts, ownerKind, ownerId, subtype);
   if (account === undefined) {
     throw new RangeError(
       `${ownerKind} ${String(ownerId)} has no ${subtype} account for E6a trade`,
@@ -368,7 +367,7 @@ function dispatchTrade(
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
-  const regionOwner = buildRegionOwnerMap(world);
+  const provinceOwner = buildProvinceOwnerMap(world);
   const infrastructureByMarket = new Map<Id, number>();
   for (const market of world.markets) {
     infrastructureByMarket.set(market.id, marketInfrastructureQuality(world, market));
@@ -437,7 +436,7 @@ function dispatchTrade(
     market: Market,
     goodId: Id,
   ): { key: string; ownerBuildingId: Id; quantity: number }[] => {
-    const regions = new Set(market.regionIds);
+    const provinces = new Set(marketProvinceIds(world, market.id));
     const lots: { key: string; ownerBuildingId: Id; quantity: number }[] = [];
     for (const [key, entry] of remainingByLot) {
       if (entry.marketId !== market.id || entry.goodId !== goodId) continue;
@@ -447,7 +446,7 @@ function dispatchTrade(
       // Only a building located inside the market may export from it. Imported lots
       // (owned by a foreign building) are sold locally; re-export/entrepôt trade is not
       // modeled in E6a.
-      if (!regions.has(building.regionId)) continue;
+      if (!provinces.has(building.provinceId)) continue;
       lots.push({
         key,
         ownerBuildingId: entry.ownerBuildingId,
@@ -540,7 +539,7 @@ function dispatchTrade(
         for (const lot of exportable) {
           const building = buildingById.get(lot.ownerBuildingId);
           if (building === undefined) continue;
-          const countryId = regionOwner.get(building.regionId);
+          const countryId = provinceOwner.get(building.provinceId);
           if (countryId !== undefined) exportingCountries.add(countryId);
         }
         let restrictionAppliesToAll = exportingCountries.size > 0;
@@ -592,7 +591,7 @@ function dispatchTrade(
           }
           const building = buildingById.get(lot.ownerBuildingId);
           if (building === undefined || !building.operational) continue;
-          const countryId = regionOwner.get(building.regionId) ?? null;
+          const countryId = provinceOwner.get(building.provinceId) ?? null;
           if (countryId !== null) {
             const country = countryById.get(countryId);
             if (country !== undefined && country.trade.exportRestricted[goodId] === true) continue;
@@ -865,9 +864,7 @@ function dispatchTrade(
 }
 
 function systemCashAccount(world: World): FinancialAccount {
-  const accounts = world.finance.accounts.filter(
-    (account) => account.subtype === "system-reserve-cash",
-  );
+  const accounts = findAccountsBySubtype(world.finance.accounts, "system-reserve-cash");
   if (accounts.length !== 1) {
     throw new RangeError("E6a freight requires exactly one system-reserve account");
   }
