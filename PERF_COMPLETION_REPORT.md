@@ -63,6 +63,7 @@ All changes are recorded in `DECISIONS.md` D-137. In order of effect:
 | `pnpm audit:monetary` | **passed** (537 current files, 67 documented legacy aliases, 4 historical) |
 | `pnpm run bench:world` | **passed**: staged and phase p50 990.7 / 503.2 ms; hash `2378849b1151277d`; phase reproduces staged |
 | `node packages/bench/dist/perfTrace.js 64` | **identical** to `docs/perf/trace-baseline.txt` on all 65 lines (days 0–64) |
+| `d137-performance-invariants.test.ts` (run on its own; added after the full-suite run started) | **passed** 3/3: observer changes no hash, `summary` detail equals `full`, cached snapshot equals fresh |
 | `node packages/bench/dist/perfBench.js 92 --out docs/perf/after.json` | see §4 |
 | `node scripts/perf/playtest-stage.mjs` (headless Chrome, 844×390) | **passed** 13/13 checks: viewport, new campaign, fastest speed, save, load, no console errors/exceptions/failed loads |
 | `pnpm test` (full) | **1,323 passed, 4 failed** (1,327); the 4 are `m11-flags` ×2 (expected, unchanged committed flag provenance/doc outputs) and `m13-branding` + `m14-rusd` (both caused by this branch and fixed afterwards: the format-1 save is now refused by format version, and the monetary audit pins protocol 18). Both fixed suites were rerun and pass (15/15). A final full run was started after the fixes; see §8. |
@@ -206,7 +207,8 @@ about 80 ms, and politics/institution/interest-group initialisation about 95 ms.
 
 ## 9. Files created or modified in this report's work
 
-Created: `packages/sim/src/ordering.ts`, `docs/perf/after.json`,
+Created: `packages/sim/src/ordering.ts`,
+`packages/tests/src/d137-performance-invariants.test.ts`, `docs/perf/after.json`,
 `docs/perf/trace-current.txt`, `docs/images/perf/*`, `scripts/perf/playtest-stage.mjs`,
 this report.
 
