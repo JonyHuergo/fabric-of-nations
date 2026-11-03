@@ -42,6 +42,7 @@ import {
   isCashAccount,
   subtypeAllowsOwnerKind,
   tallyOwnerEquity,
+  accountOwnerKey,
   transactionKindChangesCash,
   type OwnerEquityTally,
 } from "./accounts.js";
@@ -658,7 +659,7 @@ export function assertValidFinanceState(finance: FinanceState): void {
   const record = requireRecord(finance, "world.finance");
   const rawAccounts = requireArray(record.accounts, "world.finance.accounts");
   const accounts = new Map<number, FinancialAccount>();
-  const ownerKeys = new Set<string>();
+  const ownerKeys = new Set<number | string>();
   let maxAccountId = 0;
   for (const value of rawAccounts) {
     const account = value as FinancialAccount;
@@ -668,7 +669,9 @@ export function assertValidFinanceState(finance: FinanceState): void {
     }
     accounts.set(account.id, account);
     maxAccountId = Math.max(maxAccountId, account.id);
-    const key = `${account.ownerKind}:${account.ownerId === null ? "-" : String(account.ownerId)}:${account.subtype}`;
+    // D-137: the collision-free numeric owner key of the finance index (no string per
+    // account); unusual owner ids fall back to the string form.
+    const key = accountOwnerKey(account.ownerKind, account.ownerId, account.subtype);
     // E6b external-counterparty accounts are per-country system accounts identified by
     // explicit ids in `World.monetary`; they are the one documented exception to the
     // one-account-per-owner/subtype rule (D-080).
@@ -1439,7 +1442,7 @@ export function assertValidEconomyState(
   //
   // The same pass collects the D-047 owner-equity tallies, so the invariant adds
   // no extra per-account scan. Reference errors are reported first.
-  const ownerEquityTallies = new Map<string, OwnerEquityTally>();
+  const ownerEquityTallies = new Map<number | string, OwnerEquityTally>();
   for (const account of world.finance.accounts) {
     if (account.ownerKind === "building") {
       if (account.ownerId === null || !buildingById.has(account.ownerId)) {

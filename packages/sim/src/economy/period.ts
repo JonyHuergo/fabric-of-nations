@@ -948,11 +948,21 @@ export function closeFinancePeriod(
   world: World,
   options: { readonly financeInPlace?: boolean } = {},
 ): FinanceCloseResult {
-  assertValidPeriodSummaries(world.finance, {
-    startDayIndex: world.startDayIndex,
-    dayIndex: world.dayIndex,
-    allowUnadvancedClose: true,
-  });
+  // D-137: inside the integrated day (in place) the close's own whole-finance
+  // validations are replaced by the month-end whole-world validation that ends the
+  // same day before it is published (tick and tickPhaseMode validate the world
+  // after every civil month end), which covers the finance state, the owner-equity
+  // invariant and the new summary. Direct callers keep every check below.
+  const inDay = options.financeInPlace === true;
+  assertValidPeriodSummaries(
+    world.finance,
+    {
+      startDayIndex: world.startDayIndex,
+      dayIndex: world.dayIndex,
+      allowUnadvancedClose: true,
+    },
+    inDay ? "latest" : "all",
+  );
   const bounds = resolveClosePeriod(world);
   // D-047: fail before staging or mutating published state when an owner that
   // has revenue/expense accounts has no single owner-equity account.
@@ -961,7 +971,7 @@ export function closeFinancePeriod(
   // D-137: in place inside the integrated day (the day's owner restores the world on
   // failure); a staged copy for direct callers.
   const staged = phaseFinance(world.finance, options.financeInPlace);
-  assertValidFinanceState(staged);
+  if (!inDay) assertValidFinanceState(staged);
 
   const summary = capturePeriodSummary(staged, bounds);
   assertSummaryTrialBalance(staged, summary);
@@ -979,13 +989,15 @@ export function closeFinancePeriod(
     staged.annualSummaries.push(buildAnnualSummary(staged, world, world.dayIndex));
   }
 
-  assertOwnerEquityInvariant(staged);
-  assertValidFinanceState(staged);
-  assertValidPeriodSummaries(staged, {
-    startDayIndex: world.startDayIndex,
-    dayIndex: world.dayIndex,
-    allowUnadvancedClose: true,
-  });
+  if (!inDay) {
+    assertOwnerEquityInvariant(staged);
+    assertValidFinanceState(staged);
+    assertValidPeriodSummaries(staged, {
+      startDayIndex: world.startDayIndex,
+      dayIndex: world.dayIndex,
+      allowUnadvancedClose: true,
+    });
+  }
   const closedAccountIds: Id[] = [];
   for (const entry of entries) closedAccountIds.push(...entry.closedAccountIds);
 

@@ -89,12 +89,36 @@ function fmix32(hash: number): number {
   return value >>> 0;
 }
 
+/**
+ * D-137: validated purposes and the hash after their three purpose steps (step 1 of
+ * the algorithm above). This is a pure function of the purpose string, memoised
+ * because every draw re-validated its purpose with a regular expression and hashed
+ * it twice. A derived value only: every draw returns the same value with or without
+ * it, nothing is stored in a world, and the cache is bounded so arbitrary purposes
+ * cannot grow it without limit.
+ */
+const purposePrefixCache = new Map<string, number>();
+const PURPOSE_PREFIX_CACHE_LIMIT = 1024;
+
+function purposePrefix(purpose: string): number {
+  const cached = purposePrefixCache.get(purpose);
+  if (cached !== undefined) return cached;
+  assertRandomPurpose(purpose);
+  let hash = fnv1a32(purpose);
+  hash = combine(hash, fnv1a32(purpose, FNV_SECOND_LANE_BASIS));
+  hash = combine(hash, purpose.length);
+  if (purposePrefixCache.size < PURPOSE_PREFIX_CACHE_LIMIT) purposePrefixCache.set(purpose, hash);
+  return hash;
+}
+
 /** Return the unsigned 32-bit result of one keyed draw. */
 export function drawUint32(key: RandomKey): number {
-  assertValidRandomKey(key);
-  let hash = fnv1a32(key.purpose);
-  hash = combine(hash, fnv1a32(key.purpose, FNV_SECOND_LANE_BASIS));
-  hash = combine(hash, key.purpose.length);
+  // `assertValidRandomKey`, in its order; the purpose check is memoised with its hash.
+  requireUint32(key.seed, "random key.seed");
+  assertValidDayIndex(key.day);
+  requireUint32(key.entityId, "random key.entityId");
+  requireUint32(key.drawIndex, "random key.drawIndex");
+  let hash = purposePrefix(key.purpose);
   hash = combine(hash, key.seed);
   hash = combine(hash, key.day);
   hash = combine(hash, key.entityId);

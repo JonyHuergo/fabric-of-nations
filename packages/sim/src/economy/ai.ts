@@ -641,13 +641,24 @@ export function buildCountryAIObservation(
   world: World,
   countryId: Id,
   dayIndex: Day,
+  /**
+   * D-137: lookups the AI phase computes once for all countries. `latestPeriodTotals`
+   * is `governmentPeriodTotals` of the latest closed summary (a closed summary and the
+   * account registry it references do not change during the phase);
+   * `sortedPopBlocks` is `world.popBlocks` in ascending id order.
+   */
+  shared: {
+    readonly latestPeriodTotals?: readonly ReturnType<typeof governmentPeriodTotals>[number][];
+    readonly sortedPopBlocks?: readonly World["popBlocks"][number][];
+  } = {},
 ): CountryAIObservation {
   const country = world.countries.find((candidate) => candidate.id === countryId);
   if (country === undefined) throw new RangeError(`unknown country ${String(countryId)}`);
   const provinceIds = new Set(countryProvinceIds(world, country.id));
   const blocks: CountryAIObservedBlock[] = [];
   let population = 0;
-  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+  for (const block of shared.sortedPopBlocks ??
+    [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     if (!provinceIds.has(block.provinceId)) continue;
     const blockPopulation = populationTotal(block);
     population += blockPopulation;
@@ -666,7 +677,7 @@ export function buildCountryAIObservation(
   const latestSummary = world.finance.periodSummaries.at(-1);
   let lastClosedPeriod: CountryAIObservedPeriod | null = null;
   if (latestSummary !== undefined) {
-    const totals = governmentPeriodTotals(world.finance, latestSummary).find(
+    const totals = (shared.latestPeriodTotals ?? governmentPeriodTotals(world.finance, latestSummary)).find(
       (entry) => entry.countryId === countryId,
     );
     if (totals === undefined) {
@@ -2035,6 +2046,10 @@ export function runCountryAIPhase(
   let appliedActionCount = 0;
   let rejectedActionCount = 0;
 
+  // Computed on the first evaluating country (D-137); see `buildCountryAIObservation`.
+  let latestPeriodTotals: ReturnType<typeof governmentPeriodTotals> | undefined;
+  // Blocks never change membership or ids during the phase (actions are fiscal).
+  let sortedPopBlocks: World["popBlocks"] | undefined;
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     // Post-M7 player control: the designated player country is never governed by
     // the AI, so the player's fiscal settings cannot be silently overwritten.
@@ -2042,7 +2057,16 @@ export function runCountryAIPhase(
     // application path below.
     if (world.playerCountryId !== null && country.id === world.playerCountryId) continue;
     if (dayIndex < country.ai.nextEvaluationDay) continue;
-    const observation = buildCountryAIObservation(world, country.id, dayIndex);
+    if (latestPeriodTotals === undefined) {
+      const latestSummary = world.finance.periodSummaries.at(-1);
+      latestPeriodTotals =
+        latestSummary === undefined ? [] : governmentPeriodTotals(world.finance, latestSummary);
+    }
+    sortedPopBlocks ??= [...world.popBlocks].sort((left, right) => left.id - right.id);
+    const observation = buildCountryAIObservation(world, country.id, dayIndex, {
+      ...(world.finance.periodSummaries.length === 0 ? {} : { latestPeriodTotals }),
+      sortedPopBlocks,
+    });
     const decision = planCountryActions(observation);
     let applied = 0;
     let rejected = 0;

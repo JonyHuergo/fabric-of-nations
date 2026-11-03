@@ -236,49 +236,73 @@ function validateAssignments(
   const blockById = new Map(world.popBlocks.map((b) => [b.id, b]));
   const { provinceOwners, countries } = countryMaps(world);
   const assignedByBlock = new Map<Id, number>();
-  const assignedBySlot = new Map<string, number>();
-  const keys = new Set<string>();
+  // D-137: slots and duplicate keys in nested numeric maps (no key strings or
+  // `split` per assignment); slots keep first-appearance order for the cap checks,
+  // and each block's eligible workforce (an age-cell sum) is computed once.
+  interface SlotUse {
+    readonly buildingId: Id;
+    readonly professionId: Id;
+    assigned: number;
+    readonly blocks: Set<Id>;
+  }
+  const slots = new Map<Id, Map<Id, SlotUse>>();
+  const slotOrder: SlotUse[] = [];
+  const eligibleByBlock = new Map<Id, number>();
 
   for (const assignment of assignments) {
     if (!Number.isInteger(assignment.workers) || assignment.workers <= 0) {
       throw new RangeError("employment assignment workers must be a positive integer");
     }
-    const key = assignmentKey(
-      assignment.popBlockId,
-      assignment.buildingInstanceId,
-      assignment.professionId,
-    );
-    if (keys.has(key)) throw new RangeError(`duplicate employment assignment ${key}`);
-    keys.add(key);
+    let byProfession = slots.get(assignment.buildingInstanceId);
+    if (byProfession === undefined) {
+      byProfession = new Map();
+      slots.set(assignment.buildingInstanceId, byProfession);
+    }
+    let slot = byProfession.get(assignment.professionId);
+    if (slot === undefined) {
+      slot = {
+        buildingId: assignment.buildingInstanceId,
+        professionId: assignment.professionId,
+        assigned: 0,
+        blocks: new Set<Id>(),
+      };
+      byProfession.set(assignment.professionId, slot);
+      slotOrder.push(slot);
+    }
+    if (slot.blocks.has(assignment.popBlockId)) {
+      throw new RangeError(
+        `duplicate employment assignment ${assignmentKey(assignment.popBlockId, assignment.buildingInstanceId, assignment.professionId)}`,
+      );
+    }
+    slot.blocks.add(assignment.popBlockId);
     const block = blockById.get(assignment.popBlockId);
     const building = buildingById.get(assignment.buildingInstanceId);
     const profession = professionById.get(assignment.professionId);
+    const key = (): string =>
+      assignmentKey(assignment.popBlockId, assignment.buildingInstanceId, assignment.professionId);
     if (block === undefined || building === undefined || profession === undefined) {
-      throw new RangeError(`employment assignment ${key} has a broken reference`);
+      throw new RangeError(`employment assignment ${key()} has a broken reference`);
     }
     if (!building.operational) {
-      throw new RangeError(`employment assignment ${key} references a non-operational building`);
+      throw new RangeError(`employment assignment ${key()} references a non-operational building`);
     }
     if (
       !laborAccessAllowed(provinceOwners, countries, block.provinceId, building.provinceId)
     ) {
       throw new RangeError(
-        `employment assignment ${key} crosses a closed border between provinces ${String(block.provinceId)} and ${String(building.provinceId)}`,
+        `employment assignment ${key()} crosses a closed border between provinces ${String(block.provinceId)} and ${String(building.provinceId)}`,
       );
     }
     const eligible = eligibleWorkforceForBlock(block, profession);
     if (eligible <= 0) {
-      throw new RangeError(`employment assignment ${key} assigns an ineligible block`);
+      throw new RangeError(`employment assignment ${key()} assigns an ineligible block`);
     }
+    if (block.professionId === profession.id) eligibleByBlock.set(block.id, eligible);
     assignedByBlock.set(
       assignment.popBlockId,
       (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
-    const slotKey = `${String(assignment.buildingInstanceId)}:${String(assignment.professionId)}`;
-    assignedBySlot.set(
-      slotKey,
-      (assignedBySlot.get(slotKey) ?? 0) + assignment.workers,
-    );
+    slot.assigned += assignment.workers;
   }
 
   for (const [blockId, assigned] of assignedByBlock) {
@@ -286,20 +310,20 @@ function validateAssignments(
     if (block === undefined) throw new RangeError(`unknown popBlock ${String(blockId)}`);
     const profession = professionById.get(block.professionId);
     if (profession === undefined) throw new RangeError(`unknown profession for popBlock ${String(blockId)}`);
-    if (assigned > eligibleWorkforceForBlock(block, profession)) {
+    const eligible = eligibleByBlock.get(blockId) ?? eligibleWorkforceForBlock(block, profession);
+    if (assigned > eligible) {
       throw new RangeError(`popBlock ${String(blockId)} exceeds its eligible workforce`);
     }
   }
-  for (const [slotKey, assigned] of assignedBySlot) {
-    const [buildingIdText, professionIdText] = slotKey.split(":");
-    const buildingId = Number(buildingIdText);
-    const professionId = Number(professionIdText);
-    const building = buildingById.get(buildingId);
-    if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
+  for (const slot of slotOrder) {
+    const building = buildingById.get(slot.buildingId);
+    if (building === undefined) throw new RangeError(`unknown building ${String(slot.buildingId)}`);
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`unknown building definition`);
-    if (assigned > jobSlotsForBuilding(definition, building, professionId)) {
-      throw new RangeError(`building ${String(buildingId)} profession ${String(professionId)} exceeds job slots`);
+    if (slot.assigned > jobSlotsForBuilding(definition, building, slot.professionId)) {
+      throw new RangeError(
+        `building ${String(slot.buildingId)} profession ${String(slot.professionId)} exceeds job slots`,
+      );
     }
   }
 }
@@ -403,9 +427,14 @@ export function refreshEmployment(
     validExisting.push({ ...assignment });
   }
 
+  // D-137: each assignment's keyed draw once (was two draws per comparison).
+  const retentionKey = new Map<Id, number>();
+  for (const assignment of validExisting) {
+    retentionKey.set(assignment.id, keyedTie(world, dayIndex, assignment.id, EMPLOYMENT_RETENTION_PURPOSE));
+  }
   validExisting.sort((left, right) => {
-    const leftKey = keyedTie(world, dayIndex, left.id, EMPLOYMENT_RETENTION_PURPOSE);
-    const rightKey = keyedTie(world, dayIndex, right.id, EMPLOYMENT_RETENTION_PURPOSE);
+    const leftKey = retentionKey.get(left.id) ?? 0;
+    const rightKey = retentionKey.get(right.id) ?? 0;
     return leftKey - rightKey || left.id - right.id;
   });
 

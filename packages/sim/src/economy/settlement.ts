@@ -37,7 +37,7 @@ import {
 import {
   buildFinanceIndex,
   designatedCashTotal,
-  isCashAccount,
+  findAccountsBySubtype,
   type FinanceIndex,
 } from "./accounts.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
@@ -749,8 +749,28 @@ function settleMarketDaysInternal(
   const index = buildFinanceIndex(world.finance);
   const transactions = prepareTransactions(world, definitions, index, pendingTransactions);
 
-  const openingBalances = new Map<Id, number>();
-  for (const account of world.finance.accounts) openingBalances.set(account.id, account.balanceRUSD);
+  // D-137: opening balances as one array in account order (restored on failure; no
+  // account is created during settlement), plus the opening cash of each producer
+  // and household and the opening designated-cash total, read before any posting.
+  // These are the values the former per-account map returned.
+  const accounts = world.finance.accounts;
+  const openingBalanceArray = new Float64Array(accounts.length);
+  for (let position = 0; position < accounts.length; position += 1) {
+    openingBalanceArray[position] = (accounts[position] as FinancialAccount).balanceRUSD;
+  }
+  const openingProducerCash = new Map<Id, number>();
+  for (const building of world.buildings) {
+    openingProducerCash.set(
+      building.operatingCashAccountId,
+      index.byId.get(building.operatingCashAccountId)?.balanceRUSD ?? 0,
+    );
+  }
+  const openingHouseholdCash = new Map<Id, number>();
+  for (const block of world.popBlocks) {
+    const account = index.find("popBlock", block.id, "household-cash");
+    if (account !== undefined) openingHouseholdCash.set(account.id, account.balanceRUSD);
+  }
+  const initialCash = designatedCashTotal(world.finance);
   const openingPostings = [...world.finance.postings];
   const openingNextPostingId = world.finance.nextPostingId;
 
@@ -944,9 +964,7 @@ function settleMarketDaysInternal(
       }
       if (obligation <= 0) continue;
       if (systemAccount === undefined) {
-        const systemAccounts = world.finance.accounts.filter(
-          (account) => account.subtype === "system-reserve-cash",
-        );
+        const systemAccounts = findAccountsBySubtype(world.finance.accounts, "system-reserve-cash");
         if (systemAccounts.length !== 1) {
           throw new RangeError("M3e upkeep requires exactly one system-reserve account");
         }
@@ -1029,7 +1047,7 @@ function settleMarketDaysInternal(
     const producers: ProducerSettlement[] = [...world.buildings]
       .sort((left, right) => left.id - right.id)
       .map((building) => {
-        const initialCash = openingBalances.get(building.operatingCashAccountId) ?? 0;
+        const initialCash = openingProducerCash.get(building.operatingCashAccountId) ?? 0;
         const current = operatingCash(index, building.id);
         const revenue = revenueByBuilding.get(building.id) ?? 0;
         const inputCosts = inputCostsByBuilding.get(building.id) ?? 0;
@@ -1064,7 +1082,7 @@ function settleMarketDaysInternal(
       .sort((left, right) => left.id - right.id)
       .map((block) => {
         const account = householdCash(index, block.id);
-        const initialCash = openingBalances.get(account.id) ?? 0;
+        const initialCash = openingHouseholdCash.get(account.id) ?? 0;
         const purchases = purchasesByBlock.get(block.id) ?? 0;
         const wages = wagesByBlock.get(block.id) ?? 0;
         const expected = initialCash - purchases + wages;
@@ -1081,11 +1099,6 @@ function settleMarketDaysInternal(
         };
       });
 
-    let initialCash = 0;
-    for (const account of world.finance.accounts) {
-      if (!isCashAccount(account)) continue;
-      initialCash += openingBalances.get(account.id) ?? 0;
-    }
     const endingCash = designatedCashTotal(world.finance);
     if (Math.abs(initialCash - endingCash) > toleranceMoney(initialCash, endingCash)) {
       throw new RangeError("market settlement did not conserve aggregate cash");
@@ -1150,10 +1163,11 @@ function settleMarketDaysInternal(
       postingIds: postings.map((posting) => posting.id),
     };
   } catch (error) {
-    for (const account of world.finance.accounts) {
-      const balance = openingBalances.get(account.id);
-      if (balance === undefined) throw new RangeError(`settlement rollback lost account ${String(account.id)}`);
-      account.balanceRUSD = balance;
+    if (accounts.length !== openingBalanceArray.length) {
+      throw new RangeError("settlement rollback found accounts created during settlement");
+    }
+    for (let position = 0; position < accounts.length; position += 1) {
+      (accounts[position] as FinancialAccount).balanceRUSD = openingBalanceArray[position] ?? 0;
     }
     world.finance.postings = openingPostings;
     world.finance.nextPostingId = openingNextPostingId;

@@ -109,8 +109,13 @@ interface ProvinceSignal {
   readonly vacancyRate: number;
 }
 
-function signalKey(provinceId: Id, professionId: Id): string {
-  return `${String(provinceId)}:${String(professionId)}`;
+/**
+ * Numeric (province, profession) key (D-137; was a `province:profession` string built
+ * for every source-destination pair). Profession ids are definition ids below 2^16
+ * (checked in `provinceSignalState`), province ids are uint32, so keys are exact.
+ */
+function signalKey(provinceId: Id, professionId: Id): number {
+  return provinceId * 65_536 + professionId;
 }
 
 /**
@@ -118,9 +123,9 @@ function signalKey(provinceId: Id, professionId: Id): string {
  * `clamp(unfilled slots / max(1, eligible provincial workforce), 0, 1)`.
  */
 interface ProvinceSignalState {
-  readonly signals: Map<string, ProvinceSignal>;
+  readonly signals: Map<number, ProvinceSignal>;
   /** Recompute the signals of the given keys after their blocks' people changed. */
-  readonly refresh: (keys: readonly string[]) => void;
+  readonly refresh: (keys: readonly number[]) => void;
 }
 
 /**
@@ -135,11 +140,16 @@ function provinceSignalState(
   definitions: EconomyDefinitions,
 ): ProvinceSignalState {
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
+  for (const profession of definitions.professions) {
+    if (!Number.isInteger(profession.id) || profession.id < 0 || profession.id >= 65_536) {
+      throw new RangeError(`migration signals require profession ids in 0..65535, received ${String(profession.id)}`);
+    }
+  }
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
-  const signals = new Map<string, ProvinceSignal>();
-  const eligible = new Map<string, number>();
-  const slots = new Map<string, number>();
-  const assigned = new Map<string, number>();
+  const signals = new Map<number, ProvinceSignal>();
+  const eligible = new Map<number, number>();
+  const slots = new Map<number, number>();
+  const assigned = new Map<number, number>();
 
   for (const block of world.popBlocks) {
     const profession = professionById.get(block.professionId);
@@ -167,22 +177,22 @@ function provinceSignalState(
     assigned.set(key, (assigned.get(key) ?? 0) + assignment.workers);
   }
 
-  const blocksByKey = new Map<string, World["popBlocks"][number][]>();
+  const blocksByKey = new Map<number, World["popBlocks"][number][]>();
   for (const block of world.popBlocks) {
     const key = signalKey(block.provinceId, block.professionId);
     const list = blocksByKey.get(key);
     if (list === undefined) blocksByKey.set(key, [block]);
     else list.push(block);
   }
-  const signalFor = (key: string): ProvinceSignal => {
+  const signalFor = (key: number): ProvinceSignal => {
     const eligibleWorkers = eligible.get(key) ?? 0;
     const unfilled = Math.max(0, (slots.get(key) ?? 0) - (assigned.get(key) ?? 0));
     const rate = unfilled / Math.max(1, eligibleWorkers);
     return { vacancyRate: Math.min(1, Math.max(0, rate)) };
   };
-  const keys = new Set<string>([...eligible.keys(), ...slots.keys()]);
+  const keys = new Set<number>([...eligible.keys(), ...slots.keys()]);
   for (const key of keys) signals.set(key, signalFor(key));
-  const refresh = (changed: readonly string[]): void => {
+  const refresh = (changed: readonly number[]): void => {
     for (const key of changed) {
       let total = 0;
       for (const block of blocksByKey.get(key) ?? []) {
@@ -212,9 +222,10 @@ function splitMigrantsByCell(
   dayIndex: DayIndex,
 ): { readonly male: Uint32Array; readonly female: Uint32Array } {
   const totalCells = block.maleByAge.length + block.femaleByAge.length;
-  const counts = new Array<number>(totalCells).fill(0);
-  const exact = new Array<number>(totalCells).fill(0);
-  const allocated = new Array<number>(totalCells).fill(0);
+  // Typed scratch (D-137): the same integer counts and float remainders.
+  const counts = new Float64Array(totalCells);
+  const exact = new Float64Array(totalCells);
+  const allocated = new Float64Array(totalCells);
   let assigned = 0;
   for (let index = 0; index < block.maleByAge.length; index += 1) {
     const cell = block.maleByAge[index] ?? 0;
@@ -237,33 +248,57 @@ function splitMigrantsByCell(
   }
   let remaining = people - assigned;
   if (remaining < 0) throw new RangeError("migration cell allocation exceeded the migrant count");
-  const order = exact
-    .map((remainder, index) => ({
-      index,
-      remainder,
-      order:
+  // Cells in (remainder descending, keyed order ascending) order. D-137: a cell's
+  // keyed order is drawn only when its remainder ties another's, and the cells with
+  // zero remainder (which sort after every positive one) are ordered only if the
+  // positive cells cannot absorb the remainder. Same order as sorting every cell by
+  // (remainder, draw), with a fraction of the draws.
+  const drawn = new Map<number, number>();
+  const orderOf = (index: number): number => {
+    let value = drawn.get(index);
+    if (value === undefined) {
+      value =
         drawUint32({
           seed: world.seed,
           day: dayIndex,
           entityId: block.id,
           purpose: MIGRATION_AGE_REMAINDER_PURPOSE,
           drawIndex: index,
-        }) + index / (totalCells + 1),
-    }))
-    .sort((left, right) => right.remainder - left.remainder || left.order - right.order);
-  for (const candidate of order) {
-    if (remaining === 0) break;
-    const cellCount = counts[candidate.index] ?? 0;
-    const current = allocated[candidate.index] ?? 0;
-    if (cellCount <= 0 || current >= cellCount) continue;
-    allocated[candidate.index] = current + 1;
-    remaining -= 1;
+        }) + index / (totalCells + 1);
+      drawn.set(index, value);
+    }
+    return value;
+  };
+  const positive: number[] = [];
+  const zero: number[] = [];
+  for (let index = 0; index < totalCells; index += 1) {
+    if ((exact[index] ?? 0) > 0) positive.push(index);
+    else zero.push(index);
+  }
+  positive.sort(
+    (left, right) =>
+      (exact[right] ?? 0) - (exact[left] ?? 0) || orderOf(left) - orderOf(right),
+  );
+  const take = (cells: readonly number[]): void => {
+    for (const index of cells) {
+      if (remaining === 0) break;
+      const cellCount = counts[index] ?? 0;
+      const current = allocated[index] ?? 0;
+      if (cellCount <= 0 || current >= cellCount) continue;
+      allocated[index] = current + 1;
+      remaining -= 1;
+    }
+  };
+  take(positive);
+  if (remaining > 0) {
+    zero.sort((left, right) => orderOf(left) - orderOf(right));
+    take(zero);
   }
   if (remaining !== 0) {
     throw new RangeError("migration cell remainder allocation did not conserve people");
   }
-  const male = Uint32Array.from(allocated.slice(0, block.maleByAge.length));
-  const female = Uint32Array.from(allocated.slice(block.maleByAge.length));
+  const male = Uint32Array.from(allocated.subarray(0, block.maleByAge.length));
+  const female = Uint32Array.from(allocated.subarray(block.maleByAge.length));
   return { male, female };
 }
 
@@ -542,6 +577,60 @@ export function runMigrationPhase(
   let sourceBlocksConsidered = 0;
   let destinationsCappedByInflowLimit = 0;
 
+  // D-137: destination attributes per profession as typed columns in the order of
+  // `blocksByProfession` (ascending id), kept current after every flow: population
+  // (the two blocks of the flow), wealth (the destination's) and vacancy (every block
+  // of the two refreshed signal keys). The candidate scan reads the same values with
+  // the same arithmetic as reading the blocks, maps and signals directly.
+  interface ProfessionColumns {
+    readonly blocks: readonly World["popBlocks"][number][];
+    readonly id: Float64Array;
+    readonly province: Float64Array;
+    /** Owner country id, or -1 for an unowned province. */
+    readonly owner: Float64Array;
+    /** 1 when the owner admits immigrants. */
+    readonly open: Uint8Array;
+    /** Standing population of the province at phase start, or -1 when it had none. */
+    readonly standing: Float64Array;
+    readonly population: Float64Array;
+    readonly wealth: Float64Array;
+    readonly vacancy: Float64Array;
+  }
+  const columnsByProfession = new Map<Id, ProfessionColumns>();
+  const columnPosition = new Map<Id, number>();
+  const positionsByKey = new Map<number, number[]>();
+  for (const [professionId, list] of blocksByProfession) {
+    const columns: ProfessionColumns = {
+      blocks: list,
+      id: new Float64Array(list.length),
+      province: new Float64Array(list.length),
+      owner: new Float64Array(list.length),
+      open: new Uint8Array(list.length),
+      standing: new Float64Array(list.length),
+      population: new Float64Array(list.length),
+      wealth: new Float64Array(list.length),
+      vacancy: new Float64Array(list.length),
+    };
+    list.forEach((block, position) => {
+      const owner = provinceOwners.get(block.provinceId);
+      columns.id[position] = block.id;
+      columns.province[position] = block.provinceId;
+      columns.owner[position] = owner ?? -1;
+      columns.open[position] =
+        owner !== undefined && countryById.get(owner)?.immigrationOpen === true ? 1 : 0;
+      columns.standing[position] = standingByProvince.get(block.provinceId) ?? -1;
+      columns.population[position] = populationOf(block);
+      columns.wealth[position] = block.wealthLevel;
+      const key = signalKey(block.provinceId, professionId);
+      columns.vacancy[position] = signals.get(key)?.vacancyRate ?? 0;
+      if (!columnPosition.has(block.id)) columnPosition.set(block.id, position);
+      const positions = positionsByKey.get(key);
+      if (positions === undefined) positionsByKey.set(key, [position]);
+      else positions.push(position);
+    });
+    columnsByProfession.set(professionId, columns);
+  }
+
   const sourceOrder = [...world.popBlocks].sort((left, right) => {
     const leftKey = drawUint32({
       seed: world.seed,
@@ -571,25 +660,26 @@ export function runMigrationPhase(
       const sourceSignal = signals.get(signalKey(source.provinceId, source.professionId));
 
       const candidates: Candidate[] = [];
-      for (const destination of blocksByProfession.get(source.professionId) ?? []) {
-        if (destination.id === source.id) continue;
-        if (destination.provinceId === source.provinceId) continue;
-        const destinationPopulation = populationOf(destination);
+      const columns = columnsByProfession.get(source.professionId);
+      const destinations = columns?.blocks ?? [];
+      const sourceOwner = sourceCountryId ?? -1;
+      const sourceVacancyRate = sourceSignal?.vacancyRate ?? 0;
+      for (let position = 0; position < destinations.length; position += 1) {
+        if (columns === undefined) break;
+        if (columns.id[position] === source.id) continue;
+        if (columns.province[position] === source.provinceId) continue;
+        const destinationPopulation = columns.population[position] ?? 0;
         if (destinationPopulation <= 0) continue;
-        const destinationCountryId = provinceOwners.get(destination.provinceId) ?? null;
-        if (sourceCountryId !== destinationCountryId) {
-          if (destinationCountryId === null) continue;
-          if (countryById.get(destinationCountryId)?.immigrationOpen !== true) continue;
+        const destinationOwner = columns.owner[position] ?? -1;
+        if (sourceOwner !== destinationOwner) {
+          if (destinationOwner === -1) continue;
+          if (columns.open[position] !== 1) continue;
         }
-        const destinationSignal = signals.get(
-          signalKey(destination.provinceId, source.professionId),
-        );
-        const vacancyRate = destinationSignal?.vacancyRate ?? 0;
-        const sourceVacancyRate = sourceSignal?.vacancyRate ?? 0;
+        const vacancyRate = columns.vacancy[position] ?? 0;
         const netVacancy = vacancyRate - sourceVacancyRate;
         const wealthGap = Math.max(
           -1,
-          Math.min(1, (destination.wealthLevel - source.wealthLevel) / 100),
+          Math.min(1, ((columns.wealth[position] ?? 0) - source.wealthLevel) / 100),
         );
         const pressure =
           MIGRATION_VACANCY_WEIGHT * Math.max(0, netVacancy) +
@@ -601,7 +691,9 @@ export function runMigrationPhase(
         );
         let people = Math.floor(sourcePopulationBefore * fraction);
         if (people < 1) continue;
-        const standing = standingByProvince.get(destination.provinceId) ?? destinationPopulation;
+        const destination = destinations[position] as World["popBlocks"][number];
+        const standingAtStart = columns.standing[position] ?? -1;
+        const standing = standingAtStart >= 0 ? standingAtStart : destinationPopulation;
         const cap = Math.floor(standing * MIGRATION_MONTHLY_INFLOW_CAP_FRACTION);
         const alreadyIn = inflowByProvince.get(destination.provinceId) ?? 0;
         const remainingCapacity = cap - alreadyIn;
@@ -612,35 +704,54 @@ export function runMigrationPhase(
         if (people > remainingCapacity) people = remainingCapacity;
         if (people > sourcePopulationBefore) people = sourcePopulationBefore;
         if (people < 1) continue;
-        candidates.push({
-          destination,
-          pressure,
+        // D-137: only the candidates at the highest pressure can be chosen, so the
+        // keyed order is drawn below for those alone (the former sort by pressure,
+        // draw and id chose the same block).
+        if (candidates.length > 0 && pressure < (candidates[0] as Candidate).pressure) continue;
+        if (candidates.length > 0 && pressure > (candidates[0] as Candidate).pressure) candidates.length = 0;
+        candidates.push({ destination, pressure, order: 0, people });
+      }
+      if (candidates.length === 0) continue;
+      let chosen = candidates[0];
+      if (candidates.length > 1) {
+        const ranked = candidates.map((candidate) => ({
+          ...candidate,
           order: drawUint32({
             seed: world.seed,
             day: dayIndex,
             entityId: source.id,
             purpose: MIGRATION_DESTINATION_PURPOSE,
-            drawIndex: destination.id,
+            drawIndex: candidate.destination.id,
           }),
-          people,
-        });
+        }));
+        ranked.sort(
+          (left, right) => left.order - right.order || left.destination.id - right.destination.id,
+        );
+        chosen = ranked[0];
       }
-      if (candidates.length === 0) continue;
-      candidates.sort(
-        (left, right) =>
-          right.pressure - left.pressure ||
-          left.order - right.order ||
-          left.destination.id - right.destination.id,
-      );
-      const chosen = candidates[0];
       if (chosen === undefined) continue;
       applyFlow(world, dayIndex, source, chosen.destination, chosen.people, flows, inflowByProvince);
       blockPopulation.set(source.id, populationTotal(source));
       blockPopulation.set(chosen.destination.id, populationTotal(chosen.destination));
-      signalState.refresh([
+      const changedKeys = [
         signalKey(source.provinceId, source.professionId),
         signalKey(chosen.destination.provinceId, chosen.destination.professionId),
-      ]);
+      ];
+      signalState.refresh(changedKeys);
+      for (const block of [source, chosen.destination]) {
+        const blockColumns = columnsByProfession.get(block.professionId);
+        const position = columnPosition.get(block.id);
+        if (blockColumns === undefined || position === undefined) continue;
+        blockColumns.population[position] = blockPopulation.get(block.id) ?? populationTotal(block);
+        blockColumns.wealth[position] = block.wealthLevel;
+      }
+      for (const key of changedKeys) {
+        const keyColumns = columnsByProfession.get(key % 65_536);
+        const vacancy = signals.get(key)?.vacancyRate ?? 0;
+        for (const position of positionsByKey.get(key) ?? []) {
+          if (keyColumns !== undefined) keyColumns.vacancy[position] = vacancy;
+        }
+      }
       if (!blocksById.has(source.id)) throw new RangeError("migration lost its source block");
     }
     if (flows.length > 0) {
@@ -714,8 +825,8 @@ function applyFlow(
 
   // M9: capture the destination's pre-flow population by age so the migrating
   // cohort's age-specific literacy can be merged with the correct weights.
-  const destinationMaleBefore = [...destination.maleByAge];
-  const destinationFemaleBefore = [...destination.femaleByAge];
+  const destinationMaleBefore = destination.maleByAge.slice();
+  const destinationFemaleBefore = destination.femaleByAge.slice();
 
   subtractCells(source, cells.male, cells.female);
   addCells(destination, cells.male, cells.female);

@@ -235,12 +235,18 @@ export function runProfitDistributionPhase(
   ) {
     throw new RangeError("profit allocation requires the latest published period summary");
   }
-  assertValidFinanceState(world.finance);
-  assertValidPeriodSummaries(world.finance, {
-    startDayIndex: world.startDayIndex,
-    dayIndex,
-    allowUnadvancedClose: true,
-  });
+  // D-137: inside the integrated day (in place) the whole-finance validations of
+  // this phase's input (the close's output) and output are those of the month-end
+  // whole-world validation that ends the same day; direct callers keep them.
+  const inDay = options.financeInPlace === true;
+  if (!inDay) {
+    assertValidFinanceState(world.finance);
+    assertValidPeriodSummaries(world.finance, {
+      startDayIndex: world.startDayIndex,
+      dayIndex,
+      allowUnadvancedClose: true,
+    });
+  }
 
   const openingCash = designatedCashTotal(world.finance);
   // D-137: in place inside the integrated day, staged for direct callers.
@@ -358,13 +364,15 @@ export function runProfitDistributionPhase(
   if (entries.length > 0) {
     postingIds = postJournalBatch(staged, dayIndex, entries).map((posting) => posting.id);
   }
-  assertValidFinanceState(staged);
+  if (!inDay) assertValidFinanceState(staged);
   assertAccountingIdentity(staged);
-  assertValidPeriodSummaries(staged, {
-    startDayIndex: world.startDayIndex,
-    dayIndex,
-    allowUnadvancedClose: true,
-  });
+  if (!inDay) {
+    assertValidPeriodSummaries(staged, {
+      startDayIndex: world.startDayIndex,
+      dayIndex,
+      allowUnadvancedClose: true,
+    });
+  }
   const closingCash = designatedCashTotal(staged);
   if (Math.abs(openingCash - closingCash) > toleranceMoney(openingCash, closingCash)) {
     throw new RangeError("profit allocation did not conserve aggregate designated cash");

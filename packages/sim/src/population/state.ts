@@ -164,7 +164,11 @@ export function assertValidPopBlock(block: PopBlock): void {
     );
   }
   for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
-    assertRate(literacyByAge[age], `popBlock.literacyByAge[${String(age)}]`);
+    // `assertRate`, with the path built only for a failing cell (D-137).
+    const value: unknown = literacyByAge[age];
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) {
+      assertRate(value, `popBlock.literacyByAge[${String(age)}]`);
+    }
   }
   const derived = adultLiteracy(block);
   if (Math.abs(derived - record.literacy) > LITERACY_AGGREGATE_TOLERANCE) {
@@ -258,11 +262,15 @@ export function assertValidPopulationState(world: World): void {
     }
   }
 
+  // D-137: block ids per province once (was a filter of every block per province).
+  const blockIdsByProvince = new Map<number, number[]>();
+  for (const block of blocks as PopBlock[]) {
+    const list = blockIdsByProvince.get(block.provinceId);
+    if (list === undefined) blockIdsByProvince.set(block.provinceId, [block.id]);
+    else list.push(block.id);
+  }
   for (const province of provinces as ProvinceEconomy[]) {
-    const expected = (blocks as PopBlock[])
-      .filter((block) => block.provinceId === province.id)
-      .map((block) => block.id)
-      .sort((left, right) => left - right);
+    const expected = [...(blockIdsByProvince.get(province.id) ?? [])].sort((left, right) => left - right);
     const actual = [...province.popBlockIds].sort((left, right) => left - right);
     if (expected.length !== actual.length || expected.some((value, index) => value !== actual[index])) {
       throw new RangeError(`province ${String(province.id)} popBlockIds do not match its pop blocks`);

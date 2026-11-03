@@ -1928,13 +1928,19 @@ export interface OwnerEquityTally {
 export function ownerEquityKey(
   ownerKind: FinancialAccountOwnerKind,
   ownerId: Id | null,
-): string {
+): number | string {
+  // D-137: numeric for integer owner ids (no string per account in validation);
+  // other ids keep the string form, which can never equal a number.
+  const ownerCode = ownerId === null ? 0 : ownerId + 1;
+  if (Number.isInteger(ownerCode) && ownerCode >= 0 && ownerCode < NUMERIC_OWNER_KEY_LIMIT) {
+    return ownerCode * 4 + OWNER_KIND_CODES[ownerKind];
+  }
   return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}`;
 }
 
 /** Fold one account into an owner-equity tally map. */
 export function tallyOwnerEquity(
-  tallies: Map<string, OwnerEquityTally>,
+  tallies: Map<number | string, OwnerEquityTally>,
   account: FinancialAccount,
 ): void {
   const key = ownerEquityKey(account.ownerKind, account.ownerId);
@@ -1984,7 +1990,7 @@ export function assertOwnerEquityTallies(tallies: Iterable<OwnerEquityTally>): v
  * pass. It never creates an equity account implicitly.
  */
 export function assertOwnerEquityInvariant(finance: FinanceState): void {
-  const tallies = new Map<string, OwnerEquityTally>();
+  const tallies = new Map<number | string, OwnerEquityTally>();
   for (const value of requireArray(finance.accounts, "finance.accounts")) {
     tallyOwnerEquity(tallies, value as FinancialAccount);
   }
@@ -2114,6 +2120,14 @@ const NUMERIC_OWNER_KEY_LIMIT = 2 ** 40;
  * lookup on the settlement hot path; unusual owner ids fall back to the string form,
  * which can never equal a number, so the two key spaces cannot collide.
  */
+export function accountOwnerKey(
+  ownerKind: FinancialAccountOwnerKind,
+  ownerId: Id | null,
+  subtype: AccountSubtype,
+): number | string {
+  return ownerKey(ownerKind, ownerId, subtype);
+}
+
 function ownerKey(
   ownerKind: FinancialAccountOwnerKind,
   ownerId: Id | null,
