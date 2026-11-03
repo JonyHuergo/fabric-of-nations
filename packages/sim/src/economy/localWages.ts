@@ -24,14 +24,20 @@ export function localWageIndex(
   blocks: readonly World["popBlocks"][number][],
   definitions: EconomyDefinitions | undefined,
   professionKeys: ReadonlySet<string>,
+  /** The non-empty province wage tables, when the caller already built them (D-137). */
+  provinceWages?: ReadonlyMap<Id, readonly number[]>,
 ): number {
   if (definitions === undefined || professionKeys.size === 0) return 1;
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
-  const wagesByProvince = new Map<Id, readonly number[]>();
-  for (const province of world.provinceEconomies) {
-    if (province.wageRUSDPerYearByProfession.length > 0) {
-      wagesByProvince.set(province.id, province.wageRUSDPerYearByProfession);
+  let wagesByProvince = provinceWages;
+  if (wagesByProvince === undefined) {
+    const built = new Map<Id, readonly number[]>();
+    for (const province of world.provinceEconomies) {
+      if (province.wageRUSDPerYearByProfession.length > 0) {
+        built.set(province.id, province.wageRUSDPerYearByProfession);
+      }
     }
+    wagesByProvince = built;
   }
   if (wagesByProvince.size === 0) return 1;
   let local = 0;

@@ -40,7 +40,7 @@ import {
   assertAccountingIdentity,
   assertOwnerEquityInvariant,
   categoryAllowsNegativeBalance,
-  cloneFinanceState,
+  phaseFinance,
   FLOW_EXPENSE_SUBTYPE,
 } from "./accounts.js";
 import {
@@ -944,7 +944,10 @@ function buildAnnualSummary(
  * Failure: throws before `world.finance` is replaced, leaving every account,
  * balance, posting, summary, and the close boundary unchanged.
  */
-export function closeFinancePeriod(world: World): FinanceCloseResult {
+export function closeFinancePeriod(
+  world: World,
+  options: { readonly financeInPlace?: boolean } = {},
+): FinanceCloseResult {
   assertValidPeriodSummaries(world.finance, {
     startDayIndex: world.startDayIndex,
     dayIndex: world.dayIndex,
@@ -955,7 +958,9 @@ export function closeFinancePeriod(world: World): FinanceCloseResult {
   // has revenue/expense accounts has no single owner-equity account.
   assertOwnerEquityInvariant(world.finance);
 
-  const staged = cloneFinanceState(world.finance);
+  // D-137: in place inside the integrated day (the day's owner restores the world on
+  // failure); a staged copy for direct callers.
+  const staged = phaseFinance(world.finance, options.financeInPlace);
   assertValidFinanceState(staged);
 
   const summary = capturePeriodSummary(staged, bounds);

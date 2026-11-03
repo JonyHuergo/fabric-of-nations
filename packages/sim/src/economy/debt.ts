@@ -10,7 +10,7 @@ import { assertValidWorld, assertValidWorldForTick, type PhaseValidationOptions,
 
 import { postJournalBatch, postJournalEntry, type JournalEntryInput } from "./accounting.js";
 
-import { assertAccountingIdentity, buildFinanceIndex, cloneFinanceState, designatedCashTotal, type FinanceIndex, } from "./accounts.js";
+import { assertAccountingIdentity, buildFinanceIndex, cloneFinanceState, designatedCashTotal, phaseFinance, type FinanceIndex, } from "./accounts.js";
 
 import { MAX_ACTIVE_DEBT_CONTRACTS, MAX_DEBT_COUPON_RATE, MAX_DEBT_TERM_DAYS, MAX_RETAINED_TERMINATED_DEBT_CONTRACTS, MIN_DEBT_COUPON_RATE, MIN_DEBT_TERM_DAYS, } from "./constants.js";
 
@@ -618,9 +618,10 @@ export function runDebtPhase(world: World, dayIndex: DayIndex, options: PhaseVal
         return emptyDebtResult(dayIndex);
     }
     if (options.validateWorld !== false) assertValidFinanceState(world.finance);
-    const staged = cloneFinanceState(world.finance);
-    const index = buildFinanceIndex(staged);
     const openingCash = designatedCashTotal(world.finance);
+    // D-137: in place inside the integrated day, staged for direct callers.
+    const staged = phaseFinance(world.finance, options.financeInPlace);
+    const index = buildFinanceIndex(staged);
     const monthEnd = isLastCivilDayOfMonth(dayIndex);
     const results = new Map<Id, DebtContractResult>();
     let interestAccrued = 0;

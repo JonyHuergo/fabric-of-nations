@@ -188,7 +188,6 @@ export interface MarketSettlementResult {
 }
 
 interface PreparedTransaction extends SettledMarketTransaction {
-  readonly key: string;
   readonly transactionKind: "goods-purchase" | "input-purchase";
   readonly buyerExpenseAccountId: Id;
   readonly sellerRevenueAccountId: Id;
@@ -224,19 +223,19 @@ function operatingCash(index: FinanceIndex, buildingId: Id): FinancialAccount {
   return account;
 }
 
-function assertTransactionAmount(transaction: PendingTransaction, path: string): void {
-  for (const [name, value] of [
-    ["quantity", transaction.quantity],
-    ["unitPriceRUSD", transaction.unitPriceRUSD],
-    ["totalRUSD", transaction.totalRUSD],
-  ] as const) {
-    if (!Number.isFinite(value) || !(value > 0)) {
-      throw new RangeError(`${path}.${name} must be finite and strictly positive`);
-    }
-  }
+function assertTransactionAmount(transaction: PendingTransaction, index: number): void {
+  // Same checks, order and messages as before; the path is built only on failure.
+  const fail = (name: string): never => {
+    throw new RangeError(`pendingTransactions[${String(index)}].${name} must be finite and strictly positive`);
+  };
+  if (!Number.isFinite(transaction.quantity) || !(transaction.quantity > 0)) fail("quantity");
+  if (!Number.isFinite(transaction.unitPriceRUSD) || !(transaction.unitPriceRUSD > 0)) fail("unitPriceRUSD");
+  if (!Number.isFinite(transaction.totalRUSD) || !(transaction.totalRUSD > 0)) fail("totalRUSD");
   const expected = transaction.quantity * transaction.unitPriceRUSD;
   if (Math.abs(expected - transaction.totalRUSD) > toleranceMoney(expected, transaction.totalRUSD)) {
-    throw new RangeError(`${path}.totalRUSD does not reconcile with quantity × unit price`);
+    throw new RangeError(
+      `pendingTransactions[${String(index)}].totalRUSD does not reconcile with quantity × unit price`,
+    );
   }
 }
 
@@ -246,6 +245,20 @@ function transactionKey(transaction: PendingTransaction): string {
       ? `household:${String(transaction.buyerPopBlockId)}`
       : `building:${String(transaction.buyerBuildingId)}`;
   return `${transaction.kind}:${buyer}:${String(transaction.sellerBuildingId)}:${String(transaction.goodId)}:${String(transaction.tier)}:${transaction.phase}`;
+}
+
+const MARKET_TRANSACTION_TIERS: ReadonlySet<number> = new Set([1, 2, 3, 5, 6]);
+
+/**
+ * Rank of each value as its decimal text compares inside a `transactionKey`, where
+ * every field is followed by `:` (D-137). No field contains `:`, so comparing two
+ * keys equals comparing their fields in order as `text + ":"`; ranking each field's
+ * distinct values once reproduces the string sort with numeric comparisons only.
+ */
+function keyFieldRanks(values: Iterable<number | null>): Map<number | null, number> {
+  const distinct = [...new Set(values)].map((value) => ({ value, text: `${String(value)}:` }));
+  distinct.sort((left, right) => (left.text < right.text ? -1 : left.text > right.text ? 1 : 0));
+  return new Map(distinct.map((entry, rank) => [entry.value, rank] as const));
 }
 
 /**
@@ -338,62 +351,136 @@ function prepareTransactions(
 ): PreparedTransaction[] {
   const goodIds = new Set(definitions.goods.map((good) => good.id));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
-  const seen = new Set<string>();
+  // Accounts per owner, looked up once (an owner appears in many transactions).
+  const sellerAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly revenue: FinancialAccount }>();
+  const householdAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly expense: FinancialAccount }>();
+  const buildingBuyerAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly expense: FinancialAccount }>();
   const prepared: PreparedTransaction[] = [];
   for (let index_ = 0; index_ < transactions.length; index_ += 1) {
     const transaction = transactions[index_];
     if (transaction === undefined) throw new RangeError(`pending transaction ${String(index_)} is missing`);
-    const path = `pendingTransactions[${String(index_)}]`;
-    assertTransactionAmount(transaction, path);
-    if (!goodIds.has(transaction.goodId)) throw new RangeError(`${path}.goodId is unknown`);
-    if (!buildingById.has(transaction.sellerBuildingId)) {
-      throw new RangeError(`${path}.sellerBuildingId is unknown`);
+    assertTransactionAmount(transaction, index_);
+    if (!goodIds.has(transaction.goodId)) {
+      throw new RangeError(`pendingTransactions[${String(index_)}].goodId is unknown`);
     }
-    const seller = operatingCash(index, transaction.sellerBuildingId);
-    const sellerRevenue = index.get("building", transaction.sellerBuildingId, "sales-revenue");
-    let buyer: FinancialAccount;
-    let buyerExpense: FinancialAccount;
+    if (!buildingById.has(transaction.sellerBuildingId)) {
+      throw new RangeError(`pendingTransactions[${String(index_)}].sellerBuildingId is unknown`);
+    }
+    let seller = sellerAccounts.get(transaction.sellerBuildingId);
+    if (seller === undefined) {
+      seller = {
+        cash: operatingCash(index, transaction.sellerBuildingId),
+        revenue: index.get("building", transaction.sellerBuildingId, "sales-revenue"),
+      };
+      sellerAccounts.set(transaction.sellerBuildingId, seller);
+    }
+    let buyer: { readonly cash: FinancialAccount; readonly expense: FinancialAccount };
     if (transaction.kind === "household-purchase") {
       if (transaction.buyerPopBlockId === null || transaction.buyerBuildingId !== null) {
-        throw new RangeError(`${path} must identify exactly one household buyer`);
+        throw new RangeError(`pendingTransactions[${String(index_)}] must identify exactly one household buyer`);
       }
-      buyer = householdCash(index, transaction.buyerPopBlockId);
-      buyerExpense = index.get("popBlock", transaction.buyerPopBlockId, "consumption-expense");
+      const cached = householdAccounts.get(transaction.buyerPopBlockId);
+      if (cached === undefined) {
+        buyer = {
+          cash: householdCash(index, transaction.buyerPopBlockId),
+          expense: index.get("popBlock", transaction.buyerPopBlockId, "consumption-expense"),
+        };
+        householdAccounts.set(transaction.buyerPopBlockId, buyer);
+      } else {
+        buyer = cached;
+      }
     } else if (transaction.kind === "input-purchase") {
       if (transaction.buyerBuildingId === null || transaction.buyerPopBlockId !== null) {
-        throw new RangeError(`${path} must identify exactly one building buyer`);
+        throw new RangeError(`pendingTransactions[${String(index_)}] must identify exactly one building buyer`);
       }
       const buyerBuilding = buildingById.get(transaction.buyerBuildingId);
       if (buyerBuilding === undefined || !buyerBuilding.operational) {
-        throw new RangeError(`${path}.buyerBuildingId must reference an operational building`);
+        throw new RangeError(
+          `pendingTransactions[${String(index_)}].buyerBuildingId must reference an operational building`,
+        );
       }
-      buyer = operatingCash(index, transaction.buyerBuildingId);
-      buyerExpense = index.get("building", transaction.buyerBuildingId, "input-expense");
+      const cached = buildingBuyerAccounts.get(transaction.buyerBuildingId);
+      if (cached === undefined) {
+        buyer = {
+          cash: operatingCash(index, transaction.buyerBuildingId),
+          expense: index.get("building", transaction.buyerBuildingId, "input-expense"),
+        };
+        buildingBuyerAccounts.set(transaction.buyerBuildingId, buyer);
+      } else {
+        buyer = cached;
+      }
     } else {
-      throw new RangeError(`${path}.kind is invalid`);
+      throw new RangeError(`pendingTransactions[${String(index_)}].kind is invalid`);
     }
-    if (![1, 2, 3, 5, 6].includes(transaction.tier)) {
-      throw new RangeError(`${path}.tier is invalid`);
+    if (!MARKET_TRANSACTION_TIERS.has(transaction.tier)) {
+      throw new RangeError(`pendingTransactions[${String(index_)}].tier is invalid`);
     }
     if (transaction.phase !== "A" && transaction.phase !== "B") {
-      throw new RangeError(`${path}.phase must be A or B`);
+      throw new RangeError(`pendingTransactions[${String(index_)}].phase must be A or B`);
     }
-    const key = transactionKey(transaction);
-    if (seen.has(key)) throw new RangeError(`duplicate pending transaction ${key}`);
-    seen.add(key);
     prepared.push({
-      ...transaction,
-      buyerAccountId: buyer.id,
-      sellerAccountId: seller.id,
-      buyerExpenseAccountId: buyerExpense.id,
-      sellerRevenueAccountId: sellerRevenue.id,
+      kind: transaction.kind,
+      buyerPopBlockId: transaction.buyerPopBlockId,
+      buyerBuildingId: transaction.buyerBuildingId,
+      sellerBuildingId: transaction.sellerBuildingId,
+      goodId: transaction.goodId,
+      quantity: transaction.quantity,
+      unitPriceRUSD: transaction.unitPriceRUSD,
+      totalRUSD: transaction.totalRUSD,
+      tier: transaction.tier,
+      phase: transaction.phase,
+      buyerAccountId: buyer.cash.id,
+      sellerAccountId: seller.cash.id,
+      buyerExpenseAccountId: buyer.expense.id,
+      sellerRevenueAccountId: seller.revenue.id,
       transactionKind:
         transaction.kind === "household-purchase" ? "goods-purchase" : "input-purchase",
-      key,
     });
   }
-  prepared.sort((left, right) => (left.key < right.key ? -1 : left.key > right.key ? 1 : 0));
-  return prepared;
+  // Canonical `transactionKey` order (D-137: by field ranks, see `keyFieldRanks`).
+  // "household-purchase" sorts before "input-purchase", and the buyer word is fixed
+  // by the kind, so the buyer id is the next field that can differ.
+  const buyerRank = keyFieldRanks(
+    prepared.map((transaction) => transaction.buyerPopBlockId ?? transaction.buyerBuildingId),
+  );
+  const sellerRank = keyFieldRanks(prepared.map((transaction) => transaction.sellerBuildingId));
+  const goodRank = keyFieldRanks(prepared.map((transaction) => transaction.goodId));
+  const tierRank = keyFieldRanks(prepared.map((transaction) => transaction.tier));
+  const ranked = prepared.map((transaction) => ({
+    transaction,
+    kind: transaction.kind === "household-purchase" ? 0 : 1,
+    buyer: buyerRank.get(transaction.buyerPopBlockId ?? transaction.buyerBuildingId) ?? 0,
+    seller: sellerRank.get(transaction.sellerBuildingId) ?? 0,
+    good: goodRank.get(transaction.goodId) ?? 0,
+    tier: tierRank.get(transaction.tier) ?? 0,
+    phase: transaction.phase === "A" ? 0 : 1,
+  }));
+  ranked.sort(
+    (left, right) =>
+      left.kind - right.kind ||
+      left.buyer - right.buyer ||
+      left.seller - right.seller ||
+      left.good - right.good ||
+      left.tier - right.tier ||
+      left.phase - right.phase,
+  );
+  for (let position = 1; position < ranked.length; position += 1) {
+    const previous = ranked[position - 1];
+    const current = ranked[position];
+    if (
+      previous !== undefined &&
+      current !== undefined &&
+      previous.kind === current.kind &&
+      previous.buyer === current.buyer &&
+      previous.seller === current.seller &&
+      previous.good === current.good &&
+      previous.tier === current.tier &&
+      previous.phase === current.phase
+    ) {
+      throw new RangeError(`duplicate pending transaction ${transactionKey(current.transaction)}`);
+    }
+  }
+  return ranked.map((entry) => entry.transaction);
 }
 
 function allocateMoney(
@@ -414,23 +501,24 @@ function allocateMoney(
     allocated += quantity;
   }
   let residual = total - allocated;
-  const order = [...groups].sort((left, right) => {
-    const leftKey = drawUint32({
-      seed: world.seed,
-      day: dayIndex,
-      entityId: left.popBlockId,
-      purpose: M3E_WAGE_RESIDUAL_PURPOSE,
-      drawIndex: 0,
-    });
-    const rightKey = drawUint32({
-      seed: world.seed,
-      day: dayIndex,
-      entityId: right.popBlockId,
-      purpose: M3E_WAGE_RESIDUAL_PURPOSE,
-      drawIndex: 0,
-    });
-    return leftKey - rightKey || left.popBlockId - right.popBlockId;
-  });
+  // The keyed order is read only when a residual beyond tolerance remains; each
+  // group's draw is computed once rather than twice per comparison (D-137).
+  const order =
+    Math.abs(residual) > toleranceMoney(residual)
+      ? groups
+          .map((group) => ({
+            group,
+            key: drawUint32({
+              seed: world.seed,
+              day: dayIndex,
+              entityId: group.popBlockId,
+              purpose: M3E_WAGE_RESIDUAL_PURPOSE,
+              drawIndex: 0,
+            }),
+          }))
+          .sort((left, right) => left.key - right.key || left.group.popBlockId - right.group.popBlockId)
+          .map((entry) => entry.group)
+      : [];
   for (let attempt = 0; attempt < order.length && Math.abs(residual) > toleranceMoney(residual); attempt += 1) {
     const group = order[attempt];
     if (group === undefined) break;
@@ -1040,7 +1128,20 @@ function settleMarketDaysInternal(
       startDayIndex: world.startDayIndex,
       settlementNextPostingId: world.finance.nextPostingId,
       fiscalApplied: false,
-      transactions: transactions.map(({ key: _key, transactionKind: _kind, ...transaction }) => transaction),
+      transactions: transactions.map((transaction) => ({
+        kind: transaction.kind,
+        buyerPopBlockId: transaction.buyerPopBlockId,
+        buyerBuildingId: transaction.buyerBuildingId,
+        sellerBuildingId: transaction.sellerBuildingId,
+        goodId: transaction.goodId,
+        quantity: transaction.quantity,
+        unitPriceRUSD: transaction.unitPriceRUSD,
+        totalRUSD: transaction.totalRUSD,
+        tier: transaction.tier,
+        phase: transaction.phase,
+        buyerAccountId: transaction.buyerAccountId,
+        sellerAccountId: transaction.sellerAccountId,
+      })),
       wages: wageSettlements,
       upkeep: upkeepSettlements,
       producers,

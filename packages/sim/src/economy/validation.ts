@@ -1487,6 +1487,12 @@ export function assertValidEconomyState(
   // account exists.
   assertOwnerEquityTallies(ownerEquityTallies.values());
 
+  // D-137: blocks by id once, first occurrence first, as the per-assignment
+  // `world.popBlocks.find` scans returned them.
+  const blockById = new Map<number, World["popBlocks"][number]>();
+  for (const block of world.popBlocks) {
+    if (!blockById.has(block.id)) blockById.set(block.id, block);
+  }
   const rawAssignments = requireArray(world.employment, "world.employment");
   const assignmentIds = new Set<number>();
   const assignmentKeys = new Set<string>();
@@ -1512,7 +1518,7 @@ export function assertValidEconomyState(
     if (!building.operational) {
       throw new RangeError("employment assignment references a non-operational building");
     }
-    const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
+    const block = blockById.get(assignment.popBlockId);
     if (block === undefined) {
       throw new RangeError(
         `employment assignment references unknown popBlock ${String(assignment.popBlockId)}`,
@@ -1524,7 +1530,7 @@ export function assertValidEconomyState(
     );
   }
   for (const [blockId, assigned] of assignedByBlock) {
-    const block = world.popBlocks.find((candidate) => candidate.id === blockId);
+    const block = blockById.get(blockId);
     if (block === undefined) throw new RangeError(`unknown popBlock ${String(blockId)}`);
     if (assigned > workingAgePopulation(block)) {
       throw new RangeError(
@@ -1854,7 +1860,7 @@ export function assertValidEconomyState(
     const ownerBlock =
       ownerAccount.ownerId === null
         ? undefined
-        : world.popBlocks.find((block) => block.id === ownerAccount.ownerId);
+        : blockById.get(ownerAccount.ownerId);
     if (ownerBlock === undefined) {
       throw new RangeError(
         `building ${String(building.id)} owner account must belong to a pop block`,
@@ -1879,7 +1885,7 @@ export function assertValidEconomyState(
   }
 
   for (const assignment of world.employment) {
-    const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
+    const block = blockById.get(assignment.popBlockId);
     const building = buildingById.get(assignment.buildingInstanceId);
     if (block === undefined || building === undefined) continue;
     const sourceCountry = provinceOwners.get(block.provinceId) ?? null;

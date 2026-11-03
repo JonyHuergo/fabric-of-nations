@@ -153,6 +153,66 @@ export function countryProvinceIds(world: World, countryId: Id): Id[] {
   return result;
 }
 
+/**
+ * D-137: per-country population lookups that service derivations (education,
+ * training, health, administration wages) read for every country. Built once per
+ * phase instead of once per country and use; derived only, never stored.
+ *
+ * - `blocksByCountry`: each country's blocks in `world.popBlocks` order, exactly the
+ *   blocks whose province `countryProvinceIds` returns for that country.
+ * - `assignedByBlock`: assigned workers per block, summed in `world.employment` order.
+ * - `wagesByProvince`: the non-empty province wage tables (P2b, D-135).
+ */
+export interface CountryPopulationIndex {
+  readonly blocksByCountry: ReadonlyMap<Id, readonly World["popBlocks"][number][]>;
+  readonly assignedByBlock: ReadonlyMap<Id, number>;
+  readonly wagesByProvince: ReadonlyMap<Id, readonly number[]>;
+}
+
+export function buildCountryPopulationIndex(world: World): CountryPopulationIndex {
+  const ownersByProvince = new Map<Id, Id[]>();
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      const owners = ownersByProvince.get(record.provinceId);
+      if (owners === undefined) ownersByProvince.set(record.provinceId, [record.ownerPolityId]);
+      else if (!owners.includes(record.ownerPolityId)) owners.push(record.ownerPolityId);
+    }
+  }
+  const blocksByCountry = new Map<Id, World["popBlocks"][number][]>();
+  for (const block of world.popBlocks) {
+    for (const ownerId of ownersByProvince.get(block.provinceId) ?? []) {
+      const list = blocksByCountry.get(ownerId);
+      if (list === undefined) blocksByCountry.set(ownerId, [block]);
+      else list.push(block);
+    }
+  }
+  const assignedByBlock = new Map<Id, number>();
+  for (const assignment of world.employment) {
+    assignedByBlock.set(
+      assignment.popBlockId,
+      (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
+    );
+  }
+  const wagesByProvince = new Map<Id, readonly number[]>();
+  for (const province of world.provinceEconomies) {
+    if (province.wageRUSDPerYearByProfession.length > 0) {
+      wagesByProvince.set(province.id, province.wageRUSDPerYearByProfession);
+    }
+  }
+  return { blocksByCountry, assignedByBlock, wagesByProvince };
+}
+
+/** A country's blocks in `world.popBlocks` order, from the index when one is supplied. */
+export function countryPopBlocks(
+  world: World,
+  countryId: Id,
+  index?: CountryPopulationIndex,
+): readonly World["popBlocks"][number][] {
+  if (index !== undefined) return index.blocksByCountry.get(countryId) ?? [];
+  const provinces = new Set(countryProvinceIds(world, countryId));
+  return world.popBlocks.filter((block) => provinces.has(block.provinceId));
+}
+
 /** Province ids of one market (customs territory), ascending, derived from `marketId`. */
 export function marketProvinceIds(world: World, marketId: Id): Id[] {
   const result: Id[] = [];
@@ -229,7 +289,8 @@ export function assertValidIndustrialPolicy(
   return { sectorSubsidyRates: rates };
 }
 
-/** Neutral defaults for the E2 fiscal-policy fields, used by scenario input. */
+/** Neutral defaults for the E2 fiscal-policy fields, used by scenario 
+input. */
 export function neutralFiscalPolicyDefaults(): Pick<
   FiscalPolicy,
   | "incomeTaxAllowanceRUSDPerYear"

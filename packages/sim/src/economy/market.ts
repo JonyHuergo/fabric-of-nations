@@ -25,7 +25,9 @@ import { assertValidEconomyDefinitions } from "./definitions.js";
 import { deriveStockByGood } from "./inventory.js";
 import {
   applyOverflowLosses,
+  buildProductionLookups,
   runProductionPhase,
+  type ProductionLookups,
   type InputReservation,
   type OverflowLoss,
   type ProductionPhaseResult,
@@ -238,16 +240,41 @@ function productionInputTier(
   return 5;
 }
 
+/**
+ * Lookups the integrated day builds once for all of its market-day calls
+ * (performance stage, D-137). They are derived from the world at the start of the
+ * market phase: blocks, buildings and province membership do not change while
+ * markets clear (production moves stock and prices only). A direct caller that
+ * passes none gets the same lookups built for its single call.
+ */
+export interface MarketDayLookups {
+  readonly blockById: ReadonlyMap<number, World["popBlocks"][number]>;
+  /** Buildings, province membership and production capacities (shared with M3c). */
+  readonly production: ProductionLookups;
+}
+
+export function buildMarketDayLookups(world: World, definitions: EconomyDefinitions): MarketDayLookups {
+  const blockById = new Map<number, World["popBlocks"][number]>();
+  for (const block of world.popBlocks) {
+    if (!blockById.has(block.id)) blockById.set(block.id, block);
+  }
+  return { blockById, production: buildProductionLookups(world, definitions) };
+}
+
+export interface MarketDayOptions extends PhaseValidationOptions {
+  /** Day-level lookups (D-137); built for this call when omitted. */
+  readonly lookups?: MarketDayLookups;
+}
+
 function validateMarketDayInput(
   world: World,
   definitions: EconomyDefinitions,
   input: MarketDayInput,
-  options: PhaseValidationOptions = {},
+  options: MarketDayOptions = {},
 ): {
   readonly marketId: number;
   readonly criticalGoods: ReadonlySet<number>;
   readonly buildingById: Map<number, BuildingDef>;
-  readonly blockIds: Set<number>;
 } {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   // Staged mode: the integrated day validated the definitions once at its start.
@@ -269,18 +296,22 @@ function validateMarketDayInput(
   if (market.priceRUSD.length !== definitions.goods.length) {
     throw new RangeError("market price array does not match the goods definitions");
   }
-  const marketProvinceIdSet = new Set(marketProvinceIds(world, market.id));
+  const lookups = options.lookups ?? buildMarketDayLookups(world, definitions);
+  const marketProvinceIdSet: ReadonlySet<number> =
+    lookups.production.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
   const goodIds = new Set(definitions.goods.map((good) => good.id));
-  const blockIds = new Set(world.popBlocks.map((block) => block.id));
-  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
+  const blockById = lookups.blockById;
   const buildingById = new Map(definitions.buildings.map((building) => [building.id, building]));
   const criticalGoods = criticalGoodIds(definitions, input.needs);
-  const householdKeys = new Set<string>();
+  // Good ids equal their definition index (validated), so these numeric keys are
+  // collision-free for uint32 buyer ids.
+  const goodCount = definitions.goods.length;
+  const householdKeys = new Set<number>();
   for (let index = 0; index < input.householdDemands.length; index += 1) {
     const demand = input.householdDemands[index];
     if (demand === undefined) throw new RangeError("missing household demand");
     const path = `householdDemands[${String(index)}]`;
-    if (!blockIds.has(demand.popBlockId)) {
+    if (!blockById.has(demand.popBlockId)) {
       throw new RangeError(`${path}.popBlockId references an unknown pop block`);
     }
     const block = blockById.get(demand.popBlockId);
@@ -296,17 +327,17 @@ function validateMarketDayInput(
     if (funded > desired + tolerance(desired, funded)) {
       throw new RangeError(`${path}.fundedQuantity cannot exceed desiredQuantity`);
     }
-    const key = `${String(demand.popBlockId)}:${String(demand.tier)}:${String(demand.goodId)}`;
+    const key = (demand.popBlockId * 8 + demand.tier) * goodCount + demand.goodId;
     if (householdKeys.has(key)) throw new RangeError(`${path} duplicates a household demand`);
     householdKeys.add(key);
   }
 
-  const productionKeys = new Set<string>();
+  const productionKeys = new Set<number>();
   for (let index = 0; index < input.productionDemands.length; index += 1) {
     const demand = input.productionDemands[index];
     if (demand === undefined) throw new RangeError("missing production demand");
     const path = `productionDemands[${String(index)}]`;
-    const building = world.buildings.find((candidate) => candidate.id === demand.buyerBuildingId);
+    const building = lookups.production.buildingById.get(demand.buyerBuildingId);
     if (building === undefined) {
       throw new RangeError(`${path}.buyerBuildingId references an unknown building`);
     }
@@ -338,12 +369,12 @@ function validateMarketDayInput(
     if (funded > desired + tolerance(desired, funded)) {
       throw new RangeError(`${path}.fundedQuantity cannot exceed desiredQuantity`);
     }
-    const key = `${String(demand.buyerBuildingId)}:${String(demand.goodId)}`;
+    const key = demand.buyerBuildingId * goodCount + demand.goodId;
     if (productionKeys.has(key)) throw new RangeError(`${path} duplicates a production demand`);
     productionKeys.add(key);
   }
 
-  return { marketId: market.id, criticalGoods, buildingById, blockIds };
+  return { marketId: market.id, criticalGoods, buildingById };
 }
 
 interface HouseholdTierTotals {
@@ -399,10 +430,39 @@ function householdTierEligible(
  * Returns the actual fulfilled quantity. Mutates demand fulfilled counters and
  * reservations/remaining lots.
  */
+/**
+ * Remaining seller lots by good, then seller building id (D-137). Replaces one map of
+ * `"good:owner"` strings that every allocation re-parsed and filtered; each
+ * allocation still reads its good's positive lots in ascending seller order.
+ */
+type LotBook = Map<number, Map<number, number>>;
+
+function lotBookSet(book: LotBook, goodId: number, sellerBuildingId: number, quantity: number): void {
+  let lots = book.get(goodId);
+  if (lots === undefined) {
+    lots = new Map<number, number>();
+    book.set(goodId, lots);
+  }
+  lots.set(sellerBuildingId, quantity);
+}
+
+function lotBookAdd(book: LotBook, goodId: number, sellerBuildingId: number, quantity: number): void {
+  let lots = book.get(goodId);
+  if (lots === undefined) {
+    lots = new Map<number, number>();
+    book.set(goodId, lots);
+  }
+  lots.set(sellerBuildingId, (lots.get(sellerBuildingId) ?? 0) + quantity);
+}
+
+function lotBookGet(book: LotBook, goodId: number, sellerBuildingId: number): number | undefined {
+  return book.get(goodId)?.get(sellerBuildingId);
+}
+
 function allocateTierGood(
   demands: readonly DemandAllocation[],
   goodId: number,
-  remainingByLot: Map<string, number>,
+  remainingByLot: LotBook,
   reservations: MarketReservation[],
   phase: "A" | "B",
 ): { readonly totalFunded: number; readonly fulfilled: number } {
@@ -422,13 +482,14 @@ function allocateTierGood(
     return { totalFunded: 0, fulfilled: 0 };
   }
 
-  const lots = [...remainingByLot.entries()]
-    .map(([key, quantity]) => {
-      const [goodText, ownerText] = key.split(":");
-      return { key, goodId: Number(goodText), sellerBuildingId: Number(ownerText), quantity };
-    })
-    .filter((lot) => lot.goodId === goodId && lot.quantity > 0)
-    .sort((left, right) => left.sellerBuildingId - right.sellerBuildingId);
+  const goodLots = remainingByLot.get(goodId);
+  const lots: { readonly sellerBuildingId: number; readonly quantity: number }[] = [];
+  if (goodLots !== undefined) {
+    for (const [sellerBuildingId, quantity] of goodLots) {
+      if (quantity > 0) lots.push({ sellerBuildingId, quantity });
+    }
+  }
+  lots.sort((left, right) => left.sellerBuildingId - right.sellerBuildingId);
   const available = lots.reduce((total, lot) => total + lot.quantity, 0);
   if (available <= 0) return { totalFunded, fulfilled: 0 };
 
@@ -511,10 +572,12 @@ function allocateTierGood(
     // regression: a small lot in a 1e8-unit market overran by 1e-8 and threw).
     const lotTolerance = tolerance(lot.quantity, reservedFromLot, fulfilledTotal);
     if (remaining < -lotTolerance) {
-      throw new RangeError(`market reservation exceeds seller lot ${lot.key}`);
+      throw new RangeError(
+        `market reservation exceeds seller lot ${String(goodId)}:${String(lot.sellerBuildingId)}`,
+      );
     }
-    if (remaining <= lotTolerance) remainingByLot.delete(lot.key);
-    else remainingByLot.set(lot.key, remaining);
+    if (remaining <= lotTolerance) goodLots?.delete(lot.sellerBuildingId);
+    else goodLots?.set(lot.sellerBuildingId, remaining);
   }
   if (Math.abs(actualFulfilled - fulfilledTotal) > tolerance(actualFulfilled, fulfilledTotal)) {
     throw new RangeError(`market allocation does not reconcile for good ${String(goodId)}`);
@@ -558,14 +621,23 @@ function demandStates(
   return states;
 }
 
-function openingLotMap(world: World, marketId: number): Map<string, number> {
-  const market = world.markets.find((candidate) => candidate.id === marketId);
-  if (market === undefined) throw new RangeError("missing market");
-  const map = new Map<string, number>();
+function openingLotBook(market: World["markets"][number]): LotBook {
+  const book: LotBook = new Map();
   for (const lot of market.stockLots) {
-    map.set(`${String(lot.goodId)}:${String(lot.ownerBuildingId)}`, lot.quantity);
+    lotBookSet(book, lot.goodId, lot.ownerBuildingId, lot.quantity);
   }
-  return map;
+  return book;
+}
+
+/** Demands of one tier grouped by good, each group in demand order (D-137). */
+function demandsByGood(demands: readonly DemandState[]): Map<number, DemandState[]> {
+  const groups = new Map<number, DemandState[]>();
+  for (const demand of demands) {
+    const group = groups.get(demand.goodId);
+    if (group === undefined) groups.set(demand.goodId, [demand]);
+    else group.push(demand);
+  }
+  return groups;
 }
 
 /** Update all market prices once, after clearing, using bounded incremental rules. */
@@ -626,7 +698,7 @@ export function runMarketDay(
   world: World,
   definitions: EconomyDefinitions,
   input: MarketDayInput,
-  options: PhaseValidationOptions = {},
+  options: MarketDayOptions = {},
 ): MarketDayResult {
   const validated = validateMarketDayInput(world, definitions, input, options);
   const market = world.markets.find((candidate) => candidate.id === validated.marketId);
@@ -635,7 +707,7 @@ export function runMarketDay(
   const openingPrices = [...market.priceRUSD];
   const demands = demandStates(input);
   const reservations: MarketReservation[] = [];
-  const remainingByLot = openingLotMap(world, market.id);
+  const remainingByLot = openingLotBook(market);
   const priceFundedByGood = new Array<number>(definitions.goods.length).fill(0);
   const blockedGoods = new Set<number>();
 
@@ -650,10 +722,11 @@ export function runMarketDay(
             (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
         }
       }
+      const tierByGood = demandsByGood(tierDemands);
       for (let goodId = 0; goodId < definitions.goods.length; goodId += 1) {
         if (blockedGoods.has(goodId)) continue;
-        const goodDemands = tierDemands.filter(
-          (demand) => demand.goodId === goodId && demand.eligible && demand.funded > 0,
+        const goodDemands = (tierByGood.get(goodId) ?? []).filter(
+          (demand) => demand.eligible && demand.funded > 0,
         );
         const allocation = allocateTierGood(
           goodDemands.map((demand) => ({ demand, funded: demand.funded })),
@@ -692,20 +765,17 @@ export function runMarketDay(
       {
         applyOverflow: false,
         marketId: market.id,
+        ...(options.lookups === undefined ? {} : { lookups: options.lookups.production }),
         ...(options.validateWorld === undefined
           ? {}
           : { validateWorld: options.validateWorld }),
       },
     );
 
-    const householdReservedByLot = new Map<string, number>();
+    const householdReservedByLot: LotBook = new Map();
     const householdPassAByGood = new Map<number, number>();
     for (const reservation of householdPassA) {
-      const key = `${String(reservation.goodId)}:${String(reservation.sellerBuildingId)}`;
-      householdReservedByLot.set(
-        key,
-        (householdReservedByLot.get(key) ?? 0) + reservation.quantity,
-      );
+      lotBookAdd(householdReservedByLot, reservation.goodId, reservation.sellerBuildingId, reservation.quantity);
       householdPassAByGood.set(
         reservation.goodId,
         (householdPassAByGood.get(reservation.goodId) ?? 0) + reservation.quantity,
@@ -714,17 +784,19 @@ export function runMarketDay(
     // `market.stockLots` already includes M3c output and excludes actual input
     // use. Do not add production again here; only remove outstanding household
     // Pass-A reservations.
-    const passBLots = new Map<string, number>();
+    const passBLots: LotBook = new Map();
     for (const lot of market.stockLots) {
-      const key = `${String(lot.goodId)}:${String(lot.ownerBuildingId)}`;
-      const available = lot.quantity - (householdReservedByLot.get(key) ?? 0);
+      const reserved = lotBookGet(householdReservedByLot, lot.goodId, lot.ownerBuildingId) ?? 0;
+      const available = lot.quantity - reserved;
       if (
         available <
-        -tolerance(lot.quantity, householdReservedByLot.get(key) ?? 0, householdPassAByGood.get(lot.goodId) ?? 0)
+        -tolerance(lot.quantity, reserved, householdPassAByGood.get(lot.goodId) ?? 0)
       ) {
-        throw new RangeError(`household reservation exceeds current seller lot ${key}`);
+        throw new RangeError(
+          `household reservation exceeds current seller lot ${String(lot.goodId)}:${String(lot.ownerBuildingId)}`,
+        );
       }
-      if (available > 0) passBLots.set(key, available);
+      if (available > 0) lotBookSet(passBLots, lot.goodId, lot.ownerBuildingId, available);
     }
 
     const inputCriticalUnmet = new Set<number>();
@@ -761,6 +833,7 @@ export function runMarketDay(
           demand.eligible &&
           demand.funded - demand.passAFulfilled > tolerance(demand.funded, demand.passAFulfilled),
       );
+      const tierByGood = demandsByGood(tierDemands);
       for (let goodId = 0; goodId < definitions.goods.length; goodId += 1) {
         if (passBBlocked.has(goodId)) continue;
         if (tier === 3 && inputCriticalUnmet.has(goodId)) continue;
@@ -770,7 +843,7 @@ export function runMarketDay(
         ) {
           continue;
         }
-        const goodDemands = tierDemands.filter((demand) => demand.goodId === goodId);
+        const goodDemands = tierByGood.get(goodId) ?? [];
         const allocation = allocateTierGood(
           goodDemands.map((demand) => ({
             demand,
@@ -793,39 +866,47 @@ export function runMarketDay(
     const householdReservations = reservations.filter(
       (reservation) => reservation.buyerKind === "household",
     );
-    const householdByLot = new Map<string, number>();
+    const householdByLot: LotBook = new Map();
     const householdByGood = new Map<number, number>();
     for (const reservation of householdReservations) {
-      const key = `${String(reservation.goodId)}:${String(reservation.sellerBuildingId)}`;
-      householdByLot.set(key, (householdByLot.get(key) ?? 0) + reservation.quantity);
+      lotBookAdd(householdByLot, reservation.goodId, reservation.sellerBuildingId, reservation.quantity);
       householdByGood.set(reservation.goodId, (householdByGood.get(reservation.goodId) ?? 0) + reservation.quantity);
     }
-    const finalLots = new Map<string, number>();
+    // `market.stockLots` holds one lot per (good, owner) (canonical after
+    // production), so the remaining lots keep its order.
+    const finalLots: World["markets"][number]["stockLots"] = [];
     for (const lot of market.stockLots) {
-      const key = `${String(lot.goodId)}:${String(lot.ownerBuildingId)}`;
-      const consumed = householdByLot.get(key) ?? 0;
+      const consumed = lotBookGet(householdByLot, lot.goodId, lot.ownerBuildingId) ?? 0;
       const remaining = lot.quantity - consumed;
       // D-136: reservations are differences of cumulative interval ends, so the
       // rounding error scales with the good's household total, not with one lot.
       if (remaining < -tolerance(lot.quantity, consumed, householdByGood.get(lot.goodId) ?? 0)) {
-        throw new RangeError(`fulfilled household demand exceeds seller lot ${key}`);
+        throw new RangeError(
+          `fulfilled household demand exceeds seller lot ${String(lot.goodId)}:${String(lot.ownerBuildingId)}`,
+        );
       }
-      if (remaining > 0) finalLots.set(key, remaining);
+      if (remaining > 0) {
+        finalLots.push({ goodId: lot.goodId, ownerBuildingId: lot.ownerBuildingId, quantity: remaining });
+      }
     }
-    market.stockLots = [...finalLots.entries()].map(([key, quantity]) => {
-      const [goodText, ownerText] = key.split(":");
-      return {
-        goodId: Number(goodText),
-        ownerBuildingId: Number(ownerText),
-        quantity,
-      };
-    });
-    const overflowLosses = applyOverflowLosses(world, definitions, market.id, options);
+    market.stockLots = finalLots;
+    const overflowLosses = applyOverflowLosses(
+      world,
+      definitions,
+      market.id,
+      options.validateWorld === undefined ? {} : { validateWorld: options.validateWorld },
+    );
 
-    const usedInputByDemand = new Map<string, number>();
+    // Used input per (buyer, good), summed in `reservationUses` order (one use per
+    // buyer, good and seller), which is the order the per-demand scan summed it in.
+    const usedInputByDemand = new Map<number, Map<number, number>>();
     for (const use of production.reservationUses) {
-      const key = `${String(use.buyerBuildingId)}:${String(use.goodId)}:${String(use.sellerBuildingId)}`;
-      usedInputByDemand.set(key, (usedInputByDemand.get(key) ?? 0) + use.usedQuantity);
+      let byGood = usedInputByDemand.get(use.buyerBuildingId);
+      if (byGood === undefined) {
+        byGood = new Map<number, number>();
+        usedInputByDemand.set(use.buyerBuildingId, byGood);
+      }
+      byGood.set(use.goodId, (byGood.get(use.goodId) ?? 0) + use.usedQuantity);
     }
 
     const householdDemandResults: HouseholdDemandResult[] = demands
@@ -854,13 +935,7 @@ export function runMarketDay(
       .filter((demand) => demand.kind === "building")
       .map((demand) => {
         const reserved = demand.fulfilled;
-        let used = 0;
-        for (const [key, quantity] of usedInputByDemand) {
-          const [buildingText, goodText] = key.split(":");
-          if (Number(buildingText) === demand.buyerId && Number(goodText) === demand.goodId) {
-            used += quantity;
-          }
-        }
+        const used = usedInputByDemand.get(demand.buyerId)?.get(demand.goodId) ?? 0;
         return {
           buyerBuildingId: demand.buyerId,
           tier: demand.tier as ProductionInputTier,
@@ -904,6 +979,23 @@ export function runMarketDay(
       return left.sellerBuildingId - right.sellerBuildingId;
     });
 
+    // First phase-A building reservation per (buyer, good, seller) in sorted order,
+    // the one `reservations.find` returned for each input use.
+    const inputReservationByKey = new Map<number, Map<number, Map<number, MarketReservation>>>();
+    for (const reservation of reservations) {
+      if (reservation.buyerKind !== "building" || reservation.phase !== "A") continue;
+      let byGood = inputReservationByKey.get(reservation.buyerId);
+      if (byGood === undefined) {
+        byGood = new Map();
+        inputReservationByKey.set(reservation.buyerId, byGood);
+      }
+      let bySeller = byGood.get(reservation.goodId);
+      if (bySeller === undefined) {
+        bySeller = new Map();
+        byGood.set(reservation.goodId, bySeller);
+      }
+      if (!bySeller.has(reservation.sellerBuildingId)) bySeller.set(reservation.sellerBuildingId, reservation);
+    }
     const pendingTransactions: PendingTransaction[] = [];
     for (const purchase of householdPurchases) {
       pendingTransactions.push({
@@ -921,14 +1013,10 @@ export function runMarketDay(
     }
     for (const use of production.reservationUses) {
       if (!(use.usedQuantity > 0)) continue;
-      const reservation = reservations.find(
-        (candidate) =>
-          candidate.buyerKind === "building" &&
-          candidate.buyerId === use.buyerBuildingId &&
-          candidate.goodId === use.goodId &&
-          candidate.sellerBuildingId === use.sellerBuildingId &&
-          candidate.phase === "A",
-      );
+      const reservation = inputReservationByKey
+        .get(use.buyerBuildingId)
+        ?.get(use.goodId)
+        ?.get(use.sellerBuildingId);
       if (reservation === undefined) {
         throw new RangeError("production input use has no matching reservation");
       }

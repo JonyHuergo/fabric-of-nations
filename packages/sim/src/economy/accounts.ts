@@ -1778,28 +1778,39 @@ export function assertSemanticJournalLine(
   side: JournalSide,
   path: string,
 ): void {
+  const violation = semanticJournalLineViolation(kind, account, side);
+  if (violation !== null) throw new RangeError(`${path}: ${violation}`);
+}
+
+/**
+ * The D-047 semantic-matrix violation of one line, or null when the line is allowed.
+ * Separate from `assertSemanticJournalLine` so the posting hot path builds the line
+ * path only for a failing line (D-137).
+ */
+export function semanticJournalLineViolation(
+  kind: TransactionKind,
+  account: FinancialAccount,
+  side: JournalSide,
+): string | null {
   if (kind === "correction") {
     // A controlled correction is an audited administrative posting. It may
     // affect any account category; balance/cash/affordability invariants are
     // enforced by the correction API and the surrounding finance validation.
-    return;
+    return null;
   }
-  if (account.category !== "revenue" && account.category !== "expense") return;
+  if (account.category !== "revenue" && account.category !== "expense") return null;
   if (kind === "period-close") {
     const required: JournalSide = account.category === "revenue" ? "debit" : "credit";
     if (side !== required) {
-      throw new RangeError(
-        `${path}: period-close may only ${required} ${account.category} account ${String(account.id)} (${account.subtype})`,
-      );
+      return `period-close may only ${required} ${account.category} account ${String(account.id)} (${account.subtype})`;
     }
-    return;
+    return null;
   }
   const rules = SEMANTIC_LINE_RULES[kind];
   if (!rules.some((rule) => rule.subtype === account.subtype && rule.side === side)) {
-    throw new RangeError(
-      `${path}: transactionKind ${JSON.stringify(kind)} may not ${side} ${account.category} account ${String(account.id)} (${account.subtype}) under the M4b semantic matrix`,
-    );
+    return `transactionKind ${JSON.stringify(kind)} may not ${side} ${account.category} account ${String(account.id)} (${account.subtype}) under the M4b semantic matrix`;
   }
+  return null;
 }
 
 /**
@@ -1887,6 +1898,18 @@ export function cloneFinanceState(
     ),
     closedThroughDay: finance.closedThroughDay,
   };
+}
+
+/**
+ * The finance a phase writes (D-137). Staged (the default): a deep copy that the
+ * phase publishes only after every posting and check succeeded, so a failure
+ * leaves `finance` untouched. In place: `finance` itself, for callers that own
+ * atomicity at a larger scope (the integrated economic day). Every phase reads the
+ * finance it writes, so both choices compute the same values; in place avoids
+ * copying every account and keeps the cached finance index valid.
+ */
+export function phaseFinance(finance: FinanceState, inPlace: boolean | undefined): FinanceState {
+  return inPlace === true ? finance : cloneFinanceState(finance);
 }
 
 /**
@@ -1995,7 +2018,11 @@ export function accountingTotals(finance: FinanceState): AccountingTotals {
   let expenses = 0;
   for (const value of accounts) {
     const account = value as FinancialAccount;
-    const balance = requireFiniteNumber(account.balanceRUSD, `account ${String(account.id)}.balanceRUSD`);
+    const balance = account.balanceRUSD;
+    // `requireFiniteNumber`'s check and message, built only on failure (D-137).
+    if (typeof balance !== "number" || !Number.isFinite(balance)) {
+      throw new TypeError(`account ${String(account.id)}.balanceRUSD must be a finite number`);
+    }
     switch (account.category) {
       case "asset":
         assets += balance;
@@ -2044,7 +2071,12 @@ export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
   for (const value of accounts) {
     const account = value as FinancialAccount;
     if (!isCashAccount(account)) continue;
-    total += requireFiniteNumber(account.balanceRUSD, `account ${String(account.id)}.balanceRUSD`);
+    const balance = account.balanceRUSD;
+    // `requireFiniteNumber`'s check and message, built only on failure (D-137).
+    if (typeof balance !== "number" || !Number.isFinite(balance)) {
+      throw new TypeError(`account ${String(account.id)}.balanceRUSD must be a finite number`);
+    }
+    total += balance;
   }
   return total;
 }

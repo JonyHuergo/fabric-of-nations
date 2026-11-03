@@ -48,7 +48,7 @@ import {
   type World,
 } from "../world.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
-import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
+import { buildFinanceIndex, phaseFinance } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import { buildProvinceOwnerMap, fiscalPolicyIsActive } from "./country.js";
 import type { MarketSettlementResult } from "./settlement.js";
@@ -269,7 +269,7 @@ function executeFiscalPhase(
 ): FiscalPhaseResult {
   assertFiscalPreconditions(world, settlement, dayIndex, options);
 
-  const stagedFinance = cloneFinanceState(world.finance);
+  const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
   const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
   const wagesByBlock = new Map(

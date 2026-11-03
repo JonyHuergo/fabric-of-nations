@@ -38,11 +38,11 @@ import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./productio
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import {
+  buildCountryPopulationIndex,
   copyCountry,
   copyCurrency,
   buildProvinceOwnerMap,
   copyCurrencyValuation,
-  marketProvinceIds,
 } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
@@ -70,6 +70,7 @@ import {
   type ProfitDistributionResult,
 } from "./profit.js";
 import {
+  buildMarketDayLookups,
   runMarketDay,
   type HouseholdDemandRecord,
   type MarketDayInput,
@@ -478,13 +479,16 @@ function buildProductionDemands(
   mode: "full" | "cash",
   index: FinanceIndex,
   cap: { cappedBuildings: number } = { cappedBuildings: 0 },
+  capacityOf: (buildingId: Id) => ReturnType<typeof computeBuildingCapacity> = (() => {
+    const capacityIndex = buildBuildingCapacityIndex(world, definitions);
+    return (buildingId: Id) => computeBuildingCapacity(world, definitions, buildingId, capacityIndex);
+  })(),
 ): ProductionDemandRecord[] {
   const provinceToMarket = marketByProvince(world);
   const critical = criticalGoodIds(definitions, populationDefinitions.needs);
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const records: ProductionDemandRecord[] = [];
 
-  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
     if (!building.operational) continue;
     const definition = definitionById.get(building.definitionId);
@@ -494,7 +498,7 @@ function buildProductionDemands(
       throw new RangeError(`building ${String(building.id)} is in a province with no market`);
     }
     const market = marketPrices(world, marketId);
-    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
+    const capacity = capacityOf(building.id);
     if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
     const inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
     if (inputs.length === 0) continue;
@@ -549,10 +553,6 @@ function makeMarketInput(
   };
 }
 
-function demandResultKey(popBlockId: Id, tier: MarketTier, goodId: Id): string {
-  return `${String(popBlockId)}:${String(tier)}:${String(goodId)}`;
-}
-
 function buildNeedsResult(
   world: World,
   definitions: EconomyDefinitions,
@@ -560,29 +560,38 @@ function buildNeedsResult(
   markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
 ): PopulationNeedsDayResult {
-  const resultByKey = new Map(
-    markets.flatMap((market) =>
-      market.householdDemands.map((demand) => [
-        demandResultKey(demand.popBlockId, demand.tier, demand.goodId),
-        demand,
-      ] as const),
-    ),
-  );
+  // D-137: numeric (block, tier, good) keys; good ids equal their definition index.
+  const goodCount = definitions.goods.length;
+  const numericKey = (popBlockId: Id, tier: MarketTier, goodId: Id): number =>
+    (popBlockId * 8 + tier) * goodCount + goodId;
+  const resultByKey = new Map<number, MarketDayResult["householdDemands"][number]>();
+  for (const market of markets) {
+    for (const demand of market.householdDemands) {
+      resultByKey.set(numericKey(demand.popBlockId, demand.tier, demand.goodId), demand);
+    }
+  }
   const householdByName = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
   );
   const pricesByMarket = new Map(markets.map((market) => [market.marketId, market.openingPrices]));
   const blocks: PopBlockNeedsResult[] = [];
-  const metaByBlock = new Map<number, (typeof household.meta)[number][]>();
+  // Each block's meta grouped by need tier, in meta order (the order the per-tier
+  // filter produced).
+  const metaByBlock = new Map<number, Map<NeedTier, (typeof household.meta)[number][]>>();
   for (const item of household.meta) {
-    const list = metaByBlock.get(item.popBlockId);
-    if (list === undefined) metaByBlock.set(item.popBlockId, [item]);
+    let byTier = metaByBlock.get(item.popBlockId);
+    if (byTier === undefined) {
+      byTier = new Map();
+      metaByBlock.set(item.popBlockId, byTier);
+    }
+    const list = byTier.get(item.needTier);
+    if (list === undefined) byTier.set(item.needTier, [item]);
     else list.push(item);
   }
 
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const population = populationTotal(block);
-    const meta = metaByBlock.get(block.id) ?? [];
+    const meta = metaByBlock.get(block.id);
     const householdSettlement = householdByName.get(block.id);
     if (householdSettlement === undefined) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
@@ -592,7 +601,7 @@ function buildNeedsResult(
     let lowerMet = true;
 
     for (const tier of NEED_TIER_ORDER) {
-      const tierMeta = meta.filter((item) => item.needTier === tier);
+      const tierMeta = meta?.get(tier) ?? [];
       const active = population > 0 && lowerMet && tierMeta.length > 0;
       let desiredCost = 0;
       let fundedCost = 0;
@@ -600,9 +609,7 @@ function buildNeedsResult(
       let allMet = true;
       const goods: NeedGoodResult[] = [];
       for (const item of tierMeta) {
-        const demand = resultByKey.get(
-          demandResultKey(item.popBlockId, item.tier, item.goodId),
-        );
+        const demand = resultByKey.get(numericKey(item.popBlockId, item.tier, item.goodId));
         if (demand === undefined) throw new RangeError("missing market household demand result");
         const marketOpeningPrices = pricesByMarket.get(item.marketId);
         if (marketOpeningPrices === undefined) {
@@ -867,6 +874,10 @@ function runMarketAttempt(
   );
   const cap = { cappedBuildings: 0 };
   observe?.("market-production-demand");
+  // D-137: one set of day-level lookups (capacity index and per-building capacity)
+  // serves the input demand here and the production of every market below; the
+  // market phase changes only stock and prices, never what capacity reads.
+  const lookups = buildMarketDayLookups(world, definitions);
   const production = buildProductionDemands(
     world,
     definitions,
@@ -874,19 +885,36 @@ function runMarketAttempt(
     mode,
     index,
     cap,
+    lookups.production.capacityOf,
   );
   observe?.("market-clearing");
-  const buildingProvince = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
+  // D-137: each market's demand records in their day order, bucketed once instead of
+  // filtering every record for every market. A province belongs to the market named
+  // by its `marketId`, which is what `marketProvinceIds` reads.
+  const marketByProvinceId = marketByProvince(world);
+  const buildingMarket = new Map<Id, Id>();
+  for (const building of world.buildings) {
+    const marketId = marketByProvinceId.get(building.provinceId);
+    if (marketId !== undefined && !buildingMarket.has(building.id)) buildingMarket.set(building.id, marketId);
+  }
+  const householdByMarket = new Map<Id, HouseholdDemandRecord[]>();
+  for (const record of household.records) {
+    const marketId = household.marketByPopBlock.get(record.popBlockId);
+    if (marketId === undefined) continue;
+    const list = householdByMarket.get(marketId);
+    if (list === undefined) householdByMarket.set(marketId, [record]);
+    else list.push(record);
+  }
+  const productionByMarket = new Map<Id, ProductionDemandRecord[]>();
+  for (const record of production) {
+    const marketId = buildingMarket.get(record.buyerBuildingId);
+    if (marketId === undefined) continue;
+    const list = productionByMarket.get(marketId);
+    if (list === undefined) productionByMarket.set(marketId, [record]);
+    else list.push(record);
+  }
   const results: MarketDayResult[] = [];
   for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
-    const provinceIds = new Set(marketProvinceIds(world, market.id));
-    const marketHousehold = household.records.filter(
-      (record) => household.marketByPopBlock.get(record.popBlockId) === market.id,
-    );
-    const marketProduction = production.filter((record) => {
-      const provinceId = buildingProvince.get(record.buyerBuildingId);
-      return provinceId !== undefined && provinceIds.has(provinceId);
-    });
     results.push(
       runMarketDay(
         world,
@@ -895,10 +923,10 @@ function runMarketAttempt(
           populationDefinitions,
           dayIndex,
           market.id,
-          marketHousehold,
-          marketProduction,
+          householdByMarket.get(market.id) ?? [],
+          productionByMarket.get(market.id) ?? [],
         ),
-        { validateWorld: false },
+        { validateWorld: false, lookups },
       ),
     );
   }
@@ -924,7 +952,8 @@ function runMarketAttempt(
  */
 function closeMonthEndIfDue(world: World, dayIndex: DayIndex): FinanceCloseResult | null {
   if (!isLastDayOfMonth(dayIndex)) return null;
-  return closeFinancePeriod(world);
+  // D-137: the integrated day owns atomicity, so the close writes in place.
+  return closeFinancePeriod(world, { financeInPlace: true });
 }
 
 /** Run one integrated economic day on the supplied (already staged) world. */
@@ -1009,6 +1038,7 @@ export function runEconomicDay(
   const provinceOwners = buildProvinceOwnerMap(world);
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
   const factorByCountry = new Map<Id, number>();
+  const countryPopulation = buildCountryPopulationIndex(world);
   for (const block of world.popBlocks) {
     const ownerId = provinceOwners.get(block.provinceId);
     const country = ownerId === undefined ? undefined : countryById.get(ownerId);
@@ -1022,7 +1052,12 @@ export function runEconomicDay(
         world.technology.enabled && economyDefinitions.technology !== undefined
           ? technologyMortalityFactor(country, economyDefinitions)
           : 1;
-      const healthFactor = deriveHealth(world, country, economyDefinitions).mortalityFactor;
+      const healthFactor = deriveHealth(
+        world,
+        country,
+        economyDefinitions,
+        countryPopulation,
+      ).mortalityFactor;
       const hoursFactor = laborHoursMortalityFactor(country, economyDefinitions);
       factor = combinedMortalityFactor(technologyFactor, healthFactor, hoursFactor);
       factorByCountry.set(country.id, factor);
@@ -1054,6 +1089,7 @@ export function runEconomicDay(
   observe?.("migration");
   const migration = runMigrationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
+    restoreOnFailure: options.integrity !== "phase",
   });
   if (migration.employmentRefresh !== null) {
     employment = migration.employmentRefresh;
@@ -1093,6 +1129,7 @@ export function runEconomicDay(
   observe?.("fiscal");
   const fiscal = runFiscalPhase(world, settlement, dayIndex, {
     validateWorld: false,
+    financeInPlace: true,
     economyDefinitions,
   });
 
@@ -1126,7 +1163,7 @@ export function runEconomicDay(
   // the same post-fiscal treasury cash as the other service payrolls) and before the
   // education phase.
   observe?.("training");
-  const training = runTrainingPhase(world, economyDefinitions, dayIndex);
+  const training = runTrainingPhase(world, economyDefinitions, dayIndex, { financeInPlace: true });
 
   // M9 education and research: the payroll is paid from actual post-fiscal treasury
   // cash, age-specific literacy rises for the school-age cohort, and the active
@@ -1134,6 +1171,7 @@ export function runEconomicDay(
   observe?.("education");
   const education = runEducationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
+    financeInPlace: true,
   });
 
   // E4 sectoral production subsidy: verified physical output is valued at the
@@ -1145,7 +1183,7 @@ export function runEconomicDay(
     economyDefinitions,
     marketResults,
     dayIndex,
-    { validateWorld: false },
+    { validateWorld: false, financeInPlace: true },
   );
 
   // E2 business-profit tax: assessed on the just-completed civil month's
@@ -1153,7 +1191,10 @@ export function runEconomicDay(
   // revenue reduces that month's financing requirement, and before the close so
   // the tax expense/revenue belong to the period that generated the profit.
   observe?.("business-tax");
-  const businessTax = runBusinessTaxPhase(world, dayIndex, { validateWorld: false });
+  const businessTax = runBusinessTaxPhase(world, dayIndex, {
+    validateWorld: false,
+    financeInPlace: true,
+  });
 
   // E3 construction: hire idle labor, pay and capitalize construction wages, and
   // complete projects. It runs before the debt phase so month-end financing sees
@@ -1164,13 +1205,13 @@ export function runEconomicDay(
     economyDefinitions,
     dayIndex,
     settlement,
-    { validateWorld: false },
+    { validateWorld: false, financeInPlace: true },
   );
 
   // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
   // month-end finance the accrued fiscal deficit before the M4b close.
   observe?.("debt");
-  const debt = runDebtPhase(world, dayIndex, { validateWorld: false });
+  const debt = runDebtPhase(world, dayIndex, { validateWorld: false, financeInPlace: true });
 
   observe?.("needs");
   const needs = buildNeedsResult(
@@ -1202,7 +1243,7 @@ export function runEconomicDay(
   const profitDistribution =
     financeClose === null
       ? null
-      : runProfitDistributionPhase(world, dayIndex, financeClose);
+      : runProfitDistributionPhase(world, dayIndex, financeClose, { financeInPlace: true });
 
   observe?.("day-result");
   let workingAge = 0;

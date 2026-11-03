@@ -24,7 +24,7 @@ import type { DayIndex, Id } from "../types.js";
 import {
   assertAccountingIdentity,
   buildFinanceIndex,
-  cloneFinanceState,
+  phaseFinance,
   designatedCashTotal,
   type FinanceIndex,
 } from "./accounts.js";
@@ -201,6 +201,7 @@ export function runProfitDistributionPhase(
   world: World,
   dayIndex: DayIndex,
   close: FinanceCloseResult,
+  options: { readonly financeInPlace?: boolean } = {},
 ): ProfitDistributionResult {
   assertValidDayIndex(dayIndex);
   if (isTerminalDayIndex(dayIndex)) {
@@ -241,9 +242,10 @@ export function runProfitDistributionPhase(
     allowUnadvancedClose: true,
   });
 
-  const staged = cloneFinanceState(world.finance);
-  const index = buildFinanceIndex(staged);
   const openingCash = designatedCashTotal(world.finance);
+  // D-137: in place inside the integrated day, staged for direct callers.
+  const staged = phaseFinance(world.finance, options.financeInPlace);
+  const index = buildFinanceIndex(staged);
   const entries: JournalEntryInput[] = [];
   const buildings: BuildingProfitAllocationResult[] = [];
   let totalPrivate = 0;

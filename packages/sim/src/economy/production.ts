@@ -132,6 +132,75 @@ export interface ProductionPhaseOptions {
    * inventory-conservation checks still run.
    */
   readonly validateWorld?: boolean;
+  /**
+   * Day-level lookups shared by every market's production (D-137). Blocks,
+   * buildings, employment and province ownership do not change while markets
+   * clear, so one capacity index and one capacity result per building serve the
+   * whole market phase. Built for the call when omitted.
+   */
+  readonly lookups?: ProductionLookups;
+}
+
+/** See `ProductionPhaseOptions.lookups`. */
+export interface ProductionLookups {
+  readonly buildingById: ReadonlyMap<number, BuildingInstance>;
+  readonly provinceOwners: ReadonlyMap<number, number>;
+  readonly countryById: ReadonlyMap<number, World["countries"][number]>;
+  readonly provinceIdsByMarket: ReadonlyMap<number, ReadonlySet<number>>;
+  /** Building ids per market (owner province's market), ascending. */
+  readonly buildingIdsByMarket: ReadonlyMap<number, readonly number[]>;
+  readonly capacityIndex: BuildingCapacityIndex;
+  /** `computeBuildingCapacity` for the day's state, computed once per building. */
+  readonly capacityOf: (buildingId: number) => BuildingCapacityResult;
+}
+
+export function buildProductionLookups(
+  world: World,
+  definitions: EconomyDefinitions,
+): ProductionLookups {
+  const buildingById = new Map<number, BuildingInstance>();
+  for (const building of world.buildings) {
+    if (!buildingById.has(building.id)) buildingById.set(building.id, building);
+  }
+  const provinceIdsByMarket = new Map<number, Set<number>>();
+  const marketByProvince = new Map<number, number>();
+  for (const province of world.provinceEconomies) {
+    if (province.marketId === null) continue;
+    marketByProvince.set(province.id, province.marketId);
+    let set = provinceIdsByMarket.get(province.marketId);
+    if (set === undefined) {
+      set = new Set<number>();
+      provinceIdsByMarket.set(province.marketId, set);
+    }
+    set.add(province.id);
+  }
+  const buildingIdsByMarket = new Map<number, number[]>();
+  for (const building of world.buildings) {
+    const marketId = marketByProvince.get(building.provinceId);
+    if (marketId === undefined) continue;
+    const list = buildingIdsByMarket.get(marketId);
+    if (list === undefined) buildingIdsByMarket.set(marketId, [building.id]);
+    else list.push(building.id);
+  }
+  for (const list of buildingIdsByMarket.values()) list.sort((a, b) => a - b);
+  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
+  const capacities = new Map<number, BuildingCapacityResult>();
+  return {
+    buildingById,
+    provinceOwners: buildProvinceOwnerMap(world),
+    countryById: new Map(world.countries.map((country) => [country.id, country])),
+    provinceIdsByMarket,
+    buildingIdsByMarket,
+    capacityIndex,
+    capacityOf(buildingId) {
+      let capacity = capacities.get(buildingId);
+      if (capacity === undefined) {
+        capacity = computeBuildingCapacity(world, definitions, buildingId, capacityIndex);
+        capacities.set(buildingId, capacity);
+      }
+      return capacity;
+    },
+  };
 }
 
 function tolerance(...values: number[]): number {
@@ -510,13 +579,15 @@ export function applyOverflowLosses(
       };
     }),
   );
-  const candidateWorld: World = {
-    ...world,
-    markets: world.markets.map((candidate) =>
-      candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
-    ),
-  };
-  if (options.validateWorld !== false) assertValidWorldForTick(candidateWorld);
+  if (options.validateWorld !== false) {
+    const candidateWorld: World = {
+      ...world,
+      markets: world.markets.map((candidate) =>
+        candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
+      ),
+    };
+    assertValidWorldForTick(candidateWorld);
+  }
   market.stockLots = canonicalLots;
   losses.sort((left, right) => {
     if (left.goodId !== right.goodId) return left.goodId - right.goodId;
@@ -549,9 +620,11 @@ export function runProductionPhase(
       ? world.markets[0]
       : world.markets.find((candidate) => candidate.id === options.marketId);
   if (market === undefined) throw new RangeError("M3c production requires a market");
-  const marketProvinceIdSet = new Set(marketProvinceIds(world, market.id));
-  const provinceOwners = buildProvinceOwnerMap(world);
-  const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
+  const lookups = options.lookups ?? buildProductionLookups(world, definitions);
+  const marketProvinceIdSet: ReadonlySet<number> =
+    lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
+  const provinceOwners = lookups.provinceOwners;
+  const buildingById = lookups.buildingById;
   const definitionsById = definitionById(definitions);
   const goods = definitions.goods;
   const goodIds = new Set(goods.map((good) => good.id));
@@ -649,17 +722,13 @@ export function runProductionPhase(
   const reservationUses: ReservationUse[] = [];
   const nextLots = new Map<string, number>(openingLots);
 
-  const buildingIds = [...world.buildings]
-    .filter((building) => marketProvinceIdSet.has(building.provinceId))
-    .map((building) => building.id)
-    .sort((a, b) => a - b);
-  const capacityIndex = buildBuildingCapacityIndex(world, definitions);
+  const buildingIds = lookups.buildingIdsByMarket.get(market.id) ?? [];
   for (const buildingId of buildingIds) {
     const building = buildingById.get(buildingId);
     if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
     const definition = definitionsById.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} has no definition`);
-    const capacity = computeBuildingCapacity(world, definitions, building.id, capacityIndex);
+    const capacity = lookups.capacityOf(building.id);
     if (!capacity.isProductionBuilding) continue;
 
     let executedTU = capacity.capacityTU;
@@ -736,8 +805,7 @@ export function runProductionPhase(
     // the same executed throughput (and therefore the same inputs). It does not
     // change capacity, prices, or the input recipe.
     const ownerId = provinceOwners.get(building.provinceId);
-    const owner =
-      ownerId === undefined ? undefined : world.countries.find((country) => country.id === ownerId);
+    const owner = ownerId === undefined ? undefined : lookups.countryById.get(ownerId);
     const technologyFactor =
       owner === undefined
         ? 1
@@ -823,13 +891,15 @@ export function runProductionPhase(
       };
     }),
   );
-  const candidateWorld: World = {
-    ...world,
-    markets: world.markets.map((candidate) =>
-      candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
-    ),
-  };
-  if (options.validateWorld !== false) assertValidWorldForTick(candidateWorld);
+  if (options.validateWorld !== false) {
+    const candidateWorld: World = {
+      ...world,
+      markets: world.markets.map((candidate) =>
+        candidate.id === market.id ? { ...candidate, stockLots: canonicalLots } : candidate,
+      ),
+    };
+    assertValidWorldForTick(candidateWorld);
+  }
   market.stockLots = canonicalLots;
 
   reservationUses.sort((left, right) => {

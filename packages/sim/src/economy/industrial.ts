@@ -33,7 +33,7 @@ import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import {
   assertAccountingIdentity,
   buildFinanceIndex,
-  cloneFinanceState,
+  phaseFinance,
   designatedCashTotal,
 } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
@@ -178,7 +178,10 @@ export function runIndustrialSubsidyPhase(
   candidates.sort((left, right) => left.buildingId - right.buildingId);
   if (candidates.length === 0) return emptyResult(dayIndex);
 
-  const stagedFinance = cloneFinanceState(world.finance);
+  // Opening designated cash before any posting (read here so an in-place phase,
+  // D-137, compares the same two totals as a staged one).
+  const openingCash = designatedCashTotal(world.finance);
+  const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
   const cashByCountry = new Map<Id, number>();
   const entries: JournalEntryInput[] = [];
@@ -249,7 +252,6 @@ export function runIndustrialSubsidyPhase(
   const postings = postJournalBatch(stagedFinance, dayIndex, entries);
   assertValidFinanceState(stagedFinance);
   assertAccountingIdentity(stagedFinance);
-  const openingCash = designatedCashTotal(world.finance);
   const closingCash = designatedCashTotal(stagedFinance);
   if (Math.abs(openingCash - closingCash) > toleranceMoney(openingCash, closingCash)) {
     throw new RangeError("industrial subsidy phase did not conserve designated cash");

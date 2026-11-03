@@ -25,7 +25,6 @@ import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from
 import {
   mergeBlockLiteracyByAge,
   populationTotal,
-  provincePopulation,
 } from "../population/state.js";
 import { roundTo } from "../population/definitions.js";
 import { drawUint32 } from "../rng.js";
@@ -37,7 +36,7 @@ import {
   type World,
 } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
-import { cloneFinanceState } from "./accounts.js";
+import { cloneFinanceState, findAccountByOwner } from "./accounts.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import {
   MIGRATION_MONTHLY_INFLOW_CAP_FRACTION,
@@ -304,12 +303,8 @@ function addCells(
  * by world validation, so the first match is the only match.
  */
 function householdAccount(world: World, popBlockId: Id): FinancialAccount {
-  const account = world.finance.accounts.find(
-    (candidate) =>
-      candidate.ownerKind === "popBlock" &&
-      candidate.ownerId === popBlockId &&
-      candidate.subtype === "household-cash",
-  );
+  // The cached owner lookup returns the first account in array order, as `find` did.
+  const account = findAccountByOwner(world.finance.accounts, "popBlock", popBlockId, "household-cash");
   if (account === undefined) {
     throw new RangeError(`popBlock ${String(popBlockId)} has no household cash account`);
   }
@@ -475,11 +470,20 @@ function provinceOwnerId(world: World, provinceId: Id): Id | null {
  * scenario start performs flows; otherwise the function returns `ran: false`
  * without mutation.
  */
+export interface MigrationPhaseOptions extends PhaseValidationOptions {
+  /**
+   * Restore population, finance and employment if the phase fails (default true).
+   * D-137: a D-116 phase-mode day passes false because the rollback runner restores
+   * the whole world to the start of a failed day, so the full backup is redundant.
+   */
+  readonly restoreOnFailure?: boolean;
+}
+
 export function runMigrationPhase(
   world: World,
   definitions: EconomyDefinitions,
   dayIndex: DayIndex,
-  options: PhaseValidationOptions = {},
+  options: MigrationPhaseOptions = {},
 ): MigrationDayResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
@@ -514,15 +518,26 @@ export function runMigrationPhase(
   }
   for (const list of blocksByProfession.values()) list.sort((left, right) => left.id - right.id);
 
-  const backup = backupWorld(world);
+  const backup = options.restoreOnFailure === false ? null : backupWorld(world);
   const flows: MigrationFlow[] = [];
   let employmentRefresh: EmploymentRefreshResult | null = null;
   const inflowByProvince = new Map<Id, number>();
+  // D-137: every block's population once per phase (an age-cell sum), kept current
+  // for the two blocks of each flow; flows are the only writers during the phase.
+  // Integer counts, so the cached totals equal a fresh `populationTotal` exactly.
+  const blockPopulation = new Map<Id, number>();
+  const provinceTotals = new Map<Id, number>();
+  for (const block of world.popBlocks) {
+    const total = populationTotal(block);
+    if (!blockPopulation.has(block.id)) blockPopulation.set(block.id, total);
+    provinceTotals.set(block.provinceId, (provinceTotals.get(block.provinceId) ?? 0) + total);
+  }
+  const populationOf = (block: World["popBlocks"][number]): number =>
+    blockPopulation.get(block.id) ?? populationTotal(block);
   const standingByProvince = new Map<Id, number>();
   for (const province of world.provinceEconomies) {
-    if (populationTotalOfProvince(world, province.id) > 0) {
-      standingByProvince.set(province.id, provincePopulation(world, province.id));
-    }
+    const total = provinceTotals.get(province.id) ?? 0;
+    if (total > 0) standingByProvince.set(province.id, total);
   }
   let sourceBlocksConsidered = 0;
   let destinationsCappedByInflowLimit = 0;
@@ -547,7 +562,7 @@ export function runMigrationPhase(
 
   try {
     for (const source of sourceOrder) {
-      const sourcePopulationBefore = populationTotal(source);
+      const sourcePopulationBefore = populationOf(source);
       if (sourcePopulationBefore <= 0) continue;
       sourceBlocksConsidered += 1;
       const profession = professionById.get(source.professionId);
@@ -559,7 +574,7 @@ export function runMigrationPhase(
       for (const destination of blocksByProfession.get(source.professionId) ?? []) {
         if (destination.id === source.id) continue;
         if (destination.provinceId === source.provinceId) continue;
-        const destinationPopulation = populationTotal(destination);
+        const destinationPopulation = populationOf(destination);
         if (destinationPopulation <= 0) continue;
         const destinationCountryId = provinceOwners.get(destination.provinceId) ?? null;
         if (sourceCountryId !== destinationCountryId) {
@@ -620,6 +635,8 @@ export function runMigrationPhase(
       const chosen = candidates[0];
       if (chosen === undefined) continue;
       applyFlow(world, dayIndex, source, chosen.destination, chosen.people, flows, inflowByProvince);
+      blockPopulation.set(source.id, populationTotal(source));
+      blockPopulation.set(chosen.destination.id, populationTotal(chosen.destination));
       signalState.refresh([
         signalKey(source.provinceId, source.professionId),
         signalKey(chosen.destination.provinceId, chosen.destination.professionId),
@@ -631,7 +648,7 @@ export function runMigrationPhase(
       employmentRefresh = refreshEmployment(world, definitions, dayIndex, { force: true });
     }
   } catch (error) {
-    restoreWorld(world, backup);
+    if (backup !== null) restoreWorld(world, backup);
     throw error;
   }
 
@@ -651,14 +668,6 @@ export function runMigrationPhase(
     destinationsCappedByInflowLimit,
     employmentRefresh,
   };
-}
-
-function populationTotalOfProvince(world: World, provinceId: Id): number {
-  let total = 0;
-  for (const block of world.popBlocks) {
-    if (block.provinceId === provinceId) total += populationTotal(block);
-  }
-  return total;
 }
 
 function applyFlow(

@@ -46,7 +46,7 @@ import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import {
   assertAccountingIdentity,
   buildFinanceIndex,
-  cloneFinanceState,
+  phaseFinance,
   designatedCashTotal,
   type FinanceIndex,
 } from "./accounts.js";
@@ -146,10 +146,10 @@ export function runBusinessTaxPhase(
   if (!isLastCivilDayOfMonth(dayIndex)) return emptyResult(dayIndex);
   if (options.validateWorld !== false) assertValidFinanceState(world.finance);
 
-  const staged: FinanceState = cloneFinanceState(world.finance);
+  const openingCash = designatedCashTotal(world.finance);
+  const staged: FinanceState = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(staged);
   const owners = buildProvinceOwnerMap(world);
-  const openingCash = designatedCashTotal(world.finance);
   const entries: JournalEntryInput[] = [];
   const buildingResults: BusinessTaxBuildingResult[] = [];
   const countryTotals = new Map<Id, { assessed: number; collected: number; uncollected: number }>();

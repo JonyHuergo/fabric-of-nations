@@ -21,7 +21,7 @@
 import { assertValidDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
-import { requireArray, requireFiniteNumber, requireInteger, requireRecord } from "../validation.js";
+import { isRecord, requireArray, requireInteger } from "../validation.js";
 import {
   accountNormalSide,
   assertBusinessTaxPostingStructure,
@@ -37,7 +37,7 @@ import {
   assertOwnerCapitalInjectionStructure,
   assertMonetaryPostingStructure,
   assertMilitaryPostingStructure,
-  assertSemanticJournalLine,
+  semanticJournalLineViolation,
   categoryAllowsNegativeBalance,
   isCashAccount,
   isDebtPostingKind,
@@ -122,14 +122,20 @@ function validatePostingLines(
   let debits = 0;
   let credits = 0;
   let cashDelta = 0;
+  // The checks and messages are those of `requireRecord`, `requireInteger` and
+  // `requireFiniteNumber`; each line's path is built only when it fails (D-137).
   for (let index = 0; index < lines.length; index += 1) {
-    const record = requireRecord(lines[index], `journal line ${String(index)}`);
-    const accountId = requireInteger(
-      record.accountId,
-      `journal line ${String(index)}.accountId`,
-      0,
-      0xffff_ffff,
-    );
+    const record: unknown = lines[index];
+    if (!isRecord(record)) throw new TypeError(`journal line ${String(index)} must be an object`);
+    const accountId = record.accountId;
+    if (typeof accountId !== "number" || !Number.isInteger(accountId)) {
+      throw new TypeError(`journal line ${String(index)}.accountId must be an integer`);
+    }
+    if (accountId < 0 || accountId > 0xffff_ffff) {
+      throw new RangeError(
+        `journal line ${String(index)}.accountId must be in 0..${String(0xffff_ffff)}, received ${String(accountId)}`,
+      );
+    }
     const account = accounts.get(accountId);
     if (account === undefined) {
       throw new RangeError(`journal line ${String(index)} references unknown account ${String(accountId)}`);
@@ -138,15 +144,16 @@ function validatePostingLines(
     if (side !== "debit" && side !== "credit") {
       throw new RangeError(`journal line ${String(index)}.side must be debit or credit`);
     }
-    const amount = requireFiniteNumber(
-      record.amountRUSD,
-      `journal line ${String(index)}.amountRUSD`,
-    );
+    const amount = record.amountRUSD;
+    if (typeof amount !== "number" || !Number.isFinite(amount)) {
+      throw new TypeError(`journal line ${String(index)}.amountRUSD must be a finite number`);
+    }
     if (!(amount > 0)) {
       throw new RangeError(`journal line ${String(index)}.amountRUSD must be strictly positive`);
     }
     // D-047 semantic matrix: applies to revenue/expense lines for every kind.
-    assertSemanticJournalLine(transactionKind, account, side, `journal line ${String(index)}`);
+    const violation = semanticJournalLineViolation(transactionKind, account, side);
+    if (violation !== null) throw new RangeError(`journal line ${String(index)}: ${violation}`);
     const normalSide = accountNormalSide(account.category);
     const signed = side === normalSide ? amount : -amount;
     if (side === "debit") debits += amount;
@@ -384,9 +391,11 @@ export function postJournalBatch(
     for (const [accountId, delta] of validated.deltas) {
       aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
     }
+    // The validated lines are copied once, into the posting below (D-137); nothing
+    // runs between validation and that copy that could change them.
     prepared.push({
       transactionKind: entry.transactionKind,
-      lines: entry.lines.map((line) => ({ ...line })),
+      lines: entry.lines,
       sourceEntityId: entry.sourceEntityId ?? null,
       targetEntityId: entry.targetEntityId ?? null,
     });

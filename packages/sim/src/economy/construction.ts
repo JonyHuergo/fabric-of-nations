@@ -45,6 +45,7 @@ import {
   buildFinanceIndex,
   categoryForSubtype,
   cloneFinanceState,
+  phaseFinance,
   designatedCashTotal,
 } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
@@ -468,7 +469,9 @@ export function runConstructionPhase(
   if (world.construction.projects.length === 0) return emptyResult(dayIndex);
   if (options.validateWorld !== false) assertValidWorldForTick(world);
 
-  const stagedFinance = cloneFinanceState(world.finance);
+  // Opening designated cash before any posting (D-137, see `phaseFinance`).
+  const openingCash = designatedCashTotal(world.finance);
+  const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const stagedConstruction = cloneConstructionState(world.construction);
   const stagedBuildings = world.buildings.map((building) => ({ ...building }));
   const stagedProvinces = world.provinceEconomies.map((province) => ({
@@ -876,7 +879,6 @@ export function runConstructionPhase(
   compactConstructionProjects(stagedConstruction);
   assertValidFinanceState(stagedFinance);
   assertAccountingIdentity(stagedFinance);
-  const openingCash = designatedCashTotal(world.finance);
   const closingCash = designatedCashTotal(stagedFinance);
   if (Math.abs(openingCash - closingCash) > toleranceMoney(openingCash, closingCash)) {
     throw new RangeError("construction phase did not conserve aggregate designated cash");

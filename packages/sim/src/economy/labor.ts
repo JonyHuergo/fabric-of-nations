@@ -27,7 +27,7 @@ import {
   requireRecord,
 } from "../validation.js";
 import type { World } from "../world.js";
-import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
+import { buildFinanceIndex, phaseFinance } from "./accounts.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import {
@@ -67,7 +67,11 @@ import type {
   LaborPolicyState,
   LawDef,
 } from "./types.js";
-import { countryProvinceIds } from "./country.js";
+import {
+  buildCountryPopulationIndex,
+  countryPopBlocks,
+  type CountryPopulationIndex,
+} from "./country.js";
 
 function clamp(value: number, minimum: number, maximum: number): number {
   if (value < minimum) return minimum;
@@ -84,9 +88,12 @@ function isFirstDayOfMonth(day: Day): boolean {
   return dayIndexToCivilDate(day).day === 1;
 }
 
-function countryBlocks(world: World, country: Country): World["popBlocks"] {
-  const provinces = new Set(countryProvinceIds(world, country.id));
-  return world.popBlocks.filter((block) => provinces.has(block.provinceId));
+function countryBlocks(
+  world: World,
+  country: Country,
+  index?: CountryPopulationIndex,
+): readonly World["popBlocks"][number][] {
+  return countryPopBlocks(world, country.id, index);
 }
 
 function lawInSlot(
@@ -296,6 +303,8 @@ export function deriveHealth(
   world: World,
   country: Country,
   definitions: EconomyDefinitions | undefined,
+  /** Shared per-phase lookups (D-137); built from `world` when omitted. */
+  populationIndex?: CountryPopulationIndex,
 ): HealthDerived {
   const share = clamp(country.institutions.healthStaffShare ?? 0, 0, 1);
   const keys = administrationKeys(definitions);
@@ -305,7 +314,8 @@ export function deriveHealth(
   let clerkPopulation = 0;
   let population = 0;
   let literacyWeighted = 0;
-  for (const block of countryBlocks(world, country)) {
+  const blocks = countryBlocks(world, country, populationIndex);
+  for (const block of blocks) {
     const count = populationTotal(block);
     population += count;
     literacyWeighted += block.literacy * count;
@@ -322,7 +332,7 @@ export function deriveHealth(
   const fundingBenchmark =
     population *
     world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
-    localWageIndex(world, countryBlocks(world, country), definitions, keys);
+    localWageIndex(world, blocks, definitions, keys, populationIndex?.wagesByProvince);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -364,9 +374,10 @@ interface TrainingEligibleBlock {
 function trainingEligibleBlocks(
   world: World,
   country: Country,
+  index?: CountryPopulationIndex,
 ): TrainingEligibleBlock[] {
   const result: TrainingEligibleBlock[] = [];
-  for (const block of countryBlocks(world, country)) {
+  for (const block of countryBlocks(world, country, index)) {
     const workingAge = workingAgePopulation(block);
     if (workingAge <= 0) continue;
     if (block.literacy < TRAINING_MIN_LITERACY) continue;
@@ -392,9 +403,12 @@ export function deriveTraining(
   world: World,
   country: Country,
   definitions: EconomyDefinitions | undefined,
+  /** Shared per-phase lookups (D-137); built from `world` when omitted. */
+  populationIndex?: CountryPopulationIndex,
 ): TrainingDerived {
-  const education = deriveEducation(world, country, definitions);
-  const eligible = trainingEligibleBlocks(world, country);
+  const index = populationIndex ?? buildCountryPopulationIndex(world);
+  const education = deriveEducation(world, country, definitions, index);
+  const eligible = trainingEligibleBlocks(world, country, index);
   const eligibleWorkingAge = eligible.reduce((total, entry) => total + entry.workingAge, 0);
   const instructors = Math.max(0, education.trainingStaff);
   const capacityTrainees = Math.floor(instructors * TRAINEES_PER_INSTRUCTOR);
@@ -473,8 +487,10 @@ export function runLaborMonthStart(
   day: Day,
 ): void {
   if (day !== world.startDayIndex && !isFirstDayOfMonth(day)) return;
+  // D-137: the loop writes only `country.labor`, which the lookups do not read.
+  const populationIndex = buildCountryPopulationIndex(world);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    const derived = deriveTraining(world, country, definitions);
+    const derived = deriveTraining(world, country, definitions, populationIndex);
     country.labor = {
       ...neutralLaborPolicyState(),
       ...country.labor,
@@ -495,16 +511,20 @@ export function runTrainingPhase(
   world: World,
   definitions: EconomyDefinitions | undefined,
   day: Day,
+  options: { readonly financeInPlace?: boolean } = {},
 ): TrainingPhaseResult {
   if (definitions === undefined) {
     return { dayIndex: day, countries: [], totalPaidRUSD: 0, totalRequestedRUSD: 0 };
   }
   const yearDays = daysInYear(dayIndexToCivilDate(day).year);
+  // D-137: one set of country lookups for the phase; the payroll changes balances and
+  // the qualification gains below change `qualification`, neither of which they read.
+  const populationIndex = buildCountryPopulationIndex(world);
   const derivedByCountry = new Map<Id, TrainingDerived>();
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    derivedByCountry.set(country.id, deriveTraining(world, country, definitions));
+    derivedByCountry.set(country.id, deriveTraining(world, country, definitions, populationIndex));
   }
-  const stagedFinance = cloneFinanceState(world.finance);
+  const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
   const entries: JournalEntryInput[] = [];
   const drafts: {
@@ -530,7 +550,7 @@ export function runTrainingPhase(
     if (derived === undefined) throw new RangeError("missing training derivation");
     if (!(derived.participation > 0)) continue;
     const labor = country.labor ?? neutralLaborPolicyState();
-    const eligible = trainingEligibleBlocks(world, country);
+    const eligible = trainingEligibleBlocks(world, country, populationIndex);
     const requestedPayroll = labor.trainingBudgetRUSDPerYear / yearDays;
     const requestedStipend =
       (labor.trainingStipendPerTraineeRUSDPerYear * derived.trainees) / yearDays;
@@ -544,7 +564,7 @@ export function runTrainingPhase(
     const stipendPaid = requestedStipend * scale;
 
     if (payrollPaid > 0) {
-      const academicBlocks = countryBlocks(world, country)
+      const academicBlocks = countryBlocks(world, country, populationIndex)
         .filter(
           (block) =>
             populationTotal(block) > 0 &&
@@ -635,7 +655,13 @@ export function runTrainingPhase(
     // P2b: instructors are paid at the country's own academic wages (D-135).
     const instructorCost =
       world.moneyCoefficients.trainingInstructorCostPerYearRUSD *
-      localWageIndex(world, countryBlocks(world, country), definitions, academicProfessionKeys);
+      localWageIndex(
+        world,
+        countryBlocks(world, country, populationIndex),
+        definitions,
+        academicProfessionKeys,
+        populationIndex.wagesByProvince,
+      );
     const instructorBenchmark = derived.instructors * instructorCost;
     const fundingAdequacy =
       instructorBenchmark > 0 ? clamp(payrollPaid / instructorBenchmark, 0, 1) : 0;

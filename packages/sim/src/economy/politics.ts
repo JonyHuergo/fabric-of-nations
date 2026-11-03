@@ -897,11 +897,67 @@ function professionKeyById(definitions: EconomyDefinitions): Map<Id, string> {
   return map;
 }
 
-function countryBlocks(world: World, country: Country): typeof world.popBlocks {
+function countryBlocks(
+  world: World,
+  country: Country,
+  lookups?: PoliticsLookups,
+): readonly World["popBlocks"][number][] {
+  if (lookups !== undefined) return lookups.blocksByCountry.get(country.id) ?? [];
   const provinceIds = new Set(countryProvinceIds(world, country.id));
   return [...world.popBlocks]
     .filter((block) => provinceIds.has(block.provinceId))
     .sort((left, right) => left.id - right.id);
+}
+
+/**
+ * D-137: per-phase political lookups, built once instead of once per country and
+ * use. Derived from the world when built; the politics phases change militancy,
+ * unrest, laws and regimes, never which blocks or provinces a country has.
+ *
+ * - `blocksByCountry`: `countryBlocks` of every country (ascending block id).
+ * - `blocksByProvince`: each province's blocks, ascending id; for a province of the
+ *   country this equals the country's blocks filtered to that province.
+ * - `provinceIdsByCountry`: `countryProvinceIds` of every country.
+ * - `provinceById`: the first province economy with each id, as `find` returns it.
+ */
+export interface PoliticsLookups {
+  readonly blocksByCountry: ReadonlyMap<Id, readonly World["popBlocks"][number][]>;
+  readonly blocksByProvince: ReadonlyMap<Id, readonly World["popBlocks"][number][]>;
+  readonly provinceIdsByCountry: ReadonlyMap<Id, readonly Id[]>;
+  readonly provinceById: ReadonlyMap<Id, World["provinceEconomies"][number]>;
+}
+
+export function buildPoliticsLookups(world: World): PoliticsLookups {
+  const sorted = [...world.popBlocks].sort((left, right) => left.id - right.id);
+  const provinceIdsByCountry = new Map<Id, Id[]>();
+  const ownersByProvince = new Map<Id, Id[]>();
+  if (world.provinces.enabled) {
+    for (const record of world.provinces.ownership) {
+      const list = provinceIdsByCountry.get(record.ownerPolityId);
+      if (list === undefined) provinceIdsByCountry.set(record.ownerPolityId, [record.provinceId]);
+      else list.push(record.provinceId);
+      const owners = ownersByProvince.get(record.provinceId);
+      if (owners === undefined) ownersByProvince.set(record.provinceId, [record.ownerPolityId]);
+      else if (!owners.includes(record.ownerPolityId)) owners.push(record.ownerPolityId);
+    }
+  }
+  const blocksByCountry = new Map<Id, World["popBlocks"][number][]>();
+  const blocksByProvince = new Map<Id, World["popBlocks"][number][]>();
+  for (const block of sorted) {
+    const inProvince = blocksByProvince.get(block.provinceId);
+    if (inProvince === undefined) blocksByProvince.set(block.provinceId, [block]);
+    else inProvince.push(block);
+    for (const ownerId of ownersByProvince.get(block.provinceId) ?? []) {
+      const list = blocksByCountry.get(ownerId);
+      if (list === undefined) blocksByCountry.set(ownerId, [block]);
+      else list.push(block);
+    }
+  }
+  const provinceById = new Map<Id, World["provinceEconomies"][number]>();
+  for (const province of world.provinceEconomies) {
+    if (!provinceById.has(province.id)) provinceById.set(province.id, province);
+  }
+  return { blocksByCountry, blocksByProvince, provinceIdsByCountry, provinceById };
 }
 
 function ageFraction(block: { maleByAge: Uint32Array; femaleByAge: Uint32Array }, minAge: number): number {
@@ -958,11 +1014,12 @@ export function countryFranchise(
   world: World,
   country: Country,
   definitions: PoliticsDefinitions,
+  lookups?: PoliticsLookups,
 ): { share: Rate; eligiblePopulation: number } {
   const rule = suffrageRuleForCountry(country, definitions);
   let population = 0;
   let eligible = 0;
-  for (const block of countryBlocks(world, country)) {
+  for (const block of countryBlocks(world, country, lookups)) {
     const count = populationTotal(block);
     population += count;
     eligible += count * blockEnfranchisement(block, rule);
@@ -978,6 +1035,7 @@ export function refreshInterestGroups(
   world: World,
   country: Country,
   definitions: EconomyDefinitions,
+  lookups?: PoliticsLookups,
 ): InterestGroupRefreshResult {
   const politics = definitions.politics;
   if (politics === undefined) {
@@ -989,8 +1047,8 @@ export function refreshInterestGroups(
     };
   }
   const professionKey = professionKeyById(definitions);
-  const blocks = countryBlocks(world, country);
-  const franchise = countryFranchise(world, country, politics);
+  const blocks = countryBlocks(world, country, lookups);
+  const franchise = countryFranchise(world, country, politics, lookups);
   let population = 0;
   for (const block of blocks) population += populationTotal(block);
   const laborLaw = lawDefinition(politics, country.laws.labor);
@@ -1082,6 +1140,7 @@ export function refreshInstitution(
   country: Country,
   definitions: EconomyDefinitions,
   day: Day,
+  lookups?: PoliticsLookups,
 ): InstitutionState {
   const politics = definitions.politics;
   if (politics === undefined) {
@@ -1097,7 +1156,7 @@ export function refreshInstitution(
   let literacyWeighted = 0;
   let infrastructureWeighted = 0;
   let provinceCount = 0;
-  for (const block of countryBlocks(world, country)) {
+  for (const block of countryBlocks(world, country, lookups)) {
     const count = populationTotal(block);
     population += count;
     const key = professionKey.get(block.professionId) ?? "";
@@ -1111,8 +1170,11 @@ export function refreshInstitution(
     }
     literacyWeighted += block.literacy * count;
   }
-  for (const provinceId of countryProvinceIds(world, country.id)) {
-    const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+  for (const provinceId of lookups?.provinceIdsByCountry.get(country.id) ?? countryProvinceIds(world, country.id)) {
+    const province =
+      lookups !== undefined
+        ? lookups.provinceById.get(provinceId)
+        : world.provinceEconomies.find((candidate) => candidate.id === provinceId);
     if (province === undefined) continue;
     infrastructureWeighted += province.infrastructure;
     provinceCount += 1;
@@ -1125,7 +1187,7 @@ export function refreshInstitution(
   const fundingBenchmark =
     population *
     world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
-    localWageIndex(world, countryBlocks(world, country), definitions, adminKeys);
+    localWageIndex(world, countryBlocks(world, country, lookups), definitions, adminKeys);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -1437,10 +1499,11 @@ export function runPoliticsDayStart(
   }
 
   const monthly = isFirstDayOfMonth(day) || day === world.startDayIndex;
+  const lookups = buildPoliticsLookups(world);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     if (monthly) {
-      refreshInstitution(world, country, definitions, day);
-      refreshInterestGroups(world, country, definitions);
+      refreshInstitution(world, country, definitions, day, lookups);
+      refreshInterestGroups(world, country, definitions, lookups);
       country.institutions = {
         ...country.institutions,
         fundingRequestedMonthToDateRUSD: 0,
@@ -1452,7 +1515,7 @@ export function runPoliticsDayStart(
     }
     // Crisis pressure accumulates daily from measured conditions, not from a
     // monthly timer. Elections and the institution/group refresh remain monthly.
-    updateCrisis(world, country, politics, day);
+    updateCrisis(world, country, politics, day, lookups);
   }
 }
 
@@ -1574,8 +1637,9 @@ function updateCrisis(
   country: Country,
   definitions: PoliticsDefinitions,
   day: Day,
+  lookups?: PoliticsLookups,
 ): void {
-  const pressure = crisisPressure(world, country, definitions);
+  const pressure = crisisPressure(world, country, definitions, lookups);
   const crisis = { ...country.regime.crisis };
   if (pressure >= CRISIS_PRESSURE_THRESHOLD) {
     crisis.pressureDays += 1;
@@ -1620,8 +1684,9 @@ export function crisisPressure(
   world: World,
   country: Country,
   definitions: PoliticsDefinitions,
+  lookups?: PoliticsLookups,
 ): number {
-  const blocks = countryBlocks(world, country);
+  const blocks = countryBlocks(world, country, lookups);
   let population = 0;
   let weightedMilitancy = 0;
   let unmetPopulation = 0;
@@ -1635,18 +1700,27 @@ export function crisisPressure(
   const unmet = population > 0 ? unmetPopulation / population : 0;
   let weightedUnrest = 0;
   let unrestWeight = 0;
-  for (const provinceId of countryProvinceIds(world, country.id)) {
-    const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+  for (const provinceId of lookups?.provinceIdsByCountry.get(country.id) ?? countryProvinceIds(world, country.id)) {
+    const province =
+      lookups !== undefined
+        ? lookups.provinceById.get(provinceId)
+        : world.provinceEconomies.find((candidate) => candidate.id === provinceId);
     if (province === undefined) continue;
     let provincePopulation = 0;
-    for (const block of blocks) {
-      if (block.provinceId === provinceId) provincePopulation += populationTotal(block);
+    if (lookups !== undefined) {
+      for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
+        provincePopulation += populationTotal(block);
+      }
+    } else {
+      for (const block of blocks) {
+        if (block.provinceId === provinceId) provincePopulation += populationTotal(block);
+      }
     }
     weightedUnrest += province.unrest * provincePopulation;
     unrestWeight += provincePopulation;
   }
   const unrest = unrestWeight > 0 ? weightedUnrest / unrestWeight : 0;
-  const franchise = countryFranchise(world, country, definitions);
+  const franchise = countryFranchise(world, country, definitions, lookups);
   const exclusion = clamp(1 - franchise.share, 0, 1);
   const overload = Math.min(country.institutions.overload, 1);
   const labor = lawDefinition(definitions, country.laws.labor);
@@ -1733,20 +1807,21 @@ export function runUnrestPhase(
       (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
+  // D-137: provinces and their blocks by id once; a province's blocks in ascending id
+  // are the country's blocks filtered to it, which the per-province scan read.
+  const lookups = buildPoliticsLookups(world);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    const blocks = countryBlocks(world, country);
     const labor = lawDefinition(politics, country.laws.labor);
     const grievance = labor?.laborGrievance ?? 0;
-    for (const provinceId of countryProvinceIds(world, country.id)) {
-      const province = world.provinceEconomies.find((candidate) => candidate.id === provinceId);
+    for (const provinceId of lookups.provinceIdsByCountry.get(country.id) ?? []) {
+      const province = lookups.provinceById.get(provinceId);
       if (province === undefined) continue;
       let provincePopulation = 0;
       let weightedMilitancy = 0;
       let unmetPopulation = 0;
       let workingAge = 0;
       let employed = 0;
-      for (const block of blocks) {
-        if (block.provinceId !== provinceId) continue;
+      for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
         const count = populationTotal(block);
         provincePopulation += count;
         weightedMilitancy += block.militancy * count;

@@ -309,6 +309,14 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
  */
 export interface PhaseValidationOptions {
   readonly validateWorld?: boolean;
+  /**
+   * D-137: the caller owns the phase's atomicity. Inside the integrated economic day
+   * the staged-day clone, or the D-116 rollback runner, restores the whole world when
+   * any phase fails, so a phase writes `world.finance` in place instead of staging its
+   * postings on a copy (`phaseFinance`). Direct callers keep the staged copy and its
+   * guarantee that a failed phase leaves finance untouched.
+   */
+  readonly financeInPlace?: boolean;
 }
 
 /**

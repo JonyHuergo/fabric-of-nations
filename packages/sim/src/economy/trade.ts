@@ -29,10 +29,7 @@ import {
   TRADE_MIN_MARGIN_RATE,
 } from "./constants.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import {
-  buildProvinceOwnerMap,
-  marketProvinceIds,
-} from "./country.js";
+import { buildProvinceOwnerMap } from "./country.js";
 import { isConvertibilitySuspended } from "./monetary.js";
 import {
   type AccountSubtype,
@@ -46,7 +43,7 @@ import {
   type TradeShipment,
   type TradeState,
 } from "./types.js";
-import { findAccountByOwner, findAccountsBySubtype } from "./accounts.js";
+import { findAccountById, findAccountByOwner, findAccountsBySubtype } from "./accounts.js";
 
 export {
   assertValidTradePolicyState,
@@ -387,7 +384,7 @@ function dispatchTrade(
   const cashOfAccount = (accountId: Id): number => {
     const existing = cashByAccount.get(accountId);
     if (existing !== undefined) return existing;
-    const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+    const account = findAccountById(world.finance.accounts, accountId);
     if (account === undefined) {
       throw new RangeError(`unknown cash account ${String(accountId)} for E6a trade`);
     }
@@ -421,6 +418,45 @@ function dispatchTrade(
       });
     }
   }
+  // D-137: the static half of exportability (the owner is operational and located in
+  // the market) cannot change during dispatch, so each (market, good) candidate list is
+  // built once, in ascending owner order, instead of scanning every lot of every market
+  // for every route, direction and good. Quantities stay live in `remainingByLot`.
+  const provincesByMarket = new Map<Id, Set<Id>>();
+  for (const province of world.provinceEconomies) {
+    if (province.marketId === null) continue;
+    let set = provincesByMarket.get(province.marketId);
+    if (set === undefined) {
+      set = new Set<Id>();
+      provincesByMarket.set(province.marketId, set);
+    }
+    set.add(province.id);
+  }
+  const exportCandidates = new Map<
+    Id,
+    Map<Id, { readonly key: string; readonly entry: { readonly ownerBuildingId: Id; quantity: number } }[]>
+  >();
+  for (const [key, entry] of remainingByLot) {
+    const building = buildingById.get(entry.ownerBuildingId);
+    if (building === undefined || !building.operational) continue;
+    // Only a building located inside the market may export from it. Imported lots
+    // (owned by a foreign building) are sold locally; re-export/entrepôt trade is not
+    // modeled in E6a.
+    if (provincesByMarket.get(entry.marketId)?.has(building.provinceId) !== true) continue;
+    let byGood = exportCandidates.get(entry.marketId);
+    if (byGood === undefined) {
+      byGood = new Map();
+      exportCandidates.set(entry.marketId, byGood);
+    }
+    const list = byGood.get(entry.goodId);
+    if (list === undefined) byGood.set(entry.goodId, [{ key, entry }]);
+    else list.push({ key, entry });
+  }
+  for (const byGood of exportCandidates.values()) {
+    for (const list of byGood.values()) {
+      list.sort((left, right) => left.entry.ownerBuildingId - right.entry.ownerBuildingId);
+    }
+  }
 
   const noteBlock = (
     originMarketId: Id,
@@ -436,24 +472,15 @@ function dispatchTrade(
     market: Market,
     goodId: Id,
   ): { key: string; ownerBuildingId: Id; quantity: number }[] => {
-    const provinces = new Set(marketProvinceIds(world, market.id));
     const lots: { key: string; ownerBuildingId: Id; quantity: number }[] = [];
-    for (const [key, entry] of remainingByLot) {
-      if (entry.marketId !== market.id || entry.goodId !== goodId) continue;
-      if (!(entry.quantity > 0)) continue;
-      const building = buildingById.get(entry.ownerBuildingId);
-      if (building === undefined || !building.operational) continue;
-      // Only a building located inside the market may export from it. Imported lots
-      // (owned by a foreign building) are sold locally; re-export/entrepôt trade is not
-      // modeled in E6a.
-      if (!provinces.has(building.provinceId)) continue;
+    for (const candidate of exportCandidates.get(market.id)?.get(goodId) ?? []) {
+      if (!(candidate.entry.quantity > 0)) continue;
       lots.push({
-        key,
-        ownerBuildingId: entry.ownerBuildingId,
-        quantity: entry.quantity,
+        key: candidate.key,
+        ownerBuildingId: candidate.entry.ownerBuildingId,
+        quantity: candidate.entry.quantity,
       });
     }
-    lots.sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
     return lots;
   };
 
@@ -899,9 +926,7 @@ function ownerFundingFor(
 } {
   const ownerKind: "popBlock" | "country" =
     building.ownerKind === "private" ? "popBlock" : "country";
-  const cashAccount = world.finance.accounts.find(
-    (candidate) => candidate.id === building.ownerAccountId,
-  );
+  const cashAccount = findAccountById(world.finance.accounts, building.ownerAccountId);
   if (cashAccount === undefined || cashAccount.ownerId === null) {
     throw new RangeError(
       `building ${String(building.id)} owner account ${String(building.ownerAccountId)} is missing`,

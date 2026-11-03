@@ -27,7 +27,7 @@ import {
   requireString,
 } from "../validation.js";
 import type { World } from "../world.js";
-import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
+import { buildFinanceIndex, phaseFinance } from "./accounts.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import {
@@ -63,7 +63,12 @@ import {
   type TechnologyDefinitions,
   type TechnologyEra,
 } from "./types.js";
-import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
+import {
+  buildCountryPopulationIndex,
+  buildProvinceOwnerMap,
+  countryPopBlocks,
+  type CountryPopulationIndex,
+} from "./country.js";
 
 const MAX_TECHNOLOGY_DESCRIPTION_LENGTH = 500;
 const MAX_TECHNOLOGY_KEY_LENGTH = 64;
@@ -641,9 +646,12 @@ export function countryForProvince(world: World, provinceId: Id): Country | null
   return ownerId === undefined ? null : (world.countries.find((country) => country.id === ownerId) ?? null);
 }
 
-function countryBlocks(world: World, country: Country): World["popBlocks"] {
-  const provinces = new Set(countryProvinceIds(world, country.id));
-  return world.popBlocks.filter((block) => provinces.has(block.provinceId));
+function countryBlocks(
+  world: World,
+  country: Country,
+  index?: CountryPopulationIndex,
+): readonly World["popBlocks"][number][] {
+  return countryPopBlocks(world, country.id, index);
 }
 
 function professionKeyById(definitions: EconomyDefinitions): Map<Id, string> {
@@ -708,9 +716,11 @@ export function deriveEducation(
   world: World,
   country: Country,
   definitions: EconomyDefinitions | undefined,
+  /** Shared per-phase lookups (D-137); built from `world` when omitted. */
+  populationIndex?: CountryPopulationIndex,
 ): EducationDerived {
   const content = definitions?.technology;
-  const blocks = countryBlocks(world, country);
+  const blocks = countryBlocks(world, country, populationIndex);
   if (content === undefined || definitions === undefined) {
     let schoolAge = 0;
     for (const block of blocks) schoolAge += schoolAgeOf(block);
@@ -735,13 +745,7 @@ export function deriveEducation(
   }
   const academicKeys = new Set(content.academicProfessionKeys);
   const professionById = new Map(definitions.professions.map((entry) => [entry.id, entry]));
-  const assignedByBlock = new Map<Id, number>();
-  for (const assignment of world.employment) {
-    assignedByBlock.set(
-      assignment.popBlockId,
-      (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
-    );
-  }
+  const assignedByBlock = (populationIndex ?? buildCountryPopulationIndex(world)).assignedByBlock;
   let academicPopulation = 0;
   let availableAcademicWorkers = 0;
   let literacyWeighted = 0;
@@ -799,7 +803,13 @@ export function deriveEducation(
   const fundingBenchmark =
     availableAcademicWorkers *
     world.moneyCoefficients.educationFundingPerStaffPerYearRUSD *
-    localWageIndex(world, blocks, definitions, new Set(content.academicProfessionKeys));
+    localWageIndex(
+      world,
+      blocks,
+      definitions,
+      new Set(content.academicProfessionKeys),
+      populationIndex?.wagesByProvince,
+    );
   const fundingAdequacy =
     fundingBenchmark > 0
       ? clamp(country.education.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -917,7 +927,7 @@ export function runEducationPhase(
   world: World,
   definitions: EconomyDefinitions | undefined,
   day: Day,
-  options: { readonly validateWorld?: boolean } = {},
+  options: { readonly validateWorld?: boolean; readonly financeInPlace?: boolean } = {},
 ): EducationPhaseResult {
   if (definitions?.technology === undefined || !world.technology.enabled) {
     return {
@@ -930,13 +940,17 @@ export function runEducationPhase(
   resetEducationMemoIfDue(world, day);
   const content = definitions.technology;
   const yearDays = daysInYear(dayIndexToCivilDate(day).year);
+  // D-137: one set of country lookups for the whole phase; the payroll below changes
+  // only balances, never the blocks, assignments or wage tables it reads.
+  const populationIndex = buildCountryPopulationIndex(world);
   const derivedByCountry = new Map<Id, EducationDerived>();
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    derivedByCountry.set(country.id, deriveEducation(world, country, definitions));
+    derivedByCountry.set(country.id, deriveEducation(world, country, definitions, populationIndex));
   }
 
-  // Stage the finance mutation. Posting errors leave the world untouched.
-  const stagedFinance = cloneFinanceState(world.finance);
+  // Stage the finance mutation. Posting errors leave the world untouched (direct
+  // callers); the integrated day writes in place (D-137).
+  const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
   const countryDrafts: {
     countryId: Id;
@@ -954,7 +968,7 @@ export function runEducationPhase(
       throw new RangeError(`invalid education funding for country ${String(country.id)}`);
     }
     if (!(requested > 0)) continue;
-    const eligible = countryBlocks(world, country)
+    const eligible = countryBlocks(world, country, populationIndex)
       .filter(
         (block) =>
           populationTotal(block) > 0 &&
@@ -1021,7 +1035,7 @@ export function runEducationPhase(
       derived.fundingAdequacy > 0
     ) {
       const lawPolicy = educationLawPolicy(country, definitions);
-      for (const block of countryBlocks(world, country)) {
+      for (const block of countryBlocks(world, country, populationIndex)) {
         let schoolAge = 0;
         for (let age = EDUCATION_SCHOOL_AGE_MIN; age <= EDUCATION_SCHOOL_AGE_MAX; age += 1) {
           schoolAge += (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
