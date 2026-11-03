@@ -682,6 +682,11 @@ export function settleMarketDays(
      * every posting, balance and total is the same. Defaults to `full`.
      */
     readonly detail?: "full" | "summary";
+    /**
+     * Skip the employment precondition when the caller validated it immediately
+     * before (the integrated day does, after migration). Defaults to checking.
+     */
+    readonly validateEmployment?: boolean;
   } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
@@ -715,7 +720,10 @@ export function settleMarketDays(
   if (isTerminalDayIndex(world.dayIndex)) {
     throw new RangeError("settlement cannot run at the terminal boundary");
   }
-  assertValidEmploymentState(world, definitions);
+  // D-137: the integrated day validates employment immediately before the market
+  // phase (after migration), so it can say so and avoid a second full pass; direct
+  // callers keep the precondition check.
+  if (options.validateEmployment !== false) assertValidEmploymentState(world, definitions);
   const sortedResults = [...marketDays].sort((left, right) => left.marketId - right.marketId);
   const result = settleMarketDaysInternal(world, definitions, sortedResults, options.detail ?? "full");
   for (const marketDay of marketDays) marketDay.settled = true;

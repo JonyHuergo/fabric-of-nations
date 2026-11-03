@@ -458,20 +458,9 @@ function buildHouseholdDemand(
     }
   }
 
-  records.sort((left, right) =>
-    left.popBlockId !== right.popBlockId
-      ? left.popBlockId - right.popBlockId
-      : left.tier !== right.tier
-        ? left.tier - right.tier
-        : left.goodId - right.goodId,
-  );
-  meta.sort((left, right) =>
-    left.popBlockId !== right.popBlockId
-      ? left.popBlockId - right.popBlockId
-      : left.tier !== right.tier
-        ? left.tier - right.tier
-        : left.goodId - right.goodId,
-  );
+  // Blocks are walked in ascending id order, tiers in 1/3/6 order and each tier's
+  // goods in ascending good id, so both lists are already in the canonical
+  // (popBlock, tier, good) order the sorts produced.
   return { records, meta, marketByPopBlock };
 }
 
@@ -512,6 +501,10 @@ function buildProductionDemands(
   const provinceToMarket = marketByProvince(world);
   const critical = criticalGoodIds(definitions, populationDefinitions.needs);
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  const marketById = new Map(world.markets.map((market) => [market.id, market]));
+  // D-137: each definition's inputs in ascending good order once, not a copy and
+  // sort per building and per day.
+  const sortedInputsByDefinition = new Map<Id, readonly BuildingDef["inputs"][number][]>();
   const records: ProductionDemandRecord[] = [];
 
   for (const building of inIdOrder(world.buildings)) {
@@ -522,10 +515,15 @@ function buildProductionDemands(
     if (marketId === undefined) {
       throw new RangeError(`building ${String(building.id)} is in a province with no market`);
     }
-    const market = marketPrices(world, marketId);
+    const market = marketById.get(marketId);
+    if (market === undefined) throw new RangeError(`missing market ${String(marketId)}`);
     const capacity = capacityOf(building.id);
     if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
-    const inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
+    let inputs = sortedInputsByDefinition.get(definition.id);
+    if (inputs === undefined) {
+      inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
+      sortedInputsByDefinition.set(definition.id, inputs);
+    }
     if (inputs.length === 0) continue;
     const desired = inputs.map((input) => ({
       goodId: input.goodId,
@@ -554,11 +552,8 @@ function buildProductionDemands(
       });
     }
   }
-  records.sort((left, right) =>
-    left.buyerBuildingId !== right.buyerBuildingId
-      ? left.buyerBuildingId - right.buyerBuildingId
-      : left.goodId - right.goodId,
-  );
+  // Buildings and their definitions' inputs are in ascending id order, so the
+  // records are already in canonical (buyer, good) order.
   return records;
 }
 
@@ -959,7 +954,13 @@ function runMarketAttempt(
     );
   }
   observe?.("settlement");
-  const settlement = settleMarketDays(world, definitions, results, { validateWorld: false, detail });
+  // The integrated day validated employment after migration and before the market
+  // phase, so settlement does not repeat that full pass (D-137).
+  const settlement = settleMarketDays(world, definitions, results, {
+    validateWorld: false,
+    validateEmployment: false,
+    detail,
+  });
   return {
     household,
     production,
