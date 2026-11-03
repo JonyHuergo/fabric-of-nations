@@ -62,6 +62,7 @@ import type {
   ProfessionDef,
 } from "./types.js";
 import { buildProvinceOwnerMap } from "./country.js";
+import { inIdOrder } from "../ordering.js";
 
 export const M3E_WAGE_RESIDUAL_PURPOSE = "settlement.wage-residual";
 
@@ -763,45 +764,45 @@ function settleMarketDaysInternal(
   // These are the values the former per-account map returned.
   const accounts = world.finance.accounts;
   const openingBalanceArray = new Float64Array(accounts.length);
+  let maxAccountId = 0;
   for (let position = 0; position < accounts.length; position += 1) {
-    openingBalanceArray[position] = (accounts[position] as FinancialAccount).balanceRUSD;
+    const account = accounts[position] as FinancialAccount;
+    openingBalanceArray[position] = account.balanceRUSD;
+    if (account.id > maxAccountId) maxAccountId = account.id;
+  }
+  // D-137: opening cash by account id in a dense table when ids allow it (the
+  // common case: ids are allocated sequentially); the producer and household loops
+  // then read an array instead of building two maps per day.
+  const denseOpening =
+    Number.isSafeInteger(maxAccountId) && maxAccountId <= accounts.length * 4 + 1024;
+  const openingByAccountId = denseOpening ? new Float64Array(maxAccountId + 1) : null;
+  if (openingByAccountId !== null) {
+    for (const account of accounts) openingByAccountId[account.id] = account.balanceRUSD;
   }
   const openingProducerCash = new Map<Id, number>();
-  for (const building of world.buildings) {
-    openingProducerCash.set(
-      building.operatingCashAccountId,
-      index.byId.get(building.operatingCashAccountId)?.balanceRUSD ?? 0,
-    );
+  if (openingByAccountId === null) {
+    for (const building of world.buildings) {
+      openingProducerCash.set(
+        building.operatingCashAccountId,
+        index.byId.get(building.operatingCashAccountId)?.balanceRUSD ?? 0,
+      );
+    }
   }
   const openingHouseholdCash = new Map<Id, number>();
-  for (const block of world.popBlocks) {
-    const account = index.find("popBlock", block.id, "household-cash");
-    if (account !== undefined) openingHouseholdCash.set(account.id, account.balanceRUSD);
+  if (openingByAccountId === null) {
+    for (const block of world.popBlocks) {
+      const account = index.find("popBlock", block.id, "household-cash");
+      if (account !== undefined) openingHouseholdCash.set(account.id, account.balanceRUSD);
+    }
   }
   const initialCash = designatedCashTotal(world.finance);
   const openingPostings = [...world.finance.postings];
   const openingNextPostingId = world.finance.nextPostingId;
 
-  const marketDeltas = new Map<Id, number>();
-  for (const transaction of transactions) {
-    marketDeltas.set(
-      transaction.sellerAccountId,
-      (marketDeltas.get(transaction.sellerAccountId) ?? 0) + transaction.totalRUSD,
-    );
-    marketDeltas.set(
-      transaction.buyerAccountId,
-      (marketDeltas.get(transaction.buyerAccountId) ?? 0) - transaction.totalRUSD,
-    );
-  }
-  for (const [accountId, delta] of marketDeltas) {
-    const account = index.byId.get(accountId);
-    if (account === undefined) throw new RangeError(`unknown settlement account ${String(accountId)}`);
-    if (account.balanceRUSD + delta < 0) {
-      throw new RangeError(
-        `insufficient funds; market settlement would overdraw account ${String(accountId)}`,
-      );
-    }
-  }
+  // D-125/D-137: the aggregated market postings are also the batch affordability
+  // check (their aggregate is exactly the net cash change below), so the former
+  // per-account delta map duplicated a 100k-account pass; the posting batch rejects
+  // an overdraw with the same invariant.
 
   const postings: JournalPosting[] = [];
   try {
@@ -819,7 +820,7 @@ function settleMarketDaysInternal(
     const wageSettlements: WageSettlement[] = [];
     const wageLookup = buildWageLookup(world);
     const wageEntries: JournalEntryInput[] = [];
-    for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
+    for (const building of inIdOrder(world.buildings)) {
       if (!building.operational) continue;
       const definition = buildingDefinitions.get(building.definitionId);
       if (definition === undefined) {
@@ -960,7 +961,7 @@ function settleMarketDaysInternal(
     const unpaidUpkeepByBuilding = new Map<Id, number>();
     let systemAccount: FinancialAccount | undefined;
     let systemIncome: FinancialAccount | undefined;
-    for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
+    for (const building of inIdOrder(world.buildings)) {
       if (!building.operational) continue;
       const definition = buildingDefinitions.get(building.definitionId);
       if (definition === undefined) {
@@ -1052,10 +1053,12 @@ function settleMarketDaysInternal(
       }
     }
 
-    const producers: ProducerSettlement[] = [...world.buildings]
-      .sort((left, right) => left.id - right.id)
+    const producers: ProducerSettlement[] = inIdOrder(world.buildings)
       .map((building) => {
-        const initialCash = openingProducerCash.get(building.operatingCashAccountId) ?? 0;
+        const initialCash =
+          openingByAccountId !== null
+            ? (openingByAccountId[building.operatingCashAccountId] ?? 0)
+            : (openingProducerCash.get(building.operatingCashAccountId) ?? 0);
         const current = operatingCash(index, building.id);
         const revenue = revenueByBuilding.get(building.id) ?? 0;
         const inputCosts = inputCostsByBuilding.get(building.id) ?? 0;
@@ -1086,11 +1089,13 @@ function settleMarketDaysInternal(
         };
       });
 
-    const households: HouseholdSettlement[] = [...world.popBlocks]
-      .sort((left, right) => left.id - right.id)
+    const households: HouseholdSettlement[] = inIdOrder(world.popBlocks)
       .map((block) => {
         const account = householdCash(index, block.id);
-        const initialCash = openingHouseholdCash.get(account.id) ?? 0;
+        const initialCash =
+          openingByAccountId !== null
+            ? (openingByAccountId[account.id] ?? 0)
+            : (openingHouseholdCash.get(account.id) ?? 0);
         const purchases = purchasesByBlock.get(block.id) ?? 0;
         const wages = wagesByBlock.get(block.id) ?? 0;
         const expected = initialCash - purchases + wages;

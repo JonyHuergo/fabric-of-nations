@@ -31,6 +31,7 @@ import type {
 } from "../population/types.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.js";
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
+import { inIdOrder } from "../ordering.js";
 import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import type { DayPhaseObserver, DayResultDetail } from "../population/types.js";
@@ -380,7 +381,7 @@ function buildHouseholdDemand(
   const labelByGood: NeedTier[] = new Array<NeedTier>(goodCount);
   const presentGoods: number[] = [];
 
-  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+  for (const block of inIdOrder(world.popBlocks)) {
     const population = populationTotal(block);
     if (population <= 0) continue;
     const marketId = provinceToMarket.get(block.provinceId);
@@ -513,7 +514,7 @@ function buildProductionDemands(
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const records: ProductionDemandRecord[] = [];
 
-  for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
+  for (const building of inIdOrder(world.buildings)) {
     if (!building.operational) continue;
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
@@ -614,7 +615,7 @@ function buildNeedsResult(
     else list.push(item);
   }
 
-  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+  for (const block of inIdOrder(world.popBlocks)) {
     const population = populationTotal(block);
     const meta = metaByBlock.get(block.id);
     const householdSettlement = householdByName.get(block.id);

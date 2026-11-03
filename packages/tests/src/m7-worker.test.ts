@@ -13,6 +13,7 @@ import {
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 import {
+  STORED_SAVE_PREFIX,
   base64ToBytes,
   bytesToBase64,
   compressSaveForStorage,
@@ -499,15 +500,23 @@ describe("M7 simulation worker host", () => {
   test("compresses saves for storage and rejects malformed stored payloads", () => {
     const { host, events } = createHarness();
     host.handleCommand(command("SAVE", "save-1"));
+    // D-137: the worker compresses off the app thread, so SAVE_RESULT carries the
+    // stored form (metadata line + deflate level 1 + base64) and the app stores it
+    // as-is. Compressing it again is idempotent; the canonical save is larger.
     const save = lastEvent(events, "SAVE_RESULT")!.save;
+    expect(save.startsWith(STORED_SAVE_PREFIX)).toBe(true);
     const stored = compressSaveForStorage(save);
-    expect(stored.startsWith("century-save-gzip1:")).toBe(true);
-    expect(decompressSaveFromStorage(stored)).toBe(save);
-    expect(stored.length).toBeLessThan(save.length);
+    expect(stored).toBe(save);
+    const canonical = decompressSaveFromStorage(stored);
+    expect(canonical.startsWith('{"checksum":')).toBe(true);
+    expect(stored.length).toBeLessThan(canonical.length);
+    expect(decompressSaveFromStorage(compressSaveForStorage(canonical))).toBe(canonical);
 
     const bytes = new Uint8Array([0, 1, 2, 250, 255]);
     expect([...base64ToBytes(bytesToBase64(bytes))]).toEqual([...bytes]);
-    expect(() => decompressSaveFromStorage("not-compressed")).toThrow(/century-save-gzip1/);
+    expect(() => decompressSaveFromStorage("not-compressed")).toThrow(
+      /fon-save-deflate2|century-save-gzip1/,
+    );
     expect(() =>
       decompressSaveFromStorage(`century-save-gzip1:${"A".repeat(8)}`),
     ).toThrow();

@@ -32,6 +32,7 @@ import {
 import { CAMPAIGN_TERMINAL_DAY_INDEX, MAX_RECENT_WARNINGS } from "../constants.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { populationTotal } from "../population/state.js";
+import { inIdOrder } from "../ordering.js";
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
@@ -657,8 +658,7 @@ export function buildCountryAIObservation(
   const provinceIds = new Set(countryProvinceIds(world, country.id));
   const blocks: CountryAIObservedBlock[] = [];
   let population = 0;
-  for (const block of shared.sortedPopBlocks ??
-    [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+  for (const block of shared.sortedPopBlocks ?? inIdOrder(world.popBlocks)) {
     if (!provinceIds.has(block.provinceId)) continue;
     const blockPopulation = populationTotal(block);
     population += blockPopulation;
@@ -2049,7 +2049,7 @@ export function runCountryAIPhase(
   // Computed on the first evaluating country (D-137); see `buildCountryAIObservation`.
   let latestPeriodTotals: ReturnType<typeof governmentPeriodTotals> | undefined;
   // Blocks never change membership or ids during the phase (actions are fiscal).
-  let sortedPopBlocks: World["popBlocks"] | undefined;
+  let sortedPopBlocks: readonly World["popBlocks"][number][] | undefined;
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     // Post-M7 player control: the designated player country is never governed by
     // the AI, so the player's fiscal settings cannot be silently overwritten.
@@ -2062,7 +2062,7 @@ export function runCountryAIPhase(
       latestPeriodTotals =
         latestSummary === undefined ? [] : governmentPeriodTotals(world.finance, latestSummary);
     }
-    sortedPopBlocks ??= [...world.popBlocks].sort((left, right) => left.id - right.id);
+    sortedPopBlocks ??= inIdOrder(world.popBlocks);
     const observation = buildCountryAIObservation(world, country.id, dayIndex, {
       ...(world.finance.periodSummaries.length === 0 ? {} : { latestPeriodTotals }),
       sortedPopBlocks,

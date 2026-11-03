@@ -118,9 +118,15 @@ function validatePostingLines(
   transactionKind: TransactionKind,
   /** `accounts.get` through the finance index's dense id table (D-137). */
   accountOf: (id: number) => FinancialAccount | undefined = (id) => accounts.get(id),
+  /**
+   * Optional accumulator for the batch path (D-137): validated line deltas are added
+   * straight into the batch aggregate instead of a per-entry map. The per-entry map
+   * remains for single postings and for callers that need it.
+   */
+  deltasOut?: Map<number, number>,
 ): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
-  const deltas = new Map<number, number>();
+  const deltas = deltasOut ?? new Map<number, number>();
   let debits = 0;
   let credits = 0;
   let cashDelta = 0;
@@ -379,30 +385,25 @@ export function postJournalBatch(
     throw new RangeError("finance posting id overflow");
   }
 
+  // Only the newest MAX_AUDIT_POSTINGS entries can remain in the audit buffer after
+  // the trim below: older entries are evicted from the front first. Earlier entries
+  // are still validated and applied, but their posting objects are not materialised
+  // (D-137): a settlement batch creates thousands of wage/upkeep entries per day and
+  // the buffer keeps 256.
+  const retainedStart = Math.max(0, entries.length - MAX_AUDIT_POSTINGS);
   const aggregate = new Map<number, number>();
-  const prepared: {
-    readonly transactionKind: PublicTransactionKind;
-    readonly lines: readonly JournalLine[];
-    readonly sourceEntityId: Id | null;
-    readonly targetEntityId: Id | null;
-  }[] = [];
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
     assertPublicTransactionKind(entry.transactionKind);
-    const validated = validatePostingLines(entry.lines, accounts, entry.transactionKind, accountOf);
+    const validated = validatePostingLines(
+      entry.lines,
+      accounts,
+      entry.transactionKind,
+      accountOf,
+      aggregate,
+    );
     assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
-    for (const [accountId, delta] of validated.deltas) {
-      aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
-    }
-    // The validated lines are copied once, into the posting below (D-137); nothing
-    // runs between validation and that copy that could change them.
-    prepared.push({
-      transactionKind: entry.transactionKind,
-      lines: entry.lines,
-      sourceEntityId: entry.sourceEntityId ?? null,
-      targetEntityId: entry.targetEntityId ?? null,
-    });
   }
   assertBalanceConstraints(accounts, aggregate);
 
@@ -412,21 +413,30 @@ export function postJournalBatch(
     account.balanceRUSD += delta;
   }
 
+  // Materialise postings only after every entry is validated and affordable, so a
+  // rejected batch leaves the audit buffer and posting id untouched (as before).
   const postings: JournalPosting[] = [];
   let postingId = nextId;
-  for (const entry of prepared) {
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
+    // Only the retained tail is copied into the buffer. The returned array keeps the
+    // entry's own line array for evicted entries, so callers that read ids or lengths
+    // see the same shape.
+    const retained = index >= retainedStart;
     const posting: JournalPosting = {
       id: postingId,
       dayIndex,
       transactionKind: entry.transactionKind,
-      lines: entry.lines.map((line) => ({ ...line })),
-      sourceEntityId: entry.sourceEntityId,
-      targetEntityId: entry.targetEntityId,
+      lines: retained ? entry.lines.map((line) => ({ ...line })) : [...entry.lines],
+      sourceEntityId: entry.sourceEntityId ?? null,
+      targetEntityId: entry.targetEntityId ?? null,
     };
-    finance.postings.push(posting);
+    if (retained) finance.postings.push(posting);
     postings.push(posting);
     postingId += 1;
   }
+
   finance.nextPostingId = postingId;
   if (finance.postings.length > MAX_AUDIT_POSTINGS) {
     finance.postings.splice(0, finance.postings.length - MAX_AUDIT_POSTINGS);

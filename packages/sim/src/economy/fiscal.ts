@@ -51,6 +51,7 @@ import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { buildFinanceIndex, phaseFinance } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import { buildProvinceOwnerMap, fiscalPolicyIsActive } from "./country.js";
+import { inIdOrder } from "../ordering.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import type { Country, EconomyDefinitions, FinanceState, JournalLine } from "./types.js";
 import { taxCollectionEfficiency } from "./politics.js";
@@ -276,7 +277,7 @@ function executeFiscalPhase(
     settlement.households.map((household) => [household.popBlockId, household.wagesReceivedRUSD]),
   );
   const owners = buildProvinceOwnerMap(world);
-  const countries = [...world.countries].sort((left, right) => left.id - right.id);
+  const countries = inIdOrder(world.countries);
   const politics = options.economyDefinitions?.politics;
   const administrationProfessionKeys = new Set(
     politics?.administrationProfessionKeys ?? [],
@@ -294,7 +295,7 @@ function executeFiscalPhase(
   }));
   const groupByCountry = new Map(groups.map((group) => [group.country.id, group]));
   const unowned: Id[] = [];
-  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+  for (const block of inIdOrder(world.popBlocks)) {
     const countryId = owners.get(block.provinceId);
     if (countryId === undefined) {
       unowned.push(block.id);

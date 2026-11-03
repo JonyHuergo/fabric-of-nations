@@ -16,6 +16,7 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { populationTotal } from "../population/state.js";
+import { inIdOrder } from "../ordering.js";
 import { localWageIndex } from "./localWages.js";
 import type { PopulationDefinitions } from "../population/types.js";
 import type { Day, Id, Month, Rate } from "../types.js";
@@ -928,7 +929,7 @@ export interface PoliticsLookups {
 }
 
 export function buildPoliticsLookups(world: World): PoliticsLookups {
-  const sorted = [...world.popBlocks].sort((left, right) => left.id - right.id);
+  const sorted = inIdOrder(world.popBlocks);
   const provinceIdsByCountry = new Map<Id, Id[]>();
   const ownersByProvince = new Map<Id, Id[]>();
   if (world.provinces.enabled) {
