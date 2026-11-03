@@ -28,11 +28,13 @@ import {
   MAX_RECENT_WARNINGS,
   MAX_SCENARIO_ID_LENGTH,
   MAX_WARNING_LENGTH,
+  SAVE_CHECKSUM_PREFIX,
   SAVE_FORMAT_VERSION,
   SIM_VERSION,
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
-import { checksumOfJson, stableStringify } from "./hash.js";
+import { categoryForSubtype } from "./economy/accounts.js";
+import { checksumOfJson, fnv1a32Hex, stableStringify } from "./hash.js";
 import { MONEY_COEFFICIENT_KEYS } from "./economy/constants.js";
 import type { MoneyCoefficients } from "./economy/types.js";
 import { canonicalizeStockLots } from "./economy/inventory.js";
@@ -1068,6 +1070,11 @@ export function encodeTypedArray(array: SupportedTypedArray): EncodedTypedArray 
     );
   }
   const kind = typedArrayKind(array);
+  // D-137: every element of a Uint32Array is a valid uint32 by construction, so the
+  // per-element check (and its path string) cannot fail; the values are the same.
+  if (array instanceof Uint32Array) {
+    return { encoding: "typed-array-v1", kind, length: array.length, values: Array.from(array) };
+  }
   const values: number[] = [];
   for (let index = 0; index < array.length; index += 1) {
     const value = array[index];
@@ -4220,11 +4227,252 @@ function decodeWorldPayload(value: unknown): World {
   return world;
 }
 
+
+// ---- D-137 save format 2: column tables for the large collections ------------
+//
+// The payload of format 2 is the format-1 payload (`encodeWorld`) with its largest
+// collections stored as columns: finance accounts (owner kind and subtype as codes;
+// the category is the subtype's), pop blocks (age and literacy arrays flattened),
+// buildings, employment, province economies, province ownership, and each closed
+// period's per-account totals. Columns of finite numbers are written by the
+// canonical encoder as plain number arrays, so the payload has a few thousand
+// objects instead of a few hundred thousand. Decoding rebuilds the format-1 payload
+// exactly and then runs the unchanged decoder and whole-world validation.
+
+const SAVE_OWNER_KINDS = ["popBlock", "building", "country", "system"] as const;
+
+interface SavedColumnTable {
+  readonly keys: readonly string[];
+  readonly rows: number;
+  readonly columns: readonly (readonly unknown[])[];
+}
+
+function toColumnTable(rows: readonly object[], path: string): SavedColumnTable {
+  const first = rows[0] as Record<string, unknown> | undefined;
+  const keys = first === undefined ? [] : Object.keys(first).sort();
+  const columns: unknown[][] = keys.map(() => new Array<unknown>(rows.length));
+  for (let row = 0; row < rows.length; row += 1) {
+    const record = rows[row] as Record<string, unknown>;
+    if (Object.keys(record).length !== keys.length) {
+      throw new RangeError(`${path}[${String(row)}] does not share the table's fields`);
+    }
+    for (let column = 0; column < keys.length; column += 1) {
+      const value = record[keys[column] as string];
+      if (value === undefined) {
+        throw new RangeError(`${path}[${String(row)}] does not share the table's fields`);
+      }
+      (columns[column] as unknown[])[row] = value;
+    }
+  }
+  return { keys, rows: rows.length, columns };
+}
+
+function fromColumnTable(value: unknown, path: string): Record<string, unknown>[] {
+  const table = requireRecord(value, path);
+  const keys = requireArray(table.keys, `${path}.keys`).map((key, index) =>
+    requireString(key, `${path}.keys[${String(index)}]`),
+  );
+  const rows = requireInteger(table.rows, `${path}.rows`, 0, Number.MAX_SAFE_INTEGER);
+  const columns = requireArray(table.columns, `${path}.columns`);
+  if (columns.length !== keys.length) {
+    throw new SaveFormatError(`${path} has ${String(columns.length)} columns for ${String(keys.length)} fields`);
+  }
+  const typedColumns = columns.map((column, index) => {
+    const values = requireArray(column, `${path}.columns[${String(index)}]`);
+    if (values.length !== rows) {
+      throw new SaveFormatError(`${path}.columns[${String(index)}] does not have ${String(rows)} rows`);
+    }
+    return values;
+  });
+  const result: Record<string, unknown>[] = new Array<Record<string, unknown>>(rows);
+  for (let row = 0; row < rows; row += 1) {
+    const record: Record<string, unknown> = {};
+    for (let column = 0; column < keys.length; column += 1) {
+      record[keys[column] as string] = (typedColumns[column] as unknown[])[row];
+    }
+    result[row] = record;
+  }
+  return result;
+}
+
+function codeOf(values: readonly string[], value: string, path: string): number {
+  const code = values.indexOf(value);
+  if (code < 0) throw new RangeError(`${path} has no save code for ${JSON.stringify(value)}`);
+  return code;
+}
+
+function valueOfCode<T extends string>(values: readonly T[], code: unknown, path: string): T {
+  const index = requireInteger(code, path, 0, values.length - 1);
+  return values[index] as T;
+}
+
+/**
+ * Save format 2 codec for tooling and tests (D-137): `decodeSavePayload` turns a
+ * format-2 save payload into the format-1 shape that `encodeWorld` returns, and
+ * `encodeSavePayload` back. `deserializeWorld` validates whatever it is given.
+ */
+export function encodeSavePayload(encoded: SerializedWorld): Record<string, unknown> {
+  return toSavePayload(encoded);
+}
+
+export function decodeSavePayload(payload: unknown): unknown {
+  return fromSavePayload(payload);
+}
+
+/** Format-1 payload (`encodeWorld`) to the format-2 column payload. */
+function toSavePayload(encoded: SerializedWorld): Record<string, unknown> {
+  const subtypeCodes = new Map<string, number>(ACCOUNT_SUBTYPES.map((subtype, index) => [subtype, index]));
+  const accounts = encoded.finance.accounts;
+  const accountColumns = {
+    id: accounts.map((account) => account.id),
+    ownerKind: accounts.map((account) => codeOf(SAVE_OWNER_KINDS, account.ownerKind, "finance.accounts.ownerKind")),
+    ownerId: accounts.map((account) => (account.ownerId === null ? -1 : account.ownerId)),
+    subtype: accounts.map((account) => {
+      const code = subtypeCodes.get(account.subtype);
+      if (code === undefined) throw new RangeError(`account subtype ${JSON.stringify(account.subtype)} has no save code`);
+      return code;
+    }),
+    balanceRUSD: accounts.map((account) => account.balanceRUSD),
+  };
+  const blocks = encoded.popBlocks;
+  const maleByAge: number[] = [];
+  const femaleByAge: number[] = [];
+  const literacyByAge: number[] = [];
+  const blockRest = blocks.map((block) => {
+    if (
+      block.maleByAge.length !== SINGLE_AGE_COUNT ||
+      block.femaleByAge.length !== SINGLE_AGE_COUNT ||
+      block.literacyByAge.length !== SINGLE_AGE_COUNT
+    ) {
+      throw new RangeError(`popBlock ${String(block.id)} age arrays must have length ${String(SINGLE_AGE_COUNT)}`);
+    }
+    for (const value of block.maleByAge.values) maleByAge.push(value);
+    for (const value of block.femaleByAge.values) femaleByAge.push(value);
+    for (const value of block.literacyByAge) literacyByAge.push(value);
+    const { maleByAge: _male, femaleByAge: _female, literacyByAge: _literacy, ...rest } = block;
+    return rest;
+  });
+  const periodSummaries = encoded.finance.periodSummaries.map((summary) => {
+    const ids = Object.keys(summary.accountTotals)
+      .map((key) => Number(key))
+      .sort((left, right) => left - right);
+    return {
+      ...summary,
+      accountTotals: { id: ids, value: ids.map((id) => summary.accountTotals[accountTotalKey(id)] as number) },
+    };
+  });
+  return {
+    ...encoded,
+    provinceEconomies: toColumnTable(encoded.provinceEconomies, "provinceEconomies"),
+    popBlocks: {
+      ageCount: SINGLE_AGE_COUNT,
+      table: toColumnTable(blockRest, "popBlocks"),
+      maleByAge,
+      femaleByAge,
+      literacyByAge,
+    },
+    buildings: toColumnTable(encoded.buildings, "buildings"),
+    employment: toColumnTable(encoded.employment, "employment"),
+    finance: { ...encoded.finance, accounts: accountColumns, periodSummaries },
+    provinces: {
+      ...encoded.provinces,
+      ownership: toColumnTable(encoded.provinces.ownership, "provinces.ownership"),
+    },
+  };
+}
+
+/** Format-2 column payload back to the format-1 payload that `decodeWorldPayload` reads. */
+function fromSavePayload(value: unknown): unknown {
+  const payload = requireRecord(value, "save payload");
+  const finance = requireRecord(payload.finance, "save payload.finance");
+  const accountColumns = requireRecord(finance.accounts, "save payload.finance.accounts");
+  const ids = requireArray(accountColumns.id, "finance.accounts.id");
+  const ownerKinds = requireArray(accountColumns.ownerKind, "finance.accounts.ownerKind");
+  const ownerIds = requireArray(accountColumns.ownerId, "finance.accounts.ownerId");
+  const subtypes = requireArray(accountColumns.subtype, "finance.accounts.subtype");
+  const balances = requireArray(accountColumns.balanceRUSD, "finance.accounts.balanceRUSD");
+  const count = ids.length;
+  if (ownerKinds.length !== count || ownerIds.length !== count || subtypes.length !== count || balances.length !== count) {
+    throw new SaveFormatError("save payload.finance.accounts columns have different lengths");
+  }
+  const accounts: Record<string, unknown>[] = new Array<Record<string, unknown>>(count);
+  for (let index = 0; index < count; index += 1) {
+    const subtype = valueOfCode(ACCOUNT_SUBTYPES, subtypes[index], "finance.accounts.subtype");
+    const ownerId = ownerIds[index];
+    accounts[index] = {
+      id: ids[index],
+      ownerKind: valueOfCode(SAVE_OWNER_KINDS, ownerKinds[index], "finance.accounts.ownerKind"),
+      ownerId: ownerId === -1 ? null : ownerId,
+      category: categoryForSubtype(subtype),
+      subtype,
+      balanceRUSD: balances[index],
+    };
+  }
+  const periodSummaries = requireArray(finance.periodSummaries, "save payload.finance.periodSummaries").map(
+    (entry, summaryIndex) => {
+      const summary = requireRecord(entry, `finance.periodSummaries[${String(summaryIndex)}]`);
+      const totals = requireRecord(summary.accountTotals, `finance.periodSummaries[${String(summaryIndex)}].accountTotals`);
+      const totalIds = requireArray(totals.id, "accountTotals.id");
+      const totalValues = requireArray(totals.value, "accountTotals.value");
+      if (totalIds.length !== totalValues.length) {
+        throw new SaveFormatError("save period account totals have different column lengths");
+      }
+      const accountTotals: Record<string, unknown> = {};
+      for (let index = 0; index < totalIds.length; index += 1) {
+        accountTotals[String(requireInteger(totalIds[index], "accountTotals.id", 0, 0xffff_ffff))] = totalValues[index];
+      }
+      return { ...summary, accountTotals };
+    },
+  );
+  const blocks = requireRecord(payload.popBlocks, "save payload.popBlocks");
+  const ageCount = requireInteger(blocks.ageCount, "popBlocks.ageCount", SINGLE_AGE_COUNT, SINGLE_AGE_COUNT);
+  const blockRows = fromColumnTable(blocks.table, "popBlocks.table");
+  const male = requireArray(blocks.maleByAge, "popBlocks.maleByAge");
+  const female = requireArray(blocks.femaleByAge, "popBlocks.femaleByAge");
+  const literacy = requireArray(blocks.literacyByAge, "popBlocks.literacyByAge");
+  const cells = blockRows.length * ageCount;
+  if (male.length !== cells || female.length !== cells || literacy.length !== cells) {
+    throw new SaveFormatError("save payload.popBlocks age arrays do not match the block count");
+  }
+  const popBlocks = blockRows.map((row, index) => ({
+    ...row,
+    maleByAge: { encoding: "typed-array-v1", kind: "Uint32Array", length: ageCount, values: male.slice(index * ageCount, (index + 1) * ageCount) },
+    femaleByAge: { encoding: "typed-array-v1", kind: "Uint32Array", length: ageCount, values: female.slice(index * ageCount, (index + 1) * ageCount) },
+    literacyByAge: literacy.slice(index * ageCount, (index + 1) * ageCount),
+  }));
+  const provinces = requireRecord(payload.provinces, "save payload.provinces");
+  return {
+    ...payload,
+    provinceEconomies: fromColumnTable(payload.provinceEconomies, "provinceEconomies"),
+    popBlocks,
+    buildings: fromColumnTable(payload.buildings, "buildings"),
+    employment: fromColumnTable(payload.employment, "employment"),
+    finance: { ...finance, accounts, periodSummaries },
+    provinces: { ...provinces, ownership: fromColumnTable(provinces.ownership, "provinces.ownership") },
+  };
+}
+
+/** The canonical envelope text with `payloadText` in its sorted key position (D-137). */
+function saveEnvelopeText(
+  header: Omit<SaveEnvelope, "payload">,
+  payloadText: string,
+): string {
+  return (
+    `{"checksum":${JSON.stringify(header.checksum)},"dataVersion":${JSON.stringify(header.dataVersion)}` +
+    `,"dayIndex":${String(header.dayIndex)},"format":${JSON.stringify(header.format)}` +
+    `,"formatVersion":${String(header.formatVersion)},"payload":${payloadText}` +
+    `,"scenarioId":${JSON.stringify(header.scenarioId)},"schemaVersion":${String(header.schemaVersion)}` +
+    `,"seed":${String(header.seed)},"simVersion":${JSON.stringify(header.simVersion)}}`
+  );
+}
+
 /** Serialize a world to the canonical versioned save envelope. */
 export function serializeWorld(world: World): string {
-  const payload = encodeWorld(world);
-  const envelope: SaveEnvelope = {
-    format: "century-save",
+  // D-137: the payload is canonicalised once; the checksum is over that text and the
+  // envelope is assembled around it (the same text as canonicalising the envelope).
+  const payloadText = stableStringify(toSavePayload(encodeWorld(world)));
+  const header = {
+    format: "century-save" as const,
     formatVersion: SAVE_FORMAT_VERSION,
     schemaVersion: world.schemaVersion,
     simVersion: world.simVersion,
@@ -4232,53 +4480,12 @@ export function serializeWorld(world: World): string {
     scenarioId: world.scenarioId,
     dayIndex: world.dayIndex,
     seed: world.seed,
-    checksum: checksumOfJson(payload),
-    payload,
+    checksum: `${SAVE_CHECKSUM_PREFIX}${fnv1a32Hex(payloadText)}`,
   };
-  return stableStringify(envelope);
+  return saveEnvelopeText(header, payloadText);
 }
 
-/**
- * M14 save compatibility: canonical saves use RUSD field names, while saves
- * written before the rename use the former SUSD vocabulary. The monetary unit
- * is the same quantity with the same scale, so only object keys are translated;
- * numeric values, arrays and string values are untouched. The envelope checksum
- * is verified against the raw payload before this translation.
- */
-function normalizeLegacyMonetaryKeys(value: unknown, path = "save payload"): unknown {
-  if (Array.isArray(value)) {
-    for (let index = 0; index < value.length; index += 1) {
-      value[index] = normalizeLegacyMonetaryKeys(value[index], `${path}[${String(index)}]`);
-    }
-    return value;
-  }
-  if (value !== null && typeof value === "object") {
-    const record = value as Record<string, unknown>;
-    for (const key of Object.keys(record)) {
-      const normalizedKey = key
-        .replaceAll("SUSD", "RUSD")
-        .replaceAll("Susd", "Rusd")
-        .replaceAll("susd", "rusd");
-      if (normalizedKey !== key) {
-        if (Object.prototype.hasOwnProperty.call(record, normalizedKey)) {
-          throw new SaveFormatError(
-            `${path} mixes legacy and current spellings for ${JSON.stringify(normalizedKey)}`,
-          );
-        }
-        record[normalizedKey] = record[key];
-        delete record[key];
-      }
-      record[normalizedKey] = normalizeLegacyMonetaryKeys(
-        record[normalizedKey],
-        `${path}.${normalizedKey}`,
-      );
-    }
-    return record;
-  }
-  return value;
-}
-
-function decodeEnvelope(value: unknown): World {
+function decodeEnvelope(value: unknown, text: string): World {
   const envelope = requireRecord(value, "save envelope");
 
   const format = requireString(envelope.format, "save envelope.format");
@@ -4296,7 +4503,7 @@ function decodeEnvelope(value: unknown): World {
   );
   if (formatVersion !== SAVE_FORMAT_VERSION) {
     throw new SaveFormatError(
-      `Unsupported save format version ${String(formatVersion)}; this build supports ${String(SAVE_FORMAT_VERSION)}`,
+      `Save format version ${String(formatVersion)} is incompatible with this build (${String(SAVE_FORMAT_VERSION)})`,
     );
   }
 
@@ -4347,14 +4554,30 @@ function decodeEnvelope(value: unknown): World {
   });
   const payload = requireRecord(envelope.payload, "save envelope.payload");
 
-  const expectedChecksum = checksumOfJson(payload);
-  if (checksum !== expectedChecksum) {
+  // D-137: a save this build wrote is the canonical envelope around the canonical
+  // payload text, so its checksum is verified over that text without re-encoding.
+  // Any other spelling of the same envelope is verified by canonicalising the payload.
+  const start = text.indexOf(',"payload":');
+  const end = text.lastIndexOf(',"scenarioId":');
+  const payloadText = start >= 0 && end > start ? text.slice(start + ',"payload":'.length, end) : null;
+  const ownText =
+    payloadText !== null &&
+    saveEnvelopeText(
+      { format, formatVersion, schemaVersion, simVersion, dataVersion, scenarioId, dayIndex, seed, checksum },
+      payloadText,
+    ) === text;
+  // A matching checksum over the text proves that text is what was checksummed; a
+  // layout match alone does not prove the payload text is canonical (a parsed and
+  // re-stringified save keeps the layout), so a mismatch is decided canonically.
+  const textMatches =
+    ownText && payloadText !== null && checksum === `${SAVE_CHECKSUM_PREFIX}${fnv1a32Hex(payloadText)}`;
+  if (!textMatches && checksum !== checksumOfJson(payload)) {
     throw new SaveFormatError(
       "Save checksum mismatch; the save is corrupt or was modified outside the simulation",
     );
   }
 
-  const world = decodeWorldPayload(normalizeLegacyMonetaryKeys(payload));
+  const world = decodeWorldPayload(fromSavePayload(payload));
 
   if (
     schemaVersion !== world.schemaVersion ||
@@ -4386,7 +4609,7 @@ export function deserializeWorld(serialized: string): World {
   }
 
   try {
-    return decodeEnvelope(parsed);
+    return decodeEnvelope(parsed, serialized);
   } catch (error) {
     if (error instanceof SaveFormatError) throw error;
     throw new SaveFormatError(`Invalid save data: ${errorMessage(error)}`);

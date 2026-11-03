@@ -1,14 +1,27 @@
 /**
- * Save-storage codec used by the app.
+ * Save-storage codec used by the worker and the app.
  *
- * The canonical simulation save format is unchanged. This layer gzip-compresses
- * that exact string and base64-encodes it so a platform key/value store can hold
- * a large campaign save without changing validation, hashing, or save
- * compatibility. The prefix makes the storage representation explicit.
+ * D-137 stored form (`STORED_SAVE_PREFIX`): the prefix, the save envelope's metadata
+ * as one JSON line, then the canonical simulation save deflated (fflate, level 1:
+ * pure JavaScript, the same on web, iOS and Android) and base64-encoded so a platform
+ * key/value store can hold it. The worker produces it when saving (so compression
+ * runs off the app thread) and accepts it when loading; the app stores and lists it
+ * without decompressing, reading only the metadata line. The canonical save inside
+ * is unchanged and carries its own checksum.
+ *
+ * Saves stored before D-137 (`COMPRESSED_SAVE_PREFIX`, gzip of the whole save) are
+ * still decoded so they can be listed with the reason they cannot be loaded (D-120).
  */
 
-import { gunzipSync, gzipSync, strFromU8, strToU8 } from "fflate";
+import { deflateSync, gunzipSync, gzipSync, inflateSync, strFromU8, strToU8 } from "fflate";
 
+export const STORED_SAVE_PREFIX = "fon-save-deflate2:";
+/**
+ * Save envelope format this build writes and loads (the simulation's
+ * `SAVE_FORMAT_VERSION`, mirrored so the app bundle does not import the simulation;
+ * the worker test checks they agree).
+ */
+export const SAVE_FORMAT_VERSION = 2;
 export const COMPRESSED_SAVE_PREFIX = "century-save-gzip1:";
 export const MAX_STORED_SAVE_LENGTH = 64 * 1024 * 1024;
 
@@ -18,23 +31,42 @@ const BASE64_LOOKUP = new Map(
   [...BASE64_ALPHABET].map((character, index) => [character, index] as const),
 );
 
+const BASE64_CODES = new Uint8Array([...BASE64_ALPHABET].map((character) => character.charCodeAt(0)));
+const BASE64_PAD = "=".charCodeAt(0);
+const BASE64_DECODE = (() => {
+  const table = new Int16Array(128).fill(-1);
+  for (let index = 0; index < BASE64_CODES.length; index += 1) table[BASE64_CODES[index] as number] = index;
+  return table;
+})();
+/** Characters converted per `String.fromCharCode` call (well under engine argument limits). */
+const BASE64_CHUNK = 0x8000;
+
 /** Encode bytes as standard padded base64 without Buffer/btoa. */
 export function bytesToBase64(bytes: Uint8Array): string {
-  let output = "";
+  // D-137: character codes into a byte buffer, turned into text in chunks (was one
+  // string concatenation per character).
+  const output = new Uint8Array(Math.ceil(bytes.length / 3) * 4);
+  let out = 0;
   for (let index = 0; index < bytes.length; index += 3) {
     const first = bytes[index] ?? 0;
-    const second = bytes[index + 1];
-    const third = bytes[index + 2];
-    output += BASE64_ALPHABET[first >> 2] ?? "";
-    output +=
-      BASE64_ALPHABET[((first & 0x03) << 4) | ((second ?? 0) >> 4)] ?? "";
-    output +=
-      second === undefined
-        ? "="
-        : (BASE64_ALPHABET[((second & 0x0f) << 2) | ((third ?? 0) >> 6)] ?? "=");
-    output += third === undefined ? "=" : (BASE64_ALPHABET[third & 0x3f] ?? "=");
+    const hasSecond = index + 1 < bytes.length;
+    const hasThird = index + 2 < bytes.length;
+    const second = hasSecond ? (bytes[index + 1] ?? 0) : 0;
+    const third = hasThird ? (bytes[index + 2] ?? 0) : 0;
+    output[out++] = BASE64_CODES[first >> 2] as number;
+    output[out++] = BASE64_CODES[((first & 0x03) << 4) | (second >> 4)] as number;
+    output[out++] = hasSecond ? (BASE64_CODES[((second & 0x0f) << 2) | (third >> 6)] as number) : BASE64_PAD;
+    output[out++] = hasThird ? (BASE64_CODES[third & 0x3f] as number) : BASE64_PAD;
   }
-  return output;
+  // Every code is ASCII, so a UTF-8 decoder yields exactly these characters; engines
+  // without one take the chunked path (same text).
+  const decoder = (globalThis as { TextDecoder?: new () => { decode(bytes: Uint8Array): string } }).TextDecoder;
+  if (decoder !== undefined) return new decoder().decode(output);
+  const parts: string[] = [];
+  for (let start = 0; start < output.length; start += BASE64_CHUNK) {
+    parts.push(String.fromCharCode(...output.subarray(start, start + BASE64_CHUNK)));
+  }
+  return parts.join("");
 }
 
 /** Decode standard padded base64 into bytes. */
@@ -49,14 +81,18 @@ export function base64ToBytes(text: string): Uint8Array {
   for (let index = 0; index < text.length; index += 4) {
     let value = 0;
     for (let offset = 0; offset < 4; offset += 1) {
-      const character = text[index + offset] ?? "";
-      if (character === "=" && index + 4 === text.length && offset >= 4 - padding) {
+      const code = text.charCodeAt(index + offset);
+      if (code === BASE64_PAD && index + 4 === text.length && offset >= 4 - padding) {
         value <<= 6;
         continue;
       }
-      const digit = BASE64_LOOKUP.get(character);
-      if (digit === undefined) {
-        throw new RangeError(`invalid base64 character ${JSON.stringify(character)}`);
+      // D-137: a code table instead of a map lookup per character; same errors.
+      const digit = code < 128 ? (BASE64_DECODE[code] ?? -1) : -1;
+      if (digit < 0) {
+        const character = text[index + offset] ?? "";
+        if (BASE64_LOOKUP.get(character) === undefined) {
+          throw new RangeError(`invalid base64 character ${JSON.stringify(character)}`);
+        }
       }
       value = (value << 6) | digit;
     }
@@ -67,24 +103,71 @@ export function base64ToBytes(text: string): Uint8Array {
   return bytes;
 }
 
-/** Compress a canonical save string for platform storage. */
+/**
+ * The metadata fields of a canonical save envelope as a small JSON object text. A
+ * save written by the simulation is canonical (sorted keys): its metadata is the text
+ * before `"payload"` and after the payload's closing brace, so the large payload is
+ * not parsed. Any other spelling is parsed in full.
+ */
+function envelopeMetadataText(save: string): string {
+  const start = save.indexOf(',"payload":');
+  const end = save.lastIndexOf(',"scenarioId":');
+  if (save.startsWith('{"checksum":') && start > 0 && end > start) {
+    const text = `${save.slice(0, start)},${save.slice(end + 1)}`;
+    try {
+      const parsed = JSON.parse(text) as unknown;
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) return text;
+    } catch {
+      // Fall through to the full parse below.
+    }
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(save) as unknown;
+  } catch (error) {
+    throw new RangeError(
+      `save metadata is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new RangeError("save metadata must be an object");
+  }
+  const { payload: _payload, ...metadata } = parsed as Record<string, unknown>;
+  return JSON.stringify(metadata);
+}
+
+/** Compress a canonical save string for platform storage (D-137 stored form). */
 export function compressSaveForStorage(save: string): string {
   if (typeof save !== "string" || save.length === 0) {
     throw new TypeError("save must be a non-empty string");
   }
-  const compressed = gzipSync(strToU8(save), { level: 9 });
-  return `${COMPRESSED_SAVE_PREFIX}${bytesToBase64(compressed)}`;
+  if (save.startsWith(STORED_SAVE_PREFIX)) return save;
+  const metadata = envelopeMetadataText(save);
+  const compressed = deflateSync(strToU8(save), { level: 1 });
+  return `${STORED_SAVE_PREFIX}${metadata}\n${bytesToBase64(compressed)}`;
 }
 
-/** Restore a canonical save string from platform storage. */
+/** Restore a canonical save string from platform storage (either stored form). */
 export function decompressSaveFromStorage(stored: string): string {
-  if (typeof stored !== "string" || !stored.startsWith(COMPRESSED_SAVE_PREFIX)) {
-    throw new RangeError(
-      `stored save must start with ${JSON.stringify(COMPRESSED_SAVE_PREFIX)}`,
-    );
+  if (typeof stored !== "string") {
+    throw new RangeError(`stored save must start with ${JSON.stringify(STORED_SAVE_PREFIX)}`);
   }
   if (stored.length > MAX_STORED_SAVE_LENGTH) {
     throw new RangeError("stored save exceeds the maximum supported length");
+  }
+  if (stored.startsWith(STORED_SAVE_PREFIX)) {
+    const newline = stored.indexOf("\n", STORED_SAVE_PREFIX.length);
+    if (newline < 0) throw new RangeError("stored save has no metadata line");
+    const payload = stored.slice(newline + 1);
+    if (payload.length === 0) throw new RangeError("stored save payload is empty");
+    const restored = strFromU8(inflateSync(base64ToBytes(payload)));
+    if (restored.length === 0) throw new RangeError("stored save is empty after decompression");
+    return restored;
+  }
+  if (!stored.startsWith(COMPRESSED_SAVE_PREFIX)) {
+    throw new RangeError(
+      `stored save must start with ${JSON.stringify(STORED_SAVE_PREFIX)} or ${JSON.stringify(COMPRESSED_SAVE_PREFIX)}`,
+    );
   }
   const payload = stored.slice(COMPRESSED_SAVE_PREFIX.length);
   if (payload.length === 0) throw new RangeError("stored save payload is empty");
@@ -92,6 +175,18 @@ export function decompressSaveFromStorage(stored: string): string {
   const restored = strFromU8(gunzipSync(compressed));
   if (restored.length === 0) throw new RangeError("stored save is empty after decompression");
   return restored;
+}
+
+/** Saves the worker can load: the stored form, or a canonical save. */
+export function canonicalSaveOf(save: string): string {
+  return save.startsWith(STORED_SAVE_PREFIX) || save.startsWith(COMPRESSED_SAVE_PREFIX)
+    ? decompressSaveFromStorage(save)
+    : save;
+}
+
+/** Legacy gzip stored form (tests of pre-D-137 storage); not written by the app. */
+export function legacyCompressSaveForStorage(save: string): string {
+  return `${COMPRESSED_SAVE_PREFIX}${bytesToBase64(gzipSync(strToU8(save), { level: 9 }))}`;
 }
 
 /** User-visible metadata parsed from the canonical envelope without loading a world. */
@@ -158,9 +253,21 @@ export function readSaveMetadata(save: string): SaveMetadata {
   if (typeof save !== "string" || save.length === 0) {
     throw new RangeError("save must be a non-empty string");
   }
+  // D-137: the stored form carries the metadata on its first line; a canonical save
+  // yields it without parsing the payload; a legacy stored save is decompressed.
+  let metadataText: string;
+  if (save.startsWith(STORED_SAVE_PREFIX)) {
+    const newline = save.indexOf("\n", STORED_SAVE_PREFIX.length);
+    if (newline < 0) throw new RangeError("stored save has no metadata line");
+    metadataText = save.slice(STORED_SAVE_PREFIX.length, newline);
+  } else if (save.startsWith(COMPRESSED_SAVE_PREFIX)) {
+    metadataText = envelopeMetadataText(decompressSaveFromStorage(save));
+  } else {
+    metadataText = envelopeMetadataText(save);
+  }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(save) as unknown;
+    parsed = JSON.parse(metadataText) as unknown;
   } catch (error) {
     throw new RangeError(
       `save metadata is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
@@ -272,7 +379,7 @@ export class SaveStore {
   public constructor(backend: SaveStorageBackend, options: SaveStoreOptions) {
     this.backend = backend;
     this.expectedSchemaVersion = options.expectedSchemaVersion;
-    this.expectedFormatVersion = options.expectedFormatVersion ?? 1;
+    this.expectedFormatVersion = options.expectedFormatVersion ?? SAVE_FORMAT_VERSION;
     this.primaryKey = options.keys?.primary ?? "century.m7.save.v1";
     this.previousKey = options.keys?.previous ?? "century.m7.save.v1.previous";
     this.stagingKey = options.keys?.staging ?? "century.m7.save.v1.staging";
@@ -350,7 +457,9 @@ export class SaveStore {
       if (stored === null) continue;
       sawValue = true;
       try {
-        const save = decompressSaveFromStorage(stored);
+        // D-137: a current save is returned in its stored form (the worker inflates
+        // it); its metadata line is read without decompressing.
+        const save = stored.startsWith(STORED_SAVE_PREFIX) ? stored : decompressSaveFromStorage(stored);
         const metadata = readSaveMetadata(save);
         if (metadata.schemaVersion !== this.expectedSchemaVersion) {
           throw new RangeError(
@@ -387,8 +496,7 @@ export class SaveStore {
 
   private isReadable(stored: string): boolean {
     try {
-      const save = decompressSaveFromStorage(stored);
-      readSaveMetadata(save);
+      readSaveMetadata(stored.startsWith(STORED_SAVE_PREFIX) ? stored : decompressSaveFromStorage(stored));
       return true;
     } catch {
       return false;
@@ -543,7 +651,7 @@ export class SaveLibrary {
   public constructor(backend: SaveStorageBackend, options: SaveLibraryOptions) {
     this.backend = backend;
     this.expectedSchemaVersion = options.expectedSchemaVersion;
-    this.expectedFormatVersion = options.expectedFormatVersion ?? 1;
+    this.expectedFormatVersion = options.expectedFormatVersion ?? SAVE_FORMAT_VERSION;
     this.indexKey = options.indexKey ?? "fon.saves.index.v1";
     this.slotKeyPrefix = options.slotKeyPrefix ?? "fon.saves.slot.";
     this.legacyKey = options.legacyKey ?? "century.m7.save.v1";

@@ -9,6 +9,7 @@ import { loadM5EightPolities } from "@century/data";
 import {
   SaveLibrary,
   SaveStore,
+  canonicalSaveOf,
   compressSaveForStorage,
   type SaveStorageBackend,
   type SaveSlot,
@@ -83,8 +84,8 @@ describe("save library", () => {
     expect(listed[0]).toEqual(again.slot);
     expect(again.slot.playerCountryId).toBe(3);
     expect(again.slot.metadata?.dayIndex).toBe(2);
-    expect((await saved.load(first.slot.id))?.save).toBe(day2);
-    expect((await saved.load(second.slot.id))?.save).toBe(day1);
+    expect(canonicalSaveOf((await saved.load(first.slot.id))?.save ?? "")).toBe(day2);
+    expect(canonicalSaveOf((await saved.load(second.slot.id))?.save ?? "")).toBe(day1);
   });
 
   test("a slot keeps its previous save as a recovery copy", async () => {
@@ -95,7 +96,7 @@ describe("save library", () => {
     backend.values.set(slot.key, "corrupt");
     const recovered = await saved.load(slot.id);
     expect(recovered?.source).toBe("previous");
-    expect(recovered?.save).toBe(day0);
+    expect(canonicalSaveOf(recovered?.save ?? "")).toBe(day0);
   });
 
   test("a failed slot write leaves the listed save and the index as they were", async () => {
@@ -107,7 +108,7 @@ describe("save library", () => {
     await expect(saved.store(slot.id, day1, { playerCountryId: 1, savedAtMs: null })).rejects.toThrow();
     backend.failWritesTo = null;
     expect(backend.values.get(INDEX)).toBe(before);
-    expect((await saved.load(slot.id))?.save).toBe(day0);
+    expect(canonicalSaveOf((await saved.load(slot.id))?.save ?? "")).toBe(day0);
   });
 
   test("deleting a slot removes it and its recovery copies, and nothing else", async () => {
@@ -120,7 +121,7 @@ describe("save library", () => {
     expect((await saved.list()).map((slot) => slot.id)).toEqual([kept.slot.id]);
     expect([...backend.values.keys()].filter((key) => key.startsWith(gone.slot.key))).toEqual([]);
     expect(await saved.load(gone.slot.id)).toBeNull();
-    expect((await saved.load(kept.slot.id))?.save).toBe(day0);
+    expect(canonicalSaveOf((await saved.load(kept.slot.id))?.save ?? "")).toBe(day0);
   });
 
   test("an unlisting that fails deletes nothing", async () => {
@@ -130,7 +131,7 @@ describe("save library", () => {
     backend.failWritesTo = INDEX;
     await expect(saved.remove(slot.id)).rejects.toThrow();
     backend.failWritesTo = null;
-    expect((await saved.load(slot.id))?.save).toBe(day0);
+    expect(canonicalSaveOf((await saved.load(slot.id))?.save ?? "")).toBe(day0);
   });
 
   test("concurrent saves are serialized and never share a slot", async () => {
@@ -153,14 +154,14 @@ describe("save library", () => {
     expect(adopted?.key).toBe(LEGACY);
     expect(adopted?.playerCountryId).toBeNull();
     expect(adopted?.metadata?.dayIndex).toBe(1);
-    expect((await saved.load(adopted?.id ?? ""))?.save).toBe(day1);
+    expect(canonicalSaveOf((await saved.load(adopted?.id ?? ""))?.save ?? "")).toBe(day1);
 
     // Its nation is recorded once known; a new campaign gets a new slot beside it.
     expect((await saved.annotate(adopted?.id ?? "", 7))?.playerCountryId).toBe(7);
     expect((await saved.annotate(adopted?.id ?? "", 9))?.playerCountryId).toBe(7);
     const next = await saved.create(day0, { playerCountryId: 2, savedAtMs: null });
     expect((await saved.list()).map((slot) => slot.id)).toEqual([next.slot.id, adopted?.id]);
-    expect((await saved.load(adopted?.id ?? ""))?.save).toBe(day1);
+    expect(canonicalSaveOf((await saved.load(adopted?.id ?? ""))?.save ?? "")).toBe(day1);
   });
 
   test("an adopted save this build cannot read is listed, refuses to load, and can be deleted", async () => {

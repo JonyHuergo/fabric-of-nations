@@ -17,6 +17,8 @@ import {
   applyMilitaryAction,
   assertValidWorld,
   checksumOfJson,
+  decodeSavePayload,
+  encodeSavePayload,
   createEconomyWorld,
   deserializeWorld,
   hashWorld,
@@ -174,7 +176,10 @@ function zeroProvincePopulation(world: World, provinceId: Id): void {
 
 function craftSave(world: World, mutate: (payload: LooseSave["payload"]) => void): string {
   const parsed = JSON.parse(serializeWorld(world)) as LooseSave;
-  mutate(parsed.payload);
+  // Save format 2 (D-137): edit the decoded format-1 payload, then re-encode and reseal.
+  const payload = decodeSavePayload(parsed.payload) as LooseSave["payload"];
+  mutate(payload);
+  parsed.payload = encodeSavePayload(payload as unknown as Parameters<typeof encodeSavePayload>[0]) as unknown as LooseSave["payload"];
   parsed.checksum = checksumOfJson(parsed.payload);
   return JSON.stringify(parsed);
 }

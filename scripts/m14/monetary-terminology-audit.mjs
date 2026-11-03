@@ -210,7 +210,10 @@ if (/"key":\s*"(rusd|susd)"/.test(countriesText)) {
 }
 
 const serialization = readFileSync(join(ROOT, "packages/sim/src/serialization.ts"), "utf8");
-requireIncludes("legacy key normalizer", serialization, "normalizeLegacyMonetaryKeys");
+// D-137: save format 2 rejects every format-1 save (pre-M14 SUSD saves included) as
+// incompatible before decoding, so the format-1 SUSD key normalizer was removed; the
+// SUSD spelling survives only in the hash view and the opening checksum below.
+requireIncludes("format-1 saves rejected as incompatible", serialization, "is incompatible with this build");
 requireIncludes("canonical RUSD save fields", serialization, "balanceRUSD");
 
 const stateHash = readFileSync(join(ROOT, "packages/sim/src/stateHash.ts"), "utf8");

@@ -9,7 +9,6 @@
 
 import {
   applyCountryAction,
-  assertValidWorld,
   checkpointRollbackRunner,
   createEconomyWorld,
   createRollbackRunner,
@@ -39,6 +38,7 @@ import {
   type WorkerEvent,
 } from "./protocol.js";
 import { buildSimulationSnapshot, createSnapshotCache, type SnapshotCache } from "./snapshot.js";
+import { canonicalSaveOf, compressSaveForStorage } from "./persistence.js";
 
 const PUMP_INTERVAL_MS = 100;
 const SNAPSHOT_INTERVAL_MS = 100;
@@ -118,9 +118,13 @@ export class SimulationHost {
     this.context = {
       population: { definitions: options.scenario.population.definitions },
       economy: { definitions: options.scenario.definitions },
+      // The host never reads per-day result diagnostics (D-137); the world outcome
+      // is the same at every detail level.
+      detail: "summary",
     };
     this.world = createEconomyWorld(options.scenario, { seed: options.seed });
-    this.runner = createRollbackRunner(this.world);
+    // `createEconomyWorld` validated the world (D-137: no second validation).
+    this.runner = createRollbackRunner(this.world, { worldJustValidated: true });
     this.lastClockMs = this.clock();
     this.lastSnapshotMs = this.lastClockMs;
     this.emitSnapshot("READY");
@@ -225,7 +229,8 @@ export class SimulationHost {
           protocolVersion: PROTOCOL_VERSION,
           type: "SAVE_RESULT",
           commandId: command.commandId,
-          save: serializeWorld(this.world),
+          // D-137: the stored form (compressed here, off the app thread).
+          save: compressSaveForStorage(serializeWorld(this.world)),
         });
         return;
       case "LOAD":
@@ -445,7 +450,7 @@ export class SimulationHost {
     this.pause();
     this.scenario = scenario;
     this.world = world;
-    this.runner = createRollbackRunner(world);
+    this.runner = createRollbackRunner(world, { worldJustValidated: true });
     this.focusCountryId = null;
     this.lastSnapshotMs = this.clock();
     this.emitEvent({
@@ -499,8 +504,8 @@ export class SimulationHost {
     };
     let loaded: World;
     try {
-      loaded = deserializeWorld(save);
-      assertValidWorld(loaded);
+      // `deserializeWorld` validates the whole world (D-137: not repeated here).
+      loaded = deserializeWorld(canonicalSaveOf(save));
     } catch (error) {
       reject([errorMessage(error)]);
       return;
@@ -532,8 +537,8 @@ export class SimulationHost {
   private load(commandId: string, save: string): void {
     let loaded: World;
     try {
-      loaded = deserializeWorld(save);
-      assertValidWorld(loaded);
+      // `deserializeWorld` validates the whole world (D-137: not repeated here).
+      loaded = deserializeWorld(canonicalSaveOf(save));
     } catch (error) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,
@@ -559,7 +564,7 @@ export class SimulationHost {
     }
     this.pause();
     this.world = loaded;
-    this.runner = createRollbackRunner(loaded);
+    this.runner = createRollbackRunner(loaded, { worldJustValidated: true });
     this.resetPacing();
     this.lastSnapshotMs = this.lastClockMs;
     this.emitEvent({

@@ -7,6 +7,7 @@ import {
 import { loadM5EightPolities } from "@century/data";
 import {
   SaveStore,
+  canonicalSaveOf,
   compressSaveForStorage,
   readSaveMetadata,
   saveDateLabel,
@@ -69,7 +70,7 @@ describe("replace-safe save storage", () => {
     expect(info.metadata.dateLabel).toBe("1900-01-02");
     const loaded = await store.load();
     expect(loaded?.source).toBe("primary");
-    expect(loaded?.save).toBe(save);
+    expect(canonicalSaveOf(loaded?.save ?? "")).toBe(save);
     expect(loaded?.metadata.checksum).toBe(info.metadata.checksum);
   });
 
@@ -84,7 +85,7 @@ describe("replace-safe save storage", () => {
       /injected write failure/,
     );
     const loaded = await store.load();
-    expect(loaded?.save).toBe(first);
+    expect(canonicalSaveOf(loaded?.save ?? "")).toBe(first);
     expect(loaded?.source).toBe("primary");
   });
 
@@ -110,7 +111,7 @@ describe("replace-safe save storage", () => {
     backend.values.set("century.m7.save.v1", "century-save-gzip1:not-valid-base64");
     const loaded = await store.load();
     expect(loaded?.source).toBe("previous");
-    expect(loaded?.save).toBe(second);
+    expect(canonicalSaveOf(loaded?.save ?? "")).toBe(second);
   });
 
   test("recovers a fully written staging replacement after an interrupted swap", async () => {
@@ -121,7 +122,7 @@ describe("replace-safe save storage", () => {
     backend.values.set("century.m7.save.v1.staging", compressSaveForStorage(save));
     const loaded = await store.load();
     expect(loaded?.source).toBe("staging");
-    expect(loaded?.save).toBe(save);
+    expect(canonicalSaveOf(loaded?.save ?? "")).toBe(save);
   });
 
   test("rejects incompatible and unreadable saves without inventing a campaign", async () => {

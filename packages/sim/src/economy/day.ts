@@ -33,7 +33,7 @@ import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
-import type { DayPhaseObserver } from "../population/types.js";
+import type { DayPhaseObserver, DayResultDetail } from "../population/types.js";
 import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
@@ -104,7 +104,6 @@ import type {
   BuildingDef,
   EconomyDefinitions,
   FinancialAccount,
-  GoodDef,
   Market,
 } from "./types.js";
 
@@ -348,6 +347,39 @@ function buildHouseholdDemand(
   const meta: HouseholdDemandMeta[] = [];
   const marketByPopBlock = new Map<Id, Id>();
 
+  // D-137: the need items of each market tier resolved once (was a map, item objects
+  // and a sort per block and tier), and per-good scratch reused across blocks. Desired
+  // quantities are summed in need-item order and emitted in ascending good id, as the
+  // map-then-sort did; every cost is summed in the same order.
+  const goodCount = economyDefinitions.goods.length;
+  const tierPlans = ([1, 3, 6] as const).map((tier) => ({
+    tier,
+    needs: M3_TIER_NEEDS[tier].flatMap((needTier) => {
+      const need = needByTier.get(needTier);
+      if (need === undefined) return [];
+      return [
+        {
+          needTier,
+          activationWealthMin: need.activationWealthMin,
+          items: need.items.map((item) => {
+            const good = goodByKey.get(item.goodKey);
+            if (good === undefined) {
+              throw new RangeError(
+                `needs tier ${needTier} references unknown economy good ${JSON.stringify(item.goodKey)}`,
+              );
+            }
+            return { goodId: good.id, quantityPerCapitaPerDay: item.quantityPerCapitaPerDay };
+          }),
+        },
+      ];
+    }),
+  }));
+  const marketById = new Map(world.markets.map((market) => [market.id, market]));
+  const present = new Uint8Array(goodCount);
+  const desiredByGood = new Float64Array(goodCount);
+  const labelByGood: NeedTier[] = new Array<NeedTier>(goodCount);
+  const presentGoods: number[] = [];
+
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const population = populationTotal(block);
     if (population <= 0) continue;
@@ -355,75 +387,67 @@ function buildHouseholdDemand(
     if (marketId === undefined) {
       throw new RangeError(`popBlock ${String(block.id)} is in a province with no market`);
     }
-    const market = marketPrices(world, marketId);
+    const market = marketById.get(marketId) ?? marketPrices(world, marketId);
     marketByPopBlock.set(block.id, marketId);
     const account = accountByOwner(index, "popBlock", block.id);
     let remainingCash = account.balanceRUSD;
 
-    for (const tier of [1, 3, 6] as const) {
-      const itemsByGood = new Map<
-        Id,
-        { needTier: NeedTier; desired: number; good: GoodDef }
-      >();
-      for (const needTier of M3_TIER_NEEDS[tier]) {
-        const need = needByTier.get(needTier);
-        if (need === undefined || block.wealthLevel < need.activationWealthMin) continue;
+    for (const plan of tierPlans) {
+      const tier = plan.tier;
+      presentGoods.length = 0;
+      for (const need of plan.needs) {
+        if (block.wealthLevel < need.activationWealthMin) continue;
         for (const item of need.items) {
-          const good = goodByKey.get(item.goodKey);
-          if (good === undefined) {
-            throw new RangeError(
-              `needs tier ${needTier} references unknown economy good ${JSON.stringify(item.goodKey)}`,
-            );
-          }
           const desired = item.quantityPerCapitaPerDay * population;
           if (desired <= 0) continue;
-          const existing = itemsByGood.get(good.id);
-          if (existing === undefined) {
-            itemsByGood.set(good.id, { needTier, desired, good });
+          if (present[item.goodId] !== 1) {
+            present[item.goodId] = 1;
+            desiredByGood[item.goodId] = desired;
+            labelByGood[item.goodId] = need.needTier;
+            presentGoods.push(item.goodId);
           } else {
             // M3 needs data has no overlapping good/tier pairs, but keep the
             // first tier label and combine physical demand defensively.
-            itemsByGood.set(good.id, {
-              needTier: existing.needTier,
-              desired: existing.desired + desired,
-              good,
-            });
+            desiredByGood[item.goodId] = (desiredByGood[item.goodId] ?? 0) + desired;
           }
         }
       }
-      if (itemsByGood.size === 0) continue;
+      if (presentGoods.length === 0) continue;
+      presentGoods.sort((left, right) => left - right);
 
-      const items = [...itemsByGood.entries()]
-        .map(([goodId, item]) => ({ goodId, ...item }))
-        .sort((left, right) => left.goodId - right.goodId);
       let desiredCost = 0;
-      for (const item of items) {
-        desiredCost += item.desired * (market.priceRUSD[item.goodId] ?? 0);
+      for (const goodId of presentGoods) {
+        desiredCost += (desiredByGood[goodId] ?? 0) * (market.priceRUSD[goodId] ?? 0);
       }
-      if (!(desiredCost > 0)) continue;
+      if (!(desiredCost > 0)) {
+        for (const goodId of presentGoods) present[goodId] = 0;
+        continue;
+      }
       const spendable = Math.max(0, remainingCash - MONEY_TOLERANCE_RUSD);
       const ratio = spendable >= desiredCost ? 1 : spendable / desiredCost;
       let fundedCost = 0;
-      for (const item of items) {
-        const funded = item.desired * ratio;
-        const price = market.priceRUSD[item.goodId] ?? 0;
+      for (const goodId of presentGoods) {
+        const desired = desiredByGood[goodId] ?? 0;
+        const funded = desired * ratio;
+        const price = market.priceRUSD[goodId] ?? 0;
         fundedCost += funded * price;
         records.push({
           popBlockId: block.id,
           tier,
-          goodId: item.goodId,
-          desiredQuantity: item.desired,
+          goodId,
+          desiredQuantity: desired,
           fundedQuantity: funded,
         });
         meta.push({
           popBlockId: block.id,
           marketId,
           tier,
-          needTier: item.needTier,
-          goodId: item.goodId,
-          desired: item.desired,
+          needTier: labelByGood[goodId] as NeedTier,
+          goodId,
+          desired,
           funded,
         });
+        present[goodId] = 0;
       }
       if (fundedCost > remainingCash + moneyTolerance(fundedCost, remainingCash)) {
         throw new RangeError(`household funding exceeds available cash for popBlock ${String(block.id)}`);
@@ -559,6 +583,7 @@ function buildNeedsResult(
   household: HouseholdDemandBuild,
   markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
+  detail: DayResultDetail = "full",
 ): PopulationNeedsDayResult {
   // D-137: numeric (block, tier, good) keys; good ids equal their definition index.
   const goodCount = definitions.goods.length;
@@ -624,7 +649,8 @@ function buildNeedsResult(
         if (!active || demand.fulfilledQuantity + quantityTolerance(item.desired, demand.fulfilledQuantity) < item.desired) {
           allMet = false;
         }
-        if (population > 0) {
+        // Per-good detail is diagnostic only (`summary` omits it, D-137).
+        if (population > 0 && detail === "full") {
           goods.push({
             goodKey: definitions.goods[item.goodId]?.key ?? String(item.goodId),
             desired: item.desired,
@@ -864,6 +890,7 @@ function runMarketAttempt(
   index: FinanceIndex,
   mode: "full" | "cash",
   observe?: DayPhaseObserver,
+  detail: DayResultDetail = "full",
 ): MarketAttempt {
   observe?.("market-household-demand");
   const household = buildHouseholdDemand(
@@ -926,12 +953,12 @@ function runMarketAttempt(
           householdByMarket.get(market.id) ?? [],
           productionByMarket.get(market.id) ?? [],
         ),
-        { validateWorld: false, lookups },
+        { validateWorld: false, lookups, detail },
       ),
     );
   }
   observe?.("settlement");
-  const settlement = settleMarketDays(world, definitions, results, { validateWorld: false });
+  const settlement = settleMarketDays(world, definitions, results, { validateWorld: false, detail });
   return {
     household,
     production,
@@ -968,6 +995,8 @@ export function runEconomicDay(
     readonly integrity?: "staged" | "phase";
     /** Benchmark hook (D-137); never read back. */
     readonly phaseObserver?: DayPhaseObserver;
+    /** Result detail (D-137, `TickContext.detail`); the world outcome is the same. */
+    readonly detail?: DayResultDetail;
   } = {},
 ): EconomyDayResult {
   const observe = options.phaseObserver;
@@ -1116,6 +1145,7 @@ export function runEconomicDay(
     buildFinanceIndex(world.finance),
     "cash",
     observe,
+    options.detail ?? "full",
   );
   const fallbackUsed = attempt.cappedBuildings > 0;
   const household = attempt.household;
@@ -1220,6 +1250,7 @@ export function runEconomicDay(
     household,
     marketResults,
     settlement,
+    options.detail ?? "full",
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);

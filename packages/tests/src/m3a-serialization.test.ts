@@ -1,6 +1,7 @@
 ﻿import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
+  decodeSavePayload,
   deriveStockByGood,
   deserializeWorld,
   hashWorld,
@@ -72,7 +73,10 @@ describe("M3a schema-25 serialization", () => {
     world.dayIndex = 30;
 
     const serialized = serializeWorld(world);
-    const parsed = parseEnvelope(serialized);
+    const envelope = parseEnvelope(serialized);
+    // Save format 2 (D-137) stores the collections as columns; the checks read the
+    // decoded format-1 shape.
+    const parsed = { ...envelope, payload: decodeSavePayload(envelope.payload) as typeof envelope.payload };
     expect(parsed.schemaVersion).toBe(WORLD_SCHEMA_VERSION);
     expect(parsed.payload?.buildings).toHaveLength(8);
     expect(parsed.payload?.employment).toHaveLength(3);

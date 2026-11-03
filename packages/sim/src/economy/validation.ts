@@ -962,13 +962,24 @@ const customs = valueOf("customsDutyRevenueRUSD");
     let equity = 0;
     let revenues = 0;
     let expenses = 0;
+    // D-137: the checks of `parseAccountTotalKey` and `requireFiniteNumber`, with their
+    // paths built only for a failing entry.
+    const totalsPath = `${path}.accountTotals`;
     for (const key of Object.keys(totals)) {
-      const accountId = parseAccountTotalKey(key, `${path}.accountTotals`);
+      const numericKey = Number(key);
+      const accountId =
+        String(numericKey) === key && Number.isSafeInteger(numericKey) && numericKey >= 0 && numericKey <= 0xffff_ffff
+          ? numericKey
+          : parseAccountTotalKey(key, totalsPath);
       const account = accounts.get(accountId);
       if (account === undefined) {
         throw new RangeError(`${path}.accountTotals references unknown account ${String(accountId)}`);
       }
-      const value = requireFiniteNumber(totals[key], `${path}.accountTotals.${key}`);
+      const rawValue = totals[key];
+      const value =
+        typeof rawValue === "number" && Number.isFinite(rawValue)
+          ? rawValue
+          : requireFiniteNumber(rawValue, `${path}.accountTotals.${key}`);
       if (value === 0) {
         throw new RangeError(`${path}.accountTotals.${key} must be omitted when zero`);
       }

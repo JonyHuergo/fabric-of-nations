@@ -116,6 +116,8 @@ function validatePostingLines(
   lines: readonly JournalLine[],
   accounts: ReadonlyMap<number, FinancialAccount>,
   transactionKind: TransactionKind,
+  /** `accounts.get` through the finance index's dense id table (D-137). */
+  accountOf: (id: number) => FinancialAccount | undefined = (id) => accounts.get(id),
 ): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
   const deltas = new Map<number, number>();
@@ -136,7 +138,7 @@ function validatePostingLines(
         `journal line ${String(index)}.accountId must be in 0..${String(0xffff_ffff)}, received ${String(accountId)}`,
       );
     }
-    const account = accounts.get(accountId);
+    const account = accountOf(accountId);
     if (account === undefined) {
       throw new RangeError(`journal line ${String(index)} references unknown account ${String(accountId)}`);
     }
@@ -364,6 +366,8 @@ export function postJournalBatch(
 ): JournalPosting[] {
   assertValidDayIndex(dayIndex);
   const accounts = accountMap(finance);
+  const financeIndex = buildFinanceIndex(finance);
+  const accountOf = (id: number): FinancialAccount | undefined => financeIndex.account(id);
   const nextId = requireInteger(
     finance.nextPostingId,
     "finance.nextPostingId",
@@ -386,7 +390,7 @@ export function postJournalBatch(
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
     assertPublicTransactionKind(entry.transactionKind);
-    const validated = validatePostingLines(entry.lines, accounts, entry.transactionKind);
+    const validated = validatePostingLines(entry.lines, accounts, entry.transactionKind, accountOf);
     assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
     for (const [accountId, delta] of validated.deltas) {
       aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);

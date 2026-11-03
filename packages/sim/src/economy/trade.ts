@@ -98,10 +98,6 @@ export function transitDays(route: TradeRoute): number {
   return Math.max(1, Math.ceil(route.distanceUnits));
 }
 
-function lotKey(goodId: Id, ownerBuildingId: Id): string {
-  return `${String(goodId)}:${String(ownerBuildingId)}`;
-}
-
 function canonicalLots(lots: readonly { goodId: Id; ownerBuildingId: Id; quantity: number }[]) {
   return [...lots]
     .filter((lot) => lot.quantity > 0)
@@ -148,6 +144,11 @@ export function runTradeArrivals(
   const dueIds = new Set(due.map((shipment) => shipment.id));
   const remaining = world.trade.shipments.filter((shipment) => !dueIds.has(shipment.id));
 
+  // D-137: each destination market's lots are read once, every due shipment is added
+  // in id order, and the lots are made canonical once per market (was a rebuild and
+  // sort of the market's lots per shipment). The additions are the same, in the same
+  // order, so every lot quantity is identical.
+  const lotsByMarket = new Map<Id, { market: Market; lots: Map<Id, Map<Id, number>> }>();
   for (const shipment of due) {
     const market = marketById.get(shipment.destinationMarketId);
     if (market === undefined) {
@@ -158,20 +159,33 @@ export function runTradeArrivals(
     if (!Number.isFinite(shipment.quantity) || !(shipment.quantity > 0)) {
       throw new RangeError(`trade shipment ${String(shipment.id)} has an invalid quantity`);
     }
-    const lots = new Map<string, number>();
-    for (const lot of market.stockLots) lots.set(lotKey(lot.goodId, lot.ownerBuildingId), lot.quantity);
-    const key = lotKey(shipment.goodId, shipment.sellerBuildingId);
-    lots.set(key, (lots.get(key) ?? 0) + shipment.quantity);
-    market.stockLots = canonicalLots(
-      [...lots.entries()].map(([text, quantity]) => {
-        const [goodText, ownerText] = text.split(":");
-        return {
-          goodId: Number(goodText),
-          ownerBuildingId: Number(ownerText),
-          quantity,
-        };
-      }),
-    );
+    let entry = lotsByMarket.get(market.id);
+    if (entry === undefined) {
+      const lots = new Map<Id, Map<Id, number>>();
+      for (const lot of market.stockLots) {
+        let byOwner = lots.get(lot.goodId);
+        if (byOwner === undefined) {
+          byOwner = new Map();
+          lots.set(lot.goodId, byOwner);
+        }
+        byOwner.set(lot.ownerBuildingId, lot.quantity);
+      }
+      entry = { market, lots };
+      lotsByMarket.set(market.id, entry);
+    }
+    let byOwner = entry.lots.get(shipment.goodId);
+    if (byOwner === undefined) {
+      byOwner = new Map();
+      entry.lots.set(shipment.goodId, byOwner);
+    }
+    byOwner.set(shipment.sellerBuildingId, (byOwner.get(shipment.sellerBuildingId) ?? 0) + shipment.quantity);
+  }
+  for (const { market, lots } of lotsByMarket.values()) {
+    const flat: { goodId: Id; ownerBuildingId: Id; quantity: number }[] = [];
+    for (const [goodId, byOwner] of lots) {
+      for (const [ownerBuildingId, quantity] of byOwner) flat.push({ goodId, ownerBuildingId, quantity });
+    }
+    market.stockLots = canonicalLots(flat);
   }
 
   world.trade.shipments = remaining;

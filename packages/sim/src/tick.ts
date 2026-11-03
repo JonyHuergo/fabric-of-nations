@@ -182,7 +182,7 @@ export function tick(world: World, context?: TickContext): TickResult {
       population.definitions,
       economy.definitions,
       processedDay,
-      { validateWorld: false },
+      { validateWorld: false, ...(context?.detail === undefined ? {} : { detail: context.detail }) },
     );
     working.dayIndex = processedDay + 1;
     assertValidWorldForTick(working);
@@ -253,6 +253,7 @@ export function tickPhaseMode(world: World, context: TickContext): TickResult {
       validateWorld: false,
       integrity: "phase",
       ...(observe === undefined ? {} : { phaseObserver: observe }),
+      ...(context.detail === undefined ? {} : { detail: context.detail }),
     },
   );
   world.dayIndex = processedDay + 1;

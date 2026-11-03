@@ -254,7 +254,19 @@ export interface TickContext {
    * from the observer, so outcomes cannot depend on it. Omitted in the app.
    */
   phaseObserver?: DayPhaseObserver;
+  /**
+   * Detail of the day's result (D-137). `full` (default) returns every diagnostic
+   * list in canonical order, as tests read them. `summary` is for callers that do not
+   * read the per-transaction diagnostics (the worker host): the market-day result
+   * lists are left in production order instead of being sorted, settlement omits its
+   * per-transaction copies and the needs result omits per-good detail. The world
+   * state after the day is identical at both levels.
+   */
+  detail?: DayResultDetail;
 }
+
+/** See `TickContext.detail`. */
+export type DayResultDetail = "full" | "summary";
 
 /** See `TickContext.phaseObserver`. */
 export type DayPhaseObserver = (phase: string) => void;

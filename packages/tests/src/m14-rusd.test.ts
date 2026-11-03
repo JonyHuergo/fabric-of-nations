@@ -148,7 +148,8 @@ describe("M14 current documentation and protocol", () => {
 
   test("the worker protocol version reflects the snapshot vocabulary change", () => {
     // 17: P2 province economy table, territories and professions (D-134).
-    expect(PROTOCOL_VERSION).toBe(17);
+    // 18: stored save form on SAVE_RESULT and LOAD (D-137).
+    expect(PROTOCOL_VERSION).toBe(18);
   });
 
   test("the monetary terminology audit passes", () => {

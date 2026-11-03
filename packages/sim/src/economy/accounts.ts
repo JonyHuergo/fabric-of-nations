@@ -2072,11 +2072,11 @@ export function assertAccountingIdentity(finance: FinanceState): AccountingTotal
  * implemented in M4a-1.
  */
 export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
-  const accounts = requireArray(finance.accounts, "finance.accounts");
+  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
   let total = 0;
-  for (const value of accounts) {
-    const account = value as FinancialAccount;
-    if (!isCashAccount(account)) continue;
+  // D-137: the cached designated-cash accounts, in array order (the order the scan
+  // of every account summed them in).
+  for (const account of accountLookup(accounts).cash) {
     const balance = account.balanceRUSD;
     // `requireFiniteNumber`'s check and message, built only on failure (D-137).
     if (typeof balance !== "number" || !Number.isFinite(balance)) {
@@ -2091,6 +2091,8 @@ export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
 export interface FinanceIndex {
   readonly accounts: readonly FinancialAccount[];
   readonly byId: ReadonlyMap<Id, FinancialAccount>;
+  /** The account with this id (`byId.get`), through a dense id table when ids are dense (D-137). */
+  account(id: Id): FinancialAccount | undefined;
   /** Look up exactly one account for an owner and subtype, or throw. */
   get(ownerKind: FinancialAccountOwnerKind, ownerId: Id | null, subtype: AccountSubtype): FinancialAccount;
   /** Look up an account for an owner and subtype, or return undefined. */
@@ -2153,6 +2155,8 @@ interface AccountLookupCache {
   readonly byId: Map<Id, FinancialAccount>;
   readonly byOwner: Map<number | string, FinancialAccount>;
   readonly bySubtype: Map<AccountSubtype, FinancialAccount[]>;
+  /** Designated-cash accounts in array order (D-137; subtypes never change). */
+  readonly cash: FinancialAccount[];
 }
 
 /**
@@ -2171,6 +2175,7 @@ function accountLookup(accounts: readonly FinancialAccount[]): AccountLookupCach
   const byId = new Map<Id, FinancialAccount>();
   const byOwner = new Map<number | string, FinancialAccount>();
   const bySubtype = new Map<AccountSubtype, FinancialAccount[]>();
+  const cash: FinancialAccount[] = [];
   for (const account of accounts) {
     if (!byId.has(account.id)) byId.set(account.id, account);
     const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
@@ -2178,8 +2183,9 @@ function accountLookup(accounts: readonly FinancialAccount[]): AccountLookupCach
     const list = bySubtype.get(account.subtype);
     if (list === undefined) bySubtype.set(account.subtype, [account]);
     else list.push(account);
+    if (isCashAccount(account)) cash.push(account);
   }
-  const entry = { length: accounts.length, byId, byOwner, bySubtype };
+  const entry = { length: accounts.length, byId, byOwner, bySubtype, cash };
   accountLookupCache.set(accounts, entry);
   return entry;
 }
@@ -2254,9 +2260,22 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
     if (isCashAccount(account)) cash.push(account);
   }
   cash.sort((left, right) => left.id - right.id);
+  // Account ids are allocated sequentially, so an id-indexed table is small; fall back
+  // to the map for sparse ids.
+  let maxId = 0;
+  for (const account of accounts) if (account.id > maxId) maxId = account.id;
+  const dense: (FinancialAccount | undefined)[] | null =
+    Number.isSafeInteger(maxId) && maxId <= accounts.length * 4 + 1024
+      ? new Array<FinancialAccount | undefined>(maxId + 1).fill(undefined)
+      : null;
+  if (dense !== null) for (const account of accounts) dense[account.id] = account;
   return {
     accounts,
     byId,
+    account(id) {
+      if (dense !== null && Number.isInteger(id) && id >= 0 && id < dense.length) return dense[id];
+      return byId.get(id);
+    },
     get(ownerKind, ownerId, subtype) {
       const account = byOwner.get(ownerKey(ownerKind, ownerId, subtype));
       if (account === undefined) {

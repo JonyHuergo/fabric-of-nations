@@ -6,7 +6,11 @@
  * protocol constants, and runtime validation of untrusted messages.
  */
 
-export const PROTOCOL_VERSION = 17 as const;
+/**
+ * 18 (D-137): SAVE_RESULT returns and LOAD/PREVIEW_SAVE accept the stored save form
+ * (`STORED_SAVE_PREFIX`, compressed in the worker); a canonical save is still accepted.
+ */
+export const PROTOCOL_VERSION = 18 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;

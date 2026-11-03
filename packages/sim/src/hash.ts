@@ -26,10 +26,12 @@ export const FNV_SECOND_LANE_BASIS = SECOND_LANE_BASIS;
 
 /** Compute an FNV-1a 32-bit hash over a string's UTF-16 code units. */
 export function fnv1a32(text: string, basis: number = FNV_OFFSET_BASIS): number {
-  let hash = basis >>> 0;
-  for (let index = 0; index < text.length; index += 1) {
-    hash ^= text.charCodeAt(index);
-    hash = Math.imul(hash, FNV_PRIME) >>> 0;
+  // D-137: the state is kept as a signed 32-bit integer inside the loop (XOR and
+  // `Math.imul` are the same modulo 2^32 on either reading) and made unsigned once.
+  let hash = basis | 0;
+  const length = text.length;
+  for (let index = 0; index < length; index += 1) {
+    hash = Math.imul(hash ^ text.charCodeAt(index), FNV_PRIME);
   }
   return hash >>> 0;
 }
@@ -54,7 +56,77 @@ export function dualFnv1a32Hex(text: string): string {
 
 /** Canonical JSON encoding used by checksums, state hashes, and tests. */
 export function stableStringify(value: unknown): string {
+  // D-137: a fast encoder produces the same text for every valid input; it builds no
+  // path strings and keeps no ancestor set. On any input it cannot encode it defers
+  // to the checked encoder below, which throws the exact error with its path.
+  const fast = encodeFast(value, 0);
+  if (fast !== null) return fast;
   return encodeValue(value, "$", new Set<object>());
+}
+
+/** Nesting bound of the fast encoder; deeper (or cyclic) input takes the checked path. */
+const FAST_ENCODE_MAX_DEPTH = 256;
+
+/**
+ * The canonical encoding of `value`, or null when the value is outside what
+ * `encodeValue` accepts (or nests deeper than the bound, which also catches cycles),
+ * leaving the error to the checked encoder. For accepted input the text is identical:
+ * sorted keys, `JSON.stringify` strings, finite numbers with -0 written as 0 (`String`
+ * and `JSON.stringify` agree on every finite number, and `JSON.stringify` writes -0 as
+ * 0, so an array of finite numbers is written natively).
+ */
+function encodeFast(value: unknown, depth: number): string | null {
+  if (value === null) return "null";
+  switch (typeof value) {
+    case "string":
+      return JSON.stringify(value);
+    case "number":
+      if (!Number.isFinite(value)) return null;
+      return Object.is(value, -0) ? "0" : String(value);
+    case "boolean":
+      return value ? "true" : "false";
+    case "object": {
+      if (depth >= FAST_ENCODE_MAX_DEPTH) return null;
+      if (Array.isArray(value)) {
+        const array = value as unknown[];
+        let numeric = true;
+        for (let index = 0; index < array.length; index += 1) {
+          if (!(index in array)) return null;
+          const element = array[index];
+          if (typeof element !== "number" || !Number.isFinite(element)) {
+            numeric = false;
+            break;
+          }
+        }
+        if (numeric) return JSON.stringify(array);
+        let out = "[";
+        for (let index = 0; index < array.length; index += 1) {
+          if (!(index in array)) return null;
+          const encoded = encodeFast(array[index], depth + 1);
+          if (encoded === null) return null;
+          out += index === 0 ? encoded : `,${encoded}`;
+        }
+        return `${out}]`;
+      }
+      const record = value as Record<string, unknown>;
+      const prototype: unknown = Object.getPrototypeOf(record);
+      if (prototype !== Object.prototype && prototype !== null) return null;
+      if (Object.getOwnPropertySymbols(record).length > 0) return null;
+      const keys = Object.keys(record).sort();
+      let out = "{";
+      for (let index = 0; index < keys.length; index += 1) {
+        const key = keys[index] as string;
+        const child = record[key];
+        if (child === undefined) return null;
+        const encoded = encodeFast(child, depth + 1);
+        if (encoded === null) return null;
+        out += `${index === 0 ? "" : ","}${JSON.stringify(key)}:${encoded}`;
+      }
+      return `${out}}`;
+    }
+    default:
+      return null;
+  }
 }
 
 function encodeValue(value: unknown, path: string, ancestors: Set<object>): string {

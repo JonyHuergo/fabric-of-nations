@@ -71,7 +71,7 @@ export const SIM_VERSION = "0.28.0";
 export const WORLD_SCHEMA_VERSION = 29;
 
 /** Version of the save envelope itself. */
-export const SAVE_FORMAT_VERSION = 1;
+export const SAVE_FORMAT_VERSION = 2;
 
 /**
  * Content/data version. M4a-2/M4b/M4c add runtime state but ship no new

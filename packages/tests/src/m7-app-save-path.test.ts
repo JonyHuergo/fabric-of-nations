@@ -20,7 +20,7 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
-import { compressSaveForStorage } from "@century/sim-worker/persistence";
+import { canonicalSaveOf, compressSaveForStorage } from "@century/sim-worker/persistence";
 
 import {
   SUPPORTED_SAVE_SCHEMA_VERSION,
@@ -50,15 +50,16 @@ describe("app storage adapter save path", () => {
     const stored = await storeSave(save);
     expect(stored.metadata.schemaVersion).toBe(WORLD_SCHEMA_VERSION);
 
+    // D-137: the adapter returns the stored form, which the worker accepts as is.
     const loaded = await readSave();
-    expect(loaded).toBe(save);
+    expect(canonicalSaveOf(loaded ?? "")).toBe(save);
 
     const campaign = await readStoredCampaign();
     expect(campaign?.metadata.schemaVersion).toBe(WORLD_SCHEMA_VERSION);
     expect(campaign?.metadata.scenarioId).toBe(world.scenarioId);
-    expect(campaign?.save).toBe(save);
+    expect(canonicalSaveOf(campaign?.save ?? "")).toBe(save);
 
-    const restored = deserializeWorld(loaded as string);
+    const restored = deserializeWorld(canonicalSaveOf(loaded as string));
     expect(hashWorld(restored)).toBe(hashWorld(world));
 
     // The worker remains the authoritative validator: a save accepted by the

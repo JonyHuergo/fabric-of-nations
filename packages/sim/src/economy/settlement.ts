@@ -279,9 +279,10 @@ function aggregatedMarketEntries(transactions: readonly PreparedTransaction[]): 
     readonly buyers: Map<Id, { expenseAccountId: Id; amount: number }>;
     readonly sellers: Map<Id, { revenueAccountId: Id; amount: number }>;
   }
-  const groups = new Map<string, Group>();
+  // D-137: numeric (kind, good) group keys; groups are ordered explicitly below.
+  const groups = new Map<number, Group>();
   for (const transaction of transactions) {
-    const key = `${transaction.transactionKind}:${String(transaction.goodId)}`;
+    const key = (transaction.transactionKind === "goods-purchase" ? 0 : 2 ** 32) + transaction.goodId;
     let group = groups.get(key);
     if (group === undefined) {
       group = {
@@ -674,7 +675,13 @@ export function settleMarketDays(
   world: World,
   definitions: EconomyDefinitions,
   marketDays: readonly MarketDayResult[],
-  options: PhaseValidationOptions = {},
+  options: PhaseValidationOptions & {
+    /**
+     * `summary` (D-137, `TickContext.detail`) returns an empty `transactions` list;
+     * every posting, balance and total is the same. Defaults to `full`.
+     */
+    readonly detail?: "full" | "summary";
+  } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidEconomyDefinitions(definitions);
@@ -709,7 +716,7 @@ export function settleMarketDays(
   }
   assertValidEmploymentState(world, definitions);
   const sortedResults = [...marketDays].sort((left, right) => left.marketId - right.marketId);
-  const result = settleMarketDaysInternal(world, definitions, sortedResults);
+  const result = settleMarketDaysInternal(world, definitions, sortedResults, options.detail ?? "full");
   for (const marketDay of marketDays) marketDay.settled = true;
   return result;
 }
@@ -739,6 +746,7 @@ function settleMarketDaysInternal(
   world: World,
   definitions: EconomyDefinitions,
   marketDays: readonly MarketDayResult[],
+  detail: "full" | "summary",
 ): MarketSettlementResult {
   const dayIndex = marketDays[0]?.dayIndex;
   if (dayIndex === undefined) throw new RangeError("settlement requires a market-day result");
@@ -1141,7 +1149,7 @@ function settleMarketDaysInternal(
       startDayIndex: world.startDayIndex,
       settlementNextPostingId: world.finance.nextPostingId,
       fiscalApplied: false,
-      transactions: transactions.map((transaction) => ({
+      transactions: (detail === "summary" ? [] : transactions).map((transaction) => ({
         kind: transaction.kind,
         buyerPopBlockId: transaction.buyerPopBlockId,
         buyerBuildingId: transaction.buyerBuildingId,

@@ -80,11 +80,19 @@ function phaseContext(context: TickContext): TickContext {
   return { ...context, integrity: "phase" };
 }
 
-/** Create a runner for a world; the world is fully validated by the checkpoint copy. */
-export function createRollbackRunner(world: World): RollbackRunner {
+/**
+ * Create a runner for a world; the world is fully validated by the checkpoint copy,
+ * unless the caller states it validated this exact world just before (D-137: a world
+ * returned by `createEconomyWorld` or `deserializeWorld`, which validate it), so the
+ * same validation does not run twice.
+ */
+export function createRollbackRunner(
+  world: World,
+  options: { readonly worldJustValidated?: boolean } = {},
+): RollbackRunner {
   return {
     world,
-    checkpoint: cloneWorld(world),
+    checkpoint: cloneWorld(world, { validate: options.worldJustValidated !== true }),
     checkpointsTaken: 1,
     rollbacks: 0,
   };

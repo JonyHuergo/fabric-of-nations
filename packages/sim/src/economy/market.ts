@@ -264,6 +264,12 @@ export function buildMarketDayLookups(world: World, definitions: EconomyDefiniti
 export interface MarketDayOptions extends PhaseValidationOptions {
   /** Day-level lookups (D-137); built for this call when omitted. */
   readonly lookups?: MarketDayLookups;
+  /**
+   * `summary` (D-137, `TickContext.detail`) leaves the result lists in production
+   * order: no later computation depends on their order (settlement sorts its
+   * transactions by their full canonical key). Defaults to `full`.
+   */
+  readonly detail?: "full" | "summary";
 }
 
 function validateMarketDayInput(
@@ -909,6 +915,7 @@ export function runMarketDay(
       byGood.set(use.goodId, (byGood.get(use.goodId) ?? 0) + use.usedQuantity);
     }
 
+    const canonicalOrder = options.detail !== "summary";
     const householdDemandResults: HouseholdDemandResult[] = demands
       .filter((demand) => demand.kind === "household")
       .map((demand) => ({
@@ -922,14 +929,16 @@ export function runMarketDay(
         fulfilledQuantity: demand.fulfilled,
         unmetFunded: Math.max(0, demand.funded - demand.fulfilled),
         unmetDesired: Math.max(0, demand.desired - demand.fulfilled),
-      }))
-      .sort((left, right) =>
+      }));
+    if (canonicalOrder) {
+      householdDemandResults.sort((left, right) =>
         left.popBlockId !== right.popBlockId
           ? left.popBlockId - right.popBlockId
           : left.tier !== right.tier
             ? left.tier - right.tier
             : left.goodId - right.goodId,
       );
+    }
 
     const productionDemandResults: ProductionDemandResult[] = demands
       .filter((demand) => demand.kind === "building")
@@ -946,21 +955,22 @@ export function runMarketDay(
           usedQuantity: used,
           releasedQuantity: Math.max(0, reserved - used),
         };
-      })
-      .sort((left, right) =>
+      });
+    if (canonicalOrder) {
+      productionDemandResults.sort((left, right) =>
         left.buyerBuildingId !== right.buyerBuildingId
           ? left.buyerBuildingId - right.buyerBuildingId
           : left.goodId - right.goodId,
       );
-
-    reservations.sort((left, right) => {
-      if (left.phase !== right.phase) return left.phase < right.phase ? -1 : 1;
-      if (left.tier !== right.tier) return left.tier - right.tier;
-      if (left.buyerKind !== right.buyerKind) return left.buyerKind < right.buyerKind ? -1 : 1;
-      if (left.buyerId !== right.buyerId) return left.buyerId - right.buyerId;
-      if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-      return left.sellerBuildingId - right.sellerBuildingId;
-    });
+      reservations.sort((left, right) => {
+        if (left.phase !== right.phase) return left.phase < right.phase ? -1 : 1;
+        if (left.tier !== right.tier) return left.tier - right.tier;
+        if (left.buyerKind !== right.buyerKind) return left.buyerKind < right.buyerKind ? -1 : 1;
+        if (left.buyerId !== right.buyerId) return left.buyerId - right.buyerId;
+        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+        return left.sellerBuildingId - right.sellerBuildingId;
+      });
+    }
 
     const householdPurchases: HouseholdPurchase[] = householdReservations.map((reservation) => ({
       popBlockId: reservation.buyerId,
@@ -972,15 +982,18 @@ export function runMarketDay(
       totalRUSD: reservation.quantity * (openingPrices[reservation.goodId] ?? 0),
       phase: reservation.phase,
     }));
-    householdPurchases.sort((left, right) => {
-      if (left.popBlockId !== right.popBlockId) return left.popBlockId - right.popBlockId;
-      if (left.tier !== right.tier) return left.tier - right.tier;
-      if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-      return left.sellerBuildingId - right.sellerBuildingId;
-    });
+    if (canonicalOrder) {
+      householdPurchases.sort((left, right) => {
+        if (left.popBlockId !== right.popBlockId) return left.popBlockId - right.popBlockId;
+        if (left.tier !== right.tier) return left.tier - right.tier;
+        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+        return left.sellerBuildingId - right.sellerBuildingId;
+      });
+    }
 
-    // First phase-A building reservation per (buyer, good, seller) in sorted order,
-    // the one `reservations.find` returned for each input use.
+    // The phase-A building reservation of each (buyer, good, seller), the one
+    // `reservations.find` returned for each input use (production rejects a second
+    // reservation of the same buyer, good and seller, so it is unique).
     const inputReservationByKey = new Map<number, Map<number, Map<number, MarketReservation>>>();
     for (const reservation of reservations) {
       if (reservation.buyerKind !== "building" || reservation.phase !== "A") continue;
@@ -1034,14 +1047,16 @@ export function runMarketDay(
         phase: "A",
       });
     }
-    pendingTransactions.sort((left, right) => {
-      if (left.kind !== right.kind) return left.kind < right.kind ? -1 : 1;
-      if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-      const leftBuyer = left.buyerPopBlockId ?? left.buyerBuildingId ?? -1;
-      const rightBuyer = right.buyerPopBlockId ?? right.buyerBuildingId ?? -1;
-      if (leftBuyer !== rightBuyer) return leftBuyer - rightBuyer;
-      return left.sellerBuildingId - right.sellerBuildingId;
-    });
+    if (canonicalOrder) {
+      pendingTransactions.sort((left, right) => {
+        if (left.kind !== right.kind) return left.kind < right.kind ? -1 : 1;
+        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+        const leftBuyer = left.buyerPopBlockId ?? left.buyerBuildingId ?? -1;
+        const rightBuyer = right.buyerPopBlockId ?? right.buyerBuildingId ?? -1;
+        if (leftBuyer !== rightBuyer) return leftBuyer - rightBuyer;
+        return left.sellerBuildingId - right.sellerBuildingId;
+      });
+    }
 
     // D-136 (amends D-040): sellable supply is the opening stock plus same-day output,
     // less the funded input demand of producers. Households may buy the day's output

@@ -29,6 +29,8 @@ async function main(): Promise<void> {
   const context: TickContext = {
     population: { definitions: scenario.population.definitions },
     economy: { definitions: scenario.definitions },
+    // The worker host's result detail (D-137).
+    detail: "summary",
   };
   if (fromDay > 0) runTicksWithRollback(runner, fromDay, context);
   const session = new Session();
