@@ -1,0 +1,1365 @@
+{
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "win32 x64",
+    "cpu": "AMD Ryzen 5 2600 Six-Core Processor             (12 logical processors)",
+    "memoryGiB": 7.93,
+    "simVersion": "0.28.0",
+    "dataVersion": "m3-economy-v12"
+  },
+  "days": 92,
+  "scenarioLoadMs": 240.7977,
+  "newGame": {
+    "createWorldMs": 673.7435999999998,
+    "firstCheckpointMs": 345.90970000000016,
+    "createPlusCheckpointMs": 990.0742999999998,
+    "createGameCommandMs": 953.7786999999998
+  },
+  "host": {
+    "total": {
+      "count": 92,
+      "mean": 2355.926001086956,
+      "p50": 2189.7851000000082,
+      "p95": 3909.1217999999935,
+      "p99": 7252.854600000021,
+      "max": 7252.854600000021
+    },
+    "ordinary": {
+      "count": 85,
+      "mean": 2134.0325305882357,
+      "p50": 2162.363200000007,
+      "p95": 2433.3481999999785,
+      "p99": 2656.673600000009,
+      "max": 2656.673600000009
+    },
+    "tick": {
+      "count": 92,
+      "mean": 2192.6215369565207,
+      "p50": 2013.169499999989,
+      "p95": 3724.3405000000203,
+      "p99": 7074.405800000008,
+      "max": 7074.405800000008
+    },
+    "snapshot": {
+      "count": 92,
+      "mean": 156.49183043478268,
+      "p50": 155.20750000001863,
+      "p95": 203.49109999998473,
+      "p99": 254.9277000000002,
+      "max": 254.9277000000002
+    },
+    "encode": {
+      "count": 92,
+      "mean": 6.814515217391011,
+      "p50": 6.632300000012037,
+      "p95": 8.114600000000792,
+      "p99": 12.362200000003213,
+      "max": 12.362200000003213
+    },
+    "heap": {
+      "count": 92,
+      "mean": 515.0336454640264,
+      "p50": 526.2192001342773,
+      "p95": 811.2329788208008,
+      "p99": 864.6213531494141,
+      "max": 864.6213531494141
+    },
+    "snapshotChars": {
+      "count": 92,
+      "mean": 730066.4130434783,
+      "p50": 730314,
+      "p95": 731595,
+      "p99": 732730,
+      "max": 732730
+    },
+    "days": [
+      {
+        "dayIndex": 0,
+        "monthStart": true,
+        "monthEnd": false,
+        "totalMs": 2428.4933,
+        "tickMs": 2246.736500000001,
+        "snapshotMs": 174.77980000000025,
+        "encodeMs": 6.972700000002078,
+        "snapshotBytes": 728656,
+        "heapMiB": 547.1213302612305
+      },
+      {
+        "dayIndex": 1,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2256.1368,
+        "tickMs": 2080.4301000000014,
+        "snapshotMs": 167.8845999999976,
+        "encodeMs": 7.807699999997567,
+        "snapshotBytes": 728824,
+        "heapMiB": 593.6843795776367
+      },
+      {
+        "dayIndex": 2,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1928.4140999999981,
+        "tickMs": 1779.6540999999997,
+        "snapshotMs": 141.3195999999989,
+        "encodeMs": 7.429899999995541,
+        "snapshotBytes": 728985,
+        "heapMiB": 816.968864440918
+      },
+      {
+        "dayIndex": 3,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2399.168099999999,
+        "tickMs": 2247.3283999999985,
+        "snapshotMs": 144.7536,
+        "encodeMs": 7.079400000002352,
+        "snapshotBytes": 728916,
+        "heapMiB": 339.0166778564453
+      },
+      {
+        "dayIndex": 4,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2116.3473999999987,
+        "tickMs": 1944.8266000000003,
+        "snapshotMs": 163.20709999999963,
+        "encodeMs": 8.279200000000856,
+        "snapshotBytes": 728376,
+        "heapMiB": 594.3653259277344
+      },
+      {
+        "dayIndex": 5,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1880.4616999999998,
+        "tickMs": 1743.456299999998,
+        "snapshotMs": 130.9276000000027,
+        "encodeMs": 6.068999999995867,
+        "snapshotBytes": 728561,
+        "heapMiB": 775.4384994506836
+      },
+      {
+        "dayIndex": 6,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2052.606100000001,
+        "tickMs": 1899.9025000000001,
+        "snapshotMs": 146.57600000000093,
+        "encodeMs": 6.074800000002142,
+        "snapshotBytes": 728342,
+        "heapMiB": 391.5848159790039
+      },
+      {
+        "dayIndex": 7,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1838.314400000003,
+        "tickMs": 1698.2322000000022,
+        "snapshotMs": 133.39819999999963,
+        "encodeMs": 6.675900000002002,
+        "snapshotBytes": 728312,
+        "heapMiB": 571.9025650024414
+      },
+      {
+        "dayIndex": 8,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1772.0998999999974,
+        "tickMs": 1637.7996999999996,
+        "snapshotMs": 128.08020000000033,
+        "encodeMs": 6.220000000001164,
+        "snapshotBytes": 728277,
+        "heapMiB": 805.9564590454102
+      },
+      {
+        "dayIndex": 9,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2080.2003000000004,
+        "tickMs": 1925.9329000000034,
+        "snapshotMs": 147.7574999999997,
+        "encodeMs": 6.52270000000135,
+        "snapshotBytes": 728264,
+        "heapMiB": 392.4620361328125
+      },
+      {
+        "dayIndex": 10,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1864.9560999999958,
+        "tickMs": 1733.0031999999992,
+        "snapshotMs": 125.16909999999916,
+        "encodeMs": 6.783899999994901,
+        "snapshotBytes": 728110,
+        "heapMiB": 569.2408752441406
+      },
+      {
+        "dayIndex": 11,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1937.4387999999963,
+        "tickMs": 1807.2273999999961,
+        "snapshotMs": 124.03190000000177,
+        "encodeMs": 6.178200000002107,
+        "snapshotBytes": 728228,
+        "heapMiB": 329.960205078125
+      },
+      {
+        "dayIndex": 12,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1762.976300000002,
+        "tickMs": 1643.0250000000015,
+        "snapshotMs": 113.08529999999882,
+        "encodeMs": 6.861499999999069,
+        "snapshotBytes": 727965,
+        "heapMiB": 594.5697021484375
+      },
+      {
+        "dayIndex": 13,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1993.5976999999984,
+        "tickMs": 1857.4691999999995,
+        "snapshotMs": 129.75589999999647,
+        "encodeMs": 6.373599999998987,
+        "snapshotBytes": 727988,
+        "heapMiB": 345.8205795288086
+      },
+      {
+        "dayIndex": 14,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1862.6930999999968,
+        "tickMs": 1744.240700000002,
+        "snapshotMs": 112.3978999999963,
+        "encodeMs": 6.063900000008289,
+        "snapshotBytes": 727957,
+        "heapMiB": 541.8584747314453
+      },
+      {
+        "dayIndex": 15,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1754.8894,
+        "tickMs": 1635.4437999999936,
+        "snapshotMs": 112.82040000000416,
+        "encodeMs": 6.6357999999963795,
+        "snapshotBytes": 727998,
+        "heapMiB": 776.7280731201172
+      },
+      {
+        "dayIndex": 16,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2022.2344999999987,
+        "tickMs": 1892.3724999999977,
+        "snapshotMs": 123.16150000000198,
+        "encodeMs": 6.704499999992549,
+        "snapshotBytes": 727846,
+        "heapMiB": 320.4001007080078
+      },
+      {
+        "dayIndex": 17,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1814.3525999999983,
+        "tickMs": 1690.3456000000006,
+        "snapshotMs": 116.8955999999962,
+        "encodeMs": 7.105199999998149,
+        "snapshotBytes": 727997,
+        "heapMiB": 567.8273468017578
+      },
+      {
+        "dayIndex": 18,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1770.9240999999965,
+        "tickMs": 1653.6398999999947,
+        "snapshotMs": 110.78710000000137,
+        "encodeMs": 6.505700000001525,
+        "snapshotBytes": 727966,
+        "heapMiB": 748.2622299194336
+      },
+      {
+        "dayIndex": 19,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1988.2160000000003,
+        "tickMs": 1843.1163000000015,
+        "snapshotMs": 138.7445000000007,
+        "encodeMs": 6.359199999998964,
+        "snapshotBytes": 728057,
+        "heapMiB": 296.14942932128906
+      },
+      {
+        "dayIndex": 20,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1817.9519999999975,
+        "tickMs": 1698.3653999999951,
+        "snapshotMs": 113.60160000000178,
+        "encodeMs": 5.996299999998882,
+        "snapshotBytes": 728054,
+        "heapMiB": 505.8410873413086
+      },
+      {
+        "dayIndex": 21,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1727.4386000000013,
+        "tickMs": 1608.0944999999992,
+        "snapshotMs": 113.19249999999738,
+        "encodeMs": 6.160499999998137,
+        "snapshotBytes": 727998,
+        "heapMiB": 715.8641128540039
+      },
+      {
+        "dayIndex": 22,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1878.0803000000014,
+        "tickMs": 1735.454700000002,
+        "snapshotMs": 134.80690000000322,
+        "encodeMs": 7.811099999998987,
+        "snapshotBytes": 728028,
+        "heapMiB": 374.2866897583008
+      },
+      {
+        "dayIndex": 23,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1820.630299999997,
+        "tickMs": 1697.0056999999942,
+        "snapshotMs": 117.48540000000503,
+        "encodeMs": 6.142200000002049,
+        "snapshotBytes": 727944,
+        "heapMiB": 598.0844802856445
+      },
+      {
+        "dayIndex": 24,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1855.0080000000016,
+        "tickMs": 1726.6665999999968,
+        "snapshotMs": 122.19700000000012,
+        "encodeMs": 6.1458999999958905,
+        "snapshotBytes": 727854,
+        "heapMiB": 272.6197738647461
+      },
+      {
+        "dayIndex": 25,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1874.849199999997,
+        "tickMs": 1738.8133000000016,
+        "snapshotMs": 128.03229999999894,
+        "encodeMs": 7.9980000000068685,
+        "snapshotBytes": 727842,
+        "heapMiB": 464.2660598754883
+      },
+      {
+        "dayIndex": 26,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1848.4285000000018,
+        "tickMs": 1732.616900000001,
+        "snapshotMs": 108.96940000000177,
+        "encodeMs": 6.8303000000087195,
+        "snapshotBytes": 727875,
+        "heapMiB": 704.8114776611328
+      },
+      {
+        "dayIndex": 27,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1916.0708999999915,
+        "tickMs": 1758.8220999999903,
+        "snapshotMs": 149.08819999999832,
+        "encodeMs": 8.118199999982608,
+        "snapshotBytes": 727851,
+        "heapMiB": 343.4716567993164
+      },
+      {
+        "dayIndex": 28,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1886.8048000000126,
+        "tickMs": 1771.3296000000119,
+        "snapshotMs": 109.10119999999006,
+        "encodeMs": 6.383700000005774,
+        "snapshotBytes": 727923,
+        "heapMiB": 525.6234741210938
+      },
+      {
+        "dayIndex": 29,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 1796.0417000000016,
+        "tickMs": 1676.2654000000039,
+        "snapshotMs": 113.13809999999648,
+        "encodeMs": 6.63739999999234,
+        "snapshotBytes": 727786,
+        "heapMiB": 752.0363082885742
+      },
+      {
+        "dayIndex": 30,
+        "monthStart": false,
+        "monthEnd": true,
+        "totalMs": 3653.376799999998,
+        "tickMs": 3493.626999999993,
+        "snapshotMs": 152.56040000000212,
+        "encodeMs": 7.189100000003236,
+        "snapshotBytes": 730087,
+        "heapMiB": 472.3803405761719
+      },
+      {
+        "dayIndex": 31,
+        "monthStart": true,
+        "monthEnd": false,
+        "totalMs": 7176.7932,
+        "tickMs": 6968.585299999992,
+        "snapshotMs": 202.1322000000073,
+        "encodeMs": 6.089399999997113,
+        "snapshotBytes": 730289,
+        "heapMiB": 350.5141143798828
+      },
+      {
+        "dayIndex": 32,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2234.2045999999973,
+        "tickMs": 2082.57239999999,
+        "snapshotMs": 145.12450000000536,
+        "encodeMs": 6.51589999999851,
+        "snapshotBytes": 730480,
+        "heapMiB": 795.3273620605469
+      },
+      {
+        "dayIndex": 33,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2347.613499999992,
+        "tickMs": 2179.617400000003,
+        "snapshotMs": 162.011599999998,
+        "encodeMs": 5.988999999986845,
+        "snapshotBytes": 730544,
+        "heapMiB": 339.2344055175781
+      },
+      {
+        "dayIndex": 34,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2263.560999999987,
+        "tickMs": 2116.206999999995,
+        "snapshotMs": 140.96210000000428,
+        "encodeMs": 6.400200000003679,
+        "snapshotBytes": 730522,
+        "heapMiB": 597.9814834594727
+      },
+      {
+        "dayIndex": 35,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2208.487899999993,
+        "tickMs": 2039.743399999992,
+        "snapshotMs": 162.0280000000057,
+        "encodeMs": 6.717899999988731,
+        "snapshotBytes": 730456,
+        "heapMiB": 836.1396789550781
+      },
+      {
+        "dayIndex": 36,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2251.213300000003,
+        "tickMs": 2095.0752000000066,
+        "snapshotMs": 148.92389999999432,
+        "encodeMs": 7.163300000000163,
+        "snapshotBytes": 730417,
+        "heapMiB": 390.99808502197266
+      },
+      {
+        "dayIndex": 37,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2253.2127000000037,
+        "tickMs": 2108.302899999995,
+        "snapshotMs": 137.22900000000664,
+        "encodeMs": 7.691399999981513,
+        "snapshotBytes": 730441,
+        "heapMiB": 629.8257293701172
+      },
+      {
+        "dayIndex": 38,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2383.915599999993,
+        "tickMs": 2176.8689999999915,
+        "snapshotMs": 199.35400000000664,
+        "encodeMs": 7.713199999998324,
+        "snapshotBytes": 730376,
+        "heapMiB": 210.0184326171875
+      },
+      {
+        "dayIndex": 39,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2366.3461000000098,
+        "tickMs": 2215.290200000003,
+        "snapshotMs": 143.62630000000354,
+        "encodeMs": 7.433900000003632,
+        "snapshotBytes": 730288,
+        "heapMiB": 527.6806945800781
+      },
+      {
+        "dayIndex": 40,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2107.6731,
+        "tickMs": 1962.8332999999984,
+        "snapshotMs": 138.23010000000068,
+        "encodeMs": 6.632300000012037,
+        "snapshotBytes": 730413,
+        "heapMiB": 726.5756454467773
+      },
+      {
+        "dayIndex": 41,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2189.7851000000082,
+        "tickMs": 2034.0328000000009,
+        "snapshotMs": 149.01330000000598,
+        "encodeMs": 6.747600000016973,
+        "snapshotBytes": 730226,
+        "heapMiB": 297.2300338745117
+      },
+      {
+        "dayIndex": 42,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2656.673600000009,
+        "tickMs": 2504.2504000000044,
+        "snapshotMs": 145.2896000000037,
+        "encodeMs": 7.157200000001467,
+        "snapshotBytes": 730320,
+        "heapMiB": 565.7470321655273
+      },
+      {
+        "dayIndex": 43,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2636.6782999999996,
+        "tickMs": 2388.5736999999936,
+        "snapshotMs": 235.75139999999374,
+        "encodeMs": 12.362200000003213,
+        "snapshotBytes": 730429,
+        "heapMiB": 864.6213531494141
+      },
+      {
+        "dayIndex": 44,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2519.952900000004,
+        "tickMs": 2354.2788,
+        "snapshotMs": 159.45140000000538,
+        "encodeMs": 6.225500000015018,
+        "snapshotBytes": 730237,
+        "heapMiB": 377.52394104003906
+      },
+      {
+        "dayIndex": 45,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2162.363200000007,
+        "tickMs": 2016.934500000003,
+        "snapshotMs": 139.04869999999937,
+        "encodeMs": 6.390100000004168,
+        "snapshotBytes": 730314,
+        "heapMiB": 242.24585723876953
+      },
+      {
+        "dayIndex": 46,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2277.7763000000123,
+        "tickMs": 2135.5789000000077,
+        "snapshotMs": 135.77520000000368,
+        "encodeMs": 6.430399999997462,
+        "snapshotBytes": 730150,
+        "heapMiB": 466.3177947998047
+      },
+      {
+        "dayIndex": 47,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2127.3919999999925,
+        "tickMs": 1976.837599999999,
+        "snapshotMs": 143.79529999999795,
+        "encodeMs": 6.760399999999208,
+        "snapshotBytes": 730192,
+        "heapMiB": 788.7317352294922
+      },
+      {
+        "dayIndex": 48,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2408.3733000000066,
+        "tickMs": 2240.7948000000033,
+        "snapshotMs": 161.26750000000175,
+        "encodeMs": 6.3131999999895925,
+        "snapshotBytes": 730227,
+        "heapMiB": 331.0206985473633
+      },
+      {
+        "dayIndex": 49,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2207.5363999999972,
+        "tickMs": 2066.3840000000055,
+        "snapshotMs": 134.65639999999257,
+        "encodeMs": 6.507500000006985,
+        "snapshotBytes": 730314,
+        "heapMiB": 608.9341812133789
+      },
+      {
+        "dayIndex": 50,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2199.2852999999886,
+        "tickMs": 2056.141100000008,
+        "snapshotMs": 137.10469999999623,
+        "encodeMs": 6.053399999975227,
+        "snapshotBytes": 730298,
+        "heapMiB": 830.9509429931641
+      },
+      {
+        "dayIndex": 51,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2372.1137000000163,
+        "tickMs": 2216.8330000000133,
+        "snapshotMs": 148.88969999999972,
+        "encodeMs": 6.403300000005402,
+        "snapshotBytes": 730173,
+        "heapMiB": 389.1054992675781
+      },
+      {
+        "dayIndex": 52,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2199.4968000000226,
+        "tickMs": 2037.7163,
+        "snapshotMs": 155.20750000001863,
+        "encodeMs": 6.5737000000081025,
+        "snapshotBytes": 730300,
+        "heapMiB": 221.2252960205078
+      },
+      {
+        "dayIndex": 53,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2184.9983000000066,
+        "tickMs": 2033.1526000000013,
+        "snapshotMs": 145.45219999999972,
+        "encodeMs": 6.4042999999946915,
+        "snapshotBytes": 730247,
+        "heapMiB": 466.48693084716797
+      },
+      {
+        "dayIndex": 54,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2035.2361999999848,
+        "tickMs": 1881.391499999998,
+        "snapshotMs": 146.81649999998626,
+        "encodeMs": 7.037500000005821,
+        "snapshotBytes": 730384,
+        "heapMiB": 722.206916809082
+      },
+      {
+        "dayIndex": 55,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2312.752599999978,
+        "tickMs": 2153.060299999983,
+        "snapshotMs": 152.63229999999749,
+        "encodeMs": 7.053199999994831,
+        "snapshotBytes": 730247,
+        "heapMiB": 354.23889923095703
+      },
+      {
+        "dayIndex": 56,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2240.469300000026,
+        "tickMs": 2077.919099999999,
+        "snapshotMs": 155.6319000000076,
+        "encodeMs": 6.932199999981094,
+        "snapshotBytes": 730300,
+        "heapMiB": 638.0132064819336
+      },
+      {
+        "dayIndex": 57,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2379.573400000023,
+        "tickMs": 2212.2358999999997,
+        "snapshotMs": 160.87280000001192,
+        "encodeMs": 6.463600000017323,
+        "snapshotBytes": 730234,
+        "heapMiB": 217.87360382080078
+      },
+      {
+        "dayIndex": 58,
+        "monthStart": false,
+        "monthEnd": true,
+        "totalMs": 3909.1217999999935,
+        "tickMs": 3724.3405000000203,
+        "snapshotMs": 178.39649999997346,
+        "encodeMs": 6.383000000030734,
+        "snapshotBytes": 731392,
+        "heapMiB": 678.4098052978516
+      },
+      {
+        "dayIndex": 59,
+        "monthStart": true,
+        "monthEnd": false,
+        "totalMs": 7252.854600000021,
+        "tickMs": 7074.405800000008,
+        "snapshotMs": 171.28789999999572,
+        "encodeMs": 7.169599999993807,
+        "snapshotBytes": 731655,
+        "heapMiB": 357.9556427001953
+      },
+      {
+        "dayIndex": 60,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2108.951700000005,
+        "tickMs": 1936.0536999999895,
+        "snapshotMs": 166.75320000000647,
+        "encodeMs": 6.147099999972852,
+        "snapshotBytes": 731444,
+        "heapMiB": 576.7219467163086
+      },
+      {
+        "dayIndex": 61,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2161.68299999999,
+        "tickMs": 1901.560199999978,
+        "snapshotMs": 253.18950000000768,
+        "encodeMs": 6.934500000032131,
+        "snapshotBytes": 731418,
+        "heapMiB": 183.42739868164062
+      },
+      {
+        "dayIndex": 62,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2284.785499999998,
+        "tickMs": 2076.239100000006,
+        "snapshotMs": 202.4272999999812,
+        "encodeMs": 6.130000000004657,
+        "snapshotBytes": 731427,
+        "heapMiB": 451.1968231201172
+      },
+      {
+        "dayIndex": 63,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2267.0424000000057,
+        "tickMs": 2091.25410000002,
+        "snapshotMs": 169.4305999999924,
+        "encodeMs": 6.364999999990687,
+        "snapshotBytes": 731523,
+        "heapMiB": 258.1945343017578
+      },
+      {
+        "dayIndex": 64,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2198.636999999988,
+        "tickMs": 2017.6232000000018,
+        "snapshotMs": 173.2055999999866,
+        "encodeMs": 7.8166999999957625,
+        "snapshotBytes": 731448,
+        "heapMiB": 556.3503112792969
+      },
+      {
+        "dayIndex": 65,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2195.630600000004,
+        "tickMs": 1998.497800000012,
+        "snapshotMs": 189.4101999999839,
+        "encodeMs": 7.74220000000787,
+        "snapshotBytes": 731369,
+        "heapMiB": 807.0587387084961
+      },
+      {
+        "dayIndex": 66,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2622.4924000000174,
+        "tickMs": 2421.818200000009,
+        "snapshotMs": 194.12950000001,
+        "encodeMs": 6.551399999996647,
+        "snapshotBytes": 731336,
+        "heapMiB": 393.6611633300781
+      },
+      {
+        "dayIndex": 67,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2419.5580999999947,
+        "tickMs": 2186.204299999983,
+        "snapshotMs": 227.29260000001523,
+        "encodeMs": 6.065299999987474,
+        "snapshotBytes": 731223,
+        "heapMiB": 152.62714385986328
+      },
+      {
+        "dayIndex": 68,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2416.746699999989,
+        "tickMs": 2235.517499999987,
+        "snapshotMs": 174.81630000000587,
+        "encodeMs": 6.426000000035856,
+        "snapshotBytes": 731394,
+        "heapMiB": 427.86334228515625
+      },
+      {
+        "dayIndex": 69,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2145.0719999999856,
+        "tickMs": 1967.982399999979,
+        "snapshotMs": 170.75780000002123,
+        "encodeMs": 6.332900000008522,
+        "snapshotBytes": 731219,
+        "heapMiB": 258.0227813720703
+      },
+      {
+        "dayIndex": 70,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2098.59209999998,
+        "tickMs": 1935.661999999982,
+        "snapshotMs": 156.6751000000222,
+        "encodeMs": 6.265400000003865,
+        "snapshotBytes": 731382,
+        "heapMiB": 535.0240478515625
+      },
+      {
+        "dayIndex": 71,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2315.397399999987,
+        "tickMs": 2145.8603000000003,
+        "snapshotMs": 162.35039999999572,
+        "encodeMs": 7.205500000010943,
+        "snapshotBytes": 731379,
+        "heapMiB": 811.2329788208008
+      },
+      {
+        "dayIndex": 72,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2433.3481999999785,
+        "tickMs": 2248.2029999999795,
+        "snapshotMs": 178.4939000000013,
+        "encodeMs": 6.670200000022305,
+        "snapshotBytes": 731474,
+        "heapMiB": 391.9193344116211
+      },
+      {
+        "dayIndex": 73,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2220.834600000002,
+        "tickMs": 2033.4155000000028,
+        "snapshotMs": 180.99460000000545,
+        "encodeMs": 6.419899999978952,
+        "snapshotBytes": 731362,
+        "heapMiB": 645.9267883300781
+      },
+      {
+        "dayIndex": 74,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2262.7838000000047,
+        "tickMs": 2065.8883000000205,
+        "snapshotMs": 188.78649999998743,
+        "encodeMs": 8.114600000000792,
+        "snapshotBytes": 731341,
+        "heapMiB": 285.1221466064453
+      },
+      {
+        "dayIndex": 75,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2277.1731000000145,
+        "tickMs": 2105.183699999994,
+        "snapshotMs": 165.92829999999958,
+        "encodeMs": 6.071899999980815,
+        "snapshotBytes": 731405,
+        "heapMiB": 537.8456802368164
+      },
+      {
+        "dayIndex": 76,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2020.4682999999786,
+        "tickMs": 1855.473800000007,
+        "snapshotMs": 158.33269999999902,
+        "encodeMs": 6.671799999981886,
+        "snapshotBytes": 731428,
+        "heapMiB": 782.8564453125
+      },
+      {
+        "dayIndex": 77,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2179.0755000000063,
+        "tickMs": 2000.6075999999885,
+        "snapshotMs": 172.2679000000062,
+        "encodeMs": 6.201600000000326,
+        "snapshotBytes": 731297,
+        "heapMiB": 389.60418701171875
+      },
+      {
+        "dayIndex": 78,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2005.0427999999956,
+        "tickMs": 1844.9842000000062,
+        "snapshotMs": 153.41620000000694,
+        "encodeMs": 6.646999999997206,
+        "snapshotBytes": 731480,
+        "heapMiB": 644.9176406860352
+      },
+      {
+        "dayIndex": 79,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2298.3957000000228,
+        "tickMs": 2116.888500000001,
+        "snapshotMs": 174.89579999999842,
+        "encodeMs": 6.610400000005029,
+        "snapshotBytes": 731316,
+        "heapMiB": 226.23109436035156
+      },
+      {
+        "dayIndex": 80,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2101.898199999996,
+        "tickMs": 1929.0609000000113,
+        "snapshotMs": 166.2621999999974,
+        "encodeMs": 6.589299999963259,
+        "snapshotBytes": 731346,
+        "heapMiB": 526.2192001342773
+      },
+      {
+        "dayIndex": 81,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2060.0420999999915,
+        "tickMs": 1871.4062999999733,
+        "snapshotMs": 182.4086000000243,
+        "encodeMs": 6.2264999999897555,
+        "snapshotBytes": 731430,
+        "heapMiB": 732.7583084106445
+      },
+      {
+        "dayIndex": 82,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2144.2257999999856,
+        "tickMs": 1966.6774999999907,
+        "snapshotMs": 171.40649999998277,
+        "encodeMs": 6.150200000003679,
+        "snapshotBytes": 731575,
+        "heapMiB": 384.2643737792969
+      },
+      {
+        "dayIndex": 83,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2112.2932000000146,
+        "tickMs": 1948.4412000000011,
+        "snapshotMs": 156.7614000000176,
+        "encodeMs": 7.100000000034925,
+        "snapshotBytes": 731499,
+        "heapMiB": 706.1669006347656
+      },
+      {
+        "dayIndex": 84,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2298.632100000017,
+        "tickMs": 2103.4178000000247,
+        "snapshotMs": 187.19879999998375,
+        "encodeMs": 8.008800000010524,
+        "snapshotBytes": 731565,
+        "heapMiB": 225.42273712158203
+      },
+      {
+        "dayIndex": 85,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2191.830099999992,
+        "tickMs": 2013.169499999989,
+        "snapshotMs": 172.64509999999427,
+        "encodeMs": 6.017499999987194,
+        "snapshotBytes": 731501,
+        "heapMiB": 501.29114532470703
+      },
+      {
+        "dayIndex": 86,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2089.9717999999993,
+        "tickMs": 1900.3616000000038,
+        "snapshotMs": 182.25159999998868,
+        "encodeMs": 7.3122999999905005,
+        "snapshotBytes": 731552,
+        "heapMiB": 758.8951644897461
+      },
+      {
+        "dayIndex": 87,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2168.3502000000153,
+        "tickMs": 1988.5473000000056,
+        "snapshotMs": 172.64970000000903,
+        "encodeMs": 7.149399999965681,
+        "snapshotBytes": 731531,
+        "heapMiB": 377.8651123046875
+      },
+      {
+        "dayIndex": 88,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2034.959200000012,
+        "tickMs": 1872.014200000005,
+        "snapshotMs": 155.6640999999945,
+        "encodeMs": 7.289500000013504,
+        "snapshotBytes": 731595,
+        "heapMiB": 703.5729675292969
+      },
+      {
+        "dayIndex": 89,
+        "monthStart": false,
+        "monthEnd": true,
+        "totalMs": 4257.968399999983,
+        "tickMs": 4057.300900000002,
+        "snapshotMs": 194.3586999999825,
+        "encodeMs": 6.309899999992922,
+        "snapshotBytes": 732694,
+        "heapMiB": 495.40445709228516
+      },
+      {
+        "dayIndex": 90,
+        "monthStart": true,
+        "monthEnd": false,
+        "totalMs": 6673.818899999984,
+        "tickMs": 6410.622099999979,
+        "snapshotMs": 254.9277000000002,
+        "encodeMs": 8.268500000005588,
+        "snapshotBytes": 732730,
+        "heapMiB": 777.5928497314453
+      },
+      {
+        "dayIndex": 91,
+        "monthStart": false,
+        "monthEnd": false,
+        "totalMs": 2214.835300000006,
+        "tickMs": 2004.0429000000004,
+        "snapshotMs": 203.49109999998473,
+        "encodeMs": 7.2942000000039116,
+        "snapshotBytes": 732695,
+        "heapMiB": 406.09920501708984
+      }
+    ]
+  },
+  "phases": [
+    {
+      "phase": "market-clearing",
+      "meanMs": 491.6343423913062,
+      "p50Ms": 473.49680000002263,
+      "maxMs": 667.1353999999992,
+      "monthStartMeanMs": 475.51674999998795
+    },
+    {
+      "phase": "settlement",
+      "meanMs": 356.89195869564975,
+      "p50Ms": 340.72279999998864,
+      "maxMs": 578.07150000002,
+      "monthStartMeanMs": 340.2302000000054
+    },
+    {
+      "phase": "trade-dispatch",
+      "meanMs": 300.4000760869556,
+      "p50Ms": 297.5176999999676,
+      "maxMs": 421.1921999999904,
+      "monthStartMeanMs": 294.1976249999934
+    },
+    {
+      "phase": "migration",
+      "meanMs": 167.24653804347895,
+      "p50Ms": 11.697299999999814,
+      "maxMs": 5120.828900000022,
+      "monthStartMeanMs": 3576.9239500000112
+    },
+    {
+      "phase": "ai",
+      "meanMs": 136.08309782608367,
+      "p50Ms": 189.32069999998203,
+      "maxMs": 319.203600000008,
+      "monthStartMeanMs": 158.98749999998108
+    },
+    {
+      "phase": "education",
+      "meanMs": 113.71749130434435,
+      "p50Ms": 97.95050000003539,
+      "maxMs": 233.4953000000096,
+      "monthStartMeanMs": 117.81847500000731
+    },
+    {
+      "phase": "training",
+      "meanMs": 93.35931413043696,
+      "p50Ms": 76.2497999999905,
+      "maxMs": 232.26230000000214,
+      "monthStartMeanMs": 107.67342500000086
+    },
+    {
+      "phase": "fiscal",
+      "meanMs": 87.4844434782638,
+      "p50Ms": 73.61920000001555,
+      "maxMs": 242.84480000002077,
+      "monthStartMeanMs": 100.79407500000525
+    },
+    {
+      "phase": "debt",
+      "meanMs": 84.34562608695484,
+      "p50Ms": 72.73170000000391,
+      "maxMs": 164.3454999999958,
+      "monthStartMeanMs": 99.74057500000345
+    },
+    {
+      "phase": "needs",
+      "meanMs": 78.55722282608653,
+      "p50Ms": 72.5969000000041,
+      "maxMs": 248.16220000002068,
+      "monthStartMeanMs": 67.7587499999936
+    },
+    {
+      "phase": "trade-arrivals",
+      "meanMs": 65.26025434782407,
+      "p50Ms": 67.17749999999069,
+      "maxMs": 94.85540000000037,
+      "monthStartMeanMs": 61.11429999998654
+    },
+    {
+      "phase": "demography",
+      "meanMs": 63.0118347826131,
+      "p50Ms": 61.37900000001537,
+      "maxMs": 100.59210000000894,
+      "monthStartMeanMs": 66.52747500001715
+    },
+    {
+      "phase": "finance-close",
+      "meanMs": 35.103591304351816,
+      "p50Ms": 0.002299999992828816,
+      "maxMs": 1259.780000000028,
+      "monthStartMeanMs": 0.001849999993282836
+    },
+    {
+      "phase": "market-household-demand",
+      "meanMs": 34.69265869565551,
+      "p50Ms": 32.35719999999856,
+      "maxMs": 137.37940000003437,
+      "monthStartMeanMs": 31.40970000001107
+    },
+    {
+      "phase": "politics",
+      "meanMs": 31.852739130434994,
+      "p50Ms": 28.130200000014156,
+      "maxMs": 116.148600000015,
+      "monthStartMeanMs": 110.07244999998511
+    },
+    {
+      "phase": "unrest",
+      "meanMs": 26.51821413044008,
+      "p50Ms": 19.134399999980815,
+      "maxMs": 115.08770000003278,
+      "monthStartMeanMs": 20.725674999994226
+    },
+    {
+      "phase": "validate-month-end",
+      "meanMs": 25.820426086956537,
+      "p50Ms": 0,
+      "maxMs": 878.4475000000093,
+      "monthStartMeanMs": 0
+    },
+    {
+      "phase": "employment",
+      "meanMs": 17.03524130434443,
+      "p50Ms": 11.486499999999069,
+      "maxMs": 142.3289999999688,
+      "monthStartMeanMs": 128.49887499999022
+    },
+    {
+      "phase": "monetary",
+      "meanMs": 9.247963043478313,
+      "p50Ms": 9.142400000011548,
+      "maxMs": 11.434499999973923,
+      "monthStartMeanMs": 9.38897500000894
+    },
+    {
+      "phase": "fingerprint",
+      "meanMs": 7.454243478261481,
+      "p50Ms": 5.801800000015646,
+      "maxMs": 29.821500000020023,
+      "monthStartMeanMs": 6.330174999995506
+    },
+    {
+      "phase": "invariants-start",
+      "meanMs": 6.567154347826347,
+      "p50Ms": 4.919300000008661,
+      "maxMs": 16.393900000024587,
+      "monthStartMeanMs": 6.702525000007881
+    },
+    {
+      "phase": "market-production-demand",
+      "meanMs": 5.732790217389107,
+      "p50Ms": 5.519800000009127,
+      "maxMs": 10.180200000002515,
+      "monthStartMeanMs": 5.776275000003807
+    },
+    {
+      "phase": "invariants-end",
+      "meanMs": 5.392055434782536,
+      "p50Ms": 4.805599999963306,
+      "maxMs": 16.085399999981746,
+      "monthStartMeanMs": 7.90159999999014
+    },
+    {
+      "phase": "checkpoint",
+      "meanMs": 3.052522826087585,
+      "p50Ms": 0,
+      "maxMs": 109.75580000004265,
+      "monthStartMeanMs": 70.20802500001446
+    },
+    {
+      "phase": "day-result",
+      "meanMs": 2.1175608695617565,
+      "p50Ms": 1.9671000000089407,
+      "maxMs": 3.4067999999970198,
+      "monthStartMeanMs": 1.9123000000035972
+    },
+    {
+      "phase": "labor-month-start",
+      "meanMs": 1.4909902173910623,
+      "p50Ms": 0.011100000003352761,
+      "maxMs": 39.147700000030454,
+      "monthStartMeanMs": 33.990050000007614
+    },
+    {
+      "phase": "wealth",
+      "meanMs": 1.0656804347783453,
+      "p50Ms": 0.007199999992735684,
+      "maxMs": 33.86229999997886,
+      "monthStartMeanMs": 0.02380000000994187
+    },
+    {
+      "phase": "military",
+      "meanMs": 0.5937956521735507,
+      "p50Ms": 0.5581999999703839,
+      "maxMs": 1.4345999999786727,
+      "monthStartMeanMs": 0.8107249999957276
+    },
+    {
+      "phase": "day-preconditions",
+      "meanMs": 0.5659749999996047,
+      "p50Ms": 0.4604999999864958,
+      "maxMs": 8.164700000023004,
+      "monthStartMeanMs": 0.4569999999948777
+    },
+    {
+      "phase": "industrial-subsidy",
+      "meanMs": 0.3583423913084477,
+      "p50Ms": 0.335300000035204,
+      "maxMs": 0.8831000000354834,
+      "monthStartMeanMs": 0.34357500000623986
+    },
+    {
+      "phase": "construction",
+      "meanMs": 0.2256597826072602,
+      "p50Ms": 0.2143999999971129,
+      "maxMs": 0.47470000002067536,
+      "monthStartMeanMs": 0.21892500000831205
+    },
+    {
+      "phase": "business-tax",
+      "meanMs": 0.015154347825243705,
+      "p50Ms": 0.012500000011641532,
+      "maxMs": 0.09159999998519197,
+      "monthStartMeanMs": 0.009724999981699511
+    },
+    {
+      "phase": "result",
+      "meanMs": 0.014744565217963258,
+      "p50Ms": 0.012800000025890768,
+      "maxMs": 0.07229999999981374,
+      "monthStartMeanMs": 0.018600000024889596
+    },
+    {
+      "phase": "runner",
+      "meanMs": 0.00834891304491422,
+      "p50Ms": 0.006999999983236194,
+      "maxMs": 0.060800000006565824,
+      "monthStartMeanMs": 0.023350000010395888
+    }
+  ],
+  "staged": {
+    "count": 92,
+    "mean": 3210.9826847826057,
+    "p50": 2968.2883999999613,
+    "p95": 4427.948600000003,
+    "p99": 8342.713099999935,
+    "max": 8342.713099999935
+  },
+  "hashes": {
+    "1": "2a5ceab2d6064474",
+    "31": "8aa08777376187bd",
+    "32": "d2cc7abe667c2d68",
+    "92": "c66f5627a8f799a5"
+  },
+  "deterministic": true,
+  "stagedEqual": true,
+  "saveLoad": {
+    "saveCommandMs": 2860.0568000000203,
+    "libraryCreateMs": 2035.6220000000903,
+    "libraryReplaceMs": 2504.004900000058,
+    "saveTotalMs": 5364.061700000078,
+    "libraryLoadMs": 560.4058999998961,
+    "loadCommandMs": 4546.752599999891,
+    "loadTotalMs": 5107.158499999787,
+    "previewMs": 3811.814599999925,
+    "saveChars": 30128654,
+    "storedChars": 6203747,
+    "roundTripHashEqual": true
+  },
+  "throughput": {
+    "days": 32,
+    "wallMs": 80557.73809999996,
+    "daysPerSecond": 0.3972306168809874,
+    "snapshots": 8
+  }
+}

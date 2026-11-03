@@ -224,6 +224,8 @@ function isEconomicWorld(world: World): boolean {
  * `runTicksWithRollback` must use the default staged mode.
  */
 export function tickPhaseMode(world: World, context: TickContext): TickResult {
+  const observe = context.phaseObserver;
+  observe?.("invariants-start");
   assertDailyWorldInvariants(world);
   if (world.dayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX) {
     return {
@@ -247,14 +249,21 @@ export function tickPhaseMode(world: World, context: TickContext): TickResult {
     population.definitions,
     economy.definitions,
     processedDay,
-    { validateWorld: false, integrity: "phase" },
+    {
+      validateWorld: false,
+      integrity: "phase",
+      ...(observe === undefined ? {} : { phaseObserver: observe }),
+    },
   );
   world.dayIndex = processedDay + 1;
   if (lastDayOfMonth(processedDay) || isTerminalDayIndex(world.dayIndex)) {
+    observe?.("validate-month-end");
     assertValidWorldForTick(world);
   } else {
+    observe?.("invariants-end");
     assertDailyWorldInvariants(world);
   }
+  observe?.("result");
   return {
     advanced: true,
     dayProcessed: processedDay,

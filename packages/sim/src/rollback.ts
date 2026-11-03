@@ -135,10 +135,12 @@ function runOneDay(runner: RollbackRunner, context: TickContext): TickResult {
   const world = runner.world;
   const dayIndex = world.dayIndex;
   if (isFirstDayOfMonth(dayIndex) && runner.checkpoint.dayIndex !== dayIndex) {
+    context.phaseObserver?.("checkpoint");
     // The previous day ended a civil month, so the whole world was validated then.
     runner.checkpoint = cloneWorld(world, { validate: false });
     runner.checkpointsTaken += 1;
   }
+  context.phaseObserver?.("fingerprint");
   const fingerprint = worldDayFingerprint(world);
   try {
     return tickPhaseMode(world, context);

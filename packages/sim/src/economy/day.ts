@@ -33,6 +33,7 @@ import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
+import type { DayPhaseObserver } from "../population/types.js";
 import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
@@ -855,7 +856,9 @@ function runMarketAttempt(
   dayIndex: DayIndex,
   index: FinanceIndex,
   mode: "full" | "cash",
+  observe?: DayPhaseObserver,
 ): MarketAttempt {
+  observe?.("market-household-demand");
   const household = buildHouseholdDemand(
     world,
     definitions,
@@ -863,6 +866,7 @@ function runMarketAttempt(
     index,
   );
   const cap = { cappedBuildings: 0 };
+  observe?.("market-production-demand");
   const production = buildProductionDemands(
     world,
     definitions,
@@ -871,6 +875,7 @@ function runMarketAttempt(
     index,
     cap,
   );
+  observe?.("market-clearing");
   const buildingProvince = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
   const results: MarketDayResult[] = [];
   for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
@@ -897,6 +902,7 @@ function runMarketAttempt(
       ),
     );
   }
+  observe?.("settlement");
   const settlement = settleMarketDays(world, definitions, results, { validateWorld: false });
   return {
     household,
@@ -931,8 +937,12 @@ export function runEconomicDay(
     readonly validateWorld?: boolean;
     /** D-116 mode of the calling tick; `phase` skips per-AI-action world validation. */
     readonly integrity?: "staged" | "phase";
+    /** Benchmark hook (D-137); never read back. */
+    readonly phaseObserver?: DayPhaseObserver;
   } = {},
 ): EconomyDayResult {
+  const observe = options.phaseObserver;
+  observe?.("day-preconditions");
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidPopulationDefinitions(populationDefinitions);
   assertValidEconomyDefinitions(economyDefinitions);
@@ -963,22 +973,26 @@ export function runEconomicDay(
   // M8 pipeline step 2: due scripted events and effective law transitions, plus
   // the monthly institution/interest-group/election/crisis refresh. The phase
   // applies effects forward only; it never rewrites a closed period.
+  observe?.("politics");
   runPoliticsDayStart(world, economyDefinitions, dayIndex);
 
   // E5 pipeline step 2a: monthly training participation from real instructors,
   // funding, and eligible working-age people. Part-time training does not invalidate
   // employment assignments; its time cost is read in production.
+  observe?.("labor-month-start");
   runLaborMonthStart(world, economyDefinitions, dayIndex);
 
   // M6 pipeline step 2: apply effective policy changes. Country AI evaluates on
   // its staggered day and applies only validated fiscal-policy actions. The
   // staged day is already validated above, so the phase skips a duplicate full
   // validation; every applied action still validates its candidate world.
+  observe?.("ai");
   const ai = runCountryAIPhase(world, dayIndex, {
     validateWorld: false,
     validateActionWorlds: options.integrity !== "phase",
   });
 
+  observe?.("demography");
   const populationStart = world.popBlocks.reduce(
     (total, block) => total + populationTotal(block),
     0,
@@ -1025,6 +1039,7 @@ export function runEconomicDay(
   // Population decline can invalidate assignments before the next monthly
   // refresh. D-126: trim the over-assigned blocks first; only a state that the
   // trim cannot make valid falls back to the dirty full refresh.
+  observe?.("employment");
   try {
     assertValidEmploymentState(world, economyDefinitions);
   } catch {
@@ -1036,6 +1051,7 @@ export function runEconomicDay(
   // M5 migration: monthly, after the initial labor allocation and before the
   // day's market phase. The migration phase owns the post-flow employment repair
   // when it moves people, so the integrated day does not repeat it.
+  observe?.("migration");
   const migration = runMigrationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
@@ -1047,6 +1063,7 @@ export function runEconomicDay(
   // E6a pipeline step 2b: consignments whose transit time has elapsed are delivered
   // into their destination markets before that market clears. Delivery is exact-once
   // and the goods are not part of any market's stock while in transit.
+  observe?.("trade-arrivals");
   const tradeArrivals = runTradeArrivals(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
@@ -1062,6 +1079,7 @@ export function runEconomicDay(
     dayIndex,
     buildFinanceIndex(world.finance),
     "cash",
+    observe,
   );
   const fallbackUsed = attempt.cappedBuildings > 0;
   const household = attempt.household;
@@ -1072,6 +1090,7 @@ export function runEconomicDay(
   // M4c fiscal phase (GDD §4.2 step 12, fiscal part): after market/wage/upkeep
   // settlement and before needs/militancy and wealth. It uses the same day's
   // settlement result and never estimates wages from account balances.
+  observe?.("fiscal");
   const fiscal = runFiscalPhase(world, settlement, dayIndex, {
     validateWorld: false,
     economyDefinitions,
@@ -1082,6 +1101,7 @@ export function runEconomicDay(
   // surplus and shipper cash is known, so the day's consignments can be dispatched with
   // their freight and import-duty postings. They are still in the open period and before
   // the month-end close.
+  observe?.("trade-dispatch");
   const trade = runTradeDispatchPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
@@ -1090,6 +1110,7 @@ export function runEconomicDay(
   // realized-import capture and the bounded price-index observation run at a civil
   // month-end. It follows dispatch so realized trade is known and precedes the close so
   // no closed period is rewritten.
+  observe?.("monetary");
   const monetary = runMonetaryPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
@@ -1097,17 +1118,20 @@ export function runEconomicDay(
   // M10 military phase: movement arrivals, battles, occupation/liberation, garrison and
   // upkeep payments, wounded recovery, and the bounded AI peace rule. It follows fiscal
   // so pay uses post-tax treasury cash and precedes the close so outlays are in-period.
+  observe?.("military");
   const military = runMilitaryPhase(world, dayIndex, { validateWorld: false });
 
   // E5 training: treasury-limited provider payroll and trainee stipend, then
   // qualification gains for participating blocks. It runs after fiscal (so it sees
   // the same post-fiscal treasury cash as the other service payrolls) and before the
   // education phase.
+  observe?.("training");
   const training = runTrainingPhase(world, economyDefinitions, dayIndex);
 
   // M9 education and research: the payroll is paid from actual post-fiscal treasury
   // cash, age-specific literacy rises for the school-age cohort, and the active
   // project advances. A technology completed today applies from the next day.
+  observe?.("education");
   const education = runEducationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
   });
@@ -1115,6 +1139,7 @@ export function runEconomicDay(
   // E4 sectoral production subsidy: verified physical output is valued at the
   // post-clearing market price and paid from actual treasury cash. It runs before
   // business tax so the recognized subsidy revenue is part of the month-end base.
+  observe?.("industrial-subsidy");
   const industrialSubsidy = runIndustrialSubsidyPhase(
     world,
     economyDefinitions,
@@ -1127,11 +1152,13 @@ export function runEconomicDay(
   // recognized building results. It runs before the debt phase so collected
   // revenue reduces that month's financing requirement, and before the close so
   // the tax expense/revenue belong to the period that generated the profit.
+  observe?.("business-tax");
   const businessTax = runBusinessTaxPhase(world, dayIndex, { validateWorld: false });
 
   // E3 construction: hire idle labor, pay and capitalize construction wages, and
   // complete projects. It runs before the debt phase so month-end financing sees
   // the resulting treasury cash, and before the close so outlays are in-period.
+  observe?.("construction");
   const construction = runConstructionPhase(
     world,
     economyDefinitions,
@@ -1142,8 +1169,10 @@ export function runEconomicDay(
 
   // M5b debt phase: accrue daily interest, service coupons/maturities, and on a
   // month-end finance the accrued fiscal deficit before the M4b close.
+  observe?.("debt");
   const debt = runDebtPhase(world, dayIndex, { validateWorld: false });
 
+  observe?.("needs");
   const needs = buildNeedsResult(
     world,
     economyDefinitions,
@@ -1155,7 +1184,9 @@ export function runEconomicDay(
   updateDailyMilitancy(world, needs);
   // M8: provincial unrest is updated after the day's needs/militancy and before
   // the close. Its tax/construction effects are read on the next civil day.
+  observe?.("unrest");
   runUnrestPhase(world, economyDefinitions, dayIndex);
+  observe?.("wealth");
   const wealthUpdates = updateEconomicWealth(
     world,
     economyDefinitions,
@@ -1166,12 +1197,14 @@ export function runEconomicDay(
     needs,
     populationDefinitions,
   );
+  observe?.("finance-close");
   const financeClose = closeMonthEndIfDue(world, dayIndex);
   const profitDistribution =
     financeClose === null
       ? null
       : runProfitDistributionPhase(world, dayIndex, financeClose);
 
+  observe?.("day-result");
   let workingAge = 0;
   for (const block of world.popBlocks) workingAge += workingAgePopulation(block);
   const population: PopulationTickResult = {

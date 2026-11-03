@@ -10,6 +10,7 @@
     "start": "node ./dist/bench.js",
     "campaign": "node ./dist/m6Campaign.js",
     "world": "node ./dist/p1WorldBench.js",
+    "perf": "node --max-old-space-size=4096 ./dist/perfBench.js",
     "typecheck": "tsc -p tsconfig.typecheck.json"
   },
   "dependencies": {

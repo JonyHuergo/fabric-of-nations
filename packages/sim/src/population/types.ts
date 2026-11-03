@@ -248,7 +248,16 @@ export interface TickContext {
   economy?: EconomyTickContext;
   /** Economic-world integrity mode; defaults to `staged`. */
   integrity?: TickIntegrityMode;
+  /**
+   * Benchmark hook (D-137): called with a phase name when a phase-mode day enters
+   * that phase. The simulation never reads a clock and never reads anything back
+   * from the observer, so outcomes cannot depend on it. Omitted in the app.
+   */
+  phaseObserver?: DayPhaseObserver;
 }
+
+/** See `TickContext.phaseObserver`. */
+export type DayPhaseObserver = (phase: string) => void;
 
 export interface NeedGoodResult {
   goodKey: string;
